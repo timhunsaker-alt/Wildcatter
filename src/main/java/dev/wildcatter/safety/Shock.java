@@ -41,12 +41,22 @@ public final class Shock {
 		};
 	}
 
-	/** Shocks {@code victim}: damage (doubled when wet), a crack of sparks and a sting of sound. Creative players are skipped. */
+	/** Shocks with whatever fraction of the full voltage is actually present. */
+	public static void zap(ServerLevel level, LivingEntity victim, Voltage voltage, BlockPos source, double volts) {
+		zapScaled(level, victim, voltage, source, (float) Math.min(1.0, Math.abs(volts) / voltage.nominal()));
+	}
+
+	/** Shocks {@code victim} at full strength. */
 	public static void zap(ServerLevel level, LivingEntity victim, Voltage voltage, BlockPos source) {
+		zapScaled(level, victim, voltage, source, 1.0F);
+	}
+
+	/** Shocks {@code victim}: damage (doubled when wet), a crack of sparks and a sting of sound. Creative players are skipped. */
+	private static void zapScaled(ServerLevel level, LivingEntity victim, Voltage voltage, BlockPos source, float fraction) {
 		if (victim instanceof Player player && (player.isCreative() || player.isSpectator())) {
 			return;
 		}
-		float amount = damage(voltage) * (victim.isInWaterOrRain() ? Tuning.WET_SHOCK_MULTIPLIER : 1.0F);
+		float amount = damage(voltage) * fraction * (victim.isInWaterOrRain() ? Tuning.WET_SHOCK_MULTIPLIER : 1.0F);
 		victim.hurtServer(level, level.damageSources().lightningBolt(), amount);
 		Vec3 at = Vec3.atCenterOf(source);
 		level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 12, 0.3, 0.3, 0.3, 0.2);

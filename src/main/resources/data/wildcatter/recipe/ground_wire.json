@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "redstone",
   "ingredients": [
-    "wildcatter:copper_cable",
+    "wildcatter:wire_neutral",
     "minecraft:green_dye"
   ],
   "result": {

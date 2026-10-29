@@ -1,0 +1,416 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "wear": "0"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_0_core"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "wear": "0"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_0_arm"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "wear": "0"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_0_arm",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "wear": "0"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_0_arm",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "wear": "0"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_0_arm",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "wear": "0"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_0_arm",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "wear": "0"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_0_arm",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "wear": "1"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_1_core"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "wear": "1"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_1_arm"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "wear": "1"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_1_arm",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "wear": "1"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_1_arm",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "wear": "1"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_1_arm",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "wear": "1"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_1_arm",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "wear": "1"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_1_arm",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "wear": "2"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_2_core"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "wear": "2"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_2_arm"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "wear": "2"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_2_arm",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "wear": "2"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_2_arm",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "wear": "2"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_2_arm",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "wear": "2"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_2_arm",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "wear": "2"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_2_arm",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "wear": "3"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_3_core"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "wear": "3"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_3_arm"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "wear": "3"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_3_arm",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "wear": "3"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_3_arm",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "wear": "3"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_3_arm",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "wear": "3"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_3_arm",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "wear": "3"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_neutral_3_arm",
+        "x": 90
+      }
+    }
+  ]
+}

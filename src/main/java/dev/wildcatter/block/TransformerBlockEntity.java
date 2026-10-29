@@ -2,9 +2,9 @@ package dev.wildcatter.block;
 
 import dev.wildcatter.Tuning;
 import dev.wildcatter.WildcatterBlocks;
-import dev.wildcatter.energy.EnergyBuffer;
-import dev.wildcatter.energy.EnergyNet;
-import dev.wildcatter.energy.EnergyNode;
+import dev.wildcatter.circuit.Circuit;
+import dev.wildcatter.circuit.CircuitPart;
+import dev.wildcatter.circuit.Role;
 import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.energy.Voltage;
 import dev.wildcatter.safety.Bondable;
@@ -12,17 +12,27 @@ import dev.wildcatter.safety.Grounding;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 
-/** Two buffers, one per voltage. Each tick it moves energy from the fuller side to the emptier one, losing a few percent. */
-public class TransformerBlockEntity extends BlockEntity implements EnergyNode, Inspectable, Bondable {
-	private final EnergyBuffer lowSide = new EnergyBuffer(Tuning.TRANSFORMER_BUFFER, Tuning.TRANSFORMER_THROUGHPUT, Tuning.TRANSFORMER_THROUGHPUT);
-	private final EnergyBuffer highSide = new EnergyBuffer(Tuning.TRANSFORMER_BUFFER, Tuning.TRANSFORMER_THROUGHPUT, Tuning.TRANSFORMER_THROUGHPUT);
-	private int lost;
+/**
+ * Two circuits at different voltages, joined only by magnetism: the power that goes in one side comes out the other,
+ * with the volts and amps traded against each other (a 4.16 kV side carries 1/38th of the current of the 110 V side).
+ * The windings have a little resistance, which is where the heat and the few percent of loss come from.
+ * The neutral on each side is tied to ground, as it is at a real service entrance.
+ */
+public class TransformerBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable {
+	private int lowHotPort;
+	private int highHotPort;
+	private int lowNeutral;
+	private int highNeutral;
+	private int lowWinding = -1;
+	private int highWinding = -1;
+	private double lowVolts;
+	private double highVolts;
+	private double lowAmps;
+	private double highAmps;
+	private double lossWatts;
 
 	public TransformerBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.TRANSFORMER_ENTITY, pos, state);
@@ -32,73 +42,82 @@ public class TransformerBlockEntity extends BlockEntity implements EnergyNode, I
 		return (TransformerBlock) getBlockState().getBlock();
 	}
 
-	private Direction highDirection() {
+	private Direction highFace() {
 		return getBlockState().getValue(TransformerBlock.FACING);
 	}
 
-	@Override
-	public EnergyBuffer energy() {
-		return lowSide;
-	}
-
-	@Override
-	public EnergyBuffer energyAt(Direction side) {
-		return side == highDirection() ? highSide : lowSide;
-	}
-
-	@Override
-	public Voltage voltageAt(Direction side) {
-		if (side == highDirection()) {
-			return block().high();
-		}
-		return side == highDirection().getOpposite() ? block().low() : null;
-	}
-
-	public static void tick(Level level, BlockPos pos, BlockState state, TransformerBlockEntity t) {
-		// Move energy across toward the emptier side.
-		EnergyBuffer from = t.lowSide.fraction() > t.highSide.fraction() ? t.lowSide : t.highSide;
-		EnergyBuffer to = from == t.lowSide ? t.highSide : t.lowSide;
-		int taken = from.extract(Math.min(from.available(), (int) (to.room() / Tuning.TRANSFORMER_EFFICIENCY)));
-		int delivered = to.insert((int) (taken * Tuning.TRANSFORMER_EFFICIENCY));
-		t.lost = taken - delivered;
-
-		Direction high = t.highDirection();
-		EnergyNet.push(level, pos, t.highSide, t.block().high(), high);
-		EnergyNet.push(level, pos, t.lowSide, t.block().low(), high.getOpposite());
-		if (taken > 0) {
-			t.setChanged();
-		}
-	}
-
-	/** True if there is power in it to bite with. */
 	public boolean isLive() {
-		return lowSide.stored() > 0 || highSide.stored() > 0;
+		return Math.max(Math.abs(lowVolts), Math.abs(highVolts)) > Tuning.SHOCK_MIN_VOLTS;
 	}
 
-	/** The highest voltage in here: that is the one that decides how bad a shock is. */
 	public Voltage topVoltage() {
 		return block().high();
 	}
 
+	/** The high-voltage terminals are on the front and the top (where real bushings are); the low side is the back and the bottom. */
+	private boolean isHighFace(Direction face) {
+		return face == highFace() || face == Direction.UP;
+	}
+
+	private boolean isLowFace(Direction face) {
+		return face == highFace().getOpposite() || face == Direction.DOWN;
+	}
+
+	@Override
+	public boolean hasPort(Direction face, Role role, Voltage voltage) {
+		if (isHighFace(face)) {
+			return voltage == block().high();
+		}
+		return isLowFace(face) && voltage == block().low();
+	}
+
+	@Override
+	public void build(Circuit circuit) {
+		TransformerBlock block = block();
+		double ratio = block.high().nominal() / block.low().nominal();
+
+		lowHotPort = circuit.node();
+		highHotPort = circuit.node();
+		lowNeutral = circuit.node();
+		highNeutral = circuit.node();
+		int lowCoil = circuit.node();
+		int highCoil = circuit.node();
+
+		double lowOhms = Tuning.TRANSFORMER_LOW_WINDING_OHMS;
+		lowWinding = circuit.resistor(lowHotPort, lowCoil, lowOhms);
+		highWinding = circuit.resistor(highHotPort, highCoil, lowOhms * ratio * ratio);
+		circuit.transformer(highCoil, highNeutral, lowCoil, lowNeutral, ratio);
+		circuit.ground(lowNeutral);
+		circuit.ground(highNeutral);
+
+		// Both conductors can attach to either face of a side, so a hot wire and a neutral wire each get a face of their own.
+		for (Direction face : Direction.values()) {
+			for (Role role : Role.values()) {
+				boolean hot = role == Role.HOT;
+				if (isHighFace(face)) {
+					circuit.port(worldPosition, face, role, block.high(), hot ? highHotPort : highNeutral, Tuning.CONTACT_OHMS / 2, false);
+				} else if (isLowFace(face)) {
+					circuit.port(worldPosition, face, role, block.low(), hot ? lowHotPort : lowNeutral, Tuning.CONTACT_OHMS / 2, false);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void apply(Circuit circuit, int ticks) {
+		lowVolts = circuit.across(lowHotPort, lowNeutral);
+		highVolts = circuit.across(highHotPort, highNeutral);
+		lowAmps = circuit.current(lowWinding);
+		highAmps = circuit.current(highWinding);
+		double ratio = block().high().nominal() / block().low().nominal();
+		lossWatts = lowAmps * lowAmps * Tuning.TRANSFORMER_LOW_WINDING_OHMS + highAmps * highAmps * Tuning.TRANSFORMER_LOW_WINDING_OHMS * ratio * ratio;
+	}
+
 	@Override
 	public Component inspect() {
-		return Component.literal("Transformer " + block().low().label() + " / " + block().high().label()
-				+ ": " + lowSide.stored() + " RF on the " + block().low().label() + " side, "
-				+ highSide.stored() + " RF on the " + block().high().label() + " side, losing " + lost + " RF/t as heat; "
+		return Component.literal("Transformer " + block().low().label() + " / " + block().high().label() + ": "
+				+ String.format("%.0f V %.1f A on the %s side, %.0f V %.2f A on the %s side, losing %.0f W as heat; ",
+						lowVolts, Math.abs(lowAmps), block().low().label(), highVolts, Math.abs(highAmps), block().high().label(), lossWatts)
 				+ (level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you"));
-	}
-
-	@Override
-	protected void saveAdditional(ValueOutput output) {
-		super.saveAdditional(output);
-		output.putInt("low", lowSide.stored());
-		output.putInt("high", highSide.stored());
-	}
-
-	@Override
-	protected void loadAdditional(ValueInput input) {
-		super.loadAdditional(input);
-		lowSide.set(input.getIntOr("low", 0));
-		highSide.set(input.getIntOr("high", 0));
 	}
 }

@@ -4,6 +4,9 @@ import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.energy.Voltage;
 import dev.wildcatter.safety.Shock;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.InteractionHand;
+import dev.wildcatter.item.PowerMeterItem;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -39,6 +42,13 @@ public class SteamTurbineBlock extends BaseEntityBlock {
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
 		return level.isClientSide() ? null : createTickerHelper(type, WildcatterBlocks.STEAM_TURBINE_ENTITY, SteamTurbineBlockEntity::tick);
+	}
+
+	@Override
+	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+			InteractionHand hand, BlockHitResult hit) {
+		InteractionResult read = PowerMeterItem.readIfMeter(stack, level, pos, player);
+		return read != null ? read : InteractionResult.TRY_WITH_EMPTY_HAND;
 	}
 
 	@Override

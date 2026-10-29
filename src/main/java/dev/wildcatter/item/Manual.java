@@ -1,6 +1,7 @@
 package dev.wildcatter.item;
 
 import dev.wildcatter.Tuning;
+import dev.wildcatter.energy.Voltage;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.network.chat.Component;
@@ -24,45 +25,57 @@ public final class Manual {
 	}
 
 	private static List<String> pages() {
+		double volts = Voltage.LOW.nominal();
 		return List.of(
-				"WILDCATTER\nField Manual\n\nPower from steam, gas and oil, built the way the real grid is.\n\nRead the safety pages before you touch anything.",
+				"WILDCATTER\nField Manual\n\nPower from steam, gas and oil, built the way the real grid is: volts, amps, breakers and all.\n\nRead the safety pages before you touch anything.",
 
 				"1. STEAM\n\nPut a Boiler on a lit campfire. Fill it with water buckets (" + Tuning.WATER_PER_BUCKET + " each). "
-						+ "Put a Steam Turbine touching it.\n\nOne campfire makes " + (Tuning.BOILER_STEAM_PER_TICK * Tuning.TURBINE_RF_PER_STEAM)
-						+ " RF a tick. Four buckets last about "
-						+ (Tuning.BOILER_WATER_CAPACITY * Tuning.STEAM_PER_WATER / Tuning.BOILER_STEAM_PER_TICK / 20 / 60) + " minutes.",
+						+ "Put a Steam Turbine touching it.\n\nOne campfire makes " + Math.round(Tuning.BOILER_STEAM_PER_TICK * 20 * Tuning.JOULES_PER_STEAM / 1000)
+						+ " kW. Four buckets last about "
+						+ (Tuning.BOILER_WATER_CAPACITY * Tuning.STEAM_PER_WATER / Tuning.BOILER_STEAM_PER_TICK / 20 / 60) + " minutes.\n\nThe turbine only burns steam for the power you actually use.",
 
-				"2. VOLTAGE\n\n110 V: lamps and small machines.\n4.16 kV: bigger generators and local lines.\n138 kV: long hauls.\n\n"
-						+ "Things only connect at the same voltage. A wire at one level will not join a wire at another: "
-						+ "it draws no arm toward it.",
+				"2. THE LOOP\n\nElectricity needs a loop. Power leaves on a HOT wire (red) and comes back on a NEUTRAL wire (black). "
+						+ "Every machine has to be joined to both.\n\nOne wire is a dead end: nothing flows and the lamp stays dark.",
 
-				"3. TRANSFORMERS\n\nA transformer joins two levels. The side it faces is the HIGH side. Power flows either way.\n\n"
-						+ "Transformer: 110 V / 4.16 kV.\nSubstation: 4.16 kV / 138 kV.\n\nAbout "
-						+ Math.round((1 - Tuning.TRANSFORMER_EFFICIENCY) * 100) + "% is lost as heat in each one.",
+				"3. OHM'S LAW\n\nVolts = Amps x Ohms\nWatts = Volts x Amps\n\nA " + Math.round(Tuning.LAMP_WATTS) + " W lamp on " + Math.round(volts)
+						+ " V draws " + String.format("%.2f", Tuning.LAMP_WATTS / volts) + " A. A " + Math.round(Tuning.HEATER_WATTS) + " W heater draws "
+						+ String.format("%.1f", Tuning.HEATER_WATTS / volts) + " A.\n\nRight-click anything with the Power Meter to see its real volts and amps.",
 
-				"4. BARE vs INSULATED\n\nBare wire is cheap. While it carries power it SHOCKS anything that comes near it.\n\n"
-						+ "Insulated cable is safe to touch. It costs slime (our rubber), and more of it the higher the voltage.",
+				"4. ADDING LOADS\n\nMachines wired across the same two wires are in parallel. Their amps ADD UP.\n\nTwo heaters: "
+						+ String.format("%.1f", 2 * Tuning.HEATER_WATTS / volts) + " A. Add enough machines and the current passes what the wire "
+						+ "and the breaker can take.",
 
-				"5. REACH\n\nA bare wire reaches further the higher its voltage:\n\n110 V: you must touch it\n4.16 kV: " + (int) Tuning.BARE_REACH_MEDIUM
-						+ " blocks\n138 kV: " + (int) Tuning.BARE_REACH_HIGH
-						+ " blocks\n\nKeep bare lines up on tall poles, out of reach. Jumping adds more than a block.",
+				"5. BREAKERS\n\nPut a Breaker in the HOT wire: wire in at the back, out at the front. It opens the circuit when the current is too high.\n\n"
+						+ "Overload: a little over its rating heats it until it trips; the further over, the faster.\nShort: " + (int) Tuning.BREAKER_MAGNETIC_MULTIPLE
+						+ "x its rating trips it at once.\n\nRight-click: off/on, and reset. Sneak and right-click: change its rating.\n\nA breaker only guards what comes AFTER it. Put it first, right at the generator.",
 
-				"6. SHOCKS\n\n110 V: " + hearts(Tuning.SHOCK_DAMAGE_LOW) + " heart\n4.16 kV: " + hearts(Tuning.SHOCK_DAMAGE_MEDIUM)
-						+ " hearts\n138 kV: " + hearts(Tuning.SHOCK_DAMAGE_HIGH)
-						+ " hearts, which is all of them.\n\nDouble if you are wet. Water and rain are the worst place to be near a live wire.",
+				"6. WIRE RATINGS\n\nEvery wire has a maximum current: " + (int) Tuning.WIRE_AMPS_LOW + " A at 110 V. Past it the wire heats up. At twice the rating it burns out in about "
+						+ (int) Tuning.WIRE_BURN_SECONDS_AT_2X + " seconds.\n\nA breaker protects the WIRE. Never fit a breaker rated higher than the wire it guards.\n\n"
+						+ "Wire also has resistance: on a long run the voltage drops.",
 
-				"7. TWO CABLES\n\nA device needs at least " + Tuning.DEVICE_MIN_CABLES + " cables joined to it: one to bring the power and "
-						+ "one to take it back. A lamp on a single wire is a dead end and stays dark.",
+				"7. SHORT CIRCUITS\n\nIf the hot and neutral touch with no load between them, the current is limited only by the wire: hundreds of amps. "
+						+ "That is a short circuit.\n\nBare wires of opposite colour touching each other make one. A breaker trips at once. Without one, the wire burns out.",
 
-				"8. GROUNDING\n\nPut a Ground Rod in the earth against a machine, or run Ground Wire from the machine to a rod. "
-						+ "A grounded machine is safe to touch.\n\nAn ungrounded machine with power in it may bite when you touch it: "
-						+ Math.round(Tuning.TOUCH_SHOCK_CHANCE_LOW * 100) + "% at 110 V, " + Math.round(Tuning.TOUCH_SHOCK_CHANCE_MEDIUM * 100)
-						+ "% at 4.16 kV, always at 138 kV.",
+				"8. WOOL INSULATION\n\nWool-wrapped wire is safe to touch and cannot short to a neighbour. But the wool wears: about "
+						+ (int) (Tuning.WOOL_LIFE_TICKS / 24000) + " days of use, faster under heavy current, and " + (int) Tuning.WOOL_WET_WEAR
+						+ "x faster in rain or water.\n\nWhen it is worn out it is bare wire again: it shocks and it can short. Check it. Replace it.\n\nBetter insulation needs plastic.",
 
-				"9. POWER METER\n\nRight-click any machine or cable to read what it holds and how much it is passing on. "
-						+ "It also tells you whether a machine is grounded.\n\nThe meter is insulated. It is safe to use on live equipment.",
+				"9. VOLTAGE LEVELS\n\n110 V: lamps and small machines.\n4.16 kV: bigger generators and local lines.\n138 kV: long hauls.\n\n"
+						+ "Wires only join at the same voltage. A TRANSFORMER joins two levels: high-voltage wires go on its front and top, low-voltage wires on its back and bottom (one hot, one neutral on each side). Higher voltage means fewer amps for the same power, which is why long lines use it. "
+						+ "Windings lose a little to heat.",
 
-				"COMING\n\nGas and diesel turbines.\nDrilling rigs and wells.\nRefining.\nBreakers and fuses.\n\nThis book will grow as they do."
+				"10. SHOCKS\n\nBare live wire shocks anything near it. 110 V: you must touch it. 4.16 kV: " + (int) Tuning.BARE_REACH_MEDIUM + " blocks. 138 kV: "
+						+ (int) Tuning.BARE_REACH_HIGH + " blocks, so keep bare lines up on tall poles.\n\n110 V: " + hearts(Tuning.SHOCK_DAMAGE_LOW) + " heart. 4.16 kV: "
+						+ hearts(Tuning.SHOCK_DAMAGE_MEDIUM) + " hearts. 138 kV: " + hearts(Tuning.SHOCK_DAMAGE_HIGH) + ".\nDouble if you are wet.",
+
+				"11. GROUNDING\n\nPut a Ground Rod in the earth against a machine, or run Ground Wire from the machine to a rod. A grounded machine is safe to touch.\n\n"
+						+ "An ungrounded machine with power in it may bite when you touch it: " + Math.round(Tuning.TOUCH_SHOCK_CHANCE_LOW * 100) + "% at 110 V, "
+						+ Math.round(Tuning.TOUCH_SHOCK_CHANCE_MEDIUM * 100) + "% at 4.16 kV, always at 138 kV.",
+
+				"12. POWER METER\n\nRight-click a wire, machine or breaker to read its volts, amps and watts, how worn the wool is, and whether a machine is grounded. "
+						+ "It also says why a machine has no power.\n\nThe meter is insulated: safe on live equipment.",
+
+				"COMING\n\nPlastic insulation.\nGas and diesel turbines.\nDrilling rigs and wells.\nRefining.\nFuses, switches and panels.\n\nThis book will grow as they do."
 		);
 	}
 

@@ -5,13 +5,17 @@
     "wildcatter:transformer",
     "wildcatter:substation_transformer",
     "wildcatter:electric_lamp",
+    "wildcatter:electric_heater",
+    "wildcatter:breaker",
     "wildcatter:ground_rod",
-    "wildcatter:copper_cable",
-    "wildcatter:insulated_cable",
-    "wildcatter:medium_line",
-    "wildcatter:insulated_medium_cable",
-    "wildcatter:high_line",
-    "wildcatter:insulated_high_cable",
-    "wildcatter:ground_wire"
+    "wildcatter:wire_hot",
+    "wildcatter:wire_neutral",
+    "wildcatter:mv_wire_hot",
+    "wildcatter:mv_wire_neutral",
+    "wildcatter:hv_wire_hot",
+    "wildcatter:hv_wire_neutral",
+    "wildcatter:ground_wire",
+    "wildcatter:wool_wire_hot",
+    "wildcatter:wool_wire_neutral"
   ]
 }

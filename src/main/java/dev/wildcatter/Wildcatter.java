@@ -1,6 +1,9 @@
 package dev.wildcatter;
 
+import dev.wildcatter.circuit.CircuitManager;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -26,21 +29,22 @@ public class Wildcatter implements ModInitializer {
 		WildcatterItems.register();
 
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(entries -> {
-			entries.accept(WildcatterBlocks.BOILER);
-			entries.accept(WildcatterBlocks.STEAM_TURBINE);
-			entries.accept(WildcatterBlocks.COPPER_CABLE);
-			entries.accept(WildcatterBlocks.INSULATED_CABLE);
-			entries.accept(WildcatterBlocks.MEDIUM_LINE);
-			entries.accept(WildcatterBlocks.INSULATED_MEDIUM_CABLE);
-			entries.accept(WildcatterBlocks.HIGH_LINE);
-			entries.accept(WildcatterBlocks.INSULATED_HIGH_CABLE);
-			entries.accept(WildcatterBlocks.GROUND_ROD);
-			entries.accept(WildcatterBlocks.GROUND_WIRE);
-			entries.accept(WildcatterBlocks.TRANSFORMER);
-			entries.accept(WildcatterBlocks.SUBSTATION_TRANSFORMER);
-			entries.accept(WildcatterBlocks.ELECTRIC_LAMP);
+			for (var block : new net.minecraft.world.level.block.Block[] {
+					WildcatterBlocks.BOILER, WildcatterBlocks.STEAM_TURBINE,
+					WildcatterBlocks.WIRE_HOT, WildcatterBlocks.WIRE_NEUTRAL, WildcatterBlocks.WOOL_WIRE_HOT, WildcatterBlocks.WOOL_WIRE_NEUTRAL,
+					WildcatterBlocks.MV_WIRE_HOT, WildcatterBlocks.MV_WIRE_NEUTRAL, WildcatterBlocks.HV_WIRE_HOT, WildcatterBlocks.HV_WIRE_NEUTRAL,
+					WildcatterBlocks.GROUND_ROD, WildcatterBlocks.GROUND_WIRE, WildcatterBlocks.BREAKER,
+					WildcatterBlocks.TRANSFORMER, WildcatterBlocks.SUBSTATION_TRANSFORMER,
+					WildcatterBlocks.ELECTRIC_LAMP, WildcatterBlocks.ELECTRIC_HEATER}) {
+				entries.accept(block);
+			}
 			entries.accept(WildcatterItems.POWER_METER);
 			entries.accept(WildcatterItems.FIELD_MANUAL);
 		});
+
+		// Keep track of every circuit part and solve each connected group of them.
+		ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register(CircuitManager::register);
+		ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register(CircuitManager::unregister);
+		ServerTickEvents.END_LEVEL_TICK.register(CircuitManager::tick);
 	}
 }

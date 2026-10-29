@@ -1,10 +1,13 @@
 package dev.wildcatter.block;
 
 import dev.wildcatter.WildcatterBlocks;
-import dev.wildcatter.energy.EnergyNode;
+import dev.wildcatter.circuit.CircuitManager;
+import dev.wildcatter.circuit.CircuitPart;
+import dev.wildcatter.circuit.Role;
 import dev.wildcatter.energy.Voltage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -15,62 +18,66 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
 /**
- * A thin wire. Grows an arm toward every neighbour that is part of the grid at its voltage.
- * A bare wire shocks anything that comes near it while it is live; an insulated one is safe to touch.
+ * A thin wire. Red wires are the hot conductor and black wires are the neutral; a circuit needs both, running out
+ * to the load and back. Grows an arm toward every neighbour with a terminal of its own role and voltage.
+ *
+ * Bare wire is cheap and live to the touch. Wool-wrapped wire is safe until the wool wears through (WEAR 3),
+ * and then it is bare wire again.
  */
 public class CableBlock extends BaseEntityBlock {
-	private final Voltage voltage;
-	private final boolean insulated;
+	/** 0 fresh, up to 3 worn out. Only wool-insulated wire ever leaves 0. */
+	public static final IntegerProperty WEAR = IntegerProperty.create("wear", 0, 3);
 
-	public CableBlock(Properties properties, Voltage voltage, boolean insulated) {
+	private final Voltage voltage;
+	private final Role role;
+	private final boolean wool;
+
+	public CableBlock(Properties properties, Voltage voltage, Role role, boolean wool) {
 		super(properties);
 		this.voltage = voltage;
-		this.insulated = insulated;
-		registerDefaultState(WireShape.noArms(stateDefinition.any()));
-	}
-
-	/** How many cables of this voltage touch {@code pos}. Devices need two: one to feed them and one to return. */
-	public static int cablesAround(BlockGetter level, BlockPos pos, Voltage voltage) {
-		int count = 0;
-		for (Direction side : Direction.values()) {
-			if (level.getBlockState(pos.relative(side)).getBlock() instanceof CableBlock cable && cable.voltage == voltage) {
-				count++;
-			}
-		}
-		return count;
+		this.role = role;
+		this.wool = wool;
+		registerDefaultState(WireShape.noArms(stateDefinition.any()).setValue(WEAR, 0));
 	}
 
 	public Voltage voltage() {
 		return voltage;
 	}
 
-	public boolean insulated() {
-		return insulated;
+	public Role role() {
+		return role;
+	}
+
+	public boolean wool() {
+		return wool;
 	}
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		WireShape.ARMS.values().forEach(builder::add);
+		builder.add(WEAR);
 	}
 
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
-		return withArms(defaultBlockState(), context.getLevel(), context.getClickedPos(), voltage);
+		return withArms(defaultBlockState(), context.getLevel(), context.getClickedPos());
 	}
 
 	@Override
 	protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock,
 			@Nullable Orientation orientation, boolean movedByPiston) {
-		BlockState updated = withArms(state, level, pos, voltage);
+		BlockState updated = withArms(state, level, pos);
 		if (updated != state) {
 			level.setBlock(pos, updated, 2);
 		}
+		CircuitManager.markDirty(level);
 	}
 
 	@Override
@@ -78,9 +85,10 @@ public class CableBlock extends BaseEntityBlock {
 		neighborChanged(state, level, pos, this, null, movedByPiston);
 	}
 
-	private static BlockState withArms(BlockState state, BlockGetter level, BlockPos pos, Voltage voltage) {
+	private BlockState withArms(BlockState state, BlockGetter level, BlockPos pos) {
 		for (Direction side : Direction.values()) {
-			boolean joins = level.getBlockEntity(pos.relative(side)) instanceof EnergyNode node && node.connectsTo(side.getOpposite(), voltage);
+			boolean joins = level.getBlockEntity(pos.relative(side)) instanceof CircuitPart part
+					&& part.hasPort(side.getOpposite(), role, voltage);
 			state = state.setValue(WireShape.ARMS.get(side), joins);
 		}
 		return state;
@@ -93,11 +101,11 @@ public class CableBlock extends BaseEntityBlock {
 
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new CableBlockEntity(pos, state);
+		return new WireBlockEntity(pos, state);
 	}
 
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-		return level.isClientSide() ? null : createTickerHelper(type, WildcatterBlocks.CABLE_ENTITY, CableBlockEntity::tick);
+		return level.isClientSide() ? null : createTickerHelper(type, WildcatterBlocks.WIRE_ENTITY, WireBlockEntity::tick);
 	}
 }

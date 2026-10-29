@@ -2,12 +2,16 @@ package dev.wildcatter;
 
 import dev.wildcatter.block.BoilerBlock;
 import dev.wildcatter.block.BoilerBlockEntity;
+import dev.wildcatter.block.BreakerBlock;
+import dev.wildcatter.block.BreakerBlockEntity;
 import dev.wildcatter.block.CableBlock;
-import dev.wildcatter.block.CableBlockEntity;
+import dev.wildcatter.block.LoadBlock;
+import dev.wildcatter.block.LoadBlockEntity;
+import dev.wildcatter.block.WireBlockEntity;
+import dev.wildcatter.circuit.Role;
+import net.minecraft.world.level.material.MapColor;
 import dev.wildcatter.block.GroundRodBlock;
 import dev.wildcatter.block.GroundWireBlock;
-import dev.wildcatter.block.LampBlock;
-import dev.wildcatter.block.LampBlockEntity;
 import dev.wildcatter.block.SteamTurbineBlock;
 import dev.wildcatter.block.TransformerBlock;
 import dev.wildcatter.block.TransformerBlockEntity;
@@ -28,46 +32,57 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 
 /** Every block, its item, and its block entity. */
 public final class WildcatterBlocks {
-	public static final Block BOILER = block("boiler", props -> new BoilerBlock(props.mapColor(net.minecraft.world.level.material.MapColor.METAL)
+	public static final Block BOILER = block("boiler", props -> new BoilerBlock(props.mapColor(MapColor.METAL)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
-	public static final Block STEAM_TURBINE = block("steam_turbine", props -> new SteamTurbineBlock(props.mapColor(net.minecraft.world.level.material.MapColor.METAL)
+	public static final Block STEAM_TURBINE = block("steam_turbine", props -> new SteamTurbineBlock(props.mapColor(MapColor.METAL)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
-	// Cables come bare (cheap, shock you when live) or insulated (safe to touch). Higher voltage reaches further, so
-	// bare lines at 4.16 kV and 138 kV have to be up on tall poles.
-	public static final Block COPPER_CABLE = cable("copper_cable", Voltage.LOW, false);
-	public static final Block INSULATED_CABLE = cable("insulated_cable", Voltage.LOW, true);
-	public static final Block MEDIUM_LINE = cable("medium_line", Voltage.MEDIUM, false);
-	public static final Block INSULATED_MEDIUM_CABLE = cable("insulated_medium_cable", Voltage.MEDIUM, true);
-	public static final Block HIGH_LINE = cable("high_line", Voltage.HIGH, false);
-	public static final Block INSULATED_HIGH_CABLE = cable("insulated_high_cable", Voltage.HIGH, true);
+
+	// Wire. Every circuit needs two: a hot (red) one out to the load and a neutral (black) one back.
+	// Bare wire shocks you while it is live; wool-wrapped wire is safe until the wool wears out.
+	// Higher voltages are only bare for now: they get proper insulation once there is plastic.
+	public static final Block WIRE_HOT = cable("wire_hot", Voltage.LOW, Role.HOT, false);
+	public static final Block WIRE_NEUTRAL = cable("wire_neutral", Voltage.LOW, Role.NEUTRAL, false);
+	public static final Block WOOL_WIRE_HOT = cable("wool_wire_hot", Voltage.LOW, Role.HOT, true);
+	public static final Block WOOL_WIRE_NEUTRAL = cable("wool_wire_neutral", Voltage.LOW, Role.NEUTRAL, true);
+	public static final Block MV_WIRE_HOT = cable("mv_wire_hot", Voltage.MEDIUM, Role.HOT, false);
+	public static final Block MV_WIRE_NEUTRAL = cable("mv_wire_neutral", Voltage.MEDIUM, Role.NEUTRAL, false);
+	public static final Block HV_WIRE_HOT = cable("hv_wire_hot", Voltage.HIGH, Role.HOT, false);
+	public static final Block HV_WIRE_NEUTRAL = cable("hv_wire_neutral", Voltage.HIGH, Role.NEUTRAL, false);
 
 	/** A copper rod in the earth, for grounding machines. */
-	public static final Block GROUND_ROD = block("ground_rod", props -> new GroundRodBlock(props.mapColor(net.minecraft.world.level.material.MapColor.COLOR_ORANGE)
+	public static final Block GROUND_ROD = block("ground_rod", props -> new GroundRodBlock(props.mapColor(MapColor.COLOR_ORANGE)
 			.strength(1.0F).sound(SoundType.COPPER).noOcclusion()));
-	public static final Block GROUND_WIRE = block("ground_wire", props -> new GroundWireBlock(props.mapColor(net.minecraft.world.level.material.MapColor.COLOR_GREEN)
+	public static final Block GROUND_WIRE = block("ground_wire", props -> new GroundWireBlock(props.mapColor(MapColor.COLOR_GREEN)
 			.strength(0.3F).sound(SoundType.COPPER).noOcclusion()));
 
+	public static final Block BREAKER = block("breaker", props -> new BreakerBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(1.5F).sound(SoundType.METAL)));
+	public static final Block ELECTRIC_LAMP = block("electric_lamp", props -> new LoadBlock(props.mapColor(MapColor.COLOR_YELLOW)
+			.strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> state.getValue(LoadBlock.LIT) ? 15 : 0), Tuning.LAMP_WATTS));
+	public static final Block ELECTRIC_HEATER = block("electric_heater", props -> new LoadBlock(props.mapColor(MapColor.COLOR_RED)
+			.strength(1.0F).sound(SoundType.METAL).lightLevel(state -> state.getValue(LoadBlock.LIT) ? 7 : 0), Tuning.HEATER_WATTS));
+
 	/** Steps 110 V up to 4.16 kV and back. */
-	public static final Block TRANSFORMER = block("transformer", props -> new TransformerBlock(props.mapColor(net.minecraft.world.level.material.MapColor.COLOR_GRAY)
+	public static final Block TRANSFORMER = block("transformer", props -> new TransformerBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.LOW, Voltage.MEDIUM));
 	/** Steps 4.16 kV up to 138 kV and back. */
-	public static final Block SUBSTATION_TRANSFORMER = block("substation_transformer", props -> new TransformerBlock(props.mapColor(net.minecraft.world.level.material.MapColor.COLOR_BLUE)
+	public static final Block SUBSTATION_TRANSFORMER = block("substation_transformer", props -> new TransformerBlock(props.mapColor(MapColor.COLOR_BLUE)
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.MEDIUM, Voltage.HIGH));
-	public static final Block ELECTRIC_LAMP = block("electric_lamp", props -> new LampBlock(props.mapColor(net.minecraft.world.level.material.MapColor.COLOR_YELLOW)
-			.strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> state.getValue(LampBlock.LIT) ? 15 : 0)));
 
 	public static final BlockEntityType<BoilerBlockEntity> BOILER_ENTITY = entity(BoilerBlockEntity::new, BOILER);
 	public static final BlockEntityType<SteamTurbineBlockEntity> STEAM_TURBINE_ENTITY = entity(SteamTurbineBlockEntity::new, STEAM_TURBINE);
-	public static final BlockEntityType<CableBlockEntity> CABLE_ENTITY = entity(CableBlockEntity::new, COPPER_CABLE, INSULATED_CABLE, MEDIUM_LINE, INSULATED_MEDIUM_CABLE, HIGH_LINE, INSULATED_HIGH_CABLE);
+	public static final BlockEntityType<WireBlockEntity> WIRE_ENTITY = entity(WireBlockEntity::new, WIRE_HOT, WIRE_NEUTRAL, WOOL_WIRE_HOT,
+			WOOL_WIRE_NEUTRAL, MV_WIRE_HOT, MV_WIRE_NEUTRAL, HV_WIRE_HOT, HV_WIRE_NEUTRAL);
+	public static final BlockEntityType<LoadBlockEntity> LOAD_ENTITY = entity(LoadBlockEntity::new, ELECTRIC_LAMP, ELECTRIC_HEATER);
+	public static final BlockEntityType<BreakerBlockEntity> BREAKER_ENTITY = entity(BreakerBlockEntity::new, BREAKER);
 	public static final BlockEntityType<TransformerBlockEntity> TRANSFORMER_ENTITY = entity(TransformerBlockEntity::new, TRANSFORMER, SUBSTATION_TRANSFORMER);
-	public static final BlockEntityType<LampBlockEntity> LAMP_ENTITY = entity(LampBlockEntity::new, ELECTRIC_LAMP);
 
 	private WildcatterBlocks() {
 	}
 
-	private static Block cable(String name, Voltage voltage, boolean insulated) {
-		return block(name, props -> new CableBlock(props.mapColor(net.minecraft.world.level.material.MapColor.COLOR_ORANGE)
-				.strength(0.5F).sound(SoundType.COPPER).noOcclusion(), voltage, insulated));
+	private static Block cable(String name, Voltage voltage, Role role, boolean wool) {
+		return block(name, props -> new CableBlock(props.mapColor(role == Role.HOT ? MapColor.COLOR_RED : MapColor.COLOR_BLACK)
+				.strength(0.5F).sound(wool ? SoundType.WOOL : SoundType.COPPER).noOcclusion(), voltage, role, wool));
 	}
 
 	private static Block block(String name, Function<BlockBehaviour.Properties, Block> factory) {
@@ -83,22 +98,27 @@ public final class WildcatterBlocks {
 	public static void register() {
 		add("boiler", BOILER);
 		add("steam_turbine", STEAM_TURBINE);
-		add("copper_cable", COPPER_CABLE);
-		add("insulated_cable", INSULATED_CABLE);
-		add("medium_line", MEDIUM_LINE);
-		add("insulated_medium_cable", INSULATED_MEDIUM_CABLE);
-		add("high_line", HIGH_LINE);
-		add("insulated_high_cable", INSULATED_HIGH_CABLE);
+		add("wire_hot", WIRE_HOT);
+		add("wire_neutral", WIRE_NEUTRAL);
+		add("wool_wire_hot", WOOL_WIRE_HOT);
+		add("wool_wire_neutral", WOOL_WIRE_NEUTRAL);
+		add("mv_wire_hot", MV_WIRE_HOT);
+		add("mv_wire_neutral", MV_WIRE_NEUTRAL);
+		add("hv_wire_hot", HV_WIRE_HOT);
+		add("hv_wire_neutral", HV_WIRE_NEUTRAL);
 		add("ground_rod", GROUND_ROD);
 		add("ground_wire", GROUND_WIRE);
+		add("breaker", BREAKER);
 		add("transformer", TRANSFORMER);
 		add("substation_transformer", SUBSTATION_TRANSFORMER);
 		add("electric_lamp", ELECTRIC_LAMP);
+		add("electric_heater", ELECTRIC_HEATER);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("boiler"), BOILER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("steam_turbine"), STEAM_TURBINE_ENTITY);
-		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("copper_cable"), CABLE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("wire"), WIRE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("load"), LOAD_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("breaker"), BREAKER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("transformer"), TRANSFORMER_ENTITY);
-		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("electric_lamp"), LAMP_ENTITY);
 	}
 
 	/** Registers the block and its item. */

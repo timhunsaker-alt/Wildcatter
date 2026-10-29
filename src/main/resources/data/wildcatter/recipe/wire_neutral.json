@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:black_dye"
+  ],
+  "result": {
+    "id": "wildcatter:wire_neutral",
+    "count": 6
+  }
+}
