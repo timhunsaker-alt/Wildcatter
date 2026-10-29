@@ -1,0 +1,10 @@
+{
+  "block.wildcatter.boiler": "Boiler",
+  "block.wildcatter.steam_turbine": "Steam Turbine",
+  "block.wildcatter.copper_cable": "Copper Cable",
+  "block.wildcatter.electric_lamp": "Electric Lamp",
+  "block.wildcatter.medium_cable": "Medium-Voltage Line",
+  "block.wildcatter.transformer": "Transformer (110 V / 4.16 kV)",
+  "block.wildcatter.substation_transformer": "Substation Transformer (4.16 kV / 138 kV)",
+  "item.wildcatter.power_meter": "Power Meter"
+}

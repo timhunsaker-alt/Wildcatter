@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "III",
+    "IWI",
+    "III"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "W": "minecraft:water_bucket"
+  },
+  "result": {
+    "id": "wildcatter:boiler",
+    "count": 1
+  }
+}

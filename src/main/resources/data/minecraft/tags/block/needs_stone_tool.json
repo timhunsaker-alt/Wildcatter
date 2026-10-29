@@ -1,0 +1,8 @@
+{
+  "values": [
+    "wildcatter:boiler",
+    "wildcatter:steam_turbine",
+    "wildcatter:transformer",
+    "wildcatter:substation_transformer"
+  ]
+}

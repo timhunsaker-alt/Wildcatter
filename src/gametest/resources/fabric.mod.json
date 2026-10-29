@@ -1,0 +1,16 @@
+{
+	"schemaVersion": 1,
+	"id": "wildcatter-gametest",
+	"version": "1.0.0",
+	"name": "Wildcatter game tests",
+	"environment": "client",
+	"entrypoints": {
+		"fabric-client-gametest": [
+			"dev.wildcatter.gametest.WildcatterClientGameTest"
+		]
+	},
+	"depends": {
+		"wildcatter": "*",
+		"fabric-api": "*"
+	}
+}
