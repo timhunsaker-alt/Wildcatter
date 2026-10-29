@@ -83,10 +83,17 @@ def turbine_end(running):
 	return draw
 
 
-def copper(img, d):
-	noise(img, (196, 118, 72), 10)
-	for y in (4, 9, 13):
-		d.line([0, y, 15, y], fill=(150, 80, 48))
+def wire(base, strand=None, stripe=None):
+	"""A wire texture: a base colour, optional twisted-strand shading, optional coloured stripe."""
+	def draw(img, d):
+		noise(img, base, 8)
+		if strand:
+			for y in (3, 8, 12):
+				d.line([0, y, 15, y], fill=strand)
+		if stripe:
+			d.line([0, 5, 15, 5], fill=stripe)
+			d.line([0, 10, 15, 10], fill=stripe)
+	return draw
 
 
 def lamp(lit):
@@ -116,15 +123,16 @@ tex("steam_turbine_side", turbine_side(False))
 tex("steam_turbine_side_running", turbine_side(True))
 tex("steam_turbine_end", turbine_end(False))
 tex("steam_turbine_end_running", turbine_end(True))
-tex("copper_cable", copper)
+tex("copper_cable", wire((196, 118, 72), strand=(150, 80, 48)))                 # bare copper
+tex("insulated_cable", wire((30, 30, 34), stripe=(190, 190, 196)))              # black sheath
+tex("medium_line", wire((170, 176, 184), strand=(120, 126, 134)))                # bare aluminium
+tex("insulated_medium_cable", wire((60, 64, 72), stripe=(235, 190, 40)))         # grey sheath, yellow stripe
+tex("high_line", wire((140, 150, 160), strand=(90, 98, 108)))                    # steel-cored aluminium
+tex("insulated_high_cable", wire((26, 32, 52), stripe=(210, 60, 50)))            # dark blue sheath, red stripe
+tex("ground_wire", wire((40, 150, 70), stripe=(240, 220, 60)))                   # green with a yellow stripe
+tex("ground_rod", wire((205, 125, 80), strand=(140, 80, 50)))
 tex("electric_lamp", lamp(False))
 tex("electric_lamp_lit", lamp(True))
-
-
-def insulated(img, d):
-	noise(img, (84, 90, 100), 6)
-	for y in (3, 8, 12):
-		d.line([0, y, 15, y], fill=(235, 190, 40))
 
 
 def transformer_front(base, glow):
@@ -150,8 +158,15 @@ def transformer_top(base):
 	return draw
 
 
+def manual(img, d):
+	d.rectangle([2, 1, 13, 14], fill=(120, 70, 40), outline=(60, 34, 20))
+	d.rectangle([3, 2, 4, 13], fill=(90, 50, 30))                       # spine
+	d.rectangle([6, 4, 11, 11], fill=(236, 222, 180), outline=(60, 34, 20))
+	d.polygon([(9, 4), (7, 8), (9, 8), (8, 11), (11, 7), (9, 7)], fill=(235, 190, 40))  # a lightning bolt
+
+
 tex("power_meter", meter, "item")
-tex("medium_cable", insulated)
+tex("field_manual", manual, "item")
 tex("transformer_front", transformer_front((96, 102, 112), (225, 225, 215)))
 tex("transformer_side", transformer_side((96, 102, 112)))
 tex("transformer_top", transformer_top((96, 102, 112)))
@@ -194,18 +209,27 @@ def cuboid(frm, to, tex_name="#cable"):
 	return {"from": frm, "to": to, "faces": faces}
 
 
-save_json(f"{ASSETS}/models/block/cable_core.json", {
-	"textures": {"cable": f"{ns}:block/copper_cable", "particle": f"{ns}:block/copper_cable"},
-	"elements": [cuboid([6, 6, 6], [10, 10, 10])]})
-save_json(f"{ASSETS}/models/block/cable_arm.json", {  # points north; rotated for the other sides in the blockstate
-	"textures": {"cable": f"{ns}:block/copper_cable", "particle": f"{ns}:block/copper_cable"},
-	"elements": [cuboid([6, 6, 0], [10, 10, 6])]})
-save_json(f"{ASSETS}/models/block/cable_inventory.json", {  # the item: a short piece lying across the middle
-	"parent": "minecraft:block/block",
-	"display": {"gui": {"rotation": [30, 225, 0], "scale": [0.9, 0.9, 0.9]}, "ground": {"scale": [0.8, 0.8, 0.8]},
-		"firstperson_righthand": {"rotation": [0, 45, 0], "scale": [0.8, 0.8, 0.8]}, "thirdperson_righthand": {"scale": [0.8, 0.8, 0.8]}},
-	"textures": {"cable": f"{ns}:block/copper_cable", "particle": f"{ns}:block/copper_cable"},
-	"elements": [cuboid([0, 6, 6], [16, 10, 10]), cuboid([6, 6, 0], [10, 10, 16])]})
+CABLES = ("copper_cable", "insulated_cable", "medium_line", "insulated_medium_cable", "high_line", "insulated_high_cable", "ground_wire")
+for name in CABLES:
+	t = {"cable": f"{ns}:block/{name}", "particle": f"{ns}:block/{name}"}
+	save_json(f"{ASSETS}/models/block/{name}_core.json", {"textures": t, "elements": [cuboid([7, 7, 7], [9, 9, 9])]})
+	save_json(f"{ASSETS}/models/block/{name}_arm.json", {"textures": t, "elements": [cuboid([7, 7, 0], [9, 9, 7])]})  # points north; rotated in the blockstate
+	save_json(f"{ASSETS}/models/block/{name}_inventory.json", {  # the item: a short piece lying across the middle
+		"parent": "minecraft:block/block",
+		"display": {"gui": {"rotation": [30, 225, 0], "scale": [1.2, 1.2, 1.2]}, "ground": {"scale": [0.8, 0.8, 0.8]},
+			"firstperson_righthand": {"rotation": [0, 45, 0], "scale": [0.8, 0.8, 0.8]}, "thirdperson_righthand": {"scale": [0.8, 0.8, 0.8]}},
+		"textures": t,
+		"elements": [cuboid([0, 7, 7], [16, 9, 9]), cuboid([7, 7, 0], [9, 9, 16])]})
+
+arms = {"north": {}, "east": {"y": 90}, "south": {"y": 180}, "west": {"y": 270}, "up": {"x": 270}, "down": {"x": 90}}
+for name in CABLES:
+	save_json(f"{ASSETS}/blockstates/{name}.json", {"multipart": [{"apply": {"model": f"{ns}:block/{name}_core"}}] + [
+		{"when": {side: "true"}, "apply": {"model": f"{ns}:block/{name}_arm", **rot}} for side, rot in arms.items()]})
+
+# the ground rod: one thin post
+save_json(f"{ASSETS}/models/block/ground_rod.json", {"textures": {"rod": f"{ns}:block/ground_rod", "particle": f"{ns}:block/ground_rod"},
+	"elements": [cuboid([7, 0, 7], [9, 16, 9], "#rod")]})
+save_json(f"{ASSETS}/blockstates/ground_rod.json", {"variants": {"": {"model": f"{ns}:block/ground_rod"}}})
 
 save_json(f"{ASSETS}/blockstates/boiler.json", {"variants": {
 	"lit=false": {"model": f"{ns}:block/boiler"}, "lit=true": {"model": f"{ns}:block/boiler_lit"}}})
@@ -214,42 +238,35 @@ save_json(f"{ASSETS}/blockstates/steam_turbine.json", {"variants": {
 save_json(f"{ASSETS}/blockstates/electric_lamp.json", {"variants": {
 	"lit=false": {"model": f"{ns}:block/electric_lamp"}, "lit=true": {"model": f"{ns}:block/electric_lamp_lit"}}})
 
-arms = {"north": {}, "east": {"y": 90}, "south": {"y": 180}, "west": {"y": 270}, "up": {"x": 270}, "down": {"x": 90}}
-multipart = [{"apply": {"model": f"{ns}:block/cable_core"}}]
-for side, rot in arms.items():
-	multipart.append({"when": {side: "true"}, "apply": {"model": f"{ns}:block/cable_arm", **rot}})
-save_json(f"{ASSETS}/blockstates/copper_cable.json", {"multipart": multipart})
-for part in ("core", "arm"):
-	m = json.load(open(f"{ASSETS}/models/block/cable_{part}.json"))
-	m["textures"] = {"cable": f"{ns}:block/medium_cable", "particle": f"{ns}:block/medium_cable"}
-	save_json(f"{ASSETS}/models/block/medium_cable_{part}.json", m)
-save_json(f"{ASSETS}/blockstates/medium_cable.json", {"multipart": [
-	{"apply": {"model": f"{ns}:block/medium_cable_core"}}] + [
-	{"when": {side: "true"}, "apply": {"model": f"{ns}:block/medium_cable_arm", **rot}} for side, rot in arms.items()]})
-inv = json.load(open(f"{ASSETS}/models/block/cable_inventory.json"))
-inv["textures"] = {"cable": f"{ns}:block/medium_cable", "particle": f"{ns}:block/medium_cable"}
-save_json(f"{ASSETS}/models/block/medium_cable_inventory.json", inv)
-
 # --- items --------------------------------------------------------------------------------------
 for name, model in (("boiler", "block/boiler"), ("steam_turbine", "block/steam_turbine"), ("electric_lamp", "block/electric_lamp"),
-		("copper_cable", "block/cable_inventory"), ("medium_cable", "block/medium_cable_inventory"), ("transformer", "block/transformer"), ("substation_transformer", "block/substation_transformer"), ("power_meter", "item/power_meter")):
+		("transformer", "block/transformer"), ("substation_transformer", "block/substation_transformer"), ("ground_rod", "block/ground_rod"),
+		("power_meter", "item/power_meter"), ("field_manual", "item/field_manual")) + tuple((c, f"block/{c}_inventory") for c in CABLES):
 	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:{model}"}})
-save_json(f"{ASSETS}/models/item/power_meter.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/power_meter"}})
+for item in ("power_meter", "field_manual"):
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}"}})
 
 # --- names --------------------------------------------------------------------------------------
 save_json(f"{ASSETS}/lang/en_us.json", {
 	"block.wildcatter.boiler": "Boiler",
 	"block.wildcatter.steam_turbine": "Steam Turbine",
-	"block.wildcatter.copper_cable": "Copper Cable",
+	"block.wildcatter.copper_cable": "Bare Copper Wire (110 V)",
+	"block.wildcatter.insulated_cable": "Insulated Cable (110 V)",
+	"block.wildcatter.medium_line": "Bare Medium-Voltage Line (4.16 kV)",
+	"block.wildcatter.insulated_medium_cable": "Insulated Medium-Voltage Cable (4.16 kV)",
+	"block.wildcatter.high_line": "Bare High-Voltage Line (138 kV)",
+	"block.wildcatter.insulated_high_cable": "Insulated High-Voltage Cable (138 kV)",
+	"block.wildcatter.ground_rod": "Ground Rod",
+	"block.wildcatter.ground_wire": "Ground Wire",
 	"block.wildcatter.electric_lamp": "Electric Lamp",
-	"block.wildcatter.medium_cable": "Medium-Voltage Line",
 	"block.wildcatter.transformer": "Transformer (110 V / 4.16 kV)",
 	"block.wildcatter.substation_transformer": "Substation Transformer (4.16 kV / 138 kV)",
 	"item.wildcatter.power_meter": "Power Meter",
+	"item.wildcatter.field_manual": "Wildcatter Field Manual",
 })
 
 # --- loot: every block drops itself ---------------------------------------------------------------
-ALL = ("boiler", "steam_turbine", "copper_cable", "medium_cable", "transformer", "substation_transformer", "electric_lamp")
+ALL = ("boiler", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "ground_rod") + CABLES
 for name in ALL:
 	save_json(f"{DATA}/loot_table/blocks/{name}.json", {
 		"type": "minecraft:block",
@@ -259,18 +276,31 @@ for name in ALL:
 save_json(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json", {"values": [f"{ns}:{n}" for n in ALL]})
 save_json(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json", {"values": [f"{ns}:{n}" for n in ("boiler", "steam_turbine", "transformer", "substation_transformer")]})
 
-# --- recipes (early game: iron, copper, redstone, glass) ------------------------------------------------
+# --- recipes (early game: iron, copper, redstone, glass; slime stands in for rubber) ------------------------
 def shaped(name, pattern, key, result, count=1):
 	save_json(f"{DATA}/recipe/{name}.json", {"type": "minecraft:crafting_shaped", "category": "redstone",
 		"pattern": pattern, "key": key, "result": {"id": f"{ns}:{result}", "count": count}})
 
 
+def shapeless(name, ingredients, result, count=1):
+	save_json(f"{DATA}/recipe/{name}.json", {"type": "minecraft:crafting_shapeless", "category": "redstone",
+		"ingredients": ingredients, "result": {"id": f"{ns}:{result}", "count": count}})
+
+
 shaped("boiler", ["III", "IWI", "III"], {"I": "minecraft:iron_ingot", "W": "minecraft:water_bucket"}, "boiler")
 shaped("steam_turbine", ["ICI", "CRC", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, "steam_turbine")
 shaped("copper_cable", ["CCC"], {"C": "minecraft:copper_ingot"}, "copper_cable", 6)
-shaped("medium_cable", ["CCC", "RRR", "CCC"], {"C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, "medium_cable", 4)
+shaped("medium_line", ["CCC", "RRR", "CCC"], {"C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, "medium_line", 4)
+shaped("high_line", ["III", "CCC", "III"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot"}, "high_line", 4)
+# Insulating a wire takes slime (our rubber): more of it the higher the voltage.
+shapeless("insulated_cable", ["wildcatter:copper_cable"] * 4 + ["minecraft:slime_ball"], "insulated_cable", 4)
+shapeless("insulated_medium_cable", ["wildcatter:medium_line"] * 4 + ["minecraft:slime_ball"] * 2, "insulated_medium_cable", 4)
+shapeless("insulated_high_cable", ["wildcatter:high_line"] * 4 + ["minecraft:slime_ball"] * 4, "insulated_high_cable", 4)
+shaped("ground_rod", ["C", "C", "C"], {"C": "minecraft:copper_ingot"}, "ground_rod", 2)
+shapeless("ground_wire", ["wildcatter:copper_cable", "minecraft:green_dye"], "ground_wire")
 shaped("transformer", ["ICI", "ICI", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot"}, "transformer")
 shaped("substation_transformer", ["IDI", "TCT", "IDI"], {"I": "minecraft:iron_ingot", "D": "minecraft:diamond", "T": "wildcatter:transformer", "C": "minecraft:copper_block"}, "substation_transformer")
 shaped("electric_lamp", [" G ", "GRG", " C "], {"G": "minecraft:glass_pane", "R": "minecraft:redstone", "C": "minecraft:copper_ingot"}, "electric_lamp")
+shapeless("field_manual", ["minecraft:book", "minecraft:copper_ingot"], "field_manual")
 shaped("power_meter", [" C ", "IRI", " I "], {"C": "minecraft:copper_ingot", "I": "minecraft:iron_ingot", "R": "minecraft:redstone"}, "power_meter")
 print("assets written")

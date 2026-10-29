@@ -3,8 +3,6 @@ package dev.wildcatter.block;
 import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.energy.EnergyNode;
 import dev.wildcatter.energy.Voltage;
-import java.util.EnumMap;
-import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -17,53 +15,48 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
-/** A thin copper cable. Grows an arm toward every neighbour that is part of the grid. */
+/**
+ * A thin wire. Grows an arm toward every neighbour that is part of the grid at its voltage.
+ * A bare wire shocks anything that comes near it while it is live; an insulated one is safe to touch.
+ */
 public class CableBlock extends BaseEntityBlock {
-
-	public static final Map<Direction, BooleanProperty> ARMS = new EnumMap<>(Direction.class);
-	static {
-		for (Direction side : Direction.values()) {
-			ARMS.put(side, BooleanProperty.create(side.getName()));
-		}
-	}
-
-	private static final VoxelShape CORE = Block.box(6, 6, 6, 10, 10, 10);
-	private static final Map<Direction, VoxelShape> ARM_SHAPES = new EnumMap<>(Direction.class);
-	static {
-		ARM_SHAPES.put(Direction.NORTH, Block.box(6, 6, 0, 10, 10, 6));
-		ARM_SHAPES.put(Direction.SOUTH, Block.box(6, 6, 10, 10, 10, 16));
-		ARM_SHAPES.put(Direction.WEST, Block.box(0, 6, 6, 6, 10, 10));
-		ARM_SHAPES.put(Direction.EAST, Block.box(10, 6, 6, 16, 10, 10));
-		ARM_SHAPES.put(Direction.DOWN, Block.box(6, 0, 6, 10, 6, 10));
-		ARM_SHAPES.put(Direction.UP, Block.box(6, 10, 6, 10, 16, 10));
-	}
-
 	private final Voltage voltage;
+	private final boolean insulated;
 
-	public CableBlock(Properties properties, Voltage voltage) {
+	public CableBlock(Properties properties, Voltage voltage, boolean insulated) {
 		super(properties);
 		this.voltage = voltage;
-		BlockState state = stateDefinition.any();
-		for (BooleanProperty arm : ARMS.values()) {
-			state = state.setValue(arm, false);
-		}
-		registerDefaultState(state);
+		this.insulated = insulated;
+		registerDefaultState(WireShape.noArms(stateDefinition.any()));
 	}
 
-	@Override
-	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		ARMS.values().forEach(builder::add);
+	/** How many cables of this voltage touch {@code pos}. Devices need two: one to feed them and one to return. */
+	public static int cablesAround(BlockGetter level, BlockPos pos, Voltage voltage) {
+		int count = 0;
+		for (Direction side : Direction.values()) {
+			if (level.getBlockState(pos.relative(side)).getBlock() instanceof CableBlock cable && cable.voltage == voltage) {
+				count++;
+			}
+		}
+		return count;
 	}
 
 	public Voltage voltage() {
 		return voltage;
+	}
+
+	public boolean insulated() {
+		return insulated;
+	}
+
+	@Override
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+		WireShape.ARMS.values().forEach(builder::add);
 	}
 
 	@Override
@@ -88,20 +81,14 @@ public class CableBlock extends BaseEntityBlock {
 	private static BlockState withArms(BlockState state, BlockGetter level, BlockPos pos, Voltage voltage) {
 		for (Direction side : Direction.values()) {
 			boolean joins = level.getBlockEntity(pos.relative(side)) instanceof EnergyNode node && node.connectsTo(side.getOpposite(), voltage);
-			state = state.setValue(ARMS.get(side), joins);
+			state = state.setValue(WireShape.ARMS.get(side), joins);
 		}
 		return state;
 	}
 
 	@Override
 	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-		VoxelShape shape = CORE;
-		for (Direction side : Direction.values()) {
-			if (state.getValue(ARMS.get(side))) {
-				shape = Shapes.or(shape, ARM_SHAPES.get(side));
-			}
-		}
-		return shape;
+		return WireShape.of(state);
 	}
 
 	@Override

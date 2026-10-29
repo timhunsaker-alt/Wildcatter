@@ -4,6 +4,8 @@ import dev.wildcatter.block.BoilerBlock;
 import dev.wildcatter.block.BoilerBlockEntity;
 import dev.wildcatter.block.CableBlock;
 import dev.wildcatter.block.CableBlockEntity;
+import dev.wildcatter.block.GroundRodBlock;
+import dev.wildcatter.block.GroundWireBlock;
 import dev.wildcatter.block.LampBlock;
 import dev.wildcatter.block.LampBlockEntity;
 import dev.wildcatter.block.SteamTurbineBlock;
@@ -30,11 +32,21 @@ public final class WildcatterBlocks {
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
 	public static final Block STEAM_TURBINE = block("steam_turbine", props -> new SteamTurbineBlock(props.mapColor(net.minecraft.world.level.material.MapColor.METAL)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
-	public static final Block COPPER_CABLE = block("copper_cable", props -> new CableBlock(props.mapColor(net.minecraft.world.level.material.MapColor.COLOR_ORANGE)
-			.strength(0.5F).sound(SoundType.COPPER).noOcclusion(), Voltage.LOW));
-	/** Insulated line for medium voltage (4.16 kV). */
-	public static final Block MEDIUM_CABLE = block("medium_cable", props -> new CableBlock(props.mapColor(net.minecraft.world.level.material.MapColor.COLOR_GRAY)
-			.strength(0.8F).sound(SoundType.COPPER).noOcclusion(), Voltage.MEDIUM));
+	// Cables come bare (cheap, shock you when live) or insulated (safe to touch). Higher voltage reaches further, so
+	// bare lines at 4.16 kV and 138 kV have to be up on tall poles.
+	public static final Block COPPER_CABLE = cable("copper_cable", Voltage.LOW, false);
+	public static final Block INSULATED_CABLE = cable("insulated_cable", Voltage.LOW, true);
+	public static final Block MEDIUM_LINE = cable("medium_line", Voltage.MEDIUM, false);
+	public static final Block INSULATED_MEDIUM_CABLE = cable("insulated_medium_cable", Voltage.MEDIUM, true);
+	public static final Block HIGH_LINE = cable("high_line", Voltage.HIGH, false);
+	public static final Block INSULATED_HIGH_CABLE = cable("insulated_high_cable", Voltage.HIGH, true);
+
+	/** A copper rod in the earth, for grounding machines. */
+	public static final Block GROUND_ROD = block("ground_rod", props -> new GroundRodBlock(props.mapColor(net.minecraft.world.level.material.MapColor.COLOR_ORANGE)
+			.strength(1.0F).sound(SoundType.COPPER).noOcclusion()));
+	public static final Block GROUND_WIRE = block("ground_wire", props -> new GroundWireBlock(props.mapColor(net.minecraft.world.level.material.MapColor.COLOR_GREEN)
+			.strength(0.3F).sound(SoundType.COPPER).noOcclusion()));
+
 	/** Steps 110 V up to 4.16 kV and back. */
 	public static final Block TRANSFORMER = block("transformer", props -> new TransformerBlock(props.mapColor(net.minecraft.world.level.material.MapColor.COLOR_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.LOW, Voltage.MEDIUM));
@@ -46,11 +58,16 @@ public final class WildcatterBlocks {
 
 	public static final BlockEntityType<BoilerBlockEntity> BOILER_ENTITY = entity(BoilerBlockEntity::new, BOILER);
 	public static final BlockEntityType<SteamTurbineBlockEntity> STEAM_TURBINE_ENTITY = entity(SteamTurbineBlockEntity::new, STEAM_TURBINE);
-	public static final BlockEntityType<CableBlockEntity> CABLE_ENTITY = entity(CableBlockEntity::new, COPPER_CABLE, MEDIUM_CABLE);
+	public static final BlockEntityType<CableBlockEntity> CABLE_ENTITY = entity(CableBlockEntity::new, COPPER_CABLE, INSULATED_CABLE, MEDIUM_LINE, INSULATED_MEDIUM_CABLE, HIGH_LINE, INSULATED_HIGH_CABLE);
 	public static final BlockEntityType<TransformerBlockEntity> TRANSFORMER_ENTITY = entity(TransformerBlockEntity::new, TRANSFORMER, SUBSTATION_TRANSFORMER);
 	public static final BlockEntityType<LampBlockEntity> LAMP_ENTITY = entity(LampBlockEntity::new, ELECTRIC_LAMP);
 
 	private WildcatterBlocks() {
+	}
+
+	private static Block cable(String name, Voltage voltage, boolean insulated) {
+		return block(name, props -> new CableBlock(props.mapColor(net.minecraft.world.level.material.MapColor.COLOR_ORANGE)
+				.strength(0.5F).sound(SoundType.COPPER).noOcclusion(), voltage, insulated));
 	}
 
 	private static Block block(String name, Function<BlockBehaviour.Properties, Block> factory) {
@@ -67,7 +84,13 @@ public final class WildcatterBlocks {
 		add("boiler", BOILER);
 		add("steam_turbine", STEAM_TURBINE);
 		add("copper_cable", COPPER_CABLE);
-		add("medium_cable", MEDIUM_CABLE);
+		add("insulated_cable", INSULATED_CABLE);
+		add("medium_line", MEDIUM_LINE);
+		add("insulated_medium_cable", INSULATED_MEDIUM_CABLE);
+		add("high_line", HIGH_LINE);
+		add("insulated_high_cable", INSULATED_HIGH_CABLE);
+		add("ground_rod", GROUND_ROD);
+		add("ground_wire", GROUND_WIRE);
 		add("transformer", TRANSFORMER);
 		add("substation_transformer", SUBSTATION_TRANSFORMER);
 		add("electric_lamp", ELECTRIC_LAMP);

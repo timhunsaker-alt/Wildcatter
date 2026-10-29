@@ -7,6 +7,8 @@ import dev.wildcatter.energy.EnergyNet;
 import dev.wildcatter.energy.EnergyNode;
 import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.energy.Voltage;
+import dev.wildcatter.safety.Bondable;
+import dev.wildcatter.safety.Grounding;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -17,7 +19,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 /** Two buffers, one per voltage. Each tick it moves energy from the fuller side to the emptier one, losing a few percent. */
-public class TransformerBlockEntity extends BlockEntity implements EnergyNode, Inspectable {
+public class TransformerBlockEntity extends BlockEntity implements EnergyNode, Inspectable, Bondable {
 	private final EnergyBuffer lowSide = new EnergyBuffer(Tuning.TRANSFORMER_BUFFER, Tuning.TRANSFORMER_THROUGHPUT, Tuning.TRANSFORMER_THROUGHPUT);
 	private final EnergyBuffer highSide = new EnergyBuffer(Tuning.TRANSFORMER_BUFFER, Tuning.TRANSFORMER_THROUGHPUT, Tuning.TRANSFORMER_THROUGHPUT);
 	private int lost;
@@ -68,11 +70,22 @@ public class TransformerBlockEntity extends BlockEntity implements EnergyNode, I
 		}
 	}
 
+	/** True if there is power in it to bite with. */
+	public boolean isLive() {
+		return lowSide.stored() > 0 || highSide.stored() > 0;
+	}
+
+	/** The highest voltage in here: that is the one that decides how bad a shock is. */
+	public Voltage topVoltage() {
+		return block().high();
+	}
+
 	@Override
 	public Component inspect() {
 		return Component.literal("Transformer " + block().low().label() + " / " + block().high().label()
 				+ ": " + lowSide.stored() + " RF on the " + block().low().label() + " side, "
-				+ highSide.stored() + " RF on the " + block().high().label() + " side, losing " + lost + " RF/t as heat");
+				+ highSide.stored() + " RF on the " + block().high().label() + " side, losing " + lost + " RF/t as heat; "
+				+ (level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you"));
 	}
 
 	@Override

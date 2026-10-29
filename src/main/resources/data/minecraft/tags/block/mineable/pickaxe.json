@@ -2,10 +2,16 @@
   "values": [
     "wildcatter:boiler",
     "wildcatter:steam_turbine",
-    "wildcatter:copper_cable",
-    "wildcatter:medium_cable",
     "wildcatter:transformer",
     "wildcatter:substation_transformer",
-    "wildcatter:electric_lamp"
+    "wildcatter:electric_lamp",
+    "wildcatter:ground_rod",
+    "wildcatter:copper_cable",
+    "wildcatter:insulated_cable",
+    "wildcatter:medium_line",
+    "wildcatter:insulated_medium_cable",
+    "wildcatter:high_line",
+    "wildcatter:insulated_high_cable",
+    "wildcatter:ground_wire"
   ]
 }

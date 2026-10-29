@@ -1,7 +1,10 @@
 package dev.wildcatter.block;
 
 import dev.wildcatter.WildcatterBlocks;
+import dev.wildcatter.energy.Voltage;
+import dev.wildcatter.safety.Shock;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -41,7 +44,9 @@ public class SteamTurbineBlock extends BaseEntityBlock {
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 		if (!level.isClientSide() && level.getBlockEntity(pos) instanceof SteamTurbineBlockEntity turbine) {
-			player.sendOverlayMessage(turbine.inspect());
+			if (!Shock.touch((ServerLevel) level, pos, player, Voltage.LOW, turbine.isLive())) {
+				player.sendOverlayMessage(turbine.inspect());
+			}
 		}
 		return InteractionResult.SUCCESS;
 	}

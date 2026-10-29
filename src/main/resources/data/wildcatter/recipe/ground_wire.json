@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "wildcatter:copper_cable",
+    "minecraft:green_dye"
+  ],
+  "result": {
+    "id": "wildcatter:ground_wire",
+    "count": 1
+  }
+}

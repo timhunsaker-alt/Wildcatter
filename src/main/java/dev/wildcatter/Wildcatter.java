@@ -29,11 +29,18 @@ public class Wildcatter implements ModInitializer {
 			entries.accept(WildcatterBlocks.BOILER);
 			entries.accept(WildcatterBlocks.STEAM_TURBINE);
 			entries.accept(WildcatterBlocks.COPPER_CABLE);
-			entries.accept(WildcatterBlocks.MEDIUM_CABLE);
+			entries.accept(WildcatterBlocks.INSULATED_CABLE);
+			entries.accept(WildcatterBlocks.MEDIUM_LINE);
+			entries.accept(WildcatterBlocks.INSULATED_MEDIUM_CABLE);
+			entries.accept(WildcatterBlocks.HIGH_LINE);
+			entries.accept(WildcatterBlocks.INSULATED_HIGH_CABLE);
+			entries.accept(WildcatterBlocks.GROUND_ROD);
+			entries.accept(WildcatterBlocks.GROUND_WIRE);
 			entries.accept(WildcatterBlocks.TRANSFORMER);
 			entries.accept(WildcatterBlocks.SUBSTATION_TRANSFORMER);
 			entries.accept(WildcatterBlocks.ELECTRIC_LAMP);
 			entries.accept(WildcatterItems.POWER_METER);
+			entries.accept(WildcatterItems.FIELD_MANUAL);
 		});
 	}
 }

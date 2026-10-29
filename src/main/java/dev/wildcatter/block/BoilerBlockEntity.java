@@ -27,8 +27,10 @@ public class BoilerBlockEntity extends BlockEntity implements Inspectable {
 
 	public static void tick(Level level, BlockPos pos, BlockState state, BoilerBlockEntity boiler) {
 		boolean heated = boiler.isHeated(level, pos);
-		boolean working = false;
-		if (heated && boiler.water > 0 && boiler.steam < Tuning.BOILER_STEAM_CAPACITY) {
+		// Lit means "heated and has water to boil". It stays lit while the steam tank is full, or it would flicker
+		// on and off every tick as the turbine draws the tank down and it refills.
+		boolean working = heated && boiler.water > 0;
+		if (working && boiler.steam < Tuning.BOILER_STEAM_CAPACITY) {
 			int made = Math.min(Tuning.BOILER_STEAM_PER_TICK, Tuning.BOILER_STEAM_CAPACITY - boiler.steam);
 			boiler.steam += made;
 			boiler.boiled += made;
@@ -36,7 +38,6 @@ public class BoilerBlockEntity extends BlockEntity implements Inspectable {
 				boiler.boiled -= Tuning.STEAM_PER_WATER;
 				boiler.water--;
 			}
-			working = true;
 			boiler.setChanged();
 		}
 		if (state.getValue(BoilerBlock.LIT) != working) {

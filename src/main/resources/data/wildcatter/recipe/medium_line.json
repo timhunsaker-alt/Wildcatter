@@ -11,7 +11,7 @@
     "R": "minecraft:redstone"
   },
   "result": {
-    "id": "wildcatter:medium_cable",
+    "id": "wildcatter:medium_line",
     "count": 4
   }
 }

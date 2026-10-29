@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "wildcatter:block/insulated_medium_cable_inventory"
+  }
+}

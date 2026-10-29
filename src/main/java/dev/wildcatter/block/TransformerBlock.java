@@ -2,7 +2,9 @@ package dev.wildcatter.block;
 
 import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.energy.Voltage;
+import dev.wildcatter.safety.Shock;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -68,7 +70,9 @@ public class TransformerBlock extends BaseEntityBlock {
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 		if (!level.isClientSide() && level.getBlockEntity(pos) instanceof TransformerBlockEntity transformer) {
-			player.sendOverlayMessage(transformer.inspect());
+			if (!Shock.touch((ServerLevel) level, pos, player, transformer.topVoltage(), transformer.isLive())) {
+				player.sendOverlayMessage(transformer.inspect());
+			}
 		}
 		return InteractionResult.SUCCESS;
 	}

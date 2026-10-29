@@ -7,6 +7,8 @@ import dev.wildcatter.energy.EnergyNet;
 import dev.wildcatter.energy.EnergyNode;
 import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.energy.Voltage;
+import dev.wildcatter.safety.Bondable;
+import dev.wildcatter.safety.Grounding;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -17,9 +19,11 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 /** Takes steam from any boiler touching it and turns it into RF, pushed out into the cables around it. */
-public class SteamTurbineBlockEntity extends BlockEntity implements EnergyNode, Inspectable {
+public class SteamTurbineBlockEntity extends BlockEntity implements EnergyNode, Inspectable, Bondable {
 	private final EnergyBuffer energy = new EnergyBuffer(Tuning.TURBINE_BUFFER, 0, Tuning.TURBINE_OUTPUT);
 	private int lastMade;
+	/** Ticks since it last made power; the rotor keeps spinning for a second so the block doesn't flicker. */
+	private int sinceMade = 100;
 
 	public SteamTurbineBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.STEAM_TURBINE_ENTITY, pos, state);
@@ -45,7 +49,8 @@ public class SteamTurbineBlockEntity extends BlockEntity implements EnergyNode, 
 		turbine.lastMade = made;
 		EnergyNet.push(level, pos, turbine.energy, Voltage.LOW);
 
-		boolean running = made > 0;
+		turbine.sinceMade = made > 0 ? 0 : Math.min(turbine.sinceMade + 1, 100);
+		boolean running = turbine.sinceMade < 20;
 		if (state.getValue(SteamTurbineBlock.RUNNING) != running) {
 			level.setBlock(pos, state.setValue(SteamTurbineBlock.RUNNING, running), 3);
 		}
@@ -54,9 +59,14 @@ public class SteamTurbineBlockEntity extends BlockEntity implements EnergyNode, 
 		}
 	}
 
+	public boolean isLive() {
+		return energy.stored() > 0;
+	}
+
 	@Override
 	public Component inspect() {
-		return Component.literal("Steam turbine (110 V): " + energy.stored() + "/" + energy.capacity() + " RF, making " + lastMade + " RF/t");
+		return Component.literal("Steam turbine (110 V): " + energy.stored() + "/" + energy.capacity() + " RF, making " + lastMade + " RF/t; "
+				+ (level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you"));
 	}
 
 	@Override
