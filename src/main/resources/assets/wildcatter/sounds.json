@@ -1,0 +1,38 @@
+{
+  "turbine_hum": {
+    "sounds": [
+      "wildcatter:turbine_hum"
+    ],
+    "subtitle": "subtitles.wildcatter.turbine_hum"
+  },
+  "boiler_hiss": {
+    "sounds": [
+      "wildcatter:boiler_hiss"
+    ],
+    "subtitle": "subtitles.wildcatter.boiler_hiss"
+  },
+  "breaker_trip": {
+    "sounds": [
+      "wildcatter:breaker_trip"
+    ],
+    "subtitle": "subtitles.wildcatter.breaker_trip"
+  },
+  "breaker_click": {
+    "sounds": [
+      "wildcatter:breaker_click"
+    ],
+    "subtitle": "subtitles.wildcatter.breaker_click"
+  },
+  "zap": {
+    "sounds": [
+      "wildcatter:zap"
+    ],
+    "subtitle": "subtitles.wildcatter.zap"
+  },
+  "structure_formed": {
+    "sounds": [
+      "wildcatter:structure_formed"
+    ],
+    "subtitle": "subtitles.wildcatter.structure_formed"
+  }
+}

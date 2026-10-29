@@ -25,6 +25,7 @@ public class Wildcatter implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		WildcatterSounds.register();
 		WildcatterBlocks.register();
 		WildcatterItems.register();
 

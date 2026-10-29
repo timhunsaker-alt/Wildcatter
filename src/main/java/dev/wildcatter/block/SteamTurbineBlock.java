@@ -23,15 +23,17 @@ import net.minecraft.world.phys.BlockHitResult;
 
 public class SteamTurbineBlock extends BaseEntityBlock {
 	public static final BooleanProperty RUNNING = BooleanProperty.create("running");
+	/** Part of a medium voltage generator (a 3x3x3 cube of turbines). */
+	public static final BooleanProperty FORMED = BooleanProperty.create("formed");
 
 	public SteamTurbineBlock(Properties properties) {
 		super(properties);
-		registerDefaultState(stateDefinition.any().setValue(RUNNING, false));
+		registerDefaultState(stateDefinition.any().setValue(RUNNING, false).setValue(FORMED, false));
 	}
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(RUNNING);
+		builder.add(RUNNING, FORMED);
 	}
 
 	@Override
@@ -54,7 +56,7 @@ public class SteamTurbineBlock extends BaseEntityBlock {
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 		if (!level.isClientSide() && level.getBlockEntity(pos) instanceof SteamTurbineBlockEntity turbine) {
-			if (!Shock.touch((ServerLevel) level, pos, player, Voltage.LOW, turbine.isLive())) {
+			if (!Shock.touch((ServerLevel) level, pos, player, turbine.voltage(), turbine.isLive())) {
 				player.sendOverlayMessage(turbine.inspect());
 			}
 		}

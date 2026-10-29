@@ -1,5 +1,6 @@
 package dev.wildcatter.block;
 
+import dev.wildcatter.WildcatterSounds;
 import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.circuit.CircuitManager;
 import net.minecraft.core.BlockPos;
@@ -82,7 +83,7 @@ public class BreakerBlock extends BaseEntityBlock {
 		} else {
 			boolean closing = state.getValue(POSITION) != Position.ON;
 			breaker.setSwitch(closing);
-			level.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.5F, closing ? 0.7F : 0.5F);
+			level.playSound(null, pos, WildcatterSounds.BREAKER_CLICK, SoundSource.BLOCKS, 0.8F, closing ? 1.0F : 0.85F);
 			player.sendOverlayMessage(breaker.inspect());
 		}
 		CircuitManager.markDirty(level);

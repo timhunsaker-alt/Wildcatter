@@ -1,5 +1,6 @@
 package dev.wildcatter.block;
 
+import dev.wildcatter.WildcatterSounds;
 import dev.wildcatter.Tuning;
 import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.circuit.Circuit;
@@ -115,7 +116,7 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 		amps = 0;
 		setPosition(BreakerBlock.Position.TRIPPED);
 		if (level instanceof ServerLevel server) {
-			server.playSound(null, worldPosition, SoundEvents.BEACON_DEACTIVATE, SoundSource.BLOCKS, 0.6F, 1.8F);
+			server.playSound(null, worldPosition, WildcatterSounds.BREAKER_TRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
 			CircuitManager.markDirty(server);
 		}
 		lastTrip = String.format("%s: %.0f A on a %d A breaker", reason, tripAmps, rating());

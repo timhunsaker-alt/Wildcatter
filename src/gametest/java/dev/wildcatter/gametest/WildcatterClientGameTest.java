@@ -42,6 +42,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			server.runCommand("difficulty normal");
 			lowVoltageLoop(context, server);
 			transformerChain(context, server);
+			bigMachines(context, server);
 			fieldManual(server);
 		}
 	}
@@ -98,6 +99,65 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		if (!ok) {
 			throw new AssertionError(message);
 		}
+	}
+
+	// ---- the 3x3x3 machines ------------------------------------------------------------------------------------
+	private void bigMachines(ClientGameTestContext context, TestServerContext server) {
+		server.runCommand("fill 27 " + (y - 1) + " 26 42 " + (y + 6) + " 36 minecraft:air");
+		server.runCommand("fill 27 " + (y - 1) + " 26 42 " + (y - 1) + " 36 minecraft:stone");
+		server.runCommand("tp @p 34 " + up + " 24 0 20");
+		// 9 lit furnaces, with 27 boilers on top of them
+		for (int x = 30; x <= 32; x++) {
+			for (int z = 30; z <= 32; z++) {
+				put(server, x, y, z, "minecraft:furnace[lit=true]");
+				server.runCommand("data merge block " + x + " " + y + " " + z + " {lit_time_remaining:3000,lit_total_time:3000}");
+				for (int h = 0; h < 3; h++) {
+					put(server, x, up + h, z, "wildcatter:boiler");
+				}
+			}
+		}
+		// 27 steam turbines right next to them, and a transformer + lamp on the generator's far side
+		for (int x = 33; x <= 35; x++) {
+			for (int z = 30; z <= 32; z++) {
+				for (int h = 0; h < 3; h++) {
+					put(server, x, up + h, z, "wildcatter:steam_turbine");
+				}
+			}
+		}
+		put(server, 36, up, 31, "wildcatter:transformer[facing=west]");
+		put(server, 37, up, 31, "wildcatter:electric_lamp");
+		context.waitTicks(60);   // they find each other
+		server.computeOnServer(srv -> {
+			BoilerBlockEntity boiler = (BoilerBlockEntity) srv.overworld().getBlockEntity(new BlockPos(31, up + 1, 31));
+			for (int i = 0; i < 30; i++) {
+				boiler.addWater(1000);
+			}
+			return null;
+		});
+		context.waitTicks(80);
+
+		String coil = read(server, 31, up + 1, 31);   // any boiler of the cube answers for the whole thing
+		check(coil.contains("Coil boiler") && coil.contains("9 of 9"), "27 boilers over 9 lit furnaces should form a coil boiler: " + coil);
+		check(coil.contains("/108000"), "the coil boiler should hold 27 boilers of water: " + coil);
+		check(server.computeOnServer(srv -> srv.overworld().getBlockState(new BlockPos(32, up + 2, 32)).getValue(BoilerBlock.FORMED)),
+				"the boilers of a coil boiler should switch to the coil look");
+		String gen = read(server, 34, up + 1, 31);
+		check(gen.contains("Medium voltage generator"), "27 turbines in a cube should form a medium voltage generator: " + gen);
+		check(server.computeOnServer(srv -> srv.overworld().getBlockState(new BlockPos(35, up + 2, 30)).getValue(SteamTurbineBlock.FORMED)),
+				"the turbines of the generator should switch to the generator look");
+		check(read(server, 36, up, 31).contains("4"), "the transformer should see the generator's medium voltage: " + read(server, 36, up, 31));
+		check(lit(server, 37, 31), "a lamp behind a transformer on the medium voltage generator should light: " + read(server, 37, up, 31));
+		String lamp = read(server, 37, up, 31);
+		context.takeScreenshot("wildcatter-big-machines");
+
+		// Pull out a boiler from the middle layer: the coil boiler falls apart, and the blocks go back to normal.
+		server.runCommand("setblock 31 " + (up + 1) + " 31 minecraft:air");
+		context.waitTicks(60);
+		String broken = read(server, 31, up, 31);
+		check(!broken.contains("Coil boiler"), "a coil boiler with a boiler missing must fall apart: " + broken);
+		check(!server.computeOnServer(srv -> srv.overworld().getBlockState(new BlockPos(32, up + 2, 32)).getValue(BoilerBlock.FORMED)),
+				"the leftover boilers should go back to the plain look");
+		System.out.println("[wildcatter-test] big machines ok: " + coil + " | " + gen + " | " + lamp);
 	}
 
 	// ---- the 110 V loop --------------------------------------------------------------------------------------

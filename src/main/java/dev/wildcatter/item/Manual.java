@@ -75,6 +75,11 @@ public final class Manual {
 				"12. POWER METER\n\nRight-click a wire, machine or breaker to read its volts, amps and watts, how worn the wool is, and whether a machine is grounded. "
 						+ "It also says why a machine has no power.\n\nThe meter is insulated: safe on live equipment.",
 
+				"BIG MACHINES\n\nCOIL BOILER: build a 3x3x3 cube of 27 Boilers on top of a 3x3 floor of 9 Furnaces. It joins up by itself (you will hear it). Light the furnaces: each one needs fuel and something to smelt. "
+						+ "Each lit furnace does a ninth of the work, so nine make " + (Tuning.BOILER_STEAM_PER_TICK * Tuning.BIG_SIZE * Tuning.BIG_SIZE * Tuning.BIG_SIZE * 20 * (int) Tuning.JOULES_PER_STEAM / 1000)
+						+ " kW of steam. Fill any boiler of the cube with water: they share one big tank.\n\n"
+						+ "MEDIUM VOLTAGE GENERATOR: a 3x3x3 cube of 27 Steam Turbines, touching the coil boiler, makes 4.16 kV. Wire to ANY face. Step it down with a transformer for 110 V.\n\nBreak one block and the machine falls apart.",
+
 				"COMING\n\nPlastic insulation.\nGas and diesel turbines.\nDrilling rigs and wells.\nRefining.\nFuses, switches and panels.\n\nThis book will grow as they do."
 		);
 	}

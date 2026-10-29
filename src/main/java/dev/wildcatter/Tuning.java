@@ -22,6 +22,13 @@ public final class Tuning {
 	public static final int STEAM_PER_WATER = 20;             // 1 water makes this much steam: a campfire runs 33 minutes on 4 buckets
 	public static final int WATER_PER_BUCKET = 1000;
 
+	// ---- Big machines (3x3x3 multiblocks) ------------------------------------------------------------------------
+	/** 27 boilers on top of 9 furnaces make a coil boiler. Each lit furnace under it does 1/9 of the work. */
+	public static final int BIG_SIZE = 3;
+	public static final int STRUCTURE_CHECK_TICKS = 20;       // how often a structure is checked / looked for
+	/** 27 steam turbines in a cube make a medium voltage generator: 27 x 2 kW = 54 kW at 4.16 kV. */
+	public static final double MV_GENERATOR_OHMS = 16.0;      // its output sags about 5% at full load (13 A)
+
 	// ---- Steam turbine -----------------------------------------------------------------------------------------
 	/** Energy in one unit of steam. A campfire boiler (2 steam a tick) therefore makes 2 kW. */
 	public static final double JOULES_PER_STEAM = 50.0;

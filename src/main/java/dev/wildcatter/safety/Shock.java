@@ -1,5 +1,6 @@
 package dev.wildcatter.safety;
 
+import dev.wildcatter.WildcatterSounds;
 import dev.wildcatter.Tuning;
 import dev.wildcatter.energy.Voltage;
 import net.minecraft.core.BlockPos;
@@ -61,7 +62,7 @@ public final class Shock {
 		Vec3 at = Vec3.atCenterOf(source);
 		level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 12, 0.3, 0.3, 0.3, 0.2);
 		level.sendParticles(ParticleTypes.ELECTRIC_SPARK, victim.getX(), victim.getY() + 1.0, victim.getZ(), 8, 0.3, 0.5, 0.3, 0.2);
-		level.playSound(null, source, SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.BLOCKS, 0.25F, 2.0F);
+		level.playSound(null, source, WildcatterSounds.ZAP, SoundSource.BLOCKS, 0.9F, 1.0F);
 	}
 
 	/**

@@ -1,10 +1,16 @@
 {
   "variants": {
-    "lit=false": {
+    "lit=false,formed=false": {
       "model": "wildcatter:block/boiler"
     },
-    "lit=true": {
+    "lit=false,formed=true": {
+      "model": "wildcatter:block/boiler_formed"
+    },
+    "lit=true,formed=false": {
       "model": "wildcatter:block/boiler_lit"
+    },
+    "lit=true,formed=true": {
+      "model": "wildcatter:block/boiler_formed_lit"
     }
   }
 }

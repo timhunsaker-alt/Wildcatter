@@ -236,19 +236,29 @@ def manual(img, d):
 tex("power_meter", meter, "item")
 tex("field_manual", manual, "item")
 
+# Real art: the Ludo textures (made by tools/process_art.py) replace the placeholders of the same name.
+if os.path.isdir("art/final"):
+	for f in os.listdir("art/final"):
+		kind = "item" if f in ("power_meter.png", "field_manual.png") else "block"
+		shutil.copy(f"art/final/{f}", f"{ASSETS}/textures/{kind}/{f}")
+
 # ---- models -------------------------------------------------------------------------------------------
 def block_model(name, parent, textures):
 	save_json(f"{ASSETS}/models/block/{name}.json", {"parent": parent, "textures": textures})
 
 
-block_model("boiler", "minecraft:block/cube_bottom_top",
-	{"top": f"{ns}:block/boiler_top", "bottom": f"{ns}:block/boiler_bottom", "side": f"{ns}:block/boiler_side"})
-block_model("boiler_lit", "minecraft:block/cube_bottom_top",
-	{"top": f"{ns}:block/boiler_top", "bottom": f"{ns}:block/boiler_bottom", "side": f"{ns}:block/boiler_side_lit"})
-block_model("steam_turbine", "minecraft:block/cube_column",
-	{"end": f"{ns}:block/steam_turbine_end", "side": f"{ns}:block/steam_turbine_side"})
-block_model("steam_turbine_running", "minecraft:block/cube_column",
-	{"end": f"{ns}:block/steam_turbine_end_running", "side": f"{ns}:block/steam_turbine_side_running"})
+for lit in (False, True):
+	suffix = "_lit" if lit else ""
+	block_model(f"boiler{suffix}", "minecraft:block/cube_bottom_top",
+		{"top": f"{ns}:block/boiler_top", "bottom": f"{ns}:block/boiler_bottom", "side": f"{ns}:block/boiler_side{suffix}"})
+	block_model(f"boiler_formed{suffix}", "minecraft:block/cube_bottom_top",
+		{"top": f"{ns}:block/boiler_top", "bottom": f"{ns}:block/boiler_bottom", "side": f"{ns}:block/boiler_formed_side{suffix}"})
+for running in (False, True):
+	suffix = "_running" if running else ""
+	block_model(f"steam_turbine{suffix}", "minecraft:block/cube_column",
+		{"end": f"{ns}:block/steam_turbine_end{suffix}", "side": f"{ns}:block/steam_turbine_side{suffix}"})
+	block_model(f"steam_turbine_formed{suffix}", "minecraft:block/cube_column",
+		{"end": f"{ns}:block/generator_end{suffix}", "side": f"{ns}:block/generator_side{suffix}"})
 for load in ("electric_lamp", "electric_heater"):
 	block_model(load, "minecraft:block/cube_all", {"all": f"{ns}:block/{load}"})
 	block_model(f"{load}_lit", "minecraft:block/cube_all", {"all": f"{ns}:block/{load}_lit"})
@@ -256,9 +266,11 @@ for load in ("electric_lamp", "electric_heater"):
 		"lit=false": {"model": f"{ns}:block/{load}"}, "lit=true": {"model": f"{ns}:block/{load}_lit"}}})
 
 save_json(f"{ASSETS}/blockstates/boiler.json", {"variants": {
-	"lit=false": {"model": f"{ns}:block/boiler"}, "lit=true": {"model": f"{ns}:block/boiler_lit"}}})
+	f"lit={lit},formed={formed}": {"model": f"{ns}:block/boiler{'_formed' if formed == 'true' else ''}{'_lit' if lit == 'true' else ''}"}
+	for lit in ("false", "true") for formed in ("false", "true")}})
 save_json(f"{ASSETS}/blockstates/steam_turbine.json", {"variants": {
-	"running=false": {"model": f"{ns}:block/steam_turbine"}, "running=true": {"model": f"{ns}:block/steam_turbine_running"}}})
+	f"running={running},formed={formed}": {"model": f"{ns}:block/steam_turbine{'_formed' if formed == 'true' else ''}{'_running' if running == 'true' else ''}"}
+	for running in ("false", "true") for formed in ("false", "true")}})
 
 for tname, t in (("transformer", "transformer"), ("substation_transformer", "substation")):
 	save_json(f"{ASSETS}/models/block/{tname}.json", {"parent": "minecraft:block/orientable", "textures": {
@@ -354,6 +366,12 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 	"block.wildcatter.electric_heater": "Electric Heater (1500 W)",
 	"block.wildcatter.transformer": "Transformer (110 V / 4.16 kV)",
 	"block.wildcatter.substation_transformer": "Substation Transformer (4.16 kV / 138 kV)",
+	"subtitles.wildcatter.turbine_hum": "Turbine hums",
+	"subtitles.wildcatter.boiler_hiss": "Boiler hisses",
+	"subtitles.wildcatter.breaker_trip": "Breaker trips",
+	"subtitles.wildcatter.breaker_click": "Breaker clicks",
+	"subtitles.wildcatter.zap": "Electric shock",
+	"subtitles.wildcatter.structure_formed": "Machine powers up",
 	"item.wildcatter.power_meter": "Power Meter",
 	"item.wildcatter.field_manual": "Wildcatter Field Manual",
 })

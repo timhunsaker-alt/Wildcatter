@@ -19,18 +19,20 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
-/** A steel tank you fill with water. Put it on a lit campfire. */
+/** A steel tank you fill with water. Put it on a lit campfire, or build 27 of them over 9 furnaces for a coil boiler. */
 public class BoilerBlock extends BaseEntityBlock {
 	public static final BooleanProperty LIT = BlockStateProperties.LIT;
+	/** Part of a coil boiler (27 boilers over 9 furnaces). */
+	public static final BooleanProperty FORMED = BooleanProperty.create("formed");
 
 	public BoilerBlock(Properties properties) {
 		super(properties);
-		registerDefaultState(stateDefinition.any().setValue(LIT, false));
+		registerDefaultState(stateDefinition.any().setValue(LIT, false).setValue(FORMED, false));
 	}
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
-		builder.add(LIT);
+		builder.add(LIT, FORMED);
 	}
 
 	@Override
