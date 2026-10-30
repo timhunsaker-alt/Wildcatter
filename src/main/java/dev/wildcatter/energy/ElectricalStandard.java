@@ -97,6 +97,7 @@ public enum ElectricalStandard {
 		return switch (tier) {
 			case LOW -> low;
 			case MEDIUM -> medium;
+			case DISTRIBUTION -> distribution;
 			case HIGH -> high;
 		};
 	}

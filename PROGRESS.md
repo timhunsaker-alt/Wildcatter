@@ -95,6 +95,11 @@ All of them go in the hot wire: in at the back, out at the front. Sneak and righ
 - Game test: a 2 kW turbine with a lamp and a 4.5 kW heater bank behind a relay sheds the heaters (island fell to 58.2 Hz), keeps running and recovers to 60.0 Hz; without the relay the turbine trips on under-frequency, restarts when the load is removed, and runs. The old overload-trips-the-breaker test now has a second turbine set, because a lone 2 kW set stalls before a breaker's heating can trip it.
 - Not done: frequency effect on motors, MV feeder relays (Phase 2), reclosers, generator synchronisation.
 
+## Phase 2a: distribution tier
+- `Voltage.DISTRIBUTION` (12.47 kV NA / 11 kV IEC; a single-phase tap holds the line-to-neutral 7.2 kV). New: distribution wires (bare and plastic, selectable conductor), a distribution breaker (200/400/600/1200 A), and a distribution transformer (138 kV to 12.47 kV, a 20 MVA stand-in until the Phase 4 substation). Values and their real-world basis: `docs/phase2-distribution.md`.
+- Game test: 120 V stepped up to 4.16 kV, 138 kV and down to a 12.47 kV line that holds 7,200 V.
+- Next: 2b insulators and spans.
+
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.

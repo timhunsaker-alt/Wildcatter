@@ -46,6 +46,7 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 		return switch (voltage()) {
 			case LOW -> Tuning.BREAKER_AMPS;
 			case MEDIUM -> Tuning.BREAKER_AMPS_MEDIUM;
+			case DISTRIBUTION -> Tuning.BREAKER_AMPS_DISTRIBUTION;
 			case HIGH -> Tuning.BREAKER_AMPS_HIGH;
 		};
 	}

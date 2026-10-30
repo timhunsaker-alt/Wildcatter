@@ -244,6 +244,7 @@ def tinted_breaker(color):
 tex("switch_body", tinted_breaker((200, 170, 40)))
 tex("relay_body", tinted_breaker((150, 70, 190)))
 tex("mv_breaker_body", tinted_breaker((60, 90, 170)))
+tex("dist_breaker_body", tinted_breaker((60, 150, 90)))
 tex("hv_breaker_body", tinted_breaker((170, 60, 60)))
 
 
@@ -260,7 +261,7 @@ tex("insulator", plain((200, 200, 210)))
 tex("breaker_lever_on", lever((60, 190, 90)))
 tex("breaker_lever_off", lever((120, 120, 126)))
 tex("breaker_lever_tripped", lever((220, 60, 50)))
-for name, t in (("transformer", ((96, 102, 112), (225, 225, 215))), ("substation", ((70, 90, 130), (200, 215, 240)))):
+for name, t in (("transformer", ((96, 102, 112), (225, 225, 215))), ("substation", ((70, 90, 130), (200, 215, 240))), ("distribution", ((60, 115, 85), (205, 235, 215)))):
 	tex(f"{name}_front", transformer_front(*t))
 	tex(f"{name}_side", transformer_side(t[0]))
 	tex(f"{name}_top", transformer_top(t[0]))
@@ -282,10 +283,11 @@ def plastic_sheath(sheath, band):
 for key, band in CONDUCTOR_COLORS.items():
 	tex(f"wire_{key}", bare(COPPER, band))
 	tex(f"mv_wire_{key}", bare(ALUMINIUM, band))
+	tex(f"dist_wire_{key}", bare((178, 164, 150), band))
 	tex(f"hv_wire_{key}", bare(STEEL_WIRE, band))
 	for wear in range(4):
 		tex(f"wool_wire_{key}_{wear}", wool(band if key != "n" else (45, 45, 50), wear))
-	for prefix, tint in (("", (235, 235, 240)), ("mv_", (225, 230, 245)), ("hv_", (215, 225, 250))):
+	for prefix, tint in (("", (235, 235, 240)), ("mv_", (225, 230, 245)), ("dist_", (225, 240, 230)), ("hv_", (215, 225, 250))):
 		tex(f"{prefix}plastic_wire_{key}", plastic_sheath(tint if key != "n" else (60, 60, 66), band))
 tex("ground_wire", bare((40, 150, 70), (240, 220, 60)))
 tex("ground_rod", bare((205, 125, 80), (140, 80, 50)))
@@ -360,7 +362,7 @@ save_json(f"{ASSETS}/blockstates/steam_turbine.json", {"variants": {
 	f"running={running},formed={formed}": {"model": f"{ns}:block/steam_turbine{'_formed' if formed == 'true' else ''}{'_running' if running == 'true' else ''}"}
 	for running in ("false", "true") for formed in ("false", "true")}})
 
-for tname, t in (("transformer", "transformer"), ("substation_transformer", "substation")):
+for tname, t in (("transformer", "transformer"), ("substation_transformer", "substation"), ("distribution_transformer", "distribution")):
 	save_json(f"{ASSETS}/models/block/{tname}.json", {"parent": "minecraft:block/orientable", "textures": {
 		"front": f"{ns}:block/{t}_front", "side": f"{ns}:block/{t}_side", "top": f"{ns}:block/{t}_top", "bottom": f"{ns}:block/{t}_top"}})
 	save_json(f"{ASSETS}/blockstates/{tname}.json", {"variants": {
@@ -375,7 +377,7 @@ def cuboid(frm, to, texture="#cable"):
 
 # The breaker: a box with a lever. On leans one way, off the other, tripped sits in the middle. The 4.16 kV and
 # 138 kV ones are bigger (a wider, taller body and a longer lever) and tinted blue and red.
-for prefix, wide in (("", 0), ("mv_", 1), ("hv_", 2)):
+for prefix, wide in (("", 0), ("mv_", 1), ("dist_", 1), ("hv_", 2)):
 	for position, angle in (("on", -30), ("off", 30), ("tripped", 0)):
 		top = 10 + 3 * wide
 		lever_el = cuboid([7, top, 7], [9, top + 5 + wide, 9], "#lever")
@@ -404,7 +406,7 @@ save_json(f"{ASSETS}/blockstates/ufls_relay.json", {"variants": {
 save_json(f"{ASSETS}/blockstates/fuse.json", {"variants": {
 	f"blown={blown},facing={facing}": {"model": f"{ns}:block/fuse_{'blown' if blown == 'true' else 'good'}", "y": y}
 	for facing, y in rotations.items() for blown in ("false", "true")}})
-for prefix in ("", "mv_", "hv_"):
+for prefix in ("", "mv_", "dist_", "hv_"):
 	save_json(f"{ASSETS}/blockstates/{prefix}breaker.json", {"variants": {
 		f"facing={facing},position={position}": {"model": f"{ns}:block/{prefix}breaker_{position}", "y": y}
 		for facing, y in rotations.items() for position in ("on", "off", "tripped")}})
@@ -436,8 +438,8 @@ def wire_models(model_name, texture):
 		"elements": [cuboid([0, 7, 7], [16, 9, 9]), cuboid([7, 7, 0], [9, 9, 16])]})
 
 
-BARE_WIRES = ("wire_hot", "wire_neutral", "mv_wire_hot", "mv_wire_neutral", "hv_wire_hot", "hv_wire_neutral", "ground_wire")
-PLASTIC_WIRES = ("plastic_wire_hot", "plastic_wire_neutral", "mv_plastic_wire_hot", "mv_plastic_wire_neutral", "hv_plastic_wire_hot", "hv_plastic_wire_neutral")
+BARE_WIRES = ("wire_hot", "wire_neutral", "mv_wire_hot", "mv_wire_neutral", "dist_wire_hot", "dist_wire_neutral", "hv_wire_hot", "hv_wire_neutral", "ground_wire")
+PLASTIC_WIRES = ("plastic_wire_hot", "plastic_wire_neutral", "mv_plastic_wire_hot", "mv_plastic_wire_neutral", "dist_plastic_wire_hot", "dist_plastic_wire_neutral", "hv_plastic_wire_hot", "hv_plastic_wire_neutral")
 WOOL_WIRES = ("wool_wire_hot", "wool_wire_neutral")
 
 # The ground wire (the bonding wire for machines) is a plain single piece.
@@ -496,7 +498,7 @@ WIRES = BARE_WIRES + WOOL_WIRES + PLASTIC_WIRES
 ITEM_MODELS = {"firebox": "block/firebox", "pump": "block/pump", "pipe": "block/pipe_inventory", "gas_line": "block/gas_line_inventory", "drilling_rig": "block/drilling_rig", "refinery": "block/refinery", "refinery_column": "block/refinery_column", "cooling_tower": "block/cooling_tower", "cooling_fill": "block/cooling_fill",
 	"diesel_engine": "block/diesel_engine", "gas_turbine": "block/gas_turbine", "pumpjack": "block/pumpjack",
 	"gas_wellhead": "block/gas_wellhead", "casing": "block/casing", "boiler": "block/boiler", "steam_turbine": "block/steam_turbine", "electric_lamp": "block/electric_lamp",
-	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "fuse": "block/fuse_good", "switch": "block/switch_on", "ufls_relay": "block/relay_on", "mv_breaker": "block/mv_breaker_on", "hv_breaker": "block/hv_breaker_on", "pole": "block/pole", "crossarm": "block/crossarm_x", "transformer": "block/transformer",
+	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "fuse": "block/fuse_good", "dist_breaker": "block/dist_breaker_on", "distribution_transformer": "block/distribution_transformer", "switch": "block/switch_on", "ufls_relay": "block/relay_on", "mv_breaker": "block/mv_breaker_on", "hv_breaker": "block/hv_breaker_on", "pole": "block/pole", "crossarm": "block/crossarm_x", "transformer": "block/transformer",
 	"substation_transformer": "block/substation_transformer", "ground_rod": "block/ground_rod",
 	"power_meter": "item/power_meter", "field_manual": "item/field_manual", "seismograph": "item/seismograph", "crude_oil_bucket": "item/crude_oil_bucket", "plastic_sheet": "item/plastic_sheet", "diesel_bucket": "item/diesel_bucket", "steel_ingot": "item/steel_ingot"}
 ITEM_MODELS.update({w: f"block/{w}_inventory" for w in WIRES})
@@ -544,6 +546,12 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 	"block.wildcatter.switch": "Switch (LV)",
 	"block.wildcatter.ufls_relay": "Under-Frequency Relay (LV)",
 	"block.wildcatter.mv_breaker": "Circuit Breaker (MV)",
+	"block.wildcatter.dist_breaker": "Circuit Breaker (DIST)",
+	"block.wildcatter.dist_wire_hot": "Bare Line, red (DIST)",
+	"block.wildcatter.dist_wire_neutral": "Bare Line, black (DIST)",
+	"block.wildcatter.dist_plastic_wire_hot": "Plastic Line, red (DIST)",
+	"block.wildcatter.dist_plastic_wire_neutral": "Plastic Line, black (DIST)",
+	"block.wildcatter.distribution_transformer": "Distribution Transformer (HV / DIST)",
 	"block.wildcatter.hv_breaker": "Circuit Breaker (HV)",
 	"block.wildcatter.pole": "Utility Pole",
 	"block.wildcatter.crossarm": "Pole Crossarm",
@@ -567,7 +575,7 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 })
 
 # ---- loot: every block drops itself ---------------------------------------------------------------
-BLOCKS = ("refinery", "refinery_column", "cooling_tower", "cooling_fill", "diesel_engine", "gas_turbine", "boiler", "firebox", "pipe", "gas_line", "drilling_rig", "pumpjack", "gas_wellhead", "pump", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "electric_heater", "breaker", "fuse", "switch", "ufls_relay", "mv_breaker", "hv_breaker", "pole", "crossarm", "ground_rod") + WIRES
+BLOCKS = ("refinery", "refinery_column", "cooling_tower", "cooling_fill", "diesel_engine", "gas_turbine", "boiler", "firebox", "pipe", "gas_line", "drilling_rig", "pumpjack", "gas_wellhead", "pump", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "electric_heater", "breaker", "fuse", "switch", "ufls_relay", "mv_breaker", "dist_breaker", "distribution_transformer", "hv_breaker", "pole", "crossarm", "ground_rod") + WIRES
 for name in BLOCKS:
 	save_json(f"{DATA}/loot_table/blocks/{name}.json", {
 		"type": "minecraft:block",
@@ -577,7 +585,7 @@ for name in BLOCKS:
 save_json(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json", {"values": [f"{ns}:{n}" for n in BLOCKS + ("casing",) if n not in ("pole", "crossarm")]})
 save_json(f"{ROOT}/data/minecraft/tags/block/mineable/axe.json", {"values": [f"{ns}:pole", f"{ns}:crossarm"]})
 save_json(f"{ROOT}/data/minecraft/tags/block/climbable.json", {"values": [f"{ns}:pole"]})
-save_json(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json", {"values": [f"{ns}:{n}" for n in ("boiler", "firebox", "mv_breaker", "hv_breaker", "pump", "drilling_rig", "pumpjack", "gas_wellhead", "refinery", "refinery_column", "cooling_tower", "cooling_fill", "diesel_engine", "gas_turbine", "steam_turbine", "transformer", "substation_transformer")]})
+save_json(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json", {"values": [f"{ns}:{n}" for n in ("boiler", "firebox", "mv_breaker", "dist_breaker", "distribution_transformer", "hv_breaker", "pump", "drilling_rig", "pumpjack", "gas_wellhead", "refinery", "refinery_column", "cooling_tower", "cooling_fill", "diesel_engine", "gas_turbine", "steam_turbine", "transformer", "substation_transformer")]})
 
 # ---- recipes (early game: iron, copper, redstone, glass, dye, wool) ----------------------------------------
 def shaped(name, pattern, key, result, count=1):
@@ -612,6 +620,7 @@ shaped("steam_turbine", ["ICI", "CRC", "ICI"], {"I": "minecraft:iron_ingot", "C"
 for role, dye in (("hot", "minecraft:red_dye"), ("neutral", "minecraft:black_dye")):
 	shapeless(f"wire_{role}", ["minecraft:copper_ingot"] * 3 + [dye], f"wire_{role}", 6)
 	shapeless(f"wool_wire_{role}", [f"{ns}:wire_{role}"] * 4 + ["#minecraft:wool"], f"wool_wire_{role}", 4)
+	shapeless(f"dist_wire_{role}", ["minecraft:iron_ingot"] * 2 + ["minecraft:copper_ingot"] * 3 + ["minecraft:gold_ingot", dye], f"dist_wire_{role}", 4)
 	shapeless(f"mv_wire_{role}", ["minecraft:iron_ingot"] * 2 + ["minecraft:copper_ingot"] * 3 + [dye], f"mv_wire_{role}", 4)
 	shapeless(f"hv_wire_{role}", ["minecraft:iron_ingot"] * 4 + ["minecraft:copper_ingot"] * 2 + [dye], f"hv_wire_{role}", 4)
 shaped("ground_rod", ["C", "C", "C"], {"C": "minecraft:copper_ingot"}, "ground_rod", 2)
@@ -621,16 +630,19 @@ shaped("ufls_relay", ["ICI", "RBR", "III"], {"I": "minecraft:iron_ingot", "C": "
 shaped("switch", ["I I", "ICI", "III"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot"}, "switch")
 shaped("breaker", ["ICI", "IRI", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, "breaker")
 shaped("mv_breaker", ["IBI", "CRC", "IBI"], {"I": "minecraft:iron_ingot", "B": f"{ns}:breaker", "C": "minecraft:copper_ingot", "R": "minecraft:redstone_block"}, "mv_breaker")
+shaped("dist_breaker", ["IBI", "GRG", "IBI"], {"I": "minecraft:iron_ingot", "B": f"{ns}:mv_breaker", "G": "minecraft:gold_ingot", "R": "minecraft:redstone_block"}, "dist_breaker")
 shaped("hv_breaker", ["DBD", "IRI", "DBD"], {"I": "minecraft:iron_block", "B": f"{ns}:mv_breaker", "D": "minecraft:diamond", "R": "minecraft:redstone_block"}, "hv_breaker")
 shaped("pole", ["L", "L", "L"], {"L": "#minecraft:logs"}, "pole", 3)
 shaped("crossarm", ["PPP", " N "], {"P": "#minecraft:planks", "N": "minecraft:iron_nugget"}, "crossarm", 2)
 shaped("transformer", ["ICI", "ICI", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot"}, "transformer")
+shaped("distribution_transformer", ["IDI", "SCS", "IDI"], {"I": "minecraft:iron_ingot", "D": "minecraft:diamond", "S": f"{ns}:substation_transformer", "C": "minecraft:copper_block"}, "distribution_transformer")
 shaped("substation_transformer", ["IDI", "TCT", "IDI"], {"I": "minecraft:iron_ingot", "D": "minecraft:diamond", "T": "wildcatter:transformer", "C": "minecraft:copper_block"}, "substation_transformer")
 shaped("electric_lamp", [" G ", "GRG", " C "], {"G": "minecraft:glass_pane", "R": "minecraft:redstone", "C": "minecraft:copper_ingot"}, "electric_lamp")
 shaped("electric_heater", ["III", "CRC", "III"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, "electric_heater")
 # Plastic wire: the same copper as ordinary wire, wrapped in plastic sheet.
 for role, dye in (("hot", "minecraft:red_dye"), ("neutral", "minecraft:black_dye")):
 	shapeless(f"plastic_wire_{role}", [f"{ns}:wire_{role}"] * 4 + [f"{ns}:plastic_sheet"], f"plastic_wire_{role}", 4)
+	shapeless(f"dist_plastic_wire_{role}", [f"{ns}:dist_wire_{role}"] * 4 + [f"{ns}:plastic_sheet"] * 2, f"dist_plastic_wire_{role}", 4)
 	shapeless(f"mv_plastic_wire_{role}", [f"{ns}:mv_wire_{role}"] * 4 + [f"{ns}:plastic_sheet"] * 2, f"mv_plastic_wire_{role}", 4)
 	shapeless(f"hv_plastic_wire_{role}", [f"{ns}:hv_wire_{role}"] * 4 + [f"{ns}:plastic_sheet"] * 3, f"hv_plastic_wire_{role}", 4)
 shapeless("field_manual", ["minecraft:book", "minecraft:copper_ingot"], "field_manual")

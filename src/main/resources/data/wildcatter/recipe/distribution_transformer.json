@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IDI",
+    "SCS",
+    "IDI"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "D": "minecraft:diamond",
+    "S": "wildcatter:substation_transformer",
+    "C": "minecraft:copper_block"
+  },
+  "result": {
+    "id": "wildcatter:distribution_transformer",
+    "count": 1
+  }
+}

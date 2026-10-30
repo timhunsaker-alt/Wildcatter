@@ -118,9 +118,11 @@ public final class Tuning {
 	public static final double WIRE_OHMS_LOW = 0.02;
 	public static final double WIRE_OHMS_MEDIUM = 0.5;
 	public static final double WIRE_OHMS_HIGH = 2.0;
+	public static final double WIRE_OHMS_DISTRIBUTION = 0.8;   // between 4.16 kV and 138 kV wire (docs/phase2-distribution.md)
 	public static final double WIRE_AMPS_LOW = 20.0;          // about 12 gauge copper
 	public static final double WIRE_AMPS_MEDIUM = 200.0;
 	public static final double WIRE_AMPS_HIGH = 600.0;
+	public static final double WIRE_AMPS_DISTRIBUTION = 400.0;
 	/** A wire carrying twice its rating burns out after about this long. Hotter, faster. */
 	public static final double WIRE_BURN_SECONDS_AT_2X = 6.0;
 	public static final double WIRE_COOL_SECONDS = 20.0;
@@ -142,6 +144,7 @@ public final class Tuning {
 	public static final int[] BREAKER_AMPS = {15, 20, 30, 50};               // 110 V
 	public static final int[] BREAKER_AMPS_MEDIUM = {30, 60, 100, 200};      // 4.16 kV: a 100 kW generator makes 24 A
 	public static final int[] BREAKER_AMPS_HIGH = {100, 200, 400, 600};      // 138 kV
+	public static final int[] BREAKER_AMPS_DISTRIBUTION = {200, 400, 600, 1200};   // feeder breakers
 	public static final double BREAKER_MAGNETIC_MULTIPLE = 8; // instant trip at this many times the rating: a short circuit
 	public static final double BREAKER_TRIP_SECONDS_AT_2X = 4.0; // a breaker carrying twice its rating trips after about this long
 	public static final double BREAKER_COOL_SECONDS = 10.0;
@@ -157,6 +160,7 @@ public final class Tuning {
 	// Damage is in half-hearts (2 = one heart) at full voltage, and doubles if you are wet (in water or in rain).
 	public static final float SHOCK_DAMAGE_LOW = 2.0F;        // 110 V: it hurts
 	public static final float SHOCK_DAMAGE_MEDIUM = 8.0F;     // 4.16 kV: four hearts
+	public static final float SHOCK_DAMAGE_DISTRIBUTION = 12.0F;   // 12.47 kV: six hearts
 	public static final float SHOCK_DAMAGE_HIGH = 20.0F;      // 138 kV: no
 	public static final float WET_SHOCK_MULTIPLIER = 2.0F;
 	public static final int SHOCK_INTERVAL = 10;              // ticks between shocks from a live wire
@@ -166,11 +170,13 @@ public final class Tuning {
 	// Higher voltage arcs further, so bare lines have to be up on tall poles.
 	public static final double BARE_REACH_LOW = 0.3;
 	public static final double BARE_REACH_MEDIUM = 2.0;
+	public static final double BARE_REACH_DISTRIBUTION = 3.0;
 	public static final double BARE_REACH_HIGH = 4.0;
 
 	// Touching a live machine that has no ground connection: the chance it bites.
 	public static final double TOUCH_SHOCK_CHANCE_LOW = 0.15;
 	public static final double TOUCH_SHOCK_CHANCE_MEDIUM = 0.6;
+	public static final double TOUCH_SHOCK_CHANCE_DISTRIBUTION = 0.8;
 	public static final double TOUCH_SHOCK_CHANCE_HIGH = 1.0;
 
 	/** How far a ground wire may run from a machine to its ground rod. */

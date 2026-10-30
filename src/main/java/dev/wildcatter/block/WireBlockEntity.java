@@ -51,6 +51,7 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		return switch (block().voltage()) {
 			case LOW -> Tuning.WIRE_OHMS_LOW;
 			case MEDIUM -> Tuning.WIRE_OHMS_MEDIUM;
+			case DISTRIBUTION -> Tuning.WIRE_OHMS_DISTRIBUTION;
 			case HIGH -> Tuning.WIRE_OHMS_HIGH;
 		};
 	}
@@ -59,6 +60,7 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		return switch (block().voltage()) {
 			case LOW -> Tuning.WIRE_AMPS_LOW;
 			case MEDIUM -> Tuning.WIRE_AMPS_MEDIUM;
+			case DISTRIBUTION -> Tuning.WIRE_AMPS_DISTRIBUTION;
 			case HIGH -> Tuning.WIRE_AMPS_HIGH;
 		};
 	}

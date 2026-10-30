@@ -116,6 +116,8 @@ public final class WildcatterBlocks {
 	public static final Block WOOL_WIRE_NEUTRAL = cable("wool_wire_neutral", Voltage.LOW, Conductor.N, true);
 	public static final Block MV_WIRE_HOT = cable("mv_wire_hot", Voltage.MEDIUM, Conductor.A, false);
 	public static final Block MV_WIRE_NEUTRAL = cable("mv_wire_neutral", Voltage.MEDIUM, Conductor.N, false);
+	public static final Block DIST_WIRE_HOT = cable("dist_wire_hot", Voltage.DISTRIBUTION, Conductor.A, false);
+	public static final Block DIST_WIRE_NEUTRAL = cable("dist_wire_neutral", Voltage.DISTRIBUTION, Conductor.N, false);
 	public static final Block HV_WIRE_HOT = cable("hv_wire_hot", Voltage.HIGH, Conductor.A, false);
 	public static final Block HV_WIRE_NEUTRAL = cable("hv_wire_neutral", Voltage.HIGH, Conductor.N, false);
 
@@ -124,6 +126,8 @@ public final class WildcatterBlocks {
 	public static final Block PLASTIC_WIRE_NEUTRAL = plasticCable("plastic_wire_neutral", Voltage.LOW, Conductor.N);
 	public static final Block MV_PLASTIC_WIRE_HOT = plasticCable("mv_plastic_wire_hot", Voltage.MEDIUM, Conductor.A);
 	public static final Block MV_PLASTIC_WIRE_NEUTRAL = plasticCable("mv_plastic_wire_neutral", Voltage.MEDIUM, Conductor.N);
+	public static final Block DIST_PLASTIC_WIRE_HOT = plasticCable("dist_plastic_wire_hot", Voltage.DISTRIBUTION, Conductor.A);
+	public static final Block DIST_PLASTIC_WIRE_NEUTRAL = plasticCable("dist_plastic_wire_neutral", Voltage.DISTRIBUTION, Conductor.N);
 	public static final Block HV_PLASTIC_WIRE_HOT = plasticCable("hv_plastic_wire_hot", Voltage.HIGH, Conductor.A);
 	public static final Block HV_PLASTIC_WIRE_NEUTRAL = plasticCable("hv_plastic_wire_neutral", Voltage.HIGH, Conductor.N);
 
@@ -146,6 +150,9 @@ public final class WildcatterBlocks {
 	/** For 4.16 kV and 138 kV hot lines. Same rules as the 110 V breaker, with ratings to suit the current. */
 	public static final Block MV_BREAKER = block("mv_breaker", props -> new BreakerBlock(props.mapColor(MapColor.COLOR_BLUE)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.MEDIUM));
+	/** For 12.47 kV feeders. */
+	public static final Block DIST_BREAKER = block("dist_breaker", props -> new BreakerBlock(props.mapColor(MapColor.COLOR_GREEN)
+			.strength(3.5F, 7.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.DISTRIBUTION));
 	public static final Block HV_BREAKER = block("hv_breaker", props -> new BreakerBlock(props.mapColor(MapColor.COLOR_RED)
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.HIGH));
 	public static final Block ELECTRIC_LAMP = block("electric_lamp", props -> new LoadBlock(props.mapColor(MapColor.COLOR_YELLOW)
@@ -157,18 +164,21 @@ public final class WildcatterBlocks {
 	public static final Block TRANSFORMER = block("transformer", props -> new TransformerBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.LOW, Voltage.MEDIUM));
 	/** Steps 4.16 kV up to 138 kV and back. */
+	/** 138 kV to 12.47 kV: the stand-in until the Phase 4 substation multiblock. */
+	public static final Block DISTRIBUTION_TRANSFORMER = block("distribution_transformer", props -> new TransformerBlock(props.mapColor(MapColor.COLOR_LIGHT_GREEN)
+			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.DISTRIBUTION, Voltage.HIGH));
 	public static final Block SUBSTATION_TRANSFORMER = block("substation_transformer", props -> new TransformerBlock(props.mapColor(MapColor.COLOR_BLUE)
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.MEDIUM, Voltage.HIGH));
 
 	public static final BlockEntityType<BoilerBlockEntity> BOILER_ENTITY = entity(BoilerBlockEntity::new, BOILER);
 	public static final BlockEntityType<SteamTurbineBlockEntity> STEAM_TURBINE_ENTITY = entity(SteamTurbineBlockEntity::new, STEAM_TURBINE);
-	public static final BlockEntityType<WireBlockEntity> WIRE_ENTITY = entity(WireBlockEntity::new, WIRE_HOT, WIRE_NEUTRAL, WOOL_WIRE_HOT,
+	public static final BlockEntityType<WireBlockEntity> WIRE_ENTITY = entity(WireBlockEntity::new, DIST_WIRE_HOT, DIST_WIRE_NEUTRAL, DIST_PLASTIC_WIRE_HOT, DIST_PLASTIC_WIRE_NEUTRAL, WIRE_HOT, WIRE_NEUTRAL, WOOL_WIRE_HOT,
 			WOOL_WIRE_NEUTRAL, MV_WIRE_HOT, MV_WIRE_NEUTRAL, HV_WIRE_HOT, HV_WIRE_NEUTRAL,
 			PLASTIC_WIRE_HOT, PLASTIC_WIRE_NEUTRAL, MV_PLASTIC_WIRE_HOT, MV_PLASTIC_WIRE_NEUTRAL, HV_PLASTIC_WIRE_HOT, HV_PLASTIC_WIRE_NEUTRAL);
 	public static final BlockEntityType<LoadBlockEntity> LOAD_ENTITY = entity(LoadBlockEntity::new, ELECTRIC_LAMP, ELECTRIC_HEATER);
-	public static final BlockEntityType<BreakerBlockEntity> BREAKER_ENTITY = entity(BreakerBlockEntity::new, BREAKER, MV_BREAKER, HV_BREAKER, SWITCH, UFLS_RELAY);
+	public static final BlockEntityType<BreakerBlockEntity> BREAKER_ENTITY = entity(BreakerBlockEntity::new, BREAKER, MV_BREAKER, DIST_BREAKER, HV_BREAKER, SWITCH, UFLS_RELAY);
 	public static final BlockEntityType<FuseBlockEntity> FUSE_ENTITY = entity(FuseBlockEntity::new, FUSE);
-	public static final BlockEntityType<TransformerBlockEntity> TRANSFORMER_ENTITY = entity(TransformerBlockEntity::new, TRANSFORMER, SUBSTATION_TRANSFORMER);
+	public static final BlockEntityType<TransformerBlockEntity> TRANSFORMER_ENTITY = entity(TransformerBlockEntity::new, TRANSFORMER, SUBSTATION_TRANSFORMER, DISTRIBUTION_TRANSFORMER);
 
 	public static final BlockEntityType<FireboxBlockEntity> FIREBOX_ENTITY = entity(FireboxBlockEntity::new, FIREBOX);
 	public static final BlockEntityType<PumpBlockEntity> PUMP_ENTITY = entity(PumpBlockEntity::new, PUMP);
@@ -233,6 +243,10 @@ public final class WildcatterBlocks {
 		add("wool_wire_neutral", WOOL_WIRE_NEUTRAL);
 		add("mv_wire_hot", MV_WIRE_HOT);
 		add("mv_wire_neutral", MV_WIRE_NEUTRAL);
+		add("dist_wire_hot", DIST_WIRE_HOT);
+		add("dist_wire_neutral", DIST_WIRE_NEUTRAL);
+		add("dist_plastic_wire_hot", DIST_PLASTIC_WIRE_HOT);
+		add("dist_plastic_wire_neutral", DIST_PLASTIC_WIRE_NEUTRAL);
 		add("hv_wire_hot", HV_WIRE_HOT);
 		add("hv_wire_neutral", HV_WIRE_NEUTRAL);
 		add("ground_rod", GROUND_ROD);
@@ -244,9 +258,11 @@ public final class WildcatterBlocks {
 		add("switch", SWITCH);
 		add("ufls_relay", UFLS_RELAY);
 		add("mv_breaker", MV_BREAKER);
+		add("dist_breaker", DIST_BREAKER);
 		add("hv_breaker", HV_BREAKER);
 		add("transformer", TRANSFORMER);
 		add("substation_transformer", SUBSTATION_TRANSFORMER);
+		add("distribution_transformer", DISTRIBUTION_TRANSFORMER);
 		add("electric_lamp", ELECTRIC_LAMP);
 		add("electric_heater", ELECTRIC_HEATER);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("boiler"), BOILER_ENTITY);

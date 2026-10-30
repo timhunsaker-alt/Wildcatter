@@ -11,6 +11,8 @@ package dev.wildcatter.energy;
 public enum Voltage {
 	LOW,
 	MEDIUM,
+	/** 12.47 kV (11 kV IEC): feeders from the substation to the pole transformers. */
+	DISTRIBUTION,
 	HIGH;
 
 	public String label() {
@@ -19,6 +21,8 @@ public enum Voltage {
 
 	/** The volts a source at this tier is meant to hold. */
 	public double nominal() {
-		return ElectricalStandard.active().level(this).volts();
+		double volts = ElectricalStandard.active().level(this).volts();
+		// the single-phase taps of a distribution feeder run line to neutral: 12.47 kV / sqrt 3 = 7.2 kV
+		return this == DISTRIBUTION ? volts / Math.sqrt(3.0) : volts;
 	}
 }

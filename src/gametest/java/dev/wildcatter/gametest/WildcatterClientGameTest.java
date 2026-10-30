@@ -55,6 +55,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			steamLoop(context, server);
 			refining(context, server);
 			frequency(context, server);
+			distribution(context, server);
 			fieldManual(server);
 		}
 	}
@@ -852,6 +853,32 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 				System.out.println("[wildcatter-test] generator trip ok: " + turbine + " | " + restarted);
 			}
 		}
+	}
+
+	/**
+	 * The distribution tier: a turbine's 120 V is stepped up to 4.16 kV, up to 138 kV, and down to 12.47 kV, the single-phase tap there holding 7.2 kV.
+	 * Row z=-60, facing east. The neutrals are tied to ground at each transformer, so only the hot line needs wire.
+	 */
+	private void distribution(ClientGameTestContext context, TestServerContext server) {
+		int z = -60;
+		server.runCommand("fill 8 " + y + " " + (z - 2) + " 22 " + (y + 5) + " " + (z + 3) + " minecraft:air");
+		plant(server, z);
+		put(server, 12, up, z, "wildcatter:wool_wire_hot");
+		put(server, 13, up, z, "wildcatter:transformer[facing=east]");
+		put(server, 14, up, z, "wildcatter:mv_wire_hot");
+		put(server, 15, up, z, "wildcatter:substation_transformer[facing=east]");
+		put(server, 16, up, z, "wildcatter:hv_wire_hot");
+		put(server, 17, up, z, "wildcatter:distribution_transformer[facing=west]");
+		put(server, 18, up, z, "wildcatter:dist_wire_hot");
+		put(server, 19, up, z, "wildcatter:dist_wire_hot");
+		server.runCommand("tp @p 17 " + (up + 1) + " " + (z + 5) + " 180 25");
+		context.waitTicks(160);
+		String line = read(server, 19, up, z);
+		check(line.contains("12.47 kV") && line.matches(".*\\b7[12]\\d\\d V,.*"), "the distribution line should hold about 7.2 kV line to neutral: " + line);
+		String transformer = read(server, 17, up, z);
+		check(transformer.contains("12.47 kV") && transformer.contains("138 kV"), "the distribution transformer should name its two voltages: " + transformer);
+		context.takeScreenshot("wildcatter-distribution");
+		System.out.println("[wildcatter-test] distribution ok: " + line + " | " + transformer);
 	}
 
 	private void fieldManual(TestServerContext server) {

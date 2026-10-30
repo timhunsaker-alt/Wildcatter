@@ -21,6 +21,7 @@ public final class Shock {
 		return switch (voltage) {
 			case LOW -> Tuning.SHOCK_DAMAGE_LOW;
 			case MEDIUM -> Tuning.SHOCK_DAMAGE_MEDIUM;
+			case DISTRIBUTION -> Tuning.SHOCK_DAMAGE_DISTRIBUTION;
 			case HIGH -> Tuning.SHOCK_DAMAGE_HIGH;
 		};
 	}
@@ -30,6 +31,7 @@ public final class Shock {
 		return switch (voltage) {
 			case LOW -> Tuning.BARE_REACH_LOW;
 			case MEDIUM -> Tuning.BARE_REACH_MEDIUM;
+			case DISTRIBUTION -> Tuning.BARE_REACH_DISTRIBUTION;
 			case HIGH -> Tuning.BARE_REACH_HIGH;
 		};
 	}
@@ -38,6 +40,7 @@ public final class Shock {
 		return switch (voltage) {
 			case LOW -> Tuning.TOUCH_SHOCK_CHANCE_LOW;
 			case MEDIUM -> Tuning.TOUCH_SHOCK_CHANCE_MEDIUM;
+			case DISTRIBUTION -> Tuning.TOUCH_SHOCK_CHANCE_DISTRIBUTION;
 			case HIGH -> Tuning.TOUCH_SHOCK_CHANCE_HIGH;
 		};
 	}
