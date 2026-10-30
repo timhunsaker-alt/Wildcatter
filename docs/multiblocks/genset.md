@@ -1,4 +1,4 @@
-# Genset: diesel and gas (PROPOSED)
+# Genset: diesel and gas (APPROVED 2026-10-30)
 
 ## Real-world counterpart
 A skid-mounted **engine-generator set**: engine, alternator, radiator, fuel tank, exhaust, and a control panel.

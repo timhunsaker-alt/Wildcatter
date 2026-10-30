@@ -1,4 +1,4 @@
-# Refinery tower (PROPOSED rework; the current build is a base plus two identical columns)
+# Refinery tower (APPROVED 2026-10-30)
 
 ## Real-world counterpart
 A **crude distillation unit**: fired heater, atmospheric distillation column with trays, overhead condenser and

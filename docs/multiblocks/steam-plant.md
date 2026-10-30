@@ -1,4 +1,4 @@
-# Steam plant (PROPOSED)
+# Steam plant (APPROVED 2026-10-30)
 
 ## Real-world counterpart
 A small industrial **condensing steam turbine plant**: package water-tube boiler with burner, superheater, turbine,

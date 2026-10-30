@@ -1,4 +1,4 @@
-# Cooling tower (PROPOSED rework; the current build is a fan plus two identical fill blocks)
+# Cooling tower (APPROVED 2026-10-30)
 
 ## Real-world counterpart
 A **mechanical-draft (induced draft) cooling tower**: basin, fill, drift eliminators, fan deck and fan with a motor.

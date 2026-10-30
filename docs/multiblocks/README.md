@@ -4,8 +4,9 @@ Every multiblock has a spec here **before any code is written** (CLAUDE.md). A s
 layered ASCII grid (bottom to top), a legend, the controller, rotation, how it forms, what happens when a part is
 removed, and the game test.
 
-**Status of every spec below: PROPOSED.** The numbers are real-world values chosen to be plausible; each one marked
-**DECISION** needs Tim's approval before code. Nothing here is built except where a spec says "As built".
+**Status: the layouts-and-values below were APPROVED by Tim on 2026-10-30.** Approval covers the real-world numbers and the
+part lists. The ASCII grids are still sketches and are fixed with the models when each multiblock is built. Approval is
+not a go-ahead to build: that waits for the roadmap phase (ROADMAP.md). Nothing here is built except where a spec says "As built".
 
 | Spec | Roadmap phase | Replaces |
 |---|---|---|

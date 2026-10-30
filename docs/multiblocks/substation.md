@@ -1,4 +1,4 @@
-# Substation (PROPOSED)
+# Substation (APPROVED 2026-10-30)
 
 ## Real-world counterpart
 A **distribution substation**: 138 kV in, 12.47 kV out (both from the ELECTRICAL_MODEL NA table). Power
