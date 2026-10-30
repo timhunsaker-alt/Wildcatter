@@ -101,10 +101,25 @@ save("boiler_side_lit", glow(side, (255, 140, 40), 0.9, lambda x, y: (0.25 + 0.7
 save("boiler_top", top)
 save("boiler_bottom", darker(side, 0.55))
 
-# the coil boiler (27 boilers over 9 furnaces): copper heating coils; lit, they glow
+# the coil boiler (27 boilers over 9 fireboxes): copper heating coils; lit, they glow
 coil = load("coil_side_0")
 save("boiler_formed_side", coil)
 save("boiler_formed_side_lit", brighten_hot(coil, 0.3))
+
+# ---- firebox, pump and pipe ------------------------------------------------------------------------------
+fire = load("firebox")
+save("firebox_side", dim_hot(fire))
+save("firebox_side_lit", brighten_hot(fire, 0.3))
+save("firebox_top", darker(side, 0.7))
+save("pump", load("pump"))
+save("pipe", load("pipe"))
+
+# ---- oil and gas wells ---------------------------------------------------------------------------------
+save("drilling_rig", load("drilling_rig"))
+save("pumpjack", load("pumpjack"))
+save("gas_wellhead", load("gas_wellhead"))
+save("casing", load("casing"))
+save("gas_line", hue_shift(load("pipe"), 0.07, 1.4))   # the same pipe, painted orange
 
 # ---- turbine and generator ------------------------------------------------------------------------------
 tside = load("turbine_side_1")
@@ -144,6 +159,10 @@ print("art processed:", len(os.listdir(OUT)), "textures")
 # ---- item icons (Ludo drew them on a transparent background) --------------------------------------------
 def icon(name):
 	img = Image.open(f"{SRC}/{name}.webp").convert("RGBA")
+	if img.getpixel((0, 0))[3] == 255:   # drawn on a plain background: make that transparent
+		from PIL import ImageDraw
+		for corner in ((0, 0), (img.width - 1, 0), (0, img.height - 1), (img.width - 1, img.height - 1)):
+			ImageDraw.floodfill(img, corner, (0, 0, 0, 0), thresh=40)
 	img = img.crop(img.getbbox())
 	side = max(img.size)
 	square = Image.new("RGBA", (side, side), (0, 0, 0, 0))
@@ -151,6 +170,6 @@ def icon(name):
 	return square.resize((SIZE, SIZE), Image.BOX)
 
 
-for name in ("power_meter", "field_manual"):
+for name in ("power_meter", "field_manual", "seismograph", "crude_oil_bucket"):
 	icon(name).save(f"{OUT}/{name}.png")
 print("icons done")

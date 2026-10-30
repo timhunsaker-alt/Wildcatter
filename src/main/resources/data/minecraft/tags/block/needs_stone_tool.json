@@ -1,6 +1,11 @@
 {
   "values": [
     "wildcatter:boiler",
+    "wildcatter:firebox",
+    "wildcatter:pump",
+    "wildcatter:drilling_rig",
+    "wildcatter:pumpjack",
+    "wildcatter:gas_wellhead",
     "wildcatter:steam_turbine",
     "wildcatter:transformer",
     "wildcatter:substation_transformer"

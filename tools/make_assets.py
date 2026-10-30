@@ -184,6 +184,21 @@ def wool(color, wear):
 	return draw
 
 
+def firebox_side(lit):
+	def draw(img, d):
+		noise(img, (120, 60, 50), 10)
+		d.rectangle([3, 4, 12, 14], fill=(30, 28, 30), outline=(50, 50, 55))
+		if lit:
+			d.rectangle([4, 8, 11, 13], fill=(255, 140, 40))
+			d.rectangle([5, 10, 10, 13], fill=(255, 220, 90))
+	return draw
+
+
+tex("firebox_side", firebox_side(False))
+tex("firebox_side_lit", firebox_side(True))
+tex("firebox_top", boiler_bottom)
+tex("pump", plain((50, 90, 160)))
+tex("pipe", bare((110, 130, 120), (80, 100, 90)))
 tex("boiler_side", boiler_side(False))
 tex("boiler_side_lit", boiler_side(True))
 tex("boiler_top", boiler_top)
@@ -239,7 +254,7 @@ tex("field_manual", manual, "item")
 # Real art: the Ludo textures (made by tools/process_art.py) replace the placeholders of the same name.
 if os.path.isdir("art/final"):
 	for f in os.listdir("art/final"):
-		kind = "item" if f in ("power_meter.png", "field_manual.png") else "block"
+		kind = "item" if f in ("power_meter.png", "field_manual.png", "seismograph.png", "crude_oil_bucket.png") else "block"
 		shutil.copy(f"art/final/{f}", f"{ASSETS}/textures/{kind}/{f}")
 
 # ---- models -------------------------------------------------------------------------------------------
@@ -259,6 +274,16 @@ for running in (False, True):
 		{"end": f"{ns}:block/steam_turbine_end{suffix}", "side": f"{ns}:block/steam_turbine_side{suffix}"})
 	block_model(f"steam_turbine_formed{suffix}", "minecraft:block/cube_column",
 		{"end": f"{ns}:block/generator_end{suffix}", "side": f"{ns}:block/generator_side{suffix}"})
+for suffix in ("", "_lit"):
+	block_model(f"firebox{suffix}", "minecraft:block/cube_bottom_top",
+		{"top": f"{ns}:block/firebox_top", "bottom": f"{ns}:block/firebox_top", "side": f"{ns}:block/firebox_side{suffix}"})
+save_json(f"{ASSETS}/blockstates/firebox.json", {"variants": {
+	"lit=false": {"model": f"{ns}:block/firebox"}, "lit=true": {"model": f"{ns}:block/firebox_lit"}}})
+block_model("pump", "minecraft:block/cube_all", {"all": f"{ns}:block/pump"})
+save_json(f"{ASSETS}/blockstates/pump.json", {"variants": {"": {"model": f"{ns}:block/pump"}}})
+for cube in ("drilling_rig", "pumpjack", "gas_wellhead", "casing"):
+	block_model(cube, "minecraft:block/cube_all", {"all": f"{ns}:block/{cube}"})
+	save_json(f"{ASSETS}/blockstates/{cube}.json", {"variants": {"": {"model": f"{ns}:block/{cube}"}}})
 for load in ("electric_lamp", "electric_heater"):
 	block_model(load, "minecraft:block/cube_all", {"all": f"{ns}:block/{load}"})
 	block_model(f"{load}_lit", "minecraft:block/cube_all", {"all": f"{ns}:block/{load}_lit"})
@@ -335,21 +360,52 @@ save_json(f"{ASSETS}/models/block/ground_rod.json", {"textures": {"rod": f"{ns}:
 	"elements": [cuboid([7, 0, 7], [9, 16, 9], "#rod")]})
 save_json(f"{ASSETS}/blockstates/ground_rod.json", {"variants": {"": {"model": f"{ns}:block/ground_rod"}}})
 
+# the pipe: a fat core with a fat arm toward each joined neighbour
+pt = {"pipe": f"{ns}:block/pipe", "particle": f"{ns}:block/pipe"}
+save_json(f"{ASSETS}/models/block/pipe_core.json", {"textures": pt, "elements": [cuboid([5, 5, 5], [11, 11, 11], "#pipe")]})
+save_json(f"{ASSETS}/models/block/pipe_arm.json", {"textures": pt, "elements": [cuboid([5, 5, 0], [11, 11, 5], "#pipe")]})
+save_json(f"{ASSETS}/models/block/pipe_inventory.json", {
+	"parent": "minecraft:block/block",
+	"display": {"gui": {"rotation": [30, 225, 0], "scale": [1.0, 1.0, 1.0]}, "ground": {"scale": [0.8, 0.8, 0.8]},
+		"firstperson_righthand": {"rotation": [0, 45, 0], "scale": [0.8, 0.8, 0.8]}, "thirdperson_righthand": {"scale": [0.8, 0.8, 0.8]}},
+	"textures": pt, "elements": [cuboid([0, 5, 5], [16, 11, 11], "#pipe"), cuboid([5, 5, 0], [11, 11, 16], "#pipe")]})
+save_json(f"{ASSETS}/blockstates/pipe.json", {"multipart": [{"apply": {"model": f"{ns}:block/pipe_core"}}] + [
+	{"when": {side: "true"}, "apply": {"model": f"{ns}:block/pipe_arm", **rot}} for side, rot in arms.items()]})
+
+# the gas line: the same shapes as the pipe, painted orange
+gt = {"pipe": f"{ns}:block/gas_line", "particle": f"{ns}:block/gas_line"}
+save_json(f"{ASSETS}/models/block/gas_line_core.json", {"textures": gt, "elements": [cuboid([5, 5, 5], [11, 11, 11], "#pipe")]})
+save_json(f"{ASSETS}/models/block/gas_line_arm.json", {"textures": gt, "elements": [cuboid([5, 5, 0], [11, 11, 5], "#pipe")]})
+inv = json.load(open(f"{ASSETS}/models/block/pipe_inventory.json"))
+inv["textures"] = gt
+save_json(f"{ASSETS}/models/block/gas_line_inventory.json", inv)
+save_json(f"{ASSETS}/blockstates/gas_line.json", {"multipart": [{"apply": {"model": f"{ns}:block/gas_line_core"}}] + [
+	{"when": {side: "true"}, "apply": {"model": f"{ns}:block/gas_line_arm", **rot}} for side, rot in arms.items()]})
+
 # ---- items --------------------------------------------------------------------------------------------
 WIRES = BARE_WIRES + WOOL_WIRES
-ITEM_MODELS = {"boiler": "block/boiler", "steam_turbine": "block/steam_turbine", "electric_lamp": "block/electric_lamp",
+ITEM_MODELS = {"firebox": "block/firebox", "pump": "block/pump", "pipe": "block/pipe_inventory", "gas_line": "block/gas_line_inventory", "drilling_rig": "block/drilling_rig", "pumpjack": "block/pumpjack",
+	"gas_wellhead": "block/gas_wellhead", "casing": "block/casing", "boiler": "block/boiler", "steam_turbine": "block/steam_turbine", "electric_lamp": "block/electric_lamp",
 	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "transformer": "block/transformer",
 	"substation_transformer": "block/substation_transformer", "ground_rod": "block/ground_rod",
-	"power_meter": "item/power_meter", "field_manual": "item/field_manual"}
+	"power_meter": "item/power_meter", "field_manual": "item/field_manual", "seismograph": "item/seismograph", "crude_oil_bucket": "item/crude_oil_bucket"}
 ITEM_MODELS.update({w: f"block/{w}_inventory" for w in WIRES})
 for name, model in ITEM_MODELS.items():
 	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:{model}"}})
-for item in ("power_meter", "field_manual"):
+for item in ("power_meter", "field_manual", "seismograph", "crude_oil_bucket"):
 	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}"}})
 
 # ---- names --------------------------------------------------------------------------------------------
 save_json(f"{ASSETS}/lang/en_us.json", {
 	"block.wildcatter.boiler": "Boiler",
+	"block.wildcatter.firebox": "Firebox",
+	"block.wildcatter.pipe": "Water Pipe",
+	"block.wildcatter.pump": "Water Pump (110 V)",
+	"block.wildcatter.gas_line": "Gas Line",
+	"block.wildcatter.drilling_rig": "Drilling Rig (110 V)",
+	"block.wildcatter.casing": "Well Casing",
+	"block.wildcatter.pumpjack": "Pumpjack (110 V)",
+	"block.wildcatter.gas_wellhead": "Gas Wellhead",
 	"block.wildcatter.steam_turbine": "Steam Turbine",
 	"block.wildcatter.wire_hot": "Bare Hot Wire (110 V)",
 	"block.wildcatter.wire_neutral": "Bare Neutral Wire (110 V)",
@@ -374,18 +430,20 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 	"subtitles.wildcatter.structure_formed": "Machine powers up",
 	"item.wildcatter.power_meter": "Power Meter",
 	"item.wildcatter.field_manual": "Wildcatter Field Manual",
+	"item.wildcatter.seismograph": "Seismograph",
+	"item.wildcatter.crude_oil_bucket": "Bucket of Crude Oil",
 })
 
 # ---- loot: every block drops itself ---------------------------------------------------------------
-BLOCKS = ("boiler", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "electric_heater", "breaker", "ground_rod") + WIRES
+BLOCKS = ("boiler", "firebox", "pipe", "gas_line", "drilling_rig", "pumpjack", "gas_wellhead", "pump", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "electric_heater", "breaker", "ground_rod") + WIRES
 for name in BLOCKS:
 	save_json(f"{DATA}/loot_table/blocks/{name}.json", {
 		"type": "minecraft:block",
 		"pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],
 			"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
 
-save_json(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json", {"values": [f"{ns}:{n}" for n in BLOCKS]})
-save_json(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json", {"values": [f"{ns}:{n}" for n in ("boiler", "steam_turbine", "transformer", "substation_transformer")]})
+save_json(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json", {"values": [f"{ns}:{n}" for n in BLOCKS + ("casing",)]})
+save_json(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json", {"values": [f"{ns}:{n}" for n in ("boiler", "firebox", "pump", "drilling_rig", "pumpjack", "gas_wellhead", "steam_turbine", "transformer", "substation_transformer")]})
 
 # ---- recipes (early game: iron, copper, redstone, glass, dye, wool) ----------------------------------------
 def shaped(name, pattern, key, result, count=1):
@@ -399,6 +457,14 @@ def shapeless(name, ingredients, result, count=1):
 
 
 shaped("boiler", ["III", "IWI", "III"], {"I": "minecraft:iron_ingot", "W": "minecraft:water_bucket"}, "boiler")
+shaped("firebox", ["IBI", "BFB", "IBI"], {"I": "minecraft:iron_ingot", "B": "minecraft:bricks", "F": "minecraft:furnace"}, "firebox")
+shaped("pipe", ["III", "   ", "III"], {"I": "minecraft:iron_ingot"}, "pipe", 6)
+shaped("pump", ["III", "CBC", "IRI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "B": "minecraft:bucket", "R": "minecraft:redstone"}, "pump")
+shaped("gas_line", ["III", "   ", "III"], {"I": "minecraft:copper_ingot"}, "gas_line", 6)
+shaped("drilling_rig", ["IPI", "CMC", "IBI"], {"I": "minecraft:iron_ingot", "P": "minecraft:iron_pickaxe", "C": "minecraft:copper_ingot", "M": "minecraft:piston", "B": "minecraft:iron_block"}, "drilling_rig")
+shaped("pumpjack", ["III", "CPC", "IRI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "P": "minecraft:piston", "R": "minecraft:redstone"}, "pumpjack")
+shaped("gas_wellhead", ["III", "CBC", "III"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "B": "minecraft:iron_block"}, "gas_wellhead")
+shaped("seismograph", ["IPI", "RCR", "III"], {"I": "minecraft:iron_ingot", "P": "minecraft:paper", "R": "minecraft:redstone", "C": "minecraft:compass"}, "seismograph")
 shaped("steam_turbine", ["ICI", "CRC", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, "steam_turbine")
 # Wire is coloured with dye so you can tell the two conductors apart: red is hot, black is neutral.
 for role, dye in (("hot", "minecraft:red_dye"), ("neutral", "minecraft:black_dye")):

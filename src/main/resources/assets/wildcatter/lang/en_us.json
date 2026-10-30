@@ -1,5 +1,13 @@
 {
   "block.wildcatter.boiler": "Boiler",
+  "block.wildcatter.firebox": "Firebox",
+  "block.wildcatter.pipe": "Water Pipe",
+  "block.wildcatter.pump": "Water Pump (110 V)",
+  "block.wildcatter.gas_line": "Gas Line",
+  "block.wildcatter.drilling_rig": "Drilling Rig (110 V)",
+  "block.wildcatter.casing": "Well Casing",
+  "block.wildcatter.pumpjack": "Pumpjack (110 V)",
+  "block.wildcatter.gas_wellhead": "Gas Wellhead",
   "block.wildcatter.steam_turbine": "Steam Turbine",
   "block.wildcatter.wire_hot": "Bare Hot Wire (110 V)",
   "block.wildcatter.wire_neutral": "Bare Neutral Wire (110 V)",
@@ -16,6 +24,14 @@
   "block.wildcatter.electric_heater": "Electric Heater (1500 W)",
   "block.wildcatter.transformer": "Transformer (110 V / 4.16 kV)",
   "block.wildcatter.substation_transformer": "Substation Transformer (4.16 kV / 138 kV)",
+  "subtitles.wildcatter.turbine_hum": "Turbine hums",
+  "subtitles.wildcatter.boiler_hiss": "Boiler hisses",
+  "subtitles.wildcatter.breaker_trip": "Breaker trips",
+  "subtitles.wildcatter.breaker_click": "Breaker clicks",
+  "subtitles.wildcatter.zap": "Electric shock",
+  "subtitles.wildcatter.structure_formed": "Machine powers up",
   "item.wildcatter.power_meter": "Power Meter",
-  "item.wildcatter.field_manual": "Wildcatter Field Manual"
+  "item.wildcatter.field_manual": "Wildcatter Field Manual",
+  "item.wildcatter.seismograph": "Seismograph",
+  "item.wildcatter.crude_oil_bucket": "Bucket of Crude Oil"
 }

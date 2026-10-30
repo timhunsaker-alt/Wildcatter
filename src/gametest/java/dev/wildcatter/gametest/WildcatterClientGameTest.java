@@ -1,6 +1,11 @@
 package dev.wildcatter.gametest;
 
+import dev.wildcatter.Tuning;
+import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.WildcatterItems;
+import dev.wildcatter.item.SeismographItem;
+import dev.wildcatter.well.Reservoir;
+import dev.wildcatter.well.ReservoirData;
 import dev.wildcatter.block.BoilerBlock;
 import dev.wildcatter.block.BoilerBlockEntity;
 import dev.wildcatter.block.BreakerBlock;
@@ -16,6 +21,8 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.Items;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -43,6 +50,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			lowVoltageLoop(context, server);
 			transformerChain(context, server);
 			bigMachines(context, server);
+			steamLoop(context, server);
 			fieldManual(server);
 		}
 	}
@@ -106,11 +114,10 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		server.runCommand("fill 27 " + (y - 1) + " 26 42 " + (y + 6) + " 36 minecraft:air");
 		server.runCommand("fill 27 " + (y - 1) + " 26 42 " + (y - 1) + " 36 minecraft:stone");
 		server.runCommand("tp @p 34 " + up + " 24 0 20");
-		// 9 lit furnaces, with 27 boilers on top of them
+		// 9 fireboxes, with 27 boilers on top of them
 		for (int x = 30; x <= 32; x++) {
 			for (int z = 30; z <= 32; z++) {
-				put(server, x, y, z, "minecraft:furnace[lit=true]");
-				server.runCommand("data merge block " + x + " " + y + " " + z + " {lit_time_remaining:3000,lit_total_time:3000}");
+				put(server, x, y, z, "wildcatter:firebox");
 				for (int h = 0; h < 3; h++) {
 					put(server, x, up + h, z, "wildcatter:boiler");
 				}
@@ -134,10 +141,21 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			}
 			return null;
 		});
-		context.waitTicks(80);
+		// Fuel: a hopper feeds the side of one firebox, and a bit is put straight into another (they share one store)
+		put(server, 29, y, 31, "minecraft:hopper[facing=east]");
+		server.computeOnServer(srv -> {
+			((Container) srv.overworld().getBlockEntity(new BlockPos(29, y, 31))).setItem(0, new ItemStack(Items.COAL, 8));
+			((Container) srv.overworld().getBlockEntity(new BlockPos(32, y, 32))).setItem(0, new ItemStack(Items.COAL, 4));
+			return null;
+		});
+		context.waitTicks(100);
+		check(server.computeOnServer(srv -> ((Container) srv.overworld().getBlockEntity(new BlockPos(29, y, 31))).isEmpty()),
+				"the hopper should have fed its coal into the firebox");
+		String fire = read(server, 31, y, 30);
+		check(fire.contains("Big firebox") && fire.contains("burning"), "9 fireboxes with coal should form one big burning firebox: " + fire);
 
 		String coil = read(server, 31, up + 1, 31);   // any boiler of the cube answers for the whole thing
-		check(coil.contains("Coil boiler") && coil.contains("9 of 9"), "27 boilers over 9 lit furnaces should form a coil boiler: " + coil);
+		check(coil.contains("Coil boiler") && coil.contains("9 of 9"), "27 boilers over 9 burning fireboxes should form a coil boiler: " + coil);
 		check(coil.contains("/108000"), "the coil boiler should hold 27 boilers of water: " + coil);
 		check(server.computeOnServer(srv -> srv.overworld().getBlockState(new BlockPos(32, up + 2, 32)).getValue(BoilerBlock.FORMED)),
 				"the boilers of a coil boiler should switch to the coil look");
@@ -150,6 +168,8 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		String lamp = read(server, 37, up, 31);
 		context.takeScreenshot("wildcatter-big-machines");
 
+		wells(context, server);   // the generator is running: its transformer feeds the rig
+
 		// Pull out a boiler from the middle layer: the coil boiler falls apart, and the blocks go back to normal.
 		server.runCommand("setblock 31 " + (up + 1) + " 31 minecraft:air");
 		context.waitTicks(60);
@@ -157,7 +177,154 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(!broken.contains("Coil boiler"), "a coil boiler with a boiler missing must fall apart: " + broken);
 		check(!server.computeOnServer(srv -> srv.overworld().getBlockState(new BlockPos(32, up + 2, 32)).getValue(BoilerBlock.FORMED)),
 				"the leftover boilers should go back to the plain look");
-		System.out.println("[wildcatter-test] big machines ok: " + coil + " | " + gen + " | " + lamp);
+		System.out.println("[wildcatter-test] big machines ok: " + fire + " | " + coil + " | " + gen + " | " + lamp);
+	}
+
+	/** Pump, pipes and drain: a pump feeds a second boiler through pipes, and the turbine's drain brings its water home. */
+	private void steamLoop(ClientGameTestContext context, TestServerContext server) {
+		server.runCommand("fill 46 " + (y - 1) + " 44 58 " + (y + 4) + " 54 minecraft:air");
+		server.runCommand("fill 46 " + (y - 1) + " 44 58 " + (y - 1) + " 54 minecraft:stone");
+		server.runCommand("tp @p 52 " + up + " 56 180 20");
+		put(server, 50, y, 50, "minecraft:campfire[lit=true]");
+		put(server, 50, up, 50, "wildcatter:boiler");
+		put(server, 51, up, 50, "wildcatter:steam_turbine");
+		put(server, 52, up, 50, "wildcatter:wool_wire_hot");
+		put(server, 53, up, 50, "wildcatter:pump");
+		for (int x = 51; x <= 53; x++) {
+			put(server, x, up, 51, "wildcatter:wool_wire_neutral");
+		}
+		// the pump drinks from a pond that is walled in so it cannot run away
+		put(server, 55, up, 50, "minecraft:stone");
+		put(server, 54, up, 49, "minecraft:stone");
+		put(server, 54, up, 51, "minecraft:stone");
+		put(server, 54, up + 1, 50, "minecraft:stone");
+		put(server, 54, up, 50, "minecraft:water");
+		// its pipes run to a second boiler
+		put(server, 53, up, 49, "wildcatter:pipe");
+		put(server, 53, up, 48, "wildcatter:pipe");
+		put(server, 53, up, 47, "wildcatter:boiler");
+		server.computeOnServer(srv -> ((BoilerBlockEntity) srv.overworld().getBlockEntity(new BlockPos(50, up, 50))).addWater(4000));
+		context.waitTicks(120);
+
+		String pump = read(server, 53, up, 50);
+		check(pump.contains("pumping") || pump.contains("boilers are full"), "a wired pump touching water with a pipe to a boiler should pump: " + pump);
+		String tank = read(server, 53, up, 47);
+		check(tank.matches(".*water [1-9]\\d*/.*"), "the pipe should have carried water into the second boiler: " + tank);
+		String noDrain = read(server, 51, up, 50);
+		check(noDrain.contains("no drain pipe"), "a turbine with no pipe should say it has no drain: " + noDrain);
+
+		// The drain: a pipe touching the turbine that reaches the boiler it takes steam from
+		put(server, 51, up, 49, "wildcatter:pipe");
+		put(server, 50, up, 49, "wildcatter:pipe");
+		context.waitTicks(60);
+		String drain = read(server, 51, up, 50);
+		check(drain.contains("drain connected"), "a pipe on the turbine should connect its drain: " + drain);
+		int before = waterIn(server, 50, up, 50);
+		context.waitTicks(400);
+		int after = waterIn(server, 50, up, 50);
+		check(before - after <= 4, "with the drain, the boiler should get its condensate back: " + before + " -> " + after);
+		context.takeScreenshot("wildcatter-pump-and-pipes");
+		System.out.println("[wildcatter-test] steam loop ok: " + pump + " | " + tank + " | " + drain + " | boiler water " + before + " -> " + after);
+	}
+
+	/**
+	 * Oil and gas. The test picks a world seed that puts an oil field under the lamp of the big generator (so the
+	 * rig has 110 V) and a gas field somewhere near, then drills the oil well with the rig and opens the gas well onto a firebox.
+	 */
+	private void wells(ClientGameTestContext context, TestServerContext server) {
+		// bigMachines ended with the generator still running: its transformer feeds whatever sits where the lamp was
+		int rx = 37, rz = 31;
+		int gx = 0, gz = 0;
+		long found = -1;
+		search:
+		for (long seed = 1; seed < 2_000_000; seed++) {
+			Reservoir oil = Reservoir.at(seed, rx, rz);
+			if (oil == null || Reservoir.at(seed, rx + 1, rz) == null || oil.kind() != Reservoir.Kind.OIL || oil.topY() > -42) {
+				continue;
+			}
+			for (int x = 20; x <= 60; x += 2) {
+				for (int z = 40; z <= 70; z += 2) {
+					Reservoir gas = Reservoir.at(seed, x, z);
+					if (gas != null && gas.kind() == Reservoir.Kind.GAS && gas.units() > 0 && !gas.key().equals(oil.key())) {
+						found = seed;
+						gx = x;
+						gz = z;
+						break search;
+					}
+				}
+			}
+		}
+		check(found >= 0, "no seed puts an oil field under the rig and a gas field nearby");
+		ReservoirData.testSeed = found;
+		final int fgx = gx, fgz = gz;
+		final long seed = found;
+		try {
+			String echo = server.computeOnServer(srv -> SeismographItem.report(srv.overworld(), rx + 0.5, rz + 0.5));
+			check(echo.contains("STRONG ECHO"), "a seismograph over a field should hear it: " + echo);
+			String far = server.computeOnServer(srv -> SeismographItem.report(srv.overworld(), fgx + 300.5, fgz + 300.5));
+			check(far.contains("echo") || far.contains("solid rock"), "a seismograph should say something anywhere: " + far);
+
+			// ---- the oil well: the world is flat, so the rig stands on a tall pole of wool wire (hot up the back of the
+			// transformer, neutral up from its underside) to have some rock to drill through ----
+			int top = up + 30;
+			int dx = rx + 1;   // the rig stands beside the hot pole so its hole does not eat the wire
+			server.runCommand("tp @p 36 " + up + " 24 0 20");
+			for (int h = up; h <= top + 1; h++) {
+				put(server, rx, h, rz, "wildcatter:wool_wire_hot");
+				put(server, rx, h, rz + 2, "wildcatter:wool_wire_neutral");
+			}
+			put(server, rx - 1, up - 1, rz, "wildcatter:wool_wire_neutral");
+			put(server, rx, up - 1, rz, "wildcatter:wool_wire_neutral");
+			put(server, rx, up - 1, rz + 1, "wildcatter:wool_wire_neutral");
+			put(server, rx, up - 1, rz + 2, "wildcatter:wool_wire_neutral");
+			put(server, dx, top + 1, rz + 2, "wildcatter:wool_wire_neutral");
+			put(server, dx, top + 1, rz + 1, "wildcatter:wool_wire_neutral");
+			put(server, dx, top + 1, rz, "wildcatter:drilling_rig");
+			context.waitTicks(40);
+			String rig = read(server, dx, top + 1, rz);
+			check(rig.contains("drilling"), "a wired rig should start drilling: " + rig + " | xfmr " + read(server, 36, up, 31)
+					+ " | hot@top " + read(server, rx, top + 1, rz) + " | neutral@top " + read(server, dx, top + 1, rz + 1));
+			int topY = Reservoir.at(seed, dx, rz).topY();
+			for (int waited = 0; waited < 3000; waited += 100) {
+				if (server.computeOnServer(srv -> srv.overworld().getBlockState(new BlockPos(dx, top + 1, rz)).is(WildcatterBlocks.PUMPJACK))) {
+					break;
+				}
+				context.waitTicks(100);
+			}
+			check(server.computeOnServer(srv -> srv.overworld().getBlockState(new BlockPos(dx, top + 1, rz)).is(WildcatterBlocks.PUMPJACK)),
+					"the rig should have struck oil and become a pumpjack: " + read(server, dx, top + 1, rz));
+			check(server.computeOnServer(srv -> srv.overworld().getBlockState(new BlockPos(dx, topY, rz)).is(WildcatterBlocks.CASING)),
+					"the hole should be cased down to the field");
+			context.waitTicks(200);
+			String jack = read(server, dx, top + 1, rz);
+			check(jack.matches(".*tank [1-9]\\d*/.*"), "a wired pumpjack should fill its tank: " + jack);
+			context.takeScreenshot("wildcatter-pumpjack");
+
+			// ---- the gas well: a wellhead against a firebox under a boiler, no fuel put in ----
+			server.runCommand("tp @p " + gx + " " + up + " " + (gz - 6) + " 0 20");
+			context.waitTicks(40);
+			server.runCommand("fill " + (gx - 1) + " " + (up - 1) + " " + (gz - 1) + " " + (gx + 3) + " " + (up + 3) + " " + (gz + 1) + " minecraft:air");
+			put(server, gx, up, gz, "wildcatter:gas_wellhead");
+			put(server, gx + 1, up, gz, "wildcatter:gas_line");
+			put(server, gx + 2, up, gz, "wildcatter:firebox");
+			put(server, gx + 2, up + 1, gz, "wildcatter:boiler");
+			server.computeOnServer(srv -> ((BoilerBlockEntity) srv.overworld().getBlockEntity(new BlockPos(fgx + 2, up + 1, fgz))).addWater(4000));
+			context.waitTicks(200);
+			String fire = read(server, gx + 2, up, gz);
+			check(fire.contains("burning"), "a gas well on a gas line should light a firebox with no fuel in it: " + fire);
+			String head = read(server, gx, up, gz);
+			check(head.contains("feeding"), "the wellhead should be feeding the firebox: " + head);
+			String boiler = read(server, gx + 2, up + 1, gz);
+			System.out.println("[wildcatter-test] wells ok: " + echo + " | " + jack + " | " + head + " | " + fire + " | " + boiler);
+		} finally {
+			ReservoirData.testSeed = null;
+		}
+	}
+
+	private int waterIn(TestServerContext server, int x, int yy, int z) {
+		// water plus the water the steam in the tank came from, so a boiler filling its steam tank does not look like a leak
+		java.util.regex.Matcher m = java.util.regex.Pattern.compile("water (\\d+)/\\d+, steam (\\d+)/").matcher(read(server, x, yy, z));
+		return m.find() ? Integer.parseInt(m.group(1)) + Integer.parseInt(m.group(2)) / Tuning.STEAM_PER_WATER : -1;
 	}
 
 	// ---- the 110 V loop --------------------------------------------------------------------------------------

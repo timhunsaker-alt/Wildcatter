@@ -29,6 +29,47 @@ public final class Tuning {
 	/** 27 steam turbines in a cube make a medium voltage generator: 27 x 2 kW = 54 kW at 4.16 kV. */
 	public static final double MV_GENERATOR_OHMS = 16.0;      // its output sags about 5% at full load (13 A)
 
+	// ---- Firebox, pipes, pump and drain -----------------------------------------------------------------------------
+	/** A firebox burns this many ticks of fuel per tick, but only while the boiler above it wants heat. A 3x3 bank burns 9 cells' worth. */
+	public static final double FIREBOX_FUEL_PER_TICK = 1.0;
+	public static final int FIREBOX_SLOTS = 9;
+	public static final double PUMP_WATTS = 750.0;            // a 110 V motor: 6.8 A
+	public static final int PUMP_WATER_PER_TICK = 40;         // at full voltage
+	public static final int PLUMBING_INTERVAL = 4;            // ticks between pump / drain transfers
+	public static final int PIPE_NETWORK_LIMIT = 512;
+	/** Share of the steam a turbine uses that comes back as water through its drain. The rest is lost, so a loop needs some makeup. */
+	public static final double CONDENSATE_RETURN = 0.9;
+	public static final double DRAIN_TANK = 100;              // water a drain can hold before it spills
+
+	// ---- Oil and gas wells -------------------------------------------------------------------------------------------
+	/** The ground is divided into square cells of this many blocks; each may hold one hidden reservoir. */
+	public static final int FIELD_CELL = 64;
+	public static final double FIELD_CHANCE = 0.4;
+	public static final int FIELD_MIN_RADIUS = 8;
+	public static final int FIELD_MAX_RADIUS = 14;
+	public static final int FIELD_MIN_Y = -45;                // the top of a reservoir lies between these heights
+	public static final int FIELD_MAX_Y = -12;
+	public static final int DRY_HOLE_Y = -50;                 // a rig that finds nothing gives up at this height
+	public static final int SURVEY_RANGE = 96;                // how far a seismograph can hear a field (blocks)
+	public static final double OIL_FRACTION = 0.55;           // of the fields; the rest are gas
+	public static final int OIL_MIN_UNITS = 60_000;           // a bucket of crude is 1000 units
+	public static final int OIL_MAX_UNITS = 200_000;
+	public static final int GAS_MIN_UNITS = 150_000;
+	public static final int GAS_MAX_UNITS = 400_000;
+	/** Fire in a firebox per unit: crude is 20 ticks a unit (a bucket burns 20000 ticks, like lava); gas is 8. */
+	public static final double OIL_FUEL_TICKS_PER_UNIT = 20.0;
+	public static final double GAS_FUEL_TICKS_PER_UNIT = 8.0;
+	public static final int CRUDE_BUCKET_UNITS = 1000;
+	public static final double RIG_WATTS = 2000.0;            // a 110 V drive: 18 A, so it needs a 20 A breaker and good wire
+	public static final int DRILL_TICKS_PER_BLOCK = 20;       // at full voltage
+	public static final double PUMPJACK_WATTS = 1500.0;       // 13.6 A
+	public static final double PUMPJACK_UNITS_PER_TICK = 0.5; // at full pressure and voltage
+	public static final int PUMPJACK_TANK = 4000;
+	public static final double GAS_UNITS_PER_TICK = 1.5;      // a free-flowing well at full pressure
+	/** Fuel a firebox will take from a well before it is full, in ticks of fire. */
+	public static final double FIREBOX_FEED_CAP = 200.0;
+	public static final int WELL_INTERVAL = 4;                // ticks between a well's transfers
+
 	// ---- Steam turbine -----------------------------------------------------------------------------------------
 	/** Energy in one unit of steam. A campfire boiler (2 steam a tick) therefore makes 2 kW. */
 	public static final double JOULES_PER_STEAM = 50.0;

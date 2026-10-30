@@ -75,12 +75,30 @@ public final class Manual {
 				"12. POWER METER\n\nRight-click a wire, machine or breaker to read its volts, amps and watts, how worn the wool is, and whether a machine is grounded. "
 						+ "It also says why a machine has no power.\n\nThe meter is insulated: safe on live equipment.",
 
-				"BIG MACHINES\n\nCOIL BOILER: build a 3x3x3 cube of 27 Boilers on top of a 3x3 floor of 9 Furnaces. It joins up by itself (you will hear it). Light the furnaces: each one needs fuel and something to smelt. "
-						+ "Each lit furnace does a ninth of the work, so nine make " + (Tuning.BOILER_STEAM_PER_TICK * Tuning.BIG_SIZE * Tuning.BIG_SIZE * Tuning.BIG_SIZE * 20 * (int) Tuning.JOULES_PER_STEAM / 1000)
+				"FIREBOX\n\nRight-click a Firebox to open it and add coal, charcoal or wood. A hopper can feed it from any side. Put it under a Boiler and it heats it like a campfire (" + Math.round(Tuning.BOILER_STEAM_PER_TICK * 20 * Tuning.JOULES_PER_STEAM / 1000) + " kW).\n\n"
+						+ "It only burns while the boiler wants heat, so a full steam tank costs no fuel.\n\nNine Fireboxes in a 3x3 floor join into one BIG FIREBOX with one shared fuel store.",
+
+				"BIG MACHINES\n\nCOIL BOILER: build a 3x3x3 cube of 27 Boilers on top of a 3x3 floor of 9 Fireboxes. It joins up by itself (you will hear it). "
+						+ "Each burning firebox does a ninth of the work, so nine make " + (Tuning.BOILER_STEAM_PER_TICK * Tuning.BIG_SIZE * Tuning.BIG_SIZE * Tuning.BIG_SIZE * 20 * (int) Tuning.JOULES_PER_STEAM / 1000)
 						+ " kW of steam. Fill any boiler of the cube with water: they share one big tank.\n\n"
 						+ "MEDIUM VOLTAGE GENERATOR: a 3x3x3 cube of 27 Steam Turbines, touching the coil boiler, makes 4.16 kV. Wire to ANY face. Step it down with a transformer for 110 V.\n\nBreak one block and the machine falls apart.",
 
-				"COMING\n\nPlastic insulation.\nGas and diesel turbines.\nDrilling rigs and wells.\nRefining.\nFuses, switches and panels.\n\nThis book will grow as they do."
+				"WATER\n\nPUMP: a 110 V motor (" + Math.round(Tuning.PUMP_WATTS) + " W, " + String.format("%.1f", Tuning.PUMP_WATTS / Voltage.LOW.nominal()) + " A). Put it touching water, wire a hot and a neutral to it, and run PIPES to your boilers. "
+						+ "It fills every boiler on its pipes. Low voltage slows it: its delivery follows the square of the voltage.\n\n"
+						+ "DRAIN: a pipe touching a Steam Turbine carries its used steam back as water to the boilers on the same pipes. " + Math.round(Tuning.CONDENSATE_RETURN * 100) + "% comes back, so a loop still needs the pump. With no pipe the water is lost.",
+
+				"FINDING OIL\n\nOil and gas hide in pockets deep underground. Use the SEISMOGRAPH (right-click): it thumps the ground and tells you which way the nearest pocket lies, how far, and how deep its top is. "
+						+ "It cannot tell oil from gas: only a drill finds that out.\n\nPockets are about " + (Tuning.FIELD_MIN_RADIUS * 2) + "-" + (Tuning.FIELD_MAX_RADIUS * 2) + " blocks across. Walk toward a stronger echo.",
+
+				"DRILLING\n\nSet a DRILLING RIG on the ground over a pocket and wire it for 110 V (" + Math.round(Tuning.RIG_WATTS) + " W, " + String.format("%.0f", Tuning.RIG_WATTS / Voltage.LOW.nominal())
+						+ " A: use a 20 A breaker and good wire). It sinks a steel-cased hole, a block a second at full voltage. Low voltage drills slowly.\n\n"
+						+ "Reach the pocket and it STRIKES: the rig becomes a wellhead. Miss, and you get a DRY HOLE: break the rig and try again.",
+
+				"OIL AND GAS WELLS\n\nGAS WELLHEAD: gas comes up by its own pressure, no power needed. Put a Firebox against it, or run GAS LINES (orange pipes) to fireboxes. It only opens when a firebox is low, so gas is only used as you burn it.\n\n"
+						+ "PUMPJACK (oil): a " + Math.round(Tuning.PUMPJACK_WATTS) + " W, 110 V pump. Right-click it with a bucket for CRUDE OIL, or send it down gas lines to fireboxes. A bucket of crude burns as long as lava.\n\n"
+						+ "Wells on the same pocket share it, and the PRESSURE drops as it empties: the flow slows. Read it with the Power Meter.",
+
+				"COMING\n\nPlastic insulation.\nGas and diesel turbines.\nCooling towers: hot condensate will have to be cooled.\nRefining.\nFuses, switches and panels.\n\nThis book will grow as they do."
 		);
 	}
 

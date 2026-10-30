@@ -11,6 +11,9 @@ import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.energy.Voltage;
 import dev.wildcatter.safety.Bondable;
 import dev.wildcatter.safety.Grounding;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -47,6 +50,9 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 	private @Nullable BlockPos master;
 	private boolean isMaster;
 	private double cubeWatts;
+	/** Water condensed from the steam used, waiting to go out through the drain. */
+	private double drainWater;
+	private boolean drained;
 
 	public SteamTurbineBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.STEAM_TURBINE_ENTITY, pos, state);
@@ -137,6 +143,7 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 		double share = 1.0;
 		if (wanted > 0) {
 			int got = turbine.draw(level, wanted);
+			turbine.drainWater = Math.min(Tuning.DRAIN_TANK, turbine.drainWater + got * Tuning.CONDENSATE_RETURN / Tuning.STEAM_PER_WATER);
 			share = Math.min(1.0, got / (joules / Tuning.JOULES_PER_STEAM));
 			turbine.idleTicks = 0;
 		} else {
@@ -144,12 +151,41 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 		}
 		turbine.satisfaction += (share - turbine.satisfaction) * Tuning.TURBINE_STEAM_SMOOTHING;
 
+		if (phase % Tuning.PLUMBING_INTERVAL == 0) {
+			turbine.drain(level);
+		}
+
 		boolean running = turbine.idleTicks < 20;
 		if (state.getValue(SteamTurbineBlock.RUNNING) != running) {
 			level.setBlock(pos, state.setValue(SteamTurbineBlock.RUNNING, running), 3);
 		}
 		if (running && phase % 60 == 0) {
 			level.playSound(null, pos, WildcatterSounds.TURBINE_HUM, SoundSource.BLOCKS, turbine.isMaster ? 1.5F : 0.6F, 1.0F);
+		}
+	}
+
+	/**
+	 * The drain: a pipe touching the turbine (or, for a cube, any turbine of it) carries the condensed steam back
+	 * to the boilers on the same run of pipe. With no pipe the water just spills away, so the boiler slowly dries out.
+	 */
+	private void drain(Level level) {
+		List<BlockPos> cells = new ArrayList<>();
+		int n = isMaster ? Tuning.BIG_SIZE : 1;
+		for (int x = 0; x < n; x++) {
+			for (int y = 0; y < n; y++) {
+				for (int z = 0; z < n; z++) {
+					cells.add(worldPosition.offset(x, y, z));
+				}
+			}
+		}
+		Set<BlockPos> pipes = Plumbing.network(level, cells);
+		drained = !pipes.isEmpty();
+		if (drainWater >= 1) {
+			if (drained) {
+				drainWater -= Plumbing.deliver(Plumbing.boilers(level, cells, pipes, false), (int) drainWater);
+			} else {
+				drainWater = 0;   // it just spills
+			}
 		}
 	}
 
@@ -277,12 +313,13 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 		if (r == null) {
 			return Component.literal("Steam turbine: its generator has lost its master");
 		}
+		String drain = r.drained ? ", drain connected" : ", no drain pipe (condensate is lost)";
 		String starved = r.satisfaction < 0.98 ? ", STARVED of steam (" + Math.round(r.satisfaction * 100) + "%)" : "";
 		if (master != null) {
 			return Component.literal("Medium voltage generator (27 turbines, 4.16 kV): " + String.format("%.0f V, %.0f W of %.0f W", volts, r.cubeWatts,
-					CUBE * Tuning.BOILER_STEAM_PER_TICK * Tuning.JOULES_PER_STEAM * 20) + starved + "; " + earth);
+					CUBE * Tuning.BOILER_STEAM_PER_TICK * Tuning.JOULES_PER_STEAM * 20) + starved + drain + "; " + earth);
 		}
-		return Component.literal("Steam turbine (110 V): " + String.format("%.0f V, %.1f A, %.0f W", volts, amps, watts()) + starved + "; " + earth);
+		return Component.literal("Steam turbine (110 V): " + String.format("%.0f V, %.1f A, %.0f W", volts, amps, watts()) + starved + drain + "; " + earth);
 	}
 
 	@Override

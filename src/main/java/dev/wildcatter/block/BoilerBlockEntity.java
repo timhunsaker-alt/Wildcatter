@@ -8,7 +8,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,9 +18,9 @@ import org.jspecify.annotations.Nullable;
 /**
  * Holds water and makes steam while it is heated. A turbine next to it takes the steam.
  *
- * Alone it sits on a lit campfire. Build a 3x3x3 cube of boilers over a 3x3 floor of furnaces and the cube becomes
+ * Alone it sits on a lit campfire. Build a 3x3x3 cube of boilers over a 3x3 floor of fireboxes and the cube becomes
  * one coil boiler: the lowest corner boiler is its master and holds everything, the other 26 hand their tanks to it.
- * Each lit furnace does a ninth of the work, so the whole thing makes 27 times the steam of one campfire boiler.
+ * Each burning firebox does a ninth of the work, so the whole thing makes 27 times the steam of one campfire boiler.
  */
 public class BoilerBlockEntity extends BlockEntity implements Inspectable {
 	private int water;
@@ -32,7 +31,7 @@ public class BoilerBlockEntity extends BlockEntity implements Inspectable {
 	private @Nullable BlockPos master;
 	/** True on the one boiler (lowest corner) that runs a whole coil boiler. */
 	private boolean isMaster;
-	private int litFurnaces;
+	private int fires;
 
 	public BoilerBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.BOILER_ENTITY, pos, state);
@@ -78,9 +77,9 @@ public class BoilerBlockEntity extends BlockEntity implements Inspectable {
 		boolean heated;
 		int power;   // steam made per tick at full water
 		if (boiler.isMaster) {
-			boiler.litFurnaces = boiler.countLitFurnaces(level);
-			heated = boiler.litFurnaces > 0;
-			power = Tuning.BOILER_STEAM_PER_TICK * Tuning.BIG_SIZE * boiler.litFurnaces;   // 27 boilers' worth over 9 furnaces
+			boiler.fires = boiler.countBurning(level);
+			heated = boiler.fires > 0;
+			power = Tuning.BOILER_STEAM_PER_TICK * Tuning.BIG_SIZE * boiler.fires;   // 27 boilers' worth over 9 fireboxes
 		} else {
 			heated = boiler.isHeated(level, pos);
 			power = Tuning.BOILER_STEAM_PER_TICK;
@@ -126,17 +125,28 @@ public class BoilerBlockEntity extends BlockEntity implements Inspectable {
 				&& pos.getZ() >= worldPosition.getZ() && pos.getZ() < worldPosition.getZ() + Tuning.BIG_SIZE;
 	}
 
-	private static boolean isFurnace(BlockState state) {
-		return state.getBlock() instanceof AbstractFurnaceBlock;
+	private static boolean isFirebox(BlockState state) {
+		return state.getBlock() instanceof FireboxBlock;
 	}
 
-	/** Looks for a 3x3x3 cube of free boilers with this one as its lowest corner, over a 3x3 floor of furnaces. */
+	/** Where this boiler's tanks are kept (its own position unless it belongs to a coil boiler). */
+	public BlockPos rootPos() {
+		return isSlave() ? master : worldPosition;
+	}
+
+	/** True if there is water to boil and room for more steam: the fire under it should burn. */
+	public boolean wantsHeat() {
+		BoilerBlockEntity r = root();
+		return r != null && r.water > 0 && r.steam < Tuning.BOILER_STEAM_CAPACITY * r.size();
+	}
+
+	/** Looks for a 3x3x3 cube of free boilers with this one as its lowest corner, over a 3x3 floor of fireboxes. */
 	private void tryForm(Level level) {
 		int n = Tuning.BIG_SIZE;
 		BlockPos o = worldPosition;
 		for (int x = 0; x < n; x++) {
 			for (int z = 0; z < n; z++) {
-				if (!isFurnace(level.getBlockState(o.offset(x, -1, z)))) {
+				if (!isFirebox(level.getBlockState(o.offset(x, -1, z)))) {
 					return;
 				}
 				for (int y = 0; y < n; y++) {
@@ -177,7 +187,7 @@ public class BoilerBlockEntity extends BlockEntity implements Inspectable {
 		BlockPos o = worldPosition;
 		for (int x = 0; x < n; x++) {
 			for (int z = 0; z < n; z++) {
-				if (!isFurnace(level.getBlockState(o.offset(x, -1, z)))) {
+				if (!isFirebox(level.getBlockState(o.offset(x, -1, z)))) {
 					return false;
 				}
 				for (int y = 0; y < n; y++) {
@@ -190,12 +200,11 @@ public class BoilerBlockEntity extends BlockEntity implements Inspectable {
 		return true;
 	}
 
-	private int countLitFurnaces(Level level) {
+	private int countBurning(Level level) {
 		int lit = 0;
 		for (int x = 0; x < Tuning.BIG_SIZE; x++) {
 			for (int z = 0; z < Tuning.BIG_SIZE; z++) {
-				BlockState furnace = level.getBlockState(worldPosition.offset(x, -1, z));
-				if (isFurnace(furnace) && furnace.getValue(AbstractFurnaceBlock.LIT)) {
+				if (level.getBlockEntity(worldPosition.offset(x, -1, z)) instanceof FireboxBlockEntity firebox && firebox.isBurning()) {
 					lit++;
 				}
 			}
@@ -232,6 +241,9 @@ public class BoilerBlockEntity extends BlockEntity implements Inspectable {
 
 	private boolean isHeated(Level level, BlockPos pos) {
 		BlockState below = level.getBlockState(pos.below());
+		if (below.getBlock() instanceof FireboxBlock) {
+			return level.getBlockEntity(pos.below()) instanceof FireboxBlockEntity firebox && firebox.isBurning();
+		}
 		return below.getBlock() instanceof CampfireBlock && below.getValue(CampfireBlock.LIT);
 	}
 
@@ -272,11 +284,11 @@ public class BoilerBlockEntity extends BlockEntity implements Inspectable {
 		if (r.isMaster) {
 			int size = r.size();
 			return Component.literal("Coil boiler (27 boilers): water " + r.water + "/" + Tuning.BOILER_WATER_CAPACITY * size
-					+ ", steam " + r.steam + "/" + Tuning.BOILER_STEAM_CAPACITY * size + ", " + r.litFurnaces + " of 9 furnaces lit"
-					+ (r.litFurnaces == 0 ? " (light the furnaces: they need something to smelt)" : ""));
+					+ ", steam " + r.steam + "/" + Tuning.BOILER_STEAM_CAPACITY * size + ", " + r.fires + " of 9 fireboxes burning"
+					+ (r.fires == 0 ? " (put fuel in the fireboxes under it)" : ""));
 		}
 		String heat = level != null && isHeated(level, worldPosition) ? "heated"
-				: "cold, needs a lit campfire underneath (or build 27 over 9 furnaces)";
+				: "cold, needs a lit campfire or a burning firebox underneath (or build 27 over 9 fireboxes)";
 		return Component.literal("Boiler: water " + r.water + "/" + Tuning.BOILER_WATER_CAPACITY
 				+ ", steam " + r.steam + "/" + Tuning.BOILER_STEAM_CAPACITY + ", " + heat);
 	}

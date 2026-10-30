@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "III",
+    "   ",
+    "III"
+  ],
+  "key": {
+    "I": "minecraft:copper_ingot"
+  },
+  "result": {
+    "id": "wildcatter:gas_line",
+    "count": 6
+  }
+}

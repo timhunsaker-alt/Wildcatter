@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "wildcatter:block/firebox"
+    },
+    "lit=true": {
+      "model": "wildcatter:block/firebox_lit"
+    }
+  }
+}
