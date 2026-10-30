@@ -58,6 +58,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			distribution(context, server);
 			spans(context, server);
 			poleTransformer(context, server);
+			serviceDrop(context, server);
 			fieldManual(server);
 		}
 	}
@@ -976,6 +977,76 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		dev.wildcatter.block.TransformerBlockEntity.testRatedVa = null;
 		check(isAir(server, 20, up, z), "a pole transformer at four times its rating should burn out");
 		System.out.println("[wildcatter-test] pole transformer ok: " + unit + " | " + heating);
+	}
+
+	/**
+	 * From a feeder through a fused cutout and a pole transformer, then a low voltage service drop (two spans, hot and neutral) to a house lamp.
+	 * Blowing the cutout takes the house dark; a new link brings it back.
+	 */
+	private void serviceDrop(ClientGameTestContext context, TestServerContext server) {
+		int z = -108;
+		server.runCommand("fill 8 " + y + " " + (z - 3) + " 36 " + (y + 7) + " " + (z + 4) + " minecraft:air");
+		plant(server, z);
+		put(server, 12, up, z, "wildcatter:wool_wire_hot");
+		put(server, 13, up, z, "wildcatter:transformer[facing=east]");
+		put(server, 14, up, z, "wildcatter:mv_wire_hot");
+		put(server, 15, up, z, "wildcatter:substation_transformer[facing=east]");
+		put(server, 16, up, z, "wildcatter:hv_wire_hot");
+		put(server, 17, up, z, "wildcatter:distribution_transformer[facing=west]");
+		put(server, 18, up, z, "wildcatter:dist_wire_hot");
+		put(server, 19, up, z, "wildcatter:fused_cutout[facing=east]");
+		put(server, 20, up, z - 1, "wildcatter:pole");
+		put(server, 20, up, z, "wildcatter:pole_transformer[facing=west]");
+		String hot = "wildcatter:wool_wire_hot";
+		String neutral = "wildcatter:wool_wire_neutral";
+		// the transformer's low side: hot out of the back and up to a pole, neutral out of the bottom and up beside it
+		for (int k = 0; k <= 3; k++) {
+			put(server, 21, up + k, z, hot);
+			put(server, 21, up + k, z + 1, neutral);
+		}
+		put(server, 20, y, z, neutral);
+		put(server, 21, y, z, neutral);
+		put(server, 21, y, z + 1, neutral);
+		for (int px : new int[] {22, 29}) {
+			for (int dz = 0; dz <= 1; dz++) {
+				put(server, px, up, z + dz, "wildcatter:pole");
+				put(server, px, up + 1, z + dz, "wildcatter:pole");
+				put(server, px, up + 2, z + dz, "wildcatter:crossarm[axis=x]");
+			}
+			put(server, px, up + 3, z, "wildcatter:insulator_lv");
+			put(server, px, up + 3, z + 1, "wildcatter:insulator_lv[conductor=n]");
+		}
+		// the house end
+		for (int k = 0; k <= 3; k++) {
+			put(server, 30, up + k, z, hot);
+			put(server, 30, up + k, z + 1, neutral);
+		}
+		put(server, 31, up, z + 1, neutral);
+		put(server, 31, up, z, "wildcatter:electric_lamp");
+		context.waitTicks(20);
+		dev.wildcatter.item.SpoolItem.Result hotSpan = server.computeOnServer(srv -> dev.wildcatter.item.SpoolItem.connect(srv.overworld(),
+				new BlockPos(22, up + 3, z), new BlockPos(29, up + 3, z), dev.wildcatter.energy.Voltage.LOW, true, 256));
+		dev.wildcatter.item.SpoolItem.Result neutralSpan = server.computeOnServer(srv -> dev.wildcatter.item.SpoolItem.connect(srv.overworld(),
+				new BlockPos(22, up + 3, z + 1), new BlockPos(29, up + 3, z + 1), dev.wildcatter.energy.Voltage.LOW, true, 256));
+		check(hotSpan.ok() && neutralSpan.ok(), "the service drop's two spans should be strung: " + hotSpan + " " + neutralSpan);
+		server.runCommand("tp @p 26 " + (up + 2) + " " + (z + 9) + " 180 -3");
+		context.waitTicks(200);
+		String cutout = read(server, 19, up, z);
+		check(cutout.contains("Fused cutout") && lit(server, 31, z), "the house lamp should light through the cutout, transformer and service drop: " + cutout + " | " + read(server, 31, up, z));
+		context.takeScreenshot("wildcatter-service-drop");
+		// a fault takes out the cutout: shrink its rating so the lamp's small current blows it
+		dev.wildcatter.block.FuseBlockEntity.testRatingScale = 0.0003;
+		context.waitTicks(100);
+		String blown = read(server, 19, up, z);
+		check(blown.contains("BLOWN") && !lit(server, 31, z), "an overloaded cutout should blow and darken the house: " + blown);
+		dev.wildcatter.block.FuseBlockEntity.testRatingScale = null;
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.FuseBlockEntity) srv.overworld().getBlockEntity(new BlockPos(19, up, z))).replaceElement();
+			return null;
+		});
+		context.waitTicks(100);
+		check(lit(server, 31, z), "with a new link the house should have power again: " + read(server, 19, up, z));
+		System.out.println("[wildcatter-test] service drop ok: " + hotSpan.message() + " | " + cutout + " | " + blown);
 	}
 
 	private void fieldManual(TestServerContext server) {

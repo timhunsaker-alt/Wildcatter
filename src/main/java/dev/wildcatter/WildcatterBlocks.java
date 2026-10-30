@@ -147,6 +147,9 @@ public final class WildcatterBlocks {
 	/** Opens its feeder when the island's frequency falls too far: load shedding. */
 	public static final Block UFLS_RELAY = block("ufls_relay", props -> new BreakerBlock(props.mapColor(MapColor.COLOR_PURPLE)
 			.strength(1.5F).sound(SoundType.METAL), Voltage.LOW, false, true));
+	/** A fused cutout: the 12.47 kV fuse on a pole. Its link drops open when it blows and a new link (a copper ingot) renews it. */
+	public static final Block FUSED_CUTOUT = block("fused_cutout", props -> new FuseBlock(props.mapColor(MapColor.TERRACOTTA_ORANGE)
+			.strength(1.5F).sound(SoundType.GLASS), Voltage.DISTRIBUTION));
 	/** Insulators on top of a pole or crossarm: one conductor each, rated for a tier of line. */
 	public static final Block INSULATOR_LV = block("insulator_lv", props -> new InsulatorBlock(props.mapColor(MapColor.TERRACOTTA_WHITE)
 			.strength(1.0F).sound(SoundType.GLASS).noOcclusion(), Voltage.LOW));
@@ -189,7 +192,7 @@ public final class WildcatterBlocks {
 			PLASTIC_WIRE_HOT, PLASTIC_WIRE_NEUTRAL, MV_PLASTIC_WIRE_HOT, MV_PLASTIC_WIRE_NEUTRAL, HV_PLASTIC_WIRE_HOT, HV_PLASTIC_WIRE_NEUTRAL);
 	public static final BlockEntityType<LoadBlockEntity> LOAD_ENTITY = entity(LoadBlockEntity::new, ELECTRIC_LAMP, ELECTRIC_HEATER);
 	public static final BlockEntityType<BreakerBlockEntity> BREAKER_ENTITY = entity(BreakerBlockEntity::new, BREAKER, MV_BREAKER, DIST_BREAKER, HV_BREAKER, SWITCH, UFLS_RELAY);
-	public static final BlockEntityType<FuseBlockEntity> FUSE_ENTITY = entity(FuseBlockEntity::new, FUSE);
+	public static final BlockEntityType<FuseBlockEntity> FUSE_ENTITY = entity(FuseBlockEntity::new, FUSE, FUSED_CUTOUT);
 	public static final BlockEntityType<InsulatorBlockEntity> INSULATOR_ENTITY = entity(InsulatorBlockEntity::new, INSULATOR_LV, INSULATOR_DIST, INSULATOR_HV);
 	public static final BlockEntityType<TransformerBlockEntity> TRANSFORMER_ENTITY = entity(TransformerBlockEntity::new, TRANSFORMER, SUBSTATION_TRANSFORMER, DISTRIBUTION_TRANSFORMER, POLE_TRANSFORMER);
 
@@ -268,6 +271,7 @@ public final class WildcatterBlocks {
 		add("crossarm", CROSSARM);
 		add("breaker", BREAKER);
 		add("fuse", FUSE);
+		add("fused_cutout", FUSED_CUTOUT);
 		add("insulator_lv", INSULATOR_LV);
 		add("insulator_dist", INSULATOR_DIST);
 		add("insulator_hv", INSULATOR_HV);

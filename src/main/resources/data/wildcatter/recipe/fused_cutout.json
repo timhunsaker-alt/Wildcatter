@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BCB",
+    "NFN",
+    " I "
+  ],
+  "key": {
+    "B": "minecraft:brick",
+    "C": "minecraft:copper_ingot",
+    "N": "minecraft:iron_nugget",
+    "F": "wildcatter:fuse",
+    "I": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "wildcatter:fused_cutout",
+    "count": 1
+  }
+}

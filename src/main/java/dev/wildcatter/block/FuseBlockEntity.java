@@ -35,8 +35,27 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		super(WildcatterBlocks.FUSE_ENTITY, pos, state);
 	}
 
+	/** The game test shrinks every rating by this factor so a small fault can blow a big fuse. Null in play. */
+	public static volatile Double testRatingScale;
+
+	private Voltage voltage() {
+		return ((FuseBlock) getBlockState().getBlock()).voltage();
+	}
+
+	private int[] ratings() {
+		return voltage() == Voltage.LOW ? Tuning.BREAKER_AMPS : Tuning.CUTOUT_K_LINKS;
+	}
+
 	public int rating() {
-		return Tuning.BREAKER_AMPS[ratingIndex];
+		return ratings()[Math.min(ratingIndex, ratings().length - 1)];
+	}
+
+	private double effectiveRating() {
+		return rating() * (testRatingScale != null ? testRatingScale : 1.0);
+	}
+
+	private boolean cutout() {
+		return voltage() != Voltage.LOW;
 	}
 
 	private boolean blown() {
@@ -48,7 +67,7 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 	}
 
 	public void nextRating() {
-		ratingIndex = (ratingIndex + 1) % Tuning.BREAKER_AMPS.length;
+		ratingIndex = (ratingIndex + 1) % ratings().length;
 		setChanged();
 	}
 
@@ -68,7 +87,7 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 
 	@Override
 	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
-		return (role == Conductor.A || role == Conductor.B) && voltage == Voltage.LOW && (face == facing() || face == facing().getOpposite());
+		return (role == Conductor.A || role == Conductor.B) && voltage == voltage() && (face == facing() || face == facing().getOpposite());
 	}
 
 	@Override
@@ -76,10 +95,10 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		back = circuit.node();
 		front = circuit.node();
 		link = blown() ? -1 : circuit.resistor(back, front, Tuning.BREAKER_CLOSED_OHMS);
-		circuit.port(worldPosition, facing().getOpposite(), Conductor.A, Voltage.LOW, back, Tuning.CONTACT_OHMS / 2, false);
-		circuit.port(worldPosition, facing().getOpposite(), Conductor.B, Voltage.LOW, back, Tuning.CONTACT_OHMS / 2, false);
-		circuit.port(worldPosition, facing(), Conductor.A, Voltage.LOW, front, Tuning.CONTACT_OHMS / 2, false);
-		circuit.port(worldPosition, facing(), Conductor.B, Voltage.LOW, front, Tuning.CONTACT_OHMS / 2, false);
+		circuit.port(worldPosition, facing().getOpposite(), Conductor.A, voltage(), back, Tuning.CONTACT_OHMS / 2, false);
+		circuit.port(worldPosition, facing().getOpposite(), Conductor.B, voltage(), back, Tuning.CONTACT_OHMS / 2, false);
+		circuit.port(worldPosition, facing(), Conductor.A, voltage(), front, Tuning.CONTACT_OHMS / 2, false);
+		circuit.port(worldPosition, facing(), Conductor.B, voltage(), front, Tuning.CONTACT_OHMS / 2, false);
 	}
 
 	@Override
@@ -88,7 +107,7 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 			return false;
 		}
 		double now = Math.abs(circuit.current(link));
-		if (now > rating() * Tuning.FUSE_INSTANT_MULTIPLE) {
+		if (now > effectiveRating() * Tuning.FUSE_INSTANT_MULTIPLE) {
 			blow();
 			return true;
 		}
@@ -98,7 +117,7 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 	@Override
 	public void apply(Circuit circuit, int ticks) {
 		amps = link >= 0 ? Math.abs(circuit.current(link)) : 0;
-		double ratio = amps / rating();
+		double ratio = amps / effectiveRating();
 		if (ratio > 1.0) {
 			heat += (ratio * ratio - 1.0) / 3.0 * ticks / (20.0 * Tuning.FUSE_SECONDS_AT_2X);
 		} else {
@@ -125,7 +144,7 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 	public Component inspect() {
 		String status = blown() ? "BLOWN: fix the fault, then right-click with a copper ingot to fit a new element" : String.format("good, carrying %.1f A", amps)
 				+ (heat > 0.05 ? ", getting hot " + Math.round(heat * 100) + "%" : "");
-		return Component.literal("Fuse " + rating() + " A (" + Voltage.LOW.label() + "): " + status + "; a fuse can't be reset, a breaker can");
+		return Component.literal((cutout() ? "Fused cutout, " + rating() + " A K link (" : "Fuse " + rating() + " A (") + voltage().label() + "): " + status + (cutout() ? "; the link drops out when it blows: fit a new one" : "; a fuse can't be reset, a breaker can"));
 	}
 
 	@Override
@@ -138,7 +157,7 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
-		ratingIndex = Math.max(0, Math.min(Tuning.BREAKER_AMPS.length - 1, input.getIntOr("rating", 0)));
+		ratingIndex = Math.max(0, Math.min(Tuning.CUTOUT_K_LINKS.length - 1, input.getIntOr("rating", 0)));
 		heat = input.getDoubleOr("heat", 0);
 	}
 }

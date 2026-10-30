@@ -107,6 +107,12 @@ All of them go in the hot wire: in at the back, out at the front. Sneak and righ
 - Game test: a 9 block distribution span carries 7,200 V, a 16 block span is refused ("Too far"), insulators on different conductors are refused, and an under-rated insulator is flagged.
 - Not done: span conductor ampacity (spans never burn), spans for the 4.16 kV tier (no MV spool), conductor sizes (one per tier).
 
+## Phase 2c and 2d: pole transformer, fused cutout, service drop
+- **Pole-Mount Transformer** (25 kVA, 12.47 kV (7.2 kV to neutral) to 120/240 V split-phase, or 230 V on IEC): hangs on a pole (one must stand beside it), feeder to its top (high side), leg A and neutral on the back and bottom, leg B on the sides. Loaded beyond 25 kVA it heats and at 150 % burns out in 10 s. Not done: the 2.5 % impedance (it uses the common winding model).
+- **Fused Cutout** (DIST): an in-line fuse for the feeder with K-link ratings 6/10/15/25/40/65/100 A; it blows, its tube drops open, and a copper ingot fits a new link.
+- **Service drop**: a low voltage span pair (hot and neutral) from the pole transformer to the house. Not done: tying the neutral to earth at the house (the transformer neutral is tied at the pole).
+- Game test: feeder, cutout, pole transformer, a 7 block service drop and a house lamp that lights; the cutout blows (test shrinks its rating) and the house goes dark; a new link restores it.
+
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.

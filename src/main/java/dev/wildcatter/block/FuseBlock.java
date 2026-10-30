@@ -32,9 +32,21 @@ public class FuseBlock extends BaseEntityBlock {
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 	public static final BooleanProperty BLOWN = BooleanProperty.create("blown");
 
+	private final dev.wildcatter.energy.Voltage voltage;
+
 	public FuseBlock(Properties properties) {
+		this(properties, dev.wildcatter.energy.Voltage.LOW);
+	}
+
+	/** A fuse for a tier; the distribution one is a fused cutout. */
+	public FuseBlock(Properties properties, dev.wildcatter.energy.Voltage voltage) {
 		super(properties);
+		this.voltage = voltage;
 		registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(BLOWN, false));
+	}
+
+	public dev.wildcatter.energy.Voltage voltage() {
+		return voltage;
 	}
 
 	@Override

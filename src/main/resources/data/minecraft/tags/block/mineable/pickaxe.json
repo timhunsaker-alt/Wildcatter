@@ -21,6 +21,7 @@
     "wildcatter:electric_heater",
     "wildcatter:breaker",
     "wildcatter:fuse",
+    "wildcatter:fused_cutout",
     "wildcatter:switch",
     "wildcatter:ufls_relay",
     "wildcatter:mv_breaker",
