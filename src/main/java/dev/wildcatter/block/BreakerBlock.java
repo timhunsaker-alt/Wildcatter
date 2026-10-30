@@ -51,15 +51,26 @@ public class BreakerBlock extends BaseEntityBlock {
 	public static final EnumProperty<Position> POSITION = EnumProperty.create("position", Position.class);
 
 	private final Voltage voltage;
+	private final boolean plainSwitch;
 
 	public BreakerBlock(Properties properties, Voltage voltage) {
+		this(properties, voltage, false);
+	}
+
+	/** A plain switch has no protection: it only opens and closes by hand. */
+	public BreakerBlock(Properties properties, Voltage voltage, boolean plainSwitch) {
 		super(properties);
 		this.voltage = voltage;
+		this.plainSwitch = plainSwitch;
 		registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(POSITION, Position.ON));
 	}
 
 	public Voltage voltage() {
 		return voltage;
+	}
+
+	public boolean isSwitch() {
+		return plainSwitch;
 	}
 
 	@Override
@@ -85,7 +96,7 @@ public class BreakerBlock extends BaseEntityBlock {
 		if (level.isClientSide() || !(level.getBlockEntity(pos) instanceof BreakerBlockEntity breaker)) {
 			return InteractionResult.SUCCESS;
 		}
-		if (player.isShiftKeyDown()) {
+		if (player.isShiftKeyDown() && !plainSwitch) {
 			breaker.nextRating();
 			player.sendOverlayMessage(breaker.inspect());
 		} else {

@@ -50,6 +50,10 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 		};
 	}
 
+	private boolean plainSwitch() {
+		return ((BreakerBlock) getBlockState().getBlock()).isSwitch();
+	}
+
 	public int rating() {
 		return ratings()[Math.min(ratingIndex, ratings().length - 1)];
 	}
@@ -97,7 +101,7 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 	/** The magnetic trip: a current far over the rating opens it at once, before anything else sees the fault. */
 	@Override
 	public boolean protect(Circuit circuit, int ticks) {
-		if (link < 0) {
+		if (link < 0 || plainSwitch()) {
 			return false;
 		}
 		double now = Math.abs(circuit.current(link));
@@ -117,6 +121,9 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 			heat += (ratio * ratio - 1.0) / 3.0 * ticks / (20.0 * Tuning.BREAKER_TRIP_SECONDS_AT_2X);
 		} else {
 			heat = Math.max(0, heat - ticks / (20.0 * Tuning.BREAKER_COOL_SECONDS));
+		}
+		if (plainSwitch()) {
+			return;
 		}
 		if (heat >= 1.0 && closed()) {
 			trip(amps, "overload");
@@ -144,6 +151,10 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 			case OFF -> "OFF";
 			case TRIPPED -> "TRIPPED (" + lastTrip + "); right-click to reset after you fix the fault";
 		};
+		if (plainSwitch()) {
+			return Component.literal("Switch (" + voltage().label() + "): " + (closed() ? String.format("CLOSED, carrying %.1f A", amps) : "OPEN")
+					+ "; right-click to flip it. A switch has NO protection: it never trips, so put a breaker or fuse before it");
+		}
 		return Component.literal("Breaker " + rating() + " A (" + voltage().label() + "): " + status + "; sneak and right-click changes the rating"
 				+ (heat > 0.05 && closed() ? ", getting warm " + Math.round(heat * 100) + "%" : ""));
 	}

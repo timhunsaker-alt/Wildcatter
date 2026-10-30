@@ -266,8 +266,22 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		});
 		context.waitTicks(40);
 		check(read(server, 52, up, 50).contains("good"), "a new element should make the fuse good again: " + read(server, 52, up, 50));
-		context.takeScreenshot("wildcatter-fuse");
 		System.out.println("[wildcatter-test] fuse ok: " + blown);
+
+		// A plain switch in the same place: closed it carries current, open it cuts the pump off, and it never trips.
+		put(server, 52, up, 50, "wildcatter:switch[facing=east]");
+		context.waitTicks(40);
+		String closed = read(server, 52, up, 50);
+		check(closed.contains("CLOSED"), "a switch should start closed: " + closed);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.BreakerBlockEntity) srv.overworld().getBlockEntity(new BlockPos(52, up, 50))).setSwitch(false);
+			return null;
+		});
+		context.waitTicks(40);
+		String open = read(server, 52, up, 50);
+		check(open.contains("OPEN") && open.contains("NO protection"), "an open switch should say so: " + open);
+		check(read(server, 53, up, 50).contains("NO POWER"), "an open switch should cut the pump off: " + read(server, 53, up, 50));
+		System.out.println("[wildcatter-test] switch ok: " + closed + " | " + open);
 	}
 
 	/**

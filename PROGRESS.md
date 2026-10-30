@@ -24,6 +24,7 @@ Wildcatter is a Fabric mod for Minecraft 26.3 that works as a teaching tool for 
 | Circuit Breaker | 110 V | Ratings 15 / 20 / 30 / 50 A. Thermal trip on a mild overload, instant trip on a short. Resettable. |
 | MV Breaker | 4.16 kV | Ratings 30 / 60 / 100 / 200 A. Blue. |
 | HV Breaker | 138 kV | Ratings 100 / 200 / 400 / 600 A. Red. |
+| Switch | 110 V | Yellow. Opens and closes the hot wire by hand and never trips. Protects nothing, so put a breaker or fuse before it. |
 | Fuse | 110 V | One-shot and fast. Blows on a short and cannot be reset. Renew it with a copper ingot. |
 
 All of them go in the hot wire: in at the back, out at the front. Sneak and right-click changes the rating.
