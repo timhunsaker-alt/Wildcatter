@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IBI",
+    "CRC",
+    "IBI"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "B": "wildcatter:breaker",
+    "C": "minecraft:copper_ingot",
+    "R": "minecraft:redstone_block"
+  },
+  "result": {
+    "id": "wildcatter:mv_breaker",
+    "count": 1
+  }
+}

@@ -128,7 +128,9 @@ public final class Tuning {
 	public static final int BURNOUT_TICKS = 20;
 
 	// ---- Breaker ---------------------------------------------------------------------------------------------------
-	public static final int[] BREAKER_AMPS = {15, 20, 30, 50};
+	public static final int[] BREAKER_AMPS = {15, 20, 30, 50};               // 110 V
+	public static final int[] BREAKER_AMPS_MEDIUM = {30, 60, 100, 200};      // 4.16 kV: a 100 kW generator makes 24 A
+	public static final int[] BREAKER_AMPS_HIGH = {100, 200, 400, 600};      // 138 kV
 	public static final double BREAKER_MAGNETIC_MULTIPLE = 8; // instant trip at this many times the rating: a short circuit
 	public static final double BREAKER_TRIP_SECONDS_AT_2X = 4.0; // a breaker carrying twice its rating trips after about this long
 	public static final double BREAKER_COOL_SECONDS = 10.0;

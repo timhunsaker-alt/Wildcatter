@@ -18,6 +18,8 @@
     "wildcatter:electric_lamp",
     "wildcatter:electric_heater",
     "wildcatter:breaker",
+    "wildcatter:mv_breaker",
+    "wildcatter:hv_breaker",
     "wildcatter:ground_rod",
     "wildcatter:wire_hot",
     "wildcatter:wire_neutral",

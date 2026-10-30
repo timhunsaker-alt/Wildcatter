@@ -212,6 +212,32 @@ tex("electric_lamp_lit", lamp(True))
 tex("electric_heater", heater(False))
 tex("electric_heater_lit", heater(True))
 tex("breaker_body", breaker_body)
+
+
+def tinted_breaker(color):
+	def draw(img, d):
+		breaker_body(img, d)
+		for x in range(16):
+			for y in range(16):
+				r, g, b, a = img.getpixel((x, y))
+				img.putpixel((x, y), (min(255, (r + color[0]) // 2), min(255, (g + color[1]) // 2), min(255, (b + color[2]) // 2), a))
+	return draw
+
+
+tex("mv_breaker_body", tinted_breaker((60, 90, 170)))
+tex("hv_breaker_body", tinted_breaker((170, 60, 60)))
+
+
+def wood(base, grain):
+	def draw(img, d):
+		noise(img, base, 8)
+		for x in (2, 5, 9, 12):
+			d.line([x, 0, x, 15], fill=grain)
+	return draw
+
+
+tex("pole", wood((110, 78, 48), (80, 55, 34)))
+tex("insulator", plain((200, 200, 210)))
 tex("breaker_lever_on", lever((60, 190, 90)))
 tex("breaker_lever_off", lever((120, 120, 126)))
 tex("breaker_lever_tripped", lever((220, 60, 50)))
@@ -328,17 +354,31 @@ def cuboid(frm, to, texture="#cable"):
 	return {"from": frm, "to": to, "faces": faces}
 
 
-# The breaker: a box with a lever. On leans one way, off the other, tripped sits in the middle.
-for position, angle in (("on", -30), ("off", 30), ("tripped", 0)):
-	lever_el = cuboid([7, 10, 7], [9, 15, 9], "#lever")
-	lever_el["rotation"] = {"origin": [8, 10, 8], "axis": "x", "angle": angle}
-	save_json(f"{ASSETS}/models/block/breaker_{position}.json", {
-		"textures": {"body": f"{ns}:block/breaker_body", "lever": f"{ns}:block/breaker_lever_{position}", "particle": f"{ns}:block/breaker_body"},
-		"elements": [cuboid([3, 0, 3], [13, 10, 13], "#body"), lever_el]})
+# The breaker: a box with a lever. On leans one way, off the other, tripped sits in the middle. The 4.16 kV and
+# 138 kV ones are bigger (a wider, taller body and a longer lever) and tinted blue and red.
+for prefix, wide in (("", 0), ("mv_", 1), ("hv_", 2)):
+	for position, angle in (("on", -30), ("off", 30), ("tripped", 0)):
+		top = 10 + 3 * wide
+		lever_el = cuboid([7, top, 7], [9, top + 5 + wide, 9], "#lever")
+		lever_el["rotation"] = {"origin": [8, top, 8], "axis": "x", "angle": angle}
+		save_json(f"{ASSETS}/models/block/{prefix}breaker_{position}.json", {
+			"textures": {"body": f"{ns}:block/{prefix}breaker_body", "lever": f"{ns}:block/breaker_lever_{position}", "particle": f"{ns}:block/{prefix}breaker_body"},
+			"elements": [cuboid([3 - wide, 0, 3 - wide], [13 + wide, top, 13 + wide], "#body"), lever_el]})
 rotations = {"north": 0, "east": 90, "south": 180, "west": 270}
-save_json(f"{ASSETS}/blockstates/breaker.json", {"variants": {
-	f"facing={facing},position={position}": {"model": f"{ns}:block/breaker_{position}", "y": y}
-	for facing, y in rotations.items() for position in ("on", "off", "tripped")}})
+for prefix in ("", "mv_", "hv_"):
+	save_json(f"{ASSETS}/blockstates/{prefix}breaker.json", {"variants": {
+		f"facing={facing},position={position}": {"model": f"{ns}:block/{prefix}breaker_{position}", "y": y}
+		for facing, y in rotations.items() for position in ("on", "off", "tripped")}})
+
+# the pole: a thin post. The crossarm: a beam with two insulators.
+save_json(f"{ASSETS}/models/block/pole.json", {"textures": {"wood": f"{ns}:block/pole", "particle": f"{ns}:block/pole"},
+	"elements": [cuboid([5, 0, 5], [11, 16, 11], "#wood")]})
+for axis, (lo, hi, ins) in {"x": ([0, 8, 6], [16, 12, 10], ([1, 12, 7], [3, 15, 9], [13, 12, 7], [15, 15, 9])),
+		"z": ([6, 8, 0], [10, 12, 16], ([7, 12, 1], [9, 15, 3], [7, 12, 13], [9, 15, 15]))}.items():
+	save_json(f"{ASSETS}/models/block/crossarm_{axis}.json", {
+		"textures": {"wood": f"{ns}:block/pole", "ins": f"{ns}:block/insulator", "particle": f"{ns}:block/pole"},
+		"elements": [cuboid(lo, hi, "#wood"), cuboid(ins[0], ins[1], "#ins"), cuboid(ins[2], ins[3], "#ins")]})
+save_json(f"{ASSETS}/blockstates/crossarm.json", {"variants": {"axis=x": {"model": f"{ns}:block/crossarm_x"}, "axis=z": {"model": f"{ns}:block/crossarm_z"}}})
 
 # Wire: a thin core with an arm toward each joined neighbour. Wool wire has four wear stages.
 arms = {"north": {}, "east": {"y": 90}, "south": {"y": 180}, "west": {"y": 270}, "up": {"x": 270}, "down": {"x": 90}}
@@ -411,7 +451,7 @@ WIRES = BARE_WIRES + WOOL_WIRES + PLASTIC_WIRES
 ITEM_MODELS = {"firebox": "block/firebox", "pump": "block/pump", "pipe": "block/pipe_inventory", "gas_line": "block/gas_line_inventory", "drilling_rig": "block/drilling_rig", "refinery": "block/refinery", "refinery_column": "block/refinery_column",
 	"diesel_engine": "block/diesel_engine", "gas_turbine": "block/gas_turbine", "pumpjack": "block/pumpjack",
 	"gas_wellhead": "block/gas_wellhead", "casing": "block/casing", "boiler": "block/boiler", "steam_turbine": "block/steam_turbine", "electric_lamp": "block/electric_lamp",
-	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "transformer": "block/transformer",
+	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "mv_breaker": "block/mv_breaker_on", "hv_breaker": "block/hv_breaker_on", "pole": "block/pole", "crossarm": "block/crossarm_x", "transformer": "block/transformer",
 	"substation_transformer": "block/substation_transformer", "ground_rod": "block/ground_rod",
 	"power_meter": "item/power_meter", "field_manual": "item/field_manual", "seismograph": "item/seismograph", "crude_oil_bucket": "item/crude_oil_bucket", "plastic_sheet": "item/plastic_sheet", "diesel_bucket": "item/diesel_bucket"}
 ITEM_MODELS.update({w: f"block/{w}_inventory" for w in WIRES})
@@ -453,6 +493,10 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 	"block.wildcatter.ground_rod": "Ground Rod",
 	"block.wildcatter.ground_wire": "Ground Wire",
 	"block.wildcatter.breaker": "Circuit Breaker (110 V)",
+	"block.wildcatter.mv_breaker": "Circuit Breaker (4.16 kV)",
+	"block.wildcatter.hv_breaker": "Circuit Breaker (138 kV)",
+	"block.wildcatter.pole": "Utility Pole",
+	"block.wildcatter.crossarm": "Pole Crossarm",
 	"block.wildcatter.electric_lamp": "Electric Lamp (60 W)",
 	"block.wildcatter.electric_heater": "Electric Heater (1500 W)",
 	"block.wildcatter.transformer": "Transformer (110 V / 4.16 kV)",
@@ -472,15 +516,17 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 })
 
 # ---- loot: every block drops itself ---------------------------------------------------------------
-BLOCKS = ("refinery", "refinery_column", "diesel_engine", "gas_turbine", "boiler", "firebox", "pipe", "gas_line", "drilling_rig", "pumpjack", "gas_wellhead", "pump", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "electric_heater", "breaker", "ground_rod") + WIRES
+BLOCKS = ("refinery", "refinery_column", "diesel_engine", "gas_turbine", "boiler", "firebox", "pipe", "gas_line", "drilling_rig", "pumpjack", "gas_wellhead", "pump", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "electric_heater", "breaker", "mv_breaker", "hv_breaker", "pole", "crossarm", "ground_rod") + WIRES
 for name in BLOCKS:
 	save_json(f"{DATA}/loot_table/blocks/{name}.json", {
 		"type": "minecraft:block",
 		"pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],
 			"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
 
-save_json(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json", {"values": [f"{ns}:{n}" for n in BLOCKS + ("casing",)]})
-save_json(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json", {"values": [f"{ns}:{n}" for n in ("boiler", "firebox", "pump", "drilling_rig", "pumpjack", "gas_wellhead", "refinery", "refinery_column", "diesel_engine", "gas_turbine", "steam_turbine", "transformer", "substation_transformer")]})
+save_json(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json", {"values": [f"{ns}:{n}" for n in BLOCKS + ("casing",) if n not in ("pole", "crossarm")]})
+save_json(f"{ROOT}/data/minecraft/tags/block/mineable/axe.json", {"values": [f"{ns}:pole", f"{ns}:crossarm"]})
+save_json(f"{ROOT}/data/minecraft/tags/block/climbable.json", {"values": [f"{ns}:pole"]})
+save_json(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json", {"values": [f"{ns}:{n}" for n in ("boiler", "firebox", "mv_breaker", "hv_breaker", "pump", "drilling_rig", "pumpjack", "gas_wellhead", "refinery", "refinery_column", "diesel_engine", "gas_turbine", "steam_turbine", "transformer", "substation_transformer")]})
 
 # ---- recipes (early game: iron, copper, redstone, glass, dye, wool) ----------------------------------------
 def shaped(name, pattern, key, result, count=1):
@@ -516,6 +562,10 @@ for role, dye in (("hot", "minecraft:red_dye"), ("neutral", "minecraft:black_dye
 shaped("ground_rod", ["C", "C", "C"], {"C": "minecraft:copper_ingot"}, "ground_rod", 2)
 shapeless("ground_wire", [f"{ns}:wire_neutral", "minecraft:green_dye"], "ground_wire")
 shaped("breaker", ["ICI", "IRI", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, "breaker")
+shaped("mv_breaker", ["IBI", "CRC", "IBI"], {"I": "minecraft:iron_ingot", "B": f"{ns}:breaker", "C": "minecraft:copper_ingot", "R": "minecraft:redstone_block"}, "mv_breaker")
+shaped("hv_breaker", ["DBD", "IRI", "DBD"], {"I": "minecraft:iron_block", "B": f"{ns}:mv_breaker", "D": "minecraft:diamond", "R": "minecraft:redstone_block"}, "hv_breaker")
+shaped("pole", ["L", "L", "L"], {"L": "#minecraft:logs"}, "pole", 3)
+shaped("crossarm", ["PPP", " N "], {"P": "#minecraft:planks", "N": "minecraft:iron_nugget"}, "crossarm", 2)
 shaped("transformer", ["ICI", "ICI", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot"}, "transformer")
 shaped("substation_transformer", ["IDI", "TCT", "IDI"], {"I": "minecraft:iron_ingot", "D": "minecraft:diamond", "T": "wildcatter:transformer", "C": "minecraft:copper_block"}, "substation_transformer")
 shaped("electric_lamp", [" G ", "GRG", " C "], {"G": "minecraft:glass_pane", "R": "minecraft:redstone", "C": "minecraft:copper_ingot"}, "electric_lamp")

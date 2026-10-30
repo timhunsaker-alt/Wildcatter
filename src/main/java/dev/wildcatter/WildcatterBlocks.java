@@ -6,6 +6,8 @@ import dev.wildcatter.block.BreakerBlock;
 import dev.wildcatter.block.BreakerBlockEntity;
 import dev.wildcatter.block.CableBlock;
 import dev.wildcatter.block.CasingBlock;
+import dev.wildcatter.block.CrossarmBlock;
+import dev.wildcatter.block.PoleBlock;
 import dev.wildcatter.block.ColumnBlock;
 import dev.wildcatter.block.EngineBlock;
 import dev.wildcatter.block.EngineBlockEntity;
@@ -89,6 +91,12 @@ public final class WildcatterBlocks {
 	public static final Block GAS_TURBINE = block("gas_turbine", props -> new EngineBlock(props.mapColor(MapColor.COLOR_LIGHT_BLUE)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), EngineBlock.Fuel.GAS));
 
+	/** A utility pole section and the crossarm that goes on top. Bare high-voltage lines belong up here. */
+	public static final Block POLE = block("pole", props -> new PoleBlock(props.mapColor(MapColor.WOOD)
+			.strength(2.0F, 3.0F).sound(SoundType.WOOD).noOcclusion()));
+	public static final Block CROSSARM = block("crossarm", props -> new CrossarmBlock(props.mapColor(MapColor.WOOD)
+			.strength(1.5F, 3.0F).sound(SoundType.WOOD).noOcclusion()));
+
 	// Wire. Every circuit needs two: a hot (red) one out to the load and a neutral (black) one back.
 	// Bare wire shocks you while it is live; wool-wrapped wire is safe until the wool wears out.
 	// Higher voltages are only bare for now: they get proper insulation once there is plastic.
@@ -116,7 +124,12 @@ public final class WildcatterBlocks {
 			.strength(0.3F).sound(SoundType.COPPER).noOcclusion()));
 
 	public static final Block BREAKER = block("breaker", props -> new BreakerBlock(props.mapColor(MapColor.COLOR_GRAY)
-			.strength(1.5F).sound(SoundType.METAL)));
+			.strength(1.5F).sound(SoundType.METAL), Voltage.LOW));
+	/** For 4.16 kV and 138 kV hot lines. Same rules as the 110 V breaker, with ratings to suit the current. */
+	public static final Block MV_BREAKER = block("mv_breaker", props -> new BreakerBlock(props.mapColor(MapColor.COLOR_BLUE)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.MEDIUM));
+	public static final Block HV_BREAKER = block("hv_breaker", props -> new BreakerBlock(props.mapColor(MapColor.COLOR_RED)
+			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.HIGH));
 	public static final Block ELECTRIC_LAMP = block("electric_lamp", props -> new LoadBlock(props.mapColor(MapColor.COLOR_YELLOW)
 			.strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> state.getValue(LoadBlock.LIT) ? 15 : 0), Tuning.LAMP_WATTS));
 	public static final Block ELECTRIC_HEATER = block("electric_heater", props -> new LoadBlock(props.mapColor(MapColor.COLOR_RED)
@@ -135,7 +148,7 @@ public final class WildcatterBlocks {
 			WOOL_WIRE_NEUTRAL, MV_WIRE_HOT, MV_WIRE_NEUTRAL, HV_WIRE_HOT, HV_WIRE_NEUTRAL,
 			PLASTIC_WIRE_HOT, PLASTIC_WIRE_NEUTRAL, MV_PLASTIC_WIRE_HOT, MV_PLASTIC_WIRE_NEUTRAL, HV_PLASTIC_WIRE_HOT, HV_PLASTIC_WIRE_NEUTRAL);
 	public static final BlockEntityType<LoadBlockEntity> LOAD_ENTITY = entity(LoadBlockEntity::new, ELECTRIC_LAMP, ELECTRIC_HEATER);
-	public static final BlockEntityType<BreakerBlockEntity> BREAKER_ENTITY = entity(BreakerBlockEntity::new, BREAKER);
+	public static final BlockEntityType<BreakerBlockEntity> BREAKER_ENTITY = entity(BreakerBlockEntity::new, BREAKER, MV_BREAKER, HV_BREAKER);
 	public static final BlockEntityType<TransformerBlockEntity> TRANSFORMER_ENTITY = entity(TransformerBlockEntity::new, TRANSFORMER, SUBSTATION_TRANSFORMER);
 
 	public static final BlockEntityType<FireboxBlockEntity> FIREBOX_ENTITY = entity(FireboxBlockEntity::new, FIREBOX);
@@ -202,7 +215,11 @@ public final class WildcatterBlocks {
 		add("hv_wire_neutral", HV_WIRE_NEUTRAL);
 		add("ground_rod", GROUND_ROD);
 		add("ground_wire", GROUND_WIRE);
+		add("pole", POLE);
+		add("crossarm", CROSSARM);
 		add("breaker", BREAKER);
+		add("mv_breaker", MV_BREAKER);
+		add("hv_breaker", HV_BREAKER);
 		add("transformer", TRANSFORMER);
 		add("substation_transformer", SUBSTATION_TRANSFORMER);
 		add("electric_lamp", ELECTRIC_LAMP);

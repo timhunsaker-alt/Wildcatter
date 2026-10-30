@@ -3,6 +3,7 @@ package dev.wildcatter.block;
 import dev.wildcatter.WildcatterSounds;
 import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.circuit.CircuitManager;
+import dev.wildcatter.energy.Voltage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.InteractionHand;
@@ -49,9 +50,16 @@ public class BreakerBlock extends BaseEntityBlock {
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 	public static final EnumProperty<Position> POSITION = EnumProperty.create("position", Position.class);
 
-	public BreakerBlock(Properties properties) {
+	private final Voltage voltage;
+
+	public BreakerBlock(Properties properties, Voltage voltage) {
 		super(properties);
+		this.voltage = voltage;
 		registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(POSITION, Position.ON));
+	}
+
+	public Voltage voltage() {
+		return voltage;
 	}
 
 	@Override

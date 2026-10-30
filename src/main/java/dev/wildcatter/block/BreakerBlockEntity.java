@@ -38,8 +38,20 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 		super(WildcatterBlocks.BREAKER_ENTITY, pos, state);
 	}
 
+	private Voltage voltage() {
+		return ((BreakerBlock) getBlockState().getBlock()).voltage();
+	}
+
+	private int[] ratings() {
+		return switch (voltage()) {
+			case LOW -> Tuning.BREAKER_AMPS;
+			case MEDIUM -> Tuning.BREAKER_AMPS_MEDIUM;
+			case HIGH -> Tuning.BREAKER_AMPS_HIGH;
+		};
+	}
+
 	public int rating() {
-		return Tuning.BREAKER_AMPS[ratingIndex];
+		return ratings()[Math.min(ratingIndex, ratings().length - 1)];
 	}
 
 	private boolean closed() {
@@ -51,7 +63,7 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 	}
 
 	public void nextRating() {
-		ratingIndex = (ratingIndex + 1) % Tuning.BREAKER_AMPS.length;
+		ratingIndex = (ratingIndex + 1) % ratings().length;
 		setChanged();
 	}
 
@@ -70,7 +82,7 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 
 	@Override
 	public boolean hasPort(Direction face, Role role, Voltage voltage) {
-		return role == Role.HOT && voltage == Voltage.LOW && (face == facing() || face == facing().getOpposite());
+		return role == Role.HOT && voltage == voltage() && (face == facing() || face == facing().getOpposite());
 	}
 
 	@Override
@@ -78,8 +90,8 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 		back = circuit.node();
 		front = circuit.node();
 		link = closed() ? circuit.resistor(back, front, Tuning.BREAKER_CLOSED_OHMS) : -1;
-		circuit.port(worldPosition, facing().getOpposite(), Role.HOT, Voltage.LOW, back, Tuning.CONTACT_OHMS / 2, false);
-		circuit.port(worldPosition, facing(), Role.HOT, Voltage.LOW, front, Tuning.CONTACT_OHMS / 2, false);
+		circuit.port(worldPosition, facing().getOpposite(), Role.HOT, voltage(), back, Tuning.CONTACT_OHMS / 2, false);
+		circuit.port(worldPosition, facing(), Role.HOT, voltage(), front, Tuning.CONTACT_OHMS / 2, false);
 	}
 
 	/** The magnetic trip: a current far over the rating opens it at once, before anything else sees the fault. */
@@ -132,7 +144,7 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 			case OFF -> "OFF";
 			case TRIPPED -> "TRIPPED (" + lastTrip + "); right-click to reset after you fix the fault";
 		};
-		return Component.literal("Breaker " + rating() + " A (110 V): " + status + "; sneak and right-click changes the rating"
+		return Component.literal("Breaker " + rating() + " A (" + voltage().label() + "): " + status + "; sneak and right-click changes the rating"
 				+ (heat > 0.05 && closed() ? ", getting warm " + Math.round(heat * 100) + "%" : ""));
 	}
 
@@ -147,7 +159,7 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
-		ratingIndex = Math.max(0, Math.min(Tuning.BREAKER_AMPS.length - 1, input.getIntOr("rating", 0)));
+		ratingIndex = Math.max(0, Math.min(3, input.getIntOr("rating", 0)));
 		heat = input.getDoubleOr("heat", 0);
 		lastTrip = input.getStringOr("lastTrip", "");
 	}

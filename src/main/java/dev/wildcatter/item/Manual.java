@@ -107,6 +107,11 @@ public final class Manual {
 
 				"PLASTIC WIRE\n\nCraft wire with plastic sheets: it never wears out, at any voltage. Plastic hot and neutral wire are safe to touch, and a plastic 4.16 kV or 138 kV line has no arc reach: you can run it at ground level.\n\nIt carries no more current than bare wire of the same voltage: the rating is the copper.",
 
+				"HIGH VOLTAGE\n\nBREAKERS come for 4.16 kV (ratings " + java.util.Arrays.toString(Tuning.BREAKER_AMPS_MEDIUM) + " A) and 138 kV (" + java.util.Arrays.toString(Tuning.BREAKER_AMPS_HIGH)
+						+ " A). They work like the 110 V one: in the hot wire, in at the back, out at the front. A 100 kW generator at 4.16 kV makes only 24 A, so size the breaker to the line, and put it at the generator.\n\n"
+						+ "POLES: stack UTILITY POLES and put a CROSSARM on top. Its insulators hold the lines apart. A bare 4.16 kV line shocks within " + (int) Tuning.BARE_REACH_MEDIUM + " blocks, 138 kV within " + (int) Tuning.BARE_REACH_HIGH
+						+ ": hang them higher than that above where anyone walks. Poles can be climbed, which puts you next to the line. Or use plastic-insulated line.",
+
 				"COMING\n\nCooling towers: hot condensate will have to be cooled.\nFuses, switches and panels.\n\nThis book will grow as they do."
 		);
 	}

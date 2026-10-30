@@ -366,8 +366,16 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		put(server, 70, up, 58, "wildcatter:plastic_wire_hot");
 		String wire = read(server, 70, up, 58);
 		check(wire.contains("plastic insulated"), "plastic wire should say so: " + wire);
+		// A 4.16 kV short on the generator's west face, with an MV breaker guarding the hot side: it must trip
+		put(server, 71, up, 60, "wildcatter:mv_breaker[facing=west]");
+		put(server, 70, up, 60, "wildcatter:mv_wire_hot");
+		put(server, 71, up, 61, "wildcatter:mv_wire_neutral");
+		put(server, 70, up, 61, "wildcatter:mv_wire_neutral");   // touches the hot wire: a short
+		context.waitTicks(60);
+		String breaker = read(server, 71, up, 60);
+		check(breaker.contains("TRIPPED") && breaker.contains("4.16 kV"), "an MV breaker should trip on a short on the generator: " + breaker);
 		context.takeScreenshot("wildcatter-refinery");
-		System.out.println("[wildcatter-test] refining ok: " + gen + " | " + refinery + " | " + wire);
+		System.out.println("[wildcatter-test] refining ok: " + gen + " | " + refinery + " | " + wire + " | " + breaker);
 	}
 
 	private int waterIn(TestServerContext server, int x, int yy, int z) {
