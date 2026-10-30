@@ -39,8 +39,16 @@ public class CableBlock extends BaseEntityBlock {
 	private final Role role;
 	private final boolean wool;
 
+	private final boolean plastic;
+
 	public CableBlock(Properties properties, Voltage voltage, Role role, boolean wool) {
+		this(properties, voltage, role, wool, false);
+	}
+
+	/** Plastic insulation never wears out, at any voltage. */
+	public CableBlock(Properties properties, Voltage voltage, Role role, boolean wool, boolean plastic) {
 		super(properties);
+		this.plastic = plastic;
 		this.voltage = voltage;
 		this.role = role;
 		this.wool = wool;
@@ -53,6 +61,10 @@ public class CableBlock extends BaseEntityBlock {
 
 	public Role role() {
 		return role;
+	}
+
+	public boolean plastic() {
+		return plastic;
 	}
 
 	public boolean wool() {

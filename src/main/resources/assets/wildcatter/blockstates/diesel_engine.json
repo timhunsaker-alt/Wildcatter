@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "wildcatter:block/diesel_engine"
+    },
+    "lit=true": {
+      "model": "wildcatter:block/diesel_engine_running"
+    }
+  }
+}

@@ -153,6 +153,9 @@ public class FireboxBlockEntity extends BaseContainerBlockEntity implements Worl
 		if (stack.is(dev.wildcatter.WildcatterItems.CRUDE_OIL_BUCKET)) {
 			return (int) (Tuning.CRUDE_BUCKET_UNITS * Tuning.OIL_FUEL_TICKS_PER_UNIT);
 		}
+		if (stack.is(dev.wildcatter.WildcatterItems.DIESEL_BUCKET)) {
+			return (int) (Tuning.DIESEL_BUCKET_UNITS * Tuning.DIESEL_FUEL_TICKS_PER_UNIT);
+		}
 		if (stack.isEmpty() || stack.get(DataComponents.COOKING_FUEL) == null) {
 			return 0;
 		}

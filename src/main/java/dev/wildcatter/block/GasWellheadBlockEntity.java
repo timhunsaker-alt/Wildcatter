@@ -22,6 +22,8 @@ import net.minecraft.world.level.storage.ValueOutput;
  */
 public class GasWellheadBlockEntity extends BlockEntity implements Inspectable {
 	private double owed;
+	/** Gas this well can still flow before its next interval. */
+	private double allowance;
 	private String status = "starting";
 
 	public GasWellheadBlockEntity(BlockPos pos, BlockState state) {
@@ -32,6 +34,37 @@ public class GasWellheadBlockEntity extends BlockEntity implements Inspectable {
 		return Reservoir.at(ReservoirData.seed(level), worldPosition.getX(), worldPosition.getZ());
 	}
 
+	/**
+	 * Gas for a generator on the gas lines: gives up to {@code units}, within what the well can flow this interval
+	 * (fireboxes are served first, so this is what they left).
+	 */
+	public double offer(double units) {
+		if (!(level instanceof ServerLevel server)) {
+			return 0;
+		}
+		Reservoir field = field(server);
+		if (field == null) {
+			return 0;
+		}
+		double give = Math.min(Math.min(units, allowance), ReservoirData.get(server).remaining(field) - owed);
+		if (give <= 0) {
+			return 0;
+		}
+		allowance -= give;
+		owed += give;
+		settle(server, field);
+		return give;
+	}
+
+	private void settle(ServerLevel server, Reservoir field) {
+		int whole = (int) owed;
+		if (whole > 0) {
+			ReservoirData.get(server).draw(field, whole);
+			owed -= whole;
+			setChanged();
+		}
+	}
+
 	public static void tick(Level level, BlockPos pos, BlockState state, GasWellheadBlockEntity head) {
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0 || !(level instanceof ServerLevel server)) {
 			return;
@@ -40,25 +73,19 @@ public class GasWellheadBlockEntity extends BlockEntity implements Inspectable {
 		ReservoirData data = ReservoirData.get(server);
 		if (field == null || data.remaining(field) <= 0) {
 			head.status = "DEPLETED: the well has run dry";
+			head.allowance = 0;
 			return;
 		}
+		head.allowance = Tuning.GAS_UNITS_PER_TICK * Tuning.WELL_INTERVAL * Math.max(0.1, Math.min(1.0, data.pressure(field) * 1.25));
 		List<BlockPos> cell = List.of(pos);
 		Set<BlockPos> lines = Plumbing.network(level, cell, PipeBlock.Kind.GAS);
 		List<FireboxBlockEntity> fireboxes = Plumbing.fireboxes(level, cell, lines, true);
-		if (fireboxes.isEmpty()) {
-			head.status = "valve shut: no firebox on its gas lines";
-			return;
-		}
-		double flow = Tuning.GAS_UNITS_PER_TICK * Tuning.WELL_INTERVAL * Math.max(0.1, Math.min(1.0, data.pressure(field) * 1.25));
-		double used = Plumbing.feedFireboxes(fireboxes, flow * Tuning.GAS_FUEL_TICKS_PER_UNIT) / Tuning.GAS_FUEL_TICKS_PER_UNIT;
+		double used = Plumbing.feedFireboxes(fireboxes, head.allowance * Tuning.GAS_FUEL_TICKS_PER_UNIT) / Tuning.GAS_FUEL_TICKS_PER_UNIT;
+		head.allowance -= used;
 		head.owed += used;
-		int whole = (int) head.owed;
-		if (whole > 0) {
-			data.draw(field, whole);
-			head.owed -= whole;
-			head.setChanged();
-		}
-		head.status = used > 0 ? "feeding " + fireboxes.size() + " firebox(es)" : "valve shut: the fireboxes are full or idle";
+		head.settle(server, field);
+		head.status = used > 0 ? "feeding " + fireboxes.size() + " firebox(es)"
+				: fireboxes.isEmpty() ? "valve shut: no firebox on its gas lines (a gas turbine can still draw from it)" : "valve shut: the fireboxes are full or idle";
 	}
 
 	@Override

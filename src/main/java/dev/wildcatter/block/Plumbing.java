@@ -90,6 +90,25 @@ public final class Plumbing {
 		return new ArrayList<>(found.values());
 	}
 
+	/** The block entities of one kind touching the gas lines (and, if {@code direct}, the cells). */
+	public static <T extends net.minecraft.world.level.block.entity.BlockEntity> List<T> machines(Level level, Collection<BlockPos> cells,
+			Set<BlockPos> pipes, boolean direct, Class<T> kind) {
+		Map<BlockPos, T> found = new LinkedHashMap<>();
+		List<BlockPos> sources = new ArrayList<>(pipes);
+		if (direct) {
+			sources.addAll(cells);
+		}
+		for (BlockPos source : sources) {
+			for (Direction side : Direction.values()) {
+				BlockPos next = source.relative(side);
+				if (!cells.contains(next) && kind.isInstance(level.getBlockEntity(next))) {
+					found.putIfAbsent(next, kind.cast(level.getBlockEntity(next)));
+				}
+			}
+		}
+		return new ArrayList<>(found.values());
+	}
+
 	/** Hands up to {@code available} ticks of fire to the fireboxes that are hungry; returns how many were taken. */
 	public static double feedFireboxes(List<FireboxBlockEntity> fireboxes, double available) {
 		double left = available;

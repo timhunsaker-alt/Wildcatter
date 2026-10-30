@@ -58,6 +58,16 @@ public class PumpjackBlockEntity extends BlockEntity implements CircuitPart, Ins
 		return true;
 	}
 
+	/** Lets a refinery on the gas lines draw crude from the tank: returns how much it got. */
+	public double take(double max) {
+		double got = Math.min(max, tank);
+		if (got > 0) {
+			tank -= got;
+			setChanged();
+		}
+		return got;
+	}
+
 	@Override
 	public boolean hasPort(Direction face, Role role, Voltage voltage) {
 		return voltage == Voltage.LOW;

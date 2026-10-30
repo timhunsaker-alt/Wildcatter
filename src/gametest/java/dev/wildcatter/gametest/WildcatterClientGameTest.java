@@ -51,6 +51,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			transformerChain(context, server);
 			bigMachines(context, server);
 			steamLoop(context, server);
+			refining(context, server);
 			fieldManual(server);
 		}
 	}
@@ -314,11 +315,59 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			check(fire.contains("burning"), "a gas well on a gas line should light a firebox with no fuel in it: " + fire);
 			String head = read(server, gx, up, gz);
 			check(head.contains("feeding"), "the wellhead should be feeding the firebox: " + head);
-			String boiler = read(server, gx + 2, up + 1, gz);
+			// a gas turbine on the same well draws what the firebox leaves
+			put(server, gx, up + 1, gz, "wildcatter:gas_turbine");
+			context.waitTicks(100);
+			String turbine = read(server, gx, up + 1, gz);
+			check(turbine.matches(".*fuel [1-9]\\d*(\\.\\d+)?/.*") || turbine.contains("fuel 1"), "a gas turbine touching a gas well should fill its tank: " + turbine);
+			String boiler = read(server, gx + 2, up + 1, gz) + " | " + turbine;
 			System.out.println("[wildcatter-test] wells ok: " + echo + " | " + jack + " | " + head + " | " + fire + " | " + boiler);
 		} finally {
 			ReservoirData.testSeed = null;
 		}
+	}
+
+	/**
+	 * Refining and engines: eight diesel engines join into a generator, a transformer steps it down to run a refinery
+	 * tower (a base with two columns), and the refinery's diesel comes back down a gas line to fuel the engines.
+	 */
+	private void refining(ClientGameTestContext context, TestServerContext server) {
+		server.runCommand("fill 66 " + (y - 1) + " 56 82 " + (y + 5) + " 66 minecraft:air");
+		server.runCommand("fill 66 " + (y - 1) + " 56 82 " + (y - 1) + " 66 minecraft:stone");
+		server.runCommand("tp @p 74 " + up + " 70 180 20");
+		for (int x = 72; x <= 73; x++) {
+			for (int h = 0; h < 2; h++) {
+				for (int z = 60; z <= 61; z++) {
+					put(server, x, up + h, z, "wildcatter:diesel_engine");
+				}
+			}
+		}
+		put(server, 74, up, 60, "wildcatter:transformer[facing=west]");
+		put(server, 75, up, 60, "wildcatter:refinery");
+		put(server, 75, up + 1, 60, "wildcatter:refinery_column");
+		put(server, 75, up + 2, 60, "wildcatter:refinery_column");
+		put(server, 75, up, 59, "wildcatter:gas_line");
+		put(server, 74, up, 59, "wildcatter:gas_line");
+		put(server, 73, up, 59, "wildcatter:gas_line");
+		context.waitTicks(60);   // the engines find each other
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.EngineBlockEntity) srv.overworld().getBlockEntity(new BlockPos(72, up, 60))).addFuel(100);
+			((dev.wildcatter.block.RefineryBlockEntity) srv.overworld().getBlockEntity(new BlockPos(75, up, 60))).addCrude(3000);
+			return null;
+		});
+		context.waitTicks(700);
+		String gen = read(server, 72, up, 60);
+		check(gen.contains("generator (8 engines"), "eight diesel engines in a cube should form a generator: " + gen);
+		String refinery = read(server, 75, up, 60);
+		check(refinery.contains("Refinery tower"), "a base with two columns should be a full tower: " + refinery);
+		check(refinery.contains("refining"), "a refinery on the engines' power should be refining: " + refinery);
+		check(refinery.matches(".*plastic [1-9]\\d* sheets.*"), "a tower should have made plastic: " + refinery);
+		check(refinery.matches(".*diesel [1-9]\\d*/.*") || gen.matches(".*fuel \\d+/.*"), "it should have made diesel: " + refinery);
+		put(server, 70, up, 58, "wildcatter:plastic_wire_hot");
+		String wire = read(server, 70, up, 58);
+		check(wire.contains("plastic insulated"), "plastic wire should say so: " + wire);
+		context.takeScreenshot("wildcatter-refinery");
+		System.out.println("[wildcatter-test] refining ok: " + gen + " | " + refinery + " | " + wire);
 	}
 
 	private int waterIn(TestServerContext server, int x, int yy, int z) {

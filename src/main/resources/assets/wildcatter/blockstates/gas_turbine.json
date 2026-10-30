@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "wildcatter:block/gas_turbine"
+    },
+    "lit=true": {
+      "model": "wildcatter:block/gas_turbine_running"
+    }
+  }
+}

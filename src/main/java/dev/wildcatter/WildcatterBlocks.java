@@ -6,6 +6,11 @@ import dev.wildcatter.block.BreakerBlock;
 import dev.wildcatter.block.BreakerBlockEntity;
 import dev.wildcatter.block.CableBlock;
 import dev.wildcatter.block.CasingBlock;
+import dev.wildcatter.block.ColumnBlock;
+import dev.wildcatter.block.EngineBlock;
+import dev.wildcatter.block.EngineBlockEntity;
+import dev.wildcatter.block.RefineryBlock;
+import dev.wildcatter.block.RefineryBlockEntity;
 import dev.wildcatter.block.DrillingRigBlock;
 import dev.wildcatter.block.DrillingRigBlockEntity;
 import dev.wildcatter.block.GasWellheadBlock;
@@ -73,6 +78,17 @@ public final class WildcatterBlocks {
 	public static final Block GAS_WELLHEAD = block("gas_wellhead", props -> new GasWellheadBlock(props.mapColor(MapColor.COLOR_ORANGE)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
 
+	/** Crude in, diesel out. The base is a pot still; two columns on top make it a full tower that also makes plastic. */
+	public static final Block REFINERY = block("refinery", props -> new RefineryBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+	public static final Block REFINERY_COLUMN = block("refinery_column", props -> new ColumnBlock(props.mapColor(MapColor.METAL)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+	/** Each is a small 110 V set; eight of one kind in a 2x2x2 cube make a 4.16 kV generator. */
+	public static final Block DIESEL_ENGINE = block("diesel_engine", props -> new EngineBlock(props.mapColor(MapColor.COLOR_GREEN)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), EngineBlock.Fuel.DIESEL));
+	public static final Block GAS_TURBINE = block("gas_turbine", props -> new EngineBlock(props.mapColor(MapColor.COLOR_LIGHT_BLUE)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), EngineBlock.Fuel.GAS));
+
 	// Wire. Every circuit needs two: a hot (red) one out to the load and a neutral (black) one back.
 	// Bare wire shocks you while it is live; wool-wrapped wire is safe until the wool wears out.
 	// Higher voltages are only bare for now: they get proper insulation once there is plastic.
@@ -84,6 +100,14 @@ public final class WildcatterBlocks {
 	public static final Block MV_WIRE_NEUTRAL = cable("mv_wire_neutral", Voltage.MEDIUM, Role.NEUTRAL, false);
 	public static final Block HV_WIRE_HOT = cable("hv_wire_hot", Voltage.HIGH, Role.HOT, false);
 	public static final Block HV_WIRE_NEUTRAL = cable("hv_wire_neutral", Voltage.HIGH, Role.NEUTRAL, false);
+
+	// Plastic insulation never wears out, at any voltage: safe to touch, with no bare-line arc reach.
+	public static final Block PLASTIC_WIRE_HOT = plasticCable("plastic_wire_hot", Voltage.LOW, Role.HOT);
+	public static final Block PLASTIC_WIRE_NEUTRAL = plasticCable("plastic_wire_neutral", Voltage.LOW, Role.NEUTRAL);
+	public static final Block MV_PLASTIC_WIRE_HOT = plasticCable("mv_plastic_wire_hot", Voltage.MEDIUM, Role.HOT);
+	public static final Block MV_PLASTIC_WIRE_NEUTRAL = plasticCable("mv_plastic_wire_neutral", Voltage.MEDIUM, Role.NEUTRAL);
+	public static final Block HV_PLASTIC_WIRE_HOT = plasticCable("hv_plastic_wire_hot", Voltage.HIGH, Role.HOT);
+	public static final Block HV_PLASTIC_WIRE_NEUTRAL = plasticCable("hv_plastic_wire_neutral", Voltage.HIGH, Role.NEUTRAL);
 
 	/** A copper rod in the earth, for grounding machines. */
 	public static final Block GROUND_ROD = block("ground_rod", props -> new GroundRodBlock(props.mapColor(MapColor.COLOR_ORANGE)
@@ -108,7 +132,8 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<BoilerBlockEntity> BOILER_ENTITY = entity(BoilerBlockEntity::new, BOILER);
 	public static final BlockEntityType<SteamTurbineBlockEntity> STEAM_TURBINE_ENTITY = entity(SteamTurbineBlockEntity::new, STEAM_TURBINE);
 	public static final BlockEntityType<WireBlockEntity> WIRE_ENTITY = entity(WireBlockEntity::new, WIRE_HOT, WIRE_NEUTRAL, WOOL_WIRE_HOT,
-			WOOL_WIRE_NEUTRAL, MV_WIRE_HOT, MV_WIRE_NEUTRAL, HV_WIRE_HOT, HV_WIRE_NEUTRAL);
+			WOOL_WIRE_NEUTRAL, MV_WIRE_HOT, MV_WIRE_NEUTRAL, HV_WIRE_HOT, HV_WIRE_NEUTRAL,
+			PLASTIC_WIRE_HOT, PLASTIC_WIRE_NEUTRAL, MV_PLASTIC_WIRE_HOT, MV_PLASTIC_WIRE_NEUTRAL, HV_PLASTIC_WIRE_HOT, HV_PLASTIC_WIRE_NEUTRAL);
 	public static final BlockEntityType<LoadBlockEntity> LOAD_ENTITY = entity(LoadBlockEntity::new, ELECTRIC_LAMP, ELECTRIC_HEATER);
 	public static final BlockEntityType<BreakerBlockEntity> BREAKER_ENTITY = entity(BreakerBlockEntity::new, BREAKER);
 	public static final BlockEntityType<TransformerBlockEntity> TRANSFORMER_ENTITY = entity(TransformerBlockEntity::new, TRANSFORMER, SUBSTATION_TRANSFORMER);
@@ -120,12 +145,20 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<PumpjackBlockEntity> PUMPJACK_ENTITY = entity(PumpjackBlockEntity::new, PUMPJACK);
 	public static final BlockEntityType<GasWellheadBlockEntity> GAS_WELLHEAD_ENTITY = entity(GasWellheadBlockEntity::new, GAS_WELLHEAD);
 
+	public static final BlockEntityType<RefineryBlockEntity> REFINERY_ENTITY = entity(RefineryBlockEntity::new, REFINERY);
+	public static final BlockEntityType<EngineBlockEntity> ENGINE_ENTITY = entity(EngineBlockEntity::new, DIESEL_ENGINE, GAS_TURBINE);
+
 	private WildcatterBlocks() {
 	}
 
 	private static Block cable(String name, Voltage voltage, Role role, boolean wool) {
 		return block(name, props -> new CableBlock(props.mapColor(role == Role.HOT ? MapColor.COLOR_RED : MapColor.COLOR_BLACK)
 				.strength(0.5F).sound(wool ? SoundType.WOOL : SoundType.COPPER).noOcclusion(), voltage, role, wool));
+	}
+
+	private static Block plasticCable(String name, Voltage voltage, Role role) {
+		return block(name, props -> new CableBlock(props.mapColor(role == Role.HOT ? MapColor.COLOR_RED : MapColor.COLOR_BLACK)
+				.strength(0.5F).sound(SoundType.COPPER).noOcclusion(), voltage, role, false, true));
 	}
 
 	private static Block block(String name, Function<BlockBehaviour.Properties, Block> factory) {
@@ -149,6 +182,16 @@ public final class WildcatterBlocks {
 		add("casing", CASING);
 		add("pumpjack", PUMPJACK);
 		add("gas_wellhead", GAS_WELLHEAD);
+		add("refinery", REFINERY);
+		add("refinery_column", REFINERY_COLUMN);
+		add("diesel_engine", DIESEL_ENGINE);
+		add("gas_turbine", GAS_TURBINE);
+		add("plastic_wire_hot", PLASTIC_WIRE_HOT);
+		add("plastic_wire_neutral", PLASTIC_WIRE_NEUTRAL);
+		add("mv_plastic_wire_hot", MV_PLASTIC_WIRE_HOT);
+		add("mv_plastic_wire_neutral", MV_PLASTIC_WIRE_NEUTRAL);
+		add("hv_plastic_wire_hot", HV_PLASTIC_WIRE_HOT);
+		add("hv_plastic_wire_neutral", HV_PLASTIC_WIRE_NEUTRAL);
 		add("wire_hot", WIRE_HOT);
 		add("wire_neutral", WIRE_NEUTRAL);
 		add("wool_wire_hot", WOOL_WIRE_HOT);
@@ -171,6 +214,8 @@ public final class WildcatterBlocks {
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("drilling_rig"), DRILLING_RIG_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("pumpjack"), PUMPJACK_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("gas_wellhead"), GAS_WELLHEAD_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("refinery"), REFINERY_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("engine"), ENGINE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("wire"), WIRE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("load"), LOAD_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("breaker"), BREAKER_ENTITY);

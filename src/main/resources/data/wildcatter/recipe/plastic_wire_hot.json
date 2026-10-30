@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "wildcatter:wire_hot",
+    "wildcatter:wire_hot",
+    "wildcatter:wire_hot",
+    "wildcatter:wire_hot",
+    "wildcatter:plastic_sheet"
+  ],
+  "result": {
+    "id": "wildcatter:plastic_wire_hot",
+    "count": 4
+  }
+}

@@ -70,6 +70,33 @@ public final class Tuning {
 	public static final double FIREBOX_FEED_CAP = 200.0;
 	public static final int WELL_INTERVAL = 4;                // ticks between a well's transfers
 
+	// ---- Refining and engines ----------------------------------------------------------------------------------------
+	public static final double REFINERY_WATTS = 2000.0;       // 110 V, 18 A
+	public static final double REFINERY_CRUDE_PER_TICK = 0.5; // at full voltage
+	public static final int REFINERY_TANK = 4000;             // crude in, and diesel out
+	public static final double DIESEL_YIELD = 0.7;            // units of diesel per unit of crude
+	public static final int CRUDE_PER_PLASTIC = 250;          // crude refined for each plastic sheet
+	public static final int PLASTIC_BIN = 64;                 // the refinery stops when this many sheets are waiting
+	public static final int DIESEL_BUCKET_UNITS = 1000;
+	public static final double DIESEL_FUEL_TICKS_PER_UNIT = 16.0;   // burning it in a firebox
+	/** Electrical energy in one unit of fuel, after the engine's losses: 100 kW of diesel uses 2.5 units a second. */
+	public static final double DIESEL_JOULES_PER_UNIT = 40000.0;
+	public static final double GAS_JOULES_PER_UNIT = 15000.0;
+	/**
+	 * A single engine is a 110 V set. A 2x2x2 cube of eight joins into one 4.16 kV generator, like the steam turbines do:
+	 * 8 diesel engines make 100 kW, 8 gas turbines 250 kW. Each engine's share of the fuel tank is on its own.
+	 */
+	public static final int ENGINE_CUBE = 2;
+	public static final double DIESEL_ENGINE_WATTS = 12_500.0;
+	public static final double GAS_TURBINE_WATTS = 31_250.0;
+	public static final double ENGINE_SAG = 0.05;             // output voltage sags this much at full load
+	public static final double DIESEL_TANK = 125.0;           // each engine's own fuel tank, in units
+	public static final double GAS_TURBINE_TANK = 12.5;
+	/** A refinery base alone is a pot still: slow, a poor yield of diesel, and no plastic. Two columns on top make a full tower. */
+	public static final int REFINERY_COLUMNS = 2;
+	public static final double POT_STILL_SPEED = 0.5;
+	public static final double POT_STILL_YIELD = 0.4;
+
 	// ---- Steam turbine -----------------------------------------------------------------------------------------
 	/** Energy in one unit of steam. A campfire boiler (2 steam a tick) therefore makes 2 kW. */
 	public static final double JOULES_PER_STEAM = 50.0;

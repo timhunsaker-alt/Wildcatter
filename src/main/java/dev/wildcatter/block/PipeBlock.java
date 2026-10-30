@@ -82,7 +82,8 @@ public class PipeBlock extends Block {
 		}
 		return kind == Kind.WATER
 				? block instanceof BoilerBlock || block instanceof SteamTurbineBlock || block instanceof PumpBlock
-				: block instanceof GasWellheadBlock || block instanceof PumpjackBlock || block instanceof FireboxBlock;
+				: block instanceof GasWellheadBlock || block instanceof PumpjackBlock || block instanceof FireboxBlock
+						|| block instanceof RefineryBlock || block instanceof EngineBlock;
 	}
 
 	private BlockState withArms(BlockState state, BlockGetter level, BlockPos pos) {

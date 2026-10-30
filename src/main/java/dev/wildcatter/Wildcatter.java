@@ -38,12 +38,17 @@ public class Wildcatter implements ModInitializer {
 					WildcatterBlocks.TRANSFORMER, WildcatterBlocks.SUBSTATION_TRANSFORMER,
 					WildcatterBlocks.ELECTRIC_LAMP, WildcatterBlocks.ELECTRIC_HEATER,
 					WildcatterBlocks.FIREBOX, WildcatterBlocks.PIPE, WildcatterBlocks.PUMP, WildcatterBlocks.GAS_LINE,
-					WildcatterBlocks.DRILLING_RIG, WildcatterBlocks.CASING, WildcatterBlocks.PUMPJACK, WildcatterBlocks.GAS_WELLHEAD}) {
+					WildcatterBlocks.DRILLING_RIG, WildcatterBlocks.CASING, WildcatterBlocks.PUMPJACK, WildcatterBlocks.GAS_WELLHEAD,
+					WildcatterBlocks.REFINERY, WildcatterBlocks.REFINERY_COLUMN, WildcatterBlocks.DIESEL_ENGINE, WildcatterBlocks.GAS_TURBINE,
+					WildcatterBlocks.PLASTIC_WIRE_HOT, WildcatterBlocks.PLASTIC_WIRE_NEUTRAL, WildcatterBlocks.MV_PLASTIC_WIRE_HOT,
+					WildcatterBlocks.MV_PLASTIC_WIRE_NEUTRAL, WildcatterBlocks.HV_PLASTIC_WIRE_HOT, WildcatterBlocks.HV_PLASTIC_WIRE_NEUTRAL}) {
 				entries.accept(block);
 			}
 			entries.accept(WildcatterItems.POWER_METER);
 			entries.accept(WildcatterItems.SEISMOGRAPH);
 			entries.accept(WildcatterItems.CRUDE_OIL_BUCKET);
+			entries.accept(WildcatterItems.DIESEL_BUCKET);
+			entries.accept(WildcatterItems.PLASTIC_SHEET);
 			entries.accept(WildcatterItems.FIELD_MANUAL);
 		});
 

@@ -98,7 +98,16 @@ public final class Manual {
 						+ "PUMPJACK (oil): a " + Math.round(Tuning.PUMPJACK_WATTS) + " W, 110 V pump. Right-click it with a bucket for CRUDE OIL, or send it down gas lines to fireboxes. A bucket of crude burns as long as lava.\n\n"
 						+ "Wells on the same pocket share it, and the PRESSURE drops as it empties: the flow slows. Read it with the Power Meter.",
 
-				"COMING\n\nPlastic insulation.\nGas and diesel turbines.\nCooling towers: hot condensate will have to be cooled.\nRefining.\nFuses, switches and panels.\n\nThis book will grow as they do."
+				"REFINING\n\nREFINERY BASE: a " + Math.round(Tuning.REFINERY_WATTS) + " W, 110 V unit. Pour in a bucket of crude, or put it on a GAS LINE with a pumpjack. Alone it is a POT STILL: slow, and only " + Math.round(Tuning.POT_STILL_YIELD * 100)
+						+ "% of the crude comes out as diesel.\n\nStack " + Tuning.REFINERY_COLUMNS + " DISTILLATION COLUMNS on top and it becomes a full TOWER: twice the speed, " + Math.round(Tuning.DIESEL_YIELD * 100)
+						+ "% diesel, and PLASTIC (a sheet per " + Tuning.CRUDE_PER_PLASTIC + " crude). Right-click with an empty hand for the plastic, with a bucket for diesel.",
+
+				"ENGINES\n\nDIESEL ENGINE and GAS TURBINE: small 110 V generators. Put eight of one kind in a 2x2x2 cube and they join into one 4.16 kV GENERATOR: " + Math.round(Tuning.DIESEL_ENGINE_WATTS * 8 / 1000) + " kW diesel, "
+						+ Math.round(Tuning.GAS_TURBINE_WATTS * 8 / 1000) + " kW gas turbine.\n\nThey burn only the fuel the load uses. Diesel: pour a bucket in, or run a gas line to a refinery. Gas: run a gas line to a gas wellhead. With no fuel they make nothing. Step the 4.16 kV down with a transformer.",
+
+				"PLASTIC WIRE\n\nCraft wire with plastic sheets: it never wears out, at any voltage. Plastic hot and neutral wire are safe to touch, and a plastic 4.16 kV or 138 kV line has no arc reach: you can run it at ground level.\n\nIt carries no more current than bare wire of the same voltage: the rating is the copper.",
+
+				"COMING\n\nCooling towers: hot condensate will have to be cooled.\nFuses, switches and panels.\n\nThis book will grow as they do."
 		);
 	}
 

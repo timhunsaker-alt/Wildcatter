@@ -119,6 +119,13 @@ save("drilling_rig", load("drilling_rig"))
 save("pumpjack", load("pumpjack"))
 save("gas_wellhead", load("gas_wellhead"))
 save("casing", load("casing"))
+save("refinery", load("refinery"))
+save("refinery_column", ImageEnhance.Color(darker(load("refinery"), 0.85)).enhance(0.5))
+de, gt = load("diesel_engine"), load("gas_turbine")
+save("diesel_engine", de)
+save("diesel_engine_running", glow(de, (255, 190, 90), 0.35))
+save("gas_turbine", gt)
+save("gas_turbine_running", spin_blur(gt))
 save("gas_line", hue_shift(load("pipe"), 0.07, 1.4))   # the same pipe, painted orange
 
 # ---- turbine and generator ------------------------------------------------------------------------------
@@ -170,6 +177,6 @@ def icon(name):
 	return square.resize((SIZE, SIZE), Image.BOX)
 
 
-for name in ("power_meter", "field_manual", "seismograph", "crude_oil_bucket"):
+for name in ("power_meter", "field_manual", "seismograph", "crude_oil_bucket", "plastic_sheet", "diesel_bucket"):
 	icon(name).save(f"{OUT}/{name}.png")
 print("icons done")

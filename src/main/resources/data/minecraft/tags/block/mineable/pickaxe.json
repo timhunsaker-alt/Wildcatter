@@ -1,5 +1,9 @@
 {
   "values": [
+    "wildcatter:refinery",
+    "wildcatter:refinery_column",
+    "wildcatter:diesel_engine",
+    "wildcatter:gas_turbine",
     "wildcatter:boiler",
     "wildcatter:firebox",
     "wildcatter:pipe",
@@ -24,6 +28,12 @@
     "wildcatter:ground_wire",
     "wildcatter:wool_wire_hot",
     "wildcatter:wool_wire_neutral",
+    "wildcatter:plastic_wire_hot",
+    "wildcatter:plastic_wire_neutral",
+    "wildcatter:mv_plastic_wire_hot",
+    "wildcatter:mv_plastic_wire_neutral",
+    "wildcatter:hv_plastic_wire_hot",
+    "wildcatter:hv_plastic_wire_neutral",
     "wildcatter:casing"
   ]
 }

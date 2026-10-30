@@ -64,7 +64,7 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 
 	/** Bare copper, because there is no insulation or because it has worn through. */
 	public boolean exposed() {
-		return !block().wool() || wear >= 1.0;
+		return block().plastic() ? false : !block().wool() || wear >= 1.0;
 	}
 
 	/** Test hook and repair: sets how worn the insulation is. */
@@ -163,7 +163,8 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 	@Override
 	public Component inspect() {
 		CableBlock block = block();
-		String insulation = !block.wool() ? "bare copper, live to the touch"
+		String insulation = block.plastic() ? "plastic insulated, safe to touch"
+				: !block.wool() ? "bare copper, live to the touch"
 				: wear >= 1.0 ? "wool worn OUT, bare copper" : "wool " + Math.round(wear * 100) + "% worn";
 		return Component.literal(block.role().label() + " wire (" + block.voltage().label() + ", " + insulation + "): "
 				+ fmt(volts) + " V, " + fmt(amps) + " A of " + fmt(ampacity()) + " A allowed"
