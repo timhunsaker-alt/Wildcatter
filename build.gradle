@@ -52,3 +52,17 @@ jar {
 		rename { "${it}_$projectName" }
 	}
 }
+
+// The solver package must stay plain Java (no Minecraft or Fabric imports) so a NeoForge port is cheap. See CLAUDE.md.
+tasks.register('verifySolverPurity') {
+	def sources = fileTree('src/main/java/dev/wildcatter/solver') { include '**/*.java' }
+	inputs.files(sources)
+	doLast {
+		sources.each { f ->
+			if (f.text =~ /(?m)^\s*import\s+(net\.minecraft|net\.fabricmc|com\.mojang|dev\.wildcatter\.(?!solver))/) {
+				throw new GradleException("${f.name} imports Minecraft, Fabric or non-solver code; the solver package must be pure Java")
+			}
+		}
+	}
+}
+compileJava.dependsOn verifySolverPurity

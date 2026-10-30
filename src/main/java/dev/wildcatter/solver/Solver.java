@@ -1,4 +1,4 @@
-package dev.wildcatter.circuit;
+package dev.wildcatter.solver;
 
 import java.util.ArrayList;
 import java.util.List;

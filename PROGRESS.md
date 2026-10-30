@@ -58,6 +58,9 @@ All of them go in the hot wire: in at the back, out at the front. Sneak and righ
 - **Crossarm:** carries two insulators to hold the lines apart. 2 crossarms from planks plus an iron nugget.
 - Both are structural and decorative. They do not conduct or enforce any support rule.
 
+## Solver package
+- `dev.wildcatter.solver` (`Solver`, `Network`) is plain Java with no Minecraft or Fabric imports. `circuit/Circuit` adapts block positions to it. `./gradlew build` fails if the package imports Minecraft.
+
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.
