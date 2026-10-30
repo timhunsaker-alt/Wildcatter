@@ -169,7 +169,7 @@ public class RefineryBlockEntity extends BlockEntity implements CircuitPart, Ins
 	@Override
 	public Component inspect() {
 		String kind = tower ? "Refinery tower" : "Pot still (stack " + Tuning.REFINERY_COLUMNS + " columns on top for a full tower: more diesel, faster, and plastic)";
-		return Component.literal(kind + " (rated " + Math.round(Tuning.REFINERY_WATTS) + " W at 110 V): " + String.format("%.0f V, %.2f A", volts, amps)
+		return Component.literal(kind + " (rated " + Math.round(Tuning.REFINERY_WATTS) + " W at " + Voltage.LOW.label() + "): " + String.format("%.0f V, %.2f A", volts, amps)
 				+ ", crude " + (int) crude + "/" + Tuning.REFINERY_TANK + ", diesel " + (int) diesel + "/" + Tuning.REFINERY_TANK
 				+ ", plastic " + plastic + " sheets, " + status + "; "
 				+ (level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you"));

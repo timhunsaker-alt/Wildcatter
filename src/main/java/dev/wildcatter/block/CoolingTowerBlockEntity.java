@@ -87,7 +87,7 @@ public class CoolingTowerBlockEntity extends BlockEntity implements CircuitPart,
 	public Component inspect() {
 		String state = cooling ? "COOLING" : fill < Tuning.COOLING_FILL ? "needs " + Tuning.COOLING_FILL + " fill sections above it (has " + fill + ")"
 				: volts < 1.0 ? "NO POWER: wire a hot and a neutral to the fan" : "too little voltage for the fan";
-		return Component.literal("Cooling tower (rated " + Math.round(Tuning.COOLING_FAN_WATTS) + " W at 110 V): " + String.format("%.0f V, %.2f A", volts, amps)
+		return Component.literal("Cooling tower (rated " + Math.round(Tuning.COOLING_FAN_WATTS) + " W at " + Voltage.LOW.label() + "): " + String.format("%.0f V, %.2f A", volts, amps)
 				+ ", " + state + "; "
 				+ (level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you"));
 	}

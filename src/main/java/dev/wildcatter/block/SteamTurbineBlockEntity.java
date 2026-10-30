@@ -324,10 +324,10 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 				+ (r.cooled ? ", condensate cooled" : ", NO COOLING TOWER (needs " + Math.round(100 / Tuning.UNCOOLED_EFFICIENCY - 100) + "% more steam)");
 		String starved = r.satisfaction < 0.98 ? ", STARVED of steam (" + Math.round(r.satisfaction * 100) + "%)" : "";
 		if (master != null) {
-			return Component.literal("Medium voltage generator (27 turbines, 4.16 kV): " + String.format("%.0f V, %.0f W of %.0f W", volts, r.cubeWatts,
+			return Component.literal("Medium voltage generator (27 turbines, " + Voltage.MEDIUM.label() + "): " + String.format("%.0f V, %.0f W of %.0f W", volts, r.cubeWatts,
 					CUBE * Tuning.BOILER_STEAM_PER_TICK * Tuning.JOULES_PER_STEAM * 20) + starved + drain + "; " + earth);
 		}
-		return Component.literal("Steam turbine (110 V): " + String.format("%.0f V, %.1f A, %.0f W", volts, amps, watts()) + starved + drain + "; " + earth);
+		return Component.literal("Steam turbine (" + Voltage.LOW.label() + "): " + String.format("%.0f V, %.1f A, %.0f W", volts, amps, watts()) + starved + drain + "; " + earth);
 	}
 
 	@Override

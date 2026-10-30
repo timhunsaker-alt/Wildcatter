@@ -94,7 +94,7 @@ public class LoadBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		} else {
 			state = "running";
 		}
-		return Component.literal(what + " (rated " + Math.round(watts()) + " W at 110 V): " + String.format("%.0f V, %.2f A, %.0f W", volts, amps, volts * amps)
+		return Component.literal(what + " (rated " + Math.round(watts()) + " W at " + Voltage.LOW.label() + "): " + String.format("%.0f V, %.2f A, %.0f W", volts, amps, volts * amps)
 				+ ", " + state + "; " + (level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you"));
 	}
 }

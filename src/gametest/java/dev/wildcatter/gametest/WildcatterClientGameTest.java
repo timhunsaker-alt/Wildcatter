@@ -481,8 +481,18 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(lit(server, 15, 10), "the lamp should light once the neutral wire completes the loop");
 		String lampReading = read(server, 15, up, 10);
 		System.out.println("[wildcatter-test] lamp: " + lampReading);
-		check(lampReading.matches(".*\\b(10[5-9]|110) V, 0\\.[45]\\d A.*"), "lamp volts and amps look wrong: " + lampReading);
+		check(lampReading.matches(".*\\b(11[0-9]|120) V, 0\\.[45]\\d A.*"), "lamp volts and amps look wrong: " + lampReading);
 		context.takeScreenshot("steam-plant-running");
+
+		// The electrical standard is the world's choice: the same lamp on an IEC world runs on 230 V, and goes back on a North American one.
+		dev.wildcatter.energy.ElectricalStandard.setActive(dev.wildcatter.energy.ElectricalStandard.IEC);
+		context.waitTicks(80);
+		String iec = read(server, 15, up, 10);
+		check(iec.matches(".*\\b2[23]\\d V, 0\\.[23]\\d A.*") && iec.contains("230 V"), "on an IEC world the lamp should run on 230 V: " + iec);
+		dev.wildcatter.energy.ElectricalStandard.setActive(dev.wildcatter.energy.ElectricalStandard.NORTH_AMERICAN);
+		context.waitTicks(80);
+		check(read(server, 15, up, 10).matches(".*\\b(11[0-9]|120) V, 0\\.[45]\\d A.*"), "back on a North American world the lamp should run on 120 V: " + read(server, 15, up, 10));
+		System.out.println("[wildcatter-test] standards ok: " + iec);
 
 		// 3. The boiler and turbine must not flicker while they run.
 		boolean boilerLit = server.computeOnServer(srv -> srv.overworld().getBlockState(new BlockPos(10, up, 10)).getValue(BoilerBlock.LIT));

@@ -142,7 +142,7 @@ public class PumpjackBlockEntity extends BlockEntity implements CircuitPart, Ins
 				field = Math.round(data.pressure(reservoir) * 100) + "% pressure, about " + data.remaining(reservoir) + " units left in the field; ";
 			}
 		}
-		return Component.literal("Pumpjack (rated " + Math.round(Tuning.PUMPJACK_WATTS) + " W at 110 V): " + String.format("%.0f V, %.2f A", volts, amps)
+		return Component.literal("Pumpjack (rated " + Math.round(Tuning.PUMPJACK_WATTS) + " W at " + Voltage.LOW.label() + "): " + String.format("%.0f V, %.2f A", volts, amps)
 				+ ", " + field + "tank " + (int) tank + "/" + Tuning.PUMPJACK_TANK + " (a bucket is " + Tuning.CRUDE_BUCKET_UNITS + "), " + status + "; "
 				+ (level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you"));
 	}

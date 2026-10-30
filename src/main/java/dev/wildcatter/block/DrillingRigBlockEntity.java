@@ -166,7 +166,7 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 			case DRY -> "DRY HOLE: nothing there. Break the rig and drill somewhere else";
 			case BLOCKED -> "STOPPED: hit rock it cannot cut. Break the rig and drill somewhere else";
 		};
-		return Component.literal("Drilling rig (rated " + Math.round(Tuning.RIG_WATTS) + " W at 110 V): " + String.format("%.0f V, %.1f A", volts, amps)
+		return Component.literal("Drilling rig (rated " + Math.round(Tuning.RIG_WATTS) + " W at " + Voltage.LOW.label() + "): " + String.format("%.0f V, %.1f A", volts, amps)
 				+ ", " + depth + " blocks down, " + state + "; "
 				+ (level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you"));
 	}

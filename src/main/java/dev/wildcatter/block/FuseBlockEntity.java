@@ -123,7 +123,7 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 	public Component inspect() {
 		String status = blown() ? "BLOWN: fix the fault, then right-click with a copper ingot to fit a new element" : String.format("good, carrying %.1f A", amps)
 				+ (heat > 0.05 ? ", getting hot " + Math.round(heat * 100) + "%" : "");
-		return Component.literal("Fuse " + rating() + " A (110 V): " + status + "; a fuse can't be reset, a breaker can");
+		return Component.literal("Fuse " + rating() + " A (" + Voltage.LOW.label() + "): " + status + "; a fuse can't be reset, a breaker can");
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package dev.wildcatter;
 import dev.wildcatter.circuit.CircuitManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.minecraft.resources.Identifier;
@@ -55,6 +56,7 @@ public class Wildcatter implements ModInitializer {
 		// Keep track of every circuit part and solve each connected group of them.
 		ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register(CircuitManager::register);
 		ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register(CircuitManager::unregister);
+		ServerLifecycleEvents.SERVER_STARTED.register(dev.wildcatter.energy.StandardData::apply);
 		ServerTickEvents.END_LEVEL_TICK.register(CircuitManager::tick);
 	}
 }

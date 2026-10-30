@@ -105,7 +105,7 @@ public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspect
 
 	@Override
 	public Component inspect() {
-		return Component.literal("Water pump (rated " + Math.round(Tuning.PUMP_WATTS) + " W at 110 V): "
+		return Component.literal("Water pump (rated " + Math.round(Tuning.PUMP_WATTS) + " W at " + Voltage.LOW.label() + "): "
 				+ String.format("%.0f V, %.2f A", volts, amps) + ", " + status + "; "
 				+ (level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you"));
 	}

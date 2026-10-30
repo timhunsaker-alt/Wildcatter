@@ -313,10 +313,10 @@ public class EngineBlockEntity extends BlockEntity implements CircuitPart, Inspe
 				: r.satisfaction < 0.98 ? "fuel starved (" + Math.round(r.satisfaction * 100) + "%)" : "running";
 		String fuel = ", fuel " + (int) r.tank + "/" + (int) r.tankSize() + " units, " + state + "; " + earth;
 		if (master != null) {
-			return Component.literal(name + " generator (8 engines, 4.16 kV, rated " + Math.round(unitWatts() * CELLS / 1000) + " kW): "
+			return Component.literal(name + " generator (8 engines, " + Voltage.MEDIUM.label() + ", rated " + Math.round(unitWatts() * CELLS / 1000) + " kW): "
 					+ String.format("%.0f V, %.0f W", volts, r.cubeWatts) + fuel);
 		}
-		return Component.literal(name + " engine (110 V, rated " + Math.round(unitWatts() / 1000.0 * 10) / 10.0 + " kW; build a 2x2x2 cube of them for 4.16 kV): "
+		return Component.literal(name + " engine (" + Voltage.LOW.label() + ", rated " + Math.round(unitWatts() / 1000.0 * 10) / 10.0 + " kW; build a 2x2x2 cube of them for " + Voltage.MEDIUM.label() + "): "
 				+ String.format("%.0f V, %.1f A, %.0f W", volts, amps, watts()) + fuel);
 	}
 

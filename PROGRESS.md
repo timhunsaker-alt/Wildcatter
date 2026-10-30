@@ -67,6 +67,13 @@ All of them go in the hot wire: in at the back, out at the front. Sneak and righ
 - Not wired into the game yet: the blocks still use the real-valued `Solver`; wiring comes with 1c.
 - Factorization caching is deferred: the budget is met without it.
 
+## Phase 1b: electrical standard (part 1)
+- `energy/ElectricalStandard` (North American 60 Hz or IEC 50 Hz) holds every voltage and the frequency; `Voltage` (LOW/MEDIUM/HIGH) reads its volts and label from the active standard. Low is 120 V or 230 V, medium 4.16 kV or 3.3 kV, high 138 kV or 132 kV. The distribution, generator-terminal and industrial/commercial low-voltage rows are in the table as data; their equipment, and a distribution tier, come in Phase 2.
+- `energy/StandardData` stores the choice in the world and locks it at first load: the Create World choice if one was made, else `config/wildcatter.properties` (`standard=NORTH_AMERICAN` or `IEC`).
+- Block names say LV / MV / HV; inspect text and the Field Manual print the active voltages.
+- Game test: the same lamp runs on 230 V when the standard is switched to IEC and back to 120 V.
+- Not done yet: the Create World screen selector, and split-phase 120/240 V (comes with the conductor work in 1c).
+
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.
