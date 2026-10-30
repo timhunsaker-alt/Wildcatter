@@ -61,6 +61,12 @@ All of them go in the hot wire: in at the back, out at the front. Sneak and righ
 ## Solver package
 - `dev.wildcatter.solver` (`Solver`, `Network`) is plain Java with no Minecraft or Fabric imports. `circuit/Circuit` adapts block positions to it. `./gradlew build` fails if the package imports Minecraft.
 
+## Phase 1a: phasor solver
+- `solver/PhasorSolver` (+ `Complex`): AC steady-state complex nodal solver, any number of conductors, so balanced and unbalanced three-phase and split-phase are all just nodes. Sources and transformers carry impedance; inductors and capacitors follow frequency; banded LU after reverse Cuthill-McKee.
+- `./gradlew test` runs 10 JUnit checks (Ohm, series/parallel, lagging PF, 3φ balanced and unbalanced, split-phase, Delta-Y +30°, power conservation, frequency). A 1,000-node three-phase network solves in about 0.4 ms (budget 5 ms).
+- Not wired into the game yet: the blocks still use the real-valued `Solver`; wiring comes with 1c.
+- Factorization caching is deferred: the budget is met without it.
+
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.
