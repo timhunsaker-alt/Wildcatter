@@ -19,21 +19,21 @@ and the Field Manual has a page for each new system.
 | Copper "gas lines" carrying crude and diesel | Rework → steel pipe for oil and gas. |
 | Utility poles (decorative) | Rework → functional (Phase 2). |
 
-## Phase 0 — Realign — CURRENT
+## Phase 0 — Realign — DONE
 1. Add VISION.md, ELECTRICAL_MODEL.md, ROADMAP.md, CLAUDE.md.
 2. Claude Code reviews the existing code against these docs and writes `docs/ALIGNMENT.md`:
    what matches, what conflicts, what each rework above touches. No code changes.
 3. Design decisions are settled (see the table in ELECTRICAL_MODEL.md).
 4. Move the solver into a package with no Minecraft or Fabric imports.
 
-## Phase 1 — AC solver, standards, frequency
+## Phase 1 — AC solver, standards, frequency — DONE (phasor solver built and tested but not yet wired into the blocks; that happens with the first three-phase equipment in Phase 3)
 - Complex phasor MNA, full unbalanced three-phase, A/B/C/N/G conductors.
 - Per-world electrical standard (North American 60 Hz / IEC 50 Hz); all voltages read from the standard.
 - 110 V → 120/240 V split-phase (NA) or 230 V (IEC). Existing content keeps working.
 - Dynamic frequency per island: inertia, governor droop, generator over/under-frequency trips.
 - Steel pipe replaces copper gas lines for oil and gas.
 
-## Phase 2 — Distribution and plugs
+## Phase 2 — Distribution and plugs — CURRENT
 - Distribution voltage (12.47 kV NA / 11 kV IEC); overhead lines as spans between rated insulators;
   functional poles with span limits.
 - Pole-mount transformer, fused cutout, service drop.
