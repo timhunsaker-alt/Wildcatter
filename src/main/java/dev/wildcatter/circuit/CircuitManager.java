@@ -91,6 +91,13 @@ public final class CircuitManager {
 						queue.add(next);
 					}
 				}
+				if (level.getBlockEntity(here) instanceof CircuitPart part) {
+					for (BlockPos far : part.links()) {
+						if (registered.contains(far) && seen.add(far)) {
+							queue.add(far);
+						}
+					}
+				}
 			}
 			solveGroup(level, group, ticks, live);
 		}

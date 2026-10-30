@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "conductor=a": {
+      "model": "wildcatter:block/insulator_hv_a"
+    },
+    "conductor=b": {
+      "model": "wildcatter:block/insulator_hv_b"
+    },
+    "conductor=c": {
+      "model": "wildcatter:block/insulator_hv_c"
+    },
+    "conductor=n": {
+      "model": "wildcatter:block/insulator_hv_n"
+    },
+    "conductor=g": {
+      "model": "wildcatter:block/insulator_hv_g"
+    }
+  }
+}

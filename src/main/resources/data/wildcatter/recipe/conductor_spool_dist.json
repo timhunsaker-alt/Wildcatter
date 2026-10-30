@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "WWW",
+    "WSW",
+    "WWW"
+  ],
+  "key": {
+    "W": "wildcatter:dist_wire_hot",
+    "S": "minecraft:stick"
+  },
+  "result": {
+    "id": "wildcatter:conductor_spool_dist",
+    "count": 1
+  }
+}

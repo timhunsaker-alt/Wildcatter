@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "wildcatter:conductor_spool_dist",
+    "wildcatter:plastic_sheet",
+    "wildcatter:plastic_sheet"
+  ],
+  "result": {
+    "id": "wildcatter:covered_conductor_spool_dist",
+    "count": 1
+  }
+}

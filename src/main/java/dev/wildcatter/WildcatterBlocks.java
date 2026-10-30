@@ -4,6 +4,8 @@ import dev.wildcatter.block.BoilerBlock;
 import dev.wildcatter.block.BoilerBlockEntity;
 import dev.wildcatter.block.BreakerBlock;
 import dev.wildcatter.block.FuseBlock;
+import dev.wildcatter.block.InsulatorBlock;
+import dev.wildcatter.block.InsulatorBlockEntity;
 import dev.wildcatter.block.FuseBlockEntity;
 import dev.wildcatter.block.BreakerBlockEntity;
 import dev.wildcatter.block.CableBlock;
@@ -145,6 +147,13 @@ public final class WildcatterBlocks {
 	/** Opens its feeder when the island's frequency falls too far: load shedding. */
 	public static final Block UFLS_RELAY = block("ufls_relay", props -> new BreakerBlock(props.mapColor(MapColor.COLOR_PURPLE)
 			.strength(1.5F).sound(SoundType.METAL), Voltage.LOW, false, true));
+	/** Insulators on top of a pole or crossarm: one conductor each, rated for a tier of line. */
+	public static final Block INSULATOR_LV = block("insulator_lv", props -> new InsulatorBlock(props.mapColor(MapColor.TERRACOTTA_WHITE)
+			.strength(1.0F).sound(SoundType.GLASS).noOcclusion(), Voltage.LOW));
+	public static final Block INSULATOR_DIST = block("insulator_dist", props -> new InsulatorBlock(props.mapColor(MapColor.TERRACOTTA_BROWN)
+			.strength(1.0F).sound(SoundType.GLASS).noOcclusion(), Voltage.DISTRIBUTION));
+	public static final Block INSULATOR_HV = block("insulator_hv", props -> new InsulatorBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
+			.strength(1.5F).sound(SoundType.GLASS).noOcclusion(), Voltage.HIGH));
 	/** One-shot protection: cheap, fast, and it has to be replaced after it blows. */
 	public static final Block FUSE = block("fuse", props -> new FuseBlock(props.mapColor(MapColor.COLOR_ORANGE).strength(1.0F).sound(SoundType.GLASS)));
 	/** For 4.16 kV and 138 kV hot lines. Same rules as the 110 V breaker, with ratings to suit the current. */
@@ -178,6 +187,7 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<LoadBlockEntity> LOAD_ENTITY = entity(LoadBlockEntity::new, ELECTRIC_LAMP, ELECTRIC_HEATER);
 	public static final BlockEntityType<BreakerBlockEntity> BREAKER_ENTITY = entity(BreakerBlockEntity::new, BREAKER, MV_BREAKER, DIST_BREAKER, HV_BREAKER, SWITCH, UFLS_RELAY);
 	public static final BlockEntityType<FuseBlockEntity> FUSE_ENTITY = entity(FuseBlockEntity::new, FUSE);
+	public static final BlockEntityType<InsulatorBlockEntity> INSULATOR_ENTITY = entity(InsulatorBlockEntity::new, INSULATOR_LV, INSULATOR_DIST, INSULATOR_HV);
 	public static final BlockEntityType<TransformerBlockEntity> TRANSFORMER_ENTITY = entity(TransformerBlockEntity::new, TRANSFORMER, SUBSTATION_TRANSFORMER, DISTRIBUTION_TRANSFORMER);
 
 	public static final BlockEntityType<FireboxBlockEntity> FIREBOX_ENTITY = entity(FireboxBlockEntity::new, FIREBOX);
@@ -255,6 +265,9 @@ public final class WildcatterBlocks {
 		add("crossarm", CROSSARM);
 		add("breaker", BREAKER);
 		add("fuse", FUSE);
+		add("insulator_lv", INSULATOR_LV);
+		add("insulator_dist", INSULATOR_DIST);
+		add("insulator_hv", INSULATOR_HV);
 		add("switch", SWITCH);
 		add("ufls_relay", UFLS_RELAY);
 		add("mv_breaker", MV_BREAKER);
@@ -279,6 +292,7 @@ public final class WildcatterBlocks {
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("load"), LOAD_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("breaker"), BREAKER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("fuse"), FUSE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("insulator"), INSULATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("transformer"), TRANSFORMER_ENTITY);
 	}
 

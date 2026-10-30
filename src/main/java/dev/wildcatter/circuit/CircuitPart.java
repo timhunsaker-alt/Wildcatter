@@ -25,6 +25,11 @@ public interface CircuitPart {
 		return false;
 	}
 
+	/** Other parts this one is linked to without touching them (an overhead span): they are solved together as one circuit. */
+	default java.util.Collection<net.minecraft.core.BlockPos> links() {
+		return java.util.List.of();
+	}
+
 	/** Reads the results. {@code ticks} is how long it has been since the last solve. */
 	void apply(Circuit circuit, int ticks);
 }

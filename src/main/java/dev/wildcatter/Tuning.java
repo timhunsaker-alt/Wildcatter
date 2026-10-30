@@ -47,6 +47,13 @@ public final class Tuning {
 	public static final double INERTIA_GAS_TURBINE = 3.0;      // seconds (assumed like a steam turbine; not in the approved table)
 	public static final double AGC_SECONDS = 30.0;             // secondary control brings the frequency back (assumed; not in the approved table)
 	public static final double GENERATOR_TRIP_SECONDS = 1.0;   // outside the safe band this long and a generator trips (assumed delay)
+	// ---- Overhead spans (docs/phase2-distribution.md) ----
+	public static final double SPAN_METERS_PER_BLOCK = 4.0;    // one block of span is 4 m: a 12 m pole is 3 blocks
+	public static final int SPAN_MAX_LOW = 8;                  // 32 m: a service drop
+	public static final int SPAN_MAX_DISTRIBUTION = 10;        // 40 m: a distribution span
+	public static final int SPAN_MAX_HIGH = 64;                // 256 m: a transmission span
+	public static final int SPOOL_SPAN_BLOCKS = 256;           // how much span a conductor spool holds
+	public static final int INSULATOR_FLASHOVER_TICKS = 60;    // an under-rated insulator under load lasts this long
 	public static final double UNCOOLED_EFFICIENCY = 0.75;
 	public static final double COOLING_FAN_WATTS = 750;
 	public static final int COOLING_FILL = 2;                 // fill sections a tower needs above its fan
@@ -181,4 +188,23 @@ public final class Tuning {
 
 	/** How far a ground wire may run from a machine to its ground rod. */
 	public static final int GROUND_SEARCH_LIMIT = 64;
+
+	/** Resistance of one block of wire at a tier. */
+	public static double wireOhms(dev.wildcatter.energy.Voltage voltage) {
+		return switch (voltage) {
+			case LOW -> WIRE_OHMS_LOW;
+			case MEDIUM -> WIRE_OHMS_MEDIUM;
+			case DISTRIBUTION -> WIRE_OHMS_DISTRIBUTION;
+			case HIGH -> WIRE_OHMS_HIGH;
+		};
+	}
+
+	/** The longest span (in blocks) a line of this tier may have between two insulators. */
+	public static int maxSpan(dev.wildcatter.energy.Voltage voltage) {
+		return switch (voltage) {
+			case LOW -> SPAN_MAX_LOW;
+			case MEDIUM, DISTRIBUTION -> SPAN_MAX_DISTRIBUTION;
+			case HIGH -> SPAN_MAX_HIGH;
+		};
+	}
 }

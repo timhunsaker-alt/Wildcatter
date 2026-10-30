@@ -60,8 +60,28 @@ public final class Circuit {
 		network.port(cell(pos), face.ordinal(), role.ordinal(), voltage.ordinal(), node, halfOhms, exposed);
 	}
 
-	/** Joins the terminals of neighbouring parts, then solves. */
+	private final java.util.Map<BlockPos, Integer> endpoints = new java.util.HashMap<>();
+	private final java.util.List<Object[]> spans = new java.util.ArrayList<>();
+
+	/** A part says which node an overhead span attaches to. */
+	public void publish(BlockPos pos, int node) {
+		endpoints.put(pos.immutable(), node);
+	}
+
+	/** An overhead span between two published endpoints, with the resistance of its length. */
+	public void span(BlockPos a, BlockPos b, double ohms) {
+		spans.add(new Object[] {a.immutable(), b.immutable(), ohms});
+	}
+
+	/** Joins the terminals of neighbouring parts and the ends of spans, then solves. */
 	public boolean solve() {
+		for (Object[] span : spans) {
+			Integer a = endpoints.get((BlockPos) span[0]);
+			Integer b = endpoints.get((BlockPos) span[1]);
+			if (a != null && b != null) {
+				network.resistor(a, b, (Double) span[2]);
+			}
+		}
 		return network.solve();
 	}
 

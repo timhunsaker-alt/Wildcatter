@@ -21,6 +21,7 @@ import net.minecraft.network.chat.Component;
 public class WildcatterClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
+		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.INSULATOR_ENTITY, context -> new SpanRenderer());
 		ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
 			if (screen instanceof SelectWorldScreen) {
 				ElectricalStandard.setPending(null);   // a cancelled creation must not leak into the next world

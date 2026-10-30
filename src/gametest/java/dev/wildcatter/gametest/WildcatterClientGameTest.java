@@ -56,6 +56,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			refining(context, server);
 			frequency(context, server);
 			distribution(context, server);
+			spans(context, server);
 			fieldManual(server);
 		}
 	}
@@ -879,6 +880,67 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(transformer.contains("12.47 kV") && transformer.contains("138 kV"), "the distribution transformer should name its two voltages: " + transformer);
 		context.takeScreenshot("wildcatter-distribution");
 		System.out.println("[wildcatter-test] distribution ok: " + line + " | " + transformer);
+	}
+
+	/** Overhead spans between insulators on poles: a good span carries 7.2 kV, rules refuse bad ones, and an under-rated insulator flashes over. */
+	private void spans(ClientGameTestContext context, TestServerContext server) {
+		int z = -76;
+		server.runCommand("fill 8 " + y + " " + (z - 3) + " 48 " + (y + 9) + " " + (z + 4) + " minecraft:air");
+		plant(server, z);
+		put(server, 12, up, z, "wildcatter:wool_wire_hot");
+		put(server, 13, up, z, "wildcatter:transformer[facing=east]");
+		put(server, 14, up, z, "wildcatter:mv_wire_hot");
+		put(server, 15, up, z, "wildcatter:substation_transformer[facing=east]");
+		put(server, 16, up, z, "wildcatter:hv_wire_hot");
+		put(server, 17, up, z, "wildcatter:distribution_transformer[facing=west]");
+		put(server, 18, up, z, "wildcatter:dist_wire_hot");
+		put(server, 19, up, z, "wildcatter:dist_wire_hot");
+		put(server, 20, up, z, "wildcatter:dist_breaker[facing=east]");
+		for (int x = 21; x <= 23; x++) {
+			put(server, x, up, z, "wildcatter:dist_wire_hot");
+		}
+		for (int k = 1; k <= 4; k++) {
+			put(server, 23, up + k, z, "wildcatter:dist_wire_hot");
+		}
+		for (int px : new int[] {24, 33, 40}) {
+			for (int k = 0; k < 3; k++) {
+				put(server, px, up + k, z, "wildcatter:pole");
+			}
+			put(server, px, up + 3, z, "wildcatter:crossarm[axis=x]");
+			put(server, px, up + 4, z, "wildcatter:insulator_dist");
+		}
+		context.waitTicks(20);
+		BlockPos a = new BlockPos(24, up + 4, z);
+		BlockPos b = new BlockPos(33, up + 4, z);
+		BlockPos c = new BlockPos(40, up + 4, z);
+		dev.wildcatter.item.SpoolItem.Result strung = server.computeOnServer(srv ->
+				dev.wildcatter.item.SpoolItem.connect(srv.overworld(), a, b, dev.wildcatter.energy.Voltage.DISTRIBUTION, false, 256));
+		check(strung.ok() && strung.length() == 9, "a 9 block span between two distribution insulators should be strung: " + strung);
+		dev.wildcatter.item.SpoolItem.Result tooFar = server.computeOnServer(srv ->
+				dev.wildcatter.item.SpoolItem.connect(srv.overworld(), a, c, dev.wildcatter.energy.Voltage.DISTRIBUTION, false, 256));
+		check(!tooFar.ok() && tooFar.message().contains("Too far"), "a 16 block span is over the 10 block limit and should be refused: " + tooFar);
+		server.runCommand("setblock 40 " + (up + 4) + " " + z + " wildcatter:insulator_dist[conductor=b]");
+		dev.wildcatter.item.SpoolItem.Result wrongConductor = server.computeOnServer(srv ->
+				dev.wildcatter.item.SpoolItem.connect(srv.overworld(), b, c, dev.wildcatter.energy.Voltage.DISTRIBUTION, false, 256));
+		check(!wrongConductor.ok() && wrongConductor.message().contains("different conductors"), "insulators on different conductors should not be joined: " + wrongConductor);
+		server.runCommand("tp @p 28 " + (up + 3) + " " + (z + 12) + " 180 -5");
+		context.waitTicks(100);
+		String far = read(server, 33, up + 4, z);
+		check(far.contains("1 span") && far.matches(".*\\b7[12]\\d\\d V.*"), "the far end of the span should hold about 7.2 kV: " + far);
+		context.takeScreenshot("wildcatter-span");
+		System.out.println("[wildcatter-test] span ok: " + strung.message() + " | " + tooFar.message() + " | " + far);
+
+		// an under-rated insulator: swap the far end for a low voltage one and the 12.47 kV line flashes over it
+		server.runCommand("setblock 33 " + (up + 4) + " " + z + " minecraft:air");
+		context.waitTicks(30);
+		server.runCommand("setblock 33 " + (up + 4) + " " + z + " wildcatter:insulator_lv");
+		dev.wildcatter.item.SpoolItem.Result flash = server.computeOnServer(srv ->
+				dev.wildcatter.item.SpoolItem.connect(srv.overworld(), a, b, dev.wildcatter.energy.Voltage.DISTRIBUTION, false, 256));
+		check(flash.ok(), "a span can be strung to an under-rated insulator: " + flash);
+		context.waitTicks(20);
+		String lv = read(server, 33, up + 4, z);
+		check(lv.contains("UNDER-RATED") && lv.contains("flashing over"), "the low voltage insulator on a 12.47 kV line should flash over: " + lv);
+		System.out.println("[wildcatter-test] under-rated insulator ok: " + lv);
 	}
 
 	private void fieldManual(TestServerContext server) {

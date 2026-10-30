@@ -415,12 +415,46 @@ for prefix in ("", "mv_", "dist_", "hv_"):
 save_json(f"{ASSETS}/blockstates/pole.json", {"variants": {"": {"model": f"{ns}:block/pole"}}})
 save_json(f"{ASSETS}/models/block/pole.json", {"textures": {"wood": f"{ns}:block/pole", "particle": f"{ns}:block/pole"},
 	"elements": [cuboid([5, 0, 5], [11, 16, 11], "#wood")]})
-for axis, (lo, hi, ins) in {"x": ([0, 8, 6], [16, 12, 10], ([1, 12, 7], [3, 15, 9], [13, 12, 7], [15, 15, 9])),
-		"z": ([6, 8, 0], [10, 12, 16], ([7, 12, 1], [9, 15, 3], [7, 12, 13], [9, 15, 15]))}.items():
+for axis, (lo, hi) in {"x": ([0, 12, 6], [16, 16, 10]), "z": ([6, 12, 0], [10, 16, 16])}.items():
 	save_json(f"{ASSETS}/models/block/crossarm_{axis}.json", {
-		"textures": {"wood": f"{ns}:block/pole", "ins": f"{ns}:block/insulator", "particle": f"{ns}:block/pole"},
-		"elements": [cuboid(lo, hi, "#wood"), cuboid(ins[0], ins[1], "#ins"), cuboid(ins[2], ins[3], "#ins")]})
+		"textures": {"wood": f"{ns}:block/pole", "particle": f"{ns}:block/pole"},
+		"elements": [cuboid([5, 0, 5], [11, 12, 11], "#wood"), cuboid(lo, hi, "#wood")]})   # a short post under the beam joins it to the pole
 save_json(f"{ASSETS}/blockstates/crossarm.json", {"variants": {"axis=x": {"model": f"{ns}:block/crossarm_x"}, "axis=z": {"model": f"{ns}:block/crossarm_z"}}})
+
+# ---- insulators and conductor spools -------------------------------------------------------------------------
+tex("insulator_pin", plain((92, 92, 98)))
+for tier, glaze in (("lv", (232, 232, 238)), ("dist", (150, 98, 66)), ("hv", (176, 196, 176))):
+	tex(f"insulator_glaze_{tier}", plain(glaze, 5))
+for key, color in CONDUCTOR_COLORS.items():
+	tex(f"insulator_cap_{key}", plain(color, 4))
+for tier, discs in (("lv", [(3, 5)]), ("dist", [(3, 5), (6, 8)]), ("hv", [(2, 4), (5, 7), (8, 10)])):
+	wide = 5 if tier != "hv" else 4
+	for key in CONDUCTOR_COLORS:
+		els = [cuboid([7, 0, 7], [9, 10, 9], "#pin")] + [cuboid([wide, lo, wide], [16 - wide, hi, 16 - wide], "#glaze") for lo, hi in discs] + [cuboid([6, 10, 6], [10, 13, 10], "#cap")]
+		save_json(f"{ASSETS}/models/block/insulator_{tier}_{key}.json", {
+			"textures": {"pin": f"{ns}:block/insulator_pin", "glaze": f"{ns}:block/insulator_glaze_{tier}", "cap": f"{ns}:block/insulator_cap_{key}",
+				"particle": f"{ns}:block/insulator_glaze_{tier}"}, "elements": els})
+	save_json(f"{ASSETS}/blockstates/insulator_{tier}.json", {"variants": {
+		f"conductor={key}": {"model": f"{ns}:block/insulator_{tier}_{key}"} for key in CONDUCTOR_COLORS}})
+
+
+def spool_icon(metal, covered):
+	def draw(img, d):
+		d.rectangle([2, 1, 13, 3], fill=(122, 82, 50, 255), outline=(80, 52, 30, 255))
+		d.rectangle([2, 12, 13, 14], fill=(122, 82, 50, 255), outline=(80, 52, 30, 255))
+		d.rectangle([4, 4, 11, 11], fill=metal + (255,))
+		for y in (5, 7, 9):
+			d.line([4, y, 11, y], fill=tuple(max(0, c - 40) for c in metal) + (255,))
+		if covered:
+			d.rectangle([4, 4, 11, 11], fill=(236, 236, 242, 255))
+			for y in (5, 7, 9):
+				d.line([4, y, 11, y], fill=(190, 190, 200, 255))
+	return draw
+
+
+for tier, metal in (("lv", COPPER), ("dist", (178, 164, 150)), ("hv", STEEL_WIRE)):
+	tex(f"conductor_spool_{tier}", spool_icon(metal, False), kind="item")
+	tex(f"covered_conductor_spool_{tier}", spool_icon(metal, True), kind="item")
 
 # Wire: a thin core with an arm toward each joined neighbour. Wool wire has four wear stages.
 arms = {"north": {}, "east": {"y": 90}, "south": {"y": 180}, "west": {"y": 270}, "up": {"x": 270}, "down": {"x": 90}}
@@ -500,11 +534,11 @@ ITEM_MODELS = {"firebox": "block/firebox", "pump": "block/pump", "pipe": "block/
 	"gas_wellhead": "block/gas_wellhead", "casing": "block/casing", "boiler": "block/boiler", "steam_turbine": "block/steam_turbine", "electric_lamp": "block/electric_lamp",
 	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "fuse": "block/fuse_good", "dist_breaker": "block/dist_breaker_on", "distribution_transformer": "block/distribution_transformer", "switch": "block/switch_on", "ufls_relay": "block/relay_on", "mv_breaker": "block/mv_breaker_on", "hv_breaker": "block/hv_breaker_on", "pole": "block/pole", "crossarm": "block/crossarm_x", "transformer": "block/transformer",
 	"substation_transformer": "block/substation_transformer", "ground_rod": "block/ground_rod",
-	"power_meter": "item/power_meter", "field_manual": "item/field_manual", "seismograph": "item/seismograph", "crude_oil_bucket": "item/crude_oil_bucket", "plastic_sheet": "item/plastic_sheet", "diesel_bucket": "item/diesel_bucket", "steel_ingot": "item/steel_ingot"}
+	"power_meter": "item/power_meter", "field_manual": "item/field_manual", "seismograph": "item/seismograph", "crude_oil_bucket": "item/crude_oil_bucket", "plastic_sheet": "item/plastic_sheet", "diesel_bucket": "item/diesel_bucket", "steel_ingot": "item/steel_ingot", "conductor_spool_lv": "item/conductor_spool_lv", "conductor_spool_dist": "item/conductor_spool_dist", "conductor_spool_hv": "item/conductor_spool_hv", "covered_conductor_spool_lv": "item/covered_conductor_spool_lv", "covered_conductor_spool_dist": "item/covered_conductor_spool_dist", "covered_conductor_spool_hv": "item/covered_conductor_spool_hv", "insulator_lv": "block/insulator_lv_a", "insulator_dist": "block/insulator_dist_a", "insulator_hv": "block/insulator_hv_a"}
 ITEM_MODELS.update({w: f"block/{w}_inventory" for w in WIRES})
 for name, model in ITEM_MODELS.items():
 	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:{model}"}})
-for item in ("power_meter", "field_manual", "seismograph", "crude_oil_bucket", "plastic_sheet", "diesel_bucket", "steel_ingot"):
+for item in ("power_meter", "field_manual", "seismograph", "crude_oil_bucket", "plastic_sheet", "diesel_bucket", "steel_ingot", "conductor_spool_lv", "conductor_spool_dist", "conductor_spool_hv", "covered_conductor_spool_lv", "covered_conductor_spool_dist", "covered_conductor_spool_hv"):
 	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}"}})
 
 # ---- names --------------------------------------------------------------------------------------------
@@ -553,6 +587,15 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 	"block.wildcatter.dist_plastic_wire_neutral": "Plastic Line, black (DIST)",
 	"block.wildcatter.distribution_transformer": "Distribution Transformer (HV / DIST)",
 	"block.wildcatter.hv_breaker": "Circuit Breaker (HV)",
+	"block.wildcatter.insulator_lv": "Insulator (LV, 1 kV)",
+	"block.wildcatter.insulator_dist": "Pin Insulator (DIST, 15 kV)",
+	"block.wildcatter.insulator_hv": "Suspension Insulator (HV, 138 kV)",
+	"item.wildcatter.conductor_spool_lv": "Conductor Spool (LV)",
+	"item.wildcatter.conductor_spool_dist": "Conductor Spool (DIST)",
+	"item.wildcatter.conductor_spool_hv": "Conductor Spool (HV)",
+	"item.wildcatter.covered_conductor_spool_lv": "Covered Conductor Spool (LV)",
+	"item.wildcatter.covered_conductor_spool_dist": "Covered Conductor Spool (DIST)",
+	"item.wildcatter.covered_conductor_spool_hv": "Covered Conductor Spool (HV)",
 	"block.wildcatter.pole": "Utility Pole",
 	"block.wildcatter.crossarm": "Pole Crossarm",
 	"block.wildcatter.electric_lamp": "Electric Lamp (60 W)",
@@ -575,7 +618,7 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 })
 
 # ---- loot: every block drops itself ---------------------------------------------------------------
-BLOCKS = ("refinery", "refinery_column", "cooling_tower", "cooling_fill", "diesel_engine", "gas_turbine", "boiler", "firebox", "pipe", "gas_line", "drilling_rig", "pumpjack", "gas_wellhead", "pump", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "electric_heater", "breaker", "fuse", "switch", "ufls_relay", "mv_breaker", "dist_breaker", "distribution_transformer", "hv_breaker", "pole", "crossarm", "ground_rod") + WIRES
+BLOCKS = ("refinery", "refinery_column", "cooling_tower", "cooling_fill", "diesel_engine", "gas_turbine", "boiler", "firebox", "pipe", "gas_line", "drilling_rig", "pumpjack", "gas_wellhead", "pump", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "electric_heater", "breaker", "fuse", "switch", "ufls_relay", "mv_breaker", "dist_breaker", "distribution_transformer", "hv_breaker", "pole", "crossarm", "insulator_lv", "insulator_dist", "insulator_hv", "ground_rod") + WIRES
 for name in BLOCKS:
 	save_json(f"{DATA}/loot_table/blocks/{name}.json", {
 		"type": "minecraft:block",
@@ -632,6 +675,12 @@ shaped("breaker", ["ICI", "IRI", "ICI"], {"I": "minecraft:iron_ingot", "C": "min
 shaped("mv_breaker", ["IBI", "CRC", "IBI"], {"I": "minecraft:iron_ingot", "B": f"{ns}:breaker", "C": "minecraft:copper_ingot", "R": "minecraft:redstone_block"}, "mv_breaker")
 shaped("dist_breaker", ["IBI", "GRG", "IBI"], {"I": "minecraft:iron_ingot", "B": f"{ns}:mv_breaker", "G": "minecraft:gold_ingot", "R": "minecraft:redstone_block"}, "dist_breaker")
 shaped("hv_breaker", ["DBD", "IRI", "DBD"], {"I": "minecraft:iron_block", "B": f"{ns}:mv_breaker", "D": "minecraft:diamond", "R": "minecraft:redstone_block"}, "hv_breaker")
+for tier, wire, sheets in (("lv", "wire_hot", 1), ("dist", "dist_wire_hot", 2), ("hv", "hv_wire_hot", 3)):
+	shaped(f"conductor_spool_{tier}", ["WWW", "WSW", "WWW"], {"W": f"{ns}:{wire}", "S": "minecraft:stick"}, f"conductor_spool_{tier}")
+	shapeless(f"covered_conductor_spool_{tier}", [f"{ns}:conductor_spool_{tier}"] + [f"{ns}:plastic_sheet"] * sheets, f"covered_conductor_spool_{tier}")
+shaped("insulator_lv", ["B", "N"], {"B": "minecraft:brick", "N": "minecraft:iron_nugget"}, "insulator_lv", 2)
+shaped("insulator_dist", ["B", "B", "N"], {"B": "minecraft:brick", "N": "minecraft:iron_nugget"}, "insulator_dist", 2)
+shaped("insulator_hv", ["BBB", "BNB", "BIB"], {"B": "minecraft:brick", "N": "minecraft:iron_nugget", "I": "minecraft:iron_ingot"}, "insulator_hv", 2)
 shaped("pole", ["L", "L", "L"], {"L": "#minecraft:logs"}, "pole", 3)
 shaped("crossarm", ["PPP", " N "], {"P": "#minecraft:planks", "N": "minecraft:iron_nugget"}, "crossarm", 2)
 shaped("transformer", ["ICI", "ICI", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot"}, "transformer")

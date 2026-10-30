@@ -100,6 +100,13 @@ All of them go in the hot wire: in at the back, out at the front. Sneak and righ
 - Game test: 120 V stepped up to 4.16 kV, 138 kV and down to a 12.47 kV line that holds 7,200 V.
 - Next: 2b insulators and spans.
 
+## Phase 2b: insulators and overhead spans
+- **Insulators** (LV 1 kV, DIST 15 kV pin, HV 138 kV suspension) sit on top of a pole or crossarm (they pop off otherwise) and hold one conductor, chosen by right-click. **Conductor spools** (bare and covered, per tier) string a span between two insulators: right-click one, then the other. A spool pays out one block of its 256 per block of span.
+- A span is a link stored on both insulators, solved with the circuit (the two ends are one island even far apart), with the tier's wire resistance per block, and drawn by a client renderer as a sagging line (`client/SpanRenderer`). Limits: 8 blocks at LV, 10 at DIST, 64 at HV (1 block = 4 m); both ends the same conductor; one kind of line per insulator; four spans at most. A span whose other end is gone is dropped. Bare spans shock like bare wire.
+- A line above an insulator's rating gets a ground arc ("flashing over"); under load for 3 s the insulator shatters. Tested: the flag. The shattering depends on enough fault current, which a small generator cannot supply (it trips on frequency first), so that path is not exercised by the game test.
+- Game test: a 9 block distribution span carries 7,200 V, a 16 block span is refused ("Too far"), insulators on different conductors are refused, and an under-rated insulator is flagged.
+- Not done: span conductor ampacity (spans never burn), spans for the 4.16 kV tier (no MV spool), conductor sizes (one per tier).
+
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.

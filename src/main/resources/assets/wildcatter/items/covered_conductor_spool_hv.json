@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "wildcatter:item/covered_conductor_spool_hv"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "B",
+    "B",
+    "N"
+  ],
+  "key": {
+    "B": "minecraft:brick",
+    "N": "minecraft:iron_nugget"
+  },
+  "result": {
+    "id": "wildcatter:insulator_dist",
+    "count": 2
+  }
+}

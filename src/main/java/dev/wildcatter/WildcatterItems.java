@@ -6,6 +6,9 @@ import dev.wildcatter.item.PowerMeterItem;
 import dev.wildcatter.item.SeismographItem;
 import net.minecraft.world.item.Items;
 import net.minecraft.core.component.DataComponents;
+import dev.wildcatter.Tuning;
+import dev.wildcatter.energy.Voltage;
+import dev.wildcatter.item.SpoolItem;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -37,6 +40,23 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> DIESEL_BUCKET_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("diesel_bucket"));
 	public static final Item DIESEL_BUCKET = new Item(new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET).setId(DIESEL_BUCKET_KEY));
 
+	/** Conductor spools: a span of a tier, bare or plastic covered. A spool holds {@link Tuning#SPOOL_SPAN_BLOCKS} blocks of span. */
+	public static final Item SPOOL_LV = spool("conductor_spool_lv", Voltage.LOW, false);
+	public static final Item SPOOL_DIST = spool("conductor_spool_dist", Voltage.DISTRIBUTION, false);
+	public static final Item SPOOL_HV = spool("conductor_spool_hv", Voltage.HIGH, false);
+	public static final Item COVERED_SPOOL_LV = spool("covered_conductor_spool_lv", Voltage.LOW, true);
+	public static final Item COVERED_SPOOL_DIST = spool("covered_conductor_spool_dist", Voltage.DISTRIBUTION, true);
+	public static final Item COVERED_SPOOL_HV = spool("covered_conductor_spool_hv", Voltage.HIGH, true);
+
+	private static Item spool(String name, Voltage tier, boolean covered) {
+		ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, Wildcatter.id(name));
+		return new SpoolItem(new Item.Properties().durability(Tuning.SPOOL_SPAN_BLOCKS).setId(key), tier, covered);
+	}
+
+	private static void registerSpool(String name, Item item) {
+		Registry.register(BuiltInRegistries.ITEM, ResourceKey.create(Registries.ITEM, Wildcatter.id(name)), item);
+	}
+
 	private WildcatterItems() {
 	}
 
@@ -48,5 +68,11 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, PLASTIC_SHEET_KEY, PLASTIC_SHEET);
 		Registry.register(BuiltInRegistries.ITEM, STEEL_INGOT_KEY, STEEL_INGOT);
 		Registry.register(BuiltInRegistries.ITEM, DIESEL_BUCKET_KEY, DIESEL_BUCKET);
+		registerSpool("conductor_spool_lv", SPOOL_LV);
+		registerSpool("conductor_spool_dist", SPOOL_DIST);
+		registerSpool("conductor_spool_hv", SPOOL_HV);
+		registerSpool("covered_conductor_spool_lv", COVERED_SPOOL_LV);
+		registerSpool("covered_conductor_spool_dist", COVERED_SPOOL_DIST);
+		registerSpool("covered_conductor_spool_hv", COVERED_SPOOL_HV);
 	}
 }
