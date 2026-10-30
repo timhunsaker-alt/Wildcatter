@@ -173,6 +173,9 @@ public final class WildcatterBlocks {
 	public static final Block TRANSFORMER = block("transformer", props -> new TransformerBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.LOW, Voltage.MEDIUM));
 	/** Steps 4.16 kV up to 138 kV and back. */
+	/** 12.47 kV (7.2 kV to neutral) down to 120/240 V split-phase, 25 kVA; it hangs on a pole. */
+	public static final Block POLE_TRANSFORMER = block("pole_transformer", props -> new TransformerBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.LOW, Voltage.DISTRIBUTION, Tuning.POLE_TRANSFORMER_VA));
 	/** 138 kV to 12.47 kV: the stand-in until the Phase 4 substation multiblock. */
 	public static final Block DISTRIBUTION_TRANSFORMER = block("distribution_transformer", props -> new TransformerBlock(props.mapColor(MapColor.COLOR_LIGHT_GREEN)
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.DISTRIBUTION, Voltage.HIGH));
@@ -188,7 +191,7 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<BreakerBlockEntity> BREAKER_ENTITY = entity(BreakerBlockEntity::new, BREAKER, MV_BREAKER, DIST_BREAKER, HV_BREAKER, SWITCH, UFLS_RELAY);
 	public static final BlockEntityType<FuseBlockEntity> FUSE_ENTITY = entity(FuseBlockEntity::new, FUSE);
 	public static final BlockEntityType<InsulatorBlockEntity> INSULATOR_ENTITY = entity(InsulatorBlockEntity::new, INSULATOR_LV, INSULATOR_DIST, INSULATOR_HV);
-	public static final BlockEntityType<TransformerBlockEntity> TRANSFORMER_ENTITY = entity(TransformerBlockEntity::new, TRANSFORMER, SUBSTATION_TRANSFORMER, DISTRIBUTION_TRANSFORMER);
+	public static final BlockEntityType<TransformerBlockEntity> TRANSFORMER_ENTITY = entity(TransformerBlockEntity::new, TRANSFORMER, SUBSTATION_TRANSFORMER, DISTRIBUTION_TRANSFORMER, POLE_TRANSFORMER);
 
 	public static final BlockEntityType<FireboxBlockEntity> FIREBOX_ENTITY = entity(FireboxBlockEntity::new, FIREBOX);
 	public static final BlockEntityType<PumpBlockEntity> PUMP_ENTITY = entity(PumpBlockEntity::new, PUMP);
@@ -276,6 +279,7 @@ public final class WildcatterBlocks {
 		add("transformer", TRANSFORMER);
 		add("substation_transformer", SUBSTATION_TRANSFORMER);
 		add("distribution_transformer", DISTRIBUTION_TRANSFORMER);
+		add("pole_transformer", POLE_TRANSFORMER);
 		add("electric_lamp", ELECTRIC_LAMP);
 		add("electric_heater", ELECTRIC_HEATER);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("boiler"), BOILER_ENTITY);

@@ -54,6 +54,9 @@ public final class Tuning {
 	public static final int SPAN_MAX_HIGH = 64;                // 256 m: a transmission span
 	public static final int SPOOL_SPAN_BLOCKS = 256;           // how much span a conductor spool holds
 	public static final int INSULATOR_FLASHOVER_TICKS = 60;    // an under-rated insulator under load lasts this long
+	public static final double POLE_TRANSFORMER_VA = 25_000;     // a 25 kVA pole-top unit
+	public static final double POLE_TRANSFORMER_FAIL_SECONDS = 10.0;   // at 150 % of its rating it fails in this long
+	public static final double POLE_TRANSFORMER_COOL_SECONDS = 30.0;
 	public static final double UNCOOLED_EFFICIENCY = 0.75;
 	public static final double COOLING_FAN_WATTS = 750;
 	public static final int COOLING_FILL = 2;                 // fill sections a tower needs above its fan

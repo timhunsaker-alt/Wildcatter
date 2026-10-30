@@ -33,11 +33,18 @@ public class TransformerBlock extends BaseEntityBlock {
 
 	private final Voltage low;
 	private final Voltage high;
+	/** A pole-mount unit has a kVA rating (it heats on overload and fails); the others are not rated. 0 means unrated. */
+	private final double ratedVa;
 
 	public TransformerBlock(Properties properties, Voltage low, Voltage high) {
+		this(properties, low, high, 0);
+	}
+
+	public TransformerBlock(Properties properties, Voltage low, Voltage high, double ratedVa) {
 		super(properties);
 		this.low = low;
 		this.high = high;
+		this.ratedVa = ratedVa;
 		registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
 	}
 
@@ -47,6 +54,24 @@ public class TransformerBlock extends BaseEntityBlock {
 
 	public Voltage high() {
 		return high;
+	}
+
+	public double ratedVa() {
+		return ratedVa;
+	}
+
+	/** A pole-mount transformer hangs on a pole: one must stand beside it. */
+	@Override
+	protected boolean canSurvive(BlockState state, net.minecraft.world.level.LevelReader level, BlockPos pos) {
+		if (ratedVa <= 0) {
+			return true;
+		}
+		for (Direction side : Direction.Plane.HORIZONTAL) {
+			if (level.getBlockState(pos.relative(side)).is(WildcatterBlocks.POLE)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -67,7 +92,7 @@ public class TransformerBlock extends BaseEntityBlock {
 
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-		return null;
+		return level.isClientSide() || ratedVa <= 0 ? null : createTickerHelper(type, WildcatterBlocks.TRANSFORMER_ENTITY, TransformerBlockEntity::tick);
 	}
 
 	@Override

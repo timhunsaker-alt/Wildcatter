@@ -36,7 +36,7 @@ public class Wildcatter implements ModInitializer {
 					WildcatterBlocks.WIRE_HOT, WildcatterBlocks.WIRE_NEUTRAL, WildcatterBlocks.WOOL_WIRE_HOT, WildcatterBlocks.WOOL_WIRE_NEUTRAL,
 					WildcatterBlocks.MV_WIRE_HOT, WildcatterBlocks.MV_WIRE_NEUTRAL, WildcatterBlocks.HV_WIRE_HOT, WildcatterBlocks.HV_WIRE_NEUTRAL,
 					WildcatterBlocks.GROUND_ROD, WildcatterBlocks.GROUND_WIRE, WildcatterBlocks.BREAKER, WildcatterBlocks.FUSE, WildcatterBlocks.SWITCH, WildcatterBlocks.UFLS_RELAY, WildcatterBlocks.MV_BREAKER, WildcatterBlocks.HV_BREAKER, WildcatterBlocks.POLE, WildcatterBlocks.CROSSARM, WildcatterBlocks.INSULATOR_LV, WildcatterBlocks.INSULATOR_DIST, WildcatterBlocks.INSULATOR_HV,
-					WildcatterBlocks.TRANSFORMER, WildcatterBlocks.SUBSTATION_TRANSFORMER, WildcatterBlocks.DISTRIBUTION_TRANSFORMER,
+					WildcatterBlocks.TRANSFORMER, WildcatterBlocks.SUBSTATION_TRANSFORMER, WildcatterBlocks.DISTRIBUTION_TRANSFORMER, WildcatterBlocks.POLE_TRANSFORMER,
 					WildcatterBlocks.DIST_WIRE_HOT, WildcatterBlocks.DIST_WIRE_NEUTRAL, WildcatterBlocks.DIST_PLASTIC_WIRE_HOT, WildcatterBlocks.DIST_PLASTIC_WIRE_NEUTRAL, WildcatterBlocks.DIST_BREAKER,
 					WildcatterBlocks.ELECTRIC_LAMP, WildcatterBlocks.ELECTRIC_HEATER,
 					WildcatterBlocks.FIREBOX, WildcatterBlocks.PIPE, WildcatterBlocks.PUMP, WildcatterBlocks.GAS_LINE,

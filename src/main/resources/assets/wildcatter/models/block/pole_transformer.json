@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "wildcatter:block/pole_tx_front",
+    "side": "wildcatter:block/pole_tx_side",
+    "top": "wildcatter:block/pole_tx_top",
+    "bottom": "wildcatter:block/pole_tx_top"
+  }
+}

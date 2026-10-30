@@ -42,6 +42,7 @@
   "block.wildcatter.dist_plastic_wire_hot": "Plastic Line, red (DIST)",
   "block.wildcatter.dist_plastic_wire_neutral": "Plastic Line, black (DIST)",
   "block.wildcatter.distribution_transformer": "Distribution Transformer (HV / DIST)",
+  "block.wildcatter.pole_transformer": "Pole-Mount Transformer (DIST / LV, 25 kVA)",
   "block.wildcatter.hv_breaker": "Circuit Breaker (HV)",
   "block.wildcatter.insulator_lv": "Insulator (LV, 1 kV)",
   "block.wildcatter.insulator_dist": "Pin Insulator (DIST, 15 kV)",

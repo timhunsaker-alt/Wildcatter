@@ -38,6 +38,15 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 	private double lowAmps;
 	private double highAmps;
 	private double lossWatts;
+	/** 0 to 1: how close an overloaded pole transformer is to failing. */
+	private double heat;
+	private boolean failed;
+	/** The game test sets this to give a pole transformer a small rating. Null in play. */
+	public static volatile Double testRatedVa;
+
+	private double ratedVa() {
+		return testRatedVa != null && block().ratedVa() > 0 ? testRatedVa : block().ratedVa();
+	}
 
 	public TransformerBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.TRANSFORMER_ENTITY, pos, state);
@@ -134,13 +143,38 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 		lowBAmps = split ? circuit.current(lowBWinding) : 0;
 		highAmps = circuit.current(highWinding);
 		double ratio = block().high().nominal() / block().low().nominal();
+		double rated = ratedVa();
+		if (rated > 0) {
+			double va = Math.abs(lowVolts * lowAmps) + (split ? Math.abs(lowBVolts * lowBAmps) : 0);
+			double loading = va / rated;
+			double dt = ticks / 20.0;
+			if (loading > 1.0) {
+				heat += (loading - 1.0) * 2.0 * dt / Tuning.POLE_TRANSFORMER_FAIL_SECONDS;   // 150 % for the fail time takes it from cold to failed
+			} else {
+				heat = Math.max(0, heat - dt / Tuning.POLE_TRANSFORMER_COOL_SECONDS);
+			}
+			if (heat >= 1.0) {
+				failed = true;
+			}
+		}
 		lossWatts = lowAmps * lowAmps * Tuning.TRANSFORMER_LOW_WINDING_OHMS + highAmps * highAmps * Tuning.TRANSFORMER_LOW_WINDING_OHMS * ratio * ratio;
+	}
+
+	/** A pole transformer that has overheated burns out. */
+	public static void tick(net.minecraft.world.level.Level level, BlockPos pos, BlockState state, TransformerBlockEntity transformer) {
+		if (transformer.failed && level instanceof net.minecraft.server.level.ServerLevel server) {
+			server.sendParticles(net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE, pos.getX() + 0.5, pos.getY() + 0.7, pos.getZ() + 0.5, 20, 0.3, 0.3, 0.3, 0.05);
+			server.playSound(null, pos, net.minecraft.sounds.SoundEvents.GENERIC_EXPLODE.value(), net.minecraft.sounds.SoundSource.BLOCKS, 0.8F, 1.3F);
+			server.destroyBlock(pos, false);
+			dev.wildcatter.circuit.CircuitManager.markDirty(server);
+		}
 	}
 
 	@Override
 	public Component inspect() {
+		String rating = ratedVa() > 0 ? String.format("rated %.0f kVA, %s; ", ratedVa() / 1000.0, heat > 0.05 ? "OVERLOADED, heating " + Math.round(heat * 100) + "%" : "within its rating") : "";
 		String legB = split ? String.format("leg B %.0f V %.1f A (A to B %.0f V), ", Math.abs(lowBVolts), Math.abs(lowBAmps), Math.abs(lowVolts - lowBVolts)) : "";
-		return Component.literal("Transformer " + block().low().label() + " / " + block().high().label() + ": " + legB
+		return Component.literal("Transformer " + block().low().label() + " / " + block().high().label() + ": " + rating + legB
 				+ String.format("%.0f V %.1f A on the %s side, %.0f V %.2f A on the %s side, losing %.0f W as heat; ",
 						lowVolts, Math.abs(lowAmps), block().low().label(), highVolts, Math.abs(highAmps), block().high().label(), lossWatts)
 				+ (level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you"));

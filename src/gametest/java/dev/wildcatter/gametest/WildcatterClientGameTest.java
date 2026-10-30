@@ -57,6 +57,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			frequency(context, server);
 			distribution(context, server);
 			spans(context, server);
+			poleTransformer(context, server);
 			fieldManual(server);
 		}
 	}
@@ -941,6 +942,40 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		String lv = read(server, 33, up + 4, z);
 		check(lv.contains("UNDER-RATED") && lv.contains("flashing over"), "the low voltage insulator on a 12.47 kV line should flash over: " + lv);
 		System.out.println("[wildcatter-test] under-rated insulator ok: " + lv);
+	}
+
+	/** A pole-mount transformer on the 12.47 kV line lights lamps on both legs, and burns out when overloaded. */
+	private void poleTransformer(ClientGameTestContext context, TestServerContext server) {
+		int z = -92;
+		server.runCommand("fill 8 " + y + " " + (z - 3) + " 26 " + (y + 6) + " " + (z + 4) + " minecraft:air");
+		plant(server, z);
+		put(server, 12, up, z, "wildcatter:wool_wire_hot");
+		put(server, 13, up, z, "wildcatter:transformer[facing=east]");
+		put(server, 14, up, z, "wildcatter:mv_wire_hot");
+		put(server, 15, up, z, "wildcatter:substation_transformer[facing=east]");
+		put(server, 16, up, z, "wildcatter:hv_wire_hot");
+		put(server, 17, up, z, "wildcatter:distribution_transformer[facing=west]");
+		put(server, 18, up, z, "wildcatter:dist_wire_hot");
+		put(server, 19, up, z, "wildcatter:dist_wire_hot");
+		put(server, 20, up, z - 1, "wildcatter:pole");
+		put(server, 20, up, z, "wildcatter:pole_transformer[facing=west]");
+		put(server, 21, up, z, "wildcatter:electric_lamp");        // leg A, on the back
+		put(server, 20, up, z + 1, "wildcatter:electric_lamp");    // leg B, on a side
+		server.runCommand("tp @p 22 " + (up + 1) + " " + (z + 5) + " 180 15");
+		context.waitTicks(160);
+		String unit = read(server, 20, up, z);
+		check(unit.contains("25 kVA") && unit.contains("within its rating"), "the pole transformer should show its rating and be within it: " + unit);
+		check(lit(server, 21, z) && lit(server, 20, z + 1), "lamps on both legs of the pole transformer should light: A " + read(server, 21, up, z) + " | B " + read(server, 20, up, z + 1));
+		context.takeScreenshot("wildcatter-pole-transformer");
+		// overload it: rate it at 30 VA for the test, with two lamps (120 VA) on it
+		dev.wildcatter.block.TransformerBlockEntity.testRatedVa = 30.0;
+		context.waitTicks(30);
+		String heating = read(server, 20, up, z);
+		check(heating.contains("OVERLOADED") || isAir(server, 20, up, z), "an overloaded pole transformer should say so or already have failed: " + heating);
+		context.waitTicks(120);
+		dev.wildcatter.block.TransformerBlockEntity.testRatedVa = null;
+		check(isAir(server, 20, up, z), "a pole transformer at four times its rating should burn out");
+		System.out.println("[wildcatter-test] pole transformer ok: " + unit + " | " + heating);
 	}
 
 	private void fieldManual(TestServerContext server) {
