@@ -72,7 +72,9 @@ All of them go in the hot wire: in at the back, out at the front. Sneak and righ
 - `energy/StandardData` stores the choice in the world and locks it at first load: the Create World choice if one was made, else `config/wildcatter.properties` (`standard=NORTH_AMERICAN` or `IEC`).
 - Block names say LV / MV / HV; inspect text and the Field Manual print the active voltages.
 - Game test: the same lamp runs on 230 V when the standard is switched to IEC and back to 120 V.
-- Not done yet: the Create World screen selector, and split-phase 120/240 V (comes with the conductor work in 1c).
+- Create World screen: a "Grid" button on the Game tab (under Allow Commands) picks North American or IEC. It is a client entrypoint (`client/WildcatterClient`) using Fabric's screen events, no mixins. The game test opens the real screen, checks the button, presses it and checks the choice changes. A real mouse click on it has not been exercised (the test harness's synthetic mouse did not reach the widget); the button is in the screen's children list and sits on the Game tab.
+- A cancelled Create World leaves no choice behind (the Select World screen clears it). A world made before this change, or by a server, gets the config default.
+- Not done yet: split-phase 120/240 V (comes with the conductor work in 1c).
 
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.

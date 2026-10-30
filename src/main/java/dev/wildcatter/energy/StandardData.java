@@ -38,7 +38,8 @@ public class StandardData extends SavedData {
 		return new StandardData(standard);
 	}
 
-	private static ElectricalStandard configDefault() {
+	/** The standard new worlds get unless the Create World screen picks another: from the config file. */
+	public static ElectricalStandard configDefault() {
 		java.nio.file.Path file = FabricLoader.getInstance().getConfigDir().resolve("wildcatter.properties");
 		java.util.Properties props = new java.util.Properties();
 		try {
@@ -59,6 +60,7 @@ public class StandardData extends SavedData {
 	public static ElectricalStandard apply(MinecraftServer server) {
 		StandardData data = server.overworld().getDataStorage().computeIfAbsent(TYPE);
 		data.setDirty();
+		ElectricalStandard.setPending(null);
 		ElectricalStandard.setActive(data.standard);
 		Wildcatter.LOGGER.info("Electrical standard: {} ({} Hz)", data.standard.displayName(), data.standard.hertz());
 		return data.standard;

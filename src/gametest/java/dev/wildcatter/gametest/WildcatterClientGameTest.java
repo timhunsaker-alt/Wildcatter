@@ -40,6 +40,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 
 	@Override
 	public void runTest(ClientGameTestContext context) {
+		createWorldScreen(context);
 		try (TestSingleplayerContext world = context.worldBuilder().create()) {
 			TestServerContext server = world.getServer();
 			context.waitTicks(40);
@@ -54,6 +55,55 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			refining(context, server);
 			fieldManual(server);
 		}
+	}
+
+	/** The Create World screen has the electrical standard selector, and clicking it changes the choice. */
+	private void createWorldScreen(ClientGameTestContext context) {
+		net.minecraft.client.gui.screens.Screen[] opened = new net.minecraft.client.gui.screens.Screen[1];
+		net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
+			if (screen instanceof net.minecraft.client.gui.screens.worldselection.CreateWorldScreen) {
+				opened[0] = screen;
+			}
+		});
+		context.runOnClient(client -> net.minecraft.client.gui.screens.worldselection.CreateWorldScreen.openFresh(client, () -> {}, (screen, registries, data, rules, path) -> false));
+		context.waitForScreen(net.minecraft.client.gui.screens.worldselection.CreateWorldScreen.class);
+		context.waitTicks(20);
+		int[] spot = context.computeOnClient(client -> {
+			for (var widget : net.fabricmc.fabric.api.client.screen.v1.Screens.getWidgets(opened[0])) {
+				if (widget instanceof net.minecraft.client.gui.components.CycleButton<?> && widget.getMessage().getString().startsWith("Grid")) {
+					double scale = client.getWindow().getGuiScale();
+					return new int[] {(int) ((widget.getX() + widget.getWidth() / 2.0) * scale), (int) ((widget.getY() + widget.getHeight() / 2.0) * scale)};
+				}
+			}
+			return null;
+		});
+		check(spot != null, "the Create World screen should have the electrical standard button");
+		check(dev.wildcatter.energy.ElectricalStandard.pending() == dev.wildcatter.energy.ElectricalStandard.NORTH_AMERICAN, "the selector should start on the config default");
+		context.takeScreenshot("wildcatter-create-world");
+		// The synthetic mouse of the test harness does not reach this screen's widgets, so press the button the way a key press does.
+		context.runOnClient(client -> {
+			for (var widget : net.fabricmc.fabric.api.client.screen.v1.Screens.getWidgets(opened[0])) {
+				if (widget instanceof net.minecraft.client.gui.components.CycleButton<?> cycle && cycle.getMessage().getString().startsWith("Grid")) {
+					cycle.onPress(new net.minecraft.client.input.KeyEvent(0, 0, 0));
+				}
+			}
+		});
+		context.waitTicks(10);
+		System.out.println("[wildcatter-test] selector after click: " + context.computeOnClient(client -> {
+			for (var widget : net.fabricmc.fabric.api.client.screen.v1.Screens.getWidgets(opened[0])) {
+				if (widget.getMessage().getString().startsWith("Grid")) {
+					return widget.getMessage().getString() + " children=" + opened[0].children().contains(widget) + " cursor=" + spot[0] + "," + spot[1] + " scale=" + client.getWindow().getGuiScale()
+							+ " box=" + widget.getX() + "," + widget.getY() + "," + widget.getWidth() + "," + widget.getHeight();
+				}
+			}
+			return "none";
+		}));
+		check(dev.wildcatter.energy.ElectricalStandard.pending() == dev.wildcatter.energy.ElectricalStandard.IEC, "clicking the selector should choose IEC, it is " + dev.wildcatter.energy.ElectricalStandard.pending());
+		context.takeScreenshot("wildcatter-create-world-iec");
+		System.out.println("[wildcatter-test] create world selector ok");
+		dev.wildcatter.energy.ElectricalStandard.setPending(null);
+		context.setScreen(() -> null);
+		context.waitTicks(10);
 	}
 
 	// ---- helpers ---------------------------------------------------------------------------------------------

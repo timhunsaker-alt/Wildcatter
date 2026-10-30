@@ -13,6 +13,9 @@
 	"entrypoints": {
 		"main": [
 			"dev.wildcatter.Wildcatter"
+		],
+		"client": [
+			"dev.wildcatter.client.WildcatterClient"
 		]
 	},
 	"depends": {
