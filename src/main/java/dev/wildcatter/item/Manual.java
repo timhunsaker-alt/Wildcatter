@@ -118,6 +118,8 @@ public final class Manual {
 
 				"COOLING TOWER\n\nA steam turbine hands its waste heat to the condensate in its drain. Without cooling, back pressure means it needs " + Math.round(100 / Tuning.UNCOOLED_EFFICIENCY - 100) + "% more steam for the same power.\n\nBuild a tower from small parts: put a COOLING FAN (" + Math.round(Tuning.COOLING_FAN_WATTS) + " W, " + Voltage.LOW.label() + ") where it touches your water pipes, and stack " + Tuning.COOLING_FILL + " COOLING FILL sections on top. It only cools while the fan has power. Click the turbine to see if it is cooled.",
 
+				"CONDUCTORS\n\nA wire carries ONE conductor, shown by its coloured band: A red (the hot of a single-phase circuit), B orange, C blue, N black (neutral), G green (ground). Right-click a wire with an empty hand to change which conductor it carries. A circuit needs its conductors running out to the load and back.\n\nSPLIT-PHASE (North American worlds): a transformer's low side is centre-tapped. A and B are the two legs, 180 degrees apart. Each leg is " + Voltage.LOW.label() + " to the neutral N, and A to B is double that. A load on leg A and a load on leg B share the neutral, and it carries only the DIFFERENCE between them: equal loads leave it empty. IEC worlds have a single phase and no leg B.\n\nThe ground conductor G is the earth itself: a bare wire carrying another conductor that touches it is a ground fault.",
+
 				"COMING\n\nFuses, switches and panels.\n\nThis book will grow as they do."
 		);
 	}

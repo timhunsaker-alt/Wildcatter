@@ -6,7 +6,7 @@ import dev.wildcatter.WildcatterSounds;
 import dev.wildcatter.circuit.Circuit;
 import dev.wildcatter.circuit.CircuitManager;
 import dev.wildcatter.circuit.CircuitPart;
-import dev.wildcatter.circuit.Role;
+import dev.wildcatter.circuit.Conductor;
 import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.energy.Voltage;
 import net.minecraft.core.BlockPos;
@@ -67,8 +67,8 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 	}
 
 	@Override
-	public boolean hasPort(Direction face, Role role, Voltage voltage) {
-		return role == Role.HOT && voltage == Voltage.LOW && (face == facing() || face == facing().getOpposite());
+	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
+		return (role == Conductor.A || role == Conductor.B) && voltage == Voltage.LOW && (face == facing() || face == facing().getOpposite());
 	}
 
 	@Override
@@ -76,8 +76,10 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		back = circuit.node();
 		front = circuit.node();
 		link = blown() ? -1 : circuit.resistor(back, front, Tuning.BREAKER_CLOSED_OHMS);
-		circuit.port(worldPosition, facing().getOpposite(), Role.HOT, Voltage.LOW, back, Tuning.CONTACT_OHMS / 2, false);
-		circuit.port(worldPosition, facing(), Role.HOT, Voltage.LOW, front, Tuning.CONTACT_OHMS / 2, false);
+		circuit.port(worldPosition, facing().getOpposite(), Conductor.A, Voltage.LOW, back, Tuning.CONTACT_OHMS / 2, false);
+		circuit.port(worldPosition, facing().getOpposite(), Conductor.B, Voltage.LOW, back, Tuning.CONTACT_OHMS / 2, false);
+		circuit.port(worldPosition, facing(), Conductor.A, Voltage.LOW, front, Tuning.CONTACT_OHMS / 2, false);
+		circuit.port(worldPosition, facing(), Conductor.B, Voltage.LOW, front, Tuning.CONTACT_OHMS / 2, false);
 	}
 
 	@Override

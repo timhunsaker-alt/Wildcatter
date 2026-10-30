@@ -81,6 +81,12 @@ All of them go in the hot wire: in at the back, out at the front. Sneak and righ
 - New Ludo art for both; Field Manual text says steel pipe.
 - Game test: the full oil, gas, refining and engine run still passes on the new pipe.
 
+## Phase 1c: conductors and split-phase (single phase side)
+- `Role` (hot/neutral) is now `Conductor` (A, B, C, N, G). A wire carries one conductor, chosen by right-clicking it with an empty hand; its band shows which (A red, B orange, C blue, N black, G green). Existing wires keep working (hot starts as A, neutral as N). G wires are tied to earth.
+- North American worlds: a transformer's low side is centre-tapped, giving legs A and B 180 degrees apart (B on the transformer's side faces). Loads take A or B and measure against N; the shared neutral carries only the difference. IEC worlds have no leg B.
+- Game test: a lamp on leg B lights, equal lamps on A and B leave the shared neutral at 0.0 A, and with only the A lamp it carries 0.5 A.
+- Not done: wiring the phasor solver into the grid and three-phase (C), the three-pole breaker, a 240 V (A to B) load, and per-phase wear on cables. Wire textures are still script-drawn placeholders (not yet named `*_placeholder`).
+
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.

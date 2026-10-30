@@ -5,7 +5,7 @@ import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.WildcatterSounds;
 import dev.wildcatter.circuit.Circuit;
 import dev.wildcatter.circuit.CircuitPart;
-import dev.wildcatter.circuit.Role;
+import dev.wildcatter.circuit.Conductor;
 import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.energy.Voltage;
 import dev.wildcatter.safety.Bondable;
@@ -42,7 +42,7 @@ public class CoolingTowerBlockEntity extends BlockEntity implements CircuitPart,
 	}
 
 	@Override
-	public boolean hasPort(Direction face, Role role, Voltage voltage) {
+	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
 		return voltage == Voltage.LOW;
 	}
 
@@ -53,15 +53,16 @@ public class CoolingTowerBlockEntity extends BlockEntity implements CircuitPart,
 		double nominal = Voltage.LOW.nominal();
 		resistor = circuit.resistor(hot, neutral, nominal * nominal / Tuning.COOLING_FAN_WATTS);
 		for (Direction face : Direction.values()) {
-			circuit.port(worldPosition, face, Role.HOT, Voltage.LOW, hot, Tuning.CONTACT_OHMS / 2, false);
-			circuit.port(worldPosition, face, Role.NEUTRAL, Voltage.LOW, neutral, Tuning.CONTACT_OHMS / 2, false);
+			circuit.port(worldPosition, face, Conductor.A, Voltage.LOW, hot, Tuning.CONTACT_OHMS / 2, false);
+			circuit.port(worldPosition, face, Conductor.B, Voltage.LOW, hot, Tuning.CONTACT_OHMS / 2, false);
+			circuit.port(worldPosition, face, Conductor.N, Voltage.LOW, neutral, Tuning.CONTACT_OHMS / 2, false);
 		}
 	}
 
 	@Override
 	public void apply(Circuit circuit, int ticks) {
-		volts = circuit.across(hot, neutral);
-		amps = circuit.current(resistor);
+		volts = Math.abs(circuit.across(hot, neutral));   // leg B runs the other way round, so only the size matters
+		amps = Math.abs(circuit.current(resistor));
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, CoolingTowerBlockEntity tower) {

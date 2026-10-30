@@ -1,4 +1,16 @@
-# Phase 1c design: conductors and cable blocks (PROPOSED, needs approval)
+# Phase 1c design: conductors (SUPERSEDED, see the decision below)
+
+**Decided 2026-10-30 (after the cable-block proposal below showed that every machine terminal and in-line device would need reworking):**
+one **selectable single-conductor wire**. Same wire blocks as before; a `conductor` blockstate property (A, B, C, N, G) is stepped by right-clicking with an empty hand,
+and the coloured band shows which. Old wires keep working: `*_wire_hot` starts as A and `*_wire_neutral` as N, and a world's saved wires load with that default.
+Bare wires keep today's short-circuit behaviour. Multi-conductor cable blocks can be built on top of this later.
+Split-phase first, three-phase after. Built in Phase 1c: `Conductor` enum, selectable wires, North American split-phase low side on transformers
+(leg A on the back and bottom, leg B on the sides, N on all four, 180 degrees apart), loads accept A or B, `G` wires tie to earth.
+Three-phase (C) and the three-pole breaker come with the phasor solver wiring.
+
+---
+The original proposal follows, kept for the record.
+# Phase 1c design: conductors and cable blocks (PROPOSED)
 
 Phase 1a (phasor solver) and 1b (electrical standard) are done. 1c is the step that finally puts the phasor solver in the game,
 so it changes every wire and every machine. CLAUDE.md says to propose rather than invent, so this is a proposal with the

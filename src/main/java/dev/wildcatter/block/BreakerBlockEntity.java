@@ -6,7 +6,7 @@ import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.circuit.Circuit;
 import dev.wildcatter.circuit.CircuitManager;
 import dev.wildcatter.circuit.CircuitPart;
-import dev.wildcatter.circuit.Role;
+import dev.wildcatter.circuit.Conductor;
 import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.energy.Voltage;
 import net.minecraft.core.BlockPos;
@@ -85,8 +85,8 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 	}
 
 	@Override
-	public boolean hasPort(Direction face, Role role, Voltage voltage) {
-		return role == Role.HOT && voltage == voltage() && (face == facing() || face == facing().getOpposite());
+	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
+		return (role == Conductor.A || role == Conductor.B) && voltage == voltage() && (face == facing() || face == facing().getOpposite());
 	}
 
 	@Override
@@ -94,8 +94,10 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 		back = circuit.node();
 		front = circuit.node();
 		link = closed() ? circuit.resistor(back, front, Tuning.BREAKER_CLOSED_OHMS) : -1;
-		circuit.port(worldPosition, facing().getOpposite(), Role.HOT, voltage(), back, Tuning.CONTACT_OHMS / 2, false);
-		circuit.port(worldPosition, facing(), Role.HOT, voltage(), front, Tuning.CONTACT_OHMS / 2, false);
+		circuit.port(worldPosition, facing().getOpposite(), Conductor.A, voltage(), back, Tuning.CONTACT_OHMS / 2, false);
+		circuit.port(worldPosition, facing().getOpposite(), Conductor.B, voltage(), back, Tuning.CONTACT_OHMS / 2, false);
+		circuit.port(worldPosition, facing(), Conductor.A, voltage(), front, Tuning.CONTACT_OHMS / 2, false);
+		circuit.port(worldPosition, facing(), Conductor.B, voltage(), front, Tuning.CONTACT_OHMS / 2, false);
 	}
 
 	/** The magnetic trip: a current far over the rating opens it at once, before anything else sees the fault. */

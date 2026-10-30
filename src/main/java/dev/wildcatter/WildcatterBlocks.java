@@ -27,7 +27,7 @@ import dev.wildcatter.block.PumpjackBlockEntity;
 import dev.wildcatter.block.LoadBlock;
 import dev.wildcatter.block.LoadBlockEntity;
 import dev.wildcatter.block.WireBlockEntity;
-import dev.wildcatter.circuit.Role;
+import dev.wildcatter.circuit.Conductor;
 import net.minecraft.world.level.material.MapColor;
 import dev.wildcatter.block.FireboxBlock;
 import dev.wildcatter.block.FireboxBlockEntity;
@@ -110,22 +110,22 @@ public final class WildcatterBlocks {
 	// Wire. Every circuit needs two: a hot (red) one out to the load and a neutral (black) one back.
 	// Bare wire shocks you while it is live; wool-wrapped wire is safe until the wool wears out.
 	// Higher voltages are only bare for now: they get proper insulation once there is plastic.
-	public static final Block WIRE_HOT = cable("wire_hot", Voltage.LOW, Role.HOT, false);
-	public static final Block WIRE_NEUTRAL = cable("wire_neutral", Voltage.LOW, Role.NEUTRAL, false);
-	public static final Block WOOL_WIRE_HOT = cable("wool_wire_hot", Voltage.LOW, Role.HOT, true);
-	public static final Block WOOL_WIRE_NEUTRAL = cable("wool_wire_neutral", Voltage.LOW, Role.NEUTRAL, true);
-	public static final Block MV_WIRE_HOT = cable("mv_wire_hot", Voltage.MEDIUM, Role.HOT, false);
-	public static final Block MV_WIRE_NEUTRAL = cable("mv_wire_neutral", Voltage.MEDIUM, Role.NEUTRAL, false);
-	public static final Block HV_WIRE_HOT = cable("hv_wire_hot", Voltage.HIGH, Role.HOT, false);
-	public static final Block HV_WIRE_NEUTRAL = cable("hv_wire_neutral", Voltage.HIGH, Role.NEUTRAL, false);
+	public static final Block WIRE_HOT = cable("wire_hot", Voltage.LOW, Conductor.A, false);
+	public static final Block WIRE_NEUTRAL = cable("wire_neutral", Voltage.LOW, Conductor.N, false);
+	public static final Block WOOL_WIRE_HOT = cable("wool_wire_hot", Voltage.LOW, Conductor.A, true);
+	public static final Block WOOL_WIRE_NEUTRAL = cable("wool_wire_neutral", Voltage.LOW, Conductor.N, true);
+	public static final Block MV_WIRE_HOT = cable("mv_wire_hot", Voltage.MEDIUM, Conductor.A, false);
+	public static final Block MV_WIRE_NEUTRAL = cable("mv_wire_neutral", Voltage.MEDIUM, Conductor.N, false);
+	public static final Block HV_WIRE_HOT = cable("hv_wire_hot", Voltage.HIGH, Conductor.A, false);
+	public static final Block HV_WIRE_NEUTRAL = cable("hv_wire_neutral", Voltage.HIGH, Conductor.N, false);
 
 	// Plastic insulation never wears out, at any voltage: safe to touch, with no bare-line arc reach.
-	public static final Block PLASTIC_WIRE_HOT = plasticCable("plastic_wire_hot", Voltage.LOW, Role.HOT);
-	public static final Block PLASTIC_WIRE_NEUTRAL = plasticCable("plastic_wire_neutral", Voltage.LOW, Role.NEUTRAL);
-	public static final Block MV_PLASTIC_WIRE_HOT = plasticCable("mv_plastic_wire_hot", Voltage.MEDIUM, Role.HOT);
-	public static final Block MV_PLASTIC_WIRE_NEUTRAL = plasticCable("mv_plastic_wire_neutral", Voltage.MEDIUM, Role.NEUTRAL);
-	public static final Block HV_PLASTIC_WIRE_HOT = plasticCable("hv_plastic_wire_hot", Voltage.HIGH, Role.HOT);
-	public static final Block HV_PLASTIC_WIRE_NEUTRAL = plasticCable("hv_plastic_wire_neutral", Voltage.HIGH, Role.NEUTRAL);
+	public static final Block PLASTIC_WIRE_HOT = plasticCable("plastic_wire_hot", Voltage.LOW, Conductor.A);
+	public static final Block PLASTIC_WIRE_NEUTRAL = plasticCable("plastic_wire_neutral", Voltage.LOW, Conductor.N);
+	public static final Block MV_PLASTIC_WIRE_HOT = plasticCable("mv_plastic_wire_hot", Voltage.MEDIUM, Conductor.A);
+	public static final Block MV_PLASTIC_WIRE_NEUTRAL = plasticCable("mv_plastic_wire_neutral", Voltage.MEDIUM, Conductor.N);
+	public static final Block HV_PLASTIC_WIRE_HOT = plasticCable("hv_plastic_wire_hot", Voltage.HIGH, Conductor.A);
+	public static final Block HV_PLASTIC_WIRE_NEUTRAL = plasticCable("hv_plastic_wire_neutral", Voltage.HIGH, Conductor.N);
 
 	/** A copper rod in the earth, for grounding machines. */
 	public static final Block GROUND_ROD = block("ground_rod", props -> new GroundRodBlock(props.mapColor(MapColor.COLOR_ORANGE)
@@ -181,13 +181,13 @@ public final class WildcatterBlocks {
 	private WildcatterBlocks() {
 	}
 
-	private static Block cable(String name, Voltage voltage, Role role, boolean wool) {
-		return block(name, props -> new CableBlock(props.mapColor(role == Role.HOT ? MapColor.COLOR_RED : MapColor.COLOR_BLACK)
+	private static Block cable(String name, Voltage voltage, Conductor role, boolean wool) {
+		return block(name, props -> new CableBlock(props.mapColor(role == Conductor.A ? MapColor.COLOR_RED : MapColor.COLOR_BLACK)
 				.strength(0.5F).sound(wool ? SoundType.WOOL : SoundType.COPPER).noOcclusion(), voltage, role, wool));
 	}
 
-	private static Block plasticCable(String name, Voltage voltage, Role role) {
-		return block(name, props -> new CableBlock(props.mapColor(role == Role.HOT ? MapColor.COLOR_RED : MapColor.COLOR_BLACK)
+	private static Block plasticCable(String name, Voltage voltage, Conductor role) {
+		return block(name, props -> new CableBlock(props.mapColor(role == Conductor.A ? MapColor.COLOR_RED : MapColor.COLOR_BLACK)
 				.strength(0.5F).sound(SoundType.COPPER).noOcclusion(), voltage, role, false, true));
 	}
 

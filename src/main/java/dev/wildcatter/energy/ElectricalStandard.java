@@ -65,6 +65,11 @@ public enum ElectricalStandard {
 		pending = standard;
 	}
 
+	/** North American residential service is split-phase (two legs 180 degrees apart); IEC is a single phase and neutral. */
+	public boolean splitPhase() {
+		return this == NORTH_AMERICAN;
+	}
+
 	public String displayName() {
 		return displayName;
 	}

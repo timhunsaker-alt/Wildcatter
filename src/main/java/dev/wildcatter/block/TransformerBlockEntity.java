@@ -4,7 +4,7 @@ import dev.wildcatter.Tuning;
 import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.circuit.Circuit;
 import dev.wildcatter.circuit.CircuitPart;
-import dev.wildcatter.circuit.Role;
+import dev.wildcatter.circuit.Conductor;
 import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.energy.Voltage;
 import dev.wildcatter.safety.Bondable;
@@ -25,6 +25,11 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 	private int lowHotPort;
 	private int highHotPort;
 	private int lowNeutral;
+	private int lowBPort;
+	private int lowBWinding = -1;
+	private double lowBVolts;
+	private double lowBAmps;
+	private boolean split;
 	private int highNeutral;
 	private int lowWinding = -1;
 	private int highWinding = -1;
@@ -54,17 +59,17 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 		return block().high();
 	}
 
-	/** The high-voltage terminals are on the front and the top (where real bushings are); the low side is the back and the bottom. */
+	/** The high-voltage terminals are on the front and the top (where real bushings are); the low side is the other four faces, so a split-phase secondary has room for A, B and N. */
 	private boolean isHighFace(Direction face) {
 		return face == highFace() || face == Direction.UP;
 	}
 
 	private boolean isLowFace(Direction face) {
-		return face == highFace().getOpposite() || face == Direction.DOWN;
+		return !isHighFace(face);
 	}
 
 	@Override
-	public boolean hasPort(Direction face, Role role, Voltage voltage) {
+	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
 		if (isHighFace(face)) {
 			return voltage == block().high();
 		}
@@ -87,17 +92,34 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 		lowWinding = circuit.resistor(lowHotPort, lowCoil, lowOhms);
 		highWinding = circuit.resistor(highHotPort, highCoil, lowOhms * ratio * ratio);
 		circuit.transformer(highCoil, highNeutral, lowCoil, lowNeutral, ratio);
+		// North American service: the low side is centre-tapped. Winding two runs the other way round, so leg B is 180 degrees from leg A.
+		split = block.low() == Voltage.LOW && dev.wildcatter.energy.ElectricalStandard.active().splitPhase();
+		lowBPort = circuit.node();
+		if (split) {
+			int lowBCoil = circuit.node();
+			lowBWinding = circuit.resistor(lowBPort, lowBCoil, lowOhms);
+			circuit.transformer(highCoil, highNeutral, lowNeutral, lowBCoil, ratio);
+		} else {
+			lowBWinding = -1;
+		}
 		circuit.ground(lowNeutral);
 		circuit.ground(highNeutral);
 
-		// Both conductors can attach to either face of a side, so a hot wire and a neutral wire each get a face of their own.
+		// Each conductor can attach to either face of a side, so each wire gets a face of its own.
 		for (Direction face : Direction.values()) {
-			for (Role role : Role.values()) {
-				boolean hot = role == Role.HOT;
-				if (isHighFace(face)) {
-					circuit.port(worldPosition, face, role, block.high(), hot ? highHotPort : highNeutral, Tuning.CONTACT_OHMS / 2, false);
-				} else if (isLowFace(face)) {
-					circuit.port(worldPosition, face, role, block.low(), hot ? lowHotPort : lowNeutral, Tuning.CONTACT_OHMS / 2, false);
+			if (isHighFace(face)) {
+				circuit.port(worldPosition, face, Conductor.A, block.high(), highHotPort, Tuning.CONTACT_OHMS / 2, false);
+				circuit.port(worldPosition, face, Conductor.N, block.high(), highNeutral, Tuning.CONTACT_OHMS / 2, false);
+			} else if (isLowFace(face)) {
+				boolean side = face != highFace().getOpposite() && face != Direction.DOWN;
+				if (!side) {
+					// back and bottom: leg A and the neutral, as a single-phase low side always had
+					circuit.port(worldPosition, face, Conductor.A, block.low(), lowHotPort, Tuning.CONTACT_OHMS / 2, false);
+					circuit.port(worldPosition, face, Conductor.N, block.low(), lowNeutral, Tuning.CONTACT_OHMS / 2, false);
+				} else if (split) {
+					// the sides: leg B and the neutral, so a machine touching a side runs on leg B and never bridges the two legs
+					circuit.port(worldPosition, face, Conductor.B, block.low(), lowBPort, Tuning.CONTACT_OHMS / 2, false);
+					circuit.port(worldPosition, face, Conductor.N, block.low(), lowNeutral, Tuning.CONTACT_OHMS / 2, false);
 				}
 			}
 		}
@@ -108,6 +130,8 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 		lowVolts = circuit.across(lowHotPort, lowNeutral);
 		highVolts = circuit.across(highHotPort, highNeutral);
 		lowAmps = circuit.current(lowWinding);
+		lowBVolts = split ? circuit.across(lowBPort, lowNeutral) : 0;
+		lowBAmps = split ? circuit.current(lowBWinding) : 0;
 		highAmps = circuit.current(highWinding);
 		double ratio = block().high().nominal() / block().low().nominal();
 		lossWatts = lowAmps * lowAmps * Tuning.TRANSFORMER_LOW_WINDING_OHMS + highAmps * highAmps * Tuning.TRANSFORMER_LOW_WINDING_OHMS * ratio * ratio;
@@ -115,7 +139,8 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 
 	@Override
 	public Component inspect() {
-		return Component.literal("Transformer " + block().low().label() + " / " + block().high().label() + ": "
+		String legB = split ? String.format("leg B %.0f V %.1f A (A to B %.0f V), ", Math.abs(lowBVolts), Math.abs(lowBAmps), Math.abs(lowVolts - lowBVolts)) : "";
+		return Component.literal("Transformer " + block().low().label() + " / " + block().high().label() + ": " + legB
 				+ String.format("%.0f V %.1f A on the %s side, %.0f V %.2f A on the %s side, losing %.0f W as heat; ",
 						lowVolts, Math.abs(lowAmps), block().low().label(), highVolts, Math.abs(highAmps), block().high().label(), lossWatts)
 				+ (level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you"));

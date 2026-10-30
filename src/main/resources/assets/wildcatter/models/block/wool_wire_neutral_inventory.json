@@ -41,8 +41,8 @@
     }
   },
   "textures": {
-    "cable": "wildcatter:block/wool_wire_neutral_0",
-    "particle": "wildcatter:block/wool_wire_neutral_0"
+    "cable": "wildcatter:block/wool_wire_n_0",
+    "particle": "wildcatter:block/wool_wire_n_0"
   },
   "elements": [
     {

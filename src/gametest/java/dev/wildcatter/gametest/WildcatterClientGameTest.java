@@ -754,6 +754,26 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		// It steps 110 V up to about 4.16 kV (a little under, because of the winding resistance) at a tiny current.
 		check(first.matches(".*\\b4[01]\\d\\d V 0\\.0\\d A on the 4.16 kV side.*"), "the first transformer should hold about 4.16 kV on its high side at a tiny current: " + first);
 
+		// Split phase (North American): the same transformer's low side has a second leg, B, 180 degrees from A. A lamp on leg B lights,
+		// and with equal lamps on A and B the shared neutral carries nothing.
+		check(first.length() > 0 && read(server, 16, up, 14).contains("leg B"), "a North American transformer should report its second leg: " + read(server, 16, up, 14));
+		put(server, 16, up, 13, "wildcatter:wool_wire_hot[conductor=b]");
+		put(server, 16, up, 12, "wildcatter:electric_lamp");
+		put(server, 17, up, 12, neutral);
+		put(server, 17, y, 12, neutral);
+		put(server, 17, y, 13, neutral);
+		context.waitTicks(120);
+		String legB = read(server, 16, up, 13);
+		check(lit(server, 16, 12), "a lamp on leg B should light: " + legB);
+		check(legB.contains("Phase B") && legB.matches(".*\\b1[12]\\d V,.*"), "the B wire should read about 120 V and say it is phase B: " + legB);
+		String sharedNeutral = read(server, 16, y, 14);
+		check(sharedNeutral.matches(".*, 0\\.[0-2] A of.*"), "equal lamps on A and B should leave the shared neutral nearly empty: " + sharedNeutral);
+		put(server, 16, up, 12, "minecraft:air");
+		context.waitTicks(60);
+		String unbalanced = read(server, 16, y, 14);
+		check(unbalanced.matches(".*, 0\\.[3-7] A of.*"), "with only the A lamp the neutral should carry its 0.5 A: " + unbalanced);
+		System.out.println("[wildcatter-test] split phase ok: " + legB + " | balanced neutral: " + sharedNeutral + " | unbalanced: " + unbalanced);
+
 		// A 110 V wire and a 4.16 kV line touching each other must not join.
 		put(server, 14, up, 12, "wildcatter:wire_hot");
 		put(server, 15, up, 12, "wildcatter:mv_wire_hot");

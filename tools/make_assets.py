@@ -264,15 +264,10 @@ for name, t in (("transformer", ((96, 102, 112), (225, 225, 215))), ("substation
 	tex(f"{name}_side", transformer_side(t[0]))
 	tex(f"{name}_top", transformer_top(t[0]))
 
-tex("wire_hot", bare(COPPER, HOT))
-tex("wire_neutral", bare(COPPER, NEUTRAL))
-tex("mv_wire_hot", bare(ALUMINIUM, HOT))
-tex("mv_wire_neutral", bare(ALUMINIUM, NEUTRAL))
-tex("hv_wire_hot", bare(STEEL_WIRE, HOT))
-tex("hv_wire_neutral", bare(STEEL_WIRE, NEUTRAL))
-for wear in range(4):
-	tex(f"wool_wire_hot_{wear}", wool(HOT, wear))
-	tex(f"wool_wire_neutral_{wear}", wool((45, 45, 50), wear))
+# Every wire is drawn once per conductor: the coloured band says which one it carries (A red, B orange, C blue, N black, G green).
+CONDUCTOR_COLORS = {"a": HOT, "b": (230, 140, 40), "c": (50, 90, 200), "n": (25, 25, 28), "g": (40, 150, 70)}
+
+
 def plastic_sheath(sheath, band):
 	def draw(img, d):
 		noise(img, sheath, 6)
@@ -283,9 +278,14 @@ def plastic_sheath(sheath, band):
 	return draw
 
 
-for prefix, tint in (("", (235, 235, 240)), ("mv_", (225, 230, 245)), ("hv_", (215, 225, 250))):
-	tex(f"{prefix}plastic_wire_hot", plastic_sheath(tint, HOT))
-	tex(f"{prefix}plastic_wire_neutral", plastic_sheath((60, 60, 66), NEUTRAL))
+for key, band in CONDUCTOR_COLORS.items():
+	tex(f"wire_{key}", bare(COPPER, band))
+	tex(f"mv_wire_{key}", bare(ALUMINIUM, band))
+	tex(f"hv_wire_{key}", bare(STEEL_WIRE, band))
+	for wear in range(4):
+		tex(f"wool_wire_{key}_{wear}", wool(band if key != "n" else (45, 45, 50), wear))
+	for prefix, tint in (("", (235, 235, 240)), ("mv_", (225, 230, 245)), ("hv_", (215, 225, 250))):
+		tex(f"{prefix}plastic_wire_{key}", plastic_sheath(tint if key != "n" else (60, 60, 66), band))
 tex("ground_wire", bare((40, 150, 70), (240, 220, 60)))
 tex("ground_rod", bare((205, 125, 80), (140, 80, 50)))
 
@@ -432,27 +432,32 @@ def wire_models(model_name, texture):
 
 
 BARE_WIRES = ("wire_hot", "wire_neutral", "mv_wire_hot", "mv_wire_neutral", "hv_wire_hot", "hv_wire_neutral", "ground_wire")
-for name in BARE_WIRES:
-	wire_models(name, name)
-	save_json(f"{ASSETS}/blockstates/{name}.json", {"multipart": [{"apply": {"model": f"{ns}:block/{name}_core"}}] + [
-		{"when": {side: "true"}, "apply": {"model": f"{ns}:block/{name}_arm", **rot}} for side, rot in arms.items()]})
-
 PLASTIC_WIRES = ("plastic_wire_hot", "plastic_wire_neutral", "mv_plastic_wire_hot", "mv_plastic_wire_neutral", "hv_plastic_wire_hot", "hv_plastic_wire_neutral")
-for name in PLASTIC_WIRES:
-	wire_models(name, name)
-	save_json(f"{ASSETS}/blockstates/{name}.json", {"multipart": [{"apply": {"model": f"{ns}:block/{name}_core"}}] + [
-		{"when": {side: "true"}, "apply": {"model": f"{ns}:block/{name}_arm", **rot}} for side, rot in arms.items()]})
-
 WOOL_WIRES = ("wool_wire_hot", "wool_wire_neutral")
-for name in WOOL_WIRES:
+
+# The ground wire (the bonding wire for machines) is a plain single piece.
+wire_models("ground_wire", "ground_wire")
+save_json(f"{ASSETS}/blockstates/ground_wire.json", {"multipart": [{"apply": {"model": f"{ns}:block/ground_wire_core"}}] + [
+	{"when": {side: "true"}, "apply": {"model": f"{ns}:block/ground_wire_arm", **rot}} for side, rot in arms.items()]})
+
+# Every other wire block can carry any conductor (the blockstate property "conductor"); the block you place starts as A (hot) or N (neutral).
+for name in BARE_WIRES[:-1] + PLASTIC_WIRES + WOOL_WIRES:
+	base = name.rsplit("_", 1)[0]                      # wire_hot -> wire, mv_plastic_wire_neutral -> mv_plastic_wire
+	wool_wire = name.startswith("wool_")
 	parts = []
-	for wear in range(4):
-		wire_models(f"{name}_{wear}", f"{name}_{wear}")
-		parts.append({"when": {"wear": str(wear)}, "apply": {"model": f"{ns}:block/{name}_{wear}_core"}})
-		for side, rot in arms.items():
-			parts.append({"when": {"AND": [{side: "true"}, {"wear": str(wear)}]}, "apply": {"model": f"{ns}:block/{name}_{wear}_arm", **rot}})
+	for key in CONDUCTOR_COLORS:
+		for wear in (range(4) if wool_wire else [None]):
+			texture = f"{base}_{key}" + (f"_{wear}" if wear is not None else "")
+			wire_models(texture, texture)
+			cond = {"conductor": key}
+			when_core = {**cond, "wear": str(wear)} if wear is not None else cond
+			parts.append({"when": when_core, "apply": {"model": f"{ns}:block/{texture}_core"}})
+			for side, rot in arms.items():
+				parts.append({"when": {"AND": [{side: "true"}, {k: v for k, v in when_core.items()}]}, "apply": {"model": f"{ns}:block/{texture}_arm", **rot}})
 	save_json(f"{ASSETS}/blockstates/{name}.json", {"multipart": parts})
-	save_json(f"{ASSETS}/models/block/{name}_inventory.json", json.load(open(f"{ASSETS}/models/block/{name}_0_inventory.json")))
+	default_key = "a" if name.endswith("_hot") else "n"
+	default_texture = f"{base}_{default_key}" + ("_0" if wool_wire else "")
+	save_json(f"{ASSETS}/models/block/{name}_inventory.json", json.load(open(f"{ASSETS}/models/block/{default_texture}_inventory.json")))
 
 # the ground rod: one thin post
 save_json(f"{ASSETS}/models/block/ground_rod.json", {"textures": {"rod": f"{ns}:block/ground_rod", "particle": f"{ns}:block/ground_rod"},
@@ -510,23 +515,23 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 	"block.wildcatter.cooling_fill": "Cooling Tower Fill",
 	"block.wildcatter.diesel_engine": "Diesel Engine (LV)",
 	"block.wildcatter.gas_turbine": "Gas Turbine (LV)",
-	"block.wildcatter.plastic_wire_hot": "Plastic Hot Wire (LV)",
-	"block.wildcatter.plastic_wire_neutral": "Plastic Neutral Wire (LV)",
-	"block.wildcatter.mv_plastic_wire_hot": "Plastic Hot Line (MV)",
-	"block.wildcatter.mv_plastic_wire_neutral": "Plastic Neutral Line (MV)",
-	"block.wildcatter.hv_plastic_wire_hot": "Plastic Hot Line (HV)",
-	"block.wildcatter.hv_plastic_wire_neutral": "Plastic Neutral Line (HV)",
+	"block.wildcatter.plastic_wire_hot": "Plastic Wire, red (LV)",
+	"block.wildcatter.plastic_wire_neutral": "Plastic Wire, black (LV)",
+	"block.wildcatter.mv_plastic_wire_hot": "Plastic Line, red (MV)",
+	"block.wildcatter.mv_plastic_wire_neutral": "Plastic Line, black (MV)",
+	"block.wildcatter.hv_plastic_wire_hot": "Plastic Line, red (HV)",
+	"block.wildcatter.hv_plastic_wire_neutral": "Plastic Line, black (HV)",
 	"block.wildcatter.pumpjack": "Pumpjack (LV)",
 	"block.wildcatter.gas_wellhead": "Gas Wellhead",
 	"block.wildcatter.steam_turbine": "Steam Turbine",
-	"block.wildcatter.wire_hot": "Bare Hot Wire (LV)",
-	"block.wildcatter.wire_neutral": "Bare Neutral Wire (LV)",
-	"block.wildcatter.wool_wire_hot": "Wool-Insulated Hot Wire (LV)",
-	"block.wildcatter.wool_wire_neutral": "Wool-Insulated Neutral Wire (LV)",
-	"block.wildcatter.mv_wire_hot": "Bare Hot Line (MV)",
-	"block.wildcatter.mv_wire_neutral": "Bare Neutral Line (MV)",
-	"block.wildcatter.hv_wire_hot": "Bare Hot Line (HV)",
-	"block.wildcatter.hv_wire_neutral": "Bare Neutral Line (HV)",
+	"block.wildcatter.wire_hot": "Bare Wire, red (LV)",
+	"block.wildcatter.wire_neutral": "Bare Wire, black (LV)",
+	"block.wildcatter.wool_wire_hot": "Wool-Insulated Wire, red (LV)",
+	"block.wildcatter.wool_wire_neutral": "Wool-Insulated Wire, black (LV)",
+	"block.wildcatter.mv_wire_hot": "Bare Line, red (MV)",
+	"block.wildcatter.mv_wire_neutral": "Bare Line, black (MV)",
+	"block.wildcatter.hv_wire_hot": "Bare Line, red (HV)",
+	"block.wildcatter.hv_wire_neutral": "Bare Line, black (HV)",
 	"block.wildcatter.ground_rod": "Ground Rod",
 	"block.wildcatter.ground_wire": "Ground Wire",
 	"block.wildcatter.breaker": "Circuit Breaker (LV)",

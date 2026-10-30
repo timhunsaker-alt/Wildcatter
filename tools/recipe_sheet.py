@@ -14,6 +14,8 @@ def tex(item_id):
 	ns, name = item_id.split(":")
 	if ns == "wildcatter" and name == "crossarm":
 		name = "pole"
+	if ns == "wildcatter" and (name.endswith("_hot") or name.endswith("_neutral")):
+		name = name.replace("_hot", "_a").replace("_neutral", "_n")
 	cands = []
 	if ns == "wildcatter":
 		for d in ("item", "block"):

@@ -6,7 +6,7 @@ import dev.wildcatter.WildcatterSounds;
 import dev.wildcatter.circuit.Circuit;
 import dev.wildcatter.circuit.CircuitManager;
 import dev.wildcatter.circuit.CircuitPart;
-import dev.wildcatter.circuit.Role;
+import dev.wildcatter.circuit.Conductor;
 import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.energy.Voltage;
 import dev.wildcatter.safety.Bondable;
@@ -85,7 +85,7 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 	}
 
 	@Override
-	public boolean hasPort(Direction face, Role role, Voltage voltage) {
+	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
 		return voltage == voltage();
 	}
 
@@ -101,8 +101,8 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 		circuit.resistor(internal, hot, ohms);
 		circuit.ground(neutral);
 		for (Direction face : Direction.values()) {
-			circuit.port(worldPosition, face, Role.HOT, voltage(), hot, Tuning.CONTACT_OHMS / 2, false);
-			circuit.port(worldPosition, face, Role.NEUTRAL, voltage(), neutral, Tuning.CONTACT_OHMS / 2, false);
+			circuit.port(worldPosition, face, Conductor.A, voltage(), hot, Tuning.CONTACT_OHMS / 2, false);
+			circuit.port(worldPosition, face, Conductor.N, voltage(), neutral, Tuning.CONTACT_OHMS / 2, false);
 		}
 	}
 

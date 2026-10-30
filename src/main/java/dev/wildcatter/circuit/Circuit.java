@@ -46,7 +46,7 @@ public final class Circuit {
 	 * Puts a terminal on {@code face} of the block at {@code pos}. {@code exposed} means bare metal that can touch
 	 * the bare metal of a neighbour of the other role (a short circuit).
 	 */
-	public void port(BlockPos pos, Direction face, Role role, Voltage voltage, int node, double halfOhms, boolean exposed) {
+	public void port(BlockPos pos, Direction face, Conductor role, Voltage voltage, int node, double halfOhms, boolean exposed) {
 		network.port(cell(pos), face.ordinal(), role.ordinal(), voltage.ordinal(), node, halfOhms, exposed);
 	}
 

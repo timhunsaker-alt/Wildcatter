@@ -12,7 +12,7 @@ import net.minecraft.core.Direction;
  */
 public interface CircuitPart {
 	/** True if there is a terminal of this role and voltage on {@code face}. Wires use it to know where to grow arms. */
-	boolean hasPort(Direction face, Role role, Voltage voltage);
+	boolean hasPort(Direction face, Conductor role, Voltage voltage);
 
 	/** Adds this part's nodes, components and terminals to the circuit. */
 	void build(Circuit circuit);

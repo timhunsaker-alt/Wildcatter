@@ -5,7 +5,7 @@ import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.circuit.Circuit;
 import dev.wildcatter.circuit.CircuitManager;
 import dev.wildcatter.circuit.CircuitPart;
-import dev.wildcatter.circuit.Role;
+import dev.wildcatter.circuit.Conductor;
 import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.energy.Voltage;
 import dev.wildcatter.safety.Shock;
@@ -79,16 +79,20 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 	}
 
 	@Override
-	public boolean hasPort(Direction face, Role role, Voltage voltage) {
-		return role == block().role() && voltage == block().voltage();
+	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
+		return role == getBlockState().getValue(CableBlock.CONDUCTOR) && voltage == block().voltage();
 	}
 
 	@Override
 	public void build(Circuit circuit) {
 		node = circuit.node();
 		CableBlock block = block();
+		Conductor conductor = getBlockState().getValue(CableBlock.CONDUCTOR);
+		if (conductor == Conductor.G) {
+			circuit.ground(node);   // the ground conductor is the earth: tied to it at every piece
+		}
 		for (Direction face : Direction.values()) {
-			circuit.port(worldPosition, face, block.role(), block.voltage(), node, ohms() / 2.0, exposed());
+			circuit.port(worldPosition, face, conductor, block.voltage(), node, ohms() / 2.0, exposed());
 		}
 	}
 
@@ -166,7 +170,7 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		String insulation = block.plastic() ? "plastic insulated, safe to touch"
 				: !block.wool() ? "bare copper, live to the touch"
 				: wear >= 1.0 ? "wool worn OUT, bare copper" : "wool " + Math.round(wear * 100) + "% worn";
-		return Component.literal(block.role().label() + " wire (" + block.voltage().label() + ", " + insulation + "): "
+		return Component.literal(getBlockState().getValue(CableBlock.CONDUCTOR).label() + " wire (" + block.voltage().label() + ", " + insulation + "): "
 				+ fmt(volts) + " V, " + fmt(amps) + " A of " + fmt(ampacity()) + " A allowed"
 				+ (heat > 0.05 ? ", HEATING " + Math.round(heat * 100) + "%" : ""));
 	}
