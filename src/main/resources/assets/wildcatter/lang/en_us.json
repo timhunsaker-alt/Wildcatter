@@ -34,6 +34,7 @@
   "block.wildcatter.breaker": "Circuit Breaker (LV)",
   "block.wildcatter.fuse": "Fuse (LV)",
   "block.wildcatter.switch": "Switch (LV)",
+  "block.wildcatter.ufls_relay": "Under-Frequency Relay (LV)",
   "block.wildcatter.mv_breaker": "Circuit Breaker (MV)",
   "block.wildcatter.hv_breaker": "Circuit Breaker (HV)",
   "block.wildcatter.pole": "Utility Pole",

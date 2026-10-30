@@ -84,6 +84,9 @@ public class EngineBlock extends BaseEntityBlock {
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 		if (!level.isClientSide() && level.getBlockEntity(pos) instanceof EngineBlockEntity engine) {
+			if (engine.isTripped()) {
+				engine.resetTrip();
+			}
 			if (!Shock.touch((ServerLevel) level, pos, player, engine.voltage(), engine.isLive())) {
 				player.sendOverlayMessage(engine.inspect());
 			}

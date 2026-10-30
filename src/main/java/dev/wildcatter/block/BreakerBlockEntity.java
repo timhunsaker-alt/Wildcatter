@@ -51,8 +51,15 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 	}
 
 	private boolean plainSwitch() {
-		return ((BreakerBlock) getBlockState().getBlock()).isSwitch();
+		BreakerBlock block = (BreakerBlock) getBlockState().getBlock();
+		return block.isSwitch() || block.isRelay();   // neither trips on current
 	}
+
+	private boolean relay() {
+		return ((BreakerBlock) getBlockState().getBlock()).isRelay();
+	}
+
+	private double hertz = dev.wildcatter.energy.ElectricalStandard.active().hertz();
 
 	public int rating() {
 		return ratings()[Math.min(ratingIndex, ratings().length - 1)];
@@ -118,6 +125,15 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 	@Override
 	public void apply(Circuit circuit, int ticks) {
 		amps = link >= 0 ? Math.abs(circuit.current(link)) : 0;
+		hertz = circuit.hertz();
+		if (relay()) {
+			double shed = dev.wildcatter.energy.ElectricalStandard.active().loadShedHertz();
+			if (closed() && hertz < shed) {
+				trip(amps, "under-frequency");
+				lastTrip = String.format("under-frequency: the island fell to %.1f Hz, below %.1f Hz", hertz, shed);
+			}
+			return;
+		}
 		double ratio = amps / rating();
 		if (ratio > 1.0) {
 			heat += (ratio * ratio - 1.0) / 3.0 * ticks / (20.0 * Tuning.BREAKER_TRIP_SECONDS_AT_2X);
@@ -153,6 +169,16 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 			case OFF -> "OFF";
 			case TRIPPED -> "TRIPPED (" + lastTrip + "); right-click to reset after you fix the fault";
 		};
+		if (relay()) {
+			double shed = dev.wildcatter.energy.ElectricalStandard.active().loadShedHertz();
+			String state = switch (position) {
+				case ON -> String.format("CLOSED, carrying %.1f A", amps);
+				case OFF -> "OPEN";
+				case TRIPPED -> "TRIPPED (" + lastTrip + "); right-click to close it again once the frequency has recovered";
+			};
+			return Component.literal("Under-frequency relay (" + voltage().label() + "): " + state + String.format(", island at %.1f Hz, opens below %.1f Hz", hertz, shed)
+					+ "; it sheds this feeder to save the generators and protects nothing else");
+		}
 		if (plainSwitch()) {
 			return Component.literal("Switch (" + voltage().label() + "): " + (closed() ? String.format("CLOSED, carrying %.1f A", amps) : "OPEN")
 					+ "; right-click to flip it. A switch has NO protection: it never trips, so put a breaker or fuse before it");

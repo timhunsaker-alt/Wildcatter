@@ -70,6 +70,21 @@ public enum ElectricalStandard {
 		return this == NORTH_AMERICAN;
 	}
 
+	/** Under-frequency load shedding, stage 1: relays on feeders open below this. */
+	public double loadShedHertz() {
+		return this == NORTH_AMERICAN ? 59.3 : 49.0;
+	}
+
+	/** A generator trips if the frequency stays below this. */
+	public double generatorLowHertz() {
+		return this == NORTH_AMERICAN ? 57.0 : 47.5;
+	}
+
+	/** A generator trips if the frequency stays above this. */
+	public double generatorHighHertz() {
+		return this == NORTH_AMERICAN ? 61.5 : 51.5;
+	}
+
 	public String displayName() {
 		return displayName;
 	}

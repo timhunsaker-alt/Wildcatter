@@ -138,6 +138,9 @@ public final class WildcatterBlocks {
 	/** Opens and closes the hot wire by hand and protects nothing. */
 	public static final Block SWITCH = block("switch", props -> new BreakerBlock(props.mapColor(MapColor.COLOR_YELLOW)
 			.strength(1.5F).sound(SoundType.METAL), Voltage.LOW, true));
+	/** Opens its feeder when the island's frequency falls too far: load shedding. */
+	public static final Block UFLS_RELAY = block("ufls_relay", props -> new BreakerBlock(props.mapColor(MapColor.COLOR_PURPLE)
+			.strength(1.5F).sound(SoundType.METAL), Voltage.LOW, false, true));
 	/** One-shot protection: cheap, fast, and it has to be replaced after it blows. */
 	public static final Block FUSE = block("fuse", props -> new FuseBlock(props.mapColor(MapColor.COLOR_ORANGE).strength(1.0F).sound(SoundType.GLASS)));
 	/** For 4.16 kV and 138 kV hot lines. Same rules as the 110 V breaker, with ratings to suit the current. */
@@ -163,7 +166,7 @@ public final class WildcatterBlocks {
 			WOOL_WIRE_NEUTRAL, MV_WIRE_HOT, MV_WIRE_NEUTRAL, HV_WIRE_HOT, HV_WIRE_NEUTRAL,
 			PLASTIC_WIRE_HOT, PLASTIC_WIRE_NEUTRAL, MV_PLASTIC_WIRE_HOT, MV_PLASTIC_WIRE_NEUTRAL, HV_PLASTIC_WIRE_HOT, HV_PLASTIC_WIRE_NEUTRAL);
 	public static final BlockEntityType<LoadBlockEntity> LOAD_ENTITY = entity(LoadBlockEntity::new, ELECTRIC_LAMP, ELECTRIC_HEATER);
-	public static final BlockEntityType<BreakerBlockEntity> BREAKER_ENTITY = entity(BreakerBlockEntity::new, BREAKER, MV_BREAKER, HV_BREAKER, SWITCH);
+	public static final BlockEntityType<BreakerBlockEntity> BREAKER_ENTITY = entity(BreakerBlockEntity::new, BREAKER, MV_BREAKER, HV_BREAKER, SWITCH, UFLS_RELAY);
 	public static final BlockEntityType<FuseBlockEntity> FUSE_ENTITY = entity(FuseBlockEntity::new, FUSE);
 	public static final BlockEntityType<TransformerBlockEntity> TRANSFORMER_ENTITY = entity(TransformerBlockEntity::new, TRANSFORMER, SUBSTATION_TRANSFORMER);
 
@@ -239,6 +242,7 @@ public final class WildcatterBlocks {
 		add("breaker", BREAKER);
 		add("fuse", FUSE);
 		add("switch", SWITCH);
+		add("ufls_relay", UFLS_RELAY);
 		add("mv_breaker", MV_BREAKER);
 		add("hv_breaker", HV_BREAKER);
 		add("transformer", TRANSFORMER);

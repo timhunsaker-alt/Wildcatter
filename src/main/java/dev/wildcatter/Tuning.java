@@ -40,6 +40,13 @@ public final class Tuning {
 	/** Share of the steam a turbine uses that comes back as water through its drain. The rest is lost, so a loop needs some makeup. */
 	public static final double CONDENSATE_RETURN = 0.9;
 	/** Steam turbines need more steam for the same power when their condensate is not cooled (back pressure). */
+	// ---- Frequency (docs/ELECTRICAL_MODEL.md; values approved by Tim 2026-10-30) ----
+	public static final double GOVERNOR_DROOP = 0.04;          // a 4% frequency fall takes a generator from no load to full load
+	public static final double INERTIA_DIESEL = 1.0;           // seconds, small diesel set
+	public static final double INERTIA_STEAM = 3.0;            // seconds, steam turbine
+	public static final double INERTIA_GAS_TURBINE = 3.0;      // seconds (assumed like a steam turbine; not in the approved table)
+	public static final double AGC_SECONDS = 30.0;             // secondary control brings the frequency back (assumed; not in the approved table)
+	public static final double GENERATOR_TRIP_SECONDS = 1.0;   // outside the safe band this long and a generator trips (assumed delay)
 	public static final double UNCOOLED_EFFICIENCY = 0.75;
 	public static final double COOLING_FAN_WATTS = 750;
 	public static final int COOLING_FILL = 2;                 // fill sections a tower needs above its fan

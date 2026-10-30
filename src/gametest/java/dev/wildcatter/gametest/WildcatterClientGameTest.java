@@ -12,6 +12,7 @@ import dev.wildcatter.block.BreakerBlock;
 import dev.wildcatter.block.BreakerBlockEntity;
 import dev.wildcatter.block.LoadBlock;
 import dev.wildcatter.block.SteamTurbineBlock;
+import dev.wildcatter.block.SteamTurbineBlockEntity;
 import dev.wildcatter.block.WireBlockEntity;
 import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.energy.Voltage;
@@ -53,6 +54,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			bigMachines(context, server);
 			steamLoop(context, server);
 			refining(context, server);
+			frequency(context, server);
 			fieldManual(server);
 		}
 	}
@@ -515,6 +517,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	// ---- the 110 V loop --------------------------------------------------------------------------------------
 	private void lowVoltageLoop(ClientGameTestContext context, TestServerContext server) {
 		plant(server, 10);
+		plant(server, 9);   // a second set beside the first: 4 kW between them, so a 3 kW overload trips the breaker and not the generators
 		hotLine(server, "wildcatter:wool_wire_hot");
 		put(server, 13, up, 10, "wildcatter:breaker[facing=east]");
 		put(server, 15, up, 10, "wildcatter:electric_lamp");
@@ -786,6 +789,69 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		});
 		check(!joined, "110 V and medium voltage wire must not join");
 		System.out.println("[wildcatter-test] transformer chain: 110 V up to 4.16 kV and back down, lamp lit");
+	}
+
+	/**
+	 * Frequency. A steam turbine rated 2 kW feeds a lamp and a bank of three 1.5 kW heaters (more than it can give). With an
+	 * under-frequency relay in the heaters' feeder, the frequency dips, the relay sheds the heaters, and the turbine survives.
+	 * Without one the frequency collapses and the turbine trips on under-frequency.
+	 */
+	private void frequency(ClientGameTestContext context, TestServerContext server) {
+		for (int pass = 0; pass < 2; pass++) {
+			boolean withRelay = pass == 0;
+			int z = withRelay ? -30 : -44;
+			server.runCommand("fill 8 " + y + " " + (z - 2) + " 18 " + (y + 5) + " " + (z + 3) + " minecraft:air");
+			plant(server, z);
+			String hot = "wildcatter:wool_wire_hot";
+			String neutral = "wildcatter:wool_wire_neutral";
+			put(server, 12, up, z, hot);
+			put(server, 13, up, z, withRelay ? "wildcatter:ufls_relay[facing=east]" : hot);
+			for (int x = 11; x <= 15; x++) {
+				put(server, x, up, z + 1, neutral);
+			}
+			// a lamp on the bus ahead of the relay
+			put(server, 12, up + 1, z, "wildcatter:electric_lamp");
+			put(server, 12, up + 1, z + 1, neutral);
+			server.runCommand("tp @p 14 " + (up + 2) + " " + (z + 6) + " 180 25");
+			context.waitTicks(120);
+			String quiet = read(server, 11, up, z);
+			check(quiet.matches(".*\\b(59\\.9|60\\.0|60\\.1) Hz.*"), "a lightly loaded island should sit at 60 Hz: " + quiet);
+
+			// a bank of three heaters, 4.5 kW on a 2 kW turbine
+			for (int k = 0; k < 3; k++) {
+				put(server, 14, up + k, z, hot);
+				put(server, 15, up + k, z, "wildcatter:electric_heater");
+				put(server, 15, up + k, z + 1, neutral);
+			}
+			if (withRelay) {
+				context.waitTicks(60);
+				String relay = read(server, 13, up, z);
+				String turbine = read(server, 11, up, z);
+				check(relay.contains("TRIPPED") && relay.contains("under-frequency"), "the relay should shed the heaters on under-frequency: " + relay);
+				check(!turbine.contains("TRIPPED"), "with the heaters shed the turbine should stay on line: " + turbine);
+				context.takeScreenshot("wildcatter-load-shedding");
+				context.waitTicks(400);
+				String recovered = read(server, 11, up, z);
+				check(recovered.matches(".*\\b(59\\.[89]|60\\.[01]) Hz.*"), "after shedding the frequency should recover: " + recovered);
+				System.out.println("[wildcatter-test] load shedding ok: " + relay + " | " + recovered);
+			} else {
+				context.waitTicks(100);
+				String turbine = read(server, 11, up, z);
+				check(turbine.contains("TRIPPED on frequency"), "without a relay the overloaded turbine should trip on under-frequency: " + turbine);
+				// restart it (right-click does this), remove the heaters, and it runs again
+				for (int k = 0; k < 3; k++) {
+					put(server, 15, up + k, z, "minecraft:air");
+				}
+				server.computeOnServer(srv -> {
+					((SteamTurbineBlockEntity) srv.overworld().getBlockEntity(new BlockPos(11, up, z))).resetTrip();
+					return null;
+				});
+				context.waitTicks(120);
+				String restarted = read(server, 11, up, z);
+				check(!restarted.contains("TRIPPED"), "after the restart the turbine should be back on line: " + restarted);
+				System.out.println("[wildcatter-test] generator trip ok: " + turbine + " | " + restarted);
+			}
+		}
 	}
 
 	private void fieldManual(TestServerContext server) {

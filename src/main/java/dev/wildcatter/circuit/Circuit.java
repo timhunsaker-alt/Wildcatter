@@ -12,6 +12,16 @@ import net.minecraft.core.Direction;
  */
 public final class Circuit {
 	private final Network network = new Network(Tuning.GROUND_TIE_OHMS, Tuning.SHORT_CONTACT_OHMS);
+	private double hertz = dev.wildcatter.energy.ElectricalStandard.active().hertz();
+
+	/** The frequency of the island this circuit is part of. */
+	public double hertz() {
+		return hertz;
+	}
+
+	public void setHertz(double hertz) {
+		this.hertz = hertz;
+	}
 
 	private static Network.Cell cell(BlockPos pos) {
 		return new Network.Cell(pos.getX(), pos.getY(), pos.getZ());

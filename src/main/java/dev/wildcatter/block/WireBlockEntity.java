@@ -37,6 +37,7 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 	private double wear;
 	/** 0 to 1: how close the copper is to burning out. */
 	private double heat;
+	private double hertz = dev.wildcatter.energy.ElectricalStandard.active().hertz();
 
 	public WireBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.WIRE_ENTITY, pos, state);
@@ -101,6 +102,7 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		if (level == null) {
 			return;
 		}
+		hertz = circuit.hertz();
 		volts = circuit.voltage(node);
 		amps = circuit.through(node);
 		double ratio = amps / ampacity();
@@ -172,7 +174,7 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 				: wear >= 1.0 ? "wool worn OUT, bare copper" : "wool " + Math.round(wear * 100) + "% worn";
 		return Component.literal(getBlockState().getValue(CableBlock.CONDUCTOR).label() + " wire (" + block.voltage().label() + ", " + insulation + "): "
 				+ fmt(volts) + " V, " + fmt(amps) + " A of " + fmt(ampacity()) + " A allowed"
-				+ (heat > 0.05 ? ", HEATING " + Math.round(heat * 100) + "%" : ""));
+				+ (heat > 0.05 ? ", HEATING " + Math.round(heat * 100) + "%" : "") + String.format(", %.1f Hz", hertz));
 	}
 
 	private static String fmt(double value) {

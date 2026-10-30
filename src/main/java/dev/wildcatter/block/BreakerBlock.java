@@ -52,6 +52,7 @@ public class BreakerBlock extends BaseEntityBlock {
 
 	private final Voltage voltage;
 	private final boolean plainSwitch;
+	private final boolean relay;
 
 	public BreakerBlock(Properties properties, Voltage voltage) {
 		this(properties, voltage, false);
@@ -59,7 +60,13 @@ public class BreakerBlock extends BaseEntityBlock {
 
 	/** A plain switch has no protection: it only opens and closes by hand. */
 	public BreakerBlock(Properties properties, Voltage voltage, boolean plainSwitch) {
+		this(properties, voltage, plainSwitch, false);
+	}
+
+	/** An under-frequency relay opens when the island's frequency falls too far (load shedding) and protects nothing else. */
+	public BreakerBlock(Properties properties, Voltage voltage, boolean plainSwitch, boolean relay) {
 		super(properties);
+		this.relay = relay;
 		this.voltage = voltage;
 		this.plainSwitch = plainSwitch;
 		registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(POSITION, Position.ON));
@@ -71,6 +78,10 @@ public class BreakerBlock extends BaseEntityBlock {
 
 	public boolean isSwitch() {
 		return plainSwitch;
+	}
+
+	public boolean isRelay() {
+		return relay;
 	}
 
 	@Override
@@ -96,7 +107,7 @@ public class BreakerBlock extends BaseEntityBlock {
 		if (level.isClientSide() || !(level.getBlockEntity(pos) instanceof BreakerBlockEntity breaker)) {
 			return InteractionResult.SUCCESS;
 		}
-		if (player.isShiftKeyDown() && !plainSwitch) {
+		if (player.isShiftKeyDown() && !plainSwitch && !relay) {
 			breaker.nextRating();
 			player.sendOverlayMessage(breaker.inspect());
 		} else {

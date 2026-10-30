@@ -35,7 +35,7 @@ import org.jspecify.annotations.Nullable;
  * turbine in the cube still makes its share of the power and has terminals on all sides, so a wire on any face
  * of the cube is connected to the whole generator.
  */
-public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable {
+public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart, dev.wildcatter.circuit.Generator, Inspectable, Bondable {
 	private static final int CUBE = Tuning.BIG_SIZE * Tuning.BIG_SIZE * Tuning.BIG_SIZE;
 
 	private int hot;
@@ -53,6 +53,11 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 	/** Water condensed from the steam used, waiting to go out through the drain. */
 	private double drainWater;
 	private boolean drained;
+	/** Frequency protection shut this generator down. */
+	private boolean tripped;
+	private double tripHertz;
+	/** The frequency of its island, as of the last solve. */
+	private double hertz = dev.wildcatter.energy.ElectricalStandard.active().hertz();
 	/** A cooling tower on the drain's pipes is running. Without one the turbine needs more steam per joule. */
 	private boolean cooled;
 
@@ -97,7 +102,7 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 		hot = circuit.node();
 		neutral = circuit.node();
 		int internal = circuit.node();
-		source = circuit.source(internal, neutral, voltage().nominal() * sat);
+		source = circuit.source(internal, neutral, tripped ? 0 : voltage().nominal() * sat);
 		circuit.resistor(internal, hot, ohms);
 		circuit.ground(neutral);
 		for (Direction face : Direction.values()) {
@@ -110,6 +115,7 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 	public void apply(Circuit circuit, int ticks) {
 		volts = circuit.across(hot, neutral);
 		amps = circuit.sourceCurrent(source);
+		hertz = circuit.hertz();
 	}
 
 	/** Every tick: take the steam the circuit is using this tick from the boilers touching it. */
@@ -315,6 +321,54 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 
 	@Override
 	public Component inspect() {
+		return Component.literal(inspectText().getString() + frequencyText());
+	}
+
+
+	// ---- Generator: the island's frequency, and frequency protection ----------------------------------------------------
+	@Override
+	public double ratedWatts() {
+		return Tuning.BOILER_STEAM_PER_TICK * Tuning.JOULES_PER_STEAM * 20.0;
+	}
+
+	@Override
+	public double inertiaSeconds() {
+		return Tuning.INERTIA_STEAM;
+	}
+
+	@Override
+	public double deliveredWatts() {
+		return watts();
+	}
+
+	@Override
+	public boolean online() {
+		return !tripped;
+	}
+
+	@Override
+	public void tripOnFrequency(double frequency) {
+		tripped = true;
+		tripHertz = frequency;
+		setChanged();
+	}
+
+	public boolean isTripped() {
+		return tripped;
+	}
+
+	/** Right-click after a trip: it starts up again. */
+	public void resetTrip() {
+		tripped = false;
+		setChanged();
+		CircuitManager.markDirty(level);
+	}
+
+	private String frequencyText() {
+		return tripped ? String.format(", TRIPPED on frequency (%.1f Hz): fix the overload, then right-click to restart", tripHertz) : String.format(", %.1f Hz", hertz);
+	}
+
+	private Component inspectText() {
 		SteamTurbineBlockEntity r = root();
 		String earth = level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you";
 		if (r == null) {
@@ -334,6 +388,7 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
 		output.putDouble("satisfaction", satisfaction);
+		output.putBoolean("tripped", tripped);
 		output.putBoolean("is_master", isMaster);
 		if (master != null) {
 			output.putInt("master_x", master.getX());
@@ -346,6 +401,7 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
 		satisfaction = input.getDoubleOr("satisfaction", 1.0);
+		tripped = input.getBooleanOr("tripped", false);
 		isMaster = input.getBooleanOr("is_master", false);
 		master = input.getInt("master_x").isPresent()
 				? new BlockPos(input.getIntOr("master_x", 0), input.getIntOr("master_y", 0), input.getIntOr("master_z", 0)) : null;

@@ -56,6 +56,9 @@ public class SteamTurbineBlock extends BaseEntityBlock {
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 		if (!level.isClientSide() && level.getBlockEntity(pos) instanceof SteamTurbineBlockEntity turbine) {
+			if (turbine.isTripped()) {
+				turbine.resetTrip();
+			}
 			if (!Shock.touch((ServerLevel) level, pos, player, turbine.voltage(), turbine.isLive())) {
 				player.sendOverlayMessage(turbine.inspect());
 			}

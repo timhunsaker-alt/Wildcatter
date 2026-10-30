@@ -31,7 +31,7 @@ import org.jspecify.annotations.Nullable;
  * sags as the current rises and it burns only the fuel the circuit is using. Its tank is topped up from a refinery
  * (diesel) or a gas well (gas) on its gas lines, or by hand with a bucket of diesel. With no fuel it makes nothing.
  */
-public class EngineBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable {
+public class EngineBlockEntity extends BlockEntity implements CircuitPart, dev.wildcatter.circuit.Generator, Inspectable, Bondable {
 	private static final int CELLS = Tuning.ENGINE_CUBE * Tuning.ENGINE_CUBE * Tuning.ENGINE_CUBE;
 
 	private int hot;
@@ -42,6 +42,11 @@ public class EngineBlockEntity extends BlockEntity implements CircuitPart, Inspe
 	private double tank;
 	/** Share of the demanded fuel the tank could supply; smoothed so the voltage does not jump. Shared by a cube. */
 	private double satisfaction;
+	/** Frequency protection shut this generator down. */
+	private boolean tripped;
+	private double tripHertz;
+	/** The frequency of its island, as of the last solve. */
+	private double hertz = dev.wildcatter.energy.ElectricalStandard.active().hertz();
 	private int idleTicks = 100;
 	private double cubeWatts;
 	private String supply = "no gas line to a fuel source";
@@ -121,7 +126,7 @@ public class EngineBlockEntity extends BlockEntity implements CircuitPart, Inspe
 		hot = circuit.node();
 		neutral = circuit.node();
 		int internal = circuit.node();
-		source = circuit.source(internal, neutral, nominal * sat);
+		source = circuit.source(internal, neutral, tripped ? 0 : nominal * sat);
 		circuit.resistor(internal, hot, ohms);
 		circuit.ground(neutral);
 		for (Direction face : Direction.values()) {
@@ -134,6 +139,7 @@ public class EngineBlockEntity extends BlockEntity implements CircuitPart, Inspe
 	public void apply(Circuit circuit, int ticks) {
 		volts = circuit.across(hot, neutral);
 		amps = circuit.sourceCurrent(source);
+		hertz = circuit.hertz();
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, EngineBlockEntity engine) {
@@ -303,6 +309,54 @@ public class EngineBlockEntity extends BlockEntity implements CircuitPart, Inspe
 
 	@Override
 	public Component inspect() {
+		return Component.literal(inspectText().getString() + frequencyText());
+	}
+
+
+	// ---- Generator: the island's frequency, and frequency protection ----------------------------------------------------
+	@Override
+	public double ratedWatts() {
+		return unitWatts();
+	}
+
+	@Override
+	public double inertiaSeconds() {
+		return (diesel() ? Tuning.INERTIA_DIESEL : Tuning.INERTIA_GAS_TURBINE);
+	}
+
+	@Override
+	public double deliveredWatts() {
+		return watts();
+	}
+
+	@Override
+	public boolean online() {
+		return !tripped;
+	}
+
+	@Override
+	public void tripOnFrequency(double frequency) {
+		tripped = true;
+		tripHertz = frequency;
+		setChanged();
+	}
+
+	public boolean isTripped() {
+		return tripped;
+	}
+
+	/** Right-click after a trip: it starts up again. */
+	public void resetTrip() {
+		tripped = false;
+		setChanged();
+		CircuitManager.markDirty(level);
+	}
+
+	private String frequencyText() {
+		return tripped ? String.format(", TRIPPED on frequency (%.1f Hz): fix the overload, then right-click to restart", tripHertz) : String.format(", %.1f Hz", hertz);
+	}
+
+	private Component inspectText() {
 		EngineBlockEntity r = root();
 		String earth = level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you";
 		if (r == null) {
@@ -325,6 +379,7 @@ public class EngineBlockEntity extends BlockEntity implements CircuitPart, Inspe
 		super.saveAdditional(output);
 		output.putDouble("tank", tank);
 		output.putDouble("satisfaction", satisfaction);
+		output.putBoolean("tripped", tripped);
 		output.putBoolean("is_master", isMaster);
 		if (master != null) {
 			output.putInt("master_x", master.getX());
@@ -338,6 +393,7 @@ public class EngineBlockEntity extends BlockEntity implements CircuitPart, Inspe
 		super.loadAdditional(input);
 		tank = input.getDoubleOr("tank", 0);
 		satisfaction = input.getDoubleOr("satisfaction", 0);
+		tripped = input.getBooleanOr("tripped", false);
 		isMaster = input.getBooleanOr("is_master", false);
 		master = input.getInt("master_x").isPresent()
 				? new BlockPos(input.getIntOr("master_x", 0), input.getIntOr("master_y", 0), input.getIntOr("master_z", 0)) : null;

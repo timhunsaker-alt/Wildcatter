@@ -22,6 +22,7 @@
     "wildcatter:breaker",
     "wildcatter:fuse",
     "wildcatter:switch",
+    "wildcatter:ufls_relay",
     "wildcatter:mv_breaker",
     "wildcatter:hv_breaker",
     "wildcatter:ground_rod",

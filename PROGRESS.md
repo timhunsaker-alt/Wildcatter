@@ -87,6 +87,14 @@ All of them go in the hot wire: in at the back, out at the front. Sneak and righ
 - Game test: a lamp on leg B lights, equal lamps on A and B leave the shared neutral at 0.0 A, and with only the A lamp it carries 0.5 A.
 - Not done: wiring the phasor solver into the grid and three-phase (C), the three-pole breaker, a 240 V (A to B) load, and per-phase wear on cables. Wire textures are still script-drawn placeholders (not yet named `*_placeholder`).
 
+## Phase 1d: dynamic frequency
+- Each island of generators has one frequency (`solver/FrequencyIsland`, plain Java, unit tested): the swing equation with each set's inertia, a governor with 4% droop, and a slow secondary control (AGC) that brings it back to nominal. Load above the generators' rating drags it down; lost load lets it rise.
+- Approved values (NA / IEC): 60 / 50 Hz; H 1 s diesel, 3 s steam; droop 4%; load shed at 59.3 / 49.0 Hz; generators trip below 57.0 / 47.5 Hz or above 61.5 / 51.5 Hz. Assumptions NOT in your table, easy to change in `Tuning`: gas turbine H = 3 s, AGC time constant 30 s, generator trip delay 1 s.
+- New **Under-Frequency Relay (LV)**: an in-line breaker-style block that opens its feeder when the island frequency falls below the load-shed point. Right-click to close it again.
+- Steam turbines and engines are `Generator`s: they report rating and output, trip on frequency (right-click to restart), and show the island frequency. Wires and relays show it too. Islands restart when the standard changes.
+- Game test: a 2 kW turbine with a lamp and a 4.5 kW heater bank behind a relay sheds the heaters (island fell to 58.2 Hz), keeps running and recovers to 60.0 Hz; without the relay the turbine trips on under-frequency, restarts when the load is removed, and runs. The old overload-trips-the-breaker test now has a second turbine set, because a lone 2 kW set stalls before a breaker's heating can trip it.
+- Not done: frequency effect on motors, MV feeder relays (Phase 2), reclosers, generator synchronisation.
+
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.
