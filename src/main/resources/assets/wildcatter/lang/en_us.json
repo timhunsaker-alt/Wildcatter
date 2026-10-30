@@ -3,7 +3,7 @@
   "block.wildcatter.firebox": "Firebox",
   "block.wildcatter.pipe": "Water Pipe",
   "block.wildcatter.pump": "Water Pump (LV)",
-  "block.wildcatter.gas_line": "Gas Line",
+  "block.wildcatter.gas_line": "Steel Pipe (oil and gas)",
   "block.wildcatter.drilling_rig": "Drilling Rig (LV)",
   "block.wildcatter.casing": "Well Casing",
   "block.wildcatter.refinery": "Refinery Base (LV)",
@@ -52,6 +52,7 @@
   "item.wildcatter.field_manual": "Wildcatter Field Manual",
   "item.wildcatter.seismograph": "Seismograph",
   "item.wildcatter.plastic_sheet": "Plastic Sheet",
+  "item.wildcatter.steel_ingot": "Steel Ingot",
   "item.wildcatter.diesel_bucket": "Bucket of Diesel",
   "item.wildcatter.crude_oil_bucket": "Bucket of Crude Oil"
 }

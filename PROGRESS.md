@@ -76,6 +76,11 @@ All of them go in the hot wire: in at the back, out at the front. Sneak and righ
 - A cancelled Create World leaves no choice behind (the Select World screen clears it). A world made before this change, or by a server, gets the config default.
 - Not done yet: split-phase 120/240 V (comes with the conductor work in 1c).
 
+## Phase 1e: steel pipe
+- New **Steel Ingot**: iron ingot smelted in a blast furnace (coal is the fuel). **Steel Pipe** (block id `gas_line`, so existing worlds keep working) is crafted from steel ingots and replaces the copper gas line for crude, diesel and gas. The iron pipe is now called Water Pipe.
+- New Ludo art for both; Field Manual text says steel pipe.
+- Game test: the full oil, gas, refining and engine run still passes on the new pipe.
+
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.

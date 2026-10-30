@@ -7,7 +7,7 @@
     "III"
   ],
   "key": {
-    "I": "minecraft:copper_ingot"
+    "I": "wildcatter:steel_ingot"
   },
   "result": {
     "id": "wildcatter:gas_line",

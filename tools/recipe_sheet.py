@@ -62,13 +62,16 @@ def render(path):
 				if ch != " ":
 					cells[y][x] = r["key"][ch]
 		ing = cells
+	elif r["type"].endswith("blasting"):
+		ing = [[None] * 3, [None, r["ingredient"], None], [None] * 3]
+		name += "  (blast furnace)"
 	else:
 		flat = (r["ingredients"] + [None] * 9)[:9]
 		ing = [flat[0:3], flat[3:6], flat[6:9]]
 	W, H = 3 * S + 2 * 6 + 60 + S + 40, 3 * S + 56
 	im = Image.new("RGBA", (W, H), (198, 198, 198, 255))
 	d = ImageDraw.Draw(im)
-	d.text((8, 6), name + ("" if r["type"].endswith("shaped") else "  (shapeless)"), font=FONT, fill=(30, 30, 30))
+	d.text((8, 6), name + ("  (shapeless)" if r["type"].endswith("shapeless") else ""), font=FONT, fill=(30, 30, 30))
 	for y in range(3):
 		for x in range(3):
 			ox, oy = 8 + x * (S + 2), 32 + y * (S + 2)

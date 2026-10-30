@@ -311,7 +311,7 @@ tex("field_manual", manual, "item")
 # Real art: the Ludo textures (made by tools/process_art.py) replace the placeholders of the same name.
 if os.path.isdir("art/final"):
 	for f in os.listdir("art/final"):
-		kind = "item" if f in ("power_meter.png", "field_manual.png", "seismograph.png", "crude_oil_bucket.png", "plastic_sheet.png", "diesel_bucket.png") else "block"
+		kind = "item" if f in ("power_meter.png", "field_manual.png", "seismograph.png", "crude_oil_bucket.png", "plastic_sheet.png", "diesel_bucket.png", "steel_ingot.png") else "block"
 		shutil.copy(f"art/final/{f}", f"{ASSETS}/textures/{kind}/{f}")
 
 # ---- models -------------------------------------------------------------------------------------------
@@ -488,11 +488,11 @@ ITEM_MODELS = {"firebox": "block/firebox", "pump": "block/pump", "pipe": "block/
 	"gas_wellhead": "block/gas_wellhead", "casing": "block/casing", "boiler": "block/boiler", "steam_turbine": "block/steam_turbine", "electric_lamp": "block/electric_lamp",
 	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "fuse": "block/fuse_good", "switch": "block/switch_on", "mv_breaker": "block/mv_breaker_on", "hv_breaker": "block/hv_breaker_on", "pole": "block/pole", "crossarm": "block/crossarm_x", "transformer": "block/transformer",
 	"substation_transformer": "block/substation_transformer", "ground_rod": "block/ground_rod",
-	"power_meter": "item/power_meter", "field_manual": "item/field_manual", "seismograph": "item/seismograph", "crude_oil_bucket": "item/crude_oil_bucket", "plastic_sheet": "item/plastic_sheet", "diesel_bucket": "item/diesel_bucket"}
+	"power_meter": "item/power_meter", "field_manual": "item/field_manual", "seismograph": "item/seismograph", "crude_oil_bucket": "item/crude_oil_bucket", "plastic_sheet": "item/plastic_sheet", "diesel_bucket": "item/diesel_bucket", "steel_ingot": "item/steel_ingot"}
 ITEM_MODELS.update({w: f"block/{w}_inventory" for w in WIRES})
 for name, model in ITEM_MODELS.items():
 	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:{model}"}})
-for item in ("power_meter", "field_manual", "seismograph", "crude_oil_bucket", "plastic_sheet", "diesel_bucket"):
+for item in ("power_meter", "field_manual", "seismograph", "crude_oil_bucket", "plastic_sheet", "diesel_bucket", "steel_ingot"):
 	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}"}})
 
 # ---- names --------------------------------------------------------------------------------------------
@@ -501,7 +501,7 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 	"block.wildcatter.firebox": "Firebox",
 	"block.wildcatter.pipe": "Water Pipe",
 	"block.wildcatter.pump": "Water Pump (LV)",
-	"block.wildcatter.gas_line": "Gas Line",
+	"block.wildcatter.gas_line": "Steel Pipe (oil and gas)",
 	"block.wildcatter.drilling_rig": "Drilling Rig (LV)",
 	"block.wildcatter.casing": "Well Casing",
 	"block.wildcatter.refinery": "Refinery Base (LV)",
@@ -550,6 +550,7 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 	"item.wildcatter.field_manual": "Wildcatter Field Manual",
 	"item.wildcatter.seismograph": "Seismograph",
 	"item.wildcatter.plastic_sheet": "Plastic Sheet",
+	"item.wildcatter.steel_ingot": "Steel Ingot",
 	"item.wildcatter.diesel_bucket": "Bucket of Diesel",
 	"item.wildcatter.crude_oil_bucket": "Bucket of Crude Oil",
 })
@@ -582,7 +583,9 @@ shaped("boiler", ["III", "IWI", "III"], {"I": "minecraft:iron_ingot", "W": "mine
 shaped("firebox", ["IBI", "BFB", "IBI"], {"I": "minecraft:iron_ingot", "B": "minecraft:bricks", "F": "minecraft:furnace"}, "firebox")
 shaped("pipe", ["III", "   ", "III"], {"I": "minecraft:iron_ingot"}, "pipe", 6)
 shaped("pump", ["III", "CBC", "IRI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "B": "minecraft:bucket", "R": "minecraft:redstone"}, "pump")
-shaped("gas_line", ["III", "   ", "III"], {"I": "minecraft:copper_ingot"}, "gas_line", 6)
+shaped("gas_line", ["III", "   ", "III"], {"I": f"{ns}:steel_ingot"}, "gas_line", 6)
+# steel: iron smelted in a blast furnace with coal as the fuel (real steel is iron with carbon)
+save_json(f"{DATA}/recipe/steel_ingot.json", {"type": "minecraft:blasting", "ingredient": "minecraft:iron_ingot", "cookingtime": 200, "experience": 0.7, "result": {"id": f"{ns}:steel_ingot"}})
 shaped("drilling_rig", ["IPI", "CMC", "IBI"], {"I": "minecraft:iron_ingot", "P": "minecraft:iron_pickaxe", "C": "minecraft:copper_ingot", "M": "minecraft:piston", "B": "minecraft:iron_block"}, "drilling_rig")
 shaped("pumpjack", ["III", "CPC", "IRI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "P": "minecraft:piston", "R": "minecraft:redstone"}, "pumpjack")
 shaped("gas_wellhead", ["III", "CBC", "III"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "B": "minecraft:iron_block"}, "gas_wellhead")

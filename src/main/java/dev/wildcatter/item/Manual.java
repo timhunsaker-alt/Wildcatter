@@ -94,16 +94,16 @@ public final class Manual {
 						+ " A: use a 20 A breaker and good wire). It sinks a steel-cased hole, a block a second at full voltage. Low voltage drills slowly.\n\n"
 						+ "Reach the pocket and it STRIKES: the rig becomes a wellhead. Miss, and you get a DRY HOLE: break the rig and try again.",
 
-				"OIL AND GAS WELLS\n\nGAS WELLHEAD: gas comes up by its own pressure, no power needed. Put a Firebox against it, or run GAS LINES (orange pipes) to fireboxes. It only opens when a firebox is low, so gas is only used as you burn it.\n\n"
-						+ "PUMPJACK (oil): a " + Math.round(Tuning.PUMPJACK_WATTS) + " W, " + Voltage.LOW.label() + " pump. Right-click it with a bucket for CRUDE OIL, or send it down gas lines to fireboxes. A bucket of crude burns as long as lava.\n\n"
+				"OIL AND GAS WELLS\n\nGAS WELLHEAD: gas comes up by its own pressure, no power needed. Put a Firebox against it, or run STEEL PIPES (the dark pipes, crafted from STEEL INGOTS: smelt iron ingots in a blast furnace) to fireboxes. It only opens when a firebox is low, so gas is only used as you burn it.\n\n"
+						+ "PUMPJACK (oil): a " + Math.round(Tuning.PUMPJACK_WATTS) + " W, " + Voltage.LOW.label() + " pump. Right-click it with a bucket for CRUDE OIL, or send it down steel pipes to fireboxes. A bucket of crude burns as long as lava.\n\n"
 						+ "Wells on the same pocket share it, and the PRESSURE drops as it empties: the flow slows. Read it with the Power Meter.",
 
-				"REFINING\n\nREFINERY BASE: a " + Math.round(Tuning.REFINERY_WATTS) + " W, " + Voltage.LOW.label() + " unit. Pour in a bucket of crude, or put it on a GAS LINE with a pumpjack. Alone it is a POT STILL: slow, and only " + Math.round(Tuning.POT_STILL_YIELD * 100)
+				"REFINING\n\nREFINERY BASE: a " + Math.round(Tuning.REFINERY_WATTS) + " W, " + Voltage.LOW.label() + " unit. Pour in a bucket of crude, or put it on a STEEL PIPE with a pumpjack. Alone it is a POT STILL: slow, and only " + Math.round(Tuning.POT_STILL_YIELD * 100)
 						+ "% of the crude comes out as diesel.\n\nStack " + Tuning.REFINERY_COLUMNS + " DISTILLATION COLUMNS on top and it becomes a full TOWER: twice the speed, " + Math.round(Tuning.DIESEL_YIELD * 100)
 						+ "% diesel, and PLASTIC (a sheet per " + Tuning.CRUDE_PER_PLASTIC + " crude). Right-click with an empty hand for the plastic, with a bucket for diesel.",
 
 				"ENGINES\n\nDIESEL ENGINE and GAS TURBINE: small " + Voltage.LOW.label() + " generators. Put eight of one kind in a 2x2x2 cube and they join into one " + Voltage.MEDIUM.label() + " GENERATOR: " + Math.round(Tuning.DIESEL_ENGINE_WATTS * 8 / 1000) + " kW diesel, "
-						+ Math.round(Tuning.GAS_TURBINE_WATTS * 8 / 1000) + " kW gas turbine.\n\nThey burn only the fuel the load uses. Diesel: pour a bucket in, or run a gas line to a refinery. Gas: run a gas line to a gas wellhead. With no fuel they make nothing. Step the " + Voltage.MEDIUM.label() + " down with a transformer.",
+						+ Math.round(Tuning.GAS_TURBINE_WATTS * 8 / 1000) + " kW gas turbine.\n\nThey burn only the fuel the load uses. Diesel: pour a bucket in, or run a steel pipe to a refinery. Gas: run a steel pipe to a gas wellhead. With no fuel they make nothing. Step the " + Voltage.MEDIUM.label() + " down with a transformer.",
 
 				"PLASTIC WIRE\n\nCraft wire with plastic sheets: it never wears out, at any voltage. Plastic hot and neutral wire are safe to touch, and a plastic " + Voltage.MEDIUM.label() + " or " + Voltage.HIGH.label() + " line has no arc reach: you can run it at ground level.\n\nIt carries no more current than bare wire of the same voltage: the rating is the copper.",
 

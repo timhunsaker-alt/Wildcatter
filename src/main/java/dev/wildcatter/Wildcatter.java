@@ -50,6 +50,7 @@ public class Wildcatter implements ModInitializer {
 			entries.accept(WildcatterItems.CRUDE_OIL_BUCKET);
 			entries.accept(WildcatterItems.DIESEL_BUCKET);
 			entries.accept(WildcatterItems.PLASTIC_SHEET);
+			entries.accept(WildcatterItems.STEEL_INGOT);
 			entries.accept(WildcatterItems.FIELD_MANUAL);
 		});
 
