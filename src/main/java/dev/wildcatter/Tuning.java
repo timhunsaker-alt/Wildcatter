@@ -138,6 +138,8 @@ public final class Tuning {
 	public static final double BREAKER_MAGNETIC_MULTIPLE = 8; // instant trip at this many times the rating: a short circuit
 	public static final double BREAKER_TRIP_SECONDS_AT_2X = 4.0; // a breaker carrying twice its rating trips after about this long
 	public static final double BREAKER_COOL_SECONDS = 10.0;
+	public static final double FUSE_INSTANT_MULTIPLE = 5;    // a fuse melts at once at this many times its rating (faster than a breaker)
+	public static final double FUSE_SECONDS_AT_2X = 2.0;
 	public static final double BREAKER_CLOSED_OHMS = 0.002;
 
 	// ---- Transformer ------------------------------------------------------------------------------------------------

@@ -245,6 +245,29 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(10);
 		context.takeScreenshot("wildcatter-cooling-tower");
 		System.out.println("[wildcatter-test] cooling ok: " + fan + " | " + cooled);
+
+		// A fuse in the hot wire between turbine and pump: a short blows it, and it stays blown until it gets a copper ingot.
+		put(server, 52, up, 50, "wildcatter:fuse[facing=east]");
+		context.waitTicks(40);
+		check(read(server, 52, up, 50).contains("good"), "a fuse with a healthy load should be good: " + read(server, 52, up, 50));
+		put(server, 53, up + 1, 50, "wildcatter:wire_hot");
+		put(server, 53, up + 1, 51, "wildcatter:wire_neutral");
+		context.waitTicks(40);
+		String blown = read(server, 52, up, 50);
+		check(blown.contains("BLOWN"), "a short circuit should blow the fuse: " + blown);
+		put(server, 53, up + 1, 50, "minecraft:air");
+		put(server, 53, up + 1, 51, "minecraft:air");
+		server.runCommand("item replace entity @p weapon.mainhand with minecraft:copper_ingot");
+		server.runCommand("tp @p 52 " + up + " 53 0 20");
+		context.waitTicks(10);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.FuseBlockEntity) srv.overworld().getBlockEntity(new BlockPos(52, up, 50))).replaceElement();
+			return null;
+		});
+		context.waitTicks(40);
+		check(read(server, 52, up, 50).contains("good"), "a new element should make the fuse good again: " + read(server, 52, up, 50));
+		context.takeScreenshot("wildcatter-fuse");
+		System.out.println("[wildcatter-test] fuse ok: " + blown);
 	}
 
 	/**

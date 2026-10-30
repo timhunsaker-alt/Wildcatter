@@ -3,6 +3,8 @@ package dev.wildcatter;
 import dev.wildcatter.block.BoilerBlock;
 import dev.wildcatter.block.BoilerBlockEntity;
 import dev.wildcatter.block.BreakerBlock;
+import dev.wildcatter.block.FuseBlock;
+import dev.wildcatter.block.FuseBlockEntity;
 import dev.wildcatter.block.BreakerBlockEntity;
 import dev.wildcatter.block.CableBlock;
 import dev.wildcatter.block.CasingBlock;
@@ -133,6 +135,8 @@ public final class WildcatterBlocks {
 
 	public static final Block BREAKER = block("breaker", props -> new BreakerBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(1.5F).sound(SoundType.METAL), Voltage.LOW));
+	/** One-shot protection: cheap, fast, and it has to be replaced after it blows. */
+	public static final Block FUSE = block("fuse", props -> new FuseBlock(props.mapColor(MapColor.COLOR_ORANGE).strength(1.0F).sound(SoundType.GLASS)));
 	/** For 4.16 kV and 138 kV hot lines. Same rules as the 110 V breaker, with ratings to suit the current. */
 	public static final Block MV_BREAKER = block("mv_breaker", props -> new BreakerBlock(props.mapColor(MapColor.COLOR_BLUE)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.MEDIUM));
@@ -157,6 +161,7 @@ public final class WildcatterBlocks {
 			PLASTIC_WIRE_HOT, PLASTIC_WIRE_NEUTRAL, MV_PLASTIC_WIRE_HOT, MV_PLASTIC_WIRE_NEUTRAL, HV_PLASTIC_WIRE_HOT, HV_PLASTIC_WIRE_NEUTRAL);
 	public static final BlockEntityType<LoadBlockEntity> LOAD_ENTITY = entity(LoadBlockEntity::new, ELECTRIC_LAMP, ELECTRIC_HEATER);
 	public static final BlockEntityType<BreakerBlockEntity> BREAKER_ENTITY = entity(BreakerBlockEntity::new, BREAKER, MV_BREAKER, HV_BREAKER);
+	public static final BlockEntityType<FuseBlockEntity> FUSE_ENTITY = entity(FuseBlockEntity::new, FUSE);
 	public static final BlockEntityType<TransformerBlockEntity> TRANSFORMER_ENTITY = entity(TransformerBlockEntity::new, TRANSFORMER, SUBSTATION_TRANSFORMER);
 
 	public static final BlockEntityType<FireboxBlockEntity> FIREBOX_ENTITY = entity(FireboxBlockEntity::new, FIREBOX);
@@ -229,6 +234,7 @@ public final class WildcatterBlocks {
 		add("pole", POLE);
 		add("crossarm", CROSSARM);
 		add("breaker", BREAKER);
+		add("fuse", FUSE);
 		add("mv_breaker", MV_BREAKER);
 		add("hv_breaker", HV_BREAKER);
 		add("transformer", TRANSFORMER);
@@ -248,6 +254,7 @@ public final class WildcatterBlocks {
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("wire"), WIRE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("load"), LOAD_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("breaker"), BREAKER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("fuse"), FUSE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("transformer"), TRANSFORMER_ENTITY);
 	}
 

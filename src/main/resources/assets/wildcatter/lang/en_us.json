@@ -32,6 +32,7 @@
   "block.wildcatter.ground_rod": "Ground Rod",
   "block.wildcatter.ground_wire": "Ground Wire",
   "block.wildcatter.breaker": "Circuit Breaker (110 V)",
+  "block.wildcatter.fuse": "Fuse (110 V)",
   "block.wildcatter.mv_breaker": "Circuit Breaker (4.16 kV)",
   "block.wildcatter.hv_breaker": "Circuit Breaker (138 kV)",
   "block.wildcatter.pole": "Utility Pole",

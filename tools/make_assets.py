@@ -214,6 +214,23 @@ tex("electric_heater_lit", heater(True))
 tex("breaker_body", breaker_body)
 
 
+def fuse_tube(blown):
+	def draw(img, d):
+		noise(img, (120, 70, 40) if not blown else (50, 40, 36), 6)
+		if not blown:
+			d.rectangle([0, 4, 15, 11], fill=(214, 220, 226, 255))
+			d.line([0, 8, 15, 8], fill=(190, 120, 70, 255))
+		else:
+			d.rectangle([0, 4, 15, 11], fill=(70, 66, 64, 255))
+			d.line([4, 8, 7, 8], fill=(40, 36, 34, 255))
+	return draw
+
+
+tex("fuse_tube", fuse_tube(False))
+tex("fuse_tube_blown", fuse_tube(True))
+tex("fuse_cap", plain((196, 130, 70)))
+
+
 def tinted_breaker(color):
 	def draw(img, d):
 		breaker_body(img, d)
@@ -364,7 +381,14 @@ for prefix, wide in (("", 0), ("mv_", 1), ("hv_", 2)):
 		save_json(f"{ASSETS}/models/block/{prefix}breaker_{position}.json", {
 			"textures": {"body": f"{ns}:block/{prefix}breaker_body", "lever": f"{ns}:block/breaker_lever_{position}", "particle": f"{ns}:block/{prefix}breaker_body"},
 			"elements": [cuboid([3 - wide, 0, 3 - wide], [13 + wide, top, 13 + wide], "#body"), lever_el]})
+for state, texname in (("good", "fuse_tube"), ("blown", "fuse_tube_blown")):
+	save_json(f"{ASSETS}/models/block/fuse_{state}.json", {"textures": {"tube": f"{ns}:block/{texname}", "cap": f"{ns}:block/fuse_cap", "particle": f"{ns}:block/fuse_cap"},
+		"elements": [cuboid([6, 6, 4], [10, 10, 12], "#tube"), cuboid([5, 5, 2], [11, 11, 4], "#cap"), cuboid([5, 5, 12], [11, 11, 14], "#cap"),
+			cuboid([7, 0, 7], [9, 6, 9], "#cap")]})
 rotations = {"north": 0, "east": 90, "south": 180, "west": 270}
+save_json(f"{ASSETS}/blockstates/fuse.json", {"variants": {
+	f"blown={blown},facing={facing}": {"model": f"{ns}:block/fuse_{'blown' if blown == 'true' else 'good'}", "y": y}
+	for facing, y in rotations.items() for blown in ("false", "true")}})
 for prefix in ("", "mv_", "hv_"):
 	save_json(f"{ASSETS}/blockstates/{prefix}breaker.json", {"variants": {
 		f"facing={facing},position={position}": {"model": f"{ns}:block/{prefix}breaker_{position}", "y": y}
@@ -451,7 +475,7 @@ WIRES = BARE_WIRES + WOOL_WIRES + PLASTIC_WIRES
 ITEM_MODELS = {"firebox": "block/firebox", "pump": "block/pump", "pipe": "block/pipe_inventory", "gas_line": "block/gas_line_inventory", "drilling_rig": "block/drilling_rig", "refinery": "block/refinery", "refinery_column": "block/refinery_column", "cooling_tower": "block/cooling_tower", "cooling_fill": "block/cooling_fill",
 	"diesel_engine": "block/diesel_engine", "gas_turbine": "block/gas_turbine", "pumpjack": "block/pumpjack",
 	"gas_wellhead": "block/gas_wellhead", "casing": "block/casing", "boiler": "block/boiler", "steam_turbine": "block/steam_turbine", "electric_lamp": "block/electric_lamp",
-	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "mv_breaker": "block/mv_breaker_on", "hv_breaker": "block/hv_breaker_on", "pole": "block/pole", "crossarm": "block/crossarm_x", "transformer": "block/transformer",
+	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "fuse": "block/fuse_good", "mv_breaker": "block/mv_breaker_on", "hv_breaker": "block/hv_breaker_on", "pole": "block/pole", "crossarm": "block/crossarm_x", "transformer": "block/transformer",
 	"substation_transformer": "block/substation_transformer", "ground_rod": "block/ground_rod",
 	"power_meter": "item/power_meter", "field_manual": "item/field_manual", "seismograph": "item/seismograph", "crude_oil_bucket": "item/crude_oil_bucket", "plastic_sheet": "item/plastic_sheet", "diesel_bucket": "item/diesel_bucket"}
 ITEM_MODELS.update({w: f"block/{w}_inventory" for w in WIRES})
@@ -495,6 +519,7 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 	"block.wildcatter.ground_rod": "Ground Rod",
 	"block.wildcatter.ground_wire": "Ground Wire",
 	"block.wildcatter.breaker": "Circuit Breaker (110 V)",
+	"block.wildcatter.fuse": "Fuse (110 V)",
 	"block.wildcatter.mv_breaker": "Circuit Breaker (4.16 kV)",
 	"block.wildcatter.hv_breaker": "Circuit Breaker (138 kV)",
 	"block.wildcatter.pole": "Utility Pole",
@@ -518,7 +543,7 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 })
 
 # ---- loot: every block drops itself ---------------------------------------------------------------
-BLOCKS = ("refinery", "refinery_column", "cooling_tower", "cooling_fill", "diesel_engine", "gas_turbine", "boiler", "firebox", "pipe", "gas_line", "drilling_rig", "pumpjack", "gas_wellhead", "pump", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "electric_heater", "breaker", "mv_breaker", "hv_breaker", "pole", "crossarm", "ground_rod") + WIRES
+BLOCKS = ("refinery", "refinery_column", "cooling_tower", "cooling_fill", "diesel_engine", "gas_turbine", "boiler", "firebox", "pipe", "gas_line", "drilling_rig", "pumpjack", "gas_wellhead", "pump", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "electric_heater", "breaker", "fuse", "mv_breaker", "hv_breaker", "pole", "crossarm", "ground_rod") + WIRES
 for name in BLOCKS:
 	save_json(f"{DATA}/loot_table/blocks/{name}.json", {
 		"type": "minecraft:block",
@@ -565,6 +590,7 @@ for role, dye in (("hot", "minecraft:red_dye"), ("neutral", "minecraft:black_dye
 	shapeless(f"hv_wire_{role}", ["minecraft:iron_ingot"] * 4 + ["minecraft:copper_ingot"] * 2 + [dye], f"hv_wire_{role}", 4)
 shaped("ground_rod", ["C", "C", "C"], {"C": "minecraft:copper_ingot"}, "ground_rod", 2)
 shapeless("ground_wire", [f"{ns}:wire_neutral", "minecraft:green_dye"], "ground_wire")
+shaped("fuse", ["GGG", "ICI", "GGG"], {"G": "minecraft:glass_pane", "I": "minecraft:iron_nugget", "C": "minecraft:copper_ingot"}, "fuse", 2)
 shaped("breaker", ["ICI", "IRI", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, "breaker")
 shaped("mv_breaker", ["IBI", "CRC", "IBI"], {"I": "minecraft:iron_ingot", "B": f"{ns}:breaker", "C": "minecraft:copper_ingot", "R": "minecraft:redstone_block"}, "mv_breaker")
 shaped("hv_breaker", ["DBD", "IRI", "DBD"], {"I": "minecraft:iron_block", "B": f"{ns}:mv_breaker", "D": "minecraft:diamond", "R": "minecraft:redstone_block"}, "hv_breaker")
