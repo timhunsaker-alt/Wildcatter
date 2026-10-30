@@ -173,6 +173,9 @@ public final class WildcatterBlocks {
 	public static final Block PLUG_NEMA_14_50 = plug("plug_nema_14_50", PlugType.NEMA_14_50);
 	public static final Block PLUG_CEE_7 = plug("plug_cee_7", PlugType.CEE_7);
 	public static final Block PLUG_IEC_60309_BLUE = plug("plug_iec_60309_blue", PlugType.IEC_60309_BLUE);
+	/** The distribution-tier under-frequency relay for feeders. */
+	public static final Block UFLS_RELAY_DIST = block("ufls_relay_dist", props -> new BreakerBlock(props.mapColor(MapColor.COLOR_PURPLE)
+			.strength(3.5F, 7.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.DISTRIBUTION, false, true));
 	/** One-shot protection: cheap, fast, and it has to be replaced after it blows. */
 	public static final Block FUSE = block("fuse", props -> new FuseBlock(props.mapColor(MapColor.COLOR_ORANGE).strength(1.0F).sound(SoundType.GLASS)));
 	/** For 4.16 kV and 138 kV hot lines. Same rules as the 110 V breaker, with ratings to suit the current. */
@@ -207,7 +210,7 @@ public final class WildcatterBlocks {
 			WOOL_WIRE_NEUTRAL, MV_WIRE_HOT, MV_WIRE_NEUTRAL, HV_WIRE_HOT, HV_WIRE_NEUTRAL,
 			PLASTIC_WIRE_HOT, PLASTIC_WIRE_NEUTRAL, MV_PLASTIC_WIRE_HOT, MV_PLASTIC_WIRE_NEUTRAL, HV_PLASTIC_WIRE_HOT, HV_PLASTIC_WIRE_NEUTRAL);
 	public static final BlockEntityType<LoadBlockEntity> LOAD_ENTITY = entity(LoadBlockEntity::new, ELECTRIC_LAMP, ELECTRIC_HEATER);
-	public static final BlockEntityType<BreakerBlockEntity> BREAKER_ENTITY = entity(BreakerBlockEntity::new, BREAKER, MV_BREAKER, DIST_BREAKER, HV_BREAKER, SWITCH, UFLS_RELAY);
+	public static final BlockEntityType<BreakerBlockEntity> BREAKER_ENTITY = entity(BreakerBlockEntity::new, BREAKER, MV_BREAKER, DIST_BREAKER, HV_BREAKER, SWITCH, UFLS_RELAY, UFLS_RELAY_DIST);
 	public static final BlockEntityType<FuseBlockEntity> FUSE_ENTITY = entity(FuseBlockEntity::new, FUSE, FUSED_CUTOUT);
 	public static final BlockEntityType<ReceptacleBlockEntity> RECEPTACLE_ENTITY = entity(ReceptacleBlockEntity::new, RECEPTACLE_NEMA_5_15, RECEPTACLE_NEMA_5_20, RECEPTACLE_NEMA_14_50, RECEPTACLE_CEE_7, RECEPTACLE_IEC_60309_BLUE);
 	public static final BlockEntityType<PlugAdapterBlockEntity> PLUG_ADAPTER_ENTITY = entity(PlugAdapterBlockEntity::new, PLUG_NEMA_5_15, PLUG_NEMA_5_20, PLUG_NEMA_14_50, PLUG_CEE_7, PLUG_IEC_60309_BLUE);
@@ -327,6 +330,7 @@ public final class WildcatterBlocks {
 		add("insulator_hv", INSULATOR_HV);
 		add("switch", SWITCH);
 		add("ufls_relay", UFLS_RELAY);
+		add("ufls_relay_dist", UFLS_RELAY_DIST);
 		add("mv_breaker", MV_BREAKER);
 		add("dist_breaker", DIST_BREAKER);
 		add("hv_breaker", HV_BREAKER);

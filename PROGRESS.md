@@ -113,6 +113,15 @@ All of them go in the hot wire: in at the back, out at the front. Sneak and righ
 - **Service drop**: a low voltage span pair (hot and neutral) from the pole transformer to the house. Not done: tying the neutral to earth at the house (the transformer neutral is tied at the pole).
 - Game test: feeder, cutout, pole transformer, a 7 block service drop and a house lamp that lights; the cutout blows (test shrinks its rating) and the house goes dark; a new link restores it.
 
+## Phase 2e and 2f: receptacles, plug adapters, feeder relays
+- **Receptacles and plug adapters** (NEMA 5-15, 5-20, 14-50; CEE 7; IEC 60309 blue): wire a receptacle, set the plug of the same type against it (it will not stay beside another type) and put an FE machine or cable beside the plug. The plug draws real current, as many watts as the attached machines demand (1 W = 1 FE/t, `wattsPerFe` in the config), has no protection, delivers nothing on the wrong voltage, and burns out with its receptacle after 30 s above 120 % of its rating. Two parts: `energy/EnergyBridge` + `HostEnergy` (plain Java) are the only meeting point with other mods.
+- **Not done:** the Team Reborn Energy adapter (no confirmed 26.3 build; nothing is registered by default, so plugs deliver to no one until an adapter registers), and the three-phase plugs (Phase 3).
+- **Under-Frequency Relay (DIST)** for 12.47 kV feeders: same behaviour as the low voltage relay.
+- Game test: a plug hands 923 FE/t (92k FE in 100 ticks) to a stand-in machine; a CEE 7 plug is refused beside a NEMA receptacle and delivers nothing on 120 V; a plug above its rating burns with its receptacle; the feeder relay sheds a pole transformer's overload at 59.0 Hz and the turbine stays on.
+
+## Phase 2 summary
+Distribution tier, insulators and spans, pole transformer, fused cutout, service drop, receptacles and plugs, feeder relays are all built and covered by the game test. Known gaps: span ampacity, 4.16 kV spans, conductor sizes, transformer impedance, neutral earthing at the house, flashover shattering path untested, Team Reborn adapter.
+
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.

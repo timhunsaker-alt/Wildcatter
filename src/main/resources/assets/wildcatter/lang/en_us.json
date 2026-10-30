@@ -36,6 +36,7 @@
   "block.wildcatter.switch": "Switch (LV)",
   "block.wildcatter.fused_cutout": "Fused Cutout (DIST)",
   "block.wildcatter.ufls_relay": "Under-Frequency Relay (LV)",
+  "block.wildcatter.ufls_relay_dist": "Under-Frequency Relay (DIST)",
   "block.wildcatter.mv_breaker": "Circuit Breaker (MV)",
   "block.wildcatter.dist_breaker": "Circuit Breaker (DIST)",
   "block.wildcatter.dist_wire_hot": "Bare Line, red (DIST)",

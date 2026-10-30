@@ -24,6 +24,7 @@
     "wildcatter:fused_cutout",
     "wildcatter:switch",
     "wildcatter:ufls_relay",
+    "wildcatter:ufls_relay_dist",
     "wildcatter:mv_breaker",
     "wildcatter:dist_breaker",
     "wildcatter:distribution_transformer",

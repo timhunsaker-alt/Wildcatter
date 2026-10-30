@@ -33,14 +33,14 @@ and the Field Manual has a page for each new system.
 - Dynamic frequency per island: inertia, governor droop, generator over/under-frequency trips.
 - Steel pipe replaces copper gas lines for oil and gas.
 
-## Phase 2 — Distribution and plugs — CURRENT
+## Phase 2 — Distribution and plugs — DONE
 - Distribution voltage (12.47 kV NA / 11 kV IEC); overhead lines as spans between rated insulators;
   functional poles with span limits.
 - Pole-mount transformer, fused cutout, service drop.
 - Receptacles and plug adapters (starting set in ELECTRICAL_MODEL.md) exporting FE to other mods.
 - Under-frequency load shedding relays on feeders.
 
-## Phase 3 — Three-phase industry
+## Phase 3 — Three-phase industry — NEXT (waiting for Tim's go-ahead; it wires the phasor solver into the blocks)
 - Three-phase LV service (480Y/277 and 208Y/120 NA; 400Y/230 IEC), pad-mount transformers.
 - Three-phase receptacles and plugs (L21-30, L22-30, IEC 60309 red).
 - Motor loads; pumps and pumpjacks become motors and stop drawing power when idle.

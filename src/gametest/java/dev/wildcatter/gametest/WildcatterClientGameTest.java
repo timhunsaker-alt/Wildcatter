@@ -60,6 +60,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			poleTransformer(context, server);
 			serviceDrop(context, server);
 			plugs(context, server);
+			feederRelay(context, server);
 			fieldManual(server);
 		}
 	}
@@ -1112,6 +1113,38 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		dev.wildcatter.energy.EnergyBridge.clear();
 		check(isAir(server, 14, up, z) && isAir(server, 13, up, z), "a plug held above its rating should burn out with its receptacle");
 		System.out.println("[wildcatter-test] plugs ok: " + plug + " | " + wrong + " | FE gained " + gained);
+	}
+
+	/** An under-frequency relay on a 12.47 kV feeder sheds a pole transformer's overload and keeps the generator on line. */
+	private void feederRelay(ClientGameTestContext context, TestServerContext server) {
+		int z = -140;
+		server.runCommand("fill 8 " + (y - 1) + " " + (z - 3) + " 24 " + (y + 5) + " " + (z + 4) + " minecraft:air");
+		server.runCommand("fill 8 " + (y - 1) + " " + (z - 3) + " 24 " + (y - 1) + " " + (z + 4) + " minecraft:stone");
+		plant(server, z);
+		put(server, 12, up, z, "wildcatter:wool_wire_hot");
+		put(server, 13, up, z, "wildcatter:transformer[facing=east]");
+		put(server, 14, up, z, "wildcatter:mv_wire_hot");
+		put(server, 15, up, z, "wildcatter:substation_transformer[facing=east]");
+		put(server, 16, up, z, "wildcatter:hv_wire_hot");
+		put(server, 17, up, z, "wildcatter:distribution_transformer[facing=west]");
+		put(server, 18, up, z, "wildcatter:dist_wire_hot");
+		put(server, 19, up, z, "wildcatter:ufls_relay_dist[facing=east]");
+		put(server, 20, up, z - 1, "wildcatter:pole");
+		put(server, 20, up, z, "wildcatter:pole_transformer[facing=west]");
+		put(server, 21, up, z, "wildcatter:electric_lamp");
+		context.waitTicks(120);
+		String quiet = read(server, 11, up, z);
+		check(quiet.matches(".*\\b(59\\.9|60\\.0|60\\.1) Hz.*"), "the feeder should sit at 60 Hz before the overload: " + quiet);
+		// three heaters (4.5 kW) behind the pole transformer overload the 2 kW turbine
+		put(server, 21, up, z, "wildcatter:electric_heater");
+		put(server, 20, up, z + 1, "wildcatter:electric_heater");
+		put(server, 20, y, z, "wildcatter:electric_heater");
+		context.waitTicks(80);
+		String relay = read(server, 19, up, z);
+		String turbine = read(server, 11, up, z);
+		check(relay.contains("TRIPPED") && relay.contains("under-frequency"), "the feeder relay should shed the overload: " + relay);
+		check(!turbine.contains("TRIPPED"), "with the feeder shed the turbine should stay on line: " + turbine);
+		System.out.println("[wildcatter-test] feeder relay ok: " + relay);
 	}
 
 	private void fieldManual(TestServerContext server) {
