@@ -258,7 +258,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		put(server, 53, up + 1, 50, "minecraft:air");
 		put(server, 53, up + 1, 51, "minecraft:air");
 		server.runCommand("item replace entity @p weapon.mainhand with minecraft:copper_ingot");
-		server.runCommand("tp @p 52 " + up + " 53 0 20");
+		server.runCommand("tp @p 52.5 " + (up + 3) + " 52.4 180 60");
 		context.waitTicks(10);
 		server.computeOnServer(srv -> {
 			((dev.wildcatter.block.FuseBlockEntity) srv.overworld().getBlockEntity(new BlockPos(52, up, 50))).replaceElement();
@@ -417,6 +417,28 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		String breaker = read(server, 71, up, 60);
 		check(breaker.contains("TRIPPED") && breaker.contains("4.16 kV"), "an MV breaker should trip on a short on the generator: " + breaker);
 		context.takeScreenshot("wildcatter-refinery");
+		// a pole line for the picture: two poles with crossarms, an MV breaker at the foot of one
+		server.runCommand("fill 84 " + (y - 1) + " 66 100 " + (y + 8) + " 76 minecraft:air");
+		server.runCommand("fill 84 " + (y - 1) + " 66 100 " + (y - 1) + " 76 minecraft:grass_block");
+		for (int px : new int[] {86, 96}) {
+			for (int h = 0; h < 6; h++) {
+				put(server, px, up + h, 70, "wildcatter:pole");
+			}
+			put(server, px, up + 6, 70, "wildcatter:crossarm[axis=z]");
+			put(server, px, up + 6, 69, "wildcatter:crossarm[axis=z]");
+			put(server, px, up + 6, 71, "wildcatter:crossarm[axis=z]");
+		}
+		for (int wx = 87; wx <= 95; wx++) {
+			put(server, wx, up + 7, 69, "wildcatter:hv_plastic_wire_hot");
+			put(server, wx, up + 7, 71, "wildcatter:hv_plastic_wire_neutral");
+		}
+		put(server, 88, up, 72, "wildcatter:mv_breaker[facing=east]");
+		put(server, 90, up, 72, "wildcatter:hv_breaker[facing=east]");
+		put(server, 92, up, 72, "wildcatter:breaker[facing=east]");
+		put(server, 94, up, 72, "wildcatter:fuse[facing=east]");
+		server.runCommand("tp @p 91 " + (up + 2) + " 79 180 -5");
+		context.waitTicks(20);
+		context.takeScreenshot("wildcatter-pole-line");
 		System.out.println("[wildcatter-test] refining ok: " + gen + " | " + refinery + " | " + wire + " | " + breaker);
 	}
 

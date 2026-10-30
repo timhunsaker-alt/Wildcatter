@@ -395,6 +395,7 @@ for prefix in ("", "mv_", "hv_"):
 		for facing, y in rotations.items() for position in ("on", "off", "tripped")}})
 
 # the pole: a thin post. The crossarm: a beam with two insulators.
+save_json(f"{ASSETS}/blockstates/pole.json", {"variants": {"": {"model": f"{ns}:block/pole"}}})
 save_json(f"{ASSETS}/models/block/pole.json", {"textures": {"wood": f"{ns}:block/pole", "particle": f"{ns}:block/pole"},
 	"elements": [cuboid([5, 0, 5], [11, 16, 11], "#wood")]})
 for axis, (lo, hi, ins) in {"x": ([0, 8, 6], [16, 12, 10], ([1, 12, 7], [3, 15, 9], [13, 12, 7], [15, 15, 9])),
