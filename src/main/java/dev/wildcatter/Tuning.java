@@ -57,6 +57,7 @@ public final class Tuning {
 	public static final double POLE_TRANSFORMER_VA = 25_000;     // a 25 kVA pole-top unit
 	public static final double POLE_TRANSFORMER_FAIL_SECONDS = 10.0;   // at 150 % of its rating it fails in this long
 	public static final double POLE_TRANSFORMER_COOL_SECONDS = 30.0;
+	public static final double RECEPTACLE_BURN_SECONDS = 30.0;  // sustained 120 % of the plug rating for this long burns the receptacle
 	public static final double UNCOOLED_EFFICIENCY = 0.75;
 	public static final double COOLING_FAN_WATTS = 750;
 	public static final int COOLING_FILL = 2;                 // fill sections a tower needs above its fan

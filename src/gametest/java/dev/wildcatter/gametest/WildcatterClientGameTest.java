@@ -59,6 +59,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			spans(context, server);
 			poleTransformer(context, server);
 			serviceDrop(context, server);
+			plugs(context, server);
 			fieldManual(server);
 		}
 	}
@@ -1047,6 +1048,70 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(100);
 		check(lit(server, 31, z), "with a new link the house should have power again: " + read(server, 19, up, z));
 		System.out.println("[wildcatter-test] service drop ok: " + hotSpan.message() + " | " + cutout + " | " + blown);
+	}
+
+	/** Receptacles and plugs: a matching plug delivers FE for the watts it draws, a wrong type does not fit, the wrong voltage delivers nothing, an overload burns it. */
+	private void plugs(ClientGameTestContext context, TestServerContext server) {
+		int z = -124;
+		server.runCommand("fill 8 " + y + " " + (z - 3) + " 22 " + (y + 5) + " " + (z + 4) + " minecraft:air");
+		plant(server, z);
+		put(server, 12, up, z, "wildcatter:wool_wire_hot");
+		for (int x = 11; x <= 13; x++) {
+			put(server, x, up, z + 1, "wildcatter:wool_wire_neutral");
+		}
+		put(server, 13, up, z, "wildcatter:receptacle_nema_5_15");
+		put(server, 14, up, z, "wildcatter:plug_nema_5_15");
+		put(server, 15, up, z, "minecraft:iron_block");        // stands in for another mod's machine: it takes 1000 FE per tick
+		java.util.concurrent.atomic.AtomicLong delivered = new java.util.concurrent.atomic.AtomicLong();
+		dev.wildcatter.energy.EnergyBridge.clear();
+		dev.wildcatter.energy.EnergyBridge.register(target -> target.level().getBlockState(target.pos()).is(net.minecraft.world.level.block.Blocks.IRON_BLOCK)
+				? new dev.wildcatter.energy.HostEnergy() {
+					@Override
+					public long demand() {
+						return 1000;
+					}
+
+					@Override
+					public long insert(long fe) {
+						delivered.addAndGet(fe);
+						return fe;
+					}
+				} : null);
+		server.runCommand("tp @p 14 " + (up + 1) + " " + (z + 5) + " 180 15");
+		context.waitTicks(160);
+		long before = delivered.get();
+		context.waitTicks(100);
+		long gained = delivered.get() - before;
+		String plug = read(server, 14, up, z);
+		check(plug.contains("delivering") && gained > 70_000 && gained < 120_000, "a matching plug should hand over about 1000 FE per tick (" + gained + " in 100 ticks): " + plug);
+		context.takeScreenshot("wildcatter-plug");
+		boolean mismatchFits = server.computeOnServer(srv -> dev.wildcatter.block.PlugAdapterBlock.fits(srv.overworld(), new BlockPos(14, up, z), dev.wildcatter.energy.PlugType.CEE_7));
+		boolean matchFits = server.computeOnServer(srv -> dev.wildcatter.block.PlugAdapterBlock.fits(srv.overworld(), new BlockPos(14, up, z), dev.wildcatter.energy.PlugType.NEMA_5_15));
+		check(!mismatchFits && matchFits, "a plug only fits a receptacle of its own type");
+
+		// a 230 V plug on a 120 V circuit delivers nothing
+		put(server, 14, up, z, "minecraft:air");
+		put(server, 13, up, z, "wildcatter:receptacle_cee_7");
+		put(server, 14, up, z, "wildcatter:plug_cee_7");
+		context.waitTicks(60);
+		long wrongBefore = delivered.get();
+		context.waitTicks(60);
+		String wrong = read(server, 14, up, z);
+		check(wrong.contains("WRONG VOLTAGE") && delivered.get() - wrongBefore < 1000, "a 230 V plug on a 120 V circuit should deliver nothing: " + wrong);
+
+		// an overload burns the plug and receptacle (the test shrinks the rating and the time)
+		put(server, 14, up, z, "minecraft:air");
+		put(server, 13, up, z, "wildcatter:receptacle_nema_5_15");
+		put(server, 14, up, z, "wildcatter:plug_nema_5_15");
+		context.waitTicks(40);
+		dev.wildcatter.block.PlugAdapterBlockEntity.testRatingScale = 0.2;
+		dev.wildcatter.block.PlugAdapterBlockEntity.testBurnSeconds = 1.5;
+		context.waitTicks(120);
+		dev.wildcatter.block.PlugAdapterBlockEntity.testRatingScale = null;
+		dev.wildcatter.block.PlugAdapterBlockEntity.testBurnSeconds = null;
+		dev.wildcatter.energy.EnergyBridge.clear();
+		check(isAir(server, 14, up, z) && isAir(server, 13, up, z), "a plug held above its rating should burn out with its receptacle");
+		System.out.println("[wildcatter-test] plugs ok: " + plug + " | " + wrong + " | FE gained " + gained);
 	}
 
 	private void fieldManual(TestServerContext server) {

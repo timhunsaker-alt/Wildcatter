@@ -468,6 +468,42 @@ for tier, metal in (("lv", COPPER), ("dist", (178, 164, 150)), ("hv", STEEL_WIRE
 	tex(f"conductor_spool_{tier}", spool_icon(metal, False), kind="item")
 	tex(f"covered_conductor_spool_{tier}", spool_icon(metal, True), kind="item")
 
+# ---- receptacles and plug adapters ----------------------------------------------------------------------------
+PLUG_COLORS = {"nema_5_15": (238, 238, 232), "nema_5_20": (200, 60, 50), "nema_14_50": (46, 46, 52), "cee_7": (246, 246, 246), "iec_60309_blue": (40, 92, 204)}
+PLUG_LABELS = {"nema_5_15": "NEMA 5-15 (120 V, 15 A)", "nema_5_20": "NEMA 5-20 (120 V, 20 A)", "nema_14_50": "NEMA 14-50 (120/240 V, 50 A)",
+	"cee_7": "CEE 7 Schuko (230 V, 16 A)", "iec_60309_blue": "IEC 60309 blue (230 V, 32 A)"}
+
+
+def socket_face(color):
+	def draw(img, d):
+		noise(img, color, 5)
+		d.rectangle([0, 0, 15, 15], outline=tuple(max(0, c - 60) for c in color))
+		dark = (30, 30, 34)
+		d.rectangle([4, 5, 5, 10], fill=dark)
+		d.rectangle([10, 5, 11, 10], fill=dark)
+		d.rectangle([7, 11, 8, 13], fill=dark)
+	return draw
+
+
+def plug_face(color):
+	def draw(img, d):
+		noise(img, tuple(max(0, c - 70) for c in color), 5)
+		d.rectangle([0, 0, 15, 15], outline=(20, 20, 24))
+		prong = (200, 200, 206)
+		d.rectangle([4, 4, 5, 9], fill=prong)
+		d.rectangle([10, 4, 11, 9], fill=prong)
+		d.rectangle([7, 10, 8, 12], fill=prong)
+	return draw
+
+
+for pid, color in PLUG_COLORS.items():
+	tex(f"receptacle_{pid}", socket_face(color))
+	tex(f"plug_{pid}", plug_face(color))
+	save_json(f"{ASSETS}/models/block/receptacle_{pid}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"{ns}:block/receptacle_{pid}"}, "elements": [cuboid([3, 3, 3], [13, 13, 13], "#all")]})
+	save_json(f"{ASSETS}/models/block/plug_{pid}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"{ns}:block/plug_{pid}"}, "elements": [cuboid([4, 4, 4], [12, 12, 12], "#all")]})
+	save_json(f"{ASSETS}/blockstates/receptacle_{pid}.json", {"variants": {"": {"model": f"{ns}:block/receptacle_{pid}"}}})
+	save_json(f"{ASSETS}/blockstates/plug_{pid}.json", {"variants": {"": {"model": f"{ns}:block/plug_{pid}"}}})
+
 # Wire: a thin core with an arm toward each joined neighbour. Wool wire has four wear stages.
 arms = {"north": {}, "east": {"y": 90}, "south": {"y": 180}, "west": {"y": 270}, "up": {"x": 270}, "down": {"x": 90}}
 
@@ -546,7 +582,7 @@ ITEM_MODELS = {"firebox": "block/firebox", "pump": "block/pump", "pipe": "block/
 	"gas_wellhead": "block/gas_wellhead", "casing": "block/casing", "boiler": "block/boiler", "steam_turbine": "block/steam_turbine", "electric_lamp": "block/electric_lamp",
 	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "fuse": "block/fuse_good", "fused_cutout": "block/cutout_good", "dist_breaker": "block/dist_breaker_on", "distribution_transformer": "block/distribution_transformer", "pole_transformer": "block/pole_transformer", "switch": "block/switch_on", "ufls_relay": "block/relay_on", "mv_breaker": "block/mv_breaker_on", "hv_breaker": "block/hv_breaker_on", "pole": "block/pole", "crossarm": "block/crossarm_x", "transformer": "block/transformer",
 	"substation_transformer": "block/substation_transformer", "ground_rod": "block/ground_rod",
-	"power_meter": "item/power_meter", "field_manual": "item/field_manual", "seismograph": "item/seismograph", "crude_oil_bucket": "item/crude_oil_bucket", "plastic_sheet": "item/plastic_sheet", "diesel_bucket": "item/diesel_bucket", "steel_ingot": "item/steel_ingot", "conductor_spool_lv": "item/conductor_spool_lv", "conductor_spool_dist": "item/conductor_spool_dist", "conductor_spool_hv": "item/conductor_spool_hv", "covered_conductor_spool_lv": "item/covered_conductor_spool_lv", "covered_conductor_spool_dist": "item/covered_conductor_spool_dist", "covered_conductor_spool_hv": "item/covered_conductor_spool_hv", "insulator_lv": "block/insulator_lv_a", "insulator_dist": "block/insulator_dist_a", "insulator_hv": "block/insulator_hv_a"}
+	"power_meter": "item/power_meter", "field_manual": "item/field_manual", "seismograph": "item/seismograph", "crude_oil_bucket": "item/crude_oil_bucket", "plastic_sheet": "item/plastic_sheet", "diesel_bucket": "item/diesel_bucket", "steel_ingot": "item/steel_ingot", "conductor_spool_lv": "item/conductor_spool_lv", "conductor_spool_dist": "item/conductor_spool_dist", "conductor_spool_hv": "item/conductor_spool_hv", "covered_conductor_spool_lv": "item/covered_conductor_spool_lv", "covered_conductor_spool_dist": "item/covered_conductor_spool_dist", "covered_conductor_spool_hv": "item/covered_conductor_spool_hv", "insulator_lv": "block/insulator_lv_a", **{f"receptacle_{p}": f"block/receptacle_{p}" for p in PLUG_COLORS}, **{f"plug_{p}": f"block/plug_{p}" for p in PLUG_COLORS}, "insulator_dist": "block/insulator_dist_a", "insulator_hv": "block/insulator_hv_a"}
 ITEM_MODELS.update({w: f"block/{w}_inventory" for w in WIRES})
 for name, model in ITEM_MODELS.items():
 	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:{model}"}})
@@ -610,6 +646,8 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 	"item.wildcatter.covered_conductor_spool_lv": "Covered Conductor Spool (LV)",
 	"item.wildcatter.covered_conductor_spool_dist": "Covered Conductor Spool (DIST)",
 	"item.wildcatter.covered_conductor_spool_hv": "Covered Conductor Spool (HV)",
+	**{f"block.wildcatter.receptacle_{p}": f"Receptacle {PLUG_LABELS[p]}" for p in PLUG_COLORS},
+	**{f"block.wildcatter.plug_{p}": f"Plug Adapter {PLUG_LABELS[p]}" for p in PLUG_COLORS},
 	"block.wildcatter.pole": "Utility Pole",
 	"block.wildcatter.crossarm": "Pole Crossarm",
 	"block.wildcatter.electric_lamp": "Electric Lamp (60 W)",
@@ -632,7 +670,7 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 })
 
 # ---- loot: every block drops itself ---------------------------------------------------------------
-BLOCKS = ("refinery", "refinery_column", "cooling_tower", "cooling_fill", "diesel_engine", "gas_turbine", "boiler", "firebox", "pipe", "gas_line", "drilling_rig", "pumpjack", "gas_wellhead", "pump", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "electric_heater", "breaker", "fuse", "fused_cutout", "switch", "ufls_relay", "mv_breaker", "dist_breaker", "distribution_transformer", "pole_transformer", "hv_breaker", "pole", "crossarm", "insulator_lv", "insulator_dist", "insulator_hv", "ground_rod") + WIRES
+BLOCKS = ("refinery", "refinery_column", "cooling_tower", "cooling_fill", "diesel_engine", "gas_turbine", "boiler", "firebox", "pipe", "gas_line", "drilling_rig", "pumpjack", "gas_wellhead", "pump", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "electric_heater", "breaker", "fuse", "fused_cutout", "switch", "ufls_relay", "mv_breaker", "dist_breaker", "distribution_transformer", "pole_transformer", "hv_breaker", "pole", "crossarm", "insulator_lv", "insulator_dist", "insulator_hv", "ground_rod") + tuple(f"receptacle_{p}" for p in PLUG_COLORS) + tuple(f"plug_{p}" for p in PLUG_COLORS) + WIRES
 for name in BLOCKS:
 	save_json(f"{DATA}/loot_table/blocks/{name}.json", {
 		"type": "minecraft:block",
@@ -696,6 +734,9 @@ for tier, wire, sheets in (("lv", "wire_hot", 1), ("dist", "dist_wire_hot", 2), 
 shaped("insulator_lv", ["B", "N"], {"B": "minecraft:brick", "N": "minecraft:iron_nugget"}, "insulator_lv", 2)
 shaped("insulator_dist", ["B", "B", "N"], {"B": "minecraft:brick", "N": "minecraft:iron_nugget"}, "insulator_dist", 2)
 shaped("insulator_hv", ["BBB", "BNB", "BIB"], {"B": "minecraft:brick", "N": "minecraft:iron_nugget", "I": "minecraft:iron_ingot"}, "insulator_hv", 2)
+for pid, dye, copper in (("nema_5_15", "minecraft:white_dye", 1), ("nema_5_20", "minecraft:red_dye", 1), ("nema_14_50", "minecraft:black_dye", 2), ("cee_7", "minecraft:yellow_dye", 1), ("iec_60309_blue", "minecraft:blue_dye", 2)):
+	shapeless(f"receptacle_{pid}", ["minecraft:iron_ingot"] + ["minecraft:copper_ingot"] * copper + [dye], f"receptacle_{pid}", 2)
+	shapeless(f"plug_{pid}", [f"{ns}:receptacle_{pid}", "minecraft:redstone", "minecraft:iron_ingot"], f"plug_{pid}")
 shaped("pole", ["L", "L", "L"], {"L": "#minecraft:logs"}, "pole", 3)
 shaped("crossarm", ["PPP", " N "], {"P": "#minecraft:planks", "N": "minecraft:iron_nugget"}, "crossarm", 2)
 shaped("transformer", ["ICI", "ICI", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot"}, "transformer")

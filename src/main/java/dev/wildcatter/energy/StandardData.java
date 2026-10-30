@@ -56,12 +56,25 @@ public class StandardData extends SavedData {
 		}
 	}
 
+	/** FE per tick that one watt is worth: {@code wattsPerFe} in the config, default 1 (1 W = 1 FE/t). */
+	private static double configWattsPerFe() {
+		java.nio.file.Path file = FabricLoader.getInstance().getConfigDir().resolve("wildcatter.properties");
+		try (java.io.InputStream in = java.nio.file.Files.newInputStream(file)) {
+			java.util.Properties props = new java.util.Properties();
+			props.load(in);
+			return Double.parseDouble(props.getProperty("wattsPerFe", "1.0").trim());
+		} catch (java.io.IOException | NumberFormatException e) {
+			return 1.0;
+		}
+	}
+
 	/** Reads (or fixes) the world's standard and makes it the active one. Call when the server has started. */
 	public static ElectricalStandard apply(MinecraftServer server) {
 		StandardData data = server.overworld().getDataStorage().computeIfAbsent(TYPE);
 		data.setDirty();
 		ElectricalStandard.setPending(null);
 		ElectricalStandard.setActive(data.standard);
+		EnergyBridge.setWattsPerFe(configWattsPerFe());
 		Wildcatter.LOGGER.info("Electrical standard: {} ({} Hz)", data.standard.displayName(), data.standard.hertz());
 		return data.standard;
 	}

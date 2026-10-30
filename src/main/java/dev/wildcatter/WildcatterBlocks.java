@@ -5,6 +5,11 @@ import dev.wildcatter.block.BoilerBlockEntity;
 import dev.wildcatter.block.BreakerBlock;
 import dev.wildcatter.block.FuseBlock;
 import dev.wildcatter.block.InsulatorBlock;
+import dev.wildcatter.block.PlugAdapterBlock;
+import dev.wildcatter.block.PlugAdapterBlockEntity;
+import dev.wildcatter.block.ReceptacleBlock;
+import dev.wildcatter.block.ReceptacleBlockEntity;
+import dev.wildcatter.energy.PlugType;
 import dev.wildcatter.block.InsulatorBlockEntity;
 import dev.wildcatter.block.FuseBlockEntity;
 import dev.wildcatter.block.BreakerBlockEntity;
@@ -157,6 +162,17 @@ public final class WildcatterBlocks {
 			.strength(1.0F).sound(SoundType.GLASS).noOcclusion(), Voltage.DISTRIBUTION));
 	public static final Block INSULATOR_HV = block("insulator_hv", props -> new InsulatorBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
 			.strength(1.5F).sound(SoundType.GLASS).noOcclusion(), Voltage.HIGH));
+	/** Receptacles and the plug adapters that fit them, one pair per type. */
+	public static final Block RECEPTACLE_NEMA_5_15 = receptacle("receptacle_nema_5_15", PlugType.NEMA_5_15);
+	public static final Block RECEPTACLE_NEMA_5_20 = receptacle("receptacle_nema_5_20", PlugType.NEMA_5_20);
+	public static final Block RECEPTACLE_NEMA_14_50 = receptacle("receptacle_nema_14_50", PlugType.NEMA_14_50);
+	public static final Block RECEPTACLE_CEE_7 = receptacle("receptacle_cee_7", PlugType.CEE_7);
+	public static final Block RECEPTACLE_IEC_60309_BLUE = receptacle("receptacle_iec_60309_blue", PlugType.IEC_60309_BLUE);
+	public static final Block PLUG_NEMA_5_15 = plug("plug_nema_5_15", PlugType.NEMA_5_15);
+	public static final Block PLUG_NEMA_5_20 = plug("plug_nema_5_20", PlugType.NEMA_5_20);
+	public static final Block PLUG_NEMA_14_50 = plug("plug_nema_14_50", PlugType.NEMA_14_50);
+	public static final Block PLUG_CEE_7 = plug("plug_cee_7", PlugType.CEE_7);
+	public static final Block PLUG_IEC_60309_BLUE = plug("plug_iec_60309_blue", PlugType.IEC_60309_BLUE);
 	/** One-shot protection: cheap, fast, and it has to be replaced after it blows. */
 	public static final Block FUSE = block("fuse", props -> new FuseBlock(props.mapColor(MapColor.COLOR_ORANGE).strength(1.0F).sound(SoundType.GLASS)));
 	/** For 4.16 kV and 138 kV hot lines. Same rules as the 110 V breaker, with ratings to suit the current. */
@@ -193,6 +209,8 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<LoadBlockEntity> LOAD_ENTITY = entity(LoadBlockEntity::new, ELECTRIC_LAMP, ELECTRIC_HEATER);
 	public static final BlockEntityType<BreakerBlockEntity> BREAKER_ENTITY = entity(BreakerBlockEntity::new, BREAKER, MV_BREAKER, DIST_BREAKER, HV_BREAKER, SWITCH, UFLS_RELAY);
 	public static final BlockEntityType<FuseBlockEntity> FUSE_ENTITY = entity(FuseBlockEntity::new, FUSE, FUSED_CUTOUT);
+	public static final BlockEntityType<ReceptacleBlockEntity> RECEPTACLE_ENTITY = entity(ReceptacleBlockEntity::new, RECEPTACLE_NEMA_5_15, RECEPTACLE_NEMA_5_20, RECEPTACLE_NEMA_14_50, RECEPTACLE_CEE_7, RECEPTACLE_IEC_60309_BLUE);
+	public static final BlockEntityType<PlugAdapterBlockEntity> PLUG_ADAPTER_ENTITY = entity(PlugAdapterBlockEntity::new, PLUG_NEMA_5_15, PLUG_NEMA_5_20, PLUG_NEMA_14_50, PLUG_CEE_7, PLUG_IEC_60309_BLUE);
 	public static final BlockEntityType<InsulatorBlockEntity> INSULATOR_ENTITY = entity(InsulatorBlockEntity::new, INSULATOR_LV, INSULATOR_DIST, INSULATOR_HV);
 	public static final BlockEntityType<TransformerBlockEntity> TRANSFORMER_ENTITY = entity(TransformerBlockEntity::new, TRANSFORMER, SUBSTATION_TRANSFORMER, DISTRIBUTION_TRANSFORMER, POLE_TRANSFORMER);
 
@@ -208,6 +226,34 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<EngineBlockEntity> ENGINE_ENTITY = entity(EngineBlockEntity::new, DIESEL_ENGINE, GAS_TURBINE);
 
 	private WildcatterBlocks() {
+	}
+
+	public static Block receptacleFor(PlugType type) {
+		return switch (type) {
+			case NEMA_5_15 -> RECEPTACLE_NEMA_5_15;
+			case NEMA_5_20 -> RECEPTACLE_NEMA_5_20;
+			case NEMA_14_50 -> RECEPTACLE_NEMA_14_50;
+			case CEE_7 -> RECEPTACLE_CEE_7;
+			case IEC_60309_BLUE -> RECEPTACLE_IEC_60309_BLUE;
+		};
+	}
+
+	public static Block plugFor(PlugType type) {
+		return switch (type) {
+			case NEMA_5_15 -> PLUG_NEMA_5_15;
+			case NEMA_5_20 -> PLUG_NEMA_5_20;
+			case NEMA_14_50 -> PLUG_NEMA_14_50;
+			case CEE_7 -> PLUG_CEE_7;
+			case IEC_60309_BLUE -> PLUG_IEC_60309_BLUE;
+		};
+	}
+
+	private static Block receptacle(String name, PlugType type) {
+		return block(name, props -> new ReceptacleBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY).strength(1.0F).sound(SoundType.METAL).noOcclusion(), type));
+	}
+
+	private static Block plug(String name, PlugType type) {
+		return block(name, props -> new PlugAdapterBlock(props.mapColor(MapColor.COLOR_BLACK).strength(1.0F).sound(SoundType.METAL).noOcclusion(), type));
 	}
 
 	private static Block cable(String name, Voltage voltage, Conductor role, boolean wool) {
@@ -270,6 +316,10 @@ public final class WildcatterBlocks {
 		add("pole", POLE);
 		add("crossarm", CROSSARM);
 		add("breaker", BREAKER);
+		for (PlugType type : PlugType.values()) {
+			add("receptacle_" + type.id(), receptacleFor(type));
+			add("plug_" + type.id(), plugFor(type));
+		}
 		add("fuse", FUSE);
 		add("fused_cutout", FUSED_CUTOUT);
 		add("insulator_lv", INSULATOR_LV);
@@ -300,6 +350,8 @@ public final class WildcatterBlocks {
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("load"), LOAD_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("breaker"), BREAKER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("fuse"), FUSE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("receptacle"), RECEPTACLE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("plug_adapter"), PLUG_ADAPTER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("insulator"), INSULATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("transformer"), TRANSFORMER_ENTITY);
 	}

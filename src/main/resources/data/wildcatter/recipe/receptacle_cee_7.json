@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:iron_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:yellow_dye"
+  ],
+  "result": {
+    "id": "wildcatter:receptacle_cee_7",
+    "count": 2
+  }
+}
