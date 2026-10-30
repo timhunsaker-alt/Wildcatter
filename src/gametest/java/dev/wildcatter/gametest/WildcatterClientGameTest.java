@@ -226,6 +226,25 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(before - after <= 4, "with the drain, the boiler should get its condensate back: " + before + " -> " + after);
 		context.takeScreenshot("wildcatter-pump-and-pipes");
 		System.out.println("[wildcatter-test] steam loop ok: " + pump + " | " + tank + " | " + drain + " | boiler water " + before + " -> " + after);
+
+		// The cooling tower, built from small parts: a fan on top of the turbine (powered through it), two fill blocks on the fan,
+		// and a pipe taking the fan to the drain.
+		check(drain.contains("NO COOLING TOWER"), "a turbine without a tower should say so: " + drain);
+		put(server, 51, up + 1, 50, "wildcatter:cooling_tower");
+		put(server, 51, up + 1, 49, "wildcatter:pipe");
+		put(server, 51, up + 2, 50, "wildcatter:cooling_fill");
+		context.waitTicks(60);
+		check(read(server, 51, up + 1, 50).contains("needs 2 fill"), "a fan with one fill section is not a tower: " + read(server, 51, up + 1, 50));
+		put(server, 51, up + 3, 50, "wildcatter:cooling_fill");
+		context.waitTicks(80);
+		String fan = read(server, 51, up + 1, 50);
+		String cooled = read(server, 51, up, 50);
+		check(fan.contains("COOLING"), "a powered fan with two fill sections should be cooling: " + fan);
+		check(cooled.contains("condensate cooled"), "the turbine should know its condensate is cooled: " + cooled);
+		server.runCommand("tp @p 53 " + (up + 3) + " 56 180 20");
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-cooling-tower");
+		System.out.println("[wildcatter-test] cooling ok: " + fan + " | " + cooled);
 	}
 
 	/**

@@ -320,7 +320,7 @@ save_json(f"{ASSETS}/blockstates/firebox.json", {"variants": {
 	"lit=false": {"model": f"{ns}:block/firebox"}, "lit=true": {"model": f"{ns}:block/firebox_lit"}}})
 block_model("pump", "minecraft:block/cube_all", {"all": f"{ns}:block/pump"})
 save_json(f"{ASSETS}/blockstates/pump.json", {"variants": {"": {"model": f"{ns}:block/pump"}}})
-for cube in ("drilling_rig", "pumpjack", "gas_wellhead", "casing", "refinery", "refinery_column"):
+for cube in ("drilling_rig", "pumpjack", "gas_wellhead", "casing", "refinery", "refinery_column", "cooling_tower", "cooling_fill"):
 	block_model(cube, "minecraft:block/cube_all", {"all": f"{ns}:block/{cube}"})
 	save_json(f"{ASSETS}/blockstates/{cube}.json", {"variants": {"": {"model": f"{ns}:block/{cube}"}}})
 for engine in ("diesel_engine", "gas_turbine"):
@@ -448,7 +448,7 @@ save_json(f"{ASSETS}/blockstates/gas_line.json", {"multipart": [{"apply": {"mode
 
 # ---- items --------------------------------------------------------------------------------------------
 WIRES = BARE_WIRES + WOOL_WIRES + PLASTIC_WIRES
-ITEM_MODELS = {"firebox": "block/firebox", "pump": "block/pump", "pipe": "block/pipe_inventory", "gas_line": "block/gas_line_inventory", "drilling_rig": "block/drilling_rig", "refinery": "block/refinery", "refinery_column": "block/refinery_column",
+ITEM_MODELS = {"firebox": "block/firebox", "pump": "block/pump", "pipe": "block/pipe_inventory", "gas_line": "block/gas_line_inventory", "drilling_rig": "block/drilling_rig", "refinery": "block/refinery", "refinery_column": "block/refinery_column", "cooling_tower": "block/cooling_tower", "cooling_fill": "block/cooling_fill",
 	"diesel_engine": "block/diesel_engine", "gas_turbine": "block/gas_turbine", "pumpjack": "block/pumpjack",
 	"gas_wellhead": "block/gas_wellhead", "casing": "block/casing", "boiler": "block/boiler", "steam_turbine": "block/steam_turbine", "electric_lamp": "block/electric_lamp",
 	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "mv_breaker": "block/mv_breaker_on", "hv_breaker": "block/hv_breaker_on", "pole": "block/pole", "crossarm": "block/crossarm_x", "transformer": "block/transformer",
@@ -471,6 +471,8 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 	"block.wildcatter.casing": "Well Casing",
 	"block.wildcatter.refinery": "Refinery Base (110 V)",
 	"block.wildcatter.refinery_column": "Distillation Column",
+	"block.wildcatter.cooling_tower": "Cooling Tower Fan (110 V)",
+	"block.wildcatter.cooling_fill": "Cooling Tower Fill",
 	"block.wildcatter.diesel_engine": "Diesel Engine (110 V)",
 	"block.wildcatter.gas_turbine": "Gas Turbine (110 V)",
 	"block.wildcatter.plastic_wire_hot": "Plastic Hot Wire (110 V)",
@@ -516,7 +518,7 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 })
 
 # ---- loot: every block drops itself ---------------------------------------------------------------
-BLOCKS = ("refinery", "refinery_column", "diesel_engine", "gas_turbine", "boiler", "firebox", "pipe", "gas_line", "drilling_rig", "pumpjack", "gas_wellhead", "pump", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "electric_heater", "breaker", "mv_breaker", "hv_breaker", "pole", "crossarm", "ground_rod") + WIRES
+BLOCKS = ("refinery", "refinery_column", "cooling_tower", "cooling_fill", "diesel_engine", "gas_turbine", "boiler", "firebox", "pipe", "gas_line", "drilling_rig", "pumpjack", "gas_wellhead", "pump", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "electric_heater", "breaker", "mv_breaker", "hv_breaker", "pole", "crossarm", "ground_rod") + WIRES
 for name in BLOCKS:
 	save_json(f"{DATA}/loot_table/blocks/{name}.json", {
 		"type": "minecraft:block",
@@ -526,7 +528,7 @@ for name in BLOCKS:
 save_json(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json", {"values": [f"{ns}:{n}" for n in BLOCKS + ("casing",) if n not in ("pole", "crossarm")]})
 save_json(f"{ROOT}/data/minecraft/tags/block/mineable/axe.json", {"values": [f"{ns}:pole", f"{ns}:crossarm"]})
 save_json(f"{ROOT}/data/minecraft/tags/block/climbable.json", {"values": [f"{ns}:pole"]})
-save_json(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json", {"values": [f"{ns}:{n}" for n in ("boiler", "firebox", "mv_breaker", "hv_breaker", "pump", "drilling_rig", "pumpjack", "gas_wellhead", "refinery", "refinery_column", "diesel_engine", "gas_turbine", "steam_turbine", "transformer", "substation_transformer")]})
+save_json(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json", {"values": [f"{ns}:{n}" for n in ("boiler", "firebox", "mv_breaker", "hv_breaker", "pump", "drilling_rig", "pumpjack", "gas_wellhead", "refinery", "refinery_column", "cooling_tower", "cooling_fill", "diesel_engine", "gas_turbine", "steam_turbine", "transformer", "substation_transformer")]})
 
 # ---- recipes (early game: iron, copper, redstone, glass, dye, wool) ----------------------------------------
 def shaped(name, pattern, key, result, count=1):
@@ -549,6 +551,8 @@ shaped("pumpjack", ["III", "CPC", "IRI"], {"I": "minecraft:iron_ingot", "C": "mi
 shaped("gas_wellhead", ["III", "CBC", "III"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "B": "minecraft:iron_block"}, "gas_wellhead")
 shaped("seismograph", ["IPI", "RCR", "III"], {"I": "minecraft:iron_ingot", "P": "minecraft:paper", "R": "minecraft:redstone", "C": "minecraft:compass"}, "seismograph")
 shaped("refinery", ["IPI", "CBC", "III"], {"I": "minecraft:iron_ingot", "P": "minecraft:copper_ingot", "C": "minecraft:cauldron", "B": "minecraft:blast_furnace"}, "refinery")
+shaped("cooling_tower", ["IBI", "CFC", "III"], {"I": "minecraft:iron_ingot", "B": "minecraft:iron_bars", "C": "minecraft:copper_ingot", "F": "minecraft:blast_furnace"}, "cooling_tower")
+shaped("cooling_fill", ["IBI", "IBI", "IBI"], {"I": "minecraft:iron_ingot", "B": "minecraft:iron_bars"}, "cooling_fill", 2)
 shaped("refinery_column", ["ICI", "ICI", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot"}, "refinery_column")
 shaped("diesel_engine", ["IPI", "CFC", "IRI"], {"I": "minecraft:iron_ingot", "P": "minecraft:piston", "C": "minecraft:copper_ingot", "F": "minecraft:furnace", "R": "minecraft:redstone"}, "diesel_engine")
 shaped("gas_turbine", ["IDI", "CRC", "IDI"], {"I": "minecraft:iron_ingot", "D": "minecraft:diamond", "C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, "gas_turbine")

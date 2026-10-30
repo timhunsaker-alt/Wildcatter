@@ -39,6 +39,10 @@ public final class Tuning {
 	public static final int PIPE_NETWORK_LIMIT = 512;
 	/** Share of the steam a turbine uses that comes back as water through its drain. The rest is lost, so a loop needs some makeup. */
 	public static final double CONDENSATE_RETURN = 0.9;
+	/** Steam turbines need more steam for the same power when their condensate is not cooled (back pressure). */
+	public static final double UNCOOLED_EFFICIENCY = 0.75;
+	public static final double COOLING_FAN_WATTS = 750;
+	public static final int COOLING_FILL = 2;                 // fill sections a tower needs above its fan
 	public static final double DRAIN_TANK = 100;              // water a drain can hold before it spills
 
 	// ---- Oil and gas wells -------------------------------------------------------------------------------------------

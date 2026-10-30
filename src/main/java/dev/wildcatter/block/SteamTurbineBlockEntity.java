@@ -53,6 +53,8 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 	/** Water condensed from the steam used, waiting to go out through the drain. */
 	private double drainWater;
 	private boolean drained;
+	/** A cooling tower on the drain's pipes is running. Without one the turbine needs more steam per joule. */
+	private boolean cooled;
 
 	public SteamTurbineBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.STEAM_TURBINE_ENTITY, pos, state);
@@ -139,12 +141,13 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 		double watts = turbine.isMaster ? turbine.sumWatts(level) : turbine.watts();
 		turbine.cubeWatts = watts;
 		double joules = watts / 20.0;
-		int wanted = (int) Math.ceil(joules / Tuning.JOULES_PER_STEAM);
+		double perSteam = Tuning.JOULES_PER_STEAM * (turbine.cooled ? 1.0 : Tuning.UNCOOLED_EFFICIENCY);
+		int wanted = (int) Math.ceil(joules / perSteam);
 		double share = 1.0;
 		if (wanted > 0) {
 			int got = turbine.draw(level, wanted);
 			turbine.drainWater = Math.min(Tuning.DRAIN_TANK, turbine.drainWater + got * Tuning.CONDENSATE_RETURN / Tuning.STEAM_PER_WATER);
-			share = Math.min(1.0, got / (joules / Tuning.JOULES_PER_STEAM));
+			share = Math.min(1.0, got / (joules / perSteam));
 			turbine.idleTicks = 0;
 		} else {
 			turbine.idleTicks = Math.min(turbine.idleTicks + 1, 100);
@@ -180,6 +183,10 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 		}
 		Set<BlockPos> pipes = Plumbing.network(level, cells);
 		drained = !pipes.isEmpty();
+		cooled = false;
+		for (CoolingTowerBlockEntity tower : Plumbing.machines(level, cells, pipes, false, CoolingTowerBlockEntity.class)) {
+			cooled |= tower.isCooling();
+		}
 		if (drainWater >= 1) {
 			if (drained) {
 				drainWater -= Plumbing.deliver(Plumbing.boilers(level, cells, pipes, false), (int) drainWater);
@@ -313,7 +320,8 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 		if (r == null) {
 			return Component.literal("Steam turbine: its generator has lost its master");
 		}
-		String drain = r.drained ? ", drain connected" : ", no drain pipe (condensate is lost)";
+		String drain = (r.drained ? ", drain connected" : ", no drain pipe (condensate is lost)")
+				+ (r.cooled ? ", condensate cooled" : ", NO COOLING TOWER (needs " + Math.round(100 / Tuning.UNCOOLED_EFFICIENCY - 100) + "% more steam)");
 		String starved = r.satisfaction < 0.98 ? ", STARVED of steam (" + Math.round(r.satisfaction * 100) + "%)" : "";
 		if (master != null) {
 			return Component.literal("Medium voltage generator (27 turbines, 4.16 kV): " + String.format("%.0f V, %.0f W of %.0f W", volts, r.cubeWatts,

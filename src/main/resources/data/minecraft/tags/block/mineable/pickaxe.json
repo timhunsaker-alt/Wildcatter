@@ -2,6 +2,8 @@
   "values": [
     "wildcatter:refinery",
     "wildcatter:refinery_column",
+    "wildcatter:cooling_tower",
+    "wildcatter:cooling_fill",
     "wildcatter:diesel_engine",
     "wildcatter:gas_turbine",
     "wildcatter:boiler",

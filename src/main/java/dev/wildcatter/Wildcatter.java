@@ -39,7 +39,7 @@ public class Wildcatter implements ModInitializer {
 					WildcatterBlocks.ELECTRIC_LAMP, WildcatterBlocks.ELECTRIC_HEATER,
 					WildcatterBlocks.FIREBOX, WildcatterBlocks.PIPE, WildcatterBlocks.PUMP, WildcatterBlocks.GAS_LINE,
 					WildcatterBlocks.DRILLING_RIG, WildcatterBlocks.CASING, WildcatterBlocks.PUMPJACK, WildcatterBlocks.GAS_WELLHEAD,
-					WildcatterBlocks.REFINERY, WildcatterBlocks.REFINERY_COLUMN, WildcatterBlocks.DIESEL_ENGINE, WildcatterBlocks.GAS_TURBINE,
+					WildcatterBlocks.REFINERY, WildcatterBlocks.REFINERY_COLUMN, WildcatterBlocks.COOLING_TOWER, WildcatterBlocks.COOLING_FILL, WildcatterBlocks.DIESEL_ENGINE, WildcatterBlocks.GAS_TURBINE,
 					WildcatterBlocks.PLASTIC_WIRE_HOT, WildcatterBlocks.PLASTIC_WIRE_NEUTRAL, WildcatterBlocks.MV_PLASTIC_WIRE_HOT,
 					WildcatterBlocks.MV_PLASTIC_WIRE_NEUTRAL, WildcatterBlocks.HV_PLASTIC_WIRE_HOT, WildcatterBlocks.HV_PLASTIC_WIRE_NEUTRAL}) {
 				entries.accept(block);

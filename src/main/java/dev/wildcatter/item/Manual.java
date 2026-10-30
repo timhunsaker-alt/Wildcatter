@@ -112,7 +112,9 @@ public final class Manual {
 						+ "POLES: stack UTILITY POLES and put a CROSSARM on top. Its insulators hold the lines apart. A bare 4.16 kV line shocks within " + (int) Tuning.BARE_REACH_MEDIUM + " blocks, 138 kV within " + (int) Tuning.BARE_REACH_HIGH
 						+ ": hang them higher than that above where anyone walks. Poles can be climbed, which puts you next to the line. Or use plastic-insulated line.",
 
-				"COMING\n\nCooling towers: hot condensate will have to be cooled.\nFuses, switches and panels.\n\nThis book will grow as they do."
+				"COOLING TOWER\n\nA steam turbine hands its waste heat to the condensate in its drain. Without cooling, back pressure means it needs " + Math.round(100 / Tuning.UNCOOLED_EFFICIENCY - 100) + "% more steam for the same power.\n\nBuild a tower from small parts: put a COOLING FAN (" + Math.round(Tuning.COOLING_FAN_WATTS) + " W, 110 V) where it touches your water pipes, and stack " + Tuning.COOLING_FILL + " COOLING FILL sections on top. It only cools while the fan has power. Click the turbine to see if it is cooled.",
+
+				"COMING\n\nFuses, switches and panels.\n\nThis book will grow as they do."
 		);
 	}
 

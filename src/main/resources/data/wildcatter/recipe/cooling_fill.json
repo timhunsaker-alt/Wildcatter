@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IBI",
+    "IBI",
+    "IBI"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "B": "minecraft:iron_bars"
+  },
+  "result": {
+    "id": "wildcatter:cooling_fill",
+    "count": 2
+  }
+}

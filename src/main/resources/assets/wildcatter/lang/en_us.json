@@ -8,6 +8,8 @@
   "block.wildcatter.casing": "Well Casing",
   "block.wildcatter.refinery": "Refinery Base (110 V)",
   "block.wildcatter.refinery_column": "Distillation Column",
+  "block.wildcatter.cooling_tower": "Cooling Tower Fan (110 V)",
+  "block.wildcatter.cooling_fill": "Cooling Tower Fill",
   "block.wildcatter.diesel_engine": "Diesel Engine (110 V)",
   "block.wildcatter.gas_turbine": "Gas Turbine (110 V)",
   "block.wildcatter.plastic_wire_hot": "Plastic Hot Wire (110 V)",

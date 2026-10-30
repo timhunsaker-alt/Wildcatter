@@ -11,6 +11,9 @@ import dev.wildcatter.block.PoleBlock;
 import dev.wildcatter.block.ColumnBlock;
 import dev.wildcatter.block.EngineBlock;
 import dev.wildcatter.block.EngineBlockEntity;
+import dev.wildcatter.block.CoolingFillBlock;
+import dev.wildcatter.block.CoolingTowerBlock;
+import dev.wildcatter.block.CoolingTowerBlockEntity;
 import dev.wildcatter.block.RefineryBlock;
 import dev.wildcatter.block.RefineryBlockEntity;
 import dev.wildcatter.block.DrillingRigBlock;
@@ -85,6 +88,11 @@ public final class WildcatterBlocks {
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
 	public static final Block REFINERY_COLUMN = block("refinery_column", props -> new ColumnBlock(props.mapColor(MapColor.METAL)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+	/** A fan base plus two fill sections make a cooling tower: it cools the condensate of turbines on the same water pipes. */
+	public static final Block COOLING_TOWER = block("cooling_tower", props -> new CoolingTowerBlock(props.mapColor(MapColor.STONE)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+	public static final Block COOLING_FILL = block("cooling_fill", props -> new CoolingFillBlock(props.mapColor(MapColor.STONE)
+			.strength(2.0F, 4.0F).sound(SoundType.STONE).requiresCorrectToolForDrops()));
 	/** Each is a small 110 V set; eight of one kind in a 2x2x2 cube make a 4.16 kV generator. */
 	public static final Block DIESEL_ENGINE = block("diesel_engine", props -> new EngineBlock(props.mapColor(MapColor.COLOR_GREEN)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), EngineBlock.Fuel.DIESEL));
@@ -159,6 +167,7 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<GasWellheadBlockEntity> GAS_WELLHEAD_ENTITY = entity(GasWellheadBlockEntity::new, GAS_WELLHEAD);
 
 	public static final BlockEntityType<RefineryBlockEntity> REFINERY_ENTITY = entity(RefineryBlockEntity::new, REFINERY);
+	public static final BlockEntityType<CoolingTowerBlockEntity> COOLING_TOWER_ENTITY = entity(CoolingTowerBlockEntity::new, COOLING_TOWER);
 	public static final BlockEntityType<EngineBlockEntity> ENGINE_ENTITY = entity(EngineBlockEntity::new, DIESEL_ENGINE, GAS_TURBINE);
 
 	private WildcatterBlocks() {
@@ -197,6 +206,8 @@ public final class WildcatterBlocks {
 		add("gas_wellhead", GAS_WELLHEAD);
 		add("refinery", REFINERY);
 		add("refinery_column", REFINERY_COLUMN);
+		add("cooling_tower", COOLING_TOWER);
+		add("cooling_fill", COOLING_FILL);
 		add("diesel_engine", DIESEL_ENGINE);
 		add("gas_turbine", GAS_TURBINE);
 		add("plastic_wire_hot", PLASTIC_WIRE_HOT);
@@ -232,6 +243,7 @@ public final class WildcatterBlocks {
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("pumpjack"), PUMPJACK_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("gas_wellhead"), GAS_WELLHEAD_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("refinery"), REFINERY_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("cooling_tower"), COOLING_TOWER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("engine"), ENGINE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("wire"), WIRE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("load"), LOAD_ENTITY);
