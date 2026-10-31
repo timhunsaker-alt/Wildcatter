@@ -36,6 +36,10 @@ public class SeismographItem extends Item {
 	public static String report(ServerLevel level, double x, double z) {
 		long seed = ReservoirData.seed(level);
 		Reservoir here = Reservoir.at(seed, (int) Math.floor(x), (int) Math.floor(z));
+		if (here != null && here.deep()) {
+			return "DEEP ECHO: you are standing over a deep field about " + Math.round(here.radius() * 2) + " blocks across. Its top is at y="
+					+ here.topY() + ", too deep for the small rig: it needs a land rig.";
+		}
 		if (here != null) {
 			return "STRONG ECHO: you are standing over a field about " + Math.round(here.radius() * 2) + " blocks across. Its top is at y="
 					+ here.topY() + ". Worth a drill here.";
@@ -48,6 +52,6 @@ public class SeismographItem extends Item {
 		double angle = Math.toDegrees(Math.atan2(near.centerZ() - z, near.centerX() - x));
 		String direction = COMPASS[(int) Math.floorMod(Math.round(angle / 45.0), 8L)];
 		String strength = distance < 24 ? "Strong" : distance < 56 ? "Fair" : "Faint";
-		return strength + " echo from the " + direction + ", about " + Math.round(distance) + " blocks to its edge. Walk that way and thump again.";
+		return (near.deep() ? "Deep " + strength.toLowerCase() : strength) + " echo from the " + direction + ", about " + Math.round(distance) + " blocks to its edge. Walk that way and thump again.";
 	}
 }

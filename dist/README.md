@@ -15,7 +15,8 @@ Put the jar in your instance's `mods` folder next to:
 - The gensets, the steam plant, the cooling tower, the substation yard, the generator step-up transformer, the overhead line (wood
   poles, crossarms, insulators, H-frames), the pole transformer, the pad-mounts, the unit substation, the motor control center, the
   boiler and starter turbine, the drilling rig, the pumpjack and the wellheads are built at their real size (1 block = 1 m). The
-  pumpjack's beam rocks and the rig's drill pipe turns while they work. Breakers, receptacles, lamps and heaters are drawn at
+  pumpjack's beam rocks and the rig's drill pipe turns while they work. A late-game 1,000 hp land rig, fed 4.16 kV, is the only
+  rig that reaches the new deep fields; well casing can't be broken. Breakers, receptacles, lamps and heaters are drawn at
   their real size and mount on the wall, floor or ceiling you click. Overhead spans are measured at 1 m per block.
 - The Field Manual item explains how to build each machine.
 

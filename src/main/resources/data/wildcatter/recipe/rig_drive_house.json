@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SSS",
+    "CRC",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_ingot",
+    "R": "minecraft:redstone_block"
+  },
+  "result": {
+    "id": "wildcatter:rig_drive_house",
+    "count": 1
+  }
+}

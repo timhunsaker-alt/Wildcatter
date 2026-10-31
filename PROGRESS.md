@@ -407,6 +407,35 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   wellhead); the motor, MCC and starter scenes use true-size pumpjacks; the steam loop checks the turbine and pump turning.
 - **Next (4.5h):** the full land rig, a machine of distinct parts with new power numbers; its spec comes to Tim first.
 
+## Phase 4.5h: the land rig and deep fields
+- **Spec:** docs/multiblocks/land-rig.md (approved with the plan, 2026-10-31): a 1,000 hp AC land rig, fed 4.16 kV.
+- **Parts** (`RigPartBlock`, laid out by `LandRig`): the substructure (9 × 6 × 9, the controller, the hole under its rotary
+  table), the 43 m mast and the 1,000 hp drawworks on its floor, two 1,000 hp triplex mud pumps, 60 m³ mud tanks and the drive
+  house (a 2,500 kVA 4.16 kV / 600 V rig transformer and the drives) on the ground. Each part snaps into its place when clicked
+  on the floor or on the ground within 16 blocks; the substructure's readout names what is missing. The top drive (250-ton,
+  400 hp) is an item clicked into the mast.
+- **Electrical:** the drive house is a `DriveLoad`: a balanced 4.16 kV load at PF 0.95 drawing 1.9 MW drilling, 850 kW in a
+  connection, 100 kW idle. Its power management keeps the island at 59.5 Hz (99.2 %) or above, picking load up at 10 % a second
+  and shedding it at once; below 90 % voltage the drives stop. On the test's 500 kW set it settled near 190 kW at 59.4 Hz and
+  drilled at about 10 % of full rate, the set running throughout.
+- **Drilling:** 4 ticks a block at full power (five times the small rig), a 15 s connection after each 27 m stand, 80 L of mud
+  water a metre from its 60,000 L tanks (a pump on water pipe fills them; with none it stops: NO MUD). No depth limit. On a
+  strike it sets the wellhead in its cellar: WELL COMPLETE.
+- **Deep fields:** a second field grid (128-block cells, half with a field, radius 16 to 24, tops y -58 to -50; oil 0.4 to
+  1 million units, gas 1 to 2.5 million). Shallow fields are unchanged. The seismograph reads DEEP ECHO. The small rig now stops
+  110 m down: TOO DEEP.
+- **Added while building:** `cable_mv`, a 4.16 kV three-phase cable (the 4.16 kV tier had only single wires), and, at Tim's
+  request, unbreakable well casing (cemented steel, like bedrock: a miner who meets it knows it is a well; the fields are not
+  blocks, so mining near a well takes nothing).
+- **Moving parts:** the top drive and its quill turn at 120 rpm and ride down the mast through each stand, back up in a
+  connection; the stand turns below them; the drawworks drum turns in a connection; each pump's sheave and bull wheel turn
+  while it pumps.
+- **Models:** `land_rig.py` (six parts, five rotors). No Ludo credits.
+- **Game tests:** new scene `landRig` (built by clicks, the readout naming missing parts, the top drive clicked in, a starter
+  plant's pump filling the tanks, 4.16 kV from a 500 kW set through a backward unit substation, power-limited drilling with the
+  frequency held and the set on line, the top drive turning on the client, NO MUD, a pump taken away unbuilds it, a connection,
+  the strike and its wellhead, casing to the deep field, DEEP ECHO); `wells` checks a small rig stopping TOO DEEP.
+
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.
@@ -415,7 +444,12 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
-- Phase 4.5: the full land rig is wave 4.5h. The refinery waits for Phase 5. The single-pole MV, DIST and HV breakers, the DIST under-frequency relay and the unrated `transformer` and `substation_transformer` stay one-block stand-ins (decided with Tim, until Phase 6).
+- Phase 4.5 is complete with 4.5h. The refinery waits for Phase 5.
+- The land rig's power limit works on frequency, so on a small set it holds back well below the set's rating until the
+  frequency control catches up (30 s); a real rig's power management also reads the gensets' kW.
+- The land rig's motors are inside the drive house's load: there are no cables drawn from the drive house to the pumps and
+  drawworks.
+- There is no blowout preventer stack in the cellar yet. The single-pole MV, DIST and HV breakers, the DIST under-frequency relay and the unrated `transformer` and `substation_transformer` stay one-block stand-ins (decided with Tim, until Phase 6).
 - Wall-mounted gear sits 0.55 m up its cell; a player wanting it higher places it a block up.
 - The pumpjack's crude tank stands in for a flowline and stock tank until Phase 5.
 - Pumpjack and rig collision is the still frame: the moving beam, crank and pipe do not push anything.

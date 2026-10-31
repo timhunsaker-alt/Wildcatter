@@ -83,6 +83,7 @@ public class PipeBlock extends Block {
 		}
 		return kind == Kind.WATER
 				? block instanceof BoilerBlock || block instanceof SteamTurbineBlock || block instanceof PumpBlock || block instanceof TowerBasinBlock
+						|| block instanceof RigPartBlock rig && rig.part() == RigPartBlock.Part.MUD_TANKS
 						|| block instanceof SteamPlantPartBlock plant && plant.part() == SteamPlantPartBlock.Part.CONDENSER
 				: block instanceof GasWellheadBlock gas && neighbour.getValue(gas.piece()) == 0 || block instanceof OilWellheadBlock || block instanceof FireboxBlock
 						|| block instanceof RefineryBlock

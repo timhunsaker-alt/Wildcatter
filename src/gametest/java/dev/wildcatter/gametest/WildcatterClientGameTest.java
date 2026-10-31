@@ -142,6 +142,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("buildingGear")) {
 				buildingGear(context, server);
 			}
+			if (only("landRig")) {
+				landRig(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -395,7 +398,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		search:
 		for (long seed = 1; seed < 2_000_000; seed++) {
 			Reservoir oil = Reservoir.at(seed, rx + 7, rz);   // under the rig's hole
-			if (oil == null || oil.kind() != Reservoir.Kind.OIL || oil.topY() > -42) {
+			if (oil == null || oil.deep() || oil.kind() != Reservoir.Kind.OIL || oil.topY() > -42) {
 				continue;
 			}
 			for (int x = 20; x <= 60; x += 2) {
@@ -415,7 +418,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		final int fgx = gx, fgz = gz;
 		final long seed = found;
 		try {
-			String echo = server.computeOnServer(srv -> SeismographItem.report(srv.overworld(), rx + 0.5, rz + 0.5));
+			String echo = server.computeOnServer(srv -> SeismographItem.report(srv.overworld(), rx + 7.5, rz + 0.5));   // over the hole
 			check(echo.contains("STRONG ECHO"), "a seismograph over a field should hear it: " + echo);
 			String far = server.computeOnServer(srv -> SeismographItem.report(srv.overworld(), fgx + 300.5, fgz + 300.5));
 			check(far.contains("echo") || far.contains("solid rock"), "a seismograph should say something anywhere: " + far);
@@ -461,6 +464,18 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			check(itemsNear(server, hole, WildcatterBlocks.DRILLING_RIG) == 1, "the rig should drop as its item when it rigs down");
 			check(server.computeOnServer(srv -> srv.overworld().getBlockState(new BlockPos(hx, topY, rz)).is(WildcatterBlocks.CASING)),
 					"the hole should be cased down to the field");
+			// the small rig reaches 110 m: one already that deep stops TOO DEEP (a second rig south of the pole, its box on the pole's cable)
+			BlockPos deepRig = new BlockPos(rx, top + 1, rz + 6);
+			placeBig(server, WildcatterBlocks.DRILLING_RIG, deepRig, net.minecraft.core.Direction.SOUTH);
+			server.computeOnServer(srv -> {
+				((dev.wildcatter.block.DrillingRigBlockEntity) srv.overworld().getBlockEntity(deepRig)).testDepth(Tuning.SMALL_RIG_MAX_DEPTH);
+				return null;
+			});
+			context.waitTicks(120);
+			String tooDeep = read(server, deepRig.getX(), deepRig.getY(), deepRig.getZ());
+			check(tooDeep.contains("TOO DEEP"), "a small rig " + Tuning.SMALL_RIG_MAX_DEPTH + " m down should stop: " + tooDeep);
+			server.computeOnServer(srv -> srv.overworld().destroyBlock(deepRig, false));
+			context.waitTicks(5);
 			// a pumpjack clicked on the wellhead from the west snaps over it, facing east; the short cable gives way to its terminal
 			// box, which the pole's cable then feeds directly
 			put(server, rx + 1, top + 1, rz, "minecraft:air");
@@ -2165,6 +2180,159 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 
 	private dev.wildcatter.block.TurbineGeneratorBlockEntity plantAt(net.minecraft.server.MinecraftServer srv, BlockPos at) {
 		return (dev.wildcatter.block.TurbineGeneratorBlockEntity) srv.overworld().getBlockEntity(at);
+	}
+
+	/**
+	 * The 1,000 hp land rig (docs/multiblocks/land-rig.md) on a pad 45 m up, over a deep oil field: built part by part by clicks,
+	 * the readout naming what is missing; the top drive clicked into the mast; a 120 V starter plant's pump filling the mud tanks;
+	 * a 500 kW diesel set through a unit substation run backward to 4.16 kV, up an MV cable to the drive house. Far short of the
+	 * rig's 1.9 MW, the drives power-limit and the set keeps running; the rig drills, makes a connection, strikes and sets an oil
+	 * wellhead in its cellar. Taking a mud pump away unbuilds it, and with no water it stops for mud.
+	 */
+	private void landRig(ClientGameTestContext context, TestServerContext server) {
+		int hx = 30, hz = -440;
+		int pad = up + 45;
+		BlockPos hole = new BlockPos(hx, pad + 1, hz);
+		long seed = -1;
+		for (long s = 1; s < 3_000_000 && seed < 0; s++) {
+			Reservoir field = Reservoir.at(s, hx, hz);
+			if (field != null && field.deep() && field.kind() == Reservoir.Kind.OIL && hole.getY() - field.topY() > Tuning.LAND_RIG_STAND_BLOCKS + 3) {
+				seed = s;
+			}
+		}
+		check(seed >= 0, "no seed puts a deep oil field under the land rig");
+		ReservoirData.testSeed = seed;
+		final long found = seed;
+		try {
+			server.runCommand("effect give @p minecraft:slow_falling 600 0 true");   // the pad is 45 m up: a fall would kill the player and unload the genset
+			server.runCommand("tp @p " + hx + " " + (up + 2) + " " + (hz + 14) + " 180 0");   // so the scene's chunks are loaded before it is built
+			context.waitTicks(40);
+			server.runCommand("kill @e[type=item]");
+			server.runCommand("fill 0 " + (y - 1) + " -452 47 " + (y - 1) + " -424 minecraft:stone");
+			server.runCommand("fill 0 " + y + " -452 47 " + (y + 6) + " -424 minecraft:air");
+			server.runCommand("fill 20 " + pad + " -448 47 " + pad + " -426 minecraft:stone");
+			String echo = server.computeOnServer(srv -> SeismographItem.report(srv.overworld(), hx + 0.5, hz + 0.5));
+			check(echo.contains("DEEP ECHO"), "a seismograph over a deep field should say so: " + echo);
+			// the substructure first: clicked on the pad from the north, looking south, it faces north over the hole
+			BlockPos origin = new BlockPos(hx - 4, pad + 1, hz - 4);
+			check(placeOn(server, WildcatterBlocks.RIG_SUBSTRUCTURE, origin.below(), hx - 4 + 0.5, hz - 7 + 0.5, 0.0F), "the substructure should place");
+			check(stateAt(server, origin).is(WildcatterBlocks.RIG_SUBSTRUCTURE) && stateAt(server, origin).getValue(dev.wildcatter.block.RigPartBlock.FACING) == net.minecraft.core.Direction.NORTH,
+					"the substructure should face north: " + stateAt(server, origin));
+			context.waitTicks(25);
+			check(read(server, origin.getX(), origin.getY(), origin.getZ()).contains("NOT BUILT: needs the"), "alone it should name what it needs: " + read(server, origin.getX(), origin.getY(), origin.getZ()));
+			// each part clicked somewhere on the floor or the pad snaps into its place
+			BlockPos floor = new BlockPos(hx + 3, pad + 6, hz - 3);
+			check(placeOn(server, WildcatterBlocks.RIG_MAST, floor, hx + 3.5, hz - 2.5, 0.0F), "the mast should place on the floor");
+			check(placeOn(server, WildcatterBlocks.RIG_DRAWWORKS, floor, hx + 3.5, hz - 2.5, 0.0F), "the drawworks should place on the floor");
+			BlockPos ground = new BlockPos(hx + 2, pad, hz + 12);
+			for (net.minecraft.world.level.block.Block part : new net.minecraft.world.level.block.Block[] {WildcatterBlocks.MUD_TANKS, WildcatterBlocks.MUD_PUMP,
+					WildcatterBlocks.MUD_PUMP, WildcatterBlocks.RIG_DRIVE_HOUSE}) {
+				check(placeOn(server, part, ground, hx + 2.5, hz + 12.5, 180.0F), part.getName().getString() + " should place near the rig");
+			}
+			check(stateAt(server, new BlockPos(hx - 1, pad + 7, hz - 1)).is(WildcatterBlocks.RIG_MAST), "the mast should have snapped over the hole");
+			check(stateAt(server, new BlockPos(hx + 10, pad + 1, hz)).is(WildcatterBlocks.MUD_PUMP), "the second pump should have gone to its own place");
+			check(stateAt(server, new BlockPos(hx - 6, pad + 1, hz + 7)).is(WildcatterBlocks.RIG_DRIVE_HOUSE), "the drive house should be behind the rig");
+			context.waitTicks(25);
+			String noDrive = read(server, origin.getX(), origin.getY(), origin.getZ());
+			check(noDrive.contains("NO TOP DRIVE"), "built, it should ask for its top drive: " + noDrive);
+			check(clickWith(server, new BlockPos(hx - 1, pad + 20, hz - 1), net.minecraft.core.Direction.WEST, new ItemStack(WildcatterItems.TOP_DRIVE)), "the top drive should go into the mast");
+			// a ledge to watch from, south-west of the rig (the player must not fall: the genset far below only runs near a player)
+			// (near enough that the rig, its pumps and the genset all keep ticking)
+			server.runCommand("fill " + (hx - 12) + " " + (pad + 14) + " " + (hz + 18) + " " + (hx - 8) + " " + (pad + 14) + " " + (hz + 22) + " minecraft:stone");
+			server.runCommand("tp @p " + (hx - 10) + " " + (pad + 15) + " " + (hz + 20) + " -150 -25");
+			// water: a 120 V starter plant runs a pump from a pond, its pipe to the mud tanks' east side
+			put(server, 42, pad, hz + 9, "minecraft:campfire[lit=true]");
+			put(server, 42, pad + 1, hz + 9, "wildcatter:boiler");
+			put(server, 41, pad + 1, hz + 9, "wildcatter:steam_turbine");
+			put(server, 40, pad + 1, hz + 9, "wildcatter:wool_wire_hot");
+			put(server, 39, pad + 1, hz + 9, "wildcatter:pump");
+			for (int x = 39; x <= 41; x++) {
+				put(server, x, pad + 1, hz + 10, "wildcatter:wool_wire_neutral");
+			}
+			put(server, 37, pad + 1, hz + 9, "minecraft:stone");
+			put(server, 38, pad + 1, hz + 8, "minecraft:stone");
+			put(server, 38, pad + 1, hz + 10, "minecraft:stone");
+			put(server, 38, pad + 2, hz + 9, "minecraft:stone");
+			put(server, 38, pad + 1, hz + 9, "minecraft:water");
+			for (int z = hz + 8; z >= hz + 6; z--) {
+				put(server, 39, pad + 1, z, "wildcatter:pipe");
+			}
+			server.computeOnServer(srv -> ((BoilerBlockEntity) srv.overworld().getBlockEntity(new BlockPos(42, pad + 1, hz + 9))).addWater(4000));
+			// power: a 500 kW diesel set, a unit substation run backward to 4.16 kV, and MV cable up to the drive house's west end
+			BlockPos set = new BlockPos(10, up, hz + 7);
+			genset(server, set, net.minecraft.core.Direction.NORTH, false);
+			inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, set, net.minecraft.core.Direction.EAST, false);
+			for (int x = 15; x <= hx - 7; x++) {
+				put(server, x, up, hz + 7, "wildcatter:cable_mv");
+			}
+			for (int h = up + 1; h <= pad + 1; h++) {
+				put(server, hx - 7, h, hz + 7, "wildcatter:cable_mv");
+			}
+			startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 1000);
+			context.waitTicks(100);
+			String filling = read(server, origin.getX(), origin.getY(), origin.getZ());
+			check(filling.matches(".*mud water [1-9]\\d* of.*"), "the pump should be filling the mud tanks: " + filling + " | " + stateAt(server, origin) + " | pump " + read(server, 39, pad + 1, hz + 9));
+			server.computeOnServer(srv -> {
+				rig(srv, origin).testWater(Tuning.LAND_RIG_MUD_TANK);   // topped up so the test need not wait the 75 s a full fill takes
+				rig(srv, origin).toggle();   // the driller's console: drill
+				return null;
+			});
+			context.waitTicks(300);
+			String drilling = read(server, origin.getX(), origin.getY(), origin.getZ());
+			String gen = read(server, set.getX(), set.getY(), set.getZ());
+			check(drilling.contains("drilling at") && drilling.contains("POWER LIMITED"), "on 500 kW the rig should drill power-limited: " + drilling);
+			check(gen.contains("RUNNING") && gen.contains("breaker CLOSED"), "the power limit should keep the genset on line: " + gen);
+			java.util.regex.Matcher hz1 = java.util.regex.Pattern.compile("([0-9.]+) Hz").matcher(drilling);
+			check(hz1.find() && Double.parseDouble(hz1.group(1)) > 59.0, "the frequency should be held up: " + drilling);
+			float topRpm = context.computeOnClient(client -> client.level.getBlockEntity(origin) instanceof dev.wildcatter.block.RigSubstructureBlockEntity r ? r.spin().rpm() : -1F);
+			check(Math.abs(topRpm - Tuning.TOP_DRIVE_RPM) < 1, "the client should see the top drive turning at 120 rpm: " + topRpm);
+			context.takeScreenshot("wildcatter-land-rig");
+			// with no water it stops for mud; with a mud pump gone it is not built
+			server.computeOnServer(srv -> {
+				rig(srv, origin).testWater(0);
+				return null;
+			});
+			context.waitTicks(5);
+			String noMud = read(server, origin.getX(), origin.getY(), origin.getZ());
+			check(noMud.contains("NO MUD"), "with no water it should stop for mud: " + noMud);
+			server.computeOnServer(srv -> {
+				rig(srv, origin).testWater(Tuning.LAND_RIG_MUD_TANK);
+				srv.overworld().destroyBlock(new BlockPos(hx + 10, pad + 1, hz), false);
+				return null;
+			});
+			context.waitTicks(30);
+			String unbuilt = read(server, origin.getX(), origin.getY(), origin.getZ());
+			check(unbuilt.contains("NOT BUILT") && unbuilt.contains("mud pump"), "with a mud pump gone it should stop: " + unbuilt);
+			check(placeOn(server, WildcatterBlocks.MUD_PUMP, ground, hx + 2.5, hz + 12.5, 180.0F), "the pump should go back in its place");
+			// on to the field: a connection at 27 m, then the strike
+			boolean connected = false;
+			for (int waited = 0; waited < 4000; waited += 20) {
+				String now = read(server, origin.getX(), origin.getY(), origin.getZ());
+				connected |= now.contains("making a connection");
+				if (now.contains("WELL COMPLETE")) {
+					break;
+				}
+				context.waitTicks(20);
+			}
+			String done = read(server, origin.getX(), origin.getY(), origin.getZ());
+			check(connected, "the rig should have made a connection after its first 27 m stand");
+			check(done.contains("WELL COMPLETE") && stateAt(server, hole).is(WildcatterBlocks.OIL_WELLHEAD), "the rig should strike the deep oil and set a wellhead in its cellar: " + done);
+			int topY = Reservoir.at(found, hx, hz).topY();
+			check(stateAt(server, new BlockPos(hx, topY, hz)).is(WildcatterBlocks.CASING), "the hole should be cased down to the deep field");
+			System.out.println("[wildcatter-test] land rig ok: " + echo + " | " + drilling + " | " + done + " | " + gen);
+		} finally {
+			server.runCommand("effect clear @p minecraft:slow_falling");
+			ReservoirData.testSeed = null;
+		}
+	}
+
+	private dev.wildcatter.block.RigSubstructureBlockEntity rig(net.minecraft.server.MinecraftServer srv, BlockPos origin) {
+		net.minecraft.world.level.block.entity.BlockEntity entity = srv.overworld().getBlockEntity(origin);
+		if (!(entity instanceof dev.wildcatter.block.RigSubstructureBlockEntity rig)) {
+			throw new AssertionError("no rig at " + origin + ": " + srv.overworld().getBlockState(origin) + " owner " + dev.wildcatter.multiblock.BigParts.owner(srv.overworld(), origin)
+					+ " entity " + entity + " via owner " + dev.wildcatter.multiblock.BigParts.entity(srv.overworld(), origin));
+		}
+		return rig;
 	}
 
 	/**

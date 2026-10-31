@@ -639,7 +639,7 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 	"block.wildcatter.pump": "Water Pump (LV)",
 	"block.wildcatter.gas_line": "Steel Pipe (oil and gas)",
 	"block.wildcatter.drilling_rig": "Drilling Rig (LV)",
-	"block.wildcatter.casing": "Well Casing",
+	"block.wildcatter.casing": "Well Casing (cemented: unbreakable)",
 	"block.wildcatter.refinery": "Refinery Base (LV)",
 	"block.wildcatter.refinery_column": "Distillation Column",
 	"block.wildcatter.cooling_tower": "Cooling Tower Fan Deck (LV)",
@@ -717,7 +717,7 @@ for name in BLOCKS:
 		"pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],
 			"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
 
-save_json(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json", {"values": [f"{ns}:{n}" for n in BLOCKS + ("casing",) if n not in ("pole", "crossarm")]})
+save_json(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json", {"values": [f"{ns}:{n}" for n in BLOCKS if n not in ("pole", "crossarm")]})
 save_json(f"{ROOT}/data/minecraft/tags/block/mineable/axe.json", {"values": [f"{ns}:pole", f"{ns}:crossarm"]})
 save_json(f"{ROOT}/data/minecraft/tags/block/climbable.json", {"values": [f"{ns}:pole"]})
 save_json(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json", {"values": [f"{ns}:{n}" for n in ("boiler", "firebox", "mv_breaker", "dist_breaker", "pole_transformer", "hv_breaker", "pump", "drilling_rig", "pumpjack", "gas_wellhead", "refinery", "refinery_column", "cooling_tower", "cooling_fill", "steam_turbine", "transformer", "substation_transformer")]})
@@ -812,7 +812,7 @@ def cable_sheath(sheath):
 	return draw
 
 
-CABLES = {"cable_lv": (40, 40, 44), "cable_industrial": (70, 52, 40), "cable_dist": (30, 50, 40), "cable_hv": (24, 24, 30)}
+CABLES = {"cable_lv": (40, 40, 44), "cable_industrial": (70, 52, 40), "cable_mv": (40, 46, 60), "cable_dist": (30, 50, 40), "cable_hv": (24, 24, 30)}
 for cable, sheath in CABLES.items():
 	tex(f"{cable}_placeholder", cable_sheath(sheath))
 	t = {"cable": f"{ns}:block/{art(cable)}", "particle": f"{ns}:block/{art(cable)}"}
@@ -909,6 +909,7 @@ lang.update({
 	"block.wildcatter.industrial_plastic_wire_neutral": "Plastic Wire, black (480 V)",
 	"block.wildcatter.cable_lv": "Three-Phase Cable (LV, A B C N G)",
 	"block.wildcatter.cable_industrial": "Three-Phase Cable (480 V, A B C N G)",
+	"block.wildcatter.cable_mv": "MV Cable (4.16 kV, A B C N G)",
 	"block.wildcatter.cable_dist": "Underground Primary Cable (DIST, A B C N G)",
 	"block.wildcatter.cable_hv": "High-Voltage Cable (HV, A B C N G)",
 	"block.wildcatter.breaker_3p_lv": "Three-Pole Breaker (LV)",
@@ -927,7 +928,7 @@ save_json(f"{ASSETS}/lang/en_us.json", lang)
 for role, dye in (("hot", "minecraft:red_dye"), ("neutral", "minecraft:black_dye")):
 	shapeless(f"industrial_wire_{role}", ["minecraft:copper_ingot"] * 4 + ["minecraft:iron_ingot", dye], f"industrial_wire_{role}", 4)
 	shapeless(f"industrial_plastic_wire_{role}", [f"{ns}:industrial_wire_{role}"] * 4 + [f"{ns}:plastic_sheet"], f"industrial_plastic_wire_{role}", 4)
-for cable, (wire_hot, wire_neutral) in {"cable_lv": ("wire_hot", "wire_neutral"), "cable_industrial": ("industrial_wire_hot", "industrial_wire_neutral"), "cable_dist": ("dist_wire_hot", "dist_wire_neutral"), "cable_hv": ("hv_wire_hot", "hv_wire_neutral")}.items():
+for cable, (wire_hot, wire_neutral) in {"cable_lv": ("wire_hot", "wire_neutral"), "cable_industrial": ("industrial_wire_hot", "industrial_wire_neutral"), "cable_mv": ("mv_wire_hot", "mv_wire_neutral"), "cable_dist": ("dist_wire_hot", "dist_wire_neutral"), "cable_hv": ("hv_wire_hot", "hv_wire_neutral")}.items():
 	shaped(cable, ["PHP", "HNH", "PGP"], {"P": f"{ns}:plastic_sheet", "H": f"{ns}:{wire_hot}", "N": f"{ns}:{wire_neutral}", "G": f"{ns}:ground_wire"}, cable, 4)
 shaped("breaker_3p_lv", ["BBB", "IRI"], {"B": f"{ns}:breaker", "I": "minecraft:iron_ingot", "R": "minecraft:redstone"}, "breaker_3p_lv")
 shaped("breaker_3p_industrial", ["BBB", "SRS"], {"B": f"{ns}:breaker", "S": f"{ns}:steel_ingot", "R": "minecraft:redstone_block"}, "breaker_3p_industrial")
@@ -1264,7 +1265,7 @@ for role in ("hot", "neutral"):
 		FAMILY[f"{prefix}wire_{role}"] = BUILDING
 	for prefix in ("mv_", "mv_plastic_", "dist_", "dist_plastic_", "hv_", "hv_plastic_"):
 		FAMILY[f"{prefix}wire_{role}"] = ACSR
-FAMILY.update({"cable_lv": BUILDING, "cable_industrial": BUILDING, "cable_dist": MV_CABLE, "cable_hv": MV_CABLE})
+FAMILY.update({"cable_lv": BUILDING, "cable_industrial": BUILDING, "cable_mv": MV_CABLE, "cable_dist": MV_CABLE, "cable_hv": MV_CABLE})
 for tier, fam in (("lv", BUILDING), ("dist", ACSR), ("hv", ACSR)):
 	FAMILY[f"conductor_spool_{tier}"] = fam
 	FAMILY[f"covered_conductor_spool_{tier}"] = fam
@@ -1349,6 +1350,37 @@ ROTOR_PARTS = ("radiator_fan", "crank_pulley", "coupling", "tower_fan", "disconn
 	"disconnect_arm_hv", "disconnect_arm_hv_back", "disconnect_blade_dist", "pumpjack_crank", "pumpjack_pitman_low", "pumpjack_pitman_high",
 	"pumpjack_beam_front", "pumpjack_beam_mid", "pumpjack_beam_back", "pumpjack_rod", "pumpjack_rod_low", "pumpjack_bridle",
 	"rig_carriage", "rig_spindle", "rig_pipe", "starter_coupling", "flyball_governor", "starter_pump_coupling")
+save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ROTOR_PARTS}})
+
+# ---- Phase 4.5h: the 1,000 hp land rig (docs/multiblocks/land-rig.md) -----------------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/land_rig.py; here loot, names, tags, recipes, the top drive's item
+# and the rotor blockstate's new parts.
+RIG_PARTS = ("rig_substructure", "rig_mast", "rig_drawworks", "mud_pump", "mud_tanks", "rig_drive_house")
+for name in RIG_PARTS:
+	big_part_loot(name)
+for tag in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
+	t["values"] += [f"{ns}:{n}" for n in RIG_PARTS]
+	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
+shaped("rig_substructure", ["SSS", "B B", "S S"], {"S": S_, "B": "minecraft:iron_block"}, "rig_substructure")
+shaped("rig_mast", ["S S", "SBS", "S S"], {"S": S_, "B": "minecraft:iron_bars"}, "rig_mast")
+shaped("rig_drawworks", ["SCS", "CXC", "SSS"], {"S": S_, "C": C_, "X": f"{ns}:crankshaft"}, "rig_drawworks")
+shaped("mud_pump", ["SPS", "CXC", "SSS"], {"S": S_, "P": "minecraft:piston", "C": C_, "X": f"{ns}:crankshaft"}, "mud_pump")
+shaped("mud_tanks", ["S S", "S S", "SSS"], {"S": S_}, "mud_tanks")
+shaped("rig_drive_house", ["SSS", "CRC", "SSS"], {"S": S_, "C": C_, "R": "minecraft:redstone_block"}, "rig_drive_house")
+shaped("top_drive", ["SCS", "CXC", "SPS"], {"S": S_, "C": C_, "X": f"{ns}:crankshaft", "P": f"{ns}:gas_line"}, "top_drive")
+save_json(f"{ASSETS}/models/item/top_drive.json", {"parent": f"{ns}:block/rotor_top_drive", "display": {
+	"gui": {"rotation": [30, 225, 0], "translation": [0, -2, 0], "scale": [0.45, 0.45, 0.45]}, "ground": {"scale": [0.3, 0.3, 0.3]},
+	"fixed": {"scale": [0.5, 0.5, 0.5]}, "thirdperson_righthand": {"rotation": [75, 45, 0], "scale": [0.3, 0.3, 0.3]},
+	"firstperson_righthand": {"rotation": [0, 45, 0], "scale": [0.35, 0.35, 0.35]}, "firstperson_lefthand": {"rotation": [0, 225, 0], "scale": [0.35, 0.35, 0.35]}}})
+save_json(f"{ASSETS}/items/top_drive.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/top_drive"}})
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({"block.wildcatter.rig_substructure": "Land Rig Substructure (the controller, 9 x 9 m)", "block.wildcatter.rig_mast": "Land Rig Mast (43 m)",
+	"block.wildcatter.rig_drawworks": "Drawworks (1,000 hp)", "block.wildcatter.mud_pump": "Mud Pump (1,000 hp triplex)",
+	"block.wildcatter.mud_tanks": "Mud Tanks (60 m3)", "block.wildcatter.rig_drive_house": "Rig Drive House (4.16 kV, 2,500 kVA)",
+	"item.wildcatter.top_drive": "Top Drive (250-ton, 400 hp)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+ROTOR_PARTS += ("top_drive", "top_drive_quill", "mud_pump_sheave", "mud_pump_bull_wheel", "drawworks_drum")
 save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ROTOR_PARTS}})
 
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------

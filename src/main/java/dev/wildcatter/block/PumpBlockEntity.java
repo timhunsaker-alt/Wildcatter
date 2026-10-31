@@ -92,14 +92,18 @@ public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		// steam plants take their makeup water at the condenser's hotwell (1 unit of water is 1 kg)
 		List<TurbineGeneratorBlockEntity> plants = Plumbing.machines(level, cell, pipes, true, SteamPlantPartBlockEntity.class).stream()
 				.filter(p -> p.part() == SteamPlantPartBlock.Part.CONDENSER).map(SteamPlantPartBlockEntity::controller).filter(java.util.Objects::nonNull).distinct().toList();
-		if (boilers.isEmpty() && plants.isEmpty()) {
+		// a land rig's mud tanks take their water too (docs/multiblocks/land-rig.md)
+		List<RigSubstructureBlockEntity> rigs = Plumbing.machines(level, cell, pipes, true, RigPartBlockEntity.class).stream()
+				.filter(p -> p.part() == RigPartBlock.Part.MUD_TANKS).map(RigPartBlockEntity::rig).filter(java.util.Objects::nonNull).distinct().toList();
+		if (boilers.isEmpty() && plants.isEmpty() && rigs.isEmpty()) {
 			pump.wanted = false;
-			pump.status = "no boiler or plant condenser on its pipes";
+			pump.status = "no boiler, plant condenser or mud tanks on its pipes";
 			return;
 		}
-		// a level switch: start when a boiler or hotwell falls below the start level, stop when they are all full
-		double lowest = Math.min(boilers.stream().mapToDouble(BoilerBlockEntity::waterLevel).min().orElse(1.0),
-				plants.stream().mapToDouble(TurbineGeneratorBlockEntity::hotwellLevel).min().orElse(1.0));
+		// a level switch: start when a boiler, hotwell or mud tank falls below the start level, stop when they are all full
+		double lowest = Math.min(Math.min(boilers.stream().mapToDouble(BoilerBlockEntity::waterLevel).min().orElse(1.0),
+				plants.stream().mapToDouble(TurbineGeneratorBlockEntity::hotwellLevel).min().orElse(1.0)),
+				rigs.stream().mapToDouble(RigSubstructureBlockEntity::waterLevel).min().orElse(1.0));
 		pump.wanted = pump.wanted ? lowest < 1.0 : lowest < Tuning.PUMP_START_LEVEL;
 		double strength = pump.motor.output();
 		if (strength == 0) {
@@ -111,7 +115,11 @@ public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		for (TurbineGeneratorBlockEntity plant : plants) {
 			moved += (int) Math.round(plant.addMakeup((budget - moved) / (double) plants.size()));
 		}
-		pump.status = (moved > 0 ? "pumping " + Math.round(moved * 20.0 / Tuning.PLUMBING_INTERVAL) + " water/s to " + boilers.size() + " boiler(s) and " + plants.size() + " plant(s)"
+		for (RigSubstructureBlockEntity rig : rigs) {
+			moved += rig.addWater(budget - moved);
+		}
+		pump.status = (moved > 0 ? "pumping " + Math.round(moved * 20.0 / Tuning.PLUMBING_INTERVAL) + " water/s to " + boilers.size() + " boiler(s), " + plants.size() + " plant(s)"
+				+ (rigs.isEmpty() ? "" : " and " + rigs.size() + " rig's mud tanks")
 				: "boilers are full") + ", " + pump.motor.describe();
 	}
 

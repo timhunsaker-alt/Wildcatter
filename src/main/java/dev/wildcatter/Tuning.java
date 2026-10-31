@@ -93,6 +93,33 @@ public final class Tuning {
 	public static final double RIG_ROTARY_RPM = 80.0;         // the small rig's top head while drilling
 	public static final int RIG_JOINT_BLOCKS = 6;             // a 6 m joint of drill pipe: the head's travel down the mast
 	public static final double STARTER_PUMP_RPM = 3450.0;     // the 750 W pump's two-pole motor at full load
+	public static final int SMALL_RIG_MAX_DEPTH = 110;        // blocks below the small rig: a balance choice (docs/multiblocks/land-rig.md)
+
+	// ---- The land rig and deep fields (docs/multiblocks/land-rig.md, approved 2026-10-31) -------------------------------
+	public static final double LAND_RIG_DRILL_WATTS = 1_900_000.0;      // top drive 300 kW + two 750 kW (1,000 hp) mud pumps + 100 kW auxiliaries
+	public static final double LAND_RIG_CONNECTION_WATTS = 850_000.0;   // the 750 kW (1,000 hp) drawworks hoisting + auxiliaries
+	public static final double LAND_RIG_IDLE_WATTS = 100_000.0;         // auxiliaries: lights, shakers, mixing, the house's cooling
+	public static final double LAND_RIG_POWER_FACTOR = 0.95;            // a VFD house's front end
+	public static final double LAND_RIG_FREQUENCY_FLOOR = 0.992;        // the power limit holds the island at 59.5 Hz (IEC 49.6 Hz)
+	public static final double LAND_RIG_UNDERVOLTAGE = 0.9;             // the drives stop below 90 % voltage
+	public static final int LAND_RIG_TICKS_PER_BLOCK = 4;               // at full power: five times the small rig
+	public static final int LAND_RIG_STAND_BLOCKS = 27;                 // a stand of three 9 m (range 2) joints
+	public static final int LAND_RIG_CONNECTION_TICKS = 300;            // 15 s to hoist and make up the next stand
+	public static final int LAND_RIG_MUD_PER_BLOCK = 80;                // litres of water a metre: an 8.5 in hole is 37 L/m, plus surface losses
+	public static final int LAND_RIG_MUD_TANK = 60_000;                 // litres: a 60 m3 (380 bbl) active system
+	public static final double TOP_DRIVE_RPM = 120.0;                   // drilling rotary speed
+	public static final double MUD_PUMP_SHEAVE_RPM = 480.0;             // 120 strokes a minute, the motor sheave about four times the crank
+	public static final double DRAWWORKS_DRUM_RPM = 380.0;              // hoisting 27 m in 15 s on ten lines: 18 m/s of drill line on a 0.9 m drum
+	public static final int DEEP_FIELD_CELL = 128;
+	public static final double DEEP_FIELD_CHANCE = 0.5;
+	public static final int DEEP_FIELD_MIN_RADIUS = 16;
+	public static final int DEEP_FIELD_MAX_RADIUS = 24;
+	public static final int DEEP_FIELD_MIN_Y = -58;                     // above the bedrock noise (-64 to -60), below every shallow field
+	public static final int DEEP_FIELD_MAX_Y = -50;
+	public static final int DEEP_OIL_MIN_UNITS = 400_000;
+	public static final int DEEP_OIL_MAX_UNITS = 1_000_000;
+	public static final int DEEP_GAS_MIN_UNITS = 1_000_000;
+	public static final int DEEP_GAS_MAX_UNITS = 2_500_000;
 	public static final double GAS_UNITS_PER_TICK = 1.5;      // a free-flowing well at full pressure
 	/** Fuel a firebox will take from a well before it is full, in ticks of fire. */
 	public static final double FIREBOX_FEED_CAP = 200.0;

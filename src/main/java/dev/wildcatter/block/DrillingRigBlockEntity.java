@@ -40,7 +40,7 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 	private static final float HEAD_TOP = 8.3F;
 
 	private enum Phase {
-		DRILLING, DRY, BLOCKED
+		DRILLING, DRY, BLOCKED, TOO_DEEP
 	}
 
 	/** Its 480 V three-phase drive motor; it turns only while drilling. */
@@ -140,23 +140,25 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 		}
 	}
 
-	private int goalY(ServerLevel level) {
-		Reservoir field = Reservoir.at(ReservoirData.seed(level), worldPosition.getX(), worldPosition.getZ());
-		return field != null ? field.topY() : Tuning.DRY_HOLE_Y;
+	/** Game test hook: as if it had already drilled (and cased) this far. */
+	public void testDepth(int blocks) {
+		depth = blocks;
+		setChanged();
 	}
 
 	private void advance(ServerLevel level) {
-		BlockPos next = worldPosition.below(depth + 1);
-		BlockState rock = level.getBlockState(next);
-		if (next.getY() <= level.getMinY() || rock.getDestroySpeed(level, next) < 0) {
+		if (Drilling.tooDeepForSmallRig(depth)) {
+			finish(level, Phase.TOO_DEEP);
+			return;
+		}
+		if (!Drilling.caseNext(level, worldPosition, depth)) {
 			finish(level, Phase.BLOCKED);
 			return;
 		}
-		level.setBlock(next, WildcatterBlocks.CASING.defaultBlockState(), 3);
 		depth++;
 		setChanged();
 		level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);   // the head moves down the mast
-		if (next.getY() <= goalY(level)) {
+		if (worldPosition.getY() - depth <= Drilling.goalY(level, worldPosition, Tuning.DRY_HOLE_Y)) {
 			strike(level);
 		}
 	}
@@ -164,23 +166,17 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 	/** The hole has reached the depth where the field would be. */
 	private void strike(ServerLevel level) {
 		ReservoirData data = ReservoirData.get(level);
-		Reservoir field = Reservoir.at(ReservoirData.seed(level), worldPosition.getX(), worldPosition.getZ());
+		Reservoir field = Drilling.field(level, worldPosition);
 		if (field == null || data.remaining(field) <= 0) {
 			finish(level, Phase.DRY);
 			return;
 		}
+		BlockPos hole = worldPosition;
 		rigDown(level, field.kind());
 		CircuitManager.markDirty(level);
-		level.playSound(null, worldPosition, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 0.7F, 0.8F);
-		level.sendParticles(ParticleTypes.LARGE_SMOKE, worldPosition.getX() + 0.5, worldPosition.getY() + 1.0, worldPosition.getZ() + 0.5, 30, 0.5, 0.3, 0.5, 0.05);
-		Component news = Component.literal("STRIKE! " + (field.kind() == Reservoir.Kind.OIL ? "Oil" : "Gas") + " at " + depth + " blocks down. "
+		Drilling.announce(level, hole, Component.literal("STRIKE! " + (field.kind() == Reservoir.Kind.OIL ? "Oil" : "Gas") + " at " + depth + " blocks down. "
 				+ "The rig has rigged down and dropped; "
-				+ (field.kind() == Reservoir.Kind.OIL ? "click the oil wellhead with a pumpjack and wire it to bring the oil up." : "run steel pipe from the Christmas tree to a firebox."));
-		for (ServerPlayer player : level.players()) {
-			if (player.distanceToSqr(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ()) < 48 * 48) {
-				player.sendOverlayMessage(news);
-			}
-		}
+				+ (field.kind() == Reservoir.Kind.OIL ? "click the oil wellhead with a pumpjack and wire it to bring the oil up." : "run steel pipe from the Christmas tree to a firebox.")));
 	}
 
 	/** The rig leaves the hole: every cell goes, it drops as its item, and the wellhead for the field stands on the hole. */
@@ -194,13 +190,7 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 		}
 		level.removeBlockEntity(hole);
 		Direction facing = state.getValue(DrillingRigBlock.FACING);
-		if (kind == Reservoir.Kind.OIL) {
-			level.setBlock(hole, WildcatterBlocks.OIL_WELLHEAD.defaultBlockState().setValue(OilWellheadBlock.FACING, facing), 3);
-		} else {
-			BlockState tree = WildcatterBlocks.GAS_WELLHEAD.defaultBlockState().setValue(GasWellheadBlock.FACING, facing);
-			level.setBlock(hole, tree, 3);
-			dev.wildcatter.multiblock.BigParts.grow(level, hole, tree);
-		}
+		Drilling.setWellhead(level, hole, kind, facing);
 		net.minecraft.world.level.block.Block.popResource(level, hole.relative(facing.getOpposite()).above(), new net.minecraft.world.item.ItemStack(WildcatterBlocks.DRILLING_RIG));
 	}
 
@@ -216,6 +206,7 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 		String state = switch (phase) {
 			case DRILLING -> strength() == 0 ? motor.describe() : "drilling, " + (int) Math.round(strength() * 100) + "% speed, " + motor.describe();
 			case DRY -> "DRY HOLE: nothing there. Break the rig and drill somewhere else";
+			case TOO_DEEP -> "TOO DEEP: this rig reaches " + Tuning.SMALL_RIG_MAX_DEPTH + " m. A land rig goes deeper";
 			case BLOCKED -> "STOPPED: hit rock it cannot cut. Break the rig and drill somewhere else";
 		};
 		return Component.literal("Drilling rig (" + Math.round(Tuning.RIG_WATTS / 1000) + " kW motor, " + Voltage.INDUSTRIAL.label() + " three-phase): " + depth + " blocks down, " + state + "; "

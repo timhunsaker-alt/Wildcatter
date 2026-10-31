@@ -72,7 +72,7 @@ and the Field Manual has a page for each new system.
   starter plant (breakers, the MCC, receptacles, loads, the boiler and 120 V turbine); 4.5g the well site (the small mast
   rig, the wellheads, the pumpjack with its moving linkage, real-size pipe, the starter turbine's and pump's turning parts);
   4.5h the full land rig, a late-game machine of distinct parts (decided with Tim on 2026-10-31: a small rig early, a land rig
-  late; its spec and power numbers go to Tim first). The split of the old
+  late), with deep fields only it reaches and unbreakable well casing. The split of the old
   4.5e into 4.5e and 4.5f was decided with Tim on 2026-10-31. The refinery waits for Phase 5.
 - Tim checks each wave in a real session before the next starts.
 

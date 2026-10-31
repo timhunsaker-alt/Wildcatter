@@ -6,15 +6,17 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * A pocket of oil or gas hiding in the rock. Where the fields are depends only on the world seed, so nothing is
- * stored until a well starts to empty one. The world is cut into square cells; a cell may hold one field.
+ * stored until a well starts to empty one. The world is cut into square cells; a cell may hold one field. Deep fields
+ * (docs/multiblocks/land-rig.md) are a second, coarser grid of their own below the shallow ones, so adding them changed no
+ * shallow field: only a land rig reaches them.
  */
-public record Reservoir(int cellX, int cellZ, double centerX, double centerZ, double radius, int topY, Kind kind, int units) {
+public record Reservoir(int cellX, int cellZ, double centerX, double centerZ, double radius, int topY, Kind kind, int units, boolean deep) {
 	public enum Kind {
 		OIL, GAS
 	}
 
 	public String key() {
-		return cellX + "," + cellZ;
+		return (deep ? "deep:" : "") + cellX + "," + cellZ;
 	}
 
 	/** True if a hole drilled at this column reaches it. */
@@ -45,12 +47,37 @@ public record Reservoir(int cellX, int cellZ, double centerX, double centerZ, do
 		Kind kind = random.nextDouble() < Tuning.OIL_FRACTION ? Kind.OIL : Kind.GAS;
 		int min = kind == Kind.OIL ? Tuning.OIL_MIN_UNITS : Tuning.GAS_MIN_UNITS;
 		int max = kind == Kind.OIL ? Tuning.OIL_MAX_UNITS : Tuning.GAS_MAX_UNITS;
-		return new Reservoir(cellX, cellZ, cx, cz, radius, topY, kind, min + random.nextInt(max - min + 1));
+		return new Reservoir(cellX, cellZ, cx, cz, radius, topY, kind, min + random.nextInt(max - min + 1), false);
 	}
 
-	/** The field a hole at this column would reach, or null. */
+	/** The deep field in this cell of the deep grid, or null. */
+	public static @Nullable Reservoir deepInCell(long seed, int cellX, int cellZ) {
+		long mix = seed * 0xD6E8FEB86659FD93L ^ (cellX * 0x9FB21C651E98DF25L) ^ (cellZ * 0xA0761D6478BD642FL) ^ 0x5DEECE66DL;
+		SplittableRandom random = new SplittableRandom(mix);
+		if (random.nextDouble() >= Tuning.DEEP_FIELD_CHANCE) {
+			return null;
+		}
+		double radius = Tuning.DEEP_FIELD_MIN_RADIUS + random.nextDouble() * (Tuning.DEEP_FIELD_MAX_RADIUS - Tuning.DEEP_FIELD_MIN_RADIUS);
+		double margin = Tuning.DEEP_FIELD_MAX_RADIUS;
+		double room = Tuning.DEEP_FIELD_CELL - 2 * margin;
+		double cx = cellX * (double) Tuning.DEEP_FIELD_CELL + margin + random.nextDouble() * room;
+		double cz = cellZ * (double) Tuning.DEEP_FIELD_CELL + margin + random.nextDouble() * room;
+		int topY = Tuning.DEEP_FIELD_MIN_Y + random.nextInt(Tuning.DEEP_FIELD_MAX_Y - Tuning.DEEP_FIELD_MIN_Y + 1);
+		Kind kind = random.nextDouble() < Tuning.OIL_FRACTION ? Kind.OIL : Kind.GAS;
+		int min = kind == Kind.OIL ? Tuning.DEEP_OIL_MIN_UNITS : Tuning.DEEP_GAS_MIN_UNITS;
+		int max = kind == Kind.OIL ? Tuning.DEEP_OIL_MAX_UNITS : Tuning.DEEP_GAS_MAX_UNITS;
+		return new Reservoir(cellX, cellZ, cx, cz, radius, topY, kind, min + random.nextInt(max - min + 1), true);
+	}
+
+	/** The field a hole at this column would reach first: the shallow one, or else the deep one under it, or null. */
 	public static @Nullable Reservoir at(long seed, int x, int z) {
 		Reservoir field = inCell(seed, Math.floorDiv(x, Tuning.FIELD_CELL), Math.floorDiv(z, Tuning.FIELD_CELL));
+		return field != null && field.covers(x, z) ? field : deepAt(seed, x, z);
+	}
+
+	/** The deep field under this column, or null. */
+	public static @Nullable Reservoir deepAt(long seed, int x, int z) {
+		Reservoir field = deepInCell(seed, Math.floorDiv(x, Tuning.DEEP_FIELD_CELL), Math.floorDiv(z, Tuning.DEEP_FIELD_CELL));
 		return field != null && field.covers(x, z) ? field : null;
 	}
 
@@ -64,6 +91,18 @@ public record Reservoir(int cellX, int cellZ, double centerX, double centerZ, do
 		for (int i = -reach; i <= reach; i++) {
 			for (int j = -reach; j <= reach; j++) {
 				Reservoir field = inCell(seed, cx + i, cz + j);
+				if (field != null && field.edgeDistance(x, z) < bestDistance) {
+					best = field;
+					bestDistance = field.edgeDistance(x, z);
+				}
+			}
+		}
+		int dx = Math.floorDiv((int) Math.floor(x), Tuning.DEEP_FIELD_CELL);
+		int dz = Math.floorDiv((int) Math.floor(z), Tuning.DEEP_FIELD_CELL);
+		int deepReach = (int) Math.ceil(range / Tuning.DEEP_FIELD_CELL) + 1;
+		for (int i = -deepReach; i <= deepReach; i++) {
+			for (int j = -deepReach; j <= deepReach; j++) {
+				Reservoir field = deepInCell(seed, dx + i, dz + j);
 				if (field != null && field.edgeDistance(x, z) < bestDistance) {
 					best = field;
 					bestDistance = field.edgeDistance(x, z);

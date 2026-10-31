@@ -93,8 +93,9 @@ public final class WildcatterBlocks {
 	/** Sinks a cased hole straight down. On a strike it rigs down and leaves an oil wellhead or a gas wellhead. */
 	public static final Block DRILLING_RIG = block("drilling_rig", props -> new DrillingRigBlock(props.mapColor(MapColor.COLOR_YELLOW)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+	/** Steel casing cemented in the hole: it cannot be broken (like bedrock), so a miner who meets one knows it is a well. */
 	public static final Block CASING = block("casing", props -> new CasingBlock(props.mapColor(MapColor.METAL)
-			.strength(4.0F, 8.0F).sound(SoundType.NETHERITE_BLOCK)));
+			.strength(-1.0F, 3_600_000.0F).noLootTable().sound(SoundType.NETHERITE_BLOCK)));
 	public static final Block PUMPJACK = block("pumpjack", props -> new PumpjackBlock(props.mapColor(MapColor.COLOR_BLACK)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
 	public static final Block GAS_WELLHEAD = block("gas_wellhead", props -> new GasWellheadBlock(props.mapColor(MapColor.COLOR_ORANGE)
@@ -170,6 +171,8 @@ public final class WildcatterBlocks {
 	/** Three-phase cable: A, B, C, N and G in one insulated block. */
 	public static final Block CABLE_LV = multiCable("cable_lv", Voltage.LOW);
 	public static final Block CABLE_INDUSTRIAL = multiCable("cable_industrial", Voltage.INDUSTRIAL);
+	/** 4.16 kV (IEC 3.3 kV) cable: 5 kV class shielded MV cable, for a land rig's drive house or a plant's 4.16 kV feeders. */
+	public static final Block CABLE_MV = multiCable("cable_mv", Voltage.MEDIUM);
 	public static final Block CABLE_DIST = multiCable("cable_dist", Voltage.DISTRIBUTION);
 	/** 138 kV (IEC 132 kV) cable: the getaway from a substation transformer's bushings to the line's three insulators. */
 	public static final Block CABLE_HV = multiCable("cable_hv", Voltage.HIGH);
@@ -320,6 +323,13 @@ public final class WildcatterBlocks {
 	public static final Block TURBINE_CASING = plantPart("turbine_casing", dev.wildcatter.block.SteamPlantPartBlock.Part.TURBINE);
 	public static final Block CONDENSER = plantPart("condenser", dev.wildcatter.block.SteamPlantPartBlock.Part.CONDENSER);
 	public static final Block FEED_PUMP = plantPart("feed_pump", dev.wildcatter.block.SteamPlantPartBlock.Part.FEED_PUMP);
+	// the 1,000 hp land rig (docs/multiblocks/land-rig.md)
+	public static final Block RIG_SUBSTRUCTURE = rigPart(dev.wildcatter.block.RigPartBlock.Part.SUBSTRUCTURE);
+	public static final Block RIG_MAST = rigPart(dev.wildcatter.block.RigPartBlock.Part.MAST);
+	public static final Block RIG_DRAWWORKS = rigPart(dev.wildcatter.block.RigPartBlock.Part.DRAWWORKS);
+	public static final Block MUD_PUMP = rigPart(dev.wildcatter.block.RigPartBlock.Part.MUD_PUMP);
+	public static final Block MUD_TANKS = rigPart(dev.wildcatter.block.RigPartBlock.Part.MUD_TANKS);
+	public static final Block RIG_DRIVE_HOUSE = rigPart(dev.wildcatter.block.RigPartBlock.Part.DRIVE_HOUSE);
 	/** Never placed: its states carry the models of the turning parts (kinetic/RotorBlock). */
 	public static final Block ROTOR = block("rotor", props -> new dev.wildcatter.kinetic.RotorBlock(props.noOcclusion().noLootTable()));
 
@@ -329,7 +339,7 @@ public final class WildcatterBlocks {
 			WOOL_WIRE_NEUTRAL, MV_WIRE_HOT, MV_WIRE_NEUTRAL, HV_WIRE_HOT, HV_WIRE_NEUTRAL,
 			PLASTIC_WIRE_HOT, PLASTIC_WIRE_NEUTRAL, MV_PLASTIC_WIRE_HOT, MV_PLASTIC_WIRE_NEUTRAL, HV_PLASTIC_WIRE_HOT, HV_PLASTIC_WIRE_NEUTRAL,
 			INDUSTRIAL_WIRE_HOT, INDUSTRIAL_WIRE_NEUTRAL, INDUSTRIAL_PLASTIC_WIRE_HOT, INDUSTRIAL_PLASTIC_WIRE_NEUTRAL);
-	public static final BlockEntityType<MultiCableBlockEntity> MULTI_CABLE_ENTITY = entity(MultiCableBlockEntity::new, CABLE_LV, CABLE_INDUSTRIAL, CABLE_DIST, CABLE_HV, BUSWAY_LV, BUSWAY_INDUSTRIAL);
+	public static final BlockEntityType<MultiCableBlockEntity> MULTI_CABLE_ENTITY = entity(MultiCableBlockEntity::new, CABLE_LV, CABLE_INDUSTRIAL, CABLE_MV, CABLE_DIST, CABLE_HV, BUSWAY_LV, BUSWAY_INDUSTRIAL);
 	public static final BlockEntityType<MotorStarterBlockEntity> MOTOR_STARTER_ENTITY = entity(MotorStarterBlockEntity::new, MOTOR_STARTER, MCC_BUCKET);
 	public static final BlockEntityType<MccIncomingBlockEntity> MCC_INCOMING_ENTITY = entity(MccIncomingBlockEntity::new, MCC_INCOMING);
 	public static final BlockEntityType<dev.wildcatter.block.MccSectionBlockEntity> MCC_SECTION_ENTITY = entity(dev.wildcatter.block.MccSectionBlockEntity::new, MCC_SECTION);
@@ -337,6 +347,10 @@ public final class WildcatterBlocks {
 			DIESEL_ENGINE_PART, GAS_ENGINE_PART, ALTERNATOR, RADIATOR, FUEL_TANK, EXHAUST_STACK, BASE_FRAME, EXHAUST_SILENCER_LARGE);
 	public static final BlockEntityType<dev.wildcatter.block.SteamPlantPartBlockEntity> STEAM_PLANT_PART_ENTITY = entity(dev.wildcatter.block.SteamPlantPartBlockEntity::new,
 			BOILER_BURNER, BOILER_DRUM, SUPERHEATER, TURBINE_CASING, CONDENSER, FEED_PUMP);
+	public static final BlockEntityType<dev.wildcatter.block.RigSubstructureBlockEntity> RIG_SUBSTRUCTURE_ENTITY = entity(dev.wildcatter.block.RigSubstructureBlockEntity::new, RIG_SUBSTRUCTURE);
+	public static final BlockEntityType<dev.wildcatter.block.RigDriveHouseBlockEntity> RIG_DRIVE_HOUSE_ENTITY = entity(dev.wildcatter.block.RigDriveHouseBlockEntity::new, RIG_DRIVE_HOUSE);
+	public static final BlockEntityType<dev.wildcatter.block.RigPartBlockEntity> RIG_PART_ENTITY = entity(dev.wildcatter.block.RigPartBlockEntity::new,
+			RIG_MAST, RIG_DRAWWORKS, MUD_PUMP, MUD_TANKS);
 	public static final BlockEntityType<dev.wildcatter.block.TurbineGeneratorBlockEntity> TURBINE_GENERATOR_ENTITY = entity(dev.wildcatter.block.TurbineGeneratorBlockEntity::new, TURBINE_GENERATOR);
 	public static final BlockEntityType<dev.wildcatter.block.GensetControlPanelBlockEntity> GENSET_CONTROL_PANEL_ENTITY = entity(dev.wildcatter.block.GensetControlPanelBlockEntity::new, GENSET_CONTROL_PANEL);
 	public static final BlockEntityType<ThreePhaseHeaterBlockEntity> THREE_PHASE_HEATER_ENTITY = entity(ThreePhaseHeaterBlockEntity::new, THREE_PHASE_HEATER);
@@ -415,6 +429,11 @@ public final class WildcatterBlocks {
 	private static Block gensetPart(String name, dev.wildcatter.block.GensetPartBlock.Part part) {
 		return block(name, props -> new dev.wildcatter.block.GensetPartBlock(props.mapColor(MapColor.COLOR_GRAY)
 				.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
+	}
+
+	private static Block rigPart(dev.wildcatter.block.RigPartBlock.Part part) {
+		return block(part.id(), props -> new dev.wildcatter.block.RigPartBlock(props.mapColor(MapColor.COLOR_YELLOW)
+				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
 	}
 
 	private static Block plantPart(String name, dev.wildcatter.block.SteamPlantPartBlock.Part part) {
@@ -529,6 +548,7 @@ public final class WildcatterBlocks {
 		add("industrial_plastic_wire_neutral", INDUSTRIAL_PLASTIC_WIRE_NEUTRAL);
 		add("cable_lv", CABLE_LV);
 		add("cable_industrial", CABLE_INDUSTRIAL);
+		add("cable_mv", CABLE_MV);
 		add("cable_dist", CABLE_DIST);
 		add("cable_hv", CABLE_HV);
 		add("busway_lv", BUSWAY_LV);
@@ -554,6 +574,9 @@ public final class WildcatterBlocks {
 		add("turbine_casing", TURBINE_CASING);
 		add("condenser", CONDENSER);
 		add("feed_pump", FEED_PUMP);
+		for (Block part : new Block[] {RIG_SUBSTRUCTURE, RIG_MAST, RIG_DRAWWORKS, MUD_PUMP, MUD_TANKS, RIG_DRIVE_HOUSE}) {
+			add(((dev.wildcatter.block.RigPartBlock) part).part().id(), part);
+		}
 		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("rotor"), ROTOR);   // no item: it is never placed
 		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("mcc_bucket"), MCC_BUCKET);   // its item is WildcatterItems.MCC_BUCKET
 		add("mcc_section", MCC_SECTION);
@@ -590,6 +613,9 @@ public final class WildcatterBlocks {
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("power_transformer"), POWER_TRANSFORMER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("disconnect_switch"), DISCONNECT_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("steam_plant_part"), STEAM_PLANT_PART_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rig_substructure"), RIG_SUBSTRUCTURE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rig_drive_house"), RIG_DRIVE_HOUSE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rig_part"), RIG_PART_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("turbine_generator"), TURBINE_GENERATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("genset_control_panel"), GENSET_CONTROL_PANEL_ENTITY);
 	}

@@ -77,6 +77,21 @@
     },
     "part=starter_pump_coupling": {
       "model": "wildcatter:block/rotor_starter_pump_coupling"
+    },
+    "part=top_drive": {
+      "model": "wildcatter:block/rotor_top_drive"
+    },
+    "part=top_drive_quill": {
+      "model": "wildcatter:block/rotor_top_drive_quill"
+    },
+    "part=mud_pump_sheave": {
+      "model": "wildcatter:block/rotor_mud_pump_sheave"
+    },
+    "part=mud_pump_bull_wheel": {
+      "model": "wildcatter:block/rotor_mud_pump_bull_wheel"
+    },
+    "part=drawworks_drum": {
+      "model": "wildcatter:block/rotor_drawworks_drum"
     }
   }
 }

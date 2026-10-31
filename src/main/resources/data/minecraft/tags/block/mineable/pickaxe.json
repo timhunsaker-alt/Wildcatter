@@ -72,12 +72,12 @@
     "wildcatter:hv_plastic_wire_neutral",
     "wildcatter:industrial_plastic_wire_hot",
     "wildcatter:industrial_plastic_wire_neutral",
-    "wildcatter:casing",
     "wildcatter:motor_starter",
     "wildcatter:mcc_bucket",
     "wildcatter:mcc_incoming",
     "wildcatter:cable_lv",
     "wildcatter:cable_industrial",
+    "wildcatter:cable_mv",
     "wildcatter:cable_dist",
     "wildcatter:cable_hv",
     "wildcatter:breaker_3p_lv",
@@ -118,6 +118,12 @@
     "wildcatter:chain_link_fence",
     "wildcatter:barbed_wire_top",
     "wildcatter:mcc_section",
-    "wildcatter:oil_wellhead"
+    "wildcatter:oil_wellhead",
+    "wildcatter:rig_substructure",
+    "wildcatter:rig_mast",
+    "wildcatter:rig_drawworks",
+    "wildcatter:mud_pump",
+    "wildcatter:mud_tanks",
+    "wildcatter:rig_drive_house"
   ]
 }

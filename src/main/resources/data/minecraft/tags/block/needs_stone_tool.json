@@ -52,6 +52,12 @@
     "wildcatter:chain_link_fence",
     "wildcatter:barbed_wire_top",
     "wildcatter:mcc_section",
-    "wildcatter:oil_wellhead"
+    "wildcatter:oil_wellhead",
+    "wildcatter:rig_substructure",
+    "wildcatter:rig_mast",
+    "wildcatter:rig_drawworks",
+    "wildcatter:mud_pump",
+    "wildcatter:mud_tanks",
+    "wildcatter:rig_drive_house"
   ]
 }

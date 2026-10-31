@@ -5,7 +5,7 @@
   "block.wildcatter.pump": "Water Pump (LV)",
   "block.wildcatter.gas_line": "Steel Pipe (4 in, oil and gas)",
   "block.wildcatter.drilling_rig": "Drilling Rig (small mast rig, 40 hp)",
-  "block.wildcatter.casing": "Well Casing",
+  "block.wildcatter.casing": "Well Casing (cemented: unbreakable)",
   "block.wildcatter.refinery": "Refinery Base (LV)",
   "block.wildcatter.refinery_column": "Distillation Column",
   "block.wildcatter.cooling_tower": "Cooling Tower Fan Deck (7.5 kW, 480 V)",
@@ -95,6 +95,7 @@
   "block.wildcatter.industrial_plastic_wire_neutral": "Plastic Wire, black (480 V)",
   "block.wildcatter.cable_lv": "Three-Phase Cable (LV, A B C N G)",
   "block.wildcatter.cable_industrial": "Three-Phase Cable (480 V, A B C N G)",
+  "block.wildcatter.cable_mv": "MV Cable (4.16 kV, A B C N G)",
   "block.wildcatter.cable_dist": "Underground Primary Cable (DIST, A B C N G)",
   "block.wildcatter.cable_hv": "High-Voltage Cable (HV, A B C N G)",
   "block.wildcatter.breaker_3p_lv": "Three-Pole Breaker (LV)",
@@ -170,5 +171,12 @@
   "block.wildcatter.x_brace_138": "H-Frame X-Brace (HV)",
   "block.wildcatter.mcc_section": "MCC Starter Section (480 V, three buckets)",
   "item.wildcatter.mcc_bucket": "MCC Bucket (combination starter)",
-  "block.wildcatter.oil_wellhead": "Oil Wellhead (rod pumping)"
+  "block.wildcatter.oil_wellhead": "Oil Wellhead (rod pumping)",
+  "block.wildcatter.rig_substructure": "Land Rig Substructure (the controller, 9 x 9 m)",
+  "block.wildcatter.rig_mast": "Land Rig Mast (43 m)",
+  "block.wildcatter.rig_drawworks": "Drawworks (1,000 hp)",
+  "block.wildcatter.mud_pump": "Mud Pump (1,000 hp triplex)",
+  "block.wildcatter.mud_tanks": "Mud Tanks (60 m3)",
+  "block.wildcatter.rig_drive_house": "Rig Drive House (4.16 kV, 2,500 kVA)",
+  "item.wildcatter.top_drive": "Top Drive (250-ton, 400 hp)"
 }
