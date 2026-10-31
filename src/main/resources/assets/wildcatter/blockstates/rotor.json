@@ -32,6 +32,51 @@
     },
     "part=disconnect_blade_dist": {
       "model": "wildcatter:block/rotor_disconnect_blade_dist"
+    },
+    "part=pumpjack_crank": {
+      "model": "wildcatter:block/rotor_pumpjack_crank"
+    },
+    "part=pumpjack_pitman_low": {
+      "model": "wildcatter:block/rotor_pumpjack_pitman_low"
+    },
+    "part=pumpjack_pitman_high": {
+      "model": "wildcatter:block/rotor_pumpjack_pitman_high"
+    },
+    "part=pumpjack_beam_front": {
+      "model": "wildcatter:block/rotor_pumpjack_beam_front"
+    },
+    "part=pumpjack_beam_mid": {
+      "model": "wildcatter:block/rotor_pumpjack_beam_mid"
+    },
+    "part=pumpjack_beam_back": {
+      "model": "wildcatter:block/rotor_pumpjack_beam_back"
+    },
+    "part=pumpjack_rod": {
+      "model": "wildcatter:block/rotor_pumpjack_rod"
+    },
+    "part=pumpjack_rod_low": {
+      "model": "wildcatter:block/rotor_pumpjack_rod_low"
+    },
+    "part=pumpjack_bridle": {
+      "model": "wildcatter:block/rotor_pumpjack_bridle"
+    },
+    "part=rig_carriage": {
+      "model": "wildcatter:block/rotor_rig_carriage"
+    },
+    "part=rig_spindle": {
+      "model": "wildcatter:block/rotor_rig_spindle"
+    },
+    "part=rig_pipe": {
+      "model": "wildcatter:block/rotor_rig_pipe"
+    },
+    "part=starter_coupling": {
+      "model": "wildcatter:block/rotor_starter_coupling"
+    },
+    "part=flyball_governor": {
+      "model": "wildcatter:block/rotor_flyball_governor"
+    },
+    "part=starter_pump_coupling": {
+      "model": "wildcatter:block/rotor_starter_pump_coupling"
     }
   }
 }

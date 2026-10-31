@@ -2,9 +2,12 @@
 - the boiler, 1 x 2 x 1: a small vertical fire-tube boiler about 0.6 m across and 1.4 m tall on its base ring, its stack, the water
   gauge glass and pressure gauge on the front, the safety valve and steam outlet on top, the feed check valve and blowdown valve;
   lit, its fire door glows;
-- the 2 kW turbine-generator, one cell: the single-stage turbine (back) and the generator (front) on one skid, the coupling guard
-  between, the steam inlet on top, the governor, the terminal box;
-- the 750 W close-coupled centrifugal pump, one cell: the motor (front) and the volute (back), suction out the back, discharge up;
+- the 2 kW turbine-generator, one cell: the single-stage turbine (back) and the generator (front) on one skid, the open coupling
+  guard between, the steam inlet on top, the governor valve and the flyball governor on its pedestal behind, the terminal box;
+- the 750 W frame-mounted end-suction pump, one cell: the motor (front), the jaw coupling under its open guard, the bearing frame
+  and the volute (back), suction out the back, discharge up;
+Turning (4.5g): the turbine's coupling and its flyball governor, and the pump's jaw coupling (rotor_starter_coupling,
+rotor_flyball_governor, rotor_starter_pump_coupling), each drawn centred on its block with its shaft along z (the governor's along y).
 - the coal firebox, one cell: cast iron, its fire door and ash-pit door on the front; lit, the door's draught slots glow."""
 import gearlib as g
 import mlib
@@ -43,7 +46,11 @@ def turbine(running):
 	M.box((0.38, 0.08, 0.6), (0.62, 0.13, 0.8), "iron")
 	M.cylinder("z", (0.5, 0.25), 0.14, 0.12, 0.45, "blue", 14)                    # the generator
 	M.fins((0.36, 0.13, 0.15), (0.64, 0.38, 0.42), "z", 7, 0.012, "blue")
-	M.cylinder("z", (0.5, 0.25), 0.07, 0.45, 0.55, "galv", 10)                    # the coupling guard
+	for z in (0.45, 0.535):                                                       # the open coupling guard: two hoops and a top bar
+		M.ring("z", (0.5, 0.25), 0.09, z, z + 0.015, 0.012, "engine", sides=12)
+	M.box((0.48, 0.33, 0.45), (0.52, 0.345, 0.55), "engine")
+	M.box((0.45, 0.13, 0.86), (0.55, 0.42, 0.96), "iron")                        # the governor's pedestal, driven off the shaft end
+	M.cylinder("y", (0.5, 0.91), 0.012, 0.42, 0.5, "steel", 6)
 	M.pipe([(0.5, 0.4, 0.75), (0.5, 0.6, 0.75), (0.5, 0.6, 1.0)], 1, "steel")     # steam in from behind
 	M.box((0.45, 0.55, 0.7), (0.55, 0.66, 0.8), "brass")                          # the governor valve
 	M.pipe([(0.65, 0.25, 0.7), (1.0, 0.25, 0.7)], 1.5, "steel")                   # the exhaust
@@ -57,13 +64,17 @@ def turbine(running):
 def pump():
 	M = g.model("pump", particle="blue")
 	M.box((0.3, 0.0, 0.15), (0.7, 0.05, 0.85), "iron")                            # base
-	M.cylinder("z", (0.5, 0.2), 0.09, 0.15, 0.45, "blue", 12)                     # the motor
-	M.fins((0.41, 0.11, 0.17), (0.59, 0.29, 0.43), "z", 6, 0.01, "blue")
-	M.box((0.56, 0.24, 0.3), (0.64, 0.32, 0.4), "grey")                           # its terminal box
-	M.cylinder("z", (0.5, 0.2), 0.05, 0.45, 0.52, "galv", 10)                     # the bracket
-	M.cylinder("z", (0.5, 0.2), 0.13, 0.52, 0.62, "iron", 14)                     # the volute
-	M.pipe([(0.5, 0.2, 0.62), (0.5, 0.2, 1.0)], 1.5, "steel")                     # suction out the back
-	M.pipe([(0.5, 0.33, 0.57), (0.5, 1.0, 0.57)], 1, "steel")                     # discharge up
+	M.cylinder("z", (0.5, 0.2), 0.09, 0.1, 0.38, "blue", 12)                      # the motor
+	M.fins((0.41, 0.11, 0.12), (0.59, 0.29, 0.36), "z", 6, 0.01, "blue")
+	M.box((0.56, 0.24, 0.24), (0.64, 0.32, 0.34), "grey")                         # its terminal box
+	M.box((0.42, 0.05, 0.3), (0.58, 0.12, 0.38), "blue")                          # its feet
+	for z in (0.385, 0.46):                                                       # the open coupling guard
+		M.ring("z", (0.5, 0.2), 0.06, z, z + 0.012, 0.01, "engine", sides=12)
+	M.box((0.43, 0.05, 0.47), (0.57, 0.2, 0.6), "iron")                           # the bearing frame and its foot
+	M.cylinder("z", (0.5, 0.2), 0.05, 0.47, 0.6, "iron", 10)
+	M.cylinder("z", (0.5, 0.2), 0.13, 0.6, 0.7, "iron", 14)                       # the volute
+	M.pipe([(0.5, 0.2, 0.7), (0.5, 0.2, 1.0)], 1.5, "steel")                      # suction out the back
+	M.pipe([(0.5, 0.33, 0.65), (0.5, 1.0, 0.65)], 1, "steel")                     # discharge up
 	M.collide((0.3, 0.0, 0.15), (0.7, 0.35, 0.85))
 	return M
 
@@ -86,6 +97,30 @@ BOILERS[1].export_args = {"blockstate": False, "item": False}
 OTHERS = g.single([turbine(False), turbine(True)], "steam_turbine") + g.single([pump()], "pump") + g.single([firebox(False), firebox(True)], "firebox")
 M = BOILERS[0]
 EXTRA = BOILERS[1:] + OTHERS
+
+
+def rotor(name):
+	return mlib.Model("rotor_" + name, [(0, 0, 0)], dict(g.TEX), g.TEX["iron"])
+
+
+COUPLING = rotor("starter_coupling")             # a small disc coupling, 0.12 m across
+COUPLING.cylinder("z", (0.5, 0.5), 0.06, 0.46, 0.49, "steel", 12)
+COUPLING.cylinder("z", (0.5, 0.5), 0.06, 0.51, 0.54, "steel", 12)
+COUPLING.cylinder("z", (0.5, 0.5), 0.045, 0.49, 0.51, "galv", 12)
+COUPLING.box((0.48, 0.55, 0.46), (0.52, 0.565, 0.54), "brass")   # a painted mark
+FLYBALL = rotor("flyball_governor")               # two balls on their arms about the spindle
+FLYBALL.cylinder("y", (0.5, 0.5), 0.01, 0.5, 0.66, "steel", 6)
+for side in (-1, 1):
+	FLYBALL.box((0.5 + side * 0.005, 0.6, 0.495), (0.5 + side * 0.05, 0.61, 0.505), "steel", rot=("z", side * -30.0, (0.5, 0.6, 0.5)))
+	FLYBALL.cylinder("y", (0.5 + side * 0.05, 0.5), 0.018, 0.555, 0.59, "brass", 8)
+FLYBALL.cylinder("y", (0.5, 0.5), 0.02, 0.64, 0.66, "iron", 8)
+PUMP_COUPLING = rotor("starter_pump_coupling")    # the pump's jaw coupling and its spider, 0.06 m across
+PUMP_COUPLING.cylinder("z", (0.5, 0.5), 0.03, 0.46, 0.49, "iron", 10)
+PUMP_COUPLING.cylinder("z", (0.5, 0.5), 0.03, 0.51, 0.54, "iron", 10)
+PUMP_COUPLING.fan("z", (0.5, 0.5), 0.028, 0.5, 0.02, "rubber", blades=4, width=0.012, hub=0.01)
+PUMP_COUPLING.box((0.49, 0.525, 0.46), (0.51, 0.535, 0.49), "brass")
+for part in (COUPLING, FLYBALL, PUMP_COUPLING):
+	M.rotors[part.name[len("rotor_"):]] = part
 
 
 def after():

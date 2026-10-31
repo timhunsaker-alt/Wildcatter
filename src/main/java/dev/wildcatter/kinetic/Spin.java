@@ -50,13 +50,18 @@ public final class Spin {
 
 	/** Client side: the shaft angle in degrees now, advanced by the time since the last frame. */
 	public float angle(long nowNanos) {
+		return angle(nowNanos, DISPLAY_DIVISOR);
+	}
+
+	/** The same for a machine shown at rpm / {@code divisor} (1 for a slow machine at its real speed). */
+	public float angle(long nowNanos, float divisor) {
 		if (lastNanos >= 0) {
 			float seconds = Math.min(0.25F, (nowNanos - lastNanos) / 1e9F);
 			if (!Float.isNaN(target)) {
 				float step = SWING_DEGREES_PER_SECOND * seconds;
 				angle = Math.abs(target - angle) <= step ? target : angle + Math.signum(target - angle) * step;
 			} else {
-				angle = (angle + rpm / DISPLAY_DIVISOR * 6.0F * seconds) % 360.0F;   // rpm / 60 turns a second, 360 degrees a turn
+				angle = (angle + rpm / divisor * 6.0F * seconds) % 360.0F;   // rpm / 60 turns a second, 360 degrees a turn
 			}
 		} else if (!Float.isNaN(target)) {
 			angle = target;

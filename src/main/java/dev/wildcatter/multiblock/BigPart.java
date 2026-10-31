@@ -42,6 +42,14 @@ public interface BigPart {
 	}
 
 	/**
+	 * An older world's one-block part that becomes something else instead of growing or dropping (a pumpjack standing on its
+	 * hole becomes the hole's wellhead): does it and returns true, or returns false to grow or drop as usual.
+	 */
+	default boolean replaceLegacy(net.minecraft.server.level.ServerLevel level, net.minecraft.core.BlockPos main, BlockState state) {
+		return false;
+	}
+
+	/**
 	 * The cell whose {@code face} carries this part's terminal on that side. Most parts have their terminals on their main
 	 * cell; a substation part has them on the bottom cell of the yard's centre line (see {@link BigParts#lineTerminal}).
 	 */

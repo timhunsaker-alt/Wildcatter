@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/gas_wellhead"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/gas_wellhead/item"
+ }
 }

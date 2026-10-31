@@ -103,6 +103,9 @@ public final class Plumbing {
 				BlockPos next = source.relative(side);
 				// a true-size machine shows up once, through whichever of its cells the pipe touches
 				net.minecraft.world.level.block.entity.BlockEntity entity = dev.wildcatter.multiblock.BigParts.entity(level, next);
+				if (level.getBlockState(next).getBlock() instanceof OilWellheadBlock) {   // a pumpjack's crude comes out of its wellhead
+					entity = OilWellheadBlock.pumpjack(level, next);
+				}
 				if (!cells.contains(next) && kind.isInstance(entity)) {
 					found.putIfAbsent(entity.getBlockPos(), kind.cast(entity));
 				}

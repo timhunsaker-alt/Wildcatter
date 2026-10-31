@@ -1,10 +1,10 @@
 {
   "block.wildcatter.boiler": "Boiler",
   "block.wildcatter.firebox": "Firebox",
-  "block.wildcatter.pipe": "Water Pipe",
+  "block.wildcatter.pipe": "Water Pipe (2 in)",
   "block.wildcatter.pump": "Water Pump (LV)",
-  "block.wildcatter.gas_line": "Steel Pipe (oil and gas)",
-  "block.wildcatter.drilling_rig": "Drilling Rig (LV)",
+  "block.wildcatter.gas_line": "Steel Pipe (4 in, oil and gas)",
+  "block.wildcatter.drilling_rig": "Drilling Rig (small mast rig, 40 hp)",
   "block.wildcatter.casing": "Well Casing",
   "block.wildcatter.refinery": "Refinery Base (LV)",
   "block.wildcatter.refinery_column": "Distillation Column",
@@ -16,8 +16,8 @@
   "block.wildcatter.mv_plastic_wire_neutral": "Plastic Line, black (MV)",
   "block.wildcatter.hv_plastic_wire_hot": "Plastic Line, red (HV)",
   "block.wildcatter.hv_plastic_wire_neutral": "Plastic Line, black (HV)",
-  "block.wildcatter.pumpjack": "Pumpjack (LV)",
-  "block.wildcatter.gas_wellhead": "Gas Wellhead",
+  "block.wildcatter.pumpjack": "Pumpjack (API 80-119-54, 10 hp)",
+  "block.wildcatter.gas_wellhead": "Gas Wellhead (Christmas tree)",
   "block.wildcatter.steam_turbine": "Steam Turbine",
   "block.wildcatter.wire_hot": "Bare Wire, red (LV)",
   "block.wildcatter.wire_neutral": "Bare Wire, black (LV)",
@@ -169,5 +169,6 @@
   "block.wildcatter.crossbeam_138": "H-Frame Crossbeam (HV)",
   "block.wildcatter.x_brace_138": "H-Frame X-Brace (HV)",
   "block.wildcatter.mcc_section": "MCC Starter Section (480 V, three buckets)",
-  "item.wildcatter.mcc_bucket": "MCC Bucket (combination starter)"
+  "item.wildcatter.mcc_bucket": "MCC Bucket (combination starter)",
+  "block.wildcatter.oil_wellhead": "Oil Wellhead (rod pumping)"
 }

@@ -90,7 +90,7 @@ public final class WildcatterBlocks {
 	/** Carries gas (and pumped crude) from a well to the fireboxes. Never joins a water pipe. */
 	public static final Block GAS_LINE = block("gas_line", props -> new PipeBlock(props.mapColor(MapColor.COLOR_ORANGE)
 			.strength(1.5F, 4.0F).sound(SoundType.METAL).noOcclusion(), PipeBlock.Kind.GAS));
-	/** Sinks a cased hole straight down. A strike turns it into a pumpjack or a gas wellhead. */
+	/** Sinks a cased hole straight down. On a strike it rigs down and leaves an oil wellhead or a gas wellhead. */
 	public static final Block DRILLING_RIG = block("drilling_rig", props -> new DrillingRigBlock(props.mapColor(MapColor.COLOR_YELLOW)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
 	public static final Block CASING = block("casing", props -> new CasingBlock(props.mapColor(MapColor.METAL)
@@ -98,6 +98,9 @@ public final class WildcatterBlocks {
 	public static final Block PUMPJACK = block("pumpjack", props -> new PumpjackBlock(props.mapColor(MapColor.COLOR_BLACK)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
 	public static final Block GAS_WELLHEAD = block("gas_wellhead", props -> new GasWellheadBlock(props.mapColor(MapColor.COLOR_ORANGE)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+	/** The rod-pumping wellhead a strike leaves on an oil well; a pumpjack sets its horsehead over it (docs/multiblocks/well-site.md). */
+	public static final Block OIL_WELLHEAD = block("oil_wellhead", props -> new dev.wildcatter.block.OilWellheadBlock(props.mapColor(MapColor.COLOR_GREEN)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
 
 	/** Crude in, diesel out. The base is a pot still; two columns on top make it a full tower that also makes plastic. */
@@ -454,6 +457,7 @@ public final class WildcatterBlocks {
 		add("casing", CASING);
 		add("pumpjack", PUMPJACK);
 		add("gas_wellhead", GAS_WELLHEAD);
+		add("oil_wellhead", OIL_WELLHEAD);
 		add("refinery", REFINERY);
 		add("refinery_column", REFINERY_COLUMN);
 		add("cooling_tower", COOLING_TOWER);

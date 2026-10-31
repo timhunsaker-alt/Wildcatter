@@ -16,7 +16,8 @@ PARTS = ["gsu_transformer", "fuel_tank", "genset_base_frame", "radiator", "gense
 	"tower_basin", "cooling_fill", "drift_eliminator", "cooling_tower",
 	"hv_breaker_3p", "disconnect_hv", "bus_hv", "power_transformer", "bus_dist", "disconnect_dist", "dist_breaker_3p", "relay_panel",
 	"wood_pole_30", "wood_pole_40", "wood_pole_75", "crossarm_dist", "crossbeam_138", "x_brace_138", "pole_transformer", "fused_cutout",
-	"padmount_208", "padmount_480", "unit_substation", "enclosure", "fixtures", "mcc", "starter_plant"]
+	"padmount_208", "padmount_480", "unit_substation", "enclosure", "fixtures", "mcc", "starter_plant",
+	"drilling_rig", "pumpjack", "wellheads"]
 
 
 def colours(model):

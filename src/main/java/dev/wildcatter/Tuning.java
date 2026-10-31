@@ -89,6 +89,10 @@ public final class Tuning {
 	public static final double PUMPJACK_WATTS = 7_500.0;      // a 10 hp, 480 V three-phase motor: about 11 A
 	public static final double PUMPJACK_UNITS_PER_TICK = 0.5; // at full pressure and voltage
 	public static final int PUMPJACK_TANK = 4000;
+	public static final double PUMPJACK_SPM = 9.0;            // strokes a minute: the crank's rpm (docs/multiblocks/well-site.md)
+	public static final double RIG_ROTARY_RPM = 80.0;         // the small rig's top head while drilling
+	public static final int RIG_JOINT_BLOCKS = 6;             // a 6 m joint of drill pipe: the head's travel down the mast
+	public static final double STARTER_PUMP_RPM = 3450.0;     // the 750 W pump's two-pole motor at full load
 	public static final double GAS_UNITS_PER_TICK = 1.5;      // a free-flowing well at full pressure
 	/** Fuel a firebox will take from a well before it is full, in ticks of fire. */
 	public static final double FIREBOX_FEED_CAP = 200.0;

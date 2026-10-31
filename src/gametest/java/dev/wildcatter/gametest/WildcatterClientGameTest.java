@@ -318,6 +318,10 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 
 		String pump = read(server, 53, up, 50);
 		check(pump.contains("pumping") || pump.contains("boilers are full"), "a wired pump touching water with a pipe to a boiler should pump: " + pump);
+		float[] rpm = context.computeOnClient(client -> new float[] {
+				client.level.getBlockEntity(new BlockPos(51, up, 50)) instanceof dev.wildcatter.block.SteamTurbineBlockEntity t ? t.spin().rpm() : -1F,
+				client.level.getBlockEntity(new BlockPos(53, up, 50)) instanceof dev.wildcatter.block.PumpBlockEntity p ? p.spin().rpm() : -1F});
+		check(rpm[0] > 1000 && Math.abs(rpm[1] - Tuning.STARTER_PUMP_RPM) < 1, "the client should see the turbine's coupling and the pump's turning: " + rpm[0] + " / " + rpm[1] + " rpm");
 		String tank = read(server, 53, up, 47);
 		check(tank.matches(".*water [1-9]\\d*/.*"), "the pipe should have carried water into the second boiler: " + tank);
 		String noDrain = read(server, 51, up, 50);
@@ -390,8 +394,8 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		long found = -1;
 		search:
 		for (long seed = 1; seed < 2_000_000; seed++) {
-			Reservoir oil = Reservoir.at(seed, rx, rz);
-			if (oil == null || Reservoir.at(seed, rx + 1, rz) == null || oil.kind() != Reservoir.Kind.OIL || oil.topY() > -42) {
+			Reservoir oil = Reservoir.at(seed, rx + 7, rz);   // under the rig's hole
+			if (oil == null || oil.kind() != Reservoir.Kind.OIL || oil.topY() > -42) {
 				continue;
 			}
 			for (int x = 20; x <= 60; x += 2) {
@@ -416,38 +420,69 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			String far = server.computeOnServer(srv -> SeismographItem.report(srv.overworld(), fgx + 300.5, fgz + 300.5));
 			check(far.contains("echo") || far.contains("solid rock"), "a seismograph should say something anywhere: " + far);
 
-			// ---- the oil well: the rig and the pumpjack are 480 V three-phase motors. A diesel set and a unit substation feed a
-			// three-phase cable up a tall pole (the world is flat, so the rig stands high to have something to drill through) ----
+			// ---- the oil well (docs/multiblocks/well-site.md): the rig and the pumpjack are 480 V three-phase motors. A diesel set feeds
+			// a three-phase cable up a tall pole (the world is flat, so the rig stands high to have something to drill through) and
+			// across to the rig's terminal box; the rig faces east, its hole 7 east of the pole so the casing misses the cable ----
 			int top = up + 30;
-			int dx = rx + 1;   // the rig stands beside the cable pole so its hole does not eat the cable
-			server.runCommand("tp @p 36 " + up + " 24 0 20");
+			int hx = rx + 7;
+			BlockPos hole = new BlockPos(hx, top + 1, rz);
+			server.runCommand("kill @e[type=item]");
 			BlockPos set = new BlockPos(rx, up, rz + 2);
 			genset(server, set, net.minecraft.core.Direction.WEST, false);   // the skid runs south of the panel
 			put(server, rx, up, rz + 1, "wildcatter:cable_industrial");
 			for (int h = up; h <= top + 1; h++) {
 				put(server, rx, h, rz, "wildcatter:cable_industrial");
 			}
+			put(server, rx + 1, top + 1, rz, "wildcatter:cable_industrial");
 			startGenset(context, server, set, net.minecraft.core.Direction.WEST, 1000);
-			put(server, dx, top + 1, rz, "wildcatter:drilling_rig");
+			// a pad of rock under the rig and the pumpjack, so what they drop lands there
+			server.runCommand("fill " + (rx + 1) + " " + top + " " + (rz - 1) + " " + (hx + 1) + " " + top + " " + (rz + 6) + " minecraft:stone");
+			placeBig(server, WildcatterBlocks.DRILLING_RIG, hole, net.minecraft.core.Direction.EAST);   // its terminal box at rx + 2
+			// a ledge to watch from, level with the rig's deck
+			server.runCommand("fill " + (hx - 6) + " " + (top + 1) + " " + (rz + 13) + " " + (hx - 2) + " " + (top + 1) + " " + (rz + 15) + " minecraft:stone");
+			server.runCommand("tp @p " + (hx - 4) + " " + (top + 2) + " " + (rz + 14) + " 165 -8");
 			context.waitTicks(100);   // the motor starts (2 s of inrush) and runs
-			String rig = read(server, dx, top + 1, rz);
-			check(rig.contains("drilling"), "a rig on 480 V three-phase should start drilling: " + rig + " | substation " + read(server, rx, up, rz + 2)
-					+ " | cable@top " + read(server, rx, top + 1, rz) + " | set " + read(server, rx, up, rz + 3));
-			int topY = Reservoir.at(seed, dx, rz).topY();
+			String rig = read(server, hx, top + 1, rz);
+			check(rig.contains("drilling"), "a rig on 480 V three-phase should start drilling: " + rig + " | set " + read(server, rx, up, rz + 3)
+					+ " | cable@top " + read(server, rx + 1, top + 1, rz));
+			float rigRpm = context.computeOnClient(client -> client.level.getBlockEntity(hole) instanceof dev.wildcatter.block.DrillingRigBlockEntity r ? r.spin().rpm() : -1F);
+			check(Math.abs(rigRpm - Tuning.RIG_ROTARY_RPM) < 1, "the client should see the top head turning at 80 rpm: " + rigRpm);
+			context.takeScreenshot("wildcatter-drilling-rig");
+			int topY = Reservoir.at(seed, hx, rz).topY();
 			for (int waited = 0; waited < 3000; waited += 100) {
-				if (server.computeOnServer(srv -> srv.overworld().getBlockState(new BlockPos(dx, top + 1, rz)).is(WildcatterBlocks.PUMPJACK))) {
+				if (server.computeOnServer(srv -> srv.overworld().getBlockState(hole).is(WildcatterBlocks.OIL_WELLHEAD))) {
 					break;
 				}
 				context.waitTicks(100);
 			}
-			check(server.computeOnServer(srv -> srv.overworld().getBlockState(new BlockPos(dx, top + 1, rz)).is(WildcatterBlocks.PUMPJACK)),
-					"the rig should have struck oil and become a pumpjack: " + read(server, dx, top + 1, rz));
-			check(server.computeOnServer(srv -> srv.overworld().getBlockState(new BlockPos(dx, topY, rz)).is(WildcatterBlocks.CASING)),
+			check(server.computeOnServer(srv -> srv.overworld().getBlockState(hole).is(WildcatterBlocks.OIL_WELLHEAD)),
+					"the rig should have struck oil and rigged down, leaving an oil wellhead: " + read(server, hx, top + 1, rz));
+			check(isAir(server, hx, top + 5, rz) && isAir(server, rx + 2, top + 1, rz), "the rig should have left the hole: mast and skid gone");
+			check(itemsNear(server, hole, WildcatterBlocks.DRILLING_RIG) == 1, "the rig should drop as its item when it rigs down");
+			check(server.computeOnServer(srv -> srv.overworld().getBlockState(new BlockPos(hx, topY, rz)).is(WildcatterBlocks.CASING)),
 					"the hole should be cased down to the field");
-			context.waitTicks(200);
-			String jack = read(server, dx, top + 1, rz);
+			// a pumpjack clicked on the wellhead from the west snaps over it, facing east; the short cable gives way to its terminal
+			// box, which the pole's cable then feeds directly
+			put(server, rx + 1, top + 1, rz, "minecraft:air");
+			check(placeAt(server, WildcatterBlocks.PUMPJACK, hole, net.minecraft.core.Direction.UP, rx - 0.5, rz + 0.5, -90.0F),
+					"a pumpjack clicked on the oil wellhead should place");
+			BlockPos jackMain = hole.west();
+			check(stateAt(server, jackMain).is(WildcatterBlocks.PUMPJACK) && stateAt(server, jackMain).getValue(dev.wildcatter.block.PumpjackBlock.FACING) == net.minecraft.core.Direction.EAST
+					&& stateAt(server, hole.above(2)).is(WildcatterBlocks.PUMPJACK), "the pumpjack should snap with its horsehead over the well: " + stateAt(server, jackMain));
+			context.waitTicks(300);
+			String jack = read(server, jackMain.getX(), jackMain.getY(), jackMain.getZ());
 			check(jack.matches(".*tank [1-9]\\d*/.*"), "a wired pumpjack should fill its tank: " + jack);
+			float jackRpm = context.computeOnClient(client -> client.level.getBlockEntity(jackMain) instanceof dev.wildcatter.block.PumpjackBlockEntity j ? j.spin().rpm() : -1F);
+			check(Math.abs(jackRpm - Tuning.PUMPJACK_SPM) < 0.5, "the client should see the crank turning at 9 strokes a minute: " + jackRpm);
 			context.takeScreenshot("wildcatter-pumpjack");
+			// an older world's one-block pumpjack on its cased hole becomes the hole's wellhead and drops itself
+			server.runCommand("kill @e[type=item]");
+			BlockPos old = new BlockPos(hx, top + 1, rz + 6);
+			put(server, old.getX(), old.getY() - 1, old.getZ(), "wildcatter:casing");
+			put(server, old.getX(), old.getY(), old.getZ(), "wildcatter:pumpjack");
+			context.waitTicks(10);
+			check(stateAt(server, old).is(WildcatterBlocks.OIL_WELLHEAD) && itemsNear(server, old, WildcatterBlocks.PUMPJACK) == 1,
+					"an old one-block pumpjack should become a wellhead and drop as an item: " + stateAt(server, old));
 
 			// ---- the gas well: a wellhead against a firebox under a boiler, no fuel put in ----
 			server.runCommand("tp @p " + gx + " " + up + " " + (gz - 6) + " 0 20");
@@ -1371,7 +1406,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		server.runCommand("fill 6 " + (y - 1) + " " + (z - 4) + " 22 " + (y - 1) + " " + (z + 4) + " minecraft:stone");
 		long seed = -1;
 		for (long s = 1; s < 2_000_000 && seed < 0; s++) {
-			Reservoir oil = Reservoir.at(s, px, z);
+			Reservoir oil = Reservoir.at(s, px + 6, z);   // under its wellhead
 			if (oil != null && oil.kind() == Reservoir.Kind.OIL && oil.units() > 10_000) {
 				seed = s;
 			}
@@ -1389,7 +1424,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 				put(server, x, up, z - 1, "wildcatter:industrial_plastic_wire_hot[conductor=b]");
 				put(server, x, up, z + 1, "wildcatter:industrial_plastic_wire_hot[conductor=c]");
 			}
-			put(server, px, up, z, "wildcatter:pumpjack");
+			pumpjack(server, new BlockPos(px, up, z), net.minecraft.core.Direction.EAST);   // its terminal box at px, wired on three sides
 			startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 1000);
 			context.waitTicks(100);   // the motor starts (2 s of inrush) and runs
 			String jack = read(server, px, up, z);
@@ -1399,7 +1434,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			context.takeScreenshot("wildcatter-motor");
 			// a full tank: the motor stops and draws nothing
 			server.computeOnServer(srv -> {
-				((dev.wildcatter.block.PumpjackBlockEntity) srv.overworld().getBlockEntity(new BlockPos(px, up, z))).testFill(Tuning.PUMPJACK_TANK);
+				jack(srv, new BlockPos(px, up, z)).testFill(Tuning.PUMPJACK_TANK);
 				return null;
 			});
 			context.waitTicks(60);
@@ -1408,7 +1443,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			check(full.contains("motor stopped") && idle < 0.5, "with its tank full the pumpjack should stop drawing: " + full + " | " + idle + " A");
 			// emptied, it starts again; then two leads swapped at the terminal box run it backward
 			server.computeOnServer(srv -> {
-				dev.wildcatter.block.PumpjackBlockEntity j = (dev.wildcatter.block.PumpjackBlockEntity) srv.overworld().getBlockEntity(new BlockPos(px, up, z));
+				dev.wildcatter.block.PumpjackBlockEntity j = jack(srv, new BlockPos(px, up, z));
 				j.take(Tuning.PUMPJACK_TANK);
 				j.swapLeads();
 				return null;
@@ -1417,7 +1452,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			String backward = read(server, px, up, z);
 			check(backward.contains("RUNNING BACKWARD") && backward.contains("lifting nothing"), "with two leads swapped the motor should run backward and lift nothing: " + backward);
 			server.computeOnServer(srv -> {
-				((dev.wildcatter.block.PumpjackBlockEntity) srv.overworld().getBlockEntity(new BlockPos(px, up, z))).swapLeads();
+				jack(srv, new BlockPos(px, up, z)).swapLeads();
 				return null;
 			});
 			context.waitTicks(80);
@@ -1448,13 +1483,13 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		int z = -360;
 		server.runCommand("tp @p 16 " + (up + 3) + " " + (z + 7) + " 180 15");
 		context.waitTicks(20);
-		server.runCommand("fill 6 " + (y - 1) + " " + (z - 6) + " 24 " + (y + 6) + " " + (z + 4) + " minecraft:air");
-		server.runCommand("fill 6 " + (y - 1) + " " + (z - 6) + " 24 " + (y - 1) + " " + (z + 4) + " minecraft:stone");
+		server.runCommand("fill 6 " + (y - 1) + " " + (z - 10) + " 24 " + (y + 6) + " " + (z + 4) + " minecraft:air");
+		server.runCommand("fill 6 " + (y - 1) + " " + (z - 10) + " 24 " + (y - 1) + " " + (z + 4) + " minecraft:stone");
 		server.runCommand("kill @e[type=item]");
 		long seed = -1;
 		for (long s = 1; s < 3_000_000 && seed < 0; s++) {
-			Reservoir a = Reservoir.at(s, 15, z - 2);
-			Reservoir b = Reservoir.at(s, 17, z - 3);
+			Reservoir a = Reservoir.at(s, 15, z - 8);   // under the two pumpjacks' wellheads
+			Reservoir b = Reservoir.at(s, 18, z - 9);
 			if (a != null && b != null && a.kind() == Reservoir.Kind.OIL && b.kind() == Reservoir.Kind.OIL && a.units() > 10_000 && b.units() > 10_000) {
 				seed = s;
 			}
@@ -1478,17 +1513,18 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			check(clickWith(server, new BlockPos(16, up + 1, z), south, new ItemStack(WildcatterItems.MCC_BUCKET)), "a bucket should click into section 2's middle space");
 			check(stateAt(server, new BlockPos(15, up, z)).getValue(dev.wildcatter.block.MccSectionBlock.BUCKET) == dev.wildcatter.block.MccSectionBlock.Bucket.STOPPED,
 					"the space should show its bucket: " + stateAt(server, new BlockPos(15, up, z)));
-			// bucket 1's motor leads leave the back of its cell to a pumpjack
+			// bucket 1's motor leads leave the back of its cell to a pumpjack's terminal box; the pumpjack runs on north
 			put(server, 15, up, z - 1, "wildcatter:cable_industrial");
-			put(server, 15, up, z - 2, "wildcatter:pumpjack");
-			// section 2's bucket: phase A and phase B round to a pumpjack, no phase C
+			pumpjack(server, new BlockPos(15, up, z - 2), net.minecraft.core.Direction.NORTH);
+			// section 2's bucket: phase A to one side of a second pumpjack's box and phase B to its back, no phase C
 			put(server, 16, up + 1, z - 1, "wildcatter:cable_industrial");
 			put(server, 17, up + 1, z - 1, "wildcatter:cable_industrial");
 			put(server, 17, up, z - 1, "wildcatter:cable_industrial");
 			put(server, 17, up, z - 2, "wildcatter:industrial_plastic_wire_hot[conductor=a]");
-			put(server, 17, up + 1, z - 2, "wildcatter:industrial_plastic_wire_hot[conductor=b]");
-			put(server, 17, up + 1, z - 3, "wildcatter:industrial_plastic_wire_hot[conductor=b]");
-			put(server, 17, up, z - 3, "wildcatter:pumpjack");
+			put(server, 17, up, z - 3, "wildcatter:industrial_plastic_wire_hot[conductor=a]");
+			put(server, 18, up, z - 1, "wildcatter:industrial_plastic_wire_hot[conductor=b]");
+			put(server, 18, up, z - 2, "wildcatter:industrial_plastic_wire_hot[conductor=b]");
+			pumpjack(server, new BlockPos(18, up, z - 3), net.minecraft.core.Direction.NORTH);
 			startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 1000);
 			server.computeOnServer(srv -> {
 				section(srv, 15, z).pushButton(0);
@@ -1500,7 +1536,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			check(mcc.contains("2 bucket(s)") && mcc.contains("main 100 A ON"), "the incoming section and its two sections' buckets should form a lineup: " + mcc);
 			String jack = read(server, 15, up, z - 2);
 			check(jack.contains("pumping"), "the pumpjack on bucket 1 should run: " + jack + " | " + read(server, 15, up, z) + " | " + mcc);
-			check(read(server, 17, up, z - 3).contains("STALLED"), "a motor with two phases cannot start: " + read(server, 17, up, z - 3));
+			check(read(server, 18, up, z - 3).contains("STALLED"), "a motor with two phases cannot start: " + read(server, 18, up, z - 3));
 			String tripped = "";
 			for (int waited = 0; waited < 600; waited += 40) {
 				tripped = read(server, 16, up, z);
@@ -1568,11 +1604,11 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		int px = 17;
 		server.runCommand("tp @p 14 " + (up + 2) + " " + (z + 6) + " 180 15");
 		context.waitTicks(20);
-		server.runCommand("fill 6 " + (y - 1) + " " + (z - 4) + " 22 " + (y + 4) + " " + (z + 4) + " minecraft:air");
-		server.runCommand("fill 6 " + (y - 1) + " " + (z - 4) + " 22 " + (y - 1) + " " + (z + 4) + " minecraft:stone");
+		server.runCommand("fill 6 " + (y - 1) + " " + (z - 4) + " 24 " + (y + 5) + " " + (z + 4) + " minecraft:air");
+		server.runCommand("fill 6 " + (y - 1) + " " + (z - 4) + " 24 " + (y - 1) + " " + (z + 4) + " minecraft:stone");
 		long seed = -1;
 		for (long s = 1; s < 2_000_000 && seed < 0; s++) {
-			Reservoir oil = Reservoir.at(s, px, z);
+			Reservoir oil = Reservoir.at(s, px + 6, z);   // under its wellhead
 			if (oil != null && oil.kind() == Reservoir.Kind.OIL && oil.units() > 10_000) {
 				seed = s;
 			}
@@ -1586,7 +1622,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			put(server, 14, up, z, "wildcatter:motor_starter[facing=east]");   // line in at the back (west), motor out of the front (east)
 			put(server, 15, up, z, "wildcatter:cable_industrial");
 			put(server, 16, up, z, "wildcatter:cable_industrial");
-			put(server, px, up, z, "wildcatter:pumpjack");
+			pumpjack(server, new BlockPos(px, up, z), net.minecraft.core.Direction.EAST);
 			startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 1000);
 			String stopped = read(server, 14, up, z);
 			String idleJack = read(server, px, up, z);
@@ -2129,6 +2165,23 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 
 	private dev.wildcatter.block.TurbineGeneratorBlockEntity plantAt(net.minecraft.server.MinecraftServer srv, BlockPos at) {
 		return (dev.wildcatter.block.TurbineGeneratorBlockEntity) srv.overworld().getBlockEntity(at);
+	}
+
+	/**
+	 * A true-size pumpjack over a new oil wellhead (docs/multiblocks/well-site.md): its motor's terminal box at {@code box}, its front
+	 * and its well {@code facing} (the box is wired on its back and both sides). Returns the wellhead.
+	 */
+	private BlockPos pumpjack(TestServerContext server, BlockPos box, net.minecraft.core.Direction facing) {
+		BlockPos main = box.relative(facing, 5);
+		BlockPos well = main.relative(facing);
+		put(server, well.getX(), well.getY(), well.getZ(), "wildcatter:oil_wellhead[facing=" + facing.getSerializedName() + "]");
+		placeBig(server, WildcatterBlocks.PUMPJACK, main, facing);
+		return well;
+	}
+
+	/** The pumpjack any of whose cells is at {@code at}. */
+	private dev.wildcatter.block.PumpjackBlockEntity jack(net.minecraft.server.MinecraftServer srv, BlockPos at) {
+		return (dev.wildcatter.block.PumpjackBlockEntity) dev.wildcatter.multiblock.BigParts.entity(srv.overworld(), at);
 	}
 
 	/** Places a true-size part's main cell and grows it into its cells, as a player's placing would. */

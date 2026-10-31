@@ -28,11 +28,17 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 /**
- * Drills straight down, one block at a time, leaving casing behind. How fast depends on the voltage it gets (the
- * square of it, like a motor). It stops at the top of the field under it, or at {@link Tuning#DRY_HOLE_Y} if there
- * is nothing there: a dry hole. A strike turns the rig into a pumpjack (oil) or a gas wellhead.
+ * Drills straight down from under its main cell, one block at a time, leaving casing behind. How fast depends on the voltage it
+ * gets (the square of it, like a motor). It stops at the top of the field under it, or at {@link Tuning#DRY_HOLE_Y} if there
+ * is nothing there: a dry hole. On a strike the rig rigs down: it drops as its item and leaves an {@link OilWellheadBlock} or a
+ * gas wellhead (Christmas tree) on the hole (docs/multiblocks/well-site.md). While drilling its top head turns at
+ * {@link Tuning#RIG_ROTARY_RPM} and slides down the mast through each 6 m joint.
  */
-public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, dev.wildcatter.kinetic.Sounding {
+public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, dev.wildcatter.kinetic.Sounding,
+		dev.wildcatter.multiblock.BigPartEntity, dev.wildcatter.kinetic.Kinetic {
+	/** The top head's carriage at the top of the mast, and how far it travels down through one joint. */
+	private static final float HEAD_TOP = 8.3F;
+
 	private enum Phase {
 		DRILLING, DRY, BLOCKED
 	}
@@ -45,6 +51,11 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 	private int depth;
 	private double progress;
 	private Phase phase = Phase.DRILLING;
+	private boolean grown;
+	private final dev.wildcatter.kinetic.Spin spin = new dev.wildcatter.kinetic.Spin();
+	/** Client side: the head's drawn height, eased toward where the depth puts it. */
+	private float shownHead = Float.NaN;
+	private long shownAt;
 
 	public DrillingRigBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.DRILLING_RIG_ENTITY, pos, state);
@@ -65,9 +76,20 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 		return Component.literal("Swapped leads B and C at the motor: it will now turn " + (motor.leadsSwapped() ? "the other way" : "the way it was wired"));
 	}
 
+	// ---- the power unit's terminal box: the back face of the bottom cell at the back (the skid is on either side) ---------------
+	private java.util.List<Direction> boxFaces() {
+		return java.util.List.of(facing().getOpposite());
+	}
+
 	@Override
 	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
-		return voltage == Voltage.INDUSTRIAL && role != Conductor.N && phase == Phase.DRILLING;
+		return false;
+	}
+
+	@Override
+	public boolean hasPortAt(BlockPos cell, Direction face, Conductor role, Voltage voltage) {
+		return cell.equals(DrillingRigBlock.terminalBox(worldPosition, getBlockState())) && boxFaces().contains(face)
+				&& voltage == Voltage.INDUSTRIAL && role != Conductor.N && phase == Phase.DRILLING;
 	}
 
 	@Override
@@ -75,7 +97,7 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 		if (phase != Phase.DRILLING) {
 			return;   // a finished rig draws nothing
 		}
-		motor.build(circuit, worldPosition);
+		motor.build(circuit, DrillingRigBlock.terminalBox(worldPosition, getBlockState()), boxFaces());
 	}
 
 	@Override
@@ -96,6 +118,11 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 
 	public static void tick(Level level, BlockPos pos, BlockState state, DrillingRigBlockEntity rig) {
 		rig.running.update(rig, rig.motor.output() > 0);   // the client plays its loop while it runs
+		rig.spin.setRpm(rig.phase == Phase.DRILLING && rig.motor.output() > 0 ? (float) Tuning.RIG_ROTARY_RPM : 0);
+		if (rig.spin.needsSync()) {
+			rig.spin.markSynced();
+			level.sendBlockUpdated(pos, state, state, 3);
+		}
 		if (rig.phase != Phase.DRILLING || !(level instanceof ServerLevel server)) {
 			return;
 		}
@@ -128,6 +155,7 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 		level.setBlock(next, WildcatterBlocks.CASING.defaultBlockState(), 3);
 		depth++;
 		setChanged();
+		level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);   // the head moves down the mast
 		if (next.getY() <= goalY(level)) {
 			strike(level);
 		}
@@ -141,18 +169,39 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 			finish(level, Phase.DRY);
 			return;
 		}
-		BlockState head = (field.kind() == Reservoir.Kind.OIL ? WildcatterBlocks.PUMPJACK : WildcatterBlocks.GAS_WELLHEAD).defaultBlockState();
-		level.setBlock(worldPosition, head, 3);
+		rigDown(level, field.kind());
 		CircuitManager.markDirty(level);
 		level.playSound(null, worldPosition, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 0.7F, 0.8F);
 		level.sendParticles(ParticleTypes.LARGE_SMOKE, worldPosition.getX() + 0.5, worldPosition.getY() + 1.0, worldPosition.getZ() + 0.5, 30, 0.5, 0.3, 0.5, 0.05);
 		Component news = Component.literal("STRIKE! " + (field.kind() == Reservoir.Kind.OIL ? "Oil" : "Gas") + " at " + depth + " blocks down. "
-				+ (field.kind() == Reservoir.Kind.OIL ? "Wire the pumpjack to bring it up." : "Run a gas line to a firebox."));
+				+ "The rig has rigged down and dropped; "
+				+ (field.kind() == Reservoir.Kind.OIL ? "click the oil wellhead with a pumpjack and wire it to bring the oil up." : "run steel pipe from the Christmas tree to a firebox."));
 		for (ServerPlayer player : level.players()) {
 			if (player.distanceToSqr(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ()) < 48 * 48) {
 				player.sendOverlayMessage(news);
 			}
 		}
+	}
+
+	/** The rig leaves the hole: every cell goes, it drops as its item, and the wellhead for the field stands on the hole. */
+	private void rigDown(ServerLevel level, Reservoir.Kind kind) {
+		BlockPos hole = worldPosition;
+		BlockState state = getBlockState();
+		java.util.List<BlockPos> cells = dev.wildcatter.multiblock.BigParts.cells(hole, state);
+		for (int i = cells.size() - 1; i >= 1; i--) {
+			level.setBlock(cells.get(i), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),
+					net.minecraft.world.level.block.Block.UPDATE_ALL | net.minecraft.world.level.block.Block.UPDATE_SUPPRESS_DROPS);
+		}
+		level.removeBlockEntity(hole);
+		Direction facing = state.getValue(DrillingRigBlock.FACING);
+		if (kind == Reservoir.Kind.OIL) {
+			level.setBlock(hole, WildcatterBlocks.OIL_WELLHEAD.defaultBlockState().setValue(OilWellheadBlock.FACING, facing), 3);
+		} else {
+			BlockState tree = WildcatterBlocks.GAS_WELLHEAD.defaultBlockState().setValue(GasWellheadBlock.FACING, facing);
+			level.setBlock(hole, tree, 3);
+			dev.wildcatter.multiblock.BigParts.grow(level, hole, tree);
+		}
+		net.minecraft.world.level.block.Block.popResource(level, hole.relative(facing.getOpposite()).above(), new net.minecraft.world.item.ItemStack(WildcatterBlocks.DRILLING_RIG));
 	}
 
 	private void finish(ServerLevel level, Phase result) {
@@ -180,6 +229,8 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 		output.putDouble("progress", progress);
 		output.putInt("phase", phase.ordinal());
 		output.putBoolean("leadsSwapped", motor.leadsSwapped());
+		output.putBoolean("grown", grown);
+		output.putFloat("rpm", spin.rpm());
 	}
 
 	@Override
@@ -190,6 +241,68 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 		progress = input.getDoubleOr("progress", 0);
 		phase = Phase.values()[Math.max(0, Math.min(Phase.values().length - 1, input.getIntOr("phase", 0)))];
 		motor.setLeadsSwapped(input.getBooleanOr("leadsSwapped", false));
+		grown = input.getBooleanOr("grown", grown);
+		spin.setRpm(input.getFloatOr("rpm", 0));
+	}
+
+	// ---- BigPartEntity ---------------------------------------------------------------------------------------------------------
+	@Override
+	public boolean grown() {
+		return grown;
+	}
+
+	@Override
+	public void markGrown() {
+		grown = true;
+		setChanged();
+	}
+
+	// ---- moving parts: the carriage slides, the spindle and drill pipe turn and slide with it ------------------------------------
+	@Override
+	public java.util.List<Rotor> rotors() {
+		dev.wildcatter.kinetic.RotorBlock rotor = (dev.wildcatter.kinetic.RotorBlock) WildcatterBlocks.ROTOR;
+		float head = head();
+		org.joml.Vector3f hole = new org.joml.Vector3f(0.5F, 0, 0.5F);
+		java.util.List<Rotor> out = new java.util.ArrayList<>();
+		out.add(new Rotor(rotor.part(dev.wildcatter.kinetic.RotorBlock.Part.RIG_CARRIAGE), hole, Direction.Axis.Y, 1.0F, (m, deg) -> m.translate(0, head, 0)));
+		out.add(new Rotor(rotor.part(dev.wildcatter.kinetic.RotorBlock.Part.RIG_SPINDLE), hole, Direction.Axis.Y, 1.0F,
+				(m, deg) -> m.translate(0, head, 0).rotateY((float) Math.toRadians(deg))));
+		for (int k = 0; k < 4; k++) {   // 2 m pieces of pipe down from the spindle, into the hole
+			float down = -2.5F - 2.0F * k;
+			out.add(new Rotor(rotor.part(dev.wildcatter.kinetic.RotorBlock.Part.RIG_PIPE), hole, Direction.Axis.Y, 1.0F,
+					(m, deg) -> m.translate(0, head + down, 0).rotateY((float) Math.toRadians(deg))));
+		}
+		return out;
+	}
+
+	/** Client side: the carriage's height, easing toward where the depth drilled puts it in the current joint. */
+	private float head() {
+		float target = HEAD_TOP - (phase == Phase.DRILLING ? depth % Tuning.RIG_JOINT_BLOCKS : 0);
+		long now = System.nanoTime();
+		if (Float.isNaN(shownHead)) {
+			shownHead = target;
+		} else {
+			float step = Math.min(0.25F, (now - shownAt) / 1e9F) * (target > shownHead ? 3.0F : 1.2F);   // up for the next joint faster
+			shownHead = Math.abs(target - shownHead) <= step ? target : shownHead + Math.signum(target - shownHead) * step;
+		}
+		shownAt = now;
+		return shownHead;
+	}
+
+	@Override
+	public Direction facing() {
+		return getBlockState().getValue(DrillingRigBlock.FACING);
+	}
+
+	@Override
+	public dev.wildcatter.kinetic.Spin spin() {
+		return spin;
+	}
+
+	/** 80 rpm: slow enough to show at its real speed. */
+	@Override
+	public float displayDivisor() {
+		return 1.0F;
 	}
 
 	@Override
@@ -214,6 +327,10 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 
 	@Override
 	public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
-		return running.tag();
+		net.minecraft.nbt.CompoundTag tag = running.tag();
+		tag.putFloat("rpm", spin.rpm());
+		tag.putInt("depth", depth);
+		tag.putInt("phase", phase.ordinal());
+		return tag;
 	}
 }

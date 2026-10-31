@@ -8,6 +8,9 @@ Tim asked for machines that visibly move, like the Create mod, with proper sound
 - The speed is the machine's real speed: the alternator from the island frequency (120·f / poles), and everything else from its own
   state. It speeds up and coasts down with the machine's inertia, stops when tripped, and slows with frequency.
 - Shown at real rpm / 20 (1,800 rpm shows 1.5 turns per second) so it reads as turning and does not strobe. This is a display choice, not physics.
+- Slow machines show at their real speed (Phase 4.5g, docs/multiblocks/well-site.md): the pumpjack's crank at 9 rpm and the small
+  rig's top head at 80 rpm. A part can also move along a linkage instead of turning about one axis: the pumpjack's walking beam
+  rocks, its pitman arms follow the crank pins and its polished rod goes up and down (`kinetic/BeamLinkage`).
 - The server sends the speed to the client only when it changes by more than 2 %. The client turns the part between updates.
 
 ## Sound

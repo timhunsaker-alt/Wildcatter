@@ -379,6 +379,34 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   bus and drops its bucket, an old bucket drops); new scene `buildingGear` (wall, floor and ceiling mounts by click, a lamp lit
   through a wall breaker, screenshots).
 
+## Phase 4.5g: the well site at true size
+- **Spec:** docs/multiblocks/well-site.md (approved with the plan, 2026-10-31). Ratings unchanged: the rig's 30 kW and the
+  pumpjack's 7.5 kW 480 V three-phase motors.
+- **Small drilling rig** (Tim's choice: a small rig now, a full land rig later): a skid-mounted top-head-drive rig, 3 × 10 × 6,
+  its 9 m mast over the hole at the main cell, its power unit's terminal box low on the back. On a strike it **rigs down**: it
+  drops as its item and leaves the wellhead on the hole. A dry or blocked hole leaves it standing.
+- **Oil wellhead** (new, one cell): casing head, tubing head, pumping tee and stuffing box. Steel pipe joins it on any side; buckets
+  and pipes reach the pumpjack's tank through it.
+- **Pumpjack:** API 80-119-54, 3 × 5 × 7 (3 wide, not the plan's 2, because the 1.8 m base straddles the well's centre line).
+  Clicked on an oil wellhead it snaps its horsehead over the well. Its motor's terminal box is the bottom cell at the back, wired
+  on the back or either side (the cells beside it are open). Off a well it says so and pumps nothing.
+- **Christmas tree:** the gas wellhead is a 1 × 2 × 1 tree with its master, wing and swab valves, choke and gauge.
+- **Pipes:** drawn at real size, 4 in steel line for oil and gas and 2 in water pipe; the click box is 0.25 m.
+- **Moving parts** (docs/kinetics-and-sound.md amended): `Kinetic.Rotor` takes a `Motion` for parts on a linkage, and slow
+  machines show at real speed. The pumpjack's crank turns at 9 strokes a minute, the pitmans, walking beam and horsehead follow
+  (`kinetic/BeamLinkage`, unit tested: a 1.39 m stroke), and the polished rod rides up and down; with its leads swapped it runs
+  backward. The rig's top head turns the pipe at 80 rpm and slides down the mast through each 6 m joint. The starter turbine's
+  coupling and flyball governor turn at 120·f/2 (3,600 rpm at 60 Hz) and coast down; the pump is now frame-mounted, its jaw
+  coupling turning at 3,450 rpm under an open guard.
+- **Old worlds:** a one-block rig grows over its hole where it has room; a one-block pumpjack on its casing becomes an oil
+  wellhead and drops a pumpjack item (its crude is lost); a one-block gas wellhead grows upward.
+- **Models:** `drilling_rig.py`, `pumpjack.py`, `wellheads.py`, new rotors, the starter plant's pump and turbine guards. No
+  Ludo credits.
+- **Game tests:** `wells` rebuilt (the rig drills and its head turns on the client, strikes, rigs down and drops; a pumpjack
+  clicked on the wellhead snaps over it, pumps, its crank turning at 9 strokes a minute on the client; an old pumpjack becomes a
+  wellhead); the motor, MCC and starter scenes use true-size pumpjacks; the steam loop checks the turbine and pump turning.
+- **Next (4.5h):** the full land rig, a machine of distinct parts with new power numbers; its spec comes to Tim first.
+
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.
@@ -387,9 +415,11 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
-- Phase 4.5: everything but the oil field is true size; the oil field is wave 4.5g. The single-pole MV, DIST and HV breakers, the DIST under-frequency relay and the unrated `transformer` and `substation_transformer` stay one-block stand-ins (decided with Tim, until Phase 6).
+- Phase 4.5: the full land rig is wave 4.5h. The refinery waits for Phase 5. The single-pole MV, DIST and HV breakers, the DIST under-frequency relay and the unrated `transformer` and `substation_transformer` stay one-block stand-ins (decided with Tim, until Phase 6).
 - Wall-mounted gear sits 0.55 m up its cell; a player wanting it higher places it a block up.
-- The starter turbine and pump show running only by a light; they have no turning parts yet.
+- The pumpjack's crude tank stands in for a flowline and stock tank until Phase 5.
+- Pumpjack and rig collision is the still frame: the moving beam, crank and pipe do not push anything.
+- The pumpjack's linkage and the rig's head have been checked in test screenshots, not watched in a real play session.
 - The pole transformer and cutout are wired as before (wire blocks to their faces); there are no jumper or riser leads drawn from an insulator down to them.
 - A pole transformer placed by command keeps its old facing rule, so in some test scenes its brackets face away from the pole.
 - Breaking a pole does not take down a pole transformer hung on it (it stays, as before).

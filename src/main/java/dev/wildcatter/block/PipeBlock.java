@@ -22,16 +22,17 @@ import org.jspecify.annotations.Nullable;
  * drain sends its condensate back the same way. See {@link Plumbing}.
  */
 public class PipeBlock extends Block {
-	private static final VoxelShape CORE = Block.box(5, 5, 5, 11, 11, 11);
+	/** Drawn at its real diameter (docs/multiblocks/well-site.md), but clicked and walked into as 0.25 m so it can be hit. */
+	private static final VoxelShape CORE = Block.box(6, 6, 6, 10, 10, 10);
 	private static final Map<Direction, VoxelShape> ARM_SHAPES = new EnumMap<>(Direction.class);
 
 	static {
-		ARM_SHAPES.put(Direction.NORTH, Block.box(5, 5, 0, 11, 11, 5));
-		ARM_SHAPES.put(Direction.SOUTH, Block.box(5, 5, 11, 11, 11, 16));
-		ARM_SHAPES.put(Direction.WEST, Block.box(0, 5, 5, 5, 11, 11));
-		ARM_SHAPES.put(Direction.EAST, Block.box(11, 5, 5, 16, 11, 11));
-		ARM_SHAPES.put(Direction.DOWN, Block.box(5, 0, 5, 11, 5, 11));
-		ARM_SHAPES.put(Direction.UP, Block.box(5, 11, 5, 11, 16, 11));
+		ARM_SHAPES.put(Direction.NORTH, Block.box(6, 6, 0, 10, 10, 6));
+		ARM_SHAPES.put(Direction.SOUTH, Block.box(6, 6, 10, 10, 10, 16));
+		ARM_SHAPES.put(Direction.WEST, Block.box(0, 6, 6, 6, 10, 10));
+		ARM_SHAPES.put(Direction.EAST, Block.box(10, 6, 6, 16, 10, 10));
+		ARM_SHAPES.put(Direction.DOWN, Block.box(6, 0, 6, 10, 6, 10));
+		ARM_SHAPES.put(Direction.UP, Block.box(6, 10, 6, 10, 16, 10));
 	}
 
 	/** Water pipes link boilers, turbines and pumps; gas lines link wells and fireboxes. The two never join. */
@@ -83,7 +84,7 @@ public class PipeBlock extends Block {
 		return kind == Kind.WATER
 				? block instanceof BoilerBlock || block instanceof SteamTurbineBlock || block instanceof PumpBlock || block instanceof TowerBasinBlock
 						|| block instanceof SteamPlantPartBlock plant && plant.part() == SteamPlantPartBlock.Part.CONDENSER
-				: block instanceof GasWellheadBlock || block instanceof PumpjackBlock || block instanceof FireboxBlock
+				: block instanceof GasWellheadBlock gas && neighbour.getValue(gas.piece()) == 0 || block instanceof OilWellheadBlock || block instanceof FireboxBlock
 						|| block instanceof RefineryBlock
 						|| block instanceof GensetPartBlock part && (part.part() == GensetPartBlock.Part.FUEL_TANK || part.part() == GensetPartBlock.Part.GAS_ENGINE)
 						|| block instanceof SteamPlantPartBlock burner && burner.part() == SteamPlantPartBlock.Part.BURNER;

@@ -26,7 +26,8 @@ import net.minecraft.world.level.block.state.BlockState;
  * A level switch runs its motor only while the boilers need water: it starts below 80 % and stops when they are full.
  * Water pressure follows the motor: it needs most of its voltage, and delivers with the square of it, like a real pump.
  */
-public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, dev.wildcatter.kinetic.Sounding {
+public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, dev.wildcatter.kinetic.Sounding, dev.wildcatter.kinetic.Kinetic {
+	private final dev.wildcatter.kinetic.Spin spin = new dev.wildcatter.kinetic.Spin();
 	/** Its induction motor (single-phase); it turns only while there is work. */
 	private final dev.wildcatter.circuit.Motor motor = new dev.wildcatter.circuit.Motor(false, Voltage.LOW, Tuning.PUMP_WATTS);
 	private final dev.wildcatter.kinetic.RunningSound running = new dev.wildcatter.kinetic.RunningSound();
@@ -72,6 +73,11 @@ public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspect
 
 	public static void tick(Level level, BlockPos pos, BlockState state, PumpBlockEntity pump) {
 		pump.running.update(pump, pump.motor.output() > 0);   // the client plays its loop while it runs
+		pump.spin.setRpm(pump.motor.output() > 0 ? (float) Tuning.STARTER_PUMP_RPM : 0);
+		if (pump.spin.needsSync()) {
+			pump.spin.markSynced();
+			level.sendBlockUpdated(pos, state, state, 3);
+		}
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.PLUMBING_INTERVAL != 0) {
 			return;
 		}
@@ -137,12 +143,32 @@ public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspect
 
 	@Override
 	public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
-		return running.tag();
+		net.minecraft.nbt.CompoundTag tag = running.tag();
+		tag.putFloat("rpm", spin.rpm());
+		return tag;
 	}
 
 	@Override
 	protected void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
 		super.loadAdditional(input);
 		running.load(input);
+		spin.setRpm(input.getFloatOr("rpm", 0));
+	}
+
+	// ---- moving parts: the jaw coupling between the motor and the bearing frame, under its open guard -------------------------
+	@Override
+	public List<Rotor> rotors() {
+		dev.wildcatter.kinetic.RotorBlock rotor = (dev.wildcatter.kinetic.RotorBlock) WildcatterBlocks.ROTOR;
+		return List.of(new Rotor(rotor.part(dev.wildcatter.kinetic.RotorBlock.Part.STARTER_PUMP_COUPLING), new org.joml.Vector3f(0.5F, 0.2F, 0.42F), Direction.Axis.Z, 1.0F));
+	}
+
+	@Override
+	public Direction facing() {
+		return getBlockState().getValue(PumpBlock.FACING);
+	}
+
+	@Override
+	public dev.wildcatter.kinetic.Spin spin() {
+		return spin;
 	}
 }

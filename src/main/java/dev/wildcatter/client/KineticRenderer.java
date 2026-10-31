@@ -50,7 +50,7 @@ public class KineticRenderer<T extends BlockEntity & Kinetic> implements BlockEn
 	public void extractRenderState(T machine, State state, float partialTick, Vec3 cameraPos, ModelFeatureRenderer.@Nullable CrumblingOverlay crumbling) {
 		BlockEntityRenderState.extractBase(machine, state, crumbling);
 		state.facing = machine.facing();
-		state.angle = machine.spin().angle(System.nanoTime());
+		state.angle = machine.spin().angle(System.nanoTime(), machine.displayDivisor());
 		state.rotors.clear();
 		state.rotors.addAll(machine.rotors());
 		while (state.models.size() < state.rotors.size()) {
@@ -74,11 +74,17 @@ public class KineticRenderer<T extends BlockEntity & Kinetic> implements BlockEn
 			Vector3f p = rotor.pivot();
 			pose.translate(p.x, p.y, p.z);
 			float degrees = state.angle * rotor.ratio();
-			pose.rotateDegrees(switch (rotor.axis()) {
-				case X -> Axis.XP;
-				case Y -> Axis.YP;
-				case Z -> Axis.ZP;
-			}, degrees);
+			if (rotor.motion() != null) {   // a part on a linkage
+				org.joml.Matrix4f moved = new org.joml.Matrix4f();
+				rotor.motion().pose(moved, degrees);
+				pose.mulPose(moved);
+			} else {
+				pose.rotateDegrees(switch (rotor.axis()) {
+					case X -> Axis.XP;
+					case Y -> Axis.YP;
+					case Z -> Axis.ZP;
+				}, degrees);
+			}
 			pose.translate(-0.5F, -0.5F, -0.5F);   // rotor models are drawn centred on the block
 			state.models.get(i).submit(pose, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
 			pose.popPose();

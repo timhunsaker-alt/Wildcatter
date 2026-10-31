@@ -20,8 +20,9 @@ import net.minecraft.world.level.storage.ValueOutput;
  * Gas needs no power: the pressure in the rock pushes it up. The valve only opens when a firebox is short of fuel, so
  * gas is only taken from the field as it is burned. As the field empties the pressure falls and the flow with it.
  */
-public class GasWellheadBlockEntity extends BlockEntity implements Inspectable {
+public class GasWellheadBlockEntity extends BlockEntity implements Inspectable, dev.wildcatter.multiblock.BigPartEntity {
 	private double owed;
+	private boolean grown;
 	/** Gas this well can still flow before its next interval. */
 	private double allowance;
 	private String status = "starting";
@@ -98,18 +99,31 @@ public class GasWellheadBlockEntity extends BlockEntity implements Inspectable {
 				pressure = Math.round(data.pressure(field) * 100) + "% pressure, about " + data.remaining(field) + " units of gas left";
 			}
 		}
-		return Component.literal("Gas wellhead: " + pressure + ", " + status);
+		return Component.literal("Gas wellhead (Christmas tree): " + pressure + ", " + status);
 	}
 
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
 		output.putDouble("owed", owed);
+		output.putBoolean("grown", grown);
+	}
+
+	@Override
+	public boolean grown() {
+		return grown;
+	}
+
+	@Override
+	public void markGrown() {
+		grown = true;
+		setChanged();
 	}
 
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
 		owed = input.getDoubleOr("owed", 0);
+		grown = input.getBooleanOr("grown", grown);
 	}
 }

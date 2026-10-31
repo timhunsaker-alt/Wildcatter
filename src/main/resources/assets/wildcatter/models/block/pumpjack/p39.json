@@ -1,0 +1,105 @@
+{
+ "textures": {
+  "engine": "wildcatter:block/mat/mat_paint_engine",
+  "gasgreen": "wildcatter:block/mat/mat_paint_pad_green",
+  "grey": "wildcatter:block/mat/mat_paint_ansi61",
+  "blue": "wildcatter:block/mat/mat_paint_ansi70",
+  "iron": "wildcatter:block/mat/mat_cast_iron",
+  "dark": "wildcatter:block/mat/mat_oil_dark",
+  "galv": "wildcatter:block/mat/mat_galvanized",
+  "steel": "wildcatter:block/mat/mat_stainless",
+  "rubber": "wildcatter:block/mat/mat_rubber",
+  "copper": "wildcatter:block/mat/mat_copper",
+  "brass": "wildcatter:block/mat/mat_brass",
+  "lagging": "wildcatter:block/mat/mat_aluminium_lagging",
+  "checker": "wildcatter:block/mat/mat_checker_plate",
+  "nameplate": "wildcatter:block/mat/decal_nameplate",
+  "danger": "wildcatter:block/mat/decal_danger_hv",
+  "gauge": "wildcatter:block/mat/decal_gauge",
+  "controller": "wildcatter:block/mat/decal_controller",
+  "engineplate": "wildcatter:block/mat/decal_engine_plate",
+  "concrete": "wildcatter:block/mat/mat_concrete",
+  "polymer": "wildcatter:block/mat/mat_polymer_grey",
+  "padgreen": "wildcatter:block/mat/mat_paint_pad_green",
+  "particle": "wildcatter:block/mat/mat_cast_iron"
+ },
+ "elements": [
+  {
+   "from": [
+    2.4,
+    2.1513,
+    11.88
+   ],
+   "to": [
+    4.8,
+    17.8487,
+    14.12
+   ],
+   "faces": {
+    "north": {
+     "texture": "#grey",
+     "uv": [
+      11.2,
+      0.3026,
+      13.6,
+      16.0
+     ]
+    },
+    "south": {
+     "texture": "#grey",
+     "uv": [
+      2.4,
+      0.3026,
+      4.8,
+      16.0
+     ]
+    },
+    "west": {
+     "texture": "#grey",
+     "uv": [
+      11.88,
+      0.3026,
+      14.12,
+      16.0
+     ]
+    },
+    "east": {
+     "texture": "#grey",
+     "uv": [
+      1.88,
+      0.3026,
+      4.12,
+      16.0
+     ]
+    },
+    "up": {
+     "texture": "#grey",
+     "uv": [
+      2.4,
+      11.88,
+      4.8,
+      14.12
+     ]
+    },
+    "down": {
+     "texture": "#grey",
+     "uv": [
+      2.4,
+      1.88,
+      4.8,
+      4.12
+     ]
+    }
+   },
+   "rotation": {
+    "origin": [
+     3.6,
+     10.0,
+     13.0
+    ],
+    "axis": "x",
+    "angle": 14.4612
+   }
+  }
+ ]
+}

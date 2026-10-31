@@ -239,6 +239,9 @@ public final class BigParts {
 			return;
 		}
 		boolean grown = level.getBlockEntity(main) instanceof BigPartEntity entity && entity.grown();
+		if (!grown && present == 0 && part(state).replaceLegacy(level, main, state)) {
+			return;
+		}
 		boolean grows = part(state).growsOnLoad();
 		if (!grown && present == 0 && grows && roomFor(level, main, state)) {
 			grow(level, main, state);

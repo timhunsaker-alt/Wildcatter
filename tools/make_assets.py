@@ -352,7 +352,7 @@ save_json(f"{ASSETS}/blockstates/firebox.json", {"variants": {
 	"lit=false": {"model": f"{ns}:block/firebox"}, "lit=true": {"model": f"{ns}:block/firebox_lit"}}})
 block_model("pump", "minecraft:block/cube_all", {"all": f"{ns}:block/pump"})
 save_json(f"{ASSETS}/blockstates/pump.json", {"variants": {"": {"model": f"{ns}:block/pump"}}})
-for cube in ("drilling_rig", "pumpjack", "gas_wellhead", "casing", "refinery", "refinery_column"):   # the cooling tower parts are true size (4.5c)
+for cube in ("casing", "refinery", "refinery_column"):   # the cooling tower parts are true size (4.5c), the well site (4.5g)
 	block_model(cube, "minecraft:block/cube_all", {"all": f"{ns}:block/{cube}"})
 	save_json(f"{ASSETS}/blockstates/{cube}.json", {"variants": {"": {"model": f"{ns}:block/{cube}"}}})
 for load in ("electric_lamp", "electric_heater"):
@@ -588,22 +588,29 @@ save_json(f"{ASSETS}/models/block/ground_rod.json", {"textures": {"rod": f"{ns}:
 	"elements": [cuboid([7, 0, 7], [9, 16, 9], "#rod")]})
 save_json(f"{ASSETS}/blockstates/ground_rod.json", {"variants": {"": {"model": f"{ns}:block/ground_rod"}}})
 
-# the pipe: a fat core with a fat arm toward each joined neighbour
+# the pipe at true size (4.5g, docs/multiblocks/well-site.md): 2 in NPS (60 mm) water pipe, a welded fitting at the core and a run
+# toward each joined neighbour. Drawn square, as wide as the pipe's outside diameter.
+def pipe_shapes(od, fitting):
+	a, b = 8 - od * 8, 8 + od * 8
+	c, d = 8 - fitting * 8, 8 + fitting * 8
+	return [cuboid([c, c, c], [d, d, d], "#pipe")], [cuboid([a, a, 0], [b, b, c], "#pipe")]
 pt = {"pipe": f"{ns}:block/pipe", "particle": f"{ns}:block/pipe"}
-save_json(f"{ASSETS}/models/block/pipe_core.json", {"textures": pt, "elements": [cuboid([5, 5, 5], [11, 11, 11], "#pipe")]})
-save_json(f"{ASSETS}/models/block/pipe_arm.json", {"textures": pt, "elements": [cuboid([5, 5, 0], [11, 11, 5], "#pipe")]})
+core, arm = pipe_shapes(0.0603, 0.085)
+save_json(f"{ASSETS}/models/block/pipe_core.json", {"textures": pt, "elements": core})
+save_json(f"{ASSETS}/models/block/pipe_arm.json", {"textures": pt, "elements": arm})
 save_json(f"{ASSETS}/models/block/pipe_inventory.json", {
 	"parent": "minecraft:block/block",
 	"display": {"gui": {"rotation": [30, 225, 0], "scale": [1.0, 1.0, 1.0]}, "ground": {"scale": [0.8, 0.8, 0.8]},
 		"firstperson_righthand": {"rotation": [0, 45, 0], "scale": [0.8, 0.8, 0.8]}, "thirdperson_righthand": {"scale": [0.8, 0.8, 0.8]}},
-	"textures": pt, "elements": [cuboid([0, 5, 5], [16, 11, 11], "#pipe"), cuboid([5, 5, 0], [11, 11, 16], "#pipe")]})
+	"textures": pt, "elements": [cuboid([0, 6, 6], [16, 10, 10], "#pipe"), cuboid([6, 6, 0], [10, 10, 16], "#pipe")]})
 save_json(f"{ASSETS}/blockstates/pipe.json", {"multipart": [{"apply": {"model": f"{ns}:block/pipe_core"}}] + [
 	{"when": {side: "true"}, "apply": {"model": f"{ns}:block/pipe_arm", **rot}} for side, rot in arms.items()]})
 
-# the gas line: the same shapes as the pipe, painted orange
+# the steel line for oil and gas: 4 in NPS (114 mm) gathering line, a welded fitting at the core
 gt = {"pipe": f"{ns}:block/gas_line", "particle": f"{ns}:block/gas_line"}
-save_json(f"{ASSETS}/models/block/gas_line_core.json", {"textures": gt, "elements": [cuboid([5, 5, 5], [11, 11, 11], "#pipe")]})
-save_json(f"{ASSETS}/models/block/gas_line_arm.json", {"textures": gt, "elements": [cuboid([5, 5, 0], [11, 11, 5], "#pipe")]})
+core, arm = pipe_shapes(0.1143, 0.15)
+save_json(f"{ASSETS}/models/block/gas_line_core.json", {"textures": gt, "elements": core})
+save_json(f"{ASSETS}/models/block/gas_line_arm.json", {"textures": gt, "elements": arm})
 inv = json.load(open(f"{ASSETS}/models/block/pipe_inventory.json"))
 inv["textures"] = gt
 save_json(f"{ASSETS}/models/block/gas_line_inventory.json", inv)
@@ -1158,7 +1165,6 @@ for name in SUB:
 	big_part_loot(name)
 save_json(f"{ASSETS}/models/block/rotor_disconnect_blade.json", {"textures": r, "elements": [   # hinged at its south end (the model's centre)
 	box([5, 7.5, -3], [6, 8.5, 8], "#rotor"), box([10, 7.5, -3], [11, 8.5, 8], "#rotor"), box([5, 7.5, -3], [11, 8.5, -2], "#rotor")]})
-save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ("radiator_fan", "crank_pulley", "coupling", "tower_fan", "disconnect_blade", "alternator_fan", "turbine_coupling", "pump_coupling", "disconnect_arm_hv", "disconnect_arm_hv_back", "disconnect_blade_dist")}})
 # the yard's fence (decoration): chain-link fabric and the barbed-wire top, joined like iron bars, see-through
 for name, texture in (("chain_link_fence", "fence_chain_link"), ("barbed_wire_top", "fence_barbed_wire")):
 	t = f"{ns}:block/mat/{texture}"
@@ -1321,6 +1327,29 @@ for name in [n for n in FAMILY if n not in SPOOLS] + ["busway_lv", "busway_indus
 		"entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],   # the block adds the size (CableBlock.getDrops)
 		"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
 print("assets written")
+
+# ---- Phase 4.5g: the well site at true size (docs/multiblocks/well-site.md) ---------------------------------------------------
+# blockstates, models and items come from tools/models/drilling_rig.py, pumpjack.py and wellheads.py; here loot, names, tags and
+# the oil wellhead's recipe, and the rotor blockstate's new parts.
+for name in ("drilling_rig", "pumpjack", "gas_wellhead"):
+	big_part_loot(name)
+save_json(f"{DATA}/loot_table/blocks/oil_wellhead.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:oil_wellhead"}],
+	"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+shaped("oil_wellhead", ["SCS", " S ", "SBS"], {"S": S_, "C": "minecraft:copper_ingot", "B": "minecraft:iron_block"}, "oil_wellhead")
+for tag in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
+	t["values"] += [f"{ns}:oil_wellhead"]
+	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({"block.wildcatter.drilling_rig": "Drilling Rig (small mast rig, 40 hp)", "block.wildcatter.pumpjack": "Pumpjack (API 80-119-54, 10 hp)",
+	"block.wildcatter.gas_wellhead": "Gas Wellhead (Christmas tree)", "block.wildcatter.oil_wellhead": "Oil Wellhead (rod pumping)",
+	"block.wildcatter.gas_line": "Steel Pipe (4 in, oil and gas)", "block.wildcatter.pipe": "Water Pipe (2 in)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+ROTOR_PARTS = ("radiator_fan", "crank_pulley", "coupling", "tower_fan", "disconnect_blade", "alternator_fan", "turbine_coupling", "pump_coupling",
+	"disconnect_arm_hv", "disconnect_arm_hv_back", "disconnect_blade_dist", "pumpjack_crank", "pumpjack_pitman_low", "pumpjack_pitman_high",
+	"pumpjack_beam_front", "pumpjack_beam_mid", "pumpjack_beam_back", "pumpjack_rod", "pumpjack_rod_low", "pumpjack_bridle",
+	"rig_carriage", "rig_spindle", "rig_pipe", "starter_coupling", "flyball_governor", "starter_pump_coupling")
+save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ROTOR_PARTS}})
 
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys

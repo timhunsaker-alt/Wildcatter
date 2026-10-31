@@ -19,6 +19,7 @@ not a go-ahead to build: that waits for the roadmap phase (ROADMAP.md). Nothing 
 | [padmount.md](padmount.md) | 4.5e | one-block pad-mounts and unit substation |
 | [building-gear.md](building-gear.md) | 4.5f | one-block breakers, receptacles, loads, boiler and turbine |
 | [motor-control-center.md](motor-control-center.md) | 3, 4.5f | a row of one-block buckets |
+| [well-site.md](well-site.md) | 4.5g | one-block rig, pumpjack and gas wellhead; fat pipes |
 
 ## Shared rules
 - One **controller** block validates the structure and holds all state. Parts have no logic of their own beyond

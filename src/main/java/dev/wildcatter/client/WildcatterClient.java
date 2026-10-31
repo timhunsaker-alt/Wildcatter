@@ -26,6 +26,10 @@ public class WildcatterClient implements ClientModInitializer {
 		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.COOLING_TOWER_ENTITY, context -> new KineticRenderer<>(context));
 		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.STEAM_PLANT_PART_ENTITY, context -> new KineticRenderer<>(context));
 		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.DISCONNECT_ENTITY, context -> new KineticRenderer<>(context));
+		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.PUMPJACK_ENTITY, context -> new KineticRenderer<>(context));
+		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.DRILLING_RIG_ENTITY, context -> new KineticRenderer<>(context));
+		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.STEAM_TURBINE_ENTITY, context -> new KineticRenderer<>(context));
+		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.PUMP_ENTITY, context -> new KineticRenderer<>(context));
 		dev.wildcatter.kinetic.Sounding.Hook.start = MachineSound::start;
 		net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents.BEFORE_GIZMOS.register(context -> {
 			net.minecraft.client.Minecraft client = net.minecraft.client.Minecraft.getInstance();

@@ -28,7 +28,10 @@ import net.minecraft.world.level.storage.ValueOutput;
  * has some resistance of its own), and it only draws as much steam from the boiler as the circuit is actually using. If the boiler
  * cannot keep up, the voltage falls: a brownout, not a blackout. Big power comes from the 1 MW steam plant (TurbineGeneratorBlockEntity).
  */
-public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart, dev.wildcatter.circuit.Generator, Inspectable, Bondable, dev.wildcatter.kinetic.Sounding {
+public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart, dev.wildcatter.circuit.Generator, Inspectable, Bondable, dev.wildcatter.kinetic.Sounding, dev.wildcatter.kinetic.Kinetic {
+	/** A two-pole generator on the turbine's shaft: 120 f / 2 rpm (3,600 at 60 Hz). */
+	private static final int POLES = 2;
+	private final dev.wildcatter.kinetic.Spin spin = new dev.wildcatter.kinetic.Spin();
 	private final dev.wildcatter.circuit.ThreePhaseSource phases = new dev.wildcatter.circuit.ThreePhaseSource();
 	private double volts;
 	private double amps;
@@ -111,6 +114,45 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 		if (state.getValue(SteamTurbineBlock.RUNNING) != running) {
 			level.setBlock(pos, state.setValue(SteamTurbineBlock.RUNNING, running), 3);
 		}
+		// the shaft runs at the island's frequency while it makes power, and coasts down when it stops
+		float target = running && !turbine.tripped ? (float) (120 * turbine.hertz / POLES) : 0;
+		float rpm = turbine.spin.rpm() + (target - turbine.spin.rpm()) * 0.05F;
+		turbine.spin.setRpm(Math.abs(rpm - target) < 5 ? target : rpm);
+		if (turbine.spin.needsSync()) {
+			turbine.spin.markSynced();
+			level.sendBlockUpdated(pos, state, state, 3);
+		}
+	}
+
+	// ---- moving parts: the coupling between turbine and generator, and the flyball governor geared 10 to 1 off the shaft -------
+	@Override
+	public java.util.List<Rotor> rotors() {
+		dev.wildcatter.kinetic.RotorBlock rotor = (dev.wildcatter.kinetic.RotorBlock) WildcatterBlocks.ROTOR;
+		return java.util.List.of(
+				new Rotor(rotor.part(dev.wildcatter.kinetic.RotorBlock.Part.STARTER_COUPLING), new org.joml.Vector3f(0.5F, 0.25F, 0.5F), Direction.Axis.Z, 1.0F),
+				new Rotor(rotor.part(dev.wildcatter.kinetic.RotorBlock.Part.FLYBALL_GOVERNOR), new org.joml.Vector3f(0.5F, 0.42F, 0.91F), Direction.Axis.Y, 0.1F));
+	}
+
+	@Override
+	public Direction facing() {
+		return getBlockState().getValue(SteamTurbineBlock.FACING);
+	}
+
+	@Override
+	public dev.wildcatter.kinetic.Spin spin() {
+		return spin;
+	}
+
+	@Override
+	public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+		return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+	}
+
+	@Override
+	public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+		net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+		tag.putFloat("rpm", spin.rpm());
+		return tag;
 	}
 
 	/**
@@ -207,6 +249,7 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 		super.saveAdditional(output);
 		output.putDouble("satisfaction", satisfaction);
 		output.putBoolean("tripped", tripped);
+		output.putFloat("rpm", spin.rpm());
 	}
 
 	@Override
@@ -214,6 +257,7 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 		super.loadAdditional(input);
 		satisfaction = input.getDoubleOr("satisfaction", 1.0);
 		tripped = input.getBooleanOr("tripped", false);
+		spin.setRpm(input.getFloatOr("rpm", 0));
 	}
 
 	@Override
