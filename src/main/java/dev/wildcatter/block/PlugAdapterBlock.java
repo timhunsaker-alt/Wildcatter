@@ -30,7 +30,6 @@ import org.jspecify.annotations.Nullable;
  * beside it power as FE, drawing the matching watts from the grid.
  */
 public class PlugAdapterBlock extends BaseEntityBlock {
-	private static final VoxelShape SHAPE = Block.box(4, 4, 4, 12, 12, 12);
 
 	private final PlugType type;
 
@@ -68,8 +67,24 @@ public class PlugAdapterBlock extends BaseEntityBlock {
 	}
 
 	@Override
+	protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<Block, BlockState> builder) {
+		builder.add(AttachedGear.ATTACH);
+	}
+
+	/** Plugged into the receptacle beside it (the one of its type), its cord running away from it. */
+	@Override
+	public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+		for (Direction side : Direction.values()) {
+			if (context.getLevel().getBlockState(context.getClickedPos().relative(side)).getBlock() instanceof ReceptacleBlock receptacle && receptacle.type() == type) {
+				return defaultBlockState().setValue(AttachedGear.ATTACH, side);
+			}
+		}
+		return AttachedGear.place(defaultBlockState(), context);
+	}
+
+	@Override
 	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-		return SHAPE;
+		return AttachedGear.shape(state, 5, 2);
 	}
 
 	@Override

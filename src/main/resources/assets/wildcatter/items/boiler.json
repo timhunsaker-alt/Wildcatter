@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/boiler"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/boiler/item"
+ }
 }

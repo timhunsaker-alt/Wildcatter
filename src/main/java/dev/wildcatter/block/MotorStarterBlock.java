@@ -66,12 +66,18 @@ public class MotorStarterBlock extends BaseEntityBlock {
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(FACING, RUN);
+		builder.add(FACING, RUN, GearMount.MOUNT);
 	}
 
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
-		return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+		return GearMount.place(defaultBlockState(), context, FACING, context.getHorizontalDirection().getOpposite());
+	}
+
+	@Override
+	protected net.minecraft.world.phys.shapes.VoxelShape getShape(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos,
+			net.minecraft.world.phys.shapes.CollisionContext context) {
+		return GearMount.shape(state, state.getValue(FACING));
 	}
 
 	@Override
@@ -109,5 +115,28 @@ public class MotorStarterBlock extends BaseEntityBlock {
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new MotorStarterBlockEntity(pos, state);
+	}
+
+	/**
+	 * An older world's one-block MCC bucket: buckets are clicked into tall starter sections now (docs/multiblocks/motor-control-center.md),
+	 * so it drops as a bucket item, with a chat line, the first time it ticks.
+	 */
+	@Override
+	public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(Level level, BlockState state,
+			net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
+		if (!bucket || level.isClientSide()) {
+			return null;
+		}
+		return (l, p, s, entity) -> {
+			String where = "MCC bucket at " + p.getX() + " " + p.getY() + " " + p.getZ()
+					+ " dropped as an item: buckets now go into a tall MCC starter section (click one into an empty space)";
+			dev.wildcatter.Wildcatter.LOGGER.info(where);
+			for (net.minecraft.world.entity.player.Player player : l.players()) {
+				if (player.blockPosition().closerThan(p, 128)) {
+					player.sendSystemMessage(net.minecraft.network.chat.Component.literal(where));
+				}
+			}
+			l.destroyBlock(p, true);
+		};
 	}
 }

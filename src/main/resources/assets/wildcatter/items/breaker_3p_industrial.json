@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/breaker_3p_industrial_on"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/breaker_3p_industrial_floor_on/item"
+ }
 }

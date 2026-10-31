@@ -42,7 +42,19 @@ public class ThreePhaseHeaterBlock extends BaseEntityBlock {
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(LoadBlock.LIT);
+		builder.add(LoadBlock.LIT, AttachedGear.ATTACH);
+	}
+
+	@Override
+	public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+		return AttachedGear.place(defaultBlockState(), context);
+	}
+
+	// a 15 kW unit heater, about 0.6 x 0.6 x 0.45 m
+	@Override
+	protected net.minecraft.world.phys.shapes.VoxelShape getShape(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos,
+			net.minecraft.world.phys.shapes.CollisionContext context) {
+		return AttachedGear.shape(state, 8, 5);
 	}
 
 	@Override

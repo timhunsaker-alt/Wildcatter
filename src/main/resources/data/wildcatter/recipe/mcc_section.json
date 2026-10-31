@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SBS",
+    "S S",
+    "SBS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "B": "minecraft:iron_bars"
+  },
+  "result": {
+    "id": "wildcatter:mcc_section",
+    "count": 1
+  }
+}

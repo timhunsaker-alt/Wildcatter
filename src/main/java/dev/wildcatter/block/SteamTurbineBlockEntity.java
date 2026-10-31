@@ -138,7 +138,7 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 	private int draw(Level level, int wanted) {
 		int got = 0;
 		for (Direction side : Direction.values()) {
-			if (got < wanted && level.getBlockEntity(worldPosition.relative(side)) instanceof BoilerBlockEntity boiler) {
+			if (got < wanted && dev.wildcatter.multiblock.BigParts.entity(level, worldPosition.relative(side)) instanceof BoilerBlockEntity boiler) {
 				got += boiler.takeSteam(wanted - got);
 			}
 		}

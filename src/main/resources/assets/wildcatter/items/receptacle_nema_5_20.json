@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/receptacle_nema_5_20"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/receptacle_nema_5_20_wall/item"
+ }
 }

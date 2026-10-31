@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/pump"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/pump/item"
+ }
 }

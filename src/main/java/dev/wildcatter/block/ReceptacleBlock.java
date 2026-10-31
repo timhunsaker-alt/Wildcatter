@@ -22,8 +22,6 @@ import org.jspecify.annotations.Nullable;
 
 /** A receptacle: a point on the grid where a matching plug adapter can be set against it. Wire it like any load point. */
 public class ReceptacleBlock extends BaseEntityBlock {
-	private static final VoxelShape SHAPE = Block.box(3, 3, 3, 13, 13, 13);
-
 	private final PlugType type;
 
 	public ReceptacleBlock(Properties properties, PlugType type) {
@@ -36,8 +34,19 @@ public class ReceptacleBlock extends BaseEntityBlock {
 	}
 
 	@Override
+	protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<Block, BlockState> builder) {
+		builder.add(AttachedGear.ATTACH);
+	}
+
+	@Override
+	public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+		return AttachedGear.place(defaultBlockState(), context);
+	}
+
+	// its box on the wall, about 0.12 m across (an IEC 60309 socket is the largest)
+	@Override
 	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-		return SHAPE;
+		return AttachedGear.shape(state, 3, 2);
 	}
 
 	@Override

@@ -126,13 +126,25 @@ public class BreakerBlock extends BaseEntityBlock {
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(FACING, POSITION);
+		builder.add(FACING, POSITION, GearMount.MOUNT);
+	}
+
+	/** Small low-voltage and 480 V gear hangs on a wall at true size; the single-pole MV, DIST and HV stand-ins do not. */
+	private boolean wallMountable() {
+		return voltage == Voltage.LOW || voltage == Voltage.INDUSTRIAL;
 	}
 
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
-		// The wire runs along the direction you are facing: in at the near side, out at the far side.
-		return defaultBlockState().setValue(FACING, context.getHorizontalDirection());
+		// The wire runs along the direction you are facing: in at the near side, out at the far side. On a wall it runs along it.
+		BlockState state = defaultBlockState().setValue(FACING, context.getHorizontalDirection());
+		return wallMountable() ? GearMount.place(state, context, FACING, context.getHorizontalDirection()) : state;
+	}
+
+	@Override
+	protected net.minecraft.world.phys.shapes.VoxelShape getShape(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos,
+			net.minecraft.world.phys.shapes.CollisionContext context) {
+		return wallMountable() ? GearMount.shape(state, state.getValue(FACING)) : super.getShape(state, level, pos, context);
 	}
 
 	@Override

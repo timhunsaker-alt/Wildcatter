@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/mcc_incoming_off"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/mcc_incoming/item"
+ }
 }

@@ -139,6 +139,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("lineParts")) {
 				lineParts(context, server);
 			}
+			if (only("buildingGear")) {
+				buildingGear(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -1435,16 +1438,19 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	}
 
 	/**
-	 * A motor control center: an incoming section fed from a unit substation on top of it, and three buckets. Bucket 1 runs a
-	 * pumpjack; bucket 3 runs one wired with only two phases, which cannot start, stalls, and trips bucket 3's overload relay
-	 * while bucket 1 keeps running. Taking out the middle bucket cuts the bus to bucket 3.
+	 * A motor control center at true size (4.5f, docs/multiblocks/motor-control-center.md): a tall incoming section fed on its top
+	 * from a genset, and two starter sections to its right. Buckets are clicked into their spaces. Section 1's bottom bucket runs a
+	 * pumpjack; section 2's middle bucket runs one wired with only two phases, which cannot start, stalls, and trips that bucket's
+	 * overload relay while bucket 1 keeps running. Breaking section 1 drops it and its bucket and cuts the bus to section 2; an older
+	 * world's one-block bucket drops as a bucket item.
 	 */
 	private void motorControlCenter(ClientGameTestContext context, TestServerContext server) {
 		int z = -360;
-		server.runCommand("tp @p 16 " + (up + 2) + " " + (z + 6) + " 180 15");
+		server.runCommand("tp @p 16 " + (up + 3) + " " + (z + 7) + " 180 15");
 		context.waitTicks(20);
-		server.runCommand("fill 6 " + (y - 1) + " " + (z - 6) + " 22 " + (y + 5) + " " + (z + 4) + " minecraft:air");
-		server.runCommand("fill 6 " + (y - 1) + " " + (z - 6) + " 22 " + (y - 1) + " " + (z + 4) + " minecraft:stone");
+		server.runCommand("fill 6 " + (y - 1) + " " + (z - 6) + " 24 " + (y + 6) + " " + (z + 4) + " minecraft:air");
+		server.runCommand("fill 6 " + (y - 1) + " " + (z - 6) + " 24 " + (y - 1) + " " + (z + 4) + " minecraft:stone");
+		server.runCommand("kill @e[type=item]");
 		long seed = -1;
 		for (long s = 1; s < 3_000_000 && seed < 0; s++) {
 			Reservoir a = Reservoir.at(s, 15, z - 2);
@@ -1456,60 +1462,94 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(seed >= 0, "no seed puts oil under both MCC pumpjacks");
 		ReservoirData.testSeed = seed;
 		try {
-			put(server, 14, up, z, "wildcatter:mcc_incoming[facing=south]");
+			net.minecraft.core.Direction south = net.minecraft.core.Direction.SOUTH;
+			placeBig(server, WildcatterBlocks.MCC_INCOMING, new BlockPos(14, up, z), south);   // its front south; the sections go east
+			placeBig(server, WildcatterBlocks.MCC_SECTION, new BlockPos(15, up, z), south);
+			placeBig(server, WildcatterBlocks.MCC_SECTION, new BlockPos(16, up, z), south);
 			BlockPos set = new BlockPos(13, up, z);
 			genset(server, set, net.minecraft.core.Direction.NORTH, false);   // beside the incoming section; the skid runs west
-			// off the back of the panel's end face, up, and onto the incoming section's top
-			put(server, 14, up, z + 1, "wildcatter:cable_industrial");
-			put(server, 14, up + 1, z + 1, "wildcatter:cable_industrial");
-			put(server, 14, up + 1, z, "wildcatter:cable_industrial");
-			for (int x = 15; x <= 17; x++) {
-				put(server, x, up, z, "wildcatter:mcc_bucket[facing=south]");
+			// off the back of the panel's end face, up the front of the incoming section, and onto its top
+			for (int k = 0; k <= 3; k++) {
+				put(server, 14, up + k, z + 1, "wildcatter:cable_industrial");
 			}
+			put(server, 14, up + 3, z, "wildcatter:cable_industrial");
+			// buckets clicked into section 1's bottom space and section 2's middle space
+			check(clickWith(server, new BlockPos(15, up, z), south, new ItemStack(WildcatterItems.MCC_BUCKET)), "a bucket should click into an empty space");
+			check(clickWith(server, new BlockPos(16, up + 1, z), south, new ItemStack(WildcatterItems.MCC_BUCKET)), "a bucket should click into section 2's middle space");
+			check(stateAt(server, new BlockPos(15, up, z)).getValue(dev.wildcatter.block.MccSectionBlock.BUCKET) == dev.wildcatter.block.MccSectionBlock.Bucket.STOPPED,
+					"the space should show its bucket: " + stateAt(server, new BlockPos(15, up, z)));
+			// bucket 1's motor leads leave the back of its cell to a pumpjack
 			put(server, 15, up, z - 1, "wildcatter:cable_industrial");
 			put(server, 15, up, z - 2, "wildcatter:pumpjack");
-			// bucket 3: phase A on its back, phase B over the top; no phase C
-			put(server, 17, up, z - 1, "wildcatter:cable_industrial");
+			// section 2's bucket: phase A and phase B round to a pumpjack, no phase C
+			put(server, 16, up + 1, z - 1, "wildcatter:cable_industrial");
 			put(server, 17, up + 1, z - 1, "wildcatter:cable_industrial");
+			put(server, 17, up, z - 1, "wildcatter:cable_industrial");
 			put(server, 17, up, z - 2, "wildcatter:industrial_plastic_wire_hot[conductor=a]");
 			put(server, 17, up + 1, z - 2, "wildcatter:industrial_plastic_wire_hot[conductor=b]");
 			put(server, 17, up + 1, z - 3, "wildcatter:industrial_plastic_wire_hot[conductor=b]");
 			put(server, 17, up, z - 3, "wildcatter:pumpjack");
 			startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 1000);
 			server.computeOnServer(srv -> {
-				starter(srv, 15, up, z).pushButton();
-				starter(srv, 17, up, z).pushButton();
+				section(srv, 15, z).pushButton(0);
+				section(srv, 16, z).pushButton(1);
 				return null;
 			});
 			context.waitTicks(120);
 			String mcc = read(server, 14, up, z);
-			check(mcc.contains("3 bucket(s)") && mcc.contains("main 100 A ON"), "the incoming section and three buckets should form a lineup: " + mcc);
+			check(mcc.contains("2 bucket(s)") && mcc.contains("main 100 A ON"), "the incoming section and its two sections' buckets should form a lineup: " + mcc);
 			String jack = read(server, 15, up, z - 2);
 			check(jack.contains("pumping"), "the pumpjack on bucket 1 should run: " + jack + " | " + read(server, 15, up, z) + " | " + mcc);
 			check(read(server, 17, up, z - 3).contains("STALLED"), "a motor with two phases cannot start: " + read(server, 17, up, z - 3));
 			String tripped = "";
 			for (int waited = 0; waited < 600; waited += 40) {
-				tripped = read(server, 17, up, z);
+				tripped = read(server, 16, up, z);
 				if (tripped.contains("TRIPPED")) {
 					break;
 				}
 				context.waitTicks(40);
 			}
-			check(tripped.contains("TRIPPED") && tripped.contains("overload"), "the stalled motor should trip bucket 3's overload relay: " + tripped);
+			check(tripped.contains("TRIPPED") && tripped.contains("overload"), "the stalled motor should trip its bucket's overload relay: " + tripped);
 			String first = read(server, 15, up, z);
-			check(first.contains("RUNNING"), "bucket 1 should keep running when bucket 3 trips: " + first);
+			check(first.contains("1 running"), "bucket 1 should keep running when the other trips: " + first);
+			check(stateAt(server, new BlockPos(16, up + 1, z)).getValue(dev.wildcatter.block.MccSectionBlock.BUCKET) == dev.wildcatter.block.MccSectionBlock.Bucket.TRIPPED,
+					"the tripped bucket's space should show it");
 			mcc = read(server, 14, up, z);
 			context.takeScreenshot("wildcatter-mcc");
-			// take out the middle bucket: the bus ends there, so bucket 3 is off it
-			put(server, 16, up, z, "minecraft:air");
+			// break section 1: it drops with its bucket, and section 2 is off the bus
+			server.runCommand("kill @e[type=item]");
+			server.computeOnServer(srv -> srv.overworld().destroyBlock(new BlockPos(15, up + 2, z), true));
 			context.waitTicks(20);
-			String cut = read(server, 17, up, z);
-			check(cut.contains("NOT ON AN MCC BUS"), "with the middle bucket gone bucket 3 should be off the bus: " + cut);
-			check(read(server, 15, up, z).contains("RUNNING"), "bucket 1 should still run: " + read(server, 15, up, z));
+			String cut = read(server, 16, up, z);
+			check(cut.contains("NOT ON AN MCC BUS"), "with section 1 gone section 2 should be off the bus: " + cut);
+			check(itemsNear(server, new BlockPos(15, up, z), WildcatterBlocks.MCC_SECTION) == 1 && itemsNear(server, new BlockPos(15, up, z), WildcatterItems.MCC_BUCKET) == 1,
+					"a broken section should drop itself and its bucket");
+			// an older world's one-block bucket drops as a bucket item
+			server.runCommand("kill @e[type=item]");
+			put(server, 21, up, z, "wildcatter:mcc_bucket[facing=south]");
+			context.waitTicks(10);
+			check(isAir(server, 21, up, z) && itemsNear(server, new BlockPos(21, up, z), WildcatterItems.MCC_BUCKET) == 1, "an older world's one-block bucket should drop as a bucket item");
 			System.out.println("[wildcatter-test] mcc ok: " + mcc + " | " + first + " | " + tripped + " | " + cut);
 		} finally {
 			ReservoirData.testSeed = null;
 		}
+	}
+
+	private dev.wildcatter.block.MccSectionBlockEntity section(net.minecraft.server.MinecraftServer srv, int x, int z) {
+		return (dev.wildcatter.block.MccSectionBlockEntity) srv.overworld().getBlockEntity(new BlockPos(x, up, z));
+	}
+
+	/** A player's right-click with {@code stack} on {@code face} of the block at {@code at}: true if the block used it. */
+	private boolean clickWith(TestServerContext server, BlockPos at, net.minecraft.core.Direction face, ItemStack stack) {
+		return server.computeOnServer(srv -> {
+			net.minecraft.server.level.ServerPlayer player = srv.getPlayerList().getPlayers().get(0);
+			player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, stack);
+			net.minecraft.world.phys.BlockHitResult hit = new net.minecraft.world.phys.BlockHitResult(
+					net.minecraft.world.phys.Vec3.atCenterOf(at).add(face.getStepX() * 0.5, face.getStepY() * 0.5, face.getStepZ() * 0.5), face, at, false);
+			boolean used = srv.overworld().getBlockState(at).useItemOn(stack, srv.overworld(), player, net.minecraft.world.InteractionHand.MAIN_HAND, hit).consumesAction();
+			player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+			return used;
+		});
 	}
 
 	private double starterAmps(String readout) {
@@ -2388,7 +2428,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	}
 
 	/** Items of one kind lying near {@code at}. */
-	private int itemsNear(TestServerContext server, BlockPos at, net.minecraft.world.level.block.Block block) {
+	private int itemsNear(TestServerContext server, BlockPos at, net.minecraft.world.level.ItemLike block) {
 		return server.computeOnServer(srv -> {
 			int n = 0;
 			for (net.minecraft.world.entity.item.ItemEntity item : srv.overworld().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
@@ -2767,6 +2807,59 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(10);
 		check(stateAt(server, new BlockPos(31, up + 1, z + 11)).is(WildcatterBlocks.PADMOUNT_208), "a one-block pad-mount with room should grow to 2 x 2 x 2: " + stateAt(server, new BlockPos(31, up + 1, z + 11)));
 		System.out.println("[wildcatter-test] line parts ok: pole, arm, insulators, transformer; break drops " + poles + "/" + arms + "/" + pins + "; H-frames strung; old span lit; pad-mount grew");
+	}
+
+	/**
+	 * Building gear at true size (4.5f, docs/multiblocks/building-gear.md), put up the way a player does: a breaker clicked on a wall
+	 * hangs on it with its line along the wall, a lamp and receptacles take the faces they are clicked on (a wall, the floor, the
+	 * ceiling), and the starter turbine lights the lamp through the wall breaker. Screenshots of the wall of gear and the starter
+	 * plant (the 1 x 2 x 1 boiler, the turbine, a firebox and a pump).
+	 */
+	private void buildingGear(ClientGameTestContext context, TestServerContext server) {
+		int z = -960;
+		net.minecraft.core.Direction south = net.minecraft.core.Direction.SOUTH;
+		server.runCommand("tp @p 15 " + (up + 1) + " " + (z + 5) + " 180 10");
+		context.waitTicks(20);
+		server.runCommand("fill 4 " + (y - 1) + " " + (z - 4) + " 30 " + (y + 5) + " " + (z + 6) + " minecraft:air");
+		server.runCommand("fill 4 " + (y - 1) + " " + (z - 4) + " 30 " + y + " " + (z + 6) + " minecraft:stone");   // ground at y
+		server.runCommand("fill 12 " + up + " " + (z - 1) + " 26 " + (up + 2) + " " + (z - 1) + " minecraft:smooth_stone");   // a wall along the north
+		server.runCommand("fill 18 " + (up + 2) + " " + z + " 22 " + (up + 2) + " " + z + " minecraft:smooth_stone");          // and a bit of ceiling
+		plant(server, z);
+		put(server, 12, up, z, "wildcatter:wool_wire_hot");
+		// standing south of the wall, looking north: the breaker clicked on the wall hangs on it, its line running west to east
+		check(placeAt(server, WildcatterBlocks.BREAKER, new BlockPos(13, up, z - 1), south, 13.5, z + 3.5, 180.0F), "a breaker should place on the wall");
+		net.minecraft.world.level.block.state.BlockState breaker = stateAt(server, new BlockPos(13, up, z));
+		check(breaker.getValue(dev.wildcatter.block.GearMount.MOUNT) == dev.wildcatter.block.GearMount.WALL && breaker.getValue(BreakerBlock.FACING) == net.minecraft.core.Direction.EAST,
+				"a breaker on a north wall should hang on it, its line running east: " + breaker);
+		put(server, 14, up, z, "wildcatter:wool_wire_hot");
+		check(placeAt(server, WildcatterBlocks.ELECTRIC_LAMP, new BlockPos(15, up, z - 1), south, 15.5, z + 3.5, 180.0F), "a lamp should place on the wall");
+		for (int x = 11; x <= 15; x++) {
+			put(server, x, up, z + 1, "wildcatter:wool_wire_neutral");
+		}
+		check(placeAt(server, WildcatterBlocks.RECEPTACLE_NEMA_5_15, new BlockPos(17, up, z - 1), south, 17.5, z + 3.5, 180.0F), "a receptacle should place on the wall");
+		check(placeOn(server, WildcatterBlocks.RECEPTACLE_NEMA_L22_30, new BlockPos(18, y, z), 18.5, z + 3.5, 180.0F), "a receptacle should place on the floor");
+		check(placeAt(server, WildcatterBlocks.ELECTRIC_LAMP, new BlockPos(19, up + 2, z), net.minecraft.core.Direction.DOWN, 19.5, z + 3.5, 180.0F), "a lamp should hang from the ceiling");
+		check(stateAt(server, new BlockPos(15, up, z)).getValue(dev.wildcatter.block.AttachedGear.ATTACH) == net.minecraft.core.Direction.NORTH
+				&& stateAt(server, new BlockPos(18, up, z)).getValue(dev.wildcatter.block.AttachedGear.ATTACH) == net.minecraft.core.Direction.DOWN
+				&& stateAt(server, new BlockPos(19, up + 1, z)).getValue(dev.wildcatter.block.AttachedGear.ATTACH) == net.minecraft.core.Direction.UP,
+				"gear should mount on the face it was clicked on: " + stateAt(server, new BlockPos(15, up, z)) + " | " + stateAt(server, new BlockPos(18, up, z)) + " | " + stateAt(server, new BlockPos(19, up + 1, z)));
+		for (Object[] g : new Object[][] {{WildcatterBlocks.ELECTRIC_HEATER, 21}, {WildcatterBlocks.MOTOR_STARTER, 22}, {WildcatterBlocks.BREAKER_3P_INDUSTRIAL, 23},
+				{WildcatterBlocks.SWITCH, 24}, {WildcatterBlocks.THREE_PHASE_HEATER, 25}}) {
+			int gx = (Integer) g[1];
+			check(placeAt(server, (net.minecraft.world.level.block.Block) g[0], new BlockPos(gx, up, z - 1), south, gx + 0.5, z + 3.5, 180.0F), "gear should place on the wall at x " + gx);
+		}
+		put(server, 8, up, z, "wildcatter:firebox[facing=south]");
+		put(server, 8, up, z + 2, "wildcatter:pump[facing=east]");
+		context.waitTicks(160);
+		check(lit(server, 15, z), "the lamp should light through the wall breaker: " + read(server, 15, up, z) + " | " + read(server, 13, up, z));
+		check(stateAt(server, new BlockPos(10, up + 1, z)).is(WildcatterBlocks.BOILER), "the boiler should stand 2 m over its campfire");
+		server.runCommand("tp @p 18 " + (up + 1) + " " + (z + 4) + " 180 12");
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-building-gear");
+		server.runCommand("tp @p 6 " + (up + 1) + " " + (z + 4) + " -140 15");
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-starter-plant");
+		System.out.println("[wildcatter-test] building gear ok: " + breaker + " | " + read(server, 15, up, z));
 	}
 
 	private void fieldManual(TestServerContext server) {

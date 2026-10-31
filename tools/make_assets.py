@@ -1229,6 +1229,23 @@ lang.update({"block.wildcatter.wood_pole_30": "Wood Pole (30 ft, class 5)", "blo
 	"block.wildcatter.insulator_hv": "Suspension Insulator String (HV, 138 kV)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 4.5f: building gear and the starter plant at true size (docs/multiblocks/building-gear.md, motor-control-center.md) --
+# blockstates, models and items come from tools/models/enclosure.py, fixtures.py, mcc.py and starter_plant.py; here loot, names,
+# tags and recipes. The MCC bucket is an item now (it clicks into a starter section); an older world's bucket block drops it.
+for name in ("mcc_incoming", "mcc_section", "boiler"):
+	big_part_loot(name)
+save_json(f"{ASSETS}/models/item/mcc_bucket.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:block/mat/decal_pushbuttons"}})
+save_json(f"{ASSETS}/items/mcc_bucket.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/mcc_bucket"}})
+shaped("mcc_section", ["SBS", "S S", "SBS"], {"S": S_, "B": "minecraft:iron_bars"}, "mcc_section")
+for tag in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
+	t["values"] += [f"{ns}:mcc_section"]
+	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({"block.wildcatter.mcc_section": "MCC Starter Section (480 V, three buckets)", "item.wildcatter.mcc_bucket": "MCC Bucket (combination starter)",
+	"block.wildcatter.mcc_incoming": "MCC Incoming Section (480 V, main breaker)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # Every conductor item and the sizes it comes in (the Java side: energy/ConductorSize).
 BUILDING = ["awg_12", "awg_10", "awg_6", "awg_2", "awg_4_0", "kcmil_500"]
 ACSR = ["acsr_sparrow", "acsr_raven", "acsr_penguin", "acsr_linnet", "acsr_drake"]

@@ -358,6 +358,27 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - **Game tests:** `spans`, `serviceDrop`, `conductorSizes`, `refining` and `overheadThreePhase` (two H-frames) are strung
   on the new poles; every pad-mount and unit-substation scene is rewired to the new terminals; new scene `lineParts`.
 
+## Phase 4.5f: building gear and the starter plant at true size
+- **Small gear** (docs/multiblocks/building-gear.md) is one cell, drawn at its real size; terminals and ratings are unchanged.
+  - **In-line gear** (breaker, switch, LV frequency relay, LV fuse, 3-pole breakers, motor starter) gets a `mount`: clicked
+    against a wall it hangs on it, its line along the wall (in from the left, out to the right); on the floor it stands on a
+    Unistrut stand. Conduit stubs run to its two terminal faces; handles, the pullout and the starter's lights show its state.
+  - **Gear wired on every face** (9 receptacles, 9 plugs, the lamp, both heaters) gets an `attach`: the wall, floor or ceiling
+    it was clicked on. Receptacles sit on steel boxes (floor boxes on the floor), IEC sockets with their lids, plugs on cords.
+- **Motor control center** (Tim's choice): tall NEMA sections, 1 × 3 × 1 — the incoming section (main breaker, fed on top or
+  at the back) and new **starter sections** with three bucket spaces each. The **MCC bucket** is now an item clicked into a
+  space; each bucket's motor leads leave the back of its cell; breaking a section drops its buckets. The bucket logic is one
+  `Starter` class shared by the sections and the standalone starter.
+- **Starter plant:** the boiler is a 1 × 2 × 1 small vertical fire-tube boiler with its stack and fittings; the 2 kW
+  turbine-generator, the 750 W pump and the firebox are drawn at true size and gain a facing.
+- **Old worlds:** one-block MCC buckets drop as bucket items with a chat line; one-block incoming sections and boilers grow
+  where they have room; other gear keeps working with the floor look.
+- **Models:** `enclosure.py`, `fixtures.py`, `mcc.py`, `starter_plant.py` with `gearlib`; Ludo bulb glass and a pushbutton
+  plate (1 credit).
+- **Game tests:** `motorControlCenter` rebuilt on tall sections with buckets clicked in (overload trip, a broken section cuts the
+  bus and drops its bucket, an old bucket drops); new scene `buildingGear` (wall, floor and ceiling mounts by click, a lamp lit
+  through a wall breaker, screenshots).
+
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.
@@ -366,7 +387,9 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
-- Phase 4.5: the GSU, gensets, steam plant, cooling tower, substation yard and overhead line are true size. The building gear (breakers, MCC, receptacles, loads), the starter plant and the oil field are still one block per part until waves 4.5f and 4.5g.
+- Phase 4.5: everything but the oil field is true size; the oil field is wave 4.5g. The single-pole MV, DIST and HV breakers, the DIST under-frequency relay and the unrated `transformer` and `substation_transformer` stay one-block stand-ins (decided with Tim, until Phase 6).
+- Wall-mounted gear sits 0.55 m up its cell; a player wanting it higher places it a block up.
+- The starter turbine and pump show running only by a light; they have no turning parts yet.
 - The pole transformer and cutout are wired as before (wire blocks to their faces); there are no jumper or riser leads drawn from an insulator down to them.
 - A pole transformer placed by command keeps its old facing rule, so in some test scenes its brackets face away from the pole.
 - Breaking a pole does not take down a pole transformer hung on it (it stays, as before).

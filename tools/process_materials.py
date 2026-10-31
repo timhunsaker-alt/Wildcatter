@@ -13,7 +13,8 @@ SRC, OUT, SIZE = "art/source", "art/final/mat", 32
 os.makedirs(OUT, exist_ok=True)
 
 # decals: the part of each picture to use, as fractions (left, top, right, bottom); the rest use the whole picture
-CROP = {"decal_nameplate": (0.0, 0.0, 0.5, 0.5), "decal_controller": (0.0, 0.0, 0.56, 0.56), "decal_engine_plate": (0.6, 0.05, 1.0, 0.45)}
+CROP = {"decal_nameplate": (0.0, 0.0, 0.5, 0.5), "decal_controller": (0.0, 0.0, 0.56, 0.56), "decal_engine_plate": (0.6, 0.05, 1.0, 0.45),
+	"decal_pushbuttons": (0.2, 0.0, 0.52, 0.64)}
 WINDOW = 0.34   # a material swatch is the cleanest window this big (a fraction of the picture)
 DECALS = ("decal_",)
 

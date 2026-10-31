@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "wildcatter:block/mcc_bucket_stopped"
+    "model": "wildcatter:item/mcc_bucket"
   }
 }

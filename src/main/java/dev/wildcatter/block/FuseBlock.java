@@ -53,12 +53,20 @@ public class FuseBlock extends BaseEntityBlock {
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(FACING, BLOWN);
+		builder.add(FACING, BLOWN, GearMount.MOUNT);
 	}
 
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
-		return defaultBlockState().setValue(FACING, context.getHorizontalDirection());
+		BlockState state = defaultBlockState().setValue(FACING, context.getHorizontalDirection());
+		// a low-voltage fused disconnect hangs on a wall at true size; a fused cutout does not
+		return voltage == dev.wildcatter.energy.Voltage.LOW ? GearMount.place(state, context, FACING, context.getHorizontalDirection()) : state;
+	}
+
+	@Override
+	protected net.minecraft.world.phys.shapes.VoxelShape getShape(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos,
+			net.minecraft.world.phys.shapes.CollisionContext context) {
+		return voltage == dev.wildcatter.energy.Voltage.LOW ? GearMount.shape(state, state.getValue(FACING)) : super.getShape(state, level, pos, context);
 	}
 
 	@Override

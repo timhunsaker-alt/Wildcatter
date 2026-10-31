@@ -36,6 +36,10 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> PLASTIC_SHEET_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("plastic_sheet"));
 	public static final Item PLASTIC_SHEET = new Item(new Item.Properties().setId(PLASTIC_SHEET_KEY));
 
+	/** A combination starter bucket for a motor control center: it clicks into an empty space of a starter section (docs/multiblocks/motor-control-center.md). */
+	public static final ResourceKey<Item> MCC_BUCKET_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("mcc_bucket"));
+	public static final Item MCC_BUCKET = new Item(new Item.Properties().stacksTo(16).setId(MCC_BUCKET_KEY));
+
 	/** A bucket of diesel. It burns in a firebox, or fills a diesel engine by hand. */
 	public static final ResourceKey<Item> DIESEL_BUCKET_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("diesel_bucket"));
 	public static final Item DIESEL_BUCKET = new Item(new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET).setId(DIESEL_BUCKET_KEY));
@@ -79,6 +83,7 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, PLASTIC_SHEET_KEY, PLASTIC_SHEET);
 		Registry.register(BuiltInRegistries.ITEM, STEEL_INGOT_KEY, STEEL_INGOT);
 		Registry.register(BuiltInRegistries.ITEM, DIESEL_BUCKET_KEY, DIESEL_BUCKET);
+		Registry.register(BuiltInRegistries.ITEM, MCC_BUCKET_KEY, MCC_BUCKET);
 		PARTS.forEach((name, item) -> Registry.register(BuiltInRegistries.ITEM, ResourceKey.create(Registries.ITEM, Wildcatter.id(name)), item));
 		registerSpool("conductor_spool_lv", SPOOL_LV);
 		registerSpool("conductor_spool_dist", SPOOL_DIST);

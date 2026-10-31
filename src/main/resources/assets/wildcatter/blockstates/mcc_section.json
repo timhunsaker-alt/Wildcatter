@@ -1,0 +1,184 @@
+{
+ "variants": {
+  "bucket=empty,facing=north,piece=0": {
+   "model": "wildcatter:block/mcc_section/p0"
+  },
+  "bucket=stopped,facing=north,piece=0": {
+   "model": "wildcatter:block/mcc_section_stopped/p0"
+  },
+  "bucket=running,facing=north,piece=0": {
+   "model": "wildcatter:block/mcc_section_running/p0"
+  },
+  "bucket=tripped,facing=north,piece=0": {
+   "model": "wildcatter:block/mcc_section_tripped/p0"
+  },
+  "bucket=empty,facing=north,piece=1": {
+   "model": "wildcatter:block/mcc_section/p1"
+  },
+  "bucket=stopped,facing=north,piece=1": {
+   "model": "wildcatter:block/mcc_section_stopped/p1"
+  },
+  "bucket=running,facing=north,piece=1": {
+   "model": "wildcatter:block/mcc_section_running/p1"
+  },
+  "bucket=tripped,facing=north,piece=1": {
+   "model": "wildcatter:block/mcc_section_tripped/p1"
+  },
+  "bucket=empty,facing=north,piece=2": {
+   "model": "wildcatter:block/mcc_section/p2"
+  },
+  "bucket=stopped,facing=north,piece=2": {
+   "model": "wildcatter:block/mcc_section_stopped/p2"
+  },
+  "bucket=running,facing=north,piece=2": {
+   "model": "wildcatter:block/mcc_section_running/p2"
+  },
+  "bucket=tripped,facing=north,piece=2": {
+   "model": "wildcatter:block/mcc_section_tripped/p2"
+  },
+  "bucket=empty,facing=east,piece=0": {
+   "model": "wildcatter:block/mcc_section/p0",
+   "y": 90
+  },
+  "bucket=stopped,facing=east,piece=0": {
+   "model": "wildcatter:block/mcc_section_stopped/p0",
+   "y": 90
+  },
+  "bucket=running,facing=east,piece=0": {
+   "model": "wildcatter:block/mcc_section_running/p0",
+   "y": 90
+  },
+  "bucket=tripped,facing=east,piece=0": {
+   "model": "wildcatter:block/mcc_section_tripped/p0",
+   "y": 90
+  },
+  "bucket=empty,facing=east,piece=1": {
+   "model": "wildcatter:block/mcc_section/p1",
+   "y": 90
+  },
+  "bucket=stopped,facing=east,piece=1": {
+   "model": "wildcatter:block/mcc_section_stopped/p1",
+   "y": 90
+  },
+  "bucket=running,facing=east,piece=1": {
+   "model": "wildcatter:block/mcc_section_running/p1",
+   "y": 90
+  },
+  "bucket=tripped,facing=east,piece=1": {
+   "model": "wildcatter:block/mcc_section_tripped/p1",
+   "y": 90
+  },
+  "bucket=empty,facing=east,piece=2": {
+   "model": "wildcatter:block/mcc_section/p2",
+   "y": 90
+  },
+  "bucket=stopped,facing=east,piece=2": {
+   "model": "wildcatter:block/mcc_section_stopped/p2",
+   "y": 90
+  },
+  "bucket=running,facing=east,piece=2": {
+   "model": "wildcatter:block/mcc_section_running/p2",
+   "y": 90
+  },
+  "bucket=tripped,facing=east,piece=2": {
+   "model": "wildcatter:block/mcc_section_tripped/p2",
+   "y": 90
+  },
+  "bucket=empty,facing=south,piece=0": {
+   "model": "wildcatter:block/mcc_section/p0",
+   "y": 180
+  },
+  "bucket=stopped,facing=south,piece=0": {
+   "model": "wildcatter:block/mcc_section_stopped/p0",
+   "y": 180
+  },
+  "bucket=running,facing=south,piece=0": {
+   "model": "wildcatter:block/mcc_section_running/p0",
+   "y": 180
+  },
+  "bucket=tripped,facing=south,piece=0": {
+   "model": "wildcatter:block/mcc_section_tripped/p0",
+   "y": 180
+  },
+  "bucket=empty,facing=south,piece=1": {
+   "model": "wildcatter:block/mcc_section/p1",
+   "y": 180
+  },
+  "bucket=stopped,facing=south,piece=1": {
+   "model": "wildcatter:block/mcc_section_stopped/p1",
+   "y": 180
+  },
+  "bucket=running,facing=south,piece=1": {
+   "model": "wildcatter:block/mcc_section_running/p1",
+   "y": 180
+  },
+  "bucket=tripped,facing=south,piece=1": {
+   "model": "wildcatter:block/mcc_section_tripped/p1",
+   "y": 180
+  },
+  "bucket=empty,facing=south,piece=2": {
+   "model": "wildcatter:block/mcc_section/p2",
+   "y": 180
+  },
+  "bucket=stopped,facing=south,piece=2": {
+   "model": "wildcatter:block/mcc_section_stopped/p2",
+   "y": 180
+  },
+  "bucket=running,facing=south,piece=2": {
+   "model": "wildcatter:block/mcc_section_running/p2",
+   "y": 180
+  },
+  "bucket=tripped,facing=south,piece=2": {
+   "model": "wildcatter:block/mcc_section_tripped/p2",
+   "y": 180
+  },
+  "bucket=empty,facing=west,piece=0": {
+   "model": "wildcatter:block/mcc_section/p0",
+   "y": 270
+  },
+  "bucket=stopped,facing=west,piece=0": {
+   "model": "wildcatter:block/mcc_section_stopped/p0",
+   "y": 270
+  },
+  "bucket=running,facing=west,piece=0": {
+   "model": "wildcatter:block/mcc_section_running/p0",
+   "y": 270
+  },
+  "bucket=tripped,facing=west,piece=0": {
+   "model": "wildcatter:block/mcc_section_tripped/p0",
+   "y": 270
+  },
+  "bucket=empty,facing=west,piece=1": {
+   "model": "wildcatter:block/mcc_section/p1",
+   "y": 270
+  },
+  "bucket=stopped,facing=west,piece=1": {
+   "model": "wildcatter:block/mcc_section_stopped/p1",
+   "y": 270
+  },
+  "bucket=running,facing=west,piece=1": {
+   "model": "wildcatter:block/mcc_section_running/p1",
+   "y": 270
+  },
+  "bucket=tripped,facing=west,piece=1": {
+   "model": "wildcatter:block/mcc_section_tripped/p1",
+   "y": 270
+  },
+  "bucket=empty,facing=west,piece=2": {
+   "model": "wildcatter:block/mcc_section/p2",
+   "y": 270
+  },
+  "bucket=stopped,facing=west,piece=2": {
+   "model": "wildcatter:block/mcc_section_stopped/p2",
+   "y": 270
+  },
+  "bucket=running,facing=west,piece=2": {
+   "model": "wildcatter:block/mcc_section_running/p2",
+   "y": 270
+  },
+  "bucket=tripped,facing=west,piece=2": {
+   "model": "wildcatter:block/mcc_section_tripped/p2",
+   "y": 270
+  }
+ }
+}

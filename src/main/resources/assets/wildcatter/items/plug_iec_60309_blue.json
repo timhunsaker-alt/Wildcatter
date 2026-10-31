@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/plug_iec_60309_blue"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/plug_iec_60309_blue_wall/item"
+ }
 }

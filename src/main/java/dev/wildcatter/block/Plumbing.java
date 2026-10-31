@@ -64,7 +64,7 @@ public final class Plumbing {
 		for (BlockPos source : sources) {
 			for (Direction side : Direction.values()) {
 				BlockPos next = source.relative(side);
-				if (!cells.contains(next) && level.getBlockEntity(next) instanceof BoilerBlockEntity boiler) {
+				if (!cells.contains(next) && dev.wildcatter.multiblock.BigParts.entity(level, next) instanceof BoilerBlockEntity boiler) {
 					found.putIfAbsent(boiler.rootPos(), boiler);
 				}
 			}

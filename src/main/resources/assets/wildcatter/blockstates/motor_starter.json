@@ -1,52 +1,94 @@
 {
-  "variants": {
-    "facing=north,run=running": {
-      "model": "wildcatter:block/motor_starter_running",
-      "y": 0
-    },
-    "facing=north,run=stopped": {
-      "model": "wildcatter:block/motor_starter_stopped",
-      "y": 0
-    },
-    "facing=north,run=tripped": {
-      "model": "wildcatter:block/motor_starter_tripped",
-      "y": 0
-    },
-    "facing=east,run=running": {
-      "model": "wildcatter:block/motor_starter_running",
-      "y": 90
-    },
-    "facing=east,run=stopped": {
-      "model": "wildcatter:block/motor_starter_stopped",
-      "y": 90
-    },
-    "facing=east,run=tripped": {
-      "model": "wildcatter:block/motor_starter_tripped",
-      "y": 90
-    },
-    "facing=south,run=running": {
-      "model": "wildcatter:block/motor_starter_running",
-      "y": 180
-    },
-    "facing=south,run=stopped": {
-      "model": "wildcatter:block/motor_starter_stopped",
-      "y": 180
-    },
-    "facing=south,run=tripped": {
-      "model": "wildcatter:block/motor_starter_tripped",
-      "y": 180
-    },
-    "facing=west,run=running": {
-      "model": "wildcatter:block/motor_starter_running",
-      "y": 270
-    },
-    "facing=west,run=stopped": {
-      "model": "wildcatter:block/motor_starter_stopped",
-      "y": 270
-    },
-    "facing=west,run=tripped": {
-      "model": "wildcatter:block/motor_starter_tripped",
-      "y": 270
-    }
+ "variants": {
+  "facing=north,run=stopped,mount=floor": {
+   "model": "wildcatter:block/motor_starter_floor_stopped/p0"
+  },
+  "facing=north,run=stopped,mount=wall": {
+   "model": "wildcatter:block/motor_starter_wall_stopped/p0"
+  },
+  "facing=north,run=running,mount=floor": {
+   "model": "wildcatter:block/motor_starter_floor_running/p0"
+  },
+  "facing=north,run=running,mount=wall": {
+   "model": "wildcatter:block/motor_starter_wall_running/p0"
+  },
+  "facing=north,run=tripped,mount=floor": {
+   "model": "wildcatter:block/motor_starter_floor_tripped/p0"
+  },
+  "facing=north,run=tripped,mount=wall": {
+   "model": "wildcatter:block/motor_starter_wall_tripped/p0"
+  },
+  "facing=east,run=stopped,mount=floor": {
+   "model": "wildcatter:block/motor_starter_floor_stopped/p0",
+   "y": 90
+  },
+  "facing=east,run=stopped,mount=wall": {
+   "model": "wildcatter:block/motor_starter_wall_stopped/p0",
+   "y": 90
+  },
+  "facing=east,run=running,mount=floor": {
+   "model": "wildcatter:block/motor_starter_floor_running/p0",
+   "y": 90
+  },
+  "facing=east,run=running,mount=wall": {
+   "model": "wildcatter:block/motor_starter_wall_running/p0",
+   "y": 90
+  },
+  "facing=east,run=tripped,mount=floor": {
+   "model": "wildcatter:block/motor_starter_floor_tripped/p0",
+   "y": 90
+  },
+  "facing=east,run=tripped,mount=wall": {
+   "model": "wildcatter:block/motor_starter_wall_tripped/p0",
+   "y": 90
+  },
+  "facing=south,run=stopped,mount=floor": {
+   "model": "wildcatter:block/motor_starter_floor_stopped/p0",
+   "y": 180
+  },
+  "facing=south,run=stopped,mount=wall": {
+   "model": "wildcatter:block/motor_starter_wall_stopped/p0",
+   "y": 180
+  },
+  "facing=south,run=running,mount=floor": {
+   "model": "wildcatter:block/motor_starter_floor_running/p0",
+   "y": 180
+  },
+  "facing=south,run=running,mount=wall": {
+   "model": "wildcatter:block/motor_starter_wall_running/p0",
+   "y": 180
+  },
+  "facing=south,run=tripped,mount=floor": {
+   "model": "wildcatter:block/motor_starter_floor_tripped/p0",
+   "y": 180
+  },
+  "facing=south,run=tripped,mount=wall": {
+   "model": "wildcatter:block/motor_starter_wall_tripped/p0",
+   "y": 180
+  },
+  "facing=west,run=stopped,mount=floor": {
+   "model": "wildcatter:block/motor_starter_floor_stopped/p0",
+   "y": 270
+  },
+  "facing=west,run=stopped,mount=wall": {
+   "model": "wildcatter:block/motor_starter_wall_stopped/p0",
+   "y": 270
+  },
+  "facing=west,run=running,mount=floor": {
+   "model": "wildcatter:block/motor_starter_floor_running/p0",
+   "y": 270
+  },
+  "facing=west,run=running,mount=wall": {
+   "model": "wildcatter:block/motor_starter_wall_running/p0",
+   "y": 270
+  },
+  "facing=west,run=tripped,mount=floor": {
+   "model": "wildcatter:block/motor_starter_floor_tripped/p0",
+   "y": 270
+  },
+  "facing=west,run=tripped,mount=wall": {
+   "model": "wildcatter:block/motor_starter_wall_tripped/p0",
+   "y": 270
   }
+ }
 }

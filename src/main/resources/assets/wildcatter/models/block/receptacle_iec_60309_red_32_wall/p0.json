@@ -1,0 +1,237 @@
+{
+ "textures": {
+  "engine": "wildcatter:block/mat/mat_paint_engine",
+  "gasgreen": "wildcatter:block/mat/mat_paint_pad_green",
+  "grey": "wildcatter:block/mat/mat_paint_ansi61",
+  "blue": "wildcatter:block/mat/mat_paint_ansi70",
+  "iron": "wildcatter:block/mat/mat_cast_iron",
+  "dark": "wildcatter:block/mat/mat_oil_dark",
+  "galv": "wildcatter:block/mat/mat_galvanized",
+  "steel": "wildcatter:block/mat/mat_stainless",
+  "rubber": "wildcatter:block/mat/mat_rubber",
+  "copper": "wildcatter:block/mat/mat_copper",
+  "brass": "wildcatter:block/mat/mat_brass",
+  "lagging": "wildcatter:block/mat/mat_aluminium_lagging",
+  "checker": "wildcatter:block/mat/mat_checker_plate",
+  "nameplate": "wildcatter:block/mat/decal_nameplate",
+  "danger": "wildcatter:block/mat/decal_danger_hv",
+  "gauge": "wildcatter:block/mat/decal_gauge",
+  "controller": "wildcatter:block/mat/decal_controller",
+  "engineplate": "wildcatter:block/mat/decal_engine_plate",
+  "concrete": "wildcatter:block/mat/mat_concrete",
+  "polymer": "wildcatter:block/mat/mat_polymer_grey",
+  "padgreen": "wildcatter:block/mat/mat_paint_pad_green",
+  "porcelain": "wildcatter:block/mat/mat_porcelain_brown",
+  "relays": "wildcatter:block/mat/decal_relays",
+  "pushbuttons": "wildcatter:block/mat/decal_pushbuttons",
+  "bulb": "wildcatter:block/mat/mat_bulb_lit",
+  "face": "wildcatter:block/receptacle_iec_60309_red_32",
+  "particle": "wildcatter:block/mat/mat_stainless"
+ },
+ "elements": [
+  {
+   "from": [
+    7.28,
+    5.36,
+    0.0
+   ],
+   "to": [
+    8.72,
+    7.44,
+    1.376
+   ],
+   "faces": {
+    "north": {
+     "texture": "#galv",
+     "uv": [
+      7.28,
+      8.56,
+      8.72,
+      10.64
+     ]
+    },
+    "south": {
+     "texture": "#galv",
+     "uv": [
+      7.28,
+      8.56,
+      8.72,
+      10.64
+     ]
+    },
+    "west": {
+     "texture": "#galv",
+     "uv": [
+      0.0,
+      8.56,
+      1.376,
+      10.64
+     ]
+    },
+    "east": {
+     "texture": "#galv",
+     "uv": [
+      14.624,
+      8.56,
+      16.0,
+      10.64
+     ]
+    },
+    "up": {
+     "texture": "#galv",
+     "uv": [
+      7.28,
+      0.0,
+      8.72,
+      1.376
+     ]
+    },
+    "down": {
+     "texture": "#galv",
+     "uv": [
+      7.28,
+      14.624,
+      8.72,
+      16.0
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    7.2,
+    5.28,
+    1.376
+   ],
+   "to": [
+    8.8,
+    7.52,
+    1.44
+   ],
+   "faces": {
+    "north": {
+     "texture": "#steel",
+     "uv": [
+      7.2,
+      8.48,
+      8.8,
+      10.72
+     ]
+    },
+    "south": {
+     "texture": "#face",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "west": {
+     "texture": "#steel",
+     "uv": [
+      1.376,
+      8.48,
+      1.44,
+      10.72
+     ]
+    },
+    "east": {
+     "texture": "#steel",
+     "uv": [
+      14.56,
+      8.48,
+      14.624,
+      10.72
+     ]
+    },
+    "up": {
+     "texture": "#steel",
+     "uv": [
+      7.2,
+      1.376,
+      8.8,
+      1.44
+     ]
+    },
+    "down": {
+     "texture": "#steel",
+     "uv": [
+      7.2,
+      14.56,
+      8.8,
+      14.624
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    7.2,
+    7.36,
+    1.44
+   ],
+   "to": [
+    8.8,
+    7.6,
+    2.4
+   ],
+   "faces": {
+    "north": {
+     "texture": "#polymer",
+     "uv": [
+      7.2,
+      8.4,
+      8.8,
+      8.64
+     ]
+    },
+    "south": {
+     "texture": "#polymer",
+     "uv": [
+      7.2,
+      8.4,
+      8.8,
+      8.64
+     ]
+    },
+    "west": {
+     "texture": "#polymer",
+     "uv": [
+      1.44,
+      8.4,
+      2.4,
+      8.64
+     ]
+    },
+    "east": {
+     "texture": "#polymer",
+     "uv": [
+      13.6,
+      8.4,
+      14.56,
+      8.64
+     ]
+    },
+    "up": {
+     "texture": "#polymer",
+     "uv": [
+      7.2,
+      1.44,
+      8.8,
+      2.4
+     ]
+    },
+    "down": {
+     "texture": "#polymer",
+     "uv": [
+      7.2,
+      13.6,
+      8.8,
+      14.56
+     ]
+    }
+   }
+  }
+ ]
+}

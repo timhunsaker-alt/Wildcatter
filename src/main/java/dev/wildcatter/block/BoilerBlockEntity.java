@@ -18,8 +18,9 @@ import net.minecraft.world.level.storage.ValueOutput;
  * The starter plant's boiler: it holds water and makes steam while a lit campfire or a burning firebox is under it. A turbine
  * next to it takes the steam. Big steam comes from the 1 MW steam plant's drum (docs/multiblocks/steam-plant.md).
  */
-public class BoilerBlockEntity extends BlockEntity implements Inspectable {
+public class BoilerBlockEntity extends BlockEntity implements Inspectable, dev.wildcatter.multiblock.BigPartEntity {
 	private int water;
+	private boolean grown;
 	private int steam;
 	/** Steam made since the last unit of water was used up. */
 	private int boiled;
@@ -101,8 +102,20 @@ public class BoilerBlockEntity extends BlockEntity implements Inspectable {
 	}
 
 	@Override
+	public boolean grown() {
+		return grown;
+	}
+
+	@Override
+	public void markGrown() {
+		grown = true;
+		setChanged();
+	}
+
+	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
+		output.putBoolean("grown", grown);
 		output.putInt("water", water);
 		output.putInt("steam", steam);
 		output.putInt("boiled", boiled);
@@ -114,5 +127,6 @@ public class BoilerBlockEntity extends BlockEntity implements Inspectable {
 		water = Math.min(input.getIntOr("water", 0), Tuning.BOILER_WATER_CAPACITY);   // a former coil boiler's master keeps only one boiler's worth
 		steam = Math.min(input.getIntOr("steam", 0), Tuning.BOILER_STEAM_CAPACITY);
 		boiled = input.getIntOr("boiled", 0);
+		grown = input.getBooleanOr("grown", false);
 	}
 }

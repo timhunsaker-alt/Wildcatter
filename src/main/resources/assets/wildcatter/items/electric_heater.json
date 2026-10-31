@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/electric_heater"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/electric_heater_wall/item"
+ }
 }

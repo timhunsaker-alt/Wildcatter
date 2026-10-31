@@ -1,7 +1,25 @@
 {
-  "variants": {
-    "": {
-      "model": "wildcatter:block/receptacle_nema_5_20"
-    }
+ "variants": {
+  "attach=north": {
+   "model": "wildcatter:block/receptacle_nema_5_20_wall/p0"
+  },
+  "attach=east": {
+   "model": "wildcatter:block/receptacle_nema_5_20_wall/p0",
+   "y": 90
+  },
+  "attach=south": {
+   "model": "wildcatter:block/receptacle_nema_5_20_wall/p0",
+   "y": 180
+  },
+  "attach=west": {
+   "model": "wildcatter:block/receptacle_nema_5_20_wall/p0",
+   "y": 270
+  },
+  "attach=down": {
+   "model": "wildcatter:block/receptacle_nema_5_20_floor/p0"
+  },
+  "attach=up": {
+   "model": "wildcatter:block/receptacle_nema_5_20_ceiling/p0"
   }
+ }
 }

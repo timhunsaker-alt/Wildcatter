@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/firebox"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/firebox/item"
+ }
 }

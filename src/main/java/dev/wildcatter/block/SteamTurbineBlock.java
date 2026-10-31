@@ -30,9 +30,17 @@ public class SteamTurbineBlock extends BaseEntityBlock {
 		registerDefaultState(stateDefinition.any().setValue(RUNNING, false));
 	}
 
+	/** Its shaft line at true size (docs/multiblocks/building-gear.md): the turbine at the back, the generator at the front. */
+	public static final net.minecraft.world.level.block.state.properties.EnumProperty<net.minecraft.core.Direction> FACING = net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
+
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(RUNNING);
+		builder.add(RUNNING, FACING);
+	}
+
+	@Override
+	public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+		return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
 	}
 
 	@Override

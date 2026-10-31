@@ -104,7 +104,7 @@
   "block.wildcatter.unit_substation": "Unit Substation (MV / 480Y/277 V, 1000 kVA)",
   "block.wildcatter.three_phase_heater": "Three-Phase Heater (480 V, 15 kW)",
   "block.wildcatter.motor_starter": "Combination Motor Starter (480 V)",
-  "block.wildcatter.mcc_incoming": "MCC Incoming Section (480 V)",
+  "block.wildcatter.mcc_incoming": "MCC Incoming Section (480 V, main breaker)",
   "block.wildcatter.mcc_bucket": "MCC Starter Bucket (480 V)",
   "block.wildcatter.busway_lv": "Busway (208Y/120 V, A B C N G)",
   "block.wildcatter.busway_industrial": "Busway (480 V, A B C N G)",
@@ -167,5 +167,7 @@
   "block.wildcatter.wood_pole_75": "Wood Pole (75 ft, class 2)",
   "block.wildcatter.crossarm_dist": "Crossarm (8 ft)",
   "block.wildcatter.crossbeam_138": "H-Frame Crossbeam (HV)",
-  "block.wildcatter.x_brace_138": "H-Frame X-Brace (HV)"
+  "block.wildcatter.x_brace_138": "H-Frame X-Brace (HV)",
+  "block.wildcatter.mcc_section": "MCC Starter Section (480 V, three buckets)",
+  "item.wildcatter.mcc_bucket": "MCC Bucket (combination starter)"
 }

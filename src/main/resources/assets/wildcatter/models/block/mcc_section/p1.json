@@ -1,0 +1,404 @@
+{
+ "textures": {
+  "engine": "wildcatter:block/mat/mat_paint_engine",
+  "gasgreen": "wildcatter:block/mat/mat_paint_pad_green",
+  "grey": "wildcatter:block/mat/mat_paint_ansi61",
+  "blue": "wildcatter:block/mat/mat_paint_ansi70",
+  "iron": "wildcatter:block/mat/mat_cast_iron",
+  "dark": "wildcatter:block/mat/mat_oil_dark",
+  "galv": "wildcatter:block/mat/mat_galvanized",
+  "steel": "wildcatter:block/mat/mat_stainless",
+  "rubber": "wildcatter:block/mat/mat_rubber",
+  "copper": "wildcatter:block/mat/mat_copper",
+  "brass": "wildcatter:block/mat/mat_brass",
+  "lagging": "wildcatter:block/mat/mat_aluminium_lagging",
+  "checker": "wildcatter:block/mat/mat_checker_plate",
+  "nameplate": "wildcatter:block/mat/decal_nameplate",
+  "danger": "wildcatter:block/mat/decal_danger_hv",
+  "gauge": "wildcatter:block/mat/decal_gauge",
+  "controller": "wildcatter:block/mat/decal_controller",
+  "engineplate": "wildcatter:block/mat/decal_engine_plate",
+  "concrete": "wildcatter:block/mat/mat_concrete",
+  "polymer": "wildcatter:block/mat/mat_polymer_grey",
+  "padgreen": "wildcatter:block/mat/mat_paint_pad_green",
+  "porcelain": "wildcatter:block/mat/mat_porcelain_brown",
+  "relays": "wildcatter:block/mat/decal_relays",
+  "pushbuttons": "wildcatter:block/mat/decal_pushbuttons",
+  "bulb": "wildcatter:block/mat/mat_bulb_lit",
+  "particle": "wildcatter:block/mat/mat_paint_ansi61"
+ },
+ "elements": [
+  {
+   "from": [
+    3.92,
+    0,
+    4.08
+   ],
+   "to": [
+    12.08,
+    16,
+    12.08
+   ],
+   "faces": {
+    "north": {
+     "texture": "#grey",
+     "uv": [
+      3.92,
+      0.0,
+      12.08,
+      16.0
+     ]
+    },
+    "south": {
+     "texture": "#grey",
+     "uv": [
+      3.92,
+      0.0,
+      12.08,
+      16.0
+     ]
+    },
+    "west": {
+     "texture": "#grey",
+     "uv": [
+      4.08,
+      0.0,
+      12.08,
+      16.0
+     ]
+    },
+    "east": {
+     "texture": "#grey",
+     "uv": [
+      3.92,
+      0.0,
+      11.92,
+      16.0
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    10.16,
+    0,
+    3.92
+   ],
+   "to": [
+    11.84,
+    16,
+    4.08
+   ],
+   "faces": {
+    "north": {
+     "texture": "#grey",
+     "uv": [
+      4.16,
+      0.0,
+      5.84,
+      16.0
+     ]
+    },
+    "south": {
+     "texture": "#grey",
+     "uv": [
+      10.16,
+      0.0,
+      11.84,
+      16.0
+     ]
+    },
+    "west": {
+     "texture": "#grey",
+     "uv": [
+      3.92,
+      0.0,
+      4.08,
+      16.0
+     ]
+    },
+    "east": {
+     "texture": "#grey",
+     "uv": [
+      11.92,
+      0.0,
+      12.08,
+      16.0
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    4.16,
+    1.92,
+    3.92
+   ],
+   "to": [
+    10.0,
+    14.72,
+    4.08
+   ],
+   "faces": {
+    "north": {
+     "texture": "#grey",
+     "uv": [
+      6.0,
+      1.28,
+      11.84,
+      14.08
+     ]
+    },
+    "south": {
+     "texture": "#grey",
+     "uv": [
+      4.16,
+      1.28,
+      10.0,
+      14.08
+     ]
+    },
+    "west": {
+     "texture": "#grey",
+     "uv": [
+      3.92,
+      1.28,
+      4.08,
+      14.08
+     ]
+    },
+    "east": {
+     "texture": "#grey",
+     "uv": [
+      11.92,
+      1.28,
+      12.08,
+      14.08
+     ]
+    },
+    "up": {
+     "texture": "#grey",
+     "uv": [
+      4.16,
+      3.92,
+      10.0,
+      4.08
+     ]
+    },
+    "down": {
+     "texture": "#grey",
+     "uv": [
+      4.16,
+      11.92,
+      10.0,
+      12.08
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    4.4,
+    2.24,
+    3.824
+   ],
+   "to": [
+    4.72,
+    2.88,
+    3.92
+   ],
+   "faces": {
+    "north": {
+     "texture": "#galv",
+     "uv": [
+      11.28,
+      13.12,
+      11.6,
+      13.76
+     ]
+    },
+    "south": {
+     "texture": "#galv",
+     "uv": [
+      4.4,
+      13.12,
+      4.72,
+      13.76
+     ]
+    },
+    "west": {
+     "texture": "#galv",
+     "uv": [
+      3.824,
+      13.12,
+      3.92,
+      13.76
+     ]
+    },
+    "east": {
+     "texture": "#galv",
+     "uv": [
+      12.08,
+      13.12,
+      12.176,
+      13.76
+     ]
+    },
+    "up": {
+     "texture": "#galv",
+     "uv": [
+      4.4,
+      3.824,
+      4.72,
+      3.92
+     ]
+    },
+    "down": {
+     "texture": "#galv",
+     "uv": [
+      4.4,
+      12.08,
+      4.72,
+      12.176
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    7.2,
+    2.72,
+    3.856
+   ],
+   "to": [
+    7.52,
+    3.04,
+    3.92
+   ],
+   "faces": {
+    "north": {
+     "texture": "#galv",
+     "uv": [
+      8.48,
+      12.96,
+      8.8,
+      13.28
+     ]
+    },
+    "south": {
+     "texture": "#galv",
+     "uv": [
+      7.2,
+      12.96,
+      7.52,
+      13.28
+     ]
+    },
+    "west": {
+     "texture": "#galv",
+     "uv": [
+      3.856,
+      12.96,
+      3.92,
+      13.28
+     ]
+    },
+    "east": {
+     "texture": "#galv",
+     "uv": [
+      12.08,
+      12.96,
+      12.144,
+      13.28
+     ]
+    },
+    "up": {
+     "texture": "#galv",
+     "uv": [
+      7.2,
+      3.856,
+      7.52,
+      3.92
+     ]
+    },
+    "down": {
+     "texture": "#galv",
+     "uv": [
+      7.2,
+      12.08,
+      7.52,
+      12.144
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    7.2,
+    13.6,
+    3.856
+   ],
+   "to": [
+    7.52,
+    13.92,
+    3.92
+   ],
+   "faces": {
+    "north": {
+     "texture": "#galv",
+     "uv": [
+      8.48,
+      2.08,
+      8.8,
+      2.4
+     ]
+    },
+    "south": {
+     "texture": "#galv",
+     "uv": [
+      7.2,
+      2.08,
+      7.52,
+      2.4
+     ]
+    },
+    "west": {
+     "texture": "#galv",
+     "uv": [
+      3.856,
+      2.08,
+      3.92,
+      2.4
+     ]
+    },
+    "east": {
+     "texture": "#galv",
+     "uv": [
+      12.08,
+      2.08,
+      12.144,
+      2.4
+     ]
+    },
+    "up": {
+     "texture": "#galv",
+     "uv": [
+      7.2,
+      3.856,
+      7.52,
+      3.92
+     ]
+    },
+    "down": {
+     "texture": "#galv",
+     "uv": [
+      7.2,
+      12.08,
+      7.52,
+      12.144
+     ]
+    }
+   }
+  }
+ ]
+}

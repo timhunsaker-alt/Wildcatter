@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/electric_lamp"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/electric_lamp_wall/item"
+ }
 }

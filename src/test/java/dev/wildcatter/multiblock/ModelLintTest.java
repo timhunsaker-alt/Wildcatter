@@ -77,7 +77,9 @@ class ModelLintTest {
 				String name = file.getFileName().toString().replace(".json", "");
 				JsonArray pieces = read(file).getAsJsonArray("pieces");
 				JsonObject variants = read(ASSETS.resolve("blockstates/" + name + ".json")).getAsJsonObject("variants");
-				long northPieces = variants.keySet().stream().filter(k -> k.contains("facing=north")).count();
+				// one look per piece facing north; a part with more states (an MCC section's buckets) has several looks of each piece
+				long northPieces = variants.keySet().stream().filter(k -> k.contains("facing=north"))
+						.map(k -> java.util.Arrays.stream(k.split(",")).filter(p -> p.startsWith("piece=")).findFirst().orElse(k)).distinct().count();
 				assertEquals(northPieces, pieces.size(), name + ": one shape list per piece");
 				for (JsonElement piece : pieces) {
 					for (JsonElement box : piece.getAsJsonArray()) {

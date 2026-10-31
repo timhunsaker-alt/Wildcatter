@@ -22,10 +22,11 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 /**
- * The main breaker and the bus of a motor control center. The main breaker behaves like a three-pole breaker (thermal and
- * magnetic trip on the largest phase current). Its readout lists the buckets on the bus and what each is doing.
+ * The main breaker and the bus of a motor control center (docs/multiblocks/motor-control-center.md). The main breaker behaves like
+ * a three-pole breaker (thermal and magnetic trip on the largest phase current). The feed is on the top of the section's top cell
+ * or the back of its bottom cell; the bus leaves the bottom cell's right-hand side. Its readout lists the buckets on the bus.
  */
-public class MccIncomingBlockEntity extends BlockEntity implements CircuitPart, Inspectable {
+public class MccIncomingBlockEntity extends BlockEntity implements CircuitPart, Inspectable, dev.wildcatter.multiblock.BigPartEntity {
 	private static final Conductor[] PHASES = {Conductor.A, Conductor.B, Conductor.C};
 	private final int[] feed = new int[3];
 	private final int[] bus = new int[3];
@@ -35,6 +36,7 @@ public class MccIncomingBlockEntity extends BlockEntity implements CircuitPart, 
 	private double amps;
 	private double volts;
 	private String lastTrip = "";
+	private boolean grown;
 
 	public MccIncomingBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.MCC_INCOMING_ENTITY, pos, state);
@@ -69,28 +71,41 @@ public class MccIncomingBlockEntity extends BlockEntity implements CircuitPart, 
 		}
 	}
 
-	/** The buckets on the bus, left to right as seen from the front. */
-	public List<MotorStarterBlockEntity> buckets() {
-		List<MotorStarterBlockEntity> found = new ArrayList<>();
+	/** The buckets on the bus, section by section left to right as seen from the front, each bottom to top. */
+	public List<Starter> buckets() {
+		List<Starter> found = new ArrayList<>();
 		if (level == null) {
 			return found;
 		}
 		Direction right = facing().getCounterClockWise();
 		BlockPos at = worldPosition;
-		for (int step = 1; step <= Tuning.MCC_MAX_BUCKETS; step++) {
+		for (int step = 1; step <= Tuning.MCC_MAX_BUCKETS / MccSectionBlockEntity.SPACES; step++) {
 			at = at.relative(right);
-			if (level.getBlockEntity(at) instanceof MotorStarterBlockEntity bucket && bucket.onBus()) {
-				found.add(bucket);
-			} else {
+			if (!(level.getBlockEntity(at) instanceof MccSectionBlockEntity section && section.onBus())) {
 				break;
+			}
+			for (Starter bucket : section.buckets()) {
+				if (bucket != null) {
+					found.add(bucket);
+				}
 			}
 		}
 		return found;
 	}
 
+	/** The feed's two terminals: the back of the bottom cell, the top of the top cell. */
+	private boolean feedAt(BlockPos cell, Direction face) {
+		return cell.equals(worldPosition) && face == facing().getOpposite() || cell.equals(worldPosition.above(2)) && face == Direction.UP;
+	}
+
 	@Override
 	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
-		return voltage == Voltage.INDUSTRIAL && (face == facing().getOpposite() || face == Direction.UP);
+		return hasPortAt(worldPosition, face, role, voltage);
+	}
+
+	@Override
+	public boolean hasPortAt(BlockPos cell, Direction face, Conductor role, Voltage voltage) {
+		return voltage == Voltage.INDUSTRIAL && feedAt(cell, face);
 	}
 
 	@Override
@@ -105,12 +120,14 @@ public class MccIncomingBlockEntity extends BlockEntity implements CircuitPart, 
 				poles[k] = circuit.resistor(feed[k], bus[k], Tuning.BREAKER_CLOSED_OHMS);
 			}
 		}
-		for (Direction in : new Direction[] {facing().getOpposite(), Direction.UP}) {
+		for (Object[] in : new Object[][] {{worldPosition, facing().getOpposite()}, {worldPosition.above(2), Direction.UP}}) {
+			BlockPos cell = (BlockPos) in[0];
+			Direction face = (Direction) in[1];
 			for (int k = 0; k < 3; k++) {
-				circuit.port(worldPosition, in, PHASES[k], Voltage.INDUSTRIAL, feed[k], Tuning.CONTACT_OHMS / 2, false);
+				circuit.port(cell, face, PHASES[k], Voltage.INDUSTRIAL, feed[k], Tuning.CONTACT_OHMS / 2, false);
 			}
-			circuit.port(worldPosition, in, Conductor.N, Voltage.INDUSTRIAL, neutral, Tuning.CONTACT_OHMS / 2, false);
-			circuit.port(worldPosition, in, Conductor.G, Voltage.INDUSTRIAL, ground, Tuning.CONTACT_OHMS / 2, false);
+			circuit.port(cell, face, Conductor.N, Voltage.INDUSTRIAL, neutral, Tuning.CONTACT_OHMS / 2, false);
+			circuit.port(cell, face, Conductor.G, Voltage.INDUSTRIAL, ground, Tuning.CONTACT_OHMS / 2, false);
 		}
 		Direction right = facing().getCounterClockWise();
 		for (int k = 0; k < 3; k++) {
@@ -174,7 +191,7 @@ public class MccIncomingBlockEntity extends BlockEntity implements CircuitPart, 
 			case TRIPPED -> "main " + rating() + " A TRIPPED (" + lastTrip + "): right-click to reset";
 		};
 		StringBuilder text = new StringBuilder("Motor control center (" + Voltage.INDUSTRIAL.label() + " three-phase): " + main);
-		List<MotorStarterBlockEntity> buckets = buckets();
+		List<Starter> buckets = buckets();
 		text.append("; ").append(buckets.size()).append(" bucket(s)");
 		for (int i = 0; i < buckets.size(); i++) {
 			text.append(i == 0 ? ": " : ", ").append(i + 1).append(" ").append(buckets.get(i).brief());
@@ -188,6 +205,18 @@ public class MccIncomingBlockEntity extends BlockEntity implements CircuitPart, 
 		output.putInt("rating", ratingIndex);
 		output.putDouble("heat", heat);
 		output.putString("lastTrip", lastTrip);
+		output.putBoolean("grown", grown);
+	}
+
+	@Override
+	public boolean grown() {
+		return grown;
+	}
+
+	@Override
+	public void markGrown() {
+		grown = true;
+		setChanged();
 	}
 
 	@Override
@@ -196,5 +225,6 @@ public class MccIncomingBlockEntity extends BlockEntity implements CircuitPart, 
 		ratingIndex = input.getIntOr("rating", 3);
 		heat = input.getDoubleOr("heat", 0);
 		lastTrip = input.getStringOr("lastTrip", "");
+		grown = input.getBooleanOr("grown", false);
 	}
 }

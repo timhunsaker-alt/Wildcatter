@@ -20,8 +20,21 @@ import net.minecraft.world.phys.BlockHitResult;
 
 /** An electric water pump. Put it against water, wire it for 110 V, and run pipes to the boilers. */
 public class PumpBlock extends BaseEntityBlock {
+	/** Which way its motor end faces at true size (docs/multiblocks/building-gear.md). */
+	public static final net.minecraft.world.level.block.state.properties.EnumProperty<net.minecraft.core.Direction> FACING = net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
+
 	public PumpBlock(Properties properties) {
 		super(properties);
+	}
+
+	@Override
+	protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
+		builder.add(FACING);
+	}
+
+	@Override
+	public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+		return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
 	}
 
 	@Override

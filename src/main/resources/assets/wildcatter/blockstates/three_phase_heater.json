@@ -1,10 +1,46 @@
 {
-  "variants": {
-    "lit=false": {
-      "model": "wildcatter:block/three_phase_heater"
-    },
-    "lit=true": {
-      "model": "wildcatter:block/three_phase_heater_lit"
-    }
+ "variants": {
+  "attach=north,lit=false": {
+   "model": "wildcatter:block/three_phase_heater_wall/p0"
+  },
+  "attach=east,lit=false": {
+   "model": "wildcatter:block/three_phase_heater_wall/p0",
+   "y": 90
+  },
+  "attach=south,lit=false": {
+   "model": "wildcatter:block/three_phase_heater_wall/p0",
+   "y": 180
+  },
+  "attach=west,lit=false": {
+   "model": "wildcatter:block/three_phase_heater_wall/p0",
+   "y": 270
+  },
+  "attach=down,lit=false": {
+   "model": "wildcatter:block/three_phase_heater_floor/p0"
+  },
+  "attach=up,lit=false": {
+   "model": "wildcatter:block/three_phase_heater_ceiling/p0"
+  },
+  "attach=north,lit=true": {
+   "model": "wildcatter:block/three_phase_heater_wall_lit/p0"
+  },
+  "attach=east,lit=true": {
+   "model": "wildcatter:block/three_phase_heater_wall_lit/p0",
+   "y": 90
+  },
+  "attach=south,lit=true": {
+   "model": "wildcatter:block/three_phase_heater_wall_lit/p0",
+   "y": 180
+  },
+  "attach=west,lit=true": {
+   "model": "wildcatter:block/three_phase_heater_wall_lit/p0",
+   "y": 270
+  },
+  "attach=down,lit=true": {
+   "model": "wildcatter:block/three_phase_heater_floor_lit/p0"
+  },
+  "attach=up,lit=true": {
+   "model": "wildcatter:block/three_phase_heater_ceiling_lit/p0"
   }
+ }
 }

@@ -60,8 +60,7 @@ public class BigBreakerBlock extends BreakerBlock implements BigPart {
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		super.createBlockStateDefinition(builder);
-		builder.add(BigParts.pieceProperty(BigParts.CONSTRUCTING.get()));
+		builder.add(FACING, POSITION, BigParts.pieceProperty(BigParts.CONSTRUCTING.get()));   // no wall mount: it stands in the yard
 	}
 
 	@Override

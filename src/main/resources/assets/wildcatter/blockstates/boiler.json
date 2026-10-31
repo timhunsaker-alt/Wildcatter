@@ -1,10 +1,64 @@
 {
-  "variants": {
-    "lit=false": {
-      "model": "wildcatter:block/boiler"
-    },
-    "lit=true": {
-      "model": "wildcatter:block/boiler_lit"
-    }
+ "variants": {
+  "facing=north,lit=false,piece=0": {
+   "model": "wildcatter:block/boiler/p0"
+  },
+  "facing=north,lit=true,piece=0": {
+   "model": "wildcatter:block/boiler_lit/p0"
+  },
+  "facing=north,lit=false,piece=1": {
+   "model": "wildcatter:block/boiler/p1"
+  },
+  "facing=north,lit=true,piece=1": {
+   "model": "wildcatter:block/boiler_lit/p1"
+  },
+  "facing=east,lit=false,piece=0": {
+   "model": "wildcatter:block/boiler/p0",
+   "y": 90
+  },
+  "facing=east,lit=true,piece=0": {
+   "model": "wildcatter:block/boiler_lit/p0",
+   "y": 90
+  },
+  "facing=east,lit=false,piece=1": {
+   "model": "wildcatter:block/boiler/p1",
+   "y": 90
+  },
+  "facing=east,lit=true,piece=1": {
+   "model": "wildcatter:block/boiler_lit/p1",
+   "y": 90
+  },
+  "facing=south,lit=false,piece=0": {
+   "model": "wildcatter:block/boiler/p0",
+   "y": 180
+  },
+  "facing=south,lit=true,piece=0": {
+   "model": "wildcatter:block/boiler_lit/p0",
+   "y": 180
+  },
+  "facing=south,lit=false,piece=1": {
+   "model": "wildcatter:block/boiler/p1",
+   "y": 180
+  },
+  "facing=south,lit=true,piece=1": {
+   "model": "wildcatter:block/boiler_lit/p1",
+   "y": 180
+  },
+  "facing=west,lit=false,piece=0": {
+   "model": "wildcatter:block/boiler/p0",
+   "y": 270
+  },
+  "facing=west,lit=true,piece=0": {
+   "model": "wildcatter:block/boiler_lit/p0",
+   "y": 270
+  },
+  "facing=west,lit=false,piece=1": {
+   "model": "wildcatter:block/boiler/p1",
+   "y": 270
+  },
+  "facing=west,lit=true,piece=1": {
+   "model": "wildcatter:block/boiler_lit/p1",
+   "y": 270
   }
+ }
 }

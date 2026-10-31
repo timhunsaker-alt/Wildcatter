@@ -17,6 +17,8 @@ not a go-ahead to build: that waits for the roadmap phase (ROADMAP.md). Nothing 
 | [cooling-tower.md](cooling-tower.md) | 4 | fan plus two identical fill blocks |
 | [poles.md](poles.md) | 4.5e | stacked one-block pole sections and crossarms |
 | [padmount.md](padmount.md) | 4.5e | one-block pad-mounts and unit substation |
+| [building-gear.md](building-gear.md) | 4.5f | one-block breakers, receptacles, loads, boiler and turbine |
+| [motor-control-center.md](motor-control-center.md) | 3, 4.5f | a row of one-block buckets |
 
 ## Shared rules
 - One **controller** block validates the structure and holds all state. Parts have no logic of their own beyond

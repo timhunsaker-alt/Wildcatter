@@ -1,7 +1,25 @@
 {
-  "variants": {
-    "": {
-      "model": "wildcatter:block/plug_iec_60309_red_63"
-    }
+ "variants": {
+  "attach=north": {
+   "model": "wildcatter:block/plug_iec_60309_red_63_wall/p0"
+  },
+  "attach=east": {
+   "model": "wildcatter:block/plug_iec_60309_red_63_wall/p0",
+   "y": 90
+  },
+  "attach=south": {
+   "model": "wildcatter:block/plug_iec_60309_red_63_wall/p0",
+   "y": 180
+  },
+  "attach=west": {
+   "model": "wildcatter:block/plug_iec_60309_red_63_wall/p0",
+   "y": 270
+  },
+  "attach=down": {
+   "model": "wildcatter:block/plug_iec_60309_red_63_floor/p0"
+  },
+  "attach=up": {
+   "model": "wildcatter:block/plug_iec_60309_red_63_ceiling/p0"
   }
+ }
 }

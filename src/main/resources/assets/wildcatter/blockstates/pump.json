@@ -1,7 +1,19 @@
 {
-  "variants": {
-    "": {
-      "model": "wildcatter:block/pump"
-    }
+ "variants": {
+  "facing=north": {
+   "model": "wildcatter:block/pump/p0"
+  },
+  "facing=east": {
+   "model": "wildcatter:block/pump/p0",
+   "y": 90
+  },
+  "facing=south": {
+   "model": "wildcatter:block/pump/p0",
+   "y": 180
+  },
+  "facing=west": {
+   "model": "wildcatter:block/pump/p0",
+   "y": 270
   }
+ }
 }

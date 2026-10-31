@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/motor_starter_stopped"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/motor_starter_floor_stopped/item"
+ }
 }

@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/receptacle_cee_7"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/receptacle_cee_7_wall/item"
+ }
 }

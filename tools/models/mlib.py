@@ -282,7 +282,8 @@ class Model:
 
 	def export(self, blockstate=True, item=True):
 		"""blockstate=False for a one-cell part whose block has other states (a pole transformer, a cutout): its caller writes the
-		blockstate and the shape is the block's own. item=False for a second look of the same block (the blown cutout)."""
+		blockstate and the shape is the block's own. item=False for a second look of the same block (the blown cutout); a string
+		names the item this look stands for (a breaker drawn on its stand is the breaker's item)."""
 		for e in self.elements:
 			for f, t in e.tex.items():
 				if t not in self.textures:
@@ -319,7 +320,7 @@ class Model:
 					variants[f"facing={facing},piece={i}"] = v
 			_save(os.path.join(ASSETS, "blockstates", f"{self.name}.json"), {"variants": variants})
 		if item:
-			self._export_item(textures)
+			self._export_item(textures, item if isinstance(item, str) else self.name)
 		if blockstate:
 			self._export_shapes()
 		for rotor, model in self.rotors.items():
@@ -341,7 +342,7 @@ class Model:
 			j["shade"] = False
 		return j
 
-	def _export_item(self, textures):
+	def _export_item(self, textures, item_id):
 		"""The whole part, shrunk to fit a model's -16..32 room, with the display scaled so it reads as a block-sized icon."""
 		lo = [min(min(p[i] for p in e.corners()) for e in self.elements) for i in range(3)]
 		hi = [max(max(p[i] for p in e.corners()) for e in self.elements) for i in range(3)]
@@ -371,7 +372,7 @@ class Model:
 			"firstperson_lefthand": {"rotation": [0, 225, 0], "scale": [0.4 * k] * 3},
 		}
 		_save(os.path.join(ASSETS, "models/block", self.name, "item.json"), {"textures": textures, "elements": elements, "display": display})
-		_save(os.path.join(ASSETS, "items", f"{self.name}.json"), {"model": {"type": "minecraft:model", "model": f"{NS}:block/{self.name}/item"}})
+		_save(os.path.join(ASSETS, "items", f"{item_id}.json"), {"model": {"type": "minecraft:model", "model": f"{NS}:block/{self.name}/item"}})
 
 	def _export_shapes(self):
 		pieces = [[] for _ in self.cells]

@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/relay_on"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/ufls_relay_floor_on/item"
+ }
 }

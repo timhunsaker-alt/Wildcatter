@@ -16,7 +16,7 @@ PARTS = ["gsu_transformer", "fuel_tank", "genset_base_frame", "radiator", "gense
 	"tower_basin", "cooling_fill", "drift_eliminator", "cooling_tower",
 	"hv_breaker_3p", "disconnect_hv", "bus_hv", "power_transformer", "bus_dist", "disconnect_dist", "dist_breaker_3p", "relay_panel",
 	"wood_pole_30", "wood_pole_40", "wood_pole_75", "crossarm_dist", "crossbeam_138", "x_brace_138", "pole_transformer", "fused_cutout",
-	"padmount_208", "padmount_480", "unit_substation"]
+	"padmount_208", "padmount_480", "unit_substation", "enclosure", "fixtures", "mcc", "starter_plant"]
 
 
 def colours(model):
@@ -38,8 +38,10 @@ def main(names):
 		model.export(**getattr(module, "EXPORT", {}))   # a one-cell part with other states writes its own blockstate
 		model.preview(os.path.join(previews, name + ".png"), colours(model))
 		for extra in getattr(module, "EXTRA", []):      # another look of the same block (the blown cutout)
-			extra.export(blockstate=False, item=False)
+			extra.export(**getattr(extra, "export_args", {"blockstate": False, "item": False}))
 			extra.preview(os.path.join(previews, extra.name + ".png"), colours(extra))
+		if hasattr(module, "after"):                    # a block with more states than facing and piece writes its own blockstate
+			module.after()
 	if not names or "rotors" in names:
 		for model in importlib.import_module("rotors").ROTORS:
 			model.export_single(model.name[len("rotor_"):])

@@ -1,36 +1,64 @@
 {
-  "variants": {
-    "blown=false,facing=north": {
-      "model": "wildcatter:block/fuse_good",
-      "y": 0
-    },
-    "blown=true,facing=north": {
-      "model": "wildcatter:block/fuse_blown",
-      "y": 0
-    },
-    "blown=false,facing=east": {
-      "model": "wildcatter:block/fuse_good",
-      "y": 90
-    },
-    "blown=true,facing=east": {
-      "model": "wildcatter:block/fuse_blown",
-      "y": 90
-    },
-    "blown=false,facing=south": {
-      "model": "wildcatter:block/fuse_good",
-      "y": 180
-    },
-    "blown=true,facing=south": {
-      "model": "wildcatter:block/fuse_blown",
-      "y": 180
-    },
-    "blown=false,facing=west": {
-      "model": "wildcatter:block/fuse_good",
-      "y": 270
-    },
-    "blown=true,facing=west": {
-      "model": "wildcatter:block/fuse_blown",
-      "y": 270
-    }
+ "variants": {
+  "facing=north,blown=false,mount=floor": {
+   "model": "wildcatter:block/fuse_floor_false/p0"
+  },
+  "facing=north,blown=false,mount=wall": {
+   "model": "wildcatter:block/fuse_wall_false/p0"
+  },
+  "facing=north,blown=true,mount=floor": {
+   "model": "wildcatter:block/fuse_floor_true/p0"
+  },
+  "facing=north,blown=true,mount=wall": {
+   "model": "wildcatter:block/fuse_wall_true/p0"
+  },
+  "facing=east,blown=false,mount=floor": {
+   "model": "wildcatter:block/fuse_floor_false/p0",
+   "y": 90
+  },
+  "facing=east,blown=false,mount=wall": {
+   "model": "wildcatter:block/fuse_wall_false/p0",
+   "y": 90
+  },
+  "facing=east,blown=true,mount=floor": {
+   "model": "wildcatter:block/fuse_floor_true/p0",
+   "y": 90
+  },
+  "facing=east,blown=true,mount=wall": {
+   "model": "wildcatter:block/fuse_wall_true/p0",
+   "y": 90
+  },
+  "facing=south,blown=false,mount=floor": {
+   "model": "wildcatter:block/fuse_floor_false/p0",
+   "y": 180
+  },
+  "facing=south,blown=false,mount=wall": {
+   "model": "wildcatter:block/fuse_wall_false/p0",
+   "y": 180
+  },
+  "facing=south,blown=true,mount=floor": {
+   "model": "wildcatter:block/fuse_floor_true/p0",
+   "y": 180
+  },
+  "facing=south,blown=true,mount=wall": {
+   "model": "wildcatter:block/fuse_wall_true/p0",
+   "y": 180
+  },
+  "facing=west,blown=false,mount=floor": {
+   "model": "wildcatter:block/fuse_floor_false/p0",
+   "y": 270
+  },
+  "facing=west,blown=false,mount=wall": {
+   "model": "wildcatter:block/fuse_wall_false/p0",
+   "y": 270
+  },
+  "facing=west,blown=true,mount=floor": {
+   "model": "wildcatter:block/fuse_floor_true/p0",
+   "y": 270
+  },
+  "facing=west,blown=true,mount=wall": {
+   "model": "wildcatter:block/fuse_wall_true/p0",
+   "y": 270
   }
+ }
 }

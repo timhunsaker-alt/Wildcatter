@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/switch_on"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/switch_floor_on/item"
+ }
 }

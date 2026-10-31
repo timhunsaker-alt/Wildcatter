@@ -43,7 +43,19 @@ public class LoadBlock extends BaseEntityBlock {
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(LIT);
+		builder.add(LIT, AttachedGear.ATTACH);
+	}
+
+	@Override
+	public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+		return AttachedGear.place(defaultBlockState(), context);
+	}
+
+	// a lampholder and its jar guard about 0.15 m across; a 1,500 W wall heater about 0.4 x 0.5 m (docs/multiblocks/building-gear.md)
+	@Override
+	protected net.minecraft.world.phys.shapes.VoxelShape getShape(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos,
+			net.minecraft.world.phys.shapes.CollisionContext context) {
+		return watts < 100 ? AttachedGear.shape(state, 4, 1.5) : AttachedGear.shape(state, 3, 4);
 	}
 
 	@Override

@@ -50,6 +50,7 @@
     "wildcatter:bus_hv",
     "wildcatter:bus_dist",
     "wildcatter:chain_link_fence",
-    "wildcatter:barbed_wire_top"
+    "wildcatter:barbed_wire_top",
+    "wildcatter:mcc_section"
   ]
 }

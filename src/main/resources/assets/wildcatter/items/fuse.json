@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/fuse_good"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/fuse_floor_false/item"
+ }
 }

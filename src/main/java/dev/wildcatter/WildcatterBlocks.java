@@ -240,8 +240,12 @@ public final class WildcatterBlocks {
 			.strength(2.5F, 5.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), false));
 	public static final Block MCC_INCOMING = block("mcc_incoming", props -> new MccIncomingBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+	/** An older world's one-block MCC bucket: it drops as a bucket item, which now clicks into a starter section. No item of its own. */
 	public static final Block MCC_BUCKET = block("mcc_bucket", props -> new MotorStarterBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), true));
+	/** A motor control center's starter section at true size: three bucket spaces (docs/multiblocks/motor-control-center.md). */
+	public static final Block MCC_SECTION = block("mcc_section", props -> new dev.wildcatter.block.MccSectionBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
 	public static final Block THREE_PHASE_HEATER = block("three_phase_heater", props -> new ThreePhaseHeaterBlock(props.mapColor(MapColor.COLOR_RED)
 			.strength(2.0F).sound(SoundType.METAL).lightLevel(state -> state.getValue(LoadBlock.LIT) ? 7 : 0), Voltage.INDUSTRIAL, Tuning.THREE_PHASE_HEATER_WATTS));
 	public static final Block ELECTRIC_LAMP = block("electric_lamp", props -> new LoadBlock(props.mapColor(MapColor.COLOR_YELLOW)
@@ -325,6 +329,7 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<MultiCableBlockEntity> MULTI_CABLE_ENTITY = entity(MultiCableBlockEntity::new, CABLE_LV, CABLE_INDUSTRIAL, CABLE_DIST, CABLE_HV, BUSWAY_LV, BUSWAY_INDUSTRIAL);
 	public static final BlockEntityType<MotorStarterBlockEntity> MOTOR_STARTER_ENTITY = entity(MotorStarterBlockEntity::new, MOTOR_STARTER, MCC_BUCKET);
 	public static final BlockEntityType<MccIncomingBlockEntity> MCC_INCOMING_ENTITY = entity(MccIncomingBlockEntity::new, MCC_INCOMING);
+	public static final BlockEntityType<dev.wildcatter.block.MccSectionBlockEntity> MCC_SECTION_ENTITY = entity(dev.wildcatter.block.MccSectionBlockEntity::new, MCC_SECTION);
 	public static final BlockEntityType<dev.wildcatter.block.GensetPartBlockEntity> GENSET_PART_ENTITY = entity(dev.wildcatter.block.GensetPartBlockEntity::new,
 			DIESEL_ENGINE_PART, GAS_ENGINE_PART, ALTERNATOR, RADIATOR, FUEL_TANK, EXHAUST_STACK, BASE_FRAME, EXHAUST_SILENCER_LARGE);
 	public static final BlockEntityType<dev.wildcatter.block.SteamPlantPartBlockEntity> STEAM_PLANT_PART_ENTITY = entity(dev.wildcatter.block.SteamPlantPartBlockEntity::new,
@@ -546,7 +551,8 @@ public final class WildcatterBlocks {
 		add("condenser", CONDENSER);
 		add("feed_pump", FEED_PUMP);
 		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("rotor"), ROTOR);   // no item: it is never placed
-		add("mcc_bucket", MCC_BUCKET);
+		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("mcc_bucket"), MCC_BUCKET);   // its item is WildcatterItems.MCC_BUCKET
+		add("mcc_section", MCC_SECTION);
 		add("padmount_208", PADMOUNT_208);
 		add("padmount_480", PADMOUNT_480);
 		add("unit_substation", UNIT_SUBSTATION);
@@ -574,6 +580,7 @@ public final class WildcatterBlocks {
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("three_phase_heater"), THREE_PHASE_HEATER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("motor_starter"), MOTOR_STARTER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("mcc_incoming"), MCC_INCOMING_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("mcc_section"), MCC_SECTION_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("genset_part"), GENSET_PART_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("tower_basin"), TOWER_BASIN_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("power_transformer"), POWER_TRANSFORMER_ENTITY);
