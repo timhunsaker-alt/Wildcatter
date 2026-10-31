@@ -153,6 +153,23 @@ public final class BigParts {
 		}
 	}
 
+	/**
+	 * A part in a line of parts (a substation: the line runs along the part's length, west to east for a part facing north,
+	 * {@code length} long and {@code width} across): its west terminal is on the bottom cell of the centre line at the west end,
+	 * its east terminal at the east end. Any other face is the main cell's.
+	 */
+	public static BlockPos lineTerminal(BlockPos main, BlockState state, Direction face, int length, int width) {
+		Direction facing = part(state).facing(state);
+		int across = (width - 1) / 2;
+		if (face == facing.getCounterClockWise()) {
+			return cell(main, state, part(state).footprint().pieceAt(0, 0, across, 0));
+		}
+		if (face == facing.getClockWise()) {
+			return cell(main, state, part(state).footprint().pieceAt(length - 1, 0, across, 0));
+		}
+		return main;
+	}
+
 	/** For {@code setPlacedBy}: a player placed the part, so it fills its cells now. */
 	public static void placed(Level level, BlockPos pos, BlockState state) {
 		if (!level.isClientSide()) {

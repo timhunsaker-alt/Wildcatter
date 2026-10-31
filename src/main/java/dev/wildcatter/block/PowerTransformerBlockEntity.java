@@ -6,11 +6,7 @@ import dev.wildcatter.WildcatterSounds;
 import dev.wildcatter.circuit.Circuit;
 import dev.wildcatter.circuit.CircuitManager;
 import dev.wildcatter.energy.Voltage;
-import dev.wildcatter.multiblock.Multiblock;
-import dev.wildcatter.multiblock.MultiblockLayout;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -28,21 +24,6 @@ import net.minecraft.world.level.storage.ValueOutput;
  * pickup 150 % of full load) and an instantaneous one (50, 800 %) open both breakers, which stay open until the panel is reset.
  */
 public class PowerTransformerBlockEntity extends TransformerBlockEntity {
-	/** As built, drawn for the line running west (138 kV) to east (12.47 kV): the relay panel stands south of the transformer. */
-	private static final MultiblockLayout LAYOUT = new MultiblockLayout('T',
-			new String[] {"HDBTbdL", "...K..."});
-	private static final Map<Character, Predicate<BlockState>> LEGEND = Map.of(
-			'T', s -> s.is(WildcatterBlocks.POWER_TRANSFORMER),
-			'H', s -> s.is(WildcatterBlocks.HV_BREAKER_3P),
-			'D', s -> s.is(WildcatterBlocks.DISCONNECT_HV),
-			'B', s -> s.is(WildcatterBlocks.BUS_HV),
-			'b', s -> s.is(WildcatterBlocks.BUS_DIST),
-			'd', s -> s.is(WildcatterBlocks.DISCONNECT_DIST),
-			'L', s -> s.is(WildcatterBlocks.DIST_BREAKER_3P),
-			'K', s -> s.is(WildcatterBlocks.RELAY_PANEL));
-	private static final Map<Character, String> NAMES = Map.of('H', "138 kV breaker", 'D', "138 kV disconnect", 'B', "138 kV bus", 'b', "12.47 kV bus",
-			'd', "12.47 kV disconnect", 'L', "12.47 kV feeder breaker", 'K', "relay panel (in front of the transformer)");
-
 	private boolean formed;
 	private String missing = "";
 	private List<BlockPos> parts = List.of();
@@ -56,9 +37,9 @@ public class PowerTransformerBlockEntity extends TransformerBlockEntity {
 		super(WildcatterBlocks.POWER_TRANSFORMER_ENTITY, pos, state);
 	}
 
-	private Direction lineFacing() {
-		// the transformer's front faces the 138 kV side; the layout is drawn with the line running west to east
-		return getBlockState().getValue(TransformerBlock.FACING).getClockWise();
+	/** The yard's facing: the line runs along its clockwise side, 138 kV west to 12.47 kV east for a yard facing north. */
+	private Direction yardFacing() {
+		return getBlockState().getValue(TransformerBlock.FACING);
 	}
 
 	public boolean formed() {
@@ -81,24 +62,11 @@ public class PowerTransformerBlockEntity extends TransformerBlockEntity {
 	}
 
 	private void checkStructure(ServerLevel level) {
-		List<BlockPos> found = Multiblock.match(level, worldPosition, lineFacing(), LAYOUT, LEGEND);
+		PartLayout.Found found = SubstationLayout.layout().check(level, worldPosition, yardFacing());
 		boolean was = formed;
-		formed = found != null;
-		missing = formed ? "" : String.valueOf(Multiblock.missing(level, worldPosition, lineFacing(), LAYOUT, LEGEND, NAMES));
-		if (formed) {
-			parts = found;
-			Direction along = getBlockState().getValue(TransformerBlock.FACING).getOpposite();   // from the 138 kV side toward the 12.47 kV side
-			for (BlockPos at : found) {
-				BlockState s = level.getBlockState(at);
-				if (s.getBlock() instanceof BreakerBlock && s.getValue(BreakerBlock.FACING) != along) {
-					level.setBlock(at, s.setValue(BreakerBlock.FACING, along), 3);
-				} else if (s.getBlock() instanceof DisconnectSwitchBlock && s.getValue(DisconnectSwitchBlock.FACING) != along) {
-					level.setBlock(at, s.setValue(DisconnectSwitchBlock.FACING, along), 3);
-				}
-			}
-		} else {
-			parts = List.of();
-		}
+		formed = found.parts() != null;
+		missing = formed ? "" : found.missing();
+		parts = formed ? found.parts() : List.of();
 		if (formed != was) {
 			if (formed) {
 				level.playSound(null, worldPosition, WildcatterSounds.STRUCTURE_FORMED, SoundSource.BLOCKS, 1.5F, 0.7F);

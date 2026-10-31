@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/relay_panel"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/relay_panel/item"
+ }
 }

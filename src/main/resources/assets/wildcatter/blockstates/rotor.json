@@ -23,6 +23,15 @@
     },
     "part=pump_coupling": {
       "model": "wildcatter:block/rotor_pump_coupling"
+    },
+    "part=disconnect_arm_hv": {
+      "model": "wildcatter:block/rotor_disconnect_arm_hv"
+    },
+    "part=disconnect_arm_hv_back": {
+      "model": "wildcatter:block/rotor_disconnect_arm_hv_back"
+    },
+    "part=disconnect_blade_dist": {
+      "model": "wildcatter:block/rotor_disconnect_blade_dist"
     }
   }
 }

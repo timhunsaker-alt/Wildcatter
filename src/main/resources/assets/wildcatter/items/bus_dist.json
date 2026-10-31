@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/bus_dist_inventory"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/bus_dist/item"
+ }
 }

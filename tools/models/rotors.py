@@ -8,6 +8,9 @@ KineticRenderer turns them about the pivots in GensetPartBlockEntity.rotors().
 - tower_fan: the cooling tower's 3 m fan, six blades, turning about y (4.5c)
 - turbine_coupling: the steam turbine's flexible disc coupling to its generator, 0.45 m across
 - pump_coupling: the feed pump's jaw coupling, 0.14 m across
+- disconnect_arm_hv, disconnect_arm_hv_back: a 138 kV centre-break disconnect's arms, 0.7 m from their stacks to the middle,
+  pointing east and west (4.5d); they turn about y on their stacks
+- disconnect_blade_dist: a 12.47 kV vertical-break disconnect's blade, 0.7 m from its hinge, lifting about z
 """
 import mlib
 import plantlib as g
@@ -57,4 +60,22 @@ PUMP_COUPLING.cylinder("x", C, 0.07, 0.51, 0.58, "iron", 12)
 PUMP_COUPLING.fan("x", C, 0.065, 0.5, 0.04, "rubber", blades=4, width=0.03, hub=0.02)   # the spider between the jaws
 PUMP_COUPLING.box((0.44, 0.565, 0.485), (0.56, 0.575, 0.515), "brass")
 
-ROTORS = [FAN, PULLEY, COUPLING, ALT_FAN, TOWER_FAN, TURBINE_COUPLING, PUMP_COUPLING]
+def arm(name, sign):
+	"""An arm from its hub at the block's centre, 0.7 m toward the middle (east for +1, west for -1), its contact at the end."""
+	M = rotor(name)
+	M.cylinder("y", (0.5, 0.5), 0.07, 0.42, 0.5, "galv", 10)   # the hub on the rotating stack
+	a, b = (0.5, 1.2) if sign > 0 else (-0.2, 0.5)
+	M.cylinder("x", (0.52, 0.5), 0.035, a, b, "steel", 8)
+	end = 1.2 if sign > 0 else -0.2
+	M.box((end - 0.06 if sign > 0 else end, 0.47, 0.44), (end if sign > 0 else end + 0.06, 0.58, 0.56), "copper")   # the contact
+	return M
+
+
+ARM = arm("disconnect_arm_hv", 1)
+ARM_BACK = arm("disconnect_arm_hv_back", -1)
+BLADE = rotor("disconnect_blade_dist")
+BLADE.box((0.47, 0.47, 0.47), (0.55, 0.55, 0.53), "galv")   # the hinge
+BLADE.box((0.5, 0.49, 0.48), (1.2, 0.53, 0.52), "copper")    # the blade
+BLADE.box((1.1, 0.53, 0.47), (1.2, 0.6, 0.53), "galv")       # its pull ring
+
+ROTORS = [FAN, PULLEY, COUPLING, ALT_FAN, TOWER_FAN, TURBINE_COUPLING, PUMP_COUPLING, ARM, ARM_BACK, BLADE]

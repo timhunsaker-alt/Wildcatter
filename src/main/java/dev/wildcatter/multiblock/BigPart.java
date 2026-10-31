@@ -40,4 +40,12 @@ public interface BigPart {
 	default boolean growsOnLoad() {
 		return true;
 	}
+
+	/**
+	 * The cell whose {@code face} carries this part's terminal on that side. Most parts have their terminals on their main
+	 * cell; a substation part has them on the bottom cell of the yard's centre line (see {@link BigParts#lineTerminal}).
+	 */
+	default net.minecraft.core.BlockPos terminalCell(net.minecraft.core.BlockPos main, BlockState state, Direction face) {
+		return main;
+	}
 }

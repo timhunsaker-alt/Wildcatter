@@ -148,6 +148,14 @@ public final class PartLayout {
 		return BigParts.placement(context, placementState(context, part));
 	}
 
+	/** The controller's main cell, for one of the machine's parts with its main cell at {@code partMain}, if the part were in its slot. */
+	public BlockPos controllerFrom(Block part, BlockPos partMain, Direction facing, int variant) {
+		int turns = Multiblock.turns(facing);
+		int[] p = slot(part, variant, turns);
+		int[] k = slot(controller, variant, turns);
+		return partMain.offset(k[0] - p[0], k[1] - p[1], k[2] - p[2]);
+	}
+
 	/** The origin part's main cell for a machine whose controller's main cell is at {@code controllerPos}. */
 	public BlockPos origin(BlockPos controllerPos, Direction facing, int variant) {
 		int[] k = slot(controller, variant, Multiblock.turns(facing));

@@ -13,7 +13,8 @@ import mlib
 PARTS = ["gsu_transformer", "fuel_tank", "genset_base_frame", "radiator", "genset_diesel_engine", "genset_gas_engine", "alternator",
 	"genset_control_panel", "exhaust_stack", "exhaust_silencer_large",
 	"boiler_burner", "boiler_drum", "superheater", "turbine_casing", "turbine_generator", "condenser", "feed_pump",
-	"tower_basin", "cooling_fill", "drift_eliminator", "cooling_tower"]
+	"tower_basin", "cooling_fill", "drift_eliminator", "cooling_tower",
+	"hv_breaker_3p", "disconnect_hv", "bus_hv", "power_transformer", "bus_dist", "disconnect_dist", "dist_breaker_3p", "relay_panel"]
 
 
 def colours(model):

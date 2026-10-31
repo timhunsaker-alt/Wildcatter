@@ -1,9 +1,0 @@
-{
-  "parent": "minecraft:block/orientable",
-  "textures": {
-    "front": "wildcatter:block/substation_front",
-    "side": "wildcatter:block/substation_side",
-    "top": "wildcatter:block/substation_top",
-    "bottom": "wildcatter:block/substation_top"
-  }
-}

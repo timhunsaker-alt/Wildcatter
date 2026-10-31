@@ -1,36 +1,229 @@
 {
-  "variants": {
-    "facing=north,open=false": {
-      "model": "wildcatter:block/disconnect_dist",
-      "y": 0
-    },
-    "facing=north,open=true": {
-      "model": "wildcatter:block/disconnect_dist",
-      "y": 0
-    },
-    "facing=east,open=false": {
-      "model": "wildcatter:block/disconnect_dist",
-      "y": 90
-    },
-    "facing=east,open=true": {
-      "model": "wildcatter:block/disconnect_dist",
-      "y": 90
-    },
-    "facing=south,open=false": {
-      "model": "wildcatter:block/disconnect_dist",
-      "y": 180
-    },
-    "facing=south,open=true": {
-      "model": "wildcatter:block/disconnect_dist",
-      "y": 180
-    },
-    "facing=west,open=false": {
-      "model": "wildcatter:block/disconnect_dist",
-      "y": 270
-    },
-    "facing=west,open=true": {
-      "model": "wildcatter:block/disconnect_dist",
-      "y": 270
-    }
+ "variants": {
+  "facing=north,piece=0": {
+   "model": "wildcatter:block/disconnect_dist/p0"
+  },
+  "facing=north,piece=1": {
+   "model": "wildcatter:block/disconnect_dist/p1"
+  },
+  "facing=north,piece=2": {
+   "model": "wildcatter:block/disconnect_dist/p2"
+  },
+  "facing=north,piece=3": {
+   "model": "wildcatter:block/disconnect_dist/p3"
+  },
+  "facing=north,piece=4": {
+   "model": "wildcatter:block/disconnect_dist/p4"
+  },
+  "facing=north,piece=5": {
+   "model": "wildcatter:block/disconnect_dist/p5"
+  },
+  "facing=north,piece=6": {
+   "model": "wildcatter:block/disconnect_dist/p6"
+  },
+  "facing=north,piece=7": {
+   "model": "wildcatter:block/disconnect_dist/p7"
+  },
+  "facing=north,piece=8": {
+   "model": "wildcatter:block/disconnect_dist/p8"
+  },
+  "facing=north,piece=9": {
+   "model": "wildcatter:block/disconnect_dist/p9"
+  },
+  "facing=north,piece=10": {
+   "model": "wildcatter:block/disconnect_dist/p10"
+  },
+  "facing=north,piece=11": {
+   "model": "wildcatter:block/disconnect_dist/p11"
+  },
+  "facing=north,piece=12": {
+   "model": "wildcatter:block/disconnect_dist/p12"
+  },
+  "facing=north,piece=13": {
+   "model": "wildcatter:block/disconnect_dist/p13"
+  },
+  "facing=north,piece=14": {
+   "model": "wildcatter:block/disconnect_dist/p14"
+  },
+  "facing=east,piece=0": {
+   "model": "wildcatter:block/disconnect_dist/p0",
+   "y": 90
+  },
+  "facing=east,piece=1": {
+   "model": "wildcatter:block/disconnect_dist/p1",
+   "y": 90
+  },
+  "facing=east,piece=2": {
+   "model": "wildcatter:block/disconnect_dist/p2",
+   "y": 90
+  },
+  "facing=east,piece=3": {
+   "model": "wildcatter:block/disconnect_dist/p3",
+   "y": 90
+  },
+  "facing=east,piece=4": {
+   "model": "wildcatter:block/disconnect_dist/p4",
+   "y": 90
+  },
+  "facing=east,piece=5": {
+   "model": "wildcatter:block/disconnect_dist/p5",
+   "y": 90
+  },
+  "facing=east,piece=6": {
+   "model": "wildcatter:block/disconnect_dist/p6",
+   "y": 90
+  },
+  "facing=east,piece=7": {
+   "model": "wildcatter:block/disconnect_dist/p7",
+   "y": 90
+  },
+  "facing=east,piece=8": {
+   "model": "wildcatter:block/disconnect_dist/p8",
+   "y": 90
+  },
+  "facing=east,piece=9": {
+   "model": "wildcatter:block/disconnect_dist/p9",
+   "y": 90
+  },
+  "facing=east,piece=10": {
+   "model": "wildcatter:block/disconnect_dist/p10",
+   "y": 90
+  },
+  "facing=east,piece=11": {
+   "model": "wildcatter:block/disconnect_dist/p11",
+   "y": 90
+  },
+  "facing=east,piece=12": {
+   "model": "wildcatter:block/disconnect_dist/p12",
+   "y": 90
+  },
+  "facing=east,piece=13": {
+   "model": "wildcatter:block/disconnect_dist/p13",
+   "y": 90
+  },
+  "facing=east,piece=14": {
+   "model": "wildcatter:block/disconnect_dist/p14",
+   "y": 90
+  },
+  "facing=south,piece=0": {
+   "model": "wildcatter:block/disconnect_dist/p0",
+   "y": 180
+  },
+  "facing=south,piece=1": {
+   "model": "wildcatter:block/disconnect_dist/p1",
+   "y": 180
+  },
+  "facing=south,piece=2": {
+   "model": "wildcatter:block/disconnect_dist/p2",
+   "y": 180
+  },
+  "facing=south,piece=3": {
+   "model": "wildcatter:block/disconnect_dist/p3",
+   "y": 180
+  },
+  "facing=south,piece=4": {
+   "model": "wildcatter:block/disconnect_dist/p4",
+   "y": 180
+  },
+  "facing=south,piece=5": {
+   "model": "wildcatter:block/disconnect_dist/p5",
+   "y": 180
+  },
+  "facing=south,piece=6": {
+   "model": "wildcatter:block/disconnect_dist/p6",
+   "y": 180
+  },
+  "facing=south,piece=7": {
+   "model": "wildcatter:block/disconnect_dist/p7",
+   "y": 180
+  },
+  "facing=south,piece=8": {
+   "model": "wildcatter:block/disconnect_dist/p8",
+   "y": 180
+  },
+  "facing=south,piece=9": {
+   "model": "wildcatter:block/disconnect_dist/p9",
+   "y": 180
+  },
+  "facing=south,piece=10": {
+   "model": "wildcatter:block/disconnect_dist/p10",
+   "y": 180
+  },
+  "facing=south,piece=11": {
+   "model": "wildcatter:block/disconnect_dist/p11",
+   "y": 180
+  },
+  "facing=south,piece=12": {
+   "model": "wildcatter:block/disconnect_dist/p12",
+   "y": 180
+  },
+  "facing=south,piece=13": {
+   "model": "wildcatter:block/disconnect_dist/p13",
+   "y": 180
+  },
+  "facing=south,piece=14": {
+   "model": "wildcatter:block/disconnect_dist/p14",
+   "y": 180
+  },
+  "facing=west,piece=0": {
+   "model": "wildcatter:block/disconnect_dist/p0",
+   "y": 270
+  },
+  "facing=west,piece=1": {
+   "model": "wildcatter:block/disconnect_dist/p1",
+   "y": 270
+  },
+  "facing=west,piece=2": {
+   "model": "wildcatter:block/disconnect_dist/p2",
+   "y": 270
+  },
+  "facing=west,piece=3": {
+   "model": "wildcatter:block/disconnect_dist/p3",
+   "y": 270
+  },
+  "facing=west,piece=4": {
+   "model": "wildcatter:block/disconnect_dist/p4",
+   "y": 270
+  },
+  "facing=west,piece=5": {
+   "model": "wildcatter:block/disconnect_dist/p5",
+   "y": 270
+  },
+  "facing=west,piece=6": {
+   "model": "wildcatter:block/disconnect_dist/p6",
+   "y": 270
+  },
+  "facing=west,piece=7": {
+   "model": "wildcatter:block/disconnect_dist/p7",
+   "y": 270
+  },
+  "facing=west,piece=8": {
+   "model": "wildcatter:block/disconnect_dist/p8",
+   "y": 270
+  },
+  "facing=west,piece=9": {
+   "model": "wildcatter:block/disconnect_dist/p9",
+   "y": 270
+  },
+  "facing=west,piece=10": {
+   "model": "wildcatter:block/disconnect_dist/p10",
+   "y": 270
+  },
+  "facing=west,piece=11": {
+   "model": "wildcatter:block/disconnect_dist/p11",
+   "y": 270
+  },
+  "facing=west,piece=12": {
+   "model": "wildcatter:block/disconnect_dist/p12",
+   "y": 270
+  },
+  "facing=west,piece=13": {
+   "model": "wildcatter:block/disconnect_dist/p13",
+   "y": 270
+  },
+  "facing=west,piece=14": {
+   "model": "wildcatter:block/disconnect_dist/p14",
+   "y": 270
   }
+ }
 }

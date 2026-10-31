@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/disconnect_dist"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/disconnect_dist/item"
+ }
 }

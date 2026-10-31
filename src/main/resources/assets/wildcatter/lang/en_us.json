@@ -156,6 +156,8 @@
   "block.wildcatter.disconnect_dist": "Disconnect Switch (DIST)",
   "block.wildcatter.bus_hv": "Station Bus (HV)",
   "block.wildcatter.bus_dist": "Station Bus (DIST)",
+  "block.wildcatter.chain_link_fence": "Chain-Link Fence",
+  "block.wildcatter.barbed_wire_top": "Barbed-Wire Fence Top",
   "subtitles.wildcatter.disconnect_arc": "Disconnect arcs",
   "subtitles.wildcatter.hv_breaker": "Power breaker operates",
   "subtitles.wildcatter.fuse_pop": "Fuse blows",

@@ -66,8 +66,9 @@ and the Field Manual has a page for each new system.
   outline showing where it will go. Breaking any piece breaks the part and drops one item. Specs are redone with real dimensions.
 - Detailed models built from many boxes (round parts as many-sided shapes, fins, bolts, pipes, gauges) by the model tool in
   `tools/models/`, drawn in Ludo material textures. No meshes.
-- Waves: 4.5a foundations, proved on the GSU; 4.5b gensets; 4.5c steam plant and cooling tower; 4.5d substation and
-  transformers; 4.5e line and building gear (one-piece true-height poles); 4.5f oil and gas. The refinery waits for Phase 5.
+- Waves: 4.5a foundations, proved on the GSU; 4.5b gensets; 4.5c steam plant and cooling tower; 4.5d the substation
+  yard and its fence; 4.5e line and building gear (one-piece true-height poles), with the pad-mounts and the unit substation
+  (moved from 4.5d, 2026-10-31); 4.5f oil and gas. The refinery waits for Phase 5.
 - Tim checks each wave in a real session before the next starts.
 
 ## Phase 5 — Oil and gas depth

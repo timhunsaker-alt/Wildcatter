@@ -73,3 +73,19 @@ for f in sorted(os.listdir(SRC)):
 		img = tileable(img)
 	img.convert("RGBA").save(f"{OUT}/{name}.png")
 	print(name)
+
+# see-through textures (fences): drawn on black, so the dark is made transparent and the wire kept (a cutout texture)
+CUTOUT = {"fence_chain_link": (0.0, 0.0, 0.5, 0.5), "fence_barbed_wire": (0.0, 0.0, 1.0, 1.0)}
+for name, (l, t, r, b) in CUTOUT.items():
+	if not os.path.exists(f"{SRC}/{name}.webp"):
+		continue
+	img = Image.open(f"{SRC}/{name}.webp").convert("RGB")
+	img = img.crop((int(l * img.width), int(t * img.height), int(r * img.width), int(b * img.height))).resize((SIZE, SIZE), Image.BOX)
+	out = Image.new("RGBA", img.size)
+	for yy in range(img.height):
+		for xx in range(img.width):
+			c = img.getpixel((xx, yy))
+			light = max(c)
+			out.putpixel((xx, yy), (min(255, int(c[0] * 1.3)), min(255, int(c[1] * 1.3)), min(255, int(c[2] * 1.3)), 255 if light > 55 else 0))
+	out.save(f"{OUT}/{name}.png")
+	print(name, "(cutout)")

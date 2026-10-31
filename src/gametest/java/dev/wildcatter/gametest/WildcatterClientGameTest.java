@@ -133,6 +133,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("towerParts")) {
 				towerParts(context, server);
 			}
+			if (only("substationParts")) {
+				substationParts(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -1610,8 +1613,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		int z = -410;
 		server.runCommand("tp @p 20 " + (up + 6) + " " + (z + 12) + " 180 20");
 		context.waitTicks(20);
-		server.runCommand("fill 6 " + (y - 1) + " " + (z - 4) + " 42 " + (y + 6) + " " + (z + 4) + " minecraft:air");
-		server.runCommand("fill 6 " + (y - 1) + " " + (z - 4) + " 42 " + (y - 1) + " " + (z + 4) + " minecraft:stone");
+		server.runCommand("fill 6 " + (y - 1) + " " + (z - 6) + " 50 " + (y + 8) + " " + (z + 6) + " minecraft:air");
+		server.runCommand("fill 6 " + (y - 1) + " " + (z - 6) + " 50 " + (y - 1) + " " + (z + 6) + " minecraft:stone");
+		server.runCommand("fill 27 " + y + " " + (z - 6) + " 50 " + y + " " + (z + 6) + " minecraft:stone");   // the yard's ground at y: it stands on it
 		BlockPos set = new BlockPos(10, up, z);
 		genset(server, set, net.minecraft.core.Direction.NORTH, false);   // the skid runs west
 		put(server, 11, up, z, "wildcatter:unit_substation[facing=east]");   // 480 V up to 4.16 kV
@@ -1644,17 +1648,21 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 				put(server, px, up + 4, row[k], "wildcatter:insulator_hv[conductor=" + conductor[k] + "]");
 			}
 		}
-		// far end: the substation (docs/multiblocks/substation.md), then 12.47 kV cable, a 480 V pad-mount and a heater
-		String[] lineup = {"hv_breaker_3p[facing=east]", "disconnect_hv[facing=east]", "bus_hv", "power_transformer[facing=west]", "bus_dist",
-				"disconnect_dist[facing=east]", "dist_breaker_3p[facing=east]"};
-		for (int i = 0; i < lineup.length; i++) {
-			put(server, 28 + i, up, z, "wildcatter:" + lineup[i]);
+		// far end: the substation yard at true size (docs/multiblocks/substation.md), 16 x 9 m from x 28, its centre line on z: the
+		// 138 kV breaker x 28-29 takes the line at its west face; the feeder breaker x 42-43 sends 12.47 kV out of its east face to a
+		// pad-mount and a heater. The transformer's main cell is at (34, z-2), the relay panel's at (36, z-4).
+		BlockPos transformer = new BlockPos(34, up, z - 2);
+		java.util.List<BlockPos> overwrote = server.computeOnServer(srv -> dev.wildcatter.block.SubstationLayout.layout().build(srv.overworld(), transformer, net.minecraft.core.Direction.NORTH, 0));
+		check(overwrote.isEmpty(), "the yard should be built on clear ground: " + overwrote);
+		put(server, 44, up, z, "wildcatter:cable_dist");
+		put(server, 45, up, z, "wildcatter:padmount_480[facing=west]");
+		put(server, 46, up, z, "wildcatter:cable_industrial");
+		put(server, 47, up, z, "wildcatter:three_phase_heater");
+		// a stretch of the yard's fence along its south side: chain link with the barbed-wire top
+		for (int x = 27; x <= 44; x++) {
+			put(server, x, up, z + 6, "wildcatter:chain_link_fence");
+			put(server, x, up + 1, z + 6, "wildcatter:barbed_wire_top");
 		}
-		put(server, 31, up, z + 1, "wildcatter:relay_panel[facing=south]");
-		put(server, 35, up, z, "wildcatter:cable_dist");
-		put(server, 36, up, z, "wildcatter:padmount_480[facing=west]");
-		put(server, 37, up, z, "wildcatter:cable_industrial");
-		put(server, 38, up, z, "wildcatter:three_phase_heater");
 		context.waitTicks(40);
 		for (int k = 0; k < 3; k++) {
 			BlockPos near = new BlockPos(16, up + 4, row[k]);
@@ -1670,44 +1678,59 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			line.append(far).append(" | ");
 			check(far.contains("1 span") && far.matches(".*\\b(7[5-9]|8[0-2])\\d{3} V.*"), "each phase at the far end of the 138 kV line should be about 79.7 kV to neutral: " + far);
 		}
-		String heater = read(server, 38, up, z);
-		String sub = read(server, 31, up, z);
+		String heater = read(server, 47, up, z);
+		String sub = read(server, 34, up, z - 2);
 		check(sub.contains("Delta-wye power transformer") && sub.matches(".*high side \\+30 degrees.*") && sub.contains("relays"),
 				"the substation should form, with its 138 kV side 30 degrees ahead: " + sub);
 		check(heater.contains("running") && heater.matches(".*A-B 4[5-9]\\d V, B-C 4[5-9]\\d V, C-A 4[5-9]\\d V.*"),
-				"the heater past the substation should run on 480 V between each pair of phases: " + heater + " | sub " + sub + " | pad " + read(server, 36, up, z) + " | " + line);
+				"the heater past the substation should run on 480 V between each pair of phases: " + heater + " | sub " + sub + " | pad " + read(server, 45, up, z) + " | " + line);
+		server.runCommand("tp @p 24 " + (up + 7) + " " + (z + 12) + " -150 25");
+		context.waitTicks(10);
 		context.takeScreenshot("wildcatter-overhead-three-phase");
+		server.runCommand("tp @p 50 " + (up + 8) + " " + (z - 10) + " 50 25");
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-substation-back");
+		server.runCommand("tp @p 36 " + (up + 20) + " " + (z + 1) + " 90 75");
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-substation-top");
 		System.out.println("[wildcatter-test] 138 kV three-phase overhead ok: " + line + heater + " | " + sub);
 		// a fault on the feeder: bare A and B touching past the feeder breaker. The relay panel trips both breakers.
 		dev.wildcatter.block.PowerTransformerBlockEntity.testRelayScale = 0.02;   // a 500 kW genset makes about 22 A of fault current at 138 kV: far below real substation settings
 		try {
-			put(server, 35, up + 1, z, "wildcatter:dist_wire_hot[conductor=a]");
-			put(server, 35, up, z + 1, "wildcatter:dist_wire_hot[conductor=b]");
-			put(server, 35, up + 1, z + 1, "wildcatter:dist_wire_hot[conductor=b]");
+			put(server, 44, up + 1, z, "wildcatter:dist_wire_hot[conductor=a]");
+			put(server, 44, up, z + 1, "wildcatter:dist_wire_hot[conductor=b]");
+			put(server, 44, up + 1, z + 1, "wildcatter:dist_wire_hot[conductor=b]");
 			context.waitTicks(40);
-			String feeder = read(server, 34, up, z);
-			String relay = read(server, 31, up, z);
+			String feeder = read(server, 42, up, z - 1);
+			String relay = read(server, 34, up, z - 2);
 			check(feeder.contains("TRIPPED by the relay panel") && relay.contains("RELAY TRIPPED"), "a feeder fault should trip the substation's breakers by relay: " + feeder + " | " + relay);
-			check(!read(server, 38, up, z).contains("running"), "the heater should lose power with the feeder: " + read(server, 38, up, z));
+			check(!read(server, 47, up, z).contains("running"), "the heater should lose power with the feeder: " + read(server, 47, up, z));
 			// clear the fault, reset at the relay panel, and the feeder is back
-			put(server, 35, up + 1, z, "minecraft:air");
-			put(server, 35, up + 1, z + 1, "minecraft:air");
-			put(server, 35, up, z + 1, "minecraft:air");
+			put(server, 44, up + 1, z, "minecraft:air");
+			put(server, 44, up + 1, z + 1, "minecraft:air");
+			put(server, 44, up, z + 1, "minecraft:air");
 			server.computeOnServer(srv -> {
-				dev.wildcatter.block.RelayPanelBlock.transformer(srv.overworld(), new BlockPos(31, up, z + 1)).resetRelays();
+				dev.wildcatter.block.RelayPanelBlock.transformer(srv.overworld(), new BlockPos(36, up, z - 4)).resetRelays();
 				return null;
 			});
 			context.waitTicks(60);
-			check(read(server, 38, up, z).contains("running"), "after a reset the heater should run again: " + read(server, 38, up, z) + " | " + read(server, 31, up, z));
+			check(read(server, 47, up, z).contains("running"), "after a reset the heater should run again: " + read(server, 47, up, z) + " | " + read(server, 34, up, z - 2));
 			// open the feeder breaker, then its disconnect: no load, no arc, and the blades swing open
 			server.computeOnServer(srv -> {
-				((dev.wildcatter.block.BreakerBlockEntity) srv.overworld().getBlockEntity(new BlockPos(34, up, z))).tripByRelay("opened by hand for the test");
-				((dev.wildcatter.block.DisconnectSwitchBlockEntity) srv.overworld().getBlockEntity(new BlockPos(33, up, z))).setOpen(true);
+				((dev.wildcatter.block.BreakerBlockEntity) srv.overworld().getBlockEntity(new BlockPos(42, up, z - 1))).tripByRelay("opened by hand for the test");
+				((dev.wildcatter.block.DisconnectSwitchBlockEntity) srv.overworld().getBlockEntity(new BlockPos(41, up, z - 1))).setOpen(true);
+				// and the 138 kV side: its breaker, then its disconnect, whose arms swing open
+				((dev.wildcatter.block.BreakerBlockEntity) srv.overworld().getBlockEntity(new BlockPos(28, up, z - 4))).tripByRelay("opened by hand for the test");
+				((dev.wildcatter.block.DisconnectSwitchBlockEntity) srv.overworld().getBlockEntity(new BlockPos(30, up, z - 4))).setOpen(true);
 				return null;
 			});
-			context.waitTicks(30);
-			String disc = read(server, 33, up, z);
+			context.waitTicks(60);
+			String disc = read(server, 41, up, z - 1);
+			String hvDisc = read(server, 30, up, z - 4);
 			check(disc.contains("OPEN") && !disc.contains("an arc"), "a disconnect opened after its breaker should open without an arc: " + disc);
+			check(hvDisc.contains("OPEN") && !hvDisc.contains("an arc"), "the 138 kV disconnect opened after its breaker should open without an arc: " + hvDisc);
+			server.runCommand("tp @p 24 " + (up + 11) + " " + (z - 12) + " -50 35");
+			context.waitTicks(20);
 			context.takeScreenshot("wildcatter-substation");
 			System.out.println("[wildcatter-test] substation ok: " + feeder + " | " + relay + " | " + disc);
 		} finally {
@@ -2519,6 +2542,62 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(stateAt(server, new BlockPos(16, up, z + 6)).isAir() && itemsNear(server, new BlockPos(16, up, z + 6), WildcatterBlocks.CONDENSER) == 1,
 				"a one-block condenser from an older world should drop as one item");
 		System.out.println("[wildcatter-test] tower parts ok: " + built + " | " + missing);
+	}
+
+	/**
+	 * The substation yard at true size (4.5d, docs/multiblocks/substation.md), placed the way a player places it: each part
+	 * clicked on the ground where the yard needs it, from the north looking south, so it faces north. Without its 138 kV bus
+	 * the transformer's readout names it; with every part the yard forms. Breaking one piece of a disconnect drops one
+	 * disconnect; a one-block breaker from an older world drops as an item.
+	 */
+	private void substationParts(ClientGameTestContext context, TestServerContext server) {
+		int z = -880;
+		server.runCommand("tp @p 20 " + (up + 8) + " " + (z - 14) + " 0 25");
+		context.waitTicks(20);
+		server.runCommand("fill 0 " + (y - 1) + " " + (z - 16) + " 40 " + (y + 9) + " " + (z + 12) + " minecraft:air");
+		server.runCommand("fill 0 " + (y - 1) + " " + (z - 16) + " 40 " + y + " " + (z + 12) + " minecraft:stone");   // ground at y
+		server.runCommand("kill @e[type=item]");
+		// the yard's parts at their main cells, x along the line from 10, z across from z
+		Object[][] parts = {
+				{WildcatterBlocks.HV_BREAKER_3P, 10, 0}, {WildcatterBlocks.DISCONNECT_HV, 12, 0}, {WildcatterBlocks.POWER_TRANSFORMER, 16, 2},
+				{WildcatterBlocks.RELAY_PANEL, 18, 0}, {WildcatterBlocks.BUS_DIST, 22, 3}, {WildcatterBlocks.DISCONNECT_DIST, 23, 3},
+				{WildcatterBlocks.DIST_BREAKER_3P, 24, 3}};
+		for (Object[] part : parts) {
+			net.minecraft.world.level.block.Block block = (net.minecraft.world.level.block.Block) part[0];
+			BlockPos main = new BlockPos((Integer) part[1], up, z + (Integer) part[2]);
+			check(placeOn(server, block, main.below(), main.getX() + 0.5, z - 6.5, 0.0F), "a " + block.getName().getString() + " should place on clear ground");
+			check(stateAt(server, main).is(block) && stateAt(server, main).getValue(dev.wildcatter.block.BigPartBlock.FACING) == net.minecraft.core.Direction.NORTH,
+					"placed from the north, the " + block.getName().getString() + " should face north at its main cell: " + stateAt(server, main));
+		}
+		String waiting = "";
+		for (int waited = 0; waited < 100 && !waiting.contains("138 kV bus"); waited += 10) {
+			context.waitTicks(10);
+			waiting = read(server, 16, up, z + 2);   // the server can run a little behind the client's ticks: wait for its check
+		}
+		check(waiting.contains("138 kV bus") && waiting.contains("14 " + up + " " + z), "without its 138 kV bus the transformer should name it and where: " + waiting);
+		check(placeOn(server, WildcatterBlocks.BUS_HV, new BlockPos(14, y, z), 14.5, z - 6.5, 0.0F), "the 138 kV bus should place");
+		context.waitTicks(40);
+		String formed = read(server, 16, up, z + 2);
+		check(formed.contains("relays") && !formed.contains("needs"), "with every part in place the yard should form: " + formed);
+		server.runCommand("tp @p 6 " + (up + 7) + " " + (z - 8) + " -45 25");
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-substation-built");
+		// break one piece of the 138 kV disconnect: the whole disconnect goes, one drops, and the yard names it
+		server.runCommand("kill @e[type=item]");
+		BlockPos piece = new BlockPos(13, up + 3, z + 8);
+		check(stateAt(server, piece).is(WildcatterBlocks.DISCONNECT_HV), "the disconnect should fill its far top corner: " + stateAt(server, piece));
+		server.computeOnServer(srv -> srv.overworld().destroyBlock(piece, true));
+		context.waitTicks(40);
+		check(stateAt(server, new BlockPos(12, up, z)).isAir() && itemsNear(server, new BlockPos(12, up, z + 4), WildcatterBlocks.DISCONNECT_HV) == 1,
+				"breaking one disconnect piece should take the whole disconnect and drop one");
+		check(read(server, 16, up, z + 2).contains("138 kV disconnect"), "without its disconnect the yard should say so: " + read(server, 16, up, z + 2));
+		// an older world's one-block breaker: the yard's layout changed, so it drops
+		server.runCommand("kill @e[type=item]");
+		put(server, 34, up, z + 10, "wildcatter:hv_breaker_3p[facing=north]");
+		context.waitTicks(10);
+		check(stateAt(server, new BlockPos(34, up, z + 10)).isAir() && itemsNear(server, new BlockPos(34, up, z + 10), WildcatterBlocks.HV_BREAKER_3P) == 1,
+				"a one-block 138 kV breaker from an older world should drop as one item");
+		System.out.println("[wildcatter-test] substation parts ok: " + waiting + " | " + formed);
 	}
 
 	private void fieldManual(TestServerContext server) {

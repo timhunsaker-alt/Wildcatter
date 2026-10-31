@@ -28,6 +28,48 @@ transformer, HV breaker, disconnect switches, buswork, low-side breaker and a re
  . . . K . . .
 ```
 
+## True size (Phase 4.5d, approved 2026-10-31)
+Every part is one item that fills its real size (docs/multiblocks/README.md, "Big parts"). 1 block = 1 m. Layout: NORTH
+facing, the line along x (138 kV west, 12.47 kV east), z across; each letter is a part's main cell, all on the ground.
+```
+x: 0123456789012345
+z0 H.D.B...K.......
+z1 ................
+z2 ......T.........
+z3 ............bdL.
+z4 ................   <- centre line: every part's terminals
+z5 ................
+z6 ................
+z7 ................
+z8 ................
+```
+| Char | Block id | Real part | Size (along x high x across) | Real-world basis |
+|---|---|---|---|---|
+| `H` | `wildcatter:hv_breaker_3p` | 138 kV breaker, 3-pole dead-tank SF6 | 2 x 5 x 9 | Three tanks and six bushings about 5 m to the tops, with a mechanism cabinet. 138 kV phase spacing is about 3 m. |
+| `D` | `wildcatter:disconnect_hv` | 138 kV disconnect, 3-phase centre-break | 2 x 6 x 9 | Galvanized structure about 4 m high. Two rotating insulator stacks per phase, their arms (about 1.4 m) meeting in the middle. |
+| `B` | `wildcatter:bus_hv` | 138 kV station bus | 2 x 6 x 9 | Aluminium tube on post insulators on a structure, with droppers |
+| `T` | `wildcatter:power_transformer` | Power transformer, 20 MVA, delta-wye, ONAN; **controller** | 6 x 7 x 5 | About 6 x 4 m plan plus radiators, and 7 m to the bushing tops. Conservator, Buchholz relay, tap-changer and control cabinets, arresters. |
+| `b` | `wildcatter:bus_dist` | 12.47 kV station bus | 1 x 4 x 3 | 0.9 m phase spacing (15 kV class) |
+| `d` | `wildcatter:disconnect_dist` | 12.47 kV disconnect, 3-phase vertical-break | 1 x 5 x 3 | 15 kV class, 0.9 m blades |
+| `L` | `wildcatter:dist_breaker_3p` | 12.47 kV feeder breaker, 3-pole | 2 x 4 x 3 | 15 kV outdoor breaker on its stand |
+| `K` | `wildcatter:relay_panel` | Relay panel | 2 x 2 x 1 | Outdoor relay cabinet (NEMA 3R): the 50/51 relays, the lockout and the meters |
+
+The yard is 16 x 9 m and 7 high. With a fence round it, it is about 20 x 13 m.
+
+How the yard works:
+- **Terminals:**
+  - Every part's terminals are on its west and east faces, at the bottom cell of the centre line (z 4). Placed in the
+    layout, the parts' terminals touch.
+  - The 138 kV line comes in at the breaker's west face. The 12.47 kV feeder leaves at the feeder breaker's east face.
+- **Building:** the yard has nothing to snap to. Place the parts freely with the ghost outline. The transformer's
+  readout names the next missing part, or a part turned the wrong way, with its x y z.
+- **Moving parts:**
+  - The 138 kV disconnect's six arms swing open, two per phase.
+  - The 12.47 kV disconnect's three blades lift.
+- **Fence (decoration):** chain-link fence and a barbed-wire top, each one block. They join like iron bars; stack the top
+  on the fence for a 2.1 m substation fence (NESC).
+- **Pad-mounts and the unit substation** become true size in wave 4.5e, with the rest of the line and building gear.
+
 ## Controller / rotation / formation / breaking
 `power_transformer` (`T`) is the controller. Four facings. Forms when the parts touch; the transformer only
 energizes when both breakers can see their buses. Removing a part dissolves it and the transformer de-energizes.
@@ -55,4 +97,5 @@ Build it, check it forms, energize the HV side, check 12.47 kV appears on the LV
 the breaker opens.
 
 ## Migration
+Phase 4 one-block yard parts drop as items with a chat line on load (the layout changed with true size).
 The single-block 138/12.47 kV transformer (`distribution_transformer` in the code) is removed. (`substation_transformer` in the code is the 4.16 kV to 138 kV step-up; it stays until Phase 6.)

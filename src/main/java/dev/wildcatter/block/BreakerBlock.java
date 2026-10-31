@@ -87,7 +87,7 @@ public class BreakerBlock extends BaseEntityBlock {
 		this(properties, voltage, plainSwitch, relay, poles, false);
 	}
 
-	private BreakerBlock(Properties properties, Voltage voltage, boolean plainSwitch, boolean relay, int poles, boolean relayOperated) {
+	protected BreakerBlock(Properties properties, Voltage voltage, boolean plainSwitch, boolean relay, int poles, boolean relayOperated) {
 		super(properties);
 		this.relayOperated = relayOperated;
 		this.poles = poles;
@@ -99,6 +99,11 @@ public class BreakerBlock extends BaseEntityBlock {
 
 	public Voltage voltage() {
 		return voltage;
+	}
+
+	/** The way the line runs through it, in at the back and out at the front: its facing (a true-size breaker turns it). */
+	public Direction lineFacing(BlockState state) {
+		return state.getValue(FACING);
 	}
 
 	public boolean isSwitch() {

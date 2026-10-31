@@ -25,7 +25,21 @@ import net.minecraft.world.level.storage.ValueOutput;
  * at once. A current only a little over the rating heats it slowly: it trips sooner the further over it is, and
  * never if the current stays at or under the rating.
  */
-public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Inspectable {
+public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Inspectable, dev.wildcatter.multiblock.BigPartEntity {
+	/** A true-size part has grown into its cells (see BigParts). */
+	private boolean grown;
+
+	@Override
+	public boolean grown() {
+		return grown;
+	}
+
+	@Override
+	public void markGrown() {
+		grown = true;
+		setChanged();
+	}
+
 	private int ratingIndex;
 	/** 0 to 1: how close the heat has brought it to tripping. */
 	private double heat;
@@ -92,8 +106,19 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 		return getBlockState().getValue(BreakerBlock.POSITION) == BreakerBlock.Position.ON;
 	}
 
+	/** The way the line runs through it: in at the back, out at the front. */
 	private Direction facing() {
-		return getBlockState().getValue(BreakerBlock.FACING);
+		return ((BreakerBlock) getBlockState().getBlock()).lineFacing(getBlockState());
+	}
+
+	/** The cell that carries the terminal on {@code face}: this one, or for a true-size breaker the end of the yard's centre line. */
+	private BlockPos at(Direction face) {
+		return getBlockState().getBlock() instanceof dev.wildcatter.multiblock.BigPart part ? part.terminalCell(worldPosition, getBlockState(), face) : worldPosition;
+	}
+
+	@Override
+	public boolean hasPortAt(BlockPos cell, Direction face, Conductor role, Voltage voltage) {
+		return hasPort(face, role, voltage) && cell.equals(at(face));
 	}
 
 	public void nextRating() {
@@ -145,21 +170,21 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 			}
 			if (poles == 1) {
 				// one pole: it switches whichever phase runs through it
-				circuit.hotPort(worldPosition, facing().getOpposite(), voltage(), back[k], Tuning.CONTACT_OHMS / 2, false);
-				circuit.hotPort(worldPosition, facing(), voltage(), front[k], Tuning.CONTACT_OHMS / 2, false);
+				circuit.hotPort(at(facing().getOpposite()), facing().getOpposite(), voltage(), back[k], Tuning.CONTACT_OHMS / 2, false);
+				circuit.hotPort(at(facing()), facing(), voltage(), front[k], Tuning.CONTACT_OHMS / 2, false);
 			} else {
-				circuit.port(worldPosition, facing().getOpposite(), phases[k], voltage(), back[k], Tuning.CONTACT_OHMS / 2, false);
-				circuit.port(worldPosition, facing(), phases[k], voltage(), front[k], Tuning.CONTACT_OHMS / 2, false);
+				circuit.port(at(facing().getOpposite()), facing().getOpposite(), phases[k], voltage(), back[k], Tuning.CONTACT_OHMS / 2, false);
+				circuit.port(at(facing()), facing(), phases[k], voltage(), front[k], Tuning.CONTACT_OHMS / 2, false);
 			}
 		}
 		if (poles == 3) {
 			// the neutral and ground run straight through a three-pole breaker, unswitched
 			int neutral = circuit.node();
 			int ground = circuit.node();
-			circuit.port(worldPosition, facing().getOpposite(), Conductor.N, voltage(), neutral, Tuning.CONTACT_OHMS / 2, false);
-			circuit.port(worldPosition, facing(), Conductor.N, voltage(), neutral, Tuning.CONTACT_OHMS / 2, false);
-			circuit.port(worldPosition, facing().getOpposite(), Conductor.G, voltage(), ground, Tuning.CONTACT_OHMS / 2, false);
-			circuit.port(worldPosition, facing(), Conductor.G, voltage(), ground, Tuning.CONTACT_OHMS / 2, false);
+			circuit.port(at(facing().getOpposite()), facing().getOpposite(), Conductor.N, voltage(), neutral, Tuning.CONTACT_OHMS / 2, false);
+			circuit.port(at(facing()), facing(), Conductor.N, voltage(), neutral, Tuning.CONTACT_OHMS / 2, false);
+			circuit.port(at(facing().getOpposite()), facing().getOpposite(), Conductor.G, voltage(), ground, Tuning.CONTACT_OHMS / 2, false);
+			circuit.port(at(facing()), facing(), Conductor.G, voltage(), ground, Tuning.CONTACT_OHMS / 2, false);
 		}
 	}
 
@@ -256,6 +281,7 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
+		output.putBoolean("grown", grown);
 		output.putInt("rating", ratingIndex);
 		output.putDouble("heat", heat);
 		output.putString("lastTrip", lastTrip);
@@ -264,6 +290,7 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		grown = input.getBooleanOr("grown", false);
 		ratingIndex = Math.max(0, input.getIntOr("rating", 0));
 		heat = input.getDoubleOr("heat", 0);
 		lastTrip = input.getStringOr("lastTrip", "");

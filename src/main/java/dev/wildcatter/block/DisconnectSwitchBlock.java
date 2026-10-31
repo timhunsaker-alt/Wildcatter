@@ -44,6 +44,11 @@ public class DisconnectSwitchBlock extends BaseEntityBlock {
 		return voltage;
 	}
 
+	/** The way the line runs through it, in at the back and out at the front: its facing (a true-size disconnect turns it). */
+	public Direction lineFacing(BlockState state) {
+		return state.getValue(FACING);
+	}
+
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(FACING, OPEN);

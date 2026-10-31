@@ -12,7 +12,7 @@ Put the jar in your instance's `mods` folder next to:
 ## What's in it
 - Power from a 120 V starter turbine up to a 138 kV substation.
 - Gensets, a 1 MW steam plant with its cooling tower, oil wells and a refinery.
-- The gensets, the steam plant, the cooling tower and the generator step-up transformer are built at their real size
+- The gensets, the steam plant, the cooling tower, the substation yard and the generator step-up transformer are built at their real size
   (1 block = 1 m).
 - The Field Manual item explains how to build each machine.
 

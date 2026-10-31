@@ -1132,66 +1132,45 @@ def insulator_post(img, d):
 		d.line([2, y, 13, y], fill=(150, 100, 70))   # the porcelain sheds
 
 
-tex("station_bus_placeholder", tube)
-tex("disconnect_post_placeholder", insulator_post)
-save_json(f"{ASSETS}/models/block/power_transformer.json", {"parent": "minecraft:block/orientable", "textures": {
-	"front": B("substation_front"), "side": B("substation_side"), "top": B("substation_top"), "bottom": B("substation_top")}})
-save_json(f"{ASSETS}/models/block/relay_panel.json", {"parent": "minecraft:block/orientable", "textures": {
-	"front": B("mcc_incoming_front_on"), "side": B("cabinet_side"), "top": B("cabinet_side"), "bottom": B("cabinet_side")}})
-for name in ("power_transformer", "relay_panel"):
-	save_json(f"{ASSETS}/blockstates/{name}.json", {"variants": {
-		"facing=north": {"model": f"{ns}:block/{name}"}, "facing=east": {"model": f"{ns}:block/{name}", "y": 90},
-		"facing=south": {"model": f"{ns}:block/{name}", "y": 180}, "facing=west": {"model": f"{ns}:block/{name}", "y": 270}}})
-	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{name}"}})
-# relay-operated three-pole breakers: the three-pole model, tinted red (138 kV) and green (12.47 kV)
-for name, body in (("hv_breaker_3p", "breaker_3p_industrial_body"), ("dist_breaker_3p", "breaker_3p_lv_body")):
-	for position, angle in (("on", -30), ("off", 30), ("tripped", 0)):
-		els = [cuboid([0, 0, 2], [16, 13, 14], "#body")]
-		for x in (3, 7, 11):
-			lever_el = cuboid([x, 13, 7], [x + 2, 16, 9], "#lever")
-			lever_el["rotation"] = {"origin": [8, 13, 8], "axis": "x", "angle": angle}
-			els.append(lever_el)
-		save_json(f"{ASSETS}/models/block/{name}_{position}.json", {
-			"textures": {"body": f"{ns}:block/{body}", "lever": f"{ns}:block/breaker_lever_{position}", "particle": f"{ns}:block/{body}"}, "elements": els})
-	save_json(f"{ASSETS}/blockstates/{name}.json", {"variants": {
-		f"facing={facing},position={position}": {"model": f"{ns}:block/{name}_{position}", "y": y}
-		for facing, y in rotations.items() for position in ("on", "off", "tripped")}})
-	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{name}_on"}})
-# disconnects: a base and two insulator posts; the blade is a rotor that swings up about its hinge
-post = f"{ns}:block/{art('disconnect_post')}"
-for name in ("disconnect_hv", "disconnect_dist"):
-	save_json(f"{ASSETS}/models/block/{name}.json", {"textures": {"post": post, "base": B("pipe"), "particle": post}, "elements": [
-		box([1, 0, 1], [15, 2, 15], "#base"), box([6, 2, 1], [10, 12, 4], "#post"), box([6, 2, 12], [10, 12, 15], "#post")]})
-	save_json(f"{ASSETS}/blockstates/{name}.json", {"variants": {
-		f"facing={facing},open={o}": {"model": f"{ns}:block/{name}", "y": y} for facing, y in rotations.items() for o in ("false", "true")}})
-	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{name}"}})
-save_json(f"{ASSETS}/models/block/rotor_disconnect_blade.json", {"textures": r, "elements": [   # hinged at its south end (the model's centre)
-	box([5, 7.5, -3], [6, 8.5, 8], "#rotor"), box([10, 7.5, -3], [11, 8.5, 8], "#rotor"), box([5, 7.5, -3], [11, 8.5, -2], "#rotor")]})
-save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ("radiator_fan", "crank_pulley", "coupling", "tower_fan", "disconnect_blade", "alternator_fan", "turbine_coupling", "pump_coupling")}})
-# station buses: tubular bus on the busway shape
-for bus in ("bus_hv", "bus_dist"):
-	t = {"cable": f"{ns}:block/{art('station_bus')}", "particle": f"{ns}:block/{art('station_bus')}"}
-	save_json(f"{ASSETS}/models/block/{bus}_core.json", {"textures": t, "elements": [cuboid([4, 4, 4], [12, 12, 12])]})
-	save_json(f"{ASSETS}/models/block/{bus}_arm.json", {"textures": t, "elements": [cuboid([4, 4, 0], [12, 12, 4])]})
-	save_json(f"{ASSETS}/models/block/{bus}_inventory.json", {"parent": "minecraft:block/block", "textures": t, "elements": [cuboid([0, 4, 4], [16, 12, 12])]})
-	save_json(f"{ASSETS}/blockstates/{bus}.json", {"multipart": [{"apply": {"model": f"{ns}:block/{bus}_core"}}] + [
-		{"when": {side: "true"}, "apply": {"model": f"{ns}:block/{bus}_arm", **rot}} for side, rot in arms.items()]})
-	save_json(f"{ASSETS}/items/{bus}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{bus}_inventory"}})
+# Phase 4.5d: the yard's parts are true size: blockstates, piece models, items and collision come from tools/models/<part>.py
+# (run at the end of this script); here only their loot (piece 0 drops the item).
 SUB = ("power_transformer", "relay_panel", "hv_breaker_3p", "dist_breaker_3p", "disconnect_hv", "disconnect_dist", "bus_hv", "bus_dist")
 for name in SUB:
+	big_part_loot(name)
+save_json(f"{ASSETS}/models/block/rotor_disconnect_blade.json", {"textures": r, "elements": [   # hinged at its south end (the model's centre)
+	box([5, 7.5, -3], [6, 8.5, 8], "#rotor"), box([10, 7.5, -3], [11, 8.5, 8], "#rotor"), box([5, 7.5, -3], [11, 8.5, -2], "#rotor")]})
+save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ("radiator_fan", "crank_pulley", "coupling", "tower_fan", "disconnect_blade", "alternator_fan", "turbine_coupling", "pump_coupling", "disconnect_arm_hv", "disconnect_arm_hv_back", "disconnect_blade_dist")}})
+# the yard's fence (decoration): chain-link fabric and the barbed-wire top, joined like iron bars, see-through
+for name, texture in (("chain_link_fence", "fence_chain_link"), ("barbed_wire_top", "fence_barbed_wire")):
+	t = f"{ns}:block/mat/{texture}"
+	for part in ("post_ends", "post", "cap", "cap_alt", "side", "side_alt"):
+		save_json(f"{ASSETS}/models/block/{name}_{part}.json", {"parent": f"minecraft:block/template_bars_{part}", "textures": {"bars": t, "edge": t, "particle": t}})
+	m = lambda part, y=0: {"model": f"{ns}:block/{name}_{part}", **({"y": y} if y else {})}
+	alone = {d: "false" for d in ("north", "east", "south", "west")}
+	only = lambda d: {**alone, d: "true"}
+	save_json(f"{ASSETS}/blockstates/{name}.json", {"multipart": [   # as panes and bars join: a post alone, caps at a lone end, sides
+		{"apply": m("post_ends")}, {"when": alone, "apply": m("post")},
+		{"when": only("north"), "apply": m("cap")}, {"when": only("east"), "apply": m("cap", 90)},
+		{"when": only("south"), "apply": m("cap_alt")}, {"when": only("west"), "apply": m("cap_alt", 90)},
+		{"when": {"north": "true"}, "apply": m("side")}, {"when": {"east": "true"}, "apply": m("side", 90)},
+		{"when": {"south": "true"}, "apply": m("side_alt")}, {"when": {"west": "true"}, "apply": m("side_alt", 90)}]})
+	save_json(f"{ASSETS}/models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": t}})
+	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{name}"}})
 	save_json(f"{DATA}/loot_table/blocks/{name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],
 		"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+shaped("chain_link_fence", ["III", "III"], {"I": "minecraft:iron_bars"}, "chain_link_fence", 6)
+shaped("barbed_wire_top", ["I I", " I ", "I I"], {"I": "minecraft:iron_nugget"}, "barbed_wire_top", 6)
 for tag in ("mineable/pickaxe", "needs_stone_tool"):
 	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
-	t["values"] += [f"{ns}:{n}" for n in SUB]
+	t["values"] += [f"{ns}:{n}" for n in SUB + ("chain_link_fence", "barbed_wire_top")]
 	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
 shaped("power_transformer", ["SDS", "TCT", "SDS"], {"S": S_, "D": "minecraft:diamond_block", "T": f"{ns}:substation_transformer", "C": "minecraft:copper_block"}, "power_transformer")
 shapeless("hv_breaker_3p", [f"{ns}:hv_breaker"] * 3 + ["minecraft:comparator"], "hv_breaker_3p")
 shapeless("dist_breaker_3p", [f"{ns}:dist_breaker"] * 3 + ["minecraft:comparator"], "dist_breaker_3p")
 shaped("disconnect_hv", ["I I", "ISI"], {"I": f"{ns}:insulator_hv", "S": S_}, "disconnect_hv")
 shaped("disconnect_dist", ["I I", "ISI"], {"I": f"{ns}:insulator_dist", "S": S_}, "disconnect_dist")
-shaped("bus_hv", ["AAA", "I I"], {"A": "minecraft:iron_ingot", "I": f"{ns}:insulator_hv"}, "bus_hv", 4)
-shaped("bus_dist", ["AAA", "I I"], {"A": "minecraft:iron_ingot", "I": f"{ns}:insulator_dist"}, "bus_dist", 4)
+shaped("bus_hv", ["AAA", "I I"], {"A": "minecraft:iron_ingot", "I": f"{ns}:insulator_hv"}, "bus_hv")
+shaped("bus_dist", ["AAA", "I I"], {"A": "minecraft:iron_ingot", "I": f"{ns}:insulator_dist"}, "bus_dist")
 shaped("relay_panel", ["SGS", "CRC", "SSS"], {"S": S_, "G": "minecraft:glass_pane", "C": "minecraft:comparator", "R": "minecraft:redstone_block"}, "relay_panel")
 lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
 for k in [k for k in lang if "distribution_transformer" in k]:
@@ -1199,7 +1178,8 @@ for k in [k for k in lang if "distribution_transformer" in k]:
 lang.update({"block.wildcatter.power_transformer": "Substation Power Transformer (HV delta / DIST wye, 20 MVA)", "block.wildcatter.relay_panel": "Relay Panel (50/51)",
 	"block.wildcatter.hv_breaker_3p": "Substation Breaker (HV, three-pole)", "block.wildcatter.dist_breaker_3p": "Feeder Breaker (DIST, three-pole)",
 	"block.wildcatter.disconnect_hv": "Disconnect Switch (HV)", "block.wildcatter.disconnect_dist": "Disconnect Switch (DIST)",
-	"block.wildcatter.bus_hv": "Station Bus (HV)", "block.wildcatter.bus_dist": "Station Bus (DIST)", "subtitles.wildcatter.disconnect_arc": "Disconnect arcs",
+	"block.wildcatter.bus_hv": "Station Bus (HV)", "block.wildcatter.bus_dist": "Station Bus (DIST)",
+	"block.wildcatter.chain_link_fence": "Chain-Link Fence", "block.wildcatter.barbed_wire_top": "Barbed-Wire Fence Top", "subtitles.wildcatter.disconnect_arc": "Disconnect arcs",
 	"subtitles.wildcatter.hv_breaker": "Power breaker operates", "subtitles.wildcatter.fuse_pop": "Fuse blows", "subtitles.wildcatter.flashover": "Insulator flashes over"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 

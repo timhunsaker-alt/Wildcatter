@@ -12,6 +12,13 @@
       "conditions": [
         {
           "condition": "minecraft:survives_explosion"
+        },
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "wildcatter:dist_breaker_3p",
+          "properties": {
+            "piece": "0"
+          }
         }
       ]
     }

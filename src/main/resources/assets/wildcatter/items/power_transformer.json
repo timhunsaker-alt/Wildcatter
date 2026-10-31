@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/power_transformer"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/power_transformer/item"
+ }
 }

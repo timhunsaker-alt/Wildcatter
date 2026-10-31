@@ -1,19 +1,3154 @@
 {
-  "variants": {
-    "facing=north": {
-      "model": "wildcatter:block/power_transformer"
-    },
-    "facing=east": {
-      "model": "wildcatter:block/power_transformer",
-      "y": 90
-    },
-    "facing=south": {
-      "model": "wildcatter:block/power_transformer",
-      "y": 180
-    },
-    "facing=west": {
-      "model": "wildcatter:block/power_transformer",
-      "y": 270
-    }
+ "variants": {
+  "facing=north,piece=0": {
+   "model": "wildcatter:block/power_transformer/p0"
+  },
+  "facing=north,piece=1": {
+   "model": "wildcatter:block/power_transformer/p1"
+  },
+  "facing=north,piece=2": {
+   "model": "wildcatter:block/power_transformer/p2"
+  },
+  "facing=north,piece=3": {
+   "model": "wildcatter:block/power_transformer/p3"
+  },
+  "facing=north,piece=4": {
+   "model": "wildcatter:block/power_transformer/p4"
+  },
+  "facing=north,piece=5": {
+   "model": "wildcatter:block/power_transformer/p5"
+  },
+  "facing=north,piece=6": {
+   "model": "wildcatter:block/power_transformer/p6"
+  },
+  "facing=north,piece=7": {
+   "model": "wildcatter:block/power_transformer/p7"
+  },
+  "facing=north,piece=8": {
+   "model": "wildcatter:block/power_transformer/p8"
+  },
+  "facing=north,piece=9": {
+   "model": "wildcatter:block/power_transformer/p9"
+  },
+  "facing=north,piece=10": {
+   "model": "wildcatter:block/power_transformer/p10"
+  },
+  "facing=north,piece=11": {
+   "model": "wildcatter:block/power_transformer/p11"
+  },
+  "facing=north,piece=12": {
+   "model": "wildcatter:block/power_transformer/p12"
+  },
+  "facing=north,piece=13": {
+   "model": "wildcatter:block/power_transformer/p13"
+  },
+  "facing=north,piece=14": {
+   "model": "wildcatter:block/power_transformer/p14"
+  },
+  "facing=north,piece=15": {
+   "model": "wildcatter:block/power_transformer/p15"
+  },
+  "facing=north,piece=16": {
+   "model": "wildcatter:block/power_transformer/p16"
+  },
+  "facing=north,piece=17": {
+   "model": "wildcatter:block/power_transformer/p17"
+  },
+  "facing=north,piece=18": {
+   "model": "wildcatter:block/power_transformer/p18"
+  },
+  "facing=north,piece=19": {
+   "model": "wildcatter:block/power_transformer/p19"
+  },
+  "facing=north,piece=20": {
+   "model": "wildcatter:block/power_transformer/p20"
+  },
+  "facing=north,piece=21": {
+   "model": "wildcatter:block/power_transformer/p21"
+  },
+  "facing=north,piece=22": {
+   "model": "wildcatter:block/power_transformer/p22"
+  },
+  "facing=north,piece=23": {
+   "model": "wildcatter:block/power_transformer/p23"
+  },
+  "facing=north,piece=24": {
+   "model": "wildcatter:block/power_transformer/p24"
+  },
+  "facing=north,piece=25": {
+   "model": "wildcatter:block/power_transformer/p25"
+  },
+  "facing=north,piece=26": {
+   "model": "wildcatter:block/power_transformer/p26"
+  },
+  "facing=north,piece=27": {
+   "model": "wildcatter:block/power_transformer/p27"
+  },
+  "facing=north,piece=28": {
+   "model": "wildcatter:block/power_transformer/p28"
+  },
+  "facing=north,piece=29": {
+   "model": "wildcatter:block/power_transformer/p29"
+  },
+  "facing=north,piece=30": {
+   "model": "wildcatter:block/power_transformer/p30"
+  },
+  "facing=north,piece=31": {
+   "model": "wildcatter:block/power_transformer/p31"
+  },
+  "facing=north,piece=32": {
+   "model": "wildcatter:block/power_transformer/p32"
+  },
+  "facing=north,piece=33": {
+   "model": "wildcatter:block/power_transformer/p33"
+  },
+  "facing=north,piece=34": {
+   "model": "wildcatter:block/power_transformer/p34"
+  },
+  "facing=north,piece=35": {
+   "model": "wildcatter:block/power_transformer/p35"
+  },
+  "facing=north,piece=36": {
+   "model": "wildcatter:block/power_transformer/p36"
+  },
+  "facing=north,piece=37": {
+   "model": "wildcatter:block/power_transformer/p37"
+  },
+  "facing=north,piece=38": {
+   "model": "wildcatter:block/power_transformer/p38"
+  },
+  "facing=north,piece=39": {
+   "model": "wildcatter:block/power_transformer/p39"
+  },
+  "facing=north,piece=40": {
+   "model": "wildcatter:block/power_transformer/p40"
+  },
+  "facing=north,piece=41": {
+   "model": "wildcatter:block/power_transformer/p41"
+  },
+  "facing=north,piece=42": {
+   "model": "wildcatter:block/power_transformer/p42"
+  },
+  "facing=north,piece=43": {
+   "model": "wildcatter:block/power_transformer/p43"
+  },
+  "facing=north,piece=44": {
+   "model": "wildcatter:block/power_transformer/p44"
+  },
+  "facing=north,piece=45": {
+   "model": "wildcatter:block/power_transformer/p45"
+  },
+  "facing=north,piece=46": {
+   "model": "wildcatter:block/power_transformer/p46"
+  },
+  "facing=north,piece=47": {
+   "model": "wildcatter:block/power_transformer/p47"
+  },
+  "facing=north,piece=48": {
+   "model": "wildcatter:block/power_transformer/p48"
+  },
+  "facing=north,piece=49": {
+   "model": "wildcatter:block/power_transformer/p49"
+  },
+  "facing=north,piece=50": {
+   "model": "wildcatter:block/power_transformer/p50"
+  },
+  "facing=north,piece=51": {
+   "model": "wildcatter:block/power_transformer/p51"
+  },
+  "facing=north,piece=52": {
+   "model": "wildcatter:block/power_transformer/p52"
+  },
+  "facing=north,piece=53": {
+   "model": "wildcatter:block/power_transformer/p53"
+  },
+  "facing=north,piece=54": {
+   "model": "wildcatter:block/power_transformer/p54"
+  },
+  "facing=north,piece=55": {
+   "model": "wildcatter:block/power_transformer/p55"
+  },
+  "facing=north,piece=56": {
+   "model": "wildcatter:block/power_transformer/p56"
+  },
+  "facing=north,piece=57": {
+   "model": "wildcatter:block/power_transformer/p57"
+  },
+  "facing=north,piece=58": {
+   "model": "wildcatter:block/power_transformer/p58"
+  },
+  "facing=north,piece=59": {
+   "model": "wildcatter:block/power_transformer/p59"
+  },
+  "facing=north,piece=60": {
+   "model": "wildcatter:block/power_transformer/p60"
+  },
+  "facing=north,piece=61": {
+   "model": "wildcatter:block/power_transformer/p61"
+  },
+  "facing=north,piece=62": {
+   "model": "wildcatter:block/power_transformer/p62"
+  },
+  "facing=north,piece=63": {
+   "model": "wildcatter:block/power_transformer/p63"
+  },
+  "facing=north,piece=64": {
+   "model": "wildcatter:block/power_transformer/p64"
+  },
+  "facing=north,piece=65": {
+   "model": "wildcatter:block/power_transformer/p65"
+  },
+  "facing=north,piece=66": {
+   "model": "wildcatter:block/power_transformer/p66"
+  },
+  "facing=north,piece=67": {
+   "model": "wildcatter:block/power_transformer/p67"
+  },
+  "facing=north,piece=68": {
+   "model": "wildcatter:block/power_transformer/p68"
+  },
+  "facing=north,piece=69": {
+   "model": "wildcatter:block/power_transformer/p69"
+  },
+  "facing=north,piece=70": {
+   "model": "wildcatter:block/power_transformer/p70"
+  },
+  "facing=north,piece=71": {
+   "model": "wildcatter:block/power_transformer/p71"
+  },
+  "facing=north,piece=72": {
+   "model": "wildcatter:block/power_transformer/p72"
+  },
+  "facing=north,piece=73": {
+   "model": "wildcatter:block/power_transformer/p73"
+  },
+  "facing=north,piece=74": {
+   "model": "wildcatter:block/power_transformer/p74"
+  },
+  "facing=north,piece=75": {
+   "model": "wildcatter:block/power_transformer/p75"
+  },
+  "facing=north,piece=76": {
+   "model": "wildcatter:block/power_transformer/p76"
+  },
+  "facing=north,piece=77": {
+   "model": "wildcatter:block/power_transformer/p77"
+  },
+  "facing=north,piece=78": {
+   "model": "wildcatter:block/power_transformer/p78"
+  },
+  "facing=north,piece=79": {
+   "model": "wildcatter:block/power_transformer/p79"
+  },
+  "facing=north,piece=80": {
+   "model": "wildcatter:block/power_transformer/p80"
+  },
+  "facing=north,piece=81": {
+   "model": "wildcatter:block/power_transformer/p81"
+  },
+  "facing=north,piece=82": {
+   "model": "wildcatter:block/power_transformer/p82"
+  },
+  "facing=north,piece=83": {
+   "model": "wildcatter:block/power_transformer/p83"
+  },
+  "facing=north,piece=84": {
+   "model": "wildcatter:block/power_transformer/p84"
+  },
+  "facing=north,piece=85": {
+   "model": "wildcatter:block/power_transformer/p85"
+  },
+  "facing=north,piece=86": {
+   "model": "wildcatter:block/power_transformer/p86"
+  },
+  "facing=north,piece=87": {
+   "model": "wildcatter:block/power_transformer/p87"
+  },
+  "facing=north,piece=88": {
+   "model": "wildcatter:block/power_transformer/p88"
+  },
+  "facing=north,piece=89": {
+   "model": "wildcatter:block/power_transformer/p89"
+  },
+  "facing=north,piece=90": {
+   "model": "wildcatter:block/power_transformer/p90"
+  },
+  "facing=north,piece=91": {
+   "model": "wildcatter:block/power_transformer/p91"
+  },
+  "facing=north,piece=92": {
+   "model": "wildcatter:block/power_transformer/p92"
+  },
+  "facing=north,piece=93": {
+   "model": "wildcatter:block/power_transformer/p93"
+  },
+  "facing=north,piece=94": {
+   "model": "wildcatter:block/power_transformer/p94"
+  },
+  "facing=north,piece=95": {
+   "model": "wildcatter:block/power_transformer/p95"
+  },
+  "facing=north,piece=96": {
+   "model": "wildcatter:block/power_transformer/p96"
+  },
+  "facing=north,piece=97": {
+   "model": "wildcatter:block/power_transformer/p97"
+  },
+  "facing=north,piece=98": {
+   "model": "wildcatter:block/power_transformer/p98"
+  },
+  "facing=north,piece=99": {
+   "model": "wildcatter:block/power_transformer/p99"
+  },
+  "facing=north,piece=100": {
+   "model": "wildcatter:block/power_transformer/p100"
+  },
+  "facing=north,piece=101": {
+   "model": "wildcatter:block/power_transformer/p101"
+  },
+  "facing=north,piece=102": {
+   "model": "wildcatter:block/power_transformer/p102"
+  },
+  "facing=north,piece=103": {
+   "model": "wildcatter:block/power_transformer/p103"
+  },
+  "facing=north,piece=104": {
+   "model": "wildcatter:block/power_transformer/p104"
+  },
+  "facing=north,piece=105": {
+   "model": "wildcatter:block/power_transformer/p105"
+  },
+  "facing=north,piece=106": {
+   "model": "wildcatter:block/power_transformer/p106"
+  },
+  "facing=north,piece=107": {
+   "model": "wildcatter:block/power_transformer/p107"
+  },
+  "facing=north,piece=108": {
+   "model": "wildcatter:block/power_transformer/p108"
+  },
+  "facing=north,piece=109": {
+   "model": "wildcatter:block/power_transformer/p109"
+  },
+  "facing=north,piece=110": {
+   "model": "wildcatter:block/power_transformer/p110"
+  },
+  "facing=north,piece=111": {
+   "model": "wildcatter:block/power_transformer/p111"
+  },
+  "facing=north,piece=112": {
+   "model": "wildcatter:block/power_transformer/p112"
+  },
+  "facing=north,piece=113": {
+   "model": "wildcatter:block/power_transformer/p113"
+  },
+  "facing=north,piece=114": {
+   "model": "wildcatter:block/power_transformer/p114"
+  },
+  "facing=north,piece=115": {
+   "model": "wildcatter:block/power_transformer/p115"
+  },
+  "facing=north,piece=116": {
+   "model": "wildcatter:block/power_transformer/p116"
+  },
+  "facing=north,piece=117": {
+   "model": "wildcatter:block/power_transformer/p117"
+  },
+  "facing=north,piece=118": {
+   "model": "wildcatter:block/power_transformer/p118"
+  },
+  "facing=north,piece=119": {
+   "model": "wildcatter:block/power_transformer/p119"
+  },
+  "facing=north,piece=120": {
+   "model": "wildcatter:block/power_transformer/p120"
+  },
+  "facing=north,piece=121": {
+   "model": "wildcatter:block/power_transformer/p121"
+  },
+  "facing=north,piece=122": {
+   "model": "wildcatter:block/power_transformer/p122"
+  },
+  "facing=north,piece=123": {
+   "model": "wildcatter:block/power_transformer/p123"
+  },
+  "facing=north,piece=124": {
+   "model": "wildcatter:block/power_transformer/p124"
+  },
+  "facing=north,piece=125": {
+   "model": "wildcatter:block/power_transformer/p125"
+  },
+  "facing=north,piece=126": {
+   "model": "wildcatter:block/power_transformer/p126"
+  },
+  "facing=north,piece=127": {
+   "model": "wildcatter:block/power_transformer/p127"
+  },
+  "facing=north,piece=128": {
+   "model": "wildcatter:block/power_transformer/p128"
+  },
+  "facing=north,piece=129": {
+   "model": "wildcatter:block/power_transformer/p129"
+  },
+  "facing=north,piece=130": {
+   "model": "wildcatter:block/power_transformer/p130"
+  },
+  "facing=north,piece=131": {
+   "model": "wildcatter:block/power_transformer/p131"
+  },
+  "facing=north,piece=132": {
+   "model": "wildcatter:block/power_transformer/p132"
+  },
+  "facing=north,piece=133": {
+   "model": "wildcatter:block/power_transformer/p133"
+  },
+  "facing=north,piece=134": {
+   "model": "wildcatter:block/power_transformer/p134"
+  },
+  "facing=north,piece=135": {
+   "model": "wildcatter:block/power_transformer/p135"
+  },
+  "facing=north,piece=136": {
+   "model": "wildcatter:block/power_transformer/p136"
+  },
+  "facing=north,piece=137": {
+   "model": "wildcatter:block/power_transformer/p137"
+  },
+  "facing=north,piece=138": {
+   "model": "wildcatter:block/power_transformer/p138"
+  },
+  "facing=north,piece=139": {
+   "model": "wildcatter:block/power_transformer/p139"
+  },
+  "facing=north,piece=140": {
+   "model": "wildcatter:block/power_transformer/p140"
+  },
+  "facing=north,piece=141": {
+   "model": "wildcatter:block/power_transformer/p141"
+  },
+  "facing=north,piece=142": {
+   "model": "wildcatter:block/power_transformer/p142"
+  },
+  "facing=north,piece=143": {
+   "model": "wildcatter:block/power_transformer/p143"
+  },
+  "facing=north,piece=144": {
+   "model": "wildcatter:block/power_transformer/p144"
+  },
+  "facing=north,piece=145": {
+   "model": "wildcatter:block/power_transformer/p145"
+  },
+  "facing=north,piece=146": {
+   "model": "wildcatter:block/power_transformer/p146"
+  },
+  "facing=north,piece=147": {
+   "model": "wildcatter:block/power_transformer/p147"
+  },
+  "facing=north,piece=148": {
+   "model": "wildcatter:block/power_transformer/p148"
+  },
+  "facing=north,piece=149": {
+   "model": "wildcatter:block/power_transformer/p149"
+  },
+  "facing=north,piece=150": {
+   "model": "wildcatter:block/power_transformer/p150"
+  },
+  "facing=north,piece=151": {
+   "model": "wildcatter:block/power_transformer/p151"
+  },
+  "facing=north,piece=152": {
+   "model": "wildcatter:block/power_transformer/p152"
+  },
+  "facing=north,piece=153": {
+   "model": "wildcatter:block/power_transformer/p153"
+  },
+  "facing=north,piece=154": {
+   "model": "wildcatter:block/power_transformer/p154"
+  },
+  "facing=north,piece=155": {
+   "model": "wildcatter:block/power_transformer/p155"
+  },
+  "facing=north,piece=156": {
+   "model": "wildcatter:block/power_transformer/p156"
+  },
+  "facing=north,piece=157": {
+   "model": "wildcatter:block/power_transformer/p157"
+  },
+  "facing=north,piece=158": {
+   "model": "wildcatter:block/power_transformer/p158"
+  },
+  "facing=north,piece=159": {
+   "model": "wildcatter:block/power_transformer/p159"
+  },
+  "facing=north,piece=160": {
+   "model": "wildcatter:block/power_transformer/p160"
+  },
+  "facing=north,piece=161": {
+   "model": "wildcatter:block/power_transformer/p161"
+  },
+  "facing=north,piece=162": {
+   "model": "wildcatter:block/power_transformer/p162"
+  },
+  "facing=north,piece=163": {
+   "model": "wildcatter:block/power_transformer/p163"
+  },
+  "facing=north,piece=164": {
+   "model": "wildcatter:block/power_transformer/p164"
+  },
+  "facing=north,piece=165": {
+   "model": "wildcatter:block/power_transformer/p165"
+  },
+  "facing=north,piece=166": {
+   "model": "wildcatter:block/power_transformer/p166"
+  },
+  "facing=north,piece=167": {
+   "model": "wildcatter:block/power_transformer/p167"
+  },
+  "facing=north,piece=168": {
+   "model": "wildcatter:block/power_transformer/p168"
+  },
+  "facing=north,piece=169": {
+   "model": "wildcatter:block/power_transformer/p169"
+  },
+  "facing=north,piece=170": {
+   "model": "wildcatter:block/power_transformer/p170"
+  },
+  "facing=north,piece=171": {
+   "model": "wildcatter:block/power_transformer/p171"
+  },
+  "facing=north,piece=172": {
+   "model": "wildcatter:block/power_transformer/p172"
+  },
+  "facing=north,piece=173": {
+   "model": "wildcatter:block/power_transformer/p173"
+  },
+  "facing=north,piece=174": {
+   "model": "wildcatter:block/power_transformer/p174"
+  },
+  "facing=north,piece=175": {
+   "model": "wildcatter:block/power_transformer/p175"
+  },
+  "facing=north,piece=176": {
+   "model": "wildcatter:block/power_transformer/p176"
+  },
+  "facing=north,piece=177": {
+   "model": "wildcatter:block/power_transformer/p177"
+  },
+  "facing=north,piece=178": {
+   "model": "wildcatter:block/power_transformer/p178"
+  },
+  "facing=north,piece=179": {
+   "model": "wildcatter:block/power_transformer/p179"
+  },
+  "facing=north,piece=180": {
+   "model": "wildcatter:block/power_transformer/p180"
+  },
+  "facing=north,piece=181": {
+   "model": "wildcatter:block/power_transformer/p181"
+  },
+  "facing=north,piece=182": {
+   "model": "wildcatter:block/power_transformer/p182"
+  },
+  "facing=north,piece=183": {
+   "model": "wildcatter:block/power_transformer/p183"
+  },
+  "facing=north,piece=184": {
+   "model": "wildcatter:block/power_transformer/p184"
+  },
+  "facing=north,piece=185": {
+   "model": "wildcatter:block/power_transformer/p185"
+  },
+  "facing=north,piece=186": {
+   "model": "wildcatter:block/power_transformer/p186"
+  },
+  "facing=north,piece=187": {
+   "model": "wildcatter:block/power_transformer/p187"
+  },
+  "facing=north,piece=188": {
+   "model": "wildcatter:block/power_transformer/p188"
+  },
+  "facing=north,piece=189": {
+   "model": "wildcatter:block/power_transformer/p189"
+  },
+  "facing=north,piece=190": {
+   "model": "wildcatter:block/power_transformer/p190"
+  },
+  "facing=north,piece=191": {
+   "model": "wildcatter:block/power_transformer/p191"
+  },
+  "facing=north,piece=192": {
+   "model": "wildcatter:block/power_transformer/p192"
+  },
+  "facing=north,piece=193": {
+   "model": "wildcatter:block/power_transformer/p193"
+  },
+  "facing=north,piece=194": {
+   "model": "wildcatter:block/power_transformer/p194"
+  },
+  "facing=north,piece=195": {
+   "model": "wildcatter:block/power_transformer/p195"
+  },
+  "facing=north,piece=196": {
+   "model": "wildcatter:block/power_transformer/p196"
+  },
+  "facing=north,piece=197": {
+   "model": "wildcatter:block/power_transformer/p197"
+  },
+  "facing=north,piece=198": {
+   "model": "wildcatter:block/power_transformer/p198"
+  },
+  "facing=north,piece=199": {
+   "model": "wildcatter:block/power_transformer/p199"
+  },
+  "facing=north,piece=200": {
+   "model": "wildcatter:block/power_transformer/p200"
+  },
+  "facing=north,piece=201": {
+   "model": "wildcatter:block/power_transformer/p201"
+  },
+  "facing=north,piece=202": {
+   "model": "wildcatter:block/power_transformer/p202"
+  },
+  "facing=north,piece=203": {
+   "model": "wildcatter:block/power_transformer/p203"
+  },
+  "facing=north,piece=204": {
+   "model": "wildcatter:block/power_transformer/p204"
+  },
+  "facing=north,piece=205": {
+   "model": "wildcatter:block/power_transformer/p205"
+  },
+  "facing=north,piece=206": {
+   "model": "wildcatter:block/power_transformer/p206"
+  },
+  "facing=north,piece=207": {
+   "model": "wildcatter:block/power_transformer/p207"
+  },
+  "facing=north,piece=208": {
+   "model": "wildcatter:block/power_transformer/p208"
+  },
+  "facing=north,piece=209": {
+   "model": "wildcatter:block/power_transformer/p209"
+  },
+  "facing=east,piece=0": {
+   "model": "wildcatter:block/power_transformer/p0",
+   "y": 90
+  },
+  "facing=east,piece=1": {
+   "model": "wildcatter:block/power_transformer/p1",
+   "y": 90
+  },
+  "facing=east,piece=2": {
+   "model": "wildcatter:block/power_transformer/p2",
+   "y": 90
+  },
+  "facing=east,piece=3": {
+   "model": "wildcatter:block/power_transformer/p3",
+   "y": 90
+  },
+  "facing=east,piece=4": {
+   "model": "wildcatter:block/power_transformer/p4",
+   "y": 90
+  },
+  "facing=east,piece=5": {
+   "model": "wildcatter:block/power_transformer/p5",
+   "y": 90
+  },
+  "facing=east,piece=6": {
+   "model": "wildcatter:block/power_transformer/p6",
+   "y": 90
+  },
+  "facing=east,piece=7": {
+   "model": "wildcatter:block/power_transformer/p7",
+   "y": 90
+  },
+  "facing=east,piece=8": {
+   "model": "wildcatter:block/power_transformer/p8",
+   "y": 90
+  },
+  "facing=east,piece=9": {
+   "model": "wildcatter:block/power_transformer/p9",
+   "y": 90
+  },
+  "facing=east,piece=10": {
+   "model": "wildcatter:block/power_transformer/p10",
+   "y": 90
+  },
+  "facing=east,piece=11": {
+   "model": "wildcatter:block/power_transformer/p11",
+   "y": 90
+  },
+  "facing=east,piece=12": {
+   "model": "wildcatter:block/power_transformer/p12",
+   "y": 90
+  },
+  "facing=east,piece=13": {
+   "model": "wildcatter:block/power_transformer/p13",
+   "y": 90
+  },
+  "facing=east,piece=14": {
+   "model": "wildcatter:block/power_transformer/p14",
+   "y": 90
+  },
+  "facing=east,piece=15": {
+   "model": "wildcatter:block/power_transformer/p15",
+   "y": 90
+  },
+  "facing=east,piece=16": {
+   "model": "wildcatter:block/power_transformer/p16",
+   "y": 90
+  },
+  "facing=east,piece=17": {
+   "model": "wildcatter:block/power_transformer/p17",
+   "y": 90
+  },
+  "facing=east,piece=18": {
+   "model": "wildcatter:block/power_transformer/p18",
+   "y": 90
+  },
+  "facing=east,piece=19": {
+   "model": "wildcatter:block/power_transformer/p19",
+   "y": 90
+  },
+  "facing=east,piece=20": {
+   "model": "wildcatter:block/power_transformer/p20",
+   "y": 90
+  },
+  "facing=east,piece=21": {
+   "model": "wildcatter:block/power_transformer/p21",
+   "y": 90
+  },
+  "facing=east,piece=22": {
+   "model": "wildcatter:block/power_transformer/p22",
+   "y": 90
+  },
+  "facing=east,piece=23": {
+   "model": "wildcatter:block/power_transformer/p23",
+   "y": 90
+  },
+  "facing=east,piece=24": {
+   "model": "wildcatter:block/power_transformer/p24",
+   "y": 90
+  },
+  "facing=east,piece=25": {
+   "model": "wildcatter:block/power_transformer/p25",
+   "y": 90
+  },
+  "facing=east,piece=26": {
+   "model": "wildcatter:block/power_transformer/p26",
+   "y": 90
+  },
+  "facing=east,piece=27": {
+   "model": "wildcatter:block/power_transformer/p27",
+   "y": 90
+  },
+  "facing=east,piece=28": {
+   "model": "wildcatter:block/power_transformer/p28",
+   "y": 90
+  },
+  "facing=east,piece=29": {
+   "model": "wildcatter:block/power_transformer/p29",
+   "y": 90
+  },
+  "facing=east,piece=30": {
+   "model": "wildcatter:block/power_transformer/p30",
+   "y": 90
+  },
+  "facing=east,piece=31": {
+   "model": "wildcatter:block/power_transformer/p31",
+   "y": 90
+  },
+  "facing=east,piece=32": {
+   "model": "wildcatter:block/power_transformer/p32",
+   "y": 90
+  },
+  "facing=east,piece=33": {
+   "model": "wildcatter:block/power_transformer/p33",
+   "y": 90
+  },
+  "facing=east,piece=34": {
+   "model": "wildcatter:block/power_transformer/p34",
+   "y": 90
+  },
+  "facing=east,piece=35": {
+   "model": "wildcatter:block/power_transformer/p35",
+   "y": 90
+  },
+  "facing=east,piece=36": {
+   "model": "wildcatter:block/power_transformer/p36",
+   "y": 90
+  },
+  "facing=east,piece=37": {
+   "model": "wildcatter:block/power_transformer/p37",
+   "y": 90
+  },
+  "facing=east,piece=38": {
+   "model": "wildcatter:block/power_transformer/p38",
+   "y": 90
+  },
+  "facing=east,piece=39": {
+   "model": "wildcatter:block/power_transformer/p39",
+   "y": 90
+  },
+  "facing=east,piece=40": {
+   "model": "wildcatter:block/power_transformer/p40",
+   "y": 90
+  },
+  "facing=east,piece=41": {
+   "model": "wildcatter:block/power_transformer/p41",
+   "y": 90
+  },
+  "facing=east,piece=42": {
+   "model": "wildcatter:block/power_transformer/p42",
+   "y": 90
+  },
+  "facing=east,piece=43": {
+   "model": "wildcatter:block/power_transformer/p43",
+   "y": 90
+  },
+  "facing=east,piece=44": {
+   "model": "wildcatter:block/power_transformer/p44",
+   "y": 90
+  },
+  "facing=east,piece=45": {
+   "model": "wildcatter:block/power_transformer/p45",
+   "y": 90
+  },
+  "facing=east,piece=46": {
+   "model": "wildcatter:block/power_transformer/p46",
+   "y": 90
+  },
+  "facing=east,piece=47": {
+   "model": "wildcatter:block/power_transformer/p47",
+   "y": 90
+  },
+  "facing=east,piece=48": {
+   "model": "wildcatter:block/power_transformer/p48",
+   "y": 90
+  },
+  "facing=east,piece=49": {
+   "model": "wildcatter:block/power_transformer/p49",
+   "y": 90
+  },
+  "facing=east,piece=50": {
+   "model": "wildcatter:block/power_transformer/p50",
+   "y": 90
+  },
+  "facing=east,piece=51": {
+   "model": "wildcatter:block/power_transformer/p51",
+   "y": 90
+  },
+  "facing=east,piece=52": {
+   "model": "wildcatter:block/power_transformer/p52",
+   "y": 90
+  },
+  "facing=east,piece=53": {
+   "model": "wildcatter:block/power_transformer/p53",
+   "y": 90
+  },
+  "facing=east,piece=54": {
+   "model": "wildcatter:block/power_transformer/p54",
+   "y": 90
+  },
+  "facing=east,piece=55": {
+   "model": "wildcatter:block/power_transformer/p55",
+   "y": 90
+  },
+  "facing=east,piece=56": {
+   "model": "wildcatter:block/power_transformer/p56",
+   "y": 90
+  },
+  "facing=east,piece=57": {
+   "model": "wildcatter:block/power_transformer/p57",
+   "y": 90
+  },
+  "facing=east,piece=58": {
+   "model": "wildcatter:block/power_transformer/p58",
+   "y": 90
+  },
+  "facing=east,piece=59": {
+   "model": "wildcatter:block/power_transformer/p59",
+   "y": 90
+  },
+  "facing=east,piece=60": {
+   "model": "wildcatter:block/power_transformer/p60",
+   "y": 90
+  },
+  "facing=east,piece=61": {
+   "model": "wildcatter:block/power_transformer/p61",
+   "y": 90
+  },
+  "facing=east,piece=62": {
+   "model": "wildcatter:block/power_transformer/p62",
+   "y": 90
+  },
+  "facing=east,piece=63": {
+   "model": "wildcatter:block/power_transformer/p63",
+   "y": 90
+  },
+  "facing=east,piece=64": {
+   "model": "wildcatter:block/power_transformer/p64",
+   "y": 90
+  },
+  "facing=east,piece=65": {
+   "model": "wildcatter:block/power_transformer/p65",
+   "y": 90
+  },
+  "facing=east,piece=66": {
+   "model": "wildcatter:block/power_transformer/p66",
+   "y": 90
+  },
+  "facing=east,piece=67": {
+   "model": "wildcatter:block/power_transformer/p67",
+   "y": 90
+  },
+  "facing=east,piece=68": {
+   "model": "wildcatter:block/power_transformer/p68",
+   "y": 90
+  },
+  "facing=east,piece=69": {
+   "model": "wildcatter:block/power_transformer/p69",
+   "y": 90
+  },
+  "facing=east,piece=70": {
+   "model": "wildcatter:block/power_transformer/p70",
+   "y": 90
+  },
+  "facing=east,piece=71": {
+   "model": "wildcatter:block/power_transformer/p71",
+   "y": 90
+  },
+  "facing=east,piece=72": {
+   "model": "wildcatter:block/power_transformer/p72",
+   "y": 90
+  },
+  "facing=east,piece=73": {
+   "model": "wildcatter:block/power_transformer/p73",
+   "y": 90
+  },
+  "facing=east,piece=74": {
+   "model": "wildcatter:block/power_transformer/p74",
+   "y": 90
+  },
+  "facing=east,piece=75": {
+   "model": "wildcatter:block/power_transformer/p75",
+   "y": 90
+  },
+  "facing=east,piece=76": {
+   "model": "wildcatter:block/power_transformer/p76",
+   "y": 90
+  },
+  "facing=east,piece=77": {
+   "model": "wildcatter:block/power_transformer/p77",
+   "y": 90
+  },
+  "facing=east,piece=78": {
+   "model": "wildcatter:block/power_transformer/p78",
+   "y": 90
+  },
+  "facing=east,piece=79": {
+   "model": "wildcatter:block/power_transformer/p79",
+   "y": 90
+  },
+  "facing=east,piece=80": {
+   "model": "wildcatter:block/power_transformer/p80",
+   "y": 90
+  },
+  "facing=east,piece=81": {
+   "model": "wildcatter:block/power_transformer/p81",
+   "y": 90
+  },
+  "facing=east,piece=82": {
+   "model": "wildcatter:block/power_transformer/p82",
+   "y": 90
+  },
+  "facing=east,piece=83": {
+   "model": "wildcatter:block/power_transformer/p83",
+   "y": 90
+  },
+  "facing=east,piece=84": {
+   "model": "wildcatter:block/power_transformer/p84",
+   "y": 90
+  },
+  "facing=east,piece=85": {
+   "model": "wildcatter:block/power_transformer/p85",
+   "y": 90
+  },
+  "facing=east,piece=86": {
+   "model": "wildcatter:block/power_transformer/p86",
+   "y": 90
+  },
+  "facing=east,piece=87": {
+   "model": "wildcatter:block/power_transformer/p87",
+   "y": 90
+  },
+  "facing=east,piece=88": {
+   "model": "wildcatter:block/power_transformer/p88",
+   "y": 90
+  },
+  "facing=east,piece=89": {
+   "model": "wildcatter:block/power_transformer/p89",
+   "y": 90
+  },
+  "facing=east,piece=90": {
+   "model": "wildcatter:block/power_transformer/p90",
+   "y": 90
+  },
+  "facing=east,piece=91": {
+   "model": "wildcatter:block/power_transformer/p91",
+   "y": 90
+  },
+  "facing=east,piece=92": {
+   "model": "wildcatter:block/power_transformer/p92",
+   "y": 90
+  },
+  "facing=east,piece=93": {
+   "model": "wildcatter:block/power_transformer/p93",
+   "y": 90
+  },
+  "facing=east,piece=94": {
+   "model": "wildcatter:block/power_transformer/p94",
+   "y": 90
+  },
+  "facing=east,piece=95": {
+   "model": "wildcatter:block/power_transformer/p95",
+   "y": 90
+  },
+  "facing=east,piece=96": {
+   "model": "wildcatter:block/power_transformer/p96",
+   "y": 90
+  },
+  "facing=east,piece=97": {
+   "model": "wildcatter:block/power_transformer/p97",
+   "y": 90
+  },
+  "facing=east,piece=98": {
+   "model": "wildcatter:block/power_transformer/p98",
+   "y": 90
+  },
+  "facing=east,piece=99": {
+   "model": "wildcatter:block/power_transformer/p99",
+   "y": 90
+  },
+  "facing=east,piece=100": {
+   "model": "wildcatter:block/power_transformer/p100",
+   "y": 90
+  },
+  "facing=east,piece=101": {
+   "model": "wildcatter:block/power_transformer/p101",
+   "y": 90
+  },
+  "facing=east,piece=102": {
+   "model": "wildcatter:block/power_transformer/p102",
+   "y": 90
+  },
+  "facing=east,piece=103": {
+   "model": "wildcatter:block/power_transformer/p103",
+   "y": 90
+  },
+  "facing=east,piece=104": {
+   "model": "wildcatter:block/power_transformer/p104",
+   "y": 90
+  },
+  "facing=east,piece=105": {
+   "model": "wildcatter:block/power_transformer/p105",
+   "y": 90
+  },
+  "facing=east,piece=106": {
+   "model": "wildcatter:block/power_transformer/p106",
+   "y": 90
+  },
+  "facing=east,piece=107": {
+   "model": "wildcatter:block/power_transformer/p107",
+   "y": 90
+  },
+  "facing=east,piece=108": {
+   "model": "wildcatter:block/power_transformer/p108",
+   "y": 90
+  },
+  "facing=east,piece=109": {
+   "model": "wildcatter:block/power_transformer/p109",
+   "y": 90
+  },
+  "facing=east,piece=110": {
+   "model": "wildcatter:block/power_transformer/p110",
+   "y": 90
+  },
+  "facing=east,piece=111": {
+   "model": "wildcatter:block/power_transformer/p111",
+   "y": 90
+  },
+  "facing=east,piece=112": {
+   "model": "wildcatter:block/power_transformer/p112",
+   "y": 90
+  },
+  "facing=east,piece=113": {
+   "model": "wildcatter:block/power_transformer/p113",
+   "y": 90
+  },
+  "facing=east,piece=114": {
+   "model": "wildcatter:block/power_transformer/p114",
+   "y": 90
+  },
+  "facing=east,piece=115": {
+   "model": "wildcatter:block/power_transformer/p115",
+   "y": 90
+  },
+  "facing=east,piece=116": {
+   "model": "wildcatter:block/power_transformer/p116",
+   "y": 90
+  },
+  "facing=east,piece=117": {
+   "model": "wildcatter:block/power_transformer/p117",
+   "y": 90
+  },
+  "facing=east,piece=118": {
+   "model": "wildcatter:block/power_transformer/p118",
+   "y": 90
+  },
+  "facing=east,piece=119": {
+   "model": "wildcatter:block/power_transformer/p119",
+   "y": 90
+  },
+  "facing=east,piece=120": {
+   "model": "wildcatter:block/power_transformer/p120",
+   "y": 90
+  },
+  "facing=east,piece=121": {
+   "model": "wildcatter:block/power_transformer/p121",
+   "y": 90
+  },
+  "facing=east,piece=122": {
+   "model": "wildcatter:block/power_transformer/p122",
+   "y": 90
+  },
+  "facing=east,piece=123": {
+   "model": "wildcatter:block/power_transformer/p123",
+   "y": 90
+  },
+  "facing=east,piece=124": {
+   "model": "wildcatter:block/power_transformer/p124",
+   "y": 90
+  },
+  "facing=east,piece=125": {
+   "model": "wildcatter:block/power_transformer/p125",
+   "y": 90
+  },
+  "facing=east,piece=126": {
+   "model": "wildcatter:block/power_transformer/p126",
+   "y": 90
+  },
+  "facing=east,piece=127": {
+   "model": "wildcatter:block/power_transformer/p127",
+   "y": 90
+  },
+  "facing=east,piece=128": {
+   "model": "wildcatter:block/power_transformer/p128",
+   "y": 90
+  },
+  "facing=east,piece=129": {
+   "model": "wildcatter:block/power_transformer/p129",
+   "y": 90
+  },
+  "facing=east,piece=130": {
+   "model": "wildcatter:block/power_transformer/p130",
+   "y": 90
+  },
+  "facing=east,piece=131": {
+   "model": "wildcatter:block/power_transformer/p131",
+   "y": 90
+  },
+  "facing=east,piece=132": {
+   "model": "wildcatter:block/power_transformer/p132",
+   "y": 90
+  },
+  "facing=east,piece=133": {
+   "model": "wildcatter:block/power_transformer/p133",
+   "y": 90
+  },
+  "facing=east,piece=134": {
+   "model": "wildcatter:block/power_transformer/p134",
+   "y": 90
+  },
+  "facing=east,piece=135": {
+   "model": "wildcatter:block/power_transformer/p135",
+   "y": 90
+  },
+  "facing=east,piece=136": {
+   "model": "wildcatter:block/power_transformer/p136",
+   "y": 90
+  },
+  "facing=east,piece=137": {
+   "model": "wildcatter:block/power_transformer/p137",
+   "y": 90
+  },
+  "facing=east,piece=138": {
+   "model": "wildcatter:block/power_transformer/p138",
+   "y": 90
+  },
+  "facing=east,piece=139": {
+   "model": "wildcatter:block/power_transformer/p139",
+   "y": 90
+  },
+  "facing=east,piece=140": {
+   "model": "wildcatter:block/power_transformer/p140",
+   "y": 90
+  },
+  "facing=east,piece=141": {
+   "model": "wildcatter:block/power_transformer/p141",
+   "y": 90
+  },
+  "facing=east,piece=142": {
+   "model": "wildcatter:block/power_transformer/p142",
+   "y": 90
+  },
+  "facing=east,piece=143": {
+   "model": "wildcatter:block/power_transformer/p143",
+   "y": 90
+  },
+  "facing=east,piece=144": {
+   "model": "wildcatter:block/power_transformer/p144",
+   "y": 90
+  },
+  "facing=east,piece=145": {
+   "model": "wildcatter:block/power_transformer/p145",
+   "y": 90
+  },
+  "facing=east,piece=146": {
+   "model": "wildcatter:block/power_transformer/p146",
+   "y": 90
+  },
+  "facing=east,piece=147": {
+   "model": "wildcatter:block/power_transformer/p147",
+   "y": 90
+  },
+  "facing=east,piece=148": {
+   "model": "wildcatter:block/power_transformer/p148",
+   "y": 90
+  },
+  "facing=east,piece=149": {
+   "model": "wildcatter:block/power_transformer/p149",
+   "y": 90
+  },
+  "facing=east,piece=150": {
+   "model": "wildcatter:block/power_transformer/p150",
+   "y": 90
+  },
+  "facing=east,piece=151": {
+   "model": "wildcatter:block/power_transformer/p151",
+   "y": 90
+  },
+  "facing=east,piece=152": {
+   "model": "wildcatter:block/power_transformer/p152",
+   "y": 90
+  },
+  "facing=east,piece=153": {
+   "model": "wildcatter:block/power_transformer/p153",
+   "y": 90
+  },
+  "facing=east,piece=154": {
+   "model": "wildcatter:block/power_transformer/p154",
+   "y": 90
+  },
+  "facing=east,piece=155": {
+   "model": "wildcatter:block/power_transformer/p155",
+   "y": 90
+  },
+  "facing=east,piece=156": {
+   "model": "wildcatter:block/power_transformer/p156",
+   "y": 90
+  },
+  "facing=east,piece=157": {
+   "model": "wildcatter:block/power_transformer/p157",
+   "y": 90
+  },
+  "facing=east,piece=158": {
+   "model": "wildcatter:block/power_transformer/p158",
+   "y": 90
+  },
+  "facing=east,piece=159": {
+   "model": "wildcatter:block/power_transformer/p159",
+   "y": 90
+  },
+  "facing=east,piece=160": {
+   "model": "wildcatter:block/power_transformer/p160",
+   "y": 90
+  },
+  "facing=east,piece=161": {
+   "model": "wildcatter:block/power_transformer/p161",
+   "y": 90
+  },
+  "facing=east,piece=162": {
+   "model": "wildcatter:block/power_transformer/p162",
+   "y": 90
+  },
+  "facing=east,piece=163": {
+   "model": "wildcatter:block/power_transformer/p163",
+   "y": 90
+  },
+  "facing=east,piece=164": {
+   "model": "wildcatter:block/power_transformer/p164",
+   "y": 90
+  },
+  "facing=east,piece=165": {
+   "model": "wildcatter:block/power_transformer/p165",
+   "y": 90
+  },
+  "facing=east,piece=166": {
+   "model": "wildcatter:block/power_transformer/p166",
+   "y": 90
+  },
+  "facing=east,piece=167": {
+   "model": "wildcatter:block/power_transformer/p167",
+   "y": 90
+  },
+  "facing=east,piece=168": {
+   "model": "wildcatter:block/power_transformer/p168",
+   "y": 90
+  },
+  "facing=east,piece=169": {
+   "model": "wildcatter:block/power_transformer/p169",
+   "y": 90
+  },
+  "facing=east,piece=170": {
+   "model": "wildcatter:block/power_transformer/p170",
+   "y": 90
+  },
+  "facing=east,piece=171": {
+   "model": "wildcatter:block/power_transformer/p171",
+   "y": 90
+  },
+  "facing=east,piece=172": {
+   "model": "wildcatter:block/power_transformer/p172",
+   "y": 90
+  },
+  "facing=east,piece=173": {
+   "model": "wildcatter:block/power_transformer/p173",
+   "y": 90
+  },
+  "facing=east,piece=174": {
+   "model": "wildcatter:block/power_transformer/p174",
+   "y": 90
+  },
+  "facing=east,piece=175": {
+   "model": "wildcatter:block/power_transformer/p175",
+   "y": 90
+  },
+  "facing=east,piece=176": {
+   "model": "wildcatter:block/power_transformer/p176",
+   "y": 90
+  },
+  "facing=east,piece=177": {
+   "model": "wildcatter:block/power_transformer/p177",
+   "y": 90
+  },
+  "facing=east,piece=178": {
+   "model": "wildcatter:block/power_transformer/p178",
+   "y": 90
+  },
+  "facing=east,piece=179": {
+   "model": "wildcatter:block/power_transformer/p179",
+   "y": 90
+  },
+  "facing=east,piece=180": {
+   "model": "wildcatter:block/power_transformer/p180",
+   "y": 90
+  },
+  "facing=east,piece=181": {
+   "model": "wildcatter:block/power_transformer/p181",
+   "y": 90
+  },
+  "facing=east,piece=182": {
+   "model": "wildcatter:block/power_transformer/p182",
+   "y": 90
+  },
+  "facing=east,piece=183": {
+   "model": "wildcatter:block/power_transformer/p183",
+   "y": 90
+  },
+  "facing=east,piece=184": {
+   "model": "wildcatter:block/power_transformer/p184",
+   "y": 90
+  },
+  "facing=east,piece=185": {
+   "model": "wildcatter:block/power_transformer/p185",
+   "y": 90
+  },
+  "facing=east,piece=186": {
+   "model": "wildcatter:block/power_transformer/p186",
+   "y": 90
+  },
+  "facing=east,piece=187": {
+   "model": "wildcatter:block/power_transformer/p187",
+   "y": 90
+  },
+  "facing=east,piece=188": {
+   "model": "wildcatter:block/power_transformer/p188",
+   "y": 90
+  },
+  "facing=east,piece=189": {
+   "model": "wildcatter:block/power_transformer/p189",
+   "y": 90
+  },
+  "facing=east,piece=190": {
+   "model": "wildcatter:block/power_transformer/p190",
+   "y": 90
+  },
+  "facing=east,piece=191": {
+   "model": "wildcatter:block/power_transformer/p191",
+   "y": 90
+  },
+  "facing=east,piece=192": {
+   "model": "wildcatter:block/power_transformer/p192",
+   "y": 90
+  },
+  "facing=east,piece=193": {
+   "model": "wildcatter:block/power_transformer/p193",
+   "y": 90
+  },
+  "facing=east,piece=194": {
+   "model": "wildcatter:block/power_transformer/p194",
+   "y": 90
+  },
+  "facing=east,piece=195": {
+   "model": "wildcatter:block/power_transformer/p195",
+   "y": 90
+  },
+  "facing=east,piece=196": {
+   "model": "wildcatter:block/power_transformer/p196",
+   "y": 90
+  },
+  "facing=east,piece=197": {
+   "model": "wildcatter:block/power_transformer/p197",
+   "y": 90
+  },
+  "facing=east,piece=198": {
+   "model": "wildcatter:block/power_transformer/p198",
+   "y": 90
+  },
+  "facing=east,piece=199": {
+   "model": "wildcatter:block/power_transformer/p199",
+   "y": 90
+  },
+  "facing=east,piece=200": {
+   "model": "wildcatter:block/power_transformer/p200",
+   "y": 90
+  },
+  "facing=east,piece=201": {
+   "model": "wildcatter:block/power_transformer/p201",
+   "y": 90
+  },
+  "facing=east,piece=202": {
+   "model": "wildcatter:block/power_transformer/p202",
+   "y": 90
+  },
+  "facing=east,piece=203": {
+   "model": "wildcatter:block/power_transformer/p203",
+   "y": 90
+  },
+  "facing=east,piece=204": {
+   "model": "wildcatter:block/power_transformer/p204",
+   "y": 90
+  },
+  "facing=east,piece=205": {
+   "model": "wildcatter:block/power_transformer/p205",
+   "y": 90
+  },
+  "facing=east,piece=206": {
+   "model": "wildcatter:block/power_transformer/p206",
+   "y": 90
+  },
+  "facing=east,piece=207": {
+   "model": "wildcatter:block/power_transformer/p207",
+   "y": 90
+  },
+  "facing=east,piece=208": {
+   "model": "wildcatter:block/power_transformer/p208",
+   "y": 90
+  },
+  "facing=east,piece=209": {
+   "model": "wildcatter:block/power_transformer/p209",
+   "y": 90
+  },
+  "facing=south,piece=0": {
+   "model": "wildcatter:block/power_transformer/p0",
+   "y": 180
+  },
+  "facing=south,piece=1": {
+   "model": "wildcatter:block/power_transformer/p1",
+   "y": 180
+  },
+  "facing=south,piece=2": {
+   "model": "wildcatter:block/power_transformer/p2",
+   "y": 180
+  },
+  "facing=south,piece=3": {
+   "model": "wildcatter:block/power_transformer/p3",
+   "y": 180
+  },
+  "facing=south,piece=4": {
+   "model": "wildcatter:block/power_transformer/p4",
+   "y": 180
+  },
+  "facing=south,piece=5": {
+   "model": "wildcatter:block/power_transformer/p5",
+   "y": 180
+  },
+  "facing=south,piece=6": {
+   "model": "wildcatter:block/power_transformer/p6",
+   "y": 180
+  },
+  "facing=south,piece=7": {
+   "model": "wildcatter:block/power_transformer/p7",
+   "y": 180
+  },
+  "facing=south,piece=8": {
+   "model": "wildcatter:block/power_transformer/p8",
+   "y": 180
+  },
+  "facing=south,piece=9": {
+   "model": "wildcatter:block/power_transformer/p9",
+   "y": 180
+  },
+  "facing=south,piece=10": {
+   "model": "wildcatter:block/power_transformer/p10",
+   "y": 180
+  },
+  "facing=south,piece=11": {
+   "model": "wildcatter:block/power_transformer/p11",
+   "y": 180
+  },
+  "facing=south,piece=12": {
+   "model": "wildcatter:block/power_transformer/p12",
+   "y": 180
+  },
+  "facing=south,piece=13": {
+   "model": "wildcatter:block/power_transformer/p13",
+   "y": 180
+  },
+  "facing=south,piece=14": {
+   "model": "wildcatter:block/power_transformer/p14",
+   "y": 180
+  },
+  "facing=south,piece=15": {
+   "model": "wildcatter:block/power_transformer/p15",
+   "y": 180
+  },
+  "facing=south,piece=16": {
+   "model": "wildcatter:block/power_transformer/p16",
+   "y": 180
+  },
+  "facing=south,piece=17": {
+   "model": "wildcatter:block/power_transformer/p17",
+   "y": 180
+  },
+  "facing=south,piece=18": {
+   "model": "wildcatter:block/power_transformer/p18",
+   "y": 180
+  },
+  "facing=south,piece=19": {
+   "model": "wildcatter:block/power_transformer/p19",
+   "y": 180
+  },
+  "facing=south,piece=20": {
+   "model": "wildcatter:block/power_transformer/p20",
+   "y": 180
+  },
+  "facing=south,piece=21": {
+   "model": "wildcatter:block/power_transformer/p21",
+   "y": 180
+  },
+  "facing=south,piece=22": {
+   "model": "wildcatter:block/power_transformer/p22",
+   "y": 180
+  },
+  "facing=south,piece=23": {
+   "model": "wildcatter:block/power_transformer/p23",
+   "y": 180
+  },
+  "facing=south,piece=24": {
+   "model": "wildcatter:block/power_transformer/p24",
+   "y": 180
+  },
+  "facing=south,piece=25": {
+   "model": "wildcatter:block/power_transformer/p25",
+   "y": 180
+  },
+  "facing=south,piece=26": {
+   "model": "wildcatter:block/power_transformer/p26",
+   "y": 180
+  },
+  "facing=south,piece=27": {
+   "model": "wildcatter:block/power_transformer/p27",
+   "y": 180
+  },
+  "facing=south,piece=28": {
+   "model": "wildcatter:block/power_transformer/p28",
+   "y": 180
+  },
+  "facing=south,piece=29": {
+   "model": "wildcatter:block/power_transformer/p29",
+   "y": 180
+  },
+  "facing=south,piece=30": {
+   "model": "wildcatter:block/power_transformer/p30",
+   "y": 180
+  },
+  "facing=south,piece=31": {
+   "model": "wildcatter:block/power_transformer/p31",
+   "y": 180
+  },
+  "facing=south,piece=32": {
+   "model": "wildcatter:block/power_transformer/p32",
+   "y": 180
+  },
+  "facing=south,piece=33": {
+   "model": "wildcatter:block/power_transformer/p33",
+   "y": 180
+  },
+  "facing=south,piece=34": {
+   "model": "wildcatter:block/power_transformer/p34",
+   "y": 180
+  },
+  "facing=south,piece=35": {
+   "model": "wildcatter:block/power_transformer/p35",
+   "y": 180
+  },
+  "facing=south,piece=36": {
+   "model": "wildcatter:block/power_transformer/p36",
+   "y": 180
+  },
+  "facing=south,piece=37": {
+   "model": "wildcatter:block/power_transformer/p37",
+   "y": 180
+  },
+  "facing=south,piece=38": {
+   "model": "wildcatter:block/power_transformer/p38",
+   "y": 180
+  },
+  "facing=south,piece=39": {
+   "model": "wildcatter:block/power_transformer/p39",
+   "y": 180
+  },
+  "facing=south,piece=40": {
+   "model": "wildcatter:block/power_transformer/p40",
+   "y": 180
+  },
+  "facing=south,piece=41": {
+   "model": "wildcatter:block/power_transformer/p41",
+   "y": 180
+  },
+  "facing=south,piece=42": {
+   "model": "wildcatter:block/power_transformer/p42",
+   "y": 180
+  },
+  "facing=south,piece=43": {
+   "model": "wildcatter:block/power_transformer/p43",
+   "y": 180
+  },
+  "facing=south,piece=44": {
+   "model": "wildcatter:block/power_transformer/p44",
+   "y": 180
+  },
+  "facing=south,piece=45": {
+   "model": "wildcatter:block/power_transformer/p45",
+   "y": 180
+  },
+  "facing=south,piece=46": {
+   "model": "wildcatter:block/power_transformer/p46",
+   "y": 180
+  },
+  "facing=south,piece=47": {
+   "model": "wildcatter:block/power_transformer/p47",
+   "y": 180
+  },
+  "facing=south,piece=48": {
+   "model": "wildcatter:block/power_transformer/p48",
+   "y": 180
+  },
+  "facing=south,piece=49": {
+   "model": "wildcatter:block/power_transformer/p49",
+   "y": 180
+  },
+  "facing=south,piece=50": {
+   "model": "wildcatter:block/power_transformer/p50",
+   "y": 180
+  },
+  "facing=south,piece=51": {
+   "model": "wildcatter:block/power_transformer/p51",
+   "y": 180
+  },
+  "facing=south,piece=52": {
+   "model": "wildcatter:block/power_transformer/p52",
+   "y": 180
+  },
+  "facing=south,piece=53": {
+   "model": "wildcatter:block/power_transformer/p53",
+   "y": 180
+  },
+  "facing=south,piece=54": {
+   "model": "wildcatter:block/power_transformer/p54",
+   "y": 180
+  },
+  "facing=south,piece=55": {
+   "model": "wildcatter:block/power_transformer/p55",
+   "y": 180
+  },
+  "facing=south,piece=56": {
+   "model": "wildcatter:block/power_transformer/p56",
+   "y": 180
+  },
+  "facing=south,piece=57": {
+   "model": "wildcatter:block/power_transformer/p57",
+   "y": 180
+  },
+  "facing=south,piece=58": {
+   "model": "wildcatter:block/power_transformer/p58",
+   "y": 180
+  },
+  "facing=south,piece=59": {
+   "model": "wildcatter:block/power_transformer/p59",
+   "y": 180
+  },
+  "facing=south,piece=60": {
+   "model": "wildcatter:block/power_transformer/p60",
+   "y": 180
+  },
+  "facing=south,piece=61": {
+   "model": "wildcatter:block/power_transformer/p61",
+   "y": 180
+  },
+  "facing=south,piece=62": {
+   "model": "wildcatter:block/power_transformer/p62",
+   "y": 180
+  },
+  "facing=south,piece=63": {
+   "model": "wildcatter:block/power_transformer/p63",
+   "y": 180
+  },
+  "facing=south,piece=64": {
+   "model": "wildcatter:block/power_transformer/p64",
+   "y": 180
+  },
+  "facing=south,piece=65": {
+   "model": "wildcatter:block/power_transformer/p65",
+   "y": 180
+  },
+  "facing=south,piece=66": {
+   "model": "wildcatter:block/power_transformer/p66",
+   "y": 180
+  },
+  "facing=south,piece=67": {
+   "model": "wildcatter:block/power_transformer/p67",
+   "y": 180
+  },
+  "facing=south,piece=68": {
+   "model": "wildcatter:block/power_transformer/p68",
+   "y": 180
+  },
+  "facing=south,piece=69": {
+   "model": "wildcatter:block/power_transformer/p69",
+   "y": 180
+  },
+  "facing=south,piece=70": {
+   "model": "wildcatter:block/power_transformer/p70",
+   "y": 180
+  },
+  "facing=south,piece=71": {
+   "model": "wildcatter:block/power_transformer/p71",
+   "y": 180
+  },
+  "facing=south,piece=72": {
+   "model": "wildcatter:block/power_transformer/p72",
+   "y": 180
+  },
+  "facing=south,piece=73": {
+   "model": "wildcatter:block/power_transformer/p73",
+   "y": 180
+  },
+  "facing=south,piece=74": {
+   "model": "wildcatter:block/power_transformer/p74",
+   "y": 180
+  },
+  "facing=south,piece=75": {
+   "model": "wildcatter:block/power_transformer/p75",
+   "y": 180
+  },
+  "facing=south,piece=76": {
+   "model": "wildcatter:block/power_transformer/p76",
+   "y": 180
+  },
+  "facing=south,piece=77": {
+   "model": "wildcatter:block/power_transformer/p77",
+   "y": 180
+  },
+  "facing=south,piece=78": {
+   "model": "wildcatter:block/power_transformer/p78",
+   "y": 180
+  },
+  "facing=south,piece=79": {
+   "model": "wildcatter:block/power_transformer/p79",
+   "y": 180
+  },
+  "facing=south,piece=80": {
+   "model": "wildcatter:block/power_transformer/p80",
+   "y": 180
+  },
+  "facing=south,piece=81": {
+   "model": "wildcatter:block/power_transformer/p81",
+   "y": 180
+  },
+  "facing=south,piece=82": {
+   "model": "wildcatter:block/power_transformer/p82",
+   "y": 180
+  },
+  "facing=south,piece=83": {
+   "model": "wildcatter:block/power_transformer/p83",
+   "y": 180
+  },
+  "facing=south,piece=84": {
+   "model": "wildcatter:block/power_transformer/p84",
+   "y": 180
+  },
+  "facing=south,piece=85": {
+   "model": "wildcatter:block/power_transformer/p85",
+   "y": 180
+  },
+  "facing=south,piece=86": {
+   "model": "wildcatter:block/power_transformer/p86",
+   "y": 180
+  },
+  "facing=south,piece=87": {
+   "model": "wildcatter:block/power_transformer/p87",
+   "y": 180
+  },
+  "facing=south,piece=88": {
+   "model": "wildcatter:block/power_transformer/p88",
+   "y": 180
+  },
+  "facing=south,piece=89": {
+   "model": "wildcatter:block/power_transformer/p89",
+   "y": 180
+  },
+  "facing=south,piece=90": {
+   "model": "wildcatter:block/power_transformer/p90",
+   "y": 180
+  },
+  "facing=south,piece=91": {
+   "model": "wildcatter:block/power_transformer/p91",
+   "y": 180
+  },
+  "facing=south,piece=92": {
+   "model": "wildcatter:block/power_transformer/p92",
+   "y": 180
+  },
+  "facing=south,piece=93": {
+   "model": "wildcatter:block/power_transformer/p93",
+   "y": 180
+  },
+  "facing=south,piece=94": {
+   "model": "wildcatter:block/power_transformer/p94",
+   "y": 180
+  },
+  "facing=south,piece=95": {
+   "model": "wildcatter:block/power_transformer/p95",
+   "y": 180
+  },
+  "facing=south,piece=96": {
+   "model": "wildcatter:block/power_transformer/p96",
+   "y": 180
+  },
+  "facing=south,piece=97": {
+   "model": "wildcatter:block/power_transformer/p97",
+   "y": 180
+  },
+  "facing=south,piece=98": {
+   "model": "wildcatter:block/power_transformer/p98",
+   "y": 180
+  },
+  "facing=south,piece=99": {
+   "model": "wildcatter:block/power_transformer/p99",
+   "y": 180
+  },
+  "facing=south,piece=100": {
+   "model": "wildcatter:block/power_transformer/p100",
+   "y": 180
+  },
+  "facing=south,piece=101": {
+   "model": "wildcatter:block/power_transformer/p101",
+   "y": 180
+  },
+  "facing=south,piece=102": {
+   "model": "wildcatter:block/power_transformer/p102",
+   "y": 180
+  },
+  "facing=south,piece=103": {
+   "model": "wildcatter:block/power_transformer/p103",
+   "y": 180
+  },
+  "facing=south,piece=104": {
+   "model": "wildcatter:block/power_transformer/p104",
+   "y": 180
+  },
+  "facing=south,piece=105": {
+   "model": "wildcatter:block/power_transformer/p105",
+   "y": 180
+  },
+  "facing=south,piece=106": {
+   "model": "wildcatter:block/power_transformer/p106",
+   "y": 180
+  },
+  "facing=south,piece=107": {
+   "model": "wildcatter:block/power_transformer/p107",
+   "y": 180
+  },
+  "facing=south,piece=108": {
+   "model": "wildcatter:block/power_transformer/p108",
+   "y": 180
+  },
+  "facing=south,piece=109": {
+   "model": "wildcatter:block/power_transformer/p109",
+   "y": 180
+  },
+  "facing=south,piece=110": {
+   "model": "wildcatter:block/power_transformer/p110",
+   "y": 180
+  },
+  "facing=south,piece=111": {
+   "model": "wildcatter:block/power_transformer/p111",
+   "y": 180
+  },
+  "facing=south,piece=112": {
+   "model": "wildcatter:block/power_transformer/p112",
+   "y": 180
+  },
+  "facing=south,piece=113": {
+   "model": "wildcatter:block/power_transformer/p113",
+   "y": 180
+  },
+  "facing=south,piece=114": {
+   "model": "wildcatter:block/power_transformer/p114",
+   "y": 180
+  },
+  "facing=south,piece=115": {
+   "model": "wildcatter:block/power_transformer/p115",
+   "y": 180
+  },
+  "facing=south,piece=116": {
+   "model": "wildcatter:block/power_transformer/p116",
+   "y": 180
+  },
+  "facing=south,piece=117": {
+   "model": "wildcatter:block/power_transformer/p117",
+   "y": 180
+  },
+  "facing=south,piece=118": {
+   "model": "wildcatter:block/power_transformer/p118",
+   "y": 180
+  },
+  "facing=south,piece=119": {
+   "model": "wildcatter:block/power_transformer/p119",
+   "y": 180
+  },
+  "facing=south,piece=120": {
+   "model": "wildcatter:block/power_transformer/p120",
+   "y": 180
+  },
+  "facing=south,piece=121": {
+   "model": "wildcatter:block/power_transformer/p121",
+   "y": 180
+  },
+  "facing=south,piece=122": {
+   "model": "wildcatter:block/power_transformer/p122",
+   "y": 180
+  },
+  "facing=south,piece=123": {
+   "model": "wildcatter:block/power_transformer/p123",
+   "y": 180
+  },
+  "facing=south,piece=124": {
+   "model": "wildcatter:block/power_transformer/p124",
+   "y": 180
+  },
+  "facing=south,piece=125": {
+   "model": "wildcatter:block/power_transformer/p125",
+   "y": 180
+  },
+  "facing=south,piece=126": {
+   "model": "wildcatter:block/power_transformer/p126",
+   "y": 180
+  },
+  "facing=south,piece=127": {
+   "model": "wildcatter:block/power_transformer/p127",
+   "y": 180
+  },
+  "facing=south,piece=128": {
+   "model": "wildcatter:block/power_transformer/p128",
+   "y": 180
+  },
+  "facing=south,piece=129": {
+   "model": "wildcatter:block/power_transformer/p129",
+   "y": 180
+  },
+  "facing=south,piece=130": {
+   "model": "wildcatter:block/power_transformer/p130",
+   "y": 180
+  },
+  "facing=south,piece=131": {
+   "model": "wildcatter:block/power_transformer/p131",
+   "y": 180
+  },
+  "facing=south,piece=132": {
+   "model": "wildcatter:block/power_transformer/p132",
+   "y": 180
+  },
+  "facing=south,piece=133": {
+   "model": "wildcatter:block/power_transformer/p133",
+   "y": 180
+  },
+  "facing=south,piece=134": {
+   "model": "wildcatter:block/power_transformer/p134",
+   "y": 180
+  },
+  "facing=south,piece=135": {
+   "model": "wildcatter:block/power_transformer/p135",
+   "y": 180
+  },
+  "facing=south,piece=136": {
+   "model": "wildcatter:block/power_transformer/p136",
+   "y": 180
+  },
+  "facing=south,piece=137": {
+   "model": "wildcatter:block/power_transformer/p137",
+   "y": 180
+  },
+  "facing=south,piece=138": {
+   "model": "wildcatter:block/power_transformer/p138",
+   "y": 180
+  },
+  "facing=south,piece=139": {
+   "model": "wildcatter:block/power_transformer/p139",
+   "y": 180
+  },
+  "facing=south,piece=140": {
+   "model": "wildcatter:block/power_transformer/p140",
+   "y": 180
+  },
+  "facing=south,piece=141": {
+   "model": "wildcatter:block/power_transformer/p141",
+   "y": 180
+  },
+  "facing=south,piece=142": {
+   "model": "wildcatter:block/power_transformer/p142",
+   "y": 180
+  },
+  "facing=south,piece=143": {
+   "model": "wildcatter:block/power_transformer/p143",
+   "y": 180
+  },
+  "facing=south,piece=144": {
+   "model": "wildcatter:block/power_transformer/p144",
+   "y": 180
+  },
+  "facing=south,piece=145": {
+   "model": "wildcatter:block/power_transformer/p145",
+   "y": 180
+  },
+  "facing=south,piece=146": {
+   "model": "wildcatter:block/power_transformer/p146",
+   "y": 180
+  },
+  "facing=south,piece=147": {
+   "model": "wildcatter:block/power_transformer/p147",
+   "y": 180
+  },
+  "facing=south,piece=148": {
+   "model": "wildcatter:block/power_transformer/p148",
+   "y": 180
+  },
+  "facing=south,piece=149": {
+   "model": "wildcatter:block/power_transformer/p149",
+   "y": 180
+  },
+  "facing=south,piece=150": {
+   "model": "wildcatter:block/power_transformer/p150",
+   "y": 180
+  },
+  "facing=south,piece=151": {
+   "model": "wildcatter:block/power_transformer/p151",
+   "y": 180
+  },
+  "facing=south,piece=152": {
+   "model": "wildcatter:block/power_transformer/p152",
+   "y": 180
+  },
+  "facing=south,piece=153": {
+   "model": "wildcatter:block/power_transformer/p153",
+   "y": 180
+  },
+  "facing=south,piece=154": {
+   "model": "wildcatter:block/power_transformer/p154",
+   "y": 180
+  },
+  "facing=south,piece=155": {
+   "model": "wildcatter:block/power_transformer/p155",
+   "y": 180
+  },
+  "facing=south,piece=156": {
+   "model": "wildcatter:block/power_transformer/p156",
+   "y": 180
+  },
+  "facing=south,piece=157": {
+   "model": "wildcatter:block/power_transformer/p157",
+   "y": 180
+  },
+  "facing=south,piece=158": {
+   "model": "wildcatter:block/power_transformer/p158",
+   "y": 180
+  },
+  "facing=south,piece=159": {
+   "model": "wildcatter:block/power_transformer/p159",
+   "y": 180
+  },
+  "facing=south,piece=160": {
+   "model": "wildcatter:block/power_transformer/p160",
+   "y": 180
+  },
+  "facing=south,piece=161": {
+   "model": "wildcatter:block/power_transformer/p161",
+   "y": 180
+  },
+  "facing=south,piece=162": {
+   "model": "wildcatter:block/power_transformer/p162",
+   "y": 180
+  },
+  "facing=south,piece=163": {
+   "model": "wildcatter:block/power_transformer/p163",
+   "y": 180
+  },
+  "facing=south,piece=164": {
+   "model": "wildcatter:block/power_transformer/p164",
+   "y": 180
+  },
+  "facing=south,piece=165": {
+   "model": "wildcatter:block/power_transformer/p165",
+   "y": 180
+  },
+  "facing=south,piece=166": {
+   "model": "wildcatter:block/power_transformer/p166",
+   "y": 180
+  },
+  "facing=south,piece=167": {
+   "model": "wildcatter:block/power_transformer/p167",
+   "y": 180
+  },
+  "facing=south,piece=168": {
+   "model": "wildcatter:block/power_transformer/p168",
+   "y": 180
+  },
+  "facing=south,piece=169": {
+   "model": "wildcatter:block/power_transformer/p169",
+   "y": 180
+  },
+  "facing=south,piece=170": {
+   "model": "wildcatter:block/power_transformer/p170",
+   "y": 180
+  },
+  "facing=south,piece=171": {
+   "model": "wildcatter:block/power_transformer/p171",
+   "y": 180
+  },
+  "facing=south,piece=172": {
+   "model": "wildcatter:block/power_transformer/p172",
+   "y": 180
+  },
+  "facing=south,piece=173": {
+   "model": "wildcatter:block/power_transformer/p173",
+   "y": 180
+  },
+  "facing=south,piece=174": {
+   "model": "wildcatter:block/power_transformer/p174",
+   "y": 180
+  },
+  "facing=south,piece=175": {
+   "model": "wildcatter:block/power_transformer/p175",
+   "y": 180
+  },
+  "facing=south,piece=176": {
+   "model": "wildcatter:block/power_transformer/p176",
+   "y": 180
+  },
+  "facing=south,piece=177": {
+   "model": "wildcatter:block/power_transformer/p177",
+   "y": 180
+  },
+  "facing=south,piece=178": {
+   "model": "wildcatter:block/power_transformer/p178",
+   "y": 180
+  },
+  "facing=south,piece=179": {
+   "model": "wildcatter:block/power_transformer/p179",
+   "y": 180
+  },
+  "facing=south,piece=180": {
+   "model": "wildcatter:block/power_transformer/p180",
+   "y": 180
+  },
+  "facing=south,piece=181": {
+   "model": "wildcatter:block/power_transformer/p181",
+   "y": 180
+  },
+  "facing=south,piece=182": {
+   "model": "wildcatter:block/power_transformer/p182",
+   "y": 180
+  },
+  "facing=south,piece=183": {
+   "model": "wildcatter:block/power_transformer/p183",
+   "y": 180
+  },
+  "facing=south,piece=184": {
+   "model": "wildcatter:block/power_transformer/p184",
+   "y": 180
+  },
+  "facing=south,piece=185": {
+   "model": "wildcatter:block/power_transformer/p185",
+   "y": 180
+  },
+  "facing=south,piece=186": {
+   "model": "wildcatter:block/power_transformer/p186",
+   "y": 180
+  },
+  "facing=south,piece=187": {
+   "model": "wildcatter:block/power_transformer/p187",
+   "y": 180
+  },
+  "facing=south,piece=188": {
+   "model": "wildcatter:block/power_transformer/p188",
+   "y": 180
+  },
+  "facing=south,piece=189": {
+   "model": "wildcatter:block/power_transformer/p189",
+   "y": 180
+  },
+  "facing=south,piece=190": {
+   "model": "wildcatter:block/power_transformer/p190",
+   "y": 180
+  },
+  "facing=south,piece=191": {
+   "model": "wildcatter:block/power_transformer/p191",
+   "y": 180
+  },
+  "facing=south,piece=192": {
+   "model": "wildcatter:block/power_transformer/p192",
+   "y": 180
+  },
+  "facing=south,piece=193": {
+   "model": "wildcatter:block/power_transformer/p193",
+   "y": 180
+  },
+  "facing=south,piece=194": {
+   "model": "wildcatter:block/power_transformer/p194",
+   "y": 180
+  },
+  "facing=south,piece=195": {
+   "model": "wildcatter:block/power_transformer/p195",
+   "y": 180
+  },
+  "facing=south,piece=196": {
+   "model": "wildcatter:block/power_transformer/p196",
+   "y": 180
+  },
+  "facing=south,piece=197": {
+   "model": "wildcatter:block/power_transformer/p197",
+   "y": 180
+  },
+  "facing=south,piece=198": {
+   "model": "wildcatter:block/power_transformer/p198",
+   "y": 180
+  },
+  "facing=south,piece=199": {
+   "model": "wildcatter:block/power_transformer/p199",
+   "y": 180
+  },
+  "facing=south,piece=200": {
+   "model": "wildcatter:block/power_transformer/p200",
+   "y": 180
+  },
+  "facing=south,piece=201": {
+   "model": "wildcatter:block/power_transformer/p201",
+   "y": 180
+  },
+  "facing=south,piece=202": {
+   "model": "wildcatter:block/power_transformer/p202",
+   "y": 180
+  },
+  "facing=south,piece=203": {
+   "model": "wildcatter:block/power_transformer/p203",
+   "y": 180
+  },
+  "facing=south,piece=204": {
+   "model": "wildcatter:block/power_transformer/p204",
+   "y": 180
+  },
+  "facing=south,piece=205": {
+   "model": "wildcatter:block/power_transformer/p205",
+   "y": 180
+  },
+  "facing=south,piece=206": {
+   "model": "wildcatter:block/power_transformer/p206",
+   "y": 180
+  },
+  "facing=south,piece=207": {
+   "model": "wildcatter:block/power_transformer/p207",
+   "y": 180
+  },
+  "facing=south,piece=208": {
+   "model": "wildcatter:block/power_transformer/p208",
+   "y": 180
+  },
+  "facing=south,piece=209": {
+   "model": "wildcatter:block/power_transformer/p209",
+   "y": 180
+  },
+  "facing=west,piece=0": {
+   "model": "wildcatter:block/power_transformer/p0",
+   "y": 270
+  },
+  "facing=west,piece=1": {
+   "model": "wildcatter:block/power_transformer/p1",
+   "y": 270
+  },
+  "facing=west,piece=2": {
+   "model": "wildcatter:block/power_transformer/p2",
+   "y": 270
+  },
+  "facing=west,piece=3": {
+   "model": "wildcatter:block/power_transformer/p3",
+   "y": 270
+  },
+  "facing=west,piece=4": {
+   "model": "wildcatter:block/power_transformer/p4",
+   "y": 270
+  },
+  "facing=west,piece=5": {
+   "model": "wildcatter:block/power_transformer/p5",
+   "y": 270
+  },
+  "facing=west,piece=6": {
+   "model": "wildcatter:block/power_transformer/p6",
+   "y": 270
+  },
+  "facing=west,piece=7": {
+   "model": "wildcatter:block/power_transformer/p7",
+   "y": 270
+  },
+  "facing=west,piece=8": {
+   "model": "wildcatter:block/power_transformer/p8",
+   "y": 270
+  },
+  "facing=west,piece=9": {
+   "model": "wildcatter:block/power_transformer/p9",
+   "y": 270
+  },
+  "facing=west,piece=10": {
+   "model": "wildcatter:block/power_transformer/p10",
+   "y": 270
+  },
+  "facing=west,piece=11": {
+   "model": "wildcatter:block/power_transformer/p11",
+   "y": 270
+  },
+  "facing=west,piece=12": {
+   "model": "wildcatter:block/power_transformer/p12",
+   "y": 270
+  },
+  "facing=west,piece=13": {
+   "model": "wildcatter:block/power_transformer/p13",
+   "y": 270
+  },
+  "facing=west,piece=14": {
+   "model": "wildcatter:block/power_transformer/p14",
+   "y": 270
+  },
+  "facing=west,piece=15": {
+   "model": "wildcatter:block/power_transformer/p15",
+   "y": 270
+  },
+  "facing=west,piece=16": {
+   "model": "wildcatter:block/power_transformer/p16",
+   "y": 270
+  },
+  "facing=west,piece=17": {
+   "model": "wildcatter:block/power_transformer/p17",
+   "y": 270
+  },
+  "facing=west,piece=18": {
+   "model": "wildcatter:block/power_transformer/p18",
+   "y": 270
+  },
+  "facing=west,piece=19": {
+   "model": "wildcatter:block/power_transformer/p19",
+   "y": 270
+  },
+  "facing=west,piece=20": {
+   "model": "wildcatter:block/power_transformer/p20",
+   "y": 270
+  },
+  "facing=west,piece=21": {
+   "model": "wildcatter:block/power_transformer/p21",
+   "y": 270
+  },
+  "facing=west,piece=22": {
+   "model": "wildcatter:block/power_transformer/p22",
+   "y": 270
+  },
+  "facing=west,piece=23": {
+   "model": "wildcatter:block/power_transformer/p23",
+   "y": 270
+  },
+  "facing=west,piece=24": {
+   "model": "wildcatter:block/power_transformer/p24",
+   "y": 270
+  },
+  "facing=west,piece=25": {
+   "model": "wildcatter:block/power_transformer/p25",
+   "y": 270
+  },
+  "facing=west,piece=26": {
+   "model": "wildcatter:block/power_transformer/p26",
+   "y": 270
+  },
+  "facing=west,piece=27": {
+   "model": "wildcatter:block/power_transformer/p27",
+   "y": 270
+  },
+  "facing=west,piece=28": {
+   "model": "wildcatter:block/power_transformer/p28",
+   "y": 270
+  },
+  "facing=west,piece=29": {
+   "model": "wildcatter:block/power_transformer/p29",
+   "y": 270
+  },
+  "facing=west,piece=30": {
+   "model": "wildcatter:block/power_transformer/p30",
+   "y": 270
+  },
+  "facing=west,piece=31": {
+   "model": "wildcatter:block/power_transformer/p31",
+   "y": 270
+  },
+  "facing=west,piece=32": {
+   "model": "wildcatter:block/power_transformer/p32",
+   "y": 270
+  },
+  "facing=west,piece=33": {
+   "model": "wildcatter:block/power_transformer/p33",
+   "y": 270
+  },
+  "facing=west,piece=34": {
+   "model": "wildcatter:block/power_transformer/p34",
+   "y": 270
+  },
+  "facing=west,piece=35": {
+   "model": "wildcatter:block/power_transformer/p35",
+   "y": 270
+  },
+  "facing=west,piece=36": {
+   "model": "wildcatter:block/power_transformer/p36",
+   "y": 270
+  },
+  "facing=west,piece=37": {
+   "model": "wildcatter:block/power_transformer/p37",
+   "y": 270
+  },
+  "facing=west,piece=38": {
+   "model": "wildcatter:block/power_transformer/p38",
+   "y": 270
+  },
+  "facing=west,piece=39": {
+   "model": "wildcatter:block/power_transformer/p39",
+   "y": 270
+  },
+  "facing=west,piece=40": {
+   "model": "wildcatter:block/power_transformer/p40",
+   "y": 270
+  },
+  "facing=west,piece=41": {
+   "model": "wildcatter:block/power_transformer/p41",
+   "y": 270
+  },
+  "facing=west,piece=42": {
+   "model": "wildcatter:block/power_transformer/p42",
+   "y": 270
+  },
+  "facing=west,piece=43": {
+   "model": "wildcatter:block/power_transformer/p43",
+   "y": 270
+  },
+  "facing=west,piece=44": {
+   "model": "wildcatter:block/power_transformer/p44",
+   "y": 270
+  },
+  "facing=west,piece=45": {
+   "model": "wildcatter:block/power_transformer/p45",
+   "y": 270
+  },
+  "facing=west,piece=46": {
+   "model": "wildcatter:block/power_transformer/p46",
+   "y": 270
+  },
+  "facing=west,piece=47": {
+   "model": "wildcatter:block/power_transformer/p47",
+   "y": 270
+  },
+  "facing=west,piece=48": {
+   "model": "wildcatter:block/power_transformer/p48",
+   "y": 270
+  },
+  "facing=west,piece=49": {
+   "model": "wildcatter:block/power_transformer/p49",
+   "y": 270
+  },
+  "facing=west,piece=50": {
+   "model": "wildcatter:block/power_transformer/p50",
+   "y": 270
+  },
+  "facing=west,piece=51": {
+   "model": "wildcatter:block/power_transformer/p51",
+   "y": 270
+  },
+  "facing=west,piece=52": {
+   "model": "wildcatter:block/power_transformer/p52",
+   "y": 270
+  },
+  "facing=west,piece=53": {
+   "model": "wildcatter:block/power_transformer/p53",
+   "y": 270
+  },
+  "facing=west,piece=54": {
+   "model": "wildcatter:block/power_transformer/p54",
+   "y": 270
+  },
+  "facing=west,piece=55": {
+   "model": "wildcatter:block/power_transformer/p55",
+   "y": 270
+  },
+  "facing=west,piece=56": {
+   "model": "wildcatter:block/power_transformer/p56",
+   "y": 270
+  },
+  "facing=west,piece=57": {
+   "model": "wildcatter:block/power_transformer/p57",
+   "y": 270
+  },
+  "facing=west,piece=58": {
+   "model": "wildcatter:block/power_transformer/p58",
+   "y": 270
+  },
+  "facing=west,piece=59": {
+   "model": "wildcatter:block/power_transformer/p59",
+   "y": 270
+  },
+  "facing=west,piece=60": {
+   "model": "wildcatter:block/power_transformer/p60",
+   "y": 270
+  },
+  "facing=west,piece=61": {
+   "model": "wildcatter:block/power_transformer/p61",
+   "y": 270
+  },
+  "facing=west,piece=62": {
+   "model": "wildcatter:block/power_transformer/p62",
+   "y": 270
+  },
+  "facing=west,piece=63": {
+   "model": "wildcatter:block/power_transformer/p63",
+   "y": 270
+  },
+  "facing=west,piece=64": {
+   "model": "wildcatter:block/power_transformer/p64",
+   "y": 270
+  },
+  "facing=west,piece=65": {
+   "model": "wildcatter:block/power_transformer/p65",
+   "y": 270
+  },
+  "facing=west,piece=66": {
+   "model": "wildcatter:block/power_transformer/p66",
+   "y": 270
+  },
+  "facing=west,piece=67": {
+   "model": "wildcatter:block/power_transformer/p67",
+   "y": 270
+  },
+  "facing=west,piece=68": {
+   "model": "wildcatter:block/power_transformer/p68",
+   "y": 270
+  },
+  "facing=west,piece=69": {
+   "model": "wildcatter:block/power_transformer/p69",
+   "y": 270
+  },
+  "facing=west,piece=70": {
+   "model": "wildcatter:block/power_transformer/p70",
+   "y": 270
+  },
+  "facing=west,piece=71": {
+   "model": "wildcatter:block/power_transformer/p71",
+   "y": 270
+  },
+  "facing=west,piece=72": {
+   "model": "wildcatter:block/power_transformer/p72",
+   "y": 270
+  },
+  "facing=west,piece=73": {
+   "model": "wildcatter:block/power_transformer/p73",
+   "y": 270
+  },
+  "facing=west,piece=74": {
+   "model": "wildcatter:block/power_transformer/p74",
+   "y": 270
+  },
+  "facing=west,piece=75": {
+   "model": "wildcatter:block/power_transformer/p75",
+   "y": 270
+  },
+  "facing=west,piece=76": {
+   "model": "wildcatter:block/power_transformer/p76",
+   "y": 270
+  },
+  "facing=west,piece=77": {
+   "model": "wildcatter:block/power_transformer/p77",
+   "y": 270
+  },
+  "facing=west,piece=78": {
+   "model": "wildcatter:block/power_transformer/p78",
+   "y": 270
+  },
+  "facing=west,piece=79": {
+   "model": "wildcatter:block/power_transformer/p79",
+   "y": 270
+  },
+  "facing=west,piece=80": {
+   "model": "wildcatter:block/power_transformer/p80",
+   "y": 270
+  },
+  "facing=west,piece=81": {
+   "model": "wildcatter:block/power_transformer/p81",
+   "y": 270
+  },
+  "facing=west,piece=82": {
+   "model": "wildcatter:block/power_transformer/p82",
+   "y": 270
+  },
+  "facing=west,piece=83": {
+   "model": "wildcatter:block/power_transformer/p83",
+   "y": 270
+  },
+  "facing=west,piece=84": {
+   "model": "wildcatter:block/power_transformer/p84",
+   "y": 270
+  },
+  "facing=west,piece=85": {
+   "model": "wildcatter:block/power_transformer/p85",
+   "y": 270
+  },
+  "facing=west,piece=86": {
+   "model": "wildcatter:block/power_transformer/p86",
+   "y": 270
+  },
+  "facing=west,piece=87": {
+   "model": "wildcatter:block/power_transformer/p87",
+   "y": 270
+  },
+  "facing=west,piece=88": {
+   "model": "wildcatter:block/power_transformer/p88",
+   "y": 270
+  },
+  "facing=west,piece=89": {
+   "model": "wildcatter:block/power_transformer/p89",
+   "y": 270
+  },
+  "facing=west,piece=90": {
+   "model": "wildcatter:block/power_transformer/p90",
+   "y": 270
+  },
+  "facing=west,piece=91": {
+   "model": "wildcatter:block/power_transformer/p91",
+   "y": 270
+  },
+  "facing=west,piece=92": {
+   "model": "wildcatter:block/power_transformer/p92",
+   "y": 270
+  },
+  "facing=west,piece=93": {
+   "model": "wildcatter:block/power_transformer/p93",
+   "y": 270
+  },
+  "facing=west,piece=94": {
+   "model": "wildcatter:block/power_transformer/p94",
+   "y": 270
+  },
+  "facing=west,piece=95": {
+   "model": "wildcatter:block/power_transformer/p95",
+   "y": 270
+  },
+  "facing=west,piece=96": {
+   "model": "wildcatter:block/power_transformer/p96",
+   "y": 270
+  },
+  "facing=west,piece=97": {
+   "model": "wildcatter:block/power_transformer/p97",
+   "y": 270
+  },
+  "facing=west,piece=98": {
+   "model": "wildcatter:block/power_transformer/p98",
+   "y": 270
+  },
+  "facing=west,piece=99": {
+   "model": "wildcatter:block/power_transformer/p99",
+   "y": 270
+  },
+  "facing=west,piece=100": {
+   "model": "wildcatter:block/power_transformer/p100",
+   "y": 270
+  },
+  "facing=west,piece=101": {
+   "model": "wildcatter:block/power_transformer/p101",
+   "y": 270
+  },
+  "facing=west,piece=102": {
+   "model": "wildcatter:block/power_transformer/p102",
+   "y": 270
+  },
+  "facing=west,piece=103": {
+   "model": "wildcatter:block/power_transformer/p103",
+   "y": 270
+  },
+  "facing=west,piece=104": {
+   "model": "wildcatter:block/power_transformer/p104",
+   "y": 270
+  },
+  "facing=west,piece=105": {
+   "model": "wildcatter:block/power_transformer/p105",
+   "y": 270
+  },
+  "facing=west,piece=106": {
+   "model": "wildcatter:block/power_transformer/p106",
+   "y": 270
+  },
+  "facing=west,piece=107": {
+   "model": "wildcatter:block/power_transformer/p107",
+   "y": 270
+  },
+  "facing=west,piece=108": {
+   "model": "wildcatter:block/power_transformer/p108",
+   "y": 270
+  },
+  "facing=west,piece=109": {
+   "model": "wildcatter:block/power_transformer/p109",
+   "y": 270
+  },
+  "facing=west,piece=110": {
+   "model": "wildcatter:block/power_transformer/p110",
+   "y": 270
+  },
+  "facing=west,piece=111": {
+   "model": "wildcatter:block/power_transformer/p111",
+   "y": 270
+  },
+  "facing=west,piece=112": {
+   "model": "wildcatter:block/power_transformer/p112",
+   "y": 270
+  },
+  "facing=west,piece=113": {
+   "model": "wildcatter:block/power_transformer/p113",
+   "y": 270
+  },
+  "facing=west,piece=114": {
+   "model": "wildcatter:block/power_transformer/p114",
+   "y": 270
+  },
+  "facing=west,piece=115": {
+   "model": "wildcatter:block/power_transformer/p115",
+   "y": 270
+  },
+  "facing=west,piece=116": {
+   "model": "wildcatter:block/power_transformer/p116",
+   "y": 270
+  },
+  "facing=west,piece=117": {
+   "model": "wildcatter:block/power_transformer/p117",
+   "y": 270
+  },
+  "facing=west,piece=118": {
+   "model": "wildcatter:block/power_transformer/p118",
+   "y": 270
+  },
+  "facing=west,piece=119": {
+   "model": "wildcatter:block/power_transformer/p119",
+   "y": 270
+  },
+  "facing=west,piece=120": {
+   "model": "wildcatter:block/power_transformer/p120",
+   "y": 270
+  },
+  "facing=west,piece=121": {
+   "model": "wildcatter:block/power_transformer/p121",
+   "y": 270
+  },
+  "facing=west,piece=122": {
+   "model": "wildcatter:block/power_transformer/p122",
+   "y": 270
+  },
+  "facing=west,piece=123": {
+   "model": "wildcatter:block/power_transformer/p123",
+   "y": 270
+  },
+  "facing=west,piece=124": {
+   "model": "wildcatter:block/power_transformer/p124",
+   "y": 270
+  },
+  "facing=west,piece=125": {
+   "model": "wildcatter:block/power_transformer/p125",
+   "y": 270
+  },
+  "facing=west,piece=126": {
+   "model": "wildcatter:block/power_transformer/p126",
+   "y": 270
+  },
+  "facing=west,piece=127": {
+   "model": "wildcatter:block/power_transformer/p127",
+   "y": 270
+  },
+  "facing=west,piece=128": {
+   "model": "wildcatter:block/power_transformer/p128",
+   "y": 270
+  },
+  "facing=west,piece=129": {
+   "model": "wildcatter:block/power_transformer/p129",
+   "y": 270
+  },
+  "facing=west,piece=130": {
+   "model": "wildcatter:block/power_transformer/p130",
+   "y": 270
+  },
+  "facing=west,piece=131": {
+   "model": "wildcatter:block/power_transformer/p131",
+   "y": 270
+  },
+  "facing=west,piece=132": {
+   "model": "wildcatter:block/power_transformer/p132",
+   "y": 270
+  },
+  "facing=west,piece=133": {
+   "model": "wildcatter:block/power_transformer/p133",
+   "y": 270
+  },
+  "facing=west,piece=134": {
+   "model": "wildcatter:block/power_transformer/p134",
+   "y": 270
+  },
+  "facing=west,piece=135": {
+   "model": "wildcatter:block/power_transformer/p135",
+   "y": 270
+  },
+  "facing=west,piece=136": {
+   "model": "wildcatter:block/power_transformer/p136",
+   "y": 270
+  },
+  "facing=west,piece=137": {
+   "model": "wildcatter:block/power_transformer/p137",
+   "y": 270
+  },
+  "facing=west,piece=138": {
+   "model": "wildcatter:block/power_transformer/p138",
+   "y": 270
+  },
+  "facing=west,piece=139": {
+   "model": "wildcatter:block/power_transformer/p139",
+   "y": 270
+  },
+  "facing=west,piece=140": {
+   "model": "wildcatter:block/power_transformer/p140",
+   "y": 270
+  },
+  "facing=west,piece=141": {
+   "model": "wildcatter:block/power_transformer/p141",
+   "y": 270
+  },
+  "facing=west,piece=142": {
+   "model": "wildcatter:block/power_transformer/p142",
+   "y": 270
+  },
+  "facing=west,piece=143": {
+   "model": "wildcatter:block/power_transformer/p143",
+   "y": 270
+  },
+  "facing=west,piece=144": {
+   "model": "wildcatter:block/power_transformer/p144",
+   "y": 270
+  },
+  "facing=west,piece=145": {
+   "model": "wildcatter:block/power_transformer/p145",
+   "y": 270
+  },
+  "facing=west,piece=146": {
+   "model": "wildcatter:block/power_transformer/p146",
+   "y": 270
+  },
+  "facing=west,piece=147": {
+   "model": "wildcatter:block/power_transformer/p147",
+   "y": 270
+  },
+  "facing=west,piece=148": {
+   "model": "wildcatter:block/power_transformer/p148",
+   "y": 270
+  },
+  "facing=west,piece=149": {
+   "model": "wildcatter:block/power_transformer/p149",
+   "y": 270
+  },
+  "facing=west,piece=150": {
+   "model": "wildcatter:block/power_transformer/p150",
+   "y": 270
+  },
+  "facing=west,piece=151": {
+   "model": "wildcatter:block/power_transformer/p151",
+   "y": 270
+  },
+  "facing=west,piece=152": {
+   "model": "wildcatter:block/power_transformer/p152",
+   "y": 270
+  },
+  "facing=west,piece=153": {
+   "model": "wildcatter:block/power_transformer/p153",
+   "y": 270
+  },
+  "facing=west,piece=154": {
+   "model": "wildcatter:block/power_transformer/p154",
+   "y": 270
+  },
+  "facing=west,piece=155": {
+   "model": "wildcatter:block/power_transformer/p155",
+   "y": 270
+  },
+  "facing=west,piece=156": {
+   "model": "wildcatter:block/power_transformer/p156",
+   "y": 270
+  },
+  "facing=west,piece=157": {
+   "model": "wildcatter:block/power_transformer/p157",
+   "y": 270
+  },
+  "facing=west,piece=158": {
+   "model": "wildcatter:block/power_transformer/p158",
+   "y": 270
+  },
+  "facing=west,piece=159": {
+   "model": "wildcatter:block/power_transformer/p159",
+   "y": 270
+  },
+  "facing=west,piece=160": {
+   "model": "wildcatter:block/power_transformer/p160",
+   "y": 270
+  },
+  "facing=west,piece=161": {
+   "model": "wildcatter:block/power_transformer/p161",
+   "y": 270
+  },
+  "facing=west,piece=162": {
+   "model": "wildcatter:block/power_transformer/p162",
+   "y": 270
+  },
+  "facing=west,piece=163": {
+   "model": "wildcatter:block/power_transformer/p163",
+   "y": 270
+  },
+  "facing=west,piece=164": {
+   "model": "wildcatter:block/power_transformer/p164",
+   "y": 270
+  },
+  "facing=west,piece=165": {
+   "model": "wildcatter:block/power_transformer/p165",
+   "y": 270
+  },
+  "facing=west,piece=166": {
+   "model": "wildcatter:block/power_transformer/p166",
+   "y": 270
+  },
+  "facing=west,piece=167": {
+   "model": "wildcatter:block/power_transformer/p167",
+   "y": 270
+  },
+  "facing=west,piece=168": {
+   "model": "wildcatter:block/power_transformer/p168",
+   "y": 270
+  },
+  "facing=west,piece=169": {
+   "model": "wildcatter:block/power_transformer/p169",
+   "y": 270
+  },
+  "facing=west,piece=170": {
+   "model": "wildcatter:block/power_transformer/p170",
+   "y": 270
+  },
+  "facing=west,piece=171": {
+   "model": "wildcatter:block/power_transformer/p171",
+   "y": 270
+  },
+  "facing=west,piece=172": {
+   "model": "wildcatter:block/power_transformer/p172",
+   "y": 270
+  },
+  "facing=west,piece=173": {
+   "model": "wildcatter:block/power_transformer/p173",
+   "y": 270
+  },
+  "facing=west,piece=174": {
+   "model": "wildcatter:block/power_transformer/p174",
+   "y": 270
+  },
+  "facing=west,piece=175": {
+   "model": "wildcatter:block/power_transformer/p175",
+   "y": 270
+  },
+  "facing=west,piece=176": {
+   "model": "wildcatter:block/power_transformer/p176",
+   "y": 270
+  },
+  "facing=west,piece=177": {
+   "model": "wildcatter:block/power_transformer/p177",
+   "y": 270
+  },
+  "facing=west,piece=178": {
+   "model": "wildcatter:block/power_transformer/p178",
+   "y": 270
+  },
+  "facing=west,piece=179": {
+   "model": "wildcatter:block/power_transformer/p179",
+   "y": 270
+  },
+  "facing=west,piece=180": {
+   "model": "wildcatter:block/power_transformer/p180",
+   "y": 270
+  },
+  "facing=west,piece=181": {
+   "model": "wildcatter:block/power_transformer/p181",
+   "y": 270
+  },
+  "facing=west,piece=182": {
+   "model": "wildcatter:block/power_transformer/p182",
+   "y": 270
+  },
+  "facing=west,piece=183": {
+   "model": "wildcatter:block/power_transformer/p183",
+   "y": 270
+  },
+  "facing=west,piece=184": {
+   "model": "wildcatter:block/power_transformer/p184",
+   "y": 270
+  },
+  "facing=west,piece=185": {
+   "model": "wildcatter:block/power_transformer/p185",
+   "y": 270
+  },
+  "facing=west,piece=186": {
+   "model": "wildcatter:block/power_transformer/p186",
+   "y": 270
+  },
+  "facing=west,piece=187": {
+   "model": "wildcatter:block/power_transformer/p187",
+   "y": 270
+  },
+  "facing=west,piece=188": {
+   "model": "wildcatter:block/power_transformer/p188",
+   "y": 270
+  },
+  "facing=west,piece=189": {
+   "model": "wildcatter:block/power_transformer/p189",
+   "y": 270
+  },
+  "facing=west,piece=190": {
+   "model": "wildcatter:block/power_transformer/p190",
+   "y": 270
+  },
+  "facing=west,piece=191": {
+   "model": "wildcatter:block/power_transformer/p191",
+   "y": 270
+  },
+  "facing=west,piece=192": {
+   "model": "wildcatter:block/power_transformer/p192",
+   "y": 270
+  },
+  "facing=west,piece=193": {
+   "model": "wildcatter:block/power_transformer/p193",
+   "y": 270
+  },
+  "facing=west,piece=194": {
+   "model": "wildcatter:block/power_transformer/p194",
+   "y": 270
+  },
+  "facing=west,piece=195": {
+   "model": "wildcatter:block/power_transformer/p195",
+   "y": 270
+  },
+  "facing=west,piece=196": {
+   "model": "wildcatter:block/power_transformer/p196",
+   "y": 270
+  },
+  "facing=west,piece=197": {
+   "model": "wildcatter:block/power_transformer/p197",
+   "y": 270
+  },
+  "facing=west,piece=198": {
+   "model": "wildcatter:block/power_transformer/p198",
+   "y": 270
+  },
+  "facing=west,piece=199": {
+   "model": "wildcatter:block/power_transformer/p199",
+   "y": 270
+  },
+  "facing=west,piece=200": {
+   "model": "wildcatter:block/power_transformer/p200",
+   "y": 270
+  },
+  "facing=west,piece=201": {
+   "model": "wildcatter:block/power_transformer/p201",
+   "y": 270
+  },
+  "facing=west,piece=202": {
+   "model": "wildcatter:block/power_transformer/p202",
+   "y": 270
+  },
+  "facing=west,piece=203": {
+   "model": "wildcatter:block/power_transformer/p203",
+   "y": 270
+  },
+  "facing=west,piece=204": {
+   "model": "wildcatter:block/power_transformer/p204",
+   "y": 270
+  },
+  "facing=west,piece=205": {
+   "model": "wildcatter:block/power_transformer/p205",
+   "y": 270
+  },
+  "facing=west,piece=206": {
+   "model": "wildcatter:block/power_transformer/p206",
+   "y": 270
+  },
+  "facing=west,piece=207": {
+   "model": "wildcatter:block/power_transformer/p207",
+   "y": 270
+  },
+  "facing=west,piece=208": {
+   "model": "wildcatter:block/power_transformer/p208",
+   "y": 270
+  },
+  "facing=west,piece=209": {
+   "model": "wildcatter:block/power_transformer/p209",
+   "y": 270
   }
+ }
 }

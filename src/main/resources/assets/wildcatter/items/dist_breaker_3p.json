@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/dist_breaker_3p_on"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/dist_breaker_3p/item"
+ }
 }

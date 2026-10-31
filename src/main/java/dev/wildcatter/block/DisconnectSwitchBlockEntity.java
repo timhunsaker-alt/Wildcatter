@@ -37,7 +37,21 @@ import org.joml.Vector3f;
  * The inside of a disconnect switch: three blades that close the phases straight through, with neutral and ground passing
  * unswitched. Opened while carrying load it draws an arc: a flash and a crack, and anyone close is burned. The blades swing.
  */
-public class DisconnectSwitchBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Kinetic {
+public class DisconnectSwitchBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Kinetic, dev.wildcatter.multiblock.BigPartEntity {
+	/** A true-size part has grown into its cells (see BigParts). */
+	private boolean grown;
+
+	@Override
+	public boolean grown() {
+		return grown;
+	}
+
+	@Override
+	public void markGrown() {
+		grown = true;
+		setChanged();
+	}
+
 	private static final Conductor[] PHASES = {Conductor.A, Conductor.B, Conductor.C};
 	/** Blades closed lie flat; open, they stand up. */
 	private static final float OPEN_DEGREES = -80.0F;
@@ -59,9 +73,25 @@ public class DisconnectSwitchBlockEntity extends BlockEntity implements CircuitP
 		return getBlockState().getValue(DisconnectSwitchBlock.OPEN);
 	}
 
+	/** The way the part faces, for its turning blades: the yard's facing for a true-size disconnect. */
 	@Override
 	public Direction facing() {
 		return getBlockState().getValue(DisconnectSwitchBlock.FACING);
+	}
+
+	/** The way the line runs through it: in at the back, out at the front. */
+	private Direction lineFacing() {
+		return ((DisconnectSwitchBlock) getBlockState().getBlock()).lineFacing(getBlockState());
+	}
+
+	/** The cell that carries the terminal on {@code face}: this one, or for a true-size disconnect the end of the yard's centre line. */
+	private BlockPos at(Direction face) {
+		return getBlockState().getBlock() instanceof dev.wildcatter.multiblock.BigPart part ? part.terminalCell(worldPosition, getBlockState(), face) : worldPosition;
+	}
+
+	@Override
+	public boolean hasPortAt(BlockPos cell, Direction face, Conductor role, Voltage voltage) {
+		return hasPort(face, role, voltage) && cell.equals(at(face));
 	}
 
 	/** Right-click: swing the blades. Opening under load draws an arc. */
@@ -108,7 +138,7 @@ public class DisconnectSwitchBlockEntity extends BlockEntity implements CircuitP
 
 	@Override
 	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
-		return voltage == voltage() && (face == facing() || face == facing().getOpposite());
+		return voltage == voltage() && (face == lineFacing() || face == lineFacing().getOpposite());
 	}
 
 	@Override
@@ -117,13 +147,13 @@ public class DisconnectSwitchBlockEntity extends BlockEntity implements CircuitP
 			int back = circuit.node();
 			int front = circuit.node();
 			links[k] = open() ? -1 : circuit.resistor(back, front, Tuning.BREAKER_CLOSED_OHMS);
-			circuit.port(worldPosition, facing().getOpposite(), PHASES[k], voltage(), back, Tuning.CONTACT_OHMS / 2, false);
-			circuit.port(worldPosition, facing(), PHASES[k], voltage(), front, Tuning.CONTACT_OHMS / 2, false);
+			circuit.port(at(lineFacing().getOpposite()), lineFacing().getOpposite(), PHASES[k], voltage(), back, Tuning.CONTACT_OHMS / 2, false);
+			circuit.port(at(lineFacing()), lineFacing(), PHASES[k], voltage(), front, Tuning.CONTACT_OHMS / 2, false);
 		}
 		for (Conductor passing : new Conductor[] {Conductor.N, Conductor.G}) {
 			int node = circuit.node();
-			circuit.port(worldPosition, facing().getOpposite(), passing, voltage(), node, Tuning.CONTACT_OHMS / 2, false);
-			circuit.port(worldPosition, facing(), passing, voltage(), node, Tuning.CONTACT_OHMS / 2, false);
+			circuit.port(at(lineFacing().getOpposite()), lineFacing().getOpposite(), passing, voltage(), node, Tuning.CONTACT_OHMS / 2, false);
+			circuit.port(at(lineFacing()), lineFacing(), passing, voltage(), node, Tuning.CONTACT_OHMS / 2, false);
 		}
 	}
 
@@ -142,6 +172,9 @@ public class DisconnectSwitchBlockEntity extends BlockEntity implements CircuitP
 	@Override
 	public List<Rotor> rotors() {
 		// drawn for a switch facing north (the line runs south to north): the blades hinge at the south end about the X axis
+		if (getBlockState().getBlock() instanceof BigDisconnectBlock big) {
+			return big.rotors();
+		}
 		return List.of(new Rotor(((RotorBlock) WildcatterBlocks.ROTOR).part(RotorBlock.Part.DISCONNECT_BLADE), new Vector3f(0.5F, 0.8F, 0.85F), Direction.Axis.X, 1.0F));
 	}
 
@@ -170,12 +203,14 @@ public class DisconnectSwitchBlockEntity extends BlockEntity implements CircuitP
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
+		output.putBoolean("grown", grown);
 		output.putString("lastArc", lastArc);
 	}
 
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		grown = input.getBooleanOr("grown", false);
 		lastArc = input.getStringOr("lastArc", "");
 	}
 }

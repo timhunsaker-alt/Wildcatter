@@ -246,16 +246,24 @@ public final class WildcatterBlocks {
 	// ---- The distribution substation (docs/multiblocks/substation.md): it replaces the old single-block 138/12.47 kV transformer ----
 	public static final Block POWER_TRANSFORMER = block("power_transformer", props -> new dev.wildcatter.block.PowerTransformerBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(5.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Tuning.SUBSTATION_VA, Tuning.SUBSTATION_PERCENT_Z));
-	public static final Block HV_BREAKER_3P = block("hv_breaker_3p", props -> BreakerBlock.relayOperated(props.mapColor(MapColor.COLOR_RED)
-			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.HIGH));
-	public static final Block DIST_BREAKER_3P = block("dist_breaker_3p", props -> BreakerBlock.relayOperated(props.mapColor(MapColor.COLOR_GREEN)
-			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.DISTRIBUTION));
-	public static final Block DISCONNECT_HV = block("disconnect_hv", props -> new dev.wildcatter.block.DisconnectSwitchBlock(props.mapColor(MapColor.METAL)
-			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), Voltage.HIGH));
-	public static final Block DISCONNECT_DIST = block("disconnect_dist", props -> new dev.wildcatter.block.DisconnectSwitchBlock(props.mapColor(MapColor.METAL)
-			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), Voltage.DISTRIBUTION));
-	public static final Block BUS_HV = busway("bus_hv", Voltage.HIGH);
-	public static final Block BUS_DIST = busway("bus_dist", Voltage.DISTRIBUTION);
+	// the yard's parts at true size (4.5d): length along the line, height, width across it
+	public static final Block HV_BREAKER_3P = block("hv_breaker_3p", props -> new dev.wildcatter.block.BigBreakerBlock(props.mapColor(MapColor.COLOR_RED)
+			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.HIGH, 2, 5, 9, "hv_breaker_3p"));
+	public static final Block DIST_BREAKER_3P = block("dist_breaker_3p", props -> new dev.wildcatter.block.BigBreakerBlock(props.mapColor(MapColor.COLOR_GREEN)
+			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.DISTRIBUTION, 2, 4, 3, "dist_breaker_3p"));
+	public static final Block DISCONNECT_HV = block("disconnect_hv", props -> new dev.wildcatter.block.BigDisconnectBlock(props.mapColor(MapColor.METAL)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.HIGH, 2, 6, 9, "disconnect_hv", dev.wildcatter.block.BigDisconnectBlock::hvRotors));
+	public static final Block DISCONNECT_DIST = block("disconnect_dist", props -> new dev.wildcatter.block.BigDisconnectBlock(props.mapColor(MapColor.METAL)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.DISTRIBUTION, 1, 5, 3, "disconnect_dist", dev.wildcatter.block.BigDisconnectBlock::distRotors));
+	public static final Block BUS_HV = block("bus_hv", props -> new dev.wildcatter.block.StationBusBlock(props.mapColor(MapColor.METAL)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.HIGH, 2, 6, 9, "bus_hv"));
+	public static final Block BUS_DIST = block("bus_dist", props -> new dev.wildcatter.block.StationBusBlock(props.mapColor(MapColor.METAL)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.DISTRIBUTION, 1, 4, 3, "bus_dist"));
+	/** Decoration: a substation's chain-link fence and its barbed-wire top, each a block; they join like iron bars. */
+	public static final Block CHAIN_LINK_FENCE = block("chain_link_fence", props -> new dev.wildcatter.block.ChainLinkFenceBlock(props.mapColor(MapColor.METAL)
+			.strength(3.0F, 6.0F).sound(SoundType.CHAIN).requiresCorrectToolForDrops().noOcclusion()));
+	public static final Block BARBED_WIRE_TOP = block("barbed_wire_top", props -> new dev.wildcatter.block.ChainLinkFenceBlock(props.mapColor(MapColor.METAL)
+			.strength(3.0F, 6.0F).sound(SoundType.CHAIN).requiresCorrectToolForDrops().noOcclusion()));
 	public static final Block RELAY_PANEL = block("relay_panel", props -> new dev.wildcatter.block.RelayPanelBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
 	/** Three-phase pad-mount transformers, on the ground and fed by underground cable. */
@@ -301,7 +309,7 @@ public final class WildcatterBlocks {
 			WOOL_WIRE_NEUTRAL, MV_WIRE_HOT, MV_WIRE_NEUTRAL, HV_WIRE_HOT, HV_WIRE_NEUTRAL,
 			PLASTIC_WIRE_HOT, PLASTIC_WIRE_NEUTRAL, MV_PLASTIC_WIRE_HOT, MV_PLASTIC_WIRE_NEUTRAL, HV_PLASTIC_WIRE_HOT, HV_PLASTIC_WIRE_NEUTRAL,
 			INDUSTRIAL_WIRE_HOT, INDUSTRIAL_WIRE_NEUTRAL, INDUSTRIAL_PLASTIC_WIRE_HOT, INDUSTRIAL_PLASTIC_WIRE_NEUTRAL);
-	public static final BlockEntityType<MultiCableBlockEntity> MULTI_CABLE_ENTITY = entity(MultiCableBlockEntity::new, CABLE_LV, CABLE_INDUSTRIAL, CABLE_DIST, CABLE_HV, BUSWAY_LV, BUSWAY_INDUSTRIAL, BUS_HV, BUS_DIST);
+	public static final BlockEntityType<MultiCableBlockEntity> MULTI_CABLE_ENTITY = entity(MultiCableBlockEntity::new, CABLE_LV, CABLE_INDUSTRIAL, CABLE_DIST, CABLE_HV, BUSWAY_LV, BUSWAY_INDUSTRIAL);
 	public static final BlockEntityType<MotorStarterBlockEntity> MOTOR_STARTER_ENTITY = entity(MotorStarterBlockEntity::new, MOTOR_STARTER, MCC_BUCKET);
 	public static final BlockEntityType<MccIncomingBlockEntity> MCC_INCOMING_ENTITY = entity(MccIncomingBlockEntity::new, MCC_INCOMING);
 	public static final BlockEntityType<dev.wildcatter.block.GensetPartBlockEntity> GENSET_PART_ENTITY = entity(dev.wildcatter.block.GensetPartBlockEntity::new,
@@ -336,7 +344,8 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<dev.wildcatter.block.TowerBasinBlockEntity> TOWER_BASIN_ENTITY = entity(dev.wildcatter.block.TowerBasinBlockEntity::new, TOWER_BASIN);
 	public static final BlockEntityType<CoolingTowerBlockEntity> COOLING_TOWER_ENTITY = entity(CoolingTowerBlockEntity::new, COOLING_TOWER);
 	/** The plain true-size parts that only remember they have grown (block/BigPartBlockEntity). */
-	public static final BlockEntityType<dev.wildcatter.block.BigPartBlockEntity> BIG_PART_ENTITY = entity(dev.wildcatter.block.BigPartBlockEntity::new, COOLING_FILL, DRIFT_ELIMINATOR);
+	public static final BlockEntityType<dev.wildcatter.block.BigPartBlockEntity> BIG_PART_ENTITY = entity(dev.wildcatter.block.BigPartBlockEntity::new, COOLING_FILL, DRIFT_ELIMINATOR, RELAY_PANEL);
+	public static final BlockEntityType<dev.wildcatter.block.StationBusBlockEntity> STATION_BUS_ENTITY = entity(dev.wildcatter.block.StationBusBlockEntity::new, BUS_HV, BUS_DIST);
 
 	private WildcatterBlocks() {
 	}
@@ -480,6 +489,8 @@ public final class WildcatterBlocks {
 		add("bus_hv", BUS_HV);
 		add("bus_dist", BUS_DIST);
 		add("relay_panel", RELAY_PANEL);
+		add("chain_link_fence", CHAIN_LINK_FENCE);
+		add("barbed_wire_top", BARBED_WIRE_TOP);
 		add("pole_transformer", POLE_TRANSFORMER);
 		add("electric_lamp", ELECTRIC_LAMP);
 		add("electric_heater", ELECTRIC_HEATER);
@@ -530,6 +541,7 @@ public final class WildcatterBlocks {
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("refinery"), REFINERY_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("cooling_tower"), COOLING_TOWER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("big_part"), BIG_PART_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("station_bus"), STATION_BUS_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("wire"), WIRE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("load"), LOAD_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("breaker"), BREAKER_ENTITY);
