@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/superheater"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/superheater/item"
+ }
 }

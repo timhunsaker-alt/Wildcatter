@@ -62,6 +62,11 @@ public final class Motor {
 
 	/** Terminals on every face, and the windings if it is turning or starting. */
 	public void build(Circuit circuit, BlockPos pos) {
+		build(circuit, pos, java.util.List.of(Direction.values()));
+	}
+
+	/** The same, with its terminals only on {@code faces} (a big machine's terminal box). */
+	public void build(Circuit circuit, BlockPos pos, java.util.List<Direction> faces) {
 		int phases = threePhase ? 3 : 1;
 		for (int k = 0; k < phases; k++) {
 			hot[k] = circuit.node();
@@ -84,7 +89,7 @@ public final class Motor {
 				branch[0] = circuit.impedance(hot[0], neutral, r, x);
 			}
 		}
-		for (Direction face : Direction.values()) {
+		for (Direction face : faces) {
 			if (threePhase) {
 				for (int k = 0; k < 3; k++) {
 					int lead = leadsSwapped && k > 0 ? 3 - k : k;   // swapped: B goes to the winding C was on, and C to B's

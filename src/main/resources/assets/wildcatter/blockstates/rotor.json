@@ -17,6 +17,12 @@
     },
     "part=alternator_fan": {
       "model": "wildcatter:block/rotor_alternator_fan"
+    },
+    "part=turbine_coupling": {
+      "model": "wildcatter:block/rotor_turbine_coupling"
+    },
+    "part=pump_coupling": {
+      "model": "wildcatter:block/rotor_pump_coupling"
     }
   }
 }

@@ -11,7 +11,9 @@ sys.path.insert(0, HERE)
 import mlib
 
 PARTS = ["gsu_transformer", "fuel_tank", "genset_base_frame", "radiator", "genset_diesel_engine", "genset_gas_engine", "alternator",
-	"genset_control_panel", "exhaust_stack", "exhaust_silencer_large"]
+	"genset_control_panel", "exhaust_stack", "exhaust_silencer_large",
+	"boiler_burner", "boiler_drum", "superheater", "turbine_casing", "turbine_generator", "condenser", "feed_pump",
+	"tower_basin", "cooling_fill", "drift_eliminator", "cooling_tower"]
 
 
 def colours(model):

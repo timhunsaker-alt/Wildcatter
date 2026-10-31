@@ -280,6 +280,45 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
     - drops an older world's one-block radiator
   - **New scene `gensetFrameRate`:** ten running diesel sets. The client held its 120 fps cap with them in view.
 
+## Phase 4.5c: steam plant and cooling tower at true size
+- **The 1 MW steam plant** (docs/multiblocks/steam-plant.md) is 6 × 7 m and 4 high, every part on the ground:
+  - burner 1 × 3 × 3
+  - D-type boiler 4 × 3 × 4 with the steam drum along the top
+  - superheater and stack 1 × 3 × 4
+  - generator 3 × 2 × 2 (the controller)
+  - turbine 2 × 2 × 2, right under the superheater's steam line
+  - side-exhaust condenser 3 × 2 × 2 beside the turbine (Tim's choice)
+  - feed pump 2 × 1 × 1 against the condenser's hotwell
+  The plant has no base to snap to; the generator's readout names the next missing or wrongly turned part and its x y z.
+- **Terminals:**
+  - The generator's 4.16 kV terminals are on its non-drive end, both lower cells.
+  - The feed pump's 480 V terminal box is on the motor's south side.
+  - The burner takes coal on any cell and gas through any cell; the condenser takes its water pipe on any cell.
+- **The cooling tower cell** (docs/multiblocks/cooling-tower.md) is 4 × 4 m and 6 high: concrete basin, PVC fill behind air-inlet louvres, drift eliminators with the hot-water header, and the fan deck.
+  - The 3 m fan turns in its stack. The deck has the handrail, the ladder, the motor and gearbox, and the disconnect.
+  - Parts clicked on top of the basin snap into the column.
+  - The fan motor is now **7.5 kW 480 V three-phase**, with its terminals at the front of the deck, as Tim chose. The 120 V starter turbine can no longer run a tower.
+- **Shared code:**
+  - `block/PartLayout` generalises the genset skid's snapping and checking. Instances: `GensetSkid`, `TowerColumn`, `SteamPlantLayout`.
+  - `block/BigPartBlock` is a common base for true-size part blocks.
+  - `block/BigPartBlockEntity` (type `big_part`) serves plain parts that only remember they have grown.
+  - `Plumbing.machines` finds a big machine through any of its cells.
+  - `Motor.build` can put its terminals on chosen faces.
+- **Models:** 11 scripts (77 to 484 boxes each) and three new turning parts: the 3 m tower fan, the turbine coupling and the feed pump's jaw coupling.
+- **Old worlds:** Phase 4 one-block plant and tower parts drop as items with a chat line.
+- **Game tests:**
+  - `steamPlant` is rebuilt on the true-size plant:
+    - the GSU sits on the generator's end
+    - a genset black-starts the pump and feeds the tower fan
+    - a true-size tower on the condenser's water cools the plant
+    - five screenshots
+  - The starter loop keeps its "NO COOLING TOWER" check.
+  - New scene `towerParts`:
+    - the column is built by clicks
+    - a missing eliminator is named
+    - one fill piece breaks the whole fill and drops one
+    - an old one-block condenser drops
+
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.
@@ -288,7 +327,9 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
-- Phase 4.5: the GSU and the gensets are true size. The steam plant, cooling tower, substation, line gear and oil field are still one block per part until waves 4.5c to 4.5f.
+- Phase 4.5: the GSU, gensets, steam plant and cooling tower are true size. The substation, line gear and oil field are still one block per part until waves 4.5d to 4.5f.
+- The steam plant's main steam line and feedwater line are drawn only within each part: they meet at the parts' edges, and the feedwater line stops at the boiler.
+- A hopper feeds the burner only through its main cell.
 - The frame-rate check runs at the client's 120 fps cap, so it shows no drop but not how much headroom is left.
 - The alternator is drawn 1 m long for both sets; a real 1 MW frame is about 1.6 m.
 - The old genset `*_placeholder` textures are still generated (the rotor texture is still used by the tower fan and disconnect blades).
@@ -296,7 +337,6 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The 4.16 kV to 138 kV step-up is still the single-block `substation_transformer` (Y-Y, unrated windings) until bigger plants (Phase 6).
 - The test skips the steam plant's five-minute warm-up with a hook (it checks the drum starts rising, then jumps to pressure).
 - A small genset cannot drive enough fault current through the 20 MVA substation to reach real relay settings; the test scales the relays down. In play, such a source's own protection clears a feeder fault first.
-- Pipe, drum and turbine are drawn with the old steam machines' art; the plant's parts have no models of their own yet beyond the turbine coupling and feed pump.
 - The 1/0 and 4/0 MV cable ampacities are from the NEC 310.60 table family but not checked line by line (500 kcmil, 450 A, is).
 - Genset sounds and turning parts have been checked in test screenshots and logs, not heard in a real play session.
 - The new art (cooling tower, fuse, breakers, poles) has been checked in test screenshots, not in a real play session.

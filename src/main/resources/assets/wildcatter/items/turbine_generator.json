@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/turbine_generator"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/turbine_generator/item"
+ }
 }

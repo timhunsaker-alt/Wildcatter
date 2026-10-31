@@ -130,6 +130,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("gensetFrameRate")) {
 				gensetFrameRate(context, server);
 			}
+			if (only("towerParts")) {
+				towerParts(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -324,30 +327,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.takeScreenshot("wildcatter-pump-and-pipes");
 		System.out.println("[wildcatter-test] steam loop ok: " + pump + " | " + tank + " | " + drain + " | boiler water " + before + " -> " + after);
 
-		// The cooling tower (docs/multiblocks/cooling-tower.md), a column on top of the turbine: the basin on the drain pipe, fill,
-		// drift eliminators, and the fan deck on top, powered by hot and neutral wires run up beside it.
+		// The cooling tower is a true-size cell with a 7.5 kW 480 V fan (4.5c): the 120 V starter turbine cannot run one, so it reports
+		// that it has none (the steam plant scene tests the tower)
 		check(drain.contains("NO COOLING TOWER"), "a turbine without a tower should say so: " + drain);
-		put(server, 51, up + 1, 50, "wildcatter:tower_basin");
-		put(server, 51, up + 1, 49, "wildcatter:pipe");
-		put(server, 51, up + 2, 50, "wildcatter:cooling_fill");
-		put(server, 51, up + 4, 50, "wildcatter:cooling_tower");
-		for (int h = 1; h <= 4; h++) {
-			put(server, 52, up + h, 50, "wildcatter:wool_wire_hot");
-			put(server, 51, up + h, 51, "wildcatter:wool_wire_neutral");
-		}
-		context.waitTicks(60);
-		check(read(server, 51, up + 4, 50).contains("NOT BUILT") && read(server, 51, up + 4, 50).contains("drift eliminators"),
-				"a tower without its drift eliminators is not built: " + read(server, 51, up + 4, 50));
-		put(server, 51, up + 3, 50, "wildcatter:drift_eliminator");
-		context.waitTicks(80);
-		String fan = read(server, 51, up + 4, 50);
-		String cooled = read(server, 51, up, 50);
-		check(fan.contains("COOLING"), "a built, powered tower should be cooling: " + fan);
-		check(cooled.contains("condensate cooled"), "the turbine should know its condensate is cooled: " + cooled);
-		server.runCommand("tp @p 53 " + (up + 3) + " 56 180 20");
-		context.waitTicks(10);
-		context.takeScreenshot("wildcatter-cooling-tower");
-		System.out.println("[wildcatter-test] cooling ok: " + fan + " | " + cooled);
 
 		// A fuse in the hot wire between turbine and pump: a short blows it, and it stays blown until it gets a copper ingot.
 		put(server, 52, up, 50, "wildcatter:fuse[facing=east]");
@@ -2074,47 +2056,55 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		return (dev.wildcatter.block.TurbineGeneratorBlockEntity) srv.overworld().getBlockEntity(at);
 	}
 
+	/** Places a true-size part's main cell and grows it into its cells, as a player's placing would. */
+	private void placeBig(TestServerContext server, net.minecraft.world.level.block.Block block, BlockPos main, net.minecraft.core.Direction facing) {
+		server.computeOnServer(srv -> {
+			net.minecraft.world.level.block.state.BlockState state = block.defaultBlockState()
+					.setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING, facing);
+			srv.overworld().setBlock(main, state, 3);
+			dev.wildcatter.multiblock.BigParts.grow(srv.overworld(), main, state);
+			return null;
+		});
+	}
+
 	/**
-	 * The 1 MW steam plant (4d): burner, drum, superheater, turbine, generator, condenser and feed pump form a plant. Lit, the drum
-	 * rises toward pressure. A drum too low to run waits for its feed pump, which needs 480 V station service: a genset black-starts
-	 * it. At pressure the turbine rolls up, the generator closes onto the dead bus, and through the GSU (4.16 kV delta to 12.47 kV wye,
-	 * 30 degrees) and a pad-mount it runs a heater. A cooling tower on the condenser's water cools it; without one it is capped at
-	 * three quarters of rating. Taking the superheater out dissolves the plant.
+	 * The 1 MW steam plant at true size (4.5c, docs/multiblocks/steam-plant.md): burner, boiler, superheater, generator, turbine,
+	 * feed pump and condenser form a plant, 6 x 7 m. Lit, the drum rises toward pressure. A drum too low to run waits for its
+	 * feed pump, which needs 480 V: a genset black-starts it. At pressure the turbine rolls up, the generator closes onto the dead
+	 * bus, and through the GSU on the generator's end (4.16 kV delta to 12.47 kV wye, 30 degrees) and a pad-mount it runs a
+	 * heater. A true-size cooling tower cell on the condenser's water, its 7.5 kW fan fed from the genset, cools it; without one
+	 * the plant is capped at three quarters of rating. Taking the superheater out dissolves the plant.
 	 */
 	private void steamPlant(ClientGameTestContext context, TestServerContext server) {
 		int z = -600;
-		server.runCommand("tp @p 14 " + (up + 4) + " " + (z + 9) + " 180 25");
+		server.runCommand("tp @p 12 " + (up + 6) + " " + (z + 14) + " 180 25");
 		context.waitTicks(20);   // let the chunks load before building there
-		server.runCommand("fill 4 " + (y - 1) + " " + (z - 8) + " 26 " + (y + 6) + " " + (z + 6) + " minecraft:air");
-		server.runCommand("fill 4 " + (y - 1) + " " + (z - 8) + " 26 " + (y - 1) + " " + (z + 6) + " minecraft:stone");
-		BlockPos gen = new BlockPos(14, up + 1, z);
-		// layer 2: drum, superheater, turbine, generator; layer 1: burner, feed pump, condenser
-		put(server, 11, up + 1, z, "wildcatter:boiler_drum[facing=north]");
-		put(server, 12, up + 1, z, "wildcatter:superheater[facing=north]");
-		put(server, 13, up + 1, z, "wildcatter:turbine_casing[facing=north]");
-		put(server, 14, up + 1, z, "wildcatter:turbine_generator[facing=north]");
-		put(server, 11, up, z, "wildcatter:boiler_burner[facing=north]");
-		put(server, 12, up, z, "wildcatter:feed_pump[facing=north]");
-		put(server, 13, up, z, "wildcatter:condenser[facing=north]");
-		// the GSU (true size, x 15-16) off the generator's east face, then 12.47 kV cable down from its bushings, a 480 V pad-mount and a heater
-		put(server, 15, up + 1, z, "wildcatter:gsu_transformer[facing=east]");
-		put(server, 17, up + 3, z, "wildcatter:cable_dist");
-		put(server, 17, up + 2, z, "wildcatter:cable_dist");
-		put(server, 17, up + 1, z, "wildcatter:cable_dist");
-		put(server, 18, up + 1, z, "wildcatter:padmount_480[facing=west]");
-		put(server, 19, up + 1, z, "wildcatter:cable_industrial");
-		put(server, 20, up + 1, z, "wildcatter:three_phase_heater");
+		server.runCommand("fill 0 " + (y - 1) + " " + (z - 6) + " 24 " + (y + 8) + " " + (z + 9) + " minecraft:air");
+		server.runCommand("fill 0 " + (y - 1) + " " + (z - 6) + " 24 " + y + " " + (z + 9) + " minecraft:stone");   // ground at y: the plant stands on it
+		// the plant round its generator at (10, z): burner x 9, boiler x 10-13 and superheater x 14 at z-3 to z-1; generator x 10-12
+		// and turbine x 13-14 at z to z+1; feed pump x 10-11 at z+2 and condenser x 12-14 at z+2 to z+3
+		BlockPos gen = new BlockPos(10, up, z);
+		java.util.List<BlockPos> overwrote = server.computeOnServer(srv -> dev.wildcatter.block.SteamPlantLayout.layout().build(srv.overworld(), gen, net.minecraft.core.Direction.NORTH, 0));
+		check(overwrote.isEmpty(), "the plant should be built on clear ground: " + overwrote);
+		// the GSU (true size) against the generator's west end, its bushings at the west, 12.47 kV cable down to a pad-mount and a heater
+		placeBig(server, WildcatterBlocks.GSU_TRANSFORMER, new BlockPos(9, up, z + 1), net.minecraft.core.Direction.WEST);
+		put(server, 7, up + 2, z + 1, "wildcatter:cable_dist");
+		put(server, 7, up + 1, z + 1, "wildcatter:cable_dist");
+		put(server, 7, up, z + 1, "wildcatter:cable_dist");
+		put(server, 6, up, z + 1, "wildcatter:padmount_480[facing=east]");
+		put(server, 5, up, z + 1, "wildcatter:cable_industrial");
+		put(server, 4, up, z + 1, "wildcatter:three_phase_heater");
 		context.waitTicks(30);
-		check(read(server, 14, up + 1, z).contains("COLD"), "the parts should form a cold plant: " + read(server, 14, up + 1, z));
-		// light it with coal; the drum starts at 48 % water (below the half it needs to run) and a full hotwell
+		check(read(server, 10, up, z).contains("COLD"), "the parts should form a cold plant: " + read(server, 10, up, z));
+		// light it with coal on the burner; the drum starts at 48 % water (below the half it needs to run) and a full hotwell
 		server.computeOnServer(srv -> {
-			((dev.wildcatter.block.SteamPlantPartBlockEntity) srv.overworld().getBlockEntity(new BlockPos(11, up, z))).insertFuel(new ItemStack(net.minecraft.world.item.Items.COAL, 4));
+			((dev.wildcatter.block.SteamPlantPartBlockEntity) srv.overworld().getBlockEntity(new BlockPos(9, up, z - 3))).insertFuel(new ItemStack(net.minecraft.world.item.Items.COAL, 4));
 			plantAt(srv, gen).setWaterForTest(Tuning.DRUM_WATER_KG * 0.48, Tuning.HOTWELL_KG);
 			plantAt(srv, gen).setWantRun(true);
 			return null;
 		});
 		context.waitTicks(100);
-		String firing = read(server, 14, up + 1, z);
+		String firing = read(server, 10, up, z);
 		check(firing.contains("FIRING") && !firing.contains("at 0% pressure"), "lit, the drum should start to rise: " + firing);
 		// skip the five-minute warm-up: at pressure, but too little water and no power for the feed pump, it cannot roll
 		server.computeOnServer(srv -> {
@@ -2122,55 +2112,73 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			return null;
 		});
 		context.waitTicks(100);
-		String dry = read(server, 14, up + 1, z);
-		check(dry.contains("FIRING") && read(server, 12, up, z).contains("NO POWER"), "with the drum short and no station service the plant should wait: " + dry + " | " + read(server, 12, up, z));
-		// a genset black-starts the feed pump through 480 V cable to its north face
-		BlockPos set = new BlockPos(12, up, z - 3);
-		genset(server, set, net.minecraft.core.Direction.EAST, false);   // the skid runs north
-		put(server, 12, up, z - 2, "wildcatter:cable_industrial");
-		put(server, 12, up, z - 1, "wildcatter:cable_industrial");
-		startGenset(context, server, set, net.minecraft.core.Direction.EAST, 1000);
+		String dry = read(server, 10, up, z);
+		check(dry.contains("FIRING") && read(server, 10, up, z + 2).contains("NO POWER"), "with the drum short and no station service the plant should wait: " + dry + " | " + read(server, 10, up, z + 2));
+		// a genset black-starts the feed pump: 480 V cable from its panel's end to the terminal box on the pump motor's south side
+		BlockPos set = new BlockPos(8, up + 1, z + 6);
+		genset(server, set, net.minecraft.core.Direction.NORTH, false);   // its base on the ground; the skid runs west, x 4-8, z+6 to z+7
+		put(server, 9, up + 1, z + 6, "wildcatter:cable_industrial");
+		put(server, 10, up + 1, z + 6, "wildcatter:cable_industrial");
+		put(server, 10, up, z + 6, "wildcatter:cable_industrial");
+		put(server, 10, up, z + 5, "wildcatter:cable_industrial");
+		put(server, 10, up, z + 4, "wildcatter:cable_industrial");
+		put(server, 10, up, z + 3, "wildcatter:cable_industrial");
+		startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 1000);
 		String rolling = "";
 		for (int waited = 0; waited < 1600; waited += 40) {
-			rolling = read(server, 14, up + 1, z);
+			rolling = read(server, 10, up, z);
 			if (rolling.contains("breaker CLOSED")) {
 				break;
 			}
 			context.waitTicks(40);
 		}
-		check(rolling.contains("RUNNING") && rolling.contains("breaker CLOSED"), "fed and at pressure, the turbine should roll up and close onto the dead bus: " + rolling + " | pump " + read(server, 12, up, z));
+		check(rolling.contains("RUNNING") && rolling.contains("breaker CLOSED"), "fed and at pressure, the turbine should roll up and close onto the dead bus: " + rolling + " | pump " + read(server, 10, up, z + 2));
 		context.waitTicks(60);
-		String running = read(server, 14, up + 1, z);
-		String gsu = read(server, 15, up + 1, z);
-		String heater = read(server, 20, up + 1, z);
+		String running = read(server, 10, up, z);
+		String gsu = read(server, 9, up, z + 1);
+		String heater = read(server, 4, up, z + 1);
 		check(running.matches(".*RUNNING (3[45]\\d\\d|29\\d\\d|30\\d\\d) rpm.*"), "the turbine should run at rated speed: " + running);
 		check(gsu.contains("line side +30 degrees") && heater.contains("running"), "through the GSU (30 degrees) and a pad-mount the heater should run: " + gsu + " | " + heater);
 		check(running.contains("NOT COOLED"), "with no cooling tower the plant should say so: " + running);
-		server.runCommand("tp @p 13 " + (up + 2) + " " + (z + 7) + " 180 8");
-		context.waitTicks(5);
+		server.runCommand("tp @p 3 " + (up + 4) + " " + (z - 7) + " -45 22");
+		context.waitTicks(10);
 		context.takeScreenshot("wildcatter-steam-plant");
-		// a cooling tower on the condenser's water: basin on a pipe, fill, drift eliminators, fan powered by a little 120 V turbine
-		put(server, 13, up, z + 1, "wildcatter:pipe");
-		put(server, 13, up, z + 2, "wildcatter:tower_basin");
-		put(server, 13, up + 1, z + 2, "wildcatter:cooling_fill");
-		put(server, 13, up + 2, z + 2, "wildcatter:drift_eliminator");
-		put(server, 13, up + 3, z + 2, "wildcatter:cooling_tower");
-		put(server, 14, up + 3, z + 3, "wildcatter:boiler");
-		put(server, 14, up + 2, z + 3, "minecraft:campfire[lit=true]");
-		put(server, 14, up + 3, z + 2, "wildcatter:steam_turbine");   // touches the fan deck and the boiler
-		server.computeOnServer(srv -> ((BoilerBlockEntity) srv.overworld().getBlockEntity(new BlockPos(14, up + 3, z + 3))).addWater(4000));
+		// a cooling tower cell east of the condenser, its basin on the condenser's water pipe; its fan fed from the genset's cable,
+		// along z+4 and up to the disconnect at the fan deck's front
+		BlockPos deck = new BlockPos(16, up + 4, z + 2);
+		java.util.List<BlockPos> towerOver = server.computeOnServer(srv -> dev.wildcatter.block.TowerColumn.layout().build(srv.overworld(), deck, net.minecraft.core.Direction.NORTH, 0));
+		check(towerOver.isEmpty(), "the tower should stand on clear ground: " + towerOver);
+		put(server, 15, up, z + 2, "wildcatter:pipe");
+		for (int x = 11; x <= 15; x++) {
+			put(server, x, up, z + 4, "wildcatter:cable_industrial");
+		}
+		put(server, 15, up + 1, z + 4, "wildcatter:cable_industrial");
+		for (int zz = z + 3; zz >= z + 1; zz--) {
+			put(server, 15, up + 1, zz, "wildcatter:cable_industrial");
+		}
+		for (int h = up + 1; h <= up + 4; h++) {
+			put(server, 16, h, z + 1, "wildcatter:cable_industrial");
+		}
 		context.waitTicks(200);
-		String cooled = read(server, 14, up + 1, z);
-		check(cooled.contains("condensate COOLED"), "with a cooling tower on the condenser's water the plant should be cooled: " + cooled + " | tower " + read(server, 13, up + 3, z + 2));
-		server.runCommand("tp @p 18 " + (up + 3) + " " + (z + 8) + " 150 12");
-		context.waitTicks(5);
+		String tower = read(server, 16, up + 4, z + 2);
+		String cooled = read(server, 10, up, z);
+		check(tower.contains("COOLING"), "a built tower with its fan powered should be cooling: " + tower);
+		check(cooled.contains("condensate COOLED"), "with a cooling tower on the condenser's water the plant should be cooled: " + cooled + " | tower " + tower);
+		server.runCommand("tp @p 22 " + (up + 6) + " " + (z + 12) + " 150 25");
+		context.waitTicks(10);
 		context.takeScreenshot("wildcatter-steam-plant-cooled");
+		server.runCommand("tp @p 23 " + (up + 9) + " " + (z - 4) + " 60 40");
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-cooling-tower");
+		server.runCommand("tp @p 12 " + (up + 14) + " " + (z + 1) + " 90 80");
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-steam-plant-top");
 		// take the superheater out: no plant
-		put(server, 12, up + 1, z, "minecraft:air");
+		put(server, 14, up, z - 3, "minecraft:air");
 		context.waitTicks(30);
-		String broken = read(server, 14, up + 1, z);
+		String broken = read(server, 10, up, z);
 		check(broken.contains("NOT BUILT") && broken.contains("superheater"), "without its superheater the plant should dissolve: " + broken);
-		System.out.println("[wildcatter-test] steam plant ok: " + firing + " | " + running + " | " + gsu + " | " + cooled + " | " + broken);
+		System.out.println("[wildcatter-test] steam plant ok: " + firing + " | " + running + " | " + gsu + " | " + tower + " | " + cooled + " | " + broken);
 	}
 
 	// ---- Phase 4.5: true-size parts ---------------------------------------------------------------------------------
@@ -2371,7 +2379,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		});
 		context.waitTicks(30);
 		String turned = read(server, panelAt.getX(), panelAt.getY(), panelAt.getZ());
-		check(turned.contains("NOT BUILT") && turned.contains("alternator") && turned.contains("face the set's way"), "a part facing the wrong way should be named: " + turned);
+		check(turned.contains("NOT BUILT") && turned.contains("alternator") && turned.contains("face the machine's way"), "a part facing the wrong way should be named: " + turned);
 		server.computeOnServer(srv -> srv.overworld().setBlock(alternator, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3));
 		context.waitTicks(2);
 		check(placeOn(server, WildcatterBlocks.ALTERNATOR, base, 12.5, z + 4.5, 180.0F), "a new alternator clicked on the tank should go to its slot");
@@ -2453,6 +2461,64 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.takeScreenshot("wildcatter-gensets-ten");
 		check(running == 10, "all ten sets should run: " + running);
 		System.out.println("[wildcatter-test] frame rate: " + before + " fps empty, " + after + " fps with ten running gensets in view");
+	}
+
+	/**
+	 * The cooling tower cell at true size (4.5c, docs/multiblocks/cooling-tower.md), built the way a player builds it: the basin
+	 * first, then fill, drift eliminators and fan deck, each clicked on top of the basin, snap into the column. Without its
+	 * eliminators the deck names them; breaking one piece of the fill drops one fill; and a one-block plant part from an older
+	 * world drops as an item.
+	 */
+	private void towerParts(ClientGameTestContext context, TestServerContext server) {
+		int z = -820;
+		server.runCommand("tp @p 10 " + (up + 6) + " " + (z + 12) + " 180 25");
+		context.waitTicks(20);
+		server.runCommand("fill 0 " + (y - 1) + " " + (z - 8) + " 20 " + (y + 9) + " " + (z + 10) + " minecraft:air");
+		server.runCommand("fill 0 " + (y - 1) + " " + (z - 8) + " 20 " + y + " " + (z + 10) + " minecraft:stone");   // ground at y
+		server.runCommand("kill @e[type=item]");
+		BlockPos basin = new BlockPos(10, up, z);
+		check(placeOn(server, WildcatterBlocks.TOWER_BASIN, basin.below(), 10.5, z + 6.5, 180.0F), "a basin should place on clear ground");
+		check(stateAt(server, basin).is(WildcatterBlocks.TOWER_BASIN), "the basin's main cell should be where it was clicked: " + stateAt(server, basin));
+		for (net.minecraft.world.level.block.Block part : new net.minecraft.world.level.block.Block[] {WildcatterBlocks.COOLING_FILL, WildcatterBlocks.DRIFT_ELIMINATOR, WildcatterBlocks.COOLING_TOWER}) {
+			check(placeOn(server, part, basin, 10.5, z + 6.5, 180.0F), "a " + part.getName().getString() + " clicked on the basin should go into the column");
+		}
+		BlockPos deck = basin.above(dev.wildcatter.block.TowerColumn.DECK_HEIGHT);
+		check(stateAt(server, basin.above(1)).is(WildcatterBlocks.COOLING_FILL) && stateAt(server, basin.above(3)).is(WildcatterBlocks.DRIFT_ELIMINATOR)
+				&& stateAt(server, deck).is(WildcatterBlocks.COOLING_TOWER), "fill, eliminators and deck should stack on the basin: " + stateAt(server, deck));
+		context.waitTicks(40);
+		String built = read(server, deck.getX(), deck.getY(), deck.getZ());
+		check(built.contains("Cooling tower (7.5 kW") && !built.contains("NOT BUILT"), "a full column should be a built tower, waiting for power: " + built);
+		String viaDeck = read(server, 8, up + 5, z - 2);   // a far top corner of the deck reads the tower
+		check(viaDeck.contains("Cooling tower"), "any piece of the deck should read the tower: " + viaDeck);
+		server.runCommand("tp @p 4 " + (up + 5) + " " + (z + 6) + " -140 25");
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-tower-built");
+		// take the eliminators out: the deck names them
+		server.computeOnServer(srv -> srv.overworld().destroyBlock(basin.above(3), false));
+		context.waitTicks(40);
+		String missing = read(server, deck.getX(), deck.getY(), deck.getZ());
+		check(missing.contains("NOT BUILT") && missing.contains("drift eliminators"), "without its eliminators the tower should say so: " + missing);
+		// break one piece of the fill: the whole fill goes and one drops
+		server.runCommand("kill @e[type=item]");
+		BlockPos fillPiece = server.computeOnServer(srv -> {
+			for (BlockPos at : dev.wildcatter.multiblock.BigParts.cellsAt(srv.overworld(), basin.above(1))) {
+				if (!at.equals(basin.above(1))) {
+					return at.immutable();
+				}
+			}
+			return basin.above(1);
+		});
+		server.computeOnServer(srv -> srv.overworld().destroyBlock(fillPiece, true));
+		context.waitTicks(40);   // the pieces go at once; the main cell breaks and drops on its next tick
+		check(stateAt(server, basin.above(1)).isAir() && itemsNear(server, basin, WildcatterBlocks.COOLING_FILL) == 1, "breaking one fill piece should take the whole fill and drop one: "
+				+ fillPiece.toShortString() + " -> main " + stateAt(server, basin.above(1)) + ", " + itemsNear(server, basin, WildcatterBlocks.COOLING_FILL) + " fill items");
+		// an older world's one-block condenser: the plant's layout changed, so it drops
+		server.runCommand("kill @e[type=item]");
+		put(server, 16, up, z + 6, "wildcatter:condenser[facing=north]");
+		context.waitTicks(10);
+		check(stateAt(server, new BlockPos(16, up, z + 6)).isAir() && itemsNear(server, new BlockPos(16, up, z + 6), WildcatterBlocks.CONDENSER) == 1,
+				"a one-block condenser from an older world should drop as one item");
+		System.out.println("[wildcatter-test] tower parts ok: " + built + " | " + missing);
 	}
 
 	private void fieldManual(TestServerContext server) {

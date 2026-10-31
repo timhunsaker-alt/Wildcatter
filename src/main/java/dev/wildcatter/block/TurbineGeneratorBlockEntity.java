@@ -15,12 +15,8 @@ import dev.wildcatter.energy.ElectricalStandard;
 import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.energy.Voltage;
 import dev.wildcatter.kinetic.Spin;
-import dev.wildcatter.multiblock.Multiblock;
-import dev.wildcatter.multiblock.MultiblockLayout;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -44,28 +40,16 @@ import net.minecraft.world.level.storage.ValueOutput;
  * (3.3 kV on IEC worlds) for the GSU. Without a cooling tower on the condenser's water the back pressure takes a third more steam,
  * so the plant makes at most three quarters of its rating. A low drum level trips it.
  */
-public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitPart, Generator, Inspectable {
+public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitPart, Generator, Inspectable, dev.wildcatter.multiblock.BigPartEntity {
 	public enum Run {
 		COLD, FIRING, ROLLING, RUNNING
 	}
 
-	/** As built: burner under the drum, feed pump under the superheater, condenser under the turbine; drum, superheater, turbine and generator along the shaft. */
-	private static final MultiblockLayout LAYOUT = new MultiblockLayout('G',
-			new String[] {"BPC."},
-			new String[] {"DSTG"});
-	private static final Map<Character, Predicate<BlockState>> LEGEND = Map.of(
-			'G', s -> s.is(WildcatterBlocks.TURBINE_GENERATOR),
-			'B', s -> s.is(WildcatterBlocks.BOILER_BURNER),
-			'D', s -> s.is(WildcatterBlocks.BOILER_DRUM),
-			'S', s -> s.is(WildcatterBlocks.SUPERHEATER),
-			'T', s -> s.is(WildcatterBlocks.TURBINE_CASING),
-			'C', s -> s.is(WildcatterBlocks.CONDENSER),
-			'P', s -> s.is(WildcatterBlocks.FEED_PUMP));
-	private static final Map<Character, String> NAMES = Map.of('B', "burner (under the drum)", 'D', "steam drum", 'S', "superheater", 'T', "turbine",
-			'C', "condenser (under the turbine)", 'P', "feed pump (under the superheater)");
 	private static final double FULL_FIRE_WATTS = Tuning.PLANT_WATTS / Tuning.PLANT_EFFICIENCY;
 
 	private final ThreePhaseSource phases = new ThreePhaseSource();
+	/** Grown into its true-size cells (see BigParts). */
+	private boolean grown;
 	private final StatorHeating stator = new StatorHeating();
 	private final Synchronizer sync = new Synchronizer();
 	private final Spin spin = new Spin();
@@ -92,6 +76,17 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 
 	public TurbineGeneratorBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.TURBINE_GENERATOR_ENTITY, pos, state);
+	}
+
+	@Override
+	public boolean grown() {
+		return grown;
+	}
+
+	@Override
+	public void markGrown() {
+		grown = true;
+		setChanged();
 	}
 
 	private Direction facing() {
@@ -176,26 +171,21 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 	}
 
 	private void checkStructure(ServerLevel level) {
-		List<BlockPos> found = Multiblock.match(level, worldPosition, facing(), LAYOUT, LEGEND);
-		if (found != null) {
+		PartLayout.Found found = SteamPlantLayout.layout().check(level, worldPosition, facing());
+		if (found.parts() != null) {
 			if (!formed) {
 				level.playSound(null, worldPosition, WildcatterSounds.STRUCTURE_FORMED, SoundSource.BLOCKS, 1.5F, 0.8F);
 			}
 			formed = true;
 			missing = "";
-			for (BlockPos at : found) {
+			for (BlockPos at : found.parts()) {
 				if (level.getBlockEntity(at) instanceof SteamPlantPartBlockEntity part) {
 					part.bind(worldPosition);
-					BlockState s = level.getBlockState(at);
-					if (s.getValue(SteamPlantPartBlock.FACING) != facing()) {
-						level.setBlock(at, s.setValue(SteamPlantPartBlock.FACING, facing()), 3);
-					}
 				}
 			}
-			parts = found;
+			parts = found.parts();
 		} else {
-			String why = Multiblock.missing(level, worldPosition, facing(), LAYOUT, LEGEND, NAMES);
-			missing = why == null ? "" : why;
+			missing = found.missing();
 			if (formed) {
 				for (BlockPos at : parts) {
 					if (level.getBlockEntity(at) instanceof SteamPlantPartBlockEntity part) {
@@ -228,7 +218,7 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 		if (condenser == null) {
 			return;
 		}
-		List<BlockPos> cells = List.of(condenser.getBlockPos());
+		List<BlockPos> cells = dev.wildcatter.multiblock.BigParts.cellsAt(level, condenser.getBlockPos());   // the water pipe on any cell
 		Set<BlockPos> pipes = Plumbing.network(level, cells);
 		for (TowerBasinBlockEntity basin : Plumbing.machines(level, cells, pipes, false, TowerBasinBlockEntity.class)) {
 			cooled |= basin.cooling();
@@ -329,7 +319,7 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 
 	/** Pipeline gas at the burner: up to the heat it still needs, from the gas wells on its gas lines. */
 	private double drawGas(ServerLevel level, SteamPlantPartBlockEntity burner, double joules) {
-		List<BlockPos> cells = List.of(burner.getBlockPos());
+		List<BlockPos> cells = dev.wildcatter.multiblock.BigParts.cellsAt(level, burner.getBlockPos());   // the gas line on any cell
 		Set<BlockPos> lines = Plumbing.network(level, cells, PipeBlock.Kind.GAS);
 		double got = 0;
 		for (GasWellheadBlockEntity head : Plumbing.machines(level, cells, lines, true, GasWellheadBlockEntity.class)) {
@@ -358,23 +348,31 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 	// ---- the circuit ----------------------------------------------------------------------------------------------
 	@Override
 	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
-		return voltage == Voltage.MEDIUM && face != facing().getCounterClockWise();   // not toward the turbine
+		return hasPortAt(worldPosition, face, role, voltage);
+	}
+
+	/** The 4.16 kV terminals: the generator's non-drive end, away from the turbine, on both bottom cells. */
+	@Override
+	public boolean hasPortAt(BlockPos cell, Direction face, Conductor role, Voltage voltage) {
+		return voltage == Voltage.MEDIUM && face == TurbineGeneratorBlock.terminalFace(getBlockState())
+				&& TurbineGeneratorBlock.terminalCells(worldPosition, getBlockState()).contains(cell);
 	}
 
 	@Override
 	public void build(Circuit circuit) {
 		sync.beginBuild();
-		Direction shaft = facing().getCounterClockWise();
 		if (!live()) {
 			if (formed && run == Run.RUNNING && !breakerClosed && !tripped) {
-				sync.buildTransformers(circuit, worldPosition, Voltage.MEDIUM, face -> face != shaft);
+				sync.buildTransformers(circuit, TurbineGeneratorBlock.terminalCells(worldPosition, getBlockState()),
+						List.of(TurbineGeneratorBlock.terminalFace(getBlockState())), Voltage.MEDIUM);
 			}
 			return;
 		}
 		double nominal = Voltage.MEDIUM.nominal();
 		double ratedAmps = Tuning.PLANT_WATTS / Tuning.GENERATOR_RATED_PF / (3 * nominal);
 		double ohms = nominal * Tuning.ENGINE_SAG / ratedAmps;
-		phases.build(circuit, worldPosition, Voltage.MEDIUM, nominal, ohms);
+		phases.build(circuit, TurbineGeneratorBlock.terminalCells(worldPosition, getBlockState()),
+				List.of(TurbineGeneratorBlock.terminalFace(getBlockState())), Voltage.MEDIUM, nominal, ohms);
 	}
 
 	@Override
@@ -457,6 +455,7 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
 		output.putBoolean("formed", formed);
+		output.putBoolean("grown", grown);
 		output.putString("run", run.name());
 		output.putBoolean("wantRun", wantRun);
 		output.putBoolean("breaker", breakerClosed);
@@ -472,6 +471,7 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
 		formed = input.getBooleanOr("formed", formed);
+		grown = input.getBooleanOr("grown", grown);
 		try {
 			run = Run.valueOf(input.getStringOr("run", run.name()));
 		} catch (IllegalArgumentException e) {

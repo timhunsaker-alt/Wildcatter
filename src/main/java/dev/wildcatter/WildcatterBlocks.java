@@ -111,10 +111,10 @@ public final class WildcatterBlocks {
 	/** The foot and top of the cooling-tower column (docs/multiblocks/cooling-tower.md). */
 	public static final Block TOWER_BASIN = block("tower_basin", props -> new dev.wildcatter.block.TowerBasinBlock(props.mapColor(MapColor.STONE)
 			.strength(2.0F, 6.0F).sound(SoundType.STONE).requiresCorrectToolForDrops()));
-	public static final Block DRIFT_ELIMINATOR = block("drift_eliminator", props -> new Block(props.mapColor(MapColor.STONE)
-			.strength(1.5F, 3.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+	public static final Block DRIFT_ELIMINATOR = block("drift_eliminator", props -> new CoolingFillBlock(props.mapColor(MapColor.STONE)
+			.strength(1.5F, 3.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), dev.wildcatter.multiblock.Footprint.box(4, 1, 4, 0, 0), "drift_eliminator"));
 	public static final Block COOLING_FILL = block("cooling_fill", props -> new CoolingFillBlock(props.mapColor(MapColor.STONE)
-			.strength(2.0F, 4.0F).sound(SoundType.STONE).requiresCorrectToolForDrops()));
+			.strength(2.0F, 4.0F).sound(SoundType.STONE).requiresCorrectToolForDrops(), dev.wildcatter.multiblock.Footprint.box(4, 2, 4, 0, 0), "cooling_fill"));
 	/** Each is a small 110 V set; eight of one kind in a 2x2x2 cube make a 4.16 kV generator. */
 
 	/** A utility pole section and the crossarm that goes on top. Bare high-voltage lines belong up here. */
@@ -335,6 +335,8 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<RefineryBlockEntity> REFINERY_ENTITY = entity(RefineryBlockEntity::new, REFINERY);
 	public static final BlockEntityType<dev.wildcatter.block.TowerBasinBlockEntity> TOWER_BASIN_ENTITY = entity(dev.wildcatter.block.TowerBasinBlockEntity::new, TOWER_BASIN);
 	public static final BlockEntityType<CoolingTowerBlockEntity> COOLING_TOWER_ENTITY = entity(CoolingTowerBlockEntity::new, COOLING_TOWER);
+	/** The plain true-size parts that only remember they have grown (block/BigPartBlockEntity). */
+	public static final BlockEntityType<dev.wildcatter.block.BigPartBlockEntity> BIG_PART_ENTITY = entity(dev.wildcatter.block.BigPartBlockEntity::new, COOLING_FILL, DRIFT_ELIMINATOR);
 
 	private WildcatterBlocks() {
 	}
@@ -527,6 +529,7 @@ public final class WildcatterBlocks {
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("gas_wellhead"), GAS_WELLHEAD_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("refinery"), REFINERY_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("cooling_tower"), COOLING_TOWER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("big_part"), BIG_PART_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("wire"), WIRE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("load"), LOAD_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("breaker"), BREAKER_ENTITY);

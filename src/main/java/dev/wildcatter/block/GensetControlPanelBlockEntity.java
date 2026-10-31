@@ -194,13 +194,13 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 	}
 
 	private void checkStructure(ServerLevel level) {
-		GensetSkid.Found found = GensetSkid.check(level, worldPosition, facing());
+		PartLayout.Found found = GensetSkid.layout().check(level, worldPosition, facing());
 		if (found.parts() != null) {
-			if (!formed || found.gas() != gas) {
+			if (!formed || (found.variant() == 1) != gas) {
 				level.playSound(null, worldPosition, WildcatterSounds.STRUCTURE_FORMED, SoundSource.BLOCKS, 1.2F, 0.9F);
 			}
 			formed = true;
-			gas = found.gas();
+			gas = (found.variant() == 1);
 			missing = "";
 			for (BlockPos at : found.parts()) {
 				if (level.getBlockEntity(at) instanceof GensetPartBlockEntity part) {

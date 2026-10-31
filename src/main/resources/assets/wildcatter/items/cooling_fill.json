@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/cooling_fill"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/cooling_fill/item"
+ }
 }

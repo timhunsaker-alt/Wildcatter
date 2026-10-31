@@ -61,7 +61,7 @@ public final class Tuning {
 	public static final double POLE_TRANSFORMER_PERCENT_Z = 2.5;   // nameplate impedance of a 25 kVA pole-top unit (docs/phase3-three-phase.md)
 	public static final double RECEPTACLE_BURN_SECONDS = 30.0;  // sustained 120 % of the plug rating for this long burns the receptacle
 	public static final double UNCOOLED_EFFICIENCY = 0.75;
-	public static final double COOLING_FAN_WATTS = 750;
+	public static final double COOLING_FAN_WATTS = 7_500;           // 10 hp, 480 V three-phase, through a gearbox: a 3 m tower fan (4.5c)
 	public static final double DRAIN_TANK = 100;              // water a drain can hold before it spills
 
 	// ---- Oil and gas wells -------------------------------------------------------------------------------------------

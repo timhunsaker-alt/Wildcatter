@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/cooling_tower"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/cooling_tower/item"
+ }
 }

@@ -41,7 +41,7 @@ import org.jspecify.annotations.Nullable;
  * A steam plant part. It remembers its turbine generator (sent to the client for the turning parts and sounds). The burner holds
  * its fuel (one stack, fed by hand or hopper, plus the heat already taken from it); the feed pump is a 480 V three-phase motor.
  */
-public class SteamPlantPartBlockEntity extends BlockEntity implements CircuitPart, Kinetic, Sounding, Inspectable, Container {
+public class SteamPlantPartBlockEntity extends BlockEntity implements CircuitPart, Kinetic, Sounding, Inspectable, Container, dev.wildcatter.multiblock.BigPartEntity {
 	private static final Spin STILL = new Spin();
 
 	private @Nullable BlockPos controller;
@@ -52,6 +52,8 @@ public class SteamPlantPartBlockEntity extends BlockEntity implements CircuitPar
 	private final Motor motor = new Motor(true, Voltage.INDUSTRIAL, Tuning.FEED_PUMP_WATTS);
 	private boolean wanted;
 	private final Spin pumpSpin = new Spin();
+	/** Grown into its true-size cells (see BigParts). */
+	private boolean grown;
 
 	public SteamPlantPartBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.STEAM_PLANT_PART_ENTITY, pos, state);
@@ -154,14 +156,30 @@ public class SteamPlantPartBlockEntity extends BlockEntity implements CircuitPar
 	}
 
 	@Override
+	public boolean grown() {
+		return grown;
+	}
+
+	@Override
+	public void markGrown() {
+		grown = true;
+		setChanged();
+	}
+
+	/** The feed pump's motor terminal box is on the side of the motor away from the generator (south, for a plant facing north). */
+	private Direction motorEnd() {
+		return facing().getOpposite();
+	}
+
+	@Override
 	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
-		return part() == SteamPlantPartBlock.Part.FEED_PUMP && voltage == Voltage.INDUSTRIAL && role != Conductor.N;
+		return part() == SteamPlantPartBlock.Part.FEED_PUMP && face == motorEnd() && voltage == Voltage.INDUSTRIAL && role != Conductor.N;
 	}
 
 	@Override
 	public void build(Circuit circuit) {
 		if (part() == SteamPlantPartBlock.Part.FEED_PUMP) {
-			motor.build(circuit, worldPosition);
+			motor.build(circuit, worldPosition, List.of(motorEnd()));
 		}
 	}
 
@@ -187,9 +205,10 @@ public class SteamPlantPartBlockEntity extends BlockEntity implements CircuitPar
 	public List<Rotor> rotors() {
 		RotorBlock rotor = (RotorBlock) WildcatterBlocks.ROTOR;
 		return switch (part()) {
-			// drawn for a plant facing north: the shaft runs west (drum) to east (generator)
-			case TURBINE -> List.of(new Rotor(rotor.part(RotorBlock.Part.COUPLING), new Vector3f(0.88F, 0.5F, 0.5F), Direction.Axis.X, 1.0F));
-			case FEED_PUMP -> List.of(new Rotor(rotor.part(RotorBlock.Part.COUPLING), new Vector3f(0.5F, 0.4F, 0.5F), Direction.Axis.X, 1.0F));
+			// in the main cell's frame for a plant facing north (tools/models/rotors.py): the generator is west of the turbine, the
+			// shaft 0.85 m up along the middle of the 2 m skid; the pump's motor is the west half of its 2 m skid
+			case TURBINE -> List.of(new Rotor(rotor.part(RotorBlock.Part.TURBINE_COUPLING), new Vector3f(0.1F, 0.85F, 1.0F), Direction.Axis.X, 1.0F));
+			case FEED_PUMP -> List.of(new Rotor(rotor.part(RotorBlock.Part.PUMP_COUPLING), new Vector3f(1.0F, 0.32F, 0.5F), Direction.Axis.X, 1.0F));
 			default -> List.of();
 		};
 	}
@@ -338,6 +357,7 @@ public class SteamPlantPartBlockEntity extends BlockEntity implements CircuitPar
 			output.putLong("controller", controller.asLong());
 		}
 		output.putDouble("joules", joules);
+		output.putBoolean("grown", grown);
 		if (!fuel.isEmpty()) {
 			output.store("fuel", ItemStack.CODEC, fuel);
 		}
@@ -348,6 +368,7 @@ public class SteamPlantPartBlockEntity extends BlockEntity implements CircuitPar
 		super.loadAdditional(input);
 		controller = input.getLong("controller").map(BlockPos::of).orElse(null);
 		joules = input.getDoubleOr("joules", 0);
+		grown = input.getBooleanOr("grown", false);
 		fuel = input.read("fuel", ItemStack.CODEC).orElse(ItemStack.EMPTY);
 		pumpSpin.setRpm(input.getFloatOr("rpm", pumpSpin.rpm()));
 	}

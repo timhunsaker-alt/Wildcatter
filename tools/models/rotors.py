@@ -5,9 +5,12 @@ KineticRenderer turns them about the pivots in GensetPartBlockEntity.rotors().
 - crank_pulley: the crank pulley with its two belt grooves and a timing mark, 0.3 m across
 - coupling: the flexible coupling and flywheel ring seen through the adapter's windows, 0.8 m across
 - alternator_fan: the alternator's drive-end cooling fan, 0.8 m across
+- tower_fan: the cooling tower's 3 m fan, six blades, turning about y (4.5c)
+- turbine_coupling: the steam turbine's flexible disc coupling to its generator, 0.45 m across
+- pump_coupling: the feed pump's jaw coupling, 0.14 m across
 """
 import mlib
-import gensetlib as g
+import plantlib as g
 
 C = (0.5, 0.5)   # the block's centre, (y, z)
 
@@ -37,4 +40,21 @@ ALT_FAN = rotor("alternator_fan")
 ALT_FAN.fan("x", C, 0.4, 0.5, 0.06, "galv", blades=8, width=0.1, hub=0.16, hub_tex="blue")
 ALT_FAN.ring("x", C, 0.4, 0.47, 0.53, 0.02, "galv", sides=16)
 
-ROTORS = [FAN, PULLEY, COUPLING, ALT_FAN]
+TOWER_FAN = rotor("tower_fan")
+TOWER_FAN.fan("y", (0.5, 0.5), 1.45, 0.5, 0.04, "polymer", blades=6, width=0.3, hub=0.22, hub_tex="galv")
+TOWER_FAN.cylinder("y", (0.5, 0.5), 0.12, 0.5 + 0.06, 0.5 + 0.16, "galv", 10)   # the hub's cap
+
+TURBINE_COUPLING = rotor("turbine_coupling")
+TURBINE_COUPLING.cylinder("x", C, 0.22, 0.44, 0.48, "steel", 16)   # the two hubs' flanges
+TURBINE_COUPLING.cylinder("x", C, 0.22, 0.52, 0.56, "steel", 16)
+TURBINE_COUPLING.cylinder("x", C, 0.17, 0.48, 0.52, "galv", 16)    # the disc pack
+TURBINE_COUPLING.bolt_circle("x", C, 0.18, 0.56, 8, "galv", head=0.03, height=0.02)
+TURBINE_COUPLING.box((0.43, 0.68, 0.47), (0.57, 0.72, 0.53), "brass")   # a painted mark
+
+PUMP_COUPLING = rotor("pump_coupling")
+PUMP_COUPLING.cylinder("x", C, 0.07, 0.42, 0.49, "iron", 12)
+PUMP_COUPLING.cylinder("x", C, 0.07, 0.51, 0.58, "iron", 12)
+PUMP_COUPLING.fan("x", C, 0.065, 0.5, 0.04, "rubber", blades=4, width=0.03, hub=0.02)   # the spider between the jaws
+PUMP_COUPLING.box((0.44, 0.565, 0.485), (0.56, 0.575, 0.515), "brass")
+
+ROTORS = [FAN, PULLEY, COUPLING, ALT_FAN, TOWER_FAN, TURBINE_COUPLING, PUMP_COUPLING]

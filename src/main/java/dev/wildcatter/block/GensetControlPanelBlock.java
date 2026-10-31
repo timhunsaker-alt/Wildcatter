@@ -104,22 +104,17 @@ public class GensetControlPanelBlock extends BaseEntityBlock implements BigPart 
 
 	@Override
 	public BlockPlaceContext snap(BlockPlaceContext context) {
-		return GensetSkid.snap(context, this);
+		return GensetSkid.layout().snap(context, this);
 	}
 
 	@Override
 	public BlockState placementState(BlockPlaceContext context) {
-		GensetSkid.Slot slot = GensetSkid.slotFor(context.getLevel(), context.getClickedPos(), this);
-		return defaultBlockState().setValue(FACING, slot != null ? slot.facing() : context.getHorizontalDirection().getOpposite());
+		return GensetSkid.layout().placementState(context, this);
 	}
 
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
-		GensetSkid.Slot slot = GensetSkid.slotFor(context.getLevel(), context.getClickedPos(), this);
-		if (slot != null && !slot.main().equals(context.getClickedPos())) {
-			return null;   // its slot on this skid is taken
-		}
-		return BigParts.placement(context, placementState(context));
+		return GensetSkid.layout().placement(context, this);
 	}
 
 	@Override

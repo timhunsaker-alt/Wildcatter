@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/turbine_casing"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/turbine_casing/item"
+ }
 }

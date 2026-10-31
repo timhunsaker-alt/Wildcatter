@@ -18,6 +18,9 @@
   "gauge": "wildcatter:block/mat/decal_gauge",
   "controller": "wildcatter:block/mat/decal_controller",
   "engineplate": "wildcatter:block/mat/decal_engine_plate",
+  "concrete": "wildcatter:block/mat/mat_concrete",
+  "polymer": "wildcatter:block/mat/mat_polymer_grey",
+  "padgreen": "wildcatter:block/mat/mat_paint_pad_green",
   "particle": "wildcatter:block/mat/mat_cast_iron"
  },
  "elements": [

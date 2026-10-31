@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/tower_basin"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/tower_basin/item"
+ }
 }

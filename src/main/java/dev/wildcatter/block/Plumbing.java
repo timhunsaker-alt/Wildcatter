@@ -101,8 +101,10 @@ public final class Plumbing {
 		for (BlockPos source : sources) {
 			for (Direction side : Direction.values()) {
 				BlockPos next = source.relative(side);
-				if (!cells.contains(next) && kind.isInstance(level.getBlockEntity(next))) {
-					found.putIfAbsent(next, kind.cast(level.getBlockEntity(next)));
+				// a true-size machine shows up once, through whichever of its cells the pipe touches
+				net.minecraft.world.level.block.entity.BlockEntity entity = dev.wildcatter.multiblock.BigParts.entity(level, next);
+				if (!cells.contains(next) && kind.isInstance(entity)) {
+					found.putIfAbsent(entity.getBlockPos(), kind.cast(entity));
 				}
 			}
 		}

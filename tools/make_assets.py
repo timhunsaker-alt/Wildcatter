@@ -352,7 +352,7 @@ save_json(f"{ASSETS}/blockstates/firebox.json", {"variants": {
 	"lit=false": {"model": f"{ns}:block/firebox"}, "lit=true": {"model": f"{ns}:block/firebox_lit"}}})
 block_model("pump", "minecraft:block/cube_all", {"all": f"{ns}:block/pump"})
 save_json(f"{ASSETS}/blockstates/pump.json", {"variants": {"": {"model": f"{ns}:block/pump"}}})
-for cube in ("drilling_rig", "pumpjack", "gas_wellhead", "casing", "refinery", "refinery_column", "cooling_tower", "cooling_fill"):
+for cube in ("drilling_rig", "pumpjack", "gas_wellhead", "casing", "refinery", "refinery_column"):   # the cooling tower parts are true size (4.5c)
 	block_model(cube, "minecraft:block/cube_all", {"all": f"{ns}:block/{cube}"})
 	save_json(f"{ASSETS}/blockstates/{cube}.json", {"variants": {"": {"model": f"{ns}:block/{cube}"}}})
 for load in ("electric_lamp", "electric_heater"):
@@ -711,7 +711,7 @@ shaped("gas_wellhead", ["III", "CBC", "III"], {"I": "minecraft:iron_ingot", "C":
 shaped("seismograph", ["IPI", "RCR", "III"], {"I": "minecraft:iron_ingot", "P": "minecraft:paper", "R": "minecraft:redstone", "C": "minecraft:compass"}, "seismograph")
 shaped("refinery", ["IPI", "CBC", "III"], {"I": "minecraft:iron_ingot", "P": "minecraft:copper_ingot", "C": "minecraft:cauldron", "B": "minecraft:blast_furnace"}, "refinery")
 shaped("cooling_tower", ["IBI", "CFC", "III"], {"I": "minecraft:iron_ingot", "B": "minecraft:iron_bars", "C": "minecraft:copper_ingot", "F": "minecraft:blast_furnace"}, "cooling_tower")
-shaped("cooling_fill", ["IBI", "IBI", "IBI"], {"I": "minecraft:iron_ingot", "B": "minecraft:iron_bars"}, "cooling_fill", 2)
+shaped("cooling_fill", ["IBI", "IBI", "IBI"], {"I": "minecraft:iron_ingot", "B": "minecraft:iron_bars"}, "cooling_fill")
 shaped("refinery_column", ["ICI", "ICI", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot"}, "refinery_column")
 shaped("steam_turbine", ["ICI", "CRC", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, "steam_turbine")
 # Wire is coloured with dye so you can tell the two conductors apart: red is hot, black is neutral.
@@ -1073,33 +1073,19 @@ def chevrons(img, d):
 		d.line([8, y, 15, y + 3], fill=(120, 124, 128))
 
 
-tex("tower_basin_placeholder", basin)
-tex("drift_eliminator_placeholder", chevrons)
-block_model("tower_basin", "minecraft:block/cube_all", {"all": f"{ns}:block/{art('tower_basin')}"})
-block_model("drift_eliminator", "minecraft:block/cube_all", {"all": f"{ns}:block/{art('drift_eliminator')}"})
-deck = f"{ns}:block/cooling_tower"
-save_json(f"{ASSETS}/models/block/cooling_tower.json", {"textures": {"deck": deck, "particle": deck}, "elements": [
-	box([0, 0, 0], [16, 8, 16], "#deck"),                                    # the fan deck and the motor under the fan
-	box([0, 8, 0], [16, 16, 2], "#deck"), box([0, 8, 14], [16, 16, 16], "#deck"),   # the fan stack, open at the top
-	box([0, 8, 2], [2, 16, 14], "#deck"), box([14, 8, 2], [16, 16, 14], "#deck")]})
-for name in ("tower_basin", "drift_eliminator"):
-	save_json(f"{ASSETS}/blockstates/{name}.json", {"variants": {"": {"model": f"{ns}:block/{name}"}}})
-	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{name}"}})
-	save_json(f"{DATA}/loot_table/blocks/{name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],
-		"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
-save_json(f"{ASSETS}/models/block/rotor_tower_fan.json", {"textures": r, "elements": [   # blades in the horizontal plane, turning about Y
-	box([7, 7, 7], [9, 9, 9], "#rotor"),
-	box([9, 7.5, 6.5], [14, 8.5, 9.5], "#rotor"), box([2, 7.5, 6.5], [7, 8.5, 9.5], "#rotor"),
-	box([6.5, 7.5, 9], [9.5, 8.5, 14], "#rotor"), box([6.5, 7.5, 2], [9.5, 8.5, 7], "#rotor")]})
-save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ("radiator_fan", "crank_pulley", "coupling", "tower_fan", "alternator_fan")}})
+# Phase 4.5c: the tower's parts are true size: blockstates, piece models, items and collision come from tools/models/<part>.py
+# (run at the end of this script); here only their loot (piece 0 drops the item).
+for name in ("tower_basin", "cooling_fill", "drift_eliminator", "cooling_tower"):
+	big_part_loot(name)
 shaped("tower_basin", ["S S", "SWS", "SSS"], {"S": "minecraft:smooth_stone", "W": "minecraft:water_bucket"}, "tower_basin")
-shaped("drift_eliminator", ["P P", " P ", "P P"], {"P": f"{ns}:plastic_sheet"}, "drift_eliminator", 2)
+shaped("drift_eliminator", ["P P", " P ", "P P"], {"P": f"{ns}:plastic_sheet"}, "drift_eliminator")
 for tag in ("mineable/pickaxe",):
 	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
 	t["values"] += [f"{ns}:tower_basin", f"{ns}:drift_eliminator"]
 	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
 lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
-lang.update({"block.wildcatter.tower_basin": "Cooling Tower Basin", "block.wildcatter.drift_eliminator": "Drift Eliminators"})
+lang.update({"block.wildcatter.tower_basin": "Cooling Tower Basin (4 x 4 m)", "block.wildcatter.drift_eliminator": "Drift Eliminators (4 x 4 m)",
+	"block.wildcatter.cooling_fill": "Cooling Tower Fill (4 x 4 m)", "block.wildcatter.cooling_tower": "Cooling Tower Fan Deck (7.5 kW, 480 V)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
 # ---- Phase 4d: the 1 MW steam plant (docs/multiblocks/steam-plant.md), dressed in the old steam machines' Ludo art -------------
@@ -1110,30 +1096,10 @@ def condenser_face(img, d):
 	d.rectangle([0, 0, 15, 15], outline=(60, 66, 72))
 
 
-tex("condenser_placeholder", condenser_face)
 B = lambda n: f"{ns}:block/{n}"
-block_model("boiler_burner", "minecraft:block/cube_bottom_top", {"side": B("firebox_side_lit"), "top": B("firebox_top"), "bottom": B("firebox_top")})
-block_model("boiler_drum", "minecraft:block/cube_bottom_top", {"side": B("boiler_side"), "top": B("boiler_top"), "bottom": B("boiler_bottom")})
-block_model("superheater", "minecraft:block/cube_bottom_top", {"side": B("boiler_formed_side"), "top": B("boiler_top"), "bottom": B("boiler_bottom")})
-block_model("condenser", "minecraft:block/cube_all", {"all": B(art("condenser"))})
-save_json(f"{ASSETS}/models/block/turbine_casing.json", {"textures": {"side": B("steam_turbine_side"), "end": B("steam_turbine_end"), "particle": B("steam_turbine_side")}, "elements": [
-	{"from": [0, 1, 1], "to": [12, 15, 15], "faces": {"north": {"texture": "#side"}, "south": {"texture": "#side"}, "up": {"texture": "#side"}, "down": {"texture": "#side"},
-		"west": {"texture": "#end"}, "east": {"texture": "#end"}}},
-	box([12, 7, 7], [16, 9, 9], "#side")]})   # the shaft out to the generator; the coupling turns on it
-save_json(f"{ASSETS}/models/block/turbine_generator.json", {"parent": "minecraft:block/orientable", "textures": {
-	"front": B("generator_end"), "side": B("generator_side"), "top": B("generator_side"), "bottom": B("generator_side")}})
-save_json(f"{ASSETS}/models/block/feed_pump.json", {"textures": {"body": B("pump"), "particle": B("pump")}, "elements": [
-	box([0, 2, 3], [6, 12, 13], "#body"),     # the pump
-	box([10, 1, 2], [16, 13, 14], "#body"),   # the motor
-	box([6, 6, 7], [10, 8, 9], "#body"),      # the shaft; the coupling turns on it
-	box([0, 0, 1], [16, 2, 15], "#body")]})   # the base plate
+# Phase 4.5c: the plant's parts are true size (tools/models/<part>.py); here only their loot
 for name in ("boiler_burner", "boiler_drum", "superheater", "turbine_casing", "condenser", "feed_pump", "turbine_generator"):
-	save_json(f"{ASSETS}/blockstates/{name}.json", {"variants": {
-		"facing=north": {"model": f"{ns}:block/{name}"}, "facing=east": {"model": f"{ns}:block/{name}", "y": 90},
-		"facing=south": {"model": f"{ns}:block/{name}", "y": 180}, "facing=west": {"model": f"{ns}:block/{name}", "y": 270}}})
-	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{name}"}})
-	save_json(f"{DATA}/loot_table/blocks/{name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],
-		"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+	big_part_loot(name)
 for tag in ("mineable/pickaxe", "needs_stone_tool"):
 	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
 	t["values"] += [f"{ns}:{n}" for n in ("boiler_burner", "boiler_drum", "superheater", "turbine_casing", "condenser", "feed_pump", "turbine_generator")]
@@ -1147,7 +1113,7 @@ shaped("turbine_generator", ["SWS", "WRW", "SXS"], {"S": S_, "W": f"{ns}:stator_
 shaped("condenser", ["SPS", "PCP", "SPS"], {"S": S_, "P": f"{ns}:pipe", "C": "minecraft:copper_block"}, "condenser")
 shaped("feed_pump", ["SPS", "MCM"], {"S": S_, "P": f"{ns}:pump", "M": "minecraft:piston", "C": "minecraft:copper_ingot"}, "feed_pump")
 lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
-lang.update({"block.wildcatter.boiler_burner": "Boiler Burner", "block.wildcatter.boiler_drum": "Steam Drum", "block.wildcatter.superheater": "Superheater",
+lang.update({"block.wildcatter.boiler_burner": "Boiler Burner", "block.wildcatter.boiler_drum": "Package Boiler (D-type, 4.5 t/h)", "block.wildcatter.superheater": "Superheater",
 	"block.wildcatter.turbine_casing": "Steam Turbine (1 MW)", "block.wildcatter.condenser": "Condenser", "block.wildcatter.feed_pump": "Boiler Feed Pump (480 V)",
 	"block.wildcatter.turbine_generator": "Turbine Generator (4.16 kV, 1,250 kVA)",
 	"subtitles.wildcatter.turbine_whine": "Turbine whines", "subtitles.wildcatter.burner_roar": "Burner roars", "subtitles.wildcatter.motor_hum": "Motor hums"})
@@ -1201,7 +1167,7 @@ for name in ("disconnect_hv", "disconnect_dist"):
 	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{name}"}})
 save_json(f"{ASSETS}/models/block/rotor_disconnect_blade.json", {"textures": r, "elements": [   # hinged at its south end (the model's centre)
 	box([5, 7.5, -3], [6, 8.5, 8], "#rotor"), box([10, 7.5, -3], [11, 8.5, 8], "#rotor"), box([5, 7.5, -3], [11, 8.5, -2], "#rotor")]})
-save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ("radiator_fan", "crank_pulley", "coupling", "tower_fan", "disconnect_blade", "alternator_fan")}})
+save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ("radiator_fan", "crank_pulley", "coupling", "tower_fan", "disconnect_blade", "alternator_fan", "turbine_coupling", "pump_coupling")}})
 # station buses: tubular bus on the busway shape
 for bus in ("bus_hv", "bus_dist"):
 	t = {"cable": f"{ns}:block/{art('station_bus')}", "particle": f"{ns}:block/{art('station_bus')}"}

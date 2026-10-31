@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/cube_bottom_top",
-  "textures": {
-    "side": "wildcatter:block/boiler_formed_side",
-    "top": "wildcatter:block/boiler_top",
-    "bottom": "wildcatter:block/boiler_bottom"
-  }
-}

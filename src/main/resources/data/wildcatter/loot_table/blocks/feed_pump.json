@@ -12,6 +12,13 @@
       "conditions": [
         {
           "condition": "minecraft:survives_explosion"
+        },
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "wildcatter:feed_pump",
+          "properties": {
+            "piece": "0"
+          }
         }
       ]
     }

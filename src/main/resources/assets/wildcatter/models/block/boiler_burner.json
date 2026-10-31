@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/cube_bottom_top",
-  "textures": {
-    "side": "wildcatter:block/firebox_side_lit",
-    "top": "wildcatter:block/firebox_top",
-    "bottom": "wildcatter:block/firebox_top"
-  }
-}

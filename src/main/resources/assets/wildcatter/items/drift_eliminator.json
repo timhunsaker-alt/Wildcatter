@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/drift_eliminator"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/drift_eliminator/item"
+ }
 }
