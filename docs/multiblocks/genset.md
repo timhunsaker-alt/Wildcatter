@@ -13,33 +13,62 @@ Standby diesel sets are commonly 500 kW and 625 kVA at 480Y/277 V three-phase; g
 | Governor droop | 4 percent | 4 percent |
 | Fuel | diesel, stored in the skid tank | pipeline gas |
 
-## Parts
-| Char | Block id | Real part |
-|---|---|---|
-| `E` | `wildcatter:genset_engine` | Engine block (diesel or gas variant) |
-| `A` | `wildcatter:alternator` | Alternator |
-| `K` | `wildcatter:genset_control_panel` | Control panel; **controller** |
-| `F` | `wildcatter:fuel_tank` | Skid fuel tank (diesel only) |
-| `R` | `wildcatter:radiator` | Cooling radiator |
-| `X` | `wildcatter:exhaust_stack` | Exhaust |
+## True size (Phase 4.5b, approved 2026-10-30)
+Every part is one item that fills its real size (docs/multiblocks/README.md, "Big parts"). 1 block = 1 m.
 
-## Layout (bottom layer first, NORTH facing; fixed with the models in Phase 4)
-The approved sketch put the fuel tank and radiator where they hid every turning part. As built, the skid is laid out like a real
-genset: radiator, engine, alternator and control panel in a line along the shaft, the sub-base fuel tank under the engine, the exhaust on top.
-Layer 1 (under the skid):
+| Char | Block id | Real part | Size L x W x H | Real-world basis |
+|---|---|---|---|---|
+| `F` | `wildcatter:fuel_tank` | Sub-base fuel tank, 2,000 L (diesel set) | 5 x 2 x 1 | Double-wall sub-base tank, about 0.6 m deep under a 4.4 x 1.6 m skid. Drawn 0.6 m deep, with the base rails and anti-vibration mounts up to 1 m. |
+| `B` | `wildcatter:genset_base_frame` | Steel base frame (gas set) | 7 x 2 x 1 | Fabricated base frame. Drawn 0.4 m deep, with its mounts and a lube-oil make-up tank. |
+| `R` | `wildcatter:radiator` | Radiator with a 1.2 m pusher fan | 1 x 2 x 2 | 500 kW core about 1.8 x 1.8 m. Fans are 1.1 to 1.3 m. |
+| `E` | `wildcatter:genset_diesel_engine` | Diesel engine | 2 x 2 x 2 | 15 L inline six, about 1.9 m long and 1.5 m tall |
+| `G` | `wildcatter:genset_gas_engine` | Gas engine | 4 x 2 x 2 | 1 MW lean-burn V20, about 3.8 m long |
+| `A` | `wildcatter:alternator` | Alternator (both sets) | 1 x 2 x 2 | 500 kW frame about 1.2 m long. A 1 MW frame is about 1.6 m; it is drawn 1 m so one part fits both sets. |
+| `K` | `wildcatter:genset_control_panel` | Control panel and output breaker; **controller** | 1 x 2 x 2 | Genset-mounted breaker enclosure with the controller on its face. 800 A for the diesel set (752 A at 480 V) and 1,600 A for the gas set (1,504 A). |
+| `X` | `wildcatter:exhaust_stack` | Critical-grade exhaust silencer (diesel) | 2 x 1 x 1 | About 1.8 m long and 0.5 m in diameter for 500 kW |
+| `X` | `wildcatter:exhaust_silencer_large` | Critical-grade exhaust silencer (gas) | 3 x 1 x 1 | About 2.5 m long and 0.7 m in diameter for 1 MW |
+
+Overall sizes:
+- **Diesel set:** 5 x 2 x 4. Real: 4.4 x 1.6 x 2.6 m, with the silencer on top at about 3.2 m.
+- **Gas set:** 7 x 2 x 4. Real: 6.5 x 2.0 x 2.6 m.
+
+The approved 5 x 2 x 3 and 7 x 2 x 3 became 4 high, because the sub-base takes the first metre and the silencer sits above
+the 3 m radiator.
+
+## Layout (bottom layer first, NORTH facing)
+Each letter is a part's **main cell**; its other cells follow from its size. North, the readout side, is the top row. The
+shaft runs west (radiator) to east (control panel). Every part must face the set's way.
+
+Diesel, 5 x 2 x 4:
 ```
- . F . .
+layer 0      layer 1      layer 2      layer 3
+F....        RE.AK        .....        .....
+.....        .....        .....        .X...
 ```
-Layer 2 (controller `K` at the east end, facing north):
+Gas, 7 x 2 x 4:
 ```
- R E A K
+layer 0      layer 1      layer 2      layer 3
+B......      RG...AK      .......      .......
+.......      .......      .......      ..X....
 ```
-Layer 3:
-```
- . X . .
-```
-The gas set has no `F` (pipeline gas comes to the engine). Turning parts are seen from the sides: the radiator fan behind its
-grille, the crank pulley at the radiator end of the engine, and the coupling between engine and alternator.
+
+How the set is built and used:
+- **Building:**
+  - Place the base (`F` or `B`) first.
+  - A skid part clicked anywhere on top of the base goes to its own slot and turns to the base's facing.
+  - The silencer goes into its slot when clicked on top of the engine.
+- **Power out:**
+  - The 480Y/277 V output terminals are on the control panel's east end face, on both lower cells, where cables enter a
+    real breaker box.
+  - The readout and the start button are on the panel's north face.
+- **Fuel and gas:**
+  - Diesel fills the tank from any of its cells, by bucket or pipe.
+  - The gas line connects to any cell of the gas engine.
+- **Turning parts,** drawn at real size:
+  - the radiator fan
+  - the crank pulley and fan belt
+  - the flywheel coupling, seen through the adapter's guard window
+  - the alternator's cooling fan, behind its screen
 
 ## Crafted parts (Phase 4 plan, approved 2026-10-30)
 The engine and the alternator are built from parts, as Tim asked: the engine and its generator are separate machines.
@@ -76,11 +105,14 @@ The engine and the alternator are built from parts, as Tim asked: the engine and
 `genset_control_panel` (`K`). It holds the fuel, the governor and the synchronizer, and owns the output terminal.
 
 ## Rotation / formation / breaking
-Four facings. Forms when all parts touch in the layout. Removing a part dissolves it and the set stops. A
+Four facings. Forms when every part's main cell is in the layout and faces the set's way; the readout names a part that is
+missing or faces the wrong way. Breaking any piece of a part drops that one part and dissolves the set; the set stops. A
 generator must synchronize before closing onto a live island (ELECTRICAL_MODEL).
 
 ## Game test
 Build both sets, check they form, check output at rating, check the fuel tank empties and the set stops.
 
 ## Migration
+Phase 4 one-block genset parts do not grow at true size (the layout changed): on load each drops as an item with a chat line,
+and a one-block tank's diesel is lost.
 The 120 V single engine (`diesel_engine`, `gas_turbine`) and the 8-engine cube are removed when this lands (Tim, 2026-10-30: remove now).

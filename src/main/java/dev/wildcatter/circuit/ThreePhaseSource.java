@@ -20,6 +20,11 @@ public final class ThreePhaseSource {
 
 	/** Adds the machine to the circuit: {@code volts} line to neutral on each phase, behind {@code ohms}. */
 	public void build(Circuit circuit, BlockPos pos, Voltage voltage, double volts, double ohms) {
+		build(circuit, java.util.List.of(pos), java.util.List.of(Direction.values()), voltage, volts, ohms);
+	}
+
+	/** The same source with its terminals only on {@code faces} of {@code cells} (a big part's terminal box). */
+	public void build(Circuit circuit, java.util.List<BlockPos> cells, java.util.List<Direction> faces, Voltage voltage, double volts, double ohms) {
 		neutral = circuit.node();
 		for (int k = 0; k < 3; k++) {
 			hot[k] = circuit.node();
@@ -28,11 +33,13 @@ public final class ThreePhaseSource {
 			circuit.resistor(internal, hot[k], ohms);
 		}
 		circuit.ground(neutral);
-		for (Direction face : Direction.values()) {
-			for (int k = 0; k < 3; k++) {
-				circuit.port(pos, face, PHASES[k], voltage, hot[k], Tuning.CONTACT_OHMS / 2, false);
+		for (BlockPos pos : cells) {
+			for (Direction face : faces) {
+				for (int k = 0; k < 3; k++) {
+					circuit.port(pos, face, PHASES[k], voltage, hot[k], Tuning.CONTACT_OHMS / 2, false);
+				}
+				circuit.port(pos, face, Conductor.N, voltage, neutral, Tuning.CONTACT_OHMS / 2, false);
 			}
-			circuit.port(pos, face, Conductor.N, voltage, neutral, Tuning.CONTACT_OHMS / 2, false);
 		}
 	}
 

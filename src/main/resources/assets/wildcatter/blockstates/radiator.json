@@ -1,19 +1,64 @@
 {
-  "variants": {
-    "facing=north": {
-      "model": "wildcatter:block/radiator"
-    },
-    "facing=east": {
-      "model": "wildcatter:block/radiator",
-      "y": 90
-    },
-    "facing=south": {
-      "model": "wildcatter:block/radiator",
-      "y": 180
-    },
-    "facing=west": {
-      "model": "wildcatter:block/radiator",
-      "y": 270
-    }
+ "variants": {
+  "facing=north,piece=0": {
+   "model": "wildcatter:block/radiator/p0"
+  },
+  "facing=north,piece=1": {
+   "model": "wildcatter:block/radiator/p1"
+  },
+  "facing=north,piece=2": {
+   "model": "wildcatter:block/radiator/p2"
+  },
+  "facing=north,piece=3": {
+   "model": "wildcatter:block/radiator/p3"
+  },
+  "facing=east,piece=0": {
+   "model": "wildcatter:block/radiator/p0",
+   "y": 90
+  },
+  "facing=east,piece=1": {
+   "model": "wildcatter:block/radiator/p1",
+   "y": 90
+  },
+  "facing=east,piece=2": {
+   "model": "wildcatter:block/radiator/p2",
+   "y": 90
+  },
+  "facing=east,piece=3": {
+   "model": "wildcatter:block/radiator/p3",
+   "y": 90
+  },
+  "facing=south,piece=0": {
+   "model": "wildcatter:block/radiator/p0",
+   "y": 180
+  },
+  "facing=south,piece=1": {
+   "model": "wildcatter:block/radiator/p1",
+   "y": 180
+  },
+  "facing=south,piece=2": {
+   "model": "wildcatter:block/radiator/p2",
+   "y": 180
+  },
+  "facing=south,piece=3": {
+   "model": "wildcatter:block/radiator/p3",
+   "y": 180
+  },
+  "facing=west,piece=0": {
+   "model": "wildcatter:block/radiator/p0",
+   "y": 270
+  },
+  "facing=west,piece=1": {
+   "model": "wildcatter:block/radiator/p1",
+   "y": 270
+  },
+  "facing=west,piece=2": {
+   "model": "wildcatter:block/radiator/p2",
+   "y": 270
+  },
+  "facing=west,piece=3": {
+   "model": "wildcatter:block/radiator/p3",
+   "y": 270
   }
+ }
 }

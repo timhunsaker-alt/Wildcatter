@@ -1,6 +1,7 @@
 package dev.wildcatter.multiblock;
 
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
@@ -19,8 +20,24 @@ public interface BigPart {
 	Direction facing(BlockState state);
 
 	/** The state the part would be placed in, whether or not it fits (the ghost outline shows where it would go). */
-	BlockState placementState(net.minecraft.world.item.context.BlockPlaceContext context);
+	BlockState placementState(BlockPlaceContext context);
 
 	/** The model tool's name for this part: its collision boxes are in {@code assets/wildcatter/shapes/<name>.json}. */
 	String shapeName();
+
+	/**
+	 * Where a click would really put the part: a part that belongs in a slot of a machine it is clicked onto (a genset part on
+	 * its skid) moves there. The item and the ghost outline both ask. Most parts go where they are clicked.
+	 */
+	default BlockPlaceContext snap(BlockPlaceContext context) {
+		return context;
+	}
+
+	/**
+	 * Whether an older world's one-block part grows into its cells. A part whose machine's layout changed with true size cannot
+	 * grow in place without overlapping its neighbours, so it drops as an item instead.
+	 */
+	default boolean growsOnLoad() {
+		return true;
+	}
 }

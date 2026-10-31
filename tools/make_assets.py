@@ -992,44 +992,13 @@ tex("genset_panel_side_placeholder", paint((120, 126, 132)))
 tex("rotor_placeholder", rotor_tex)
 G = {n: f"{ns}:block/{art(n)}" for n in ("genset_engine", "genset_gas_engine", "alternator", "radiator_core", "radiator_frame", "fuel_tank",
 	"exhaust_stack", "genset_panel_front", "genset_panel_side", "rotor")}
-# parts are drawn for a set facing north: the shaft runs west (radiator) to east (panel); the turning parts sit at the west of each block
-for name, key in (("genset_diesel_engine", "genset_engine"), ("genset_gas_engine", "genset_gas_engine")):
-	t = {"body": G[key], "particle": G[key]}
-	save_json(f"{ASSETS}/models/block/{name}.json", {"textures": t, "elements": [
-		box([3, 0, 1], [16, 12, 15], "#body"),          # crankcase and block
-		box([4, 12, 3], [15, 15, 13], "#body"),         # heads and rocker covers
-		box([0, 2, 6], [3, 4, 10], "#body")]})          # crank nose under the pulley
-save_json(f"{ASSETS}/models/block/alternator.json", {"textures": {"body": G["alternator"], "particle": G["alternator"]}, "elements": [
-	box([3, 1, 1], [16, 15, 15], "#body"), box([0, 7, 7], [3, 9, 9], "#body")]})
-save_json(f"{ASSETS}/models/block/radiator.json", {"textures": {"core": G["radiator_core"], "frame": G["radiator_frame"], "particle": G["radiator_frame"]}, "elements": [
-	box([0, 0, 0], [5, 16, 16], "#core"),              # the core, facing west
-	box([5, 0, 0], [12, 2, 16], "#frame"), box([5, 14, 0], [12, 16, 16], "#frame"),   # fan shroud, open at the sides
-	box([12, 0, 0], [16, 16, 16], "#frame")]})
-save_json(f"{ASSETS}/models/block/fuel_tank.json", {"parent": "minecraft:block/cube_all", "textures": {"all": G["fuel_tank"]}})
-save_json(f"{ASSETS}/models/block/exhaust_stack.json", {"textures": {"pipe": G["exhaust_stack"], "particle": G["exhaust_stack"]}, "elements": [
-	box([5, 0, 5], [11, 7, 11], "#pipe"), box([6, 7, 6], [10, 16, 10], "#pipe")]})
-save_json(f"{ASSETS}/models/block/genset_control_panel.json", {"parent": "minecraft:block/orientable", "textures": {
-	"front": G["genset_panel_front"], "side": G["genset_panel_side"], "top": G["genset_panel_side"], "bottom": G["genset_panel_side"]}})
-for name in ("genset_diesel_engine", "genset_gas_engine", "alternator", "radiator", "fuel_tank", "exhaust_stack", "genset_control_panel"):
-	save_json(f"{ASSETS}/blockstates/{name}.json", {"variants": {
-		"facing=north": {"model": f"{ns}:block/{name}"}, "facing=east": {"model": f"{ns}:block/{name}", "y": 90},
-		"facing=south": {"model": f"{ns}:block/{name}", "y": 180}, "facing=west": {"model": f"{ns}:block/{name}", "y": 270}}})
-	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{name}"}})
-	save_json(f"{DATA}/loot_table/blocks/{name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],
-		"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
-# the turning parts, centred on the block with their axis along X
+# Phase 4.5b: every genset part is true size. Its blockstate, piece models, item model and collision come from
+# tools/models/<part>.py (run at the end of this script); here only its loot (piece 0 drops the item).
+for name in ("genset_diesel_engine", "genset_gas_engine", "alternator", "radiator", "fuel_tank", "exhaust_stack", "genset_control_panel",
+		"genset_base_frame", "exhaust_silencer_large"):
+	big_part_loot(name)
+# the genset's turning parts are drawn by tools/models/rotors.py; the tower fan and disconnect blades below still use this texture
 r = {"rotor": G["rotor"], "particle": G["rotor"]}
-save_json(f"{ASSETS}/models/block/rotor_radiator_fan.json", {"textures": r, "elements": [
-	box([7, 7, 7], [9, 9, 9], "#rotor"),
-	box([7.5, 9, 6.5], [8.5, 15, 9.5], "#rotor"), box([7.5, 1, 6.5], [8.5, 7, 9.5], "#rotor"),
-	box([7.5, 6.5, 9], [8.5, 9.5, 15], "#rotor"), box([7.5, 6.5, 1], [8.5, 9.5, 7], "#rotor")]})
-save_json(f"{ASSETS}/models/block/rotor_crank_pulley.json", {"textures": r, "elements": [
-	box([6.5, 4, 5], [9.5, 12, 11], "#rotor"), box([6.5, 5, 4], [9.5, 11, 12], "#rotor"),
-	box([6, 7, 10], [10, 9, 12.5], "#rotor")]})   # a timing mark that shows it turning
-save_json(f"{ASSETS}/models/block/rotor_coupling.json", {"textures": r, "elements": [
-	box([6.5, 3, 5], [9.5, 13, 11], "#rotor"), box([6.5, 5, 3], [9.5, 11, 13], "#rotor"),
-	box([6, 11, 7], [10, 13, 9], "#rotor"), box([6, 3, 7], [10, 5, 9], "#rotor")]})   # coupling bolts
-save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ("radiator_fan", "crank_pulley", "coupling")}})
 
 # crafted parts (items) and recipes: steel and copper into parts, parts into the engine and alternator
 PART_COLORS = {"engine_block_casting": (80, 80, 86), "piston": (170, 174, 180), "crankshaft": (120, 124, 130), "cylinder_head": (150, 140, 120),
@@ -1054,8 +1023,11 @@ shaped("alternator", ["SWS", "WRW", "SXS"], {"S": S_, "W": f"{ns}:stator_winding
 shaped("radiator", ["SBS", "BCB", "SBS"], {"S": S_, "B": "minecraft:iron_bars", "C": "minecraft:copper_block"}, "radiator")
 shaped("fuel_tank", ["SSS", "S S", "SSS"], {"S": S_}, "fuel_tank")
 shaped("exhaust_stack", ["S", "S", "S"], {"S": S_}, "exhaust_stack")
+shaped("exhaust_silencer_large", ["SSS", "S S", "SSS"], {"S": f"{ns}:exhaust_stack"}, "exhaust_silencer_large")
+shaped("genset_base_frame", ["SIS", "SIS"], {"S": S_, "I": "minecraft:iron_block"}, "genset_base_frame")
 shaped("genset_control_panel", ["SGS", "RBR", "SCS"], {"S": S_, "G": "minecraft:glass_pane", "R": "minecraft:redstone", "B": f"{ns}:breaker_3p_industrial", "C": "minecraft:comparator"}, "genset_control_panel")
-GENSET_BLOCKS = ("genset_diesel_engine", "genset_gas_engine", "alternator", "radiator", "fuel_tank", "exhaust_stack", "genset_control_panel")
+GENSET_BLOCKS = ("genset_diesel_engine", "genset_gas_engine", "alternator", "radiator", "fuel_tank", "exhaust_stack", "genset_control_panel",
+	"genset_base_frame", "exhaust_silencer_large")
 pick = json.load(open(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json"))
 pick["values"] += [f"{ns}:{n}" for n in GENSET_BLOCKS]
 save_json(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json", pick)
@@ -1066,7 +1038,8 @@ lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
 lang.update({
 	"block.wildcatter.genset_diesel_engine": "Genset Diesel Engine (500 kW)", "block.wildcatter.genset_gas_engine": "Genset Gas Engine (1 MW)",
 	"block.wildcatter.alternator": "Alternator (480 V)", "block.wildcatter.radiator": "Radiator", "block.wildcatter.fuel_tank": "Sub-Base Fuel Tank (2,000 L)",
-	"block.wildcatter.exhaust_stack": "Exhaust Stack", "block.wildcatter.genset_control_panel": "Genset Control Panel", "block.wildcatter.rotor": "Rotor",
+	"block.wildcatter.exhaust_stack": "Exhaust Silencer (500 kW)", "block.wildcatter.exhaust_silencer_large": "Exhaust Silencer (1 MW)",
+	"block.wildcatter.genset_base_frame": "Genset Base Frame (1 MW gas set)", "block.wildcatter.genset_control_panel": "Genset Control Panel", "block.wildcatter.rotor": "Rotor",
 	"item.wildcatter.engine_block_casting": "Engine Block Casting", "item.wildcatter.piston": "Piston and Rod", "item.wildcatter.crankshaft": "Crankshaft",
 	"item.wildcatter.cylinder_head": "Cylinder Head", "item.wildcatter.fuel_injector": "Fuel Injector", "item.wildcatter.spark_plug": "Spark Plug",
 	"item.wildcatter.stator_winding": "Stator Winding", "item.wildcatter.rotor_field": "Rotor Field", "item.wildcatter.exciter": "Exciter and Regulator",
@@ -1118,7 +1091,7 @@ save_json(f"{ASSETS}/models/block/rotor_tower_fan.json", {"textures": r, "elemen
 	box([7, 7, 7], [9, 9, 9], "#rotor"),
 	box([9, 7.5, 6.5], [14, 8.5, 9.5], "#rotor"), box([2, 7.5, 6.5], [7, 8.5, 9.5], "#rotor"),
 	box([6.5, 7.5, 9], [9.5, 8.5, 14], "#rotor"), box([6.5, 7.5, 2], [9.5, 8.5, 7], "#rotor")]})
-save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ("radiator_fan", "crank_pulley", "coupling", "tower_fan")}})
+save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ("radiator_fan", "crank_pulley", "coupling", "tower_fan", "alternator_fan")}})
 shaped("tower_basin", ["S S", "SWS", "SSS"], {"S": "minecraft:smooth_stone", "W": "minecraft:water_bucket"}, "tower_basin")
 shaped("drift_eliminator", ["P P", " P ", "P P"], {"P": f"{ns}:plastic_sheet"}, "drift_eliminator", 2)
 for tag in ("mineable/pickaxe",):
@@ -1228,7 +1201,7 @@ for name in ("disconnect_hv", "disconnect_dist"):
 	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{name}"}})
 save_json(f"{ASSETS}/models/block/rotor_disconnect_blade.json", {"textures": r, "elements": [   # hinged at its south end (the model's centre)
 	box([5, 7.5, -3], [6, 8.5, 8], "#rotor"), box([10, 7.5, -3], [11, 8.5, 8], "#rotor"), box([5, 7.5, -3], [11, 8.5, -2], "#rotor")]})
-save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ("radiator_fan", "crank_pulley", "coupling", "tower_fan", "disconnect_blade")}})
+save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ("radiator_fan", "crank_pulley", "coupling", "tower_fan", "disconnect_blade", "alternator_fan")}})
 # station buses: tubular bus on the busway shape
 for bus in ("bus_hv", "bus_dist"):
 	t = {"cable": f"{ns}:block/{art('station_bus')}", "particle": f"{ns}:block/{art('station_bus')}"}

@@ -14,6 +14,9 @@
     },
     "part=disconnect_blade": {
       "model": "wildcatter:block/rotor_disconnect_blade"
+    },
+    "part=alternator_fan": {
+      "model": "wildcatter:block/rotor_alternator_fan"
     }
   }
 }

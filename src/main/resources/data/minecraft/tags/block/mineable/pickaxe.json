@@ -95,6 +95,8 @@
     "wildcatter:fuel_tank",
     "wildcatter:exhaust_stack",
     "wildcatter:genset_control_panel",
+    "wildcatter:genset_base_frame",
+    "wildcatter:exhaust_silencer_large",
     "wildcatter:gsu_transformer",
     "wildcatter:tower_basin",
     "wildcatter:drift_eliminator",

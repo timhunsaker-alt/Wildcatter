@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
  */
 public class RotorBlock extends Block {
 	public enum Part implements StringRepresentable {
-		RADIATOR_FAN("radiator_fan"), CRANK_PULLEY("crank_pulley"), COUPLING("coupling"), TOWER_FAN("tower_fan"), DISCONNECT_BLADE("disconnect_blade");
+		RADIATOR_FAN("radiator_fan"), CRANK_PULLEY("crank_pulley"), COUPLING("coupling"), TOWER_FAN("tower_fan"), DISCONNECT_BLADE("disconnect_blade"), ALTERNATOR_FAN("alternator_fan");
 
 		private final String name;
 

@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/fuel_tank"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/fuel_tank/item"
+ }
 }

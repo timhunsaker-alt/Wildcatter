@@ -124,6 +124,12 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("bigParts")) {
 				bigParts(context, server);
 			}
+			if (only("gensetParts")) {
+				gensetParts(context, server);
+			}
+			if (only("gensetFrameRate")) {
+				gensetFrameRate(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -233,23 +239,16 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	}
 
 	/**
-	 * A genset (docs/multiblocks/genset.md) with its control panel at {@code panel}, facing {@code facing}: the skid runs to the
-	 * panel's left (alternator, engine, radiator); a diesel set's fuel tank goes under the engine and the exhaust on top of it.
+	 * A true-size genset (docs/multiblocks/genset.md) with its control panel's main cell at {@code panel}, facing {@code facing}:
+	 * the skid runs to the panel's left (alternator, engine, radiator), two cells deep away from the front, on its base one
+	 * below and with the silencer two above. The output terminals are on the panel's right-hand (end) face. Prints any scene
+	 * blocks it had to overwrite, so a set that does not fit its scene shows in the log.
 	 */
 	private void genset(TestServerContext server, BlockPos panel, net.minecraft.core.Direction facing, boolean gas) {
-		net.minecraft.core.Direction left = facing.getCounterClockWise();
-		String f = "[facing=" + facing.getSerializedName() + "]";
-		BlockPos engine = panel.relative(left, 2);
-		put(server, panel.getX(), panel.getY(), panel.getZ(), "wildcatter:genset_control_panel" + f);
-		BlockPos a = panel.relative(left, 1);
-		BlockPos r = panel.relative(left, 3);
-		put(server, a.getX(), a.getY(), a.getZ(), "wildcatter:alternator" + f);
-		put(server, engine.getX(), engine.getY(), engine.getZ(), "wildcatter:genset_" + (gas ? "gas" : "diesel") + "_engine" + f);
-		put(server, r.getX(), r.getY(), r.getZ(), "wildcatter:radiator" + f);
-		if (!gas) {
-			put(server, engine.getX(), engine.getY() - 1, engine.getZ(), "wildcatter:fuel_tank" + f);
+		java.util.List<BlockPos> overwrote = server.computeOnServer(srv -> dev.wildcatter.block.GensetSkid.build(srv.overworld(), panel, facing, gas));
+		if (!overwrote.isEmpty()) {
+			System.out.println("[wildcatter-test] genset at " + panel.toShortString() + " overwrote " + overwrote.size() + " blocks, e.g. " + overwrote.get(0).toShortString());
 		}
-		put(server, engine.getX(), engine.getY() + 1, engine.getZ(), "wildcatter:exhaust_stack" + f);
 	}
 
 	private dev.wildcatter.block.GensetControlPanelBlockEntity panel(net.minecraft.server.MinecraftServer srv, BlockPos at) {
@@ -260,7 +259,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	private void startGenset(ClientGameTestContext context, TestServerContext server, BlockPos panel, net.minecraft.core.Direction facing, double liters) {
 		context.waitTicks(30);   // the panel finds its parts
 		server.computeOnServer(srv -> {
-			BlockPos tank = panel.relative(facing.getCounterClockWise(), 2).below();
+			BlockPos tank = dev.wildcatter.block.GensetSkid.base(panel, facing, false);
 			if (liters > 0 && srv.overworld().getBlockEntity(tank) instanceof dev.wildcatter.block.GensetPartBlockEntity t) {
 				t.setFuel(liters);
 			}
@@ -462,7 +461,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			// ---- the gas well: a wellhead against a firebox under a boiler, no fuel put in ----
 			server.runCommand("tp @p " + gx + " " + up + " " + (gz - 6) + " 0 20");
 			context.waitTicks(40);
-			server.runCommand("fill " + (gx - 1) + " " + (up - 1) + " " + (gz - 1) + " " + (gx + 3) + " " + (up + 3) + " " + (gz + 1) + " minecraft:air");
+			server.runCommand("fill " + (gx - 4) + " " + (up - 1) + " " + (gz - 1) + " " + (gx + 5) + " " + (up + 3) + " " + (gz + 3) + " minecraft:air");
 			put(server, gx, up, gz, "wildcatter:gas_wellhead");
 			put(server, gx + 1, up, gz, "wildcatter:gas_line");
 			put(server, gx + 2, up, gz, "wildcatter:firebox");
@@ -473,11 +472,12 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			check(fire.contains("burning"), "a gas well on a gas line should light a firebox with no fuel in it: " + fire);
 			String head = read(server, gx, up, gz);
 			check(head.contains("feeding"), "the wellhead should be feeding the firebox: " + head);
-			// a gas genset whose engine sits on the same well runs on what the firebox leaves
-			BlockPos gasSet = new BlockPos(gx, up + 1, gz + 2);
-			genset(server, gasSet, net.minecraft.core.Direction.EAST, true);   // the skid runs north: the engine is over the wellhead
-			startGenset(context, server, gasSet, net.minecraft.core.Direction.EAST, 0);
-			String turbine = read(server, gx, up + 1, gz + 2);
+			// a gas genset whose engine stands against the same well runs on what the firebox leaves; the wellhead touches the
+			// engine's third cell along, not its main cell, so the gas finds the engine through any of its cells
+			BlockPos gasSet = new BlockPos(gx + 3, up, gz + 1);
+			genset(server, gasSet, net.minecraft.core.Direction.NORTH, true);   // the skid runs west: engine x gx-2 to gx+1, behind the wellhead
+			startGenset(context, server, gasSet, net.minecraft.core.Direction.NORTH, 0);
+			String turbine = read(server, gx + 3, up, gz + 1);
 			check(turbine.contains("Gas genset") && turbine.contains("gas from a well"), "a gas genset on a gas well should run on its gas: " + turbine);
 			String boiler = read(server, gx + 2, up + 1, gz) + " | " + turbine;
 			System.out.println("[wildcatter-test] wells ok: " + echo + " | " + jack + " | " + head + " | " + fire + " | " + boiler);
@@ -1281,10 +1281,10 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		int z = -300;
 		server.runCommand("tp @p 16 " + (up + 3) + " " + (z + 6) + " 160 30");
 		context.waitTicks(20);
-		server.runCommand("fill 6 " + (y - 1) + " " + (z - 6) + " 26 " + (y + 4) + " " + (z + 4) + " minecraft:air");
-		server.runCommand("fill 6 " + (y - 1) + " " + (z - 6) + " 26 " + (y - 1) + " " + (z + 4) + " minecraft:stone");
+		server.runCommand("fill 4 " + (y - 1) + " " + (z - 6) + " 26 " + (y + 4) + " " + (z + 6) + " minecraft:air");
+		server.runCommand("fill 4 " + (y - 1) + " " + (z - 6) + " 26 " + (y - 1) + " " + (z + 6) + " minecraft:stone");
 		BlockPos set = new BlockPos(10, up, z);
-		genset(server, set, net.minecraft.core.Direction.WEST, false);   // the skid runs south of the panel
+		genset(server, set, net.minecraft.core.Direction.NORTH, false);   // the skid runs west of the panel; its terminals face east
 		put(server, 11, up, z, "wildcatter:unit_substation[facing=east]");   // 480 V in at the back, 4.16 kV out of the front
 		// 4.16 kV delta to 12.47 kV wye, true size: 2 m deep (x 12-13), 3 across (z-1 to z+1), 3 high; the bushings are on top at x 13
 		put(server, 12, up, z, "wildcatter:gsu_transformer[facing=east]");
@@ -1296,27 +1296,27 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		put(server, 17, up, z, "wildcatter:breaker_3p_industrial[facing=east]");
 		put(server, 18, up, z, "wildcatter:cable_industrial");
 		put(server, 19, up, z, "wildcatter:three_phase_heater");
-		// 480 V cable straight off the north side of the genset
-		put(server, 10, up, z - 1, "wildcatter:cable_industrial");
-		put(server, 10, up, z - 2, "wildcatter:cable_industrial");
-		put(server, 10, up, z - 3, "wildcatter:three_phase_heater");
-		startGenset(context, server, set, net.minecraft.core.Direction.WEST, 1000);
+		// 480 V cable straight off the genset's other terminal cell (the back of the panel's end face)
+		put(server, 11, up, z + 1, "wildcatter:cable_industrial");
+		put(server, 11, up, z + 2, "wildcatter:cable_industrial");
+		put(server, 11, up, z + 3, "wildcatter:three_phase_heater");
+		startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 1000);
 		server.runCommand("tp @p 15 " + (up + 2) + " " + (z + 6) + " 180 12");
 		context.waitTicks(200);
 		String heater = read(server, 19, up, z);
 		String cable = read(server, 18, up, z);
 		String pad = read(server, 15, up, z);
-		String unitHeater = read(server, 10, up, z - 3);
+		String unitHeater = read(server, 11, up, z + 3);
 		check(heater.contains("running") && heater.matches(".*A-B 4[5-9]\\d V, B-C 4[5-9]\\d V, C-A 4[5-9]\\d V.*"),
 				"the heater behind the pad-mount should run on 480 V between each pair of phases: " + heater + " | pad " + pad + " | cable " + cable + " | set " + read(server, 10, up, z));
 		check(cable.matches(".*A 2[6-8]\\d V \\d+\\.\\d A, B 2[6-8]\\d V \\d+\\.\\d A, C 2[6-8]\\d V.*"), "each phase of the cable should be about 277 V to neutral: " + cable);
 		check(pad.contains("Three-phase transformer") && pad.contains("300 kVA"), "the pad-mount should be a rated three-phase unit: " + pad);
-		check(unitHeater.contains("running"), "the heater on the unit substation should run: " + unitHeater + " | " + read(server, 10, up, z - 1));
+		check(unitHeater.contains("running"), "the heater on the genset's cable should run: " + unitHeater + " | " + read(server, 11, up, z + 1));
 		context.takeScreenshot("wildcatter-industrial");
 		// a NEMA L22-30 three-phase receptacle and plug on the unit substation's cable, handing 10 kW to a stand-in machine
-		put(server, 10, up, z - 3, "wildcatter:receptacle_nema_l22_30");
-		put(server, 10, up, z - 4, "wildcatter:plug_nema_l22_30");
-		put(server, 10, up, z - 5, "minecraft:iron_block");
+		put(server, 11, up, z + 3, "wildcatter:receptacle_nema_l22_30");
+		put(server, 11, up, z + 4, "wildcatter:plug_nema_l22_30");
+		put(server, 11, up, z + 5, "minecraft:iron_block");
 		java.util.concurrent.atomic.AtomicLong delivered = new java.util.concurrent.atomic.AtomicLong();
 		dev.wildcatter.energy.EnergyBridge.clear();
 		dev.wildcatter.energy.EnergyBridge.register(target -> target.level().getBlockState(target.pos()).is(net.minecraft.world.level.block.Blocks.IRON_BLOCK)
@@ -1339,8 +1339,8 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			long before = delivered.get();
 			context.waitTicks(100);
 			gained = delivered.get() - before;
-			plug = read(server, 10, up, z - 4);
-			boolean wrongFits = server.computeOnServer(srv -> dev.wildcatter.block.PlugAdapterBlock.fits(srv.overworld(), new BlockPos(10, up, z - 4), dev.wildcatter.energy.PlugType.NEMA_L21_30));
+			plug = read(server, 11, up, z + 4);
+			boolean wrongFits = server.computeOnServer(srv -> dev.wildcatter.block.PlugAdapterBlock.fits(srv.overworld(), new BlockPos(11, up, z + 4), dev.wildcatter.energy.PlugType.NEMA_L21_30));
 			check(!wrongFits, "an L21-30 plug must not fit an L22-30 receptacle");
 		} finally {
 			dev.wildcatter.energy.EnergyBridge.clear();
@@ -1380,7 +1380,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		ReservoirData.testSeed = seed;
 		try {
 			BlockPos set = new BlockPos(11, up, z);
-			genset(server, set, net.minecraft.core.Direction.WEST, false);   // the skid runs south of the panel
+			genset(server, set, net.minecraft.core.Direction.NORTH, false);   // the skid runs west of the panel; its terminals face east
 			put(server, 12, up, z, "wildcatter:cable_industrial");
 			// phase A out of the cable's east face, B out of its north face, C out of its south face, each its own plastic wire to the pumpjack
 			put(server, 13, up, z, "wildcatter:industrial_plastic_wire_hot[conductor=a]");
@@ -1390,7 +1390,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 				put(server, x, up, z + 1, "wildcatter:industrial_plastic_wire_hot[conductor=c]");
 			}
 			put(server, px, up, z, "wildcatter:pumpjack");
-			startGenset(context, server, set, net.minecraft.core.Direction.WEST, 1000);
+			startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 1000);
 			context.waitTicks(100);   // the motor starts (2 s of inrush) and runs
 			String jack = read(server, px, up, z);
 			double running = amps(read(server, 14, up, z));
@@ -1460,8 +1460,12 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		ReservoirData.testSeed = seed;
 		try {
 			put(server, 14, up, z, "wildcatter:mcc_incoming[facing=south]");
-			BlockPos set = new BlockPos(14, up + 1, z);
-			genset(server, set, net.minecraft.core.Direction.NORTH, false);   // on top of the incoming section, which it feeds; the skid runs west
+			BlockPos set = new BlockPos(13, up, z);
+			genset(server, set, net.minecraft.core.Direction.NORTH, false);   // beside the incoming section; the skid runs west
+			// off the back of the panel's end face, up, and onto the incoming section's top
+			put(server, 14, up, z + 1, "wildcatter:cable_industrial");
+			put(server, 14, up + 1, z + 1, "wildcatter:cable_industrial");
+			put(server, 14, up + 1, z, "wildcatter:cable_industrial");
 			for (int x = 15; x <= 17; x++) {
 				put(server, x, up, z, "wildcatter:mcc_bucket[facing=south]");
 			}
@@ -1941,7 +1945,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		server.runCommand("fill 4 " + (y - 1) + " " + (z - 10) + " 22 " + (y + 4) + " " + (z + 4) + " minecraft:air");
 		server.runCommand("fill 4 " + (y - 1) + " " + (z - 10) + " 22 " + (y - 1) + " " + (z + 4) + " minecraft:stone");
 		BlockPos set = new BlockPos(12, up, z);
-		genset(server, set, net.minecraft.core.Direction.NORTH, false);   // radiator 9, engine 10, alternator 11, panel 12
+		genset(server, set, net.minecraft.core.Direction.NORTH, false);   // tank 8-12 under radiator 8, engine 9-10, alternator 11, panel 12
 		put(server, 13, up, z, "wildcatter:cable_industrial");
 		put(server, 14, up, z, "wildcatter:three_phase_heater");
 		BlockPos gasSet = new BlockPos(12, up, z - 6);
@@ -1956,14 +1960,14 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		double rated = 120.0 * dev.wildcatter.energy.ElectricalStandard.active().hertz() / Tuning.GENSET_POLES;
 		check(running.matches(".*RUNNING (1[45]\\d\\d|1[78]\\d\\d) rpm.*") && running.matches(".*, 1[45] kW.*"), "the set should run at rated speed carrying the 15 kW heater: " + running);
 		check(read(server, 14, up, z).contains("running"), "the heater on the genset should run: " + read(server, 14, up, z));
-		float clientRpm = context.computeOnClient(client -> client.level.getBlockEntity(new BlockPos(10, up, z)) instanceof dev.wildcatter.block.GensetPartBlockEntity engine
+		float clientRpm = context.computeOnClient(client -> client.level.getBlockEntity(new BlockPos(9, up, z)) instanceof dev.wildcatter.block.GensetPartBlockEntity engine
 				? engine.spin().rpm() : -1F);
 		check(Math.abs(clientRpm - rated) < rated * 0.05, "the client should see the engine turning at about " + rated + " rpm: " + clientRpm);
 		context.waitTicks(3);
 		context.takeScreenshot("wildcatter-genset");
 		// a dry tank stops it
 		server.computeOnServer(srv -> {
-			((dev.wildcatter.block.GensetPartBlockEntity) srv.overworld().getBlockEntity(new BlockPos(10, y, z))).setFuel(0.01);
+			((dev.wildcatter.block.GensetPartBlockEntity) srv.overworld().getBlockEntity(new BlockPos(8, y, z))).setFuel(0.01);
 			return null;
 		});
 		context.waitTicks(60);
@@ -1971,7 +1975,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(dry.contains("OUT OF FUEL") && !dry.contains("RUNNING"), "the set should stop when its tank runs dry: " + dry);
 		check(!read(server, 14, up, z).contains("running"), "the heater should lose power with the set: " + read(server, 14, up, z));
 		// a missing radiator: no set
-		put(server, 9, up, z, "minecraft:air");
+		put(server, 8, up, z, "minecraft:air");
 		context.waitTicks(30);
 		String broken = read(server, 12, up, z);
 		check(broken.contains("NOT BUILT") && broken.contains("radiator"), "taking the radiator away should dissolve the set: " + broken);
@@ -2040,7 +2044,14 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(read(server, 12, up, z).contains("RUNNING"), "set A should ride through B's bad close: " + read(server, 12, up, z));
 		// a new alternator, and a hand close inside the window
 		put(server, 18, up, z, "minecraft:air");
-		put(server, 18, up, z, "wildcatter:alternator[facing=south]");
+		server.computeOnServer(srv -> {   // a new alternator, placed and grown into its cells as a player would
+			BlockPos at = new BlockPos(18, up, z);
+			net.minecraft.world.level.block.state.BlockState alt = dev.wildcatter.WildcatterBlocks.ALTERNATOR.defaultBlockState()
+					.setValue(dev.wildcatter.block.GensetPartBlock.FACING, net.minecraft.core.Direction.SOUTH);
+			srv.overworld().setBlock(at, alt, 3);
+			dev.wildcatter.multiblock.BigParts.grow(srv.overworld(), at, alt);
+			return null;
+		});
 		context.waitTicks(30);
 		server.computeOnServer(srv -> {
 			panel(srv, b).pushButton();   // resets the trip
@@ -2258,6 +2269,190 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(10);
 		check(gsuCells(server, main)[0] == 18, "a lone GSU with room should grow to its full size");
 		System.out.println("[wildcatter-test] big parts ok: GSU places, reads through a piece, breaks whole, refuses a blocked cell, migrates");
+	}
+
+	/** Places a true-size part the way a player does: standing at {@code (px, pz)} looking {@code yaw}, clicking the top of {@code clicked}. */
+	private boolean placeOn(TestServerContext server, net.minecraft.world.level.block.Block block, BlockPos clicked, double px, double pz, float yaw) {
+		return server.computeOnServer(srv -> {
+			net.minecraft.server.level.ServerPlayer player = srv.getPlayerList().getPlayers().get(0);
+			player.snapTo(px, clicked.getY() + 1, pz, yaw, 30.0F);
+			ItemStack stack = new ItemStack(block);
+			net.minecraft.world.phys.BlockHitResult hit = new net.minecraft.world.phys.BlockHitResult(
+					net.minecraft.world.phys.Vec3.atCenterOf(clicked).add(0, 0.5, 0), net.minecraft.core.Direction.UP, clicked, false);
+			return ((net.minecraft.world.item.BlockItem) stack.getItem())
+					.place(new net.minecraft.world.item.context.BlockPlaceContext(player, net.minecraft.world.InteractionHand.MAIN_HAND, stack, hit)).consumesAction();
+		});
+	}
+
+	/** Items of one kind lying near {@code at}. */
+	private int itemsNear(TestServerContext server, BlockPos at, net.minecraft.world.level.block.Block block) {
+		return server.computeOnServer(srv -> {
+			int n = 0;
+			for (net.minecraft.world.entity.item.ItemEntity item : srv.overworld().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+					new net.minecraft.world.phys.AABB(at).inflate(8))) {
+				if (item.getItem().is(block.asItem())) {
+					n += item.getItem().getCount();
+				}
+			}
+			return n;
+		});
+	}
+
+	/** The state at a position, for checks. */
+	private net.minecraft.world.level.block.state.BlockState stateAt(TestServerContext server, BlockPos at) {
+		return server.computeOnServer(srv -> srv.overworld().getBlockState(at));
+	}
+
+	/**
+	 * True-size gensets (4.5b, docs/multiblocks/genset.md), built the way a player builds them: the sub-base tank first, then
+	 * every part clicked anywhere on top of it goes to its own slot and turns to the tank's way, the engine included. The set
+	 * forms; a diesel bucket on the tank's far corner fills it; an alternator turned the wrong way is named in the readout;
+	 * both sets run (screenshots); breaking one engine piece drops one engine and dissolves the set; and a one-block radiator
+	 * from an older world drops as an item.
+	 */
+	private void gensetParts(ClientGameTestContext context, TestServerContext server) {
+		int z = -720;
+		server.runCommand("tp @p 10 " + (up + 3) + " " + (z + 8) + " 180 20");
+		context.waitTicks(20);
+		server.runCommand("fill 0 " + (y - 1) + " " + (z - 14) + " 24 " + (y + 8) + " " + (z + 10) + " minecraft:air");
+		server.runCommand("fill 0 " + (y - 1) + " " + (z - 14) + " 24 " + y + " " + (z + 10) + " minecraft:stone");   // ground at y
+		server.runCommand("kill @e[type=item]");
+		// the tank, placed by a player standing south and looking north: it faces the player
+		BlockPos ground = new BlockPos(12, y, z);
+		check(placeOn(server, WildcatterBlocks.FUEL_TANK, ground, 12.5, z + 4.5, 180.0F), "a sub-base tank should place on clear ground");
+		BlockPos base = new BlockPos(12, up, z);
+		net.minecraft.world.level.block.state.BlockState tank = stateAt(server, base);
+		check(tank.is(WildcatterBlocks.FUEL_TANK), "the tank's main cell should be where it was clicked: " + tank);
+		net.minecraft.core.Direction facing = tank.getValue(dev.wildcatter.block.GensetPartBlock.FACING);
+		// every part clicked on the tank's own main cell, in no particular order: each goes to its slot
+		net.minecraft.world.level.block.Block[] parts = {WildcatterBlocks.DIESEL_ENGINE_PART, WildcatterBlocks.RADIATOR, WildcatterBlocks.ALTERNATOR,
+				WildcatterBlocks.GENSET_CONTROL_PANEL, WildcatterBlocks.EXHAUST_STACK};
+		for (net.minecraft.world.level.block.Block part : parts) {
+			check(placeOn(server, part, base, 12.5, z + 4.5, 180.0F), "a " + part.getName().getString() + " clicked on the tank should go to its slot");
+		}
+		int turns = dev.wildcatter.multiblock.Multiblock.turns(facing);
+		java.util.function.Function<int[], BlockPos> slot = d -> {
+			int dx = d[0], dz = d[2];
+			for (int i = 0; i < turns; i++) {
+				int t = dx;
+				dx = -dz;
+				dz = t;
+			}
+			return base.offset(dx, d[1], dz);
+		};
+		BlockPos engine = slot.apply(new int[] {1, 1, 0});
+		BlockPos alternator = slot.apply(new int[] {3, 1, 0});
+		BlockPos panelAt = slot.apply(new int[] {4, 1, 0});
+		check(stateAt(server, engine).is(WildcatterBlocks.DIESEL_ENGINE_PART) && stateAt(server, engine).getValue(dev.wildcatter.block.GensetPartBlock.FACING) == facing,
+				"the engine, clicked off its slot, should land in it facing the tank's way: " + stateAt(server, engine));
+		context.waitTicks(30);
+		String formed = read(server, panelAt.getX(), panelAt.getY(), panelAt.getZ());
+		check(formed.contains("Diesel genset (500 kW") && formed.contains("STOPPED"), "a skid built by hand should form a stopped diesel genset: " + formed);
+		// a diesel bucket on the tank's far corner fills it
+		BlockPos far = slot.apply(new int[] {4, 0, 1});
+		server.computeOnServer(srv -> {
+			net.minecraft.server.level.ServerPlayer player = srv.getPlayerList().getPlayers().get(0);
+			player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(WildcatterItems.DIESEL_BUCKET));
+			net.minecraft.world.phys.BlockHitResult hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(far), facing, far, false);
+			srv.overworld().getBlockState(far).useItemOn(player.getMainHandItem(), srv.overworld(), player, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+			player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+			return null;
+		});
+		String fuel = read(server, base.getX(), base.getY(), base.getZ());
+		check(fuel.contains("1000 of 2000 L"), "a bucket on any cell of the tank should fill it: " + fuel);
+		// an alternator turned the wrong way (facing the set's front, so it stands out in front) is named
+		server.computeOnServer(srv -> {
+			srv.overworld().setBlock(alternator, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+			net.minecraft.world.level.block.state.BlockState turned = WildcatterBlocks.ALTERNATOR.defaultBlockState()
+					.setValue(dev.wildcatter.block.GensetPartBlock.FACING, facing.getOpposite());
+			srv.overworld().setBlock(alternator, turned, 3);
+			dev.wildcatter.multiblock.BigParts.grow(srv.overworld(), alternator, turned);
+			return null;
+		});
+		context.waitTicks(30);
+		String turned = read(server, panelAt.getX(), panelAt.getY(), panelAt.getZ());
+		check(turned.contains("NOT BUILT") && turned.contains("alternator") && turned.contains("face the set's way"), "a part facing the wrong way should be named: " + turned);
+		server.computeOnServer(srv -> srv.overworld().setBlock(alternator, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3));
+		context.waitTicks(2);
+		check(placeOn(server, WildcatterBlocks.ALTERNATOR, base, 12.5, z + 4.5, 180.0F), "a new alternator clicked on the tank should go to its slot");
+		context.waitTicks(30);
+		check(read(server, panelAt.getX(), panelAt.getY(), panelAt.getZ()).contains("STOPPED"), "with the alternator back the set should form again: " + read(server, panelAt.getX(), panelAt.getY(), panelAt.getZ()));
+		// a gas set beside it, with gas already in its line, and both run
+		BlockPos gasPanel = new BlockPos(14, up + 1, z - 7);
+		genset(server, gasPanel, net.minecraft.core.Direction.NORTH, true);
+		context.waitTicks(30);
+		server.computeOnServer(srv -> {
+			panel(srv, gasPanel).setGasForTest(50);
+			panel(srv, gasPanel).setWantRun(true);
+			panel(srv, panelAt).setWantRun(true);
+			return null;
+		});
+		context.waitTicks(260);
+		String diesel = read(server, panelAt.getX(), panelAt.getY(), panelAt.getZ());
+		String gas = read(server, gasPanel.getX(), gasPanel.getY(), gasPanel.getZ());
+		check(diesel.contains("RUNNING") && gas.contains("RUNNING"), "both sets should run: " + diesel + " | " + gas);
+		server.runCommand("tp @p 5 " + (up + 2) + " " + (z + 4) + " -140 15");
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-gensets-front");
+		server.runCommand("tp @p 19 " + (up + 2) + " " + (z - 11) + " 40 12");
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-gensets-back");
+		server.runCommand("tp @p 18 " + (up + 9) + " " + (z + 3) + " 150 50");
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-gensets-top");
+		// break one piece of the engine: one engine drops and the set dissolves
+		server.runCommand("kill @e[type=item]");
+		BlockPos enginePiece = slot.apply(new int[] {2, 2, 1});
+		check(stateAt(server, enginePiece).is(WildcatterBlocks.DIESEL_ENGINE_PART), "the engine should fill its far top cell: " + stateAt(server, enginePiece));
+		server.computeOnServer(srv -> srv.overworld().destroyBlock(enginePiece, true));
+		context.waitTicks(40);
+		int engines = itemsNear(server, engine, WildcatterBlocks.DIESEL_ENGINE_PART);
+		String gone = read(server, panelAt.getX(), panelAt.getY(), panelAt.getZ());
+		check(engines == 1 && stateAt(server, engine).isAir(), "breaking one engine piece should take the whole engine and drop one: " + engines + " items");
+		check(gone.contains("NOT BUILT") && gone.contains("diesel engine"), "without its engine the set should dissolve: " + gone);
+		// an older world's one-block radiator: the layout changed, so it drops rather than grow
+		server.runCommand("kill @e[type=item]");
+		put(server, 4, up, z + 6, "wildcatter:radiator[facing=north]");
+		context.waitTicks(10);
+		check(stateAt(server, new BlockPos(4, up, z + 6)).isAir() && itemsNear(server, new BlockPos(4, up, z + 6), WildcatterBlocks.RADIATOR) == 1,
+				"a one-block radiator from an older world should drop as one item");
+		System.out.println("[wildcatter-test] genset parts ok: " + formed + " | " + fuel + " | " + turned + " | " + diesel + " | " + gas + " | " + gone);
+	}
+
+	/** The frame-rate check from the Phase 4.5 plan: ten running diesel sets in view, and the client's frames per second logged. */
+	private void gensetFrameRate(ClientGameTestContext context, TestServerContext server) {
+		int z = -780;
+		server.runCommand("tp @p 10 " + (up + 6) + " " + (z + 14) + " 180 30");
+		context.waitTicks(20);
+		server.runCommand("fill 0 " + (y - 1) + " " + (z - 4) + " 20 " + (y + 6) + " " + (z + 32) + " minecraft:air");
+		server.runCommand("fill 0 " + (y - 1) + " " + (z - 4) + " 20 " + (y - 1) + " " + (z + 32) + " minecraft:stone");
+		context.waitTicks(40);
+		int before = context.computeOnClient(client -> client.getFps());
+		java.util.List<BlockPos> sets = new java.util.ArrayList<>();
+		for (int k = 0; k < 10; k++) {
+			BlockPos set = new BlockPos(k % 2 == 0 ? 8 : 16, up, z + 3 * (k / 2));
+			sets.add(set);
+			genset(server, set, net.minecraft.core.Direction.NORTH, false);
+		}
+		context.waitTicks(30);
+		server.computeOnServer(srv -> {
+			for (BlockPos set : sets) {
+				((dev.wildcatter.block.GensetPartBlockEntity) srv.overworld().getBlockEntity(dev.wildcatter.block.GensetSkid.base(set, net.minecraft.core.Direction.NORTH, false))).setFuel(1000);
+				panel(srv, set).setWantRun(true);
+			}
+			return null;
+		});
+		context.waitTicks(300);
+		int running = 0;
+		for (BlockPos set : sets) {
+			if (read(server, set.getX(), set.getY(), set.getZ()).contains("RUNNING")) {
+				running++;
+			}
+		}
+		int after = context.computeOnClient(client -> client.getFps());
+		context.takeScreenshot("wildcatter-gensets-ten");
+		check(running == 10, "all ten sets should run: " + running);
+		System.out.println("[wildcatter-test] frame rate: " + before + " fps empty, " + after + " fps with ten running gensets in view");
 	}
 
 	private void fieldManual(TestServerContext server) {

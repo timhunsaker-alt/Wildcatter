@@ -33,7 +33,7 @@ public final class GhostOutline {
 		for (InteractionHand hand : InteractionHand.values()) {
 			ItemStack stack = client.player.getItemInHand(hand);
 			if (stack.getItem() instanceof BlockItem item && item.getBlock() instanceof BigPart part) {
-				BlockPlaceContext context = new BlockPlaceContext(client.player, hand, stack, hit);
+				BlockPlaceContext context = part.snap(new BlockPlaceContext(client.player, hand, stack, hit));
 				BlockPos main = context.getClickedPos();
 				BlockState state = item.getBlock().getStateForPlacement(context);
 				boolean fits = state != null;

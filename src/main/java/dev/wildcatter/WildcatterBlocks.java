@@ -281,6 +281,8 @@ public final class WildcatterBlocks {
 	public static final Block RADIATOR = gensetPart("radiator", dev.wildcatter.block.GensetPartBlock.Part.RADIATOR);
 	public static final Block FUEL_TANK = gensetPart("fuel_tank", dev.wildcatter.block.GensetPartBlock.Part.FUEL_TANK);
 	public static final Block EXHAUST_STACK = gensetPart("exhaust_stack", dev.wildcatter.block.GensetPartBlock.Part.EXHAUST);
+	public static final Block BASE_FRAME = gensetPart("genset_base_frame", dev.wildcatter.block.GensetPartBlock.Part.BASE_FRAME);
+	public static final Block EXHAUST_SILENCER_LARGE = gensetPart("exhaust_silencer_large", dev.wildcatter.block.GensetPartBlock.Part.SILENCER_LARGE);
 	// ---- The 1 MW steam plant (docs/multiblocks/steam-plant.md) ----
 	public static final Block TURBINE_GENERATOR = block("turbine_generator", props -> new dev.wildcatter.block.TurbineGeneratorBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
@@ -303,7 +305,7 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<MotorStarterBlockEntity> MOTOR_STARTER_ENTITY = entity(MotorStarterBlockEntity::new, MOTOR_STARTER, MCC_BUCKET);
 	public static final BlockEntityType<MccIncomingBlockEntity> MCC_INCOMING_ENTITY = entity(MccIncomingBlockEntity::new, MCC_INCOMING);
 	public static final BlockEntityType<dev.wildcatter.block.GensetPartBlockEntity> GENSET_PART_ENTITY = entity(dev.wildcatter.block.GensetPartBlockEntity::new,
-			DIESEL_ENGINE_PART, GAS_ENGINE_PART, ALTERNATOR, RADIATOR, FUEL_TANK, EXHAUST_STACK);
+			DIESEL_ENGINE_PART, GAS_ENGINE_PART, ALTERNATOR, RADIATOR, FUEL_TANK, EXHAUST_STACK, BASE_FRAME, EXHAUST_SILENCER_LARGE);
 	public static final BlockEntityType<dev.wildcatter.block.SteamPlantPartBlockEntity> STEAM_PLANT_PART_ENTITY = entity(dev.wildcatter.block.SteamPlantPartBlockEntity::new,
 			BOILER_BURNER, BOILER_DRUM, SUPERHEATER, TURBINE_CASING, CONDENSER, FEED_PUMP);
 	public static final BlockEntityType<dev.wildcatter.block.TurbineGeneratorBlockEntity> TURBINE_GENERATOR_ENTITY = entity(dev.wildcatter.block.TurbineGeneratorBlockEntity::new, TURBINE_GENERATOR);
@@ -501,6 +503,8 @@ public final class WildcatterBlocks {
 		add("radiator", RADIATOR);
 		add("fuel_tank", FUEL_TANK);
 		add("exhaust_stack", EXHAUST_STACK);
+		add("genset_base_frame", BASE_FRAME);
+		add("exhaust_silencer_large", EXHAUST_SILENCER_LARGE);
 		add("turbine_generator", TURBINE_GENERATOR);
 		add("boiler_burner", BOILER_BURNER);
 		add("boiler_drum", BOILER_DRUM);
@@ -551,6 +555,7 @@ public final class WildcatterBlocks {
 		Item.Properties props = new Item.Properties().setId(itemKey).useBlockDescriptionPrefix();
 		Item item = block instanceof CableBlock wire ? new ConductorItem(block, props, wire.voltage(), ConductorSize.Kind.WIRE)
 				: block instanceof MultiCableBlock cable ? new ConductorItem(block, props, cable.voltage(), cable.busway() ? ConductorSize.Kind.BUSWAY : ConductorSize.Kind.CABLE)
+				: block instanceof dev.wildcatter.multiblock.BigPart ? new dev.wildcatter.item.BigPartItem(block, props)
 				: new BlockItem(block, props);
 		Registry.register(BuiltInRegistries.ITEM, itemKey, item);
 	}

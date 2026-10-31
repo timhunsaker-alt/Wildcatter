@@ -11,7 +11,7 @@ not a go-ahead to build: that waits for the roadmap phase (ROADMAP.md). Nothing 
 | Spec | Roadmap phase | Replaces |
 |---|---|---|
 | [steam-plant.md](steam-plant.md) | 4 | 3x3x3 boiler, 3x3 firebox, 27-turbine cube |
-| [genset.md](genset.md) | 4 | 2x2x2 diesel engine and gas turbine cubes |
+| [genset.md](genset.md) | 4, 4.5b | 500 kW diesel and 1 MW gas skids at true size |
 | [substation.md](substation.md) | 4 | single `substation_transformer` block |
 | [refinery-tower.md](refinery-tower.md) | 5 | refinery base plus two identical columns |
 | [cooling-tower.md](cooling-tower.md) | 4 | fan plus two identical fill blocks |
@@ -36,7 +36,8 @@ fills its real size, the way a bed fills two spaces. This is not tiling: the cel
 - Breaking any piece breaks the part and drops one item. A click, a meter or a shock on any piece is on the part.
 - Collision follows the real shape, a few boxes per cell, from the model tool.
 - Terminals are on named faces of named pieces (where the bushings or cable boxes really are), not on every face.
-- A multiblock layout lists every cell a big part fills; each cell must be that part's right piece, the right way round.
+- A multiblock layout lists each big part's main cell; the part must face the machine's way, and its footprint fills the rest.
 - Older worlds: a part that was one block grows into its cells when there is room, and otherwise drops as an item and says where.
+  Parts whose machine layout changed with true size (the genset parts) always drop.
 - Models come from `tools/models/<part>.py` (real dimensions in metres) and are drawn in the material textures in
   `art/final/mat/`. The tool refuses a box more than a block past its cell and a face with no texture.

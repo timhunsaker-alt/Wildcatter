@@ -1,0 +1,40 @@
+"""The genset's turning parts at true size (docs/kinetics-and-sound.md), each drawn centred on its block with its axis along x.
+KineticRenderer turns them about the pivots in GensetPartBlockEntity.rotors().
+
+- radiator_fan: 1.2 m pusher fan, six blades (genset radiators run 1.1 to 1.3 m fans)
+- crank_pulley: the crank pulley with its two belt grooves and a timing mark, 0.3 m across
+- coupling: the flexible coupling and flywheel ring seen through the adapter's windows, 0.8 m across
+- alternator_fan: the alternator's drive-end cooling fan, 0.8 m across
+"""
+import mlib
+import gensetlib as g
+
+C = (0.5, 0.5)   # the block's centre, (y, z)
+
+
+def rotor(name):
+	return mlib.Model("rotor_" + name, [(0, 0, 0)], dict(g.TEX), g.TEX["iron"])
+
+
+FAN = rotor("radiator_fan")
+FAN.fan("x", C, 0.58, 0.5, 0.025, "dark", blades=6, width=0.17, hub=0.09, hub_tex="galv")
+FAN.cylinder("x", C, 0.04, 0.38, 0.62, "steel", 8)   # the fan shaft
+
+PULLEY = rotor("crank_pulley")
+PULLEY.cylinder("x", C, 0.15, 0.45, 0.55, "iron", 16)
+for x in (0.47, 0.51):
+	PULLEY.ring("x", C, 0.152, x, x + 0.015, 0.01, "dark", sides=16)
+PULLEY.cylinder("x", C, 0.06, 0.42, 0.45, "steel", 10)   # the damper's centre bolt
+PULLEY.box((0.43, 0.6, 0.48), (0.46, 0.64, 0.52), "brass")   # a timing mark, so it shows turning
+
+COUPLING = rotor("coupling")
+COUPLING.cylinder("x", C, 0.4, 0.46, 0.54, "iron", 16)   # flywheel ring
+COUPLING.cylinder("x", C, 0.3, 0.42, 0.58, "rubber", 16)  # the flexible element
+COUPLING.bolt_circle("x", C, 0.34, 0.54, 12, "galv", head=0.04, height=0.025)
+COUPLING.box((0.4, 0.86, 0.45), (0.6, 0.9, 0.55), "brass")   # a painted mark on the ring
+
+ALT_FAN = rotor("alternator_fan")
+ALT_FAN.fan("x", C, 0.4, 0.5, 0.06, "galv", blades=8, width=0.1, hub=0.16, hub_tex="blue")
+ALT_FAN.ring("x", C, 0.4, 0.47, 0.53, 0.02, "galv", sides=16)
+
+ROTORS = [FAN, PULLEY, COUPLING, ALT_FAN]

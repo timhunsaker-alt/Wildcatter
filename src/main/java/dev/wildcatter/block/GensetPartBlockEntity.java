@@ -31,13 +31,15 @@ import org.jspecify.annotations.Nullable;
  * A genset part. It remembers which control panel runs it (sent to the client, which reads the shaft speed from the panel to turn
  * the fan, pulley and coupling and to play the engine). The fuel tank also holds the diesel, in litres.
  */
-public class GensetPartBlockEntity extends BlockEntity implements Kinetic, Sounding, Inspectable {
+public class GensetPartBlockEntity extends BlockEntity implements Kinetic, Sounding, Inspectable, dev.wildcatter.multiblock.BigPartEntity {
 	private static final Spin STILL = new Spin();
 
 	private @Nullable BlockPos controller;
 	private double liters;
 	/** An alternator wrecked by an out-of-sync close: it must be replaced. */
 	private boolean damaged;
+	/** Grown into its true-size cells (see BigParts). */
+	private boolean grown;
 
 	public GensetPartBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.GENSET_PART_ENTITY, pos, state);
@@ -71,6 +73,17 @@ public class GensetPartBlockEntity extends BlockEntity implements Kinetic, Sound
 		if (level != null) {
 			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
 		}
+	}
+
+	@Override
+	public boolean grown() {
+		return grown;
+	}
+
+	@Override
+	public void markGrown() {
+		grown = true;
+		setChanged();
 	}
 
 	public boolean damaged() {
@@ -114,11 +127,14 @@ public class GensetPartBlockEntity extends BlockEntity implements Kinetic, Sound
 	@Override
 	public List<Rotor> rotors() {
 		RotorBlock rotor = (RotorBlock) WildcatterBlocks.ROTOR;
+		// in the main cell's frame for a set facing north (tools/models/rotors.py): the shaft runs west (radiator) to east
+		// (panel) along the middle of the skid, 0.55 m above the base, which is z = 1 and y = 0.55 from these main cells
 		return switch (part()) {
-			// as drawn for a set facing north: the shaft runs west (radiator) to east (panel)
-			case RADIATOR -> List.of(new Rotor(rotor.part(RotorBlock.Part.RADIATOR_FAN), new Vector3f(0.55F, 0.5F, 0.5F), Direction.Axis.X, 1.2F));
-			case DIESEL_ENGINE, GAS_ENGINE -> List.of(new Rotor(rotor.part(RotorBlock.Part.CRANK_PULLEY), new Vector3f(0.09F, 0.4F, 0.5F), Direction.Axis.X, 1.0F));
-			case ALTERNATOR -> List.of(new Rotor(rotor.part(RotorBlock.Part.COUPLING), new Vector3f(0.1F, 0.5F, 0.5F), Direction.Axis.X, 1.0F));
+			case RADIATOR -> List.of(new Rotor(rotor.part(RotorBlock.Part.RADIATOR_FAN), new Vector3f(0.78F, 1.0F, 1.0F), Direction.Axis.X, 1.2F));
+			case DIESEL_ENGINE, GAS_ENGINE -> List.of(new Rotor(rotor.part(RotorBlock.Part.CRANK_PULLEY), new Vector3f(0.06F, 0.55F, 1.0F), Direction.Axis.X, 1.0F));
+			case ALTERNATOR -> List.of(
+					new Rotor(rotor.part(RotorBlock.Part.COUPLING), new Vector3f(0.1F, 0.55F, 1.0F), Direction.Axis.X, 1.0F),
+					new Rotor(rotor.part(RotorBlock.Part.ALTERNATOR_FAN), new Vector3f(0.3F, 0.55F, 1.0F), Direction.Axis.X, 1.0F));
 			default -> List.of();
 		};
 	}
@@ -169,17 +185,36 @@ public class GensetPartBlockEntity extends BlockEntity implements Kinetic, Sound
 		};
 	}
 
-	/** Client side: keeps the running sound going and puffs exhaust that follows the load. */
+	/** Server side: the main cell checks itself now and then, which is how an older world's one-block part is found. */
+	public static void serverTick(Level level, BlockPos pos, BlockState state, GensetPartBlockEntity part) {
+		dev.wildcatter.multiblock.BigParts.checkNow(level, pos, state, 100);
+	}
+
+	/** Client side: keeps the running sound going and puffs exhaust from the silencer's outlet, following the load. */
 	public static void clientTick(Level level, BlockPos pos, BlockState state, GensetPartBlockEntity part) {
 		if (level.getGameTime() % 10 == 0 && part.loop() != null) {
 			Sounding.Hook.start.accept(part);
 		}
 		GensetControlPanelBlockEntity panel = part.controller();
-		if (part.part() == GensetPartBlock.Part.EXHAUST && panel != null && panel.spin().rpm() > 0
+		if (part.part().isSilencer() && panel != null && panel.spin().rpm() > 0
 				&& level.getRandom().nextFloat() < 0.3F + 0.7F * (float) panel.loadShare()) {
+			// the tail pipe turns up at the radiator end of the silencer (tools/models/silencer.py)
+			double along = 0.1;
+			double[] at = turned(along, 0.5, part.facing());
 			level.addParticle(panel.loadShare() > 0.7 ? ParticleTypes.LARGE_SMOKE : ParticleTypes.SMOKE,
-					pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 0, 0.08 + 0.1 * panel.loadShare(), 0);
+					pos.getX() + at[0], pos.getY() + 1.0, pos.getZ() + at[1], 0, 0.08 + 0.1 * panel.loadShare(), 0);
 		}
+	}
+
+	/** A point (x east, z south, in metres from the main cell's north-west corner) drawn for a part facing north, turned to {@code facing}. */
+	static double[] turned(double x, double z, Direction facing) {
+		double dx = x - 0.5, dz = z - 0.5;
+		for (int i = 0; i < dev.wildcatter.multiblock.Multiblock.turns(facing); i++) {
+			double t = dx;
+			dx = -dz;
+			dz = t;
+		}
+		return new double[] {dx + 0.5, dz + 0.5};
 	}
 
 	@Override
@@ -191,7 +226,8 @@ public class GensetPartBlockEntity extends BlockEntity implements Kinetic, Sound
 			case ALTERNATOR -> damaged ? "Alternator, DAMAGED by an out-of-sync close: break it and fit a new one" : "Alternator";
 			case RADIATOR -> "Radiator";
 			case FUEL_TANK -> String.format("Sub-base fuel tank: %.0f of %.0f L of diesel", liters, Tuning.GENSET_TANK_LITERS);
-			case EXHAUST -> "Exhaust stack";
+			case BASE_FRAME -> "Base frame";
+			case EXHAUST, SILENCER_LARGE -> "Exhaust silencer";
 		};
 		return Component.literal(name + (panel == null ? " (not part of a genset: build the set round a control panel)" : " of a genset; the control panel reads: "))
 				.append(panel == null ? Component.empty() : panel.inspect());
@@ -212,6 +248,7 @@ public class GensetPartBlockEntity extends BlockEntity implements Kinetic, Sound
 		super.saveAdditional(output);
 		output.putDouble("liters", liters);
 		output.putBoolean("damaged", damaged);
+		output.putBoolean("grown", grown);
 		if (controller != null) {
 			output.putLong("controller", controller.asLong());
 		}
@@ -222,6 +259,7 @@ public class GensetPartBlockEntity extends BlockEntity implements Kinetic, Sound
 		super.loadAdditional(input);
 		liters = input.getDoubleOr("liters", 0);
 		damaged = input.getBooleanOr("damaged", false);
+		grown = input.getBooleanOr("grown", false);
 		controller = input.getLong("controller").map(BlockPos::of).orElse(null);
 	}
 }

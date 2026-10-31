@@ -1,19 +1,34 @@
 {
-  "variants": {
-    "facing=north": {
-      "model": "wildcatter:block/exhaust_stack"
-    },
-    "facing=east": {
-      "model": "wildcatter:block/exhaust_stack",
-      "y": 90
-    },
-    "facing=south": {
-      "model": "wildcatter:block/exhaust_stack",
-      "y": 180
-    },
-    "facing=west": {
-      "model": "wildcatter:block/exhaust_stack",
-      "y": 270
-    }
+ "variants": {
+  "facing=north,piece=0": {
+   "model": "wildcatter:block/exhaust_stack/p0"
+  },
+  "facing=north,piece=1": {
+   "model": "wildcatter:block/exhaust_stack/p1"
+  },
+  "facing=east,piece=0": {
+   "model": "wildcatter:block/exhaust_stack/p0",
+   "y": 90
+  },
+  "facing=east,piece=1": {
+   "model": "wildcatter:block/exhaust_stack/p1",
+   "y": 90
+  },
+  "facing=south,piece=0": {
+   "model": "wildcatter:block/exhaust_stack/p0",
+   "y": 180
+  },
+  "facing=south,piece=1": {
+   "model": "wildcatter:block/exhaust_stack/p1",
+   "y": 180
+  },
+  "facing=west,piece=0": {
+   "model": "wildcatter:block/exhaust_stack/p0",
+   "y": 270
+  },
+  "facing=west,piece=1": {
+   "model": "wildcatter:block/exhaust_stack/p1",
+   "y": 270
   }
+ }
 }

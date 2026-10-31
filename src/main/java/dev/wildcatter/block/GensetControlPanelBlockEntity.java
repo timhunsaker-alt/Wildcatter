@@ -15,12 +15,8 @@ import dev.wildcatter.energy.ElectricalStandard;
 import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.energy.Voltage;
 import dev.wildcatter.kinetic.Spin;
-import dev.wildcatter.multiblock.Multiblock;
-import dev.wildcatter.multiblock.MultiblockLayout;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -42,36 +38,19 @@ import net.minecraft.world.level.storage.ValueOutput;
  * output breaker and the readout, burns the fuel, and makes 480Y/277 V three-phase (400Y/230 V on IEC worlds) at its terminals
  * (every face but the front). Right-click starts and stops the set: it cranks to rated speed in 10 s, then closes its breaker.
  */
-public class GensetControlPanelBlockEntity extends BlockEntity implements CircuitPart, Generator, Inspectable {
+public class GensetControlPanelBlockEntity extends BlockEntity implements CircuitPart, Generator, Inspectable, dev.wildcatter.multiblock.BigPartEntity {
 	public enum Run {
 		STOPPED, CRANKING, RUNNING
 	}
 
-
-	/** As built: radiator, engine, alternator and panel along the shaft; the fuel tank under the engine; the exhaust on top of it. */
-	private static final MultiblockLayout DIESEL = new MultiblockLayout('K',
-			new String[] {".F.."},
-			new String[] {"REAK"},
-			new String[] {".X.."});
-	private static final MultiblockLayout GAS = new MultiblockLayout('K',
-			new String[] {"RGAK"},
-			new String[] {".X.."});
-	private static final Map<Character, Predicate<BlockState>> LEGEND = Map.of(
-			'K', s -> s.is(WildcatterBlocks.GENSET_CONTROL_PANEL),
-			'E', s -> s.is(WildcatterBlocks.DIESEL_ENGINE_PART),
-			'G', s -> s.is(WildcatterBlocks.GAS_ENGINE_PART),
-			'A', s -> s.is(WildcatterBlocks.ALTERNATOR),
-			'R', s -> s.is(WildcatterBlocks.RADIATOR),
-			'F', s -> s.is(WildcatterBlocks.FUEL_TANK),
-			'X', s -> s.is(WildcatterBlocks.EXHAUST_STACK));
-	private static final Map<Character, String> NAMES = Map.of('E', "diesel engine", 'G', "gas engine", 'A', "alternator", 'R', "radiator",
-			'F', "fuel tank (under the engine)", 'X', "exhaust stack (on top of the engine)");
 
 	private final ThreePhaseSource phases = new ThreePhaseSource();
 	private final StatorHeating stator = new StatorHeating();
 	private final Spin spin = new Spin();
 	private List<BlockPos> parts = List.of();
 	private boolean formed;
+	/** Grown into its true-size cells (see BigParts). */
+	private boolean grown;
 	private boolean gas;
 	private Run run = Run.STOPPED;
 	private boolean wantRun;
@@ -94,6 +73,17 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 
 	private Direction facing() {
 		return getBlockState().getValue(GensetControlPanelBlock.FACING);
+	}
+
+	@Override
+	public boolean grown() {
+		return grown;
+	}
+
+	@Override
+	public void markGrown() {
+		grown = true;
+		setChanged();
 	}
 
 	public boolean formed() {
@@ -170,6 +160,12 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		sync.setSlipForTest(degrees);
 	}
 
+	/** Test hook: gas already in the engine's line, in cubic metres, for a set with no well near it. */
+	public void setGasForTest(double m3) {
+		gasBuffer = m3;
+		setChanged();
+	}
+
 	/** Test hook and remote start: run or stop. */
 	public void setWantRun(boolean value) {
 		wantRun = value;
@@ -182,6 +178,12 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 			return;
 		}
 		long phase = level.getGameTime() + pos.hashCode();
+		if (phase % 100 == 0) {
+			dev.wildcatter.multiblock.BigParts.check(server, pos, state);   // an older world's one-block panel drops
+			if (!(level.getBlockEntity(pos) instanceof GensetControlPanelBlockEntity)) {
+				return;
+			}
+		}
 		if (phase % Tuning.STRUCTURE_CHECK_TICKS == 0) {
 			panel.checkStructure(server);
 		}
@@ -192,33 +194,22 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 	}
 
 	private void checkStructure(ServerLevel level) {
-		List<BlockPos> found = Multiblock.match(level, worldPosition, facing(), DIESEL, LEGEND);
-		boolean isGas = false;
-		if (found == null) {
-			found = Multiblock.match(level, worldPosition, facing(), GAS, LEGEND);
-			isGas = found != null;
-		}
-		if (found != null) {
-			if (!formed || isGas != gas) {
+		GensetSkid.Found found = GensetSkid.check(level, worldPosition, facing());
+		if (found.parts() != null) {
+			if (!formed || found.gas() != gas) {
 				level.playSound(null, worldPosition, WildcatterSounds.STRUCTURE_FORMED, SoundSource.BLOCKS, 1.2F, 0.9F);
 			}
 			formed = true;
-			gas = isGas;
+			gas = found.gas();
 			missing = "";
-			for (BlockPos at : found) {
+			for (BlockPos at : found.parts()) {
 				if (level.getBlockEntity(at) instanceof GensetPartBlockEntity part) {
 					part.bind(worldPosition);
-					BlockState s = level.getBlockState(at);
-					if (s.getValue(GensetPartBlock.FACING) != facing()) {
-						level.setBlock(at, s.setValue(GensetPartBlock.FACING, facing()), 3);
-					}
 				}
 			}
-			parts = found;
+			parts = found.parts();
 		} else {
-			boolean engineGas = level.getBlockState(worldPosition.relative(facing().getCounterClockWise(), 2)).is(WildcatterBlocks.GAS_ENGINE_PART);
-			String why = Multiblock.missing(level, worldPosition, facing(), engineGas ? GAS : DIESEL, LEGEND, NAMES);
-			missing = why == null ? "" : why;
+			missing = found.missing();
 			if (formed) {
 				dissolve(level);
 			}
@@ -264,7 +255,7 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		if (want <= 0) {
 			return;
 		}
-		List<BlockPos> cells = List.of(engine());
+		List<BlockPos> cells = dev.wildcatter.multiblock.BigParts.cellsAt(level, engine());   // a gas line to any cell of the engine
 		Set<BlockPos> lines = Plumbing.network(level, cells, PipeBlock.Kind.GAS);
 		double got = 0;
 		for (GasWellheadBlockEntity head : Plumbing.machines(level, cells, lines, true, GasWellheadBlockEntity.class)) {
@@ -280,7 +271,7 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		if (room < 1) {
 			return;
 		}
-		List<BlockPos> cells = List.of(tank.getBlockPos());
+		List<BlockPos> cells = dev.wildcatter.multiblock.BigParts.cellsAt(level, tank.getBlockPos());   // a line to any cell of the tank
 		Set<BlockPos> lines = Plumbing.network(level, cells, PipeBlock.Kind.GAS);
 		for (RefineryBlockEntity refinery : Plumbing.machines(level, cells, lines, true, RefineryBlockEntity.class)) {
 			tank.addFuel(refinery.drawDiesel(Tuning.GENSET_TANK_LITERS - tank.liters()));
@@ -435,7 +426,14 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 	// ---- the circuit ----------------------------------------------------------------------------------------------
 	@Override
 	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
-		return voltage == Voltage.INDUSTRIAL && face != facing();
+		return hasPortAt(worldPosition, face, role, voltage);
+	}
+
+	/** The output terminals: the panel's east end face (for a set facing north), on both of its bottom cells. */
+	@Override
+	public boolean hasPortAt(BlockPos cell, Direction face, Conductor role, Voltage voltage) {
+		return voltage == Voltage.INDUSTRIAL && face == GensetControlPanelBlock.terminalFace(getBlockState())
+				&& GensetControlPanelBlock.terminalCells(worldPosition, getBlockState()).contains(cell);
 	}
 
 	@Override
@@ -443,14 +441,16 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		sync.beginBuild();
 		if (!live()) {
 			if (formed && run == Run.RUNNING && !breakerClosed && !tripped) {
-				sync.buildTransformers(circuit, worldPosition, Voltage.INDUSTRIAL, face -> face != facing());
+				sync.buildTransformers(circuit, GensetControlPanelBlock.terminalCells(worldPosition, getBlockState()),
+						List.of(GensetControlPanelBlock.terminalFace(getBlockState())), Voltage.INDUSTRIAL);
 			}
 			return;
 		}
 		double nominal = Voltage.INDUSTRIAL.nominal();
 		double ratedAmps = ratedWatts() / Tuning.GENERATOR_RATED_PF / (3 * nominal);
 		double ohms = nominal * Tuning.ENGINE_SAG / ratedAmps;   // sags ENGINE_SAG at full current
-		phases.build(circuit, worldPosition, Voltage.INDUSTRIAL, nominal, ohms);
+		phases.build(circuit, GensetControlPanelBlock.terminalCells(worldPosition, getBlockState()),
+				List.of(GensetControlPanelBlock.terminalFace(getBlockState())), Voltage.INDUSTRIAL, nominal, ohms);
 	}
 
 	@Override
@@ -516,7 +516,7 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		String name = (gas ? "Gas genset (" + Math.round(Tuning.GENSET_GAS_WATTS / 1000) : "Diesel genset (" + Math.round(Tuning.GENSET_DIESEL_WATTS / 1000))
 				+ " kW, " + Voltage.INDUSTRIAL.label() + ")";
 		if (!formed) {
-			return Component.literal(name + ": NOT BUILT" + (missing.isEmpty() ? "" : ", needs a " + missing));
+			return Component.literal(name + ": NOT BUILT" + (missing.isEmpty() ? "" : ", needs the " + missing));
 		}
 		String state = tripped ? "TRIPPED " + tripReason + ": fix the cause, then right-click to reset"
 				: switch (run) {
@@ -549,6 +549,7 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
 		output.putBoolean("formed", formed);
+		output.putBoolean("grown", grown);
 		output.putBoolean("gas", gas);
 		output.putString("run", run.name());
 		output.putBoolean("wantRun", wantRun);
@@ -565,6 +566,7 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
 		formed = input.getBooleanOr("formed", false);
+		grown = input.getBooleanOr("grown", false);
 		gas = input.getBooleanOr("gas", false);
 		try {
 			run = Run.valueOf(input.getStringOr("run", "STOPPED"));

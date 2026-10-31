@@ -131,6 +131,49 @@ class Model:
 		e = Element(frm, to, faces, None, (axis, deg, origin) if abs(deg) > 1e-6 else None)
 		self.elements.append(e)
 
+	def ring(self, axis, centre, radius, start, end, thickness, tex, sides=12, skip=()):
+		"""A hoop of sides plates round the axis (a fan shroud, a guard band, a cooling rib). skip leaves gaps (window k)."""
+		i = "xyz".index(axis)
+		first = [j for j in range(3) if j != i][0]   # the plates' radial direction before they are turned
+		o = [0.0, 0.0, 0.0]
+		o[i] = (start + end) / 2
+		cross = [j for j in range(3) if j != i]
+		o[cross[0]], o[cross[1]] = centre
+		tangent = 2 * radius * math.tan(math.pi / sides) + 0.004
+		for k in range(sides):
+			if k in skip:
+				continue
+			deg = k * 360.0 / sides
+			c0 = list(o)
+			c0[first] += radius
+			c = rotate(c0, (axis, deg, o))
+			half = [0.0, 0.0, 0.0]
+			half[i] = (end - start) / 2
+			half[first] = thickness / 2
+			half[cross[1]] = tangent / 2
+			frm = [c[j] - half[j] for j in range(3)]
+			to = [c[j] + half[j] for j in range(3)]
+			self._slab(frm, to, {f: tex for f in FACES}, axis, deg, tuple(c))
+
+	def fan(self, axis, centre, radius, at, thickness, tex, blades=6, width=0.16, hub=0.08, hub_tex=None):
+		"""Blades through the hub in pairs (each pair one slab through the centre), so any count of even blades turns cleanly."""
+		for k in range(blades // 2):
+			deg = k * 360.0 / blades
+			if axis == "x":
+				cy, cz = centre
+				frm, to = (at - thickness / 2, cy - width / 2, cz - radius), (at + thickness / 2, cy + width / 2, cz + radius)
+				o = (at, cy, cz)
+			elif axis == "y":
+				cx, cz = centre
+				frm, to = (cx - width / 2, at - thickness / 2, cz - radius), (cx + width / 2, at + thickness / 2, cz + radius)
+				o = (cx, at, cz)
+			else:
+				cx, cy = centre
+				frm, to = (cx - width / 2, cy - radius, at - thickness / 2), (cx + width / 2, cy + radius, at + thickness / 2)
+				o = (cx, cy, at)
+			self._slab(frm, to, {f: tex for f in FACES}, axis, deg, o)
+		self.cylinder(axis, centre, hub, at - thickness * 1.5, at + thickness * 1.5, hub_tex or tex, 8)
+
 	def flange(self, axis, centre, radius, at, thickness, tex, bolts=8, bolt_tex=None, sides=16):
 		self.cylinder(axis, centre, radius, at - thickness / 2, at + thickness / 2, tex, sides)
 		self.bolt_circle(axis, centre, radius * 0.82, at + thickness / 2, bolts, bolt_tex or tex)

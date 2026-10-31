@@ -109,17 +109,13 @@ public class GsuTransformerBlock extends TransformerBlock implements BigPart {
 	@Override
 	public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 		super.setPlacedBy(level, pos, state, placer, stack);
-		if (!level.isClientSide()) {
-			BigParts.grow(level, pos, state);
-		}
+		BigParts.placed(level, pos, state);
 	}
 
 	@Override
 	protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
 		super.onPlace(state, level, pos, oldState, movedByPiston);
-		if (state.getValue(piece) == 0 && !oldState.is(this)) {
-			level.scheduleTick(pos, this, 1);   // set by a command or found alone: grow on the next tick if there is room
-		}
+		BigParts.onPlace(level, pos, state, oldState);   // set by a command or found alone: grow on the next tick if there is room
 	}
 
 	@Override

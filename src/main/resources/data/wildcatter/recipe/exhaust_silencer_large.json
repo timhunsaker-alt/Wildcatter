@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SSS",
+    "S S",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:exhaust_stack"
+  },
+  "result": {
+    "id": "wildcatter:exhaust_silencer_large",
+    "count": 1
+  }
+}

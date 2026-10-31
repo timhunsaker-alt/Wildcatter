@@ -153,6 +153,27 @@ public final class BigParts {
 		}
 	}
 
+	/** For {@code setPlacedBy}: a player placed the part, so it fills its cells now. */
+	public static void placed(Level level, BlockPos pos, BlockState state) {
+		if (!level.isClientSide()) {
+			grow(level, pos, state);
+		}
+	}
+
+	/** For {@code onPlace}: a main cell set by a command, or found alone, is checked on the next tick. */
+	public static void onPlace(Level level, BlockPos pos, BlockState state, BlockState oldState) {
+		if (state.getValue(part(state).piece()) == 0 && !oldState.is(state.getBlock())) {
+			level.scheduleTick(pos, state.getBlock(), 1);
+		}
+	}
+
+	/** For a block entity's ticker: every so often the main cell checks itself, which is how an older world's lone cell is found. */
+	public static void checkNow(Level level, BlockPos pos, BlockState state, int every) {
+		if (level instanceof ServerLevel server && (level.getGameTime() + pos.hashCode()) % every == 0) {
+			check(server, pos, state);
+		}
+	}
+
 	/** Only the main cell drops the item: the other pieces of a broken part drop nothing. */
 	public static java.util.List<net.minecraft.world.item.ItemStack> drops(BlockState state, java.util.List<net.minecraft.world.item.ItemStack> fromLoot) {
 		return state.getValue(part(state).piece()) == 0 ? fromLoot : java.util.List.of();
@@ -201,13 +222,15 @@ public final class BigParts {
 			return;
 		}
 		boolean grown = level.getBlockEntity(main) instanceof BigPartEntity entity && entity.grown();
-		if (!grown && present == 0 && roomFor(level, main, state)) {
+		boolean grows = part(state).growsOnLoad();
+		if (!grown && present == 0 && grows && roomFor(level, main, state)) {
 			grow(level, main, state);
 			return;
 		}
 		if (!grown) {
 			String where = state.getBlock().getName().getString() + " at " + main.getX() + " " + main.getY() + " " + main.getZ()
-					+ " is now true size (" + size(part(state).footprint()) + ") and had no room, so it dropped as an item";
+					+ " is now true size (" + size(part(state).footprint()) + ") and "
+					+ (grows ? "had no room, so it dropped as an item" : "its machine's layout changed, so it dropped as an item: rebuild the machine at true size (anything it held was lost)");
 			Wildcatter.LOGGER.info(where);
 			for (ServerPlayer player : level.players()) {
 				if (player.blockPosition().closerThan(main, 128)) {

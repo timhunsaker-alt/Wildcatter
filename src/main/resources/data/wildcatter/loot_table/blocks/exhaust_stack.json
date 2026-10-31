@@ -12,6 +12,13 @@
       "conditions": [
         {
           "condition": "minecraft:survives_explosion"
+        },
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "wildcatter:exhaust_stack",
+          "properties": {
+            "piece": "0"
+          }
         }
       ]
     }

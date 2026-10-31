@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/exhaust_stack"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/exhaust_stack/item"
+ }
 }

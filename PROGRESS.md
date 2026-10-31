@@ -248,6 +248,38 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   - Terminals: 4.16 kV on the back of the bottom-middle cell; 12.47 kV on the top and front of the cell over the bushings.
 - **Game test `bigParts`:** places a GSU like a player and checks the ghost outline, all 18 cells, a read through a corner piece and the bushing terminals. It takes three screenshots. Breaking one piece must leave one item and no cells. A blocked cell must refuse the placement. A lone GSU must drop when there is no room and grow when there is. `industrial` and `steamPlant` now run through the true-size GSU.
 
+## Phase 4.5b: gensets at true size
+- **Skids at real size** (docs/multiblocks/genset.md):
+  - The 500 kW diesel set is 5 × 2 × 4: sub-base tank, radiator, engine, alternator, control panel and silencer.
+  - The 1 MW gas set is 7 × 2 × 4: base frame, radiator, V20 engine, alternator, control panel and large silencer.
+  - Every part is one item that fills its real size. New items: the genset base frame and the large silencer.
+  - The approved height of 3 became 4, because the silencer sits above the 3 m radiator.
+- **Building** (`block/GensetSkid`, `BigPart.snap`, `item/BigPartItem`):
+  - Place the base first. A part clicked anywhere on it, or on a part already on it, goes to its slot and turns to the base's way.
+  - The ghost outline shows the slot.
+  - The panel matches each part's main cell and facing, and names a part that is missing or turned the wrong way.
+- **Terminals:**
+  - The 480 V output is on the panel's east end face, on both lower cells, instead of every face but the front.
+  - Diesel fills the tank from any of its cells, by bucket or pipe. The gas line reaches the engine through any of its cells.
+- **Older worlds:** a Phase 4 one-block genset part drops as an item with a chat line instead of growing (`BigPart.growsOnLoad`), because the layout changed. A one-block tank's diesel is lost.
+- **Models** (`tools/models/`):
+  - One script per part: `fuel_tank`, `genset_base_frame`, `radiator`, `genset_diesel_engine`, `genset_gas_engine`, `alternator`, `genset_control_panel`, `silencer` (both sizes). From 89 to 652 boxes each.
+  - Turning parts drawn at real size (`rotors.py`): the 1.2 m radiator fan, the crank pulley, the flywheel coupling behind the adapter's guard windows, and a new alternator cooling fan.
+  - New shapes in `mlib`: `ring` (hoops, shrouds, ribs, windows) and `fan`.
+- **Decals:** two more from Ludo, a generic controller display and an engine data plate (1 credit). The exhaust smoke now leaves the silencer's tail pipe.
+- **Game tests:**
+  - **Moved scenes:** all 12 scenes that build a genset now build true-size skids through `GensetSkid.build`.
+  - **Rebuilt scenes:** `industrial`, `motors` and the MCC scene turn their sets to face north, so the cable leaves the panel's end face. The MCC set stands beside the incoming section rather than on it. In the wells scene the wellhead touches one of the engine's far cells.
+  - **New scene `gensetParts`:**
+    - builds a diesel skid by player clicks; the engine, clicked off its slot, snaps in
+    - forms the set
+    - fills the tank with a bucket on its far corner
+    - names an alternator turned the wrong way
+    - runs both sets, with screenshots from three sides
+    - breaks one engine piece: one engine item drops and the set dissolves
+    - drops an older world's one-block radiator
+  - **New scene `gensetFrameRate`:** ten running diesel sets. The client held its 120 fps cap with them in view.
+
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.
@@ -256,14 +288,16 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
-- Phase 4.5: only the GSU is true size so far. The rest of the Phase 4 machines are still one block per part until waves 4.5b to 4.5f.
+- Phase 4.5: the GSU and the gensets are true size. The steam plant, cooling tower, substation, line gear and oil field are still one block per part until waves 4.5c to 4.5f.
+- The frame-rate check runs at the client's 120 fps cap, so it shows no drop but not how much headroom is left.
+- The alternator is drawn 1 m long for both sets; a real 1 MW frame is about 1.6 m.
+- The old genset `*_placeholder` textures are still generated (the rotor texture is still used by the tower fan and disconnect blades).
 - The brass swatch keeps a faint tile line.
 - The 4.16 kV to 138 kV step-up is still the single-block `substation_transformer` (Y-Y, unrated windings) until bigger plants (Phase 6).
 - The test skips the steam plant's five-minute warm-up with a hook (it checks the drum starts rising, then jumps to pressure).
 - A small genset cannot drive enough fault current through the 20 MVA substation to reach real relay settings; the test scales the relays down. In play, such a source's own protection clears a feeder fault first.
 - Pipe, drum and turbine are drawn with the old steam machines' art; the plant's parts have no models of their own yet beyond the turbine coupling and feed pump.
 - The 1/0 and 4/0 MV cable ampacities are from the NEC 310.60 table family but not checked line by line (500 kcmil, 450 A, is).
-- The gas engine's texture is the diesel engine's, hue-shifted: they are hard to tell apart.
 - Genset sounds and turning parts have been checked in test screenshots and logs, not heard in a real play session.
 - The new art (cooling tower, fuse, breakers, poles) has been checked in test screenshots, not in a real play session.
 - The starter 120 V turbine can carry its full rating on one phase (decided: it stands in for a single-phase set).

@@ -86,13 +86,24 @@ public final class Synchronizer {
 
 	/** Breaker open: the potential transformers on every face that {@code faces} allows. */
 	public void buildTransformers(Circuit circuit, BlockPos pos, Voltage tier, Predicate<Direction> faces) {
+		java.util.List<Direction> on = new java.util.ArrayList<>();
+		for (Direction face : Direction.values()) {
+			if (faces.test(face)) {
+				on.add(face);
+			}
+		}
+		buildTransformers(circuit, java.util.List.of(pos), on, tier);
+	}
+
+	/** The same, on {@code faces} of each of {@code cells} (a big part's terminal box). */
+	public void buildTransformers(Circuit circuit, java.util.List<BlockPos> cells, java.util.List<Direction> faces, Voltage tier) {
 		int earth = circuit.node();
 		circuit.ground(earth);
 		for (int k = 0; k < 3; k++) {
 			pt[k] = circuit.node();
 			circuit.resistor(pt[k], earth, Tuning.PT_OHMS);
-			for (Direction face : Direction.values()) {
-				if (faces.test(face)) {
+			for (BlockPos pos : cells) {
+				for (Direction face : faces) {
 					circuit.port(pos, face, PHASES[k], tier, pt[k], Tuning.CONTACT_OHMS / 2, false);
 				}
 			}
