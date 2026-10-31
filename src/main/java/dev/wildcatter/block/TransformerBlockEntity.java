@@ -21,7 +21,21 @@ import net.minecraft.world.level.block.state.BlockState;
  * The windings have a little resistance, which is where the heat and the few percent of loss come from.
  * The neutral on each side is tied to ground, as it is at a real service entrance.
  */
-public class TransformerBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable {
+public class TransformerBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, dev.wildcatter.multiblock.BigPartEntity {
+	/** A true-size unit (the GSU) has grown into its cells: see BigParts. */
+	private boolean grown;
+
+	@Override
+	public boolean grown() {
+		return grown;
+	}
+
+	@Override
+	public void markGrown() {
+		grown = true;
+		setChanged();
+	}
+
 	/** Delta-wye only: the phase shift across the bank, as of the last solve. */
 	private double shiftDegrees;
 	private final int[] lowPort = new int[3];
@@ -77,21 +91,24 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 		return block().high();
 	}
 
-	/** The high-voltage terminals are on the front and the top (where real bushings are); the low side is the other four faces, so a split-phase secondary has room for A, B and N. */
-	private boolean isHighFace(Direction face) {
-		return face == highFace() || face == Direction.UP;
-	}
-
-	private boolean isLowFace(Direction face) {
-		return !isHighFace(face);
+	/** The terminals (TransformerBlock#terminals): on a one-block unit the front and top are high, the other four faces low. */
+	private java.util.List<TransformerBlock.Terminal> terminals() {
+		return block().terminals(worldPosition, getBlockState());
 	}
 
 	@Override
 	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
-		if (isHighFace(face)) {
-			return voltage == block().high();
+		return hasPortAt(worldPosition, face, role, voltage);
+	}
+
+	@Override
+	public boolean hasPortAt(BlockPos cell, Direction face, Conductor role, Voltage voltage) {
+		for (TransformerBlock.Terminal t : terminals()) {
+			if (t.cell().equals(cell) && t.face() == face) {
+				return voltage == (t.high() ? block().high() : block().low());
+			}
 		}
-		return isLowFace(face) && voltage == block().low();
+		return false;
 	}
 
 	/** Pole-mount and split-phase units are single-phase; the rest are three-phase banks, grounded Y to grounded Y. */
@@ -143,36 +160,38 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 		circuit.ground(highNeutral);
 
 		Conductor[] names = {Conductor.A, Conductor.B, Conductor.C};
-		for (Direction face : Direction.values()) {
-			if (isHighFace(face)) {
+		for (TransformerBlock.Terminal t : terminals()) {
+			BlockPos at = t.cell();
+			Direction face = t.face();
+			if (t.high()) {
 				if (phases == 1) {
 					// a single-phase unit is fed from whichever phase of the line it is hung on
-					circuit.hotPort(worldPosition, face, block.high(), highPort[0], Tuning.CONTACT_OHMS / 2, false);
+					circuit.hotPort(at, face, block.high(), highPort[0], Tuning.CONTACT_OHMS / 2, false);
 				} else {
 					for (int k = 0; k < 3; k++) {
-						circuit.port(worldPosition, face, names[k], block.high(), highPort[k], Tuning.CONTACT_OHMS / 2, false);
+						circuit.port(at, face, names[k], block.high(), highPort[k], Tuning.CONTACT_OHMS / 2, false);
 					}
 				}
 				if (!block.deltaHigh()) {   // a delta has no neutral
-					circuit.port(worldPosition, face, Conductor.N, block.high(), highNeutral, Tuning.CONTACT_OHMS / 2, false);
+					circuit.port(at, face, Conductor.N, block.high(), highNeutral, Tuning.CONTACT_OHMS / 2, false);
 				}
-			} else if (isLowFace(face)) {
+			} else {
 				boolean side = face != highFace().getOpposite() && face != Direction.DOWN;
 				if (phases == 3) {
 					for (int k = 0; k < 3; k++) {
-						circuit.port(worldPosition, face, names[k], block.low(), lowPort[k], Tuning.CONTACT_OHMS / 2, false);
+						circuit.port(at, face, names[k], block.low(), lowPort[k], Tuning.CONTACT_OHMS / 2, false);
 					}
 					if (!block.deltaLow()) {   // a delta has no neutral
-						circuit.port(worldPosition, face, Conductor.N, block.low(), lowNeutral, Tuning.CONTACT_OHMS / 2, false);
+						circuit.port(at, face, Conductor.N, block.low(), lowNeutral, Tuning.CONTACT_OHMS / 2, false);
 					}
 				} else if (!side) {
 					// back and bottom: leg A and the neutral, as a single-phase low side always had
-					circuit.port(worldPosition, face, Conductor.A, block.low(), lowPort[0], Tuning.CONTACT_OHMS / 2, false);
-					circuit.port(worldPosition, face, Conductor.N, block.low(), lowNeutral, Tuning.CONTACT_OHMS / 2, false);
+					circuit.port(at, face, Conductor.A, block.low(), lowPort[0], Tuning.CONTACT_OHMS / 2, false);
+					circuit.port(at, face, Conductor.N, block.low(), lowNeutral, Tuning.CONTACT_OHMS / 2, false);
 				} else if (split) {
 					// the sides: leg B and the neutral, so a machine touching a side runs on leg B and never bridges the two legs
-					circuit.port(worldPosition, face, Conductor.B, block.low(), lowBPort, Tuning.CONTACT_OHMS / 2, false);
-					circuit.port(worldPosition, face, Conductor.N, block.low(), lowNeutral, Tuning.CONTACT_OHMS / 2, false);
+					circuit.port(at, face, Conductor.B, block.low(), lowBPort, Tuning.CONTACT_OHMS / 2, false);
+					circuit.port(at, face, Conductor.N, block.low(), lowNeutral, Tuning.CONTACT_OHMS / 2, false);
 				}
 			}
 		}
@@ -228,6 +247,10 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 			server.destroyBlock(pos, false);
 			dev.wildcatter.circuit.CircuitManager.markDirty(server);
 		}
+		if (state.getBlock() instanceof dev.wildcatter.multiblock.BigPart && level instanceof net.minecraft.server.level.ServerLevel server
+				&& (level.getGameTime() + pos.hashCode()) % 100 == 0) {
+			dev.wildcatter.multiblock.BigParts.check(server, pos, state);   // an older world's one-block unit grows to its real size
+		}
 	}
 
 	/** The largest high-side winding current, as of the last solve (in a delta, the line current is 1.73 times it). */
@@ -251,5 +274,17 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 				+ String.format("%s%.0f V %.1f A on the %s side, %.0f V %.2f A on the %s side, losing %.0f W as heat; ",
 						phases == 3 ? "A " : "", lowVolts[0], lowAmps[0], block().low().label(), highVolts[0], highAmps[0], block().high().label(), lossWatts)
 				+ (level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you"));
+	}
+
+	@Override
+	protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput output) {
+		super.saveAdditional(output);
+		output.putBoolean("grown", grown);
+	}
+
+	@Override
+	protected void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
+		super.loadAdditional(input);
+		grown = input.getBooleanOr("grown", false);
 	}
 }

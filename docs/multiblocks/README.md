@@ -25,3 +25,18 @@ not a go-ahead to build: that waits for the roadmap phase (ROADMAP.md). Nothing 
 - A rotation is one of four horizontal facings of the controller. The grid is written for NORTH; other facings rotate it.
 - Formation is checked by the controller every 20 ticks and when a part changes. Removing a part dissolves the
   structure; fluids and fuel in the controller tank are kept until it re-forms, then spill if the tank shrinks.
+
+## Big parts (Phase 4.5, true scale)
+Decided with Tim on 2026-10-30: machines are true scale, 1 block = 1 m. Each real component is still **one item**, but placed it
+fills its real size, the way a bed fills two spaces. This is not tiling: the cells are pieces of one component.
+- Footprint: a box of cells drawn facing north with the main cell (piece 0) named. Piece 0 holds the block entity; the other
+  pieces are the same block id with their own `piece` number, and point at piece 0 through the footprint.
+- Placing: in front of the player, turned to face them, only if every cell is free. Holding the item shows a ghost outline,
+  green where it fits and red where something is in the way.
+- Breaking any piece breaks the part and drops one item. A click, a meter or a shock on any piece is on the part.
+- Collision follows the real shape, a few boxes per cell, from the model tool.
+- Terminals are on named faces of named pieces (where the bushings or cable boxes really are), not on every face.
+- A multiblock layout lists every cell a big part fills; each cell must be that part's right piece, the right way round.
+- Older worlds: a part that was one block grows into its cells when there is room, and otherwise drops as an item and says where.
+- Models come from `tools/models/<part>.py` (real dimensions in metres) and are drawn in the material textures in
+  `art/final/mat/`. The tool refuses a box more than a block past its cell and a face with no texture.

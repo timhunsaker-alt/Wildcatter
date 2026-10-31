@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/gsu_transformer"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/gsu_transformer/item"
+ }
 }

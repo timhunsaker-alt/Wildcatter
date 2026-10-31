@@ -61,6 +61,15 @@ and the Field Manual has a page for each new system.
   - Sound for each machine (engine idle and load, turbine whine, fans, breaker clunk, fuse pop, flashover, transformer hum),
     with pitch and volume following machine state. Specs go in `docs/multiblocks/` first; sound sources come from Ludo.
 
+## Phase 4.5 — True-scale machines — CURRENT (added 2026-10-30 at Tim's request: "as realistic as Minecraft will allow, not just textures on blocks")
+- True scale, 1 block = 1 m. Each real component is one item that fills its real size when placed (like a bed), with a ghost
+  outline showing where it will go. Breaking any piece breaks the part and drops one item. Specs are redone with real dimensions.
+- Detailed models built from many boxes (round parts as many-sided shapes, fins, bolts, pipes, gauges) by the model tool in
+  `tools/models/`, drawn in Ludo material textures. No meshes.
+- Waves: 4.5a foundations, proved on the GSU; 4.5b gensets; 4.5c steam plant and cooling tower; 4.5d substation and
+  transformers; 4.5e line and building gear (one-piece true-height poles); 4.5f oil and gas. The refinery waits for Phase 5.
+- Tim checks each wave in a real session before the next starts.
+
 ## Phase 5 — Oil and gas depth
 - Wellhead separator (oil / gas / water), gas processing, compressor stations.
 - Refinery products: LPG, gasoline, kerosene, diesel, residue. Steam cracker → ethylene → plastic.

@@ -106,8 +106,7 @@ public class CableBlock extends BaseEntityBlock {
 
 	private BlockState withArms(BlockState state, BlockGetter level, BlockPos pos) {
 		for (Direction side : Direction.values()) {
-			boolean joins = level.getBlockEntity(pos.relative(side)) instanceof CircuitPart part
-					&& part.hasPort(side.getOpposite(), state.getValue(CONDUCTOR), voltage);
+			boolean joins = CircuitPart.portAt(level, pos.relative(side), side.getOpposite(), state.getValue(CONDUCTOR), voltage);
 			state = state.setValue(WireShape.ARMS.get(side), joins);
 		}
 		return state;

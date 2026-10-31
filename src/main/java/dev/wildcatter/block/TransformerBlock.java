@@ -112,6 +112,23 @@ public class TransformerBlock extends BaseEntityBlock {
 		return deltaHigh;
 	}
 
+	/** A terminal: a face of one of the transformer's cells, on its high or its low side. */
+	public record Terminal(BlockPos cell, Direction face, boolean high) {
+	}
+
+	/**
+	 * Where the bushings are. A one-block unit has its high side on the front and the top (where real bushings are) and its
+	 * low side on the other four faces, so a split-phase secondary has room for A, B and N. A true-size unit says its own.
+	 */
+	public java.util.List<Terminal> terminals(BlockPos main, BlockState state) {
+		Direction front = state.getValue(FACING);
+		java.util.List<Terminal> out = new java.util.ArrayList<>(6);
+		for (Direction face : Direction.values()) {
+			out.add(new Terminal(main, face, face == front || face == Direction.UP));
+		}
+		return out;
+	}
+
 	/** Hangs on a pole: a rated single-phase unit. */
 	public boolean poleMount() {
 		return ratedVa > 0 && !threePhase;

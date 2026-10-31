@@ -14,6 +14,16 @@ public interface CircuitPart {
 	/** True if there is a terminal of this role and voltage on {@code face}. Wires use it to know where to grow arms. */
 	boolean hasPort(Direction face, Conductor role, Voltage voltage);
 
+	/** For a big part (docs/multiblocks/README.md): a terminal on {@code face} of one of its cells. Others have only their own cell. */
+	default boolean hasPortAt(net.minecraft.core.BlockPos cell, Direction face, Conductor role, Voltage voltage) {
+		return hasPort(face, role, voltage);
+	}
+
+	/** True if whatever stands at {@code pos} (an ordinary part, or any piece of a big part) has that terminal on {@code face}. */
+	static boolean portAt(net.minecraft.world.level.BlockGetter level, net.minecraft.core.BlockPos pos, Direction face, Conductor role, Voltage voltage) {
+		return dev.wildcatter.multiblock.BigParts.entity(level, pos) instanceof CircuitPart part && part.hasPortAt(pos, face, role, voltage);
+	}
+
 	/** Adds this part's nodes, components and terminals to the circuit. */
 	void build(Circuit circuit);
 

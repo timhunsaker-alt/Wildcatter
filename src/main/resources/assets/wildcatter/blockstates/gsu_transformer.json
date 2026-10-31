@@ -1,19 +1,274 @@
 {
-  "variants": {
-    "facing=north": {
-      "model": "wildcatter:block/gsu_transformer"
-    },
-    "facing=east": {
-      "model": "wildcatter:block/gsu_transformer",
-      "y": 90
-    },
-    "facing=south": {
-      "model": "wildcatter:block/gsu_transformer",
-      "y": 180
-    },
-    "facing=west": {
-      "model": "wildcatter:block/gsu_transformer",
-      "y": 270
-    }
+ "variants": {
+  "facing=north,piece=0": {
+   "model": "wildcatter:block/gsu_transformer/p0"
+  },
+  "facing=north,piece=1": {
+   "model": "wildcatter:block/gsu_transformer/p1"
+  },
+  "facing=north,piece=2": {
+   "model": "wildcatter:block/gsu_transformer/p2"
+  },
+  "facing=north,piece=3": {
+   "model": "wildcatter:block/gsu_transformer/p3"
+  },
+  "facing=north,piece=4": {
+   "model": "wildcatter:block/gsu_transformer/p4"
+  },
+  "facing=north,piece=5": {
+   "model": "wildcatter:block/gsu_transformer/p5"
+  },
+  "facing=north,piece=6": {
+   "model": "wildcatter:block/gsu_transformer/p6"
+  },
+  "facing=north,piece=7": {
+   "model": "wildcatter:block/gsu_transformer/p7"
+  },
+  "facing=north,piece=8": {
+   "model": "wildcatter:block/gsu_transformer/p8"
+  },
+  "facing=north,piece=9": {
+   "model": "wildcatter:block/gsu_transformer/p9"
+  },
+  "facing=north,piece=10": {
+   "model": "wildcatter:block/gsu_transformer/p10"
+  },
+  "facing=north,piece=11": {
+   "model": "wildcatter:block/gsu_transformer/p11"
+  },
+  "facing=north,piece=12": {
+   "model": "wildcatter:block/gsu_transformer/p12"
+  },
+  "facing=north,piece=13": {
+   "model": "wildcatter:block/gsu_transformer/p13"
+  },
+  "facing=north,piece=14": {
+   "model": "wildcatter:block/gsu_transformer/p14"
+  },
+  "facing=north,piece=15": {
+   "model": "wildcatter:block/gsu_transformer/p15"
+  },
+  "facing=north,piece=16": {
+   "model": "wildcatter:block/gsu_transformer/p16"
+  },
+  "facing=north,piece=17": {
+   "model": "wildcatter:block/gsu_transformer/p17"
+  },
+  "facing=east,piece=0": {
+   "model": "wildcatter:block/gsu_transformer/p0",
+   "y": 90
+  },
+  "facing=east,piece=1": {
+   "model": "wildcatter:block/gsu_transformer/p1",
+   "y": 90
+  },
+  "facing=east,piece=2": {
+   "model": "wildcatter:block/gsu_transformer/p2",
+   "y": 90
+  },
+  "facing=east,piece=3": {
+   "model": "wildcatter:block/gsu_transformer/p3",
+   "y": 90
+  },
+  "facing=east,piece=4": {
+   "model": "wildcatter:block/gsu_transformer/p4",
+   "y": 90
+  },
+  "facing=east,piece=5": {
+   "model": "wildcatter:block/gsu_transformer/p5",
+   "y": 90
+  },
+  "facing=east,piece=6": {
+   "model": "wildcatter:block/gsu_transformer/p6",
+   "y": 90
+  },
+  "facing=east,piece=7": {
+   "model": "wildcatter:block/gsu_transformer/p7",
+   "y": 90
+  },
+  "facing=east,piece=8": {
+   "model": "wildcatter:block/gsu_transformer/p8",
+   "y": 90
+  },
+  "facing=east,piece=9": {
+   "model": "wildcatter:block/gsu_transformer/p9",
+   "y": 90
+  },
+  "facing=east,piece=10": {
+   "model": "wildcatter:block/gsu_transformer/p10",
+   "y": 90
+  },
+  "facing=east,piece=11": {
+   "model": "wildcatter:block/gsu_transformer/p11",
+   "y": 90
+  },
+  "facing=east,piece=12": {
+   "model": "wildcatter:block/gsu_transformer/p12",
+   "y": 90
+  },
+  "facing=east,piece=13": {
+   "model": "wildcatter:block/gsu_transformer/p13",
+   "y": 90
+  },
+  "facing=east,piece=14": {
+   "model": "wildcatter:block/gsu_transformer/p14",
+   "y": 90
+  },
+  "facing=east,piece=15": {
+   "model": "wildcatter:block/gsu_transformer/p15",
+   "y": 90
+  },
+  "facing=east,piece=16": {
+   "model": "wildcatter:block/gsu_transformer/p16",
+   "y": 90
+  },
+  "facing=east,piece=17": {
+   "model": "wildcatter:block/gsu_transformer/p17",
+   "y": 90
+  },
+  "facing=south,piece=0": {
+   "model": "wildcatter:block/gsu_transformer/p0",
+   "y": 180
+  },
+  "facing=south,piece=1": {
+   "model": "wildcatter:block/gsu_transformer/p1",
+   "y": 180
+  },
+  "facing=south,piece=2": {
+   "model": "wildcatter:block/gsu_transformer/p2",
+   "y": 180
+  },
+  "facing=south,piece=3": {
+   "model": "wildcatter:block/gsu_transformer/p3",
+   "y": 180
+  },
+  "facing=south,piece=4": {
+   "model": "wildcatter:block/gsu_transformer/p4",
+   "y": 180
+  },
+  "facing=south,piece=5": {
+   "model": "wildcatter:block/gsu_transformer/p5",
+   "y": 180
+  },
+  "facing=south,piece=6": {
+   "model": "wildcatter:block/gsu_transformer/p6",
+   "y": 180
+  },
+  "facing=south,piece=7": {
+   "model": "wildcatter:block/gsu_transformer/p7",
+   "y": 180
+  },
+  "facing=south,piece=8": {
+   "model": "wildcatter:block/gsu_transformer/p8",
+   "y": 180
+  },
+  "facing=south,piece=9": {
+   "model": "wildcatter:block/gsu_transformer/p9",
+   "y": 180
+  },
+  "facing=south,piece=10": {
+   "model": "wildcatter:block/gsu_transformer/p10",
+   "y": 180
+  },
+  "facing=south,piece=11": {
+   "model": "wildcatter:block/gsu_transformer/p11",
+   "y": 180
+  },
+  "facing=south,piece=12": {
+   "model": "wildcatter:block/gsu_transformer/p12",
+   "y": 180
+  },
+  "facing=south,piece=13": {
+   "model": "wildcatter:block/gsu_transformer/p13",
+   "y": 180
+  },
+  "facing=south,piece=14": {
+   "model": "wildcatter:block/gsu_transformer/p14",
+   "y": 180
+  },
+  "facing=south,piece=15": {
+   "model": "wildcatter:block/gsu_transformer/p15",
+   "y": 180
+  },
+  "facing=south,piece=16": {
+   "model": "wildcatter:block/gsu_transformer/p16",
+   "y": 180
+  },
+  "facing=south,piece=17": {
+   "model": "wildcatter:block/gsu_transformer/p17",
+   "y": 180
+  },
+  "facing=west,piece=0": {
+   "model": "wildcatter:block/gsu_transformer/p0",
+   "y": 270
+  },
+  "facing=west,piece=1": {
+   "model": "wildcatter:block/gsu_transformer/p1",
+   "y": 270
+  },
+  "facing=west,piece=2": {
+   "model": "wildcatter:block/gsu_transformer/p2",
+   "y": 270
+  },
+  "facing=west,piece=3": {
+   "model": "wildcatter:block/gsu_transformer/p3",
+   "y": 270
+  },
+  "facing=west,piece=4": {
+   "model": "wildcatter:block/gsu_transformer/p4",
+   "y": 270
+  },
+  "facing=west,piece=5": {
+   "model": "wildcatter:block/gsu_transformer/p5",
+   "y": 270
+  },
+  "facing=west,piece=6": {
+   "model": "wildcatter:block/gsu_transformer/p6",
+   "y": 270
+  },
+  "facing=west,piece=7": {
+   "model": "wildcatter:block/gsu_transformer/p7",
+   "y": 270
+  },
+  "facing=west,piece=8": {
+   "model": "wildcatter:block/gsu_transformer/p8",
+   "y": 270
+  },
+  "facing=west,piece=9": {
+   "model": "wildcatter:block/gsu_transformer/p9",
+   "y": 270
+  },
+  "facing=west,piece=10": {
+   "model": "wildcatter:block/gsu_transformer/p10",
+   "y": 270
+  },
+  "facing=west,piece=11": {
+   "model": "wildcatter:block/gsu_transformer/p11",
+   "y": 270
+  },
+  "facing=west,piece=12": {
+   "model": "wildcatter:block/gsu_transformer/p12",
+   "y": 270
+  },
+  "facing=west,piece=13": {
+   "model": "wildcatter:block/gsu_transformer/p13",
+   "y": 270
+  },
+  "facing=west,piece=14": {
+   "model": "wildcatter:block/gsu_transformer/p14",
+   "y": 270
+  },
+  "facing=west,piece=15": {
+   "model": "wildcatter:block/gsu_transformer/p15",
+   "y": 270
+  },
+  "facing=west,piece=16": {
+   "model": "wildcatter:block/gsu_transformer/p16",
+   "y": 270
+  },
+  "facing=west,piece=17": {
+   "model": "wildcatter:block/gsu_transformer/p17",
+   "y": 270
   }
+ }
 }

@@ -317,9 +317,16 @@ tex("field_manual", manual, "item")
 # Real art: the Ludo textures (made by tools/process_art.py) replace the placeholders of the same name.
 if os.path.isdir("art/final"):
 	for f in os.listdir("art/final"):
+		if os.path.isdir(f"art/final/{f}"):
+			continue
 		kind = "item" if f in ("power_meter.png", "field_manual.png", "seismograph.png", "crude_oil_bucket.png", "plastic_sheet.png", "diesel_bucket.png", "steel_ingot.png",
 		"engine_block_casting.png", "piston.png", "crankshaft.png", "cylinder_head.png", "fuel_injector.png", "spark_plug.png", "stator_winding.png", "rotor_field.png", "exciter.png") else "block"
 		shutil.copy(f"art/final/{f}", f"{ASSETS}/textures/{kind}/{f}")
+# the materials the true-scale models are drawn in (tools/process_materials.py, tools/models/)
+if os.path.isdir("art/final/mat"):
+	os.makedirs(f"{ASSETS}/textures/block/mat", exist_ok=True)
+	for f in os.listdir("art/final/mat"):
+		shutil.copy(f"art/final/mat/{f}", f"{ASSETS}/textures/block/mat/{f}")
 
 # ---- models -------------------------------------------------------------------------------------------
 def block_model(name, parent, textures):
@@ -752,6 +759,12 @@ shaped("power_meter", [" C ", "IRI", " I "], {"C": "minecraft:copper_ingot", "I"
 
 # ---- Phase 3: industrial tier, three-phase cable, three-pole breakers, pad-mounts, three-phase heater -------------
 # Drawn by script as placeholders; the Ludo art in art/final (tools/process_art.py) takes over a texture when it exists.
+def big_part_loot(name):
+	"""A true-size part drops one item, from its main cell (piece 0) only: breaking any piece breaks the whole part."""
+	save_json(f"{DATA}/loot_table/blocks/{name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],
+		"conditions": [{"condition": "minecraft:survives_explosion"}, {"condition": "minecraft:block_state_property", "block": f"{ns}:{name}", "properties": {"piece": "0"}}]}]})
+
+
 def art(name):
 	return name if os.path.exists(f"art/final/{name}.png") else f"{name}_placeholder"
 
@@ -1061,15 +1074,9 @@ lang.update({
 	"subtitles.wildcatter.alternator_whine": "Alternator whines", "subtitles.wildcatter.fan": "Fan whirs", "subtitles.wildcatter.engine_crank": "Engine cranks", "subtitles.wildcatter.sync_bang": "Generator slams out of step"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
-# ---- Phase 4d: the generator step-up (docs/multiblocks/gsu.md): the transformer drawing, greyed ---------------------------
-save_json(f"{ASSETS}/models/block/gsu_transformer.json", {"parent": "minecraft:block/orientable", "textures": {
-	"front": f"{ns}:block/transformer_front", "side": f"{ns}:block/transformer_side", "top": f"{ns}:block/transformer_top", "bottom": f"{ns}:block/transformer_top"}})
-save_json(f"{ASSETS}/blockstates/gsu_transformer.json", {"variants": {
-	"facing=north": {"model": f"{ns}:block/gsu_transformer"}, "facing=east": {"model": f"{ns}:block/gsu_transformer", "y": 90},
-	"facing=south": {"model": f"{ns}:block/gsu_transformer", "y": 180}, "facing=west": {"model": f"{ns}:block/gsu_transformer", "y": 270}}})
-save_json(f"{ASSETS}/items/gsu_transformer.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/gsu_transformer"}})
-save_json(f"{DATA}/loot_table/blocks/gsu_transformer.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:gsu_transformer"}],
-	"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+# ---- Phase 4d: the generator step-up (docs/multiblocks/gsu.md). Phase 4.5: a true-size part; its blockstate, models and
+# item model come from tools/models/gsu_transformer.py, which runs at the end of this script.
+big_part_loot("gsu_transformer")
 shaped("gsu_transformer", ["SDS", "TCT", "SDS"], {"S": f"{ns}:steel_ingot", "D": "minecraft:diamond", "T": f"{ns}:unit_substation", "C": "minecraft:copper_block"}, "gsu_transformer")
 for tag in ("mineable/pickaxe", "needs_stone_tool"):
 	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
@@ -1332,3 +1339,7 @@ for name in [n for n in FAMILY if n not in SPOOLS] + ["busway_lv", "busway_indus
 		"entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],   # the block adds the size (CableBlock.getDrops)
 		"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
 print("assets written")
+
+# ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
+import subprocess, sys
+subprocess.run([sys.executable, "tools/models/build.py"], check=True)

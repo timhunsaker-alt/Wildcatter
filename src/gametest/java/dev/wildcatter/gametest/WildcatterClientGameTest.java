@@ -121,6 +121,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("steamPlant")) {
 				steamPlant(context, server);
 			}
+			if (only("bigParts")) {
+				bigParts(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -201,7 +204,8 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	}
 
 	private String read(TestServerContext server, int x, int yy, int z) {
-		return server.computeOnServer(srv -> srv.overworld().getBlockEntity(new BlockPos(x, yy, z)) instanceof Inspectable i
+		// any piece of a true-size part reads as the part
+		return server.computeOnServer(srv -> dev.wildcatter.multiblock.BigParts.entity(srv.overworld(), new BlockPos(x, yy, z)) instanceof Inspectable i
 				? i.inspect().getString() : "(no readout)");
 	}
 
@@ -1282,8 +1286,10 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		BlockPos set = new BlockPos(10, up, z);
 		genset(server, set, net.minecraft.core.Direction.WEST, false);   // the skid runs south of the panel
 		put(server, 11, up, z, "wildcatter:unit_substation[facing=east]");   // 480 V in at the back, 4.16 kV out of the front
-		put(server, 12, up, z, "wildcatter:gsu_transformer[facing=east]");   // 4.16 kV delta to 12.47 kV wye
-		put(server, 13, up, z, "wildcatter:cable_dist");
+		// 4.16 kV delta to 12.47 kV wye, true size: 2 m deep (x 12-13), 3 across (z-1 to z+1), 3 high; the bushings are on top at x 13
+		put(server, 12, up, z, "wildcatter:gsu_transformer[facing=east]");
+		put(server, 14, up + 2, z, "wildcatter:cable_dist");   // off the bushings' terminals and down to the pad-mount
+		put(server, 14, up + 1, z, "wildcatter:cable_dist");
 		put(server, 14, up, z, "wildcatter:cable_dist");
 		put(server, 15, up, z, "wildcatter:padmount_480[facing=west]");
 		put(server, 16, up, z, "wildcatter:cable_industrial");
@@ -2079,12 +2085,14 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		put(server, 11, up, z, "wildcatter:boiler_burner[facing=north]");
 		put(server, 12, up, z, "wildcatter:feed_pump[facing=north]");
 		put(server, 13, up, z, "wildcatter:condenser[facing=north]");
-		// the GSU off the generator's east face, then 12.47 kV cable, a 480 V pad-mount and a heater
+		// the GSU (true size, x 15-16) off the generator's east face, then 12.47 kV cable down from its bushings, a 480 V pad-mount and a heater
 		put(server, 15, up + 1, z, "wildcatter:gsu_transformer[facing=east]");
-		put(server, 16, up + 1, z, "wildcatter:cable_dist");
-		put(server, 17, up + 1, z, "wildcatter:padmount_480[facing=west]");
-		put(server, 18, up + 1, z, "wildcatter:cable_industrial");
-		put(server, 19, up + 1, z, "wildcatter:three_phase_heater");
+		put(server, 17, up + 3, z, "wildcatter:cable_dist");
+		put(server, 17, up + 2, z, "wildcatter:cable_dist");
+		put(server, 17, up + 1, z, "wildcatter:cable_dist");
+		put(server, 18, up + 1, z, "wildcatter:padmount_480[facing=west]");
+		put(server, 19, up + 1, z, "wildcatter:cable_industrial");
+		put(server, 20, up + 1, z, "wildcatter:three_phase_heater");
 		context.waitTicks(30);
 		check(read(server, 14, up + 1, z).contains("COLD"), "the parts should form a cold plant: " + read(server, 14, up + 1, z));
 		// light it with coal; the drum starts at 48 % water (below the half it needs to run) and a full hotwell
@@ -2123,7 +2131,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(60);
 		String running = read(server, 14, up + 1, z);
 		String gsu = read(server, 15, up + 1, z);
-		String heater = read(server, 19, up + 1, z);
+		String heater = read(server, 20, up + 1, z);
 		check(running.matches(".*RUNNING (3[45]\\d\\d|29\\d\\d|30\\d\\d) rpm.*"), "the turbine should run at rated speed: " + running);
 		check(gsu.contains("line side +30 degrees") && heater.contains("running"), "through the GSU (30 degrees) and a pad-mount the heater should run: " + gsu + " | " + heater);
 		check(running.contains("NOT COOLED"), "with no cooling tower the plant should say so: " + running);
@@ -2152,6 +2160,104 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		String broken = read(server, 14, up + 1, z);
 		check(broken.contains("NOT BUILT") && broken.contains("superheater"), "without its superheater the plant should dissolve: " + broken);
 		System.out.println("[wildcatter-test] steam plant ok: " + firing + " | " + running + " | " + gsu + " | " + cooled + " | " + broken);
+	}
+
+	// ---- Phase 4.5: true-size parts ---------------------------------------------------------------------------------
+	/** How many cells round {@code main} hold a GSU, and how many GSU items lie on the ground near it. */
+	private int[] gsuCells(TestServerContext server, BlockPos main) {
+		return server.computeOnServer(srv -> {
+			int cells = 0;
+			for (BlockPos at : BlockPos.betweenClosed(main.offset(-2, 0, -2), main.offset(2, 3, 2))) {
+				if (srv.overworld().getBlockState(at).is(dev.wildcatter.WildcatterBlocks.GSU_TRANSFORMER)) {
+					cells++;
+				}
+			}
+			int items = 0;
+			for (net.minecraft.world.entity.item.ItemEntity item : srv.overworld().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+					new net.minecraft.world.phys.AABB(main).inflate(4))) {
+				if (item.getItem().is(dev.wildcatter.WildcatterBlocks.GSU_TRANSFORMER.asItem())) {
+					items += item.getItem().getCount();
+				}
+			}
+			return new int[] {cells, items};
+		});
+	}
+
+	/** Places a GSU the way a player does: standing south of {@code main}, looking north, clicking the ground under it. */
+	private boolean placeGsu(TestServerContext server, BlockPos main) {
+		return server.computeOnServer(srv -> {
+			net.minecraft.server.level.ServerPlayer player = srv.getPlayerList().getPlayers().get(0);
+			player.snapTo(main.getX() + 0.5, main.getY(), main.getZ() + 4.5, 180.0F, 30.0F);
+			ItemStack stack = new ItemStack(dev.wildcatter.WildcatterBlocks.GSU_TRANSFORMER);
+			net.minecraft.world.phys.BlockHitResult hit = new net.minecraft.world.phys.BlockHitResult(
+					net.minecraft.world.phys.Vec3.atCenterOf(main.below()).add(0, 0.5, 0), net.minecraft.core.Direction.UP, main.below(), false);
+			net.minecraft.world.InteractionResult result = ((net.minecraft.world.item.BlockItem) stack.getItem())
+					.place(new net.minecraft.world.item.context.BlockPlaceContext(player, net.minecraft.world.InteractionHand.MAIN_HAND, stack, hit));
+			return result.consumesAction();
+		});
+	}
+
+	/**
+	 * A true-size part (docs/multiblocks/README.md, "Big parts"), on the GSU: placed like a player it fills its 3 x 2 x 3 m; a
+	 * click on any piece reads the transformer; breaking one piece takes the whole part and drops one item; it is refused where
+	 * a cell is blocked; and a lone main cell with no room (an older world's one-block GSU) drops as an item.
+	 */
+	private void bigParts(ClientGameTestContext context, TestServerContext server) {
+		int z = -660;
+		server.runCommand("tp @p 10 " + (up + 3) + " " + (z + 6) + " 180 20");
+		context.waitTicks(20);
+		server.runCommand("fill 4 " + (y - 1) + " " + (z - 8) + " 16 " + (y + 6) + " " + (z + 6) + " minecraft:air");
+		server.runCommand("fill 4 " + (y - 1) + " " + (z - 8) + " 16 " + y + " " + (z + 6) + " minecraft:stone");   // ground at y, so the click lands on it
+		BlockPos main = new BlockPos(10, up, z);
+		// holding one, the ghost outline shows where it would go
+		server.runCommand("item replace entity @p weapon.mainhand with wildcatter:gsu_transformer");
+		server.runCommand("tp @p 10.5 " + up + " " + (z + 4.5) + " 180 40");
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-gsu-ghost");
+		server.runCommand("item replace entity @p weapon.mainhand with minecraft:air");
+		check(placeGsu(server, main), "a GSU should place on clear ground");
+		context.waitTicks(5);
+		int[] placed = gsuCells(server, main);
+		check(placed[0] == 18, "placed, the GSU should fill its 3 x 2 x 3 cells: " + placed[0]);
+		String viaPiece = read(server, 9, up + 2, z - 1);   // a top corner of the front row
+		check(viaPiece.contains("generator step-up"), "a click on any piece should read the transformer: " + viaPiece);
+		boolean bushingsJoin = server.computeOnServer(srv -> dev.wildcatter.circuit.CircuitPart.portAt(srv.overworld(), new BlockPos(10, up + 2, z - 1),
+				net.minecraft.core.Direction.UP, dev.wildcatter.circuit.Conductor.A, dev.wildcatter.energy.Voltage.DISTRIBUTION));
+		check(bushingsJoin, "the 12.47 kV terminals should be on top of the bushings");
+		// screenshots from three sides
+		server.runCommand("tp @p 7 " + (up + 1) + " " + (z - 4) + " -35 15");
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-gsu-front");
+		server.runCommand("tp @p 14 " + (up + 2) + " " + (z + 4) + " 135 20");
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-gsu-back");
+		server.runCommand("tp @p 13 " + (up + 5) + " " + (z - 3) + " 45 50");
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-gsu-top");
+		// break one piece: the whole part goes and one GSU drops
+		server.runCommand("kill @e[type=item]");
+		server.computeOnServer(srv -> srv.overworld().destroyBlock(new BlockPos(11, up + 1, z - 1), true));
+		context.waitTicks(10);
+		int[] broken = gsuCells(server, main);
+		check(broken[0] == 0 && broken[1] == 1, "breaking one piece should take the whole GSU and drop one item: " + broken[0] + " cells, " + broken[1] + " items");
+		// a blocked cell refuses the placement
+		server.runCommand("kill @e[type=item]");
+		put(server, 11, up + 1, z - 1, "minecraft:stone");
+		check(!placeGsu(server, main), "a GSU should be refused where a cell is blocked");
+		context.waitTicks(5);
+		check(gsuCells(server, main)[0] == 0, "a refused GSU should leave nothing behind");
+		// a lone main cell with no room (as an older world's one-block GSU would load) drops as an item
+		put(server, 10, up, z, "wildcatter:gsu_transformer[facing=north]");
+		context.waitTicks(10);
+		int[] lone = gsuCells(server, main);
+		check(lone[0] == 0 && lone[1] == 1, "a lone GSU with no room should drop as one item: " + lone[0] + " cells, " + lone[1] + " items");
+		// and with room it grows into its cells
+		server.runCommand("kill @e[type=item]");
+		put(server, 11, up + 1, z - 1, "minecraft:air");
+		put(server, 10, up, z, "wildcatter:gsu_transformer[facing=north]");
+		context.waitTicks(10);
+		check(gsuCells(server, main)[0] == 18, "a lone GSU with room should grow to its full size");
+		System.out.println("[wildcatter-test] big parts ok: GSU places, reads through a piece, breaks whole, refuses a blocked cell, migrates");
 	}
 
 	private void fieldManual(TestServerContext server) {

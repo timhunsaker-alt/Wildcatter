@@ -82,6 +82,9 @@ public final class Manual {
 						+ "Feed the burner coal (a coal block is a cubic metre: one coal is " + Math.round(Tuning.COAL_JOULES / 1e9 * 10) / 10.0 + " GJ, about a quarter hour at full power) or pipe gas to it. Right-click the generator to light it: the drum takes about " + Math.round(Tuning.PLANT_HEATUP_SECONDS / 60) + " minutes to reach pressure.\n\n"
 						+ "The FEED PUMP is a " + Voltage.INDUSTRIAL.label() + " motor: the plant needs power to start (a genset will do). Pipe water to the condenser for makeup, and put a COOLING TOWER's basin on that pipe, or the plant makes only three quarters of its rating. Its output goes through a GENERATOR STEP-UP transformer (delta to wye, the line side 30 degrees ahead) to " + Voltage.DISTRIBUTION.label() + ".",
 
+				"FULL-SIZE EQUIPMENT\n\nBig equipment is its real size: one block is a metre. Hold one and a green box shows where it will go (red if something is in the way); it faces away from you. Break any part of it and the whole thing comes down as one item.\n\n"
+						+ "GENERATOR STEP-UP: 3 m across, 2 m deep, 3 m to the bushing tops. The " + Voltage.MEDIUM.label() + " cable goes into the box low on the back, in the middle; the " + Voltage.DISTRIBUTION.label() + " leaves from the top of the three brown bushings: a cable on top of them, or beside them at the front.",
+
 				"WATER\n\nPUMP: a " + Voltage.LOW.label() + " motor (" + Math.round(Tuning.PUMP_WATTS) + " W, " + String.format("%.1f", Tuning.PUMP_WATTS / Voltage.LOW.nominal()) + " A). Put it touching water, wire a hot and a neutral to it, and run PIPES to your boilers. "
 						+ "It fills every boiler on its pipes. Low voltage slows it: its delivery follows the square of the voltage.\n\n"
 						+ "DRAIN: a pipe touching a Steam Turbine carries its used steam back as water to the boilers on the same pipes. " + Math.round(Tuning.CONDENSATE_RETURN * 100) + "% comes back, so a loop still needs the pump. With no pipe the water is lost.",

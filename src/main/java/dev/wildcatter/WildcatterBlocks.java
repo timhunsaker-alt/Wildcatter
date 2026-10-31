@@ -265,7 +265,7 @@ public final class WildcatterBlocks {
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.INDUSTRIAL, Voltage.DISTRIBUTION, Tuning.PADMOUNT_480_VA, Tuning.PADMOUNT_480_PERCENT_Z));
 	/** A plant's unit substation: 4.16 kV down to 480 V. */
 	/** The steam plant's generator step-up: 4.16 kV delta to 12.47 kV grounded wye (IEC 3.3 kV / 11 kV), 1,500 kVA. */
-	public static final Block GSU_TRANSFORMER = block("gsu_transformer", props -> TransformerBlock.deltaWye(props.mapColor(MapColor.COLOR_GRAY)
+	public static final Block GSU_TRANSFORMER = block("gsu_transformer", props -> new dev.wildcatter.block.GsuTransformerBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.MEDIUM, Voltage.DISTRIBUTION, Tuning.GSU_VA, Tuning.GSU_PERCENT_Z));
 	public static final Block UNIT_SUBSTATION = block("unit_substation", props -> TransformerBlock.threePhase(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.INDUSTRIAL, Voltage.MEDIUM, Tuning.UNIT_SUBSTATION_VA, Tuning.UNIT_SUBSTATION_PERCENT_Z));

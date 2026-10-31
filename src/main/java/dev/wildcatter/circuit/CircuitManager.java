@@ -85,10 +85,13 @@ public final class CircuitManager {
 			while (!queue.isEmpty()) {
 				BlockPos here = queue.poll();
 				group.add(here);
-				for (Direction side : Direction.values()) {
-					BlockPos next = here.relative(side);
-					if (registered.contains(next) && seen.add(next)) {
-						queue.add(next);
+				// a big part touches its neighbours through every one of its cells, and a neighbour that is a piece of one means its main cell
+				for (BlockPos cell : dev.wildcatter.multiblock.BigParts.cellsAt(level, here)) {
+					for (Direction side : Direction.values()) {
+						BlockPos next = dev.wildcatter.multiblock.BigParts.owner(level, cell.relative(side));
+						if (registered.contains(next) && seen.add(next)) {
+							queue.add(next);
+						}
 					}
 				}
 				if (level.getBlockEntity(here) instanceof CircuitPart part) {

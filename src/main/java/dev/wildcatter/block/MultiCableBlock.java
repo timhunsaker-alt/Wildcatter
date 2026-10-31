@@ -88,10 +88,8 @@ public class MultiCableBlock extends BaseEntityBlock {
 	private BlockState withArms(BlockState state, BlockGetter level, BlockPos pos) {
 		for (Direction side : Direction.values()) {
 			boolean joins = false;
-			if (level.getBlockEntity(pos.relative(side)) instanceof CircuitPart part) {
-				for (Conductor conductor : Conductor.values()) {
-					joins |= part.hasPort(side.getOpposite(), conductor, voltage);
-				}
+			for (Conductor conductor : Conductor.values()) {
+				joins |= CircuitPart.portAt(level, pos.relative(side), side.getOpposite(), conductor, voltage);
 			}
 			state = state.setValue(WireShape.ARMS.get(side), joins);
 		}

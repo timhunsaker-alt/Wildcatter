@@ -1,0 +1,17 @@
+{
+ "textures": {
+  "paint": "wildcatter:block/mat/mat_paint_ansi70",
+  "dark": "wildcatter:block/mat/mat_oil_dark",
+  "porcelain": "wildcatter:block/mat/mat_porcelain_brown",
+  "brass": "wildcatter:block/mat/mat_brass",
+  "copper": "wildcatter:block/mat/mat_copper",
+  "galv": "wildcatter:block/mat/mat_galvanized",
+  "steel": "wildcatter:block/mat/mat_stainless",
+  "rubber": "wildcatter:block/mat/mat_rubber",
+  "nameplate": "wildcatter:block/mat/decal_nameplate",
+  "danger": "wildcatter:block/mat/decal_danger_hv",
+  "gauge": "wildcatter:block/mat/decal_gauge",
+  "particle": "wildcatter:block/mat/mat_paint_ansi70"
+ },
+ "elements": []
+}

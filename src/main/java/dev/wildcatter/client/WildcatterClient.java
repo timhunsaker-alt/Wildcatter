@@ -27,6 +27,12 @@ public class WildcatterClient implements ClientModInitializer {
 		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.STEAM_PLANT_PART_ENTITY, context -> new KineticRenderer<>(context));
 		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.DISCONNECT_ENTITY, context -> new KineticRenderer<>(context));
 		dev.wildcatter.kinetic.Sounding.Hook.start = MachineSound::start;
+		net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents.BEFORE_GIZMOS.register(context -> {
+			net.minecraft.client.Minecraft client = net.minecraft.client.Minecraft.getInstance();
+			try (var gizmos = client.levelRenderer.collectPerFrameRenderThreadGizmos()) {   // this frame's gizmos, which the event fires before
+				GhostOutline.draw(client);
+			}
+		});
 		ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
 			if (screen instanceof SelectWorldScreen) {
 				ElectricalStandard.setPending(null);   // a cancelled creation must not leak into the next world
