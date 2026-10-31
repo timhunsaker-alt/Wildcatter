@@ -5,9 +5,20 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+import dev.wildcatter.energy.ConductorSize;
+import dev.wildcatter.energy.Voltage;
+import dev.wildcatter.item.ConductorItem;
+import dev.wildcatter.item.SpoolItem;
+import java.util.ArrayList;
+import java.util.List;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.CreativeModeTabs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,45 +38,52 @@ public class Wildcatter implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		WildcatterSounds.register();
+		WildcatterComponents.register();
 		WildcatterBlocks.register();
 		WildcatterItems.register();
 
-		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(entries -> {
-			for (var block : new net.minecraft.world.level.block.Block[] {
-					WildcatterBlocks.BOILER, WildcatterBlocks.STEAM_TURBINE,
-					WildcatterBlocks.WIRE_HOT, WildcatterBlocks.WIRE_NEUTRAL, WildcatterBlocks.WOOL_WIRE_HOT, WildcatterBlocks.WOOL_WIRE_NEUTRAL,
-					WildcatterBlocks.MV_WIRE_HOT, WildcatterBlocks.MV_WIRE_NEUTRAL, WildcatterBlocks.HV_WIRE_HOT, WildcatterBlocks.HV_WIRE_NEUTRAL,
-					WildcatterBlocks.GROUND_ROD, WildcatterBlocks.GROUND_WIRE, WildcatterBlocks.BREAKER, WildcatterBlocks.FUSE, WildcatterBlocks.FUSED_CUTOUT, WildcatterBlocks.RECEPTACLE_NEMA_5_15, WildcatterBlocks.RECEPTACLE_NEMA_5_20, WildcatterBlocks.RECEPTACLE_NEMA_14_50, WildcatterBlocks.RECEPTACLE_CEE_7, WildcatterBlocks.RECEPTACLE_IEC_60309_BLUE,
-					WildcatterBlocks.PLUG_NEMA_5_15, WildcatterBlocks.PLUG_NEMA_5_20, WildcatterBlocks.PLUG_NEMA_14_50, WildcatterBlocks.PLUG_CEE_7, WildcatterBlocks.PLUG_IEC_60309_BLUE, WildcatterBlocks.SWITCH, WildcatterBlocks.UFLS_RELAY, WildcatterBlocks.UFLS_RELAY_DIST, WildcatterBlocks.MV_BREAKER, WildcatterBlocks.HV_BREAKER, WildcatterBlocks.POLE, WildcatterBlocks.CROSSARM, WildcatterBlocks.INSULATOR_LV, WildcatterBlocks.INSULATOR_DIST, WildcatterBlocks.INSULATOR_HV,
-					WildcatterBlocks.TRANSFORMER, WildcatterBlocks.SUBSTATION_TRANSFORMER, WildcatterBlocks.DISTRIBUTION_TRANSFORMER, WildcatterBlocks.POLE_TRANSFORMER,
-					WildcatterBlocks.DIST_WIRE_HOT, WildcatterBlocks.DIST_WIRE_NEUTRAL, WildcatterBlocks.DIST_PLASTIC_WIRE_HOT, WildcatterBlocks.DIST_PLASTIC_WIRE_NEUTRAL, WildcatterBlocks.DIST_BREAKER,
-					WildcatterBlocks.ELECTRIC_LAMP, WildcatterBlocks.ELECTRIC_HEATER,
-					WildcatterBlocks.FIREBOX, WildcatterBlocks.PIPE, WildcatterBlocks.PUMP, WildcatterBlocks.GAS_LINE,
-					WildcatterBlocks.DRILLING_RIG, WildcatterBlocks.CASING, WildcatterBlocks.PUMPJACK, WildcatterBlocks.GAS_WELLHEAD,
-					WildcatterBlocks.REFINERY, WildcatterBlocks.REFINERY_COLUMN, WildcatterBlocks.COOLING_TOWER, WildcatterBlocks.COOLING_FILL, WildcatterBlocks.DIESEL_ENGINE, WildcatterBlocks.GAS_TURBINE,
-					WildcatterBlocks.PLASTIC_WIRE_HOT, WildcatterBlocks.PLASTIC_WIRE_NEUTRAL, WildcatterBlocks.MV_PLASTIC_WIRE_HOT,
-					WildcatterBlocks.MV_PLASTIC_WIRE_NEUTRAL, WildcatterBlocks.HV_PLASTIC_WIRE_HOT, WildcatterBlocks.HV_PLASTIC_WIRE_NEUTRAL}) {
-				entries.accept(block);
-			}
-			entries.accept(WildcatterItems.POWER_METER);
-			entries.accept(WildcatterItems.SEISMOGRAPH);
-			entries.accept(WildcatterItems.CRUDE_OIL_BUCKET);
-			entries.accept(WildcatterItems.DIESEL_BUCKET);
-			entries.accept(WildcatterItems.PLASTIC_SHEET);
-			entries.accept(WildcatterItems.SPOOL_LV);
-			entries.accept(WildcatterItems.SPOOL_DIST);
-			entries.accept(WildcatterItems.SPOOL_HV);
-			entries.accept(WildcatterItems.COVERED_SPOOL_LV);
-			entries.accept(WildcatterItems.COVERED_SPOOL_DIST);
-			entries.accept(WildcatterItems.COVERED_SPOOL_HV);
-			entries.accept(WildcatterItems.STEEL_INGOT);
-			entries.accept(WildcatterItems.FIELD_MANUAL);
-		});
+		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, id("wildcatter"), FabricCreativeModeTab.builder()
+				.title(Component.translatable("itemGroup.wildcatter"))
+				.icon(() -> new ItemStack(WildcatterItems.POWER_METER))
+				.displayItems((parameters, output) -> creativeTab(output))
+				.build());
 
 		// Keep track of every circuit part and solve each connected group of them.
 		ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register(CircuitManager::register);
 		ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register(CircuitManager::unregister);
 		ServerLifecycleEvents.SERVER_STARTED.register(dev.wildcatter.energy.StandardData::apply);
 		ServerTickEvents.END_LEVEL_TICK.register(CircuitManager::tick);
+	}
+
+	/**
+	 * The Wildcatter tab: machines and tools in the order they were added, then every conductor in every size, grouped by tier
+	 * (wire, cable, busway, then spools) from 120 V up to 138 kV.
+	 */
+	private static void creativeTab(CreativeModeTab.Output output) {
+		List<Item> conductors = new ArrayList<>();
+		for (Item item : BuiltInRegistries.ITEM) {
+			if (!BuiltInRegistries.ITEM.getKey(item).getNamespace().equals(MOD_ID)) {
+				continue;
+			}
+			if (item instanceof ConductorItem || item instanceof SpoolItem) {
+				conductors.add(item);
+			} else {
+				output.accept(item);
+			}
+		}
+		for (Voltage tier : new Voltage[] {Voltage.LOW, Voltage.INDUSTRIAL, Voltage.MEDIUM, Voltage.DISTRIBUTION, Voltage.HIGH}) {
+			for (ConductorSize.Kind kind : ConductorSize.Kind.values()) {
+				for (Item item : conductors) {
+					if (item instanceof ConductorItem conductor && conductor.tier() == tier && conductor.kind() == kind) {
+						ConductorSize.sizes(tier, kind).forEach(size -> output.accept(conductor.stack(size)));
+					}
+				}
+			}
+			for (Item item : conductors) {
+				if (item instanceof SpoolItem spool && spool.tier() == tier) {
+					ConductorSize.sizes(tier, ConductorSize.Kind.WIRE).forEach(size -> output.accept(spool.stack(size)));
+				}
+			}
+		}
 	}
 }

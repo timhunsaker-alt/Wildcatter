@@ -23,16 +23,15 @@ import net.minecraft.world.phys.BlockHitResult;
 public class BoilerBlock extends BaseEntityBlock {
 	public static final BooleanProperty LIT = BlockStateProperties.LIT;
 	/** Part of a coil boiler (27 boilers over 9 fireboxes). */
-	public static final BooleanProperty FORMED = BooleanProperty.create("formed");
 
 	public BoilerBlock(Properties properties) {
 		super(properties);
-		registerDefaultState(stateDefinition.any().setValue(LIT, false).setValue(FORMED, false));
+		registerDefaultState(stateDefinition.any().setValue(LIT, false));
 	}
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
-		builder.add(LIT, FORMED);
+		builder.add(LIT);
 	}
 
 	@Override

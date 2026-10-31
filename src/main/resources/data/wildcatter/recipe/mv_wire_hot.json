@@ -11,6 +11,9 @@
   ],
   "result": {
     "id": "wildcatter:mv_wire_hot",
-    "count": 4
+    "count": 4,
+    "components": {
+      "wildcatter:conductor_size": "acsr_sparrow"
+    }
   }
 }

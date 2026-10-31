@@ -22,6 +22,11 @@ public class WildcatterClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.INSULATOR_ENTITY, context -> new SpanRenderer());
+		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.GENSET_PART_ENTITY, context -> new KineticRenderer<>(context));
+		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.COOLING_TOWER_ENTITY, context -> new KineticRenderer<>(context));
+		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.STEAM_PLANT_PART_ENTITY, context -> new KineticRenderer<>(context));
+		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.DISCONNECT_ENTITY, context -> new KineticRenderer<>(context));
+		dev.wildcatter.kinetic.Sounding.Hook.start = MachineSound::start;
 		ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
 			if (screen instanceof SelectWorldScreen) {
 				ElectricalStandard.setPending(null);   // a cancelled creation must not leak into the next world

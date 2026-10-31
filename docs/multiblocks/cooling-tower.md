@@ -29,8 +29,9 @@ Layer 4: `M`
 column is complete and the basin touches water pipe; it cools only while the fan has power. Removing any part stops
 cooling.
 
-## As built
-The fan base plus `COOLING_FILL` (2) identical fill blocks. Tested: "COOLING" and "condensate cooled".
+## As built (Phase 4d)
+The spec's column: basin, fill, drift eliminators, fan deck on top (the controller). The fan turns (about 200 rpm, shown at 1/20)
+and whirs while it cools. A machine is cooled when the basin is on its water pipe. Tested on the starter turbine and the 1 MW plant.
 
 ## Game test
 Build the column, check it forms, check the turbine reports cooled, remove the drift eliminators and check it still cools but loses water faster (DECISION).

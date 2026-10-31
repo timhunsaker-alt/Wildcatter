@@ -30,6 +30,7 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 	private int front;
 	private int link = -1;
 	private double amps;
+	private double volts;
 
 	public FuseBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.FUSE_ENTITY, pos, state);
@@ -54,7 +55,7 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		return rating() * (testRatingScale != null ? testRatingScale : 1.0);
 	}
 
-	private boolean cutout() {
+	public boolean cutout() {
 		return voltage() != Voltage.LOW;
 	}
 
@@ -87,7 +88,7 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 
 	@Override
 	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
-		return (role == Conductor.A || role == Conductor.B) && voltage == voltage() && (face == facing() || face == facing().getOpposite());
+		return (role == Conductor.A || role == Conductor.B || role == Conductor.C) && voltage == voltage() && (face == facing() || face == facing().getOpposite());
 	}
 
 	@Override
@@ -95,10 +96,8 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		back = circuit.node();
 		front = circuit.node();
 		link = blown() ? -1 : circuit.resistor(back, front, Tuning.BREAKER_CLOSED_OHMS);
-		circuit.port(worldPosition, facing().getOpposite(), Conductor.A, voltage(), back, Tuning.CONTACT_OHMS / 2, false);
-		circuit.port(worldPosition, facing().getOpposite(), Conductor.B, voltage(), back, Tuning.CONTACT_OHMS / 2, false);
-		circuit.port(worldPosition, facing(), Conductor.A, voltage(), front, Tuning.CONTACT_OHMS / 2, false);
-		circuit.port(worldPosition, facing(), Conductor.B, voltage(), front, Tuning.CONTACT_OHMS / 2, false);
+		circuit.hotPort(worldPosition, facing().getOpposite(), voltage(), back, Tuning.CONTACT_OHMS / 2, false);
+		circuit.hotPort(worldPosition, facing(), voltage(), front, Tuning.CONTACT_OHMS / 2, false);
 	}
 
 	@Override
@@ -114,8 +113,18 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		return false;
 	}
 
+	/** True if either end is live: a blown cutout's top contact is still on the line. */
+	public boolean isLive() {
+		return volts > Tuning.SHOCK_MIN_VOLTS;
+	}
+
+	public double volts() {
+		return volts;
+	}
+
 	@Override
 	public void apply(Circuit circuit, int ticks) {
+		volts = Math.max(circuit.voltage(back), circuit.voltage(front));
 		amps = link >= 0 ? Math.abs(circuit.current(link)) : 0;
 		double ratio = amps / effectiveRating();
 		if (ratio > 1.0) {
@@ -133,7 +142,7 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		amps = 0;
 		setBlown(true);
 		if (level instanceof ServerLevel server) {
-			server.playSound(null, worldPosition, WildcatterSounds.BREAKER_TRIP, SoundSource.BLOCKS, 1.0F, 1.6F);
+			server.playSound(null, worldPosition, WildcatterSounds.FUSE_POP, SoundSource.BLOCKS, 1.0F, 1.0F);
 			server.sendParticles(net.minecraft.core.particles.ParticleTypes.SMOKE, worldPosition.getX() + 0.5, worldPosition.getY() + 0.6,
 					worldPosition.getZ() + 0.5, 8, 0.1, 0.1, 0.1, 0.02);
 			CircuitManager.markDirty(server);
@@ -144,7 +153,7 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 	public Component inspect() {
 		String status = blown() ? "BLOWN: fix the fault, then right-click with a copper ingot to fit a new element" : String.format("good, carrying %.1f A", amps)
 				+ (heat > 0.05 ? ", getting hot " + Math.round(heat * 100) + "%" : "");
-		return Component.literal((cutout() ? "Fused cutout, " + rating() + " A K link (" : "Fuse " + rating() + " A (") + voltage().label() + "): " + status + (cutout() ? "; the link drops out when it blows: fit a new one" : "; a fuse can't be reset, a breaker can"));
+		return Component.literal((cutout() ? "Fused cutout, " + rating() + " A K link (" : "Fuse " + rating() + " A (") + voltage().label() + "): " + status + (cutout() ? "; the link drops out when it blows: fit a new one" + (isLive() ? ". LIVE: its contacts are bare, open the line before you touch it" : "") : "; a fuse can't be reset, a breaker can"));
 	}
 
 	@Override

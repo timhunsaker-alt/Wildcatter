@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "AAA",
+    "I I"
+  ],
+  "key": {
+    "A": "minecraft:iron_ingot",
+    "I": "wildcatter:insulator_dist"
+  },
+  "result": {
+    "id": "wildcatter:bus_dist",
+    "count": 4
+  }
+}

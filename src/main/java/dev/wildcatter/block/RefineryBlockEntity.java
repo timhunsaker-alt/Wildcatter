@@ -26,10 +26,12 @@ import net.minecraft.world.level.storage.ValueOutput;
  * Splits crude into diesel and plastic. It is a 110 V load that draws its power whether or not there is crude to
  * refine; with low voltage it works slower. It pulls crude from pumpjacks on its gas lines when its tank has room.
  */
-public class RefineryBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable {
-	private int hot;
-	private int neutral;
-	private int resistor;
+public class RefineryBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, dev.wildcatter.kinetic.Sounding {
+	/** Its induction motor (single-phase); it turns only while there is work. */
+	private final dev.wildcatter.circuit.Motor motor = new dev.wildcatter.circuit.Motor(false, Voltage.LOW, Tuning.REFINERY_WATTS);
+	private final dev.wildcatter.kinetic.RunningSound running = new dev.wildcatter.kinetic.RunningSound();
+	/** Set by the machine's own logic: whether it has work for the motor. */
+	private boolean wanted;
 	private double volts;
 	private double amps;
 	private double crude;
@@ -95,29 +97,23 @@ public class RefineryBlockEntity extends BlockEntity implements CircuitPart, Ins
 
 	@Override
 	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
-		return voltage == Voltage.LOW;
+		return voltage == motor.voltage() && (motor.threePhase() ? role != Conductor.N : true);
 	}
 
 	@Override
 	public void build(Circuit circuit) {
-		hot = circuit.node();
-		neutral = circuit.node();
-		double nominal = Voltage.LOW.nominal();
-		resistor = circuit.resistor(hot, neutral, nominal * nominal / Tuning.REFINERY_WATTS);
-		for (Direction face : Direction.values()) {
-			circuit.port(worldPosition, face, Conductor.A, Voltage.LOW, hot, Tuning.CONTACT_OHMS / 2, false);
-			circuit.port(worldPosition, face, Conductor.B, Voltage.LOW, hot, Tuning.CONTACT_OHMS / 2, false);
-			circuit.port(worldPosition, face, Conductor.N, Voltage.LOW, neutral, Tuning.CONTACT_OHMS / 2, false);
-		}
+		motor.build(circuit, worldPosition);
 	}
 
 	@Override
 	public void apply(Circuit circuit, int ticks) {
-		volts = Math.abs(circuit.across(hot, neutral));   // leg B runs the other way round, so only the size matters
-		amps = Math.abs(circuit.current(resistor));
+		motor.apply(circuit, ticks, wanted);
+		volts = motor.volts();
+		amps = motor.amps();
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, RefineryBlockEntity refinery) {
+		refinery.running.update(refinery, refinery.motor.output() > 0);   // the client plays its loop while it runs
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
 			return;
 		}
@@ -128,8 +124,6 @@ public class RefineryBlockEntity extends BlockEntity implements CircuitPart, Ins
 				level.playSound(null, pos.above(), WildcatterSounds.STRUCTURE_FORMED, SoundSource.BLOCKS, 1.0F, 1.3F);
 			}
 		}
-		double nominal = Voltage.LOW.nominal();
-		double strength = refinery.volts < nominal * Tuning.BRIGHT_ABOVE ? 0 : Math.min(1.0, Math.pow(refinery.volts / nominal, 2));
 		List<BlockPos> cell = List.of(pos);
 		if (refinery.crude < Tuning.REFINERY_TANK) {
 			Set<BlockPos> lines = Plumbing.network(level, cell, PipeBlock.Kind.GAS);
@@ -137,14 +131,16 @@ public class RefineryBlockEntity extends BlockEntity implements CircuitPart, Ins
 				refinery.crude += jack.take(Tuning.REFINERY_TANK - refinery.crude);
 			}
 		}
-		if (strength == 0) {
-			refinery.status = refinery.volts < 1.0 ? "NO POWER: wire a hot and a neutral to it" : "too little voltage to run";
-		} else if (refinery.crude < 1) {
+		refinery.wanted = refinery.crude >= 1 && refinery.plastic < Tuning.PLASTIC_BIN && refinery.diesel < Tuning.REFINERY_TANK;
+		double strength = refinery.motor.output();
+		if (refinery.crude < 1) {
 			refinery.status = "idle: no crude (pour in a bucket, or put it on a gas line with a pumpjack)";
 		} else if (refinery.plastic >= Tuning.PLASTIC_BIN) {
 			refinery.status = "STOPPED: plastic bin full, collect it with an empty hand";
 		} else if (refinery.diesel >= Tuning.REFINERY_TANK) {
 			refinery.status = "STOPPED: diesel tank full";
+		} else if (strength == 0) {
+			refinery.status = refinery.motor.describe();
 		} else {
 			double yield = refinery.tower ? Tuning.DIESEL_YIELD : Tuning.POT_STILL_YIELD;
 			double room = (Tuning.REFINERY_TANK - refinery.diesel) / yield;
@@ -160,9 +156,6 @@ public class RefineryBlockEntity extends BlockEntity implements CircuitPart, Ins
 				}
 			}
 			refinery.status = "refining " + Math.round(amount * 20.0 / Tuning.WELL_INTERVAL) + " crude/s";
-			if ((level.getGameTime() / Tuning.WELL_INTERVAL) % 12 == 0) {
-				level.playSound(null, pos, WildcatterSounds.BOILER_HISS, SoundSource.BLOCKS, 0.4F, 0.8F);
-			}
 		}
 		refinery.setChanged();
 	}
@@ -188,9 +181,35 @@ public class RefineryBlockEntity extends BlockEntity implements CircuitPart, Ins
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		running.load(input);
 		crude = input.getDoubleOr("crude", 0);
 		diesel = input.getDoubleOr("diesel", 0);
 		plasticProgress = input.getDoubleOr("plastic_progress", 0);
 		plastic = input.getIntOr("plastic", 0);
+	}
+
+	@Override
+	public net.minecraft.sounds.SoundEvent loop() {
+		return running.on() ? WildcatterSounds.FAN : null;
+	}
+
+	@Override
+	public float soundPitch() {
+		return 0.9F;
+	}
+
+	@Override
+	public float soundVolume() {
+		return running.on() ? 0.5F : 0;
+	}
+
+	@Override
+	public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+		return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+	}
+
+	@Override
+	public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+		return running.tag();
 	}
 }

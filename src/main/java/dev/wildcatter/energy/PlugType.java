@@ -9,20 +9,47 @@ public enum PlugType {
 	NEMA_5_20("nema_5_20", "NEMA 5-20", 120.0, 20.0, false),
 	NEMA_14_50("nema_14_50", "NEMA 14-50", 240.0, 50.0, true),
 	CEE_7("cee_7", "CEE 7 (Schuko)", 230.0, 16.0, false),
-	IEC_60309_BLUE("iec_60309_blue", "IEC 60309 blue", 230.0, 32.0, false);
+	IEC_60309_BLUE("iec_60309_blue", "IEC 60309 blue", 230.0, 32.0, false),
+	// three-phase: A, B, C, N and G; the volts are line to line
+	NEMA_L21_30("nema_l21_30", "NEMA L21-30", 208.0, 30.0, Voltage.LOW),
+	NEMA_L22_30("nema_l22_30", "NEMA L22-30", 480.0, 30.0, Voltage.INDUSTRIAL),
+	IEC_60309_RED_32("iec_60309_red_32", "IEC 60309 red 32 A", 400.0, 32.0, Voltage.INDUSTRIAL),
+	IEC_60309_RED_63("iec_60309_red_63", "IEC 60309 red 63 A", 400.0, 63.0, Voltage.INDUSTRIAL);
 
 	private final String id;
 	private final String label;
 	private final double volts;
 	private final double amps;
 	private final boolean betweenLegs;
+	private final Voltage tier;
+	private final boolean threePhase;
 
 	PlugType(String id, String label, double volts, double amps, boolean betweenLegs) {
+		this(id, label, volts, amps, betweenLegs, Voltage.LOW, false);
+	}
+
+	PlugType(String id, String label, double volts, double amps, Voltage tier) {
+		this(id, label, volts, amps, false, tier, true);
+	}
+
+	PlugType(String id, String label, double volts, double amps, boolean betweenLegs, Voltage tier, boolean threePhase) {
 		this.id = id;
 		this.label = label;
 		this.volts = volts;
 		this.amps = amps;
 		this.betweenLegs = betweenLegs;
+		this.tier = tier;
+		this.threePhase = threePhase;
+	}
+
+	/** The wiring tier the receptacle connects to. */
+	public Voltage tier() {
+		return tier;
+	}
+
+	/** A three-phase plug takes A, B and C (and N); its volts are line to line. */
+	public boolean threePhase() {
+		return threePhase;
 	}
 
 	public String id() {

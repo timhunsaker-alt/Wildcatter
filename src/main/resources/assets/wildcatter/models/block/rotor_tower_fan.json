@@ -1,0 +1,168 @@
+{
+  "textures": {
+    "rotor": "wildcatter:block/rotor_placeholder",
+    "particle": "wildcatter:block/rotor_placeholder"
+  },
+  "elements": [
+    {
+      "from": [
+        7,
+        7,
+        7
+      ],
+      "to": [
+        9,
+        9,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rotor"
+        },
+        "south": {
+          "texture": "#rotor"
+        },
+        "east": {
+          "texture": "#rotor"
+        },
+        "west": {
+          "texture": "#rotor"
+        },
+        "up": {
+          "texture": "#rotor"
+        },
+        "down": {
+          "texture": "#rotor"
+        }
+      }
+    },
+    {
+      "from": [
+        9,
+        7.5,
+        6.5
+      ],
+      "to": [
+        14,
+        8.5,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rotor"
+        },
+        "south": {
+          "texture": "#rotor"
+        },
+        "east": {
+          "texture": "#rotor"
+        },
+        "west": {
+          "texture": "#rotor"
+        },
+        "up": {
+          "texture": "#rotor"
+        },
+        "down": {
+          "texture": "#rotor"
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        7.5,
+        6.5
+      ],
+      "to": [
+        7,
+        8.5,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rotor"
+        },
+        "south": {
+          "texture": "#rotor"
+        },
+        "east": {
+          "texture": "#rotor"
+        },
+        "west": {
+          "texture": "#rotor"
+        },
+        "up": {
+          "texture": "#rotor"
+        },
+        "down": {
+          "texture": "#rotor"
+        }
+      }
+    },
+    {
+      "from": [
+        6.5,
+        7.5,
+        9
+      ],
+      "to": [
+        9.5,
+        8.5,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rotor"
+        },
+        "south": {
+          "texture": "#rotor"
+        },
+        "east": {
+          "texture": "#rotor"
+        },
+        "west": {
+          "texture": "#rotor"
+        },
+        "up": {
+          "texture": "#rotor"
+        },
+        "down": {
+          "texture": "#rotor"
+        }
+      }
+    },
+    {
+      "from": [
+        6.5,
+        7.5,
+        2
+      ],
+      "to": [
+        9.5,
+        8.5,
+        7
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rotor"
+        },
+        "south": {
+          "texture": "#rotor"
+        },
+        "east": {
+          "texture": "#rotor"
+        },
+        "west": {
+          "texture": "#rotor"
+        },
+        "up": {
+          "texture": "#rotor"
+        },
+        "down": {
+          "texture": "#rotor"
+        }
+      }
+    }
+  ]
+}

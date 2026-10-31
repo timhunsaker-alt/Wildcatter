@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "S",
+    "S",
+    "S"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot"
+  },
+  "result": {
+    "id": "wildcatter:exhaust_stack",
+    "count": 1
+  }
+}

@@ -6,6 +6,7 @@ import dev.wildcatter.circuit.Circuit;
 import dev.wildcatter.circuit.CircuitManager;
 import dev.wildcatter.circuit.CircuitPart;
 import dev.wildcatter.circuit.Conductor;
+import dev.wildcatter.energy.ConductorSize;
 import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.energy.Voltage;
 import dev.wildcatter.safety.Shock;
@@ -35,9 +36,18 @@ import net.minecraft.world.phys.Vec3;
  */
 public class InsulatorBlockEntity extends BlockEntity implements CircuitPart, Inspectable {
 	/** A span to another insulator. */
-	public record Span(BlockPos other, int tier, boolean covered, int length) {
+	public record Span(BlockPos other, int tier, boolean covered, int length, ConductorSize size) {
+		public Span {
+			size = ConductorSize.orStandard(size, Voltage.values()[Math.max(0, Math.min(Voltage.values().length - 1, tier))], ConductorSize.Kind.WIRE);
+		}
+
 		public Voltage voltage() {
 			return Voltage.values()[Math.max(0, Math.min(Voltage.values().length - 1, tier))];
+		}
+
+		/** Resistance of the span: its conductor's ohms per metre over the span's metres. */
+		public double ohms() {
+			return size.ohmsPerMeter() * length * Tuning.SPAN_METERS_PER_BLOCK;
 		}
 	}
 
@@ -74,7 +84,7 @@ public class InsulatorBlockEntity extends BlockEntity implements CircuitPart, In
 
 	/** True if the line is a higher tier than the insulator can hold. */
 	public boolean underRated() {
-		return !spans.isEmpty() && lineTier().ordinal() > block().rating().ordinal();
+		return !spans.isEmpty() && lineTier().above(block().rating());
 	}
 
 	private boolean covered() {
@@ -128,7 +138,7 @@ public class InsulatorBlockEntity extends BlockEntity implements CircuitPart, In
 		}
 		for (Span span : spans) {
 			if (worldPosition.asLong() < span.other.asLong()) {
-				circuit.span(worldPosition, span.other, Tuning.wireOhms(span.voltage()) * span.length);
+				circuit.span(worldPosition, span.other, span.ohms());
 			}
 		}
 		if (underRated()) {
@@ -157,7 +167,7 @@ public class InsulatorBlockEntity extends BlockEntity implements CircuitPart, In
 		}
 		if (insulator.flashTicks >= Tuning.INSULATOR_FLASHOVER_TICKS) {
 			server.sendParticles(net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE, pos.getX() + 0.5, pos.getY() + 0.8, pos.getZ() + 0.5, 12, 0.2, 0.2, 0.2, 0.05);
-			server.playSound(null, pos, net.minecraft.sounds.SoundEvents.GENERIC_EXPLODE.value(), net.minecraft.sounds.SoundSource.BLOCKS, 0.7F, 1.6F);
+			server.playSound(null, pos, dev.wildcatter.WildcatterSounds.FLASHOVER, net.minecraft.sounds.SoundSource.BLOCKS, 2.0F, 1.0F);
 			server.destroyBlock(pos, false);   // the insulator shatters; its spans fall with it
 			return;
 		}
@@ -194,7 +204,7 @@ public class InsulatorBlockEntity extends BlockEntity implements CircuitPart, In
 
 	@Override
 	public Component inspect() {
-		String hold = spans.isEmpty() ? "no spans" : spans.size() + (spans.size() == 1 ? " span" : " spans") + ", " + (covered() ? "covered" : "BARE") + " " + lineTier().label() + " line";
+		String hold = spans.isEmpty() ? "no spans" : spans.size() + (spans.size() == 1 ? " span" : " spans") + ", " + (covered() ? "covered" : "BARE") + " " + lineTier().label() + " line of " + spans.get(0).size().label();
 		String warning = underRated() ? ", UNDER-RATED for this line: it is flashing over" : "";
 		return Component.literal(conductor().label() + " insulator (rated " + block().rating().label() + "): " + hold + warning
 				+ String.format(", %.0f V, %.1f A", Math.abs(volts), amps));
@@ -222,6 +232,7 @@ public class InsulatorBlockEntity extends BlockEntity implements CircuitPart, In
 			child.putInt("tier", span.tier);
 			child.putBoolean("covered", span.covered);
 			child.putInt("length", span.length);
+			child.putString("size", span.size.getSerializedName());
 		}
 	}
 
@@ -231,7 +242,8 @@ public class InsulatorBlockEntity extends BlockEntity implements CircuitPart, In
 		spans.clear();
 		for (ValueInput child : input.childrenListOrEmpty("spans")) {
 			spans.add(new Span(new BlockPos(child.getIntOr("x", 0), child.getIntOr("y", 0), child.getIntOr("z", 0)),
-					child.getIntOr("tier", 0), child.getBooleanOr("covered", false), child.getIntOr("length", 1)));
+					child.getIntOr("tier", 0), child.getBooleanOr("covered", false), child.getIntOr("length", 1),
+					ConductorSize.byId(child.getStringOr("size", ""))));
 		}
 	}
 }

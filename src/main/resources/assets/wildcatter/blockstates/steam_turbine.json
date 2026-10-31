@@ -1,16 +1,10 @@
 {
   "variants": {
-    "running=false,formed=false": {
+    "running=false": {
       "model": "wildcatter:block/steam_turbine"
     },
-    "running=false,formed=true": {
-      "model": "wildcatter:block/steam_turbine_formed"
-    },
-    "running=true,formed=false": {
+    "running=true": {
       "model": "wildcatter:block/steam_turbine_running"
-    },
-    "running=true,formed=true": {
-      "model": "wildcatter:block/steam_turbine_formed_running"
     }
   }
 }

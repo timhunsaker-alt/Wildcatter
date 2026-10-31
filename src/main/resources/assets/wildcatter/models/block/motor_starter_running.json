@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "wildcatter:block/motor_starter_front_running",
+    "side": "wildcatter:block/cabinet_side",
+    "top": "wildcatter:block/cabinet_side",
+    "bottom": "wildcatter:block/cabinet_side"
+  }
+}

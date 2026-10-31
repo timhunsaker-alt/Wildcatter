@@ -23,13 +23,15 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * A 110 V motor that lifts water from the water touching it and sends it down the pipes to every boiler on the run.
- * It is a plain load on the circuit, so it draws about 7 A whether or not the boilers need water. Water pressure
- * follows the motor: it needs most of its voltage, and delivers with the square of it, like a real pump.
+ * A level switch runs its motor only while the boilers need water: it starts below 80 % and stops when they are full.
+ * Water pressure follows the motor: it needs most of its voltage, and delivers with the square of it, like a real pump.
  */
-public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable {
-	private int hot;
-	private int neutral;
-	private int resistor;
+public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, dev.wildcatter.kinetic.Sounding {
+	/** Its induction motor (single-phase); it turns only while there is work. */
+	private final dev.wildcatter.circuit.Motor motor = new dev.wildcatter.circuit.Motor(false, Voltage.LOW, Tuning.PUMP_WATTS);
+	private final dev.wildcatter.kinetic.RunningSound running = new dev.wildcatter.kinetic.RunningSound();
+	/** Set by the machine's own logic: whether it has work for the motor. */
+	private boolean wanted;
 	private double volts;
 	private double amps;
 	private String status = "idle";
@@ -44,26 +46,19 @@ public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspect
 
 	@Override
 	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
-		return voltage == Voltage.LOW;
+		return voltage == motor.voltage() && (motor.threePhase() ? role != Conductor.N : true);
 	}
 
 	@Override
 	public void build(Circuit circuit) {
-		hot = circuit.node();
-		neutral = circuit.node();
-		double nominal = Voltage.LOW.nominal();
-		resistor = circuit.resistor(hot, neutral, nominal * nominal / Tuning.PUMP_WATTS);
-		for (Direction face : Direction.values()) {
-			circuit.port(worldPosition, face, Conductor.A, Voltage.LOW, hot, Tuning.CONTACT_OHMS / 2, false);
-			circuit.port(worldPosition, face, Conductor.B, Voltage.LOW, hot, Tuning.CONTACT_OHMS / 2, false);
-			circuit.port(worldPosition, face, Conductor.N, Voltage.LOW, neutral, Tuning.CONTACT_OHMS / 2, false);
-		}
+		motor.build(circuit, worldPosition);
 	}
 
 	@Override
 	public void apply(Circuit circuit, int ticks) {
-		volts = Math.abs(circuit.across(hot, neutral));   // leg B runs the other way round, so only the size matters
-		amps = Math.abs(circuit.current(resistor));
+		motor.apply(circuit, ticks, wanted);
+		volts = motor.volts();
+		amps = motor.amps();
 	}
 
 	private boolean touchesWater(Level level) {
@@ -76,38 +71,78 @@ public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspect
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, PumpBlockEntity pump) {
+		pump.running.update(pump, pump.motor.output() > 0);   // the client plays its loop while it runs
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.PLUMBING_INTERVAL != 0) {
 			return;
 		}
-		double nominal = Voltage.LOW.nominal();
-		double strength = pump.volts < nominal * Tuning.BRIGHT_ABOVE ? 0 : Math.min(1.0, Math.pow(pump.volts / nominal, 2));
-		if (strength == 0) {
-			pump.status = pump.volts < 1.0 ? "NO POWER: wire a hot and a neutral to it" : "too little voltage to turn";
-			return;
-		}
 		if (!pump.touchesWater(level)) {
+			pump.wanted = false;
 			pump.status = "DRY: put it against water";
 			return;
 		}
 		List<BlockPos> cell = List.of(pos);
 		Set<BlockPos> pipes = Plumbing.network(level, cell);
 		List<BoilerBlockEntity> boilers = Plumbing.boilers(level, cell, pipes, true);
-		if (boilers.isEmpty()) {
-			pump.status = "no boiler on its pipes";
+		// steam plants take their makeup water at the condenser's hotwell (1 unit of water is 1 kg)
+		List<TurbineGeneratorBlockEntity> plants = Plumbing.machines(level, cell, pipes, true, SteamPlantPartBlockEntity.class).stream()
+				.filter(p -> p.part() == SteamPlantPartBlock.Part.CONDENSER).map(SteamPlantPartBlockEntity::controller).filter(java.util.Objects::nonNull).distinct().toList();
+		if (boilers.isEmpty() && plants.isEmpty()) {
+			pump.wanted = false;
+			pump.status = "no boiler or plant condenser on its pipes";
 			return;
 		}
-		int moved = Plumbing.deliver(boilers, (int) Math.round(Tuning.PUMP_WATER_PER_TICK * Tuning.PLUMBING_INTERVAL * strength));
-		pump.status = moved > 0 ? "pumping " + Math.round(moved * 20.0 / Tuning.PLUMBING_INTERVAL) + " water/s to " + boilers.size() + " boiler(s)"
-				: "running, boilers are full";
-		if (moved > 0 && (level.getGameTime() / Tuning.PLUMBING_INTERVAL) % 15 == 0) {
-			level.playSound(null, pos, WildcatterSounds.TURBINE_HUM, SoundSource.BLOCKS, 0.4F, 1.5F);
+		// a level switch: start when a boiler or hotwell falls below the start level, stop when they are all full
+		double lowest = Math.min(boilers.stream().mapToDouble(BoilerBlockEntity::waterLevel).min().orElse(1.0),
+				plants.stream().mapToDouble(TurbineGeneratorBlockEntity::hotwellLevel).min().orElse(1.0));
+		pump.wanted = pump.wanted ? lowest < 1.0 : lowest < Tuning.PUMP_START_LEVEL;
+		double strength = pump.motor.output();
+		if (strength == 0) {
+			pump.status = pump.wanted ? pump.motor.describe() : "boilers full, " + pump.motor.describe();
+			return;
 		}
+		int budget = (int) Math.round(Tuning.PUMP_WATER_PER_TICK * Tuning.PLUMBING_INTERVAL * strength);
+		int moved = Plumbing.deliver(boilers, budget);
+		for (TurbineGeneratorBlockEntity plant : plants) {
+			moved += (int) Math.round(plant.addMakeup((budget - moved) / (double) plants.size()));
+		}
+		pump.status = (moved > 0 ? "pumping " + Math.round(moved * 20.0 / Tuning.PLUMBING_INTERVAL) + " water/s to " + boilers.size() + " boiler(s) and " + plants.size() + " plant(s)"
+				: "boilers are full") + ", " + pump.motor.describe();
 	}
 
 	@Override
 	public Component inspect() {
-		return Component.literal("Water pump (rated " + Math.round(Tuning.PUMP_WATTS) + " W at " + Voltage.LOW.label() + "): "
-				+ String.format("%.0f V, %.2f A", volts, amps) + ", " + status + "; "
+		return Component.literal("Water pump (" + Math.round(Tuning.PUMP_WATTS) + " W motor, " + Voltage.LOW.label() + "): " + status + "; "
 				+ (level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you"));
+	}
+
+	@Override
+	public net.minecraft.sounds.SoundEvent loop() {
+		return running.on() ? WildcatterSounds.MOTOR_HUM : null;
+	}
+
+	@Override
+	public float soundPitch() {
+		return 1.0F;
+	}
+
+	@Override
+	public float soundVolume() {
+		return running.on() ? 0.4F : 0;
+	}
+
+	@Override
+	public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+		return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+	}
+
+	@Override
+	public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+		return running.tag();
+	}
+
+	@Override
+	protected void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
+		super.loadAdditional(input);
+		running.load(input);
 	}
 }

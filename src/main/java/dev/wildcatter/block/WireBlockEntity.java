@@ -2,16 +2,20 @@ package dev.wildcatter.block;
 
 import dev.wildcatter.Tuning;
 import dev.wildcatter.WildcatterBlocks;
+import dev.wildcatter.WildcatterComponents;
 import dev.wildcatter.circuit.Circuit;
 import dev.wildcatter.circuit.CircuitManager;
 import dev.wildcatter.circuit.CircuitPart;
 import dev.wildcatter.circuit.Conductor;
+import dev.wildcatter.energy.ConductorSize;
 import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.energy.Voltage;
 import dev.wildcatter.safety.Shock;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -38,6 +42,8 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 	/** 0 to 1: how close the copper is to burning out. */
 	private double heat;
 	private double hertz = dev.wildcatter.energy.ElectricalStandard.active().hertz();
+	/** Null for a wire placed before sizes: it takes its tier's standard size. */
+	private ConductorSize size;
 
 	public WireBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.WIRE_ENTITY, pos, state);
@@ -47,22 +53,28 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		return (CableBlock) getBlockState().getBlock();
 	}
 
+	public ConductorSize size() {
+		return ConductorSize.orStandard(size, block().voltage(), ConductorSize.Kind.WIRE);
+	}
+
+	/** Test hook: sets the conductor size. */
+	public void setSize(ConductorSize value) {
+		size = value;
+		setChanged();
+		CircuitManager.markDirty(level);
+	}
+
+	private String metal() {
+		return size().family() == ConductorSize.Family.ACSR ? "aluminium" : "copper";
+	}
+
+	/** One block is a metre of conductor. */
 	private double ohms() {
-		return switch (block().voltage()) {
-			case LOW -> Tuning.WIRE_OHMS_LOW;
-			case MEDIUM -> Tuning.WIRE_OHMS_MEDIUM;
-			case DISTRIBUTION -> Tuning.WIRE_OHMS_DISTRIBUTION;
-			case HIGH -> Tuning.WIRE_OHMS_HIGH;
-		};
+		return size().ohmsPerMeter();
 	}
 
 	private double ampacity() {
-		return switch (block().voltage()) {
-			case LOW -> Tuning.WIRE_AMPS_LOW;
-			case MEDIUM -> Tuning.WIRE_AMPS_MEDIUM;
-			case DISTRIBUTION -> Tuning.WIRE_AMPS_DISTRIBUTION;
-			case HIGH -> Tuning.WIRE_AMPS_HIGH;
-		};
+		return size().amps();
 	}
 
 	/** Bare copper, because there is no insulation or because it has worn through. */
@@ -172,9 +184,9 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 	public Component inspect() {
 		CableBlock block = block();
 		String insulation = block.plastic() ? "plastic insulated, safe to touch"
-				: !block.wool() ? "bare copper, live to the touch"
-				: wear >= 1.0 ? "wool worn OUT, bare copper" : "wool " + Math.round(wear * 100) + "% worn";
-		return Component.literal(getBlockState().getValue(CableBlock.CONDUCTOR).label() + " wire (" + block.voltage().label() + ", " + insulation + "): "
+				: !block.wool() ? "bare " + metal() + ", live to the touch"
+				: wear >= 1.0 ? "wool worn OUT, bare " + metal() : "wool " + Math.round(wear * 100) + "% worn";
+		return Component.literal(getBlockState().getValue(CableBlock.CONDUCTOR).label() + " wire (" + block.voltage().label() + (block.voltage() == Voltage.LOW ? "" : ", " + fmt(block.voltage().nominal()) + " V to neutral") + ", " + size().label() + ", " + insulation + "): "
 				+ fmt(volts) + " V, " + fmt(amps) + " A of " + fmt(ampacity()) + " A allowed"
 				+ (heat > 0.05 ? ", HEATING " + Math.round(heat * 100) + "%" : "") + String.format(", %.1f Hz", hertz));
 	}
@@ -188,6 +200,9 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		super.saveAdditional(output);
 		output.putDouble("wear", wear);
 		output.putDouble("heat", heat);
+		if (size != null) {
+			output.putString("size", size.getSerializedName());
+		}
 	}
 
 	@Override
@@ -195,6 +210,22 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		super.loadAdditional(input);
 		wear = input.getDoubleOr("wear", 0);
 		heat = input.getDoubleOr("heat", 0);
+		size = ConductorSize.byId(input.getStringOr("size", ""));
+	}
+
+	@Override
+	protected void applyImplicitComponents(DataComponentGetter components) {
+		super.applyImplicitComponents(components);
+		ConductorSize carried = components.get(WildcatterComponents.CONDUCTOR_SIZE);
+		if (carried != null) {
+			size = carried;
+		}
+	}
+
+	@Override
+	protected void collectImplicitComponents(DataComponentMap.Builder components) {
+		super.collectImplicitComponents(components);
+		components.set(WildcatterComponents.CONDUCTOR_SIZE, size());
 	}
 
 	/** Smoke where a wire burned. */

@@ -37,7 +37,7 @@ public class RefineryBlock extends BaseEntityBlock {
 
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-		return level.isClientSide() ? null : createTickerHelper(type, WildcatterBlocks.REFINERY_ENTITY, RefineryBlockEntity::tick);
+		return createTickerHelper(type, WildcatterBlocks.REFINERY_ENTITY, level.isClientSide() ? (l, p, st, be) -> dev.wildcatter.kinetic.RunningSound.clientTick(be) : RefineryBlockEntity::tick);
 	}
 
 	private static void give(Player player, InteractionHand hand, ItemStack used, ItemStack reward) {

@@ -104,6 +104,15 @@ public final class CircuitManager {
 		ISLANDS.computeIfAbsent(level.dimension(), k -> new HashMap<>()).keySet().retainAll(live);
 	}
 
+	/** The biggest circuit solved since the last {@link #resetSolveStats} and how long its solve took: the game test reads these. */
+	public static volatile int largestNodes;
+	public static volatile long largestNanos;
+
+	public static void resetSolveStats() {
+		largestNodes = 0;
+		largestNanos = 0;
+	}
+
 	private static void solveGroup(ServerLevel level, List<BlockPos> group, int ticks, Set<Long> live) {
 		long key = group.stream().mapToLong(BlockPos::asLong).min().orElse(0L);
 		dev.wildcatter.energy.ElectricalStandard standard = dev.wildcatter.energy.ElectricalStandard.active();
@@ -132,7 +141,14 @@ public final class CircuitManager {
 				Wildcatter.LOGGER.warn("A circuit near {} has {} nodes, more than the {} allowed; it is not simulated", group.get(0), circuit.nodes(), Tuning.MAX_CIRCUIT_NODES);
 				return;
 			}
-			if (!circuit.solve()) {
+			long started = System.nanoTime();
+			boolean solved = circuit.solve();
+			long took = System.nanoTime() - started;
+			if (circuit.nodes() >= largestNodes) {
+				largestNodes = circuit.nodes();
+				largestNanos = took;
+			}
+			if (!solved) {
 				Wildcatter.LOGGER.warn("Could not solve the circuit near {}", group.get(0));
 				return;
 			}
@@ -173,8 +189,10 @@ public final class CircuitManager {
 		for (Generator generator : online) {
 			rated += generator.ratedWatts();
 			inertia += generator.ratedWatts() * generator.inertiaSeconds();
-			delivered += Math.max(0, generator.deliveredWatts());
+			delivered += generator.deliveredWatts();
 		}
+		// net over the island: current circulating between machines (one driving another) is not load
+		delivered = Math.max(0, delivered);
 		double dt = ticks / 20.0;
 		island.frequency.step(dt, rated, inertia / rated, delivered);
 		double hertz = island.frequency.hertz();

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "wildcatter:block/boiler_burner"
+    },
+    "facing=east": {
+      "model": "wildcatter:block/boiler_burner",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "wildcatter:block/boiler_burner",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "wildcatter:block/boiler_burner",
+      "y": 270
+    }
+  }
+}

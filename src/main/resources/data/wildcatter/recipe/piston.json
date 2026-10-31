@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "wildcatter:steel_ingot",
+    "wildcatter:steel_ingot",
+    "minecraft:iron_nugget"
+  ],
+  "result": {
+    "id": "wildcatter:piston",
+    "count": 2
+  }
+}

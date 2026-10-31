@@ -123,11 +123,9 @@ save("refinery", load("refinery"))
 save("cooling_tower", load("cooling_tower"))
 save("cooling_fill", load("cooling_fill"))
 save("refinery_column", ImageEnhance.Color(darker(load("refinery"), 0.85)).enhance(0.5))
-de, gt = load("diesel_engine"), load("gas_turbine")
-save("diesel_engine", de)
-save("diesel_engine_running", glow(de, (255, 190, 90), 0.35))
-save("gas_turbine", gt)
-save("gas_turbine_running", spin_blur(gt))
+de = load("diesel_engine")   # the old 120 V engine's drawing now dresses the genset engines
+save("genset_engine", de)
+save("genset_gas_engine", hue_shift(de, 0.58))
 save("gas_line", load("steel_pipe"))   # steel pipe for oil and gas (the block id stays gas_line)
 
 # ---- turbine and generator ------------------------------------------------------------------------------
@@ -162,6 +160,70 @@ save("substation_side", hue_shift(ts, 0.60))
 save("substation_top", darker(hue_shift(ts, 0.60), 0.85))
 if os.path.exists(f"{SRC}/breaker.webp"):
 	save("breaker_body", load("breaker"))
+
+# ---- Phase 3: cable, three-pole breakers, pad-mounts, unit substation, heater, starters and the MCC ------------
+def tint(img, color, k):
+	"""Blends a drawing toward a colour (cable jackets, the industrial breaker's orange case)."""
+	return Image.blend(img, Image.new("RGB", img.size, color), k)
+
+
+def lamp(img, color):
+	"""Paints the pilot light (upper left of the door) lit in a colour, with a little glow round it."""
+	out = glow(img, color, 0.35, lambda x, y: max(0.0, 1 - ((x - 0.2) ** 2 + (y - 0.2) ** 2) * 18))
+	px = out.load()
+	for x in range(5, 9):
+		for y in range(5, 9):
+			px[x, y] = color if 5 < x < 8 or 5 < y < 8 else tuple(int(c * 0.7) for c in color)
+	return out
+
+
+if os.path.exists(f"{SRC}/cable_sheath.webp"):
+	sheath = load("cable_sheath")
+	for cable, (color, k) in {"cable_lv": ((40, 40, 44), 0.0), "cable_industrial": ((90, 60, 40), 0.25), "cable_dist": ((30, 70, 45), 0.25), "cable_hv": ((10, 10, 16), 0.35)}.items():
+		save(cable, tint(sheath, color, k))
+if os.path.exists(f"{SRC}/breaker_3p.webp"):
+	b3 = load("breaker_3p")
+	save("breaker_3p_lv_body", b3)
+	save("breaker_3p_industrial_body", tint(b3, (210, 120, 40), 0.35))
+if os.path.exists(f"{SRC}/padmount_front.webp"):
+	pf, ps = load("padmount_front"), load("padmount_side")
+	for name, k in (("padmount_208", 1.0), ("padmount_480", 0.85)):   # the 480 V unit a shade darker
+		save(f"{name}_front", darker(pf, k))
+		save(f"{name}_side", darker(ps, k))
+		save(f"{name}_top", darker(ps, k * 0.8))
+if os.path.exists(f"{SRC}/unit_substation_front.webp"):
+	uf, us = load("unit_substation_front"), load("unit_substation_side")
+	save("unit_substation_front", uf)
+	save("unit_substation_side", us)
+	save("unit_substation_top", darker(us, 0.8))
+if os.path.exists(f"{SRC}/three_phase_heater.webp"):
+	h3 = load("three_phase_heater")
+	save("three_phase_heater", dim_hot(h3))
+	save("three_phase_heater_lit", brighten_hot(h3, 0.25))
+if os.path.exists(f"{SRC}/cabinet_front.webp"):
+	cf = load("cabinet_front")
+	save("cabinet_side", load("cabinet_side"))
+	lamps = {"running": (60, 220, 90), "on": (60, 220, 90), "stopped": (90, 90, 96), "off": (90, 90, 96), "tripped": (235, 50, 40)}
+	for name, states in (("motor_starter", ("running", "stopped", "tripped")), ("mcc_bucket", ("running", "stopped", "tripped")), ("mcc_incoming", ("on", "off", "tripped"))):
+		door = cf if name != "mcc_incoming" else darker(cf, 0.9)
+		for st in states:
+			save(f"{name}_front_{st}", lamp(door, lamps[st]) if lamps[st] != (90, 90, 96) else door)
+
+# ---- Phase 4b: genset parts ----------------------------------------------------------------------------------------
+if os.path.exists(f"{SRC}/alternator.webp"):
+	save("alternator", load("alternator"))
+	save("radiator_core", load("radiator_core"))
+	save("radiator_frame", darker(load("exhaust_stack"), 0.8))
+	save("fuel_tank", load("fuel_tank"))
+	save("exhaust_stack", load("exhaust_stack"))
+	save("genset_panel_front", load("genset_panel_front"))
+	save("genset_panel_side", load("cabinet_side"))
+
+# ---- Phase 4d and 4e: plant, tower, busway, substation ----------------------------------------------------------------
+for name in ("busway", "condenser", "tower_basin", "drift_eliminator", "station_bus", "disconnect_post"):
+	if os.path.exists(f"{SRC}/{name}.webp"):
+		save(name, load(name))
+
 print("art processed:", len(os.listdir(OUT)), "textures")
 
 
@@ -181,4 +243,8 @@ def icon(name):
 
 for name in ("power_meter", "field_manual", "seismograph", "crude_oil_bucket", "plastic_sheet", "diesel_bucket", "steel_ingot"):
 	icon(name).save(f"{OUT}/{name}.png")
+GENSET_PART_ICONS = ("engine_block_casting", "piston", "crankshaft", "cylinder_head", "fuel_injector", "spark_plug", "stator_winding", "rotor_field", "exciter")
+for name in GENSET_PART_ICONS:
+	if os.path.exists(f"{SRC}/{name}.webp"):
+		icon(name).save(f"{OUT}/{name}.png")
 print("icons done")

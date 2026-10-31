@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "wildcatter:dist_breaker",
+    "wildcatter:dist_breaker",
+    "wildcatter:dist_breaker",
+    "minecraft:comparator"
+  ],
+  "result": {
+    "id": "wildcatter:dist_breaker_3p",
+    "count": 1
+  }
+}

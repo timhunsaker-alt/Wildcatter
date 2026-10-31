@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BBB",
+    "SRS"
+  ],
+  "key": {
+    "B": "wildcatter:breaker",
+    "S": "wildcatter:steel_ingot",
+    "R": "minecraft:redstone_block"
+  },
+  "result": {
+    "id": "wildcatter:breaker_3p_industrial",
+    "count": 1
+  }
+}

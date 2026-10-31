@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "CSC",
+    "SCS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_ingot"
+  },
+  "result": {
+    "id": "wildcatter:superheater",
+    "count": 1
+  }
+}

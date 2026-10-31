@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BBB",
+    "IRI"
+  ],
+  "key": {
+    "B": "wildcatter:breaker",
+    "I": "minecraft:iron_ingot",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "wildcatter:breaker_3p_lv",
+    "count": 1
+  }
+}

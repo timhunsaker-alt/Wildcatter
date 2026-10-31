@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SSS",
+    "SWS",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "W": "minecraft:water_bucket"
+  },
+  "result": {
+    "id": "wildcatter:boiler_drum",
+    "count": 1
+  }
+}

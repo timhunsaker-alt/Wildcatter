@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class ReceptacleBlockEntity extends BlockEntity implements CircuitPart, Inspectable {
 	private int hotA;
 	private int hotB;
+	private int hotC;
 	private int neutral;
 	private double volts;
 
@@ -34,29 +35,43 @@ public class ReceptacleBlockEntity extends BlockEntity implements CircuitPart, I
 
 	@Override
 	public boolean hasPort(Direction face, Conductor conductor, Voltage voltage) {
-		return voltage == Voltage.LOW && conductor != Conductor.C && conductor != Conductor.G;
+		if (type().threePhase()) {
+			return voltage == type().tier() && conductor != Conductor.G;
+		}
+		return voltage == Voltage.LOW && (conductor != Conductor.C || !type().betweenLegs()) && conductor != Conductor.G;
 	}
 
 	@Override
 	public void build(Circuit circuit) {
+		PlugType type = type();
+		Voltage tier = type.tier();
 		hotA = circuit.node();
-		hotB = type().betweenLegs() ? circuit.node() : hotA;   // a single-line receptacle takes either leg on its one line terminal
+		hotB = type.betweenLegs() || type.threePhase() ? circuit.node() : hotA;
+		hotC = type.threePhase() ? circuit.node() : hotA;
 		neutral = circuit.node();
 		for (Direction face : Direction.values()) {
-			circuit.port(worldPosition, face, Conductor.A, Voltage.LOW, hotA, Tuning.CONTACT_OHMS / 2, false);
-			circuit.port(worldPosition, face, Conductor.B, Voltage.LOW, hotB, Tuning.CONTACT_OHMS / 2, false);
-			circuit.port(worldPosition, face, Conductor.N, Voltage.LOW, neutral, Tuning.CONTACT_OHMS / 2, false);
+			if (type.betweenLegs() || type.threePhase()) {
+				circuit.port(worldPosition, face, Conductor.A, tier, hotA, Tuning.CONTACT_OHMS / 2, false);
+				circuit.port(worldPosition, face, Conductor.B, tier, hotB, Tuning.CONTACT_OHMS / 2, false);
+				if (type.threePhase()) {
+					circuit.port(worldPosition, face, Conductor.C, tier, hotC, Tuning.CONTACT_OHMS / 2, false);
+				}
+			} else {
+				// a single-line receptacle takes whichever one phase reaches it on its line terminal
+				circuit.hotPort(worldPosition, face, tier, hotA, Tuning.CONTACT_OHMS / 2, false);
+			}
+			circuit.port(worldPosition, face, Conductor.N, tier, neutral, Tuning.CONTACT_OHMS / 2, false);
 		}
 	}
 
 	@Override
 	public void apply(Circuit circuit, int ticks) {
-		volts = Math.abs(circuit.across(hotA, neutral));
+		volts = type().threePhase() ? circuit.across(hotA, hotB) : circuit.across(hotA, neutral);
 	}
 
 	@Override
 	public Component inspect() {
 		return Component.literal(type().label() + " receptacle (" + Math.round(type().volts()) + " V, " + Math.round(type().amps()) + " A): "
-				+ String.format("%.0f V on its line", volts) + "; set a matching plug adapter against it");
+				+ String.format(type().threePhase() ? "%.0f V between phases A and B" : "%.0f V on its line", volts) + "; set a matching plug adapter against it");
 	}
 }

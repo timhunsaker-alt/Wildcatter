@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:iron_ingot",
+    "minecraft:red_dye"
+  ],
+  "result": {
+    "id": "wildcatter:industrial_wire_hot",
+    "count": 4,
+    "components": {
+      "wildcatter:conductor_size": "awg_12"
+    }
+  }
+}

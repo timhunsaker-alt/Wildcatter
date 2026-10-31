@@ -48,6 +48,17 @@ public final class WildcatterItems {
 	public static final Item COVERED_SPOOL_DIST = spool("covered_conductor_spool_dist", Voltage.DISTRIBUTION, true);
 	public static final Item COVERED_SPOOL_HV = spool("covered_conductor_spool_hv", Voltage.HIGH, true);
 
+	/** Genset parts, crafted and then built into the engine and the alternator (docs/multiblocks/genset.md). */
+	public static final String[] GENSET_PARTS = {"engine_block_casting", "piston", "crankshaft", "cylinder_head", "fuel_injector", "spark_plug",
+			"stator_winding", "rotor_field", "exciter"};
+	public static final java.util.Map<String, Item> PARTS = new java.util.LinkedHashMap<>();
+
+	static {
+		for (String name : GENSET_PARTS) {
+			PARTS.put(name, new Item(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, Wildcatter.id(name)))));
+		}
+	}
+
 	private static Item spool(String name, Voltage tier, boolean covered) {
 		ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, Wildcatter.id(name));
 		return new SpoolItem(new Item.Properties().durability(Tuning.SPOOL_SPAN_BLOCKS).setId(key), tier, covered);
@@ -68,6 +79,7 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, PLASTIC_SHEET_KEY, PLASTIC_SHEET);
 		Registry.register(BuiltInRegistries.ITEM, STEEL_INGOT_KEY, STEEL_INGOT);
 		Registry.register(BuiltInRegistries.ITEM, DIESEL_BUCKET_KEY, DIESEL_BUCKET);
+		PARTS.forEach((name, item) -> Registry.register(BuiltInRegistries.ITEM, ResourceKey.create(Registries.ITEM, Wildcatter.id(name)), item));
 		registerSpool("conductor_spool_lv", SPOOL_LV);
 		registerSpool("conductor_spool_dist", SPOOL_DIST);
 		registerSpool("conductor_spool_hv", SPOOL_HV);

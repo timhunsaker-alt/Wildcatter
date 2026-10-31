@@ -1,0 +1,44 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "fabric:type": "fabric:components",
+      "base": "wildcatter:hv_wire_neutral",
+      "components": {
+        "wildcatter:conductor_size": "acsr_raven"
+      }
+    },
+    {
+      "fabric:type": "fabric:components",
+      "base": "wildcatter:hv_wire_neutral",
+      "components": {
+        "wildcatter:conductor_size": "acsr_raven"
+      }
+    },
+    {
+      "fabric:type": "fabric:components",
+      "base": "wildcatter:hv_wire_neutral",
+      "components": {
+        "wildcatter:conductor_size": "acsr_raven"
+      }
+    },
+    {
+      "fabric:type": "fabric:components",
+      "base": "wildcatter:hv_wire_neutral",
+      "components": {
+        "wildcatter:conductor_size": "acsr_raven"
+      }
+    },
+    "wildcatter:plastic_sheet",
+    "wildcatter:plastic_sheet",
+    "wildcatter:plastic_sheet"
+  ],
+  "result": {
+    "id": "wildcatter:hv_plastic_wire_neutral",
+    "count": 4,
+    "components": {
+      "wildcatter:conductor_size": "acsr_raven"
+    }
+  }
+}

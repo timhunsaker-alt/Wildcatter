@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SSS",
+    "S S",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot"
+  },
+  "result": {
+    "id": "wildcatter:fuel_tank",
+    "count": 1
+  }
+}

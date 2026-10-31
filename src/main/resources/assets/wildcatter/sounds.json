@@ -34,5 +34,89 @@
       "wildcatter:structure_formed"
     ],
     "subtitle": "subtitles.wildcatter.structure_formed"
+  },
+  "engine_crank": {
+    "sounds": [
+      "wildcatter:engine_crank"
+    ],
+    "subtitle": "subtitles.wildcatter.engine_crank"
+  },
+  "sync_bang": {
+    "sounds": [
+      "wildcatter:sync_bang"
+    ],
+    "subtitle": "subtitles.wildcatter.sync_bang"
+  },
+  "disconnect_arc": {
+    "sounds": [
+      "wildcatter:disconnect_arc"
+    ],
+    "subtitle": "subtitles.wildcatter.disconnect_arc"
+  },
+  "hv_breaker": {
+    "sounds": [
+      "wildcatter:hv_breaker"
+    ],
+    "subtitle": "subtitles.wildcatter.hv_breaker"
+  },
+  "fuse_pop": {
+    "sounds": [
+      "wildcatter:fuse_pop"
+    ],
+    "subtitle": "subtitles.wildcatter.fuse_pop"
+  },
+  "flashover": {
+    "sounds": [
+      "wildcatter:flashover"
+    ],
+    "subtitle": "subtitles.wildcatter.flashover"
+  },
+  "diesel_idle": {
+    "sounds": [
+      "wildcatter:diesel_idle"
+    ],
+    "subtitle": "subtitles.wildcatter.diesel_idle"
+  },
+  "diesel_load": {
+    "sounds": [
+      "wildcatter:diesel_load"
+    ],
+    "subtitle": "subtitles.wildcatter.diesel_load"
+  },
+  "gas_engine": {
+    "sounds": [
+      "wildcatter:gas_engine"
+    ],
+    "subtitle": "subtitles.wildcatter.gas_engine"
+  },
+  "alternator_whine": {
+    "sounds": [
+      "wildcatter:alternator_whine"
+    ],
+    "subtitle": "subtitles.wildcatter.alternator_whine"
+  },
+  "fan": {
+    "sounds": [
+      "wildcatter:fan"
+    ],
+    "subtitle": "subtitles.wildcatter.fan"
+  },
+  "turbine_whine": {
+    "sounds": [
+      "wildcatter:turbine_whine"
+    ],
+    "subtitle": "subtitles.wildcatter.turbine_whine"
+  },
+  "burner_roar": {
+    "sounds": [
+      "wildcatter:burner_roar"
+    ],
+    "subtitle": "subtitles.wildcatter.burner_roar"
+  },
+  "motor_hum": {
+    "sounds": [
+      "wildcatter:motor_hum"
+    ],
+    "subtitle": "subtitles.wildcatter.motor_hum"
   }
 }

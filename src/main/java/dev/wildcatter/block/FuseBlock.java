@@ -3,8 +3,10 @@ package dev.wildcatter.block;
 import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.circuit.CircuitManager;
 import dev.wildcatter.item.PowerMeterItem;
+import dev.wildcatter.safety.Shock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -67,6 +69,9 @@ public class FuseBlock extends BaseEntityBlock {
 			return read;
 		}
 		if (stack.is(Items.COPPER_INGOT) && state.getValue(BLOWN)) {
+			if (bites(level, pos, player)) {
+				return InteractionResult.SUCCESS;
+			}
 			if (!level.isClientSide() && level.getBlockEntity(pos) instanceof FuseBlockEntity fuse) {
 				fuse.replaceElement();
 				if (!player.getAbilities().instabuild) {
@@ -81,6 +86,9 @@ public class FuseBlock extends BaseEntityBlock {
 
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+		if (bites(level, pos, player)) {
+			return InteractionResult.SUCCESS;
+		}
 		if (!level.isClientSide() && level.getBlockEntity(pos) instanceof FuseBlockEntity fuse) {
 			if (player.isShiftKeyDown() && !state.getValue(BLOWN)) {
 				fuse.nextRating();
@@ -88,6 +96,26 @@ public class FuseBlock extends BaseEntityBlock {
 			player.sendOverlayMessage(fuse.inspect());
 		}
 		return InteractionResult.SUCCESS;
+	}
+
+	/** Hitting it to knock it down is touching it too. */
+	@Override
+	protected void attack(BlockState state, Level level, BlockPos pos, Player player) {
+		bites(level, pos, player);
+	}
+
+	/**
+	 * A fused cutout's fuse tube and contacts are bare and at line voltage (linemen work them with a hot stick): a hand on a live
+	 * one is a shock, grounded or not. A low-voltage fuse is enclosed and safe to touch. Returns true if it bit.
+	 */
+	private boolean bites(Level level, BlockPos pos, Player player) {
+		if (level instanceof ServerLevel server && server.getBlockEntity(pos) instanceof FuseBlockEntity fuse && fuse.cutout() && fuse.isLive()
+				&& !player.isCreative() && !player.isSpectator()) {
+			Shock.zap(server, player, voltage, pos, fuse.volts());
+			player.sendOverlayMessage(fuse.inspect());
+			return true;
+		}
+		return false;
 	}
 
 	@Override

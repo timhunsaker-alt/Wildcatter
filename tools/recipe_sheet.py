@@ -35,7 +35,15 @@ def tex(item_id):
 					return im.crop((0, 0, im.width, im.width))
 	return None
 
-def icon(item_id, count=1):
+SIZE_KEY = "wildcatter:conductor_size"
+SIZE_LABEL = {"awg_12": "12", "awg_10": "10", "awg_6": "6", "awg_2": "2", "awg_4_0": "4/0", "kcmil_500": "500", "busway_800": "800A",
+	"acsr_sparrow": "#2", "acsr_raven": "1/0", "acsr_penguin": "4/0", "acsr_linnet": "336", "acsr_drake": "795", "mv_1_0": "1/0", "mv_4_0": "4/0", "mv_500": "500"}
+
+
+def icon(item_id, count=1, size=None):
+	if isinstance(item_id, dict):   # a fabric:components ingredient: the item in one conductor size
+		size = item_id.get("components", {}).get(SIZE_KEY)
+		item_id = item_id["base"]
 	im = Image.new("RGBA", (S, S), (139, 139, 139, 255))
 	if item_id.startswith("#"):
 		item_id = {"#minecraft:wool": "minecraft:white_wool", "#minecraft:logs": "minecraft:oak_log", "#minecraft:planks": "minecraft:oak_planks"}.get(item_id, "minecraft:barrier")
@@ -52,6 +60,8 @@ def icon(item_id, count=1):
 		d.text((S - 12, 0), "*", font=FONT, fill=(255, 255, 0))
 	if count > 1:
 		d.text((S - 16, S - 18), str(count), font=FONT, fill=(255, 255, 255), stroke_width=1, stroke_fill=(0, 0, 0))
+	if size:
+		d.text((2, 0), SIZE_LABEL.get(size, size), font=SMALL, fill=(255, 255, 160), stroke_width=1, stroke_fill=(0, 0, 0))
 	return im
 
 def render(path):
@@ -82,13 +92,18 @@ def render(path):
 				im.alpha_composite(icon(ing[y][x]), (ox, oy))
 	ax = 8 + 3 * (S + 2) + 10
 	d.polygon([(ax, 32 + 70), (ax + 30, 32 + 70), (ax + 30, 32 + 58), (ax + 52, 32 + 76), (ax + 30, 32 + 94), (ax + 30, 32 + 82), (ax, 32 + 82)], fill=(90, 90, 90))
-	im.alpha_composite(icon(r["result"]["id"], r["result"].get("count", 1)), (ax + 62, 32 + 52))
+	im.alpha_composite(icon(r["result"]["id"], r["result"].get("count", 1), r["result"].get("components", {}).get(SIZE_KEY)), (ax + 62, 32 + 52))
 	# key legend
 	return im
 
 def main(out):
 	os.makedirs(out, exist_ok=True)
-	files = sorted(glob.glob(f"{ROOT}/src/main/resources/data/wildcatter/recipe/*.json"))
+	# every size of every conductor would fill dozens of pages: show the smallest size of each sized recipe, and the upsizing chain
+	# for three representative conductors
+	smallest = ("__awg_12.json", "__acsr_sparrow.json", "__mv_1_0.json")
+	chains = ("wire_hot__", "dist_wire_hot__", "cable_industrial__")
+	files = [f for f in sorted(glob.glob(f"{ROOT}/src/main/resources/data/wildcatter/recipe/*.json"))
+		if "__" not in os.path.basename(f) or f.endswith(smallest) or ("_from_" in f and os.path.basename(f).startswith(chains))]
 	ims = [render(f) for f in files]
 	w, h = ims[0].size
 	cols = 3

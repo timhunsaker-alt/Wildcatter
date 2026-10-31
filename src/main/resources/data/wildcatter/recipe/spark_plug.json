@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:iron_nugget",
+    "minecraft:quartz",
+    "minecraft:copper_ingot"
+  ],
+  "result": {
+    "id": "wildcatter:spark_plug",
+    "count": 2
+  }
+}

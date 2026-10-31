@@ -9,6 +9,9 @@
   ],
   "result": {
     "id": "wildcatter:wire_neutral",
-    "count": 6
+    "count": 6,
+    "components": {
+      "wildcatter:conductor_size": "awg_12"
+    }
   }
 }

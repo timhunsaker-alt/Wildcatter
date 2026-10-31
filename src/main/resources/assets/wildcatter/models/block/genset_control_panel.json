@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "wildcatter:block/genset_panel_front",
+    "side": "wildcatter:block/genset_panel_side",
+    "top": "wildcatter:block/genset_panel_side",
+    "bottom": "wildcatter:block/genset_panel_side"
+  }
+}

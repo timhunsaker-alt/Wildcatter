@@ -143,4 +143,19 @@ public class CableBlock extends BaseEntityBlock {
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
 		return level.isClientSide() ? null : createTickerHelper(type, WildcatterBlocks.WIRE_ENTITY, WireBlockEntity::tick);
 	}
+	/** A broken conductor drops with its size (the size lives in the block entity, not the block state). */
+	@Override
+	protected java.util.List<net.minecraft.world.item.ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootParams.Builder params) {
+		java.util.List<net.minecraft.world.item.ItemStack> drops = super.getDrops(state, params);
+		net.minecraft.world.level.block.entity.BlockEntity be = params.getOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_ENTITY);
+		dev.wildcatter.energy.ConductorSize size = be instanceof WireBlockEntity wire ? wire.size() : be instanceof MultiCableBlockEntity cable ? cable.size() : null;
+		if (size != null) {
+			for (net.minecraft.world.item.ItemStack drop : drops) {
+				if (drop.is(asItem())) {
+					drop.set(dev.wildcatter.WildcatterComponents.CONDUCTOR_SIZE, size);
+				}
+			}
+		}
+		return drops;
+	}
 }

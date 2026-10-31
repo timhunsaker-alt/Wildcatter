@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "wildcatter:block/condenser"
+    },
+    "facing=east": {
+      "model": "wildcatter:block/condenser",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "wildcatter:block/condenser",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "wildcatter:block/condenser",
+      "y": 270
+    }
+  }
+}

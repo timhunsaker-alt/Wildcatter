@@ -32,14 +32,14 @@ import net.minecraft.world.level.storage.ValueOutput;
  * square of it, like a motor). It stops at the top of the field under it, or at {@link Tuning#DRY_HOLE_Y} if there
  * is nothing there: a dry hole. A strike turns the rig into a pumpjack (oil) or a gas wellhead.
  */
-public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable {
+public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, dev.wildcatter.kinetic.Sounding {
 	private enum Phase {
 		DRILLING, DRY, BLOCKED
 	}
 
-	private int hot;
-	private int neutral;
-	private int resistor;
+	/** Its 480 V three-phase drive motor; it turns only while drilling. */
+	private final dev.wildcatter.circuit.Motor motor = new dev.wildcatter.circuit.Motor(true, Voltage.INDUSTRIAL, Tuning.RIG_WATTS);
+	private final dev.wildcatter.kinetic.RunningSound running = new dev.wildcatter.kinetic.RunningSound();
 	private double volts;
 	private double amps;
 	private int depth;
@@ -54,9 +54,20 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 		return Math.abs(volts) > Tuning.SHOCK_MIN_VOLTS;
 	}
 
+	public dev.wildcatter.circuit.Motor motor() {
+		return motor;
+	}
+
+	/** Sneak and right-click with an empty hand: swap two leads at the motor's terminal box, which reverses its rotation. */
+	public Component swapLeads() {
+		motor.setLeadsSwapped(!motor.leadsSwapped());
+		setChanged();
+		return Component.literal("Swapped leads B and C at the motor: it will now turn " + (motor.leadsSwapped() ? "the other way" : "the way it was wired"));
+	}
+
 	@Override
 	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
-		return voltage == Voltage.LOW && phase == Phase.DRILLING;
+		return voltage == Voltage.INDUSTRIAL && role != Conductor.N && phase == Phase.DRILLING;
 	}
 
 	@Override
@@ -64,15 +75,7 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 		if (phase != Phase.DRILLING) {
 			return;   // a finished rig draws nothing
 		}
-		hot = circuit.node();
-		neutral = circuit.node();
-		double nominal = Voltage.LOW.nominal();
-		resistor = circuit.resistor(hot, neutral, nominal * nominal / Tuning.RIG_WATTS);
-		for (Direction face : Direction.values()) {
-			circuit.port(worldPosition, face, Conductor.A, Voltage.LOW, hot, Tuning.CONTACT_OHMS / 2, false);
-			circuit.port(worldPosition, face, Conductor.B, Voltage.LOW, hot, Tuning.CONTACT_OHMS / 2, false);
-			circuit.port(worldPosition, face, Conductor.N, Voltage.LOW, neutral, Tuning.CONTACT_OHMS / 2, false);
-		}
+		motor.build(circuit, worldPosition);
 	}
 
 	@Override
@@ -82,16 +85,17 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 			amps = 0;
 			return;
 		}
-		volts = Math.abs(circuit.across(hot, neutral));   // leg B runs the other way round, so only the size matters
-		amps = Math.abs(circuit.current(resistor));
+		motor.apply(circuit, ticks, true);
+		volts = motor.volts();
+		amps = motor.amps();
 	}
 
 	private double strength() {
-		double nominal = Voltage.LOW.nominal();
-		return volts < nominal * Tuning.BRIGHT_ABOVE ? 0 : Math.min(1.0, Math.pow(volts / nominal, 2));
+		return motor.output();
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, DrillingRigBlockEntity rig) {
+		rig.running.update(rig, rig.motor.output() > 0);   // the client plays its loop while it runs
 		if (rig.phase != Phase.DRILLING || !(level instanceof ServerLevel server)) {
 			return;
 		}
@@ -101,7 +105,6 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 		}
 		rig.progress += strength;
 		if (level.getGameTime() % 10 == 0) {
-			level.playSound(null, pos, WildcatterSounds.TURBINE_HUM, SoundSource.BLOCKS, 0.6F, 0.6F);
 			server.sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 1, 0.1, 0.0, 0.1, 0.01);
 		}
 		if (rig.progress >= Tuning.DRILL_TICKS_PER_BLOCK) {
@@ -162,13 +165,11 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 	@Override
 	public Component inspect() {
 		String state = switch (phase) {
-			case DRILLING -> volts < 1.0 ? "NO POWER: wire a hot and a neutral to it"
-					: strength() == 0 ? "too little voltage to turn" : "drilling, " + (int) Math.round(strength() * 100) + "% speed";
+			case DRILLING -> strength() == 0 ? motor.describe() : "drilling, " + (int) Math.round(strength() * 100) + "% speed, " + motor.describe();
 			case DRY -> "DRY HOLE: nothing there. Break the rig and drill somewhere else";
 			case BLOCKED -> "STOPPED: hit rock it cannot cut. Break the rig and drill somewhere else";
 		};
-		return Component.literal("Drilling rig (rated " + Math.round(Tuning.RIG_WATTS) + " W at " + Voltage.LOW.label() + "): " + String.format("%.0f V, %.1f A", volts, amps)
-				+ ", " + depth + " blocks down, " + state + "; "
+		return Component.literal("Drilling rig (" + Math.round(Tuning.RIG_WATTS / 1000) + " kW motor, " + Voltage.INDUSTRIAL.label() + " three-phase): " + depth + " blocks down, " + state + "; "
 				+ (level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you"));
 	}
 
@@ -178,13 +179,41 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 		output.putInt("depth", depth);
 		output.putDouble("progress", progress);
 		output.putInt("phase", phase.ordinal());
+		output.putBoolean("leadsSwapped", motor.leadsSwapped());
 	}
 
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		running.load(input);
 		depth = input.getIntOr("depth", 0);
 		progress = input.getDoubleOr("progress", 0);
 		phase = Phase.values()[Math.max(0, Math.min(Phase.values().length - 1, input.getIntOr("phase", 0)))];
+		motor.setLeadsSwapped(input.getBooleanOr("leadsSwapped", false));
+	}
+
+	@Override
+	public net.minecraft.sounds.SoundEvent loop() {
+		return running.on() ? WildcatterSounds.MOTOR_HUM : null;
+	}
+
+	@Override
+	public float soundPitch() {
+		return 0.6F;
+	}
+
+	@Override
+	public float soundVolume() {
+		return running.on() ? 0.7F : 0;
+	}
+
+	@Override
+	public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+		return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+	}
+
+	@Override
+	public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+		return running.tag();
 	}
 }

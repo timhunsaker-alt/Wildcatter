@@ -31,7 +31,7 @@ public class PumpBlock extends BaseEntityBlock {
 
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-		return level.isClientSide() ? null : createTickerHelper(type, WildcatterBlocks.PUMP_ENTITY, PumpBlockEntity::tick);
+		return createTickerHelper(type, WildcatterBlocks.PUMP_ENTITY, level.isClientSide() ? (l, p, st, be) -> dev.wildcatter.kinetic.RunningSound.clientTick(be) : PumpBlockEntity::tick);
 	}
 
 	@Override

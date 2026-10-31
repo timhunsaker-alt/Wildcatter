@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "wildcatter:block/genset_gas_engine"
+    },
+    "facing=east": {
+      "model": "wildcatter:block/genset_gas_engine",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "wildcatter:block/genset_gas_engine",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "wildcatter:block/genset_gas_engine",
+      "y": 270
+    }
+  }
+}

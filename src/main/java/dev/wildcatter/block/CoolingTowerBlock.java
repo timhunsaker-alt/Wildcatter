@@ -19,8 +19,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 /**
- * The fan base of a cooling tower. A 110 V load that joins water pipes; with cooling fill stacked on top and power
- * on the fan, it cools the condensate of every steam turbine on its pipes.
+ * The fan deck of a cooling tower: the top of a column of basin, fill and drift eliminators (docs/multiblocks/cooling-tower.md).
+ * Its fan is a 120 V motor; built and powered, the tower cools the condensate of every steam machine piped to its basin.
  */
 public class CoolingTowerBlock extends BaseEntityBlock {
 	public CoolingTowerBlock(Properties properties) {
@@ -34,7 +34,7 @@ public class CoolingTowerBlock extends BaseEntityBlock {
 
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-		return level.isClientSide() ? null : createTickerHelper(type, WildcatterBlocks.COOLING_TOWER_ENTITY, CoolingTowerBlockEntity::tick);
+		return createTickerHelper(type, WildcatterBlocks.COOLING_TOWER_ENTITY, level.isClientSide() ? CoolingTowerBlockEntity::clientTick : CoolingTowerBlockEntity::tick);
 	}
 
 	@Override

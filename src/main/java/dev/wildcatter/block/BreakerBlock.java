@@ -53,6 +53,21 @@ public class BreakerBlock extends BaseEntityBlock {
 	private final Voltage voltage;
 	private final boolean plainSwitch;
 	private final boolean relay;
+	private final int poles;
+	private final boolean relayOperated;
+
+	/**
+	 * A substation circuit breaker (docs/multiblocks/substation.md): three-pole, with no trip elements of its own; the substation's
+	 * relay panel opens it on a fault and closes it again on a reset.
+	 */
+	public static BreakerBlock relayOperated(Properties properties, Voltage voltage) {
+		return new BreakerBlock(properties, voltage, false, false, 3, true);
+	}
+
+	/** A ganged three-pole breaker: one handle opens phases A, B and C together, as a real one does. */
+	public static BreakerBlock threePole(Properties properties, Voltage voltage) {
+		return new BreakerBlock(properties, voltage, false, false, 3);
+	}
 
 	public BreakerBlock(Properties properties, Voltage voltage) {
 		this(properties, voltage, false);
@@ -65,7 +80,17 @@ public class BreakerBlock extends BaseEntityBlock {
 
 	/** An under-frequency relay opens when the island's frequency falls too far (load shedding) and protects nothing else. */
 	public BreakerBlock(Properties properties, Voltage voltage, boolean plainSwitch, boolean relay) {
+		this(properties, voltage, plainSwitch, relay, 1);
+	}
+
+	private BreakerBlock(Properties properties, Voltage voltage, boolean plainSwitch, boolean relay, int poles) {
+		this(properties, voltage, plainSwitch, relay, poles, false);
+	}
+
+	private BreakerBlock(Properties properties, Voltage voltage, boolean plainSwitch, boolean relay, int poles, boolean relayOperated) {
 		super(properties);
+		this.relayOperated = relayOperated;
+		this.poles = poles;
 		this.relay = relay;
 		this.voltage = voltage;
 		this.plainSwitch = plainSwitch;
@@ -80,8 +105,18 @@ public class BreakerBlock extends BaseEntityBlock {
 		return plainSwitch;
 	}
 
+	/** 1 for a single-pole breaker in one hot wire, 3 for a three-pole breaker in a three-phase run. */
+	public int poles() {
+		return poles;
+	}
+
 	public boolean isRelay() {
 		return relay;
+	}
+
+	/** Opened and closed by a relay panel, not by its own trip elements. */
+	public boolean isRelayOperated() {
+		return relayOperated;
 	}
 
 	@Override

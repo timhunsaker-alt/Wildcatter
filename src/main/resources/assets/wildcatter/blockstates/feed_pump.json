@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "wildcatter:block/feed_pump"
+    },
+    "facing=east": {
+      "model": "wildcatter:block/feed_pump",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "wildcatter:block/feed_pump",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "wildcatter:block/feed_pump",
+      "y": 270
+    }
+  }
+}

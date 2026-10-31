@@ -12,6 +12,9 @@
   ],
   "result": {
     "id": "wildcatter:hv_wire_neutral",
-    "count": 4
+    "count": 4,
+    "components": {
+      "wildcatter:conductor_size": "acsr_sparrow"
+    }
   }
 }

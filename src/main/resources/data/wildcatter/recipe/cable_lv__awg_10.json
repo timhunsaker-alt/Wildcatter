@@ -1,0 +1,34 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PHP",
+    "HNH",
+    "PGP"
+  ],
+  "key": {
+    "P": "wildcatter:plastic_sheet",
+    "H": {
+      "fabric:type": "fabric:components",
+      "base": "wildcatter:wire_hot",
+      "components": {
+        "wildcatter:conductor_size": "awg_10"
+      }
+    },
+    "N": {
+      "fabric:type": "fabric:components",
+      "base": "wildcatter:wire_neutral",
+      "components": {
+        "wildcatter:conductor_size": "awg_10"
+      }
+    },
+    "G": "wildcatter:ground_wire"
+  },
+  "result": {
+    "id": "wildcatter:cable_lv",
+    "count": 4,
+    "components": {
+      "wildcatter:conductor_size": "awg_10"
+    }
+  }
+}

@@ -24,16 +24,15 @@ import net.minecraft.world.phys.BlockHitResult;
 public class SteamTurbineBlock extends BaseEntityBlock {
 	public static final BooleanProperty RUNNING = BooleanProperty.create("running");
 	/** Part of a medium voltage generator (a 3x3x3 cube of turbines). */
-	public static final BooleanProperty FORMED = BooleanProperty.create("formed");
 
 	public SteamTurbineBlock(Properties properties) {
 		super(properties);
-		registerDefaultState(stateDefinition.any().setValue(RUNNING, false).setValue(FORMED, false));
+		registerDefaultState(stateDefinition.any().setValue(RUNNING, false));
 	}
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(RUNNING, FORMED);
+		builder.add(RUNNING);
 	}
 
 	@Override
@@ -43,7 +42,7 @@ public class SteamTurbineBlock extends BaseEntityBlock {
 
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-		return level.isClientSide() ? null : createTickerHelper(type, WildcatterBlocks.STEAM_TURBINE_ENTITY, SteamTurbineBlockEntity::tick);
+		return createTickerHelper(type, WildcatterBlocks.STEAM_TURBINE_ENTITY, level.isClientSide() ? (l, p, st, be) -> dev.wildcatter.kinetic.RunningSound.clientTick(be) : SteamTurbineBlockEntity::tick);
 	}
 
 	@Override

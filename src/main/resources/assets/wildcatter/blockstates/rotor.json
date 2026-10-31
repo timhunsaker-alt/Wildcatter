@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "part=radiator_fan": {
+      "model": "wildcatter:block/rotor_radiator_fan"
+    },
+    "part=crank_pulley": {
+      "model": "wildcatter:block/rotor_crank_pulley"
+    },
+    "part=coupling": {
+      "model": "wildcatter:block/rotor_coupling"
+    },
+    "part=tower_fan": {
+      "model": "wildcatter:block/rotor_tower_fan"
+    },
+    "part=disconnect_blade": {
+      "model": "wildcatter:block/rotor_disconnect_blade"
+    }
+  }
+}

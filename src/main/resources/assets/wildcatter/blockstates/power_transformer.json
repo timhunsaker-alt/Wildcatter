@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "wildcatter:block/power_transformer"
+    },
+    "facing=east": {
+      "model": "wildcatter:block/power_transformer",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "wildcatter:block/power_transformer",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "wildcatter:block/power_transformer",
+      "y": 270
+    }
+  }
+}

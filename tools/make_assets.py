@@ -287,9 +287,10 @@ for key, band in CONDUCTOR_COLORS.items():
 	tex(f"mv_wire_{key}", bare(ALUMINIUM, band))
 	tex(f"dist_wire_{key}", bare((178, 164, 150), band))
 	tex(f"hv_wire_{key}", bare(STEEL_WIRE, band))
+	tex(f"industrial_wire_{key}", bare((196, 120, 80), band))
 	for wear in range(4):
 		tex(f"wool_wire_{key}_{wear}", wool(band if key != "n" else (45, 45, 50), wear))
-	for prefix, tint in (("", (235, 235, 240)), ("mv_", (225, 230, 245)), ("dist_", (225, 240, 230)), ("hv_", (215, 225, 250))):
+	for prefix, tint in (("", (235, 235, 240)), ("mv_", (225, 230, 245)), ("dist_", (225, 240, 230)), ("hv_", (215, 225, 250)), ("industrial_", (240, 225, 205))):
 		tex(f"{prefix}plastic_wire_{key}", plastic_sheath(tint if key != "n" else (60, 60, 66), band))
 tex("ground_wire", bare((40, 150, 70), (240, 220, 60)))
 tex("ground_rod", bare((205, 125, 80), (140, 80, 50)))
@@ -316,7 +317,8 @@ tex("field_manual", manual, "item")
 # Real art: the Ludo textures (made by tools/process_art.py) replace the placeholders of the same name.
 if os.path.isdir("art/final"):
 	for f in os.listdir("art/final"):
-		kind = "item" if f in ("power_meter.png", "field_manual.png", "seismograph.png", "crude_oil_bucket.png", "plastic_sheet.png", "diesel_bucket.png", "steel_ingot.png") else "block"
+		kind = "item" if f in ("power_meter.png", "field_manual.png", "seismograph.png", "crude_oil_bucket.png", "plastic_sheet.png", "diesel_bucket.png", "steel_ingot.png",
+		"engine_block_casting.png", "piston.png", "crankshaft.png", "cylinder_head.png", "fuel_injector.png", "spark_plug.png", "stator_winding.png", "rotor_field.png", "exciter.png") else "block"
 		shutil.copy(f"art/final/{f}", f"{ASSETS}/textures/{kind}/{f}")
 
 # ---- models -------------------------------------------------------------------------------------------
@@ -346,11 +348,6 @@ save_json(f"{ASSETS}/blockstates/pump.json", {"variants": {"": {"model": f"{ns}:
 for cube in ("drilling_rig", "pumpjack", "gas_wellhead", "casing", "refinery", "refinery_column", "cooling_tower", "cooling_fill"):
 	block_model(cube, "minecraft:block/cube_all", {"all": f"{ns}:block/{cube}"})
 	save_json(f"{ASSETS}/blockstates/{cube}.json", {"variants": {"": {"model": f"{ns}:block/{cube}"}}})
-for engine in ("diesel_engine", "gas_turbine"):
-	block_model(engine, "minecraft:block/cube_all", {"all": f"{ns}:block/{engine}"})
-	block_model(f"{engine}_running", "minecraft:block/cube_all", {"all": f"{ns}:block/{engine}_running"})
-	save_json(f"{ASSETS}/blockstates/{engine}.json", {"variants": {
-		"lit=false": {"model": f"{ns}:block/{engine}"}, "lit=true": {"model": f"{ns}:block/{engine}_running"}}})
 for load in ("electric_lamp", "electric_heater"):
 	block_model(load, "minecraft:block/cube_all", {"all": f"{ns}:block/{load}"})
 	block_model(f"{load}_lit", "minecraft:block/cube_all", {"all": f"{ns}:block/{load}_lit"})
@@ -358,13 +355,11 @@ for load in ("electric_lamp", "electric_heater"):
 		"lit=false": {"model": f"{ns}:block/{load}"}, "lit=true": {"model": f"{ns}:block/{load}_lit"}}})
 
 save_json(f"{ASSETS}/blockstates/boiler.json", {"variants": {
-	f"lit={lit},formed={formed}": {"model": f"{ns}:block/boiler{'_formed' if formed == 'true' else ''}{'_lit' if lit == 'true' else ''}"}
-	for lit in ("false", "true") for formed in ("false", "true")}})
+	f"lit={lit}": {"model": f"{ns}:block/boiler{'_lit' if lit == 'true' else ''}"} for lit in ("false", "true")}})
 save_json(f"{ASSETS}/blockstates/steam_turbine.json", {"variants": {
-	f"running={running},formed={formed}": {"model": f"{ns}:block/steam_turbine{'_formed' if formed == 'true' else ''}{'_running' if running == 'true' else ''}"}
-	for running in ("false", "true") for formed in ("false", "true")}})
+	f"running={running}": {"model": f"{ns}:block/steam_turbine{'_running' if running == 'true' else ''}"} for running in ("false", "true")}})
 
-for tname, t in (("transformer", "transformer"), ("substation_transformer", "substation"), ("distribution_transformer", "distribution"), ("pole_transformer", "pole_tx")):
+for tname, t in (("transformer", "transformer"), ("substation_transformer", "substation"), ("pole_transformer", "pole_tx")):
 	save_json(f"{ASSETS}/models/block/{tname}.json", {"parent": "minecraft:block/orientable", "textures": {
 		"front": f"{ns}:block/{t}_front", "side": f"{ns}:block/{t}_side", "top": f"{ns}:block/{t}_top", "bottom": f"{ns}:block/{t}_top"}})
 	save_json(f"{ASSETS}/blockstates/{tname}.json", {"variants": {
@@ -472,9 +467,11 @@ for tier, metal in (("lv", COPPER), ("dist", (178, 164, 150)), ("hv", STEEL_WIRE
 	tex(f"covered_conductor_spool_{tier}", spool_icon(metal, True), kind="item")
 
 # ---- receptacles and plug adapters ----------------------------------------------------------------------------
-PLUG_COLORS = {"nema_5_15": (238, 238, 232), "nema_5_20": (200, 60, 50), "nema_14_50": (46, 46, 52), "cee_7": (246, 246, 246), "iec_60309_blue": (40, 92, 204)}
+PLUG_COLORS = {"nema_5_15": (238, 238, 232), "nema_5_20": (200, 60, 50), "nema_14_50": (46, 46, 52), "cee_7": (246, 246, 246), "iec_60309_blue": (40, 92, 204), "nema_l21_30": (60, 60, 66), "nema_l22_30": (180, 120, 40), "iec_60309_red_32": (196, 40, 36), "iec_60309_red_63": (150, 26, 24)}
 PLUG_LABELS = {"nema_5_15": "NEMA 5-15 (120 V, 15 A)", "nema_5_20": "NEMA 5-20 (120 V, 20 A)", "nema_14_50": "NEMA 14-50 (120/240 V, 50 A)",
-	"cee_7": "CEE 7 Schuko (230 V, 16 A)", "iec_60309_blue": "IEC 60309 blue (230 V, 32 A)"}
+	"cee_7": "CEE 7 Schuko (230 V, 16 A)", "iec_60309_blue": "IEC 60309 blue (230 V, 32 A)",
+	"nema_l21_30": "NEMA L21-30 (208Y/120 V 3-phase, 30 A)", "nema_l22_30": "NEMA L22-30 (480Y/277 V 3-phase, 30 A)",
+	"iec_60309_red_32": "IEC 60309 red (400 V 3-phase, 32 A)", "iec_60309_red_63": "IEC 60309 red (400 V 3-phase, 63 A)"}
 
 
 def socket_face(color):
@@ -523,8 +520,8 @@ def wire_models(model_name, texture):
 		"elements": [cuboid([0, 7, 7], [16, 9, 9]), cuboid([7, 7, 0], [9, 9, 16])]})
 
 
-BARE_WIRES = ("wire_hot", "wire_neutral", "mv_wire_hot", "mv_wire_neutral", "dist_wire_hot", "dist_wire_neutral", "hv_wire_hot", "hv_wire_neutral", "ground_wire")
-PLASTIC_WIRES = ("plastic_wire_hot", "plastic_wire_neutral", "mv_plastic_wire_hot", "mv_plastic_wire_neutral", "dist_plastic_wire_hot", "dist_plastic_wire_neutral", "hv_plastic_wire_hot", "hv_plastic_wire_neutral")
+BARE_WIRES = ("wire_hot", "wire_neutral", "mv_wire_hot", "mv_wire_neutral", "dist_wire_hot", "dist_wire_neutral", "hv_wire_hot", "hv_wire_neutral", "industrial_wire_hot", "industrial_wire_neutral", "ground_wire")
+PLASTIC_WIRES = ("plastic_wire_hot", "plastic_wire_neutral", "mv_plastic_wire_hot", "mv_plastic_wire_neutral", "dist_plastic_wire_hot", "dist_plastic_wire_neutral", "hv_plastic_wire_hot", "hv_plastic_wire_neutral", "industrial_plastic_wire_hot", "industrial_plastic_wire_neutral")
 WOOL_WIRES = ("wool_wire_hot", "wool_wire_neutral")
 
 # The ground wire (the bonding wire for machines) is a plain single piece.
@@ -581,9 +578,9 @@ save_json(f"{ASSETS}/blockstates/gas_line.json", {"multipart": [{"apply": {"mode
 # ---- items --------------------------------------------------------------------------------------------
 WIRES = BARE_WIRES + WOOL_WIRES + PLASTIC_WIRES
 ITEM_MODELS = {"firebox": "block/firebox", "pump": "block/pump", "pipe": "block/pipe_inventory", "gas_line": "block/gas_line_inventory", "drilling_rig": "block/drilling_rig", "refinery": "block/refinery", "refinery_column": "block/refinery_column", "cooling_tower": "block/cooling_tower", "cooling_fill": "block/cooling_fill",
-	"diesel_engine": "block/diesel_engine", "gas_turbine": "block/gas_turbine", "pumpjack": "block/pumpjack",
+	"pumpjack": "block/pumpjack",
 	"gas_wellhead": "block/gas_wellhead", "casing": "block/casing", "boiler": "block/boiler", "steam_turbine": "block/steam_turbine", "electric_lamp": "block/electric_lamp",
-	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "fuse": "block/fuse_good", "fused_cutout": "block/cutout_good", "dist_breaker": "block/dist_breaker_on", "distribution_transformer": "block/distribution_transformer", "pole_transformer": "block/pole_transformer", "switch": "block/switch_on", "ufls_relay": "block/relay_on", "ufls_relay_dist": "block/relay_on", "mv_breaker": "block/mv_breaker_on", "hv_breaker": "block/hv_breaker_on", "pole": "block/pole", "crossarm": "block/crossarm_x", "transformer": "block/transformer",
+	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "fuse": "block/fuse_good", "fused_cutout": "block/cutout_good", "dist_breaker": "block/dist_breaker_on", "pole_transformer": "block/pole_transformer", "switch": "block/switch_on", "ufls_relay": "block/relay_on", "ufls_relay_dist": "block/relay_on", "mv_breaker": "block/mv_breaker_on", "hv_breaker": "block/hv_breaker_on", "pole": "block/pole", "crossarm": "block/crossarm_x", "transformer": "block/transformer",
 	"substation_transformer": "block/substation_transformer", "ground_rod": "block/ground_rod",
 	"power_meter": "item/power_meter", "field_manual": "item/field_manual", "seismograph": "item/seismograph", "crude_oil_bucket": "item/crude_oil_bucket", "plastic_sheet": "item/plastic_sheet", "diesel_bucket": "item/diesel_bucket", "steel_ingot": "item/steel_ingot", "conductor_spool_lv": "item/conductor_spool_lv", "conductor_spool_dist": "item/conductor_spool_dist", "conductor_spool_hv": "item/conductor_spool_hv", "covered_conductor_spool_lv": "item/covered_conductor_spool_lv", "covered_conductor_spool_dist": "item/covered_conductor_spool_dist", "covered_conductor_spool_hv": "item/covered_conductor_spool_hv", "insulator_lv": "block/insulator_lv_a", **{f"receptacle_{p}": f"block/receptacle_{p}" for p in PLUG_COLORS}, **{f"plug_{p}": f"block/plug_{p}" for p in PLUG_COLORS}, "insulator_dist": "block/insulator_dist_a", "insulator_hv": "block/insulator_hv_a"}
 ITEM_MODELS.update({w: f"block/{w}_inventory" for w in WIRES})
@@ -603,10 +600,8 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 	"block.wildcatter.casing": "Well Casing",
 	"block.wildcatter.refinery": "Refinery Base (LV)",
 	"block.wildcatter.refinery_column": "Distillation Column",
-	"block.wildcatter.cooling_tower": "Cooling Tower Fan (LV)",
+	"block.wildcatter.cooling_tower": "Cooling Tower Fan Deck (LV)",
 	"block.wildcatter.cooling_fill": "Cooling Tower Fill",
-	"block.wildcatter.diesel_engine": "Diesel Engine (LV)",
-	"block.wildcatter.gas_turbine": "Gas Turbine (LV)",
 	"block.wildcatter.plastic_wire_hot": "Plastic Wire, red (LV)",
 	"block.wildcatter.plastic_wire_neutral": "Plastic Wire, black (LV)",
 	"block.wildcatter.mv_plastic_wire_hot": "Plastic Line, red (MV)",
@@ -638,7 +633,6 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 	"block.wildcatter.dist_wire_neutral": "Bare Line, black (DIST)",
 	"block.wildcatter.dist_plastic_wire_hot": "Plastic Line, red (DIST)",
 	"block.wildcatter.dist_plastic_wire_neutral": "Plastic Line, black (DIST)",
-	"block.wildcatter.distribution_transformer": "Distribution Transformer (HV / DIST)",
 	"block.wildcatter.pole_transformer": "Pole-Mount Transformer (DIST / LV, 25 kVA)",
 	"block.wildcatter.hv_breaker": "Circuit Breaker (HV)",
 	"block.wildcatter.insulator_lv": "Insulator (LV, 1 kV)",
@@ -674,7 +668,7 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 })
 
 # ---- loot: every block drops itself ---------------------------------------------------------------
-BLOCKS = ("refinery", "refinery_column", "cooling_tower", "cooling_fill", "diesel_engine", "gas_turbine", "boiler", "firebox", "pipe", "gas_line", "drilling_rig", "pumpjack", "gas_wellhead", "pump", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "electric_heater", "breaker", "fuse", "fused_cutout", "switch", "ufls_relay", "ufls_relay_dist", "mv_breaker", "dist_breaker", "distribution_transformer", "pole_transformer", "hv_breaker", "pole", "crossarm", "insulator_lv", "insulator_dist", "insulator_hv", "ground_rod") + tuple(f"receptacle_{p}" for p in PLUG_COLORS) + tuple(f"plug_{p}" for p in PLUG_COLORS) + WIRES
+BLOCKS = ("refinery", "refinery_column", "cooling_tower", "cooling_fill", "boiler", "firebox", "pipe", "gas_line", "drilling_rig", "pumpjack", "gas_wellhead", "pump", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "electric_heater", "breaker", "fuse", "fused_cutout", "switch", "ufls_relay", "ufls_relay_dist", "mv_breaker", "dist_breaker", "pole_transformer", "hv_breaker", "pole", "crossarm", "insulator_lv", "insulator_dist", "insulator_hv", "ground_rod") + tuple(f"receptacle_{p}" for p in PLUG_COLORS) + tuple(f"plug_{p}" for p in PLUG_COLORS) + WIRES
 for name in BLOCKS:
 	save_json(f"{DATA}/loot_table/blocks/{name}.json", {
 		"type": "minecraft:block",
@@ -684,7 +678,7 @@ for name in BLOCKS:
 save_json(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json", {"values": [f"{ns}:{n}" for n in BLOCKS + ("casing",) if n not in ("pole", "crossarm")]})
 save_json(f"{ROOT}/data/minecraft/tags/block/mineable/axe.json", {"values": [f"{ns}:pole", f"{ns}:crossarm"]})
 save_json(f"{ROOT}/data/minecraft/tags/block/climbable.json", {"values": [f"{ns}:pole"]})
-save_json(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json", {"values": [f"{ns}:{n}" for n in ("boiler", "firebox", "mv_breaker", "dist_breaker", "distribution_transformer", "pole_transformer", "hv_breaker", "pump", "drilling_rig", "pumpjack", "gas_wellhead", "refinery", "refinery_column", "cooling_tower", "cooling_fill", "diesel_engine", "gas_turbine", "steam_turbine", "transformer", "substation_transformer")]})
+save_json(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json", {"values": [f"{ns}:{n}" for n in ("boiler", "firebox", "mv_breaker", "dist_breaker", "pole_transformer", "hv_breaker", "pump", "drilling_rig", "pumpjack", "gas_wellhead", "refinery", "refinery_column", "cooling_tower", "cooling_fill", "steam_turbine", "transformer", "substation_transformer")]})
 
 # ---- recipes (early game: iron, copper, redstone, glass, dye, wool) ----------------------------------------
 def shaped(name, pattern, key, result, count=1):
@@ -712,8 +706,6 @@ shaped("refinery", ["IPI", "CBC", "III"], {"I": "minecraft:iron_ingot", "P": "mi
 shaped("cooling_tower", ["IBI", "CFC", "III"], {"I": "minecraft:iron_ingot", "B": "minecraft:iron_bars", "C": "minecraft:copper_ingot", "F": "minecraft:blast_furnace"}, "cooling_tower")
 shaped("cooling_fill", ["IBI", "IBI", "IBI"], {"I": "minecraft:iron_ingot", "B": "minecraft:iron_bars"}, "cooling_fill", 2)
 shaped("refinery_column", ["ICI", "ICI", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot"}, "refinery_column")
-shaped("diesel_engine", ["IPI", "CFC", "IRI"], {"I": "minecraft:iron_ingot", "P": "minecraft:piston", "C": "minecraft:copper_ingot", "F": "minecraft:furnace", "R": "minecraft:redstone"}, "diesel_engine")
-shaped("gas_turbine", ["IDI", "CRC", "IDI"], {"I": "minecraft:iron_ingot", "D": "minecraft:diamond", "C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, "gas_turbine")
 shaped("steam_turbine", ["ICI", "CRC", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, "steam_turbine")
 # Wire is coloured with dye so you can tell the two conductors apart: red is hot, black is neutral.
 for role, dye in (("hot", "minecraft:red_dye"), ("neutral", "minecraft:black_dye")):
@@ -739,14 +731,13 @@ for tier, wire, sheets in (("lv", "wire_hot", 1), ("dist", "dist_wire_hot", 2), 
 shaped("insulator_lv", ["B", "N"], {"B": "minecraft:brick", "N": "minecraft:iron_nugget"}, "insulator_lv", 2)
 shaped("insulator_dist", ["B", "B", "N"], {"B": "minecraft:brick", "N": "minecraft:iron_nugget"}, "insulator_dist", 2)
 shaped("insulator_hv", ["BBB", "BNB", "BIB"], {"B": "minecraft:brick", "N": "minecraft:iron_nugget", "I": "minecraft:iron_ingot"}, "insulator_hv", 2)
-for pid, dye, copper in (("nema_5_15", "minecraft:white_dye", 1), ("nema_5_20", "minecraft:red_dye", 1), ("nema_14_50", "minecraft:black_dye", 2), ("cee_7", "minecraft:yellow_dye", 1), ("iec_60309_blue", "minecraft:blue_dye", 2)):
+for pid, dye, copper in (("nema_5_15", "minecraft:white_dye", 1), ("nema_5_20", "minecraft:red_dye", 1), ("nema_14_50", "minecraft:black_dye", 2), ("cee_7", "minecraft:yellow_dye", 1), ("iec_60309_blue", "minecraft:blue_dye", 2), ("nema_l21_30", "minecraft:gray_dye", 3), ("nema_l22_30", "minecraft:orange_dye", 3), ("iec_60309_red_32", "minecraft:red_dye", 3), ("iec_60309_red_63", "minecraft:red_dye", 4)):
 	shapeless(f"receptacle_{pid}", ["minecraft:iron_ingot"] + ["minecraft:copper_ingot"] * copper + [dye], f"receptacle_{pid}", 2)
 	shapeless(f"plug_{pid}", [f"{ns}:receptacle_{pid}", "minecraft:redstone", "minecraft:iron_ingot"], f"plug_{pid}")
 shaped("pole", ["L", "L", "L"], {"L": "#minecraft:logs"}, "pole", 3)
 shaped("crossarm", ["PPP", " N "], {"P": "#minecraft:planks", "N": "minecraft:iron_nugget"}, "crossarm", 2)
 shaped("transformer", ["ICI", "ICI", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot"}, "transformer")
 shaped("pole_transformer", ["ICI", "CTC", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "T": f"{ns}:transformer"}, "pole_transformer")
-shaped("distribution_transformer", ["IDI", "SCS", "IDI"], {"I": "minecraft:iron_ingot", "D": "minecraft:diamond", "S": f"{ns}:substation_transformer", "C": "minecraft:copper_block"}, "distribution_transformer")
 shaped("substation_transformer", ["IDI", "TCT", "IDI"], {"I": "minecraft:iron_ingot", "D": "minecraft:diamond", "T": "wildcatter:transformer", "C": "minecraft:copper_block"}, "substation_transformer")
 shaped("electric_lamp", [" G ", "GRG", " C "], {"G": "minecraft:glass_pane", "R": "minecraft:redstone", "C": "minecraft:copper_ingot"}, "electric_lamp")
 shaped("electric_heater", ["III", "CRC", "III"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, "electric_heater")
@@ -758,4 +749,586 @@ for role, dye in (("hot", "minecraft:red_dye"), ("neutral", "minecraft:black_dye
 	shapeless(f"hv_plastic_wire_{role}", [f"{ns}:hv_wire_{role}"] * 4 + [f"{ns}:plastic_sheet"] * 3, f"hv_plastic_wire_{role}", 4)
 shapeless("field_manual", ["minecraft:book", "minecraft:copper_ingot"], "field_manual")
 shaped("power_meter", [" C ", "IRI", " I "], {"C": "minecraft:copper_ingot", "I": "minecraft:iron_ingot", "R": "minecraft:redstone"}, "power_meter")
+
+# ---- Phase 3: industrial tier, three-phase cable, three-pole breakers, pad-mounts, three-phase heater -------------
+# Drawn by script as placeholders; the Ludo art in art/final (tools/process_art.py) takes over a texture when it exists.
+def art(name):
+	return name if os.path.exists(f"art/final/{name}.png") else f"{name}_placeholder"
+
+
+def cable_sheath(sheath):
+	def draw(img, d):
+		noise(img, sheath, 5)
+		for i, key in enumerate(("a", "b", "c", "n", "g")):
+			d.line([0, 3 + 2 * i, 15, 3 + 2 * i], fill=CONDUCTOR_COLORS[key] if key != "n" else (235, 235, 235))
+	return draw
+
+
+CABLES = {"cable_lv": (40, 40, 44), "cable_industrial": (70, 52, 40), "cable_dist": (30, 50, 40), "cable_hv": (24, 24, 30)}
+for cable, sheath in CABLES.items():
+	tex(f"{cable}_placeholder", cable_sheath(sheath))
+	t = {"cable": f"{ns}:block/{art(cable)}", "particle": f"{ns}:block/{art(cable)}"}
+	save_json(f"{ASSETS}/models/block/{cable}_core.json", {"textures": t, "elements": [cuboid([6, 6, 6], [10, 10, 10])]})
+	save_json(f"{ASSETS}/models/block/{cable}_arm.json", {"textures": t, "elements": [cuboid([6, 6, 0], [10, 10, 6])]})
+	save_json(f"{ASSETS}/models/block/{cable}_inventory.json", {"parent": "minecraft:block/block",
+		"display": {"gui": {"rotation": [30, 225, 0], "scale": [1.1, 1.1, 1.1]}, "ground": {"scale": [0.8, 0.8, 0.8]},
+			"firstperson_righthand": {"rotation": [0, 45, 0], "scale": [0.8, 0.8, 0.8]}, "thirdperson_righthand": {"scale": [0.8, 0.8, 0.8]}},
+		"textures": t, "elements": [cuboid([0, 6, 6], [16, 10, 10]), cuboid([6, 6, 0], [10, 10, 16])]})
+	save_json(f"{ASSETS}/blockstates/{cable}.json", {"multipart": [{"apply": {"model": f"{ns}:block/{cable}_core"}}] + [
+		{"when": {side: "true"}, "apply": {"model": f"{ns}:block/{cable}_arm", **rot}} for side, rot in arms.items()]})
+	ITEM_MODELS[cable] = f"block/{cable}_inventory"
+
+# three-pole breakers: a wide body with three levers tied by a handle bar
+tex("breaker_3p_lv_body_placeholder", tinted_breaker((150, 150, 158)))
+tex("breaker_3p_industrial_body_placeholder", tinted_breaker((210, 130, 50)))
+for name in ("breaker_3p_lv", "breaker_3p_industrial"):
+	for position, angle in (("on", -30), ("off", 30), ("tripped", 0)):
+		els = [cuboid([1, 0, 3], [15, 11, 13], "#body")]
+		for x in (3, 7, 11):
+			lever_el = cuboid([x, 11, 7], [x + 2, 16, 9], "#lever")
+			lever_el["rotation"] = {"origin": [8, 11, 8], "axis": "x", "angle": angle}
+			els.append(lever_el)
+		bar = cuboid([3, 14, 7], [13, 15, 9], "#lever")
+		bar["rotation"] = {"origin": [8, 11, 8], "axis": "x", "angle": angle}
+		els.append(bar)
+		save_json(f"{ASSETS}/models/block/{name}_{position}.json", {
+			"textures": {"body": f"{ns}:block/{art(name + '_body')}", "lever": f"{ns}:block/breaker_lever_{position}", "particle": f"{ns}:block/{art(name + '_body')}"},
+			"elements": els})
+	save_json(f"{ASSETS}/blockstates/{name}.json", {"variants": {
+		f"facing={facing},position={position}": {"model": f"{ns}:block/{name}_{position}", "y": y}
+		for facing, y in rotations.items() for position in ("on", "off", "tripped")}})
+	ITEM_MODELS[name] = f"block/{name}_on"
+
+# pad-mounts and the unit substation: orientable cabinets
+for tname, t in (("padmount_208", ((70, 110, 80), (210, 230, 210))), ("padmount_480", ((60, 100, 70), (230, 215, 160))), ("unit_substation", ((120, 124, 130), (220, 220, 210)))):
+	tex(f"{tname}_front_placeholder", transformer_front(*t))
+	tex(f"{tname}_side_placeholder", transformer_side(t[0]))
+	tex(f"{tname}_top_placeholder", transformer_top(t[0]))
+	save_json(f"{ASSETS}/models/block/{tname}.json", {"parent": "minecraft:block/orientable", "textures": {
+		"front": f"{ns}:block/{art(tname + '_front')}", "side": f"{ns}:block/{art(tname + '_side')}", "top": f"{ns}:block/{art(tname + '_top')}", "bottom": f"{ns}:block/{art(tname + '_top')}"}})
+	save_json(f"{ASSETS}/blockstates/{tname}.json", {"variants": {
+		"facing=north": {"model": f"{ns}:block/{tname}"}, "facing=east": {"model": f"{ns}:block/{tname}", "y": 90},
+		"facing=south": {"model": f"{ns}:block/{tname}", "y": 180}, "facing=west": {"model": f"{ns}:block/{tname}", "y": 270}}})
+	ITEM_MODELS[tname] = f"block/{tname}"
+
+# the three-phase heater
+tex("three_phase_heater_placeholder", heater(False))
+tex("three_phase_heater_lit_placeholder", heater(True))
+block_model("three_phase_heater", "minecraft:block/cube_all", {"all": f"{ns}:block/{art('three_phase_heater')}"})
+block_model("three_phase_heater_lit", "minecraft:block/cube_all", {"all": f"{ns}:block/{art('three_phase_heater_lit')}"})
+save_json(f"{ASSETS}/blockstates/three_phase_heater.json", {"variants": {
+	"lit=false": {"model": f"{ns}:block/three_phase_heater"}, "lit=true": {"model": f"{ns}:block/three_phase_heater_lit"}}})
+ITEM_MODELS["three_phase_heater"] = "block/three_phase_heater"
+
+# motor starters and the motor control center: steel cabinets; the front shows a green (running), grey (stopped) or red (tripped) lamp
+def cabinet_front(lamp, handle=False):
+	def draw(img, d):
+		noise(img, (128, 134, 140), 5)
+		d.rectangle([1, 1, 14, 14], outline=(80, 84, 90))
+		d.rectangle([3, 3, 12, 7], fill=(60, 64, 70))
+		d.rectangle([5, 9, 7, 11], fill=lamp)
+		d.rectangle([9, 9, 11, 11], fill=(40, 40, 44) if not handle else (200, 160, 40))
+	return draw
+
+
+def cabinet_side(img, d):
+	noise(img, (118, 124, 130), 5)
+	d.line([0, 0, 15, 0], fill=(90, 94, 100))
+	d.line([0, 15, 15, 15], fill=(90, 94, 100))
+
+
+tex("cabinet_side_placeholder", cabinet_side)
+LAMPS = {"running": (60, 200, 90), "stopped": (110, 110, 116), "tripped": (220, 50, 40), "on": (60, 200, 90), "off": (110, 110, 116)}
+for name in ("motor_starter", "mcc_bucket", "mcc_incoming"):
+	states = ("on", "off", "tripped") if name == "mcc_incoming" else ("running", "stopped", "tripped")
+	prop = "position" if name == "mcc_incoming" else "run"
+	for st in states:
+		tex(f"{name}_front_{st}_placeholder", cabinet_front(LAMPS[st], name == "mcc_incoming"))
+		save_json(f"{ASSETS}/models/block/{name}_{st}.json", {"parent": "minecraft:block/orientable", "textures": {
+			"front": f"{ns}:block/{art(f'{name}_front_{st}')}", "side": f"{ns}:block/{art('cabinet_side')}", "top": f"{ns}:block/{art('cabinet_side')}", "bottom": f"{ns}:block/{art('cabinet_side')}"}})
+	save_json(f"{ASSETS}/blockstates/{name}.json", {"variants": {
+		f"facing={facing},{prop}={st}": {"model": f"{ns}:block/{name}_{st}", "y": y} for facing, y in rotations.items() for st in states}})
+	ITEM_MODELS[name] = f"block/{name}_{states[1]}"
+
+PHASE3_BLOCKS = ("motor_starter", "mcc_bucket", "mcc_incoming") + tuple(CABLES) + ("breaker_3p_lv", "breaker_3p_industrial", "padmount_208", "padmount_480", "unit_substation", "three_phase_heater")
+for name in PHASE3_BLOCKS:
+	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:{ITEM_MODELS[name]}"}})
+	save_json(f"{DATA}/loot_table/blocks/{name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],
+		"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+pick = json.load(open(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json"))
+pick["values"] += [f"{ns}:{n}" for n in PHASE3_BLOCKS]
+save_json(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json", pick)
+stone = json.load(open(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json"))
+stone["values"] += [f"{ns}:{n}" for n in ("breaker_3p_industrial", "padmount_208", "padmount_480", "unit_substation", "motor_starter", "mcc_incoming", "mcc_bucket")]
+save_json(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json", stone)
+
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({
+	"block.wildcatter.industrial_wire_hot": "Bare Wire, red (480 V)",
+	"block.wildcatter.industrial_wire_neutral": "Bare Wire, black (480 V)",
+	"block.wildcatter.industrial_plastic_wire_hot": "Plastic Wire, red (480 V)",
+	"block.wildcatter.industrial_plastic_wire_neutral": "Plastic Wire, black (480 V)",
+	"block.wildcatter.cable_lv": "Three-Phase Cable (LV, A B C N G)",
+	"block.wildcatter.cable_industrial": "Three-Phase Cable (480 V, A B C N G)",
+	"block.wildcatter.cable_dist": "Underground Primary Cable (DIST, A B C N G)",
+	"block.wildcatter.cable_hv": "High-Voltage Cable (HV, A B C N G)",
+	"block.wildcatter.breaker_3p_lv": "Three-Pole Breaker (LV)",
+	"block.wildcatter.breaker_3p_industrial": "Three-Pole Breaker (480 V)",
+	"block.wildcatter.padmount_208": "Pad-Mount Transformer (DIST / 208Y/120 V, 75 kVA)",
+	"block.wildcatter.padmount_480": "Pad-Mount Transformer (DIST / 480Y/277 V, 300 kVA)",
+	"block.wildcatter.unit_substation": "Unit Substation (MV / 480Y/277 V, 1000 kVA)",
+	"block.wildcatter.three_phase_heater": "Three-Phase Heater (480 V, 15 kW)",
+	"block.wildcatter.motor_starter": "Combination Motor Starter (480 V)",
+	"block.wildcatter.mcc_incoming": "MCC Incoming Section (480 V)",
+	"block.wildcatter.mcc_bucket": "MCC Starter Bucket (480 V)",
+})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+# recipes: industrial copper is heavier; cable is three phase wires, a neutral and a ground in plastic
+for role, dye in (("hot", "minecraft:red_dye"), ("neutral", "minecraft:black_dye")):
+	shapeless(f"industrial_wire_{role}", ["minecraft:copper_ingot"] * 4 + ["minecraft:iron_ingot", dye], f"industrial_wire_{role}", 4)
+	shapeless(f"industrial_plastic_wire_{role}", [f"{ns}:industrial_wire_{role}"] * 4 + [f"{ns}:plastic_sheet"], f"industrial_plastic_wire_{role}", 4)
+for cable, (wire_hot, wire_neutral) in {"cable_lv": ("wire_hot", "wire_neutral"), "cable_industrial": ("industrial_wire_hot", "industrial_wire_neutral"), "cable_dist": ("dist_wire_hot", "dist_wire_neutral"), "cable_hv": ("hv_wire_hot", "hv_wire_neutral")}.items():
+	shaped(cable, ["PHP", "HNH", "PGP"], {"P": f"{ns}:plastic_sheet", "H": f"{ns}:{wire_hot}", "N": f"{ns}:{wire_neutral}", "G": f"{ns}:ground_wire"}, cable, 4)
+shaped("breaker_3p_lv", ["BBB", "IRI"], {"B": f"{ns}:breaker", "I": "minecraft:iron_ingot", "R": "minecraft:redstone"}, "breaker_3p_lv")
+shaped("breaker_3p_industrial", ["BBB", "SRS"], {"B": f"{ns}:breaker", "S": f"{ns}:steel_ingot", "R": "minecraft:redstone_block"}, "breaker_3p_industrial")
+shaped("padmount_208", ["SSS", "TCT", "SSS"], {"S": f"{ns}:steel_ingot", "T": f"{ns}:transformer", "C": "minecraft:copper_block"}, "padmount_208")
+shaped("padmount_480", ["SDS", "TCT", "SSS"], {"S": f"{ns}:steel_ingot", "D": "minecraft:diamond", "T": f"{ns}:transformer", "C": "minecraft:copper_block"}, "padmount_480")
+shaped("unit_substation", ["SDS", "TCT", "SDS"], {"S": f"{ns}:steel_ingot", "D": "minecraft:diamond", "T": f"{ns}:transformer", "C": "minecraft:copper_block"}, "unit_substation")
+shaped("motor_starter", ["SBS", "CRC", "SSS"], {"S": f"{ns}:steel_ingot", "B": f"{ns}:breaker_3p_industrial", "C": "minecraft:copper_ingot", "R": "minecraft:repeater"}, "motor_starter")
+shaped("mcc_bucket", ["SMS", "S S"], {"S": f"{ns}:steel_ingot", "M": f"{ns}:motor_starter"}, "mcc_bucket")
+shaped("mcc_incoming", ["SBS", "CCC", "SSS"], {"S": f"{ns}:steel_ingot", "B": f"{ns}:breaker_3p_industrial", "C": "minecraft:copper_block"}, "mcc_incoming")
+shaped("three_phase_heater", ["SSS", "HHH", "SRS"], {"S": f"{ns}:steel_ingot", "H": f"{ns}:electric_heater", "R": "minecraft:redstone"}, "three_phase_heater")
+# ---- Phase 4.1: busway, and conductor sizes (docs/phase4-conductors.md) --------------------------------------------
+def busway_side(img, d):
+	noise(img, (150, 154, 160), 4)
+	d.rectangle([0, 0, 15, 15], outline=(96, 100, 108))
+	for x in (4, 8, 12):
+		d.line([x, 2, x, 13], fill=(184, 115, 51))   # copper bars seen through the vent slots
+
+
+tex("busway_placeholder", busway_side)
+for bus in ("busway_lv", "busway_industrial"):
+	t = {"cable": f"{ns}:block/{art('busway')}", "particle": f"{ns}:block/{art('busway')}"}
+	save_json(f"{ASSETS}/models/block/{bus}_core.json", {"textures": t, "elements": [cuboid([4, 4, 4], [12, 12, 12])]})
+	save_json(f"{ASSETS}/models/block/{bus}_arm.json", {"textures": t, "elements": [cuboid([4, 4, 0], [12, 12, 4])]})
+	save_json(f"{ASSETS}/models/block/{bus}_inventory.json", {"parent": "minecraft:block/block",
+		"display": {"gui": {"rotation": [30, 225, 0], "scale": [0.9, 0.9, 0.9]}, "ground": {"scale": [0.6, 0.6, 0.6]}},
+		"textures": t, "elements": [cuboid([0, 4, 4], [16, 12, 12])]})
+	save_json(f"{ASSETS}/blockstates/{bus}.json", {"multipart": [{"apply": {"model": f"{ns}:block/{bus}_core"}}] + [
+		{"when": {side: "true"}, "apply": {"model": f"{ns}:block/{bus}_arm", **rot}} for side, rot in arms.items()]})
+	save_json(f"{ASSETS}/items/{bus}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{bus}_inventory"}})
+	shaped(bus, ["SCS", "CCC", "SCS"], {"S": f"{ns}:steel_ingot", "C": "minecraft:copper_block"}, bus, 4)
+pick = json.load(open(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json"))
+pick["values"] += [f"{ns}:busway_lv", f"{ns}:busway_industrial"]
+save_json(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json", pick)
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({"block.wildcatter.busway_lv": "Busway (208Y/120 V, A B C N G)", "block.wildcatter.busway_industrial": "Busway (480 V, A B C N G)",
+	"itemGroup.wildcatter": "Wildcatter"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+# ---- Phase 4b: gensets (docs/multiblocks/genset.md) and the turning parts (docs/kinetics-and-sound.md) ------------------
+def box(frm, to, texture):
+	"""A model element whose faces take their UVs from where they sit in the block (no squashing)."""
+	return {"from": frm, "to": to, "faces": {f: {"texture": texture} for f in ("north", "south", "east", "west", "up", "down")}}
+
+
+def paint(base, stripes=None, bolts=True):
+	def draw(img, d):
+		noise(img, base, 6)
+		d.rectangle([0, 0, 15, 15], outline=tuple(max(0, c - 40) for c in base))
+		for y, color in (stripes or []):
+			d.line([1, y, 14, y], fill=color)
+		if bolts:
+			for x, y in ((2, 2), (13, 2), (2, 13), (13, 13)):
+				d.point((x, y), fill=(200, 200, 200))
+	return draw
+
+
+def grille(img, d):
+	noise(img, (60, 64, 70), 4)
+	for y in range(1, 15, 2):
+		d.line([1, y, 14, y], fill=(150, 156, 164))
+
+
+def panel_face(img, d):
+	noise(img, (120, 126, 132), 4)
+	d.rectangle([2, 2, 13, 7], fill=(30, 40, 30))
+	for x in (4, 8, 12):
+		d.ellipse([x - 1, 3, x + 1, 5], fill=(230, 230, 200))
+	d.rectangle([3, 10, 5, 12], fill=(60, 200, 90))
+	d.rectangle([7, 10, 9, 12], fill=(220, 50, 40))
+	d.rectangle([11, 9, 13, 13], fill=(40, 40, 44))
+
+
+def rotor_tex(img, d):
+	noise(img, (70, 74, 80), 5)
+	d.line([0, 7, 15, 7], fill=(230, 190, 40))   # a painted stripe, so the turning shows
+	d.line([0, 8, 15, 8], fill=(230, 190, 40))
+
+
+tex("genset_engine_placeholder", paint((196, 160, 40), [(5, (90, 90, 96)), (11, (90, 90, 96))]))     # engine yellow, rocker covers
+tex("genset_gas_engine_placeholder", paint((60, 110, 160), [(5, (90, 90, 96)), (11, (90, 90, 96))]))
+tex("alternator_placeholder", paint((70, 90, 120), [(3, (40, 50, 70)), (12, (40, 50, 70))]))
+tex("radiator_core_placeholder", grille)
+tex("radiator_frame_placeholder", paint((80, 84, 90), bolts=False))
+tex("fuel_tank_placeholder", paint((90, 96, 90), [(8, (60, 64, 60))]))
+tex("exhaust_stack_placeholder", paint((60, 56, 52), bolts=False))
+tex("genset_panel_front_placeholder", panel_face)
+tex("genset_panel_side_placeholder", paint((120, 126, 132)))
+tex("rotor_placeholder", rotor_tex)
+G = {n: f"{ns}:block/{art(n)}" for n in ("genset_engine", "genset_gas_engine", "alternator", "radiator_core", "radiator_frame", "fuel_tank",
+	"exhaust_stack", "genset_panel_front", "genset_panel_side", "rotor")}
+# parts are drawn for a set facing north: the shaft runs west (radiator) to east (panel); the turning parts sit at the west of each block
+for name, key in (("genset_diesel_engine", "genset_engine"), ("genset_gas_engine", "genset_gas_engine")):
+	t = {"body": G[key], "particle": G[key]}
+	save_json(f"{ASSETS}/models/block/{name}.json", {"textures": t, "elements": [
+		box([3, 0, 1], [16, 12, 15], "#body"),          # crankcase and block
+		box([4, 12, 3], [15, 15, 13], "#body"),         # heads and rocker covers
+		box([0, 2, 6], [3, 4, 10], "#body")]})          # crank nose under the pulley
+save_json(f"{ASSETS}/models/block/alternator.json", {"textures": {"body": G["alternator"], "particle": G["alternator"]}, "elements": [
+	box([3, 1, 1], [16, 15, 15], "#body"), box([0, 7, 7], [3, 9, 9], "#body")]})
+save_json(f"{ASSETS}/models/block/radiator.json", {"textures": {"core": G["radiator_core"], "frame": G["radiator_frame"], "particle": G["radiator_frame"]}, "elements": [
+	box([0, 0, 0], [5, 16, 16], "#core"),              # the core, facing west
+	box([5, 0, 0], [12, 2, 16], "#frame"), box([5, 14, 0], [12, 16, 16], "#frame"),   # fan shroud, open at the sides
+	box([12, 0, 0], [16, 16, 16], "#frame")]})
+save_json(f"{ASSETS}/models/block/fuel_tank.json", {"parent": "minecraft:block/cube_all", "textures": {"all": G["fuel_tank"]}})
+save_json(f"{ASSETS}/models/block/exhaust_stack.json", {"textures": {"pipe": G["exhaust_stack"], "particle": G["exhaust_stack"]}, "elements": [
+	box([5, 0, 5], [11, 7, 11], "#pipe"), box([6, 7, 6], [10, 16, 10], "#pipe")]})
+save_json(f"{ASSETS}/models/block/genset_control_panel.json", {"parent": "minecraft:block/orientable", "textures": {
+	"front": G["genset_panel_front"], "side": G["genset_panel_side"], "top": G["genset_panel_side"], "bottom": G["genset_panel_side"]}})
+for name in ("genset_diesel_engine", "genset_gas_engine", "alternator", "radiator", "fuel_tank", "exhaust_stack", "genset_control_panel"):
+	save_json(f"{ASSETS}/blockstates/{name}.json", {"variants": {
+		"facing=north": {"model": f"{ns}:block/{name}"}, "facing=east": {"model": f"{ns}:block/{name}", "y": 90},
+		"facing=south": {"model": f"{ns}:block/{name}", "y": 180}, "facing=west": {"model": f"{ns}:block/{name}", "y": 270}}})
+	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{name}"}})
+	save_json(f"{DATA}/loot_table/blocks/{name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],
+		"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+# the turning parts, centred on the block with their axis along X
+r = {"rotor": G["rotor"], "particle": G["rotor"]}
+save_json(f"{ASSETS}/models/block/rotor_radiator_fan.json", {"textures": r, "elements": [
+	box([7, 7, 7], [9, 9, 9], "#rotor"),
+	box([7.5, 9, 6.5], [8.5, 15, 9.5], "#rotor"), box([7.5, 1, 6.5], [8.5, 7, 9.5], "#rotor"),
+	box([7.5, 6.5, 9], [8.5, 9.5, 15], "#rotor"), box([7.5, 6.5, 1], [8.5, 9.5, 7], "#rotor")]})
+save_json(f"{ASSETS}/models/block/rotor_crank_pulley.json", {"textures": r, "elements": [
+	box([6.5, 4, 5], [9.5, 12, 11], "#rotor"), box([6.5, 5, 4], [9.5, 11, 12], "#rotor"),
+	box([6, 7, 10], [10, 9, 12.5], "#rotor")]})   # a timing mark that shows it turning
+save_json(f"{ASSETS}/models/block/rotor_coupling.json", {"textures": r, "elements": [
+	box([6.5, 3, 5], [9.5, 13, 11], "#rotor"), box([6.5, 5, 3], [9.5, 11, 13], "#rotor"),
+	box([6, 11, 7], [10, 13, 9], "#rotor"), box([6, 3, 7], [10, 5, 9], "#rotor")]})   # coupling bolts
+save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ("radiator_fan", "crank_pulley", "coupling")}})
+
+# crafted parts (items) and recipes: steel and copper into parts, parts into the engine and alternator
+PART_COLORS = {"engine_block_casting": (80, 80, 86), "piston": (170, 174, 180), "crankshaft": (120, 124, 130), "cylinder_head": (150, 140, 120),
+	"fuel_injector": (180, 160, 60), "spark_plug": (230, 230, 230), "stator_winding": (184, 115, 51), "rotor_field": (150, 90, 50), "exciter": (90, 110, 150)}
+for name, color in PART_COLORS.items():
+	tex(f"{name}_placeholder", lambda img, d, c=color: (d.rectangle([3, 3, 12, 12], fill=c + (255,), outline=(40, 40, 40, 255)), d.line([3, 8, 12, 8], fill=(40, 40, 40, 255))), "item")
+	save_json(f"{ASSETS}/models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{art(name)}"}})
+	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{name}"}})
+S_, I_, C_ = f"{ns}:steel_ingot", "minecraft:iron_ingot", "minecraft:copper_ingot"
+shaped("engine_block_casting", ["SSS", "SBS", "SSS"], {"S": S_, "B": "minecraft:iron_block"}, "engine_block_casting")
+shapeless("piston", [S_, S_, "minecraft:iron_nugget"], "piston", 2)
+shaped("crankshaft", ["S  ", " S ", "  S"], {"S": S_}, "crankshaft")
+shaped("cylinder_head", ["SSS", "I I"], {"S": S_, "I": I_}, "cylinder_head")
+shapeless("fuel_injector", [S_, "minecraft:iron_nugget", "minecraft:redstone"], "fuel_injector", 2)
+shapeless("spark_plug", ["minecraft:iron_nugget", "minecraft:quartz", C_], "spark_plug", 2)
+shaped("stator_winding", ["CCC", "CSC", "CCC"], {"C": C_, "S": S_}, "stator_winding")
+shaped("rotor_field", ["CSC", "SIS", "CSC"], {"C": C_, "S": S_, "I": "minecraft:iron_block"}, "rotor_field")
+shaped("exciter", ["CRC", "SDS"], {"C": C_, "R": "minecraft:redstone", "S": S_, "D": "minecraft:comparator"}, "exciter")
+shaped("genset_diesel_engine", ["IHI", "PCP", "PBP"], {"I": f"{ns}:fuel_injector", "H": f"{ns}:cylinder_head", "P": f"{ns}:piston", "C": f"{ns}:crankshaft", "B": f"{ns}:engine_block_casting"}, "genset_diesel_engine")
+shaped("genset_gas_engine", ["IHI", "PCP", "PBP"], {"I": f"{ns}:spark_plug", "H": f"{ns}:cylinder_head", "P": f"{ns}:piston", "C": f"{ns}:crankshaft", "B": f"{ns}:engine_block_casting"}, "genset_gas_engine")
+shaped("alternator", ["SWS", "WRW", "SXS"], {"S": S_, "W": f"{ns}:stator_winding", "R": f"{ns}:rotor_field", "X": f"{ns}:exciter"}, "alternator")
+shaped("radiator", ["SBS", "BCB", "SBS"], {"S": S_, "B": "minecraft:iron_bars", "C": "minecraft:copper_block"}, "radiator")
+shaped("fuel_tank", ["SSS", "S S", "SSS"], {"S": S_}, "fuel_tank")
+shaped("exhaust_stack", ["S", "S", "S"], {"S": S_}, "exhaust_stack")
+shaped("genset_control_panel", ["SGS", "RBR", "SCS"], {"S": S_, "G": "minecraft:glass_pane", "R": "minecraft:redstone", "B": f"{ns}:breaker_3p_industrial", "C": "minecraft:comparator"}, "genset_control_panel")
+GENSET_BLOCKS = ("genset_diesel_engine", "genset_gas_engine", "alternator", "radiator", "fuel_tank", "exhaust_stack", "genset_control_panel")
+pick = json.load(open(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json"))
+pick["values"] += [f"{ns}:{n}" for n in GENSET_BLOCKS]
+save_json(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json", pick)
+stone = json.load(open(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json"))
+stone["values"] += [f"{ns}:{n}" for n in GENSET_BLOCKS]
+save_json(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json", stone)
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({
+	"block.wildcatter.genset_diesel_engine": "Genset Diesel Engine (500 kW)", "block.wildcatter.genset_gas_engine": "Genset Gas Engine (1 MW)",
+	"block.wildcatter.alternator": "Alternator (480 V)", "block.wildcatter.radiator": "Radiator", "block.wildcatter.fuel_tank": "Sub-Base Fuel Tank (2,000 L)",
+	"block.wildcatter.exhaust_stack": "Exhaust Stack", "block.wildcatter.genset_control_panel": "Genset Control Panel", "block.wildcatter.rotor": "Rotor",
+	"item.wildcatter.engine_block_casting": "Engine Block Casting", "item.wildcatter.piston": "Piston and Rod", "item.wildcatter.crankshaft": "Crankshaft",
+	"item.wildcatter.cylinder_head": "Cylinder Head", "item.wildcatter.fuel_injector": "Fuel Injector", "item.wildcatter.spark_plug": "Spark Plug",
+	"item.wildcatter.stator_winding": "Stator Winding", "item.wildcatter.rotor_field": "Rotor Field", "item.wildcatter.exciter": "Exciter and Regulator",
+	"subtitles.wildcatter.diesel_idle": "Diesel engine idles", "subtitles.wildcatter.diesel_load": "Diesel engine labours", "subtitles.wildcatter.gas_engine": "Gas engine runs",
+	"subtitles.wildcatter.alternator_whine": "Alternator whines", "subtitles.wildcatter.fan": "Fan whirs", "subtitles.wildcatter.engine_crank": "Engine cranks", "subtitles.wildcatter.sync_bang": "Generator slams out of step"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+# ---- Phase 4d: the generator step-up (docs/multiblocks/gsu.md): the transformer drawing, greyed ---------------------------
+save_json(f"{ASSETS}/models/block/gsu_transformer.json", {"parent": "minecraft:block/orientable", "textures": {
+	"front": f"{ns}:block/transformer_front", "side": f"{ns}:block/transformer_side", "top": f"{ns}:block/transformer_top", "bottom": f"{ns}:block/transformer_top"}})
+save_json(f"{ASSETS}/blockstates/gsu_transformer.json", {"variants": {
+	"facing=north": {"model": f"{ns}:block/gsu_transformer"}, "facing=east": {"model": f"{ns}:block/gsu_transformer", "y": 90},
+	"facing=south": {"model": f"{ns}:block/gsu_transformer", "y": 180}, "facing=west": {"model": f"{ns}:block/gsu_transformer", "y": 270}}})
+save_json(f"{ASSETS}/items/gsu_transformer.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/gsu_transformer"}})
+save_json(f"{DATA}/loot_table/blocks/gsu_transformer.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:gsu_transformer"}],
+	"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+shaped("gsu_transformer", ["SDS", "TCT", "SDS"], {"S": f"{ns}:steel_ingot", "D": "minecraft:diamond", "T": f"{ns}:unit_substation", "C": "minecraft:copper_block"}, "gsu_transformer")
+for tag in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
+	t["values"].append(f"{ns}:gsu_transformer")
+	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang["block.wildcatter.gsu_transformer"] = "Generator Step-Up Transformer (MV delta / DIST wye, 1500 kVA)"
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+# ---- Phase 4d: the cooling tower as a column (docs/multiblocks/cooling-tower.md) --------------------------------------
+def basin(img, d):
+	noise(img, (150, 150, 146), 5)
+	d.rectangle([2, 2, 13, 9], fill=(60, 110, 150))   # the cold water
+	d.rectangle([0, 0, 15, 15], outline=(110, 110, 106))
+
+
+def chevrons(img, d):
+	noise(img, (200, 200, 196), 4)
+	for y in range(0, 16, 4):
+		d.line([0, y + 3, 7, y], fill=(120, 124, 128))
+		d.line([8, y, 15, y + 3], fill=(120, 124, 128))
+
+
+tex("tower_basin_placeholder", basin)
+tex("drift_eliminator_placeholder", chevrons)
+block_model("tower_basin", "minecraft:block/cube_all", {"all": f"{ns}:block/{art('tower_basin')}"})
+block_model("drift_eliminator", "minecraft:block/cube_all", {"all": f"{ns}:block/{art('drift_eliminator')}"})
+deck = f"{ns}:block/cooling_tower"
+save_json(f"{ASSETS}/models/block/cooling_tower.json", {"textures": {"deck": deck, "particle": deck}, "elements": [
+	box([0, 0, 0], [16, 8, 16], "#deck"),                                    # the fan deck and the motor under the fan
+	box([0, 8, 0], [16, 16, 2], "#deck"), box([0, 8, 14], [16, 16, 16], "#deck"),   # the fan stack, open at the top
+	box([0, 8, 2], [2, 16, 14], "#deck"), box([14, 8, 2], [16, 16, 14], "#deck")]})
+for name in ("tower_basin", "drift_eliminator"):
+	save_json(f"{ASSETS}/blockstates/{name}.json", {"variants": {"": {"model": f"{ns}:block/{name}"}}})
+	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{name}"}})
+	save_json(f"{DATA}/loot_table/blocks/{name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],
+		"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+save_json(f"{ASSETS}/models/block/rotor_tower_fan.json", {"textures": r, "elements": [   # blades in the horizontal plane, turning about Y
+	box([7, 7, 7], [9, 9, 9], "#rotor"),
+	box([9, 7.5, 6.5], [14, 8.5, 9.5], "#rotor"), box([2, 7.5, 6.5], [7, 8.5, 9.5], "#rotor"),
+	box([6.5, 7.5, 9], [9.5, 8.5, 14], "#rotor"), box([6.5, 7.5, 2], [9.5, 8.5, 7], "#rotor")]})
+save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ("radiator_fan", "crank_pulley", "coupling", "tower_fan")}})
+shaped("tower_basin", ["S S", "SWS", "SSS"], {"S": "minecraft:smooth_stone", "W": "minecraft:water_bucket"}, "tower_basin")
+shaped("drift_eliminator", ["P P", " P ", "P P"], {"P": f"{ns}:plastic_sheet"}, "drift_eliminator", 2)
+for tag in ("mineable/pickaxe",):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
+	t["values"] += [f"{ns}:tower_basin", f"{ns}:drift_eliminator"]
+	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({"block.wildcatter.tower_basin": "Cooling Tower Basin", "block.wildcatter.drift_eliminator": "Drift Eliminators"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+# ---- Phase 4d: the 1 MW steam plant (docs/multiblocks/steam-plant.md), dressed in the old steam machines' Ludo art -------------
+def condenser_face(img, d):
+	noise(img, (96, 104, 110), 5)
+	for y in range(2, 15, 3):
+		d.line([1, y, 14, y], fill=(150, 160, 168))   # the tube bundle seen through the shell
+	d.rectangle([0, 0, 15, 15], outline=(60, 66, 72))
+
+
+tex("condenser_placeholder", condenser_face)
+B = lambda n: f"{ns}:block/{n}"
+block_model("boiler_burner", "minecraft:block/cube_bottom_top", {"side": B("firebox_side_lit"), "top": B("firebox_top"), "bottom": B("firebox_top")})
+block_model("boiler_drum", "minecraft:block/cube_bottom_top", {"side": B("boiler_side"), "top": B("boiler_top"), "bottom": B("boiler_bottom")})
+block_model("superheater", "minecraft:block/cube_bottom_top", {"side": B("boiler_formed_side"), "top": B("boiler_top"), "bottom": B("boiler_bottom")})
+block_model("condenser", "minecraft:block/cube_all", {"all": B(art("condenser"))})
+save_json(f"{ASSETS}/models/block/turbine_casing.json", {"textures": {"side": B("steam_turbine_side"), "end": B("steam_turbine_end"), "particle": B("steam_turbine_side")}, "elements": [
+	{"from": [0, 1, 1], "to": [12, 15, 15], "faces": {"north": {"texture": "#side"}, "south": {"texture": "#side"}, "up": {"texture": "#side"}, "down": {"texture": "#side"},
+		"west": {"texture": "#end"}, "east": {"texture": "#end"}}},
+	box([12, 7, 7], [16, 9, 9], "#side")]})   # the shaft out to the generator; the coupling turns on it
+save_json(f"{ASSETS}/models/block/turbine_generator.json", {"parent": "minecraft:block/orientable", "textures": {
+	"front": B("generator_end"), "side": B("generator_side"), "top": B("generator_side"), "bottom": B("generator_side")}})
+save_json(f"{ASSETS}/models/block/feed_pump.json", {"textures": {"body": B("pump"), "particle": B("pump")}, "elements": [
+	box([0, 2, 3], [6, 12, 13], "#body"),     # the pump
+	box([10, 1, 2], [16, 13, 14], "#body"),   # the motor
+	box([6, 6, 7], [10, 8, 9], "#body"),      # the shaft; the coupling turns on it
+	box([0, 0, 1], [16, 2, 15], "#body")]})   # the base plate
+for name in ("boiler_burner", "boiler_drum", "superheater", "turbine_casing", "condenser", "feed_pump", "turbine_generator"):
+	save_json(f"{ASSETS}/blockstates/{name}.json", {"variants": {
+		"facing=north": {"model": f"{ns}:block/{name}"}, "facing=east": {"model": f"{ns}:block/{name}", "y": 90},
+		"facing=south": {"model": f"{ns}:block/{name}", "y": 180}, "facing=west": {"model": f"{ns}:block/{name}", "y": 270}}})
+	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{name}"}})
+	save_json(f"{DATA}/loot_table/blocks/{name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],
+		"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+for tag in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
+	t["values"] += [f"{ns}:{n}" for n in ("boiler_burner", "boiler_drum", "superheater", "turbine_casing", "condenser", "feed_pump", "turbine_generator")]
+	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
+S_ = f"{ns}:steel_ingot"
+shaped("boiler_burner", ["SBS", "BFB", "SBS"], {"S": S_, "B": "minecraft:bricks", "F": "minecraft:blast_furnace"}, "boiler_burner")
+shaped("boiler_drum", ["SSS", "SWS", "SSS"], {"S": S_, "W": "minecraft:water_bucket"}, "boiler_drum")
+shaped("superheater", ["SCS", "CSC", "SCS"], {"S": S_, "C": "minecraft:copper_ingot"}, "superheater")
+shaped("turbine_casing", ["SSS", "BCB", "SSS"], {"S": S_, "B": "minecraft:iron_bars", "C": f"{ns}:crankshaft"}, "turbine_casing")
+shaped("turbine_generator", ["SWS", "WRW", "SXS"], {"S": S_, "W": f"{ns}:stator_winding", "R": f"{ns}:rotor_field", "X": f"{ns}:exciter"}, "turbine_generator")
+shaped("condenser", ["SPS", "PCP", "SPS"], {"S": S_, "P": f"{ns}:pipe", "C": "minecraft:copper_block"}, "condenser")
+shaped("feed_pump", ["SPS", "MCM"], {"S": S_, "P": f"{ns}:pump", "M": "minecraft:piston", "C": "minecraft:copper_ingot"}, "feed_pump")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({"block.wildcatter.boiler_burner": "Boiler Burner", "block.wildcatter.boiler_drum": "Steam Drum", "block.wildcatter.superheater": "Superheater",
+	"block.wildcatter.turbine_casing": "Steam Turbine (1 MW)", "block.wildcatter.condenser": "Condenser", "block.wildcatter.feed_pump": "Boiler Feed Pump (480 V)",
+	"block.wildcatter.turbine_generator": "Turbine Generator (4.16 kV, 1,250 kVA)",
+	"subtitles.wildcatter.turbine_whine": "Turbine whines", "subtitles.wildcatter.burner_roar": "Burner roars", "subtitles.wildcatter.motor_hum": "Motor hums"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+# ---- Phase 4e: the distribution substation (docs/multiblocks/substation.md) -------------------------------------------
+def tube(img, d):
+	noise(img, (190, 192, 196), 4)
+	for y in (4, 8, 12):
+		d.line([0, y, 15, y], fill=(150, 152, 158))
+
+
+def insulator_post(img, d):
+	noise(img, (110, 70, 50), 4)
+	for y in range(1, 16, 3):
+		d.line([2, y, 13, y], fill=(150, 100, 70))   # the porcelain sheds
+
+
+tex("station_bus_placeholder", tube)
+tex("disconnect_post_placeholder", insulator_post)
+save_json(f"{ASSETS}/models/block/power_transformer.json", {"parent": "minecraft:block/orientable", "textures": {
+	"front": B("substation_front"), "side": B("substation_side"), "top": B("substation_top"), "bottom": B("substation_top")}})
+save_json(f"{ASSETS}/models/block/relay_panel.json", {"parent": "minecraft:block/orientable", "textures": {
+	"front": B("mcc_incoming_front_on"), "side": B("cabinet_side"), "top": B("cabinet_side"), "bottom": B("cabinet_side")}})
+for name in ("power_transformer", "relay_panel"):
+	save_json(f"{ASSETS}/blockstates/{name}.json", {"variants": {
+		"facing=north": {"model": f"{ns}:block/{name}"}, "facing=east": {"model": f"{ns}:block/{name}", "y": 90},
+		"facing=south": {"model": f"{ns}:block/{name}", "y": 180}, "facing=west": {"model": f"{ns}:block/{name}", "y": 270}}})
+	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{name}"}})
+# relay-operated three-pole breakers: the three-pole model, tinted red (138 kV) and green (12.47 kV)
+for name, body in (("hv_breaker_3p", "breaker_3p_industrial_body"), ("dist_breaker_3p", "breaker_3p_lv_body")):
+	for position, angle in (("on", -30), ("off", 30), ("tripped", 0)):
+		els = [cuboid([0, 0, 2], [16, 13, 14], "#body")]
+		for x in (3, 7, 11):
+			lever_el = cuboid([x, 13, 7], [x + 2, 16, 9], "#lever")
+			lever_el["rotation"] = {"origin": [8, 13, 8], "axis": "x", "angle": angle}
+			els.append(lever_el)
+		save_json(f"{ASSETS}/models/block/{name}_{position}.json", {
+			"textures": {"body": f"{ns}:block/{body}", "lever": f"{ns}:block/breaker_lever_{position}", "particle": f"{ns}:block/{body}"}, "elements": els})
+	save_json(f"{ASSETS}/blockstates/{name}.json", {"variants": {
+		f"facing={facing},position={position}": {"model": f"{ns}:block/{name}_{position}", "y": y}
+		for facing, y in rotations.items() for position in ("on", "off", "tripped")}})
+	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{name}_on"}})
+# disconnects: a base and two insulator posts; the blade is a rotor that swings up about its hinge
+post = f"{ns}:block/{art('disconnect_post')}"
+for name in ("disconnect_hv", "disconnect_dist"):
+	save_json(f"{ASSETS}/models/block/{name}.json", {"textures": {"post": post, "base": B("pipe"), "particle": post}, "elements": [
+		box([1, 0, 1], [15, 2, 15], "#base"), box([6, 2, 1], [10, 12, 4], "#post"), box([6, 2, 12], [10, 12, 15], "#post")]})
+	save_json(f"{ASSETS}/blockstates/{name}.json", {"variants": {
+		f"facing={facing},open={o}": {"model": f"{ns}:block/{name}", "y": y} for facing, y in rotations.items() for o in ("false", "true")}})
+	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{name}"}})
+save_json(f"{ASSETS}/models/block/rotor_disconnect_blade.json", {"textures": r, "elements": [   # hinged at its south end (the model's centre)
+	box([5, 7.5, -3], [6, 8.5, 8], "#rotor"), box([10, 7.5, -3], [11, 8.5, 8], "#rotor"), box([5, 7.5, -3], [11, 8.5, -2], "#rotor")]})
+save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ("radiator_fan", "crank_pulley", "coupling", "tower_fan", "disconnect_blade")}})
+# station buses: tubular bus on the busway shape
+for bus in ("bus_hv", "bus_dist"):
+	t = {"cable": f"{ns}:block/{art('station_bus')}", "particle": f"{ns}:block/{art('station_bus')}"}
+	save_json(f"{ASSETS}/models/block/{bus}_core.json", {"textures": t, "elements": [cuboid([4, 4, 4], [12, 12, 12])]})
+	save_json(f"{ASSETS}/models/block/{bus}_arm.json", {"textures": t, "elements": [cuboid([4, 4, 0], [12, 12, 4])]})
+	save_json(f"{ASSETS}/models/block/{bus}_inventory.json", {"parent": "minecraft:block/block", "textures": t, "elements": [cuboid([0, 4, 4], [16, 12, 12])]})
+	save_json(f"{ASSETS}/blockstates/{bus}.json", {"multipart": [{"apply": {"model": f"{ns}:block/{bus}_core"}}] + [
+		{"when": {side: "true"}, "apply": {"model": f"{ns}:block/{bus}_arm", **rot}} for side, rot in arms.items()]})
+	save_json(f"{ASSETS}/items/{bus}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{bus}_inventory"}})
+SUB = ("power_transformer", "relay_panel", "hv_breaker_3p", "dist_breaker_3p", "disconnect_hv", "disconnect_dist", "bus_hv", "bus_dist")
+for name in SUB:
+	save_json(f"{DATA}/loot_table/blocks/{name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],
+		"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+for tag in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
+	t["values"] += [f"{ns}:{n}" for n in SUB]
+	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
+shaped("power_transformer", ["SDS", "TCT", "SDS"], {"S": S_, "D": "minecraft:diamond_block", "T": f"{ns}:substation_transformer", "C": "minecraft:copper_block"}, "power_transformer")
+shapeless("hv_breaker_3p", [f"{ns}:hv_breaker"] * 3 + ["minecraft:comparator"], "hv_breaker_3p")
+shapeless("dist_breaker_3p", [f"{ns}:dist_breaker"] * 3 + ["minecraft:comparator"], "dist_breaker_3p")
+shaped("disconnect_hv", ["I I", "ISI"], {"I": f"{ns}:insulator_hv", "S": S_}, "disconnect_hv")
+shaped("disconnect_dist", ["I I", "ISI"], {"I": f"{ns}:insulator_dist", "S": S_}, "disconnect_dist")
+shaped("bus_hv", ["AAA", "I I"], {"A": "minecraft:iron_ingot", "I": f"{ns}:insulator_hv"}, "bus_hv", 4)
+shaped("bus_dist", ["AAA", "I I"], {"A": "minecraft:iron_ingot", "I": f"{ns}:insulator_dist"}, "bus_dist", 4)
+shaped("relay_panel", ["SGS", "CRC", "SSS"], {"S": S_, "G": "minecraft:glass_pane", "C": "minecraft:comparator", "R": "minecraft:redstone_block"}, "relay_panel")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for k in [k for k in lang if "distribution_transformer" in k]:
+	del lang[k]
+lang.update({"block.wildcatter.power_transformer": "Substation Power Transformer (HV delta / DIST wye, 20 MVA)", "block.wildcatter.relay_panel": "Relay Panel (50/51)",
+	"block.wildcatter.hv_breaker_3p": "Substation Breaker (HV, three-pole)", "block.wildcatter.dist_breaker_3p": "Feeder Breaker (DIST, three-pole)",
+	"block.wildcatter.disconnect_hv": "Disconnect Switch (HV)", "block.wildcatter.disconnect_dist": "Disconnect Switch (DIST)",
+	"block.wildcatter.bus_hv": "Station Bus (HV)", "block.wildcatter.bus_dist": "Station Bus (DIST)", "subtitles.wildcatter.disconnect_arc": "Disconnect arcs",
+	"subtitles.wildcatter.hv_breaker": "Power breaker operates", "subtitles.wildcatter.fuse_pop": "Fuse blows", "subtitles.wildcatter.flashover": "Insulator flashes over"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+# Every conductor item and the sizes it comes in (the Java side: energy/ConductorSize).
+BUILDING = ["awg_12", "awg_10", "awg_6", "awg_2", "awg_4_0", "kcmil_500"]
+ACSR = ["acsr_sparrow", "acsr_raven", "acsr_penguin", "acsr_linnet", "acsr_drake"]
+MV_CABLE = ["mv_1_0", "mv_4_0", "mv_500"]
+# how many of one size make one of the next: copper roughly in proportion to the cross-section
+UPSIZE = {"awg_10": 2, "awg_6": 3, "awg_2": 3, "awg_4_0": 3, "kcmil_500": 2, "acsr_raven": 2, "acsr_penguin": 2, "acsr_linnet": 2, "acsr_drake": 2, "mv_4_0": 2, "mv_500": 2}
+FAMILY = {}
+for role in ("hot", "neutral"):
+	for prefix in ("", "wool_", "plastic_", "industrial_", "industrial_plastic_"):
+		FAMILY[f"{prefix}wire_{role}"] = BUILDING
+	for prefix in ("mv_", "mv_plastic_", "dist_", "dist_plastic_", "hv_", "hv_plastic_"):
+		FAMILY[f"{prefix}wire_{role}"] = ACSR
+FAMILY.update({"cable_lv": BUILDING, "cable_industrial": BUILDING, "cable_dist": MV_CABLE, "cable_hv": MV_CABLE})
+for tier, fam in (("lv", BUILDING), ("dist", ACSR), ("hv", ACSR)):
+	FAMILY[f"conductor_spool_{tier}"] = fam
+	FAMILY[f"covered_conductor_spool_{tier}"] = fam
+SIZE_KEY = f"{ns}:conductor_size"
+SPOOLS = tuple(n for n in FAMILY if "spool" in n)
+
+
+def sized(item_id, size):
+	return {"fabric:type": "fabric:components", "base": item_id, "components": {SIZE_KEY: size}}
+
+
+def conductor_of(ingredient):
+	if isinstance(ingredient, str) and ingredient.startswith(f"{ns}:") and ingredient[len(ns) + 1:] in FAMILY:
+		return ingredient[len(ns) + 1:]
+	return None
+
+
+recipe_dir = f"{DATA}/recipe"
+for fname in sorted(os.listdir(recipe_dir)):
+	if "__" in fname:
+		continue
+	path = f"{recipe_dir}/{fname}"
+	recipe = json.load(open(path))
+	result = recipe.get("result", {}).get("id", "")
+	name = result[len(ns) + 1:] if result.startswith(f"{ns}:") else ""
+	if name not in FAMILY:
+		continue
+	family = FAMILY[name]
+	slots = recipe["key"] if "key" in recipe else None
+	ingredients = list(slots.values()) if slots is not None else recipe["ingredients"]
+	same = [i for i in ingredients if conductor_of(i) and FAMILY[conductor_of(i)] is family]
+	if not same:
+		recipe["result"]["components"] = {SIZE_KEY: family[0]}   # from raw materials: the smallest size
+		save_json(path, recipe)
+		continue
+	# made from conductors of the same family (plastic from bare, cable from wire, spool from wire): one recipe per size
+	os.remove(path)
+	for size in family:
+		variant = json.loads(json.dumps(recipe))
+		constrain = lambda i: sized(i, size) if conductor_of(i) and FAMILY[conductor_of(i)] is family else i
+		if slots is not None:
+			variant["key"] = {k: constrain(v) for k, v in slots.items()}
+		else:
+			variant["ingredients"] = [constrain(i) for i in recipe["ingredients"]]
+		variant["result"]["components"] = {SIZE_KEY: size}
+		save_json(f"{recipe_dir}/{fname[:-5]}__{size}.json", variant)
+# a bigger size from several of the next smaller one (wire and cable; spools are wound from the size you want)
+for name, family in FAMILY.items():
+	if name in SPOOLS:
+		continue
+	for small, big in zip(family, family[1:]):
+		shapeless(f"{name}__{big}_from_{small}", [sized(f"{ns}:{name}", small)] * UPSIZE[big], name)
+		path = f"{recipe_dir}/{name}__{big}_from_{small}.json"
+		recipe = json.load(open(path))
+		recipe["result"]["components"] = {SIZE_KEY: big}
+		save_json(path, recipe)
+# conductor blocks drop themselves; CableBlock and MultiCableBlock put the size on the drop
+for name in [n for n in FAMILY if n not in SPOOLS] + ["busway_lv", "busway_industrial"]:
+	save_json(f"{DATA}/loot_table/blocks/{name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
+		"entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],   # the block adds the size (CableBlock.getDrops)
+		"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
 print("assets written")

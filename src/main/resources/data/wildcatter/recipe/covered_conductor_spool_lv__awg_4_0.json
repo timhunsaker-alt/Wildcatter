@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "fabric:type": "fabric:components",
+      "base": "wildcatter:conductor_spool_lv",
+      "components": {
+        "wildcatter:conductor_size": "awg_4_0"
+      }
+    },
+    "wildcatter:plastic_sheet"
+  ],
+  "result": {
+    "id": "wildcatter:covered_conductor_spool_lv",
+    "count": 1,
+    "components": {
+      "wildcatter:conductor_size": "awg_4_0"
+    }
+  }
+}

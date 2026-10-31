@@ -31,7 +31,7 @@ public class DrillingRigBlock extends BaseEntityBlock {
 
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-		return level.isClientSide() ? null : createTickerHelper(type, WildcatterBlocks.DRILLING_RIG_ENTITY, DrillingRigBlockEntity::tick);
+		return createTickerHelper(type, WildcatterBlocks.DRILLING_RIG_ENTITY, level.isClientSide() ? (l, p, st, be) -> dev.wildcatter.kinetic.RunningSound.clientTick(be) : DrillingRigBlockEntity::tick);
 	}
 
 	@Override
@@ -44,7 +44,10 @@ public class DrillingRigBlock extends BaseEntityBlock {
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 		if (!level.isClientSide() && level.getBlockEntity(pos) instanceof DrillingRigBlockEntity rig) {
-			if (!Shock.touch((ServerLevel) level, pos, player, Voltage.LOW, rig.isLive())) {
+			if (player.isShiftKeyDown()) {
+				player.sendOverlayMessage(rig.swapLeads());
+				dev.wildcatter.circuit.CircuitManager.markDirty(level);
+			} else if (!Shock.touch((ServerLevel) level, pos, player, Voltage.INDUSTRIAL, rig.isLive())) {
 				player.sendOverlayMessage(rig.inspect());
 			}
 		}

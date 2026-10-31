@@ -40,17 +40,26 @@ and the Field Manual has a page for each new system.
 - Receptacles and plug adapters (starting set in ELECTRICAL_MODEL.md) exporting FE to other mods.
 - Under-frequency load shedding relays on feeders.
 
-## Phase 3 — Three-phase industry — NEXT (waiting for Tim's go-ahead; it wires the phasor solver into the blocks)
+## Phase 3 — Three-phase industry — DONE (spec: `docs/phase3-three-phase.md`; all values approved 2026-10-30; gap fill done)
 - Three-phase LV service (480Y/277 and 208Y/120 NA; 400Y/230 IEC), pad-mount transformers.
 - Three-phase receptacles and plugs (L21-30, L22-30, IEC 60309 red).
 - Motor loads; pumps and pumpjacks become motors and stop drawing power when idle.
-- Motor control center.
+- Motor control center (`docs/multiblocks/motor-control-center.md`).
 
-## Phase 4 — Real multiblocks
+## Phase 4 — Real multiblocks — DONE 2026-10-30 (4.0 specs, 4.1 conductor sizes, 4a foundations, 4b gensets, 4c synchronization, 4d steam plant and GSU, 4e substation, 4f sounds; a few values added while building wait for Tim)
+- Conductor sizes (added 2026-10-30 at Tim's request): NEC building wire 12 AWG to 500 kcmil, an 800 A busway, ACSR overhead conductors;
+  real resistance per metre; each size its own item; span limits by conductor.
 - Steam plant rebuilt from distinct parts (firebox, drum, superheater, turbine, generator,
   condenser, feed pump, cooling tower).
 - Gensets at 480 V; generator synchronization; generator step-up transformer.
 - Substation as a multiblock.
+- Moving parts and sound (added 2026-10-30 at Tim's request; decided to fold into this phase):
+  - A shared renderer for rotating parts (crankshaft, flywheel, fan, turbine rotor, generator rotor, pump gear),
+    spinning at a speed tied to the machine's real state (load, trip, coast-down; generators follow grid frequency).
+  - The diesel engine and its generator are separate machines. The engine is assembled from crafted parts
+    (block, pistons, crankshaft, radiator, injector) and the alternator is its own part.
+  - Sound for each machine (engine idle and load, turbine whine, fans, breaker clunk, fuse pop, flashover, transformer hum),
+    with pitch and volume following machine state. Specs go in `docs/multiblocks/` first; sound sources come from Ludo.
 
 ## Phase 5 — Oil and gas depth
 - Wellhead separator (oil / gas / water), gas processing, compressor stations.

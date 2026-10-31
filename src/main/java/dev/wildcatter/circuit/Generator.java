@@ -12,7 +12,7 @@ public interface Generator {
 	/** Its inertia constant H in seconds: how long its spinning mass could run it at rating. */
 	double inertiaSeconds();
 
-	/** What it is delivering right now, in watts. */
+	/** What it is delivering right now, in watts: negative while the rest of the island drives it. */
 	double deliveredWatts();
 
 	/** False once it has tripped. */

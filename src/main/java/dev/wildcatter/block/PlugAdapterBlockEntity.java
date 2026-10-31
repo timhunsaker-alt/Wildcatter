@@ -34,11 +34,16 @@ public class PlugAdapterBlockEntity extends BlockEntity implements CircuitPart, 
 
 	private int hotA;
 	private int hotB;
+	private int hotC;
 	private int neutral;
 	private int load = -1;
+	/** The three delta elements of a three-phase plug's load (A-B, B-C, C-A). */
+	private final int[] delta = {-1, -1, -1};
 	private double volts;
 	private double amps;
 	private double demandWatts;
+	/** What the grid actually delivered through the plug, in watts. */
+	private double drawnWatts;
 	private boolean wrongVoltage;
 	private int burnTicks;
 	private long delivered;
@@ -64,29 +69,54 @@ public class PlugAdapterBlockEntity extends BlockEntity implements CircuitPart, 
 
 	@Override
 	public void build(Circuit circuit) {
+		PlugType type = type();
 		hotA = circuit.node();
-		hotB = type().betweenLegs() ? circuit.node() : hotA;
+		hotB = type.betweenLegs() || type.threePhase() ? circuit.node() : hotA;
+		hotC = type.threePhase() ? circuit.node() : hotA;
 		neutral = circuit.node();
 		double watts = wrongVoltage ? 0 : demandWatts;
-		double volts = type().volts();
-		if (type().betweenLegs()) {
+		double volts = type.volts();
+		load = -1;
+		if (type.threePhase()) {
+			// a balanced three-phase load: a third of the watts in each element, at line-to-line volts
+			int[] hot = {hotA, hotB, hotC};
+			for (int k = 0; k < 3; k++) {
+				delta[k] = circuit.resistor(hot[k], hot[(k + 1) % 3], watts > 0 ? volts * volts / (watts / 3.0) : 1e9);
+			}
+		} else if (type.betweenLegs()) {
 			load = circuit.resistor(hotA, hotB, watts > 0 ? volts * volts / watts : 1e9);
 		} else {
 			load = circuit.resistor(hotA, neutral, watts > 0 ? volts * volts / watts : 1e9);
 		}
 		for (Direction face : Direction.values()) {
 			if (matchingFace(face)) {
-				circuit.port(worldPosition, face, Conductor.A, Voltage.LOW, hotA, Tuning.CONTACT_OHMS / 2, false);
-				circuit.port(worldPosition, face, Conductor.B, Voltage.LOW, hotB, Tuning.CONTACT_OHMS / 2, false);
-				circuit.port(worldPosition, face, Conductor.N, Voltage.LOW, neutral, Tuning.CONTACT_OHMS / 2, false);
+				Voltage tier = type.tier();
+				circuit.port(worldPosition, face, Conductor.A, tier, hotA, Tuning.CONTACT_OHMS / 2, false);
+				circuit.port(worldPosition, face, Conductor.B, tier, hotB, Tuning.CONTACT_OHMS / 2, false);
+				if (type.threePhase()) {
+					circuit.port(worldPosition, face, Conductor.C, tier, hotC, Tuning.CONTACT_OHMS / 2, false);
+				}
+				circuit.port(worldPosition, face, Conductor.N, tier, neutral, Tuning.CONTACT_OHMS / 2, false);
 			}
 		}
 	}
 
 	@Override
 	public void apply(Circuit circuit, int ticks) {
-		volts = type().betweenLegs() ? Math.abs(circuit.across(hotA, hotB)) : Math.abs(circuit.across(hotA, neutral));
-		amps = load >= 0 ? Math.abs(circuit.current(load)) : 0;
+		if (type().threePhase()) {
+			volts = circuit.across(hotA, hotB);
+			double element = Math.max(circuit.current(delta[0]), Math.max(circuit.current(delta[1]), circuit.current(delta[2])));
+			amps = element * Math.sqrt(3.0);   // a line of a balanced delta carries root 3 times an element's current
+			int[] hot = {hotA, hotB, hotC};
+			drawnWatts = 0;
+			for (int k = 0; k < 3; k++) {
+				drawnWatts += circuit.across(hot[k], hot[(k + 1) % 3]) * circuit.current(delta[k]);
+			}
+		} else {
+			volts = type().betweenLegs() ? circuit.across(hotA, hotB) : circuit.across(hotA, neutral);
+			amps = load >= 0 ? circuit.current(load) : 0;
+			drawnWatts = volts * amps;
+		}
 		boolean wrong = Math.abs(volts - type().volts()) > type().volts() * 0.15;
 		if (wrong != wrongVoltage) {
 			wrongVoltage = wrong;
@@ -147,7 +177,7 @@ public class PlugAdapterBlockEntity extends BlockEntity implements CircuitPart, 
 			dev.wildcatter.circuit.CircuitManager.markDirty(server);
 		}
 		// hand over what the grid actually delivered since the last visit, as FE per tick for the interval
-		double watts = plug.wrongVoltage ? 0 : plug.volts * plug.amps;
+		double watts = plug.wrongVoltage ? 0 : plug.drawnWatts;
 		long fe = Math.round(watts / wattsPerFe * INTERVAL);
 		for (HostEnergy sink : sinks) {
 			long share = demand > 0 ? Math.round(fe * (double) Math.max(0, sink.demand()) / demand) : 0;

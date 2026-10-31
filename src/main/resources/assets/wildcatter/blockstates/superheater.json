@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "wildcatter:block/superheater"
+    },
+    "facing=east": {
+      "model": "wildcatter:block/superheater",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "wildcatter:block/superheater",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "wildcatter:block/superheater",
+      "y": 270
+    }
+  }
+}

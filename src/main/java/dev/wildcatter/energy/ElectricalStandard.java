@@ -99,6 +99,7 @@ public enum ElectricalStandard {
 			case MEDIUM -> medium;
 			case DISTRIBUTION -> distribution;
 			case HIGH -> high;
+			case INDUSTRIAL -> industrialLow;
 		};
 	}
 

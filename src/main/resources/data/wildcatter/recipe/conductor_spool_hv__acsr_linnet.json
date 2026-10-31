@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "WWW",
+    "WSW",
+    "WWW"
+  ],
+  "key": {
+    "W": {
+      "fabric:type": "fabric:components",
+      "base": "wildcatter:hv_wire_hot",
+      "components": {
+        "wildcatter:conductor_size": "acsr_linnet"
+      }
+    },
+    "S": "minecraft:stick"
+  },
+  "result": {
+    "id": "wildcatter:conductor_spool_hv",
+    "count": 1,
+    "components": {
+      "wildcatter:conductor_size": "acsr_linnet"
+    }
+  }
+}

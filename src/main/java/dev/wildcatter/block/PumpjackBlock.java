@@ -34,7 +34,7 @@ public class PumpjackBlock extends BaseEntityBlock {
 
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-		return level.isClientSide() ? null : createTickerHelper(type, WildcatterBlocks.PUMPJACK_ENTITY, PumpjackBlockEntity::tick);
+		return createTickerHelper(type, WildcatterBlocks.PUMPJACK_ENTITY, level.isClientSide() ? (l, p, st, be) -> dev.wildcatter.kinetic.RunningSound.clientTick(be) : PumpjackBlockEntity::tick);
 	}
 
 	@Override
@@ -64,7 +64,10 @@ public class PumpjackBlock extends BaseEntityBlock {
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 		if (!level.isClientSide() && level.getBlockEntity(pos) instanceof PumpjackBlockEntity jack) {
-			if (!Shock.touch((ServerLevel) level, pos, player, Voltage.LOW, jack.isLive())) {
+			if (player.isShiftKeyDown()) {
+				player.sendOverlayMessage(jack.swapLeads());
+				dev.wildcatter.circuit.CircuitManager.markDirty(level);
+			} else if (!Shock.touch((ServerLevel) level, pos, player, Voltage.INDUSTRIAL, jack.isLive())) {
 				player.sendOverlayMessage(jack.inspect());
 			}
 		}

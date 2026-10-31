@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "fabric:type": "fabric:components",
+      "base": "wildcatter:mv_wire_hot",
+      "components": {
+        "wildcatter:conductor_size": "acsr_sparrow"
+      }
+    },
+    {
+      "fabric:type": "fabric:components",
+      "base": "wildcatter:mv_wire_hot",
+      "components": {
+        "wildcatter:conductor_size": "acsr_sparrow"
+      }
+    }
+  ],
+  "result": {
+    "id": "wildcatter:mv_wire_hot",
+    "count": 1,
+    "components": {
+      "wildcatter:conductor_size": "acsr_raven"
+    }
+  }
+}

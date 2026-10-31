@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "wildcatter:block/exhaust_stack"
+    },
+    "facing=east": {
+      "model": "wildcatter:block/exhaust_stack",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "wildcatter:block/exhaust_stack",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "wildcatter:block/exhaust_stack",
+      "y": 270
+    }
+  }
+}

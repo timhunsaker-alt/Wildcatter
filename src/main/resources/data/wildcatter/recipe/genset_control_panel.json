@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SGS",
+    "RBR",
+    "SCS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "G": "minecraft:glass_pane",
+    "R": "minecraft:redstone",
+    "B": "wildcatter:breaker_3p_industrial",
+    "C": "minecraft:comparator"
+  },
+  "result": {
+    "id": "wildcatter:genset_control_panel",
+    "count": 1
+  }
+}

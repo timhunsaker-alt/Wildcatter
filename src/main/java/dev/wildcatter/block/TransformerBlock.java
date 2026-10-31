@@ -35,16 +35,52 @@ public class TransformerBlock extends BaseEntityBlock {
 	private final Voltage high;
 	/** A pole-mount unit has a kVA rating (it heats on overload and fails); the others are not rated. 0 means unrated. */
 	private final double ratedVa;
+	/** The nameplate impedance in percent (leakage reactance); 0 for the unrated stand-ins. */
+	private final double percentZ;
+	/** A pad-mount or unit-substation bank: always three-phase, never a pole unit, never split-phase. */
+	private final boolean threePhase;
+	/** Delta on the low (generator) side, grounded wye on the high side: a generator step-up. The high side leads by 30 degrees. */
+	private final boolean deltaLow;
+	/** Delta on the high (transmission) side, grounded wye on the low side: a distribution substation. The high side leads by 30 degrees. */
+	private final boolean deltaHigh;
 
 	public TransformerBlock(Properties properties, Voltage low, Voltage high) {
 		this(properties, low, high, 0);
 	}
 
+	/** A pole-mount unit with its kVA rating. */
 	public TransformerBlock(Properties properties, Voltage low, Voltage high, double ratedVa) {
+		this(properties, low, high, ratedVa, ratedVa > 0 ? dev.wildcatter.Tuning.POLE_TRANSFORMER_PERCENT_Z : 0, false);
+	}
+
+	/** A three-phase pad-mount or unit substation, sitting on the ground: its kVA rating and nameplate impedance. */
+	public static TransformerBlock threePhase(Properties properties, Voltage low, Voltage high, double ratedVa, double percentZ) {
+		return new TransformerBlock(properties, low, high, ratedVa, percentZ, true, false);
+	}
+
+	/** A generator step-up (docs/multiblocks/gsu.md): delta on the generator side, grounded wye on the line side. */
+	public static TransformerBlock deltaWye(Properties properties, Voltage low, Voltage high, double ratedVa, double percentZ) {
+		return new TransformerBlock(properties, low, high, ratedVa, percentZ, true, true);
+	}
+
+	private TransformerBlock(Properties properties, Voltage low, Voltage high, double ratedVa, double percentZ, boolean threePhase) {
+		this(properties, low, high, ratedVa, percentZ, threePhase, false);
+	}
+
+	private TransformerBlock(Properties properties, Voltage low, Voltage high, double ratedVa, double percentZ, boolean threePhase, boolean deltaLow) {
+		this(properties, low, high, ratedVa, percentZ, threePhase, deltaLow, false);
+	}
+
+	/** For the substation's power transformer: delta on the high side. */
+	protected TransformerBlock(Properties properties, Voltage low, Voltage high, double ratedVa, double percentZ, boolean threePhase, boolean deltaLow, boolean deltaHigh) {
 		super(properties);
 		this.low = low;
 		this.high = high;
 		this.ratedVa = ratedVa;
+		this.percentZ = percentZ;
+		this.threePhase = threePhase;
+		this.deltaLow = deltaLow;
+		this.deltaHigh = deltaHigh;
 		registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
 	}
 
@@ -60,10 +96,31 @@ public class TransformerBlock extends BaseEntityBlock {
 		return ratedVa;
 	}
 
+	public double percentZ() {
+		return percentZ;
+	}
+
+	public boolean threePhase() {
+		return threePhase;
+	}
+
+	public boolean deltaLow() {
+		return deltaLow;
+	}
+
+	public boolean deltaHigh() {
+		return deltaHigh;
+	}
+
+	/** Hangs on a pole: a rated single-phase unit. */
+	public boolean poleMount() {
+		return ratedVa > 0 && !threePhase;
+	}
+
 	/** A pole-mount transformer hangs on a pole: one must stand beside it. */
 	@Override
 	protected boolean canSurvive(BlockState state, net.minecraft.world.level.LevelReader level, BlockPos pos) {
-		if (ratedVa <= 0) {
+		if (!poleMount()) {
 			return true;
 		}
 		for (Direction side : Direction.Plane.HORIZONTAL) {

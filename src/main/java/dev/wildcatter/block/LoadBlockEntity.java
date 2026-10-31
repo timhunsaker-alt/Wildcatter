@@ -54,8 +54,7 @@ public class LoadBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		double nominal = Voltage.LOW.nominal();
 		resistor = circuit.resistor(hot, neutral, nominal * nominal / watts()); // P = V^2 / R
 		for (Direction face : Direction.values()) {
-			circuit.port(worldPosition, face, Conductor.A, Voltage.LOW, hot, Tuning.CONTACT_OHMS / 2, false);
-			circuit.port(worldPosition, face, Conductor.B, Voltage.LOW, hot, Tuning.CONTACT_OHMS / 2, false);
+			circuit.hotPort(worldPosition, face, Voltage.LOW, hot, Tuning.CONTACT_OHMS / 2, false);
 			circuit.port(worldPosition, face, Conductor.N, Voltage.LOW, neutral, Tuning.CONTACT_OHMS / 2, false);
 		}
 	}

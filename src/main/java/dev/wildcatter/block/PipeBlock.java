@@ -81,9 +81,12 @@ public class PipeBlock extends Block {
 			return pipe.kind == kind;
 		}
 		return kind == Kind.WATER
-				? block instanceof BoilerBlock || block instanceof SteamTurbineBlock || block instanceof PumpBlock || block instanceof CoolingTowerBlock
+				? block instanceof BoilerBlock || block instanceof SteamTurbineBlock || block instanceof PumpBlock || block instanceof TowerBasinBlock
+						|| block instanceof SteamPlantPartBlock plant && plant.part() == SteamPlantPartBlock.Part.CONDENSER
 				: block instanceof GasWellheadBlock || block instanceof PumpjackBlock || block instanceof FireboxBlock
-						|| block instanceof RefineryBlock || block instanceof EngineBlock;
+						|| block instanceof RefineryBlock
+						|| block instanceof GensetPartBlock part && (part.part() == GensetPartBlock.Part.FUEL_TANK || part.part() == GensetPartBlock.Part.GAS_ENGINE)
+						|| block instanceof SteamPlantPartBlock burner && burner.part() == SteamPlantPartBlock.Part.BURNER;
 	}
 
 	private BlockState withArms(BlockState state, BlockGetter level, BlockPos pos) {

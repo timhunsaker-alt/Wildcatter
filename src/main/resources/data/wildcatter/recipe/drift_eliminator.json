@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "P P",
+    " P ",
+    "P P"
+  ],
+  "key": {
+    "P": "wildcatter:plastic_sheet"
+  },
+  "result": {
+    "id": "wildcatter:drift_eliminator",
+    "count": 2
+  }
+}
