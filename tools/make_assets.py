@@ -366,7 +366,10 @@ save_json(f"{ASSETS}/blockstates/boiler.json", {"variants": {
 save_json(f"{ASSETS}/blockstates/steam_turbine.json", {"variants": {
 	f"running={running}": {"model": f"{ns}:block/steam_turbine{'_running' if running == 'true' else ''}"} for running in ("false", "true")}})
 
-for tname, t in (("transformer", "transformer"), ("substation_transformer", "substation"), ("pole_transformer", "pole_tx")):
+# Phase 4.5e: the pole transformer is drawn at true size in its cell by tools/models/pole_transformer.py; its blockstate is here
+save_json(f"{ASSETS}/blockstates/pole_transformer.json", {"variants": {f"facing={facing}": {"model": f"{ns}:block/pole_transformer/p0", **({"y": y} if y else {})}
+	for facing, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270))}})
+for tname, t in (("transformer", "transformer"), ("substation_transformer", "substation")):
 	save_json(f"{ASSETS}/models/block/{tname}.json", {"parent": "minecraft:block/orientable", "textures": {
 		"front": f"{ns}:block/{t}_front", "side": f"{ns}:block/{t}_side", "top": f"{ns}:block/{t}_top", "bottom": f"{ns}:block/{t}_top"}})
 	save_json(f"{ASSETS}/blockstates/{tname}.json", {"variants": {
@@ -407,15 +410,9 @@ save_json(f"{ASSETS}/blockstates/switch.json", {"variants": {
 save_json(f"{ASSETS}/blockstates/ufls_relay_dist.json", {"variants": {
 	f"facing={facing},position={position}": {"model": f"{ns}:block/relay_{'on' if position == 'on' else 'off'}", "y": y}
 	for facing, y in rotations.items() for position in ("on", "off", "tripped")}})
-# the fused cutout: a porcelain body with a fuse tube hanging in a hinged holder; when the link blows the tube drops open
-for state, angle in (("good", 0), ("blown", -75)):
-	tube = cuboid([6.5, 1, 7], [9.5, 15, 9], "#tube")
-	tube["rotation"] = {"origin": [8, 14, 8], "axis": "x", "angle": angle}
-	save_json(f"{ASSETS}/models/block/cutout_{state}.json", {
-		"textures": {"body": f"{ns}:block/cutout_body", "tube": f"{ns}:block/cutout_tube", "particle": f"{ns}:block/cutout_body"},
-		"elements": [cuboid([5, 0, 3], [11, 16, 6], "#body"), cuboid([6, 13, 6], [10, 16, 10], "#body"), tube]})
+# the fused cutout (Phase 4.5e: tools/models/fused_cutout.py draws it at true size): when the link blows the tube drops open
 save_json(f"{ASSETS}/blockstates/fused_cutout.json", {"variants": {
-	f"blown={blown},facing={facing}": {"model": f"{ns}:block/cutout_{'blown' if blown == 'true' else 'good'}", "y": y}
+	f"blown={blown},facing={facing}": {"model": f"{ns}:block/fused_cutout{'_blown' if blown == 'true' else ''}/p0", "y": y}
 	for facing, y in rotations.items() for blown in ("false", "true")}})
 save_json(f"{ASSETS}/blockstates/ufls_relay.json", {"variants": {
 	f"facing={facing},position={position}": {"model": f"{ns}:block/relay_{'on' if position == 'on' else 'off'}", "y": y}
@@ -439,6 +436,31 @@ for axis, (lo, hi) in {"x": ([0, 12, 6], [16, 16, 10]), "z": ([6, 12, 0], [10, 1
 save_json(f"{ASSETS}/blockstates/crossarm.json", {"variants": {"axis=x": {"model": f"{ns}:block/crossarm_x"}, "axis=z": {"model": f"{ns}:block/crossarm_z"}}})
 
 # ---- insulators and conductor spools -------------------------------------------------------------------------
+def insulator_mounts(tier):
+	"""True-size insulators, in sixteenths of a metre (docs/multiblocks/poles.md). On an arm the pin stands on the cell's floor and
+	the conductor sits 0.26 m up; on a pole-top pin everything is 0.3 m higher, on a strap down the pole; a 138 kV string of nine
+	146 mm bells hangs 1.5 m from the crossbeam to its clamp at the bottom of the cell."""
+	if tier == "hv":
+		els = [cuboid([7, 23.2, 6.5], [9, 24, 9.5], "#pin")]                         # the yoke under the beam's clevis
+		for k in range(9):
+			top = 22.4 - k * 2.336
+			els.append(cuboid([7.3, top - 1.0, 7.3], [8.7, top, 8.7], "#pin"))          # the bell's cap
+			els.append(cuboid([5.97, top - 1.6, 5.97], [10.03, top - 1.0, 10.03], "#glaze"))   # its porcelain skirt, 254 mm
+		els.append(cuboid([7.6, 1.2, 7.6], [8.4, 2.4, 8.4], "#pin"))                   # the socket clevis
+		els.append(cuboid([7.2, 0, 6.0], [8.8, 1.2, 10.0], "#cap"))                    # the suspension clamp, with the conductor in it
+		return {"hanging": els}
+	def pin(lift):
+		if tier == "lv":    # a secondary spool on its pin
+			return [cuboid([7.8, lift, 7.8], [8.2, lift + 3, 8.2], "#pin"), cuboid([7.35, lift + 3, 7.35], [8.65, lift + 4.4, 8.65], "#glaze"),
+				cuboid([7.25, lift + 3.5, 7.25], [8.75, lift + 3.9, 8.75], "#cap")]
+		# an ANSI 55-5 pin insulator, 114 mm across, on its steel pin, the conductor tied in its top groove
+		return [cuboid([7.8, lift, 7.8], [8.2, lift + 2.4, 8.2], "#pin"), cuboid([7.1, lift + 2.4, 7.1], [8.9, lift + 2.9, 8.9], "#glaze"),
+			cuboid([7.3, lift + 2.9, 7.3], [8.7, lift + 4.0, 8.7], "#glaze"), cuboid([7.4, lift + 4.0, 7.4], [8.6, lift + 4.4, 8.6], "#cap")]
+	strap = [cuboid([7.6, -8, 9.35], [8.4, 5.2, 9.7], "#pin"), cuboid([7.6, 4.8, 8.0], [8.4, 5.2, 9.7], "#pin")]   # the pole-top pin's strap
+	return {"arm": pin(0), "pole_top": pin(4.8) + strap}
+
+
+
 tex("insulator_pin", plain((92, 92, 98)))
 for tier, glaze in (("lv", (232, 232, 238)), ("dist", (150, 98, 66)), ("hv", (176, 196, 176))):
 	tex(f"insulator_glaze_{tier}", plain(glaze, 5))
@@ -451,8 +473,14 @@ for tier, discs in (("lv", [(3, 5)]), ("dist", [(3, 5), (6, 8)]), ("hv", [(2, 4)
 		save_json(f"{ASSETS}/models/block/insulator_{tier}_{key}.json", {
 			"textures": {"pin": f"{ns}:block/insulator_pin", "glaze": f"{ns}:block/insulator_glaze_{tier}", "cap": f"{ns}:block/insulator_cap_{key}",
 				"particle": f"{ns}:block/insulator_glaze_{tier}"}, "elements": els})
+		# Phase 4.5e, true size (docs/multiblocks/poles.md): on a crossarm, on a pole-top pin, or a 138 kV string hanging from a crossbeam
+		for mount, mels in insulator_mounts(tier).items():
+			save_json(f"{ASSETS}/models/block/insulator_{tier}_{key}_{mount}.json", {
+				"textures": {"pin": f"{ns}:block/mat/mat_galvanized", "glaze": f"{ns}:block/mat/mat_porcelain_brown", "cap": f"{ns}:block/insulator_cap_{key}",
+					"particle": f"{ns}:block/mat/mat_porcelain_brown"}, "elements": mels})
 	save_json(f"{ASSETS}/blockstates/insulator_{tier}.json", {"variants": {
-		f"conductor={key}": {"model": f"{ns}:block/insulator_{tier}_{key}"} for key in CONDUCTOR_COLORS}})
+		f"conductor={key},mount={mount}": {"model": f"{ns}:block/insulator_{tier}_{key}{'' if mount not in insulator_mounts(tier) else '_' + mount}"}
+		for key in CONDUCTOR_COLORS for mount in ("legacy", "arm", "pole_top", "hanging")}})
 
 
 def spool_icon(metal, covered):
@@ -587,7 +615,7 @@ WIRES = BARE_WIRES + WOOL_WIRES + PLASTIC_WIRES
 ITEM_MODELS = {"firebox": "block/firebox", "pump": "block/pump", "pipe": "block/pipe_inventory", "gas_line": "block/gas_line_inventory", "drilling_rig": "block/drilling_rig", "refinery": "block/refinery", "refinery_column": "block/refinery_column", "cooling_tower": "block/cooling_tower", "cooling_fill": "block/cooling_fill",
 	"pumpjack": "block/pumpjack",
 	"gas_wellhead": "block/gas_wellhead", "casing": "block/casing", "boiler": "block/boiler", "steam_turbine": "block/steam_turbine", "electric_lamp": "block/electric_lamp",
-	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "fuse": "block/fuse_good", "fused_cutout": "block/cutout_good", "dist_breaker": "block/dist_breaker_on", "pole_transformer": "block/pole_transformer", "switch": "block/switch_on", "ufls_relay": "block/relay_on", "ufls_relay_dist": "block/relay_on", "mv_breaker": "block/mv_breaker_on", "hv_breaker": "block/hv_breaker_on", "pole": "block/pole", "crossarm": "block/crossarm_x", "transformer": "block/transformer",
+	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "fuse": "block/fuse_good", "fused_cutout": "block/fused_cutout/item", "dist_breaker": "block/dist_breaker_on", "pole_transformer": "block/pole_transformer/item", "switch": "block/switch_on", "ufls_relay": "block/relay_on", "ufls_relay_dist": "block/relay_on", "mv_breaker": "block/mv_breaker_on", "hv_breaker": "block/hv_breaker_on", "pole": "block/pole", "crossarm": "block/crossarm_x", "transformer": "block/transformer",
 	"substation_transformer": "block/substation_transformer", "ground_rod": "block/ground_rod",
 	"power_meter": "item/power_meter", "field_manual": "item/field_manual", "seismograph": "item/seismograph", "crude_oil_bucket": "item/crude_oil_bucket", "plastic_sheet": "item/plastic_sheet", "diesel_bucket": "item/diesel_bucket", "steel_ingot": "item/steel_ingot", "conductor_spool_lv": "item/conductor_spool_lv", "conductor_spool_dist": "item/conductor_spool_dist", "conductor_spool_hv": "item/conductor_spool_hv", "covered_conductor_spool_lv": "item/covered_conductor_spool_lv", "covered_conductor_spool_dist": "item/covered_conductor_spool_dist", "covered_conductor_spool_hv": "item/covered_conductor_spool_hv", "insulator_lv": "block/insulator_lv_a", **{f"receptacle_{p}": f"block/receptacle_{p}" for p in PLUG_COLORS}, **{f"plug_{p}": f"block/plug_{p}" for p in PLUG_COLORS}, "insulator_dist": "block/insulator_dist_a", "insulator_hv": "block/insulator_hv_a"}
 ITEM_MODELS.update({w: f"block/{w}_inventory" for w in WIRES})
@@ -812,17 +840,7 @@ for name in ("breaker_3p_lv", "breaker_3p_industrial"):
 		for facing, y in rotations.items() for position in ("on", "off", "tripped")}})
 	ITEM_MODELS[name] = f"block/{name}_on"
 
-# pad-mounts and the unit substation: orientable cabinets
-for tname, t in (("padmount_208", ((70, 110, 80), (210, 230, 210))), ("padmount_480", ((60, 100, 70), (230, 215, 160))), ("unit_substation", ((120, 124, 130), (220, 220, 210)))):
-	tex(f"{tname}_front_placeholder", transformer_front(*t))
-	tex(f"{tname}_side_placeholder", transformer_side(t[0]))
-	tex(f"{tname}_top_placeholder", transformer_top(t[0]))
-	save_json(f"{ASSETS}/models/block/{tname}.json", {"parent": "minecraft:block/orientable", "textures": {
-		"front": f"{ns}:block/{art(tname + '_front')}", "side": f"{ns}:block/{art(tname + '_side')}", "top": f"{ns}:block/{art(tname + '_top')}", "bottom": f"{ns}:block/{art(tname + '_top')}"}})
-	save_json(f"{ASSETS}/blockstates/{tname}.json", {"variants": {
-		"facing=north": {"model": f"{ns}:block/{tname}"}, "facing=east": {"model": f"{ns}:block/{tname}", "y": 90},
-		"facing=south": {"model": f"{ns}:block/{tname}", "y": 180}, "facing=west": {"model": f"{ns}:block/{tname}", "y": 270}}})
-	ITEM_MODELS[tname] = f"block/{tname}"
+# pad-mounts and the unit substation: true size since Phase 4.5e (tools/models/padmount_208.py, padmount_480.py, unit_substation.py)
 
 # the three-phase heater
 tex("three_phase_heater_placeholder", heater(False))
@@ -865,7 +883,8 @@ for name in ("motor_starter", "mcc_bucket", "mcc_incoming"):
 
 PHASE3_BLOCKS = ("motor_starter", "mcc_bucket", "mcc_incoming") + tuple(CABLES) + ("breaker_3p_lv", "breaker_3p_industrial", "padmount_208", "padmount_480", "unit_substation", "three_phase_heater")
 for name in PHASE3_BLOCKS:
-	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:{ITEM_MODELS[name]}"}})
+	if name in ITEM_MODELS:   # the pad-mounts and unit substation get theirs from the model tool (Phase 4.5e)
+		save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:{ITEM_MODELS[name]}"}})
 	save_json(f"{DATA}/loot_table/blocks/{name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],
 		"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
 pick = json.load(open(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json"))
@@ -1181,6 +1200,33 @@ lang.update({"block.wildcatter.power_transformer": "Substation Power Transformer
 	"block.wildcatter.bus_hv": "Station Bus (HV)", "block.wildcatter.bus_dist": "Station Bus (DIST)",
 	"block.wildcatter.chain_link_fence": "Chain-Link Fence", "block.wildcatter.barbed_wire_top": "Barbed-Wire Fence Top", "subtitles.wildcatter.disconnect_arc": "Disconnect arcs",
 	"subtitles.wildcatter.hv_breaker": "Power breaker operates", "subtitles.wildcatter.fuse_pop": "Fuse blows", "subtitles.wildcatter.flashover": "Insulator flashes over"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+# ---- Phase 4.5e: the overhead line at true size (docs/multiblocks/poles.md, padmount.md) -------------------------------------
+# blockstates, piece models, items and collision come from tools/models/<part>.py; here loot, names, tags and recipes. The
+# older one-block pole and crossarm stay (their spans keep working) but are no longer crafted.
+LINE = ("wood_pole_30", "wood_pole_40", "wood_pole_75", "crossarm_dist", "crossbeam_138", "x_brace_138")
+for name in LINE + ("padmount_208", "padmount_480", "unit_substation"):
+	big_part_loot(name)
+for name in ("pole", "crossarm"):
+	if os.path.exists(f"{DATA}/recipe/{name}.json"):
+		os.remove(f"{DATA}/recipe/{name}.json")
+shapeless("wood_pole_30", ["#minecraft:logs"] * 4 + ["minecraft:coal"], "wood_pole_30")        # coal tar for the creosote
+shapeless("wood_pole_40", ["#minecraft:logs"] * 5 + ["minecraft:coal"], "wood_pole_40")
+shapeless("wood_pole_75", ["#minecraft:logs"] * 8 + ["minecraft:coal"], "wood_pole_75")
+shaped("crossarm_dist", ["PPP", "N N"], {"P": "#minecraft:planks", "N": "minecraft:iron_nugget"}, "crossarm_dist")
+shaped("crossbeam_138", ["PPP", "PPP", "NIN"], {"P": "#minecraft:planks", "N": "minecraft:iron_nugget", "I": "minecraft:iron_ingot"}, "crossbeam_138")
+shaped("x_brace_138", ["P P", " N ", "P P"], {"P": "#minecraft:planks", "N": "minecraft:iron_nugget"}, "x_brace_138")
+t = json.load(open(f"{ROOT}/data/minecraft/tags/block/mineable/axe.json"))
+t["values"] += [f"{ns}:{n}" for n in LINE]
+save_json(f"{ROOT}/data/minecraft/tags/block/mineable/axe.json", t)
+save_json(f"{ROOT}/data/minecraft/tags/block/climbable.json", {"values": [f"{ns}:pole", f"{ns}:wood_pole_30", f"{ns}:wood_pole_40", f"{ns}:wood_pole_75"]})
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({"block.wildcatter.wood_pole_30": "Wood Pole (30 ft, class 5)", "block.wildcatter.wood_pole_40": "Wood Pole (40 ft, class 4)",
+	"block.wildcatter.wood_pole_75": "Wood Pole (75 ft, class 2)", "block.wildcatter.crossarm_dist": "Crossarm (8 ft)",
+	"block.wildcatter.crossbeam_138": "H-Frame Crossbeam (HV)", "block.wildcatter.x_brace_138": "H-Frame X-Brace (HV)",
+	"block.wildcatter.pole": "Utility Pole Section (old)", "block.wildcatter.crossarm": "Pole Crossarm (old)",
+	"block.wildcatter.insulator_hv": "Suspension Insulator String (HV, 138 kV)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
 # Every conductor item and the sizes it comes in (the Java side: energy/ConductorSize).

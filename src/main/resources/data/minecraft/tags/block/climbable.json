@@ -1,5 +1,8 @@
 {
   "values": [
-    "wildcatter:pole"
+    "wildcatter:pole",
+    "wildcatter:wood_pole_30",
+    "wildcatter:wood_pole_40",
+    "wildcatter:wood_pole_75"
   ]
 }

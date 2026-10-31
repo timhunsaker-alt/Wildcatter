@@ -43,6 +43,17 @@ public final class Footprint {
 		return new Footprint(out);
 	}
 
+	/**
+	 * A part that does not fill a box (a crossarm leaves out the cell its pole stands in): the cells as offsets from the main
+	 * cell, facing north, the main cell first. Each cell once.
+	 */
+	public static Footprint of(Cell... cells) {
+		if (cells.length == 0 || !cells[0].equals(new Cell(0, 0, 0)) || java.util.Set.of(cells).size() != cells.length) {
+			throw new IllegalArgumentException("a footprint lists its main cell (0, 0, 0) first and each cell once");
+		}
+		return new Footprint(List.of(cells));
+	}
+
 	/** How many cells (pieces) the part fills. */
 	public int pieces() {
 		return cells.size();

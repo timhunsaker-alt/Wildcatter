@@ -134,14 +134,14 @@ public class TransformerBlock extends BaseEntityBlock {
 		return ratedVa > 0 && !threePhase;
 	}
 
-	/** A pole-mount transformer hangs on a pole: one must stand beside it. */
+	/** A pole-mount transformer hangs on a pole (a true-size pole's cell, or an older one-block section): one must stand beside it. */
 	@Override
 	protected boolean canSurvive(BlockState state, net.minecraft.world.level.LevelReader level, BlockPos pos) {
 		if (!poleMount()) {
 			return true;
 		}
 		for (Direction side : Direction.Plane.HORIZONTAL) {
-			if (level.getBlockState(pos.relative(side)).is(WildcatterBlocks.POLE)) {
+			if (WoodPoleBlock.isPole(level.getBlockState(pos.relative(side)))) {
 				return true;
 			}
 		}
@@ -155,6 +155,11 @@ public class TransformerBlock extends BaseEntityBlock {
 
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		// a pole unit clicked onto a pole hangs with its bracket (the back) on the pole
+		Direction face = context.getClickedFace();
+		if (poleMount() && face.getAxis().isHorizontal() && WoodPoleBlock.isPole(context.getLevel().getBlockState(context.getClickedPos().relative(face.getOpposite())))) {
+			return defaultBlockState().setValue(FACING, face);
+		}
 		// The high side faces away from the player, so the near side (where you stand) is the lower voltage.
 		return defaultBlockState().setValue(FACING, context.getHorizontalDirection());
 	}

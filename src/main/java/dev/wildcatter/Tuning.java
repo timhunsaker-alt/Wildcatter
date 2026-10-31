@@ -48,11 +48,12 @@ public final class Tuning {
 	public static final double STATOR_I2T_SECONDS = 37.5;      // IEEE C50.13: (I^2 - 1) t = 37.5 s per unit
 	public static final double STATOR_COOL_SECONDS = 120.0;    // from the limit back to cold below rating (as the overload relay)
 	// ---- Overhead spans (docs/phase2-distribution.md) ----
-	public static final double SPAN_METERS_PER_BLOCK = 4.0;    // one block of span is 4 m: a 12 m pole is 3 blocks
-	public static final int SPAN_MAX_LOW = 8;                  // 32 m: a service drop
-	public static final int SPAN_MAX_DISTRIBUTION = 10;        // 40 m: a distribution span
-	public static final int SPAN_MAX_HIGH = 64;                // 256 m: a transmission span
-	public static final int SPOOL_SPAN_BLOCKS = 256;           // how much span a conductor spool holds
+	public static final double SPAN_METERS_PER_BLOCK = 1.0;    // true scale (docs/multiblocks/poles.md); 4 m before Phase 4.5e
+	public static final double SPAN_SAG = 0.025;               // drawn sag, a fraction of the span: ACSR at typical tension sags 2 to 3 %
+	public static final int SPAN_MAX_LOW = 32;                 // 32 m: a service drop
+	public static final int SPAN_MAX_DISTRIBUTION = 40;        // 40 m: a distribution span
+	public static final int SPAN_MAX_HIGH = 256;               // 256 m: a transmission span
+	public static final int SPOOL_SPAN_BLOCKS = 1024;          // how much span a conductor spool holds: 1,024 m
 	public static final int INSULATOR_FLASHOVER_TICKS = 60;    // an under-rated insulator under load lasts this long
 	public static final double POLE_TRANSFORMER_VA = 25_000;     // a 25 kVA pole-top unit
 	public static final double POLE_TRANSFORMER_FAIL_SECONDS = 10.0;   // at 150 % of its rating it fails in this long

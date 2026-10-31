@@ -15,6 +15,8 @@ not a go-ahead to build: that waits for the roadmap phase (ROADMAP.md). Nothing 
 | [substation.md](substation.md) | 4 | single `substation_transformer` block |
 | [refinery-tower.md](refinery-tower.md) | 5 | refinery base plus two identical columns |
 | [cooling-tower.md](cooling-tower.md) | 4 | fan plus two identical fill blocks |
+| [poles.md](poles.md) | 4.5e | stacked one-block pole sections and crossarms |
+| [padmount.md](padmount.md) | 4.5e | one-block pad-mounts and unit substation |
 
 ## Shared rules
 - One **controller** block validates the structure and holds all state. Parts have no logic of their own beyond

@@ -1,18 +1,18 @@
 {
   "variants": {
     "facing=north": {
-      "model": "wildcatter:block/pole_transformer"
+      "model": "wildcatter:block/pole_transformer/p0"
     },
     "facing=east": {
-      "model": "wildcatter:block/pole_transformer",
+      "model": "wildcatter:block/pole_transformer/p0",
       "y": 90
     },
     "facing=south": {
-      "model": "wildcatter:block/pole_transformer",
+      "model": "wildcatter:block/pole_transformer/p0",
       "y": 180
     },
     "facing=west": {
-      "model": "wildcatter:block/pole_transformer",
+      "model": "wildcatter:block/pole_transformer/p0",
       "y": 270
     }
   }

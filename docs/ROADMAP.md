@@ -67,8 +67,10 @@ and the Field Manual has a page for each new system.
 - Detailed models built from many boxes (round parts as many-sided shapes, fins, bolts, pipes, gauges) by the model tool in
   `tools/models/`, drawn in Ludo material textures. No meshes.
 - Waves: 4.5a foundations, proved on the GSU; 4.5b gensets; 4.5c steam plant and cooling tower; 4.5d the substation
-  yard and its fence; 4.5e line and building gear (one-piece true-height poles), with the pad-mounts and the unit substation
-  (moved from 4.5d, 2026-10-31); 4.5f oil and gas. The refinery waits for Phase 5.
+  yard and its fence; 4.5e the overhead line (one-piece true-height poles, crossarms, insulators, spans at 1 m per block, the
+  pole transformer and cutout) with the pad-mounts and the unit substation (moved from 4.5d); 4.5f the building gear and the
+  starter plant (breakers, the MCC, receptacles, loads, the boiler and 120 V turbine); 4.5g oil and gas. The split of the old
+  4.5e into 4.5e and 4.5f was decided with Tim on 2026-10-31. The refinery waits for Phase 5.
 - Tim checks each wave in a real session before the next starts.
 
 ## Phase 5 — Oil and gas depth

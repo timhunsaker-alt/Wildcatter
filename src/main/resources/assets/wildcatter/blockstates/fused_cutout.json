@@ -1,35 +1,35 @@
 {
   "variants": {
     "blown=false,facing=north": {
-      "model": "wildcatter:block/cutout_good",
+      "model": "wildcatter:block/fused_cutout/p0",
       "y": 0
     },
     "blown=true,facing=north": {
-      "model": "wildcatter:block/cutout_blown",
+      "model": "wildcatter:block/fused_cutout_blown/p0",
       "y": 0
     },
     "blown=false,facing=east": {
-      "model": "wildcatter:block/cutout_good",
+      "model": "wildcatter:block/fused_cutout/p0",
       "y": 90
     },
     "blown=true,facing=east": {
-      "model": "wildcatter:block/cutout_blown",
+      "model": "wildcatter:block/fused_cutout_blown/p0",
       "y": 90
     },
     "blown=false,facing=south": {
-      "model": "wildcatter:block/cutout_good",
+      "model": "wildcatter:block/fused_cutout/p0",
       "y": 180
     },
     "blown=true,facing=south": {
-      "model": "wildcatter:block/cutout_blown",
+      "model": "wildcatter:block/fused_cutout_blown/p0",
       "y": 180
     },
     "blown=false,facing=west": {
-      "model": "wildcatter:block/cutout_good",
+      "model": "wildcatter:block/fused_cutout/p0",
       "y": 270
     },
     "blown=true,facing=west": {
-      "model": "wildcatter:block/cutout_blown",
+      "model": "wildcatter:block/fused_cutout_blown/p0",
       "y": 270
     }
   }

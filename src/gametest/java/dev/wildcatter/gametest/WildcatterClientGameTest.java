@@ -136,6 +136,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("substationParts")) {
 				substationParts(context, server);
 			}
+			if (only("lineParts")) {
+				lineParts(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -478,30 +481,33 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	private void refining(ClientGameTestContext context, TestServerContext server) {
 		server.runCommand("fill 66 " + (y - 1) + " 56 82 " + (y + 5) + " 66 minecraft:air");
 		server.runCommand("fill 66 " + (y - 1) + " 56 82 " + (y - 1) + " 66 minecraft:stone");
+		server.runCommand("kill @e[type=item]");
 		server.runCommand("tp @p 74 " + up + " 70 180 20");
 		BlockPos set = new BlockPos(72, up, 60);
 		genset(server, set, net.minecraft.core.Direction.NORTH, false);   // skid to the west: alternator 71, engine 70, radiator 69
-		put(server, 73, up, 60, "wildcatter:unit_substation[facing=east]");   // 480 V in at the back, 4.16 kV out of the front
-		put(server, 74, up, 60, "wildcatter:transformer[facing=west]");
-		put(server, 75, up, 60, "wildcatter:refinery");
-		put(server, 75, up + 1, 60, "wildcatter:refinery_column");
-		put(server, 75, up + 2, 60, "wildcatter:refinery_column");
-		put(server, 75, up, 59, "wildcatter:gas_line");
-		put(server, 74, up, 59, "wildcatter:gas_line");
-		put(server, 73, up, 59, "wildcatter:gas_line");
-		for (int x = 70; x <= 72; x++) {
-			put(server, x, up, 59, "wildcatter:gas_line");
+		// the unit substation (true size, x 73-76 and z 59-60) takes 480 V at its west end and gives 4.16 kV at its east end, through
+		// a short MV wire to the old 110 V / 4.16 kV transformer and the refinery
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, new BlockPos(72, up, 60), net.minecraft.core.Direction.EAST, false);
+		put(server, 77, up, 60, "wildcatter:mv_wire_hot");
+		put(server, 78, up, 60, "wildcatter:transformer[facing=west]");
+		put(server, 79, up, 60, "wildcatter:refinery");
+		put(server, 79, up + 1, 60, "wildcatter:refinery_column");
+		put(server, 79, up + 2, 60, "wildcatter:refinery_column");
+		put(server, 79, up, 59, "wildcatter:gas_line");
+		for (int x = 70; x <= 79; x++) {
+			put(server, x, up, 58, "wildcatter:gas_line");
 		}
+		put(server, 70, up, 59, "wildcatter:gas_line");
 		put(server, 70, y, 59, "wildcatter:gas_line");   // down beside the fuel tank under the engine
 		startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 100);
 		server.computeOnServer(srv -> {
-			((dev.wildcatter.block.RefineryBlockEntity) srv.overworld().getBlockEntity(new BlockPos(75, up, 60))).addCrude(3000);
+			((dev.wildcatter.block.RefineryBlockEntity) srv.overworld().getBlockEntity(new BlockPos(79, up, 60))).addCrude(3000);
 			return null;
 		});
 		context.waitTicks(700);
 		String gen = read(server, 72, up, 60);
 		check(gen.contains("Diesel genset") && gen.contains("RUNNING"), "the diesel genset should be running: " + gen);
-		String refinery = read(server, 75, up, 60);
+		String refinery = read(server, 79, up, 60);
 		check(refinery.contains("Refinery tower"), "a base with two columns should be a full tower: " + refinery);
 		check(refinery.contains("refining"), "a refinery on the engines' power should be refining: " + refinery);
 		check(refinery.matches(".*plastic [1-9]\\d* sheets.*"), "a tower should have made plastic: " + refinery);
@@ -509,35 +515,37 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		put(server, 70, up, 58, "wildcatter:plastic_wire_hot");
 		String wire = read(server, 70, up, 58);
 		check(wire.contains("plastic insulated"), "plastic wire should say so: " + wire);
-		// A 4.16 kV ground fault off the unit substation's top, with an MV breaker guarding it: it must trip
-		put(server, 73, up + 1, 60, "wildcatter:mv_wire_hot");
-		put(server, 73, up + 1, 61, "wildcatter:mv_breaker[facing=south]");
-		put(server, 73, up + 1, 62, "wildcatter:mv_wire_hot");
-		put(server, 73, up + 1, 63, "wildcatter:mv_wire_hot[conductor=g]");   // bare ground touching the bare phase: a fault to earth
+		// A 4.16 kV ground fault off the unit substation's MV wire, with an MV breaker guarding it: it must trip
+		put(server, 77, up, 61, "wildcatter:mv_breaker[facing=south]");
+		put(server, 77, up, 62, "wildcatter:mv_wire_hot");
+		put(server, 77, up, 63, "wildcatter:mv_wire_hot[conductor=g]");   // bare ground touching the bare phase: a fault to earth
 		context.waitTicks(60);
-		String breaker = read(server, 73, up + 1, 61);
+		String breaker = read(server, 77, up, 61);
 		check(breaker.contains("TRIPPED") && breaker.contains("4.16 kV"), "an MV breaker should trip on a short on the generator: " + breaker);
 		context.takeScreenshot("wildcatter-refinery");
-		// a pole line for the picture: two poles with crossarms, an MV breaker at the foot of one
-		server.runCommand("fill 84 " + (y - 1) + " 66 100 " + (y + 8) + " 76 minecraft:air");
-		server.runCommand("fill 84 " + (y - 1) + " 66 100 " + (y - 1) + " 76 minecraft:grass_block");
-		for (int px : new int[] {86, 96}) {
-			for (int h = 0; h < 6; h++) {
-				put(server, px, up + h, 70, "wildcatter:pole");
-			}
-			put(server, px, up + 6, 70, "wildcatter:crossarm[axis=z]");
-			put(server, px, up + 6, 69, "wildcatter:crossarm[axis=z]");
-			put(server, px, up + 6, 71, "wildcatter:crossarm[axis=z]");
+		// a pole line for the picture: three 40 ft poles with arms and pin insulators, strung 30 m apart, breakers at the foot
+		server.runCommand("fill 84 " + (y - 1) + " 66 150 " + (y + 12) + " 76 minecraft:air");
+		server.runCommand("fill 84 " + (y - 1) + " 66 150 " + (y - 1) + " 76 minecraft:grass_block");
+		int[] poles = {86, 116, 146};
+		for (int px : poles) {
+			placeBig(server, WildcatterBlocks.WOOD_POLE_40, new BlockPos(px, up, 70), net.minecraft.core.Direction.NORTH);
+			crossarm(server, new BlockPos(px, up + 9, 70));
+			insulator(server, WildcatterBlocks.INSULATOR_DIST, new BlockPos(px, up + 10, 69), "a");
+			insulator(server, WildcatterBlocks.INSULATOR_DIST, new BlockPos(px, up + 10, 70), "b");
+			insulator(server, WildcatterBlocks.INSULATOR_DIST, new BlockPos(px, up + 10, 71), "c");
 		}
-		for (int wx = 87; wx <= 95; wx++) {
-			put(server, wx, up + 7, 69, "wildcatter:hv_plastic_wire_hot");
-			put(server, wx, up + 7, 71, "wildcatter:hv_plastic_wire_neutral");
+		for (int k = 0; k + 1 < poles.length; k++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				BlockPos from = new BlockPos(poles[k], up + 10, 70 + dz);
+				BlockPos to = new BlockPos(poles[k + 1], up + 10, 70 + dz);
+				server.computeOnServer(srv -> dev.wildcatter.item.SpoolItem.connect(srv.overworld(), from, to, dev.wildcatter.energy.Voltage.DISTRIBUTION, false, 1024));
+			}
 		}
 		put(server, 88, up, 72, "wildcatter:mv_breaker[facing=east]");
 		put(server, 90, up, 72, "wildcatter:hv_breaker[facing=east]");
 		put(server, 92, up, 72, "wildcatter:breaker[facing=east]");
 		put(server, 94, up, 72, "wildcatter:fuse[facing=east]");
-		server.runCommand("tp @p 91 " + (up + 2) + " 79 180 -5");
+		server.runCommand("tp @p 100 " + (up + 4) + " 84 160 -12");
 		context.waitTicks(20);
 		context.takeScreenshot("wildcatter-pole-line");
 		System.out.println("[wildcatter-test] refining ok: " + gen + " | " + refinery + " | " + wire + " | " + breaker);
@@ -912,9 +920,8 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		int z = -60;
 		server.runCommand("fill 8 " + y + " " + (z - 2) + " 22 " + (y + 5) + " " + (z + 3) + " minecraft:air");
 		plant(server, z);
-		put(server, 12, up, z, "wildcatter:wool_wire_hot");
-		put(server, 13, up, z, "wildcatter:padmount_208[facing=east]");   // run backward: 120 V in at the back, 12.47 kV out of the front
-		for (int x = 14; x <= 17; x++) {
+		stepUp(server, z);
+		for (int x = 15; x <= 17; x++) {
 			put(server, x, up, z, "wildcatter:dist_wire_hot");
 		}
 		put(server, 18, up, z, "wildcatter:dist_wire_hot");
@@ -933,11 +940,10 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	/** Overhead spans between insulators on poles: a good span carries 7.2 kV, rules refuse bad ones, and an under-rated insulator flashes over. */
 	private void spans(ClientGameTestContext context, TestServerContext server) {
 		int z = -76;
-		server.runCommand("fill 8 " + y + " " + (z - 3) + " 48 " + (y + 9) + " " + (z + 4) + " minecraft:air");
+		server.runCommand("fill 8 " + y + " " + (z - 3) + " 70 " + (y + 12) + " " + (z + 4) + " minecraft:air");
 		plant(server, z);
-		put(server, 12, up, z, "wildcatter:wool_wire_hot");
-		put(server, 13, up, z, "wildcatter:padmount_208[facing=east]");   // run backward: 120 V in at the back, 12.47 kV out of the front
-		for (int x = 14; x <= 17; x++) {
+		stepUp(server, z);
+		for (int x = 15; x <= 17; x++) {
 			put(server, x, up, z, "wildcatter:dist_wire_hot");
 		}
 		put(server, 18, up, z, "wildcatter:dist_wire_hot");
@@ -946,46 +952,55 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		for (int x = 21; x <= 23; x++) {
 			put(server, x, up, z, "wildcatter:dist_wire_hot");
 		}
-		for (int k = 1; k <= 4; k++) {
+		// a riser up the first pole to its pole-top pin: 40 ft poles (10 m) with 8 ft arms, phase A on the pole tops
+		for (int k = 1; k <= 10; k++) {
 			put(server, 23, up + k, z, "wildcatter:dist_wire_hot");
 		}
-		for (int px : new int[] {24, 33, 40}) {
-			for (int k = 0; k < 3; k++) {
-				put(server, px, up + k, z, "wildcatter:pole");
-			}
-			put(server, px, up + 3, z, "wildcatter:crossarm[axis=x]");
-			put(server, px, up + 4, z, "wildcatter:insulator_dist");
+		for (int px : new int[] {24, 60}) {
+			placeBig(server, WildcatterBlocks.WOOD_POLE_40, new BlockPos(px, up, z), net.minecraft.core.Direction.NORTH);
+			crossarm(server, new BlockPos(px, up + 9, z));
+			insulator(server, WildcatterBlocks.INSULATOR_DIST, new BlockPos(px, up + 10, z), "a");
+			insulator(server, WildcatterBlocks.INSULATOR_DIST, new BlockPos(px, up + 10, z - 1), "b");
+			insulator(server, WildcatterBlocks.INSULATOR_DIST, new BlockPos(px, up + 10, z + 1), "c");
 		}
+		placeBig(server, WildcatterBlocks.WOOD_POLE_40, new BlockPos(61, up, z + 3), net.minecraft.core.Direction.NORTH);
+		insulator(server, WildcatterBlocks.INSULATOR_DIST, new BlockPos(61, up + 10, z + 3), "a");
 		context.waitTicks(20);
-		BlockPos a = new BlockPos(24, up + 4, z);
-		BlockPos b = new BlockPos(33, up + 4, z);
-		BlockPos c = new BlockPos(40, up + 4, z);
+		BlockPos a = new BlockPos(24, up + 10, z);
+		BlockPos b = new BlockPos(60, up + 10, z);
+		BlockPos c = new BlockPos(61, up + 10, z + 3);
+		check(stateAt(server, a).getValue(dev.wildcatter.block.InsulatorBlock.MOUNT) == dev.wildcatter.block.InsulatorBlock.Mount.POLE_TOP
+				&& stateAt(server, a.north()).getValue(dev.wildcatter.block.InsulatorBlock.MOUNT) == dev.wildcatter.block.InsulatorBlock.Mount.ARM,
+				"the insulators should be mounted on the pole top and the arm: " + stateAt(server, a) + " | " + stateAt(server, a.north()));
 		dev.wildcatter.item.SpoolItem.Result strung = server.computeOnServer(srv ->
-				dev.wildcatter.item.SpoolItem.connect(srv.overworld(), a, b, dev.wildcatter.energy.Voltage.DISTRIBUTION, false, 256));
-		check(strung.ok() && strung.length() == 9, "a 9 block span between two distribution insulators should be strung: " + strung);
+				dev.wildcatter.item.SpoolItem.connect(srv.overworld(), a, b, dev.wildcatter.energy.Voltage.DISTRIBUTION, false, 1024));
+		check(strung.ok() && strung.length() == 36 && strung.message().contains("(36 m)"), "a 36 m span of 4/0 ACSR (its longest) between two distribution insulators should be strung: " + strung);
+		for (int dz : new int[] {-1, 1}) {   // B and C, dead, for the picture
+			server.computeOnServer(srv -> dev.wildcatter.item.SpoolItem.connect(srv.overworld(), a.offset(0, 0, dz), b.offset(0, 0, dz), dev.wildcatter.energy.Voltage.DISTRIBUTION, false, 1024));
+		}
 		dev.wildcatter.item.SpoolItem.Result tooFar = server.computeOnServer(srv ->
-				dev.wildcatter.item.SpoolItem.connect(srv.overworld(), a, c, dev.wildcatter.energy.Voltage.DISTRIBUTION, false, 256));
-		check(!tooFar.ok() && tooFar.message().contains("Too far"), "a 16 block span is over the 10 block limit and should be refused: " + tooFar);
-		server.runCommand("setblock 40 " + (up + 4) + " " + z + " wildcatter:insulator_dist[conductor=b]");
+				dev.wildcatter.item.SpoolItem.connect(srv.overworld(), a, c, dev.wildcatter.energy.Voltage.DISTRIBUTION, false, 1024));
+		check(!tooFar.ok() && tooFar.message().contains("Too far"), "a 38 m span is over 4/0 ACSR's 36 m and should be refused: " + tooFar);
+		insulator(server, WildcatterBlocks.INSULATOR_DIST, c, "b");
 		dev.wildcatter.item.SpoolItem.Result wrongConductor = server.computeOnServer(srv ->
-				dev.wildcatter.item.SpoolItem.connect(srv.overworld(), b, c, dev.wildcatter.energy.Voltage.DISTRIBUTION, false, 256));
+				dev.wildcatter.item.SpoolItem.connect(srv.overworld(), b, c, dev.wildcatter.energy.Voltage.DISTRIBUTION, false, 1024));
 		check(!wrongConductor.ok() && wrongConductor.message().contains("different conductors"), "insulators on different conductors should not be joined: " + wrongConductor);
-		server.runCommand("tp @p 28 " + (up + 3) + " " + (z + 12) + " 180 -5");
+		server.runCommand("tp @p 42 " + (up + 7) + " " + (z + 28) + " 180 5");
 		context.waitTicks(100);
-		String far = read(server, 33, up + 4, z);
+		String far = read(server, 60, up + 10, z);
 		check(far.contains("1 span") && far.matches(".*\\b7[12]\\d\\d V.*"), "the far end of the span should hold about 7.2 kV: " + far);
 		context.takeScreenshot("wildcatter-span");
 		System.out.println("[wildcatter-test] span ok: " + strung.message() + " | " + tooFar.message() + " | " + far);
 
 		// an under-rated insulator: swap the far end for a low voltage one and the 12.47 kV line flashes over it
-		server.runCommand("setblock 33 " + (up + 4) + " " + z + " minecraft:air");
+		server.runCommand("setblock 60 " + (up + 10) + " " + z + " minecraft:air");
 		context.waitTicks(30);
-		server.runCommand("setblock 33 " + (up + 4) + " " + z + " wildcatter:insulator_lv");
+		insulator(server, WildcatterBlocks.INSULATOR_LV, b, "a");
 		dev.wildcatter.item.SpoolItem.Result flash = server.computeOnServer(srv ->
-				dev.wildcatter.item.SpoolItem.connect(srv.overworld(), a, b, dev.wildcatter.energy.Voltage.DISTRIBUTION, false, 256));
+				dev.wildcatter.item.SpoolItem.connect(srv.overworld(), a, b, dev.wildcatter.energy.Voltage.DISTRIBUTION, false, 1024));
 		check(flash.ok(), "a span can be strung to an under-rated insulator: " + flash);
 		context.waitTicks(20);
-		String lv = read(server, 33, up + 4, z);
+		String lv = read(server, 60, up + 10, z);
 		check(lv.contains("UNDER-RATED") && lv.contains("flashing over"), "the low voltage insulator on a 12.47 kV line should flash over: " + lv);
 		System.out.println("[wildcatter-test] under-rated insulator ok: " + lv);
 	}
@@ -995,14 +1010,13 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		int z = -92;
 		server.runCommand("fill 8 " + y + " " + (z - 3) + " 26 " + (y + 6) + " " + (z + 4) + " minecraft:air");
 		plant(server, z);
-		put(server, 12, up, z, "wildcatter:wool_wire_hot");
-		put(server, 13, up, z, "wildcatter:padmount_208[facing=east]");   // run backward: 120 V in at the back, 12.47 kV out of the front
-		for (int x = 14; x <= 17; x++) {
+		stepUp(server, z);
+		for (int x = 15; x <= 17; x++) {
 			put(server, x, up, z, "wildcatter:dist_wire_hot");
 		}
 		put(server, 18, up, z, "wildcatter:dist_wire_hot");
 		put(server, 19, up, z, "wildcatter:dist_wire_hot");
-		put(server, 20, up, z - 1, "wildcatter:pole");
+		placeBig(server, WildcatterBlocks.WOOD_POLE_40, new BlockPos(20, up, z - 1), net.minecraft.core.Direction.NORTH);
 		put(server, 20, up, z, "wildcatter:pole_transformer[facing=west]");
 		put(server, 21, up, z, "wildcatter:electric_lamp");        // leg A, on the back
 		put(server, 20, up, z + 1, "wildcatter:electric_lamp");    // leg B, on a side
@@ -1029,66 +1043,64 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	 */
 	private void serviceDrop(ClientGameTestContext context, TestServerContext server) {
 		int z = -108;
-		server.runCommand("fill 8 " + y + " " + (z - 3) + " 36 " + (y + 7) + " " + (z + 4) + " minecraft:air");
+		server.runCommand("fill 8 " + y + " " + (z - 3) + " 56 " + (y + 12) + " " + (z + 4) + " minecraft:air");
 		plant(server, z);
-		put(server, 12, up, z, "wildcatter:wool_wire_hot");
-		put(server, 13, up, z, "wildcatter:padmount_208[facing=east]");   // run backward: 120 V in at the back, 12.47 kV out of the front
-		for (int x = 14; x <= 17; x++) {
+		stepUp(server, z);
+		for (int x = 15; x <= 17; x++) {
 			put(server, x, up, z, "wildcatter:dist_wire_hot");
 		}
 		put(server, 18, up, z, "wildcatter:dist_wire_hot");
 		put(server, 19, up, z, "wildcatter:fused_cutout[facing=east]");
-		put(server, 20, up, z - 1, "wildcatter:pole");
+		placeBig(server, WildcatterBlocks.WOOD_POLE_40, new BlockPos(20, up, z - 1), net.minecraft.core.Direction.NORTH);
 		put(server, 20, up, z, "wildcatter:pole_transformer[facing=west]");
 		String hot = "wildcatter:wool_wire_hot";
 		String neutral = "wildcatter:wool_wire_neutral";
-		// the transformer's low side: hot out of the back and up to a pole, neutral out of the bottom and up beside it
-		for (int k = 0; k <= 3; k++) {
-			put(server, 21, up + k, z, hot);
+		// the transformer's low side: hot out of the back, round and up to the first service pole's arm (z-1); the neutral out
+		// of the bottom and up to its other end (z+1)
+		put(server, 21, up, z, hot);
+		for (int k = 0; k <= 8; k++) {
+			put(server, 21, up + k, z - 1, hot);
 			put(server, 21, up + k, z + 1, neutral);
 		}
 		put(server, 20, y, z, neutral);
 		put(server, 21, y, z, neutral);
 		put(server, 21, y, z + 1, neutral);
-		for (int px : new int[] {22, 29}) {
-			for (int dz = 0; dz <= 1; dz++) {
-				put(server, px, up, z + dz, "wildcatter:pole");
-				put(server, px, up + 1, z + dz, "wildcatter:pole");
-				put(server, px, up + 2, z + dz, "wildcatter:crossarm[axis=x]");
-			}
-			put(server, px, up + 3, z, "wildcatter:insulator_lv");
-			put(server, px, up + 3, z + 1, "wildcatter:insulator_lv[conductor=n]");
+		// two 30 ft poles 28 m apart, each with an arm across the drop and a spool insulator at each end of it
+		for (int px : new int[] {22, 50}) {
+			placeBig(server, WildcatterBlocks.WOOD_POLE_30, new BlockPos(px, up, z), net.minecraft.core.Direction.NORTH);
+			crossarm(server, new BlockPos(px, up + 7, z));
+			insulator(server, WildcatterBlocks.INSULATOR_LV, new BlockPos(px, up + 8, z - 1), "a");
+			insulator(server, WildcatterBlocks.INSULATOR_LV, new BlockPos(px, up + 8, z + 1), "n");
 		}
 		// the house end
-		for (int k = 0; k <= 3; k++) {
-			put(server, 30, up + k, z, hot);
-			put(server, 30, up + k, z + 1, neutral);
+		for (int k = 0; k <= 8; k++) {
+			put(server, 51, up + k, z - 1, hot);
+			put(server, 51, up + k, z + 1, neutral);
 		}
-		put(server, 31, up, z + 1, neutral);
-		put(server, 31, up, z, "wildcatter:electric_lamp");
+		put(server, 51, up, z, "wildcatter:electric_lamp");
 		context.waitTicks(20);
 		dev.wildcatter.item.SpoolItem.Result hotSpan = server.computeOnServer(srv -> dev.wildcatter.item.SpoolItem.connect(srv.overworld(),
-				new BlockPos(22, up + 3, z), new BlockPos(29, up + 3, z), dev.wildcatter.energy.Voltage.LOW, true, 256));
+				new BlockPos(22, up + 8, z - 1), new BlockPos(50, up + 8, z - 1), dev.wildcatter.energy.Voltage.LOW, true, 1024));
 		dev.wildcatter.item.SpoolItem.Result neutralSpan = server.computeOnServer(srv -> dev.wildcatter.item.SpoolItem.connect(srv.overworld(),
-				new BlockPos(22, up + 3, z + 1), new BlockPos(29, up + 3, z + 1), dev.wildcatter.energy.Voltage.LOW, true, 256));
-		check(hotSpan.ok() && neutralSpan.ok(), "the service drop's two spans should be strung: " + hotSpan + " " + neutralSpan);
-		server.runCommand("tp @p 26 " + (up + 2) + " " + (z + 9) + " 180 -3");
+				new BlockPos(22, up + 8, z + 1), new BlockPos(50, up + 8, z + 1), dev.wildcatter.energy.Voltage.LOW, true, 1024));
+		check(hotSpan.ok() && neutralSpan.ok() && hotSpan.length() == 28, "the service drop's two 28 m spans should be strung: " + hotSpan + " " + neutralSpan);
+		server.runCommand("tp @p 36 " + (up + 5) + " " + (z + 22) + " 180 -5");
 		context.waitTicks(200);
 		String cutout = read(server, 19, up, z);
-		check(cutout.contains("Fused cutout") && lit(server, 31, z), "the house lamp should light through the cutout, transformer and service drop: " + cutout + " | " + read(server, 31, up, z));
+		check(cutout.contains("Fused cutout") && lit(server, 51, z), "the house lamp should light through the cutout, transformer and service drop: " + cutout + " | " + read(server, 51, up, z));
 		context.takeScreenshot("wildcatter-service-drop");
 		// a fault takes out the cutout: shrink its rating so the lamp's small current blows it
 		dev.wildcatter.block.FuseBlockEntity.testRatingScale = 0.0003;
 		context.waitTicks(100);
 		String blown = read(server, 19, up, z);
-		check(blown.contains("BLOWN") && !lit(server, 31, z), "an overloaded cutout should blow and darken the house: " + blown);
+		check(blown.contains("BLOWN") && !lit(server, 51, z), "an overloaded cutout should blow and darken the house: " + blown);
 		dev.wildcatter.block.FuseBlockEntity.testRatingScale = null;
 		server.computeOnServer(srv -> {
 			((dev.wildcatter.block.FuseBlockEntity) srv.overworld().getBlockEntity(new BlockPos(19, up, z))).replaceElement();
 			return null;
 		});
 		context.waitTicks(100);
-		check(lit(server, 31, z), "with a new link the house should have power again: " + read(server, 19, up, z));
+		check(lit(server, 51, z), "with a new link the house should have power again: " + read(server, 19, up, z));
 		// the cutout's contacts are bare: a hand on the live one is a shock; with the line open it is safe
 		float live = touchCutout(server, new BlockPos(19, up, z));
 		check(live < 20.0F, "touching a live fused cutout should shock: health " + live + " | " + read(server, 19, up, z));
@@ -1170,14 +1182,13 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		server.runCommand("fill 8 " + (y - 1) + " " + (z - 3) + " 24 " + (y + 5) + " " + (z + 4) + " minecraft:air");
 		server.runCommand("fill 8 " + (y - 1) + " " + (z - 3) + " 24 " + (y - 1) + " " + (z + 4) + " minecraft:stone");
 		plant(server, z);
-		put(server, 12, up, z, "wildcatter:wool_wire_hot");
-		put(server, 13, up, z, "wildcatter:padmount_208[facing=east]");   // run backward: 120 V in at the back, 12.47 kV out of the front
-		for (int x = 14; x <= 17; x++) {
+		stepUp(server, z);
+		for (int x = 15; x <= 17; x++) {
 			put(server, x, up, z, "wildcatter:dist_wire_hot");
 		}
 		put(server, 18, up, z, "wildcatter:dist_wire_hot");
 		put(server, 19, up, z, "wildcatter:ufls_relay_dist[facing=east]");
-		put(server, 20, up, z - 1, "wildcatter:pole");
+		placeBig(server, WildcatterBlocks.WOOD_POLE_40, new BlockPos(20, up, z - 1), net.minecraft.core.Direction.NORTH);
 		put(server, 20, up, z, "wildcatter:pole_transformer[facing=west]");
 		put(server, 21, up, z, "wildcatter:electric_lamp");
 		context.waitTicks(120);
@@ -1270,27 +1281,28 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		server.runCommand("fill 4 " + (y - 1) + " " + (z - 6) + " 26 " + (y - 1) + " " + (z + 6) + " minecraft:stone");
 		BlockPos set = new BlockPos(10, up, z);
 		genset(server, set, net.minecraft.core.Direction.NORTH, false);   // the skid runs west of the panel; its terminals face east
-		put(server, 11, up, z, "wildcatter:unit_substation[facing=east]");   // 480 V in at the back, 4.16 kV out of the front
-		// 4.16 kV delta to 12.47 kV wye, true size: 2 m deep (x 12-13), 3 across (z-1 to z+1), 3 high; the bushings are on top at x 13
-		put(server, 12, up, z, "wildcatter:gsu_transformer[facing=east]");
-		put(server, 14, up + 2, z, "wildcatter:cable_dist");   // off the bushings' terminals and down to the pad-mount
-		put(server, 14, up + 1, z, "wildcatter:cable_dist");
-		put(server, 14, up, z, "wildcatter:cable_dist");
-		put(server, 15, up, z, "wildcatter:padmount_480[facing=west]");
-		put(server, 16, up, z, "wildcatter:cable_industrial");
-		put(server, 17, up, z, "wildcatter:breaker_3p_industrial[facing=east]");
-		put(server, 18, up, z, "wildcatter:cable_industrial");
-		put(server, 19, up, z, "wildcatter:three_phase_heater");
+		// the unit substation, true size x 11-14 and z-1 to z: 480 V in at its west end, 4.16 kV out of its east end
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, set, net.minecraft.core.Direction.EAST, false);
+		// 4.16 kV delta to 12.47 kV wye, true size, face to face with it: 2 m deep (x 15-16), 3 across (z-1 to z+1), 3 high; the bushings on top at x 16
+		placeBig(server, WildcatterBlocks.GSU_TRANSFORMER, new BlockPos(15, up, z), net.minecraft.core.Direction.EAST);
+		put(server, 17, up + 2, z, "wildcatter:cable_dist");   // off the bushings' terminals and down to the pad-mount
+		put(server, 17, up + 1, z, "wildcatter:cable_dist");
+		put(server, 17, up, z, "wildcatter:cable_dist");
+		inlineTransformer(server, WildcatterBlocks.PADMOUNT_480, new BlockPos(17, up, z), net.minecraft.core.Direction.EAST, false);   // x 18-19, 480 V out at x 20
+		put(server, 20, up, z, "wildcatter:cable_industrial");
+		put(server, 21, up, z, "wildcatter:breaker_3p_industrial[facing=east]");
+		put(server, 22, up, z, "wildcatter:cable_industrial");
+		put(server, 23, up, z, "wildcatter:three_phase_heater");
 		// 480 V cable straight off the genset's other terminal cell (the back of the panel's end face)
 		put(server, 11, up, z + 1, "wildcatter:cable_industrial");
 		put(server, 11, up, z + 2, "wildcatter:cable_industrial");
 		put(server, 11, up, z + 3, "wildcatter:three_phase_heater");
 		startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 1000);
-		server.runCommand("tp @p 15 " + (up + 2) + " " + (z + 6) + " 180 12");
+		server.runCommand("tp @p 17 " + (up + 3) + " " + (z + 8) + " 180 15");
 		context.waitTicks(200);
-		String heater = read(server, 19, up, z);
-		String cable = read(server, 18, up, z);
-		String pad = read(server, 15, up, z);
+		String heater = read(server, 23, up, z);
+		String cable = read(server, 22, up, z);
+		String pad = read(server, 19, up, z);
 		String unitHeater = read(server, 11, up, z + 3);
 		check(heater.contains("running") && heater.matches(".*A-B 4[5-9]\\d V, B-C 4[5-9]\\d V, C-A 4[5-9]\\d V.*"),
 				"the heater behind the pad-mount should run on 480 V between each pair of phases: " + heater + " | pad " + pad + " | cable " + cable + " | set " + read(server, 10, up, z));
@@ -1333,11 +1345,11 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(plug.contains("delivering") && gained > 700_000 && gained < 1_200_000, "an L22-30 plug should hand over about 10,000 FE per tick (" + gained + " in 100 ticks): " + plug);
 		System.out.println("[wildcatter-test] three-phase plug ok: " + plug + " | FE gained " + gained);
 		// a phase-to-phase short past the breaker: bare A and B wires touching
-		put(server, 19, up, z, "wildcatter:industrial_wire_hot[conductor=a]");
-		put(server, 18, up, z + 1, "wildcatter:industrial_wire_hot[conductor=b]");
-		put(server, 19, up, z + 1, "wildcatter:industrial_wire_hot[conductor=b]");
+		put(server, 23, up, z, "wildcatter:industrial_wire_hot[conductor=a]");
+		put(server, 22, up, z + 1, "wildcatter:industrial_wire_hot[conductor=b]");
+		put(server, 23, up, z + 1, "wildcatter:industrial_wire_hot[conductor=b]");
 		context.waitTicks(40);
-		String breaker = read(server, 17, up, z);
+		String breaker = read(server, 21, up, z);
 		check(breaker.contains("Three-pole breaker") && breaker.contains("TRIPPED") && breaker.contains("short circuit"),
 				"a phase-to-phase short should trip the three-pole breaker: " + breaker);
 		System.out.println("[wildcatter-test] industrial ok: " + heater + " | " + cable + " | " + pad + " | " + unitHeater + " | " + breaker);
@@ -1613,39 +1625,40 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		int z = -410;
 		server.runCommand("tp @p 20 " + (up + 6) + " " + (z + 12) + " 180 20");
 		context.waitTicks(20);
-		server.runCommand("fill 6 " + (y - 1) + " " + (z - 6) + " 50 " + (y + 8) + " " + (z + 6) + " minecraft:air");
+		server.runCommand("fill 6 " + (y - 1) + " " + (z - 6) + " 50 " + (y + 22) + " " + (z + 6) + " minecraft:air");
 		server.runCommand("fill 6 " + (y - 1) + " " + (z - 6) + " 50 " + (y - 1) + " " + (z + 6) + " minecraft:stone");
 		server.runCommand("fill 27 " + y + " " + (z - 6) + " 50 " + y + " " + (z + 6) + " minecraft:stone");   // the yard's ground at y: it stands on it
 		BlockPos set = new BlockPos(10, up, z);
 		genset(server, set, net.minecraft.core.Direction.NORTH, false);   // the skid runs west
-		put(server, 11, up, z, "wildcatter:unit_substation[facing=east]");   // 480 V up to 4.16 kV
-		put(server, 12, up, z, "wildcatter:substation_transformer[facing=east]");
-		// near end: cable off the 138 kV bushings, split into a riser per phase (A along z, B two blocks north, C two blocks south)
-		for (int cable : new int[] {13, 27}) {
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, set, net.minecraft.core.Direction.EAST, false);   // 480 V up to 4.16 kV, x 11-14
+		put(server, 15, up, z, "wildcatter:substation_transformer[facing=east]");
+		// near end: cable off the 138 kV bushings, split into a riser per phase up an H-frame's strings (A on z, B 4 m north, C 4 m south)
+		for (int cable : new int[] {16, 27}) {
 			for (int dz = -1; dz <= 1; dz++) {
 				put(server, cable, up, z + dz, "wildcatter:cable_hv");
 			}
 		}
 		String[] conductor = {"a", "b", "c"};
-		int[] row = {z, z - 2, z + 2};
+		int[] row = {z, z - 4, z + 4};
+		hFrame(server, 18, z);
+		hFrame(server, 24, z);
 		for (int k = 0; k < 3; k++) {
-			int from = k == 0 ? 14 : 13;
-			for (int x = from; x <= 15; x++) {
-				put(server, x, up, row[k], "wildcatter:hv_wire_hot[conductor=" + conductor[k] + "]");
+			String wire = "wildcatter:hv_wire_hot[conductor=" + conductor[k] + "]";
+			for (int h = 0; h <= 18; h++) {
+				put(server, 17, up + h, row[k], wire);
+				put(server, 25, up + h, row[k], wire);
 			}
-			int to = k == 0 ? 26 : 27;
-			for (int x = 25; x <= to; x++) {
-				put(server, x, up, row[k], "wildcatter:hv_wire_hot[conductor=" + conductor[k] + "]");
-			}
-			for (int h = 1; h <= 4; h++) {
-				put(server, 15, up + h, row[k], "wildcatter:hv_wire_hot[conductor=" + conductor[k] + "]");
-				put(server, 25, up + h, row[k], "wildcatter:hv_wire_hot[conductor=" + conductor[k] + "]");
-			}
-			for (int px : new int[] {16, 24}) {
-				for (int h = 0; h < 4; h++) {
-					put(server, px, up + h, row[k], "wildcatter:pole");
-				}
-				put(server, px, up + 4, row[k], "wildcatter:insulator_hv[conductor=" + conductor[k] + "]");
+			if (k > 0) {   // B and C from the cable's ends, out to their rows; at the far end round to the cable's ends
+				int side = row[k] < z ? -1 : 1;
+				put(server, 16, up, z + 2 * side, wire);
+				put(server, 16, up, z + 3 * side, wire);
+				put(server, 16, up, z + 4 * side, wire);
+				put(server, 26, up, z + 4 * side, wire);
+				put(server, 27, up, z + 4 * side, wire);
+				put(server, 27, up, z + 3 * side, wire);
+				put(server, 27, up, z + 2 * side, wire);
+			} else {
+				put(server, 26, up, z, wire);
 			}
 		}
 		// far end: the substation yard at true size (docs/multiblocks/substation.md), 16 x 9 m from x 28, its centre line on z: the
@@ -1655,9 +1668,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		java.util.List<BlockPos> overwrote = server.computeOnServer(srv -> dev.wildcatter.block.SubstationLayout.layout().build(srv.overworld(), transformer, net.minecraft.core.Direction.NORTH, 0));
 		check(overwrote.isEmpty(), "the yard should be built on clear ground: " + overwrote);
 		put(server, 44, up, z, "wildcatter:cable_dist");
-		put(server, 45, up, z, "wildcatter:padmount_480[facing=west]");
-		put(server, 46, up, z, "wildcatter:cable_industrial");
-		put(server, 47, up, z, "wildcatter:three_phase_heater");
+		inlineTransformer(server, WildcatterBlocks.PADMOUNT_480, new BlockPos(44, up, z), net.minecraft.core.Direction.EAST, false);   // x 45-46, 480 V out at x 47
+		put(server, 47, up, z, "wildcatter:cable_industrial");
+		put(server, 48, up, z, "wildcatter:three_phase_heater");
 		// a stretch of the yard's fence along its south side: chain link with the barbed-wire top
 		for (int x = 27; x <= 44; x++) {
 			put(server, x, up, z + 6, "wildcatter:chain_link_fence");
@@ -1665,26 +1678,26 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		}
 		context.waitTicks(40);
 		for (int k = 0; k < 3; k++) {
-			BlockPos near = new BlockPos(16, up + 4, row[k]);
-			BlockPos far = new BlockPos(24, up + 4, row[k]);
+			BlockPos near = new BlockPos(18, up + 18, row[k]);
+			BlockPos far = new BlockPos(24, up + 18, row[k]);
 			dev.wildcatter.item.SpoolItem.Result strung = server.computeOnServer(srv ->
-					dev.wildcatter.item.SpoolItem.connect(srv.overworld(), near, far, dev.wildcatter.energy.Voltage.HIGH, false, 256));
+					dev.wildcatter.item.SpoolItem.connect(srv.overworld(), near, far, dev.wildcatter.energy.Voltage.HIGH, false, 1024));
 			check(strung.ok(), "a 138 kV span on phase " + conductor[k] + " should be strung: " + strung);
 		}
 		startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 1000);
 		StringBuilder line = new StringBuilder();
 		for (int k = 0; k < 3; k++) {
-			String far = read(server, 24, up + 4, row[k]);
+			String far = read(server, 24, up + 18, row[k]);
 			line.append(far).append(" | ");
 			check(far.contains("1 span") && far.matches(".*\\b(7[5-9]|8[0-2])\\d{3} V.*"), "each phase at the far end of the 138 kV line should be about 79.7 kV to neutral: " + far);
 		}
-		String heater = read(server, 47, up, z);
+		String heater = read(server, 48, up, z);
 		String sub = read(server, 34, up, z - 2);
 		check(sub.contains("Delta-wye power transformer") && sub.matches(".*high side \\+30 degrees.*") && sub.contains("relays"),
 				"the substation should form, with its 138 kV side 30 degrees ahead: " + sub);
 		check(heater.contains("running") && heater.matches(".*A-B 4[5-9]\\d V, B-C 4[5-9]\\d V, C-A 4[5-9]\\d V.*"),
 				"the heater past the substation should run on 480 V between each pair of phases: " + heater + " | sub " + sub + " | pad " + read(server, 45, up, z) + " | " + line);
-		server.runCommand("tp @p 24 " + (up + 7) + " " + (z + 12) + " -150 25");
+		server.runCommand("tp @p 2 " + (up + 14) + " " + (z + 34) + " -145 12");
 		context.waitTicks(10);
 		context.takeScreenshot("wildcatter-overhead-three-phase");
 		server.runCommand("tp @p 50 " + (up + 8) + " " + (z - 10) + " 50 25");
@@ -1704,7 +1717,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			String feeder = read(server, 42, up, z - 1);
 			String relay = read(server, 34, up, z - 2);
 			check(feeder.contains("TRIPPED by the relay panel") && relay.contains("RELAY TRIPPED"), "a feeder fault should trip the substation's breakers by relay: " + feeder + " | " + relay);
-			check(!read(server, 47, up, z).contains("running"), "the heater should lose power with the feeder: " + read(server, 47, up, z));
+			check(!read(server, 48, up, z).contains("running"), "the heater should lose power with the feeder: " + read(server, 48, up, z));
 			// clear the fault, reset at the relay panel, and the feeder is back
 			put(server, 44, up + 1, z, "minecraft:air");
 			put(server, 44, up + 1, z + 1, "minecraft:air");
@@ -1714,7 +1727,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 				return null;
 			});
 			context.waitTicks(60);
-			check(read(server, 47, up, z).contains("running"), "after a reset the heater should run again: " + read(server, 47, up, z) + " | " + read(server, 34, up, z - 2));
+			check(read(server, 48, up, z).contains("running"), "after a reset the heater should run again: " + read(server, 48, up, z) + " | " + read(server, 34, up, z - 2));
 			// open the feeder breaker, then its disconnect: no load, no arc, and the blades swing open
 			server.computeOnServer(srv -> {
 				((dev.wildcatter.block.BreakerBlockEntity) srv.overworld().getBlockEntity(new BlockPos(42, up, z - 1))).tripByRelay("opened by hand for the test");
@@ -1752,23 +1765,23 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		server.runCommand("fill 6 " + (y - 1) + " " + (z - 6) + " 22 " + (y - 1) + " " + (z + 6) + " minecraft:stone");
 		BlockPos set = new BlockPos(12, up, z);
 		genset(server, set, net.minecraft.core.Direction.NORTH, false);   // the skid runs west
-		put(server, 13, up, z, "wildcatter:padmount_480[facing=east]");   // 480 V in at the back, 12.47 kV out of the front
+		inlineTransformer(server, WildcatterBlocks.PADMOUNT_480, set, net.minecraft.core.Direction.EAST, true);   // 480 V in at x 13, 12.47 kV out at x 15
 		for (int dz = -2; dz <= 2; dz++) {
-			put(server, 14, up, z + dz, "wildcatter:cable_dist");
+			put(server, 15, up, z + dz, "wildcatter:cable_dist");
 		}
 		int[] row = {z, z + 3, z - 3};
 		java.util.function.BiConsumer<Integer, String> feeder = (k, conductor) -> {
-			for (int x = k == 0 ? 15 : 14; x <= 16; x++) {
+			for (int x = k == 0 ? 16 : 15; x <= 17; x++) {
 				put(server, x, up, row[k], "wildcatter:dist_plastic_wire_hot[conductor=" + conductor + "]");
 			}
 		};
 		for (int k = 0; k < 3; k++) {
 			feeder.accept(k, "a");
-			put(server, 17, up, row[k] - 1, "wildcatter:pole");
-			put(server, 17, up, row[k], "wildcatter:pole_transformer[facing=west]");
-			put(server, 18, up, row[k], "wildcatter:wool_wire_hot");
-			put(server, 19, up, row[k], "wildcatter:electric_heater");
-			for (int x = 17; x <= 19; x++) {
+			placeBig(server, WildcatterBlocks.WOOD_POLE_40, new BlockPos(18, up, row[k] - 1), net.minecraft.core.Direction.NORTH);
+			put(server, 18, up, row[k], "wildcatter:pole_transformer[facing=west]");
+			put(server, 19, up, row[k], "wildcatter:wool_wire_hot");
+			put(server, 20, up, row[k], "wildcatter:electric_heater");
+			for (int x = 18; x <= 20; x++) {
 				put(server, x, y, row[k], "wildcatter:wool_wire_neutral");
 			}
 		}
@@ -1777,7 +1790,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 1000);
 			context.waitTicks(60);
 			String heating = read(server, 12, up, z);
-			check(lit(server, 19, z) && heating.contains("stator phase A at") && heating.matches(".*\\b(59|60)\\.\\d Hz.*"),
+			check(lit(server, 20, z) && heating.contains("stator phase A at") && heating.matches(".*\\b(59|60)\\.\\d Hz.*"),
 					"three heaters on phase A should run and heat the genset's phase A winding, frequency in band: " + heating);
 			String tripped = "";
 			for (int waited = 0; waited < 1200; waited += 40) {
@@ -1800,7 +1813,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			});
 			context.waitTicks(600);
 			String spread = read(server, 12, up, z);
-			check(spread.contains("RUNNING") && !spread.contains("TRIPPED") && lit(server, 19, z) && lit(server, 19, z + 3) && lit(server, 19, z - 3),
+			check(spread.contains("RUNNING") && !spread.contains("TRIPPED") && lit(server, 20, z) && lit(server, 20, z + 3) && lit(server, 20, z - 3),
 					"spread over A, B and C the same heaters should run without tripping: " + spread);
 			System.out.println("[wildcatter-test] stator limit ok: " + heating + " | " + tripped + " | spread " + spread);
 		} finally {
@@ -1900,24 +1913,23 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(isAir(server, 13, up, zc) && burning.contains("HEATING"), "6 AWG carrying 90 A should heat and burn out: " + burning);
 		System.out.println("[wildcatter-test] ampacity ok: " + holds + " | " + burning);
 
-		// 3. spans: 10 blocks is fine for 1/0 ACSR on distribution poles, too long for 4/0
+		// 3. spans: 40 m is fine for 1/0 ACSR on distribution poles, too long for 4/0
 		int zs = z - 20;
+		server.runCommand("fill 6 " + (y - 1) + " " + (zs - 4) + " 64 " + (y + 12) + " " + (zs + 1) + " minecraft:air");
 		for (int k = 0; k < 2; k++) {
-			for (int px : new int[] {20, 30}) {
-				for (int h = 0; h < 3; h++) {
-					put(server, px, up + h, zs - 3 * k, "wildcatter:pole");
-				}
-				put(server, px, up + 3, zs - 3 * k, "wildcatter:insulator_dist");
+			for (int px : new int[] {20, 60}) {
+				placeBig(server, WildcatterBlocks.WOOD_POLE_40, new BlockPos(px, up, zs - 3 * k), net.minecraft.core.Direction.NORTH);
+				insulator(server, WildcatterBlocks.INSULATOR_DIST, new BlockPos(px, up + 10, zs - 3 * k), "a");
 			}
 		}
 		context.waitTicks(10);
 		dev.wildcatter.item.SpoolItem.Result raven = server.computeOnServer(srv -> dev.wildcatter.item.SpoolItem.connect(srv.overworld(),
-				new BlockPos(20, up + 3, zs), new BlockPos(30, up + 3, zs), dev.wildcatter.energy.Voltage.DISTRIBUTION, false, 256, dev.wildcatter.energy.ConductorSize.ACSR_RAVEN));
+				new BlockPos(20, up + 10, zs), new BlockPos(60, up + 10, zs), dev.wildcatter.energy.Voltage.DISTRIBUTION, false, 1024, dev.wildcatter.energy.ConductorSize.ACSR_RAVEN));
 		dev.wildcatter.item.SpoolItem.Result penguin = server.computeOnServer(srv -> dev.wildcatter.item.SpoolItem.connect(srv.overworld(),
-				new BlockPos(20, up + 3, zs - 3), new BlockPos(30, up + 3, zs - 3), dev.wildcatter.energy.Voltage.DISTRIBUTION, false, 256, dev.wildcatter.energy.ConductorSize.ACSR_PENGUIN));
-		check(raven.ok() && raven.message().contains("Raven"), "a 10-block 1/0 ACSR span should string: " + raven);
-		check(!penguin.ok() && penguin.message().contains("Too far"), "a 10-block 4/0 ACSR span should be refused (heavier, 9 blocks at most): " + penguin);
-		check(read(server, 30, up + 3, zs).contains("Raven"), "the insulator should name its line's conductor: " + read(server, 30, up + 3, zs));
+				new BlockPos(20, up + 10, zs - 3), new BlockPos(60, up + 10, zs - 3), dev.wildcatter.energy.Voltage.DISTRIBUTION, false, 1024, dev.wildcatter.energy.ConductorSize.ACSR_PENGUIN));
+		check(raven.ok() && raven.message().contains("Raven"), "a 40 m 1/0 ACSR span should string: " + raven);
+		check(!penguin.ok() && penguin.message().contains("Too far"), "a 40 m 4/0 ACSR span should be refused (heavier, 36 m at most): " + penguin);
+		check(read(server, 60, up + 10, zs).contains("Raven"), "the insulator should name its line's conductor: " + read(server, 60, up + 10, zs));
 
 		// 4. a broken wire drops with its size
 		put(server, 40, up, zs, "wildcatter:industrial_wire_hot");
@@ -2091,6 +2103,61 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	}
 
 	/**
+	 * A pad-mount or unit substation in a line (docs/multiblocks/padmount.md), fed from {@code from} going {@code d}: on its main
+	 * cell's terminal if {@code feedMain} (a pad-mount's low side, a unit substation's 4.16 kV side), else on the far end's. It fills
+	 * the cells after {@code from} (2 for a pad-mount, 4 for a unit substation) and one row behind them; returns the cell its other
+	 * terminal feeds.
+	 */
+	private BlockPos inlineTransformer(TestServerContext server, net.minecraft.world.level.block.Block block, BlockPos from, net.minecraft.core.Direction d, boolean feedMain) {
+		int across = block == WildcatterBlocks.UNIT_SUBSTATION ? 3 : 1;
+		BlockPos first = from.relative(d);
+		net.minecraft.core.Direction facing = feedMain ? d.getCounterClockWise() : d.getClockWise();
+		placeBig(server, block, feedMain ? first : first.relative(d, across), facing);
+		return from.relative(d, across + 2);
+	}
+
+	/** The distribution scenes' step-up: 120 V wool wire at x 12, a 75 kVA pad-mount at x 13-14 run backward, 12.47 kV out at x 15. */
+	private void stepUp(TestServerContext server, int z) {
+		put(server, 12, up, z, "wildcatter:wool_wire_hot");
+		inlineTransformer(server, WildcatterBlocks.PADMOUNT_208, new BlockPos(12, up, z), net.minecraft.core.Direction.EAST, true);
+	}
+
+	/** An insulator put up as a lineman would: mounted by what holds it (an arm, a pole top, a crossbeam), on one conductor. */
+	private void insulator(TestServerContext server, net.minecraft.world.level.block.Block block, BlockPos at, String conductor) {
+		String why = server.computeOnServer(srv -> {
+			dev.wildcatter.block.InsulatorBlock insulator = (dev.wildcatter.block.InsulatorBlock) block;
+			dev.wildcatter.block.InsulatorBlock.Mount mount = insulator.mountAt(srv.overworld(), at);
+			if (mount == null) {
+				return "nothing holds an insulator at " + at.toShortString();
+			}
+			srv.overworld().setBlock(at, insulator.defaultBlockState().setValue(dev.wildcatter.block.InsulatorBlock.MOUNT, mount)
+					.setValue(dev.wildcatter.block.CableBlock.CONDUCTOR, dev.wildcatter.circuit.Conductor.valueOf(conductor.toUpperCase())), 3);
+			return "";
+		});
+		check(why.isEmpty(), why);
+	}
+
+	/** A crossarm on the pole whose top cell is {@code top}, square to a line running along x: its cells north and south of the pole. */
+	private void crossarm(TestServerContext server, BlockPos top) {
+		placeBig(server, WildcatterBlocks.CROSSARM_DIST, top.north(), net.minecraft.core.Direction.EAST);
+	}
+
+	/**
+	 * A 138 kV H-frame across a line running along x (docs/multiblocks/poles.md): 75 ft poles at (px, z-2) and (px, z+2), the
+	 * crossbeam across their tops, the X-brace, and the three strings under the beam: B at z-4, A at z and C at z+4, their clamps
+	 * 18 m up.
+	 */
+	private void hFrame(TestServerContext server, int px, int z) {
+		placeBig(server, WildcatterBlocks.WOOD_POLE_75, new BlockPos(px, up, z - 2), net.minecraft.core.Direction.NORTH);
+		placeBig(server, WildcatterBlocks.WOOD_POLE_75, new BlockPos(px, up, z + 2), net.minecraft.core.Direction.NORTH);
+		placeBig(server, WildcatterBlocks.CROSSBEAM_138, new BlockPos(px, up + 19, z), net.minecraft.core.Direction.EAST);
+		placeBig(server, WildcatterBlocks.X_BRACE_138, new BlockPos(px, up + 15, z), net.minecraft.core.Direction.EAST);
+		insulator(server, WildcatterBlocks.INSULATOR_HV, new BlockPos(px, up + 18, z - 4), "b");
+		insulator(server, WildcatterBlocks.INSULATOR_HV, new BlockPos(px, up + 18, z), "a");
+		insulator(server, WildcatterBlocks.INSULATOR_HV, new BlockPos(px, up + 18, z + 4), "c");
+	}
+
+	/**
 	 * The 1 MW steam plant at true size (4.5c, docs/multiblocks/steam-plant.md): burner, boiler, superheater, generator, turbine,
 	 * feed pump and condenser form a plant, 6 x 7 m. Lit, the drum rises toward pressure. A drum too low to run waits for its
 	 * feed pump, which needs 480 V: a genset black-starts it. At pressure the turbine rolls up, the generator closes onto the dead
@@ -2114,9 +2181,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		put(server, 7, up + 2, z + 1, "wildcatter:cable_dist");
 		put(server, 7, up + 1, z + 1, "wildcatter:cable_dist");
 		put(server, 7, up, z + 1, "wildcatter:cable_dist");
-		put(server, 6, up, z + 1, "wildcatter:padmount_480[facing=east]");
-		put(server, 5, up, z + 1, "wildcatter:cable_industrial");
-		put(server, 4, up, z + 1, "wildcatter:three_phase_heater");
+		inlineTransformer(server, WildcatterBlocks.PADMOUNT_480, new BlockPos(7, up, z + 1), net.minecraft.core.Direction.WEST, false);   // x 5-6, 480 V out at x 4
+		put(server, 4, up, z + 1, "wildcatter:cable_industrial");
+		put(server, 3, up, z + 1, "wildcatter:three_phase_heater");
 		context.waitTicks(30);
 		check(read(server, 10, up, z).contains("COLD"), "the parts should form a cold plant: " + read(server, 10, up, z));
 		// light it with coal on the burner; the drum starts at 48 % water (below the half it needs to run) and a full hotwell
@@ -2159,7 +2226,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(60);
 		String running = read(server, 10, up, z);
 		String gsu = read(server, 9, up, z + 1);
-		String heater = read(server, 4, up, z + 1);
+		String heater = read(server, 3, up, z + 1);
 		check(running.matches(".*RUNNING (3[45]\\d\\d|29\\d\\d|30\\d\\d) rpm.*"), "the turbine should run at rated speed: " + running);
 		check(gsu.contains("line side +30 degrees") && heater.contains("running"), "through the GSU (30 degrees) and a pad-mount the heater should run: " + gsu + " | " + heater);
 		check(running.contains("NOT COOLED"), "with no cooling tower the plant should say so: " + running);
@@ -2304,12 +2371,17 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 
 	/** Places a true-size part the way a player does: standing at {@code (px, pz)} looking {@code yaw}, clicking the top of {@code clicked}. */
 	private boolean placeOn(TestServerContext server, net.minecraft.world.level.block.Block block, BlockPos clicked, double px, double pz, float yaw) {
+		return placeAt(server, block, clicked, net.minecraft.core.Direction.UP, px, pz, yaw);
+	}
+
+	/** The same, clicking {@code face} of {@code clicked} (the side of a pole, say). */
+	private boolean placeAt(TestServerContext server, net.minecraft.world.level.block.Block block, BlockPos clicked, net.minecraft.core.Direction face, double px, double pz, float yaw) {
 		return server.computeOnServer(srv -> {
 			net.minecraft.server.level.ServerPlayer player = srv.getPlayerList().getPlayers().get(0);
 			player.snapTo(px, clicked.getY() + 1, pz, yaw, 30.0F);
 			ItemStack stack = new ItemStack(block);
 			net.minecraft.world.phys.BlockHitResult hit = new net.minecraft.world.phys.BlockHitResult(
-					net.minecraft.world.phys.Vec3.atCenterOf(clicked).add(0, 0.5, 0), net.minecraft.core.Direction.UP, clicked, false);
+					net.minecraft.world.phys.Vec3.atCenterOf(clicked).add(face.getStepX() * 0.5, face.getStepY() * 0.5, face.getStepZ() * 0.5), face, clicked, false);
 			return ((net.minecraft.world.item.BlockItem) stack.getItem())
 					.place(new net.minecraft.world.item.context.BlockPlaceContext(player, net.minecraft.world.InteractionHand.MAIN_HAND, stack, hit)).consumesAction();
 		});
@@ -2598,6 +2670,103 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(stateAt(server, new BlockPos(34, up, z + 10)).isAir() && itemsNear(server, new BlockPos(34, up, z + 10), WildcatterBlocks.HV_BREAKER_3P) == 1,
 				"a one-block 138 kV breaker from an older world should drop as one item");
 		System.out.println("[wildcatter-test] substation parts ok: " + waiting + " | " + formed);
+	}
+
+	/**
+	 * The overhead line at true size (4.5e, docs/multiblocks/poles.md), put up the way a player does: a 40 ft pole placed by a
+	 * click stands 10 m; an arm clicked on its side near the top goes to the standard place across the line; pin insulators on the
+	 * arm and the pole top take those mounts; a pole transformer clicked on the pole hangs with its back to it (screenshot).
+	 * Breaking the pole drops the pole, the arm and the insulators. Two H-frames with their strings (screenshot). An older world's
+	 * stacked pole still carries its span to a lamp, and an older world's one-block pad-mount grows into its 2 x 2 x 2.
+	 */
+	private void lineParts(ClientGameTestContext context, TestServerContext server) {
+		int z = -930;
+		server.runCommand("tp @p 10 " + (up + 4) + " " + (z - 10) + " 0 -20");
+		context.waitTicks(20);
+		server.runCommand("fill 0 " + (y - 1) + " " + (z - 14) + " 48 " + (y + 24) + " " + (z + 14) + " minecraft:air");
+		server.runCommand("fill 0 " + (y - 1) + " " + (z - 14) + " 48 " + y + " " + (z + 14) + " minecraft:grass_block");   // ground at y
+		server.runCommand("kill @e[type=item]");
+		BlockPos foot = new BlockPos(10, y, z);
+		check(placeOn(server, WildcatterBlocks.WOOD_POLE_40, foot, 10.5, z - 5.5, 0.0F), "a 40 ft pole should place on clear ground");
+		check(stateAt(server, new BlockPos(10, up + 9, z)).is(WildcatterBlocks.WOOD_POLE_40) && stateAt(server, new BlockPos(10, up + 10, z)).isAir(),
+				"a 40 ft pole should stand 10 m: " + stateAt(server, new BlockPos(10, up + 9, z)));
+		// standing south of it, looking north along the line, click the pole's side 2 m below its top: the arm goes to the top, across the line
+		check(placeAt(server, WildcatterBlocks.CROSSARM_DIST, new BlockPos(10, up + 8, z), net.minecraft.core.Direction.NORTH, 10.5, z - 3.5, 0.0F),
+				"a crossarm clicked on the pole should place");
+		check(stateAt(server, new BlockPos(9, up + 9, z)).is(WildcatterBlocks.CROSSARM_DIST) && stateAt(server, new BlockPos(11, up + 9, z)).is(WildcatterBlocks.CROSSARM_DIST)
+				&& stateAt(server, new BlockPos(10, up + 9, z)).is(WildcatterBlocks.WOOD_POLE_40),
+				"the arm should go beside the pole's top cell, either side: " + stateAt(server, new BlockPos(9, up + 9, z)) + " | " + stateAt(server, new BlockPos(9, up + 8, z)));
+		for (int x : new int[] {9, 10, 11}) {
+			check(placeOn(server, WildcatterBlocks.INSULATOR_DIST, new BlockPos(x, up + 9, z), x + 0.5, z - 3.5, 0.0F), "a pin insulator should go on the arm or the pole top at x " + x);
+		}
+		check(stateAt(server, new BlockPos(9, up + 10, z)).getValue(dev.wildcatter.block.InsulatorBlock.MOUNT) == dev.wildcatter.block.InsulatorBlock.Mount.ARM
+				&& stateAt(server, new BlockPos(10, up + 10, z)).getValue(dev.wildcatter.block.InsulatorBlock.MOUNT) == dev.wildcatter.block.InsulatorBlock.Mount.POLE_TOP,
+				"the insulators should take the arm's and the pole top's mounts: " + stateAt(server, new BlockPos(9, up + 10, z)) + " | " + stateAt(server, new BlockPos(10, up + 10, z)));
+		check(placeAt(server, WildcatterBlocks.POLE_TRANSFORMER, new BlockPos(10, up + 6, z), net.minecraft.core.Direction.SOUTH, 10.5, z + 3.5, 180.0F),
+				"a pole transformer clicked on the pole should hang on it");
+		check(stateAt(server, new BlockPos(10, up + 6, z + 1)).getValue(dev.wildcatter.block.TransformerBlock.FACING) == net.minecraft.core.Direction.SOUTH,
+				"the pole transformer should hang with its back to the pole: " + stateAt(server, new BlockPos(10, up + 6, z + 1)));
+		put(server, 9, up + 8, z + 1, "wildcatter:fused_cutout[facing=south]");
+		check(!placeAt(server, WildcatterBlocks.CROSSARM_DIST, new BlockPos(20, y, z), net.minecraft.core.Direction.UP, 20.5, z - 3.5, 0.0F),
+				"a crossarm with no pole should not place");
+		server.runCommand("tp @p 15 " + (up + 9) + " " + (z + 7) + " 145 5");
+		context.waitTicks(3);   // before the player falls far
+		context.takeScreenshot("wildcatter-line-pole");
+		// break the pole at its foot: it goes whole, and the arm and its insulators fall with it
+		server.runCommand("kill @e[type=item]");
+		put(server, 9, up + 8, z + 1, "minecraft:air");
+		put(server, 10, up + 6, z + 1, "minecraft:air");
+		server.computeOnServer(srv -> srv.overworld().destroyBlock(new BlockPos(10, up + 2, z), true));
+		context.waitTicks(40);
+		int poles = itemsNear(server, new BlockPos(10, up + 5, z), WildcatterBlocks.WOOD_POLE_40);
+		int arms = itemsNear(server, new BlockPos(10, up + 5, z), WildcatterBlocks.CROSSARM_DIST);
+		int pins = itemsNear(server, new BlockPos(10, up + 5, z), WildcatterBlocks.INSULATOR_DIST);
+		check(poles == 1 && arms == 1 && pins == 3 && stateAt(server, new BlockPos(9, up + 9, z)).isAir(),
+				"breaking the pole should drop one pole, its arm and its three insulators: " + poles + " " + arms + " " + pins
+						+ " | left " + stateAt(server, new BlockPos(9, up + 10, z)) + " " + stateAt(server, new BlockPos(10, up + 10, z)) + " " + stateAt(server, new BlockPos(11, up + 10, z))
+						+ " " + stateAt(server, new BlockPos(11, up + 9, z)));
+		// a 138 kV H-frame pair: two 75 ft poles, the crossbeam, the X-brace and three hanging strings each, strung 20 m apart
+		hFrame(server, 24, z);
+		hFrame(server, 44, z);
+		check(stateAt(server, new BlockPos(24, up + 18, z - 4)).getValue(dev.wildcatter.block.InsulatorBlock.MOUNT) == dev.wildcatter.block.InsulatorBlock.Mount.HANGING,
+				"a 138 kV string under the crossbeam should hang: " + stateAt(server, new BlockPos(24, up + 18, z - 4)));
+		for (int dz : new int[] {-4, 0, 4}) {
+			dev.wildcatter.item.SpoolItem.Result hv = server.computeOnServer(srv -> dev.wildcatter.item.SpoolItem.connect(srv.overworld(),
+					new BlockPos(24, up + 18, z + dz), new BlockPos(44, up + 18, z + dz), dev.wildcatter.energy.Voltage.HIGH, false, 1024));
+			check(hv.ok(), "a 138 kV span between the H-frames should string: " + hv);
+		}
+		server.runCommand("tp @p 8 " + (up + 12) + " " + (z + 30) + " -140 -2");
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-h-frame");
+		// an older world's stacked pole sections with an insulator on each still carry a 120 V span to a lamp
+		int zz = z + 10;
+		plant(server, zz);
+		put(server, 12, up, zz, "wildcatter:wool_wire_hot");
+		put(server, 12, up + 1, zz, "wildcatter:wool_wire_hot");
+		put(server, 12, up + 2, zz, "wildcatter:wool_wire_hot");
+		for (int px : new int[] {13, 20}) {
+			put(server, px, up, zz, "wildcatter:pole");
+			put(server, px, up + 1, zz, "wildcatter:pole");
+			put(server, px, up + 2, zz, "wildcatter:insulator_lv");
+		}
+		for (int k = 0; k <= 2; k++) {
+			put(server, 21, up + k, zz, "wildcatter:wool_wire_hot");
+		}
+		put(server, 22, up, zz, "wildcatter:electric_lamp");
+		for (int x = 11; x <= 22; x++) {
+			put(server, x, up, zz + 1, "wildcatter:wool_wire_neutral");
+		}
+		context.waitTicks(10);
+		dev.wildcatter.item.SpoolItem.Result old = server.computeOnServer(srv -> dev.wildcatter.item.SpoolItem.connect(srv.overworld(),
+				new BlockPos(13, up + 2, zz), new BlockPos(20, up + 2, zz), dev.wildcatter.energy.Voltage.LOW, false, 1024));
+		check(old.ok(), "an older world's insulators should still take a span: " + old);
+		context.waitTicks(160);
+		check(lit(server, 22, zz), "the span on the older poles should light the lamp: " + read(server, 22, up, zz) + " | " + read(server, 20, up + 2, zz));
+		// an older world's one-block pad-mount grows into its cells
+		put(server, 30, up, z + 10, "wildcatter:padmount_208[facing=north]");
+		context.waitTicks(10);
+		check(stateAt(server, new BlockPos(31, up + 1, z + 11)).is(WildcatterBlocks.PADMOUNT_208), "a one-block pad-mount with room should grow to 2 x 2 x 2: " + stateAt(server, new BlockPos(31, up + 1, z + 11)));
+		System.out.println("[wildcatter-test] line parts ok: pole, arm, insulators, transformer; break drops " + poles + "/" + arms + "/" + pins + "; H-frames strung; old span lit; pad-mount grew");
 	}
 
 	private void fieldManual(TestServerContext server) {

@@ -1,18 +1,63 @@
 {
   "variants": {
-    "conductor=a": {
+    "conductor=a,mount=legacy": {
       "model": "wildcatter:block/insulator_dist_a"
     },
-    "conductor=b": {
+    "conductor=a,mount=arm": {
+      "model": "wildcatter:block/insulator_dist_a_arm"
+    },
+    "conductor=a,mount=pole_top": {
+      "model": "wildcatter:block/insulator_dist_a_pole_top"
+    },
+    "conductor=a,mount=hanging": {
+      "model": "wildcatter:block/insulator_dist_a"
+    },
+    "conductor=b,mount=legacy": {
       "model": "wildcatter:block/insulator_dist_b"
     },
-    "conductor=c": {
+    "conductor=b,mount=arm": {
+      "model": "wildcatter:block/insulator_dist_b_arm"
+    },
+    "conductor=b,mount=pole_top": {
+      "model": "wildcatter:block/insulator_dist_b_pole_top"
+    },
+    "conductor=b,mount=hanging": {
+      "model": "wildcatter:block/insulator_dist_b"
+    },
+    "conductor=c,mount=legacy": {
       "model": "wildcatter:block/insulator_dist_c"
     },
-    "conductor=n": {
+    "conductor=c,mount=arm": {
+      "model": "wildcatter:block/insulator_dist_c_arm"
+    },
+    "conductor=c,mount=pole_top": {
+      "model": "wildcatter:block/insulator_dist_c_pole_top"
+    },
+    "conductor=c,mount=hanging": {
+      "model": "wildcatter:block/insulator_dist_c"
+    },
+    "conductor=n,mount=legacy": {
       "model": "wildcatter:block/insulator_dist_n"
     },
-    "conductor=g": {
+    "conductor=n,mount=arm": {
+      "model": "wildcatter:block/insulator_dist_n_arm"
+    },
+    "conductor=n,mount=pole_top": {
+      "model": "wildcatter:block/insulator_dist_n_pole_top"
+    },
+    "conductor=n,mount=hanging": {
+      "model": "wildcatter:block/insulator_dist_n"
+    },
+    "conductor=g,mount=legacy": {
+      "model": "wildcatter:block/insulator_dist_g"
+    },
+    "conductor=g,mount=arm": {
+      "model": "wildcatter:block/insulator_dist_g_arm"
+    },
+    "conductor=g,mount=pole_top": {
+      "model": "wildcatter:block/insulator_dist_g_pole_top"
+    },
+    "conductor=g,mount=hanging": {
       "model": "wildcatter:block/insulator_dist_g"
     }
   }

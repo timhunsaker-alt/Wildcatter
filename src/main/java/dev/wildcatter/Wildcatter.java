@@ -67,6 +67,8 @@ public class Wildcatter implements ModInitializer {
 			}
 			if (item instanceof ConductorItem || item instanceof SpoolItem) {
 				conductors.add(item);
+			} else if (item == WildcatterBlocks.POLE.asItem() || item == WildcatterBlocks.CROSSARM.asItem()) {
+				continue;   // an older world's one-block pole and crossarm: kept working, no longer offered (4.5e)
 			} else {
 				output.accept(item);
 			}

@@ -1,19 +1,64 @@
 {
   "variants": {
-    "conductor=a": {
+    "conductor=a,mount=legacy": {
       "model": "wildcatter:block/insulator_hv_a"
     },
-    "conductor=b": {
+    "conductor=a,mount=arm": {
+      "model": "wildcatter:block/insulator_hv_a"
+    },
+    "conductor=a,mount=pole_top": {
+      "model": "wildcatter:block/insulator_hv_a"
+    },
+    "conductor=a,mount=hanging": {
+      "model": "wildcatter:block/insulator_hv_a_hanging"
+    },
+    "conductor=b,mount=legacy": {
       "model": "wildcatter:block/insulator_hv_b"
     },
-    "conductor=c": {
+    "conductor=b,mount=arm": {
+      "model": "wildcatter:block/insulator_hv_b"
+    },
+    "conductor=b,mount=pole_top": {
+      "model": "wildcatter:block/insulator_hv_b"
+    },
+    "conductor=b,mount=hanging": {
+      "model": "wildcatter:block/insulator_hv_b_hanging"
+    },
+    "conductor=c,mount=legacy": {
       "model": "wildcatter:block/insulator_hv_c"
     },
-    "conductor=n": {
+    "conductor=c,mount=arm": {
+      "model": "wildcatter:block/insulator_hv_c"
+    },
+    "conductor=c,mount=pole_top": {
+      "model": "wildcatter:block/insulator_hv_c"
+    },
+    "conductor=c,mount=hanging": {
+      "model": "wildcatter:block/insulator_hv_c_hanging"
+    },
+    "conductor=n,mount=legacy": {
       "model": "wildcatter:block/insulator_hv_n"
     },
-    "conductor=g": {
+    "conductor=n,mount=arm": {
+      "model": "wildcatter:block/insulator_hv_n"
+    },
+    "conductor=n,mount=pole_top": {
+      "model": "wildcatter:block/insulator_hv_n"
+    },
+    "conductor=n,mount=hanging": {
+      "model": "wildcatter:block/insulator_hv_n_hanging"
+    },
+    "conductor=g,mount=legacy": {
       "model": "wildcatter:block/insulator_hv_g"
+    },
+    "conductor=g,mount=arm": {
+      "model": "wildcatter:block/insulator_hv_g"
+    },
+    "conductor=g,mount=pole_top": {
+      "model": "wildcatter:block/insulator_hv_g"
+    },
+    "conductor=g,mount=hanging": {
+      "model": "wildcatter:block/insulator_hv_g_hanging"
     }
   }
 }

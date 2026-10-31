@@ -1,6 +1,12 @@
 {
   "values": [
     "wildcatter:pole",
-    "wildcatter:crossarm"
+    "wildcatter:crossarm",
+    "wildcatter:wood_pole_30",
+    "wildcatter:wood_pole_40",
+    "wildcatter:wood_pole_75",
+    "wildcatter:crossarm_dist",
+    "wildcatter:crossbeam_138",
+    "wildcatter:x_brace_138"
   ]
 }

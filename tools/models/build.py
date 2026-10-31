@@ -14,7 +14,9 @@ PARTS = ["gsu_transformer", "fuel_tank", "genset_base_frame", "radiator", "gense
 	"genset_control_panel", "exhaust_stack", "exhaust_silencer_large",
 	"boiler_burner", "boiler_drum", "superheater", "turbine_casing", "turbine_generator", "condenser", "feed_pump",
 	"tower_basin", "cooling_fill", "drift_eliminator", "cooling_tower",
-	"hv_breaker_3p", "disconnect_hv", "bus_hv", "power_transformer", "bus_dist", "disconnect_dist", "dist_breaker_3p", "relay_panel"]
+	"hv_breaker_3p", "disconnect_hv", "bus_hv", "power_transformer", "bus_dist", "disconnect_dist", "dist_breaker_3p", "relay_panel",
+	"wood_pole_30", "wood_pole_40", "wood_pole_75", "crossarm_dist", "crossbeam_138", "x_brace_138", "pole_transformer", "fused_cutout",
+	"padmount_208", "padmount_480", "unit_substation"]
 
 
 def colours(model):
@@ -31,9 +33,13 @@ def main(names):
 	previews = os.path.join(mlib.ROOT, "build/model-previews")
 	os.makedirs(previews, exist_ok=True)
 	for name in [n for n in names if n != "rotors"] or (PARTS if not names else []):
-		model = importlib.import_module(name).M
-		model.export()
+		module = importlib.import_module(name)
+		model = module.M
+		model.export(**getattr(module, "EXPORT", {}))   # a one-cell part with other states writes its own blockstate
 		model.preview(os.path.join(previews, name + ".png"), colours(model))
+		for extra in getattr(module, "EXTRA", []):      # another look of the same block (the blown cutout)
+			extra.export(blockstate=False, item=False)
+			extra.preview(os.path.join(previews, extra.name + ".png"), colours(extra))
 	if not names or "rotors" in names:
 		for model in importlib.import_module("rotors").ROTORS:
 			model.export_single(model.name[len("rotor_"):])

@@ -1,6 +1,8 @@
 package dev.wildcatter.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import dev.wildcatter.Tuning;
+import dev.wildcatter.block.InsulatorBlock;
 import dev.wildcatter.block.InsulatorBlockEntity;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +17,7 @@ import net.minecraft.world.phys.Vec3;
 /** Draws the overhead spans between insulators as sagging lines. The lower end of each span draws it. */
 public class SpanRenderer implements BlockEntityRenderer<InsulatorBlockEntity, SpanRenderer.State> {
 	public static class State extends BlockEntityRenderState {
-		/** Per span: offset from this block to the other end, and whether it is covered. */
+		/** Per span: offset from this block to the other end, whether it is covered, its length, and each end's conductor height. */
 		final List<double[]> spans = new ArrayList<>();
 		int color = 0xFFC8322D;
 	}
@@ -37,10 +39,12 @@ public class SpanRenderer implements BlockEntityRenderer<InsulatorBlockEntity, S
 			case N -> 0xFF2A2A2E;
 			case G -> 0xFF28963F;
 		};
+		double here = InsulatorBlock.conductorY(entity.getBlockState());
 		for (InsulatorBlockEntity.Span span : entity.spans()) {
 			if (entity.getBlockPos().asLong() < span.other().asLong()) {
+				double there = entity.getLevel() != null ? InsulatorBlock.conductorY(entity.getLevel().getBlockState(span.other())) : here;
 				state.spans.add(new double[] {span.other().getX() - entity.getBlockPos().getX(), span.other().getY() - entity.getBlockPos().getY(),
-						span.other().getZ() - entity.getBlockPos().getZ(), span.covered() ? 1 : 0, span.length()});
+						span.other().getZ() - entity.getBlockPos().getZ(), span.covered() ? 1 : 0, span.length(), here, there});
 			}
 		}
 	}
@@ -56,16 +60,17 @@ public class SpanRenderer implements BlockEntityRenderer<InsulatorBlockEntity, S
 				double dx = span[0];
 				double dy = span[1];
 				double dz = span[2];
-				double sag = Math.min(2.0, 0.03 * span[4] + 0.1);
+				double sag = Tuning.SPAN_SAG * span[4];
 				float width = span[3] > 0 ? 4.0F : 2.5F;
-				int segments = 14;
+				int segments = Math.max(14, (int) (span[4] / 3));
 				double px = 0.5;
-				double py = 0.95;
+				double py = span[5];
 				double pz = 0.5;
+				double rise = dy + span[6] - span[5];
 				for (int i = 1; i <= segments; i++) {
 					double t = i / (double) segments;
 					double nx = 0.5 + dx * t;
-					double ny = 0.95 + dy * t - sag * 4.0 * t * (1 - t);
+					double ny = span[5] + rise * t - sag * 4.0 * t * (1 - t);
 					double nz = 0.5 + dz * t;
 					float lx = (float) (nx - px);
 					float ly = (float) (ny - py);
@@ -91,7 +96,7 @@ public class SpanRenderer implements BlockEntityRenderer<InsulatorBlockEntity, S
 
 	@Override
 	public int getViewDistance() {
-		return 256;
+		return 320;
 	}
 
 	@Override

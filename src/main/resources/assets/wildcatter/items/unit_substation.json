@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/unit_substation"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/unit_substation/item"
+ }
 }

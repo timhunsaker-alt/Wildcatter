@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "#minecraft:logs",
+    "#minecraft:logs",
+    "#minecraft:logs",
+    "#minecraft:logs",
+    "#minecraft:logs",
+    "#minecraft:logs",
+    "#minecraft:logs",
+    "#minecraft:logs",
+    "minecraft:coal"
+  ],
+  "result": {
+    "id": "wildcatter:wood_pole_75",
+    "count": 1
+  }
+}

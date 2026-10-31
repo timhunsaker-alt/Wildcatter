@@ -319,6 +319,45 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
     - one fill piece breaks the whole fill and drops one
     - an old one-block condenser drops
 
+## Phase 4.5d: the substation yard at true size
+- **The yard** (docs/multiblocks/substation.md) is 16 × 9 m and 7 high, every part on the ground along the centre line:
+  - 138 kV dead-tank breaker 2 × 5 × 9, centre-break disconnect 2 × 6 × 9 (six arms swing open), 138 kV bus 2 × 6 × 9
+  - 20 MVA power transformer 6 × 7 × 5 (the controller), with radiators, conservator, arresters and cabinets
+  - 12.47 kV bus 1 × 4 × 3, vertical-break disconnect 1 × 5 × 3 (three blades lift), feeder breaker 2 × 4 × 3
+  - relay panel 2 × 2 × 1 north of the transformer
+  The yard has nothing to snap to; the transformer's readout names the next missing or wrongly turned part and its x y z.
+- **Terminals** are on each part's west and east faces at the centre line's bottom cell, so parts in their spots touch.
+- **Fence (decoration):** chain-link fence and barbed-wire top blocks, see-through, joining like iron bars.
+- **Shared code:** `BigBreakerBlock`, `BigDisconnectBlock`, `StationBusBlock` (a 2,000 A station bus), `SubstationLayout`,
+  `BigPart.terminalCell` and `BigParts.lineTerminal`.
+- **Old worlds:** Phase 4 one-block yard parts drop as items with a chat line.
+- **Game tests:** `overheadThreePhase` ends in the true-size yard (relay trip, reset, disconnects opened after their
+  breakers); new scene `substationParts` (placed by clicks, a missing bus named, one disconnect piece breaks it whole).
+- This section and the Field Manual's substation page were missed in the 4.5d commit and added with 4.5e.
+
+## Phase 4.5e: the overhead line at true size
+- **Span scale** is 1 m per block (Tim's choice), with the same limits in metres: 32 m low voltage, 40 m at 12.47 kV (36 m
+  for 4/0 ACSR), 256 m at 138 kV; a spool holds 1,024 m; the drawn sag is 2.5 % of the span.
+- **Poles** (docs/multiblocks/poles.md), one item each: 30 ft (8 m), 40 ft (10 m) and 75 ft (20 m) creosoted wood poles
+  with steps, brand tag and ground wire moulding, climbable.
+  - **Crossarm**, 8 ft fir on two braces: clicked on a pole within 2 m of its top it bolts on 0.3 m below the top, across
+    the line; lower, where clicked. It fills the cells either side of the pole (the first footprint with a gap).
+  - **H-frame** for 138 kV: two 75 ft poles 4 m apart, a 9 m crossbeam clicked onto their tops, an X-brace below.
+  - Hardware needs its poles: break a pole and its arm, crossbeam or brace drops, and their insulators with them.
+- **Insulators** now know their mount: on an arm, on a pole-top pin (0.3 m higher), or a 138 kV string of nine bells
+  hanging 1.5 m from a crossbeam. The span is drawn, and its shock reach measured, from where each conductor really sits.
+- **Pole transformer and fused cutout** are drawn at true size in their cell; a pole transformer clicked onto a pole hangs
+  with its brackets on it.
+- **Pad-mounts** (75 and 300 kVA) are 2 × 2 × 2 and the **unit substation** a 4 × 3 × 2 lineup (docs/multiblocks/padmount.md),
+  with terminals at the bottom front cells; an older world's one-block unit grows into its cells where there is room.
+- **Old worlds:** the one-block pole and crossarm keep working with their spans, but are no longer crafted or in the
+  creative tab. Spans strung before keep their length in blocks, so their resistance is now a quarter.
+- **Shared code:** `Footprint.of` (footprints with gaps), `PoleHardwareBlock`, `BigTransformerBlock` (the GSU now extends
+  it), `PadmountBlock`, `InsulatorBlock.Mount`; the model tool draws a box across a footprint's gap from a neighbouring cell.
+- **Models:** 14 scripts plus `linelib` and `padlib`; Ludo creosote and fir wood textures (1 credit).
+- **Game tests:** `spans`, `serviceDrop`, `conductorSizes`, `refining` and `overheadThreePhase` (two H-frames) are strung
+  on the new poles; every pad-mount and unit-substation scene is rewired to the new terminals; new scene `lineParts`.
+
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.
@@ -327,7 +366,11 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
-- Phase 4.5: the GSU, gensets, steam plant and cooling tower are true size. The substation, line gear and oil field are still one block per part until waves 4.5d to 4.5f.
+- Phase 4.5: the GSU, gensets, steam plant, cooling tower, substation yard and overhead line are true size. The building gear (breakers, MCC, receptacles, loads), the starter plant and the oil field are still one block per part until waves 4.5f and 4.5g.
+- The pole transformer and cutout are wired as before (wire blocks to their faces); there are no jumper or riser leads drawn from an insulator down to them.
+- A pole transformer placed by command keeps its old facing rule, so in some test scenes its brackets face away from the pole.
+- Breaking a pole does not take down a pole transformer hung on it (it stays, as before).
+- There are no guy wires.
 - The steam plant's main steam line and feedwater line are drawn only within each part: they meet at the parts' edges, and the feedwater line stops at the boiler.
 - A hopper feeds the burner only through its main cell.
 - The frame-rate check runs at the client's 120 fps cap, so it shows no drop but not how much headroom is left.
@@ -343,7 +386,6 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The starter 120 V turbine can carry its full rating on one phase (decided: it stands in for a single-phase set).
 - Gas fields are large, so a gas well lasts hours.
 - Only the fused cutout shocks on touch; enclosed gear is dead-front by design.
-- There are no pole support rules.
 
 ## Ideas not started
 - Switches and panels.

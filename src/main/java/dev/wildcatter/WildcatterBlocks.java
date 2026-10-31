@@ -117,11 +117,24 @@ public final class WildcatterBlocks {
 			.strength(2.0F, 4.0F).sound(SoundType.STONE).requiresCorrectToolForDrops(), dev.wildcatter.multiblock.Footprint.box(4, 2, 4, 0, 0), "cooling_fill"));
 	/** Each is a small 110 V set; eight of one kind in a 2x2x2 cube make a 4.16 kV generator. */
 
-	/** A utility pole section and the crossarm that goes on top. Bare high-voltage lines belong up here. */
+	/** An older world's one-block pole section and crossarm: they still hold their insulators, but are no longer made (4.5e). */
 	public static final Block POLE = block("pole", props -> new PoleBlock(props.mapColor(MapColor.WOOD)
 			.strength(2.0F, 3.0F).sound(SoundType.WOOD).noOcclusion()));
 	public static final Block CROSSARM = block("crossarm", props -> new CrossarmBlock(props.mapColor(MapColor.WOOD)
 			.strength(1.5F, 3.0F).sound(SoundType.WOOD).noOcclusion()));
+	/** True-size wood poles and their hardware (docs/multiblocks/poles.md): 30, 40 and 75 ft, standing 8, 10 and 20 m. */
+	public static final Block WOOD_POLE_30 = block("wood_pole_30", props -> new dev.wildcatter.block.WoodPoleBlock(props.mapColor(MapColor.WOOD)
+			.strength(2.0F, 3.0F).sound(SoundType.WOOD), 8, "wood_pole_30"));
+	public static final Block WOOD_POLE_40 = block("wood_pole_40", props -> new dev.wildcatter.block.WoodPoleBlock(props.mapColor(MapColor.WOOD)
+			.strength(2.0F, 3.0F).sound(SoundType.WOOD), 10, "wood_pole_40"));
+	public static final Block WOOD_POLE_75 = block("wood_pole_75", props -> new dev.wildcatter.block.WoodPoleBlock(props.mapColor(MapColor.WOOD)
+			.strength(2.5F, 4.0F).sound(SoundType.WOOD), 20, "wood_pole_75"));
+	public static final Block CROSSARM_DIST = block("crossarm_dist", props -> new dev.wildcatter.block.CrossarmPartBlock(props.mapColor(MapColor.WOOD)
+			.strength(1.5F, 3.0F).sound(SoundType.WOOD)));
+	public static final Block CROSSBEAM_138 = block("crossbeam_138", props -> new dev.wildcatter.block.CrossbeamBlock(props.mapColor(MapColor.WOOD)
+			.strength(2.0F, 3.0F).sound(SoundType.WOOD)));
+	public static final Block X_BRACE_138 = block("x_brace_138", props -> new dev.wildcatter.block.XBraceBlock(props.mapColor(MapColor.WOOD)
+			.strength(1.5F, 3.0F).sound(SoundType.WOOD)));
 
 	// Wire. Every circuit needs two: a hot (red) one out to the load and a neutral (black) one back.
 	// Bare wire shocks you while it is live; wool-wrapped wire is safe until the wool wears out.
@@ -267,15 +280,15 @@ public final class WildcatterBlocks {
 	public static final Block RELAY_PANEL = block("relay_panel", props -> new dev.wildcatter.block.RelayPanelBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
 	/** Three-phase pad-mount transformers, on the ground and fed by underground cable. */
-	public static final Block PADMOUNT_208 = block("padmount_208", props -> TransformerBlock.threePhase(props.mapColor(MapColor.COLOR_GREEN)
-			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.LOW, Voltage.DISTRIBUTION, Tuning.PADMOUNT_208_VA, Tuning.PADMOUNT_208_PERCENT_Z));
-	public static final Block PADMOUNT_480 = block("padmount_480", props -> TransformerBlock.threePhase(props.mapColor(MapColor.COLOR_GREEN)
-			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.INDUSTRIAL, Voltage.DISTRIBUTION, Tuning.PADMOUNT_480_VA, Tuning.PADMOUNT_480_PERCENT_Z));
+	public static final Block PADMOUNT_208 = block("padmount_208", props -> dev.wildcatter.block.PadmountBlock.padmount(props.mapColor(MapColor.COLOR_GREEN)
+			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), "padmount_208", Voltage.LOW, Voltage.DISTRIBUTION, Tuning.PADMOUNT_208_VA, Tuning.PADMOUNT_208_PERCENT_Z));
+	public static final Block PADMOUNT_480 = block("padmount_480", props -> dev.wildcatter.block.PadmountBlock.padmount(props.mapColor(MapColor.COLOR_GREEN)
+			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), "padmount_480", Voltage.INDUSTRIAL, Voltage.DISTRIBUTION, Tuning.PADMOUNT_480_VA, Tuning.PADMOUNT_480_PERCENT_Z));
 	/** A plant's unit substation: 4.16 kV down to 480 V. */
 	/** The steam plant's generator step-up: 4.16 kV delta to 12.47 kV grounded wye (IEC 3.3 kV / 11 kV), 1,500 kVA. */
 	public static final Block GSU_TRANSFORMER = block("gsu_transformer", props -> new dev.wildcatter.block.GsuTransformerBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.MEDIUM, Voltage.DISTRIBUTION, Tuning.GSU_VA, Tuning.GSU_PERCENT_Z));
-	public static final Block UNIT_SUBSTATION = block("unit_substation", props -> TransformerBlock.threePhase(props.mapColor(MapColor.COLOR_GRAY)
+	public static final Block UNIT_SUBSTATION = block("unit_substation", props -> dev.wildcatter.block.PadmountBlock.unitSubstation(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.INDUSTRIAL, Voltage.MEDIUM, Tuning.UNIT_SUBSTATION_VA, Tuning.UNIT_SUBSTATION_PERCENT_Z));
 	public static final Block SUBSTATION_TRANSFORMER = block("substation_transformer", props -> new TransformerBlock(props.mapColor(MapColor.COLOR_BLUE)
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.MEDIUM, Voltage.HIGH));
@@ -344,7 +357,8 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<dev.wildcatter.block.TowerBasinBlockEntity> TOWER_BASIN_ENTITY = entity(dev.wildcatter.block.TowerBasinBlockEntity::new, TOWER_BASIN);
 	public static final BlockEntityType<CoolingTowerBlockEntity> COOLING_TOWER_ENTITY = entity(CoolingTowerBlockEntity::new, COOLING_TOWER);
 	/** The plain true-size parts that only remember they have grown (block/BigPartBlockEntity). */
-	public static final BlockEntityType<dev.wildcatter.block.BigPartBlockEntity> BIG_PART_ENTITY = entity(dev.wildcatter.block.BigPartBlockEntity::new, COOLING_FILL, DRIFT_ELIMINATOR, RELAY_PANEL);
+	public static final BlockEntityType<dev.wildcatter.block.BigPartBlockEntity> BIG_PART_ENTITY = entity(dev.wildcatter.block.BigPartBlockEntity::new, COOLING_FILL, DRIFT_ELIMINATOR, RELAY_PANEL,
+			WOOD_POLE_30, WOOD_POLE_40, WOOD_POLE_75, CROSSARM_DIST, CROSSBEAM_138, X_BRACE_138);
 	public static final BlockEntityType<dev.wildcatter.block.StationBusBlockEntity> STATION_BUS_ENTITY = entity(dev.wildcatter.block.StationBusBlockEntity::new, BUS_HV, BUS_DIST);
 
 	private WildcatterBlocks() {
@@ -463,6 +477,12 @@ public final class WildcatterBlocks {
 		add("ground_wire", GROUND_WIRE);
 		add("pole", POLE);
 		add("crossarm", CROSSARM);
+		add("wood_pole_30", WOOD_POLE_30);
+		add("wood_pole_40", WOOD_POLE_40);
+		add("wood_pole_75", WOOD_POLE_75);
+		add("crossarm_dist", CROSSARM_DIST);
+		add("crossbeam_138", CROSSBEAM_138);
+		add("x_brace_138", X_BRACE_138);
 		add("breaker", BREAKER);
 		for (PlugType type : PlugType.values()) {
 			add("receptacle_" + type.id(), receptacleFor(type));

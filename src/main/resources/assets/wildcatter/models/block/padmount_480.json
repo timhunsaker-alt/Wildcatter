@@ -1,9 +1,0 @@
-{
-  "parent": "minecraft:block/orientable",
-  "textures": {
-    "front": "wildcatter:block/padmount_480_front",
-    "side": "wildcatter:block/padmount_480_side",
-    "top": "wildcatter:block/padmount_480_top",
-    "bottom": "wildcatter:block/padmount_480_top"
-  }
-}

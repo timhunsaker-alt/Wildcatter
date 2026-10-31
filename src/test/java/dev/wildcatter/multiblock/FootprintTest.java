@@ -50,4 +50,15 @@ class FootprintTest {
 		assertThrows(IllegalArgumentException.class, () -> Footprint.box(3, 1, 1, 3, 0));
 		assertThrows(IllegalArgumentException.class, () -> Footprint.box(0, 1, 1, 0, 0));
 	}
+
+	@Test
+	void aFootprintWithAGapLeavesItOut() {
+		// a crossarm: its main cell west of the pole, its other cell east of it, the pole's cell left out
+		Footprint arm = Footprint.of(new Footprint.Cell(0, 0, 0), new Footprint.Cell(2, 0, 0));
+		assertEquals(2, arm.pieces());
+		assertEquals(-1, arm.pieceAt(1, 0, 0, 0), "the pole's cell is not the arm's");
+		assertArrayEquals(new int[] {0, 0, 2}, arm.offset(1, 1), "facing east, the arm runs north to south");
+		assertThrows(IllegalArgumentException.class, () -> Footprint.of(new Footprint.Cell(1, 0, 0)));
+		assertThrows(IllegalArgumentException.class, () -> Footprint.of(new Footprint.Cell(0, 0, 0), new Footprint.Cell(0, 0, 0)));
+	}
 }

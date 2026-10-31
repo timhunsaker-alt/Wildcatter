@@ -180,8 +180,8 @@ public class InsulatorBlockEntity extends BlockEntity implements CircuitPart, In
 			if (pos.asLong() >= span.other.asLong()) {
 				continue;
 			}
-			Vec3 from = Vec3.atCenterOf(pos).add(0, 0.4, 0);
-			Vec3 to = Vec3.atCenterOf(span.other).add(0, 0.4, 0);
+			Vec3 from = Vec3.atBottomCenterOf(pos).add(0, InsulatorBlock.conductorY(state), 0);
+			Vec3 to = Vec3.atBottomCenterOf(span.other).add(0, InsulatorBlock.conductorY(level.getBlockState(span.other)), 0);
 			int steps = Math.max(2, (int) Math.ceil(from.distanceTo(to)));
 			for (int i = 0; i <= steps; i++) {
 				Vec3 at = from.lerp(to, i / (double) steps);

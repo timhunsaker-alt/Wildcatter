@@ -247,6 +247,22 @@ class Model:
 	def _cell_of(self, p):
 		return tuple(math.floor(v + 1e-9) for v in p)
 
+	def _fits(self, part, cell):
+		return all(-16 - 1e-6 <= (v - c) * 16 <= 32 + 1e-6 for p in part.corners() for v, c in zip(p, cell))
+
+	def _home(self, part, cell):
+		"""The piece that draws a box: the cell it is centred in, or for a box in a gap of the footprint (an arm drawn through
+		its pole's cell) a neighbouring cell of the part that can reach it."""
+		if cell in self.index:
+			return cell
+		near = sorted(((dx, dy, dz) for dx in (-1, 0, 1) for dy in (-1, 0, 1) for dz in (-1, 0, 1) if (dx, dy, dz) != (0, 0, 0)),
+			key=lambda d: (abs(d[0]) + abs(d[1]) + abs(d[2]), d))
+		for d in near:
+			n = (cell[0] + d[0], cell[1] + d[1], cell[2] + d[2])
+			if n in self.index and self._fits(part, n):
+				return n
+		return None
+
 	def _split(self, e):
 		"""Cuts a box at cell boundaries (a turned one only along its turning axis), so each piece is lit by its own cell."""
 		axes = [0, 1, 2] if not e.rot else ["xyz".index(e.rot[0])]
@@ -264,7 +280,9 @@ class Model:
 			parts = out
 		return parts
 
-	def export(self):
+	def export(self, blockstate=True, item=True):
+		"""blockstate=False for a one-cell part whose block has other states (a pole transformer, a cutout): its caller writes the
+		blockstate and the shape is the block's own. item=False for a second look of the same block (the blown cutout)."""
 		for e in self.elements:
 			for f, t in e.tex.items():
 				if t not in self.textures:
@@ -277,8 +295,8 @@ class Model:
 				centre = [(a + b) / 2 for a, b in zip(part.frm, part.to)]
 				if part.rot:
 					centre = list(rotate(centre, part.rot))
-				cell = self._cell_of(centre)
-				if cell not in self.index:
+				cell = self._home(part, self._cell_of(centre))
+				if cell is None:
 					raise ModelError(f"{self.name}: a box centred at {centre} is outside the footprint")
 				for p in part.corners():
 					for v, c in zip(p, cell):
@@ -291,16 +309,19 @@ class Model:
 		textures["particle"] = f"{NS}:{self.particle}"
 		for i, elements in pieces.items():
 			_save(os.path.join(out, f"p{i}.json"), {"textures": textures, "elements": elements})
-		variants = {}
-		for facing, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270)):
-			for i in range(len(self.cells)):
-				v = {"model": f"{NS}:block/{self.name}/p{i}"}
-				if y:
-					v["y"] = y
-				variants[f"facing={facing},piece={i}"] = v
-		_save(os.path.join(ASSETS, "blockstates", f"{self.name}.json"), {"variants": variants})
-		self._export_item(textures)
-		self._export_shapes()
+		if blockstate:
+			variants = {}
+			for facing, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270)):
+				for i in range(len(self.cells)):
+					v = {"model": f"{NS}:block/{self.name}/p{i}"}
+					if y:
+						v["y"] = y
+					variants[f"facing={facing},piece={i}"] = v
+			_save(os.path.join(ASSETS, "blockstates", f"{self.name}.json"), {"variants": variants})
+		if item:
+			self._export_item(textures)
+		if blockstate:
+			self._export_shapes()
 		for rotor, model in self.rotors.items():
 			model.export_single(rotor)
 		count = sum(len(v) for v in pieces.values())

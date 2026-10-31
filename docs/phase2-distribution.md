@@ -12,7 +12,7 @@ Every number and mechanic below that is not in ELECTRICAL_MODEL is a proposal wi
 | Distribution wire | 0.8 ohm per block, 400 A | between the 4.16 kV (0.5 ohm, 200 A) and 138 kV (2.0 ohm, 600 A) wire; one conductor size per tier |
 | Distribution breaker ratings | 200, 400, 600, 1200 A | feeder breakers are 600 to 1200 A |
 | Distribution shock | 12 damage (6 hearts), bare reach 3 blocks, touch chance 0.8 | between 4.16 kV and 138 kV |
-| Game scale for spans | 1 block of span = 4 m | a 12 m pole is 3 blocks |
+| Game scale for spans | 1 block of span = 4 m (superseded 2026-10-31 by 1 m per block: docs/multiblocks/poles.md) | a 12 m pole is 3 blocks |
 | Max span, low voltage drop | 8 blocks (32 m) | service drops are 15 to 30 m |
 | Max span, 12.47 kV | 10 blocks (40 m) | typical distribution span 30 to 50 m |
 | Max span, 138 kV | 64 blocks (256 m) | transmission spans 200 to 400 m |

@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/padmount_208"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/padmount_208/item"
+ }
 }

@@ -45,7 +45,7 @@
   "block.wildcatter.hv_breaker": "Circuit Breaker (HV)",
   "block.wildcatter.insulator_lv": "Insulator (LV, 1 kV)",
   "block.wildcatter.insulator_dist": "Pin Insulator (DIST, 15 kV)",
-  "block.wildcatter.insulator_hv": "Suspension Insulator (HV, 138 kV)",
+  "block.wildcatter.insulator_hv": "Suspension Insulator String (HV, 138 kV)",
   "item.wildcatter.conductor_spool_lv": "Conductor Spool (LV)",
   "item.wildcatter.conductor_spool_dist": "Conductor Spool (DIST)",
   "item.wildcatter.conductor_spool_hv": "Conductor Spool (HV)",
@@ -70,8 +70,8 @@
   "block.wildcatter.plug_nema_l22_30": "Plug Adapter NEMA L22-30 (480Y/277 V 3-phase, 30 A)",
   "block.wildcatter.plug_iec_60309_red_32": "Plug Adapter IEC 60309 red (400 V 3-phase, 32 A)",
   "block.wildcatter.plug_iec_60309_red_63": "Plug Adapter IEC 60309 red (400 V 3-phase, 63 A)",
-  "block.wildcatter.pole": "Utility Pole",
-  "block.wildcatter.crossarm": "Pole Crossarm",
+  "block.wildcatter.pole": "Utility Pole Section (old)",
+  "block.wildcatter.crossarm": "Pole Crossarm (old)",
   "block.wildcatter.electric_lamp": "Electric Lamp (60 W)",
   "block.wildcatter.electric_heater": "Electric Heater (1500 W)",
   "block.wildcatter.transformer": "Transformer (LV / MV)",
@@ -161,5 +161,11 @@
   "subtitles.wildcatter.disconnect_arc": "Disconnect arcs",
   "subtitles.wildcatter.hv_breaker": "Power breaker operates",
   "subtitles.wildcatter.fuse_pop": "Fuse blows",
-  "subtitles.wildcatter.flashover": "Insulator flashes over"
+  "subtitles.wildcatter.flashover": "Insulator flashes over",
+  "block.wildcatter.wood_pole_30": "Wood Pole (30 ft, class 5)",
+  "block.wildcatter.wood_pole_40": "Wood Pole (40 ft, class 4)",
+  "block.wildcatter.wood_pole_75": "Wood Pole (75 ft, class 2)",
+  "block.wildcatter.crossarm_dist": "Crossarm (8 ft)",
+  "block.wildcatter.crossbeam_138": "H-Frame Crossbeam (HV)",
+  "block.wildcatter.x_brace_138": "H-Frame X-Brace (HV)"
 }

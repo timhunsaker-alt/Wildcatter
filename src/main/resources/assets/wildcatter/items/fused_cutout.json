@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "wildcatter:block/cutout_good"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/fused_cutout/item"
+ }
 }
