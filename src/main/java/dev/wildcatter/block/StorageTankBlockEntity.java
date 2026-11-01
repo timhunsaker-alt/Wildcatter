@@ -23,7 +23,7 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * A storage tank (docs/multiblocks/lease.md, gas-plant.md): the 400 bbl (64,000 L) steel stock tank holds one liquid product, set by
- * its first fill (crude, diesel or natural gasoline); the fiberglass water tank holds produced water; the 18,000 gallon LPG bullet
+ * its first fill (crude, condensate, gasoline, kerosene, diesel, residue or natural gasoline); the fiberglass water tank holds produced water; the 18,000 gallon LPG bullet
  * holds 58,000 L of LPG. Pipe joins the side faces of its bottom layer. It fills from the process outlets on those runs (never from
  * another tank) and gives to whatever draws on them after the outlets are drawn.
  */
@@ -46,7 +46,8 @@ public class StorageTankBlockEntity extends BlockEntity implements Inspectable, 
 
 	/** What it may hold. */
 	public boolean accepts(Product p) {
-		return water() ? p == Product.PRODUCED_WATER : bullet() ? p == Product.LPG : p == Product.CRUDE || p == Product.DIESEL || p == Product.NATURAL_GASOLINE;
+		return water() ? p == Product.PRODUCED_WATER : bullet() ? p == Product.LPG
+				: !p.gas() && p != Product.PRODUCED_WATER && p != Product.LPG && p != Product.WELL_FLUID && p != Product.Y_GRADE;
 	}
 
 	public double capacity() {

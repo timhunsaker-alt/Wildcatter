@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "CXC",
+    "SBS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "C": "minecraft:copper_block",
+    "X": "wildcatter:crankshaft",
+    "B": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:cracked_gas_compressor",
+    "count": 1
+  }
+}

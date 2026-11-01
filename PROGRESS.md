@@ -475,6 +475,31 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 5c and 5d: crude units, the cracker and plastic
+- **Specs:** docs/multiblocks/crude-units.md and cracker.md (approved with the plan, 2026-10-31). The Phase 1 one-block refinery and
+  its columns are removed (refinery-tower.md is marked replaced); in an older world they vanish.
+- **Assay:** a light sweet, WTI-like crude gives 2 % LPG, 30 % gasoline, 14 % kerosene, 26 % diesel, 28 % residue; a gas well's
+  condensate 5/60/15/15/5. A separator fed only by gas wells now gives condensate; with an oil well on it, the condensate blends
+  into the crude.
+- **Early: 1,000 bbl/day topping unit** (`RefineryPartBlock`, a unit by touching): the 12 m column (controller), a 3 MMBtu/h
+  vertical heater that burns the unit's own LPG first (it covers it on crude), and the pump and air-cooler skid (11.2 kW, 480 V).
+  1.84 L/s at full voltage.
+- **Late: 20,000 bbl/day crude unit:** the 30 m column (controller, it names missing parts), a 60 MMBtu/h box heater on gas or
+  residue, side strippers, the overhead fin-fan condenser (75 kW, 480 V; its four fans turn), the 250 hp 4.16 kV charge pump
+  against the heater and the electrostatic desalter (40 kW, 480 V) against the pump. 36.8 L/s. The column starts the desalter and
+  fans first and the charge pump after them.
+- **Cracker and polyethylene** (`PetrochemPartBlock`): the cracking furnace (1 L/s of LPG or gasoline, dilution steam from water a
+  pump brings it, fuel gas or LPG), the quench tower (pyrolysis gasoline and fuel oil drop out), the 300 hp 4.16 kV cracked gas
+  compressor, the cold box with a refrigeration compressor against it (ethylene, fuel gas back to the furnace, LPG back to the
+  bullet), the polyethylene reactor (75 kW, 480 V) and its 250 hp 4.16 kV pelletizer: about 13 plastic sheets a minute into a bin
+  a hopper can empty. Cracked gas carries its make-up from the furnace to the cold box, since it depends on the feed.
+- **Fuels:** residue (fuel oil, 38 MJ/L) fires the steam plant burner and the crude heaters; gasoline, kerosene, condensate and
+  residue burn in fireboxes; stock tanks hold every liquid product except LPG.
+- **Models:** `crude_units.py` (nine parts, two fan rotors) and `cracker.py` (six parts). No Ludo credits.
+- **Game tests:** new scenes `toppingUnit` (crude from a tank, four product tanks filling, the heater on its own LPG), `crudeUnit`
+  (built part by part, two diesel sets synchronized, 35 L/s on residue fuel, a part removed stops it) and `cracker` (LPG to plastic
+  sheets in a hopper); `gasPlant` checks a gas well's separator gives condensate; `refining` keeps its genset and MV fault checks.
+
 ## Wire heating (approved by Tim, 2026-10-31)
 - A conductor's temperature rise follows the square of its current with a 120 s time constant and burns out at 1.8 times its
   rated rise (`energy/WireHeat`, unit-tested). A motor's start no longer burns the cable sized for it; twice the rating burns in
@@ -488,9 +513,11 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
-- Phase 4.5 is complete with 4.5h. Phase 5a (the lease) is in; gas processing (5b), the distillation unit (5c) and the cracker
-  (5d) follow. The refinery is still the Phase 1 one-block base with columns until 5c.
-- Gas-well condensate goes out of the separator as crude until 5c gives it its own assay.
+- Phase 5 is complete with 5c and 5d (the lease, the gas plant, the crude units, the cracker). Tim checks each in a real session.
+- Gasoline and kerosene have no engine of their own yet: kerosene and diesel are for the Phase 6 gas turbine.
+- The cracker test tops up the furnace's water with a hook; the pump feeding a furnace is wired but not exercised in a test.
+- The cracker's pyrolysis gasoline and fuel oil are held at the quench tower (20 L) and need a pipe away in a long run.
+- A 250 hp charge pump starting direct on line needs more than one 500 kW set; there are no soft starters or drives for big motors.
 - Gas has no sales pipeline yet: a gas plant's residue gas goes to engines, burners or a flare.
 - The gas plant's reboiler and stabilizer heat are not drawn from any fuel but the dehydrator's 0.5 %.
 - Pipe arms join every face of a lease part, though only its nozzles connect; the Power Meter on a pipe says what a run carries.

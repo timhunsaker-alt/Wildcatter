@@ -1,7 +1,5 @@
 {
   "values": [
-    "wildcatter:refinery",
-    "wildcatter:refinery_column",
     "wildcatter:cooling_tower",
     "wildcatter:cooling_fill",
     "wildcatter:boiler",
@@ -136,6 +134,21 @@
     "wildcatter:ngl_chiller",
     "wildcatter:refrigeration_compressor",
     "wildcatter:stabilizer",
-    "wildcatter:lpg_bullet"
+    "wildcatter:lpg_bullet",
+    "wildcatter:topping_column",
+    "wildcatter:topping_heater",
+    "wildcatter:topping_skid",
+    "wildcatter:atmospheric_column",
+    "wildcatter:crude_heater",
+    "wildcatter:desalter",
+    "wildcatter:crude_charge_pump",
+    "wildcatter:side_strippers",
+    "wildcatter:overhead_condenser",
+    "wildcatter:cracking_furnace",
+    "wildcatter:quench_tower",
+    "wildcatter:cracked_gas_compressor",
+    "wildcatter:cold_box",
+    "wildcatter:polyethylene_reactor",
+    "wildcatter:pelletizer"
   ]
 }

@@ -271,7 +271,7 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 				: "NO GAS: run a gas line from a separator's gas side to the engine";
 	}
 
-	/** Diesel: the tank is topped up from a refinery or a diesel tank on its steel pipe. */
+	/** Diesel: the tank is topped up from a stock tank of diesel or a crude unit's diesel nozzle on its steel pipe. */
 	private void refillDiesel(ServerLevel level, GensetPartBlockEntity tank) {
 		double room = Tuning.GENSET_TANK_LITERS - tank.liters();
 		if (room < 1) {
@@ -296,7 +296,7 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 			GensetPartBlockEntity tank = tank(level);
 			if (tank != null) {
 				refillDiesel(level, tank);
-				supply = tank.liters() < 0.5 ? "OUT OF FUEL: the tank is dry, pour in diesel or pipe it from a refinery"
+				supply = tank.liters() < 0.5 ? "OUT OF FUEL: the tank is dry, pour in diesel or pipe it from a diesel tanky"
 						: String.format("%.0f of %.0f L of diesel", tank.liters(), Tuning.GENSET_TANK_LITERS);
 			}
 		}

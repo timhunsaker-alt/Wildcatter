@@ -52,13 +52,35 @@ public class GasCompressorBlockEntity extends PlantUnitBlockEntity implements Ci
 		super(WildcatterBlocks.GAS_COMPRESSOR_ENTITY, pos, state);
 	}
 
+	/** The cracker's cracked gas compressor (docs/multiblocks/cracker.md): the same package on cracked gas, 300 hp, four-pole. */
+	private boolean cracked() {
+		return getBlockState().getBlock() instanceof PetrochemPartBlock part && part.part() == PetrochemPartBlock.Part.CRACKED_GAS_COMPRESSOR;
+	}
+
+	private Product suctionProduct() {
+		return cracked() ? Product.CRACKED_GAS : Product.GAS;
+	}
+
+	private Product dischargeProduct() {
+		return cracked() ? Product.COMPRESSED_CRACKED_GAS : Product.COMPRESSED_GAS;
+	}
+
+	private double rate() {
+		return cracked() ? Tuning.COLD_BOX_KGS : Tuning.GAS_COMPRESSOR_M3S;
+	}
+
+	public boolean isRefrigeration() {
+		return refrigeration();
+	}
+
 	private boolean refrigeration() {
 		return getBlockState().getBlock() instanceof GasPlantPartBlock part && part.part() == GasPlantPartBlock.Part.REFRIGERATION_COMPRESSOR;
 	}
 
 	public Motor motor() {
 		if (motor == null) {
-			motor = refrigeration() ? new Motor(true, Voltage.INDUSTRIAL, Tuning.REFRIGERATION_WATTS) : new Motor(true, Voltage.MEDIUM, Tuning.GAS_COMPRESSOR_WATTS);
+			motor = refrigeration() ? new Motor(true, Voltage.INDUSTRIAL, Tuning.REFRIGERATION_WATTS)
+					: new Motor(true, Voltage.MEDIUM, cracked() ? Tuning.CRACKED_GAS_COMPRESSOR_WATTS : Tuning.GAS_COMPRESSOR_WATTS);
 		}
 		return motor;
 	}
@@ -85,12 +107,12 @@ public class GasCompressorBlockEntity extends PlantUnitBlockEntity implements Ci
 
 	@Override
 	protected @Nullable Product nozzle(int[] at, Direction side) {
-		return !refrigeration() && at[2] == 8 && at[1] == 0 && side == Direction.SOUTH ? Product.COMPRESSED_GAS : null;
+		return !refrigeration() && at[2] == (cracked() ? 7 : 8) && at[1] == 0 && side == Direction.SOUTH ? dischargeProduct() : null;
 	}
 
 	@Override
 	protected double hold(Product product) {
-		return Tuning.GAS_COMPRESSOR_M3S * Tuning.PLANT_HOLD_SECONDS;
+		return rate() * Tuning.PLANT_HOLD_SECONDS;
 	}
 
 	// ---- the motor's terminal box: the gas compressor's on the motor's west side, the refrigeration compressor's on its main cell --
@@ -128,7 +150,7 @@ public class GasCompressorBlockEntity extends PlantUnitBlockEntity implements Ci
 		c.running.update(c, motor.output() > 0);
 		boolean turning = motor.state() == Motor.State.RUNNING && !motor.stalled();
 		double rpm = c.refrigeration() ? 120.0 * ElectricalStandard.active().hertz() / 2 * (1 - Tuning.INJECTION_PUMP_SLIP)
-				: 120.0 * ElectricalStandard.active().hertz() / Tuning.GAS_COMPRESSOR_POLES * (1 - Tuning.GAS_COMPRESSOR_SLIP);
+				: 120.0 * ElectricalStandard.active().hertz() / (c.cracked() ? Tuning.CRACKED_GAS_COMPRESSOR_POLES : Tuning.GAS_COMPRESSOR_POLES) * (1 - Tuning.GAS_COMPRESSOR_SLIP);
 		c.spin.setRpm(turning ? (float) (rpm * (motor.reversed() ? -1 : 1)) : 0);
 		if (c.spin.needsSync()) {
 			c.spin.markSynced();
@@ -143,28 +165,37 @@ public class GasCompressorBlockEntity extends PlantUnitBlockEntity implements Ci
 			c.setChanged();
 			return;
 		}
-		double waiting = Lines.available(level, c.suction(), Product.GAS, Pull.MACHINE, c);
-		double room = c.room(Product.COMPRESSED_GAS);
+		double waiting = Lines.available(level, c.suction(), c.suctionProduct(), Pull.MACHINE, c);
+		double room = c.room(c.dischargeProduct());
 		boolean work = waiting >= 0.05 && room >= 0.05;
 		// it starts with gas waiting and half its discharge free; with nothing to do it unloads its cylinders and keeps turning
 		c.unloaded = work ? 0 : c.unloaded + 1;
 		if (!c.wanted) {
-			c.wanted = waiting >= 0.5 && room >= c.hold(Product.COMPRESSED_GAS) / 2;
+			c.wanted = waiting >= c.rate() / 2 && room >= c.hold(c.dischargeProduct()) / 2;
 		} else if (c.unloaded * seconds() >= Tuning.GAS_COMPRESSOR_UNLOADED_SECONDS) {
 			c.wanted = false;
 		}
 		c.compressed = 0;
 		if (!work) {
-			String why = waiting < 0.05 ? "no separator gas at its suction (the front end)" : "its discharge is full (pipe the back end to a dehydrator)";
+			String why = waiting < 0.05 ? "no " + (c.cracked() ? "cracked gas" : "separator gas") + " at its suction (the front end)"
+					: "its discharge is full (pipe the back end to " + (c.cracked() ? "a cold box)" : "a dehydrator)");
 			c.status = c.wanted && motor.output() > 0 ? "running UNLOADED: " + why + ", " + motor.describe() : "idle: " + why;
 		} else if (motor.output() == 0) {
 			c.status = motor.describe();
 		} else if (motor.reversed()) {
 			c.status = "compressing nothing: " + motor.describe();
 		} else {
-			c.compressed = Lines.pull(level, c.suction(), Product.GAS, Math.min(room, Tuning.GAS_COMPRESSOR_M3S * seconds() * motor.output()), Pull.MACHINE, c);
-			c.add(Product.COMPRESSED_GAS, c.compressed);
-			c.status = String.format("compressing %.2f m3/s, 125 to 1,000 psi, %s", c.compressed / seconds(), motor.describe());
+			double max = Math.min(room, c.rate() * seconds() * motor.output());
+			if (c.cracked()) {   // the cracked gas keeps its make-up through the compressor
+				double[] in = new double[5];
+				c.compressed = c.pullMixed(level, c.suction(), Product.CRACKED_GAS, max, in);
+				c.addMixed(Product.COMPRESSED_CRACKED_GAS, c.compressed, in);
+				c.status = String.format("compressing %.2f kg/s of cracked gas, %s", c.compressed / seconds(), motor.describe());
+			} else {
+				c.compressed = Lines.pull(level, c.suction(), Product.GAS, max, Pull.MACHINE, c);
+				c.add(Product.COMPRESSED_GAS, c.compressed);
+				c.status = String.format("compressing %.2f m3/s, 125 to 1,000 psi, %s", c.compressed / seconds(), motor.describe());
+			}
 		}
 		c.setChanged();
 	}
@@ -172,6 +203,7 @@ public class GasCompressorBlockEntity extends PlantUnitBlockEntity implements Ci
 	@Override
 	public Component inspect() {
 		String name = refrigeration() ? "Refrigeration compressor (propane screw, 150 hp, " + Voltage.INDUSTRIAL.label() + " three-phase)"
+				: cracked() ? "Cracked gas compressor (300 hp, " + Voltage.MEDIUM.label() + " three-phase)"
 				: "Gas compressor (two-stage reciprocating, 400 hp, " + Voltage.MEDIUM.label() + " three-phase)";
 		return Component.literal(name + ": " + status + "; "
 				+ (level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you"));

@@ -1,0 +1,364 @@
+{
+ "variants": {
+  "facing=north,piece=0": {
+   "model": "wildcatter:block/topping_heater/p0"
+  },
+  "facing=north,piece=1": {
+   "model": "wildcatter:block/topping_heater/p1"
+  },
+  "facing=north,piece=2": {
+   "model": "wildcatter:block/topping_heater/p2"
+  },
+  "facing=north,piece=3": {
+   "model": "wildcatter:block/topping_heater/p3"
+  },
+  "facing=north,piece=4": {
+   "model": "wildcatter:block/topping_heater/p4"
+  },
+  "facing=north,piece=5": {
+   "model": "wildcatter:block/topping_heater/p5"
+  },
+  "facing=north,piece=6": {
+   "model": "wildcatter:block/topping_heater/p6"
+  },
+  "facing=north,piece=7": {
+   "model": "wildcatter:block/topping_heater/p7"
+  },
+  "facing=north,piece=8": {
+   "model": "wildcatter:block/topping_heater/p8"
+  },
+  "facing=north,piece=9": {
+   "model": "wildcatter:block/topping_heater/p9"
+  },
+  "facing=north,piece=10": {
+   "model": "wildcatter:block/topping_heater/p10"
+  },
+  "facing=north,piece=11": {
+   "model": "wildcatter:block/topping_heater/p11"
+  },
+  "facing=north,piece=12": {
+   "model": "wildcatter:block/topping_heater/p12"
+  },
+  "facing=north,piece=13": {
+   "model": "wildcatter:block/topping_heater/p13"
+  },
+  "facing=north,piece=14": {
+   "model": "wildcatter:block/topping_heater/p14"
+  },
+  "facing=north,piece=15": {
+   "model": "wildcatter:block/topping_heater/p15"
+  },
+  "facing=north,piece=16": {
+   "model": "wildcatter:block/topping_heater/p16"
+  },
+  "facing=north,piece=17": {
+   "model": "wildcatter:block/topping_heater/p17"
+  },
+  "facing=north,piece=18": {
+   "model": "wildcatter:block/topping_heater/p18"
+  },
+  "facing=north,piece=19": {
+   "model": "wildcatter:block/topping_heater/p19"
+  },
+  "facing=north,piece=20": {
+   "model": "wildcatter:block/topping_heater/p20"
+  },
+  "facing=north,piece=21": {
+   "model": "wildcatter:block/topping_heater/p21"
+  },
+  "facing=north,piece=22": {
+   "model": "wildcatter:block/topping_heater/p22"
+  },
+  "facing=north,piece=23": {
+   "model": "wildcatter:block/topping_heater/p23"
+  },
+  "facing=east,piece=0": {
+   "model": "wildcatter:block/topping_heater/p0",
+   "y": 90
+  },
+  "facing=east,piece=1": {
+   "model": "wildcatter:block/topping_heater/p1",
+   "y": 90
+  },
+  "facing=east,piece=2": {
+   "model": "wildcatter:block/topping_heater/p2",
+   "y": 90
+  },
+  "facing=east,piece=3": {
+   "model": "wildcatter:block/topping_heater/p3",
+   "y": 90
+  },
+  "facing=east,piece=4": {
+   "model": "wildcatter:block/topping_heater/p4",
+   "y": 90
+  },
+  "facing=east,piece=5": {
+   "model": "wildcatter:block/topping_heater/p5",
+   "y": 90
+  },
+  "facing=east,piece=6": {
+   "model": "wildcatter:block/topping_heater/p6",
+   "y": 90
+  },
+  "facing=east,piece=7": {
+   "model": "wildcatter:block/topping_heater/p7",
+   "y": 90
+  },
+  "facing=east,piece=8": {
+   "model": "wildcatter:block/topping_heater/p8",
+   "y": 90
+  },
+  "facing=east,piece=9": {
+   "model": "wildcatter:block/topping_heater/p9",
+   "y": 90
+  },
+  "facing=east,piece=10": {
+   "model": "wildcatter:block/topping_heater/p10",
+   "y": 90
+  },
+  "facing=east,piece=11": {
+   "model": "wildcatter:block/topping_heater/p11",
+   "y": 90
+  },
+  "facing=east,piece=12": {
+   "model": "wildcatter:block/topping_heater/p12",
+   "y": 90
+  },
+  "facing=east,piece=13": {
+   "model": "wildcatter:block/topping_heater/p13",
+   "y": 90
+  },
+  "facing=east,piece=14": {
+   "model": "wildcatter:block/topping_heater/p14",
+   "y": 90
+  },
+  "facing=east,piece=15": {
+   "model": "wildcatter:block/topping_heater/p15",
+   "y": 90
+  },
+  "facing=east,piece=16": {
+   "model": "wildcatter:block/topping_heater/p16",
+   "y": 90
+  },
+  "facing=east,piece=17": {
+   "model": "wildcatter:block/topping_heater/p17",
+   "y": 90
+  },
+  "facing=east,piece=18": {
+   "model": "wildcatter:block/topping_heater/p18",
+   "y": 90
+  },
+  "facing=east,piece=19": {
+   "model": "wildcatter:block/topping_heater/p19",
+   "y": 90
+  },
+  "facing=east,piece=20": {
+   "model": "wildcatter:block/topping_heater/p20",
+   "y": 90
+  },
+  "facing=east,piece=21": {
+   "model": "wildcatter:block/topping_heater/p21",
+   "y": 90
+  },
+  "facing=east,piece=22": {
+   "model": "wildcatter:block/topping_heater/p22",
+   "y": 90
+  },
+  "facing=east,piece=23": {
+   "model": "wildcatter:block/topping_heater/p23",
+   "y": 90
+  },
+  "facing=south,piece=0": {
+   "model": "wildcatter:block/topping_heater/p0",
+   "y": 180
+  },
+  "facing=south,piece=1": {
+   "model": "wildcatter:block/topping_heater/p1",
+   "y": 180
+  },
+  "facing=south,piece=2": {
+   "model": "wildcatter:block/topping_heater/p2",
+   "y": 180
+  },
+  "facing=south,piece=3": {
+   "model": "wildcatter:block/topping_heater/p3",
+   "y": 180
+  },
+  "facing=south,piece=4": {
+   "model": "wildcatter:block/topping_heater/p4",
+   "y": 180
+  },
+  "facing=south,piece=5": {
+   "model": "wildcatter:block/topping_heater/p5",
+   "y": 180
+  },
+  "facing=south,piece=6": {
+   "model": "wildcatter:block/topping_heater/p6",
+   "y": 180
+  },
+  "facing=south,piece=7": {
+   "model": "wildcatter:block/topping_heater/p7",
+   "y": 180
+  },
+  "facing=south,piece=8": {
+   "model": "wildcatter:block/topping_heater/p8",
+   "y": 180
+  },
+  "facing=south,piece=9": {
+   "model": "wildcatter:block/topping_heater/p9",
+   "y": 180
+  },
+  "facing=south,piece=10": {
+   "model": "wildcatter:block/topping_heater/p10",
+   "y": 180
+  },
+  "facing=south,piece=11": {
+   "model": "wildcatter:block/topping_heater/p11",
+   "y": 180
+  },
+  "facing=south,piece=12": {
+   "model": "wildcatter:block/topping_heater/p12",
+   "y": 180
+  },
+  "facing=south,piece=13": {
+   "model": "wildcatter:block/topping_heater/p13",
+   "y": 180
+  },
+  "facing=south,piece=14": {
+   "model": "wildcatter:block/topping_heater/p14",
+   "y": 180
+  },
+  "facing=south,piece=15": {
+   "model": "wildcatter:block/topping_heater/p15",
+   "y": 180
+  },
+  "facing=south,piece=16": {
+   "model": "wildcatter:block/topping_heater/p16",
+   "y": 180
+  },
+  "facing=south,piece=17": {
+   "model": "wildcatter:block/topping_heater/p17",
+   "y": 180
+  },
+  "facing=south,piece=18": {
+   "model": "wildcatter:block/topping_heater/p18",
+   "y": 180
+  },
+  "facing=south,piece=19": {
+   "model": "wildcatter:block/topping_heater/p19",
+   "y": 180
+  },
+  "facing=south,piece=20": {
+   "model": "wildcatter:block/topping_heater/p20",
+   "y": 180
+  },
+  "facing=south,piece=21": {
+   "model": "wildcatter:block/topping_heater/p21",
+   "y": 180
+  },
+  "facing=south,piece=22": {
+   "model": "wildcatter:block/topping_heater/p22",
+   "y": 180
+  },
+  "facing=south,piece=23": {
+   "model": "wildcatter:block/topping_heater/p23",
+   "y": 180
+  },
+  "facing=west,piece=0": {
+   "model": "wildcatter:block/topping_heater/p0",
+   "y": 270
+  },
+  "facing=west,piece=1": {
+   "model": "wildcatter:block/topping_heater/p1",
+   "y": 270
+  },
+  "facing=west,piece=2": {
+   "model": "wildcatter:block/topping_heater/p2",
+   "y": 270
+  },
+  "facing=west,piece=3": {
+   "model": "wildcatter:block/topping_heater/p3",
+   "y": 270
+  },
+  "facing=west,piece=4": {
+   "model": "wildcatter:block/topping_heater/p4",
+   "y": 270
+  },
+  "facing=west,piece=5": {
+   "model": "wildcatter:block/topping_heater/p5",
+   "y": 270
+  },
+  "facing=west,piece=6": {
+   "model": "wildcatter:block/topping_heater/p6",
+   "y": 270
+  },
+  "facing=west,piece=7": {
+   "model": "wildcatter:block/topping_heater/p7",
+   "y": 270
+  },
+  "facing=west,piece=8": {
+   "model": "wildcatter:block/topping_heater/p8",
+   "y": 270
+  },
+  "facing=west,piece=9": {
+   "model": "wildcatter:block/topping_heater/p9",
+   "y": 270
+  },
+  "facing=west,piece=10": {
+   "model": "wildcatter:block/topping_heater/p10",
+   "y": 270
+  },
+  "facing=west,piece=11": {
+   "model": "wildcatter:block/topping_heater/p11",
+   "y": 270
+  },
+  "facing=west,piece=12": {
+   "model": "wildcatter:block/topping_heater/p12",
+   "y": 270
+  },
+  "facing=west,piece=13": {
+   "model": "wildcatter:block/topping_heater/p13",
+   "y": 270
+  },
+  "facing=west,piece=14": {
+   "model": "wildcatter:block/topping_heater/p14",
+   "y": 270
+  },
+  "facing=west,piece=15": {
+   "model": "wildcatter:block/topping_heater/p15",
+   "y": 270
+  },
+  "facing=west,piece=16": {
+   "model": "wildcatter:block/topping_heater/p16",
+   "y": 270
+  },
+  "facing=west,piece=17": {
+   "model": "wildcatter:block/topping_heater/p17",
+   "y": 270
+  },
+  "facing=west,piece=18": {
+   "model": "wildcatter:block/topping_heater/p18",
+   "y": 270
+  },
+  "facing=west,piece=19": {
+   "model": "wildcatter:block/topping_heater/p19",
+   "y": 270
+  },
+  "facing=west,piece=20": {
+   "model": "wildcatter:block/topping_heater/p20",
+   "y": 270
+  },
+  "facing=west,piece=21": {
+   "model": "wildcatter:block/topping_heater/p21",
+   "y": 270
+  },
+  "facing=west,piece=22": {
+   "model": "wildcatter:block/topping_heater/p22",
+   "y": 270
+  },
+  "facing=west,piece=23": {
+   "model": "wildcatter:block/topping_heater/p23",
+   "y": 270
+  }
+ }
+}

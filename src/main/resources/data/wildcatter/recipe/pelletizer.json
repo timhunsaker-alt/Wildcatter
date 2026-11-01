@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "XHX",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_block",
+    "X": "wildcatter:crankshaft",
+    "H": "minecraft:hopper"
+  },
+  "result": {
+    "id": "wildcatter:pelletizer",
+    "count": 1
+  }
+}

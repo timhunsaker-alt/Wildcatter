@@ -24,6 +24,9 @@ Put the jar in your instance's `mods` folder next to:
 - The gas plant: a 4.16 kV gas compressor, a glycol dehydrator, an NGL chiller with its refrigeration compressor and a
   stabilizer turn separator gas into pipeline gas, LPG (in an LPG bullet) and natural gasoline. The steam plant burner now
   needs pipeline gas.
+- Refining: a 1,000 bbl/day topping unit (early) and a 20,000 bbl/day crude unit (late) split crude into LPG, gasoline,
+  kerosene, diesel and residue. A steam cracker and a polyethylene reactor make plastic sheets from LPG or gasoline. The old
+  one-block refinery is gone: in an older world it disappears.
 - The Field Manual item explains how to build each machine.
 
 ## Older worlds

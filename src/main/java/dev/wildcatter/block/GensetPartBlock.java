@@ -41,7 +41,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * One part of a genset skid at true size (docs/multiblocks/genset.md): the base (sub-base fuel tank or base frame), radiator,
  * engine, alternator or exhaust silencer, each filling its real size. Parts do nothing alone; the control panel finds them and
  * runs them. Placed on top of a base, a part goes to its own slot on the skid. The fuel tank holds diesel (pour in a bucket on
- * any of its cells, or run a line from a refinery).
+ * any of its cells, or run a line from a diesel tank).
  */
 public class GensetPartBlock extends BaseEntityBlock implements BigPart {
 	public enum Part {

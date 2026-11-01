@@ -352,7 +352,7 @@ save_json(f"{ASSETS}/blockstates/firebox.json", {"variants": {
 	"lit=false": {"model": f"{ns}:block/firebox"}, "lit=true": {"model": f"{ns}:block/firebox_lit"}}})
 block_model("pump", "minecraft:block/cube_all", {"all": f"{ns}:block/pump"})
 save_json(f"{ASSETS}/blockstates/pump.json", {"variants": {"": {"model": f"{ns}:block/pump"}}})
-for cube in ("casing", "refinery", "refinery_column"):   # the cooling tower parts are true size (4.5c), the well site (4.5g)
+for cube in ("casing",):   # the cooling tower parts are true size (4.5c), the well site (4.5g)
 	block_model(cube, "minecraft:block/cube_all", {"all": f"{ns}:block/{cube}"})
 	save_json(f"{ASSETS}/blockstates/{cube}.json", {"variants": {"": {"model": f"{ns}:block/{cube}"}}})
 for load in ("electric_lamp", "electric_heater"):
@@ -619,7 +619,7 @@ save_json(f"{ASSETS}/blockstates/gas_line.json", {"multipart": [{"apply": {"mode
 
 # ---- items --------------------------------------------------------------------------------------------
 WIRES = BARE_WIRES + WOOL_WIRES + PLASTIC_WIRES
-ITEM_MODELS = {"firebox": "block/firebox", "pump": "block/pump", "pipe": "block/pipe_inventory", "gas_line": "block/gas_line_inventory", "drilling_rig": "block/drilling_rig", "refinery": "block/refinery", "refinery_column": "block/refinery_column", "cooling_tower": "block/cooling_tower", "cooling_fill": "block/cooling_fill",
+ITEM_MODELS = {"firebox": "block/firebox", "pump": "block/pump", "pipe": "block/pipe_inventory", "gas_line": "block/gas_line_inventory", "drilling_rig": "block/drilling_rig", "cooling_tower": "block/cooling_tower", "cooling_fill": "block/cooling_fill",
 	"pumpjack": "block/pumpjack",
 	"gas_wellhead": "block/gas_wellhead", "casing": "block/casing", "boiler": "block/boiler", "steam_turbine": "block/steam_turbine", "electric_lamp": "block/electric_lamp",
 	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "fuse": "block/fuse_good", "fused_cutout": "block/fused_cutout/item", "dist_breaker": "block/dist_breaker_on", "pole_transformer": "block/pole_transformer/item", "switch": "block/switch_on", "ufls_relay": "block/relay_on", "ufls_relay_dist": "block/relay_on", "mv_breaker": "block/mv_breaker_on", "hv_breaker": "block/hv_breaker_on", "pole": "block/pole", "crossarm": "block/crossarm_x", "transformer": "block/transformer",
@@ -640,8 +640,6 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 	"block.wildcatter.gas_line": "Steel Pipe (oil and gas)",
 	"block.wildcatter.drilling_rig": "Drilling Rig (LV)",
 	"block.wildcatter.casing": "Well Casing (cemented: unbreakable)",
-	"block.wildcatter.refinery": "Refinery Base (LV)",
-	"block.wildcatter.refinery_column": "Distillation Column",
 	"block.wildcatter.cooling_tower": "Cooling Tower Fan Deck (LV)",
 	"block.wildcatter.cooling_fill": "Cooling Tower Fill",
 	"block.wildcatter.plastic_wire_hot": "Plastic Wire, red (LV)",
@@ -710,7 +708,7 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 })
 
 # ---- loot: every block drops itself ---------------------------------------------------------------
-BLOCKS = ("refinery", "refinery_column", "cooling_tower", "cooling_fill", "boiler", "firebox", "pipe", "gas_line", "drilling_rig", "pumpjack", "gas_wellhead", "pump", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "electric_heater", "breaker", "fuse", "fused_cutout", "switch", "ufls_relay", "ufls_relay_dist", "mv_breaker", "dist_breaker", "pole_transformer", "hv_breaker", "pole", "crossarm", "insulator_lv", "insulator_dist", "insulator_hv", "ground_rod") + tuple(f"receptacle_{p}" for p in PLUG_COLORS) + tuple(f"plug_{p}" for p in PLUG_COLORS) + WIRES
+BLOCKS = ("cooling_tower", "cooling_fill", "boiler", "firebox", "pipe", "gas_line", "drilling_rig", "pumpjack", "gas_wellhead", "pump", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "electric_heater", "breaker", "fuse", "fused_cutout", "switch", "ufls_relay", "ufls_relay_dist", "mv_breaker", "dist_breaker", "pole_transformer", "hv_breaker", "pole", "crossarm", "insulator_lv", "insulator_dist", "insulator_hv", "ground_rod") + tuple(f"receptacle_{p}" for p in PLUG_COLORS) + tuple(f"plug_{p}" for p in PLUG_COLORS) + WIRES
 for name in BLOCKS:
 	save_json(f"{DATA}/loot_table/blocks/{name}.json", {
 		"type": "minecraft:block",
@@ -720,7 +718,7 @@ for name in BLOCKS:
 save_json(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json", {"values": [f"{ns}:{n}" for n in BLOCKS if n not in ("pole", "crossarm")]})
 save_json(f"{ROOT}/data/minecraft/tags/block/mineable/axe.json", {"values": [f"{ns}:pole", f"{ns}:crossarm"]})
 save_json(f"{ROOT}/data/minecraft/tags/block/climbable.json", {"values": [f"{ns}:pole"]})
-save_json(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json", {"values": [f"{ns}:{n}" for n in ("boiler", "firebox", "mv_breaker", "dist_breaker", "pole_transformer", "hv_breaker", "pump", "drilling_rig", "pumpjack", "gas_wellhead", "refinery", "refinery_column", "cooling_tower", "cooling_fill", "steam_turbine", "transformer", "substation_transformer")]})
+save_json(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json", {"values": [f"{ns}:{n}" for n in ("boiler", "firebox", "mv_breaker", "dist_breaker", "pole_transformer", "hv_breaker", "pump", "drilling_rig", "pumpjack", "gas_wellhead", "cooling_tower", "cooling_fill", "steam_turbine", "transformer", "substation_transformer")]})
 
 # ---- recipes (early game: iron, copper, redstone, glass, dye, wool) ----------------------------------------
 def shaped(name, pattern, key, result, count=1):
@@ -744,10 +742,8 @@ shaped("drilling_rig", ["IPI", "CMC", "IBI"], {"I": "minecraft:iron_ingot", "P":
 shaped("pumpjack", ["III", "CPC", "IRI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "P": "minecraft:piston", "R": "minecraft:redstone"}, "pumpjack")
 shaped("gas_wellhead", ["III", "CBC", "III"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "B": "minecraft:iron_block"}, "gas_wellhead")
 shaped("seismograph", ["IPI", "RCR", "III"], {"I": "minecraft:iron_ingot", "P": "minecraft:paper", "R": "minecraft:redstone", "C": "minecraft:compass"}, "seismograph")
-shaped("refinery", ["IPI", "CBC", "III"], {"I": "minecraft:iron_ingot", "P": "minecraft:copper_ingot", "C": "minecraft:cauldron", "B": "minecraft:blast_furnace"}, "refinery")
 shaped("cooling_tower", ["IBI", "CFC", "III"], {"I": "minecraft:iron_ingot", "B": "minecraft:iron_bars", "C": "minecraft:copper_ingot", "F": "minecraft:blast_furnace"}, "cooling_tower")
 shaped("cooling_fill", ["IBI", "IBI", "IBI"], {"I": "minecraft:iron_ingot", "B": "minecraft:iron_bars"}, "cooling_fill")
-shaped("refinery_column", ["ICI", "ICI", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot"}, "refinery_column")
 shaped("steam_turbine", ["ICI", "CRC", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, "steam_turbine")
 # Wire is coloured with dye so you can tell the two conductors apart: red is hot, black is neutral.
 for role, dye in (("hot", "minecraft:red_dye"), ("neutral", "minecraft:black_dye")):
@@ -1429,6 +1425,47 @@ lang.update({"block.wildcatter.gas_compressor": "Gas Compressor (400 hp, 4.16 kV
 	"block.wildcatter.stabilizer": "Stabilizer (debutanizer, 12 m)", "block.wildcatter.lpg_bullet": "LPG Bullet (18,000 gal)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 ROTOR_PARTS += ("gas_compressor_coupling", "gas_compressor_fan", "refrigeration_coupling")
+save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ROTOR_PARTS}})
+
+# ---- Phase 5c and 5d: the crude units and the cracker (docs/multiblocks/crude-units.md, cracker.md) ---------------------------------
+# blockstates, models, shapes and items come from tools/models/crude_units.py and cracker.py; here loot, names, tags, recipes, rotors.
+REFINING_PARTS = ("topping_column", "topping_heater", "topping_skid", "atmospheric_column", "crude_heater", "desalter", "crude_charge_pump",
+	"side_strippers", "overhead_condenser", "cracking_furnace", "quench_tower", "cracked_gas_compressor", "cold_box", "polyethylene_reactor", "pelletizer")
+for name in REFINING_PARTS:
+	big_part_loot(name)
+for tag in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
+	t["values"] = [v for v in t["values"] if v not in (f"{ns}:refinery", f"{ns}:refinery_column")] + [f"{ns}:{n}" for n in REFINING_PARTS]
+	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
+P_, F_ = f"{ns}:gas_line", "minecraft:blast_furnace"
+shaped("topping_column", ["SPS", "S S", "SPS"], {"S": S_, "P": P_}, "topping_column")
+shaped("topping_heater", ["SSS", "SFS", "SPS"], {"S": S_, "F": F_, "P": P_}, "topping_heater")
+shaped("topping_skid", ["SCS", "PXP", "SSS"], {"S": S_, "C": "minecraft:copper_ingot", "P": P_, "X": "minecraft:piston"}, "topping_skid")
+shaped("atmospheric_column", ["BPB", "B B", "BPB"], {"B": "minecraft:iron_block", "P": P_}, "atmospheric_column")
+shaped("crude_heater", ["BBB", "BFB", "BPB"], {"B": "minecraft:iron_block", "F": F_, "P": P_}, "crude_heater")
+shaped("desalter", ["SCS", "PRP", "SSS"], {"S": S_, "C": "minecraft:copper_block", "P": P_, "R": "minecraft:redstone_block"}, "desalter")
+shaped("crude_charge_pump", ["SCS", "PXP", "SBS"], {"S": S_, "C": "minecraft:copper_block", "P": P_, "X": f"{ns}:crankshaft", "B": "minecraft:iron_block"}, "crude_charge_pump")
+shaped("side_strippers", ["SPS", "S S", "SPS"], {"S": S_, "P": P_}, "side_strippers", 1)
+shaped("overhead_condenser", ["SCS", "GXG", "SPS"], {"S": S_, "C": "minecraft:copper_block", "G": "minecraft:iron_bars", "X": "minecraft:piston", "P": P_}, "overhead_condenser")
+shaped("cracking_furnace", ["BBB", "BFB", "PFP"], {"B": "minecraft:iron_block", "F": F_, "P": P_}, "cracking_furnace")
+shaped("quench_tower", ["SPS", "SWS", "SPS"], {"S": S_, "P": P_, "W": "minecraft:water_bucket"}, "quench_tower")
+shaped("cracked_gas_compressor", ["SPS", "CXC", "SBS"], {"S": S_, "P": P_, "C": "minecraft:copper_block", "X": f"{ns}:crankshaft", "B": "minecraft:iron_block"}, "cracked_gas_compressor")
+shaped("cold_box", ["SIS", "IWI", "SPS"], {"S": S_, "I": "minecraft:blue_ice", "W": "minecraft:white_wool", "P": P_}, "cold_box")
+shaped("polyethylene_reactor", ["SPS", "S S", "SXS"], {"S": S_, "P": P_, "X": "minecraft:piston"}, "polyethylene_reactor")
+shaped("pelletizer", ["SCS", "XHX", "SSS"], {"S": S_, "C": "minecraft:copper_block", "X": f"{ns}:crankshaft", "H": "minecraft:hopper"}, "pelletizer")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for old in ("block.wildcatter.refinery", "block.wildcatter.refinery_column"):
+	lang.pop(old, None)
+lang.update({"block.wildcatter.topping_column": "Topping Column (1,000 bbl/day, controller)", "block.wildcatter.topping_heater": "Topping Heater (3 MMBtu/h)",
+	"block.wildcatter.topping_skid": "Topping Pump and Air-Cooler Skid (480 V)", "block.wildcatter.atmospheric_column": "Atmospheric Column (20,000 bbl/day, controller)",
+	"block.wildcatter.crude_heater": "Crude Heater (60 MMBtu/h)", "block.wildcatter.desalter": "Electrostatic Desalter",
+	"block.wildcatter.crude_charge_pump": "Crude Charge Pump (250 hp, 4.16 kV)", "block.wildcatter.side_strippers": "Side Strippers (kerosene and diesel)",
+	"block.wildcatter.overhead_condenser": "Overhead Fin-Fan Condenser", "block.wildcatter.cracking_furnace": "Cracking Furnace",
+	"block.wildcatter.quench_tower": "Quench Tower", "block.wildcatter.cracked_gas_compressor": "Cracked Gas Compressor (300 hp, 4.16 kV)",
+	"block.wildcatter.cold_box": "Cold Box (ethylene recovery)", "block.wildcatter.polyethylene_reactor": "Polyethylene Reactor",
+	"block.wildcatter.pelletizer": "Pelletizer (250 hp, 4.16 kV)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+ROTOR_PARTS += ("skid_fan", "fin_fan")
 save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ROTOR_PARTS}})
 
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------

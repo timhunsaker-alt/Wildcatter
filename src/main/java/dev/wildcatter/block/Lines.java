@@ -74,18 +74,12 @@ public final class Lines {
 		return out;
 	}
 
-	/** The machine node standing at {@code pos}: a big part's main cell, a pumpjack through its wellhead, a refinery through its columns. */
+	/** The machine node standing at {@code pos}: a big part's main cell, a pumpjack through its wellhead. */
 	static @Nullable FluidNode node(Level level, BlockPos pos) {
 		Block block = level.getBlockState(pos).getBlock();
 		BlockEntity entity;
 		if (block instanceof OilWellheadBlock) {   // a pumpjack's stream comes out of its wellhead
 			entity = OilWellheadBlock.pumpjack(level, pos);
-		} else if (block == WildcatterBlocks.REFINERY_COLUMN) {   // a tower's products come off its columns
-			BlockPos base = pos.below();
-			while (level.getBlockState(base).is(WildcatterBlocks.REFINERY_COLUMN)) {
-				base = base.below();
-			}
-			entity = level.getBlockEntity(base);
 		} else {
 			entity = dev.wildcatter.multiblock.BigParts.entity(level, pos);
 		}

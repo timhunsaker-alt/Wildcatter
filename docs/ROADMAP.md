@@ -76,13 +76,15 @@ and the Field Manual has a page for each new system.
   4.5e into 4.5e and 4.5f was decided with Tim on 2026-10-31. The refinery waits for Phase 5.
 - Tim checks each wave in a real session before the next starts.
 
-## Phase 5 — Oil and gas depth — CURRENT (started 2026-10-31)
+## Phase 5 — Oil and gas depth — CURRENT (started 2026-10-31; all four waves built 2026-10-31, waiting for Tim's check)
 - Wellhead separator (oil / gas / water), gas processing, compressor stations.
 - Refinery products: LPG, gasoline, kerosene, diesel, residue. Steam cracker → ethylene → plastic.
 - Waves (decided with Tim on 2026-10-31: follow the chain; wells give a real mixed stream; each run of steel pipe carries one
   product): 5a the lease (separator, stock and water tanks, flare, injection pump and disposal well; docs/multiblocks/lease.md);
   5b gas processing (dehydration, NGL and LPG recovery) and a motor-driven compressor (decided with Tim: a 4.16 kV electric drive;
-  dry pipeline gas plus LPG; only big burners need processed gas; docs/multiblocks/gas-plant.md); 5c the crude distillation unit at
+  dry pipeline gas plus LPG; only big burners need processed gas; docs/multiblocks/gas-plant.md); then 5c and 5d together
+  (decided with Tim: remove the one-block refinery; an early 1,000 and a late 20,000 bbl/day unit; a WTI-like crude; residue as
+  burner fuel; docs/multiblocks/crude-units.md, cracker.md): 5c the crude distillation unit at
   true size with a real crude assay (LPG, gasoline, kerosene, diesel, residue); 5d a steam cracker, ethylene, polyethylene and
   plastic.
 - Tim checks each wave in a real session before the next starts.
@@ -102,4 +104,5 @@ and the Field Manual has a page for each new system.
 
 ## Ideas (not scheduled)
 - Switches and panels. Better wire, ground and breaker art. Saving the Ludo sound sources.
+- Soft starters and drives for big motors, so a 250 hp pump can start on a small island.
 - A sales gas pipeline and meter station, so a gas plant's residue gas has a buyer besides engines and the flare.

@@ -95,15 +95,18 @@ public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		// a land rig's mud tanks take their water too (docs/multiblocks/land-rig.md)
 		List<RigSubstructureBlockEntity> rigs = Plumbing.machines(level, cell, pipes, true, RigPartBlockEntity.class).stream()
 				.filter(p -> p.part() == RigPartBlock.Part.MUD_TANKS).map(RigPartBlockEntity::rig).filter(java.util.Objects::nonNull).distinct().toList();
-		if (boilers.isEmpty() && plants.isEmpty() && rigs.isEmpty()) {
+		// a cracking furnace makes its dilution steam from water (docs/multiblocks/cracker.md)
+		List<CrackingFurnaceBlockEntity> furnaces = Plumbing.machines(level, cell, pipes, true, CrackingFurnaceBlockEntity.class);
+		if (boilers.isEmpty() && plants.isEmpty() && rigs.isEmpty() && furnaces.isEmpty()) {
 			pump.wanted = false;
-			pump.status = "no boiler, plant condenser or mud tanks on its pipes";
+			pump.status = "no boiler, plant condenser, mud tanks or cracking furnace on its pipes";
 			return;
 		}
 		// a level switch: start when a boiler, hotwell or mud tank falls below the start level, stop when they are all full
 		double lowest = Math.min(Math.min(boilers.stream().mapToDouble(BoilerBlockEntity::waterLevel).min().orElse(1.0),
 				plants.stream().mapToDouble(TurbineGeneratorBlockEntity::hotwellLevel).min().orElse(1.0)),
-				rigs.stream().mapToDouble(RigSubstructureBlockEntity::waterLevel).min().orElse(1.0));
+				Math.min(rigs.stream().mapToDouble(RigSubstructureBlockEntity::waterLevel).min().orElse(1.0),
+						furnaces.stream().mapToDouble(CrackingFurnaceBlockEntity::waterLevel).min().orElse(1.0)));
 		pump.wanted = pump.wanted ? lowest < 1.0 : lowest < Tuning.PUMP_START_LEVEL;
 		double strength = pump.motor.output();
 		if (strength == 0) {
@@ -117,6 +120,9 @@ public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		}
 		for (RigSubstructureBlockEntity rig : rigs) {
 			moved += rig.addWater(budget - moved);
+		}
+		for (CrackingFurnaceBlockEntity furnace : furnaces) {
+			moved += furnace.addWater(budget - moved);
 		}
 		pump.status = (moved > 0 ? "pumping " + Math.round(moved * 20.0 / Tuning.PLUMBING_INTERVAL) + " water/s to " + boilers.size() + " boiler(s), " + plants.size() + " plant(s)"
 				+ (rigs.isEmpty() ? "" : " and " + rigs.size() + " rig's mud tanks")

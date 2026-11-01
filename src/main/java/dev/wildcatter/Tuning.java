@@ -161,13 +161,45 @@ public final class Tuning {
 	public static final double LPG_BULLET_LITERS = 58_000.0;       // an 18,000 gallon (68 m3) bullet at its 85 % fill
 	public static final double PLANT_HOLD_SECONDS = 5.0;           // each process part holds this much of its output
 
+	// ---- The crude units (docs/multiblocks/crude-units.md, approved 2026-10-31) -------------------------------------------
+	public static final double TOPPING_LPS = 1.84;                 // 1,000 bbl a day at full voltage
+	public static final double TOPPING_HEATER_WATTS = 0.88e6;      // 3 MMBtu/h fired
+	public static final double TOPPING_SKID_WATTS = 11_200.0;      // a 10 hp charge pump and a 5 hp air-cooler fan, 480 V
+	public static final double CRUDE_UNIT_LPS = 36.8;              // 20,000 bbl a day
+	public static final double CRUDE_HEATER_WATTS = 17.6e6;        // 60 MMBtu/h fired
+	public static final double CHARGE_PUMP_WATTS = 187_000.0;      // 250 hp, 4.16 kV: 37 L/s at about 400 psi
+	public static final double DESALTER_WATTS = 40_000.0;          // its grid transformer, 480 V
+	public static final double CONDENSER_FAN_WATTS = 75_000.0;     // four 25 hp fans, 480 V
+	public static final double FUEL_OIL_JOULES_PER_L = 38.0e6;     // residue burned as fuel oil
+	public static final double LPG_JOULES_PER_L = 25.0e6;
+	public static final double GASOLINE_FUEL_TICKS_PER_UNIT = 15.0;   // a litre in a firebox, beside crude's 20 and diesel's 16
+	public static final double KEROSENE_FUEL_TICKS_PER_UNIT = 16.0;
+	public static final double RESIDUE_FUEL_TICKS_PER_UNIT = 20.0;
+	public static final double CONDENSATE_FUEL_TICKS_PER_UNIT = 16.0;
+
+	// ---- The cracker and polyethylene (docs/multiblocks/cracker.md, approved 2026-10-31) ----------------------------------
+	public static final double CRACKER_FEED_LPS = 1.0;             // litres of LPG or gasoline a second at full rate
+	public static final double LPG_KG_PER_L = 0.51;
+	public static final double GASOLINE_KG_PER_L = 0.72;
+	public static final double ETHYLENE_KG_PER_M3 = 1.18;
+	public static final double FUEL_GAS_KG_PER_M3 = 0.75;          // methane and hydrogen
+	public static final double CRACKER_FUEL_WATTS_LPG = 7.5e6;
+	public static final double CRACKER_FUEL_WATTS_GASOLINE = 14.0e6;
+	public static final double CRACKER_WATER_LPG = 0.15;           // litres of water a second: dilution steam, 0.3 kg a kg of feed
+	public static final double CRACKER_WATER_GASOLINE = 0.36;      // 0.5 kg a kg of feed
+	public static final double CRACKED_GAS_COMPRESSOR_WATTS = 224_000.0;   // 300 hp, 4.16 kV
+	public static final double COLD_BOX_KGS = 0.6;                 // kg of cracked gas a second, through the compressor and the cold box
+	public static final int CRACKED_GAS_COMPRESSOR_POLES = 4;      // 1,780 rpm at 60 Hz
+	public static final double QUENCH_KGS = 1.0;                   // kg of hot cracked gas a second
+	public static final double RESIDUE_KG_PER_L = 0.95;            // fuel oil
+	public static final double PE_REACTOR_KGS = 0.25;              // kg of ethylene a second: sized for the cracker
+	public static final double PE_REACTOR_WATTS = 75_000.0;        // its cycle gas compressor, 480 V
+	public static final double PE_CONVERSION = 0.98;
+	public static final double PELLETIZER_WATTS = 187_000.0;       // 250 hp extruder, 4.16 kV
+	public static final double PE_KG_PER_SHEET = 1.0;
+	public static final int PELLETIZER_BIN = 256;
+
 	// ---- Refining and engines ----------------------------------------------------------------------------------------
-	public static final double REFINERY_WATTS = 2000.0;       // 110 V, 18 A
-	public static final double REFINERY_CRUDE_PER_TICK = 0.5; // at full voltage
-	public static final int REFINERY_TANK = 4000;             // crude in, and diesel out
-	public static final double DIESEL_YIELD = 0.7;            // units of diesel per unit of crude
-	public static final int CRUDE_PER_PLASTIC = 250;          // crude refined for each plastic sheet
-	public static final int PLASTIC_BIN = 64;                 // the refinery stops when this many sheets are waiting
 	public static final int DIESEL_BUCKET_UNITS = 1000;
 	public static final double DIESEL_FUEL_TICKS_PER_UNIT = 16.0;   // burning it in a firebox
 	/** Electrical energy in one unit of fuel, after the engine's losses: 100 kW of diesel uses 2.5 units a second. */
@@ -196,10 +228,6 @@ public final class Tuning {
 	public static final double[] SYNC_TRIM_HZ = {-0.2, -0.1, 0.0, 0.1, 0.2};   // the manual raise/lower speed settings
 	public static final double PT_OHMS = 1.0e6;                    // the potential transformers the synchronizer reads the bus through
 	public static final double ENGINE_SAG = 0.05;             // output voltage sags this much at full load
-	/** A refinery base alone is a pot still: slow, a poor yield of diesel, and no plastic. Two columns on top make a full tower. */
-	public static final int REFINERY_COLUMNS = 2;
-	public static final double POT_STILL_SPEED = 0.5;
-	public static final double POT_STILL_YIELD = 0.4;
 
 	// ---- Steam turbine -----------------------------------------------------------------------------------------
 	/** Energy in one unit of steam. A campfire boiler (2 steam a tick) therefore makes 2 kW. */

@@ -25,7 +25,21 @@ public enum Product {
 	/** Propane and butane. */
 	LPG("LPG", false),
 	/** The C5+ out of the bottom of a stabilizer. */
-	NATURAL_GASOLINE("natural gasoline", false);
+	NATURAL_GASOLINE("natural gasoline", false),
+	/** A gas well's liquid out of a separator: light, mostly gasoline range (docs/multiblocks/crude-units.md). */
+	CONDENSATE("condensate", false),
+	/** Naphtha off a crude unit's overhead, and a cracker's pyrolysis gasoline. */
+	GASOLINE("gasoline", false),
+	KEROSENE("kerosene", false),
+	/** Atmospheric residue: burned as fuel oil. */
+	RESIDUE("residue (fuel oil)", false),
+	/** Out of a cracking furnace, before the quench (docs/multiblocks/cracker.md). Counted in kg. */
+	HOT_CRACKED_GAS("hot cracked gas", true),
+	/** Cracked gas after the quench. Counted in kg. */
+	CRACKED_GAS("cracked gas", true),
+	/** Cracked gas after its compressor. Counted in kg. */
+	COMPRESSED_CRACKED_GAS("compressed cracked gas", true),
+	ETHYLENE("ethylene", true);
 
 	private final String label;
 	private final boolean gas;
@@ -45,6 +59,6 @@ public enum Product {
 	}
 
 	public String unit() {
-		return gas ? "m3" : "L";
+		return this == HOT_CRACKED_GAS || this == CRACKED_GAS || this == COMPRESSED_CRACKED_GAS ? "kg" : gas ? "m3" : "L";
 	}
 }

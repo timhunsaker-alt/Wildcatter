@@ -17,12 +17,9 @@ import dev.wildcatter.block.CableBlock;
 import dev.wildcatter.block.CasingBlock;
 import dev.wildcatter.block.CrossarmBlock;
 import dev.wildcatter.block.PoleBlock;
-import dev.wildcatter.block.ColumnBlock;
 import dev.wildcatter.block.CoolingFillBlock;
 import dev.wildcatter.block.CoolingTowerBlock;
 import dev.wildcatter.block.CoolingTowerBlockEntity;
-import dev.wildcatter.block.RefineryBlock;
-import dev.wildcatter.block.RefineryBlockEntity;
 import dev.wildcatter.block.DrillingRigBlock;
 import dev.wildcatter.block.DrillingRigBlockEntity;
 import dev.wildcatter.block.GasWellheadBlock;
@@ -104,11 +101,6 @@ public final class WildcatterBlocks {
 	public static final Block OIL_WELLHEAD = block("oil_wellhead", props -> new dev.wildcatter.block.OilWellheadBlock(props.mapColor(MapColor.COLOR_GREEN)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
 
-	/** Crude in, diesel out. The base is a pot still; two columns on top make it a full tower that also makes plastic. */
-	public static final Block REFINERY = block("refinery", props -> new RefineryBlock(props.mapColor(MapColor.COLOR_GRAY)
-			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
-	public static final Block REFINERY_COLUMN = block("refinery_column", props -> new ColumnBlock(props.mapColor(MapColor.METAL)
-			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
 	/** A fan base plus two fill sections make a cooling tower: it cools the condensate of turbines on the same water pipes. */
 	public static final Block COOLING_TOWER = block("cooling_tower", props -> new CoolingTowerBlock(props.mapColor(MapColor.STONE)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
@@ -345,6 +337,23 @@ public final class WildcatterBlocks {
 	public static final Block REFRIGERATION_COMPRESSOR = gasPlantPart(dev.wildcatter.block.GasPlantPartBlock.Part.REFRIGERATION_COMPRESSOR);
 	public static final Block STABILIZER = gasPlantPart(dev.wildcatter.block.GasPlantPartBlock.Part.STABILIZER);
 	public static final Block LPG_BULLET = gasPlantPart(dev.wildcatter.block.GasPlantPartBlock.Part.LPG_BULLET);
+	/** The crude units (docs/multiblocks/crude-units.md). */
+	public static final Block TOPPING_COLUMN = refineryPart(dev.wildcatter.block.RefineryPartBlock.Part.TOPPING_COLUMN);
+	public static final Block TOPPING_HEATER = refineryPart(dev.wildcatter.block.RefineryPartBlock.Part.TOPPING_HEATER);
+	public static final Block TOPPING_SKID = refineryPart(dev.wildcatter.block.RefineryPartBlock.Part.TOPPING_SKID);
+	public static final Block ATMOSPHERIC_COLUMN = refineryPart(dev.wildcatter.block.RefineryPartBlock.Part.ATMOSPHERIC_COLUMN);
+	public static final Block CRUDE_HEATER = refineryPart(dev.wildcatter.block.RefineryPartBlock.Part.CRUDE_HEATER);
+	public static final Block DESALTER = refineryPart(dev.wildcatter.block.RefineryPartBlock.Part.DESALTER);
+	public static final Block CRUDE_CHARGE_PUMP = refineryPart(dev.wildcatter.block.RefineryPartBlock.Part.CRUDE_CHARGE_PUMP);
+	public static final Block SIDE_STRIPPERS = refineryPart(dev.wildcatter.block.RefineryPartBlock.Part.SIDE_STRIPPERS);
+	public static final Block OVERHEAD_CONDENSER = refineryPart(dev.wildcatter.block.RefineryPartBlock.Part.OVERHEAD_CONDENSER);
+	/** The cracker and polyethylene (docs/multiblocks/cracker.md). */
+	public static final Block CRACKING_FURNACE = petrochemPart(dev.wildcatter.block.PetrochemPartBlock.Part.CRACKING_FURNACE);
+	public static final Block QUENCH_TOWER = petrochemPart(dev.wildcatter.block.PetrochemPartBlock.Part.QUENCH_TOWER);
+	public static final Block CRACKED_GAS_COMPRESSOR = petrochemPart(dev.wildcatter.block.PetrochemPartBlock.Part.CRACKED_GAS_COMPRESSOR);
+	public static final Block COLD_BOX = petrochemPart(dev.wildcatter.block.PetrochemPartBlock.Part.COLD_BOX);
+	public static final Block POLYETHYLENE_REACTOR = petrochemPart(dev.wildcatter.block.PetrochemPartBlock.Part.POLYETHYLENE_REACTOR);
+	public static final Block PELLETIZER = petrochemPart(dev.wildcatter.block.PetrochemPartBlock.Part.PELLETIZER);
 	/** Never placed: its states carry the models of the turning parts (kinetic/RotorBlock). */
 	public static final Block ROTOR = block("rotor", props -> new dev.wildcatter.kinetic.RotorBlock(props.noOcclusion().noLootTable()));
 
@@ -368,7 +377,17 @@ public final class WildcatterBlocks {
 			RIG_MAST, RIG_DRAWWORKS, MUD_PUMP, MUD_TANKS);
 	public static final BlockEntityType<dev.wildcatter.block.SeparatorBlockEntity> SEPARATOR_ENTITY = entity(dev.wildcatter.block.SeparatorBlockEntity::new, SEPARATOR);
 	public static final BlockEntityType<dev.wildcatter.block.StorageTankBlockEntity> STORAGE_TANK_ENTITY = entity(dev.wildcatter.block.StorageTankBlockEntity::new, STOCK_TANK, WATER_TANK, LPG_BULLET);
-	public static final BlockEntityType<dev.wildcatter.block.GasCompressorBlockEntity> GAS_COMPRESSOR_ENTITY = entity(dev.wildcatter.block.GasCompressorBlockEntity::new, GAS_COMPRESSOR, REFRIGERATION_COMPRESSOR);
+	public static final BlockEntityType<dev.wildcatter.block.GasCompressorBlockEntity> GAS_COMPRESSOR_ENTITY = entity(dev.wildcatter.block.GasCompressorBlockEntity::new, GAS_COMPRESSOR, REFRIGERATION_COMPRESSOR, CRACKED_GAS_COMPRESSOR);
+	public static final BlockEntityType<dev.wildcatter.block.UnitMotorBlockEntity> UNIT_MOTOR_ENTITY = entity(dev.wildcatter.block.UnitMotorBlockEntity::new, TOPPING_SKID, DESALTER, CRUDE_CHARGE_PUMP, OVERHEAD_CONDENSER);
+	public static final BlockEntityType<dev.wildcatter.block.FiredHeaterBlockEntity> FIRED_HEATER_ENTITY = entity(dev.wildcatter.block.FiredHeaterBlockEntity::new, TOPPING_HEATER, CRUDE_HEATER);
+	public static final BlockEntityType<dev.wildcatter.block.StripperBlockEntity> STRIPPER_ENTITY = entity(dev.wildcatter.block.StripperBlockEntity::new, SIDE_STRIPPERS);
+	public static final BlockEntityType<dev.wildcatter.block.ToppingColumnBlockEntity> TOPPING_COLUMN_ENTITY = entity(dev.wildcatter.block.ToppingColumnBlockEntity::new, TOPPING_COLUMN);
+	public static final BlockEntityType<dev.wildcatter.block.CrudeColumnBlockEntity> CRUDE_COLUMN_ENTITY = entity(dev.wildcatter.block.CrudeColumnBlockEntity::new, ATMOSPHERIC_COLUMN);
+	public static final BlockEntityType<dev.wildcatter.block.CrackingFurnaceBlockEntity> CRACKING_FURNACE_ENTITY = entity(dev.wildcatter.block.CrackingFurnaceBlockEntity::new, CRACKING_FURNACE);
+	public static final BlockEntityType<dev.wildcatter.block.QuenchTowerBlockEntity> QUENCH_TOWER_ENTITY = entity(dev.wildcatter.block.QuenchTowerBlockEntity::new, QUENCH_TOWER);
+	public static final BlockEntityType<dev.wildcatter.block.ColdBoxBlockEntity> COLD_BOX_ENTITY = entity(dev.wildcatter.block.ColdBoxBlockEntity::new, COLD_BOX);
+	public static final BlockEntityType<dev.wildcatter.block.PolyethyleneReactorBlockEntity> PE_REACTOR_ENTITY = entity(dev.wildcatter.block.PolyethyleneReactorBlockEntity::new, POLYETHYLENE_REACTOR);
+	public static final BlockEntityType<dev.wildcatter.block.PelletizerBlockEntity> PELLETIZER_ENTITY = entity(dev.wildcatter.block.PelletizerBlockEntity::new, PELLETIZER);
 	public static final BlockEntityType<dev.wildcatter.block.DehydratorBlockEntity> DEHYDRATOR_ENTITY = entity(dev.wildcatter.block.DehydratorBlockEntity::new, TEG_DEHYDRATOR);
 	public static final BlockEntityType<dev.wildcatter.block.ChillerBlockEntity> CHILLER_ENTITY = entity(dev.wildcatter.block.ChillerBlockEntity::new, NGL_CHILLER);
 	public static final BlockEntityType<dev.wildcatter.block.StabilizerBlockEntity> STABILIZER_ENTITY = entity(dev.wildcatter.block.StabilizerBlockEntity::new, STABILIZER);
@@ -398,7 +417,6 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<PumpjackBlockEntity> PUMPJACK_ENTITY = entity(PumpjackBlockEntity::new, PUMPJACK);
 	public static final BlockEntityType<GasWellheadBlockEntity> GAS_WELLHEAD_ENTITY = entity(GasWellheadBlockEntity::new, GAS_WELLHEAD);
 
-	public static final BlockEntityType<RefineryBlockEntity> REFINERY_ENTITY = entity(RefineryBlockEntity::new, REFINERY);
 	public static final BlockEntityType<dev.wildcatter.block.TowerBasinBlockEntity> TOWER_BASIN_ENTITY = entity(dev.wildcatter.block.TowerBasinBlockEntity::new, TOWER_BASIN);
 	public static final BlockEntityType<CoolingTowerBlockEntity> COOLING_TOWER_ENTITY = entity(CoolingTowerBlockEntity::new, COOLING_TOWER);
 	/** The plain true-size parts that only remember they have grown (block/BigPartBlockEntity). */
@@ -452,6 +470,16 @@ public final class WildcatterBlocks {
 	private static Block gensetPart(String name, dev.wildcatter.block.GensetPartBlock.Part part) {
 		return block(name, props -> new dev.wildcatter.block.GensetPartBlock(props.mapColor(MapColor.COLOR_GRAY)
 				.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
+	}
+
+	private static Block refineryPart(dev.wildcatter.block.RefineryPartBlock.Part part) {
+		return block(part.id(), props -> new dev.wildcatter.block.RefineryPartBlock(props.mapColor(MapColor.COLOR_GRAY)
+				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
+	}
+
+	private static Block petrochemPart(dev.wildcatter.block.PetrochemPartBlock.Part part) {
+		return block(part.id(), props -> new dev.wildcatter.block.PetrochemPartBlock(props.mapColor(MapColor.COLOR_GRAY)
+				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
 	}
 
 	private static Block gasPlantPart(dev.wildcatter.block.GasPlantPartBlock.Part part) {
@@ -510,8 +538,6 @@ public final class WildcatterBlocks {
 		add("pumpjack", PUMPJACK);
 		add("gas_wellhead", GAS_WELLHEAD);
 		add("oil_wellhead", OIL_WELLHEAD);
-		add("refinery", REFINERY);
-		add("refinery_column", REFINERY_COLUMN);
 		add("cooling_tower", COOLING_TOWER);
 		add("cooling_fill", COOLING_FILL);
 		add("tower_basin", TOWER_BASIN);
@@ -617,6 +643,12 @@ public final class WildcatterBlocks {
 		for (Block part : new Block[] {GAS_COMPRESSOR, TEG_DEHYDRATOR, NGL_CHILLER, REFRIGERATION_COMPRESSOR, STABILIZER, LPG_BULLET}) {
 			add(((dev.wildcatter.block.GasPlantPartBlock) part).part().id(), part);
 		}
+		for (Block part : new Block[] {TOPPING_COLUMN, TOPPING_HEATER, TOPPING_SKID, ATMOSPHERIC_COLUMN, CRUDE_HEATER, DESALTER, CRUDE_CHARGE_PUMP, SIDE_STRIPPERS, OVERHEAD_CONDENSER}) {
+			add(((dev.wildcatter.block.RefineryPartBlock) part).part().id(), part);
+		}
+		for (Block part : new Block[] {CRACKING_FURNACE, QUENCH_TOWER, CRACKED_GAS_COMPRESSOR, COLD_BOX, POLYETHYLENE_REACTOR, PELLETIZER}) {
+			add(((dev.wildcatter.block.PetrochemPartBlock) part).part().id(), part);
+		}
 		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("rotor"), ROTOR);   // no item: it is never placed
 		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("mcc_bucket"), MCC_BUCKET);   // its item is WildcatterItems.MCC_BUCKET
 		add("mcc_section", MCC_SECTION);
@@ -631,7 +663,6 @@ public final class WildcatterBlocks {
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("drilling_rig"), DRILLING_RIG_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("pumpjack"), PUMPJACK_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("gas_wellhead"), GAS_WELLHEAD_ENTITY);
-		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("refinery"), REFINERY_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("cooling_tower"), COOLING_TOWER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("big_part"), BIG_PART_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("station_bus"), STATION_BUS_ENTITY);
@@ -664,6 +695,16 @@ public final class WildcatterBlocks {
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("dehydrator"), DEHYDRATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("chiller"), CHILLER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("stabilizer"), STABILIZER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("unit_motor"), UNIT_MOTOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("fired_heater"), FIRED_HEATER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("side_strippers"), STRIPPER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("topping_column"), TOPPING_COLUMN_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("crude_column"), CRUDE_COLUMN_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("cracking_furnace"), CRACKING_FURNACE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("quench_tower"), QUENCH_TOWER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("cold_box"), COLD_BOX_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("polyethylene_reactor"), PE_REACTOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("pelletizer"), PELLETIZER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("turbine_generator"), TURBINE_GENERATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("genset_control_panel"), GENSET_CONTROL_PANEL_ENTITY);
 	}

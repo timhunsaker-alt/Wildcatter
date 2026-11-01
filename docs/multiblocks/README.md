@@ -13,7 +13,7 @@ not a go-ahead to build: that waits for the roadmap phase (ROADMAP.md). Nothing 
 | [steam-plant.md](steam-plant.md) | 4 | 3x3x3 boiler, 3x3 firebox, 27-turbine cube |
 | [genset.md](genset.md) | 4, 4.5b | 500 kW diesel and 1 MW gas skids at true size |
 | [substation.md](substation.md) | 4 | single `substation_transformer` block |
-| [refinery-tower.md](refinery-tower.md) | 5 | refinery base plus two identical columns |
+| [refinery-tower.md](refinery-tower.md) | 5 | REPLACED by crude-units.md (5c): the base and columns are removed |
 | [cooling-tower.md](cooling-tower.md) | 4 | fan plus two identical fill blocks |
 | [poles.md](poles.md) | 4.5e | stacked one-block pole sections and crossarms |
 | [padmount.md](padmount.md) | 4.5e | one-block pad-mounts and unit substation |
@@ -23,6 +23,8 @@ not a go-ahead to build: that waits for the roadmap phase (ROADMAP.md). Nothing 
 | [land-rig.md](land-rig.md) | 4.5h | new: the late-game land rig, and deep fields |
 | [lease.md](lease.md) | 5a | new: separator, stock and water tanks, flare, injection pump and disposal well |
 | [gas-plant.md](gas-plant.md) | 5b | new: gas compressor, TEG dehydrator, NGL chiller and its refrigeration compressor, stabilizer, LPG bullet |
+| [crude-units.md](crude-units.md) | 5c | the refinery: a 1,000 bbl/day skid topping unit and a 20,000 bbl/day crude unit |
+| [cracker.md](cracker.md) | 5d | new: steam cracker, cold box, polyethylene reactor and pelletizer (plastic) |
 
 ## Shared rules
 - One **controller** block validates the structure and holds all state. Parts have no logic of their own beyond

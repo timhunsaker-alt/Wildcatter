@@ -29,6 +29,8 @@ public class SeparatorBlockEntity extends BlockEntity implements Inspectable, Bi
 	private double oil;
 	private double water;
 	private double gas;
+	/** True once an oil well's crude is in the oil side: a gas well's condensate then blends into it; without one, it is condensate. */
+	private boolean crude;
 	/** What came in over the last interval, for the readout. */
 	private Stream.Split came = Stream.Split.NONE;
 	private String status = "starting";
@@ -54,7 +56,12 @@ public class SeparatorBlockEntity extends BlockEntity implements Inspectable, Bi
 		if (side != LeasePartBlock.world(getBlockState(), Direction.SOUTH)) {
 			return null;
 		}
-		return at[1] == 1 ? Product.CRUDE : Product.PRODUCED_WATER;
+		return at[1] == 1 ? oilProduct() : Product.PRODUCED_WATER;
+	}
+
+	/** What comes out of the oil nozzle: crude, or a gas well's condensate when no oil well feeds it (docs/multiblocks/crude-units.md). */
+	private Product oilProduct() {
+		return crude ? Product.CRUDE : Product.CONDENSATE;
 	}
 
 	@Override
@@ -69,7 +76,7 @@ public class SeparatorBlockEntity extends BlockEntity implements Inspectable, Bi
 		}
 		return switch (product) {
 			case GAS -> pull == Pull.FLARE ? Math.max(0, gas - Tuning.SEPARATOR_GAS_HOLD * Tuning.SEPARATOR_FLARE_ABOVE) : gas;
-			case CRUDE -> pull == Pull.FLARE ? 0 : oil;
+			case CRUDE, CONDENSATE -> pull == Pull.FLARE || product != oilProduct() ? 0 : oil;
 			case PRODUCED_WATER -> pull == Pull.FLARE ? 0 : water;
 			default -> 0;
 		};
@@ -83,7 +90,7 @@ public class SeparatorBlockEntity extends BlockEntity implements Inspectable, Bi
 		}
 		switch (product) {
 			case GAS -> gas -= got;
-			case CRUDE -> oil -= got;
+			case CRUDE, CONDENSATE -> oil -= got;
 			default -> water -= got;
 		}
 		setChanged();
@@ -128,6 +135,9 @@ public class SeparatorBlockEntity extends BlockEntity implements Inspectable, Bi
 				}
 				if (amount > 0) {
 					Stream.Split got = well.drain(amount);
+					if (product == Product.WELL_FLUID && got.oil() > 0) {
+						sep.crude = true;
+					}
 					in = in.plus(got);
 					liquidLeft -= got.liquid();
 					gasLeft -= got.gas();
@@ -135,6 +145,9 @@ public class SeparatorBlockEntity extends BlockEntity implements Inspectable, Bi
 			}
 		}
 		sep.oil = Math.min(Tuning.SEPARATOR_OIL_HOLD, sep.oil + in.oil());
+		if (sep.oil < 0.5 && in.oil() <= 0) {
+			sep.crude = false;   // empty: what comes next decides
+		}
 		sep.water = Math.min(Tuning.SEPARATOR_WATER_HOLD, sep.water + in.water());
 		sep.gas = Math.min(Tuning.SEPARATOR_GAS_HOLD, sep.gas + in.gas());
 		sep.came = in;
@@ -142,7 +155,7 @@ public class SeparatorBlockEntity extends BlockEntity implements Inspectable, Bi
 		if (sep.gas >= Tuning.SEPARATOR_GAS_HOLD - 0.01) {
 			sep.status = "SHUT IN: gas has nowhere to go (pipe its gas side to a burner, an engine or a flare)";
 		} else if (sep.oil >= Tuning.SEPARATOR_OIL_HOLD - 1) {
-			sep.status = "SHUT IN: oil has nowhere to go (pipe its oil side to a stock tank or a refinery)";
+			sep.status = "SHUT IN: oil has nowhere to go (pipe its oil side to a stock tank or a crude unit)";
 		} else if (sep.water >= Tuning.SEPARATOR_WATER_HOLD - 1) {
 			sep.status = "SHUT IN: water has nowhere to go (pipe its water side to a water tank)";
 		} else if (flowing) {
@@ -179,6 +192,7 @@ public class SeparatorBlockEntity extends BlockEntity implements Inspectable, Bi
 		output.putDouble("oil", oil);
 		output.putDouble("water", water);
 		output.putDouble("gas", gas);
+		output.putBoolean("crude", crude);
 		output.putBoolean("grown", grown);
 	}
 
@@ -188,6 +202,7 @@ public class SeparatorBlockEntity extends BlockEntity implements Inspectable, Bi
 		oil = input.getDoubleOr("oil", 0);
 		water = input.getDoubleOr("water", 0);
 		gas = input.getDoubleOr("gas", 0);
+		crude = input.getBooleanOr("crude", oil > 0);
 		grown = input.getBooleanOr("grown", grown);
 	}
 }

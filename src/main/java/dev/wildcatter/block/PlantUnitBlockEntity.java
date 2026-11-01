@@ -23,6 +23,11 @@ import org.jspecify.annotations.Nullable;
  */
 public abstract class PlantUnitBlockEntity extends BlockEntity implements Inspectable, BigPartEntity, FluidNode {
 	protected final Map<Product, Double> held = new EnumMap<>(Product.class);
+	/**
+	 * What a held cracked gas is made of, by weight (docs/multiblocks/cracker.md): ethylene, fuel gas, LPG, pyrolysis gasoline,
+	 * residue. It travels with the gas from the furnace to the cold box, since what it is depends on what was cracked.
+	 */
+	protected final Map<Product, double[]> mix = new EnumMap<>(Product.class);
 	protected String status = "starting";
 	private boolean grown;
 
@@ -52,6 +57,46 @@ public abstract class PlantUnitBlockEntity extends BlockEntity implements Inspec
 	protected void add(Product product, double amount) {
 		held.put(product, Math.min(hold(product), held(product) + amount));
 		setChanged();
+	}
+
+	/** The make-up of a held cracked gas: ethylene, fuel gas, LPG, pyrolysis gasoline, residue. */
+	public double[] mixOf(Product product) {
+		return mix.getOrDefault(product, new double[] {0, 0, 0, 0, 0});
+	}
+
+	/** Adds {@code amount} of a cracked gas made up as {@code in}, blending it with what is held. */
+	protected void addMixed(Product product, double amount, double[] in) {
+		double before = held(product);
+		double[] old = mixOf(product);
+		double[] out = new double[5];
+		for (int i = 0; i < 5; i++) {
+			out[i] = before + amount > 0 ? (old[i] * before + in[i] * amount) / (before + amount) : in[i];
+		}
+		mix.put(product, out);
+		add(product, amount);
+	}
+
+	/** Pulls up to {@code max} of a cracked gas from the runs on {@code faces}, filling {@code into} with what it was made of. */
+	protected double pullMixed(net.minecraft.world.level.Level level, List<Lines.Face> faces, Product product, double max, double[] into) {
+		double got = 0;
+		double[] sum = new double[5];
+		for (Lines.Line line : Lines.lines(level, faces)) {
+			for (Lines.Port port : Lines.sources(line, product, Pull.MACHINE, this)) {
+				if (got >= max) {
+					break;
+				}
+				double take = port.node().take(port.cell(), port.side(), product, max - got, Pull.MACHINE);
+				double[] from = port.node() instanceof PlantUnitBlockEntity unit ? unit.mixOf(product) : new double[5];
+				for (int i = 0; i < 5; i++) {
+					sum[i] += from[i] * take;
+				}
+				got += take;
+			}
+		}
+		for (int i = 0; i < 5; i++) {
+			into[i] = got > 0 ? sum[i] / got : 0;
+		}
+		return got;
 	}
 
 	/** The side {@code side} (in the world) seen in the part's own frame. */
@@ -112,6 +157,11 @@ public abstract class PlantUnitBlockEntity extends BlockEntity implements Inspec
 		for (Map.Entry<Product, Double> e : held.entrySet()) {
 			output.putDouble("held_" + e.getKey().name(), e.getValue());
 		}
+		for (Map.Entry<Product, double[]> e : mix.entrySet()) {
+			for (int i = 0; i < 5; i++) {
+				output.putDouble("mix_" + e.getKey().name() + "_" + i, e.getValue()[i]);
+			}
+		}
 		output.putBoolean("grown", grown);
 	}
 
@@ -122,6 +172,15 @@ public abstract class PlantUnitBlockEntity extends BlockEntity implements Inspec
 			double v = input.getDoubleOr("held_" + p.name(), 0);
 			if (v > 0) {
 				held.put(p, v);
+			}
+		}
+		for (Product p : Product.values()) {
+			if (held.containsKey(p) && input.getDoubleOr("mix_" + p.name() + "_0", -1) >= 0) {
+				double[] m = new double[5];
+				for (int i = 0; i < 5; i++) {
+					m[i] = input.getDoubleOr("mix_" + p.name() + "_" + i, 0);
+				}
+				mix.put(p, m);
 			}
 		}
 		grown = input.getBooleanOr("grown", grown);

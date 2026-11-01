@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "PXP",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_ingot",
+    "P": "wildcatter:gas_line",
+    "X": "minecraft:piston"
+  },
+  "result": {
+    "id": "wildcatter:topping_skid",
+    "count": 1
+  }
+}

@@ -1,0 +1,465 @@
+{
+ "textures": {
+  "engine": "wildcatter:block/mat/mat_paint_engine",
+  "gasgreen": "wildcatter:block/mat/mat_paint_pad_green",
+  "grey": "wildcatter:block/mat/mat_paint_ansi61",
+  "blue": "wildcatter:block/mat/mat_paint_ansi70",
+  "iron": "wildcatter:block/mat/mat_cast_iron",
+  "dark": "wildcatter:block/mat/mat_oil_dark",
+  "galv": "wildcatter:block/mat/mat_galvanized",
+  "steel": "wildcatter:block/mat/mat_stainless",
+  "rubber": "wildcatter:block/mat/mat_rubber",
+  "copper": "wildcatter:block/mat/mat_copper",
+  "brass": "wildcatter:block/mat/mat_brass",
+  "lagging": "wildcatter:block/mat/mat_aluminium_lagging",
+  "checker": "wildcatter:block/mat/mat_checker_plate",
+  "nameplate": "wildcatter:block/mat/decal_nameplate",
+  "danger": "wildcatter:block/mat/decal_danger_hv",
+  "gauge": "wildcatter:block/mat/decal_gauge",
+  "controller": "wildcatter:block/mat/decal_controller",
+  "engineplate": "wildcatter:block/mat/decal_engine_plate",
+  "concrete": "wildcatter:block/mat/mat_concrete",
+  "polymer": "wildcatter:block/mat/mat_polymer_grey",
+  "padgreen": "wildcatter:block/mat/mat_paint_pad_green",
+  "particle": "wildcatter:block/mat/mat_paint_ansi61"
+ },
+ "elements": [
+  {
+   "from": [
+    0,
+    0.32,
+    6.4
+   ],
+   "to": [
+    16,
+    2.56,
+    8.0
+   ],
+   "faces": {
+    "north": {
+     "texture": "#iron",
+     "uv": [
+      0.0,
+      13.44,
+      16.0,
+      15.68
+     ]
+    },
+    "south": {
+     "texture": "#iron",
+     "uv": [
+      0.0,
+      13.44,
+      16.0,
+      15.68
+     ]
+    },
+    "up": {
+     "texture": "#iron",
+     "uv": [
+      0.0,
+      6.4,
+      16.0,
+      8.0
+     ]
+    },
+    "down": {
+     "texture": "#iron",
+     "uv": [
+      0.0,
+      8.0,
+      16.0,
+      9.6
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    0,
+    4.0,
+    0
+   ],
+   "to": [
+    8.8,
+    6.4,
+    16
+   ],
+   "faces": {
+    "east": {
+     "texture": "#iron",
+     "uv": [
+      0.0,
+      9.6,
+      16.0,
+      12.0
+     ]
+    },
+    "up": {
+     "texture": "#iron",
+     "uv": [
+      0,
+      0.0,
+      8.8,
+      16.0
+     ]
+    },
+    "down": {
+     "texture": "#iron",
+     "uv": [
+      0,
+      0.0,
+      8.8,
+      16.0
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    0,
+    6.4,
+    0
+   ],
+   "to": [
+    1.9096,
+    16,
+    16
+   ],
+   "faces": {
+    "down": {
+     "texture": "#blue",
+     "uv": [
+      0,
+      0.0,
+      1.9096,
+      16.0
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    0,
+    14.0904,
+    0
+   ],
+   "to": [
+    9.6,
+    16,
+    16
+   ],
+   "faces": {
+    "east": {
+     "texture": "#blue",
+     "uv": [
+      0.0,
+      0,
+      16.0,
+      1.9096
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    0,
+    7.2,
+    1.28
+   ],
+   "to": [
+    8.8,
+    16,
+    1.6
+   ],
+   "faces": {
+    "north": {
+     "texture": "#blue",
+     "uv": [
+      7.2,
+      0,
+      16,
+      8.8
+     ]
+    },
+    "south": {
+     "texture": "#blue",
+     "uv": [
+      0,
+      0,
+      8.8,
+      8.8
+     ]
+    },
+    "east": {
+     "texture": "#blue",
+     "uv": [
+      14.4,
+      0,
+      14.72,
+      8.8
+     ]
+    },
+    "down": {
+     "texture": "#blue",
+     "uv": [
+      0,
+      14.4,
+      8.8,
+      14.72
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    0,
+    7.2,
+    4.16
+   ],
+   "to": [
+    8.8,
+    16,
+    4.48
+   ],
+   "faces": {
+    "north": {
+     "texture": "#blue",
+     "uv": [
+      7.2,
+      0,
+      16,
+      8.8
+     ]
+    },
+    "south": {
+     "texture": "#blue",
+     "uv": [
+      0,
+      0,
+      8.8,
+      8.8
+     ]
+    },
+    "east": {
+     "texture": "#blue",
+     "uv": [
+      11.52,
+      0,
+      11.84,
+      8.8
+     ]
+    },
+    "down": {
+     "texture": "#blue",
+     "uv": [
+      0,
+      11.52,
+      8.8,
+      11.84
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    0,
+    7.2,
+    7.04
+   ],
+   "to": [
+    8.8,
+    16,
+    7.36
+   ],
+   "faces": {
+    "north": {
+     "texture": "#blue",
+     "uv": [
+      7.2,
+      0,
+      16,
+      8.8
+     ]
+    },
+    "south": {
+     "texture": "#blue",
+     "uv": [
+      0,
+      0,
+      8.8,
+      8.8
+     ]
+    },
+    "east": {
+     "texture": "#blue",
+     "uv": [
+      8.64,
+      0,
+      8.96,
+      8.8
+     ]
+    },
+    "down": {
+     "texture": "#blue",
+     "uv": [
+      0,
+      8.64,
+      8.8,
+      8.96
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    0,
+    7.2,
+    9.92
+   ],
+   "to": [
+    8.8,
+    16,
+    10.24
+   ],
+   "faces": {
+    "north": {
+     "texture": "#blue",
+     "uv": [
+      7.2,
+      0,
+      16,
+      8.8
+     ]
+    },
+    "south": {
+     "texture": "#blue",
+     "uv": [
+      0,
+      0,
+      8.8,
+      8.8
+     ]
+    },
+    "east": {
+     "texture": "#blue",
+     "uv": [
+      5.76,
+      0,
+      6.08,
+      8.8
+     ]
+    },
+    "down": {
+     "texture": "#blue",
+     "uv": [
+      0,
+      5.76,
+      8.8,
+      6.08
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    0,
+    7.2,
+    12.8
+   ],
+   "to": [
+    8.8,
+    16,
+    13.12
+   ],
+   "faces": {
+    "north": {
+     "texture": "#blue",
+     "uv": [
+      7.2,
+      0,
+      16,
+      8.8
+     ]
+    },
+    "south": {
+     "texture": "#blue",
+     "uv": [
+      0,
+      0,
+      8.8,
+      8.8
+     ]
+    },
+    "east": {
+     "texture": "#blue",
+     "uv": [
+      2.88,
+      0,
+      3.2,
+      8.8
+     ]
+    },
+    "down": {
+     "texture": "#blue",
+     "uv": [
+      0,
+      2.88,
+      8.8,
+      3.2
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    0,
+    7.2,
+    15.68
+   ],
+   "to": [
+    8.8,
+    16,
+    16.0
+   ],
+   "faces": {
+    "north": {
+     "texture": "#blue",
+     "uv": [
+      7.2,
+      0,
+      16,
+      8.8
+     ]
+    },
+    "south": {
+     "texture": "#blue",
+     "uv": [
+      0,
+      0,
+      8.8,
+      8.8
+     ]
+    },
+    "east": {
+     "texture": "#blue",
+     "uv": [
+      0.0,
+      0,
+      0.32,
+      8.8
+     ]
+    },
+    "down": {
+     "texture": "#blue",
+     "uv": [
+      0,
+      0.0,
+      8.8,
+      0.32
+     ]
+    }
+   }
+  }
+ ]
+}

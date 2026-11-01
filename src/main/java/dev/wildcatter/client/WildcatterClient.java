@@ -34,6 +34,9 @@ public class WildcatterClient implements ClientModInitializer {
 		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.RIG_PART_ENTITY, context -> new KineticRenderer<>(context));
 		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.INJECTION_PUMP_ENTITY, context -> new KineticRenderer<>(context));
 		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.GAS_COMPRESSOR_ENTITY, context -> new KineticRenderer<>(context));
+		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.UNIT_MOTOR_ENTITY, context -> new KineticRenderer<>(context));
+		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.PE_REACTOR_ENTITY, context -> new KineticRenderer<>(context));
+		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.PELLETIZER_ENTITY, context -> new KineticRenderer<>(context));
 		dev.wildcatter.kinetic.Sounding.Hook.start = MachineSound::start;
 		net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents.BEFORE_GIZMOS.register(context -> {
 			net.minecraft.client.Minecraft client = net.minecraft.client.Minecraft.getInstance();

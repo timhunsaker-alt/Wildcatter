@@ -1,4 +1,4 @@
-# Refinery tower (APPROVED 2026-10-30)
+# Refinery tower (APPROVED 2026-10-30; REPLACED 2026-10-31 by crude-units.md: the base and columns are removed)
 
 ## Real-world counterpart
 A **crude distillation unit**: fired heater, atmospheric distillation column with trays, overhead condenser and

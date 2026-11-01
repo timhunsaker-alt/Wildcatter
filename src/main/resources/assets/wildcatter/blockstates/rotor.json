@@ -104,6 +104,12 @@
     },
     "part=refrigeration_coupling": {
       "model": "wildcatter:block/rotor_refrigeration_coupling"
+    },
+    "part=skid_fan": {
+      "model": "wildcatter:block/rotor_skid_fan"
+    },
+    "part=fin_fan": {
+      "model": "wildcatter:block/rotor_fin_fan"
     }
   }
 }

@@ -1,0 +1,273 @@
+{
+ "textures": {
+  "engine": "wildcatter:block/mat/mat_paint_engine",
+  "gasgreen": "wildcatter:block/mat/mat_paint_pad_green",
+  "grey": "wildcatter:block/mat/mat_paint_ansi61",
+  "blue": "wildcatter:block/mat/mat_paint_ansi70",
+  "iron": "wildcatter:block/mat/mat_cast_iron",
+  "dark": "wildcatter:block/mat/mat_oil_dark",
+  "galv": "wildcatter:block/mat/mat_galvanized",
+  "steel": "wildcatter:block/mat/mat_stainless",
+  "rubber": "wildcatter:block/mat/mat_rubber",
+  "copper": "wildcatter:block/mat/mat_copper",
+  "brass": "wildcatter:block/mat/mat_brass",
+  "lagging": "wildcatter:block/mat/mat_aluminium_lagging",
+  "checker": "wildcatter:block/mat/mat_checker_plate",
+  "nameplate": "wildcatter:block/mat/decal_nameplate",
+  "danger": "wildcatter:block/mat/decal_danger_hv",
+  "gauge": "wildcatter:block/mat/decal_gauge",
+  "controller": "wildcatter:block/mat/decal_controller",
+  "engineplate": "wildcatter:block/mat/decal_engine_plate",
+  "concrete": "wildcatter:block/mat/mat_concrete",
+  "polymer": "wildcatter:block/mat/mat_polymer_grey",
+  "padgreen": "wildcatter:block/mat/mat_paint_pad_green",
+  "particle": "wildcatter:block/mat/mat_stainless"
+ },
+ "elements": [
+  {
+   "from": [
+    15.9556,
+    0,
+    0
+   ],
+   "to": [
+    16,
+    8.0,
+    10.4
+   ],
+   "faces": {
+    "south": {
+     "texture": "#steel",
+     "uv": [
+      15.9556,
+      8.0,
+      16,
+      16
+     ]
+    },
+    "up": {
+     "texture": "#steel",
+     "uv": [
+      15.9556,
+      0,
+      16,
+      10.4
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    2.4922,
+    6.4,
+    2.5384
+   ],
+   "to": [
+    6.4922,
+    7.36,
+    10.8772
+   ],
+   "faces": {
+    "north": {
+     "texture": "#checker",
+     "uv": [
+      9.5078,
+      8.64,
+      13.5078,
+      9.6
+     ]
+    },
+    "south": {
+     "texture": "#checker",
+     "uv": [
+      2.4922,
+      8.64,
+      6.4922,
+      9.6
+     ]
+    },
+    "west": {
+     "texture": "#checker",
+     "uv": [
+      2.5384,
+      8.64,
+      10.8772,
+      9.6
+     ]
+    },
+    "east": {
+     "texture": "#checker",
+     "uv": [
+      5.1228,
+      8.64,
+      13.4616,
+      9.6
+     ]
+    },
+    "up": {
+     "texture": "#checker",
+     "uv": [
+      2.4922,
+      2.5384,
+      6.4922,
+      10.8772
+     ]
+    },
+    "down": {
+     "texture": "#checker",
+     "uv": [
+      2.4922,
+      5.1228,
+      6.4922,
+      13.4616
+     ]
+    }
+   },
+   "rotation": {
+    "origin": [
+     4.4922,
+     6.88,
+     6.7078
+    ],
+    "axis": "y",
+    "angle": 45.0
+   }
+  },
+  {
+   "from": [
+    7.0708,
+    6.4,
+    9.2167
+   ],
+   "to": [
+    15.4096,
+    7.36,
+    13.2167
+   ],
+   "faces": {
+    "west": {
+     "texture": "#checker",
+     "uv": [
+      9.2167,
+      8.64,
+      13.2167,
+      9.6
+     ]
+    },
+    "east": {
+     "texture": "#checker",
+     "uv": [
+      2.7833,
+      8.64,
+      6.7833,
+      9.6
+     ]
+    },
+    "north": {
+     "texture": "#checker",
+     "uv": [
+      0.5904,
+      8.64,
+      8.9292,
+      9.6
+     ]
+    },
+    "south": {
+     "texture": "#checker",
+     "uv": [
+      7.0708,
+      8.64,
+      15.4096,
+      9.6
+     ]
+    },
+    "up": {
+     "texture": "#checker",
+     "uv": [
+      7.0708,
+      9.2167,
+      15.4096,
+      13.2167
+     ]
+    },
+    "down": {
+     "texture": "#checker",
+     "uv": [
+      7.0708,
+      2.7833,
+      15.4096,
+      6.7833
+     ]
+    }
+   },
+   "rotation": {
+    "origin": [
+     11.2402,
+     6.88,
+     11.2167
+    ],
+    "axis": "y",
+    "angle": -22.5
+   }
+  },
+  {
+   "from": [
+    15.0306,
+    6.4,
+    10.8
+   ],
+   "to": [
+    16,
+    7.36,
+    14.8
+   ],
+   "faces": {
+    "west": {
+     "texture": "#checker",
+     "uv": [
+      10.8,
+      8.64,
+      14.8,
+      9.6
+     ]
+    },
+    "north": {
+     "texture": "#checker",
+     "uv": [
+      0,
+      8.64,
+      0.9694,
+      9.6
+     ]
+    },
+    "south": {
+     "texture": "#checker",
+     "uv": [
+      15.0306,
+      8.64,
+      16,
+      9.6
+     ]
+    },
+    "up": {
+     "texture": "#checker",
+     "uv": [
+      15.0306,
+      10.8,
+      16,
+      14.8
+     ]
+    },
+    "down": {
+     "texture": "#checker",
+     "uv": [
+      15.0306,
+      1.2,
+      16,
+      5.2
+     ]
+    }
+   }
+  }
+ ]
+}

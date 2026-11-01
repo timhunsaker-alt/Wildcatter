@@ -254,7 +254,7 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 		}
 		firing = got / (FULL_FIRE_WATTS * dt);
 		fuelNote = burner == null ? "" : firing < fireWanted * 0.99 && fireWanted > 0 ? (wrongGas(level, burner) ? "OUT OF FUEL: its gas line carries unprocessed gas; the burner needs pipeline gas: process it in a gas plant"
-				: "OUT OF FUEL: put coal in the burner or pipe pipeline gas to it") : "";
+				: "OUT OF FUEL: put coal in the burner or pipe pipeline gas or residue to it") : "";
 		// drum pressure: the fire raises it, the steam drawn and the losses lower it
 		heat += (firing - steamShare - 0.02) * dt / Tuning.PLANT_HEATUP_SECONDS;
 		heat = Math.max(0, Math.min(1, heat));
@@ -319,11 +319,14 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 		setChanged();
 	}
 
-	/** Pipeline gas at the burner (docs/multiblocks/gas-plant.md): up to the heat it still needs, from the gas run on any of its cells. */
+	/** Pipeline gas or residue at the burner (docs/multiblocks/gas-plant.md, crude-units.md): up to the heat it still needs, off any of its cells. */
 	private double drawGas(ServerLevel level, SteamPlantPartBlockEntity burner, double joules) {
 		List<BlockPos> cells = dev.wildcatter.multiblock.BigParts.cellsAt(level, burner.getBlockPos());   // the gas line on any cell
-		return Lines.pull(level, Lines.faces(cells), Product.PIPELINE_GAS, joules / Tuning.GAS_JOULES_PER_M3, FluidNode.Pull.MACHINE, null)
+		double got = Lines.pull(level, Lines.faces(cells), Product.PIPELINE_GAS, joules / Tuning.GAS_JOULES_PER_M3, FluidNode.Pull.MACHINE, null)
 				* Tuning.GAS_JOULES_PER_M3;
+		// or residue, as fuel oil (docs/multiblocks/crude-units.md)
+		return got + Lines.pull(level, Lines.faces(cells), Product.RESIDUE, (joules - got) / Tuning.FUEL_OIL_JOULES_PER_L, FluidNode.Pull.MACHINE, null)
+				* Tuning.FUEL_OIL_JOULES_PER_L;
 	}
 
 	/** True if the burner's gas line carries a gas it will not burn. */

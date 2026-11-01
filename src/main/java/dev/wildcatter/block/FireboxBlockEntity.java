@@ -153,16 +153,30 @@ public class FireboxBlockEntity extends BaseContainerBlockEntity implements Worl
 					}
 					yield sum;
 				}
-				case WET_GAS, GAS, COMPRESSED_GAS, DRIED_GAS, PIPELINE_GAS -> Lines.pull(line, product, need / Tuning.GAS_FUEL_TICKS_PER_UNIT, FluidNode.Pull.MACHINE, this) * Tuning.GAS_FUEL_TICKS_PER_UNIT;
-				case CRUDE -> Lines.pull(line, product, need / Tuning.OIL_FUEL_TICKS_PER_UNIT, FluidNode.Pull.MACHINE, this) * Tuning.OIL_FUEL_TICKS_PER_UNIT;
-				case DIESEL -> Lines.pull(line, product, need / Tuning.DIESEL_FUEL_TICKS_PER_UNIT, FluidNode.Pull.MACHINE, this) * Tuning.DIESEL_FUEL_TICKS_PER_UNIT;
-				case PRODUCED_WATER, Y_GRADE, LPG, NATURAL_GASOLINE -> 0;
+				default -> {
+					double perUnit = fuelTicks(product);
+					yield perUnit > 0 ? Lines.pull(line, product, need / perUnit, FluidNode.Pull.MACHINE, this) * perUnit : 0;
+				}
 			};
 			if (ticks > 0) {
 				burnLeft += ticks;
 				setChanged();
 			}
 		}
+	}
+
+	/** Ticks of fire in a unit (litre or m3) of what a line carries, or 0 if a firebox does not burn it. */
+	private static double fuelTicks(Product product) {
+		return switch (product) {
+			case WET_GAS, GAS, COMPRESSED_GAS, DRIED_GAS, PIPELINE_GAS -> Tuning.GAS_FUEL_TICKS_PER_UNIT;
+			case CRUDE -> Tuning.OIL_FUEL_TICKS_PER_UNIT;
+			case DIESEL -> Tuning.DIESEL_FUEL_TICKS_PER_UNIT;
+			case GASOLINE, NATURAL_GASOLINE -> Tuning.GASOLINE_FUEL_TICKS_PER_UNIT;
+			case KEROSENE -> Tuning.KEROSENE_FUEL_TICKS_PER_UNIT;
+			case RESIDUE -> Tuning.RESIDUE_FUEL_TICKS_PER_UNIT;
+			case CONDENSATE -> Tuning.CONDENSATE_FUEL_TICKS_PER_UNIT;
+			default -> 0;
+		};
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, FireboxBlockEntity firebox) {

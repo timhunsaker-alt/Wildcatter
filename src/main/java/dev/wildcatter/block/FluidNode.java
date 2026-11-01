@@ -6,7 +6,7 @@ import net.minecraft.core.Direction;
 import org.jspecify.annotations.Nullable;
 
 /**
- * A machine that puts something on steel pipe (docs/multiblocks/lease.md): a well, a separator nozzle, a tank, a refinery's diesel.
+ * A machine that puts something on steel pipe (docs/multiblocks/lease.md): a well, a separator nozzle, a tank, a crude unit's products.
  * A port is one face of one of its cells; {@code side} points from that cell to the pipe. Machines that only take (engines, fireboxes)
  * need not be nodes: they pull through {@link Lines}.
  */
