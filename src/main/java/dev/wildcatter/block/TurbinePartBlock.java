@@ -34,7 +34,12 @@ public class TurbinePartBlock extends BigPartBlock {
 		ST_GENERATOR("st_generator", Footprint.box(3, 3, 4, 0, 0)),
 		AIR_COOLED_CONDENSER("air_cooled_condenser", Footprint.box(6, 8, 6, 0, 0)),
 		HRSG_FEED_PUMP("hrsg_feed_pump", Footprint.box(2, 2, 4, 0, 0)),
-		LOAD_BANK("load_bank", Footprint.box(3, 3, 6, 0, 0));
+		LOAD_BANK("load_bank", Footprint.box(3, 3, 6, 0, 0)),
+		AERO_TURBINE("aero_turbine", Footprint.box(5, 5, 14, 0, 0)),
+		AERO_INLET_HOUSE("aero_inlet_house", Footprint.box(6, 8, 5, 0, 0)),
+		AERO_GENERATOR("aero_generator", Footprint.box(4, 4, 7, 0, 0)),
+		AERO_EXHAUST_STACK("aero_exhaust_stack", Footprint.box(4, 14, 4, 0, 0)),
+		GEN_BREAKER_3000("gen_breaker_3000", Footprint.box(2, 3, 2, 0, 0));
 
 		private final String id;
 		private final Footprint footprint;
@@ -63,14 +68,14 @@ public class TurbinePartBlock extends BigPartBlock {
 	@Override
 	protected BlockEntity createMain(BlockPos pos, BlockState state) {
 		return switch (part) {
-			case GAS_TURBINE -> new GasTurbineBlockEntity(pos, state);
-			case GT_GENERATOR, ST_GENERATOR -> new GeneratorPartBlockEntity(pos, state);
-			case GEN_BREAKER -> new GenBreakerBlockEntity(pos, state);
+			case GAS_TURBINE, AERO_TURBINE -> new GasTurbineBlockEntity(pos, state);
+			case GT_GENERATOR, ST_GENERATOR, AERO_GENERATOR -> new GeneratorPartBlockEntity(pos, state);
+			case GEN_BREAKER, GEN_BREAKER_3000 -> new GenBreakerBlockEntity(pos, state);
 			case HRSG -> new HrsgBlockEntity(pos, state);
 			case STEAM_TURBINE_5 -> new SteamCycleBlockEntity(pos, state);
 			case AIR_COOLED_CONDENSER, HRSG_FEED_PUMP -> new UnitMotorBlockEntity(pos, state);
 			case LOAD_BANK -> new LoadBankBlockEntity(pos, state);
-			case GT_INLET_HOUSE, GT_EXHAUST_STACK -> new TurbinePassiveBlockEntity(pos, state);
+			case GT_INLET_HOUSE, GT_EXHAUST_STACK, AERO_INLET_HOUSE, AERO_EXHAUST_STACK -> new TurbinePassiveBlockEntity(pos, state);
 		};
 	}
 
@@ -78,15 +83,15 @@ public class TurbinePartBlock extends BigPartBlock {
 	protected <T extends BlockEntity> BlockEntityTicker<T> mainTicker(Level level, BlockState state, BlockEntityType<T> type) {
 		if (level.isClientSide()) {
 			return switch (part) {
-				case GAS_TURBINE -> createTickerHelper(type, WildcatterBlocks.GAS_TURBINE_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
+				case GAS_TURBINE, AERO_TURBINE -> createTickerHelper(type, WildcatterBlocks.GAS_TURBINE_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
 				case STEAM_TURBINE_5 -> createTickerHelper(type, WildcatterBlocks.STEAM_CYCLE_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
 				case AIR_COOLED_CONDENSER, HRSG_FEED_PUMP -> createTickerHelper(type, WildcatterBlocks.UNIT_MOTOR_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
 				default -> null;
 			};
 		}
 		return switch (part) {
-			case GAS_TURBINE -> createTickerHelper(type, WildcatterBlocks.GAS_TURBINE_ENTITY, GasTurbineBlockEntity::tick);
-			case GT_GENERATOR, ST_GENERATOR -> createTickerHelper(type, WildcatterBlocks.GENERATOR_PART_ENTITY, GeneratorPartBlockEntity::tick);
+			case GAS_TURBINE, AERO_TURBINE -> createTickerHelper(type, WildcatterBlocks.GAS_TURBINE_ENTITY, GasTurbineBlockEntity::tick);
+			case GT_GENERATOR, ST_GENERATOR, AERO_GENERATOR -> createTickerHelper(type, WildcatterBlocks.GENERATOR_PART_ENTITY, GeneratorPartBlockEntity::tick);
 			case HRSG -> createTickerHelper(type, WildcatterBlocks.HRSG_ENTITY, HrsgBlockEntity::tick);
 			case STEAM_TURBINE_5 -> createTickerHelper(type, WildcatterBlocks.STEAM_CYCLE_ENTITY, SteamCycleBlockEntity::tick);
 			case AIR_COOLED_CONDENSER, HRSG_FEED_PUMP -> createTickerHelper(type, WildcatterBlocks.UNIT_MOTOR_ENTITY, UnitMotorBlockEntity::tick);

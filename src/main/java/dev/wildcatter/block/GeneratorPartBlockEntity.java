@@ -58,9 +58,17 @@ public class GeneratorPartBlockEntity extends BlockEntity implements CircuitPart
 		return getBlockState().getBlock() instanceof BigPart part && part.shapeName().equals("st_generator");
 	}
 
-	/** Its nameplate: 16.5 MW (20.6 MVA) or 5 MW (6.25 MVA). */
+	private String kind() {
+		return getBlockState().getBlock() instanceof BigPart part ? part.shapeName() : "";
+	}
+
+	/** Its nameplate: 16.5 MW (20.6 MVA), 5 MW (6.25 MVA) or 45 MW (56.25 MVA). */
 	public double nameplateWatts() {
-		return steam() ? Tuning.ST_WATTS : Tuning.GT_WATTS;
+		return switch (kind()) {
+			case "st_generator" -> Tuning.ST_WATTS;
+			case "aero_generator" -> Tuning.AERO_WATTS;
+			default -> Tuning.GT_WATTS;
+		};
 	}
 
 	/** The prime mover, each tick: whether it is at speed, and what it can deliver now. */
@@ -136,7 +144,11 @@ public class GeneratorPartBlockEntity extends BlockEntity implements CircuitPart
 
 	// ---- the circuit -----------------------------------------------------------------------------------------------------------
 	private int length() {
-		return steam() ? 4 : 6;
+		return switch (kind()) {
+			case "st_generator" -> 4;
+			case "aero_generator" -> 7;
+			default -> 6;
+		};
 	}
 
 	List<Lines.Face> terminals() {
@@ -233,7 +245,11 @@ public class GeneratorPartBlockEntity extends BlockEntity implements CircuitPart
 
 	@Override
 	public Component inspect() {
-		String name = steam() ? "Steam turbine generator (6.25 MVA, " : "Gas turbine generator (20.6 MVA, ";
+		String name = switch (kind()) {
+			case "st_generator" -> "Steam turbine generator (6.25 MVA, ";
+			case "aero_generator" -> "Aeroderivative generator (56.25 MVA, ";
+			default -> "Gas turbine generator (20.6 MVA, ";
+		};
 		return Component.literal(name + Voltage.GENERATOR.label() + "): " + status());
 	}
 

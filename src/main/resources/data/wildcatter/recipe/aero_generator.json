@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BCB",
+    "CGC",
+    "BCB"
+  ],
+  "key": {
+    "B": "minecraft:iron_block",
+    "C": "minecraft:copper_block",
+    "G": "wildcatter:gt_generator"
+  },
+  "result": {
+    "id": "wildcatter:aero_generator",
+    "count": 1
+  }
+}

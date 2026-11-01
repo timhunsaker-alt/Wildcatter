@@ -110,7 +110,7 @@ public class PipeBlock extends Block {
 						|| block instanceof LeasePartBlock || block instanceof DisposalWellheadBlock
 						|| block instanceof GasPlantPartBlock gasPlant && gasPlant.part() != GasPlantPartBlock.Part.REFRIGERATION_COMPRESSOR
 						|| block instanceof RefineryPartBlock refinery && refinery.part() != RefineryPartBlock.Part.CRUDE_CHARGE_PUMP
-						|| block instanceof TurbinePartBlock turbine && turbine.part() == TurbinePartBlock.Part.GAS_TURBINE
+						|| block instanceof TurbinePartBlock turbine && (turbine.part() == TurbinePartBlock.Part.GAS_TURBINE || turbine.part() == TurbinePartBlock.Part.AERO_TURBINE)
 						|| block instanceof PetrochemPartBlock petrochem && petrochem.part() != PetrochemPartBlock.Part.PELLETIZER
 						|| block instanceof GensetPartBlock part && (part.part() == GensetPartBlock.Part.FUEL_TANK || part.part() == GensetPartBlock.Part.GAS_ENGINE)
 						|| block instanceof SteamPlantPartBlock burner && burner.part() == SteamPlantPartBlock.Part.BURNER;

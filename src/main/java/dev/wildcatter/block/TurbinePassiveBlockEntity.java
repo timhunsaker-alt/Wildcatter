@@ -21,7 +21,7 @@ public class TurbinePassiveBlockEntity extends BlockEntity implements Inspectabl
 	@Override
 	public Component inspect() {
 		GasTurbineBlockEntity gt = level == null ? null : Touching.find(level, worldPosition, GasTurbineBlockEntity.class, g -> true);
-		String name = getBlockState().is(WildcatterBlocks.GT_INLET_HOUSE) ? "Inlet house (filters and silencer)" : "Exhaust stack (simple cycle)";
+		String name = getBlockState().is(WildcatterBlocks.GT_INLET_HOUSE) || getBlockState().is(WildcatterBlocks.AERO_INLET_HOUSE) ? "Inlet house (filters and silencer)" : "Exhaust stack (simple cycle)";
 		return Component.literal(name + ": " + (gt == null ? "NOT AGAINST A GAS TURBINE" : gt.inspect().getString()));
 	}
 

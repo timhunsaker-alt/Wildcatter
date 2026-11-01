@@ -162,6 +162,13 @@
     "wildcatter:air_cooled_condenser",
     "wildcatter:hrsg_feed_pump",
     "wildcatter:load_bank",
-    "wildcatter:gsu_25"
+    "wildcatter:gsu_25",
+    "wildcatter:aero_turbine",
+    "wildcatter:aero_inlet_house",
+    "wildcatter:aero_generator",
+    "wildcatter:aero_exhaust_stack",
+    "wildcatter:gen_breaker_3000",
+    "wildcatter:gsu_60",
+    "wildcatter:substation_transformer_60"
   ]
 }

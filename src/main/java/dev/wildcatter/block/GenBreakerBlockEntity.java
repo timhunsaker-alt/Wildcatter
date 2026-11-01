@@ -75,7 +75,8 @@ public class GenBreakerBlockEntity extends BlockEntity implements CircuitPart, I
 	public Component inspect() {
 		GeneratorPartBlockEntity gen = level == null ? null : Touching.find(level, worldPosition, GeneratorPartBlockEntity.class, g -> true);
 		String state = gen == null ? "no generator against it" : gen.breakerClosed() ? String.format("CLOSED, carrying %.0f A", amps) : "OPEN (" + gen.status() + ")";
-		return Component.literal("Generator circuit breaker (15 kV vacuum, 1,200 A, 40 kA): " + state);
+		boolean big = getBlockState().is(WildcatterBlocks.GEN_BREAKER_3000);
+		return Component.literal("Generator circuit breaker (15 kV vacuum, " + (big ? "3,000 A, 50 kA" : "1,200 A, 40 kA") + "): " + state);
 	}
 
 	@Override

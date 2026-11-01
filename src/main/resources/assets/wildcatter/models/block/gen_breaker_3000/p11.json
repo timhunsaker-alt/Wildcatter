@@ -1,0 +1,279 @@
+{
+ "textures": {
+  "engine": "wildcatter:block/mat/mat_paint_engine",
+  "gasgreen": "wildcatter:block/mat/mat_paint_pad_green",
+  "grey": "wildcatter:block/mat/mat_paint_ansi61",
+  "blue": "wildcatter:block/mat/mat_paint_ansi70",
+  "iron": "wildcatter:block/mat/mat_cast_iron",
+  "dark": "wildcatter:block/mat/mat_oil_dark",
+  "galv": "wildcatter:block/mat/mat_galvanized",
+  "steel": "wildcatter:block/mat/mat_stainless",
+  "rubber": "wildcatter:block/mat/mat_rubber",
+  "copper": "wildcatter:block/mat/mat_copper",
+  "brass": "wildcatter:block/mat/mat_brass",
+  "lagging": "wildcatter:block/mat/mat_aluminium_lagging",
+  "checker": "wildcatter:block/mat/mat_checker_plate",
+  "nameplate": "wildcatter:block/mat/decal_nameplate",
+  "danger": "wildcatter:block/mat/decal_danger_hv",
+  "gauge": "wildcatter:block/mat/decal_gauge",
+  "controller": "wildcatter:block/mat/decal_controller",
+  "engineplate": "wildcatter:block/mat/decal_engine_plate",
+  "concrete": "wildcatter:block/mat/mat_concrete",
+  "polymer": "wildcatter:block/mat/mat_polymer_grey",
+  "padgreen": "wildcatter:block/mat/mat_paint_pad_green",
+  "porcelain": "wildcatter:block/mat/mat_porcelain_brown",
+  "particle": "wildcatter:block/mat/mat_paint_ansi61"
+ },
+ "elements": [
+  {
+   "from": [
+    0,
+    0,
+    0
+   ],
+   "to": [
+    15.2,
+    12.8,
+    15.2
+   ],
+   "faces": {
+    "south": {
+     "texture": "#grey",
+     "uv": [
+      0,
+      3.2,
+      15.2,
+      16
+     ]
+    },
+    "east": {
+     "texture": "#grey",
+     "uv": [
+      0.8,
+      3.2,
+      16,
+      16
+     ]
+    },
+    "up": {
+     "texture": "#grey",
+     "uv": [
+      0,
+      0,
+      15.2,
+      15.2
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    5.6047,
+    12.8,
+    0
+   ],
+   "to": [
+    7.1953,
+    15.2,
+    1.92
+   ],
+   "faces": {
+    "south": {
+     "texture": "#galv",
+     "uv": [
+      5.6047,
+      0.8,
+      7.1953,
+      3.2
+     ]
+    },
+    "up": {
+     "texture": "#galv",
+     "uv": [
+      5.6047,
+      0,
+      7.1953,
+      1.92
+     ]
+    },
+    "down": {
+     "texture": "#galv",
+     "uv": [
+      5.6047,
+      14.08,
+      7.1953,
+      16
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    5.6047,
+    12.824,
+    -1.92
+   ],
+   "to": [
+    7.1953,
+    15.176,
+    1.92
+   ],
+   "faces": {
+    "north": {
+     "texture": "#galv",
+     "uv": [
+      8.8047,
+      0.824,
+      10.3953,
+      3.176
+     ]
+    },
+    "south": {
+     "texture": "#galv",
+     "uv": [
+      5.6047,
+      0.824,
+      7.1953,
+      3.176
+     ]
+    },
+    "up": {
+     "texture": "#galv",
+     "uv": [
+      5.6047,
+      12.16,
+      7.1953,
+      16.0
+     ]
+    },
+    "down": {
+     "texture": "#galv",
+     "uv": [
+      5.6047,
+      12.16,
+      7.1953,
+      16.0
+     ]
+    }
+   },
+   "rotation": {
+    "origin": [
+     6.4,
+     14.0,
+     0.0
+    ],
+    "axis": "y",
+    "angle": 45.0
+   }
+  },
+  {
+   "from": [
+    4.48,
+    12.848,
+    0
+   ],
+   "to": [
+    8.32,
+    15.152,
+    0.7953
+   ],
+   "faces": {
+    "west": {
+     "texture": "#galv",
+     "uv": [
+      0,
+      0.848,
+      0.7953,
+      3.152
+     ]
+    },
+    "east": {
+     "texture": "#galv",
+     "uv": [
+      15.2047,
+      0.848,
+      16,
+      3.152
+     ]
+    },
+    "up": {
+     "texture": "#galv",
+     "uv": [
+      4.48,
+      0,
+      8.32,
+      0.7953
+     ]
+    },
+    "down": {
+     "texture": "#galv",
+     "uv": [
+      4.48,
+      15.2047,
+      8.32,
+      16
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    4.48,
+    12.872,
+    -0.7953
+   ],
+   "to": [
+    8.32,
+    15.128,
+    0.7953
+   ],
+   "faces": {
+    "west": {
+     "texture": "#galv",
+     "uv": [
+      14.4094,
+      0.872,
+      16.0,
+      3.128
+     ]
+    },
+    "east": {
+     "texture": "#galv",
+     "uv": [
+      14.4094,
+      0.872,
+      16.0,
+      3.128
+     ]
+    },
+    "up": {
+     "texture": "#galv",
+     "uv": [
+      4.48,
+      14.4094,
+      8.32,
+      16.0
+     ]
+    },
+    "down": {
+     "texture": "#galv",
+     "uv": [
+      4.48,
+      14.4094,
+      8.32,
+      16.0
+     ]
+    }
+   },
+   "rotation": {
+    "origin": [
+     6.4,
+     14.0,
+     0.0
+    ],
+    "axis": "y",
+    "angle": 45.0
+   }
+  }
+ ]
+}

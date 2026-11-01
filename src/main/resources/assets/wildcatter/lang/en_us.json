@@ -216,5 +216,12 @@
   "block.wildcatter.air_cooled_condenser": "Air-Cooled Condenser",
   "block.wildcatter.hrsg_feed_pump": "HRSG Feed Pump (60 hp)",
   "block.wildcatter.load_bank": "Load Bank (13.8 kV, 10 MW)",
-  "block.wildcatter.gsu_25": "Generator Step-Up Transformer (25 MVA, 13.8/138 kV)"
+  "block.wildcatter.gsu_25": "Generator Step-Up Transformer (25 MVA, 13.8/138 kV)",
+  "block.wildcatter.aero_turbine": "Aeroderivative Gas Turbine (45 MW, controller)",
+  "block.wildcatter.aero_inlet_house": "Aeroderivative Inlet House",
+  "block.wildcatter.aero_generator": "Aeroderivative Generator (56.25 MVA, 13.8 kV)",
+  "block.wildcatter.aero_exhaust_stack": "Aeroderivative Exhaust Stack",
+  "block.wildcatter.gen_breaker_3000": "Generator Circuit Breaker (15 kV, 3,000 A)",
+  "block.wildcatter.gsu_60": "Generator Step-Up Transformer (60 MVA, 13.8/138 kV)",
+  "block.wildcatter.substation_transformer_60": "Substation Transformer (60 MVA, 138/12.47 kV)"
 }

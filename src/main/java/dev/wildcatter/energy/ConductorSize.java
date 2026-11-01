@@ -27,7 +27,9 @@ public enum ConductorSize implements StringRepresentable {
 	MV_500("mv_500", "500 kcmil MV cable", Family.MV_CABLE, 450, 0.0846e-3, 1.0),
 	STATION_BUS_2000("station_bus_2000", "2000 A station bus", Family.STATION_BUS, 2000, 0.015e-3, 1.0),
 	/** 15 kV non-segregated phase bus duct from a generator (docs/multiblocks/gas-turbine.md). */
-	BUS_DUCT_1200("bus_duct_1200", "1,200 A generator bus duct", Family.STATION_BUS, 1200, 0.025e-3, 1.0);
+	BUS_DUCT_1200("bus_duct_1200", "1,200 A generator bus duct", Family.STATION_BUS, 1200, 0.025e-3, 1.0),
+	/** The 45 MW peaker's generator bus (docs/multiblocks/aeroderivative.md). */
+	BUS_DUCT_3000("bus_duct_3000", "3,000 A generator bus duct", Family.STATION_BUS, 3000, 0.010e-3, 1.0);
 
 	/** Which set of sizes a conductor comes in. */
 	public enum Family {

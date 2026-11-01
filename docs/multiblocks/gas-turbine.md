@@ -42,7 +42,7 @@ Forming: the inlet house, the generator and a stack or HRSG touch the turbine; t
   a ground reference the 13.8 kV bus and the GSU's delta floated while the generator was off, and the circuit could not be solved.
 - At part load the plant is less efficient (33 % at 10 MW), as a gas turbine is; the test checks the 40 %+ near full load on two
   load banks.
-- No ramp limit yet: the turbine takes load as fast as the governor shares it.
+- No ramp limit at first; 6b added it (10 % of its rating a minute once its breaker closes, aeroderivative.md).
 - The no-load fuel, 30 % of full-load fuel, was not in the plan: it is a typical industrial gas turbine's part-load curve, and it is
   what makes part load inefficient. Wet gas on the fuel nozzle shows WRONG GAS in the readout; the test does not check it.
 

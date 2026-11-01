@@ -1501,6 +1501,37 @@ lang.update({"block.wildcatter.gas_turbine": "Gas Turbine (16.5 MW, controller)"
 	"block.wildcatter.load_bank": "Load Bank (13.8 kV, 10 MW)", "block.wildcatter.gsu_25": "Generator Step-Up Transformer (25 MVA, 13.8/138 kV)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 6b: the aeroderivative peaker and the 60 MVA transformers (docs/multiblocks/aeroderivative.md) -----------------------
+# blockstates, models, shapes and items come from tools/models/aeroderivative.py; here loot, names, tags, recipes.
+AERO_PARTS = ("aero_turbine", "aero_inlet_house", "aero_generator", "aero_exhaust_stack", "gen_breaker_3000", "gsu_60",
+	"substation_transformer_60")
+for name in AERO_PARTS:
+	big_part_loot(name)
+for tag in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
+	t["values"] += [f"{ns}:{n}" for n in AERO_PARTS]
+	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
+shaped("aero_turbine", ["BTB", "XGX", "BPB"], {"B": B_, "T": f"{ns}:turbine_casing", "X": f"{ns}:crankshaft", "G": f"{ns}:gas_turbine", "P": f"{ns}:gas_line"}, "aero_turbine")
+shaped("aero_inlet_house", ["SWS", "WHW", "S S"], {"S": S_, "W": "minecraft:white_wool", "H": f"{ns}:gt_inlet_house"}, "aero_inlet_house")
+shaped("aero_generator", ["BCB", "CGC", "BCB"], {"B": B_, "C": CB_, "G": f"{ns}:gt_generator"}, "aero_generator")
+shaped("aero_exhaust_stack", ["S S", "SES", "SBS"], {"S": S_, "E": f"{ns}:gt_exhaust_stack", "B": B_}, "aero_exhaust_stack")
+shaped("gen_breaker_3000", ["SCS", "CGC", "SCS"], {"S": S_, "C": CB_, "G": f"{ns}:gen_breaker"}, "gen_breaker_3000")
+shaped("gsu_60", ["SDS", "TCT", "SDS"], {"S": S_, "D": "minecraft:diamond", "T": f"{ns}:gsu_25", "C": CB_}, "gsu_60")
+shaped("substation_transformer_60", ["SDS", "TCT", "SDS"], {"S": S_, "D": "minecraft:diamond", "T": f"{ns}:substation_transformer", "C": CB_},
+	"substation_transformer_60")
+# the 3,000 A bus duct: three of the 1,200 A duct (any size) and a copper block
+shapeless("bus_duct_gen__bus_duct_3000", [f"{ns}:bus_duct_gen"] * 3 + ["minecraft:copper_block"], "bus_duct_gen")
+recipe = json.load(open(f"{DATA}/recipe/bus_duct_gen__bus_duct_3000.json"))
+recipe["result"]["components"] = {SIZE_KEY: "bus_duct_3000"}
+save_json(f"{DATA}/recipe/bus_duct_gen__bus_duct_3000.json", recipe)
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({"block.wildcatter.aero_turbine": "Aeroderivative Gas Turbine (45 MW, controller)",
+	"block.wildcatter.aero_inlet_house": "Aeroderivative Inlet House", "block.wildcatter.aero_generator": "Aeroderivative Generator (56.25 MVA, 13.8 kV)",
+	"block.wildcatter.aero_exhaust_stack": "Aeroderivative Exhaust Stack", "block.wildcatter.gen_breaker_3000": "Generator Circuit Breaker (15 kV, 3,000 A)",
+	"block.wildcatter.gsu_60": "Generator Step-Up Transformer (60 MVA, 13.8/138 kV)",
+	"block.wildcatter.substation_transformer_60": "Substation Transformer (60 MVA, 138/12.47 kV)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

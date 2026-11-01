@@ -43,7 +43,13 @@ public abstract class BigTransformerBlock extends TransformerBlock implements Bi
 	private final IntegerProperty piece;
 
 	protected BigTransformerBlock(Properties properties, Footprint footprint, String shapeName, Voltage low, Voltage high, double ratedVa, double percentZ, boolean deltaLow) {
-		super(constructing(properties, footprint), low, high, ratedVa, percentZ, true, deltaLow, false);
+		this(properties, footprint, shapeName, low, high, ratedVa, percentZ, deltaLow, false);
+	}
+
+	/** The same with the delta on either side: a generator step-up's on its low side, a substation transformer's on its high side. */
+	protected BigTransformerBlock(Properties properties, Footprint footprint, String shapeName, Voltage low, Voltage high, double ratedVa, double percentZ,
+			boolean deltaLow, boolean deltaHigh) {
+		super(constructing(properties, footprint), low, high, ratedVa, percentZ, true, deltaLow, deltaHigh);
 		this.footprint = footprint;
 		this.shapeName = shapeName;
 		this.piece = (IntegerProperty) getStateDefinition().getProperty("piece");

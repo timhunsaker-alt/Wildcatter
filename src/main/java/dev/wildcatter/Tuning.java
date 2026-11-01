@@ -219,6 +219,19 @@ public final class Tuning {
 	public static final double GSU25_PERCENT_Z = 8.0;
 	public static final double LOAD_BANK_STEP_WATTS = 1_000_000.0; // 1 MW steps, 0 to 10 MW
 	public static final int LOAD_BANK_STEPS = 10;
+	public static final double GT_RAMP_PER_MINUTE = 0.10;          // of its rating a minute after it closes its breaker
+
+	// ---- The 45 MW aeroderivative peaker (docs/multiblocks/aeroderivative.md, approved 2026-11-01) --------------------------
+	public static final double AERO_WATTS = 45_000_000.0;          // LM6000 class
+	public static final double AERO_HEAT_RATE = 8_800.0;           // kJ/kWh: 41 %
+	public static final double AERO_NO_LOAD_FUEL = 0.25;
+	public static final double AERO_PURGE_SECONDS = 30.0;
+	public static final double AERO_RUNUP_SECONDS = 60.0;
+	public static final double AERO_RAMP_PER_MINUTE = 0.25;        // full load about five minutes after the button
+	public static final double GSU60_VA = 60_000_000.0;            // 13.8 kV delta / 138 kV grounded wye
+	public static final double GSU60_PERCENT_Z = 10.0;
+	public static final double SUBSTATION60_VA = 60_000_000.0;     // 138 kV delta / 12.47 kV grounded wye
+	public static final double SUBSTATION60_PERCENT_Z = 10.0;
 
 	// ---- Refining and engines ----------------------------------------------------------------------------------------
 	public static final int DIESEL_BUCKET_UNITS = 1000;

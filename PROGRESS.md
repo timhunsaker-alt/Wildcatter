@@ -475,6 +475,21 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 6b: the aeroderivative peaker (Phase 6 done)
+- **Spec:** docs/multiblocks/aeroderivative.md (approved with the plan, 2026-11-01).
+- **45 MW aeroderivative** (LM6000 class, the same `GasTurbineBlockEntity` sized by its package): the 5 x 5 x 14 package, its inlet
+  house, a 56.25 MVA two-pole generator and its exhaust stack. Heat rate 8,800 kJ/kWh (41 %), 25 % of full fuel at no load. It
+  purges 30 s, runs up in 60 s and on line may take 25 % of its rating a minute: full load about five minutes after the button.
+- **Ramp limit:** both turbines now ramp after their breaker closes; the 16.5 MW unit at 10 % a minute (the 6a gap).
+- **3,000 A:** a 15 kV 3,000 A, 50 kA generator breaker, and a 3,000 A size of the generator bus duct (three 1,200 A ducts and a
+  copper block).
+- **60 MVA transformers** (`Gsu60TransformerBlock`, 6 x 6 x 5, 10 %Z): the GSU (13.8 kV delta / 138 kV grounded wye) and a
+  substation transformer (138 kV delta / 12.47 kV grounded wye), so a big plant's output reaches distribution.
+- **Models:** `aeroderivative.py` (seven parts). No Ludo credits.
+- **Game test:** new scene `peaker` (the purge on the diesel set's 4.16 kV; onto the dead bus over 3,000 A duct; held at its ramp;
+  four load banks, 37.3 MW at 59.0 Hz; 138 kV on the line; 6.95 kV a phase on the 12.47 kV side). `gasTurbine` still passes with
+  the ramp (its hook finishes the ramp too).
+
 ## Phase 6a: the gas turbine and combined cycle
 - **Specs:** docs/multiblocks/gas-turbine.md and combined-cycle.md (approved with the plan, 2026-10-31).
 - **13.8 kV tier:** `Voltage.GENERATOR` (11 kV IEC), 1,200 A generator bus duct, the 15 kV generator circuit breaker (it carries the
@@ -527,8 +542,9 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
-- Phase 6a is in; 6b (the 45 MW aeroderivative) follows after Tim's check. The gas turbine has no ramp limit yet: it takes load as
-  the governor asks. Its generator coupling does not turn on screen (the condenser fans and feed pump do).
+- Phase 6 is complete (6a and 6b); Tim checks the peaker in a real session. The turbines' generator couplings do not turn on
+  screen (the condenser fans and feed pump do). The test skips each turbine's start and ramp with hooks.
+- The aeroderivative's exhaust stack is drawn as an octagon; its SCR housing is blank (no NOx chemistry).
 - The 13.8 kV bus has no relay protection of its own: the generators trip on stator overcurrent and frequency.
 - Phase 5 is complete with 5c and 5d (the lease, the gas plant, the crude units, the cracker). Tim checks each in a real session.
 - Gasoline and kerosene have no engine of their own yet: kerosene and diesel are for the Phase 6 gas turbine.

@@ -37,7 +37,6 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 		STOPPED, PURGE, RUNUP, RUNNING
 	}
 
-	private static final double FULL_FUEL_WATTS = Tuning.GT_WATTS * Tuning.GT_HEAT_RATE / 3600.0;   // 46.9 MW
 
 	private final Motor starter = new Motor(true, Voltage.MEDIUM, Tuning.GT_STARTER_WATTS);
 	private final dev.wildcatter.kinetic.RunningSound running = new dev.wildcatter.kinetic.RunningSound();
@@ -53,9 +52,40 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 	private String missing = "";
 	private String trip = "";
 	private double volts;
+	/** Share of its rating it may carry, rising at its ramp rate once its breaker is closed. */
+	private double ramp;
 
 	public GasTurbineBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.GAS_TURBINE_ENTITY, pos, state);
+	}
+
+	// ---- its size: the 16.5 MW industrial turbine or the 45 MW aeroderivative (docs/multiblocks/aeroderivative.md) --------------
+	public boolean aero() {
+		return getBlockState().getBlock() instanceof TurbinePartBlock t && t.part() == TurbinePartBlock.Part.AERO_TURBINE;
+	}
+
+	private double ratedWatts() {
+		return aero() ? Tuning.AERO_WATTS : Tuning.GT_WATTS;
+	}
+
+	private double fullFuelWatts() {
+		return ratedWatts() * (aero() ? Tuning.AERO_HEAT_RATE : Tuning.GT_HEAT_RATE) / 3600.0;   // 46.9 MW or 110 MW
+	}
+
+	private double noLoadFuel() {
+		return aero() ? Tuning.AERO_NO_LOAD_FUEL : Tuning.GT_NO_LOAD_FUEL;
+	}
+
+	private double purgeSeconds() {
+		return aero() ? Tuning.AERO_PURGE_SECONDS : Tuning.GT_PURGE_SECONDS;
+	}
+
+	private double runupSeconds() {
+		return aero() ? Tuning.AERO_RUNUP_SECONDS : Tuning.GT_RUNUP_SECONDS;
+	}
+
+	private double rampPerMinute() {
+		return aero() ? Tuning.AERO_RAMP_PER_MINUTE : Tuning.GT_RAMP_PER_MINUTE;
 	}
 
 	/** Start, stop, or reset after a trip. */
@@ -78,13 +108,26 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 		setChanged();
 	}
 
-	/** Game test hook: once purging, skip the rest of the start (three minutes) to full speed. */
-	public void skipStartForTest() {
+	/** Game test hook: once purging, skip the rest of the start to full speed, and its load ramp too if {@code finishRamp}. */
+	public void skipStartForTest(boolean finishRamp) {
 		if (phase == Phase.PURGE || phase == Phase.RUNUP) {
 			speed = 1.0;
 			phase = Phase.RUNNING;
-			setChanged();
 		}
+		if (finishRamp) {
+			ramp = 1.0;
+		}
+		setChanged();
+	}
+
+	public void skipStartForTest() {
+		skipStartForTest(true);
+	}
+
+	/** Game test hook: finish the load ramp. */
+	public void skipRampForTest() {
+		ramp = 1.0;
+		setChanged();
 	}
 
 	public Phase phase() {
@@ -108,7 +151,8 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 
 	// ---- its parts, by touching --------------------------------------------------------------------------------------------------
 	private @Nullable GeneratorPartBlockEntity generator(Level level) {
-		return Touching.find(level, worldPosition, GeneratorPartBlockEntity.class, g -> !g.getBlockState().is(WildcatterBlocks.ST_GENERATOR));
+		net.minecraft.world.level.block.Block mine = aero() ? WildcatterBlocks.AERO_GENERATOR : WildcatterBlocks.GT_GENERATOR;
+		return Touching.find(level, worldPosition, GeneratorPartBlockEntity.class, g -> g.getBlockState().is(mine));
 	}
 
 	private boolean has(Level level, TurbinePartBlock.Part part) {
@@ -121,14 +165,14 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 
 	private List<String> missing(Level level) {
 		List<String> out = new ArrayList<>();
-		if (!has(level, TurbinePartBlock.Part.GT_INLET_HOUSE)) {
+		if (!has(level, aero() ? TurbinePartBlock.Part.AERO_INLET_HOUSE : TurbinePartBlock.Part.GT_INLET_HOUSE)) {
 			out.add("an INLET HOUSE");
 		}
 		if (generator(level) == null) {
 			out.add("a GENERATOR");
 		}
-		if (!has(level, TurbinePartBlock.Part.GT_EXHAUST_STACK) && hrsg(level) == null) {
-			out.add("an EXHAUST STACK or HRSG");
+		if (aero() ? !has(level, TurbinePartBlock.Part.AERO_EXHAUST_STACK) : !has(level, TurbinePartBlock.Part.GT_EXHAUST_STACK) && hrsg(level) == null) {
+			out.add(aero() ? "an EXHAUST STACK" : "an EXHAUST STACK or HRSG");
 		}
 		return out;
 	}
@@ -147,7 +191,7 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 	}
 
 	private void refuel(Level level) {
-		double room = FULL_FUEL_WATTS * 5 - fuelJoules;   // five seconds at full load
+		double room = fullFuelWatts() * 5 - fuelJoules;   // five seconds at full load
 		if (room <= 0) {
 			return;
 		}
@@ -200,8 +244,8 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 				}
 				if (!go) {
 					gt.phase = Phase.STOPPED;
-				} else if (gt.timer >= Tuning.GT_PURGE_SECONDS) {
-					if (gt.fuelJoules < FULL_FUEL_WATTS * Tuning.GT_NO_LOAD_FUEL) {
+				} else if (gt.timer >= gt.purgeSeconds()) {
+					if (gt.fuelJoules < gt.fullFuelWatts() * gt.noLoadFuel()) {
 						gt.stop(server, "NO FUEL at light-off: pipe pipeline gas, diesel or kerosene to its fuel nozzle (west side)");
 					} else {
 						gt.phase = Phase.RUNUP;
@@ -214,8 +258,8 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 				if (gt.starterWanted && gt.starter.output() <= 0) {
 					gt.stop(server, "STARTER: lost its 4.16 kV during the run-up");
 				}
-				gt.speed = Math.min(1.0, gt.speed + 0.75 * dt / Tuning.GT_RUNUP_SECONDS);
-				burn = FULL_FUEL_WATTS * Tuning.GT_NO_LOAD_FUEL * gt.speed;
+				gt.speed = Math.min(1.0, gt.speed + 0.75 * dt / gt.runupSeconds());
+				burn = gt.fullFuelWatts() * gt.noLoadFuel() * gt.speed;
 				if (!go) {
 					gt.phase = Phase.STOPPED;
 				} else if (gt.speed >= 1.0) {
@@ -224,8 +268,11 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 			}
 			case RUNNING -> {
 				gt.starterWanted = false;
-				double load = gen == null ? 0 : Math.max(0, Math.min(1, gen.deliveredWatts() / Tuning.GT_WATTS));
-				burn = FULL_FUEL_WATTS * (Tuning.GT_NO_LOAD_FUEL + (1 - Tuning.GT_NO_LOAD_FUEL) * load);
+				double load = gen == null ? 0 : Math.max(0, Math.min(1, gen.deliveredWatts() / gt.ratedWatts()));
+				burn = gt.fullFuelWatts() * (gt.noLoadFuel() + (1 - gt.noLoadFuel()) * load);
+				if (gen != null && gen.breakerClosed()) {
+					gt.ramp = Math.min(1.0, gt.ramp + gt.rampPerMinute() * dt / 60.0);   // it takes load at its ramp rate
+				}
 				if (!go) {
 					gt.phase = Phase.STOPPED;
 				}
@@ -241,7 +288,10 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 		}
 		gt.fuelWatts = burn;
 		if (gen != null) {
-			gen.drive(level, gt.phase == Phase.RUNNING, Tuning.GT_WATTS);
+			if (gt.phase != Phase.RUNNING) {
+				gt.ramp = 0.05;   // it synchronizes carrying a little, then ramps
+			}
+			gen.drive(level, gt.phase == Phase.RUNNING, gt.ratedWatts() * Math.max(0.05, gt.ramp));
 		}
 		gt.running.update(gt, gt.phase != Phase.STOPPED || gt.speed > 0.05);
 		gt.setChanged();
@@ -300,7 +350,7 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 
 	@Override
 	public Component inspect() {
-		String name = "Gas turbine (" + Math.round(Tuning.GT_WATTS / 1e5) / 10.0 + " MW, " + Voltage.GENERATOR.label() + ")";
+		String name = (aero() ? "Aeroderivative gas turbine (" : "Gas turbine (") + Math.round(ratedWatts() / 1e5) / 10.0 + " MW, " + Voltage.GENERATOR.label() + ")";
 		if (level == null) {
 			return Component.literal(name);
 		}
@@ -313,7 +363,7 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 					case STOPPED -> speed > 0.01 ? String.format("coasting down, %.0f%% speed", speed * 100) : "STOPPED: right-click to start";
 					case PURGE -> String.format("PURGE: the starter turns it at %.0f%% speed (%.0f s), %s", speed * 100, timer, starter.describe());
 					case RUNUP -> String.format("RUN-UP: lit, %.0f%% speed%s", speed * 100, starterWanted ? ", starter on" : ", starter off");
-					case RUNNING -> "RUNNING at full speed";
+					case RUNNING -> ramp < 0.999 ? String.format("RUNNING at full speed, ramping: may carry %.1f MW", ratedWatts() * Math.max(0.05, ramp) / 1e6) : "RUNNING at full speed";
 				};
 		String fuelLine = fuelWatts > 0 ? String.format("; burning %.1f MW of %s", fuelWatts / 1e6, fuel) : fuel.startsWith("WRONG") ? "; " + fuel : "";
 		double plant = plantWatts(level);
@@ -356,6 +406,7 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 		output.putBoolean("wantRun", wantRun);
 		output.putDouble("speed", speed);
 		output.putDouble("fuel", fuelJoules);
+		output.putDouble("ramp", ramp);
 		output.putString("trip", trip);
 	}
 
@@ -372,6 +423,7 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 		wantRun = input.getBooleanOr("wantRun", false);
 		speed = input.getDoubleOr("speed", 0);
 		fuelJoules = input.getDoubleOr("fuel", 0);
+		ramp = input.getDoubleOr("ramp", 0);
 		trip = input.getStringOr("trip", "");
 	}
 

@@ -29,6 +29,9 @@ Put the jar in your instance's `mods` folder next to:
   one-block refinery is gone: in an older world it disappears.
 - A 16.5 MW gas turbine at 13.8 kV, with a heat recovery steam generator and a 5 MW steam turbine for combined cycle, a 25 MVA
   step-up to 138 kV, generator bus duct and breakers, and a load bank for commissioning.
+- A 45 MW aeroderivative peaker that is at full load about five minutes after you start it, with a 3,000 A breaker and bus duct,
+  a 60 MVA step-up, and a 60 MVA substation transformer from 138 kV down to 12.47 kV. Both gas turbines now take load at a
+  limited rate after they close their breaker.
 - The Field Manual item explains how to build each machine.
 
 ## Older worlds
