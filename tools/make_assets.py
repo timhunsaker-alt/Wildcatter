@@ -1798,6 +1798,39 @@ lang.update({f"block.{ns}.reduction_reactor": "Reduction Reactor (fluid bed)", f
 	f"block.{ns}.fluorine_cell_house": "Fluorine Cell House (12 cells)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 7e: the centrifuge cascade (docs/multiblocks/enrichment.md) ------------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/enrichment.py; here loot, names, tags, recipes and the cylinders.
+ENRICHMENT_PARTS = ("centrifuge", "frequency_converter", "feed_station", "product_takeoff", "tails_takeoff")
+for name in ENRICHMENT_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in ENRICHMENT_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("centrifuge", ["SPS", "SIS", "SRS"], {"S": S_, "P": P_, "I": "minecraft:iron_block", "R": "minecraft:redstone"}, "centrifuge")
+shaped("frequency_converter", ["CRC", "SXS", "CRC"], {"C": "minecraft:copper_block", "R": "minecraft:redstone_block", "S": S_, "X": "minecraft:comparator"}, "frequency_converter")
+shaped("feed_station", ["SHS", "PFP", "SSS"], {"S": S_, "H": "minecraft:hopper", "P": P_, "F": "minecraft:furnace"}, "feed_station")
+shaped("product_takeoff", ["SHS", "PIP", "BBB"], {"S": S_, "H": "minecraft:hopper", "P": P_, "I": "minecraft:packed_ice", "B": "minecraft:iron_block"}, "product_takeoff")
+shaped("tails_takeoff", ["SHS", "PIP", "SBS"], {"S": S_, "H": "minecraft:hopper", "P": P_, "I": "minecraft:packed_ice", "B": "minecraft:iron_block"}, "tails_takeoff")
+shaped("empty_30b_cylinder", ["S S", "S S", "SSS"], {"S": S_}, "empty_30b_cylinder")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in {"empty_30b_cylinder": ("Empty 30B Cylinder", (200, 200, 195)), "leu_cylinder_30b": ("30B Cylinder of UF6 (4.95 % LEU)", (220, 190, 90)),
+		"tails_cylinder_48y": ("48Y Cylinder of UF6 (0.25 % tails)", (150, 150, 140))}.items():
+	if os.path.exists(f"{ORE_ART}/{item}.png"):
+		shutil.copy(f"{ORE_ART}/{item}.png", f"{ASSETS}/textures/item/ore/{item}.png")
+		item_tex = f"{ns}:item/ore/{item}"
+	else:
+		tex(f"{item}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+		item_tex = f"{ns}:item/{item}_placeholder"
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": item_tex}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.centrifuge": "Gas Centrifuge (TC-21 class)", f"block.{ns}.frequency_converter": "Frequency Converter (12.47 kV, 1,225 Hz)",
+	f"block.{ns}.feed_station": "Feed Station (48Y)", f"block.{ns}.product_takeoff": "Product Take-off (30B)",
+	f"block.{ns}.tails_takeoff": "Tails Take-off (48Y)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

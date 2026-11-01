@@ -109,13 +109,15 @@ and the Field Manual has a page for each new system.
   - ISR: alkaline Wyoming chemistry (oxygen), 10x the real head grade at the real flow per well (decided in the 7c plan).
   - Conversion: the rectifier is an AC load with its DC side worked out inside it, no DC tier in the solver; the plant is quarter
     size, 12 fluorine cells, about 0.7 MW at 4.16 kV (decided in the 7d plan).
+  - Enrichment: Urenco TC-21 class centrifuges, each doing 1000x its real separative work at the real 50 kWh a SWU, about 571 kW
+    a machine; at least 11 machines (one a stage) on 12.47 kV frequency converters (decided in the 7e plan).
   - Process chemicals from the existing chain plus real ores. Tim: "make sure we have all ore types from real world with exaggerated numbers".
 - Waves (each is planned with its numbers before it is built):
   - 7a: every real ore type as worldgen, plus a gamma scintillometer (docs/ores.md). DONE.
   - 7b: a sulfuric acid plant and the uranium mill (yellowcake in drums; docs/multiblocks/acid-plant.md, uranium-mill.md). DONE.
   - 7c: ISR wellfields (late; docs/multiblocks/isr-wellfield.md). DONE.
   - 7d: conversion to UF6 (a methane reformer for hydrogen, HF from fluorspar, fluorine cells on a DC rectifier, 48Y cylinders; docs/multiblocks/conversion.md). DONE.
-  - 7e: the centrifuge cascade (a high-frequency converter, 4.95 % LEU in 30B cylinders).
+  - 7e: the centrifuge cascade (a high-frequency converter, 4.95 % LEU in 30B cylinders; docs/multiblocks/enrichment.md). DONE.
   - 7f: fuel fabrication (pellets, Zircaloy tube from zircon by the Kroll process, rods, the 17×17 assembly).
 
 ## Phase 8 — Pressurized water reactor (PWR)
@@ -148,3 +150,5 @@ and the Field Manual has a page for each new system.
   scrubbers; a full-size plant.
 - ISR: bottled CO2 for the lixiviant, monitor-well rings and excursions, groundwater restoration (sweep, reverse osmosis,
   stability monitoring), a disposal well for the bleed, satellite IX with trucked resin.
+- Enrichment: centrifuge spin-up and coast-down hours, machine crashes, cooling water to the casings, the product sampling autoclave
+  and blending, cylinder heels, a choice of product assay.

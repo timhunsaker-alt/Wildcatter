@@ -475,6 +475,29 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 7e: the centrifuge cascade (spec: docs/multiblocks/enrichment.md)
+- **Natural UF6 to 4.95 % LEU** in 30B cylinders, tails at 0.25 % in 48Ys: 10.20 kg of feed and 7.81 SWU a kg of product
+  (`fluid/Enrichment.java`, unit-tested).
+- **Tim's decisions:** Urenco TC-21 class machines; each does 1000x its real 100 SWU a year (11.4 SWU/h) at the real 50 kWh a
+  SWU, so 571 kW a machine.
+- **Parts**, all on one steel-pipe header:
+  - CENTRIFUGE (1 x 6 x 1, joined by its top cell). A cascade needs at least 11, one a stage (Glaser's 1.74 separation factor);
+    more add separative work. This is the written exception to "never tile identical blocks".
+  - FREQUENCY CONVERTER (12.47 kV): drives up to 12 machines at 1,225 Hz along the header, the land rig's drive load at 0.95 PF.
+  - FEED STATION (30 kW heater, 480 V): a natural 48Y by hopper, sublimed onto the header, the emptied 48Y out below. It runs the
+    cascade: TOO FEW STAGES, NO DRIVE, TOTAL REFLUX (a take-off missing or not ready), NO FEED.
+  - PRODUCT TAKE-OFF (15 kW) into 30Bs and TAILS TAKE-OFF (30 kW) into 48Ys, empties by hopper, full ones out below.
+- **New pipe product:** UF6 (kg). **New items:** Empty 30B Cylinder, 30B Cylinder of UF6 (4.95 % LEU), 48Y Cylinder of UF6
+  (0.25 % tails), with Ludo icons (3 credits).
+- **Game test** `cascade`:
+  - the peaker's aeroderivative, 60 MVA GSU and 60 MVA substation transformer to 12.47 kV for the converter; a diesel set's 480 V
+    for the stations;
+  - ten machines read TOO FEW STAGES (10 of 11); the 11th starts it;
+  - the converter takes 6.07 of its 6.28 MW at 12,258 V (301 A); the machines run at 1,184 Hz and the cascade does 121 SWU/h,
+    23 kg of LEU UF6 an hour from 234 kg of feed;
+  - a 30B and a tails 48Y topped up by hook are finished and drop into their hoppers; a nearly empty feed 48Y comes out empty;
+  - breaking the product take-off gives TOTAL REFLUX; breaking the converter gives NO DRIVE.
+
 ## Phase 7d: conversion to UF6 (spec: docs/multiblocks/conversion.md)
 - **The Metropolis dry process at quarter size:** 12 fluorine cells, 0.075 kg of U a second, a 48Y cylinder (12,501 kg of UF6)
   about every 31 hours.
@@ -673,6 +696,8 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- The frequency converter is a fixed-impedance load like the other drives: when the 12.47 kV bus sags, it gets less than it
+  asks for and the machines slow (1,184 Hz at 12,258 V), where a real drive would draw more current.
 - Phase 6 is complete (6a and 6b); Tim checks the peaker in a real session. The turbines' generator couplings do not turn on
   screen (the condenser fans and feed pump do). The test skips each turbine's start and ramp with hooks.
 - The aeroderivative's exhaust stack is drawn as an octagon; its SCR housing is blank (no NOx chemistry).

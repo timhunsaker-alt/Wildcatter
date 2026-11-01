@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SHS",
+    "PIP",
+    "SBS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "P": "wildcatter:gas_line",
+    "I": "minecraft:packed_ice",
+    "B": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:tails_takeoff",
+    "count": 1
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "SIS",
+    "SRS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "I": "minecraft:iron_block",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "wildcatter:centrifuge",
+    "count": 1
+  }
+}

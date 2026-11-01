@@ -44,6 +44,9 @@ Put the jar in your instance's `mods` folder next to:
   a header house with an oxygen generator, and ion-exchange columns whose eluate feeds the mill's precipitation tank.
 - Conversion to UF6: reduction, hydrofluorination and fluorination in fluid beds, cold traps and distillation, into 48Y
   cylinders; hydrogen from a steam reformer, HF from fluorspar, fluorine from 12 cells on a 4.16 kV rectifier.
+- A centrifuge cascade: true-size gas centrifuges on one header pipe with a feed station, product and tails take-offs and a
+  12.47 kV frequency converter, enriching natural UF6 to 4.95 % in 30B cylinders. It needs at least 11 machines, each 571 kW:
+  power it from the aeroderivative.
 - The Field Manual item explains how to build each machine.
 
 ## Older worlds

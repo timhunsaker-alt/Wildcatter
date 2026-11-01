@@ -18,7 +18,7 @@ PARTS = ["gsu_transformer", "fuel_tank", "genset_base_frame", "radiator", "gense
 	"wood_pole_30", "wood_pole_40", "wood_pole_75", "crossarm_dist", "crossbeam_138", "x_brace_138", "pole_transformer", "fused_cutout",
 	"padmount_208", "padmount_480", "unit_substation", "enclosure", "fixtures", "mcc", "starter_plant",
 	"drilling_rig", "pumpjack", "wellheads", "land_rig", "lease", "gas_plant", "crude_units", "cracker", "gas_turbine", "combined_cycle", "aeroderivative",
-	"acid_plant", "uranium_mill", "wellfield", "conversion"]
+	"acid_plant", "uranium_mill", "wellfield", "conversion", "enrichment"]
 
 
 def colours(model):

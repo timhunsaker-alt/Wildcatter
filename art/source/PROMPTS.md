@@ -99,3 +99,14 @@ coming off the top, lying diagonally, game item icon, plain white background, no
   icon, plain white background, no text".
 - `uf6_cylinder_48y`: the same, "full of UF6 ... a yellow and black radioactive trefoil label and a white UN 2978 placard with a
   black 7".
+
+## Phase 7e (2026-11-01): the cascade's cylinders (art/source/ore/)
+`item-icon`, `Photorealistic 3D`, 2 variations each:
+- `empty_30b_cylinder` (a kept): "A single empty 30B uranium hexafluoride shipping cylinder seen from the side: a short horizontal 30
+  inch steel pressure cylinder with domed ends, painted grey-white, two stiffening skirts at the ends, a small valve at one end, no
+  markings, game item icon, plain white background, no text".
+- `leu_cylinder_30b` (b kept): the same, "full ... a yellow and black radioactive trefoil label and a white UN 3507 placard with a
+  black 7, a green stripe for enriched".
+- `tails_cylinder_48y` (a kept): "A single weathered 48Y depleted uranium hexafluoride storage cylinder seen from the side ... dull
+  dark grey paint with some rust streaks, two stiffening rings, a small valve protector at one end, a white UN 2978 placard with a
+  black 7".

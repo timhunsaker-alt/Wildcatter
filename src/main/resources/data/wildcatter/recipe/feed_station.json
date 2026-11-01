@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SHS",
+    "PFP",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "P": "wildcatter:gas_line",
+    "F": "minecraft:furnace"
+  },
+  "result": {
+    "id": "wildcatter:feed_station",
+    "count": 1
+  }
+}

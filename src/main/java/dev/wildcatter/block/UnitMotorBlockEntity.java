@@ -79,6 +79,9 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "distillation_columns" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.REBOILER_WATTS);
 				case "cylinder_filler" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CYLINDER_FILLER_WATTS);
 				case "hf_kiln" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.HF_KILN_WATTS);
+				case "feed_station" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.FEED_STATION_WATTS);
+				case "product_takeoff" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PRODUCT_TAKEOFF_WATTS);
+				case "tails_takeoff" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.TAILS_TAKEOFF_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -123,6 +126,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "distillation_columns" -> "reboiler";
 			case "cylinder_filler" -> "filler";
 			case "hf_kiln" -> "kiln drive";
+			case "feed_station" -> "heater";
+			case "product_takeoff", "tails_takeoff" -> "refrigeration";
 			default -> kind();
 		};
 	}

@@ -58,6 +58,19 @@ public final class WildcatterItems {
 			String.format("%,.0f kg of natural UF6, %,.0f kg of uranium", Tuning.CYLINDER_48Y_KG, Tuning.CYLINDER_48Y_KG / Tuning.UF6_PER_U),
 			"0.711 % U-235, as mined");
 
+	/** 7e: the cascade's cylinders (docs/multiblocks/enrichment.md): a 30B, empty and full of LEU, and a 48Y of tails. */
+	public static final ResourceKey<Item> EMPTY_30B_CYLINDER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("empty_30b_cylinder"));
+	public static final Item EMPTY_30B_CYLINDER = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(4).setId(EMPTY_30B_CYLINDER_KEY),
+			String.format("30 in steel UF6 cylinder (ANSI N14.1), %,.0f kg tare", Tuning.CYLINDER_30B_TARE));
+	public static final ResourceKey<Item> LEU_CYLINDER_30B_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("leu_cylinder_30b"));
+	public static final Item LEU_CYLINDER_30B = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(1).setId(LEU_CYLINDER_30B_KEY),
+			String.format("%,.0f kg of enriched UF6, %,.0f kg of uranium", Tuning.CYLINDER_30B_KG, Tuning.CYLINDER_30B_KG / Tuning.UF6_PER_U),
+			String.format("%.2f %% U-235: low-enriched, for fuel", Tuning.ASSAY_PRODUCT * 100));
+	public static final ResourceKey<Item> TAILS_CYLINDER_48Y_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("tails_cylinder_48y"));
+	public static final Item TAILS_CYLINDER_48Y = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(1).setId(TAILS_CYLINDER_48Y_KEY),
+			String.format("%,.0f kg of depleted UF6, %,.0f kg of uranium", Tuning.CYLINDER_48Y_KG, Tuning.CYLINDER_48Y_KG / Tuning.UF6_PER_U),
+			String.format("%.2f %% U-235: the cascade's tails", Tuning.ASSAY_TAILS * 100));
+
 	/** A bucket of crude oil. It burns in a firebox (as long as lava) and leaves the bucket behind. */
 	public static final ResourceKey<Item> CRUDE_OIL_BUCKET_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("crude_oil_bucket"));
 	public static final Item CRUDE_OIL_BUCKET = new Item(new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET).setId(CRUDE_OIL_BUCKET_KEY));
@@ -121,6 +134,9 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, SUBMERSIBLE_PUMP_KEY, SUBMERSIBLE_PUMP);
 		Registry.register(BuiltInRegistries.ITEM, EMPTY_48Y_CYLINDER_KEY, EMPTY_48Y_CYLINDER);
 		Registry.register(BuiltInRegistries.ITEM, UF6_CYLINDER_48Y_KEY, UF6_CYLINDER_48Y);
+		Registry.register(BuiltInRegistries.ITEM, EMPTY_30B_CYLINDER_KEY, EMPTY_30B_CYLINDER);
+		Registry.register(BuiltInRegistries.ITEM, LEU_CYLINDER_30B_KEY, LEU_CYLINDER_30B);
+		Registry.register(BuiltInRegistries.ITEM, TAILS_CYLINDER_48Y_KEY, TAILS_CYLINDER_48Y);
 		Registry.register(BuiltInRegistries.ITEM, CRUDE_OIL_BUCKET_KEY, CRUDE_OIL_BUCKET);
 		Registry.register(BuiltInRegistries.ITEM, PLASTIC_SHEET_KEY, PLASTIC_SHEET);
 		Registry.register(BuiltInRegistries.ITEM, STEEL_INGOT_KEY, STEEL_INGOT);

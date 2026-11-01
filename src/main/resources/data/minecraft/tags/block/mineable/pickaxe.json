@@ -225,6 +225,11 @@
     "wildcatter:hf_kiln",
     "wildcatter:hf_column",
     "wildcatter:rectifier",
-    "wildcatter:fluorine_cell_house"
+    "wildcatter:fluorine_cell_house",
+    "wildcatter:centrifuge",
+    "wildcatter:frequency_converter",
+    "wildcatter:feed_station",
+    "wildcatter:product_takeoff",
+    "wildcatter:tails_takeoff"
   ]
 }

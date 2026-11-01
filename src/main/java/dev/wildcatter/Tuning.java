@@ -306,6 +306,28 @@ public final class Tuning {
 	public static final double REBOILER_WATTS = 20_000.0;          // electric, 480 V (unverified)
 	public static final double CYLINDER_FILLER_WATTS = 5_000.0;    // 480 V (unverified)
 
+	// ---- The centrifuge cascade (docs/multiblocks/enrichment.md, approved 2026-11-01) ------------------------------------------
+	public static final double ASSAY_FEED = 0.00711;               // natural U-235
+	public static final double ASSAY_PRODUCT = 0.0495;             // LEU for the 17x17 fuel
+	public static final double ASSAY_TAILS = 0.0025;
+	public static final double CENTRIFUGE_SEPARATION_FACTOR = 1.74;   // a 5 m TC-21 (Glaser)
+	public static final double CENTRIFUGE_REAL_SWU_YEAR = 100.0;   // a TC-21 (informal, unverified)
+	public static final double CENTRIFUGE_SWU_SCALE = 1000.0;      // decided with Tim: 1000x its real separative work
+	public static final double KWH_PER_SWU = 50.0;                 // gas centrifuge plants: 50-60 kWh/SWU
+	public static final double CENTRIFUGE_TIP_SPEED = 770.0;       // m/s, TC-21
+	public static final double CENTRIFUGE_ROTOR_RADIUS = 0.10;     // m: a 20 cm rotor
+	public static final int CENTRIFUGE_MOTOR_POLES = 2;
+	/** The machines' own frequency, made by the converter from the grid: a property of the rotor, not a grid standard. */
+	public static final double CENTRIFUGE_HERTZ = CENTRIFUGE_TIP_SPEED / (2 * Math.PI * CENTRIFUGE_ROTOR_RADIUS) * CENTRIFUGE_MOTOR_POLES / 2;
+	public static final int CONVERTER_MACHINES = 12;               // machines a frequency converter drives (proposed)
+	public static final double CONVERTER_POWER_FACTOR = 0.95;      // its front end, as the land rig's drives
+	public static final double CYLINDER_30B_KG = 2_277.0;          // UF6 at up to 5 % (NRC package certificates)
+	public static final double CYLINDER_30B_TARE = 635.0;          // about 1,400 lb
+	public static final double UF6_SUBLIMATION_J_PER_KG = 137_000.0;   // 48 kJ/mol
+	public static final double FEED_STATION_WATTS = 30_000.0;      // its heater, 480 V (unverified)
+	public static final double PRODUCT_TAKEOFF_WATTS = 15_000.0;   // refrigeration, 480 V (unverified)
+	public static final double TAILS_TAKEOFF_WATTS = 30_000.0;     // refrigeration, 480 V (unverified)
+
 	// ---- The gas turbine and combined cycle (docs/multiblocks/gas-turbine.md, combined-cycle.md, approved 2026-10-31) -------
 	public static final double GT_WATTS = 16_500_000.0;            // ISO rating, Solar Titan 130 class
 	public static final double GT_HEAT_RATE = 10_230.0;            // kJ/kWh: 35 %

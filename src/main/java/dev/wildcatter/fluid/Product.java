@@ -65,7 +65,9 @@ public enum Product {
 	/** Anhydrous hydrogen fluoride, from fluorspar: for the hydrofluorinator and the fluorine cells. */
 	ANHYDROUS_HF("anhydrous HF", false),
 	/** From the fluorine cells, for the fluorinator. Counted in kg. */
-	FLUORINE("fluorine", true);
+	FLUORINE("fluorine", true),
+	/** UF6 gas on a cascade header (docs/multiblocks/enrichment.md), from a feed station. Counted in kg; real UF6 is a solid in its cylinders. */
+	UF6("UF6", true);
 
 	private final String label;
 	private final boolean gas;
@@ -86,7 +88,7 @@ public enum Product {
 
 	public String unit() {
 		return switch (this) {
-			case HOT_CRACKED_GAS, CRACKED_GAS, COMPRESSED_CRACKED_GAS, BURNER_GAS, ORE_SLURRY, LEACH_SLURRY, FLUORINE -> "kg";
+			case HOT_CRACKED_GAS, CRACKED_GAS, COMPRESSED_CRACKED_GAS, BURNER_GAS, ORE_SLURRY, LEACH_SLURRY, FLUORINE, UF6 -> "kg";
 			default -> gas ? "m3" : "L";
 		};
 	}

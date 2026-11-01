@@ -181,6 +181,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("conversion")) {
 				conversion(context, server);
 			}
+			if (only("cascade")) {
+				cascade(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -4534,6 +4537,210 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.takeScreenshot("wildcatter-conversion");
 		System.out.println("[wildcatter-test] conversion ok: " + read(server, 13, up, z + 17) + " | " + read(server, 5, up, z + 12) + " | " + read(server, 0, up, z)
 				+ " | full cylinders " + full);
+	}
+
+	/**
+	 * The centrifuge cascade (7e, docs/multiblocks/enrichment.md). South: the peaker's chain, an aeroderivative through its 60 MVA
+	 * GSU to 138 kV and a 60 MVA substation transformer down to 12.47 kV, run north and west to the frequency converter. North: the
+	 * feed station, the converter and the product and tails take-offs on a ground header, which climbs to run over the tops of a row
+	 * of centrifuges; a diesel set's 480 V for the stations. Ten machines must read too few stages; the 11th must start the cascade
+	 * at about 6.3 MW and 1,225 Hz; both take-offs must fill; nearly full cylinders must finish and drop into their hoppers; a nearly
+	 * empty feed 48Y must come out empty; without the product take-off it must idle on total reflux, and without the converter the
+	 * machines must lose their drive.
+	 */
+	private void cascade(ClientGameTestContext context, TestServerContext server) {
+		int z = -2100;
+		int zg = z - 30;   // the ground header
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 10 " + (up + 20) + " " + (z + 20) + " 180 30");
+		context.waitTicks(20);
+		for (int zz = z - 40; zz <= z + 22; zz += 21) {   // /fill takes at most 32,768 blocks
+			server.runCommand("fill -30 " + (y - 1) + " " + zz + " 44 " + (y + 16) + " " + Math.min(zz + 20, z + 22) + " minecraft:air");
+		}
+		server.runCommand("fill -30 " + (y - 1) + " " + (z - 40) + " 44 " + (y - 1) + " " + (z + 22) + " minecraft:stone");
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		// the power: the peaker's turbine, GSU and substation transformer, as its scene builds them
+		BlockPos gt = new BlockPos(20, up, z);
+		placeBig(server, WildcatterBlocks.AERO_TURBINE, gt, north);                                 // x 20-24, z..z+13
+		placeBig(server, WildcatterBlocks.AERO_INLET_HOUSE, new BlockPos(20, up, z - 5), north);    // x 20-25, z-5..z-1
+		placeBig(server, WildcatterBlocks.AERO_EXHAUST_STACK, new BlockPos(20, up, z + 14), north); // x 20-23, z+14..z+17
+		placeBig(server, WildcatterBlocks.AERO_GENERATOR, new BlockPos(25, up, z + 1), north);      // x 25-28, z+1..z+7
+		placeBig(server, WildcatterBlocks.GEN_BREAKER_3000, new BlockPos(26, up, z + 8), north);    // x 26-27, z+8..z+9
+		placeBig(server, WildcatterBlocks.GSU_60, new BlockPos(36, up, z + 8), north);              // x 33-38, z+4..z+8
+		placeBig(server, WildcatterBlocks.SUBSTATION_TRANSFORMER_60, new BlockPos(36, up, z - 6), north);   // x 33-38, z-10..z-6
+		BlockPos fuelTank = new BlockPos(14, up, z + 4);
+		placeBig(server, WildcatterBlocks.STOCK_TANK, fuelTank, north);                              // x 14-17, z+4..z+7
+		pipes(server, z, new int[][] {{18, 0, 6}, {19, 0, 6}});
+		for (int x = 26; x <= 37; x++) {
+			put(server, x, up, z + 10, "wildcatter:bus_duct_gen");
+		}
+		put(server, 36, up, z + 9, "wildcatter:bus_duct_gen");
+		sizeCables(server, new BlockPos(26, up, z + 9), new BlockPos(37, up, z + 10), WildcatterBlocks.BUS_DUCT_GEN, dev.wildcatter.energy.ConductorSize.BUS_DUCT_3000);
+		for (int zz = z - 10; zz <= z + 4; zz++) {
+			put(server, 36, up + 6, zz, "wildcatter:cable_hv");
+		}
+		BlockPos starter = new BlockPos(10, up, z + 2);
+		genset(server, starter, north, false);                                                    // x 5-10, z+2..z+3
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, starter, net.minecraft.core.Direction.EAST, false);   // x 11-14, z+1..z+2
+		for (int x = 15; x <= 19; x++) {
+			put(server, x, up, z + 2, "wildcatter:cable_mv");
+		}
+		// 12.47 kV: the substation transformer's throat, east, north up x 40, west along z-38 and down to the converter's box
+		java.util.List<int[]> mv = new java.util.ArrayList<>();
+		for (int x = 36; x <= 40; x++) {
+			mv.add(new int[] {x, z - 5});
+		}
+		for (int zz = z - 38; zz <= z - 6; zz++) {
+			mv.add(new int[] {40, zz});
+		}
+		for (int x = -17; x <= 39; x++) {
+			mv.add(new int[] {x, z - 38});
+		}
+		mv.add(new int[] {-17, z - 37});
+		mv.add(new int[] {-17, z - 36});
+		for (int[] c : mv) {
+			put(server, c[0], up, c[1], "wildcatter:cable_dist");
+		}
+		sizeCables(server, new BlockPos(-17, up, z - 38), new BlockPos(40, up, z - 5), WildcatterBlocks.CABLE_DIST, dev.wildcatter.energy.ConductorSize.MV_500);
+		// the cascade: feed station, converter and take-offs on the ground header at zg, which climbs at x -1 over ten machines
+		BlockPos feed = new BlockPos(-20, up, zg - 5);
+		placeBig(server, WildcatterBlocks.FEED_STATION, feed, north);                              // x -20..-18, zg-5..zg-1
+		BlockPos converter = new BlockPos(-16, up, zg - 6);
+		placeBig(server, WildcatterBlocks.FREQUENCY_CONVERTER, converter, north);                  // x -16..-14, zg-6..zg-1, its box at x -17
+		BlockPos product = new BlockPos(-12, up, zg + 1);
+		placeBig(server, WildcatterBlocks.PRODUCT_TAKEOFF, product, north);                        // x -12..-10, zg+1..zg+4
+		BlockPos tails = new BlockPos(-8, up, zg + 1);
+		placeBig(server, WildcatterBlocks.TAILS_TAKEOFF, tails, north);                            // x -8..-6, zg+1..zg+5
+		for (int x = 0; x < 10; x++) {
+			placeBig(server, WildcatterBlocks.CENTRIFUGE, new BlockPos(x, up, zg), north);
+		}
+		for (int x = -20; x <= -1; x++) {
+			put(server, x, up, zg, "wildcatter:gas_line");
+		}
+		for (int yy = up + 1; yy <= up + 6; yy++) {
+			put(server, -1, yy, zg, "wildcatter:gas_line");
+		}
+		for (int x = 0; x <= 10; x++) {
+			put(server, x, up + 6, zg, "wildcatter:gas_line");
+		}
+		// hoppers: a natural 48Y on the feed station, empties on the take-offs, and one under each
+		put(server, -19, up + 3, zg - 3, "minecraft:hopper");
+		server.runCommand("item replace block -19 " + (up + 3) + " " + (zg - 3) + " container.0 with wildcatter:uf6_cylinder_48y 1");
+		BlockPos feedOut = new BlockPos(-19, y, zg - 3);
+		put(server, -19, y, zg - 3, "minecraft:hopper");
+		put(server, -11, up + 3, zg + 2, "minecraft:hopper");
+		server.runCommand("item replace block -11 " + (up + 3) + " " + (zg + 2) + " container.0 with wildcatter:empty_30b_cylinder 2");
+		BlockPos productOut = new BlockPos(-11, y, zg + 2);
+		put(server, -11, y, zg + 2, "minecraft:hopper");
+		put(server, -7, up + 3, zg + 2, "minecraft:hopper");
+		server.runCommand("item replace block -7 " + (up + 3) + " " + (zg + 2) + " container.0 with wildcatter:empty_48y_cylinder 2");
+		BlockPos tailsOut = new BlockPos(-7, y, zg + 2);
+		put(server, -7, y, zg + 2, "minecraft:hopper");
+		// 480 V for the stations: a set south-west, up x -23 to the feed station's box, east along zg+6 to the take-offs' boxes
+		BlockPos lvSet = new BlockPos(-24, up, zg + 4);
+		genset(server, lvSet, north, false);                                                    // x -29..-24, zg+4..zg+5
+		java.util.List<int[]> lv = new java.util.ArrayList<>();
+		for (int zz = zg - 5; zz <= zg + 6; zz++) {
+			lv.add(new int[] {-23, zz});
+		}
+		lv.add(new int[] {-22, zg - 5});
+		lv.add(new int[] {-21, zg - 5});
+		for (int x = -22; x <= -9; x++) {
+			lv.add(new int[] {x, zg + 6});
+		}
+		for (int zz = zg + 1; zz <= zg + 5; zz++) {
+			lv.add(new int[] {-13, zz});
+			lv.add(new int[] {-9, zz});
+		}
+		for (int[] c : lv) {
+			put(server, c[0], up, c[1], "wildcatter:cable_industrial");
+		}
+		// start: the starter set, the turbine, then the stations' set
+		fillTank(server, fuelTank, dev.wildcatter.fluid.Product.KEROSENE, 40_000);
+		startGenset(context, server, starter, north, 2000);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.GasTurbineBlockEntity) srv.overworld().getBlockEntity(gt)).setWantRun(true);
+			return null;
+		});
+		context.waitTicks(200);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.GasTurbineBlockEntity) srv.overworld().getBlockEntity(gt)).skipStartForTest(false);
+			return null;
+		});
+		context.waitTicks(100);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.GasTurbineBlockEntity) srv.overworld().getBlockEntity(gt)).skipRampForTest();
+			return null;
+		});
+		startGenset(context, server, lvSet, north, 2000);
+		context.waitTicks(300);
+		String few = read(server, -20, up, zg - 5);
+		String power = " | converter " + read(server, -16, up, zg - 6) + " | turbine " + read(server, 20, up, z) + " | throat " + read(server, 36, up, z - 5);
+		check(read(server, -16, up, zg - 6).contains("driving 10 machines"), "the converter should drive the ten machines: " + few + power);
+		check(few.contains("TOO FEW STAGES (10 of 11)"), "ten machines are too few stages: " + few + power);
+		// the 11th machine starts the cascade
+		placeBig(server, WildcatterBlocks.CENTRIFUGE, new BlockPos(10, up, zg), north);
+		context.waitTicks(300);
+		String running = read(server, -20, up, zg - 5);
+		String conv = read(server, -16, up, zg - 6);
+		power = " | converter " + conv + " | turbine " + read(server, 20, up, z) + " | machine " + read(server, 5, up, zg);
+		check(running.contains("feeding") && running.contains("11 machines driven"), "eleven machines should run the cascade: " + running + power);
+		java.util.regex.Matcher kw = java.util.regex.Pattern.compile("([0-9]+) kW of ([0-9]+) kW wanted").matcher(conv);
+		check(kw.find() && Double.parseDouble(kw.group(1)) > 5_500, "the converter should take about 6.3 MW: " + conv);
+		java.util.regex.Matcher hz = java.util.regex.Pattern.compile("machines at ([0-9]+) Hz").matcher(conv);
+		check(conv.contains("1,225 Hz out") && hz.find() && Integer.parseInt(hz.group(1)) > 1_150, "the machines should run near 1,225 Hz: " + conv + power);
+		double[] filled = server.computeOnServer(srv -> new double[] {
+				((dev.wildcatter.block.TakeoffBlockEntity) srv.overworld().getBlockEntity(product)).uf6(),
+				((dev.wildcatter.block.TakeoffBlockEntity) srv.overworld().getBlockEntity(tails)).uf6()});
+		check(filled[0] > 0 && filled[1] > filled[0] * 8, "both take-offs should fill, the tails about nine times faster: " + filled[0] + " / " + filled[1]
+				+ " | " + read(server, -12, up, zg + 1) + " | " + read(server, -8, up, zg + 1));
+		// cylinders all but full: the cascade finishes them
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.TakeoffBlockEntity) srv.overworld().getBlockEntity(product)).addUf6(Tuning.CYLINDER_30B_KG);
+			((dev.wildcatter.block.TakeoffBlockEntity) srv.overworld().getBlockEntity(product)).addUf6(-0.05);
+			((dev.wildcatter.block.TakeoffBlockEntity) srv.overworld().getBlockEntity(tails)).addUf6(Tuning.CYLINDER_48Y_KG);
+			((dev.wildcatter.block.TakeoffBlockEntity) srv.overworld().getBlockEntity(tails)).addUf6(-0.5);
+			return null;
+		});
+		int leu = 0, depleted = 0;
+		for (int i = 0; i < 30 && (leu == 0 || depleted == 0); i++) {
+			context.waitTicks(40);
+			leu = countIn(server, productOut, WildcatterItems.LEU_CYLINDER_30B);
+			depleted = countIn(server, tailsOut, WildcatterItems.TAILS_CYLINDER_48Y);
+		}
+		check(leu > 0, "a full 30B of LEU should drop into the hopper under the product take-off: " + read(server, -12, up, zg + 1) + " | " + read(server, -20, up, zg - 5));
+		check(depleted > 0, "a full 48Y of tails should drop into the hopper under the tails take-off: " + read(server, -8, up, zg + 1));
+		// a feed cylinder all but empty: it comes out empty
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.FeedStationBlockEntity) srv.overworld().getBlockEntity(feed)).setUf6ForTest(1.0);
+			return null;
+		});
+		int empty = 0;
+		for (int i = 0; i < 30 && empty == 0; i++) {
+			context.waitTicks(40);
+			empty = countIn(server, feedOut, WildcatterItems.EMPTY_48Y_CYLINDER);
+		}
+		check(empty > 0, "the emptied 48Y should drop into the hopper under the feed station: " + read(server, -20, up, zg - 5));
+		check(read(server, -20, up, zg - 5).contains("NO FEED"), "with its only cylinder empty it should read NO FEED: " + read(server, -20, up, zg - 5));
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.FeedStationBlockEntity) srv.overworld().getBlockEntity(feed)).setUf6ForTest(Tuning.CYLINDER_48Y_KG);
+			return null;
+		});
+		context.waitTicks(40);
+		check(read(server, -20, up, zg - 5).contains("feeding"), "a fresh cylinder should feed again: " + read(server, -20, up, zg - 5));
+		server.runCommand("tp @p -6 " + (up + 14) + " " + (zg + 20) + " 180 32");
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-cascade");
+		String ok = read(server, -20, up, zg - 5) + " | " + conv + " | " + read(server, 5, up, zg);
+		// without the product take-off: total reflux; without the converter: no drive
+		server.computeOnServer(srv -> srv.overworld().destroyBlock(product, false));
+		context.waitTicks(40);
+		check(read(server, -20, up, zg - 5).contains("TOTAL REFLUX"), "without its product take-off the cascade should idle on total reflux: " + read(server, -20, up, zg - 5));
+		server.computeOnServer(srv -> srv.overworld().destroyBlock(converter, false));
+		context.waitTicks(80);
+		check(read(server, -20, up, zg - 5).contains("NO DRIVE") && read(server, 5, up, zg).contains("NO DRIVE"),
+				"without the converter the machines should lose their drive: " + read(server, -20, up, zg - 5) + " | " + read(server, 5, up, zg));
+		System.out.println("[wildcatter-test] cascade ok: " + ok + " | 30B " + leu + ", tails " + depleted + ", emptied " + empty);
 	}
 
 	/**
