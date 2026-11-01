@@ -63,6 +63,9 @@ SEP.box((0.94, 1.75, 2.12), (1.06, 1.85, 2.28), "iron")
 SEP.cylinder("z", (0.65, 1.55), 0.06, 1.4, 1.44, "brass", 12)          # the pressure gauge on the top
 SEP.decal((0.59, 1.49, 1.395), (0.71, 1.61, 1.4), "gauge", "north", "brass")
 SEP.decal((0.53, 0.75, 1.3), (0.54, 1.25, 2.1), "nameplate", "west", "padgreen")
+SEP.decal((0.53, 0.8, 2.3), (0.54, 1.2, 2.7), "nfpa", "west", "padgreen")
+g.pipe_label(SEP, (1.5, 1.3, 3.75), "z", 2, "pipe_crude", 0.35)
+g.pipe_label(SEP, (0.5, 0.75, 3.75), "z", 2, "pipe_water", 0.35)
 SEP.collide((0.1, 0.0, 0.05), (1.9, 0.62, 3.95))
 SEP.collide((0.54, 0.59, 0.33), (1.46, 1.51, 3.67))
 
@@ -92,6 +95,8 @@ def tank(name, tex, ribs):
 	T.handrail([(1.28, 0.15), (1.28, 1.9)], 5.9, "galv", height=0.9)
 	T.box((3.0, 0.4, 2.0 - TR - 0.05), (3.2, 5.6, 2.0 - TR - 0.03), "galv")   # the gauge board on the north side
 	T.decal((2.2, 1.0, 2.0 - TR - 0.04), (2.8, 1.4, 2.0 - TR - 0.03), "nameplate", "north", tex)
+	if name == "stock_tank":   # crude: the NFPA 704 placard
+		T.decal((2.3, 1.6, 2.0 - TR - 0.04), (2.7, 2.0, 2.0 - TR - 0.03), "nfpa", "north", tex)
 	for side in range(4):   # the bottom-ring connections, a valve on each side
 		a = side * math.pi / 2
 		x, z = 2.0 + (TR + 0.08) * math.sin(a), 2.0 - (TR + 0.08) * math.cos(a)
@@ -110,13 +115,14 @@ FL.cylinder("y", (0.5, 0.5), 0.36, 0.06, 1.3, "grey", 14)                  # the
 FL.cylinder("y", (0.5, 0.5), 0.3, 1.3, 1.4, "grey", 14)
 FL.pipe([(0.0, 0.5, 0.5), (0.2, 0.5, 0.5)], 4, "steel")                    # the inlet, on the side of the bottom cell
 FL.pipe([(0.5, 0.5, 1.0), (0.5, 0.5, 0.8)], 4, "steel")
-FL.cylinder("y", (0.5, 0.5), mlib.NPS_OD[8] / 2, 1.4, 9.6, "grey", 12)       # the 8 in riser
+FL.cylinder("y", (0.5, 0.5), mlib.NPS_OD[8] / 2, 1.4, 9.6, "hipaint", 12)       # the 8 in riser
 for y in (3.0, 6.0, 9.0):
 	FL.ring("y", (0.5, 0.5), 0.13, y, y + 0.06, 0.02, "iron", sides=12)   # its flanges
 FL.cylinder("y", (0.5, 0.5), 0.16, 9.6, 9.95, "iron", 12)                   # the flare tip and its wind shield
 FL.ring("y", (0.5, 0.5), 0.2, 9.7, 10.0, 0.02, "steel", sides=12)
 FL.cylinder("y", (0.72, 0.5), 0.015, 1.4, 9.9, "steel", 6)                  # the pilot's gas line and its igniter
 FL.box((0.68, 9.85, 0.46), (0.76, 9.98, 0.54), "brass")
+FL.decal((0.3, 0.5, 0.12), (0.7, 0.8, 0.13), "flammable", "north", "grey")
 FL.collide((0.14, 0.0, 0.14), (0.86, 1.4, 0.86))
 FL.collide((0.38, 1.4, 0.38), (0.62, 10.0, 0.62))
 
@@ -141,6 +147,7 @@ for z in (3.2, 3.8, 4.4, 5.0):
 for z in (3.0, 5.3):
 	IP.box((0.75, 0.12, z), (1.25, SY - 0.2, z + 0.15), "iron")               # the barrel's supports
 IP.pipe([(1.0, SY, 5.55), (1.0, SY, 6.0)], 4, "steel")                       # the suction, the back end
+g.pipe_label(IP, (1.0, SY, 5.78), "z", 4, "pipe_water", 0.3)
 IP.flange("z", (1.0, SY), 0.12, 5.6, 0.03, "iron", bolts=8, bolt_tex="galv")
 IP.pipe([(1.0, SY + 0.24, 3.5), (1.0, 1.0, 3.5)], 3, "steel")                # the discharge, on top by the thrust chamber
 IP.cylinder("z", (1.3, 0.9), 0.05, 3.42, 3.46, "brass", 12)                 # its gauge

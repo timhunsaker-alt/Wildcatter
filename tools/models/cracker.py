@@ -37,13 +37,13 @@ for x in (0.2, 3.6):
 for x in (1.0, 2.0, 3.0):
 	for z in (1.2, 3.0, 4.8):
 		CF.cylinder("y", (x, z), 0.12, 0.8, 1.2, "dark", 8)                 # the floor burners
-CF.box((0.2, 1.2, 0.3), (3.8, 7.5, 5.7), "grey")                          # the radiant box
+CF.box((0.2, 1.2, 0.3), (3.8, 7.5, 5.7), "hipaint")                          # the radiant box
 for z in (0.3, 2.0, 4.0, 5.7):
 	CF.box((0.15, 1.2, z - 0.05), (0.2, 7.5, z + 0.05), "iron")
 	CF.box((3.8, 1.2, z - 0.05), (3.85, 7.5, z + 0.05), "iron")
-CF.box((0.8, 7.5, 1.0), (3.2, 10.5, 5.0), "grey")                         # the convection section
+CF.box((0.8, 7.5, 1.0), (3.2, 10.5, 5.0), "hipaint")                         # the convection section
 CF.box((1.5, 10.5, 2.5), (2.5, 11.0, 3.5), "iron")
-CF.cylinder("y", (2.0, 3.0), 0.5, 11.0, 13.95, "dark", 14)                # the stack
+CF.cylinder("y", (2.0, 3.0), 0.5, 11.0, 13.95, "hipaint", 14)                # the stack
 CF.pipe([(1.0, 0.4, 0.0), (1.0, 0.4, 0.3), (1.0, 1.4, 0.3)], 3, "steel")  # feed in, the front
 CF.pipe([(4.0, 0.4, 2.0), (3.85, 0.4, 2.0)], 3, "steel")                  # fuel gas, the east side
 CF.pipe([(0.0, 0.4, 2.0), (0.15, 0.4, 2.0)], 2, "galv")                   # water, the west side
@@ -81,7 +81,7 @@ CG.box((0.05, 0.4, 4.15), (0.6, 1.25, 4.85), "grey")                      # its 
 CG.decal((0.04, 0.6, 4.25), (0.05, 1.1, 4.75), "danger", "west", "grey")
 CG.box((1.9, 1.0, 5.95), (2.1, 2.0, 6.85), "engine")
 CG.ring("z", (2.0, 2.0), 1.4, 6.9, 7.5, 0.04, "grey", sides=24)           # the cooler fan's shroud
-CG.box((0.2, 0.25, 7.55), (3.8, 3.8, 7.95), "grey")                       # the cooler
+CG.box((0.2, 0.25, 7.55), (3.8, 3.8, 7.95), "finned")                       # the cooler
 CG.fins((0.3, 0.35, 7.58), (3.7, 3.7, 7.92), "x", 18, 0.03, "galv")
 CG.pipe([(3.0, 0.5, 7.0), (3.0, 0.5, 8.0)], 4, "steel")                   # discharge, the back
 CG.collide((0.1, 0.0, 0.05), (3.9, 0.25, 7.95))

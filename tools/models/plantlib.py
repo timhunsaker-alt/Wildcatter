@@ -36,3 +36,13 @@ def coupling_guard(M, x1, x2, centre, radius, tex="engine"):
 	M.ring("x", centre, radius, x1, x1 + 0.03, 0.025, tex, sides=16)
 	M.ring("x", centre, radius, x2 - 0.03, x2, 0.025, tex, sides=16)
 	M.ring("x", centre, radius, x1 + 0.03, x2 - 0.03, 0.025, tex, sides=16, skip=tuple(k for k in range(16) if k % 4))
+
+
+def pipe_label(M, centre, along, nps, tex, length=0.3):
+	"""A pipe marker (ASME A13.1) on top of a straight run of pipe along x or z, centred at `centre` on its axis."""
+	r = mlib.NPS_OD[nps] / 2
+	x, y, z = centre
+	if along == "x":
+		M.decal((x - length / 2, y + r, z - r), (x + length / 2, y + r + 0.005, z + r), tex, "up", "steel")
+	else:
+		M.decal((x - r, y + r, z - length / 2), (x + r, y + r + 0.005, z + length / 2), tex, "up", "steel")

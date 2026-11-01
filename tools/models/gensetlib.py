@@ -25,6 +25,24 @@ TEX = {
 	"gauge": "block/mat/decal_gauge",
 	"controller": "block/mat/decal_controller",
 	"engineplate": "block/mat/decal_engine_plate",
+	# 6c: the plant materials and signs (art/source/PROMPTS.md)
+	"louvre": "block/mat/mat_enclosure_louvre",
+	"filter": "block/mat/mat_filter_house",
+	"radfin": "block/mat/mat_radiator_fins",
+	"grating": "block/mat/mat_grating",
+	"finned": "block/mat/mat_finned_tube",
+	"hipaint": "block/mat/mat_hitemp_aluminium",
+	"annunciator": "block/mat/decal_annunciator",
+	"arcflash": "block/mat/decal_arc_flash",
+	"nfpa": "block/mat/decal_nfpa",
+	"flammable": "block/mat/decal_flammable",
+	"ratingplate": "block/mat/decal_rating_plate",
+	"pipe_crude": "block/mat/decal_pipe_crude",
+	"pipe_gas": "block/mat/decal_pipe_gas",
+	"pipe_lpg": "block/mat/decal_pipe_lpg",
+	"pipe_water": "block/mat/decal_pipe_water",
+	"pipe_diesel": "block/mat/decal_pipe_diesel",
+	"pipe_steam": "block/mat/decal_pipe_steam",
 }
 
 SHAFT_Y = 0.55

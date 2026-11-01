@@ -18,6 +18,23 @@
   "gauge": "wildcatter:block/mat/decal_gauge",
   "controller": "wildcatter:block/mat/decal_controller",
   "engineplate": "wildcatter:block/mat/decal_engine_plate",
+  "louvre": "wildcatter:block/mat/mat_enclosure_louvre",
+  "filter": "wildcatter:block/mat/mat_filter_house",
+  "radfin": "wildcatter:block/mat/mat_radiator_fins",
+  "grating": "wildcatter:block/mat/mat_grating",
+  "finned": "wildcatter:block/mat/mat_finned_tube",
+  "hipaint": "wildcatter:block/mat/mat_hitemp_aluminium",
+  "annunciator": "wildcatter:block/mat/decal_annunciator",
+  "arcflash": "wildcatter:block/mat/decal_arc_flash",
+  "nfpa": "wildcatter:block/mat/decal_nfpa",
+  "flammable": "wildcatter:block/mat/decal_flammable",
+  "ratingplate": "wildcatter:block/mat/decal_rating_plate",
+  "pipe_crude": "wildcatter:block/mat/decal_pipe_crude",
+  "pipe_gas": "wildcatter:block/mat/decal_pipe_gas",
+  "pipe_lpg": "wildcatter:block/mat/decal_pipe_lpg",
+  "pipe_water": "wildcatter:block/mat/decal_pipe_water",
+  "pipe_diesel": "wildcatter:block/mat/decal_pipe_diesel",
+  "pipe_steam": "wildcatter:block/mat/decal_pipe_steam",
   "concrete": "wildcatter:block/mat/mat_concrete",
   "polymer": "wildcatter:block/mat/mat_polymer_grey",
   "padgreen": "wildcatter:block/mat/mat_paint_pad_green",
@@ -279,7 +296,7 @@
    ],
    "faces": {
     "south": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       0.4,
       0,
@@ -288,7 +305,7 @@
      ]
     },
     "west": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       0,
       0,
@@ -297,7 +314,7 @@
      ]
     },
     "east": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       13.4219,
       0,
@@ -306,7 +323,7 @@
      ]
     },
     "down": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       0.4,
       13.4219,
@@ -329,7 +346,7 @@
    ],
    "faces": {
     "south": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       0.4,
       15.04,
@@ -338,7 +355,7 @@
      ]
     },
     "west": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       0,
       15.04,
@@ -347,7 +364,7 @@
      ]
     },
     "east": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       13.4219,
       15.04,
@@ -356,7 +373,7 @@
      ]
     },
     "up": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       0.4,
       0,
@@ -365,7 +382,7 @@
      ]
     },
     "down": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       0.4,
       13.4219,
@@ -388,7 +405,7 @@
    ],
    "faces": {
     "north": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       9.0257,
       0,
@@ -397,7 +414,7 @@
      ]
     },
     "south": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       1.3743,
       0,
@@ -406,7 +423,7 @@
      ]
     },
     "west": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       2.3203,
       0,
@@ -415,7 +432,7 @@
      ]
     },
     "east": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       8.5236,
       0,
@@ -424,7 +441,7 @@
      ]
     },
     "down": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       1.3743,
       8.5236,
@@ -456,7 +473,7 @@
    ],
    "faces": {
     "north": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       9.0257,
       15.04,
@@ -465,7 +482,7 @@
      ]
     },
     "south": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       1.3743,
       15.04,
@@ -474,7 +491,7 @@
      ]
     },
     "west": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       2.3203,
       15.04,
@@ -483,7 +500,7 @@
      ]
     },
     "east": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       8.5236,
       15.04,
@@ -492,7 +509,7 @@
      ]
     },
     "up": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       1.3743,
       2.3203,
@@ -501,7 +518,7 @@
      ]
     },
     "down": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       1.3743,
       8.5236,
@@ -533,7 +550,7 @@
    ],
    "faces": {
     "north": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       6.251,
       0,
@@ -542,7 +559,7 @@
      ]
     },
     "south": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       4.149,
       0,
@@ -551,7 +568,7 @@
      ]
     },
     "west": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       6.4729,
       0,
@@ -560,7 +577,7 @@
      ]
     },
     "east": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       4.371,
       0,
@@ -569,7 +586,7 @@
      ]
     },
     "down": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       4.149,
       4.371,
@@ -601,7 +618,7 @@
    ],
    "faces": {
     "north": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       6.251,
       15.04,
@@ -610,7 +627,7 @@
      ]
     },
     "south": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       4.149,
       15.04,
@@ -619,7 +636,7 @@
      ]
     },
     "west": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       6.4729,
       15.04,
@@ -628,7 +645,7 @@
      ]
     },
     "east": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       4.371,
       15.04,
@@ -637,7 +654,7 @@
      ]
     },
     "up": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       4.149,
       6.4729,
@@ -646,7 +663,7 @@
      ]
     },
     "down": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       4.149,
       4.371,
@@ -678,7 +695,7 @@
    ],
    "faces": {
     "west": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       9.0257,
       0,
@@ -687,7 +704,7 @@
      ]
     },
     "east": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       1.3743,
       0,
@@ -696,7 +713,7 @@
      ]
     },
     "north": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       2.3203,
       0,
@@ -705,7 +722,7 @@
      ]
     },
     "south": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       8.5236,
       0,
@@ -714,7 +731,7 @@
      ]
     },
     "down": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       8.5236,
       1.3743,
@@ -746,7 +763,7 @@
    ],
    "faces": {
     "west": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       9.0257,
       15.04,
@@ -755,7 +772,7 @@
      ]
     },
     "east": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       1.3743,
       15.04,
@@ -764,7 +781,7 @@
      ]
     },
     "north": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       2.3203,
       15.04,
@@ -773,7 +790,7 @@
      ]
     },
     "south": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       8.5236,
       15.04,
@@ -782,7 +799,7 @@
      ]
     },
     "up": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       8.5236,
       9.0257,
@@ -791,7 +808,7 @@
      ]
     },
     "down": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       8.5236,
       1.3743,
@@ -823,7 +840,7 @@
    ],
    "faces": {
     "west": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       10.0,
       0,
@@ -832,7 +849,7 @@
      ]
     },
     "north": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       0,
       0,
@@ -841,7 +858,7 @@
      ]
     },
     "south": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       13.4219,
       0,
@@ -850,7 +867,7 @@
      ]
     },
     "down": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       13.4219,
       0.4,
@@ -873,7 +890,7 @@
    ],
    "faces": {
     "west": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       10.0,
       15.04,
@@ -882,7 +899,7 @@
      ]
     },
     "north": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       0,
       15.04,
@@ -891,7 +908,7 @@
      ]
     },
     "south": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       13.4219,
       15.04,
@@ -900,7 +917,7 @@
      ]
     },
     "up": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       13.4219,
       10.0,
@@ -909,7 +926,7 @@
      ]
     },
     "down": {
-     "texture": "#checker",
+     "texture": "#grating",
      "uv": [
       13.4219,
       0.4,

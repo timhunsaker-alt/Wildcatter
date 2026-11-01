@@ -1,6 +1,7 @@
 {
  "textures": {
   "paint": "wildcatter:block/mat/mat_paint_ansi70",
+  "radfin": "wildcatter:block/mat/mat_radiator_fins",
   "dark": "wildcatter:block/mat/mat_oil_dark",
   "porcelain": "wildcatter:block/mat/mat_porcelain_brown",
   "brass": "wildcatter:block/mat/mat_brass",

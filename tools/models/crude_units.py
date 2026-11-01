@@ -33,7 +33,7 @@ def rails(M, w, d, top=0.2):
 
 def platforms(M, cx, cz, r, ys, h):
 	for y in ys:
-		M.ring("y", (cx, cz), r + 0.35, y, y + 0.06, 0.35, "checker", sides=16)
+		M.ring("y", (cx, cz), r + 0.35, y, y + 0.06, 0.35, "grating", sides=16)
 		M.ring("y", (cx, cz), r + 0.7, y + 1.0, y + 1.05, 0.03, "galv", sides=16)
 
 
@@ -50,6 +50,7 @@ platforms(TC, 1.0, 1.0, 0.45, (4.0, 8.0, 11.2), 1.0)
 TC.ladder(0.4, 0.05, 0.3, 11.4, -1, "galv")
 TC.pipe([(1.45, 0.5, 1.0), (2.0, 0.5, 1.0)], 2, "steel")                   # kerosene, east
 TC.pipe([(1.0, 0.5, 1.45), (1.0, 0.5, 2.0)], 2, "steel")                   # diesel, south
+g.pipe_label(TC, (1.0, 0.5, 1.75), "z", 2, "pipe_diesel", 0.3)
 TC.pipe([(0.55, 0.5, 1.0), (0.0, 0.5, 1.0)], 3, "steel")                   # residue, west
 TC.collide((0.1, 0.0, 0.1), (1.9, 1.0, 1.9))
 TC.collide((0.55, 1.0, 0.55), (1.45, 11.75, 1.45))
@@ -58,9 +59,9 @@ TH = model("topping_heater", 2, 6, 2, "grey")
 TH.box((0.1, 0.0, 0.1), (1.9, 0.6, 1.9), "iron")                         # the legs and burner plenum
 for x, z in ((0.2, 0.2), (1.6, 0.2), (0.2, 1.6), (1.6, 1.6)):
 	TH.box((x, 0.0, z), (x + 0.2, 1.0, z + 0.2), "iron")
-TH.cylinder("y", (1.0, 1.0), 0.85, 1.0, 3.6, "grey", 16)                   # the radiant shell
-TH.box((0.25, 3.6, 0.25), (1.75, 4.6, 1.75), "grey")                      # the convection box
-TH.cylinder("y", (1.0, 1.0), 0.25, 4.6, 5.95, "dark", 12)                  # the stack
+TH.cylinder("y", (1.0, 1.0), 0.85, 1.0, 3.6, "hipaint", 16)                   # the radiant shell
+TH.box((0.25, 3.6, 0.25), (1.75, 4.6, 1.75), "hipaint")                      # the convection box
+TH.cylinder("y", (1.0, 1.0), 0.25, 4.6, 5.95, "hipaint", 12)                  # the stack
 TH.box((0.0, 0.25, 0.85), (0.1, 0.55, 1.15), "dark")                      # the fuel train on its west
 TH.collide((0.1, 0.0, 0.1), (1.9, 4.6, 1.9))
 
@@ -74,7 +75,7 @@ TS.pipe([(0.9, 0.55, 0.0), (0.9, 0.55, 0.2)], 3, "steel")                 # crud
 for x in (0.3, 2.7):                                                        # the air cooler's frame
 	for z in (1.9, 3.4):
 		TS.box((x - 0.06, 0.2, z - 0.06), (x + 0.06, 2.4, z + 0.06), "galv")
-TS.box((0.25, 2.0, 1.85), (2.75, 2.4, 3.45), "galv")                      # its finned bundle
+TS.box((0.25, 2.0, 1.85), (2.75, 2.4, 3.45), "finned")                      # its finned bundle
 TS.fins((0.3, 2.05, 1.9), (2.7, 2.35, 3.4), "x", 16, 0.02, "steel")
 TS.ring("y", (1.5, 2.6), 0.62, 2.4, 2.7, 0.03, "grey", sides=16)           # the fan ring
 TS.cylinder("z", (2.2, 0.5), 0.3, 1.0, 3.0, "padgreen", 12)               # the reflux drum
@@ -90,7 +91,7 @@ AC.cylinder("y", (1.5, 1.5), 1.0, 29.4, 29.8, "padgreen", 16)
 for y in range(3, 29, 3):
 	AC.ring("y", (1.5, 1.5), 1.43, y, y + 0.06, 0.03, "iron", sides=20)   # the tray-section seams
 for y in (6.0, 12.0, 18.0, 24.0, 28.6):
-	AC.box((0.0, y, -0.05), (3.0, y + 0.06, 0.1), "checker")              # platforms on the ladder side
+	AC.box((0.0, y, -0.05), (3.0, y + 0.06, 0.1), "grating")              # platforms on the ladder side
 	AC.box((0.0, y + 1.0, -0.06), (3.0, y + 1.05, -0.03), "galv")
 AC.ladder(0.5, -0.05, 0.4, 29.0, -1, "galv")
 AC.pipe([(1.5, 0.5, 2.9), (1.5, 0.5, 3.0)], 6, "steel")                  # residue at the foot, south
@@ -106,12 +107,12 @@ CH.box((0.2, 1.8, 0.2), (5.8, 2.0, 7.8), "iron")                          # the 
 for x in (1.0, 2.5, 3.5, 5.0):
 	for z in (1.5, 4.0, 6.5):
 		CH.cylinder("y", (x, z), 0.15, 1.4, 1.8, "dark", 8)
-CH.box((0.2, 2.0, 0.2), (5.8, 8.0, 7.8), "grey")                          # the radiant box
+CH.box((0.2, 2.0, 0.2), (5.8, 8.0, 7.8), "hipaint")                          # the radiant box
 for x in (0.2, 2.0, 4.0, 5.8):
 	CH.box((x - 0.05, 2.0, 0.15), (x + 0.05, 8.0, 0.2), "iron")
-CH.box((1.0, 8.0, 1.5), (5.0, 10.5, 6.5), "grey")                         # the convection section
+CH.box((1.0, 8.0, 1.5), (5.0, 10.5, 6.5), "hipaint")                         # the convection section
 CH.box((2.0, 10.5, 3.0), (4.0, 11.0, 5.0), "iron")                        # the breeching
-CH.cylinder("y", (3.0, 4.0), 0.75, 11.0, 13.95, "dark", 16)               # the stack
+CH.cylinder("y", (3.0, 4.0), 0.75, 11.0, 13.95, "hipaint", 16)               # the stack
 CH.pipe([(1.0, 0.5, 0.0), (1.0, 0.5, 0.3), (1.0, 1.6, 0.3)], 3, "steel")  # fuel in, the front
 CH.box((0.6, 0.3, 0.05), (1.4, 1.1, 0.3), "dark")                         # the fuel train
 CH.collide((0.2, 1.8, 0.2), (5.8, 8.0, 7.8))
@@ -128,6 +129,7 @@ DS.box((0.9, 3.0, 4.2), (2.1, 3.6, 5.8), "grey")                        # the gr
 DS.decal((0.89, 3.1, 4.4), (0.9, 3.5, 5.6), "danger", "west", "grey")
 DS.box((0.05, 0.3, 0.2), (0.4, 0.9, 0.7), "grey")                         # its 480 V box on the main cell's west face
 DS.pipe([(1.0, 0.5, 0.0), (1.0, 0.5, 0.4), (1.0, 1.0, 0.4)], 6, "steel")  # crude in, the north end
+g.pipe_label(DS, (1.0, 0.5, 0.2), "z", 6, "pipe_crude", 0.3)
 DS.box((0.85, 0.35, 0.05), (1.15, 0.65, 0.3), "dark")                     # the mixing valve
 DS.collide((0.05, 0.0, 0.35), (2.95, 3.0, 9.65))
 
@@ -155,7 +157,7 @@ OC = model("overhead_condenser", 4, 4, 8, "grey")
 for x in (0.2, 3.7):
 	for z in (0.2, 3.9, 7.7):
 		OC.box((x, 0.0, z), (x + 0.15, 3.0, z + 0.15), "galv")               # the stand
-OC.box((0.1, 3.0, 0.1), (3.9, 3.35, 7.9), "galv")                         # the bundles
+OC.box((0.1, 3.0, 0.1), (3.9, 3.35, 7.9), "finned")                         # the bundles
 OC.fins((0.15, 3.02, 0.15), (3.85, 3.33, 7.85), "x", 30, 0.02, "steel")
 for x in (1.0, 3.0):
 	for z in (2.0, 6.0):
@@ -164,6 +166,7 @@ OC.cylinder("z", (2.0, 1.0), 0.5, 0.8, 7.2, "padgreen", 16)               # the 
 OC.box((0.05, 0.3, 0.2), (0.4, 0.9, 0.7), "grey")                         # its 480 V box, west
 OC.pipe([(1.5, 0.5, 7.2), (1.5, 0.5, 8.0)], 4, "steel")                   # gasoline out, back, bottom
 OC.pipe([(2.5, 1.5, 7.2), (2.5, 1.5, 8.0)], 3, "steel")                   # LPG out, back, above
+g.pipe_label(OC, (2.5, 1.5, 7.6), "z", 3, "pipe_lpg", 0.4)
 OC.collide((0.1, 0.0, 0.1), (3.9, 3.35, 7.9))
 
 # ---- turning parts ----------------------------------------------------------------------------------------------------------------

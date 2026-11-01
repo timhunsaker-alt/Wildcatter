@@ -18,6 +18,23 @@
   "gauge": "wildcatter:block/mat/decal_gauge",
   "controller": "wildcatter:block/mat/decal_controller",
   "engineplate": "wildcatter:block/mat/decal_engine_plate",
+  "louvre": "wildcatter:block/mat/mat_enclosure_louvre",
+  "filter": "wildcatter:block/mat/mat_filter_house",
+  "radfin": "wildcatter:block/mat/mat_radiator_fins",
+  "grating": "wildcatter:block/mat/mat_grating",
+  "finned": "wildcatter:block/mat/mat_finned_tube",
+  "hipaint": "wildcatter:block/mat/mat_hitemp_aluminium",
+  "annunciator": "wildcatter:block/mat/decal_annunciator",
+  "arcflash": "wildcatter:block/mat/decal_arc_flash",
+  "nfpa": "wildcatter:block/mat/decal_nfpa",
+  "flammable": "wildcatter:block/mat/decal_flammable",
+  "ratingplate": "wildcatter:block/mat/decal_rating_plate",
+  "pipe_crude": "wildcatter:block/mat/decal_pipe_crude",
+  "pipe_gas": "wildcatter:block/mat/decal_pipe_gas",
+  "pipe_lpg": "wildcatter:block/mat/decal_pipe_lpg",
+  "pipe_water": "wildcatter:block/mat/decal_pipe_water",
+  "pipe_diesel": "wildcatter:block/mat/decal_pipe_diesel",
+  "pipe_steam": "wildcatter:block/mat/decal_pipe_steam",
   "concrete": "wildcatter:block/mat/mat_concrete",
   "polymer": "wildcatter:block/mat/mat_polymer_grey",
   "padgreen": "wildcatter:block/mat/mat_paint_pad_green",
@@ -225,6 +242,65 @@
       14.4,
       8.64,
       16
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    8.48,
+    12.8,
+    4.8
+   ],
+   "to": [
+    8.64,
+    16,
+    11.2
+   ],
+   "faces": {
+    "north": {
+     "texture": "#padgreen",
+     "uv": [
+      7.36,
+      0,
+      7.52,
+      3.2
+     ]
+    },
+    "south": {
+     "texture": "#padgreen",
+     "uv": [
+      8.48,
+      0,
+      8.64,
+      3.2
+     ]
+    },
+    "west": {
+     "texture": "#nfpa",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "east": {
+     "texture": "#padgreen",
+     "uv": [
+      4.8,
+      0,
+      11.2,
+      3.2
+     ]
+    },
+    "down": {
+     "texture": "#padgreen",
+     "uv": [
+      8.48,
+      4.8,
+      8.64,
+      11.2
      ]
     }
    }

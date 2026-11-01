@@ -18,6 +18,23 @@
   "gauge": "wildcatter:block/mat/decal_gauge",
   "controller": "wildcatter:block/mat/decal_controller",
   "engineplate": "wildcatter:block/mat/decal_engine_plate",
+  "louvre": "wildcatter:block/mat/mat_enclosure_louvre",
+  "filter": "wildcatter:block/mat/mat_filter_house",
+  "radfin": "wildcatter:block/mat/mat_radiator_fins",
+  "grating": "wildcatter:block/mat/mat_grating",
+  "finned": "wildcatter:block/mat/mat_finned_tube",
+  "hipaint": "wildcatter:block/mat/mat_hitemp_aluminium",
+  "annunciator": "wildcatter:block/mat/decal_annunciator",
+  "arcflash": "wildcatter:block/mat/decal_arc_flash",
+  "nfpa": "wildcatter:block/mat/decal_nfpa",
+  "flammable": "wildcatter:block/mat/decal_flammable",
+  "ratingplate": "wildcatter:block/mat/decal_rating_plate",
+  "pipe_crude": "wildcatter:block/mat/decal_pipe_crude",
+  "pipe_gas": "wildcatter:block/mat/decal_pipe_gas",
+  "pipe_lpg": "wildcatter:block/mat/decal_pipe_lpg",
+  "pipe_water": "wildcatter:block/mat/decal_pipe_water",
+  "pipe_diesel": "wildcatter:block/mat/decal_pipe_diesel",
+  "pipe_steam": "wildcatter:block/mat/decal_pipe_steam",
   "concrete": "wildcatter:block/mat/mat_concrete",
   "polymer": "wildcatter:block/mat/mat_polymer_grey",
   "padgreen": "wildcatter:block/mat/mat_paint_pad_green",
@@ -174,7 +191,7 @@
    ],
    "faces": {
     "north": {
-     "texture": "#grey",
+     "texture": "#louvre",
      "uv": [
       0.6775,
       1.3464,
@@ -183,7 +200,7 @@
      ]
     },
     "south": {
-     "texture": "#grey",
+     "texture": "#louvre",
      "uv": [
       0.8653,
       1.3464,
@@ -192,7 +209,7 @@
      ]
     },
     "west": {
-     "texture": "#grey",
+     "texture": "#louvre",
      "uv": [
       0.0,
       1.3464,
@@ -201,7 +218,7 @@
      ]
     },
     "east": {
-     "texture": "#grey",
+     "texture": "#louvre",
      "uv": [
       0.0,
       1.3464,
@@ -210,7 +227,7 @@
      ]
     },
     "up": {
-     "texture": "#grey",
+     "texture": "#louvre",
      "uv": [
       0.8653,
       0.0,
@@ -219,7 +236,7 @@
      ]
     },
     "down": {
-     "texture": "#grey",
+     "texture": "#louvre",
      "uv": [
       0.8653,
       0.0,
@@ -2607,6 +2624,74 @@
       8.0,
       15.6839,
       11.2857
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    15.3225,
+    2.825,
+    4.0571
+   ],
+   "to": [
+    15.3553,
+    6.7679,
+    7.6714
+   ],
+   "faces": {
+    "north": {
+     "texture": "#grey",
+     "uv": [
+      0.6447,
+      9.2321,
+      0.6775,
+      13.175
+     ]
+    },
+    "south": {
+     "texture": "#grey",
+     "uv": [
+      15.3225,
+      9.2321,
+      15.3553,
+      13.175
+     ]
+    },
+    "west": {
+     "texture": "#grey",
+     "uv": [
+      4.0571,
+      9.2321,
+      7.6714,
+      13.175
+     ]
+    },
+    "east": {
+     "texture": "#annunciator",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "up": {
+     "texture": "#grey",
+     "uv": [
+      15.3225,
+      4.0571,
+      15.3553,
+      7.6714
+     ]
+    },
+    "down": {
+     "texture": "#grey",
+     "uv": [
+      15.3225,
+      8.3286,
+      15.3553,
+      11.9429
      ]
     }
    }

@@ -18,6 +18,23 @@
   "gauge": "wildcatter:block/mat/decal_gauge",
   "controller": "wildcatter:block/mat/decal_controller",
   "engineplate": "wildcatter:block/mat/decal_engine_plate",
+  "louvre": "wildcatter:block/mat/mat_enclosure_louvre",
+  "filter": "wildcatter:block/mat/mat_filter_house",
+  "radfin": "wildcatter:block/mat/mat_radiator_fins",
+  "grating": "wildcatter:block/mat/mat_grating",
+  "finned": "wildcatter:block/mat/mat_finned_tube",
+  "hipaint": "wildcatter:block/mat/mat_hitemp_aluminium",
+  "annunciator": "wildcatter:block/mat/decal_annunciator",
+  "arcflash": "wildcatter:block/mat/decal_arc_flash",
+  "nfpa": "wildcatter:block/mat/decal_nfpa",
+  "flammable": "wildcatter:block/mat/decal_flammable",
+  "ratingplate": "wildcatter:block/mat/decal_rating_plate",
+  "pipe_crude": "wildcatter:block/mat/decal_pipe_crude",
+  "pipe_gas": "wildcatter:block/mat/decal_pipe_gas",
+  "pipe_lpg": "wildcatter:block/mat/decal_pipe_lpg",
+  "pipe_water": "wildcatter:block/mat/decal_pipe_water",
+  "pipe_diesel": "wildcatter:block/mat/decal_pipe_diesel",
+  "pipe_steam": "wildcatter:block/mat/decal_pipe_steam",
   "concrete": "wildcatter:block/mat/mat_concrete",
   "polymer": "wildcatter:block/mat/mat_polymer_grey",
   "padgreen": "wildcatter:block/mat/mat_paint_pad_green",
@@ -1657,6 +1674,74 @@
       1.92,
       9.6,
       4.48
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    7.5176,
+    5.2824,
+    9.2
+   ],
+   "to": [
+    8.4824,
+    5.3624,
+    14.8
+   ],
+   "faces": {
+    "north": {
+     "texture": "#steel",
+     "uv": [
+      7.5176,
+      10.6376,
+      8.4824,
+      10.7176
+     ]
+    },
+    "south": {
+     "texture": "#steel",
+     "uv": [
+      7.5176,
+      10.6376,
+      8.4824,
+      10.7176
+     ]
+    },
+    "west": {
+     "texture": "#steel",
+     "uv": [
+      9.2,
+      10.6376,
+      14.8,
+      10.7176
+     ]
+    },
+    "east": {
+     "texture": "#steel",
+     "uv": [
+      1.2,
+      10.6376,
+      6.8,
+      10.7176
+     ]
+    },
+    "up": {
+     "texture": "#pipe_crude",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "down": {
+     "texture": "#steel",
+     "uv": [
+      7.5176,
+      1.2,
+      8.4824,
+      6.8
      ]
     }
    }

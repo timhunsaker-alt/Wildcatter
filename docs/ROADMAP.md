@@ -96,7 +96,8 @@ and the Field Manual has a page for each new system.
   the HRSG and the 5 MW steam turbine with its air-cooled condenser, the generator breaker, bus duct and GSU, and a load bank
   (docs/multiblocks/gas-turbine.md, combined-cycle.md); 6b a 45 MW aeroderivative (LM6000 class) peaker in simple cycle with its
   own 60 MVA GSU and a 60 MVA 138/12.47 kV substation transformer, full load five minutes after the button (decided with Tim,
-  2026-11-01; docs/multiblocks/aeroderivative.md).
+  2026-11-01; docs/multiblocks/aeroderivative.md); 6c an art pass with new Ludo materials and signs on the Phase 5 and 6
+  parts (Tim, 2026-11-01).
 
 ## Phase 7 — Nuclear fuel chain
 - Uranium ore → yellowcake → UF6 → centrifuge cascade enrichment → pellets → rods → assemblies.

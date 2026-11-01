@@ -38,6 +38,7 @@ rails(GC, 4, 9)
 GC.cylinder("y", (1.0, 0.8), 0.35, 0.25, 2.6, "padgreen", 14)              # the suction scrubber
 GC.cylinder("y", (1.0, 0.8), 0.25, 2.6, 2.75, "padgreen", 12)
 GC.pipe([(1.0, 0.5, 0.0), (1.0, 0.5, 0.45)], 6, "steel")                    # the suction, front end
+g.pipe_label(GC, (1.0, 0.5, 0.25), "z", 6, "pipe_gas", 0.3)
 GC.box((1.2, 0.25, 1.3), (2.8, 1.45, 3.2), "grey")                          # the frame (crankcase)
 GC.box((1.15, 1.45, 1.25), (2.85, 1.55, 3.25), "iron")
 for x1, x2, r in ((0.3, 1.2, 0.4), (2.8, 3.7, 0.3)):                        # the first- and second-stage cylinders across the frame
@@ -53,12 +54,13 @@ GC.decal((0.04, 0.6, 4.25), (0.05, 1.1, 4.75), "danger", "west", "grey")
 GC.pipe([(0.6, 0.8, 4.5), (1.4, 0.8, 4.5)], 3, "galv")                     # the conduit into the motor
 GC.cylinder("y", (3.3, 4.6), 0.3, 0.25, 2.5, "padgreen", 14)               # the interstage scrubber
 GC.box((1.9, 1.0, 5.95), (2.1, 2.0, 7.0), "engine")                        # the fan drive's guard, motor to fan
-GC.box((0.2, 0.25, 7.7), (3.8, 3.8, 8.4), "grey")                          # the cooler: its frame and core
+GC.box((0.2, 0.25, 7.7), (3.8, 3.8, 8.4), "finned")                        # the cooler: its frame and core
 GC.fins((0.3, 0.35, 7.75), (3.7, 3.7, 8.35), "x", 18, 0.03, "galv")
 GC.ring("z", (2.0, 2.0), 1.4, 7.1, 7.7, 0.04, "grey", sides=24)            # the fan shroud
 GC.pipe([(3.7, 2.25, 3.0), (3.7, 2.25, 7.6)], 4, "steel")                  # to and from the cooler
 GC.pipe([(1.0, 0.5, 8.4), (1.0, 0.5, 9.0)], 4, "steel")                    # the discharge, back end
 GC.decal((2.56, 0.6, 4.6), (2.57, 0.9, 5.2), "nameplate", "east", "blue")
+GC.decal((2.8, 0.5, 1.6), (2.81, 1.0, 2.4), "flammable", "east", "grey")
 GC.collide((0.15, 0.0, 0.05), (3.85, 0.25, 8.95))
 GC.collide((0.6, 0.25, 0.4), (3.85, 2.7, 6.0))
 GC.collide((0.2, 0.25, 7.0), (3.8, 3.8, 8.4))
@@ -69,7 +71,7 @@ rails(TD, 3, 5)
 TD.cylinder("y", (0.7, 0.7), 0.32, 0.25, 7.6, "padgreen", 14)               # the contactor
 TD.cylinder("y", (0.7, 0.7), 0.22, 7.6, 7.75, "padgreen", 12)
 TD.ladder(0.7, 0.33, 0.25, 7.5, -1, "galv")
-TD.box((0.2, 5.0, 0.2), (1.5, 5.06, 1.4), "checker")                       # its platform
+TD.box((0.2, 5.0, 0.2), (1.5, 5.06, 1.4), "grating")                       # its platform
 TD.handrail([(0.25, 1.35), (1.45, 1.35), (1.45, 0.25)], 5.06, "galv", height=0.9)
 TD.pipe([(0.7, 0.5, 0.0), (0.7, 0.5, 0.4)], 4, "steel")                    # wet gas in, front
 TD.pipe([(0.7, 7.5, 0.95), (0.7, 7.5, 1.3), (0.7, 0.5, 1.3), (0.7, 0.5, 5.0)], 4, "steel")   # dry gas off the top, out the back
@@ -94,6 +96,7 @@ CH.pipe([(0.8, 0.5, 0.0), (0.8, 0.5, 0.3), (0.8, 1.0, 0.3)], 4, "steel")   # gas
 CH.pipe([(0.8, 1.0, 4.2), (0.8, 1.0, 4.6), (2.1, 1.0, 4.6)], 4, "lagging")   # exchanger to the chiller
 CH.pipe([(2.1, 1.15, 5.2), (2.1, 1.15, 5.6), (1.5, 1.15, 5.6)], 4, "lagging")   # chiller to the cold separator
 CH.pipe([(1.5, 2.6, 6.0), (1.5, 2.85, 6.0), (0.4, 2.85, 6.0), (0.4, 1.5, 6.0), (0.4, 1.5, 7.0)], 4, "steel")   # pipeline gas, back upper
+g.pipe_label(CH, (0.4, 1.5, 6.6), "z", 4, "pipe_gas", 0.4)
 CH.pipe([(1.5, 0.45, 6.4), (1.5, 0.45, 7.0)], 2, "steel")                  # raw NGL, back lower
 CH.pipe([(2.6, 1.7, 3.0), (3.0, 1.7, 3.0)], 3, "lagging")                  # the refrigerant lines to the east side
 CH.pipe([(2.6, 0.7, 3.6), (3.0, 0.7, 3.6)], 2, "steel")
@@ -123,7 +126,7 @@ ST.cylinder("y", (1.0, 1.0), 0.5, 0.3, 0.9, "iron", 16)                     # th
 ST.cylinder("y", (1.0, 1.0), 0.45, 0.9, 11.6, "padgreen", 16)               # the column
 ST.cylinder("y", (1.0, 1.0), 0.32, 11.6, 11.75, "padgreen", 12)
 for y in (4.0, 8.0, 11.3):
-	ST.ring("y", (1.0, 1.0), 0.75, y, y + 0.06, 0.25, "checker", sides=16)  # the platforms
+	ST.ring("y", (1.0, 1.0), 0.75, y, y + 0.06, 0.25, "grating", sides=16)  # the platforms
 	ST.ring("y", (1.0, 1.0), 0.95, y + 1.0, y + 1.05, 0.03, "galv", sides=16)
 ST.ladder(0.4, 0.05, 0.3, 11.4, -1, "galv")
 ST.pipe([(1.0, 11.75, 1.0), (1.0, 11.9, 1.0), (1.8, 11.9, 1.0), (1.8, 1.6, 1.0)], 3, "steel")   # the overhead line down to the condenser
@@ -148,6 +151,7 @@ for z in (3.0, 9.0):                                                        # th
 LB.cylinder("z", (2.2, 2.5), 0.07, 0.62, 0.66, "brass", 12)                # a pressure gauge on the front head
 LB.decal((2.13, 2.43, 0.615), (2.27, 2.57, 0.62), "gauge", "north", "brass")
 LB.decal((1.0, 1.6, 0.53), (2.0, 2.1, 0.55), "danger", "north", "steel")
+LB.decal((0.45, 1.6, 0.53), (0.95, 2.1, 0.55), "nfpa", "north", "steel")
 for x, z in ((0.0, 6.0), (3.0, 6.0)):                                       # the bottom connections on both sides
 	LB.pipe([(1.5, 0.4, z), (x, 0.4, z)], 3, "steel")
 LB.collide((0.1, 0.0, 0.55), (2.9, 3.0, 11.45))

@@ -14,7 +14,14 @@ os.makedirs(OUT, exist_ok=True)
 
 # decals: the part of each picture to use, as fractions (left, top, right, bottom); the rest use the whole picture
 CROP = {"decal_nameplate": (0.0, 0.0, 0.5, 0.5), "decal_controller": (0.0, 0.0, 0.56, 0.56), "decal_engine_plate": (0.6, 0.05, 1.0, 0.45),
-	"decal_pushbuttons": (0.2, 0.0, 0.52, 0.64)}
+	"decal_pushbuttons": (0.2, 0.0, 0.52, 0.64),
+	# 6c: one arc-flash label of the repeated sheet; one whole diamond of the placards
+	"decal_annunciator": (0.0, 0.0, 1.0, 1.0), "decal_arc_flash": (0.17, 0.0, 1.0, 0.48), "decal_nfpa": (0.42, 0.2, 0.98, 0.8)}
+# 6c: patterned materials (a louvre band, filter rows, fins, grating) keep a fixed window, since the cleanest one drops the
+# pattern; and a tone fix where Ludo drew it too dark or too blue: (crop, brightness, colour)
+PATTERN = {"mat_enclosure_louvre": ((0.0, 0.3, 0.45, 0.75), 1.0, 1.0), "mat_filter_house": ((0.0, 0.0, 0.5, 0.5), 1.0, 1.0),
+	"mat_radiator_fins": ((0.0, 0.0, 0.4, 0.4), 1.9, 0.45), "mat_grating": ((0.0, 0.0, 0.3, 0.3), 1.3, 1.0),
+	"mat_finned_tube": ((0.0, 0.0, 0.35, 0.35), 1.0, 1.0)}
 WINDOW = 0.34   # a material swatch is the cleanest window this big (a fraction of the picture)
 DECALS = ("decal_",)
 
@@ -66,6 +73,10 @@ for f in sorted(os.listdir(SRC)):
 	if name.startswith(DECALS):
 		l, t, r, b = CROP.get(name, (0.0, 0.0, 1.0, 1.0))
 		img = img.crop((int(l * img.width), int(t * img.height), int(r * img.width), int(b * img.height)))
+	elif name in PATTERN:
+		(l, t, r, b), bright, colour = PATTERN[name]
+		img = img.crop((int(l * img.width), int(t * img.height), int(r * img.width), int(b * img.height)))
+		img = ImageEnhance.Color(ImageEnhance.Brightness(img).enhance(bright)).enhance(colour)
 	else:
 		img = cleanest(img)
 	img = img.resize((SIZE, SIZE), Image.BOX)

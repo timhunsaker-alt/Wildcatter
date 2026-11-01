@@ -18,6 +18,23 @@
   "gauge": "wildcatter:block/mat/decal_gauge",
   "controller": "wildcatter:block/mat/decal_controller",
   "engineplate": "wildcatter:block/mat/decal_engine_plate",
+  "louvre": "wildcatter:block/mat/mat_enclosure_louvre",
+  "filter": "wildcatter:block/mat/mat_filter_house",
+  "radfin": "wildcatter:block/mat/mat_radiator_fins",
+  "grating": "wildcatter:block/mat/mat_grating",
+  "finned": "wildcatter:block/mat/mat_finned_tube",
+  "hipaint": "wildcatter:block/mat/mat_hitemp_aluminium",
+  "annunciator": "wildcatter:block/mat/decal_annunciator",
+  "arcflash": "wildcatter:block/mat/decal_arc_flash",
+  "nfpa": "wildcatter:block/mat/decal_nfpa",
+  "flammable": "wildcatter:block/mat/decal_flammable",
+  "ratingplate": "wildcatter:block/mat/decal_rating_plate",
+  "pipe_crude": "wildcatter:block/mat/decal_pipe_crude",
+  "pipe_gas": "wildcatter:block/mat/decal_pipe_gas",
+  "pipe_lpg": "wildcatter:block/mat/decal_pipe_lpg",
+  "pipe_water": "wildcatter:block/mat/decal_pipe_water",
+  "pipe_diesel": "wildcatter:block/mat/decal_pipe_diesel",
+  "pipe_steam": "wildcatter:block/mat/decal_pipe_steam",
   "concrete": "wildcatter:block/mat/mat_concrete",
   "polymer": "wildcatter:block/mat/mat_polymer_grey",
   "padgreen": "wildcatter:block/mat/mat_paint_pad_green",
@@ -5806,6 +5823,210 @@
       6.7226,
       2.823,
       15.7261
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    2.7104,
+    5.499,
+    11.5282
+   ],
+   "to": [
+    2.823,
+    10.0007,
+    16.03
+   ],
+   "faces": {
+    "north": {
+     "texture": "#padgreen",
+     "uv": [
+      13.177,
+      5.9993,
+      13.2896,
+      10.501
+     ]
+    },
+    "south": {
+     "texture": "#padgreen",
+     "uv": [
+      2.7104,
+      5.9993,
+      2.823,
+      10.501
+     ]
+    },
+    "west": {
+     "texture": "#nfpa",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "east": {
+     "texture": "#padgreen",
+     "uv": [
+      11.4982,
+      5.9993,
+      16.0,
+      10.501
+     ]
+    },
+    "up": {
+     "texture": "#padgreen",
+     "uv": [
+      2.7104,
+      11.4982,
+      2.823,
+      16.0
+     ]
+    },
+    "down": {
+     "texture": "#padgreen",
+     "uv": [
+      2.7104,
+      11.4982,
+      2.823,
+      16.0
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    13.2879,
+    11.4655,
+    25.8776
+   ],
+   "to": [
+    13.9665,
+    11.5218,
+    29.8166
+   ],
+   "faces": {
+    "north": {
+     "texture": "#steel",
+     "uv": [
+      2.0335,
+      4.4782,
+      2.7121,
+      4.5345
+     ]
+    },
+    "south": {
+     "texture": "#steel",
+     "uv": [
+      13.2879,
+      4.4782,
+      13.9665,
+      4.5345
+     ]
+    },
+    "west": {
+     "texture": "#steel",
+     "uv": [
+      9.8776,
+      4.4782,
+      13.8166,
+      4.5345
+     ]
+    },
+    "east": {
+     "texture": "#steel",
+     "uv": [
+      2.1834,
+      4.4782,
+      6.1224,
+      4.5345
+     ]
+    },
+    "up": {
+     "texture": "#pipe_crude",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "down": {
+     "texture": "#steel",
+     "uv": [
+      13.2879,
+      2.1834,
+      13.9665,
+      6.1224
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    2.0335,
+    5.2756,
+    25.8776
+   ],
+   "to": [
+    2.7121,
+    5.3319,
+    29.8166
+   ],
+   "faces": {
+    "north": {
+     "texture": "#steel",
+     "uv": [
+      13.2879,
+      10.6681,
+      13.9665,
+      10.7244
+     ]
+    },
+    "south": {
+     "texture": "#steel",
+     "uv": [
+      2.0335,
+      10.6681,
+      2.7121,
+      10.7244
+     ]
+    },
+    "west": {
+     "texture": "#steel",
+     "uv": [
+      9.8776,
+      10.6681,
+      13.8166,
+      10.7244
+     ]
+    },
+    "east": {
+     "texture": "#steel",
+     "uv": [
+      2.1834,
+      10.6681,
+      6.1224,
+      10.7244
+     ]
+    },
+    "up": {
+     "texture": "#pipe_water",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "down": {
+     "texture": "#steel",
+     "uv": [
+      2.0335,
+      2.1834,
+      2.7121,
+      6.1224
      ]
     }
    }

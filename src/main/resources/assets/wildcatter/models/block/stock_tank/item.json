@@ -18,6 +18,23 @@
   "gauge": "wildcatter:block/mat/decal_gauge",
   "controller": "wildcatter:block/mat/decal_controller",
   "engineplate": "wildcatter:block/mat/decal_engine_plate",
+  "louvre": "wildcatter:block/mat/mat_enclosure_louvre",
+  "filter": "wildcatter:block/mat/mat_filter_house",
+  "radfin": "wildcatter:block/mat/mat_radiator_fins",
+  "grating": "wildcatter:block/mat/mat_grating",
+  "finned": "wildcatter:block/mat/mat_finned_tube",
+  "hipaint": "wildcatter:block/mat/mat_hitemp_aluminium",
+  "annunciator": "wildcatter:block/mat/decal_annunciator",
+  "arcflash": "wildcatter:block/mat/decal_arc_flash",
+  "nfpa": "wildcatter:block/mat/decal_nfpa",
+  "flammable": "wildcatter:block/mat/decal_flammable",
+  "ratingplate": "wildcatter:block/mat/decal_rating_plate",
+  "pipe_crude": "wildcatter:block/mat/decal_pipe_crude",
+  "pipe_gas": "wildcatter:block/mat/decal_pipe_gas",
+  "pipe_lpg": "wildcatter:block/mat/decal_pipe_lpg",
+  "pipe_water": "wildcatter:block/mat/decal_pipe_water",
+  "pipe_diesel": "wildcatter:block/mat/decal_pipe_diesel",
+  "pipe_steam": "wildcatter:block/mat/decal_pipe_steam",
   "concrete": "wildcatter:block/mat/mat_concrete",
   "polymer": "wildcatter:block/mat/mat_polymer_grey",
   "padgreen": "wildcatter:block/mat/mat_paint_pad_green",
@@ -12803,6 +12820,74 @@
       9.349,
       4.5455,
       13.3959,
+      4.6129
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    10.0235,
+    -4.2082,
+    -4.6129
+   ],
+   "to": [
+    12.7214,
+    -1.5103,
+    -4.5455
+   ],
+   "faces": {
+    "north": {
+     "texture": "#nfpa",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "south": {
+     "texture": "#padgreen",
+     "uv": [
+      10.0235,
+      1.5103,
+      12.7214,
+      4.2082
+     ]
+    },
+    "west": {
+     "texture": "#padgreen",
+     "uv": [
+      11.3871,
+      1.5103,
+      11.4545,
+      4.2082
+     ]
+    },
+    "east": {
+     "texture": "#padgreen",
+     "uv": [
+      4.5455,
+      1.5103,
+      4.6129,
+      4.2082
+     ]
+    },
+    "up": {
+     "texture": "#padgreen",
+     "uv": [
+      10.0235,
+      11.3871,
+      12.7214,
+      11.4545
+     ]
+    },
+    "down": {
+     "texture": "#padgreen",
+     "uv": [
+      10.0235,
+      4.5455,
+      12.7214,
       4.6129
      ]
     }

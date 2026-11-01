@@ -12,6 +12,7 @@ import mlib
 
 M = mlib.Model("gsu_transformer", mlib.footprint_box(3, 3, 2, 1, 1), {
 	"paint": "block/mat/mat_paint_ansi70",
+	"radfin": "block/mat/mat_radiator_fins",
 	"dark": "block/mat/mat_oil_dark",
 	"porcelain": "block/mat/mat_porcelain_brown",
 	"brass": "block/mat/mat_brass",
@@ -53,7 +54,7 @@ for side, (xa, xb) in ((-1, (X1 - 0.42, X1)), (1, (X2, X2 + 0.42))):
 		for z in (-0.45, 0.45):
 			M.cylinder("x", (y, z), 0.05, xa, xb, "paint", sides=8)
 	edge = xa if side < 0 else xb - 0.32
-	M.fins((edge, 0.4, -0.52), (edge + 0.32, 1.55, 0.52), "z", 8, 0.035, "paint")
+	M.fins((edge, 0.4, -0.52), (edge + 0.32, 1.55, 0.52), "z", 8, 0.035, "radfin")
 	# the panels' outer flanges
 	M.box((edge, 0.4, -0.52), (edge + 0.32, 0.44, 0.52), "paint")
 	M.box((edge, 1.51, -0.52), (edge + 0.32, 1.55, 0.52), "paint")

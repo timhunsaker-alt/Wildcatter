@@ -37,9 +37,10 @@ HR.cylinder("y", (2.0, 5.0), 0.08, 10.5, 11.2, "brass", 8)                 # the
 HR.cylinder("y", (3.0, 5.0), 0.08, 10.5, 11.2, "brass", 8)
 HR.box((1.75, 9.6, 2.7), (1.85, 10.4, 2.8), "steel")                       # the gauge glass
 HR.pipe([(2.5, 9.9, 9.0), (2.5, 9.9, 9.6), (2.5, 11.4, 9.6)], 8, "steel")  # the main steam line over to the steam turbine
+g.pipe_label(HR, (2.5, 9.9, 9.3), "z", 8, "pipe_steam", 0.4)
 HR.box((1.2, 0.3, 9.5), (3.8, 3.0, 12.0), "grey")                          # the stack's base
-HR.cylinder("y", (2.5, 10.8), 1.0, 3.0, 11.9, "grey", 16)                  # the stack
-HR.box((1.0, 7.0, 9.5), (4.0, 7.06, 12.0), "checker")
+HR.cylinder("y", (2.5, 10.8), 1.0, 3.0, 11.9, "hipaint", 16)                  # the stack
+HR.box((1.0, 7.0, 9.5), (4.0, 7.06, 12.0), "grating")
 HR.ladder(1.2, 9.48, 0.3, 7.0, -1, "galv")
 HR.collide((0.6, 0.0, 0.0), (4.4, 3.4, 2.5))
 HR.collide((0.2, 0.0, 2.5), (4.8, 9.0, 9.5))
@@ -63,6 +64,7 @@ SG.box((0.4, 0.3, 0.3), (2.6, 2.2, 3.3), "blue")
 SG.fins((0.45, 0.5, 0.5), (2.55, 2.0, 3.1), "z", 10, 0.03, "blue")
 SG.box((0.6, 2.2, 0.6), (2.4, 2.8, 2.9), "grey")                          # its cooler
 SG.box((0.5, 0.3, 3.3), (2.5, 2.0, 4.0), "grey")                          # the terminal box, back
+SG.decal((2.6, 0.8, 1.2), (2.61, 1.6, 2.4), "ratingplate", "east", "blue")
 SG.collide((0.0, 0.0, 0.0), (3.0, 2.8, 4.0))
 
 # ---- the air-cooled condenser -------------------------------------------------------------------------------------------------------
@@ -70,11 +72,11 @@ AC = model("air_cooled_condenser", 6, 8, 6, "galv")
 for x in (0.2, 2.9, 5.6):
 	for z in (0.2, 2.9, 5.6):
 		AC.box((x, 0.0, z), (x + 0.2, 5.0, z + 0.2), "galv")               # the frame's columns
-AC.box((0.0, 5.0, 0.0), (6.0, 5.2, 6.0), "checker")                        # the fan deck
+AC.box((0.0, 5.0, 0.0), (6.0, 5.2, 6.0), "grating")                        # the fan deck
 for k in range(4):                                                          # the A-frame bundles, stepped
 	y = 5.4 + k * 0.5
-	AC.box((0.3 + k * 0.6, y, 0.2), (0.9 + k * 0.6, y + 0.5, 5.8), "steel")
-	AC.box((5.1 - k * 0.6, y, 0.2), (5.7 - k * 0.6, y + 0.5, 5.8), "steel")
+	AC.box((0.3 + k * 0.6, y, 0.2), (0.9 + k * 0.6, y + 0.5, 5.8), "finned")
+	AC.box((5.1 - k * 0.6, y, 0.2), (5.7 - k * 0.6, y + 0.5, 5.8), "finned")
 AC.cylinder("z", (3.0, 7.6), 0.35, 0.1, 5.9, "lagging", 12)               # the steam header along the ridge
 for x in (1.5, 4.5):
 	for z in (1.5, 4.5):

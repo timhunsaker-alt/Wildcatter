@@ -18,6 +18,23 @@
   "gauge": "wildcatter:block/mat/decal_gauge",
   "controller": "wildcatter:block/mat/decal_controller",
   "engineplate": "wildcatter:block/mat/decal_engine_plate",
+  "louvre": "wildcatter:block/mat/mat_enclosure_louvre",
+  "filter": "wildcatter:block/mat/mat_filter_house",
+  "radfin": "wildcatter:block/mat/mat_radiator_fins",
+  "grating": "wildcatter:block/mat/mat_grating",
+  "finned": "wildcatter:block/mat/mat_finned_tube",
+  "hipaint": "wildcatter:block/mat/mat_hitemp_aluminium",
+  "annunciator": "wildcatter:block/mat/decal_annunciator",
+  "arcflash": "wildcatter:block/mat/decal_arc_flash",
+  "nfpa": "wildcatter:block/mat/decal_nfpa",
+  "flammable": "wildcatter:block/mat/decal_flammable",
+  "ratingplate": "wildcatter:block/mat/decal_rating_plate",
+  "pipe_crude": "wildcatter:block/mat/decal_pipe_crude",
+  "pipe_gas": "wildcatter:block/mat/decal_pipe_gas",
+  "pipe_lpg": "wildcatter:block/mat/decal_pipe_lpg",
+  "pipe_water": "wildcatter:block/mat/decal_pipe_water",
+  "pipe_diesel": "wildcatter:block/mat/decal_pipe_diesel",
+  "pipe_steam": "wildcatter:block/mat/decal_pipe_steam",
   "concrete": "wildcatter:block/mat/mat_concrete",
   "polymer": "wildcatter:block/mat/mat_polymer_grey",
   "padgreen": "wildcatter:block/mat/mat_paint_pad_green",
@@ -111,7 +128,7 @@
    ],
    "faces": {
     "north": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       4.8,
       0,
@@ -120,7 +137,7 @@
      ]
     },
     "south": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       1.6,
       0,
@@ -129,7 +146,7 @@
      ]
     },
     "west": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       1.28,
       0,
@@ -138,7 +155,7 @@
      ]
     },
     "east": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       14.08,
       0,
@@ -147,7 +164,7 @@
      ]
     },
     "down": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       1.6,
       14.08,
@@ -170,7 +187,7 @@
    ],
    "faces": {
     "north": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       4.8,
       0,
@@ -179,7 +196,7 @@
      ]
     },
     "south": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       1.6,
       0,
@@ -188,7 +205,7 @@
      ]
     },
     "west": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       5.5467,
       0,
@@ -197,7 +214,7 @@
      ]
     },
     "east": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       9.8133,
       0,
@@ -206,7 +223,7 @@
      ]
     },
     "down": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       1.6,
       9.8133,
@@ -229,7 +246,7 @@
    ],
    "faces": {
     "north": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       4.8,
       0,
@@ -238,7 +255,7 @@
      ]
     },
     "south": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       1.6,
       0,
@@ -247,7 +264,7 @@
      ]
     },
     "west": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       9.8133,
       0,
@@ -256,7 +273,7 @@
      ]
     },
     "east": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       5.5467,
       0,
@@ -265,7 +282,7 @@
      ]
     },
     "down": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       1.6,
       5.5467,
@@ -288,7 +305,7 @@
    ],
    "faces": {
     "north": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       4.8,
       0,
@@ -297,7 +314,7 @@
      ]
     },
     "south": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       1.6,
       0,
@@ -306,7 +323,7 @@
      ]
     },
     "west": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       14.08,
       0,
@@ -315,7 +332,7 @@
      ]
     },
     "east": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       1.28,
       0,
@@ -324,7 +341,7 @@
      ]
     },
     "down": {
-     "texture": "#blue",
+     "texture": "#radfin",
      "uv": [
       1.6,
       1.28,

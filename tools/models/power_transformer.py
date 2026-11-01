@@ -29,7 +29,7 @@ for z1, z2, zh in ((0.15, Z1, Z1 - 0.06), (Z2, 4.85, Z2 + 0.06)):
 	for yh in (0.75, 3.0):
 		M.cylinder("z", (2.0, yh), 0.07, min(z1, zh), max(z2, zh), "grey", 8)
 		M.cylinder("z", (4.0, yh), 0.07, min(z1, zh), max(z2, zh), "grey", 8)
-	M.fins((1.4, 0.6, z1 + 0.05), (4.6, 3.15, z2 - 0.05), "x", 22, 0.03, "grey")
+	M.fins((1.4, 0.6, z1 + 0.05), (4.6, 3.15, z2 - 0.05), "x", 22, 0.03, "radfin")
 # the 138 kV bushings at the west, their arresters on brackets outside the tank, the jumpers in from the bus
 for z in HV:
 	top = y.bushing(M, 1.5, z, COVER + 0.08, 2.75, 0.09, 18, 0.16)

@@ -475,6 +475,26 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 6c: the Ludo art pass on the plant parts
+- **New Ludo art** (12 pictures plus regenerations, about 17 credits; prompts in `art/source/PROMPTS.md`):
+  - six materials: acoustic enclosure panel with a louvre band, inlet filter house face, transformer radiator fins, bar grating,
+    finned-tube cooler bundle, high-temperature aluminium paint;
+  - eleven decals: a turbine control panel, an ANSI arc-flash label, the NFPA 704 diamond, a DANGER FLAMMABLE GAS sign, an
+    equipment rating plate and six ASME A13.1 pipe markers (crude oil, natural gas, LPG, produced water, diesel, steam).
+- **Repainted** (no shape, footprint or game change):
+  - both gas turbine enclosures (louvre panels, a control panel), both inlet houses (filter face);
+  - the stacks, flare riser, fired heaters and cracking furnace (high-temperature aluminium);
+  - the air-cooled condenser, overhead condenser, topping air cooler and compressor coolers (finned tube);
+  - platforms and the condenser fan deck (grating);
+  - the radiators of every big transformer (radiator fins);
+  - generator and GSU rating plates, arc-flash labels on the generator breakers;
+  - NFPA diamonds on the stock tank, separator and LPG bullet, a flammable gas sign on the flare and gas compressor;
+  - pipe markers on outlet stubs with a fixed product.
+- `tools/process_materials.py` keeps a fixed window for patterned materials (the cleanest window would drop the pattern) and
+  crops one copy of a repeated sign.
+- **Game tests:** the repainted scenes reran for screenshots (`lease`, `gasPlant`, `toppingUnit`, `crudeUnit`, `cracker`,
+  `gasTurbine`, `peaker`).
+
 ## Phase 6b: the aeroderivative peaker (Phase 6 done)
 - **Spec:** docs/multiblocks/aeroderivative.md (approved with the plan, 2026-11-01).
 - **45 MW aeroderivative** (LM6000 class, the same `GasTurbineBlockEntity` sized by its package): the 5 x 5 x 14 package, its inlet
