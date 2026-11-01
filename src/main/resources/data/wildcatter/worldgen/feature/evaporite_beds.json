@@ -1,0 +1,19 @@
+{
+  "type": "wildcatter:layered",
+  "radius_min": 8,
+  "radius_max": 14,
+  "layers": [
+    {
+      "state": "wildcatter:halite_ore",
+      "thickness": 3
+    },
+    {
+      "state": "wildcatter:sylvite_ore",
+      "thickness": 1
+    },
+    {
+      "state": "wildcatter:halite_ore",
+      "thickness": 2
+    }
+  ]
+}

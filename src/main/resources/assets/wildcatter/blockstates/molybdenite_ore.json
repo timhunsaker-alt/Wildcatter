@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "wildcatter:block/molybdenite_ore"
+    }
+  }
+}

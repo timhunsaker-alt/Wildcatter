@@ -99,8 +99,20 @@ and the Field Manual has a page for each new system.
   2026-11-01; docs/multiblocks/aeroderivative.md); 6c an art pass with new Ludo materials and signs on the Phase 5 and 6
   parts (Tim, 2026-11-01).
 
-## Phase 7 — Nuclear fuel chain
+## Phase 7 — Nuclear fuel chain — CURRENT (started 2026-11-01)
 - Uranium ore → yellowcake → UF6 → centrifuge cascade enrichment → pellets → rods → assemblies.
+- Decided with Tim on 2026-11-01:
+  - Uranium from both ore blocks with a mill (early) and ISR wellfields (late).
+  - The cascade's output is set by counting its centrifuges. This is a written exception to "never tile identical blocks", because a real cascade is exactly that.
+  - A full-height 17×17 assembly.
+  - Process chemicals from the existing chain plus real ores. Tim: "make sure we have all ore types from real world with exaggerated numbers".
+- Waves (each is planned with its numbers before it is built):
+  - 7a: every real ore type as worldgen, plus a gamma scintillometer (docs/ores.md).
+  - 7b: a sulfuric acid plant and the uranium mill (yellowcake in drums).
+  - 7c: ISR wellfields (late).
+  - 7d: conversion to UF6 (a methane reformer for hydrogen, HF from fluorspar, fluorine cells on a DC rectifier, 48Y cylinders).
+  - 7e: the centrifuge cascade (a high-frequency converter, 4.95 % LEU in 30B cylinders).
+  - 7f: fuel fabrication (pellets, Zircaloy tube from zircon by the Kroll process, rods, the 17×17 assembly).
 
 ## Phase 8 — Pressurized water reactor (PWR)
 - Reactor vessel, control rods, primary loop, pressurizer, steam generator, secondary loop to turbine.
@@ -113,3 +125,13 @@ and the Field Manual has a page for each new system.
 - Switches and panels. Better wire, ground and breaker art. Saving the Ludo sound sources.
 - Soft starters and drives for big motors, so a 250 hp pump can start on a small island.
 - A sales gas pipeline and meter station, so a gas plant's residue gas has a buyer besides engines and the flare.
+- Plants for the 7a ores that the fuel chain doesn't use:
+  - aluminium (the Bayer process, then Hall–Héroult pots, a very large DC load);
+  - chlor-alkali from rock salt;
+  - a titanium pigment plant from ilmenite and rutile;
+  - lithium from spodumene;
+  - ferroalloys (chromium, manganese, molybdenum, tungsten);
+  - a nickel smelter;
+  - fertilizer from phosphate and potash;
+  - drilling mud from barite and bentonite.
+- Salt domes that trap oil on their flanks, as on the Gulf Coast.

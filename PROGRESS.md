@@ -475,6 +475,34 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 7a: the ores (spec: docs/ores.md; Phase 7 waves in ROADMAP)
+- **27 real ores**, one block each, drawn as the mineral in its real host rock:
+  - uranium ore and pitchblende, native sulfur, rock salt, potash, fluorspar, heavy mineral sand, bauxite;
+  - galena, sphalerite, tin, nickel, chromitite, platinum reef, molybdenum;
+  - magnesite, dolomite, graphite, borax, spodumene, barite, bentonite;
+  - silver, tungsten, cobalt, manganese, phosphate rock.
+  - Mining one gives its mineral item (Fortune gives more, Silk Touch the block). The tooltip shows the formula, this ore's
+    grade and kg per block, and the real grade.
+- **Grades** (`ore/Ore.java`): about ten times a typical mined grade, capped at 80 % of the ore mineral; ores already richer keep
+  their real grade. For example, uranium ore is 2 % U3O8 (46 kg a block) against 0.05-0.4 % real, and pitchblende is 60 % (1,500 kg).
+- **Worldgen:**
+  - ordinary veins by biome and depth (uranium in desert and badlands sandstone, pitchblende below y -40, tin and molybdenum
+    in mountains, heavy mineral sand on beaches, bauxite in jungle and savanna, phosphate in oceans);
+  - three new feature types:
+    - salt domes (a rock-salt column from y -60 under a calcite cap that is 30 % native sulfur, about 1 in 150 chunks);
+    - evaporite beds (rock salt and potash under deserts);
+    - the Bushveld reef (chromitite seams with the platinum reef above).
+  - Only new chunks get ores.
+- **Smelting:** galena → lead, cassiterite → tin, sphalerite → zinc, acanthite → silver (furnace and blast furnace). The other
+  minerals wait for their plants (7b onward, or ROADMAP Ideas).
+- **Scintillometer:** reads counts per second (50 cps background, plus uranium within 16 blocks by grade over distance squared)
+  and says which way the count rises.
+- **Art:** 27 ore textures and 32 icons from Ludo (61 jobs of two variations each, 61 credits; prompts in `art/source/PROMPTS.md`).
+  `tools/make_assets.py` reads the ore list from `Ore.java`.
+- **Game test** (`ores`): every vein and feature is placed into rock and leaves its ore; every ore drops its mineral; a
+  furnace smelts galena to lead; the scintillometer reads background over barren rock and points east at a pitchblende pod.
+  Screenshots: the ore wall and a cut salt dome.
+
 ## Phase 6c: the Ludo art pass on the plant parts
 - **New Ludo art** (12 pictures plus regenerations, about 17 credits; prompts in `art/source/PROMPTS.md`):
   - six materials: acoustic enclosure panel with a louvre band, inlet filter house face, transformer radiator fins, bar grating,

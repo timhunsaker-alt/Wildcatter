@@ -41,6 +41,8 @@ public class Wildcatter implements ModInitializer {
 		WildcatterComponents.register();
 		WildcatterBlocks.register();
 		WildcatterItems.register();
+		dev.wildcatter.ore.OreBlocks.register();
+		dev.wildcatter.ore.OreGen.register();
 
 		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, id("wildcatter"), FabricCreativeModeTab.builder()
 				.title(Component.translatable("itemGroup.wildcatter"))

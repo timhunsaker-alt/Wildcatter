@@ -1,0 +1,27 @@
+{
+  "type": "wildcatter:layered",
+  "radius_min": 8,
+  "radius_max": 14,
+  "layers": [
+    {
+      "state": "wildcatter:chromite_ore",
+      "thickness": 2
+    },
+    {
+      "state": "minecraft:air",
+      "thickness": 1
+    },
+    {
+      "state": "wildcatter:chromite_ore",
+      "thickness": 1
+    },
+    {
+      "state": "minecraft:air",
+      "thickness": 2
+    },
+    {
+      "state": "wildcatter:platinum_ore",
+      "thickness": 1
+    }
+  ]
+}

@@ -1532,6 +1532,143 @@ lang.update({"block.wildcatter.aero_turbine": "Aeroderivative Gas Turbine (45 MW
 	"block.wildcatter.substation_transformer_60": "Substation Transformer (60 MVA, 138/12.47 kV)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 7a: the ores (docs/ores.md) ---------------------------------------------------------------------------------
+# The ore list (ids, names, tool) is read from Ore.java so the two never disagree; the veins (size, count, height, host rock)
+# are here. Textures and icons are the Ludo pictures processed into art/final/ore by tools/process_art.py.
+import re
+_ore_src = open("src/main/java/dev/wildcatter/ore/Ore.java").read()
+ORES = [(m.group(1), m.group(2), m.group(3), m.group(4)) for m in
+	re.finditer(r'^\t[A-Z_]+\("(\w+)", "([^"]+)", "([^"]+)",.*?Tool\.(\w+)\)[,;]', _ore_src, re.M | re.S)]
+assert len(ORES) == 27, len(ORES)
+ORE_TOOL_TAG = {"SHOVEL": None, "STONE": "needs_stone_tool", "IRON": "needs_iron_tool"}
+ORE_ART = "art/final/ore"
+os.makedirs(f"{ASSETS}/textures/block/ore", exist_ok=True)
+os.makedirs(f"{ASSETS}/textures/item/ore", exist_ok=True)
+_ore_tags = {"mineable/pickaxe": [], "mineable/shovel": [], "needs_stone_tool": [], "needs_iron_tool": []}
+for key, block_name, mineral_name, tool in ORES:
+	block = f"{key}_ore"
+	if os.path.exists(f"{ORE_ART}/{block}.png"):
+		shutil.copy(f"{ORE_ART}/{block}.png", f"{ASSETS}/textures/block/ore/{block}.png")
+		block_tex = f"{ns}:block/ore/{block}"
+	else:
+		tex(f"{block}_placeholder", lambda img, d: noise(img, (128, 124, 120), 18))
+		block_tex = f"{ns}:block/{block}_placeholder"
+	if os.path.exists(f"{ORE_ART}/{key}.png"):
+		shutil.copy(f"{ORE_ART}/{key}.png", f"{ASSETS}/textures/item/ore/{key}.png")
+		item_tex = f"{ns}:item/ore/{key}"
+	else:
+		tex(f"{key}_placeholder", lambda img, d: noise(img, (150, 140, 130), 30), "item")
+		item_tex = f"{ns}:item/{key}_placeholder"
+	block_model(block, "minecraft:block/cube_all", {"all": block_tex})
+	save_json(f"{ASSETS}/blockstates/{block}.json", {"variants": {"": {"model": f"{ns}:block/{block}"}}})
+	save_json(f"{ASSETS}/items/{block}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{block}"}})
+	save_json(f"{ASSETS}/models/item/{key}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": item_tex}})
+	save_json(f"{ASSETS}/items/{key}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{key}"}})
+	# silk touch gives the ore block; otherwise its mineral, more with Fortune, as vanilla ores do
+	save_json(f"{DATA}/loot_table/blocks/{block}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:alternatives", "children": [
+		{"type": "minecraft:item", "condition": "minecraft:tool/can_silk_touch", "name": f"{ns}:{block}"},
+		{"type": "minecraft:item", "name": f"{ns}:{key}", "modifier": [{"type": "minecraft:apply_bonus", "enchantment": "minecraft:fortune", "formula": "minecraft:ore_drops"},
+			{"type": "minecraft:explosion_decay"}]}]}]}], "random_sequence": f"{ns}:blocks/{block}"})
+	_ore_tags["mineable/shovel" if tool == "SHOVEL" else "mineable/pickaxe"].append(f"{ns}:{block}")
+	if ORE_TOOL_TAG[tool]:
+		_ore_tags[ORE_TOOL_TAG[tool]].append(f"{ns}:{block}")
+	lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+	lang.update({f"block.{ns}.{block}": block_name, f"item.{ns}.{key}": mineral_name})
+	save_json(f"{ASSETS}/lang/en_us.json", lang)
+for tag, values in _ore_tags.items():
+	path = f"{ROOT}/data/minecraft/tags/block/{tag}.json"
+	# pickaxe and stone-tool tags were written fresh above; the shovel and iron-tool tags are only ours, so start them clean
+	t = json.load(open(path)) if tag in ("mineable/pickaxe", "needs_stone_tool") else {"replace": False, "values": []}
+	t["values"] += values
+	save_json(path, t)
+# the furnace smelts only what really smelts simply: galena, cassiterite, sphalerite and acanthite
+INGOTS = {"lead": "galena", "tin": "cassiterite", "zinc": "sphalerite", "silver": "acanthite"}
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for metal, mineral in INGOTS.items():
+	if os.path.exists(f"{ORE_ART}/{metal}_ingot.png"):
+		shutil.copy(f"{ORE_ART}/{metal}_ingot.png", f"{ASSETS}/textures/item/ore/{metal}_ingot.png")
+		item_tex = f"{ns}:item/ore/{metal}_ingot"
+	else:
+		tex(f"{metal}_ingot_placeholder", lambda img, d: noise(img, (170, 172, 180), 10), "item")
+		item_tex = f"{ns}:item/{metal}_ingot_placeholder"
+	save_json(f"{ASSETS}/models/item/{metal}_ingot.json", {"parent": "minecraft:item/generated", "textures": {"layer0": item_tex}})
+	save_json(f"{ASSETS}/items/{metal}_ingot.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{metal}_ingot"}})
+	for kind, time in (("smelting", 200), ("blasting", 100)):
+		save_json(f"{DATA}/recipe/{metal}_ingot_from_{kind}_{mineral}.json", {"type": f"minecraft:{kind}", "cookingtime": time, "experience": 0.7,
+			"group": f"{metal}_ingot", "ingredient": f"{ns}:{mineral}", "result": {"id": f"{ns}:{metal}_ingot"}})
+	lang[f"item.{ns}.{metal}_ingot"] = f"{metal.capitalize()} Ingot"
+# the scintillometer
+ITEM_ICON = f"{ns}:item/ore/scintillometer" if os.path.exists(f"{ORE_ART}/scintillometer.png") else f"{ns}:item/scintillometer_placeholder"
+if os.path.exists(f"{ORE_ART}/scintillometer.png"):
+	shutil.copy(f"{ORE_ART}/scintillometer.png", f"{ASSETS}/textures/item/ore/scintillometer.png")
+else:
+	tex("scintillometer_placeholder", lambda img, d: noise(img, (220, 190, 40), 10), "item")
+save_json(f"{ASSETS}/models/item/scintillometer.json", {"parent": "minecraft:item/generated", "textures": {"layer0": ITEM_ICON}})
+save_json(f"{ASSETS}/items/scintillometer.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/scintillometer"}})
+lang[f"item.{ns}.scintillometer"] = "Scintillometer"
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+shaped("scintillometer", ["IGI", "RCR", "III"], {"I": "minecraft:iron_ingot", "G": "minecraft:glass", "R": "minecraft:redstone", "C": "minecraft:amethyst_shard"}, "scintillometer")
+
+# worldgen: (vein size, veins per chunk, lowest y, highest y, host rule); a count below 1 is one vein in every 1/count chunks
+STONE = {"predicate_type": "minecraft:tag_match", "tag": "minecraft:base_stone_overworld"}
+def any_of(*rules):
+	return {"predicate_type": "minecraft:any_of", "rules": list(rules)}
+def tag(t):
+	return {"predicate_type": "minecraft:tag_match", "tag": t}
+def block_is(b):
+	return {"predicate_type": "minecraft:block_match", "block": b}
+VEINS = {
+	"uraninite": (8, 6, 0, 64, any_of(STONE, block_is("minecraft:sandstone"))),
+	"pitchblende": (4, 0.5, -64, -40, STONE),
+	"fluorite": (8, 4, -16, 48, STONE),
+	"heavy_mineral": (20, 4, 55, 70, any_of(tag("minecraft:sand"), block_is("minecraft:sandstone"))),
+	"bauxite": (20, 4, 55, 80, any_of(STONE, tag("minecraft:dirt"))),
+	"galena": (9, 4, -16, 64, STONE),
+	"sphalerite": (9, 5, -16, 64, STONE),
+	"cassiterite": (7, 6, 0, 80, STONE),
+	"pentlandite": (9, 3, -64, -16, STONE),
+	"molybdenite": (16, 2, 0, 80, STONE),
+	"magnesite": (12, 2, 0, 64, STONE),
+	"dolomite": (48, 1, 0, 100, STONE),
+	"graphite": (8, 4, -32, 32, STONE),
+	"borax": (16, 3, 50, 80, any_of(STONE, tag("minecraft:sand"), block_is("minecraft:sandstone"), tag("minecraft:terracotta"))),
+	"spodumene": (10, 3, 0, 64, STONE),
+	"barite": (10, 3, 0, 48, STONE),
+	"bentonite": (16, 2, 40, 70, any_of(STONE, tag("minecraft:dirt"), tag("minecraft:terracotta"))),
+	"acanthite": (6, 4, -16, 48, STONE),
+	"scheelite": (7, 3, -16, 48, STONE),
+	"cobaltite": (6, 3, -32, 32, STONE),
+	"pyrolusite": (12, 2, 0, 48, STONE),
+	"phosphate": (14, 3, 30, 60, any_of(STONE, tag("minecraft:sand"), block_is("minecraft:gravel"))),
+}
+WG = f"{DATA}/worldgen"
+def placed(name, count, lo, hi, square=True):
+	place = [{"type": "minecraft:count", "count": int(count)} if count >= 1 else {"type": "minecraft:rarity_filter", "chance": round(1 / count)}]
+	if square:
+		place.append({"type": "minecraft:in_square"})
+	place.append({"type": "minecraft:height_range", "height": {"type": "minecraft:uniform", "min_inclusive": {"absolute": lo}, "max_inclusive": {"absolute": hi}}})
+	place.append({"type": "minecraft:biome"})
+	save_json(f"{WG}/placed_feature/{name}.json", {"feature": f"{ns}:{name}", "placement": place})
+for key, (size, count, lo, hi, rule) in VEINS.items():
+	save_json(f"{WG}/feature/ore_{key}.json", {"type": "minecraft:ore", "discard_chance_on_air_exposure": 0.0, "size": size,
+		"targets": [{"state": f"{ns}:{key}_ore", "target": rule}]})
+	placed(f"ore_{key}", count, lo, hi)
+# salt domes: a rock-salt column 8 to 14 blocks across from y -60 to a crest at y 0-20, under a 4-block calcite cap with 30 % sulfur
+save_json(f"{WG}/feature/salt_dome.json", {"type": f"{ns}:salt_dome", "radius_min": 4, "radius_max": 7, "bottom": -60, "top_min": 0, "top_max": 20,
+	"caprock": 4, "sulfur_chance": 0.3})
+placed("salt_dome", 1 / 150, 0, 0)
+AIR = "minecraft:air"
+def layer(state, thickness):
+	return {"state": state, "thickness": thickness}
+# bedded evaporites under the desert: rock salt, a potash bed, rock salt
+save_json(f"{WG}/feature/evaporite_beds.json", {"type": f"{ns}:layered", "radius_min": 8, "radius_max": 14,
+	"layers": [layer(f"{ns}:halite_ore", 3), layer(f"{ns}:sylvite_ore", 1), layer(f"{ns}:halite_ore", 2)]})
+placed("evaporite_beds", 1 / 6, -32, 0)
+# the Bushveld: two chromitite seams, then a gap of country rock, then the platinum reef
+save_json(f"{WG}/feature/bushveld_reef.json", {"type": f"{ns}:layered", "radius_min": 8, "radius_max": 14,
+	"layers": [layer(f"{ns}:chromite_ore", 2), layer(AIR, 1), layer(f"{ns}:chromite_ore", 1), layer(AIR, 2), layer(f"{ns}:platinum_ore", 1)]})
+placed("bushveld_reef", 1 / 8, -64, -38)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

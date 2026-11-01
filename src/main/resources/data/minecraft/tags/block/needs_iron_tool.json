@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "wildcatter:pitchblende_ore",
+    "wildcatter:pentlandite_ore",
+    "wildcatter:chromite_ore",
+    "wildcatter:platinum_ore",
+    "wildcatter:acanthite_ore"
+  ]
+}

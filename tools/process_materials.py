@@ -101,3 +101,16 @@ for name, (l, t, r, b) in CUTOUT.items():
 			out.putpixel((xx, yy), (min(255, int(c[0] * 1.3)), min(255, int(c[1] * 1.3)), min(255, int(c[2] * 1.3)), 255 if light > 55 else 0))
 	out.save(f"{OUT}/{name}.png")
 	print(name, "(cutout)")
+
+# 7a: the ore blocks (art/source/ore/<key>_ore.webp): the whole picture, so the mineral grains survive, made to tile
+ORE_SRC, ORE_OUT = f"{SRC}/ore", "art/final/ore"
+if os.path.isdir(ORE_SRC):
+	os.makedirs(ORE_OUT, exist_ok=True)
+	for f in sorted(os.listdir(ORE_SRC)):
+		name, ext = os.path.splitext(f)
+		if ext != ".webp" or not name.endswith("_ore"):
+			continue
+		img = Image.open(f"{ORE_SRC}/{f}").convert("RGB").resize((SIZE, SIZE), Image.BOX)
+		img = tileable(ImageEnhance.Contrast(img).enhance(1.1))
+		img.convert("RGBA").save(f"{ORE_OUT}/{name}.png")
+		print(name, "(ore)")

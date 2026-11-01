@@ -26,6 +26,10 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> SEISMOGRAPH_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("seismograph"));
 	public static final Item SEISMOGRAPH = new SeismographItem(new Item.Properties().stacksTo(1).setId(SEISMOGRAPH_KEY));
 
+	/** 7a: a handheld gamma scintillometer that finds uranium ore (docs/ores.md). */
+	public static final ResourceKey<Item> SCINTILLOMETER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("scintillometer"));
+	public static final Item SCINTILLOMETER = new dev.wildcatter.item.ScintillometerItem(new Item.Properties().stacksTo(1).setId(SCINTILLOMETER_KEY));
+
 	/** A bucket of crude oil. It burns in a firebox (as long as lava) and leaves the bucket behind. */
 	public static final ResourceKey<Item> CRUDE_OIL_BUCKET_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("crude_oil_bucket"));
 	public static final Item CRUDE_OIL_BUCKET = new Item(new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET).setId(CRUDE_OIL_BUCKET_KEY));
@@ -82,6 +86,7 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, POWER_METER_KEY, POWER_METER);
 		Registry.register(BuiltInRegistries.ITEM, FIELD_MANUAL_KEY, FIELD_MANUAL);
 		Registry.register(BuiltInRegistries.ITEM, SEISMOGRAPH_KEY, SEISMOGRAPH);
+		Registry.register(BuiltInRegistries.ITEM, SCINTILLOMETER_KEY, SCINTILLOMETER);
 		Registry.register(BuiltInRegistries.ITEM, CRUDE_OIL_BUCKET_KEY, CRUDE_OIL_BUCKET);
 		Registry.register(BuiltInRegistries.ITEM, PLASTIC_SHEET_KEY, PLASTIC_SHEET);
 		Registry.register(BuiltInRegistries.ITEM, STEEL_INGOT_KEY, STEEL_INGOT);

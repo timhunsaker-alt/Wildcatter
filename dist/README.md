@@ -34,6 +34,10 @@ Put the jar in your instance's `mods` folder next to:
   limited rate after they close their breaker.
 - New art on the oil, gas, refinery and turbine parts: louvred enclosures, filter houses, radiator fins, grating,
   finned coolers, silver stacks and heaters, hazard signs, rating plates and pipe markers.
+- Real ores: uranium (and rich pitchblende deep down), salt domes with sulfur caps, fluorspar, zircon sands, bauxite, lead,
+  zinc, tin, nickel, chromium, platinum, molybdenum, lithium, boron, silver, tungsten, cobalt, manganese, phosphate and more,
+  each where the real ore is found, richer than real. A furnace makes lead, tin, zinc and silver ingots. A scintillometer finds
+  uranium. Only newly explored chunks have the ores.
 - The Field Manual item explains how to build each machine.
 
 ## Older worlds

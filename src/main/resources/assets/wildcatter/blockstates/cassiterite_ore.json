@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "wildcatter:block/cassiterite_ore"
+    }
+  }
+}

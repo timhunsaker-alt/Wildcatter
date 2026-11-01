@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:ore",
+  "discard_chance_on_air_exposure": 0.0,
+  "size": 20,
+  "targets": [
+    {
+      "state": "wildcatter:heavy_mineral_ore",
+      "target": {
+        "predicate_type": "minecraft:any_of",
+        "rules": [
+          {
+            "predicate_type": "minecraft:tag_match",
+            "tag": "minecraft:sand"
+          },
+          {
+            "predicate_type": "minecraft:block_match",
+            "block": "minecraft:sandstone"
+          }
+        ]
+      }
+    }
+  ]
+}

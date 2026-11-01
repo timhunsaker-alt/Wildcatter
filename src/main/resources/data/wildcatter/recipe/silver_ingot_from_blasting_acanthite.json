@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:blasting",
+  "cookingtime": 100,
+  "experience": 0.7,
+  "group": "silver_ingot",
+  "ingredient": "wildcatter:acanthite",
+  "result": {
+    "id": "wildcatter:silver_ingot"
+  }
+}

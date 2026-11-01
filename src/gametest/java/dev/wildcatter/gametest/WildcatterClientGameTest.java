@@ -166,6 +166,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("peaker")) {
 				peaker(context, server);
 			}
+			if (only("ores")) {
+				ores(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -3907,6 +3910,109 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(3);
 		context.takeScreenshot("wildcatter-starter-plant");
 		System.out.println("[wildcatter-test] building gear ok: " + breaker + " | " + read(server, 15, up, z));
+	}
+
+	// ---- Phase 7a: the ores (docs/ores.md) ------------------------------------------------------------------------------
+	/**
+	 * Every vein, the evaporite beds, the Bushveld reef and a salt dome are placed into rock with /place feature and must
+	 * leave their ore; every ore drops its mineral; a furnace smelts galena; the scintillometer hears a pitchblende pod.
+	 */
+	private void ores(ClientGameTestContext context, TestServerContext server) {
+		int z = -1520;
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 40 " + (up + 4) + " " + (z + 20) + " 180 10");
+		context.waitTicks(20);
+		server.runCommand("fill 0 " + (y - 1) + " " + (z - 30) + " 100 " + (y - 1) + " " + (z + 24) + " minecraft:stone");
+
+		// the scintillometer, first, before any uranium is near: background over barren stone, then a pod 6 blocks east
+		double barren = server.computeOnServer(srv -> dev.wildcatter.item.ScintillometerItem.read(srv.overworld(), 60.5, up + 1.5, z + 10.5).cps());
+		check(Math.abs(barren - Tuning.SCINT_BACKGROUND_CPS) < 1, "over barren rock the scintillometer should read background: " + barren);
+		server.runCommand("fill 66 " + up + " " + (z + 9) + " 68 " + (up + 2) + " " + (z + 11) + " wildcatter:pitchblende_ore");
+		var pod = server.computeOnServer(srv -> dev.wildcatter.item.ScintillometerItem.read(srv.overworld(), 60.5, up + 1.5, z + 10.5));
+		String scint = server.computeOnServer(srv -> dev.wildcatter.item.ScintillometerItem.report(srv.overworld(), 60.5, up + 1.5, z + 10.5));
+		check(pod.cps() > 1000 && pod.dx() > 0 && Math.abs(pod.dz()) < pod.dx() * 0.2, "a pitchblende pod to the east should read high from the east: " + scint);
+		check(scint.contains("east"), "the meter should say the count rises to the east: " + scint);
+		server.runCommand("fill 66 " + up + " " + (z + 9) + " 68 " + (up + 2) + " " + (z + 11) + " minecraft:air");
+
+		// each ore drops its mineral
+		for (dev.wildcatter.ore.Ore ore : dev.wildcatter.ore.Ore.values()) {
+			boolean drops = server.computeOnServer(srv -> net.minecraft.world.level.block.Block.getDrops(dev.wildcatter.ore.OreBlocks.block(ore).defaultBlockState(),
+					srv.overworld(), new BlockPos(60, up, z), null).stream().anyMatch(stack -> stack.is(dev.wildcatter.ore.OreBlocks.MINERALS.get(ore))));
+			check(drops, ore.blockName + " should drop " + ore.mineralName);
+		}
+
+		// a furnace smelts galena into lead
+		put(server, 60, up, z + 4, "minecraft:furnace");
+		server.runCommand("item replace block 60 " + up + " " + (z + 4) + " container.0 with wildcatter:galena");
+		server.runCommand("item replace block 60 " + up + " " + (z + 4) + " container.1 with minecraft:coal");
+		context.waitTicks(230);
+		boolean lead = server.computeOnServer(srv -> ((Container) srv.overworld().getBlockEntity(new BlockPos(60, up, z + 4))).getItem(2)
+				.is(dev.wildcatter.ore.OreBlocks.INGOTS.get("lead")));
+		check(lead, "a furnace should smelt galena into a lead ingot");
+
+		// every feature, into a box of its host rock
+		String[][] veins = {{"uraninite", "stone"}, {"pitchblende", "deepslate"}, {"fluorite", "stone"}, {"heavy_mineral", "sand"}, {"bauxite", "stone"},
+				{"galena", "stone"}, {"sphalerite", "stone"}, {"cassiterite", "stone"}, {"pentlandite", "deepslate"}, {"molybdenite", "stone"},
+				{"magnesite", "stone"}, {"dolomite", "stone"}, {"graphite", "stone"}, {"borax", "stone"}, {"spodumene", "stone"}, {"barite", "stone"},
+				{"bentonite", "stone"}, {"acanthite", "stone"}, {"scheelite", "stone"}, {"cobaltite", "stone"}, {"pyrolusite", "stone"}, {"phosphate", "stone"}};
+		int bx = 70, by = up, bz = z - 28;
+		StringBuilder found = new StringBuilder();
+		for (String[] vein : veins) {
+			dev.wildcatter.ore.Ore ore = dev.wildcatter.ore.Ore.valueOf(vein[0].toUpperCase());
+			int n = 0;
+			for (int tries = 0; tries < 4 && n == 0; tries++) {
+				server.runCommand("fill " + bx + " " + by + " " + bz + " " + (bx + 10) + " " + (by + 10) + " " + (bz + 10) + " minecraft:" + vein[1]);
+				server.runCommand("place feature wildcatter:ore_" + vein[0] + " " + (bx + 5) + " " + (by + 5) + " " + (bz + 5));
+				n = count(server, dev.wildcatter.ore.OreBlocks.block(ore), new BlockPos(bx, by, bz), new BlockPos(bx + 10, by + 10, bz + 10));
+			}
+			check(n > 0, "the " + vein[0] + " vein should leave " + ore.blockName + " in " + vein[1]);
+			found.append(vein[0]).append(' ').append(n).append(", ");
+		}
+		server.runCommand("fill " + bx + " " + by + " " + bz + " " + (bx + 10) + " " + (by + 10) + " " + (bz + 10) + " minecraft:air");
+		// the layered features: a wide flat box of stone
+		for (String[] layered : new String[][] {{"evaporite_beds", "HALITE", "SYLVITE"}, {"bushveld_reef", "CHROMITE", "PLATINUM"}}) {
+			server.runCommand("fill 30 " + by + " " + (z - 30) + " 60 " + (by + 7) + " " + z + " minecraft:stone");
+			server.runCommand("place feature wildcatter:" + layered[0] + " 45 " + (by + 1) + " " + (z - 15));
+			int a = count(server, dev.wildcatter.ore.OreBlocks.block(dev.wildcatter.ore.Ore.valueOf(layered[1])), new BlockPos(30, by, z - 30), new BlockPos(60, by + 7, z));
+			int b = count(server, dev.wildcatter.ore.OreBlocks.block(dev.wildcatter.ore.Ore.valueOf(layered[2])), new BlockPos(30, by, z - 30), new BlockPos(60, by + 7, z));
+			check(a > 100 && b > 50, layered[0] + " should lay down " + layered[1] + " and " + layered[2] + ": " + a + ", " + b);
+			found.append(layered[0]).append(' ').append(a).append('/').append(b).append(", ");
+		}
+		server.runCommand("fill 30 " + by + " " + (z - 30) + " 60 " + (by + 7) + " " + z + " minecraft:air");
+
+		// a salt dome in a column of stone from bedrock up, cut open on its south side for the picture
+		int cx = 20, cz = z - 12;
+		server.runCommand("fill " + (cx - 9) + " -63 " + (cz - 9) + " " + (cx + 9) + " 25 " + (cz + 9) + " minecraft:stone");
+		server.runCommand("place feature wildcatter:salt_dome " + cx + " 0 " + cz);
+		int salt = count(server, dev.wildcatter.ore.OreBlocks.block(dev.wildcatter.ore.Ore.HALITE), new BlockPos(cx - 9, -40, cz - 9), new BlockPos(cx + 9, -30, cz + 9));
+		int sulfur = count(server, dev.wildcatter.ore.OreBlocks.block(dev.wildcatter.ore.Ore.SULFUR), new BlockPos(cx - 9, 0, cz - 9), new BlockPos(cx + 9, 25, cz + 9));
+		check(salt > 300 && sulfur > 5, "a salt dome should have rock salt in its column and sulfur in its cap: " + salt + " salt, " + sulfur + " sulfur");
+		server.runCommand("fill " + (cx - 9) + " " + up + " " + (cz + 1) + " " + (cx + 9) + " 25 " + (cz + 9) + " minecraft:air");
+		server.runCommand("tp @p " + cx + " 4 " + (cz + 26) + " 180 -8");
+		context.waitTicks(40);
+		context.takeScreenshot("wildcatter-salt-dome");
+
+		// the wall of every ore block, nine across and three high
+		dev.wildcatter.ore.Ore[] all = dev.wildcatter.ore.Ore.values();
+		for (int i = 0; i < all.length; i++) {
+			put(server, 40 + i % 9, up + 2 - i / 9, z + 10, "wildcatter:" + all[i].blockId());
+		}
+		server.runCommand("tp @p 44.5 " + (up + 1) + " " + (z + 15.5) + " 180 0");
+		context.waitTicks(40);
+		context.takeScreenshot("wildcatter-ores");
+		System.out.println("[wildcatter-test] ores ok: " + scint + " | " + found + "salt dome " + salt + " salt, " + sulfur + " sulfur");
+	}
+
+	private static int count(TestServerContext server, net.minecraft.world.level.block.Block block, BlockPos from, BlockPos to) {
+		return server.computeOnServer(srv -> {
+			int n = 0;
+			for (BlockPos at : BlockPos.betweenClosed(from, to)) {
+				if (srv.overworld().getBlockState(at).is(block)) {
+					n++;
+				}
+			}
+			return n;
+		});
 	}
 
 	private void fieldManual(TestServerContext server) {

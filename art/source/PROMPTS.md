@@ -33,3 +33,45 @@ Single signs: image_type `asset`. With `texture` the text came out garbled.
 | decal_flammable | A single flat rectangular industrial safety sign seen straight on, filling the whole frame edge to edge, no background: red top band with the white word DANGER, white lower body with the bold black words FLAMMABLE GAS on one line and NO SMOKING on a second line, large simple lettering, OSHA style |
 | decal_rating_plate | A single brushed stainless steel equipment rating nameplate seen straight on, filling the whole frame edge to edge, no background: four round rivets in the corners, a black engraved title bar at the top, below it a neat ruled table of six rows of small black engraved text and numbers, plain and generic with no brand name or logo |
 | decal_pipe_crude (and _gas, _lpg, _water, _diesel, _steam) | A single industrial pipe marker label seen straight on, filling the whole frame edge to edge, no background: a wide yellow rectangle with bold black text CRUDE OIL and a black arrow pointing right, ASME A13.1 style. The others use NATURAL GAS, LPG and STEAM (black on yellow), PRODUCED WATER (white on green) and DIESEL (white on brown) |
+
+## Phase 7a (2026-11-01): the ores (art/source/ore/)
+Ore blocks (`<key>_ore.webp`): image_type `texture`, art_style `Photorealistic 3D`, 2 variations, the better kept. Each prompt is
+"Seamless flat texture, straight-on orthographic view, even lighting: rough mined rock face of <host> with <mineral>, natural
+rock, no text". `tools/process_materials.py` shrinks the whole picture to 32 px and makes it tile.
+
+| Key | Host and mineral in the prompt |
+|---|---|
+| uraninite | pale tan arkose sandstone, scattered black uraninite grains, patchy yellow-green uranium oxide staining |
+| pitchblende | dark grey basement rock, large black glossy botryoidal pitchblende, brick-red hematite alteration |
+| sulfur | pale grey-white calcite caprock, many bright lemon-yellow native sulfur crystals and crusts |
+| halite | rock salt wall in a salt mine, translucent white to pale grey halite, cubic faces, faint grey banding |
+| sylvite | sylvinite potash, brick-red and orange sylvite with translucent white halite |
+| fluorite | grey limestone cut by veins of purple and honey-yellow cubic fluorite |
+| heavy_mineral | (second try) dark heavy mineral beach sand, mostly black ilmenite with bold pale quartz streaks and red garnet, top-down |
+| bauxite | reddish-brown lateritic bauxite, pea-sized pisolites in orange-tan clay |
+| galena | grey dolostone, silvery lead-grey cubic galena |
+| sphalerite | tan dolostone, resinous dark brown to black sphalerite with amber glints |
+| cassiterite | light grey granite, white quartz veins with dark brown-black cassiterite |
+| pentlandite | dark grey norite, brassy bronze nickel sulfide (pentlandite and pyrrhotite) |
+| chromite | banded chromitite, granular jet-black chromite with thin pale grey-green pyroxene layers |
+| platinum | coarse grey-brown feldspathic pyroxenite reef, thin black chromitite stringers, fine brassy sulfide specks |
+| molybdenite | pale pinkish granite porphyry, quartz veinlet stockwork lined with bluish-silver molybdenite |
+| magnesite | dense chalky white magnesite, porcelain-like cauliflower texture |
+| dolomite | pale buff-pink sugary crystalline dolomite, small vugs |
+| graphite | grey mica schist full of shiny black graphite flakes along the foliation |
+| borax | (second try) borate ore face, chunky white and glassy borax and kernite masses in dark grey-green clay seams |
+| spodumene | coarse pegmatite, pale greenish-white spodumene laths, white feldspar, grey quartz, silver muscovite |
+| barite | grey chert and shale with thick white to cream tabular barite |
+| bentonite | freshly cut waxy pale olive-cream bentonite clay with popcorn drying cracks |
+| acanthite | white quartz vein in grey andesite, dark lead-grey acanthite and wiry native silver |
+| scheelite | green and brown garnet-pyroxene skarn, pale cream to honey scheelite |
+| cobaltite | dark grey rock, silvery pinkish-white cobaltite, bright pink-purple erythrite bloom |
+| pyrolusite | sooty black and steel-grey pyrolusite with fern-like dendrites on brown banded iron rock |
+| phosphate | grey-brown pelletal phosphorite, dark phosphate pellets and pale fossil shell fragments |
+
+Minerals, ingots and the scintillometer (`<key>.webp`): image_type `item-icon`, art_style `Photorealistic 3D`, 2 variations.
+Each is "A single <lump / cluster / crystal> of <the mineral as above>, mineral specimen, game item icon, plain white (or dark
+grey for white minerals) background". Heavy minerals are "a small canvas sample bag spilling dark heavy mineral sand". The
+ingots are "a single cast <lead / tin / zinc slab / silver bullion> ingot". The scintillometer is "a yellow handheld gamma-ray
+scintillometer survey meter with a carrying handle, a cylindrical detector probe on the side and a small analog dial, generic,
+no brand names".

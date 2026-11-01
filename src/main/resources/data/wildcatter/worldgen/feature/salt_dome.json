@@ -1,0 +1,10 @@
+{
+  "type": "wildcatter:salt_dome",
+  "radius_min": 4,
+  "radius_max": 7,
+  "bottom": -60,
+  "top_min": 0,
+  "top_max": 20,
+  "caprock": 4,
+  "sulfur_chance": 0.3
+}

@@ -75,6 +75,10 @@ public final class Tuning {
 	public static final int FIELD_MAX_Y = -12;
 	public static final int DRY_HOLE_Y = -50;                 // a rig that finds nothing gives up at this height
 	public static final int SURVEY_RANGE = 96;                // how far a seismograph can hear a field (blocks)
+	// 7a: the gamma scintillometer (docs/ores.md). Range is exaggerated, as the seismograph's is; background is proposed.
+	public static final int SCINT_RANGE = 16;                 // blocks it hears uranium over (real gamma: about 0.3 m of rock)
+	public static final double SCINT_BACKGROUND_CPS = 50;      // counts per second over barren rock
+	public static final double SCINT_CPS_PER_U3O8 = 50_000;   // a block of pure U3O8 at 1 m; pitchblende (60 %) at 1 m reads 30,000 cps
 	public static final double OIL_FRACTION = 0.55;           // of the fields; the rest are gas
 	public static final int OIL_MIN_UNITS = 60_000;           // a bucket of crude is 1000 units
 	public static final int OIL_MAX_UNITS = 200_000;

@@ -226,8 +226,8 @@ print("art processed:", len(os.listdir(OUT)), "textures")
 
 
 # ---- item icons (Ludo drew them on a transparent background) --------------------------------------------
-def icon(name):
-	img = Image.open(f"{SRC}/{name}.webp").convert("RGBA")
+def icon(name, src=SRC):
+	img = Image.open(f"{src}/{name}.webp").convert("RGBA")
 	if img.getpixel((0, 0))[3] == 255:   # drawn on a plain background: make that transparent
 		from PIL import ImageDraw
 		for corner in ((0, 0), (img.width - 1, 0), (0, img.height - 1), (img.width - 1, img.height - 1)):
@@ -245,4 +245,11 @@ GENSET_PART_ICONS = ("engine_block_casting", "piston", "crankshaft", "cylinder_h
 for name in GENSET_PART_ICONS:
 	if os.path.exists(f"{SRC}/{name}.webp"):
 		icon(name).save(f"{OUT}/{name}.png")
+# 7a: mineral, ingot and scintillometer icons (art/source/ore/<name>.webp, not the *_ore block pictures)
+if os.path.isdir(f"{SRC}/ore"):
+	os.makedirs(f"{OUT}/ore", exist_ok=True)
+	for f in sorted(os.listdir(f"{SRC}/ore")):
+		name, ext = os.path.splitext(f)
+		if ext == ".webp" and not name.endswith("_ore"):
+			icon(name, f"{SRC}/ore").save(f"{OUT}/ore/{name}.png")
 print("icons done")

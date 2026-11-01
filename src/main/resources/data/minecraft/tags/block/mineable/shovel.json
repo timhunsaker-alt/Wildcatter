@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "wildcatter:heavy_mineral_ore",
+    "wildcatter:bentonite_ore"
+  ]
+}
