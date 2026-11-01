@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SRS",
+    "RCR",
+    "SRS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "R": "minecraft:redstone",
+    "C": "minecraft:copper_block"
+  },
+  "result": {
+    "id": "wildcatter:load_bank",
+    "count": 1
+  }
+}

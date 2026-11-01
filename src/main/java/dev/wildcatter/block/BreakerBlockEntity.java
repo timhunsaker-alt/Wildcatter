@@ -65,6 +65,7 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 			case DISTRIBUTION -> Tuning.BREAKER_AMPS_DISTRIBUTION;
 			case HIGH -> Tuning.BREAKER_AMPS_HIGH;
 			case INDUSTRIAL -> Tuning.BREAKER_AMPS_INDUSTRIAL;
+			case GENERATOR -> Tuning.BREAKER_AMPS_GENERATOR;
 		};
 	}
 

@@ -160,6 +160,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("cracker")) {
 				cracker(context, server);
 			}
+			if (only("gasTurbine")) {
+				gasTurbine(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -2758,6 +2761,142 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(3);
 		context.takeScreenshot("wildcatter-cracker");
 		System.out.println("[wildcatter-test] cracker ok: " + f + " | " + quench + " | " + cgc + " | " + cold + " | " + reactor + " | " + pel + " | hopper " + sheetsInHopper);
+	}
+
+	/**
+	 * The 16 MW gas turbine in combined cycle (6a, docs/multiblocks/gas-turbine.md, combined-cycle.md). A diesel set and a backward
+	 * unit substation give the starter 4.16 kV; kerosene from a stock tank. With no 4.16 kV it will not start; with it, it purges and
+	 * (skipped by a hook) runs up, closes its generator breaker onto the dead 13.8 kV bus duct and energizes the GSU's 138 kV side.
+	 * A load bank takes 10 MW; the HRSG (warmed by a hook) raises steam, and the 5 MW steam turbine synchronizes and takes its share
+	 * with its condenser fans and feed pump running.
+	 */
+	private void gasTurbine(ClientGameTestContext context, TestServerContext server) {
+		int z = -1320;
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 24 " + (up + 16) + " " + (z + 34) + " 180 30");
+		context.waitTicks(20);
+		server.runCommand("fill 2 " + (y - 1) + " " + (z - 8) + " 36 " + (y + 12) + " " + (z + 27) + " minecraft:air");
+		server.runCommand("fill 2 " + (y - 1) + " " + (z - 8) + " 36 " + (y - 1) + " " + (z + 27) + " minecraft:stone");
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		BlockPos gt = new BlockPos(20, up, z);
+		placeBig(server, WildcatterBlocks.GAS_TURBINE, gt, north);                              // x 20-23, z..z+9
+		context.waitTicks(25);
+		String unbuilt = read(server, 20, up, z);
+		check(unbuilt.contains("NOT BUILT") && unbuilt.contains("INLET HOUSE") && unbuilt.contains("GENERATOR"), "a lone turbine should name its parts: " + unbuilt);
+		placeBig(server, WildcatterBlocks.GT_INLET_HOUSE, new BlockPos(20, up, z - 4), north);       // x 20-23, z-4..z-1
+		placeBig(server, WildcatterBlocks.GT_GENERATOR, new BlockPos(24, up, z + 1), north);         // x 24-27, z+1..z+6
+		placeBig(server, WildcatterBlocks.GEN_BREAKER, new BlockPos(25, up, z + 7), north);          // x 25-26, z+7..z+8
+		BlockPos hrsg = new BlockPos(20, up, z + 10);
+		placeBig(server, WildcatterBlocks.HRSG, hrsg, north);                                        // x 20-24, z+10..z+21
+		placeBig(server, WildcatterBlocks.STEAM_TURBINE_5, new BlockPos(17, up, z + 15), north);     // x 17-19, z+15..z+20
+		placeBig(server, WildcatterBlocks.ST_GENERATOR, new BlockPos(14, up, z + 15), north);        // x 14-16, z+15..z+18
+		placeBig(server, WildcatterBlocks.GEN_BREAKER, new BlockPos(14, up, z + 19), north);         // x 14-15, z+19..z+20
+		placeBig(server, WildcatterBlocks.AIR_COOLED_CONDENSER, new BlockPos(12, up, z + 9), north); // x 12-17, z+9..z+14
+		placeBig(server, WildcatterBlocks.HRSG_FEED_PUMP, new BlockPos(21, up, z + 22), north);      // x 21-22, z+22..z+25
+		placeBig(server, WildcatterBlocks.GSU_25, new BlockPos(31, up, z + 7), north);               // x 29-33, z+4..z+7
+		placeBig(server, WildcatterBlocks.LOAD_BANK, new BlockPos(31, up, z + 10), north);           // x 31-33, z+10..z+15
+		placeBig(server, WildcatterBlocks.LOAD_BANK, new BlockPos(28, up, z + 10), north);           // a second, x 28-30: 20 MW for full load
+		BlockPos fuelTank = new BlockPos(14, up, z + 4);
+		placeBig(server, WildcatterBlocks.STOCK_TANK, fuelTank, north);                              // x 14-17, z+4..z+7
+		pipes(server, z, new int[][] {{18, 0, 6}, {19, 0, 6}});                                     // kerosene to the fuel nozzle
+		// the 13.8 kV bus: the gas turbine's breaker, the GSU, the load bank; the steam turbine's breaker over the top to it
+		for (int x = 25; x <= 33; x++) {
+			put(server, x, up, z + 9, "wildcatter:bus_duct_gen");
+		}
+		put(server, 31, up, z + 8, "wildcatter:bus_duct_gen");   // up to the GSU's 13.8 kV throat
+		for (int h = 0; h <= 5; h++) {
+			put(server, 14, up + h, z + 21, "wildcatter:bus_duct_gen");
+		}
+		for (int x = 14; x <= 34; x++) {
+			put(server, x, up + 5, z + 22, "wildcatter:bus_duct_gen");
+		}
+		for (int h = 0; h <= 4; h++) {
+			put(server, 34, up + h, z + 22, "wildcatter:bus_duct_gen");
+		}
+		for (int zz = z + 9; zz <= z + 21; zz++) {
+			put(server, 34, up, zz, "wildcatter:bus_duct_gen");
+		}
+		put(server, 31, up + 4, z + 3, "wildcatter:cable_hv");   // on a 138 kV bushing, to read the line side
+		// station power: a diesel set; 4.16 kV through a backward unit substation to the starter, 480 V to the fans and the feed pump
+		BlockPos set = new BlockPos(10, up, z + 2);
+		genset(server, set, north, false);                                                        // x 5-10, z+2..z+3
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, set, net.minecraft.core.Direction.EAST, false);   // x 11-14, z+1..z+2
+		for (int x = 15; x <= 19; x++) {
+			put(server, x, up, z + 2, "wildcatter:cable_mv");   // to the starter's box, the west face of the turbine at z+2
+		}
+		for (int zz = z + 3; zz <= z + 22; zz++) {
+			put(server, 11, up, zz, "wildcatter:cable_industrial");
+		}
+		put(server, 12, up, z + 3, "wildcatter:cable_industrial");
+		for (int x = 12; x <= 20; x++) {
+			put(server, x, up, z + 22, "wildcatter:cable_industrial");   // to the feed pump's box, the west face of its main cell
+		}
+		sizeCables(server, new BlockPos(11, up, z + 3), new BlockPos(20, up, z + 22), WildcatterBlocks.CABLE_INDUSTRIAL, dev.wildcatter.energy.ConductorSize.AWG_4_0);
+		fillTank(server, fuelTank, dev.wildcatter.fluid.Product.KEROSENE, 40_000);
+		context.waitTicks(30);
+		// no 4.16 kV yet: the starter cannot turn it
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.GasTurbineBlockEntity) srv.overworld().getBlockEntity(gt)).setWantRun(true);
+			return null;
+		});
+		context.waitTicks(120);
+		String dead = read(server, 20, up, z);
+		check(dead.contains("STARTER: no 4.16 kV"), "with no 4.16 kV the start should fail: " + dead);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.GasTurbineBlockEntity) srv.overworld().getBlockEntity(gt)).pushButton();   // reset
+			return null;
+		});
+		startGenset(context, server, set, north, 2000);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.GasTurbineBlockEntity) srv.overworld().getBlockEntity(gt)).setWantRun(true);
+			return null;
+		});
+		context.waitTicks(200);
+		String purge = read(server, 20, up, z);
+		check(purge.contains("PURGE") && purge.contains("25% speed"), "the starter should purge it at a quarter speed: " + purge + " | set " + read(server, 10, up, z + 2));
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.GasTurbineBlockEntity) srv.overworld().getBlockEntity(gt)).skipStartForTest();
+			return null;
+		});
+		context.waitTicks(100);
+		String running = read(server, 20, up, z);
+		check(running.contains("RUNNING") && running.contains("breaker CLOSED"), "at speed it should close its breaker onto the dead bus: " + running);
+		String line = read(server, 31, up + 4, z + 3);
+		check(line.contains("138 kV") && !line.contains(" 0 V"), "the GSU should energize the 138 kV side: " + line);
+		// 10 MW on the load bank
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.LoadBankBlockEntity) srv.overworld().getBlockEntity(new BlockPos(31, up, z + 10))).setSteps(10);
+			return null;
+		});
+		context.waitTicks(200);
+		String loaded = read(server, 20, up, z);
+		String bank = read(server, 31, up, z + 10);
+		check(bank.contains("taking 9.") || bank.contains("taking 10."), "the load bank should take about 10 MW: " + bank + " | " + loaded);
+		check(loaded.contains("burning") && loaded.contains("kerosene"), "it should burn kerosene at its heat rate: " + loaded);
+		// the HRSG raises steam and the steam turbine joins in
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.HrsgBlockEntity) srv.overworld().getBlockEntity(hrsg)).warmForTest(srv.overworld());
+			return null;
+		});
+		context.waitTicks(1000);   // it rolls up in 30 s, synchronizes and takes its share
+		String steam = read(server, 17, up, z + 15);
+		check(steam.contains("breaker CLOSED"), "the steam turbine should synchronize on the HRSG's steam: " + steam + " | hrsg " + read(server, 20, up, z + 10)
+				+ " | acc " + read(server, 12, up, z + 9) + " | pump " + read(server, 21, up, z + 22));
+		// near full load (the second bank on too) the combined cycle is over 40 % efficient (at 10 MW it was part load)
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.LoadBankBlockEntity) srv.overworld().getBlockEntity(new BlockPos(28, up, z + 10))).setSteps(10);
+			return null;
+		});
+		context.waitTicks(400);
+		String plant = read(server, 20, up, z);
+		java.util.regex.Matcher eff = java.util.regex.Pattern.compile("(\\d+)% efficient").matcher(plant);
+		check(eff.find() && Integer.parseInt(eff.group(1)) > 40, "the combined cycle should be over 40 % efficient near full load: " + plant + " | " + read(server, 17, up, z + 15));
+		String acc = read(server, 12, up, z + 9);
+		check(acc.contains("running"), "the condenser fans should run: " + acc);
+		server.runCommand("tp @p 2 " + (up + 14) + " " + (z + 32) + " 215 25");
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-gas-turbine");
+		System.out.println("[wildcatter-test] gas turbine ok: " + plant + " | " + steam + " | " + bank + " | " + line);
 	}
 
 	private double tankAmount(TestServerContext server, BlockPos cell) {

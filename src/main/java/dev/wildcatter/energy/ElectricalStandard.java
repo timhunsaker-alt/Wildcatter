@@ -100,6 +100,7 @@ public enum ElectricalStandard {
 			case DISTRIBUTION -> distribution;
 			case HIGH -> high;
 			case INDUSTRIAL -> industrialLow;
+			case GENERATOR -> generator;
 		};
 	}
 

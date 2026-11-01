@@ -64,6 +64,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "overhead_condenser" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CONDENSER_FAN_WATTS);
 				case "polyethylene_reactor" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PE_REACTOR_WATTS);
 				case "pelletizer" -> new Motor(true, Voltage.MEDIUM, Tuning.PELLETIZER_WATTS);
+				case "air_cooled_condenser" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ACC_FAN_WATTS);
+				case "hrsg_feed_pump" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.HRSG_FEED_PUMP_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -93,6 +95,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "overhead_condenser" -> "overhead condenser";
 			case "polyethylene_reactor" -> "reactor's cycle gas compressor";
 			case "pelletizer" -> "pelletizer";
+			case "air_cooled_condenser" -> "condenser fans";
+			case "hrsg_feed_pump" -> "feed pump";
 			default -> kind();
 		};
 	}
@@ -160,7 +164,7 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 	/** The motor's speed at full load, read from the standard's frequency. */
 	private double rpm() {
 		int poles = switch (kind()) {
-			case "crude_charge_pump", "polyethylene_reactor" -> 2;
+			case "crude_charge_pump", "polyethylene_reactor", "hrsg_feed_pump" -> 2;
 			case "desalter" -> 0;
 			default -> 4;
 		};
@@ -194,6 +198,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "desalter" -> "Electrostatic desalter (its grid transformer, " + Math.round(Tuning.DESALTER_WATTS / 1000) + " kW, " + Voltage.INDUSTRIAL.label() + ")";
 			case "crude_charge_pump" -> "Crude charge pump (250 hp, " + Voltage.MEDIUM.label() + ")";
 			case "overhead_condenser" -> "Overhead fin-fan condenser (four 25 hp fans, " + Voltage.INDUSTRIAL.label() + ")";
+			case "air_cooled_condenser" -> "Air-cooled condenser (four 50 hp fans, " + Voltage.INDUSTRIAL.label() + ")";
+			case "hrsg_feed_pump" -> "HRSG feed pump (60 hp, " + Voltage.INDUSTRIAL.label() + ")";
 			default -> kind();
 		};
 		return Component.literal(label + ": " + (wanted ? motor().describe() : "idle: its unit is not running it") + heldReadout() + "; "
@@ -226,6 +232,12 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 					new Rotor(rotor.part(RotorBlock.Part.FIN_FAN), new Vector3f(3.0F, 3.6F, 6.0F), Direction.Axis.Y, 0.14F));
 			case "polyethylene_reactor" -> List.of(new Rotor(rotor.part(RotorBlock.Part.INJECTION_PUMP_COUPLING), new Vector3f(2.55F, 0.55F, 1.5F), Direction.Axis.Z, 1.0F));
 			case "pelletizer" -> List.of(new Rotor(rotor.part(RotorBlock.Part.GAS_COMPRESSOR_COUPLING), new Vector3f(1.5F, 0.9F, 1.6F), Direction.Axis.Z, 1.0F));
+			case "air_cooled_condenser" -> List.of(
+					new Rotor(rotor.part(RotorBlock.Part.FIN_FAN), new Vector3f(1.5F, 5.4F, 1.5F), Direction.Axis.Y, 0.14F),
+					new Rotor(rotor.part(RotorBlock.Part.FIN_FAN), new Vector3f(4.5F, 5.4F, 1.5F), Direction.Axis.Y, 0.14F),
+					new Rotor(rotor.part(RotorBlock.Part.FIN_FAN), new Vector3f(1.5F, 5.4F, 4.5F), Direction.Axis.Y, 0.14F),
+					new Rotor(rotor.part(RotorBlock.Part.FIN_FAN), new Vector3f(4.5F, 5.4F, 4.5F), Direction.Axis.Y, 0.14F));
+			case "hrsg_feed_pump" -> List.of(new Rotor(rotor.part(RotorBlock.Part.INJECTION_PUMP_COUPLING), new Vector3f(1.0F, 0.7F, 1.7F), Direction.Axis.Z, 1.0F));
 			default -> List.of();
 		};
 	}
@@ -242,12 +254,12 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 
 	@Override
 	public float displayDivisor() {
-		return kind().equals("overhead_condenser") ? 2 : 20;   // the fin fans turn slowly enough to show at their own speed
+		return kind().equals("overhead_condenser") || kind().equals("air_cooled_condenser") ? 2 : 20;   // the fin fans turn slowly enough to show at their own speed
 	}
 
 	@Override
 	public net.minecraft.sounds.SoundEvent loop() {
-		return running.on() ? (kind().equals("overhead_condenser") ? WildcatterSounds.FAN : WildcatterSounds.MOTOR_HUM) : null;
+		return running.on() ? (kind().endsWith("condenser") ? WildcatterSounds.FAN : WildcatterSounds.MOTOR_HUM) : null;
 	}
 
 	@Override

@@ -14,8 +14,10 @@ public enum Voltage {
 	/** 12.47 kV (11 kV IEC): feeders from the substation to the pole transformers. */
 	DISTRIBUTION,
 	HIGH,
-	/** 480Y/277 V (400Y/230 V IEC): industrial low voltage, for motors and plants. Last in the list so saved tiers keep their numbers. */
-	INDUSTRIAL;
+	/** 480Y/277 V (400Y/230 V IEC): industrial low voltage, for motors and plants. */
+	INDUSTRIAL,
+	/** 13.8 kV (11 kV IEC): generator terminals of the big plants (docs/multiblocks/gas-turbine.md). New tiers go last, so saved tiers keep their numbers. */
+	GENERATOR;
 
 	public String label() {
 		return ElectricalStandard.active().level(this).label();

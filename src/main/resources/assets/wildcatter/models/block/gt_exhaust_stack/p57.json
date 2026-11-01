@@ -1,0 +1,251 @@
+{
+ "textures": {
+  "engine": "wildcatter:block/mat/mat_paint_engine",
+  "gasgreen": "wildcatter:block/mat/mat_paint_pad_green",
+  "grey": "wildcatter:block/mat/mat_paint_ansi61",
+  "blue": "wildcatter:block/mat/mat_paint_ansi70",
+  "iron": "wildcatter:block/mat/mat_cast_iron",
+  "dark": "wildcatter:block/mat/mat_oil_dark",
+  "galv": "wildcatter:block/mat/mat_galvanized",
+  "steel": "wildcatter:block/mat/mat_stainless",
+  "rubber": "wildcatter:block/mat/mat_rubber",
+  "copper": "wildcatter:block/mat/mat_copper",
+  "brass": "wildcatter:block/mat/mat_brass",
+  "lagging": "wildcatter:block/mat/mat_aluminium_lagging",
+  "checker": "wildcatter:block/mat/mat_checker_plate",
+  "nameplate": "wildcatter:block/mat/decal_nameplate",
+  "danger": "wildcatter:block/mat/decal_danger_hv",
+  "gauge": "wildcatter:block/mat/decal_gauge",
+  "controller": "wildcatter:block/mat/decal_controller",
+  "engineplate": "wildcatter:block/mat/decal_engine_plate",
+  "concrete": "wildcatter:block/mat/mat_concrete",
+  "polymer": "wildcatter:block/mat/mat_polymer_grey",
+  "padgreen": "wildcatter:block/mat/mat_paint_pad_green",
+  "porcelain": "wildcatter:block/mat/mat_porcelain_brown",
+  "particle": "wildcatter:block/mat/mat_paint_ansi61"
+ },
+ "elements": [
+  {
+   "from": [
+    6.62,
+    0.0,
+    -1.4867
+   ],
+   "to": [
+    7.1,
+    0.96,
+    5.0098
+   ],
+   "faces": {
+    "north": {
+     "texture": "#iron",
+     "uv": [
+      8.9,
+      15.04,
+      9.38,
+      16.0
+     ]
+    },
+    "south": {
+     "texture": "#iron",
+     "uv": [
+      6.62,
+      15.04,
+      7.1,
+      16.0
+     ]
+    },
+    "west": {
+     "texture": "#iron",
+     "uv": [
+      9.5035,
+      15.04,
+      16.0,
+      16.0
+     ]
+    },
+    "east": {
+     "texture": "#iron",
+     "uv": [
+      9.5035,
+      15.04,
+      16.0,
+      16.0
+     ]
+    },
+    "up": {
+     "texture": "#iron",
+     "uv": [
+      6.62,
+      9.5035,
+      7.1,
+      16.0
+     ]
+    },
+    "down": {
+     "texture": "#iron",
+     "uv": [
+      6.62,
+      9.5035,
+      7.1,
+      16.0
+     ]
+    }
+   },
+   "rotation": {
+    "origin": [
+     6.86,
+     0.48,
+     1.7616
+    ],
+    "axis": "y",
+    "angle": -20.0
+   }
+  },
+  {
+   "from": [
+    5.52,
+    0.0,
+    4.7518
+   ],
+   "to": [
+    6.0,
+    0.96,
+    11.2482
+   ],
+   "faces": {
+    "north": {
+     "texture": "#iron",
+     "uv": [
+      10.0,
+      15.04,
+      10.48,
+      16.0
+     ]
+    },
+    "south": {
+     "texture": "#iron",
+     "uv": [
+      5.52,
+      15.04,
+      6.0,
+      16.0
+     ]
+    },
+    "west": {
+     "texture": "#iron",
+     "uv": [
+      4.7518,
+      15.04,
+      11.2482,
+      16.0
+     ]
+    },
+    "east": {
+     "texture": "#iron",
+     "uv": [
+      4.7518,
+      15.04,
+      11.2482,
+      16.0
+     ]
+    },
+    "up": {
+     "texture": "#iron",
+     "uv": [
+      5.52,
+      4.7518,
+      6.0,
+      11.2482
+     ]
+    },
+    "down": {
+     "texture": "#iron",
+     "uv": [
+      5.52,
+      4.7518,
+      6.0,
+      11.2482
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    6.62,
+    0.0,
+    10.9902
+   ],
+   "to": [
+    7.1,
+    0.96,
+    17.4867
+   ],
+   "faces": {
+    "north": {
+     "texture": "#iron",
+     "uv": [
+      8.9,
+      15.04,
+      9.38,
+      16.0
+     ]
+    },
+    "south": {
+     "texture": "#iron",
+     "uv": [
+      6.62,
+      15.04,
+      7.1,
+      16.0
+     ]
+    },
+    "west": {
+     "texture": "#iron",
+     "uv": [
+      9.5035,
+      15.04,
+      16.0,
+      16.0
+     ]
+    },
+    "east": {
+     "texture": "#iron",
+     "uv": [
+      9.5035,
+      15.04,
+      16.0,
+      16.0
+     ]
+    },
+    "up": {
+     "texture": "#iron",
+     "uv": [
+      6.62,
+      9.5035,
+      7.1,
+      16.0
+     ]
+    },
+    "down": {
+     "texture": "#iron",
+     "uv": [
+      6.62,
+      9.5035,
+      7.1,
+      16.0
+     ]
+    }
+   },
+   "rotation": {
+    "origin": [
+     6.86,
+     0.48,
+     14.2384
+    ],
+    "axis": "y",
+    "angle": 20.0
+   }
+  }
+ ]
+}

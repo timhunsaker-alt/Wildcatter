@@ -199,6 +199,27 @@ public final class Tuning {
 	public static final double PE_KG_PER_SHEET = 1.0;
 	public static final int PELLETIZER_BIN = 256;
 
+	// ---- The gas turbine and combined cycle (docs/multiblocks/gas-turbine.md, combined-cycle.md, approved 2026-10-31) -------
+	public static final double GT_WATTS = 16_500_000.0;            // ISO rating, Solar Titan 130 class
+	public static final double GT_HEAT_RATE = 10_230.0;            // kJ/kWh: 35 %
+	public static final double GT_NO_LOAD_FUEL = 0.30;             // of full-load fuel at no load
+	public static final double GT_STARTER_WATTS = 224_000.0;       // 300 hp, 4.16 kV
+	public static final double GT_PURGE_SECONDS = 60.0;            // at a quarter speed, before light-off
+	public static final double GT_RUNUP_SECONDS = 120.0;           // light-off to full speed (a real start is about ten minutes)
+	public static final double GT_STARTER_DROPOUT = 0.6;           // of full speed: the turbine runs on alone above it
+	public static final int GT_GENERATOR_POLES = 4;                // 1,800 rpm at 60 Hz, 1,500 at 50 Hz
+	public static final double LIQUID_FUEL_JOULES_PER_L = 36.0e6;  // diesel and kerosene
+	public static final double HRSG_RECOVERY = 0.65;               // of the exhaust's heat above stack temperature, to steam
+	public static final double STEAM_CYCLE_EFFICIENCY = 0.27;      // steam turbine power out of HRSG heat: 5.2 MW at full load
+	public static final double HRSG_WARMUP_SECONDS = 120.0;        // its steam follows the exhaust with this time constant
+	public static final double ST_WATTS = 5_000_000.0;             // 6.25 MVA at 0.8 PF
+	public static final double ACC_FAN_WATTS = 149_000.0;          // four 50 hp fans, 480 V
+	public static final double HRSG_FEED_PUMP_WATTS = 45_000.0;    // 60 hp, 480 V: 6 L/s at 5 MPa
+	public static final double GSU25_VA = 25_000_000.0;            // 13.8 kV delta / 138 kV grounded wye
+	public static final double GSU25_PERCENT_Z = 8.0;
+	public static final double LOAD_BANK_STEP_WATTS = 1_000_000.0; // 1 MW steps, 0 to 10 MW
+	public static final int LOAD_BANK_STEPS = 10;
+
 	// ---- Refining and engines ----------------------------------------------------------------------------------------
 	public static final int DIESEL_BUCKET_UNITS = 1000;
 	public static final double DIESEL_FUEL_TICKS_PER_UNIT = 16.0;   // burning it in a firebox
@@ -307,6 +328,7 @@ public final class Tuning {
 	public static final int[] BREAKER_AMPS = {15, 20, 30, 50};               // 110 V
 	public static final int[] BREAKER_AMPS_MEDIUM = {30, 60, 100, 200};      // 4.16 kV: a 100 kW generator makes 24 A
 	public static final int[] BREAKER_AMPS_HIGH = {100, 200, 400, 600};      // 138 kV
+	public static final int[] BREAKER_AMPS_GENERATOR = {600, 1200};          // 13.8 kV: generator circuit breakers
 	public static final int[] BREAKER_AMPS_DISTRIBUTION = {200, 400, 600, 1200};   // feeder breakers
 	public static final int[] BREAKER_AMPS_INDUSTRIAL = {20, 30, 60, 100, 225, 400};   // 480 V frames and trips
 	public static final double BREAKER_MAGNETIC_MULTIPLE = 8; // instant trip at this many times the rating: a short circuit
@@ -355,7 +377,7 @@ public final class Tuning {
 	public static int maxSpan(dev.wildcatter.energy.Voltage voltage) {
 		return switch (voltage) {
 			case LOW, INDUSTRIAL -> SPAN_MAX_LOW;
-			case MEDIUM, DISTRIBUTION -> SPAN_MAX_DISTRIBUTION;
+			case MEDIUM, DISTRIBUTION, GENERATOR -> SPAN_MAX_DISTRIBUTION;
 			case HIGH -> SPAN_MAX_HIGH;
 		};
 	}

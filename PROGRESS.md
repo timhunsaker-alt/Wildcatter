@@ -475,6 +475,20 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 6a: the gas turbine and combined cycle
+- **Specs:** docs/multiblocks/gas-turbine.md and combined-cycle.md (approved with the plan, 2026-10-31).
+- **13.8 kV tier:** `Voltage.GENERATOR` (11 kV IEC), 1,200 A generator bus duct, the 15 kV generator circuit breaker (it carries the
+  generator's synchronizing breaker and the bus voltage transformers that ground-reference the bus), and a 25 MVA 13.8/138 kV GSU.
+- **Gas turbine** (`TurbinePartBlock`, a unit by touching): the 16.5 MW package (controller; heat rate 10,230 kJ/kWh, 30 % of full
+  fuel at no load), its inlet house, a 20.6 MVA generator and an exhaust stack or HRSG. A 300 hp 4.16 kV starter purges it a
+  minute, it lights and runs up in two (a real start is ten), and its generator synchronizes. Pipeline gas, diesel or kerosene.
+- **Combined cycle:** the HRSG (65 % of the exhaust heat, two minutes to warm), the 5 MW steam turbine with its 6.25 MVA generator,
+  the air-cooled condenser (149 kW of fans) and the feed pump (45 kW). 21.7 MW at 46 % at full load.
+- **Load bank:** 0 to 10 MW at 13.8 kV in 1 MW steps.
+- **Models:** `gas_turbine.py` (six parts and the GSU) and `combined_cycle.py` (five parts). No Ludo credits.
+- **Game test:** new scene `gasTurbine` (no 4.16 kV: no start; the purge; at speed onto the dead bus; 138 kV on the GSU; 10 MW then
+  20 MW on two load banks; the steam turbine on line; 42 % at 18.5 MW). The purge-to-speed and the HRSG's warm-up are skipped by hooks.
+
 ## Phase 5c and 5d: crude units, the cracker and plastic
 - **Specs:** docs/multiblocks/crude-units.md and cracker.md (approved with the plan, 2026-10-31). The Phase 1 one-block refinery and
   its columns are removed (refinery-tower.md is marked replaced); in an older world they vanish.
@@ -513,6 +527,9 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- Phase 6a is in; 6b (the 45 MW aeroderivative) follows after Tim's check. The gas turbine has no ramp limit yet: it takes load as
+  the governor asks. Its generator coupling does not turn on screen (the condenser fans and feed pump do).
+- The 13.8 kV bus has no relay protection of its own: the generators trip on stator overcurrent and frequency.
 - Phase 5 is complete with 5c and 5d (the lease, the gas plant, the crude units, the cracker). Tim checks each in a real session.
 - Gasoline and kerosene have no engine of their own yet: kerosene and diesel are for the Phase 6 gas turbine.
 - The cracker test tops up the furnace's water with a hook; the pump feeding a furnace is wired but not exercised in a test.

@@ -27,6 +27,8 @@ Put the jar in your instance's `mods` folder next to:
 - Refining: a 1,000 bbl/day topping unit (early) and a 20,000 bbl/day crude unit (late) split crude into LPG, gasoline,
   kerosene, diesel and residue. A steam cracker and a polyethylene reactor make plastic sheets from LPG or gasoline. The old
   one-block refinery is gone: in an older world it disappears.
+- A 16.5 MW gas turbine at 13.8 kV, with a heat recovery steam generator and a 5 MW steam turbine for combined cycle, a 25 MVA
+  step-up to 138 kV, generator bus duct and breakers, and a load bank for commissioning.
 - The Field Manual item explains how to build each machine.
 
 ## Older worlds

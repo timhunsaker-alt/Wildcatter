@@ -76,7 +76,7 @@ and the Field Manual has a page for each new system.
   4.5e into 4.5e and 4.5f was decided with Tim on 2026-10-31. The refinery waits for Phase 5.
 - Tim checks each wave in a real session before the next starts.
 
-## Phase 5 — Oil and gas depth — CURRENT (started 2026-10-31; all four waves built 2026-10-31, waiting for Tim's check)
+## Phase 5 — Oil and gas depth — DONE 2026-10-31 (all four waves built; Tim checks them in play)
 - Wellhead separator (oil / gas / water), gas processing, compressor stations.
 - Refinery products: LPG, gasoline, kerosene, diesel, residue. Steam cracker → ethylene → plastic.
 - Waves (decided with Tim on 2026-10-31: follow the chain; wells give a real mixed stream; each run of steel pipe carries one
@@ -89,8 +89,13 @@ and the Field Manual has a page for each new system.
   plastic.
 - Tim checks each wave in a real session before the next starts.
 
-## Phase 6 — Gas turbine and combined cycle
+## Phase 6 — Gas turbine and combined cycle — CURRENT (started 2026-10-31)
 - Utility gas turbine + heat recovery steam generator (HRSG) feeding the steam turbine.
+- Waves (decided with Tim on 2026-10-31: an early and a late turbine; the HRSG feeds a new 5 MW steam turbine; 13.8 kV generators
+  through a 25 MVA GSU to 138 kV; an electric starter): 6a the 13.8 kV tier, a 16.5 MW industrial gas turbine (Titan 130 class),
+  the HRSG and the 5 MW steam turbine with its air-cooled condenser, the generator breaker, bus duct and GSU, and a load bank
+  (docs/multiblocks/gas-turbine.md, combined-cycle.md); 6b a 45 MW aeroderivative (LM6000 class) peaker in simple cycle with its
+  own 60 MVA GSU, proposed after Tim tries 6a.
 
 ## Phase 7 — Nuclear fuel chain
 - Uranium ore → yellowcake → UF6 → centrifuge cascade enrichment → pellets → rods → assemblies.

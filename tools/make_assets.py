@@ -944,7 +944,7 @@ def busway_side(img, d):
 
 
 tex("busway_placeholder", busway_side)
-for bus in ("busway_lv", "busway_industrial"):
+for bus in ("busway_lv", "busway_industrial", "bus_duct_gen"):
 	t = {"cable": f"{ns}:block/{art('busway')}", "particle": f"{ns}:block/{art('busway')}"}
 	save_json(f"{ASSETS}/models/block/{bus}_core.json", {"textures": t, "elements": [cuboid([4, 4, 4], [12, 12, 12])]})
 	save_json(f"{ASSETS}/models/block/{bus}_arm.json", {"textures": t, "elements": [cuboid([4, 4, 0], [12, 12, 4])]})
@@ -956,10 +956,11 @@ for bus in ("busway_lv", "busway_industrial"):
 	save_json(f"{ASSETS}/items/{bus}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{bus}_inventory"}})
 	shaped(bus, ["SCS", "CCC", "SCS"], {"S": f"{ns}:steel_ingot", "C": "minecraft:copper_block"}, bus, 4)
 pick = json.load(open(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json"))
-pick["values"] += [f"{ns}:busway_lv", f"{ns}:busway_industrial"]
+pick["values"] += [f"{ns}:busway_lv", f"{ns}:busway_industrial", f"{ns}:bus_duct_gen"]
 save_json(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json", pick)
 lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
 lang.update({"block.wildcatter.busway_lv": "Busway (208Y/120 V, A B C N G)", "block.wildcatter.busway_industrial": "Busway (480 V, A B C N G)",
+	"block.wildcatter.bus_duct_gen": "Generator Bus Duct (13.8 kV, 1,200 A, A B C N G)",
 	"itemGroup.wildcatter": "Wildcatter"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
@@ -1319,7 +1320,7 @@ for name, family in FAMILY.items():
 		recipe["result"]["components"] = {SIZE_KEY: big}
 		save_json(path, recipe)
 # conductor blocks drop themselves; CableBlock and MultiCableBlock put the size on the drop
-for name in [n for n in FAMILY if n not in SPOOLS] + ["busway_lv", "busway_industrial"]:
+for name in [n for n in FAMILY if n not in SPOOLS] + ["busway_lv", "busway_industrial", "bus_duct_gen"]:
 	save_json(f"{DATA}/loot_table/blocks/{name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
 		"entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],   # the block adds the size (CableBlock.getDrops)
 		"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
@@ -1467,6 +1468,38 @@ lang.update({"block.wildcatter.topping_column": "Topping Column (1,000 bbl/day, 
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 ROTOR_PARTS += ("skid_fan", "fin_fan")
 save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ROTOR_PARTS}})
+
+# ---- Phase 6a: the gas turbine and combined cycle (docs/multiblocks/gas-turbine.md, combined-cycle.md) -------------------------
+# blockstates, models, shapes and items come from tools/models/gas_turbine.py and combined_cycle.py; here loot, names, tags, recipes.
+TURBINE_PARTS = ("gas_turbine", "gt_inlet_house", "gt_generator", "gen_breaker", "gt_exhaust_stack", "hrsg", "steam_turbine_5", "st_generator",
+	"air_cooled_condenser", "hrsg_feed_pump", "load_bank", "gsu_25")
+for name in TURBINE_PARTS:
+	big_part_loot(name)
+for tag in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
+	t["values"] += [f"{ns}:{n}" for n in TURBINE_PARTS]
+	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
+B_, CB_ = "minecraft:iron_block", "minecraft:copper_block"
+shaped("gas_turbine", ["BCB", "XTX", "BPB"], {"B": B_, "C": CB_, "X": f"{ns}:crankshaft", "T": f"{ns}:turbine_casing", "P": f"{ns}:gas_line"}, "gas_turbine")
+shaped("gt_inlet_house", ["SWS", "SWS", "S S"], {"S": S_, "W": "minecraft:white_wool"}, "gt_inlet_house")
+shaped("gt_generator", ["BCB", "CXC", "BCB"], {"B": B_, "C": CB_, "X": f"{ns}:crankshaft"}, "gt_generator")
+shaped("gen_breaker", ["SCS", "SRS", "SCS"], {"S": S_, "C": CB_, "R": "minecraft:redstone_block"}, "gen_breaker")
+shaped("gt_exhaust_stack", ["S S", "S S", "SBS"], {"S": S_, "B": B_}, "gt_exhaust_stack")
+shaped("hrsg", ["BPB", "BWB", "BFB"], {"B": B_, "P": f"{ns}:pipe", "W": "minecraft:water_bucket", "F": "minecraft:blast_furnace"}, "hrsg")
+shaped("steam_turbine_5", ["SCS", "XTX", "SSS"], {"S": S_, "C": CB_, "X": f"{ns}:crankshaft", "T": f"{ns}:turbine_casing"}, "steam_turbine_5")
+shaped("st_generator", ["SCS", "CXC", "SCS"], {"S": S_, "C": CB_, "X": f"{ns}:crankshaft"}, "st_generator")
+shaped("air_cooled_condenser", ["SGS", "GXG", "S S"], {"S": S_, "G": "minecraft:iron_bars", "X": "minecraft:piston"}, "air_cooled_condenser")
+shaped("hrsg_feed_pump", ["SCS", "PXP", "SSS"], {"S": S_, "C": "minecraft:copper_ingot", "P": f"{ns}:pipe", "X": "minecraft:piston"}, "hrsg_feed_pump")
+shaped("load_bank", ["SRS", "RCR", "SRS"], {"S": S_, "R": "minecraft:redstone", "C": CB_}, "load_bank")
+shaped("gsu_25", ["SDS", "TCT", "SDS"], {"S": S_, "D": "minecraft:diamond", "T": f"{ns}:gsu_transformer", "C": CB_}, "gsu_25")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({"block.wildcatter.gas_turbine": "Gas Turbine (16.5 MW, controller)", "block.wildcatter.gt_inlet_house": "Gas Turbine Inlet House",
+	"block.wildcatter.gt_generator": "Gas Turbine Generator (20.6 MVA, 13.8 kV)", "block.wildcatter.gen_breaker": "Generator Circuit Breaker (15 kV, 1,200 A)",
+	"block.wildcatter.gt_exhaust_stack": "Gas Turbine Exhaust Stack", "block.wildcatter.hrsg": "Heat Recovery Steam Generator (HRSG)",
+	"block.wildcatter.steam_turbine_5": "Steam Turbine (5 MW)", "block.wildcatter.st_generator": "Steam Turbine Generator (6.25 MVA, 13.8 kV)",
+	"block.wildcatter.air_cooled_condenser": "Air-Cooled Condenser", "block.wildcatter.hrsg_feed_pump": "HRSG Feed Pump (60 hp)",
+	"block.wildcatter.load_bank": "Load Bank (13.8 kV, 10 MW)", "block.wildcatter.gsu_25": "Generator Step-Up Transformer (25 MVA, 13.8/138 kV)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
 
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys

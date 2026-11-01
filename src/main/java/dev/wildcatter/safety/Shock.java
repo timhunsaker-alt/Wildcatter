@@ -24,6 +24,7 @@ public final class Shock {
 			case DISTRIBUTION -> Tuning.SHOCK_DAMAGE_DISTRIBUTION;
 			case INDUSTRIAL -> Tuning.SHOCK_DAMAGE_INDUSTRIAL;
 			case HIGH -> Tuning.SHOCK_DAMAGE_HIGH;
+			case GENERATOR -> Tuning.SHOCK_DAMAGE_DISTRIBUTION;
 		};
 	}
 
@@ -35,6 +36,7 @@ public final class Shock {
 			case DISTRIBUTION -> Tuning.BARE_REACH_DISTRIBUTION;
 			case INDUSTRIAL -> Tuning.BARE_REACH_INDUSTRIAL;
 			case HIGH -> Tuning.BARE_REACH_HIGH;
+			case GENERATOR -> Tuning.BARE_REACH_DISTRIBUTION;
 		};
 	}
 
@@ -45,6 +47,7 @@ public final class Shock {
 			case DISTRIBUTION -> Tuning.TOUCH_SHOCK_CHANCE_DISTRIBUTION;
 			case INDUSTRIAL -> Tuning.TOUCH_SHOCK_CHANCE_INDUSTRIAL;
 			case HIGH -> Tuning.TOUCH_SHOCK_CHANCE_HIGH;
+			case GENERATOR -> Tuning.TOUCH_SHOCK_CHANCE_DISTRIBUTION;
 		};
 	}
 

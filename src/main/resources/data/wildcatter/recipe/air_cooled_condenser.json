@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SGS",
+    "GXG",
+    "S S"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "G": "minecraft:iron_bars",
+    "X": "minecraft:piston"
+  },
+  "result": {
+    "id": "wildcatter:air_cooled_condenser",
+    "count": 1
+  }
+}

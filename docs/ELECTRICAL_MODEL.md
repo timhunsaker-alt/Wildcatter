@@ -36,6 +36,10 @@ and makes no claim to teach or certify electrical work.
 - **Migration from current build:** 110 V → 120 V (NA) / 230 V (IEC); add split-phase for NA.
   4.16 kV keeps its role as NA industrial MV. Add the distribution level. 138 kV stays (NA).
 
+Built as a tier (Phase 6a, 2026-10-31): generator terminals are `Voltage.GENERATOR`, 13.8 kV (11 kV IEC), carried by 1,200 A
+generator bus duct from a generator's breaker to its 25 MVA step-up (docs/multiblocks/gas-turbine.md). The generator breaker's bus
+voltage transformers (wye-grounded, 1 MΩ a phase) give the 13.8 kV bus its ground reference while the generator is off.
+
 ## Phases and conductors
 - Every conductor has an identity: **A, B, C, N (neutral), G (ground)**. This replaces the current
   hot/neutral roles; hot becomes A, B or C.

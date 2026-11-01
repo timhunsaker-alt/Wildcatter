@@ -354,6 +354,21 @@ public final class WildcatterBlocks {
 	public static final Block COLD_BOX = petrochemPart(dev.wildcatter.block.PetrochemPartBlock.Part.COLD_BOX);
 	public static final Block POLYETHYLENE_REACTOR = petrochemPart(dev.wildcatter.block.PetrochemPartBlock.Part.POLYETHYLENE_REACTOR);
 	public static final Block PELLETIZER = petrochemPart(dev.wildcatter.block.PetrochemPartBlock.Part.PELLETIZER);
+	/** The gas turbine and combined cycle (docs/multiblocks/gas-turbine.md, combined-cycle.md). */
+	public static final Block GAS_TURBINE = turbinePart(dev.wildcatter.block.TurbinePartBlock.Part.GAS_TURBINE);
+	public static final Block GT_INLET_HOUSE = turbinePart(dev.wildcatter.block.TurbinePartBlock.Part.GT_INLET_HOUSE);
+	public static final Block GT_GENERATOR = turbinePart(dev.wildcatter.block.TurbinePartBlock.Part.GT_GENERATOR);
+	public static final Block GEN_BREAKER = turbinePart(dev.wildcatter.block.TurbinePartBlock.Part.GEN_BREAKER);
+	public static final Block GT_EXHAUST_STACK = turbinePart(dev.wildcatter.block.TurbinePartBlock.Part.GT_EXHAUST_STACK);
+	public static final Block HRSG = turbinePart(dev.wildcatter.block.TurbinePartBlock.Part.HRSG);
+	public static final Block STEAM_TURBINE_5 = turbinePart(dev.wildcatter.block.TurbinePartBlock.Part.STEAM_TURBINE_5);
+	public static final Block ST_GENERATOR = turbinePart(dev.wildcatter.block.TurbinePartBlock.Part.ST_GENERATOR);
+	public static final Block AIR_COOLED_CONDENSER = turbinePart(dev.wildcatter.block.TurbinePartBlock.Part.AIR_COOLED_CONDENSER);
+	public static final Block HRSG_FEED_PUMP = turbinePart(dev.wildcatter.block.TurbinePartBlock.Part.HRSG_FEED_PUMP);
+	public static final Block LOAD_BANK = turbinePart(dev.wildcatter.block.TurbinePartBlock.Part.LOAD_BANK);
+	public static final Block GSU_25 = block("gsu_25", props -> new dev.wildcatter.block.Gsu25TransformerBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.GENERATOR, Voltage.HIGH, Tuning.GSU25_VA, Tuning.GSU25_PERCENT_Z));
+	public static final Block BUS_DUCT_GEN = busway("bus_duct_gen", Voltage.GENERATOR);
 	/** Never placed: its states carry the models of the turning parts (kinetic/RotorBlock). */
 	public static final Block ROTOR = block("rotor", props -> new dev.wildcatter.kinetic.RotorBlock(props.noOcclusion().noLootTable()));
 
@@ -363,7 +378,7 @@ public final class WildcatterBlocks {
 			WOOL_WIRE_NEUTRAL, MV_WIRE_HOT, MV_WIRE_NEUTRAL, HV_WIRE_HOT, HV_WIRE_NEUTRAL,
 			PLASTIC_WIRE_HOT, PLASTIC_WIRE_NEUTRAL, MV_PLASTIC_WIRE_HOT, MV_PLASTIC_WIRE_NEUTRAL, HV_PLASTIC_WIRE_HOT, HV_PLASTIC_WIRE_NEUTRAL,
 			INDUSTRIAL_WIRE_HOT, INDUSTRIAL_WIRE_NEUTRAL, INDUSTRIAL_PLASTIC_WIRE_HOT, INDUSTRIAL_PLASTIC_WIRE_NEUTRAL);
-	public static final BlockEntityType<MultiCableBlockEntity> MULTI_CABLE_ENTITY = entity(MultiCableBlockEntity::new, CABLE_LV, CABLE_INDUSTRIAL, CABLE_MV, CABLE_DIST, CABLE_HV, BUSWAY_LV, BUSWAY_INDUSTRIAL);
+	public static final BlockEntityType<MultiCableBlockEntity> MULTI_CABLE_ENTITY = entity(MultiCableBlockEntity::new, CABLE_LV, CABLE_INDUSTRIAL, CABLE_MV, CABLE_DIST, CABLE_HV, BUSWAY_LV, BUSWAY_INDUSTRIAL, BUS_DUCT_GEN);
 	public static final BlockEntityType<MotorStarterBlockEntity> MOTOR_STARTER_ENTITY = entity(MotorStarterBlockEntity::new, MOTOR_STARTER, MCC_BUCKET);
 	public static final BlockEntityType<MccIncomingBlockEntity> MCC_INCOMING_ENTITY = entity(MccIncomingBlockEntity::new, MCC_INCOMING);
 	public static final BlockEntityType<dev.wildcatter.block.MccSectionBlockEntity> MCC_SECTION_ENTITY = entity(dev.wildcatter.block.MccSectionBlockEntity::new, MCC_SECTION);
@@ -378,7 +393,14 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<dev.wildcatter.block.SeparatorBlockEntity> SEPARATOR_ENTITY = entity(dev.wildcatter.block.SeparatorBlockEntity::new, SEPARATOR);
 	public static final BlockEntityType<dev.wildcatter.block.StorageTankBlockEntity> STORAGE_TANK_ENTITY = entity(dev.wildcatter.block.StorageTankBlockEntity::new, STOCK_TANK, WATER_TANK, LPG_BULLET);
 	public static final BlockEntityType<dev.wildcatter.block.GasCompressorBlockEntity> GAS_COMPRESSOR_ENTITY = entity(dev.wildcatter.block.GasCompressorBlockEntity::new, GAS_COMPRESSOR, REFRIGERATION_COMPRESSOR, CRACKED_GAS_COMPRESSOR);
-	public static final BlockEntityType<dev.wildcatter.block.UnitMotorBlockEntity> UNIT_MOTOR_ENTITY = entity(dev.wildcatter.block.UnitMotorBlockEntity::new, TOPPING_SKID, DESALTER, CRUDE_CHARGE_PUMP, OVERHEAD_CONDENSER);
+	public static final BlockEntityType<dev.wildcatter.block.UnitMotorBlockEntity> UNIT_MOTOR_ENTITY = entity(dev.wildcatter.block.UnitMotorBlockEntity::new, TOPPING_SKID, DESALTER, CRUDE_CHARGE_PUMP, OVERHEAD_CONDENSER, AIR_COOLED_CONDENSER, HRSG_FEED_PUMP);
+	public static final BlockEntityType<dev.wildcatter.block.GasTurbineBlockEntity> GAS_TURBINE_ENTITY = entity(dev.wildcatter.block.GasTurbineBlockEntity::new, GAS_TURBINE);
+	public static final BlockEntityType<dev.wildcatter.block.GeneratorPartBlockEntity> GENERATOR_PART_ENTITY = entity(dev.wildcatter.block.GeneratorPartBlockEntity::new, GT_GENERATOR, ST_GENERATOR);
+	public static final BlockEntityType<dev.wildcatter.block.GenBreakerBlockEntity> GEN_BREAKER_ENTITY = entity(dev.wildcatter.block.GenBreakerBlockEntity::new, GEN_BREAKER);
+	public static final BlockEntityType<dev.wildcatter.block.HrsgBlockEntity> HRSG_ENTITY = entity(dev.wildcatter.block.HrsgBlockEntity::new, HRSG);
+	public static final BlockEntityType<dev.wildcatter.block.SteamCycleBlockEntity> STEAM_CYCLE_ENTITY = entity(dev.wildcatter.block.SteamCycleBlockEntity::new, STEAM_TURBINE_5);
+	public static final BlockEntityType<dev.wildcatter.block.LoadBankBlockEntity> LOAD_BANK_ENTITY = entity(dev.wildcatter.block.LoadBankBlockEntity::new, LOAD_BANK);
+	public static final BlockEntityType<dev.wildcatter.block.TurbinePassiveBlockEntity> TURBINE_PASSIVE_ENTITY = entity(dev.wildcatter.block.TurbinePassiveBlockEntity::new, GT_INLET_HOUSE, GT_EXHAUST_STACK);
 	public static final BlockEntityType<dev.wildcatter.block.FiredHeaterBlockEntity> FIRED_HEATER_ENTITY = entity(dev.wildcatter.block.FiredHeaterBlockEntity::new, TOPPING_HEATER, CRUDE_HEATER);
 	public static final BlockEntityType<dev.wildcatter.block.StripperBlockEntity> STRIPPER_ENTITY = entity(dev.wildcatter.block.StripperBlockEntity::new, SIDE_STRIPPERS);
 	public static final BlockEntityType<dev.wildcatter.block.ToppingColumnBlockEntity> TOPPING_COLUMN_ENTITY = entity(dev.wildcatter.block.ToppingColumnBlockEntity::new, TOPPING_COLUMN);
@@ -408,7 +430,7 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<dev.wildcatter.block.PowerTransformerBlockEntity> POWER_TRANSFORMER_ENTITY = entity(dev.wildcatter.block.PowerTransformerBlockEntity::new, POWER_TRANSFORMER);
 	public static final BlockEntityType<dev.wildcatter.block.DisconnectSwitchBlockEntity> DISCONNECT_ENTITY = entity(dev.wildcatter.block.DisconnectSwitchBlockEntity::new, DISCONNECT_HV, DISCONNECT_DIST);
 	public static final BlockEntityType<TransformerBlockEntity> TRANSFORMER_ENTITY = entity(TransformerBlockEntity::new, TRANSFORMER, SUBSTATION_TRANSFORMER, POLE_TRANSFORMER,
-			PADMOUNT_208, PADMOUNT_480, UNIT_SUBSTATION, GSU_TRANSFORMER);
+			PADMOUNT_208, PADMOUNT_480, UNIT_SUBSTATION, GSU_TRANSFORMER, GSU_25);
 
 	public static final BlockEntityType<FireboxBlockEntity> FIREBOX_ENTITY = entity(FireboxBlockEntity::new, FIREBOX);
 	public static final BlockEntityType<PumpBlockEntity> PUMP_ENTITY = entity(PumpBlockEntity::new, PUMP);
@@ -470,6 +492,11 @@ public final class WildcatterBlocks {
 	private static Block gensetPart(String name, dev.wildcatter.block.GensetPartBlock.Part part) {
 		return block(name, props -> new dev.wildcatter.block.GensetPartBlock(props.mapColor(MapColor.COLOR_GRAY)
 				.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
+	}
+
+	private static Block turbinePart(dev.wildcatter.block.TurbinePartBlock.Part part) {
+		return block(part.id(), props -> new dev.wildcatter.block.TurbinePartBlock(props.mapColor(MapColor.COLOR_GRAY)
+				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
 	}
 
 	private static Block refineryPart(dev.wildcatter.block.RefineryPartBlock.Part part) {
@@ -646,6 +673,11 @@ public final class WildcatterBlocks {
 		for (Block part : new Block[] {TOPPING_COLUMN, TOPPING_HEATER, TOPPING_SKID, ATMOSPHERIC_COLUMN, CRUDE_HEATER, DESALTER, CRUDE_CHARGE_PUMP, SIDE_STRIPPERS, OVERHEAD_CONDENSER}) {
 			add(((dev.wildcatter.block.RefineryPartBlock) part).part().id(), part);
 		}
+		for (Block part : new Block[] {GAS_TURBINE, GT_INLET_HOUSE, GT_GENERATOR, GEN_BREAKER, GT_EXHAUST_STACK, HRSG, STEAM_TURBINE_5, ST_GENERATOR, AIR_COOLED_CONDENSER, HRSG_FEED_PUMP, LOAD_BANK}) {
+			add(((dev.wildcatter.block.TurbinePartBlock) part).part().id(), part);
+		}
+		add("gsu_25", GSU_25);
+		add("bus_duct_gen", BUS_DUCT_GEN);
 		for (Block part : new Block[] {CRACKING_FURNACE, QUENCH_TOWER, CRACKED_GAS_COMPRESSOR, COLD_BOX, POLYETHYLENE_REACTOR, PELLETIZER}) {
 			add(((dev.wildcatter.block.PetrochemPartBlock) part).part().id(), part);
 		}
@@ -696,6 +728,13 @@ public final class WildcatterBlocks {
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("chiller"), CHILLER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("stabilizer"), STABILIZER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("unit_motor"), UNIT_MOTOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("gas_turbine"), GAS_TURBINE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("generator_part"), GENERATOR_PART_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("gen_breaker"), GEN_BREAKER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("hrsg"), HRSG_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("steam_cycle"), STEAM_CYCLE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("load_bank"), LOAD_BANK_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("turbine_part"), TURBINE_PASSIVE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("fired_heater"), FIRED_HEATER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("side_strippers"), STRIPPER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("topping_column"), TOPPING_COLUMN_ENTITY);

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "CXC",
+    "SCS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_block",
+    "X": "wildcatter:crankshaft"
+  },
+  "result": {
+    "id": "wildcatter:st_generator",
+    "count": 1
+  }
+}

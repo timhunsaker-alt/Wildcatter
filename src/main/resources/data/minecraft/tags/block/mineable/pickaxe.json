@@ -86,6 +86,7 @@
     "wildcatter:three_phase_heater",
     "wildcatter:busway_lv",
     "wildcatter:busway_industrial",
+    "wildcatter:bus_duct_gen",
     "wildcatter:genset_diesel_engine",
     "wildcatter:genset_gas_engine",
     "wildcatter:alternator",
@@ -149,6 +150,18 @@
     "wildcatter:cracked_gas_compressor",
     "wildcatter:cold_box",
     "wildcatter:polyethylene_reactor",
-    "wildcatter:pelletizer"
+    "wildcatter:pelletizer",
+    "wildcatter:gas_turbine",
+    "wildcatter:gt_inlet_house",
+    "wildcatter:gt_generator",
+    "wildcatter:gen_breaker",
+    "wildcatter:gt_exhaust_stack",
+    "wildcatter:hrsg",
+    "wildcatter:steam_turbine_5",
+    "wildcatter:st_generator",
+    "wildcatter:air_cooled_condenser",
+    "wildcatter:hrsg_feed_pump",
+    "wildcatter:load_bank",
+    "wildcatter:gsu_25"
   ]
 }

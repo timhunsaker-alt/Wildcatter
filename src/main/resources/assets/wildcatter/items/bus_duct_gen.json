@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "wildcatter:block/bus_duct_gen_inventory"
+  }
+}

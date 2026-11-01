@@ -107,6 +107,7 @@
   "block.wildcatter.mcc_bucket": "MCC Starter Bucket (480 V)",
   "block.wildcatter.busway_lv": "Busway (208Y/120 V, A B C N G)",
   "block.wildcatter.busway_industrial": "Busway (480 V, A B C N G)",
+  "block.wildcatter.bus_duct_gen": "Generator Bus Duct (13.8 kV, 1,200 A, A B C N G)",
   "itemGroup.wildcatter": "Wildcatter",
   "block.wildcatter.genset_diesel_engine": "Genset Diesel Engine (500 kW)",
   "block.wildcatter.genset_gas_engine": "Genset Gas Engine (1 MW)",
@@ -203,5 +204,17 @@
   "block.wildcatter.cracked_gas_compressor": "Cracked Gas Compressor (300 hp, 4.16 kV)",
   "block.wildcatter.cold_box": "Cold Box (ethylene recovery)",
   "block.wildcatter.polyethylene_reactor": "Polyethylene Reactor",
-  "block.wildcatter.pelletizer": "Pelletizer (250 hp, 4.16 kV)"
+  "block.wildcatter.pelletizer": "Pelletizer (250 hp, 4.16 kV)",
+  "block.wildcatter.gas_turbine": "Gas Turbine (16.5 MW, controller)",
+  "block.wildcatter.gt_inlet_house": "Gas Turbine Inlet House",
+  "block.wildcatter.gt_generator": "Gas Turbine Generator (20.6 MVA, 13.8 kV)",
+  "block.wildcatter.gen_breaker": "Generator Circuit Breaker (15 kV, 1,200 A)",
+  "block.wildcatter.gt_exhaust_stack": "Gas Turbine Exhaust Stack",
+  "block.wildcatter.hrsg": "Heat Recovery Steam Generator (HRSG)",
+  "block.wildcatter.steam_turbine_5": "Steam Turbine (5 MW)",
+  "block.wildcatter.st_generator": "Steam Turbine Generator (6.25 MVA, 13.8 kV)",
+  "block.wildcatter.air_cooled_condenser": "Air-Cooled Condenser",
+  "block.wildcatter.hrsg_feed_pump": "HRSG Feed Pump (60 hp)",
+  "block.wildcatter.load_bank": "Load Bank (13.8 kV, 10 MW)",
+  "block.wildcatter.gsu_25": "Generator Step-Up Transformer (25 MVA, 13.8/138 kV)"
 }

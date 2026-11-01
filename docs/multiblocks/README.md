@@ -25,6 +25,8 @@ not a go-ahead to build: that waits for the roadmap phase (ROADMAP.md). Nothing 
 | [gas-plant.md](gas-plant.md) | 5b | new: gas compressor, TEG dehydrator, NGL chiller and its refrigeration compressor, stabilizer, LPG bullet |
 | [crude-units.md](crude-units.md) | 5c | the refinery: a 1,000 bbl/day skid topping unit and a 20,000 bbl/day crude unit |
 | [cracker.md](cracker.md) | 5d | new: steam cracker, cold box, polyethylene reactor and pelletizer (plastic) |
+| [gas-turbine.md](gas-turbine.md) | 6a | new: 16.5 MW gas turbine, 13.8 kV generator breaker and bus duct, 25 MVA GSU, load bank |
+| [combined-cycle.md](combined-cycle.md) | 6a | new: HRSG, 5 MW steam turbine, air-cooled condenser, feed pump |
 
 ## Shared rules
 - One **controller** block validates the structure and holds all state. Parts have no logic of their own beyond

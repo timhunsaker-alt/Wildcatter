@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BCB",
+    "CXC",
+    "BCB"
+  ],
+  "key": {
+    "B": "minecraft:iron_block",
+    "C": "minecraft:copper_block",
+    "X": "wildcatter:crankshaft"
+  },
+  "result": {
+    "id": "wildcatter:gt_generator",
+    "count": 1
+  }
+}
