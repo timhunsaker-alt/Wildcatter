@@ -92,6 +92,9 @@
     },
     "part=drawworks_drum": {
       "model": "wildcatter:block/rotor_drawworks_drum"
+    },
+    "part=injection_pump_coupling": {
+      "model": "wildcatter:block/rotor_injection_pump_coupling"
     }
   }
 }

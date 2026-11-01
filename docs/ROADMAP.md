@@ -61,7 +61,7 @@ and the Field Manual has a page for each new system.
   - Sound for each machine (engine idle and load, turbine whine, fans, breaker clunk, fuse pop, flashover, transformer hum),
     with pitch and volume following machine state. Specs go in `docs/multiblocks/` first; sound sources come from Ludo.
 
-## Phase 4.5 — True-scale machines — CURRENT (added 2026-10-30 at Tim's request: "as realistic as Minecraft will allow, not just textures on blocks")
+## Phase 4.5 — True-scale machines — DONE 2026-10-31 (added 2026-10-30 at Tim's request: "as realistic as Minecraft will allow, not just textures on blocks")
 - True scale, 1 block = 1 m. Each real component is one item that fills its real size when placed (like a bed), with a ghost
   outline showing where it will go. Breaking any piece breaks the part and drops one item. Specs are redone with real dimensions.
 - Detailed models built from many boxes (round parts as many-sided shapes, fins, bolts, pipes, gauges) by the model tool in
@@ -76,9 +76,15 @@ and the Field Manual has a page for each new system.
   4.5e into 4.5e and 4.5f was decided with Tim on 2026-10-31. The refinery waits for Phase 5.
 - Tim checks each wave in a real session before the next starts.
 
-## Phase 5 — Oil and gas depth
+## Phase 5 — Oil and gas depth — CURRENT (started 2026-10-31)
 - Wellhead separator (oil / gas / water), gas processing, compressor stations.
 - Refinery products: LPG, gasoline, kerosene, diesel, residue. Steam cracker → ethylene → plastic.
+- Waves (decided with Tim on 2026-10-31: follow the chain; wells give a real mixed stream; each run of steel pipe carries one
+  product): 5a the lease (separator, stock and water tanks, flare, injection pump and disposal well; docs/multiblocks/lease.md);
+  5b gas processing (dehydration, NGL and LPG recovery) and a motor-driven compressor station; 5c the crude distillation unit at
+  true size with a real crude assay (LPG, gasoline, kerosene, diesel, residue); 5d a steam cracker, ethylene, polyethylene and
+  plastic.
+- Tim checks each wave in a real session before the next starts.
 
 ## Phase 6 — Gas turbine and combined cycle
 - Utility gas turbine + heat recovery steam generator (HRSG) feeding the steam turbine.

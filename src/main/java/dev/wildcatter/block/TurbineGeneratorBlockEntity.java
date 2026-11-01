@@ -14,6 +14,7 @@ import dev.wildcatter.circuit.ThreePhaseSource;
 import dev.wildcatter.energy.ElectricalStandard;
 import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.energy.Voltage;
+import dev.wildcatter.fluid.Product;
 import dev.wildcatter.kinetic.Spin;
 import java.util.List;
 import java.util.Set;
@@ -317,15 +318,11 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 		setChanged();
 	}
 
-	/** Pipeline gas at the burner: up to the heat it still needs, from the gas wells on its gas lines. */
+	/** Separated gas at the burner: up to the heat it still needs, from the gas run on any of its cells. */
 	private double drawGas(ServerLevel level, SteamPlantPartBlockEntity burner, double joules) {
 		List<BlockPos> cells = dev.wildcatter.multiblock.BigParts.cellsAt(level, burner.getBlockPos());   // the gas line on any cell
-		Set<BlockPos> lines = Plumbing.network(level, cells, PipeBlock.Kind.GAS);
-		double got = 0;
-		for (GasWellheadBlockEntity head : Plumbing.machines(level, cells, lines, true, GasWellheadBlockEntity.class)) {
-			got += head.offer((joules - got) / Tuning.GAS_JOULES_PER_M3) * Tuning.GAS_JOULES_PER_M3;
-		}
-		return got;
+		return Lines.pull(level, Lines.faces(cells), Product.GAS, joules / Tuning.GAS_JOULES_PER_M3, FluidNode.Pull.MACHINE, null)
+				* Tuning.GAS_JOULES_PER_M3;
 	}
 
 	private boolean live() {

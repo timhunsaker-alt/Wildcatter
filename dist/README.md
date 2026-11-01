@@ -18,9 +18,13 @@ Put the jar in your instance's `mods` folder next to:
   pumpjack's beam rocks and the rig's drill pipe turns while they work. A late-game 1,000 hp land rig, fed 4.16 kV, is the only
   rig that reaches the new deep fields; well casing can't be broken. Breakers, receptacles, lamps and heaters are drawn at
   their real size and mount on the wall, floor or ceiling you click. Overhead spans are measured at 1 m per block.
+- The lease: wells now bring up oil, water and gas together. A separator splits them; oil goes to stock tanks, gas to engines,
+  burners and a flare, and produced water to a water tank, an injection pump and a disposal well on a dry hole. Each run of steel
+  pipe carries one product; the Power Meter on a pipe says what, or BLOCKED where two meet.
 - The Field Manual item explains how to build each machine.
 
 ## Older worlds
 A world made with an older build loses some machines' parts when it loads in this one. Their layouts changed when they
 went to real size, so their parts drop as items. A chat message says where. Rebuild those machines. Old one-block poles and crossarms keep working with their spans, but new lines use the true-size poles. Old one-block MCC buckets drop as bucket items: click them into a starter section. An old pumpjack becomes an oil wellhead
-and drops as an item: click the wellhead with it to set it over the well.
+and drops as an item: click the wellhead with it to set it over the well. Since 5a a pumpjack's stream needs a separator before a
+refinery, and gas gensets need separated gas (a gas well's wet gas is refused); fireboxes still burn a well's stream directly.

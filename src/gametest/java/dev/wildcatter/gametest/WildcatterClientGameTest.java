@@ -145,6 +145,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("landRig")) {
 				landRig(context, server);
 			}
+			if (only("lease")) {
+				lease(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -486,7 +489,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 					&& stateAt(server, hole.above(2)).is(WildcatterBlocks.PUMPJACK), "the pumpjack should snap with its horsehead over the well: " + stateAt(server, jackMain));
 			context.waitTicks(300);
 			String jack = read(server, jackMain.getX(), jackMain.getY(), jackMain.getZ());
-			check(jack.matches(".*tank [1-9]\\d*/.*"), "a wired pumpjack should fill its tank: " + jack);
+			check(jack.matches(".*flowline [1-9]\\d*/.*") && jack.contains("water cut 1"), "a wired pumpjack should fill its flowline with a new field's stream: " + jack);
 			float jackRpm = context.computeOnClient(client -> client.level.getBlockEntity(jackMain) instanceof dev.wildcatter.block.PumpjackBlockEntity j ? j.spin().rpm() : -1F);
 			check(Math.abs(jackRpm - Tuning.PUMPJACK_SPM) < 0.5, "the client should see the crank turning at 9 strokes a minute: " + jackRpm);
 			context.takeScreenshot("wildcatter-pumpjack");
@@ -512,14 +515,19 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			String fire = read(server, gx + 2, up, gz);
 			check(fire.contains("burning"), "a gas well on a gas line should light a firebox with no fuel in it: " + fire);
 			String head = read(server, gx, up, gz);
-			check(head.contains("feeding"), "the wellhead should be feeding the firebox: " + head);
-			// a gas genset whose engine stands against the same well runs on what the firebox leaves; the wellhead touches the
-			// engine's third cell along, not its main cell, so the gas finds the engine through any of its cells
+			check(head.contains("flowing"), "the wellhead should be flowing to the firebox: " + head);
+			// a gas genset whose engine stands against the same well will not take its wet gas (docs/multiblocks/lease.md): the
+			// wellhead touches the engine's third cell along, not its main cell, so the line finds the engine through any of its cells
 			BlockPos gasSet = new BlockPos(gx + 3, up, gz + 1);
 			genset(server, gasSet, net.minecraft.core.Direction.NORTH, true);   // the skid runs west: engine x gx-2 to gx+1, behind the wellhead
-			startGenset(context, server, gasSet, net.minecraft.core.Direction.NORTH, 0);
+			context.waitTicks(30);
+			server.computeOnServer(srv -> {
+				panel(srv, gasSet).setWantRun(true);
+				return null;
+			});
+			context.waitTicks(80);
 			String turbine = read(server, gx + 3, up, gz + 1);
-			check(turbine.contains("Gas genset") && turbine.contains("gas from a well"), "a gas genset on a gas well should run on its gas: " + turbine);
+			check(turbine.contains("Gas genset") && turbine.contains("WET GAS") && !turbine.contains("RUNNING"), "a gas genset straight on a gas well should refuse its wet gas: " + turbine);
 			String boiler = read(server, gx + 2, up + 1, gz) + " | " + turbine;
 			System.out.println("[wildcatter-test] wells ok: " + echo + " | " + jack + " | " + head + " | " + fire + " | " + boiler);
 		} finally {
@@ -547,6 +555,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		put(server, 79, up + 1, 60, "wildcatter:refinery_column");
 		put(server, 79, up + 2, 60, "wildcatter:refinery_column");
 		put(server, 79, up, 59, "wildcatter:gas_line");
+		put(server, 79, up + 1, 59, "wildcatter:gas_line");   // the diesel comes off the column, so the run carries diesel
 		for (int x = 70; x <= 79; x++) {
 			put(server, x, up, 58, "wildcatter:gas_line");
 		}
@@ -2180,6 +2189,162 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 
 	private dev.wildcatter.block.TurbineGeneratorBlockEntity plantAt(net.minecraft.server.MinecraftServer srv, BlockPos at) {
 		return (dev.wildcatter.block.TurbineGeneratorBlockEntity) srv.overworld().getBlockEntity(at);
+	}
+
+	/**
+	 * The lease (5a, docs/multiblocks/lease.md) over a new oil field: a pumpjack on 480 V from a diesel set, its wellhead piped to a
+	 * separator; the separator's oil to a stock tank, its gas to a gas genset and a flare, its water to a water tank, then an H-pump
+	 * and a disposal wellhead on a dry hole's casing. The water cut reads 10 %, the tank fills, the genset runs on separator gas, the
+	 * flare burns what is left, the H-pump injects, buckets go in and out of the stock tank, a joint between the oil and water runs
+	 * reads BLOCKED, and with the flare and the genset gone the separator shuts in on gas, as does a pumpjack whose flowline is full.
+	 */
+	private void lease(ClientGameTestContext context, TestServerContext server) {
+		int z = -1020;
+		server.runCommand("tp @p 20 " + (up + 8) + " " + (z + 22) + " 160 25");
+		context.waitTicks(20);   // let the chunks load before building there
+		server.runCommand("fill 4 " + (y - 1) + " " + (z - 10) + " 46 " + (y + 12) + " " + (z + 16) + " minecraft:air");
+		server.runCommand("fill 4 " + (y - 1) + " " + (z - 10) + " 46 " + (y - 1) + " " + (z + 16) + " minecraft:stone");
+		long seed = -1;
+		for (long s = 1; s < 2_000_000 && seed < 0; s++) {
+			Reservoir oil = Reservoir.at(s, 21, z);   // under the wellhead
+			if (oil != null && !oil.deep() && oil.kind() == Reservoir.Kind.OIL && oil.units() > 30_000) {
+				seed = s;
+			}
+		}
+		check(seed >= 0, "no seed puts an oil field under the lease's wellhead");
+		ReservoirData.testSeed = seed;
+		try {
+			// power: a diesel set, 480 V cable east to the pumpjack's terminal box and south then east to the H-pump's
+			BlockPos set = new BlockPos(11, up, z);
+			genset(server, set, net.minecraft.core.Direction.NORTH, false);
+			BlockPos well = pumpjack(server, new BlockPos(15, up, z), net.minecraft.core.Direction.EAST);   // box at x 15, wellhead at x 21
+			placeBig(server, WildcatterBlocks.SEPARATOR, new BlockPos(23, up, z), net.minecraft.core.Direction.WEST);   // x 23-26, z-1..z, inlet west
+			placeBig(server, WildcatterBlocks.STOCK_TANK, new BlockPos(28, up, z - 7), net.minecraft.core.Direction.NORTH);   // x 28-31, z-7..z-4
+			placeBig(server, WildcatterBlocks.WATER_TANK, new BlockPos(28, up, z + 3), net.minecraft.core.Direction.NORTH);   // x 28-31, z+3..z+6
+			placeBig(server, WildcatterBlocks.INJECTION_PUMP, new BlockPos(22, up, z + 10), net.minecraft.core.Direction.WEST);   // x 22-27, z+9..z+10
+			placeBig(server, WildcatterBlocks.FLARE_STACK, new BlockPos(36, up, z + 2), net.minecraft.core.Direction.NORTH);
+			put(server, 25, y, z + 13, "wildcatter:casing");   // a dry hole's top casing
+			put(server, 25, up, z + 13, "wildcatter:disposal_wellhead");
+			BlockPos gasSet = new BlockPos(44, up, z - 4);
+			genset(server, gasSet, net.minecraft.core.Direction.NORTH, true);   // engine x 39-42, z-4..z-3
+			for (int x = 12; x <= 14; x++) {
+				put(server, x, up, z, "wildcatter:cable_industrial");
+			}
+			for (int zz = z + 1; zz <= z + 10; zz++) {
+				put(server, 13, up, zz, "wildcatter:cable_industrial");
+			}
+			for (int x = 14; x <= 21; x++) {
+				put(server, x, up, z + 10, "wildcatter:cable_industrial");   // to the H-pump's terminal box, the west face of its main cell
+			}
+			server.computeOnServer(srv -> {   // a 100 hp motor draws about 124 A: 4/0 cable, not the 115 A default (2 AWG burns up on its start)
+				for (BlockPos at : BlockPos.betweenClosed(12, up, z, 21, up, z + 10)) {
+					if (srv.overworld().getBlockEntity(at) instanceof dev.wildcatter.block.MultiCableBlockEntity cable) {
+						cable.setSize(dev.wildcatter.energy.ConductorSize.AWG_4_0);
+					}
+				}
+				return null;
+			});
+			// the pipes
+			put(server, 22, up, z, "wildcatter:gas_line");   // wellhead to the separator's inlet
+			for (int[] p : new int[][] {{27, 1, -1}, {27, 1, -2}, {27, 1, -3}, {27, 0, -3}, {27, 0, -4}}) {
+				put(server, p[0], up + p[1], z + p[2], "wildcatter:gas_line");   // oil, out of the back upper cell to the stock tank
+			}
+			for (int zz = z; zz <= z + 3; zz++) {
+				put(server, 27, up, zz, "wildcatter:gas_line");   // water, out of the back lower cell to the water tank
+			}
+			for (int[] p : new int[][] {{29, 7}, {29, 8}, {29, 9}, {28, 9}}) {
+				put(server, p[0], up, z + p[1], "wildcatter:gas_line");   // the water tank to the H-pump's suction
+			}
+			for (int zz = z + 10; zz <= z + 13; zz++) {
+				put(server, 25, up + 1, zz, "wildcatter:gas_line");   // its discharge over to the disposal wellhead
+			}
+			for (int x = 26; x <= 33; x++) {
+				put(server, x, up + 2, z, "wildcatter:gas_line");   // gas off the top
+			}
+			put(server, 33, up + 1, z, "wildcatter:gas_line");
+			for (int x = 33; x <= 40; x++) {
+				put(server, x, up, z, "wildcatter:gas_line");
+			}
+			put(server, 40, up, z - 1, "wildcatter:gas_line");
+			put(server, 40, up, z - 2, "wildcatter:gas_line");   // against the gas engine's back
+			put(server, 36, up, z + 1, "wildcatter:gas_line");   // the flare's branch
+
+			startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 1000);
+			server.computeOnServer(srv -> {   // a day's water already in the tank, so the H-pump's level switch calls it
+				((dev.wildcatter.block.StorageTankBlockEntity) srv.overworld().getBlockEntity(new BlockPos(28, up, z + 3))).testFill(dev.wildcatter.fluid.Product.PRODUCED_WATER, 20_000);
+				return null;
+			});
+			context.waitTicks(300);
+			String jack = read(server, 20, up, z);
+			check(jack.contains("pumping") && jack.contains("water cut 10%"), "the pumpjack should pump a new field's stream: " + jack + " | set " + read(server, 11, up, z)
+					+ " | cable14 " + read(server, 14, up, z) + " | cable12 " + read(server, 12, up, z) + " | cable13s " + read(server, 13, up, z + 5)
+					+ " | cable21 " + read(server, 21, up, z + 10) + " | pump " + read(server, 24, up, z + 10));
+			String sep = read(server, 24, up, z);
+			check(sep.contains("separating") && sep.contains("water cut 10%"), "the separator should split the stream, 10 % water: " + sep);
+			String oilTank = read(server, 29, up, z - 5);
+			check(oilTank.contains("Stock tank") && oilTank.contains("crude") && !oilTank.contains("empty"), "the stock tank should fill with crude: " + oilTank);
+			String flare = read(server, 36, up + 5, z + 2);
+			check(flare.contains("BURNING"), "the flare should burn the gas nothing takes: " + flare + " | " + sep);
+			String pump = read(server, 24, up, z + 10);
+			check(pump.contains("injecting") && pump.contains("running"), "the H-pump should inject the produced water: " + pump + " | " + read(server, 29, up, z + 4));
+			float pumpRpm = context.computeOnClient(client -> client.level.getBlockEntity(new BlockPos(22, up, z + 10)) instanceof dev.wildcatter.block.InjectionPumpBlockEntity p ? p.spin().rpm() : -1F);
+			double twoPole = 120.0 * dev.wildcatter.energy.ElectricalStandard.active().hertz() / 2 * (1 - Tuning.INJECTION_PUMP_SLIP);
+			check(Math.abs(pumpRpm - twoPole) < 5, "the client should see the H-pump's coupling at about " + twoPole + " rpm: " + pumpRpm);
+			// the gas genset runs on the separator's gas
+			server.computeOnServer(srv -> {
+				panel(srv, gasSet).setWantRun(true);
+				return null;
+			});
+			context.waitTicks(260);
+			String gasGen = read(server, 44, up, z - 4);
+			check(gasGen.contains("RUNNING") && gasGen.contains("gas from a separator"), "a gas genset on separator gas should run: " + gasGen);
+			String run = server.computeOnServer(srv -> dev.wildcatter.block.Lines.line(srv.overworld(), new BlockPos(30, up + 2, z)).run().describe());
+			check(run.equals("carrying gas"), "the gas run should carry gas: " + run);
+			context.waitTicks(3);
+			context.takeScreenshot("wildcatter-lease");
+			// buckets: crude poured in, and taken back out
+			BlockPos tankCell = new BlockPos(29, up + 2, z - 4);
+			double before = tankAmount(server, tankCell);
+			check(clickWith(server, tankCell, net.minecraft.core.Direction.SOUTH, new ItemStack(WildcatterItems.CRUDE_OIL_BUCKET)), "a crude bucket should pour into the stock tank");
+			double poured = tankAmount(server, tankCell);
+			check(clickWith(server, tankCell, net.minecraft.core.Direction.SOUTH, new ItemStack(net.minecraft.world.item.Items.BUCKET)), "an empty bucket should fill at the stock tank");
+			double taken = tankAmount(server, tankCell);
+			check(poured - before > 900 && poured - taken > 900, "a bucket is 1,000 L in and out: " + before + " -> " + poured + " -> " + taken);
+			// a joint between the oil run and the water run blocks both
+			put(server, 27, up, z - 1, "wildcatter:gas_line");
+			context.waitTicks(2);
+			String blocked = pipeReading(server, new BlockPos(27, up, z + 2));
+			check(blocked.contains("BLOCKED") && blocked.contains("crude") && blocked.contains("produced water"), "oil meeting water should block the run: " + blocked);
+			put(server, 27, up, z - 1, "minecraft:air");
+			// no flare and no engine: the gas has nowhere to go and the separator shuts in; a full flowline shuts the pumpjack in
+			server.computeOnServer(srv -> {
+				srv.overworld().destroyBlock(new BlockPos(36, up, z + 2), false);
+				panel(srv, gasSet).setWantRun(false);
+				return null;
+			});
+			context.waitTicks(200);
+			String shut = read(server, 24, up, z);
+			check(shut.contains("SHUT IN: gas"), "with nowhere for its gas the separator should shut in: " + shut);
+			server.computeOnServer(srv -> {
+				jack(srv, new BlockPos(20, up, z)).testFill(Tuning.PUMPJACK_TANK);
+				return null;
+			});
+			context.waitTicks(20);
+			String jackShut = read(server, 20, up, z);
+			check(jackShut.contains("SHUT IN"), "a pumpjack with its flowline backed up should stop: " + jackShut);
+			System.out.println("[wildcatter-test] lease ok: " + jack + " | " + sep + " | " + oilTank + " | " + flare + " | " + pump + " | " + gasGen + " | " + blocked + " | " + shut);
+		} finally {
+			ReservoirData.testSeed = null;
+		}
+	}
+
+	private double tankAmount(TestServerContext server, BlockPos cell) {
+		return server.computeOnServer(srv -> dev.wildcatter.multiblock.BigParts.entity(srv.overworld(), cell) instanceof dev.wildcatter.block.StorageTankBlockEntity t ? t.amount() : -1.0);
+	}
+
+	/** What the Power Meter says on a pipe. */
+	private String pipeReading(TestServerContext server, BlockPos pipe) {
+		return server.computeOnServer(srv -> "Steel pipe: " + dev.wildcatter.block.Lines.line(srv.overworld(), pipe).run().describe());
 	}
 
 	/**

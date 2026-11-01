@@ -125,6 +125,25 @@ public final class Tuning {
 	public static final double FIREBOX_FEED_CAP = 200.0;
 	public static final int WELL_INTERVAL = 4;                // ticks between a well's transfers
 
+	// ---- The lease (docs/multiblocks/lease.md, approved 2026-10-31) --------------------------------------------------------
+	public static final double WATER_CUT_NEW = 0.10;               // a new oil field's water cut
+	public static final double WATER_CUT_DEPLETED = 0.80;          // a drained one's (real fields run past 90 %)
+	public static final double GAS_OIL_RATIO = 0.1;                // m3 of gas per litre of oil: 100 m3/m3, about 560 scf/bbl, a light oil
+	public static final double CONDENSATE_PER_M3 = 0.056;          // litres per m3 of a gas well's gas: 10 bbl per million scf
+	public static final double GAS_WELL_WATER_PER_M3 = 0.0112;     // litres per m3: 2 bbl per million scf
+	public static final double SEPARATOR_LIQUID_LPS = 20.0;        // a 36 in x 10 ft three-phase separator, four pumpjacks
+	public static final double SEPARATOR_GAS_M3S = 1.5;            // about 4.5 million scf a day at 125 psi
+	public static final double SEPARATOR_OIL_HOLD = 800.0;         // litres held in the vessel
+	public static final double SEPARATOR_WATER_HOLD = 800.0;
+	public static final double SEPARATOR_GAS_HOLD = 10.0;          // m3 (standard) in its gas space at 125 psi
+	public static final double SEPARATOR_GAS_WELLS_BELOW = 0.5;    // it takes a gas well's gas only while its gas side is under half full
+	public static final double SEPARATOR_FLARE_ABOVE = 0.75;       // the back-pressure valve to the flare opens above three quarters
+	public static final double STOCK_TANK_LITERS = 64_000.0;       // a 400 bbl API 12F tank, 12 ft x 20 ft
+	public static final double INJECTION_PUMP_WATTS = 75_000.0;    // a 100 hp H-pump: 10 L/s at 6 MPa is 60 kW of water power at 80 %
+	public static final double INJECTION_PUMP_LPS = 10.0;          // at full voltage
+	public static final double INJECTION_PUMP_START = 2_000.0;     // litres waiting: the water tank's level switch, about 0.2 m up the tank
+	public static final double INJECTION_PUMP_SLIP = 0.011;        // its two-pole motor: 3,560 rpm at 60 Hz, 2,967 at 50 Hz
+
 	// ---- Refining and engines ----------------------------------------------------------------------------------------
 	public static final double REFINERY_WATTS = 2000.0;       // 110 V, 18 A
 	public static final double REFINERY_CRUDE_PER_TICK = 0.5; // at full voltage

@@ -20,7 +20,7 @@ public class RotorBlock extends Block {
 		RIG_CARRIAGE("rig_carriage"), RIG_SPINDLE("rig_spindle"), RIG_PIPE("rig_pipe"),
 		STARTER_COUPLING("starter_coupling"), FLYBALL_GOVERNOR("flyball_governor"), STARTER_PUMP_COUPLING("starter_pump_coupling"),
 		TOP_DRIVE("top_drive"), TOP_DRIVE_QUILL("top_drive_quill"), MUD_PUMP_SHEAVE("mud_pump_sheave"), MUD_PUMP_BULL_WHEEL("mud_pump_bull_wheel"),
-		DRAWWORKS_DRUM("drawworks_drum");
+		DRAWWORKS_DRUM("drawworks_drum"), INJECTION_PUMP_COUPLING("injection_pump_coupling");
 
 		private final String name;
 

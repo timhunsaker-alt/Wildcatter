@@ -8,10 +8,10 @@ import dev.wildcatter.circuit.CircuitPart;
 import dev.wildcatter.circuit.Conductor;
 import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.energy.Voltage;
+import dev.wildcatter.fluid.Product;
 import dev.wildcatter.safety.Bondable;
 import dev.wildcatter.safety.Grounding;
 import java.util.List;
-import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -21,12 +21,15 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Splits crude into diesel and plastic. It is a 110 V load that draws its power whether or not there is crude to
- * refine; with low voltage it works slower. It pulls crude from pumpjacks on its gas lines when its tank has room.
+ * refine; with low voltage it works slower. It pulls crude from a run of steel pipe on the base's sides or bottom (a separator's
+ * oil side or a stock tank) when its tank has room, and its diesel comes off the top: any face of a column, or the base's top face
+ * on a pot still (docs/multiblocks/lease.md: one product per run).
  */
-public class RefineryBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, dev.wildcatter.kinetic.Sounding {
+public class RefineryBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, dev.wildcatter.kinetic.Sounding, FluidNode {
 	/** Its induction motor (single-phase); it turns only while there is work. */
 	private final dev.wildcatter.circuit.Motor motor = new dev.wildcatter.circuit.Motor(false, Voltage.LOW, Tuning.REFINERY_WATTS);
 	private final dev.wildcatter.kinetic.RunningSound running = new dev.wildcatter.kinetic.RunningSound();
@@ -124,17 +127,14 @@ public class RefineryBlockEntity extends BlockEntity implements CircuitPart, Ins
 				level.playSound(null, pos.above(), WildcatterSounds.STRUCTURE_FORMED, SoundSource.BLOCKS, 1.0F, 1.3F);
 			}
 		}
-		List<BlockPos> cell = List.of(pos);
 		if (refinery.crude < Tuning.REFINERY_TANK) {
-			Set<BlockPos> lines = Plumbing.network(level, cell, PipeBlock.Kind.GAS);
-			for (PumpjackBlockEntity jack : Plumbing.machines(level, cell, lines, true, PumpjackBlockEntity.class)) {
-				refinery.crude += jack.take(Tuning.REFINERY_TANK - refinery.crude);
-			}
+			List<Lines.Face> inlet = Lines.faces(List.of(pos)).stream().filter(f -> f.side() != Direction.UP).toList();
+			refinery.crude += Lines.pull(level, inlet, Product.CRUDE, Tuning.REFINERY_TANK - refinery.crude, Pull.MACHINE, refinery);
 		}
 		refinery.wanted = refinery.crude >= 1 && refinery.plastic < Tuning.PLASTIC_BIN && refinery.diesel < Tuning.REFINERY_TANK;
 		double strength = refinery.motor.output();
 		if (refinery.crude < 1) {
-			refinery.status = "idle: no crude (pour in a bucket, or put it on a gas line with a pumpjack)";
+			refinery.status = "idle: no crude (pour in a bucket, or pipe it from a separator's oil side or a stock tank)";
 		} else if (refinery.plastic >= Tuning.PLASTIC_BIN) {
 			refinery.status = "STOPPED: plastic bin full, collect it with an empty hand";
 		} else if (refinery.diesel >= Tuning.REFINERY_TANK) {
@@ -158,6 +158,24 @@ public class RefineryBlockEntity extends BlockEntity implements CircuitPart, Ins
 			refinery.status = "refining " + Math.round(amount * 20.0 / Tuning.WELL_INTERVAL) + " crude/s";
 		}
 		refinery.setChanged();
+	}
+
+	// ---- its diesel on steel pipe off the top ---------------------------------------------------------------------------------
+	@Override
+	public @Nullable Product offers(BlockPos cell, Direction side) {
+		boolean top = cell.equals(worldPosition) ? side == Direction.UP && level != null && !level.getBlockState(worldPosition.above()).is(WildcatterBlocks.REFINERY_COLUMN)
+				: true;   // a column's cell
+		return top ? Product.DIESEL : null;
+	}
+
+	@Override
+	public double available(BlockPos cell, Direction side, Product product, Pull pull) {
+		return product == Product.DIESEL && pull != Pull.FLARE ? diesel : 0;
+	}
+
+	@Override
+	public double take(BlockPos cell, Direction side, Product product, double max, Pull pull) {
+		return available(cell, side, product, pull) > 0 ? drawDiesel(max) : 0;
 	}
 
 	@Override

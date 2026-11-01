@@ -1,6 +1,6 @@
 # Wildcatter
 
-A Fabric mod for Minecraft Java 26.3 about building a real electric grid, meant to double as a teaching tool for how circuits and breakers actually work.
+A Fabric mod for Minecraft Java 26.3 about building a real electric grid, from the oil well to the plug, following real electrical principles.
 
 ## What's in it
 

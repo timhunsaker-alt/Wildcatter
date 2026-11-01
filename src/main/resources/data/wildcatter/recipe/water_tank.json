@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PPP",
+    "P P",
+    "PPP"
+  ],
+  "key": {
+    "P": "wildcatter:plastic_sheet"
+  },
+  "result": {
+    "id": "wildcatter:water_tank",
+    "count": 1
+  }
+}

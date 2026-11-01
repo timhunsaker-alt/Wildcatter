@@ -72,24 +72,6 @@ public final class Plumbing {
 		return new ArrayList<>(found.values());
 	}
 
-	/** The fireboxes that touch the gas lines (and, if {@code direct}, the cells). A big firebox shows up once. */
-	public static List<FireboxBlockEntity> fireboxes(Level level, Collection<BlockPos> cells, Set<BlockPos> pipes, boolean direct) {
-		Map<BlockPos, FireboxBlockEntity> found = new LinkedHashMap<>();
-		List<BlockPos> sources = new ArrayList<>(pipes);
-		if (direct) {
-			sources.addAll(cells);
-		}
-		for (BlockPos source : sources) {
-			for (Direction side : Direction.values()) {
-				BlockPos next = source.relative(side);
-				if (!cells.contains(next) && level.getBlockEntity(next) instanceof FireboxBlockEntity firebox) {
-					found.putIfAbsent(firebox.rootPos(), firebox);
-				}
-			}
-		}
-		return new ArrayList<>(found.values());
-	}
-
 	/** The block entities of one kind touching the gas lines (and, if {@code direct}, the cells). */
 	public static <T extends net.minecraft.world.level.block.entity.BlockEntity> List<T> machines(Level level, Collection<BlockPos> cells,
 			Set<BlockPos> pipes, boolean direct, Class<T> kind) {
@@ -112,18 +94,6 @@ public final class Plumbing {
 			}
 		}
 		return new ArrayList<>(found.values());
-	}
-
-	/** Hands up to {@code available} ticks of fire to the fireboxes that are hungry; returns how many were taken. */
-	public static double feedFireboxes(List<FireboxBlockEntity> fireboxes, double available) {
-		double left = available;
-		for (FireboxBlockEntity firebox : fireboxes) {
-			if (left <= 0) {
-				break;
-			}
-			left -= firebox.feed(left);
-		}
-		return available - left;
 	}
 
 	/** Pours water into the boilers, returns how much fitted. */

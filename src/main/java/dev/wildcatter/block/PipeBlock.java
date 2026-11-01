@@ -17,9 +17,10 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
 /**
- * A water pipe or a gas line. It grows an arm toward every pipe of its kind and every machine of its kind next to it. The pipes carry nothing
- * themselves: a pump pushes water through the whole connected run to the boilers touching it, and a turbine's
- * drain sends its condensate back the same way. See {@link Plumbing}.
+ * A water pipe or a steel pipe. It grows an arm toward every pipe of its kind and every machine of its kind next to it. The pipes carry
+ * nothing themselves: a pump pushes water through the whole connected run to the boilers touching it, and a turbine's
+ * drain sends its condensate back the same way (see {@link Plumbing}). Each joined run of steel pipe carries the one product its
+ * sources put on it, or is BLOCKED where two meet (see {@link Lines}); the Power Meter on any pipe says which.
  */
 public class PipeBlock extends Block {
 	/** Drawn at its real diameter (docs/multiblocks/well-site.md), but clicked and walked into as 0.25 m so it can be hit. */
@@ -72,6 +73,25 @@ public class PipeBlock extends Block {
 		neighborChanged(state, level, pos, this, null, movedByPiston);
 	}
 
+	@Override
+	protected net.minecraft.world.InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, Level level, BlockPos pos,
+			net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+		if (!stack.is(dev.wildcatter.WildcatterItems.POWER_METER)) {
+			return net.minecraft.world.InteractionResult.TRY_WITH_EMPTY_HAND;
+		}
+		if (!level.isClientSide()) {
+			if (kind == Kind.WATER) {
+				player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Water pipe (2 in): " + (Plumbing.network(level, java.util.List.of(pos)).size() + 1)
+						+ " lengths joined, carrying fresh water from a pump"));
+			} else {
+				Lines.Line line = Lines.line(level, pos);
+				player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Steel pipe (4 in): " + line.pipes().size() + " lengths joined, "
+						+ line.run().describe()));
+			}
+		}
+		return net.minecraft.world.InteractionResult.SUCCESS;
+	}
+
 	public Kind kind() {
 		return kind;
 	}
@@ -86,7 +106,8 @@ public class PipeBlock extends Block {
 						|| block instanceof RigPartBlock rig && rig.part() == RigPartBlock.Part.MUD_TANKS
 						|| block instanceof SteamPlantPartBlock plant && plant.part() == SteamPlantPartBlock.Part.CONDENSER
 				: block instanceof GasWellheadBlock gas && neighbour.getValue(gas.piece()) == 0 || block instanceof OilWellheadBlock || block instanceof FireboxBlock
-						|| block instanceof RefineryBlock
+						|| block instanceof RefineryBlock || block == dev.wildcatter.WildcatterBlocks.REFINERY_COLUMN
+						|| block instanceof LeasePartBlock || block instanceof DisposalWellheadBlock
 						|| block instanceof GensetPartBlock part && (part.part() == GensetPartBlock.Part.FUEL_TANK || part.part() == GensetPartBlock.Part.GAS_ENGINE)
 						|| block instanceof SteamPlantPartBlock burner && burner.part() == SteamPlantPartBlock.Part.BURNER;
 	}

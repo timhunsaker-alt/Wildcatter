@@ -1,9 +1,9 @@
 # Wildcatter: what is finished
 
-Wildcatter is a Fabric mod for Minecraft 26.3 that works as a teaching tool for electrical work. It has a real circuit solver, three voltage tiers, safety devices, and power from steam, oil and gas. Everything below is implemented and exercised by the automated client game test (`./gradlew runClientGameTest`). The exceptions are noted at the end.
+Wildcatter is a Fabric mod for Minecraft 26.3: a realistic power and oil mod built on real electrical principles (it is not a teaching or training tool). It has a real circuit solver, three voltage tiers, safety devices, and power from steam, oil and gas. Everything below is implemented and exercised by the automated client game test (`./gradlew runClientGameTest`). The exceptions are noted at the end.
 
 ## Design rules
-- Realism and teaching come first: voltages, amps, shocks, grounding and protection behave as they do in real life.
+- Realism comes first: voltages, amps, shocks, grounding and protection behave as they do in real life.
 - Large objects are assembled from small parts: the multiblock rule. Examples are the 27-turbine MV generator, the 8-engine cube, the refinery tower and the cooling tower.
 
 ## Electrical grid
@@ -436,6 +436,29 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   frequency held and the set on line, the top drive turning on the client, NO MUD, a pump taken away unbuilds it, a connection,
   the strike and its wellhead, casing to the deep field, DEEP ECHO); `wells` checks a small rig stopping TOO DEEP.
 
+## Phase 5a: the lease
+- **Spec:** docs/multiblocks/lease.md (approved with the plan, 2026-10-31).
+- **Well streams:** a pumpjack lifts oil, water and gas together: the water cut is 10 % on a new field and rises to 80 % as it
+  drains, with 100 m³ of gas per m³ of oil; only the oil counts against the field. A gas well's gas comes up wet: 10 bbl of
+  condensate and 2 bbl of water per million scf. The pumpjack's tank is now its 4,000 L flowline.
+- **One product a run:** each joined run of steel pipe carries the one product its sources put on it (`fluid/Run`, plain Java),
+  or is BLOCKED where two meet; the Power Meter on a pipe says which. Machines pull from their runs, process outlets before
+  tanks; a tank fills only from outlets (`block/Lines`, `FluidNode`). Fireboxes now pull their own fuel (a well's stream, wet or
+  dry gas, crude, diesel); gas gensets and the steam plant burner take only separated gas (WET GAS otherwise); diesel sets take
+  diesel from a refinery or a diesel tank; a refinery takes crude on its base's sides and gives diesel off its top.
+- **Parts** (`LeasePartBlock`): a 36 in x 10 ft three-phase separator (no power; 20 L/s of liquid, 1.5 m³/s of gas; inlet at the
+  front, gas, oil and water out of the back), 400 bbl steel stock tanks (64,000 L, one product each, buckets in and out),
+  400 bbl fiberglass water tanks, a 10 m flare stack (burns only what the separator's back-pressure valve lets go above three
+  quarters full, with flame and roar), a 100 hp (75 kW) 480 V H-pump for saltwater disposal (10 L/s, a level switch at 2,000 L,
+  its coupling turning at 3,560 rpm, 2,967 on IEC worlds) and a disposal wellhead on a dry hole's casing. With nowhere for its
+  gas, oil or water to go the separator SHUTS IN and the wells stop.
+- **Models:** `lease.py` (six parts and the coupling rotor). No Ludo credits.
+- **Game tests:** new scene `lease` (the stream at 10 % water, the stock tank filling, the gas set on separator gas, the flare
+  burning the rest, the H-pump injecting and turning on the client, a bucket in and out, oil meeting water BLOCKED, shut in on
+  gas with the flare and engine gone, a pumpjack shut in on a full flowline); `wells` now reads a gas set refusing a gas
+  well's wet gas, and `refining` takes its diesel off the column.
+- **FTB kit:** New World (2) has a `wildcatter_kit` datapack: `/function wildcatter:kit/land_rig` gives the land rig and its power.
+
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.
@@ -444,14 +467,17 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
-- Phase 4.5 is complete with 4.5h. The refinery waits for Phase 5.
+- Phase 4.5 is complete with 4.5h. Phase 5a (the lease) is in; gas processing (5b), the distillation unit (5c) and the cracker
+  (5d) follow. The refinery is still the Phase 1 one-block base with columns until 5c.
+- Gas-well condensate goes out of the separator as crude until 5c gives it its own assay.
+- Pipe arms join every face of a lease part, though only its nozzles connect; the Power Meter on a pipe says what a run carries.
+- The lease test's screenshot frames the edge of the lease, not the tanks; the parts have been checked in model previews, not in play.
 - The land rig's power limit works on frequency, so on a small set it holds back well below the set's rating until the
   frequency control catches up (30 s); a real rig's power management also reads the gensets' kW.
 - The land rig's motors are inside the drive house's load: there are no cables drawn from the drive house to the pumps and
   drawworks.
 - There is no blowout preventer stack in the cellar yet. The single-pole MV, DIST and HV breakers, the DIST under-frequency relay and the unrated `transformer` and `substation_transformer` stay one-block stand-ins (decided with Tim, until Phase 6).
 - Wall-mounted gear sits 0.55 m up its cell; a player wanting it higher places it a block up.
-- The pumpjack's crude tank stands in for a flowline and stock tank until Phase 5.
 - Pumpjack and rig collision is the still frame: the moving beam, crank and pipe do not push anything.
 - The pumpjack's linkage and the rig's head have been checked in test screenshots, not watched in a real play session.
 - The pole transformer and cutout are wired as before (wire blocks to their faces); there are no jumper or riser leads drawn from an insulator down to them.

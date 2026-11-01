@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " F ",
+    " P ",
+    " P "
+  ],
+  "key": {
+    "F": "minecraft:flint_and_steel",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:flare_stack",
+    "count": 1
+  }
+}

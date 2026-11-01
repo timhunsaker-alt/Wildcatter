@@ -330,6 +330,14 @@ public final class WildcatterBlocks {
 	public static final Block MUD_PUMP = rigPart(dev.wildcatter.block.RigPartBlock.Part.MUD_PUMP);
 	public static final Block MUD_TANKS = rigPart(dev.wildcatter.block.RigPartBlock.Part.MUD_TANKS);
 	public static final Block RIG_DRIVE_HOUSE = rigPart(dev.wildcatter.block.RigPartBlock.Part.DRIVE_HOUSE);
+	/** The lease (docs/multiblocks/lease.md): separator, stock and water tanks, flare stack, injection pump, disposal wellhead. */
+	public static final Block SEPARATOR = leasePart(dev.wildcatter.block.LeasePartBlock.Part.SEPARATOR);
+	public static final Block STOCK_TANK = leasePart(dev.wildcatter.block.LeasePartBlock.Part.STOCK_TANK);
+	public static final Block WATER_TANK = leasePart(dev.wildcatter.block.LeasePartBlock.Part.WATER_TANK);
+	public static final Block FLARE_STACK = leasePart(dev.wildcatter.block.LeasePartBlock.Part.FLARE_STACK);
+	public static final Block INJECTION_PUMP = leasePart(dev.wildcatter.block.LeasePartBlock.Part.INJECTION_PUMP);
+	public static final Block DISPOSAL_WELLHEAD = block("disposal_wellhead", props -> new dev.wildcatter.block.DisposalWellheadBlock(props.mapColor(MapColor.COLOR_GREEN)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
 	/** Never placed: its states carry the models of the turning parts (kinetic/RotorBlock). */
 	public static final Block ROTOR = block("rotor", props -> new dev.wildcatter.kinetic.RotorBlock(props.noOcclusion().noLootTable()));
 
@@ -351,6 +359,10 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<dev.wildcatter.block.RigDriveHouseBlockEntity> RIG_DRIVE_HOUSE_ENTITY = entity(dev.wildcatter.block.RigDriveHouseBlockEntity::new, RIG_DRIVE_HOUSE);
 	public static final BlockEntityType<dev.wildcatter.block.RigPartBlockEntity> RIG_PART_ENTITY = entity(dev.wildcatter.block.RigPartBlockEntity::new,
 			RIG_MAST, RIG_DRAWWORKS, MUD_PUMP, MUD_TANKS);
+	public static final BlockEntityType<dev.wildcatter.block.SeparatorBlockEntity> SEPARATOR_ENTITY = entity(dev.wildcatter.block.SeparatorBlockEntity::new, SEPARATOR);
+	public static final BlockEntityType<dev.wildcatter.block.StorageTankBlockEntity> STORAGE_TANK_ENTITY = entity(dev.wildcatter.block.StorageTankBlockEntity::new, STOCK_TANK, WATER_TANK);
+	public static final BlockEntityType<dev.wildcatter.block.FlareStackBlockEntity> FLARE_STACK_ENTITY = entity(dev.wildcatter.block.FlareStackBlockEntity::new, FLARE_STACK);
+	public static final BlockEntityType<dev.wildcatter.block.InjectionPumpBlockEntity> INJECTION_PUMP_ENTITY = entity(dev.wildcatter.block.InjectionPumpBlockEntity::new, INJECTION_PUMP);
 	public static final BlockEntityType<dev.wildcatter.block.TurbineGeneratorBlockEntity> TURBINE_GENERATOR_ENTITY = entity(dev.wildcatter.block.TurbineGeneratorBlockEntity::new, TURBINE_GENERATOR);
 	public static final BlockEntityType<dev.wildcatter.block.GensetControlPanelBlockEntity> GENSET_CONTROL_PANEL_ENTITY = entity(dev.wildcatter.block.GensetControlPanelBlockEntity::new, GENSET_CONTROL_PANEL);
 	public static final BlockEntityType<ThreePhaseHeaterBlockEntity> THREE_PHASE_HEATER_ENTITY = entity(ThreePhaseHeaterBlockEntity::new, THREE_PHASE_HEATER);
@@ -429,6 +441,11 @@ public final class WildcatterBlocks {
 	private static Block gensetPart(String name, dev.wildcatter.block.GensetPartBlock.Part part) {
 		return block(name, props -> new dev.wildcatter.block.GensetPartBlock(props.mapColor(MapColor.COLOR_GRAY)
 				.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
+	}
+
+	private static Block leasePart(dev.wildcatter.block.LeasePartBlock.Part part) {
+		return block(part.id(), props -> new dev.wildcatter.block.LeasePartBlock(props.mapColor(MapColor.COLOR_GRAY)
+				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
 	}
 
 	private static Block rigPart(dev.wildcatter.block.RigPartBlock.Part part) {
@@ -577,6 +594,10 @@ public final class WildcatterBlocks {
 		for (Block part : new Block[] {RIG_SUBSTRUCTURE, RIG_MAST, RIG_DRAWWORKS, MUD_PUMP, MUD_TANKS, RIG_DRIVE_HOUSE}) {
 			add(((dev.wildcatter.block.RigPartBlock) part).part().id(), part);
 		}
+		for (Block part : new Block[] {SEPARATOR, STOCK_TANK, WATER_TANK, FLARE_STACK, INJECTION_PUMP}) {
+			add(((dev.wildcatter.block.LeasePartBlock) part).part().id(), part);
+		}
+		add("disposal_wellhead", DISPOSAL_WELLHEAD);
 		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("rotor"), ROTOR);   // no item: it is never placed
 		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("mcc_bucket"), MCC_BUCKET);   // its item is WildcatterItems.MCC_BUCKET
 		add("mcc_section", MCC_SECTION);
@@ -616,6 +637,10 @@ public final class WildcatterBlocks {
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rig_substructure"), RIG_SUBSTRUCTURE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rig_drive_house"), RIG_DRIVE_HOUSE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rig_part"), RIG_PART_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("separator"), SEPARATOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("storage_tank"), STORAGE_TANK_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("flare_stack"), FLARE_STACK_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("injection_pump"), INJECTION_PUMP_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("turbine_generator"), TURBINE_GENERATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("genset_control_panel"), GENSET_CONTROL_PANEL_ENTITY);
 	}

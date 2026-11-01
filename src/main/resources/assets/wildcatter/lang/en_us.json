@@ -178,5 +178,11 @@
   "block.wildcatter.mud_pump": "Mud Pump (1,000 hp triplex)",
   "block.wildcatter.mud_tanks": "Mud Tanks (60 m3)",
   "block.wildcatter.rig_drive_house": "Rig Drive House (4.16 kV, 2,500 kVA)",
-  "item.wildcatter.top_drive": "Top Drive (250-ton, 400 hp)"
+  "item.wildcatter.top_drive": "Top Drive (250-ton, 400 hp)",
+  "block.wildcatter.separator": "Three-Phase Separator (36 in x 10 ft)",
+  "block.wildcatter.stock_tank": "Stock Tank (400 bbl steel)",
+  "block.wildcatter.water_tank": "Water Tank (400 bbl fiberglass)",
+  "block.wildcatter.flare_stack": "Flare Stack (10 m)",
+  "block.wildcatter.injection_pump": "Injection Pump (H-pump, 100 hp)",
+  "block.wildcatter.disposal_wellhead": "Disposal Wellhead (saltwater disposal)"
 }

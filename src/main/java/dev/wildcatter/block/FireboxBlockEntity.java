@@ -4,19 +4,15 @@ import dev.wildcatter.Tuning;
 import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.WildcatterSounds;
 import dev.wildcatter.energy.Inspectable;
+import dev.wildcatter.fluid.Product;
+import dev.wildcatter.fluid.Stream;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import java.util.Optional;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.ItemStackTemplate;
-import net.minecraft.world.item.component.CookingFuel;
-import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.minecraft.world.level.storage.loot.providers.number.ints.ResolvableInt;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.WorldlyContainer;
@@ -25,11 +21,17 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.component.CookingFuel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ResolvableInt;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -61,25 +63,6 @@ public class FireboxBlockEntity extends BaseContainerBlockEntity implements Worl
 	/** The block that holds its fuel (pipes use it to count each firebox once). */
 	public BlockPos rootPos() {
 		return worldPosition;
-	}
-
-	/**
-	 * Fuel piped in from a well: tops the fire up with up to {@code ticks} of burn, but only while a boiler above wants
-	 * heat and the fire is low. Returns how many ticks it took.
-	 */
-	public double feed(double ticks) {
-		if (level == null || !wantsHeat(level) || burnLeft >= Tuning.FIREBOX_FEED_CAP) {
-			return 0;
-		}
-		double taken = Math.min(ticks, Tuning.FIREBOX_FEED_CAP - burnLeft);
-		burnLeft += taken;
-		setChanged();
-		return taken;
-	}
-
-	/** Can this firebox use more fuel right now? */
-	public boolean hungry() {
-		return level != null && burnLeft < Tuning.FIREBOX_FEED_CAP && wantsHeat(level);
 	}
 
 	@Override
@@ -148,8 +131,45 @@ public class FireboxBlockEntity extends BaseContainerBlockEntity implements Worl
 		return level.getBlockEntity(worldPosition.above()) instanceof BoilerBlockEntity boiler && boiler.wantsHeat();
 	}
 
+	/**
+	 * Fuel off its steel pipe (docs/multiblocks/lease.md): whatever its runs carry that burns. A well's stream burns as it comes:
+	 * a pumpjack's oil and gas (the water boils off), a gas well's wet gas.
+	 */
+	private void pipeFuel(Level level) {
+		for (Lines.Line line : Lines.lines(level, Lines.faces(java.util.List.of(worldPosition)))) {
+			double need = Tuning.FIREBOX_FEED_CAP - burnLeft;
+			Product product = line.run().product();
+			if (need <= 0 || product == null) {
+				continue;
+			}
+			double ticks = switch (product) {
+				case WELL_FLUID -> {
+					double sum = 0;
+					for (Lines.Port port : Lines.sources(line, product, FluidNode.Pull.MACHINE, this)) {
+						if (port.node() instanceof WellSource well && sum < need) {
+							Stream.Split got = well.drain((need - sum) / Tuning.OIL_FUEL_TICKS_PER_UNIT);
+							sum += got.oil() * Tuning.OIL_FUEL_TICKS_PER_UNIT + got.gas() * Tuning.GAS_FUEL_TICKS_PER_UNIT;
+						}
+					}
+					yield sum;
+				}
+				case WET_GAS, GAS -> Lines.pull(line, product, need / Tuning.GAS_FUEL_TICKS_PER_UNIT, FluidNode.Pull.MACHINE, this) * Tuning.GAS_FUEL_TICKS_PER_UNIT;
+				case CRUDE -> Lines.pull(line, product, need / Tuning.OIL_FUEL_TICKS_PER_UNIT, FluidNode.Pull.MACHINE, this) * Tuning.OIL_FUEL_TICKS_PER_UNIT;
+				case DIESEL -> Lines.pull(line, product, need / Tuning.DIESEL_FUEL_TICKS_PER_UNIT, FluidNode.Pull.MACHINE, this) * Tuning.DIESEL_FUEL_TICKS_PER_UNIT;
+				case PRODUCED_WATER -> 0;
+			};
+			if (ticks > 0) {
+				burnLeft += ticks;
+				setChanged();
+			}
+		}
+	}
+
 	public static void tick(Level level, BlockPos pos, BlockState state, FireboxBlockEntity firebox) {
 		boolean wants = firebox.wantsHeat(level);
+		if (wants && (level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL == 0 && firebox.burnLeft < Tuning.FIREBOX_FEED_CAP) {
+			firebox.pipeFuel(level);
+		}
 		if (firebox.burnLeft <= 0 && wants) {
 			firebox.light((ServerLevel) level);
 		}

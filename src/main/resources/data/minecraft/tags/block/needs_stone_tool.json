@@ -58,6 +58,12 @@
     "wildcatter:rig_drawworks",
     "wildcatter:mud_pump",
     "wildcatter:mud_tanks",
-    "wildcatter:rig_drive_house"
+    "wildcatter:rig_drive_house",
+    "wildcatter:separator",
+    "wildcatter:stock_tank",
+    "wildcatter:water_tank",
+    "wildcatter:flare_stack",
+    "wildcatter:injection_pump",
+    "wildcatter:disposal_wellhead"
   ]
 }

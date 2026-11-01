@@ -7,6 +7,8 @@ import dev.wildcatter.circuit.Circuit;
 import dev.wildcatter.circuit.CircuitPart;
 import dev.wildcatter.circuit.Conductor;
 import dev.wildcatter.energy.Inspectable;
+import dev.wildcatter.fluid.Product;
+import dev.wildcatter.fluid.Stream;
 import dev.wildcatter.energy.Voltage;
 import dev.wildcatter.kinetic.BeamLinkage;
 import dev.wildcatter.kinetic.Kinetic;
@@ -18,7 +20,6 @@ import dev.wildcatter.safety.Grounding;
 import dev.wildcatter.well.Reservoir;
 import dev.wildcatter.well.ReservoirData;
 import java.util.List;
-import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -29,15 +30,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
 
 /**
- * The pumpjack's insides (docs/multiblocks/well-site.md). Oil does not always flow by itself, so the pumpjack lifts it from the
- * field under its {@link OilWellheadBlock} into a tank (standing in for a flowline and stock tank until Phase 5). The tank can be
- * drained with buckets, and crude goes along steel pipe from the wellhead to hungry fireboxes and refineries. Its 480 V
- * three-phase motor runs only while there is oil and tank room, and the pump slows as the field loses pressure. The crank turns at
+ * The pumpjack's insides (docs/multiblocks/well-site.md, lease.md). Oil does not always flow by itself, so the pumpjack lifts the
+ * well's stream from the field under its {@link OilWellheadBlock} into its flowline: oil, produced water (the water cut rises as
+ * the field drains) and the gas that comes out of the oil. A separator, or a firebox, on steel pipe from the wellhead draws it. Its
+ * 480 V three-phase motor runs only while there is oil and flowline room, and the pump slows as the field loses pressure. The crank turns at
  * {@link Tuning#PUMPJACK_SPM} and the beam, pitmans and polished rod follow it through {@link BeamLinkage}.
  */
-public class PumpjackBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, BigPartEntity, Kinetic, dev.wildcatter.kinetic.Sounding {
+public class PumpjackBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, BigPartEntity, Kinetic, dev.wildcatter.kinetic.Sounding, WellSource {
 	/** The carrier bar's height with the beam level: 2.1 m, so at the bottom of the stroke it clears the stuffing box. */
 	private static final float CARRIER_Y = 2.1F;
 
@@ -49,8 +51,10 @@ public class PumpjackBlockEntity extends BlockEntity implements CircuitPart, Ins
 	private boolean wanted;
 	private double volts;
 	private double amps;
-	private double tank;
+	/** The flowline: litres of oil and of water, m3 of gas, as lifted. */
+	private Stream.Split line = Stream.Split.NONE;
 	private double carry;
+	private double waterCut = Tuning.WATER_CUT_NEW;
 	private boolean grown;
 	private String status = "starting";
 
@@ -71,30 +75,43 @@ public class PumpjackBlockEntity extends BlockEntity implements CircuitPart, Ins
 		return level != null && level.getBlockState(wellhead()).is(WildcatterBlocks.OIL_WELLHEAD);
 	}
 
-	/** Takes oil out of the tank for a bucket; false if there is not enough. */
-	public boolean takeUnits(int units) {
-		if (tank < units) {
-			return false;
-		}
-		tank -= units;
-		setChanged();
-		return true;
-	}
-
-	/** Game test hook: fills the tank. */
-	public void testFill(double units) {
-		tank = Math.min(Tuning.PUMPJACK_TANK, tank + units);
+	/** Game test hook: fills the flowline with new-field stream. */
+	public void testFill(double litres) {
+		line = line.plus(Stream.oilWell(Math.max(0, Math.min(litres, Tuning.PUMPJACK_TANK - line.liquid())), waterCut));
 		setChanged();
 	}
 
-	/** Lets a refinery on the steel pipe draw crude from the tank: returns how much it got. */
-	public double take(double max) {
-		double got = Math.min(max, tank);
-		if (got > 0) {
-			tank -= got;
-			setChanged();
+	/** Game test hook: empties up to {@code litres} of the flowline. */
+	public double take(double litres) {
+		return drain(litres).liquid();
+	}
+
+	// ---- its stream on the steel pipe from the wellhead -------------------------------------------------------------------------
+	@Override
+	public Stream.Split drain(double litres) {
+		double liquid = line.liquid();
+		if (liquid <= 0 || litres <= 0) {
+			return Stream.Split.NONE;
 		}
-		return got;
+		Stream.Split out = line.times(Math.min(1, litres / liquid));
+		line = new Stream.Split(Math.max(0, line.oil() - out.oil()), Math.max(0, line.water() - out.water()), Math.max(0, line.gas() - out.gas()));
+		setChanged();
+		return out;
+	}
+
+	@Override
+	public @Nullable Product offers(BlockPos cell, Direction side) {
+		return cell.equals(wellhead()) && overWell() ? Product.WELL_FLUID : null;
+	}
+
+	@Override
+	public double available(BlockPos cell, Direction side, Product product, Pull pull) {
+		return product == Product.WELL_FLUID && pull != Pull.FLARE ? line.liquid() : 0;
+	}
+
+	@Override
+	public double take(BlockPos cell, Direction side, Product product, double max, Pull pull) {
+		return available(cell, side, product, pull) > 0 ? drain(max).liquid() : 0;
 	}
 
 	public dev.wildcatter.circuit.Motor motor() {
@@ -152,37 +169,32 @@ public class PumpjackBlockEntity extends BlockEntity implements CircuitPart, Ins
 		BlockPos well = jack.wellhead();
 		Reservoir field = jack.overWell() ? Reservoir.at(ReservoirData.seed(server), well.getX(), well.getZ()) : null;
 		ReservoirData data = ReservoirData.get(server);
-		jack.wanted = field != null && data.remaining(field) > 0 && jack.tank < Tuning.PUMPJACK_TANK;
+		double room = Tuning.PUMPJACK_TANK - jack.line.liquid();
+		jack.wanted = field != null && data.remaining(field) > 0 && room >= 1;
 		double strength = jack.motor.output();
+		if (field != null) {
+			jack.waterCut = Stream.waterCut(data.remaining(field), field.units());
+		}
 		if (!jack.overWell()) {
 			jack.status = "NOT OVER A WELL: set it with its horsehead over an oil wellhead";
 		} else if (field == null || data.remaining(field) <= 0) {
 			jack.status = "DEPLETED: the well has run dry";
-		} else if (jack.tank >= Tuning.PUMPJACK_TANK) {
-			jack.status = "tank full, motor stopped: empty it with buckets or burn it";
+		} else if (room < 1) {
+			jack.status = "SHUT IN: the flowline is backed up, motor stopped (pipe the wellhead to a separator)";
 		} else if (strength == 0) {
 			jack.status = jack.motor.reversed() ? "lifting nothing, " + jack.motor.describe() : jack.motor.describe();
 		} else {
 			double pressure = Math.max(0.1, Math.min(1.0, data.pressure(field) * 1.25));
-			double want = Math.min(Tuning.PUMPJACK_TANK - jack.tank, Tuning.PUMPJACK_UNITS_PER_TICK * Tuning.WELL_INTERVAL * strength * pressure);
-			jack.carry += want;
+			double liquid = Math.min(room, Tuning.PUMPJACK_UNITS_PER_TICK * Tuning.WELL_INTERVAL * strength * pressure);
+			jack.carry += liquid * (1 - jack.waterCut);   // only the oil comes out of the field
 			int whole = (int) jack.carry;
 			if (whole > 0) {
-				jack.tank += data.draw(field, whole);
+				double oil = data.draw(field, whole);
 				jack.carry -= whole;
+				jack.line = jack.line.plus(Stream.oilWell(oil / (1 - jack.waterCut), jack.waterCut));
 			}
 			jack.status = "pumping at " + Math.round(strength * pressure * 100) + "% of full rate, " + jack.motor.describe();
 			jack.setChanged();
-		}
-		if (jack.tank > 0 && jack.overWell()) {   // crude leaves through the wellhead's flowline
-			List<BlockPos> cell = List.of(well);
-			Set<BlockPos> lines = Plumbing.network(level, cell, PipeBlock.Kind.GAS);
-			List<FireboxBlockEntity> fireboxes = Plumbing.fireboxes(level, cell, lines, true);
-			double sent = Plumbing.feedFireboxes(fireboxes, jack.tank * Tuning.OIL_FUEL_TICKS_PER_UNIT);
-			if (sent > 0) {
-				jack.tank -= sent / Tuning.OIL_FUEL_TICKS_PER_UNIT;
-				jack.setChanged();
-			}
 		}
 	}
 
@@ -197,7 +209,7 @@ public class PumpjackBlockEntity extends BlockEntity implements CircuitPart, Ins
 			}
 		}
 		return Component.literal("Pumpjack (" + String.format("%.1f", Tuning.PUMPJACK_WATTS / 1000) + " kW motor, " + Voltage.INDUSTRIAL.label() + " three-phase, "
-				+ Math.round(Math.abs(spin.rpm())) + " strokes a minute): " + field + "tank " + (int) tank + "/" + Tuning.PUMPJACK_TANK + " (a bucket is " + Tuning.CRUDE_BUCKET_UNITS + "), " + status + "; "
+				+ Math.round(Math.abs(spin.rpm())) + " strokes a minute): " + field + "water cut " + Math.round(waterCut * 100) + "%, flowline " + (int) line.liquid() + "/" + Tuning.PUMPJACK_TANK + " L, " + status + "; "
 				+ (level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you"));
 	}
 
@@ -269,7 +281,10 @@ public class PumpjackBlockEntity extends BlockEntity implements CircuitPart, Ins
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
-		output.putDouble("tank", tank);
+		output.putDouble("oil", line.oil());
+		output.putDouble("water", line.water());
+		output.putDouble("gas", line.gas());
+		output.putDouble("water_cut", waterCut);
 		output.putBoolean("leadsSwapped", motor.leadsSwapped());
 		output.putDouble("carry", carry);
 		output.putBoolean("grown", grown);
@@ -280,7 +295,9 @@ public class PumpjackBlockEntity extends BlockEntity implements CircuitPart, Ins
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
 		running.load(input);
-		tank = input.getDoubleOr("tank", 0);
+		double oldTank = input.getDoubleOr("tank", 0);   // an older world's crude tank becomes new-field stream in the flowline
+		waterCut = input.getDoubleOr("water_cut", Tuning.WATER_CUT_NEW);
+		line = new Stream.Split(input.getDoubleOr("oil", oldTank), input.getDoubleOr("water", 0), input.getDoubleOr("gas", oldTank * Tuning.GAS_OIL_RATIO));
 		motor.setLeadsSwapped(input.getBooleanOr("leadsSwapped", false));
 		carry = input.getDoubleOr("carry", 0);
 		grown = input.getBooleanOr("grown", grown);

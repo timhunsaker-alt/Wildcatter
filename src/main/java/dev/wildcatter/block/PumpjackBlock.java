@@ -118,19 +118,9 @@ public class PumpjackBlock extends BigPartBlock {
 		return true;
 	}
 
-	/** A bucket of crude from the pumpjack's tank, on a click on the pumpjack or its wellhead. */
+	/** A bucket on the pumpjack or its wellhead: the stream is oil, water and gas together, so crude comes from a separator or a stock tank. */
 	static void fillBucket(PumpjackBlockEntity jack, ItemStack stack, Player player, InteractionHand hand, Level level) {
-		if (jack.takeUnits(Tuning.CRUDE_BUCKET_UNITS)) {
-			ItemStack crude = new ItemStack(WildcatterItems.CRUDE_OIL_BUCKET);
-			stack.shrink(1);
-			if (stack.isEmpty()) {
-				player.setItemInHand(hand, crude);
-			} else if (!player.getInventory().add(crude)) {
-				net.minecraft.world.Containers.dropItemStack(level, player.getX(), player.getY(), player.getZ(), crude);
-			}
-		} else {
-			player.sendOverlayMessage(jack.inspect());
-		}
+		player.sendOverlayMessage(Component.literal("The well flows oil, water and gas together: pipe the wellhead to a separator, and fill buckets at its oil side or a stock tank"));
 	}
 
 	@Override

@@ -1383,6 +1383,31 @@ save_json(f"{ASSETS}/lang/en_us.json", lang)
 ROTOR_PARTS += ("top_drive", "top_drive_quill", "mud_pump_sheave", "mud_pump_bull_wheel", "drawworks_drum")
 save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ROTOR_PARTS}})
 
+# ---- Phase 5a: the lease (docs/multiblocks/lease.md) ------------------------------------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/lease.py; here loot, names, tags, recipes and the coupling rotor.
+LEASE_PARTS = ("separator", "stock_tank", "water_tank", "flare_stack", "injection_pump")
+for name in LEASE_PARTS:
+	big_part_loot(name)
+save_json(f"{DATA}/loot_table/blocks/disposal_wellhead.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:disposal_wellhead"}],
+	"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+for tag in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
+	t["values"] += [f"{ns}:{n}" for n in LEASE_PARTS + ("disposal_wellhead",)]
+	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
+shaped("separator", ["SSS", "PGP", "SSS"], {"S": S_, "P": f"{ns}:gas_line", "G": "minecraft:glass"}, "separator")
+shaped("stock_tank", ["SSS", "S S", "SSS"], {"S": S_}, "stock_tank")
+shaped("water_tank", ["PPP", "P P", "PPP"], {"P": f"{ns}:plastic_sheet"}, "water_tank")
+shaped("flare_stack", [" F ", " P ", " P "], {"F": "minecraft:flint_and_steel", "P": f"{ns}:gas_line"}, "flare_stack")
+shaped("injection_pump", ["SPS", "CXC", "SSS"], {"S": S_, "P": f"{ns}:gas_line", "C": "minecraft:copper_ingot", "X": f"{ns}:crankshaft"}, "injection_pump")
+shaped("disposal_wellhead", ["SPS", " S ", "SBS"], {"S": S_, "P": f"{ns}:gas_line", "B": "minecraft:iron_block"}, "disposal_wellhead")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({"block.wildcatter.separator": "Three-Phase Separator (36 in x 10 ft)", "block.wildcatter.stock_tank": "Stock Tank (400 bbl steel)",
+	"block.wildcatter.water_tank": "Water Tank (400 bbl fiberglass)", "block.wildcatter.flare_stack": "Flare Stack (10 m)",
+	"block.wildcatter.injection_pump": "Injection Pump (H-pump, 100 hp)", "block.wildcatter.disposal_wellhead": "Disposal Wellhead (saltwater disposal)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+ROTOR_PARTS += ("injection_pump_coupling",)
+save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ROTOR_PARTS}})
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

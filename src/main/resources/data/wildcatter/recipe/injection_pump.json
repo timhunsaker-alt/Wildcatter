@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "CXC",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "C": "minecraft:copper_ingot",
+    "X": "wildcatter:crankshaft"
+  },
+  "result": {
+    "id": "wildcatter:injection_pump",
+    "count": 1
+  }
+}

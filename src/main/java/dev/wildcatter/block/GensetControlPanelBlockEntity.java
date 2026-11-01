@@ -14,6 +14,7 @@ import dev.wildcatter.circuit.ThreePhaseSource;
 import dev.wildcatter.energy.ElectricalStandard;
 import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.energy.Voltage;
+import dev.wildcatter.fluid.Product;
 import dev.wildcatter.kinetic.Spin;
 import java.util.List;
 import java.util.Set;
@@ -249,33 +250,30 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		return worldPosition;
 	}
 
-	/** Pipeline gas: the engine draws from the gas wells on its gas lines into a few seconds' buffer. */
+	/** Separated gas: the engine draws from the gas run on any of its cells into a few seconds' buffer. Wet gas would wreck it. */
 	private void drawGas(ServerLevel level) {
 		double want = Tuning.GAS_FULL_LOAD_M3H / 3600.0 * 10 - gasBuffer;   // ten seconds at full load
 		if (want <= 0) {
 			return;
 		}
-		List<BlockPos> cells = dev.wildcatter.multiblock.BigParts.cellsAt(level, engine());   // a gas line to any cell of the engine
-		Set<BlockPos> lines = Plumbing.network(level, cells, PipeBlock.Kind.GAS);
-		double got = 0;
-		for (GasWellheadBlockEntity head : Plumbing.machines(level, cells, lines, true, GasWellheadBlockEntity.class)) {
-			got += head.offer(want - got);
-		}
+		List<Lines.Face> faces = Lines.faces(dev.wildcatter.multiblock.BigParts.cellsAt(level, engine()));   // a gas line to any cell of the engine
+		double got = Lines.pull(level, faces, Product.GAS, want, FluidNode.Pull.MACHINE, null);
 		gasBuffer += got;
-		supply = got > 0 || gasBuffer > 0 ? "gas from a well" : "NO GAS: run a gas line from a gas wellhead to the engine";
+		dev.wildcatter.fluid.Run wrong = got > 0 ? null : Lines.wrong(level, faces, Product.GAS);
+		supply = got > 0 || gasBuffer > 0 ? "gas from a separator"
+				: wrong != null && wrong.carries(Product.WET_GAS) ? "WET GAS: put a separator between the well and the engine"
+				: wrong != null ? "NO GAS: its gas line is " + wrong.describe()
+				: "NO GAS: run a gas line from a separator's gas side to the engine";
 	}
 
-	/** Diesel: the tank is topped up from a refinery on its gas lines. */
+	/** Diesel: the tank is topped up from a refinery or a diesel tank on its steel pipe. */
 	private void refillDiesel(ServerLevel level, GensetPartBlockEntity tank) {
 		double room = Tuning.GENSET_TANK_LITERS - tank.liters();
 		if (room < 1) {
 			return;
 		}
 		List<BlockPos> cells = dev.wildcatter.multiblock.BigParts.cellsAt(level, tank.getBlockPos());   // a line to any cell of the tank
-		Set<BlockPos> lines = Plumbing.network(level, cells, PipeBlock.Kind.GAS);
-		for (RefineryBlockEntity refinery : Plumbing.machines(level, cells, lines, true, RefineryBlockEntity.class)) {
-			tank.addFuel(refinery.drawDiesel(Tuning.GENSET_TANK_LITERS - tank.liters()));
-		}
+		tank.addFuel(Lines.pull(level, Lines.faces(cells), Product.DIESEL, room, FluidNode.Pull.MACHINE, null));
 	}
 
 	/** Fuel for one tick at the present load: 15 % of full-load fuel at no load, rising in a straight line to full. */
