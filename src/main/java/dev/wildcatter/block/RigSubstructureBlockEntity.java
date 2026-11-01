@@ -210,7 +210,15 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		depth++;
 		water -= Tuning.LAND_RIG_MUD_PER_BLOCK;
 		stand++;
-		if (field != null && hole.getY() - depth <= field.topY()) {
+		dev.wildcatter.well.RollFront front = Drilling.isrFirst(level, hole) ? Drilling.rollFront(level, hole) : null;
+		if (front != null && hole.getY() - depth <= front.bottomY()) {
+			phase = Phase.COMPLETE;   // through a roll-front: an ISR well, its gamma log in the wellhead
+			String log = Drilling.gammaLog(level, hole, hole.getY() - depth);
+			if (level.getBlockState(hole).canBeReplaced()) {
+				Drilling.setIsrWell(level, hole, log);
+			}
+			Drilling.announce(level, hole, Component.literal("ISR WELL completed through a roll-front, " + depth + " m down. " + log));
+		} else if (field != null && hole.getY() - depth <= field.topY()) {
 			strike(level, field);
 		} else if (stand >= Tuning.LAND_RIG_STAND_BLOCKS) {
 			stand = 0;

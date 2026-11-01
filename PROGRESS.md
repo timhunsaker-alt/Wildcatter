@@ -475,6 +475,36 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 7c: the ISR wellfield (spec: docs/multiblocks/isr-wellfield.md)
+- **Roll-front deposits** (`well/RollFront.java`): seed-placed crescent bands of uranium in desert and badlands sandstone.
+  - Shape: arcs of radius 40-80 blocks, 15-30 blocks across and 3-6 thick.
+  - Depth: top at y -10 to -45.
+  - Grade: 1 % eU3O8 along the middle, 0.3 % at the edges.
+  - Recovery: 70 % can be won. One pool per front, shared by every producer on it (`RollFrontData`).
+- **Gamma log:** both rigs complete a hole through a front as an **ISR well** and report the ore's depth, thickness, grade and
+  grade-thickness against a 0.6 m·% cut-off. A miss logs background. A front above an oil field comes first.
+- **ISR wells:** an injector by default. A **submersible pump** (7.5 hp, 480 V) clicked in makes it a producer of 2.5 L/s.
+  - The head grade follows the 5-spot: 500 mg/L U3O8 for four injecting injectors within 25 blocks, times the oxygen they
+    carried, the ore's grade at the well, and the front's uranium left.
+  - A full pattern makes about 4.5 kg of U3O8 an hour.
+- **Header house** (480 V, its drives a variable load of 5.6 kW a running pump):
+  - runs up to 25 producers on its west pipe;
+  - sends their water to the IX columns;
+  - doses the returning lixiviant with oxygen from the **oxygen generator** (PSA, 50 Nm3/h, 25 kW) against it;
+  - holds back 1 % bleed;
+  - meters each injector on its east pipe its share.
+- **IX columns:** take 95 % of the uranium onto resin, elute it in salt brine (rock salt by hopper), and acidify the eluate
+  (sulfuric acid by pipe). The eluate, at 15 g/L U3O8, goes to the mill's precipitation tank, which now takes it as well as
+  strip liquor.
+- **Left out** (ROADMAP Ideas): CO2, monitor wells, groundwater restoration, a bleed disposal well, satellite IX.
+- **Game test** `isrWellfield`:
+  - set on a forced seed, the ground turned to desert;
+  - the rig logs 5.9 m·% of ore and leaves an ISR well;
+  - a 5-spot round it reads 493 mg/L with four injectors;
+  - the IX columns elute and the precipitation tank precipitates the eluate;
+  - with the oxygen generator gone the head grade falls to 0.
+- **Art:** the submersible pump icon from Ludo (1 credit).
+
 ## Phase 7b: the sulfuric acid plant and the uranium mill (specs: docs/multiblocks/acid-plant.md, uranium-mill.md)
 - **Acid plant** (150 t/day, sulfur-burning double contact, double absorption), eight true-size parts:
   - the SULFUR MELTER (sulfur by hopper, melted on the boiler's steam, or gas or LPG from cold);

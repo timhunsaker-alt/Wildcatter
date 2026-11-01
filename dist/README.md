@@ -40,6 +40,8 @@ Put the jar in your instance's `mods` folder next to:
   uranium. Only newly explored chunks have the ores.
 - A sulfuric acid plant (150 t a day from sulfur) and a uranium mill: crush, grind, leach, wash, solvent extraction and
   precipitation with magnesia, into 400 kg drums of yellowcake. Hoppers feed the ore and reagents.
+- In-situ recovery: roll-front uranium under deserts, found by the gamma log of a drilled hole, won by 5-spot well patterns,
+  a header house with an oxygen generator, and ion-exchange columns whose eluate feeds the mill's precipitation tank.
 - The Field Manual item explains how to build each machine.
 
 ## Older worlds

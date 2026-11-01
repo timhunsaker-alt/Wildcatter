@@ -1,0 +1,10 @@
+{
+ "variants": {
+  "pump=false": {
+   "model": "wildcatter:block/isr_wellhead/p0"
+  },
+  "pump=true": {
+   "model": "wildcatter:block/isr_wellhead_pump/p0"
+  }
+ }
+}

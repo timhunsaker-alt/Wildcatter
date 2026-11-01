@@ -74,6 +74,7 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "sx_circuit" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.SX_MIXER_WATTS);
 				case "precipitation_tank" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PRECIP_AGITATOR_WATTS);
 				case "drum_filler" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.DRUM_FILLER_WATTS);
+				case "oxygen_generator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.O2_GENERATOR_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -113,6 +114,7 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "sx_circuit" -> "SX mixers";
 			case "precipitation_tank" -> "precipitation agitator";
 			case "drum_filler" -> "drum filler";
+			case "oxygen_generator" -> "oxygen generator's air compressor";
 			default -> kind();
 		};
 	}

@@ -53,7 +53,13 @@ public enum Product {
 	/** A thickener's overflow: the leach liquor with its uranium, the solids washed out. */
 	PREGNANT_LIQUOR("pregnant liquor", false),
 	/** Salt water that has stripped the uranium out of the solvent: about 25 g/L of U3O8. */
-	STRIP_LIQUOR("strip liquor", false);
+	STRIP_LIQUOR("strip liquor", false),
+	/** A producer's water, oxygenated lixiviant that has swept the ore (docs/multiblocks/isr-wellfield.md). It carries its uranium. */
+	PREGNANT_LIXIVIANT("pregnant lixiviant", false),
+	/** Lixiviant the IX columns have stripped, back to the injectors; it carries its oxygen. */
+	BARREN_LIXIVIANT("barren lixiviant", false),
+	/** IX eluate, acidified: salt brine with about 15 g/L of U3O8, for the precipitation tank. */
+	ELUATE("eluate", false);
 
 	private final String label;
 	private final boolean gas;
@@ -82,7 +88,7 @@ public enum Product {
 	/** False for liquids no stock tank holds: molten sulfur freezes, and the mill's slurries and liquors carry their uranium. */
 	public boolean tanked() {
 		return switch (this) {
-			case MOLTEN_SULFUR, ORE_SLURRY, LEACH_SLURRY, PREGNANT_LIQUOR, STRIP_LIQUOR -> false;
+			case MOLTEN_SULFUR, ORE_SLURRY, LEACH_SLURRY, PREGNANT_LIQUOR, STRIP_LIQUOR, PREGNANT_LIXIVIANT, BARREN_LIXIVIANT, ELUATE -> false;
 			default -> !gas;
 		};
 	}

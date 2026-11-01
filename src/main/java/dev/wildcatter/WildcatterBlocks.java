@@ -371,6 +371,12 @@ public final class WildcatterBlocks {
 	public static final Block PRECIPITATION_TANK = millPart(dev.wildcatter.block.MillPartBlock.Part.PRECIPITATION_TANK);
 	public static final Block YELLOWCAKE_DRYER = millPart(dev.wildcatter.block.MillPartBlock.Part.YELLOWCAKE_DRYER);
 	public static final Block DRUM_FILLER = millPart(dev.wildcatter.block.MillPartBlock.Part.DRUM_FILLER);
+	// 7c: the ISR wellfield (docs/multiblocks/isr-wellfield.md)
+	public static final Block HEADER_HOUSE = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.HEADER_HOUSE);
+	public static final Block OXYGEN_GENERATOR = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.OXYGEN_GENERATOR);
+	public static final Block IX_COLUMNS = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.IX_COLUMNS);
+	public static final Block ISR_WELLHEAD = block("isr_wellhead", props -> new dev.wildcatter.block.IsrWellheadBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL)));
 	/** The gas turbine and combined cycle (docs/multiblocks/gas-turbine.md, combined-cycle.md). */
 	public static final Block GAS_TURBINE = turbinePart(dev.wildcatter.block.TurbinePartBlock.Part.GAS_TURBINE);
 	public static final Block GT_INLET_HOUSE = turbinePart(dev.wildcatter.block.TurbinePartBlock.Part.GT_INLET_HOUSE);
@@ -450,6 +456,10 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<dev.wildcatter.block.PrecipitationTankBlockEntity> PRECIPITATION_TANK_ENTITY = entity(dev.wildcatter.block.PrecipitationTankBlockEntity::new, PRECIPITATION_TANK);
 	public static final BlockEntityType<dev.wildcatter.block.YellowcakeDryerBlockEntity> YELLOWCAKE_DRYER_ENTITY = entity(dev.wildcatter.block.YellowcakeDryerBlockEntity::new, YELLOWCAKE_DRYER);
 	public static final BlockEntityType<dev.wildcatter.block.DrumFillerBlockEntity> DRUM_FILLER_ENTITY = entity(dev.wildcatter.block.DrumFillerBlockEntity::new, DRUM_FILLER);
+	public static final BlockEntityType<dev.wildcatter.block.HeaderHouseBlockEntity> HEADER_HOUSE_ENTITY = entity(dev.wildcatter.block.HeaderHouseBlockEntity::new, HEADER_HOUSE);
+	public static final BlockEntityType<dev.wildcatter.block.OxygenGeneratorBlockEntity> OXYGEN_GENERATOR_ENTITY = entity(dev.wildcatter.block.OxygenGeneratorBlockEntity::new, OXYGEN_GENERATOR);
+	public static final BlockEntityType<dev.wildcatter.block.IxColumnsBlockEntity> IX_COLUMNS_ENTITY = entity(dev.wildcatter.block.IxColumnsBlockEntity::new, IX_COLUMNS);
+	public static final BlockEntityType<dev.wildcatter.block.IsrWellheadBlockEntity> ISR_WELLHEAD_ENTITY = entity(dev.wildcatter.block.IsrWellheadBlockEntity::new, ISR_WELLHEAD);
 	public static final BlockEntityType<dev.wildcatter.block.DehydratorBlockEntity> DEHYDRATOR_ENTITY = entity(dev.wildcatter.block.DehydratorBlockEntity::new, TEG_DEHYDRATOR);
 	public static final BlockEntityType<dev.wildcatter.block.ChillerBlockEntity> CHILLER_ENTITY = entity(dev.wildcatter.block.ChillerBlockEntity::new, NGL_CHILLER);
 	public static final BlockEntityType<dev.wildcatter.block.StabilizerBlockEntity> STABILIZER_ENTITY = entity(dev.wildcatter.block.StabilizerBlockEntity::new, STABILIZER);
@@ -551,6 +561,11 @@ public final class WildcatterBlocks {
 
 	private static Block acidPart(dev.wildcatter.block.AcidPlantPartBlock.Part part) {
 		return block(part.id(), props -> new dev.wildcatter.block.AcidPlantPartBlock(props.mapColor(MapColor.COLOR_GRAY)
+				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
+	}
+
+	private static Block wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part part) {
+		return block(part.id(), props -> new dev.wildcatter.block.WellfieldPartBlock(props.mapColor(MapColor.COLOR_GRAY)
 				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
 	}
 
@@ -742,6 +757,10 @@ public final class WildcatterBlocks {
 		for (Block part : new Block[] {JAW_CRUSHER, SAG_MILL, LEACH_TANK, CCD_THICKENER, SX_CIRCUIT, PRECIPITATION_TANK, YELLOWCAKE_DRYER, DRUM_FILLER}) {
 			add(((dev.wildcatter.block.MillPartBlock) part).part().id(), part);
 		}
+		for (Block part : new Block[] {HEADER_HOUSE, OXYGEN_GENERATOR, IX_COLUMNS}) {
+			add(((dev.wildcatter.block.WellfieldPartBlock) part).part().id(), part);
+		}
+		add("isr_wellhead", ISR_WELLHEAD);
 		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("rotor"), ROTOR);   // no item: it is never placed
 		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("mcc_bucket"), MCC_BUCKET);   // its item is WildcatterItems.MCC_BUCKET
 		add("mcc_section", MCC_SECTION);
@@ -819,6 +838,10 @@ public final class WildcatterBlocks {
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("precipitation_tank"), PRECIPITATION_TANK_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("yellowcake_dryer"), YELLOWCAKE_DRYER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("drum_filler"), DRUM_FILLER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("header_house"), HEADER_HOUSE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("oxygen_generator"), OXYGEN_GENERATOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("ix_columns"), IX_COLUMNS_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("isr_wellhead"), ISR_WELLHEAD_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("turbine_generator"), TURBINE_GENERATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("genset_control_panel"), GENSET_CONTROL_PANEL_ENTITY);
 	}

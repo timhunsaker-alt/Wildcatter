@@ -85,6 +85,10 @@ Three ores need their own shapes:
 
 Worldgen reaches only chunks that have not been generated yet. An old world gets the ores only in new chunks.
 
+## Roll-fronts (7c)
+Under deserts and badlands, roll-front uranium deposits lie as seed-placed bands in the sandstone, y -10 to -50. They are
+found by drilling and gamma-logging, and won by ISR wells (multiblocks/isr-wellfield.md). The scintillometer can't hear them.
+
 ## Smelting
 The furnace (and the blast furnace, twice as fast) smelts only what really smelts simply:
 

@@ -49,6 +49,7 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 	private double volts;
 	private double amps;
 	private int depth;
+	private String log = "";
 	private double progress;
 	private Phase phase = Phase.DRILLING;
 	private boolean grown;
@@ -163,8 +164,19 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 		}
 	}
 
-	/** The hole has reached the depth where the field would be. */
+	/** The hole has reached the depth where the field would be, or the base of a roll-front. */
 	private void strike(ServerLevel level) {
+		log = Drilling.gammaLog(level, worldPosition, worldPosition.getY() - depth);
+		if (Drilling.isrFirst(level, worldPosition)) {
+			BlockPos hole = worldPosition;
+			String news = log;
+			rigDown(level, null);
+			Drilling.setIsrWell(level, hole, news);
+			CircuitManager.markDirty(level);
+			Drilling.announce(level, hole, Component.literal("ISR WELL completed through a roll-front, " + depth + " blocks down. " + news
+					+ ". The rig has rigged down and dropped; a submersible pump makes the well a producer."));
+			return;
+		}
 		ReservoirData data = ReservoirData.get(level);
 		Reservoir field = Drilling.field(level, worldPosition);
 		if (field == null || data.remaining(field) <= 0) {
@@ -179,8 +191,8 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 				+ (field.kind() == Reservoir.Kind.OIL ? "click the oil wellhead with a pumpjack and wire it to bring the oil up." : "run steel pipe from the Christmas tree to a firebox.")));
 	}
 
-	/** The rig leaves the hole: every cell goes, it drops as its item, and the wellhead for the field stands on the hole. */
-	private void rigDown(ServerLevel level, Reservoir.Kind kind) {
+	/** The rig leaves the hole: every cell goes, it drops as its item, and the wellhead for the field (if any) stands on the hole. */
+	private void rigDown(ServerLevel level, Reservoir.@org.jspecify.annotations.Nullable Kind kind) {
 		BlockPos hole = worldPosition;
 		BlockState state = getBlockState();
 		java.util.List<BlockPos> cells = dev.wildcatter.multiblock.BigParts.cells(hole, state);
@@ -190,7 +202,9 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 		}
 		level.removeBlockEntity(hole);
 		Direction facing = state.getValue(DrillingRigBlock.FACING);
-		Drilling.setWellhead(level, hole, kind, facing);
+		if (kind != null) {
+			Drilling.setWellhead(level, hole, kind, facing);
+		}
 		net.minecraft.world.level.block.Block.popResource(level, hole.relative(facing.getOpposite()).above(), new net.minecraft.world.item.ItemStack(WildcatterBlocks.DRILLING_RIG));
 	}
 
@@ -205,7 +219,7 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 	public Component inspect() {
 		String state = switch (phase) {
 			case DRILLING -> strength() == 0 ? motor.describe() : "drilling, " + (int) Math.round(strength() * 100) + "% speed, " + motor.describe();
-			case DRY -> "DRY HOLE: nothing there. Break the rig and drill somewhere else";
+			case DRY -> "DRY HOLE: nothing there. Break the rig and drill somewhere else" + (log.isEmpty() ? "" : "; " + log);
 			case TOO_DEEP -> "TOO DEEP: this rig reaches " + Tuning.SMALL_RIG_MAX_DEPTH + " m. A land rig goes deeper";
 			case BLOCKED -> "STOPPED: hit rock it cannot cut. Break the rig and drill somewhere else";
 		};
@@ -217,6 +231,7 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
 		output.putInt("depth", depth);
+		output.putString("log", log);
 		output.putDouble("progress", progress);
 		output.putInt("phase", phase.ordinal());
 		output.putBoolean("leadsSwapped", motor.leadsSwapped());
@@ -229,6 +244,7 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 		super.loadAdditional(input);
 		running.load(input);
 		depth = input.getIntOr("depth", 0);
+		log = input.getStringOr("log", "");
 		progress = input.getDoubleOr("progress", 0);
 		phase = Phase.values()[Math.max(0, Math.min(Phase.values().length - 1, input.getIntOr("phase", 0)))];
 		motor.setLeadsSwapped(input.getBooleanOr("leadsSwapped", false));

@@ -1722,6 +1722,40 @@ lang.update({f"block.{ns}.sulfur_melter": "Sulfur Melter", f"block.{ns}.drying_t
 	f"block.{ns}.yellowcake_dryer": "Yellowcake Dryer", f"block.{ns}.drum_filler": "Drum Filler"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 7c: the ISR wellfield (docs/multiblocks/isr-wellfield.md) -----------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/wellfield.py; here loot, names, tags, recipes and the pump's icon.
+WELLFIELD_PARTS = ("header_house", "oxygen_generator", "ix_columns")
+for name in WELLFIELD_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in WELLFIELD_PARTS + ("isr_wellhead",)]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+# a well drops its cap, and its pump if it has one
+save_json(f"{DATA}/loot_table/blocks/isr_wellhead.json", {"type": "minecraft:block", "pools": [
+	{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:isr_wellhead"}]},
+	{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:submersible_pump"}],
+		"conditions": [{"condition": "minecraft:block_state_property", "block": f"{ns}:isr_wellhead", "properties": {"pump": "true"}}]}],
+	"random_sequence": f"{ns}:blocks/isr_wellhead"})
+shaped("header_house", ["SCS", "PXP", "SBS"], {"S": S_, "C": "minecraft:copper_block", "P": P_, "X": "minecraft:comparator", "B": "minecraft:iron_block"}, "header_house")
+shaped("oxygen_generator", ["SPS", "XZX", "SSS"], {"S": S_, "P": P_, "X": "minecraft:piston", "Z": "minecraft:clay_ball"}, "oxygen_generator")
+shaped("ix_columns", ["SPS", "SRS", "SPS"], {"S": S_, "P": P_, "R": "minecraft:slime_ball"}, "ix_columns")
+shaped("submersible_pump", [" C ", "SXS", " S "], {"C": "minecraft:copper_ingot", "S": S_, "X": f"{ns}:crankshaft"}, "submersible_pump")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+if os.path.exists(f"{ORE_ART}/submersible_pump.png"):
+	shutil.copy(f"{ORE_ART}/submersible_pump.png", f"{ASSETS}/textures/item/ore/submersible_pump.png")
+	pump_tex = f"{ns}:item/ore/submersible_pump"
+else:
+	tex("submersible_pump_placeholder", lambda img, d: noise(img, (190, 195, 200), 10), "item")
+	pump_tex = f"{ns}:item/submersible_pump_placeholder"
+save_json(f"{ASSETS}/models/item/submersible_pump.json", {"parent": "minecraft:item/generated", "textures": {"layer0": pump_tex}})
+save_json(f"{ASSETS}/items/submersible_pump.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/submersible_pump"}})
+lang.update({f"item.{ns}.submersible_pump": "Submersible Pump (7.5 hp, 480 V)", f"block.{ns}.isr_wellhead": "ISR Well",
+	f"block.{ns}.header_house": "Header House (25 producers, 480 V)", f"block.{ns}.oxygen_generator": "Oxygen Generator (PSA, 50 Nm3/h)",
+	f"block.{ns}.ix_columns": "IX Columns (lead and lag)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

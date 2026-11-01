@@ -44,6 +44,11 @@ public final class WildcatterItems {
 			String.format("%.0f %% U3O8: %,.0f kg of U3O8, %,.0f kg of uranium", Tuning.YELLOWCAKE_U3O8 * 100, Tuning.DRUM_NET_KG * Tuning.YELLOWCAKE_U3O8,
 					Tuning.DRUM_NET_KG * Tuning.YELLOWCAKE_U3O8 * dev.wildcatter.ore.Ore.U_IN_U3O8));
 
+	/** 7c: a 4 in submersible pump (7.5 hp, 480 V): clicked into an ISR well, it makes the well a producer. */
+	public static final ResourceKey<Item> SUBMERSIBLE_PUMP_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("submersible_pump"));
+	public static final Item SUBMERSIBLE_PUMP = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(SUBMERSIBLE_PUMP_KEY),
+			"4 in submersible, 7.5 hp, 480 V", String.format("%.1f L/s; click it into an ISR well to make a producer", Tuning.ISR_PRODUCER_LPS));
+
 	/** A bucket of crude oil. It burns in a firebox (as long as lava) and leaves the bucket behind. */
 	public static final ResourceKey<Item> CRUDE_OIL_BUCKET_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("crude_oil_bucket"));
 	public static final Item CRUDE_OIL_BUCKET = new Item(new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET).setId(CRUDE_OIL_BUCKET_KEY));
@@ -104,6 +109,7 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, MAGNESIA_KEY, MAGNESIA);
 		Registry.register(BuiltInRegistries.ITEM, EMPTY_DRUM_KEY, EMPTY_DRUM);
 		Registry.register(BuiltInRegistries.ITEM, YELLOWCAKE_DRUM_KEY, YELLOWCAKE_DRUM);
+		Registry.register(BuiltInRegistries.ITEM, SUBMERSIBLE_PUMP_KEY, SUBMERSIBLE_PUMP);
 		Registry.register(BuiltInRegistries.ITEM, CRUDE_OIL_BUCKET_KEY, CRUDE_OIL_BUCKET);
 		Registry.register(BuiltInRegistries.ITEM, PLASTIC_SHEET_KEY, PLASTIC_SHEET);
 		Registry.register(BuiltInRegistries.ITEM, STEEL_INGOT_KEY, STEEL_INGOT);

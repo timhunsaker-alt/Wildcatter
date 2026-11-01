@@ -244,6 +244,37 @@ public final class Tuning {
 	public static final double DRUM_FILLER_WATTS = 5_000.0;        // 480 V
 	public static final double MILL_WATER_HOLD = 1_000.0;          // litres the SAG mill or the thickener keeps from its pump
 
+	// ---- Roll-front deposits and the ISR wellfield (docs/multiblocks/isr-wellfield.md, approved 2026-11-01) ------------------
+	public static final int ROLL_CELL = 256;                       // blocks: a grid of its own, at most one front a cell
+	public static final double ROLL_CHANCE = 0.5;
+	public static final double ROLL_MIN_RADIUS = 40, ROLL_MAX_RADIUS = 80;   // the arc's ring
+	public static final double ROLL_ARC_DEGREES = 120;
+	public static final double ROLL_MIN_WIDTH = 15, ROLL_MAX_WIDTH = 30;     // the band across the front (real 8-30 m)
+	public static final int ROLL_MIN_TOP_Y = -45, ROLL_MAX_TOP_Y = -10;
+	public static final int ROLL_MIN_THICKNESS = 3, ROLL_MAX_THICKNESS = 6;
+	public static final double ROLL_PEAK_GRADE = 0.01;             // eU3O8 at the band's middle: 10x a real 0.1 %
+	public static final double ROLL_EDGE_GRADE = 0.003;            // at its edges
+	public static final double ROLL_ROCK_KG_PER_M3 = 2_300.0;      // sandstone
+	public static final double ROLL_RECOVERY = 0.70;               // of the uranium in place (WNA: 60-80 %)
+	public static final double GAMMA_CUTOFF_GT = 0.6;              // m x % eU3O8: 10x a real 0.2 ft x %
+	public static final double ISR_HEAD_GRADE_MG_L = 500.0;        // a full 5-spot: 10x a real 50 mg/L U3O8
+	public static final double ISR_PRODUCER_LPS = 2.5;             // 40 gpm (Inkai 35-46 gpm)
+	public static final double ISR_INJECTOR_LPS = 1.24;            // a producer's flow less bleed, over about two injectors
+	public static final int ISR_PATTERN_RANGE = 25;                // blocks from a producer its injectors may stand (real 12-50 m)
+	public static final double ISR_BLEED = 0.01;                   // over-production that draws the wellfield inward (Lost Creek 0.5-1.5 %)
+	public static final double ISR_PUMP_WATTS = 5_600.0;           // a 7.5 hp, 4 in submersible at 480 V
+	public static final int HEADER_HOUSE_PRODUCERS = 25;           // Lost Creek: about 25 producers and 53 injectors a house
+	public static final double O2_DOSE_KG_PER_L = 0.3e-3;          // 300 mg/L (100-500 mg/L, unverified)
+	public static final double O2_GENERATOR_NM3H = 50.0;           // a PSA skid (proposed)
+	public static final double O2_GENERATOR_WATTS = 25_000.0;      // about 0.5 kWh/Nm3, 480 V (proposed)
+	public static final double O2_KG_PER_NM3 = 1.429;
+	public static final double IX_CAPTURE = 0.95;                  // GEIS: over 95 %, barren under 5 mg/L
+	public static final double IX_MAX_LPS = 63.0;                  // 1,000 gpm: one header house (proposed)
+	public static final double IX_RESIN_L = 44_000.0;              // the lead column's resin (Crow Butte, 44 m3)
+	public static final double IX_RESIN_KG_PER_L = 0.080;          // U3O8 a litre of loaded resin (about 5 lb/ft3)
+	public static final double IX_ELUATE_G_PER_L = 15.0;           // U3O8 in the eluate (GEIS: 8-20 g/L U)
+	public static final double IX_ELUATE_ACID_G_PER_L = 10.0;      // sulfuric acid to break the carbonate complex (proposed)
+
 	// ---- The gas turbine and combined cycle (docs/multiblocks/gas-turbine.md, combined-cycle.md, approved 2026-10-31) -------
 	public static final double GT_WATTS = 16_500_000.0;            // ISO rating, Solar Titan 130 class
 	public static final double GT_HEAT_RATE = 10_230.0;            // kJ/kWh: 35 %

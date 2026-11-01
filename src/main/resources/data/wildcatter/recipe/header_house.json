@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "PXP",
+    "SBS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_block",
+    "P": "wildcatter:gas_line",
+    "X": "minecraft:comparator",
+    "B": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:header_house",
+    "count": 1
+  }
+}

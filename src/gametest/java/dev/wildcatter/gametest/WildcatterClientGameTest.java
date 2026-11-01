@@ -175,6 +175,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("uraniumMill")) {
 				uraniumMill(context, server);
 			}
+			if (only("isrWellfield")) {
+				isrWellfield(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -4174,6 +4177,202 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(3);
 		context.takeScreenshot("wildcatter-uranium-mill");
 		System.out.println("[wildcatter-test] uranium mill ok: " + held + " | " + grind + " | " + thick + " | " + sxr + " | " + dry + " | drums " + drums);
+	}
+
+
+	/**
+	 * The ISR wellfield (7c, docs/multiblocks/isr-wellfield.md), far out in a cell of its own on a seed that puts a roll-front
+	 * there, the ground turned to desert. The small rig drills the producer's hole on the front's middle line and must log the ore
+	 * and leave an ISR well; its set and cable then go. Four injectors stand at the corners of a 5-spot round it, on an injection ring
+	 * from the header house; the producer's line runs to the header house's west side. The oxygen generator stands against the
+	 * header house's east side, the IX columns south of it, acid from a stock tank, the eluate to a precipitation tank with its
+	 * dryer and filler. The producer must read four injectors and a head grade near 500 mg/L; the IX columns must elute and the tank
+	 * precipitate the eluate; with the oxygen generator gone the head grade must fall.
+	 */
+	private void isrWellfield(ClientGameTestContext context, TestServerContext server) {
+		int y0 = up + 31;   // the working level: high enough that the front lies under a hole drilled from it
+		long found = -1;
+		dev.wildcatter.well.RollFront front = null;
+		for (long seed = 1; seed < 2_000_000 && found < 0; seed++) {
+			dev.wildcatter.well.RollFront f = dev.wildcatter.well.RollFront.inCell(seed, 4, -10);
+			if (f == null || f.topY() > y0 - 8 || f.bottomY() < -60) {
+				continue;
+			}
+			int[] m = f.middle();
+			boolean all = true;
+			for (int[] c : new int[][] {{0, 0}, {-5, -5}, {5, -5}, {-5, 5}, {5, 5}}) {
+				all &= f.covers(m[0] + c[0], m[1] + c[1]);
+				Reservoir field = Reservoir.at(seed, m[0] + c[0], m[1] + c[1]);
+				all &= field == null || field.topY() < f.bottomY();
+			}
+			if (all) {
+				found = seed;
+				front = f;
+			}
+		}
+		check(found >= 0, "no seed puts a roll-front under the wellfield");
+		ReservoirData.testSeed = found;
+		final int px = front.middle()[0], pz = front.middle()[1];
+		try {
+			server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+			server.runCommand("tp @p " + (px + 10) + " " + (y0 + 20) + " " + (pz + 30) + " 180 40");
+			context.waitTicks(40);   // the chunks load
+			server.runCommand("fill " + (px - 12) + " " + (y0 - 1) + " " + (pz - 11) + " " + (px + 34) + " " + (y0 + 8) + " " + (pz + 28) + " minecraft:air");
+			server.runCommand("fill " + (px - 12) + " " + (y0 - 1) + " " + (pz - 11) + " " + (px + 34) + " " + (y0 - 1) + " " + (pz + 28) + " minecraft:stone");
+			// desert under the 5-spot (fillbiome's limit is 32,768 blocks: the wells' columns are enough)
+			server.runCommand("fillbiome " + (px - 6) + " -60 " + (pz - 6) + " " + (px + 6) + " " + (y0 + 2) + " " + (pz + 6) + " minecraft:desert");
+			check(server.computeOnServer(srv -> srv.overworld().getBiome(new BlockPos(px, y0, pz)).is(net.minecraft.world.level.biome.Biomes.DESERT)),
+					"fillbiome should have turned the 5-spot to desert");
+			net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+			// ---- the producer's hole: the small rig on its own set, as in the wells scene ----
+			BlockPos hole = new BlockPos(px, y0, pz);
+			BlockPos rigSet = new BlockPos(px - 6, y0, pz + 2);
+			genset(server, rigSet, net.minecraft.core.Direction.WEST, false);
+			put(server, px - 6, y0, pz + 1, "wildcatter:cable_industrial");
+			put(server, px - 6, y0, pz, "wildcatter:cable_industrial");
+			placeBig(server, WildcatterBlocks.DRILLING_RIG, hole, net.minecraft.core.Direction.EAST);
+			startGenset(context, server, rigSet, net.minecraft.core.Direction.WEST, 1000);
+			for (int waited = 0; waited < 3000; waited += 100) {
+				if (server.computeOnServer(srv -> srv.overworld().getBlockState(hole).is(WildcatterBlocks.ISR_WELLHEAD))) {
+					break;
+				}
+				context.waitTicks(100);
+			}
+			String log = read(server, px, y0, pz);
+			check(log.contains("GAMMA LOG") && log.contains("ORE"), "the rig should complete an ISR well through the front and log its ore: " + log + " | rig "
+					+ read(server, px, y0, pz));
+			// the rig's set and cable go; the floor goes back
+			server.runCommand("kill @e[type=item]");
+			server.runCommand("fill " + (px - 9) + " " + (y0 - 1) + " " + (pz) + " " + (px - 3) + " " + (y0 + 4) + " " + (pz + 10) + " minecraft:air");
+			server.runCommand("fill " + (px - 9) + " " + (y0 - 1) + " " + (pz) + " " + (px - 3) + " " + (y0 - 1) + " " + (pz + 10) + " minecraft:stone");
+			// ---- the 5-spot: four injectors at the corners, cased; a pump into the producer ----
+			for (int[] c : new int[][] {{-5, -5}, {5, -5}, {-5, 5}, {5, 5}}) {
+				put(server, px + c[0], y0 - 1, pz + c[1], "wildcatter:casing");
+				put(server, px + c[0], y0, pz + c[1], "wildcatter:isr_wellhead");
+			}
+			server.computeOnServer(srv -> {
+				net.minecraft.world.level.block.state.BlockState st = srv.overworld().getBlockState(hole);
+				srv.overworld().setBlock(hole, st.setValue(dev.wildcatter.block.IsrWellheadBlock.PUMP, true), 3);
+				return null;
+			});
+			// ---- the surface plant ----
+			placeBig(server, WildcatterBlocks.HEADER_HOUSE, new BlockPos(px + 12, y0, pz - 5), north);          // x+12..15, z-5..z+4
+			BlockPos oxygen = new BlockPos(px + 21, y0, pz - 2);
+			placeBig(server, WildcatterBlocks.OXYGEN_GENERATOR, oxygen, net.minecraft.core.Direction.EAST);    // x+16..21, z-2..z
+			placeBig(server, WildcatterBlocks.IX_COLUMNS, new BlockPos(px + 10, y0, pz + 7), north);            // x+10..17, z+7..z+10
+			BlockPos acidTank = new BlockPos(px + 19, y0, pz + 7);
+			placeBig(server, WildcatterBlocks.STOCK_TANK, acidTank, north);                                     // x+19..22, z+7..z+10
+			placeBig(server, WildcatterBlocks.PRECIPITATION_TANK, new BlockPos(px + 10, y0, pz + 12), north);   // x+10..13, z+12..z+15
+			placeBig(server, WildcatterBlocks.YELLOWCAKE_DRYER, new BlockPos(px + 10, y0, pz + 16), north);     // x+10..12, z+16..z+18
+			placeBig(server, WildcatterBlocks.DRUM_FILLER, new BlockPos(px + 8, y0, pz + 16), north);           // x+8..9, z+16..z+17
+			BlockPos bullet = new BlockPos(px + 14, y0, pz + 16);
+			placeBig(server, WildcatterBlocks.LPG_BULLET, bullet, north);                                       // x+14..16, z+16..z+27
+			// the producer's line east to the header house's west side
+			for (int x = px + 1; x <= px + 11; x++) {
+				put(server, x, y0, pz, "wildcatter:gas_line");
+			}
+			// the injection ring: out of the header house's east side, round the pattern, a stub to each injector
+			java.util.List<int[]> ring = new java.util.ArrayList<>();
+			for (int z = pz - 7; z <= pz - 5; z++) {
+				ring.add(new int[] {px + 16, z});
+			}
+			for (int x = px - 9; x <= px + 15; x++) {
+				ring.add(new int[] {x, pz - 7});
+			}
+			for (int z = pz - 6; z <= pz + 7; z++) {
+				ring.add(new int[] {px - 9, z});
+			}
+			for (int x = px - 8; x <= px + 5; x++) {
+				ring.add(new int[] {x, pz + 7});
+			}
+			for (int[] c : new int[][] {{px - 5, pz - 6}, {px + 5, pz - 6}, {px - 5, pz + 6}, {px + 5, pz + 6}}) {
+				ring.add(c);
+			}
+			for (int[] c : ring) {
+				put(server, c[0], y0, c[1], "wildcatter:gas_line");
+			}
+			// to and from the IX columns
+			put(server, px + 12, y0, pz + 5, "wildcatter:gas_line");
+			put(server, px + 12, y0, pz + 6, "wildcatter:gas_line");
+			int[][] back = {{px + 16, pz + 11}, {px + 16, pz + 12}};
+			for (int[] c : back) {
+				put(server, c[0], y0, c[1], "wildcatter:gas_line");
+			}
+			for (int x = px + 17; x <= px + 24; x++) {
+				put(server, x, y0, pz + 12, "wildcatter:gas_line");
+			}
+			for (int z = pz + 5; z <= pz + 11; z++) {
+				put(server, px + 24, y0, z, "wildcatter:gas_line");
+			}
+			for (int x = px + 15; x <= px + 23; x++) {
+				put(server, x, y0, pz + 5, "wildcatter:gas_line");
+			}
+			put(server, px + 18, y0, pz + 8, "wildcatter:gas_line");   // acid, the stock tank to the IX columns' east side
+			put(server, px + 11, y0, pz + 11, "wildcatter:gas_line");  // eluate to the precipitation tank
+			put(server, px + 13, y0, pz + 17, "wildcatter:gas_line");  // LPG to the dryer
+			// hoppers: salt on the IX columns, magnesia on the precipitation tank, drums on the filler and one under it
+			put(server, px + 12, y0 + 6, pz + 8, "minecraft:hopper");
+			server.runCommand("item replace block " + (px + 12) + " " + (y0 + 6) + " " + (pz + 8) + " container.0 with wildcatter:halite 2");
+			put(server, px + 11, y0 + 5, pz + 13, "minecraft:hopper");
+			server.runCommand("item replace block " + (px + 11) + " " + (y0 + 5) + " " + (pz + 13) + " container.0 with wildcatter:magnesia 2");
+			put(server, px + 8, y0 + 4, pz + 16, "minecraft:hopper");
+			server.runCommand("item replace block " + (px + 8) + " " + (y0 + 4) + " " + (pz + 16) + " container.0 with wildcatter:empty_drum 2");
+			put(server, px + 8, y0 - 1, pz + 16, "minecraft:hopper");
+			fillTank(server, acidTank, dev.wildcatter.fluid.Product.SULFURIC_ACID, 20_000);
+			fillTank(server, bullet, dev.wildcatter.fluid.Product.LPG, 20_000);
+			// ---- 480 V: a set north-east; its line along z-10, over the injection ring to the header house's box, down to the oxygen
+			// generator's box, and round the west to the precipitation tank and the filler ----
+			BlockPos set = new BlockPos(px + 32, y0, pz - 9);
+			genset(server, set, north, false);                                                                  // x+27..32, z-9..z-8
+			java.util.List<int[]> cable = new java.util.ArrayList<>();
+			cable.add(new int[] {px + 33, 0, pz - 9});
+			for (int x = px - 11; x <= px + 33; x++) {
+				cable.add(new int[] {x, 0, pz - 10});
+			}
+			for (int[] c : new int[][] {{px + 12, 0, pz - 9}, {px + 12, 0, pz - 8}, {px + 12, 1, pz - 8}, {px + 12, 1, pz - 7}, {px + 12, 1, pz - 6}, {px + 12, 0, pz - 6}}) {
+				cable.add(c);
+			}
+			for (int z = pz - 9; z <= pz - 3; z++) {
+				cable.add(new int[] {px + 22, 0, z});
+			}
+			cable.add(new int[] {px + 21, 0, pz - 3});
+			for (int z = pz - 9; z <= pz + 12; z++) {
+				cable.add(new int[] {px - 11, 0, z});
+			}
+			for (int x = px - 10; x <= px + 9; x++) {
+				cable.add(new int[] {x, 0, pz + 12});
+			}
+			for (int z = pz + 13; z <= pz + 16; z++) {
+				cable.add(new int[] {px + 7, 0, z});
+			}
+			for (int[] c : cable) {
+				put(server, c[0], y0 + c[1], c[2], "wildcatter:cable_industrial");
+			}
+			startGenset(context, server, set, north, 2000);
+			context.waitTicks(400);
+			String producer = read(server, px, y0, pz);
+			String chain = " | header house " + read(server, px + 12, y0, pz - 5) + " | oxygen " + read(server, px + 21, y0, pz - 2) + " | IX " + read(server, px + 10, y0, pz + 7)
+					+ " | injector " + read(server, px - 5, y0, pz - 5) + " | precipitation " + read(server, px + 10, y0, pz + 12) + " | set " + read(server, px + 32, y0, pz - 9);
+			double grade = server.computeOnServer(srv -> ((dev.wildcatter.block.IsrWellheadBlockEntity) srv.overworld().getBlockEntity(hole)).headGrade());
+			int injectors = server.computeOnServer(srv -> ((dev.wildcatter.block.IsrWellheadBlockEntity) srv.overworld().getBlockEntity(hole)).injectors());
+			check(injectors == 4 && grade > 400, "the producer should see four injectors and about 500 mg/L: " + producer + chain);
+			String ix = read(server, px + 10, y0, pz + 7), pt = read(server, px + 10, y0, pz + 12);
+			check(ix.contains("eluting"), "the IX columns should elute: " + ix + chain);
+			check(pt.contains("precipitating") && pt.contains("eluate"), "the precipitation tank should precipitate the eluate: " + pt + chain);
+			server.runCommand("tp @p " + (px + 6) + " " + (y0 + 18) + " " + (pz + 34) + " 190 35");
+			context.waitTicks(3);
+			context.takeScreenshot("wildcatter-isr-wellfield");
+			// no oxygen: the lixiviant reaches the injectors without it, and the head grade falls away
+			server.runCommand("fill " + (px + 16) + " " + y0 + " " + (pz - 2) + " " + (px + 21) + " " + (y0 + 2) + " " + pz + " minecraft:air");
+			context.waitTicks(400);
+			double without = server.computeOnServer(srv -> ((dev.wildcatter.block.IsrWellheadBlockEntity) srv.overworld().getBlockEntity(hole)).headGrade());
+			String hh = read(server, px + 12, y0, pz - 5);
+			check(without < grade / 4 && hh.contains("NO OXYGEN"), "without oxygen the head grade should fall: " + grade + " -> " + without + " | " + hh);
+			System.out.println("[wildcatter-test] isr wellfield ok: " + log + " | " + producer + " | " + ix + " | " + pt + " | no oxygen: " + Math.round(grade) + " -> "
+					+ Math.round(without) + " mg/L");
+		} finally {
+			ReservoirData.testSeed = null;
+		}
 	}
 
 	/**

@@ -86,3 +86,8 @@ no brand names".
 - `yellowcake_drum`: "A single sealed 55 gallon steel drum of uranium ore concentrate (yellowcake), lid open slightly showing
   bright yellow powder, black and yellow radioactive trefoil label on the side, game item icon, plain white background, no other
   text" (b).
+
+## Phase 7c (2026-11-01): the submersible pump (art/source/ore/)
+`submersible_pump`: `item-icon`, `Photorealistic 3D`, 2 variations, a kept: "A single 4 inch stainless steel electric submersible
+water well pump, long slim cylinder with the motor section below the pump stages and intake screen, a flat black power cable
+coming off the top, lying diagonally, game item icon, plain white background, no text".

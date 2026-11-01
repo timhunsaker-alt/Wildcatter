@@ -28,10 +28,48 @@ public final class Drilling {
 		return Reservoir.at(ReservoirData.seed(level), hole.getX(), hole.getZ());
 	}
 
-	/** The height the hole stops at: the top of its field, or {@code dryY} with none. */
+	/**
+	 * The roll-front under this column, or null (docs/multiblocks/isr-wellfield.md). Only desert and badlands sandstone carries
+	 * one; the biome at the hole decides.
+	 */
+	public static dev.wildcatter.well.@Nullable RollFront rollFront(ServerLevel level, BlockPos hole) {
+		dev.wildcatter.well.RollFront front = dev.wildcatter.well.RollFront.at(ReservoirData.seed(level), hole.getX(), hole.getZ());
+		if (front == null) {
+			return null;
+		}
+		net.minecraft.core.Holder<net.minecraft.world.level.biome.Biome> biome = level.getBiome(hole);
+		return biome.is(net.minecraft.world.level.biome.Biomes.DESERT) || biome.is(net.minecraft.tags.BiomeTags.IS_BADLANDS) ? front : null;
+	}
+
+	/** True if a hole here reaches the roll-front before any oil or gas field: the rig completes it as an ISR well. */
+	public static boolean isrFirst(ServerLevel level, BlockPos hole) {
+		dev.wildcatter.well.RollFront front = rollFront(level, hole);
+		Reservoir field = field(level, hole);
+		return front != null && (field == null || front.bottomY() > field.topY());
+	}
+
+	/** The height the hole stops at: through the base of a roll-front, the top of its field, or {@code dryY} with neither. */
 	public static int goalY(ServerLevel level, BlockPos hole, int dryY) {
+		if (isrFirst(level, hole)) {
+			return rollFront(level, hole).bottomY();
+		}
 		Reservoir field = field(level, hole);
 		return field != null ? field.topY() : dryY;
+	}
+
+	/** What a gamma log of the hole shows: the ore zone of a roll-front, or background to the bottom. */
+	public static String gammaLog(ServerLevel level, BlockPos hole, int bottomY) {
+		dev.wildcatter.well.RollFront front = rollFront(level, hole);
+		return front != null && bottomY <= front.topY() ? front.gammaLog(hole.getX(), hole.getZ())
+				: "GAMMA LOG: background to y " + bottomY + ", no uranium";
+	}
+
+	/** Completes the hole as an ISR well through a roll-front: the wellhead on the casing, the gamma log in it. */
+	public static void setIsrWell(ServerLevel level, BlockPos hole, String log) {
+		level.setBlock(hole, WildcatterBlocks.ISR_WELLHEAD.defaultBlockState(), 3);
+		if (level.getBlockEntity(hole) instanceof IsrWellheadBlockEntity well) {
+			well.setLog(log);
+		}
 	}
 
 	/** Cases the next block down, {@code depth} blocks already cased below {@code hole}; false if the rock there cannot be cut. */

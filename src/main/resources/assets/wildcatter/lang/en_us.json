@@ -301,5 +301,10 @@
   "block.wildcatter.sx_circuit": "SX Circuit (mixer-settlers)",
   "block.wildcatter.precipitation_tank": "Precipitation Tank",
   "block.wildcatter.yellowcake_dryer": "Yellowcake Dryer",
-  "block.wildcatter.drum_filler": "Drum Filler"
+  "block.wildcatter.drum_filler": "Drum Filler",
+  "item.wildcatter.submersible_pump": "Submersible Pump (7.5 hp, 480 V)",
+  "block.wildcatter.isr_wellhead": "ISR Well",
+  "block.wildcatter.header_house": "Header House (25 producers, 480 V)",
+  "block.wildcatter.oxygen_generator": "Oxygen Generator (PSA, 50 Nm3/h)",
+  "block.wildcatter.ix_columns": "IX Columns (lead and lag)"
 }

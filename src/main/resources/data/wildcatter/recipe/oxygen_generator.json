@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "XZX",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "X": "minecraft:piston",
+    "Z": "minecraft:clay_ball"
+  },
+  "result": {
+    "id": "wildcatter:oxygen_generator",
+    "count": 1
+  }
+}

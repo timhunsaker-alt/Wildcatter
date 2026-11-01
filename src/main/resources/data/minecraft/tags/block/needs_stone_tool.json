@@ -138,6 +138,10 @@
     "wildcatter:sx_circuit",
     "wildcatter:precipitation_tank",
     "wildcatter:yellowcake_dryer",
-    "wildcatter:drum_filler"
+    "wildcatter:drum_filler",
+    "wildcatter:header_house",
+    "wildcatter:oxygen_generator",
+    "wildcatter:ix_columns",
+    "wildcatter:isr_wellhead"
   ]
 }

@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "wildcatter:isr_wellhead"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "wildcatter:submersible_pump"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "wildcatter:isr_wellhead",
+          "properties": {
+            "pump": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "random_sequence": "wildcatter:blocks/isr_wellhead"
+}

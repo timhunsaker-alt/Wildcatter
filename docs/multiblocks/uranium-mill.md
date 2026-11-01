@@ -115,3 +115,5 @@ pregnant liquor -> SX CIRCUIT -> strip liquor -> PRECIPITATION TANK -> YELLOWCAK
   ROADMAP Ideas.
 - The leach tank and the thickener are drawn open-topped under their bridges, as real ones are.
 - The dryer never fires above its 0.5 MW rating; a backlog of precipitate waits in the tank.
+- 7c: the precipitation tank also takes an ISR wellfield's acidified eluate (isr-wellfield.md) on the same face, at 15 g/L of
+  U3O8, when no strip liquor waits.

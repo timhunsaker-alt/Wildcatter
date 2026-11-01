@@ -19,7 +19,7 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * The precipitation tank (15 kW agitator, 480 V) (docs/multiblocks/uranium-mill.md): milk of magnesia, from Magnesia by a hopper on
- * top, takes the strip liquor (north face of its front cells) to pH 7 and the uranium comes down as magnesium diuranate. It holds the
+ * top, takes the strip liquor (north face of its front cells), or an ISR wellfield's acidified eluate, to pH 7 and the uranium comes down as magnesium diuranate. It holds the
  * wet precipitate for the yellowcake dryer touching it.
  */
 public class PrecipitationTankBlockEntity extends UnitMotorBlockEntity implements HopperFed {
@@ -70,9 +70,15 @@ public class PrecipitationTankBlockEntity extends UnitMotorBlockEntity implement
 
 	@Override
 	protected void work(Level level) {
-		double waiting = Lines.available(level, inlet(), Product.STRIP_LIQUOR, Pull.MACHINE, this);
+		// strip liquor from the mill's SX, or acidified eluate from an ISR wellfield's IX columns (docs/multiblocks/isr-wellfield.md)
+		Product feed = Product.STRIP_LIQUOR;
+		double waiting = Lines.available(level, inlet(), feed, Pull.MACHINE, this);
 		if (waiting < 0.001) {
-			unit = "idle: no strip liquor at its front (north face)";
+			feed = Product.ELUATE;
+			waiting = Lines.available(level, inlet(), feed, Pull.MACHINE, this);
+		}
+		if (waiting < 0.001) {
+			unit = "idle: no strip liquor or eluate at its front (north face)";
 			return;
 		}
 		if (mgo < 1 && fed() > 0) {
@@ -93,15 +99,15 @@ public class PrecipitationTankBlockEntity extends UnitMotorBlockEntity implement
 			unit = "starting: " + describe();
 			return;
 		}
-		double perLitre = Tuning.SX_STRIP_U3O8_G_PER_L / 1000;
+		double perLitre = (feed == Product.ELUATE ? Tuning.IX_ELUATE_G_PER_L : Tuning.SX_STRIP_U3O8_G_PER_L) / 1000;
 		double max = Math.min(Math.min(waiting, Tuning.MILL_U3O8_KGS * 1.2 * seconds() * strength / perLitre), room / perLitre);
 		max = Math.min(max, mgo / Tuning.PRECIP_MGO_PER_U3O8 / perLitre);
 		double[] in = new double[5];
-		double got = pullMixed(level, inlet(), Product.STRIP_LIQUOR, max, in);
+		double got = pullMixed(level, inlet(), feed, max, in);
 		double u = got * in[0];
 		mgo = Math.max(0, mgo - u * Tuning.PRECIP_MGO_PER_U3O8);
 		precipitate += u;
-		unit = String.format("precipitating %.3f kg/s of U3O8 from %.2f L/s of strip liquor with %.3f kg/s of MgO", u / seconds(), got / seconds(),
+		unit = String.format("precipitating %.3f kg/s of U3O8 from %.2f L/s of %s with %.3f kg/s of MgO", u / seconds(), got / seconds(), feed.label(),
 				u * Tuning.PRECIP_MGO_PER_U3O8 / seconds());
 	}
 

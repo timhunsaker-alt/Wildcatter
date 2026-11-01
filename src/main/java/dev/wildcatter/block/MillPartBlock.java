@@ -20,7 +20,8 @@ import net.minecraft.world.phys.BlockHitResult;
 /**
  * One part of the uranium mill at true size (docs/multiblocks/uranium-mill.md): the jaw crusher and SAG mill, the leach tank, the
  * CCD thickener and the SX circuit on steel pipe; the precipitation tank, yellowcake dryer and drum filler, a unit by touching.
- */public class MillPartBlock extends BigPartBlock implements net.minecraft.world.WorldlyContainerHolder {
+ */
+public class MillPartBlock extends BigPartBlock implements net.minecraft.world.WorldlyContainerHolder {
 	public enum Part {
 		JAW_CRUSHER("jaw_crusher", Footprint.box(3, 4, 4, 0, 0)),
 		SAG_MILL("sag_mill", Footprint.box(7, 7, 5, 0, 0)),

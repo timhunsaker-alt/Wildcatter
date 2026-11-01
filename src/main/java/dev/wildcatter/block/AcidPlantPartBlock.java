@@ -20,7 +20,8 @@ import net.minecraft.world.phys.BlockHitResult;
 /**
  * One part of the sulfuric acid plant at true size (docs/multiblocks/acid-plant.md): the sulfur melter, drying tower, main blower,
  * sulfur furnace and waste heat boiler that make burner gas; the converter and its two absorbers that make the acid.
- */public class AcidPlantPartBlock extends BigPartBlock implements net.minecraft.world.WorldlyContainerHolder {
+ */
+public class AcidPlantPartBlock extends BigPartBlock implements net.minecraft.world.WorldlyContainerHolder {
 	public enum Part {
 		SULFUR_MELTER("sulfur_melter", Footprint.box(4, 3, 8, 0, 0)),
 		DRYING_TOWER("drying_tower", Footprint.box(3, 12, 3, 0, 0)),

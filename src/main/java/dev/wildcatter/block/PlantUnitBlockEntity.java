@@ -21,7 +21,7 @@ import org.jspecify.annotations.Nullable;
  * seconds of each at its outlet nozzles for whatever draws on them. Its nozzles are written in the part's own frame (drawn facing
  * north) and turned with it.
  */
-public abstract class PlantUnitBlockEntity extends BlockEntity implements Inspectable, BigPartEntity, FluidNode {
+public abstract class PlantUnitBlockEntity extends BlockEntity implements Inspectable, BigPartEntity, FluidNode, Mixed {
 	protected final Map<Product, Double> held = new EnumMap<>(Product.class);
 	/**
 	 * What a held cracked gas is made of, by weight (docs/multiblocks/cracker.md): ethylene, fuel gas, LPG, pyrolysis gasoline,
@@ -60,6 +60,7 @@ public abstract class PlantUnitBlockEntity extends BlockEntity implements Inspec
 	}
 
 	/** The make-up of a held cracked gas: ethylene, fuel gas, LPG, pyrolysis gasoline, residue. */
+	@Override
 	public double[] mixOf(Product product) {
 		return mix.getOrDefault(product, new double[] {0, 0, 0, 0, 0});
 	}
@@ -86,7 +87,7 @@ public abstract class PlantUnitBlockEntity extends BlockEntity implements Inspec
 					break;
 				}
 				double take = port.node().take(port.cell(), port.side(), product, max - got, Pull.MACHINE);
-				double[] from = port.node() instanceof PlantUnitBlockEntity unit ? unit.mixOf(product) : new double[5];
+				double[] from = port.node() instanceof Mixed unit ? unit.mixOf(product) : new double[5];
 				for (int i = 0; i < 5; i++) {
 					sum[i] += from[i] * take;
 				}

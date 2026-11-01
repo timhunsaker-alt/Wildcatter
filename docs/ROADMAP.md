@@ -106,11 +106,12 @@ and the Field Manual has a page for each new system.
   - The cascade's output is set by counting its centrifuges. This is a written exception to "never tile identical blocks", because a real cascade is exactly that.
   - A full-height 17×17 assembly.
   - Yellowcake precipitated with magnesia (from magnesite), about 80 % U3O8 (decided in the 7b plan).
+  - ISR: alkaline Wyoming chemistry (oxygen), 10x the real head grade at the real flow per well (decided in the 7c plan).
   - Process chemicals from the existing chain plus real ores. Tim: "make sure we have all ore types from real world with exaggerated numbers".
 - Waves (each is planned with its numbers before it is built):
   - 7a: every real ore type as worldgen, plus a gamma scintillometer (docs/ores.md). DONE.
   - 7b: a sulfuric acid plant and the uranium mill (yellowcake in drums; docs/multiblocks/acid-plant.md, uranium-mill.md). DONE.
-  - 7c: ISR wellfields (late).
+  - 7c: ISR wellfields (late; docs/multiblocks/isr-wellfield.md). DONE.
   - 7d: conversion to UF6 (a methane reformer for hydrogen, HF from fluorspar, fluorine cells on a DC rectifier, 48Y cylinders).
   - 7e: the centrifuge cascade (a high-frequency converter, 4.95 % LEU in 30B cylinders).
   - 7f: fuel fabrication (pellets, Zircaloy tube from zircon by the Kroll process, rods, the 17×17 assembly).
@@ -140,3 +141,5 @@ and the Field Manual has a page for each new system.
 - The acid plant's waste heat boiler steam to a steam turbine (about 2 kg/s of 40 bar steam).
 - Lined tailings cells for the mill's thickener underflow.
 - Uranium from phosphoric acid (phosphate rock).
+- ISR: bottled CO2 for the lixiviant, monitor-well rings and excursions, groundwater restoration (sweep, reverse osmosis,
+  stability monitoring), a disposal well for the bleed, satellite IX with trucked resin.
