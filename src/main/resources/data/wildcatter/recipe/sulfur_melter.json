@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "CPC",
+    "CFC",
+    "CCC"
+  ],
+  "key": {
+    "C": "minecraft:smooth_stone",
+    "P": "wildcatter:gas_line",
+    "F": "minecraft:furnace"
+  },
+  "result": {
+    "id": "wildcatter:sulfur_melter",
+    "count": 1
+  }
+}

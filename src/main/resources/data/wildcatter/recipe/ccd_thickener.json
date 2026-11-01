@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SXS",
+    "SSS",
+    " P "
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "X": "minecraft:piston",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:ccd_thickener",
+    "count": 1
+  }
+}

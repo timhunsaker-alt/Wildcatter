@@ -47,7 +47,7 @@ public class StorageTankBlockEntity extends BlockEntity implements Inspectable, 
 	/** What it may hold. */
 	public boolean accepts(Product p) {
 		return water() ? p == Product.PRODUCED_WATER : bullet() ? p == Product.LPG
-				: !p.gas() && p != Product.PRODUCED_WATER && p != Product.LPG && p != Product.WELL_FLUID && p != Product.Y_GRADE;
+				: p.tanked() && p != Product.PRODUCED_WATER && p != Product.LPG && p != Product.WELL_FLUID && p != Product.Y_GRADE;
 	}
 
 	public double capacity() {

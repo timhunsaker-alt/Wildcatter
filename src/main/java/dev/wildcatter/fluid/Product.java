@@ -39,7 +39,21 @@ public enum Product {
 	CRACKED_GAS("cracked gas", true),
 	/** Cracked gas after its compressor. Counted in kg. */
 	COMPRESSED_CRACKED_GAS("compressed cracked gas", true),
-	ETHYLENE("ethylene", true);
+	ETHYLENE("ethylene", true),
+	/** Sulfur melted in an acid plant's melter (docs/multiblocks/acid-plant.md). */
+	MOLTEN_SULFUR("molten sulfur", false),
+	/** A sulfur furnace's gas, about 11 % SO2, after its waste heat boiler. Counted in kg. */
+	BURNER_GAS("burner gas", true),
+	/** 98.5 % sulfuric acid. */
+	SULFURIC_ACID("sulfuric acid", false),
+	/** Ground ore in water out of a SAG mill (docs/multiblocks/uranium-mill.md). Counted in kg; it carries its uranium. */
+	ORE_SLURRY("ore slurry", false),
+	/** Ore slurry after the leach: the uranium dissolved in its liquor. Counted in kg. */
+	LEACH_SLURRY("leach slurry", false),
+	/** A thickener's overflow: the leach liquor with its uranium, the solids washed out. */
+	PREGNANT_LIQUOR("pregnant liquor", false),
+	/** Salt water that has stripped the uranium out of the solvent: about 25 g/L of U3O8. */
+	STRIP_LIQUOR("strip liquor", false);
 
 	private final String label;
 	private final boolean gas;
@@ -59,6 +73,17 @@ public enum Product {
 	}
 
 	public String unit() {
-		return this == HOT_CRACKED_GAS || this == CRACKED_GAS || this == COMPRESSED_CRACKED_GAS ? "kg" : gas ? "m3" : "L";
+		return switch (this) {
+			case HOT_CRACKED_GAS, CRACKED_GAS, COMPRESSED_CRACKED_GAS, BURNER_GAS, ORE_SLURRY, LEACH_SLURRY -> "kg";
+			default -> gas ? "m3" : "L";
+		};
+	}
+
+	/** False for liquids no stock tank holds: molten sulfur freezes, and the mill's slurries and liquors carry their uranium. */
+	public boolean tanked() {
+		return switch (this) {
+			case MOLTEN_SULFUR, ORE_SLURRY, LEACH_SLURRY, PREGNANT_LIQUOR, STRIP_LIQUOR -> false;
+			default -> !gas;
+		};
 	}
 }

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "XFX",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_block",
+    "X": "wildcatter:crankshaft",
+    "F": "minecraft:iron_bars"
+  },
+  "result": {
+    "id": "wildcatter:main_blower",
+    "count": 1
+  }
+}

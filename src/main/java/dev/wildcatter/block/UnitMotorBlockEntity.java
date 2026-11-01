@@ -66,6 +66,14 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "pelletizer" -> new Motor(true, Voltage.MEDIUM, Tuning.PELLETIZER_WATTS);
 				case "air_cooled_condenser" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ACC_FAN_WATTS);
 				case "hrsg_feed_pump" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.HRSG_FEED_PUMP_WATTS);
+				case "main_blower" -> new Motor(true, Voltage.MEDIUM, Tuning.ACID_BLOWER_WATTS);
+				case "jaw_crusher" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.JAW_CRUSHER_WATTS);
+				case "sag_mill" -> new Motor(true, Voltage.MEDIUM, Tuning.SAG_MILL_WATTS);
+				case "leach_tank" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LEACH_AGITATOR_WATTS);
+				case "ccd_thickener" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.THICKENER_RAKE_WATTS);
+				case "sx_circuit" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.SX_MIXER_WATTS);
+				case "precipitation_tank" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PRECIP_AGITATOR_WATTS);
+				case "drum_filler" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.DRUM_FILLER_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -97,6 +105,14 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "pelletizer" -> "pelletizer";
 			case "air_cooled_condenser" -> "condenser fans";
 			case "hrsg_feed_pump" -> "feed pump";
+			case "main_blower" -> "main blower";
+			case "jaw_crusher" -> "jaw crusher";
+			case "sag_mill" -> "SAG mill";
+			case "leach_tank" -> "leach agitator";
+			case "ccd_thickener" -> "thickener rake";
+			case "sx_circuit" -> "SX mixers";
+			case "precipitation_tank" -> "precipitation agitator";
+			case "drum_filler" -> "drum filler";
 			default -> kind();
 		};
 	}
@@ -164,7 +180,7 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 	/** The motor's speed at full load, read from the standard's frequency. */
 	private double rpm() {
 		int poles = switch (kind()) {
-			case "crude_charge_pump", "polyethylene_reactor", "hrsg_feed_pump" -> 2;
+			case "crude_charge_pump", "polyethylene_reactor", "hrsg_feed_pump", "main_blower" -> 2;
 			case "desalter" -> 0;
 			default -> 4;
 		};
@@ -200,6 +216,7 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "overhead_condenser" -> "Overhead fin-fan condenser (four 25 hp fans, " + Voltage.INDUSTRIAL.label() + ")";
 			case "air_cooled_condenser" -> "Air-cooled condenser (four 50 hp fans, " + Voltage.INDUSTRIAL.label() + ")";
 			case "hrsg_feed_pump" -> "HRSG feed pump (60 hp, " + Voltage.INDUSTRIAL.label() + ")";
+			case "main_blower" -> "Main blower (" + Math.round(Tuning.ACID_BLOWER_WATTS / 1000) + " kW, " + Voltage.MEDIUM.label() + ")";
 			default -> kind();
 		};
 		return Component.literal(label + ": " + (wanted ? motor().describe() : "idle: its unit is not running it") + heldReadout() + "; "

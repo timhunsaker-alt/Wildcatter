@@ -203,6 +203,47 @@ public final class Tuning {
 	public static final double PE_KG_PER_SHEET = 1.0;
 	public static final int PELLETIZER_BIN = 256;
 
+	// ---- The sulfuric acid plant (docs/multiblocks/acid-plant.md, approved 2026-11-01) --------------------------------------
+	public static final double ACID_PLANT_TPD = 150.0;             // tonnes of H2SO4 a day: a small sulfur-burning DCDA plant
+	public static final double ACID_STRENGTH = 0.985;              // the product, by weight
+	public static final double ACID_KG_PER_L = 1.84;               // 98.5 % acid
+	public static final double MOLTEN_SULFUR_KG_PER_L = 1.79;      // at about 140 C
+	public static final double BURNER_SO2_VOLUME = 0.11;           // burner gas, 11 % SO2 (BREF 10.5-11.8 %)
+	public static final double ACID_CONVERSION_DOUBLE = 0.998;     // four beds with interpass absorption (BREF 99.7-99.9 %)
+	public static final double ACID_CONVERSION_SINGLE = 0.95;      // without it (BREF: 85-95 % before the intermediate absorber)
+	public static final double ACID_BLOWER_WATTS = 250_000.0;      // the main blower, 4.16 kV, two-pole
+	public static final double ACID_STEAM_PER_ACID = 1.2;          // kg of 40 bar steam a kg of acid from the waste heat boiler
+	public static final double MELTER_START_WATTS = 100_000.0;     // gas firing a cold melter: 0.57 kg/s at about 140 kJ/kg
+	public static final double ACID_PLANT_WATER_HOLD = 400.0;      // litres a boiler or absorber keeps from its pump
+
+	// ---- The uranium mill (docs/multiblocks/uranium-mill.md, approved 2026-11-01) --------------------------------------------
+	public static final double MILL_ORE_KGS = 20.8;                // kg of ore a second: White Mesa, 1,800 t/d
+	public static final double MILL_U3O8_KGS = 0.416;              // the most U3O8 in the feed SX and precipitation take: 2 % ore at full rate
+	public static final double MILL_RECOVERY = 0.93;               // overall (Rabbit Lake; 90-95 %), all taken in the leach
+	public static final double MILL_SLURRY_SOLIDS = 0.55;          // the SAG mill's discharge, by weight
+	public static final double LEACH_ACID_KG_PER_T = 70.0;         // kg of H2SO4 a tonne of ore (Rabbit Lake)
+	public static final double LEACH_MNO2_KG_PER_T = 1.5;          // pyrolusite, the oxidant (Rössing 0.7-1.5)
+	public static final double CCD_WASH_RATIO = 2.5;               // kg of wash water a kg of solids (Rabbit Lake)
+	public static final double CCD_UNDERFLOW_SOLIDS = 0.5;         // the underflow to the tailings, by weight
+	public static final double SX_STRIP_U3O8_G_PER_L = 25.0;       // the strip liquor (TRS-359)
+	public static final double SX_KEROSENE_CHARGE = 10_000.0;      // litres of diluent its settlers hold (proposed)
+	public static final double SX_KEROSENE_LOSS_L_PER_M3 = 0.1;    // lost a m3 of pregnant liquor (proposed)
+	public static final double SX_NACL_G_PER_L = 87.7;             // the 1.5 M NaCl strip
+	public static final double SX_NACL_MAKEUP = 0.1;               // of the strip's salt made up each pass, the rest recycled (proposed)
+	public static final double PRECIP_MGO_PER_U3O8 = 0.3;          // kg of MgO a kg of U3O8 (proposed; 0.14 stoichiometric)
+	public static final double MGO_IN_MGCO3 = 0.478;               // caustic calcining: the CO2 leaves
+	public static final double YELLOWCAKE_U3O8 = 0.80;             // magnesium diuranate concentrate (proposed; ASTM C967 needs 77 %)
+	public static final double DRUM_NET_KG = 400.0;                // a 208 L drum (WNTI: up to 450 kg gross)
+	public static final double DRYER_WATTS = 500_000.0;            // the spray dryer's gas burner (proposed)
+	public static final double JAW_CRUSHER_WATTS = 75_000.0;       // 480 V
+	public static final double SAG_MILL_WATTS = 522_000.0;         // White Mesa, 4.16 kV
+	public static final double LEACH_AGITATOR_WATTS = 56_000.0;    // White Mesa, 480 V
+	public static final double THICKENER_RAKE_WATTS = 7_500.0;     // 480 V
+	public static final double SX_MIXER_WATTS = 30_000.0;          // 480 V
+	public static final double PRECIP_AGITATOR_WATTS = 15_000.0;   // 480 V
+	public static final double DRUM_FILLER_WATTS = 5_000.0;        // 480 V
+	public static final double MILL_WATER_HOLD = 1_000.0;          // litres the SAG mill or the thickener keeps from its pump
+
 	// ---- The gas turbine and combined cycle (docs/multiblocks/gas-turbine.md, combined-cycle.md, approved 2026-10-31) -------
 	public static final double GT_WATTS = 16_500_000.0;            // ISO rating, Solar Titan 130 class
 	public static final double GT_HEAT_RATE = 10_230.0;            // kJ/kWh: 35 %

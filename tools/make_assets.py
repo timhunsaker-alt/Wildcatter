@@ -1669,6 +1669,59 @@ save_json(f"{WG}/feature/bushveld_reef.json", {"type": f"{ns}:layered", "radius_
 	"layers": [layer(f"{ns}:chromite_ore", 2), layer(AIR, 1), layer(f"{ns}:chromite_ore", 1), layer(AIR, 2), layer(f"{ns}:platinum_ore", 1)]})
 placed("bushveld_reef", 1 / 8, -64, -38)
 
+# ---- Phase 7b: the sulfuric acid plant and the uranium mill (docs/multiblocks/acid-plant.md, uranium-mill.md) ---------------
+# blockstates, models, shapes and items come from tools/models/acid_plant.py and uranium_mill.py; here loot, names, tags, recipes.
+FUEL_PARTS = ("sulfur_melter", "drying_tower", "main_blower", "sulfur_furnace", "waste_heat_boiler", "converter", "interpass_absorber", "final_absorber",
+	"jaw_crusher", "sag_mill", "leach_tank", "ccd_thickener", "sx_circuit", "precipitation_tank", "yellowcake_dryer", "drum_filler")
+for name in FUEL_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	t["values"] = [v for v in t["values"] if v not in [f"{ns}:{n}" for n in FUEL_PARTS]] + [f"{ns}:{n}" for n in FUEL_PARTS]
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+S_, P_, B_ = f"{ns}:steel_ingot", f"{ns}:gas_line", "minecraft:iron_block"
+shaped("sulfur_melter", ["CPC", "CFC", "CCC"], {"C": "minecraft:smooth_stone", "P": P_, "F": "minecraft:furnace"}, "sulfur_melter")
+shaped("drying_tower", ["SPS", "SBS", "SPS"], {"S": S_, "P": P_, "B": "minecraft:bricks"}, "drying_tower")
+shaped("main_blower", ["SCS", "XFX", "SSS"], {"S": S_, "C": "minecraft:copper_block", "X": f"{ns}:crankshaft", "F": "minecraft:iron_bars"}, "main_blower")
+shaped("sulfur_furnace", ["BBB", "PFB", "BBB"], {"B": "minecraft:bricks", "P": P_, "F": "minecraft:blast_furnace"}, "sulfur_furnace")
+shaped("waste_heat_boiler", ["SSS", "PWP", "SSS"], {"S": S_, "P": P_, "W": "minecraft:water_bucket"}, "waste_heat_boiler")
+shaped("converter", ["BPB", "BVB", "BPB"], {"B": B_, "P": P_, "V": "minecraft:lapis_block"}, "converter")
+shaped("interpass_absorber", ["SPS", "SBS", "SCS"], {"S": S_, "P": P_, "B": "minecraft:bricks", "C": "minecraft:copper_ingot"}, "interpass_absorber")
+shaped("final_absorber", ["SPS", "SBS", "BPB"], {"S": S_, "P": P_, "B": "minecraft:bricks"}, "final_absorber")
+shaped("jaw_crusher", ["B B", "BXB", "SCS"], {"B": B_, "X": f"{ns}:crankshaft", "S": S_, "C": "minecraft:copper_block"}, "jaw_crusher")
+shaped("sag_mill", ["BBB", "XCX", "BBB"], {"B": B_, "X": f"{ns}:crankshaft", "C": "minecraft:copper_block"}, "sag_mill")
+shaped("leach_tank", ["SXS", "S S", "SPS"], {"S": S_, "X": "minecraft:piston", "P": P_}, "leach_tank")
+shaped("ccd_thickener", ["SXS", "SSS", " P "], {"S": S_, "X": "minecraft:piston", "P": P_}, "ccd_thickener")
+shaped("sx_circuit", ["SXS", "PGP", "SSS"], {"S": S_, "X": "minecraft:piston", "P": P_, "G": "minecraft:glass"}, "sx_circuit")
+shaped("precipitation_tank", ["SXS", "SCS", "SPS"], {"S": S_, "X": "minecraft:piston", "C": "minecraft:cauldron", "P": P_}, "precipitation_tank")
+shaped("yellowcake_dryer", ["SFS", "S S", "SHS"], {"S": S_, "F": "minecraft:blast_furnace", "H": "minecraft:hopper"}, "yellowcake_dryer")
+shaped("drum_filler", ["SHS", "S S", "SXS"], {"S": S_, "H": "minecraft:hopper", "X": "minecraft:piston"}, "drum_filler")
+shaped("empty_drum", ["S S", "S S", "SSS"], {"S": "minecraft:iron_ingot"}, "empty_drum", 2)
+for kind, time in (("smelting", 200), ("blasting", 100)):
+	save_json(f"{DATA}/recipe/magnesia_from_{kind}_magnesite.json", {"type": f"minecraft:{kind}", "cookingtime": time, "experience": 0.3,
+		"group": "magnesia", "ingredient": f"{ns}:magnesite", "result": {"id": f"{ns}:magnesia"}})
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in {"magnesia": ("Magnesia", (235, 235, 228)), "empty_drum": ("Empty Drum (208 L)", (60, 90, 140)),
+		"yellowcake_drum": ("Yellowcake Drum", (220, 190, 40))}.items():
+	if os.path.exists(f"{ORE_ART}/{item}.png"):
+		shutil.copy(f"{ORE_ART}/{item}.png", f"{ASSETS}/textures/item/ore/{item}.png")
+		item_tex = f"{ns}:item/ore/{item}"
+	else:
+		tex(f"{item}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+		item_tex = f"{ns}:item/{item}_placeholder"
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": item_tex}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.sulfur_melter": "Sulfur Melter", f"block.{ns}.drying_tower": "Drying Tower",
+	f"block.{ns}.main_blower": "Main Blower (250 kW, 4.16 kV)", f"block.{ns}.sulfur_furnace": "Sulfur Furnace (acid plant front)",
+	f"block.{ns}.waste_heat_boiler": "Waste Heat Boiler", f"block.{ns}.converter": "Converter (four V2O5 beds)",
+	f"block.{ns}.interpass_absorber": "Interpass Absorber", f"block.{ns}.final_absorber": "Final Absorber and Stack",
+	f"block.{ns}.jaw_crusher": "Jaw Crusher (75 kW, 480 V)", f"block.{ns}.sag_mill": "SAG Mill (522 kW, 4.16 kV)",
+	f"block.{ns}.leach_tank": "Leach Tank (56 kW agitator)", f"block.{ns}.ccd_thickener": "CCD Thickener",
+	f"block.{ns}.sx_circuit": "SX Circuit (mixer-settlers)", f"block.{ns}.precipitation_tank": "Precipitation Tank",
+	f"block.{ns}.yellowcake_dryer": "Yellowcake Dryer", f"block.{ns}.drum_filler": "Drum Filler"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

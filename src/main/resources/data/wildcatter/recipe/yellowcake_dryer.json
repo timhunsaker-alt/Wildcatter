@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SFS",
+    "S S",
+    "SHS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "F": "minecraft:blast_furnace",
+    "H": "minecraft:hopper"
+  },
+  "result": {
+    "id": "wildcatter:yellowcake_dryer",
+    "count": 1
+  }
+}

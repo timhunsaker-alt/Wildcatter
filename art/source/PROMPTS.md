@@ -75,3 +75,14 @@ grey for white minerals) background". Heavy minerals are "a small canvas sample 
 ingots are "a single cast <lead / tin / zinc slab / silver bullion> ingot". The scintillometer is "a yellow handheld gamma-ray
 scintillometer survey meter with a carrying handle, a cylindrical detector probe on the side and a small analog dial, generic,
 no brand names".
+
+## Phase 7b (2026-11-01): the mill's items (art/source/ore/)
+`item-icon`, `Photorealistic 3D`, 2 variations, the better kept:
+- `magnesia`: "A single lump of white caustic-calcined magnesia (MgO) powder cake, chalky, slightly porous, mineral sample, game
+  item icon, dark grey background" (a).
+- `empty_drum`: (second try; the first came out squat like a bass drum) "A single tall empty 55 gallon industrial steel oil drum
+  (barrel), taller than it is wide (0.88 m tall, 0.57 m across), painted dark blue, two raised rolling hoops around the middle,
+  closed lid with bolt ring, standing upright, game item icon, plain white background, no text" (a).
+- `yellowcake_drum`: "A single sealed 55 gallon steel drum of uranium ore concentrate (yellowcake), lid open slightly showing
+  bright yellow powder, black and yellow radioactive trefoil label on the side, game item icon, plain white background, no other
+  text" (b).

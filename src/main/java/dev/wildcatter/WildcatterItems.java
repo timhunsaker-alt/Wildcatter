@@ -30,6 +30,20 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> SCINTILLOMETER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("scintillometer"));
 	public static final Item SCINTILLOMETER = new dev.wildcatter.item.ScintillometerItem(new Item.Properties().stacksTo(1).setId(SCINTILLOMETER_KEY));
 
+	/** 7b: caustic-calcined magnesia, the uranium mill's precipitant: one magnesite out of a furnace (docs/multiblocks/uranium-mill.md). */
+	public static final ResourceKey<Item> MAGNESIA_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("magnesia"));
+	public static final Item MAGNESIA = new dev.wildcatter.item.LabelledItem(new Item.Properties().setId(MAGNESIA_KEY),
+			"MgO, caustic-calcined", String.format("%,.0f kg, from one magnesite", dev.wildcatter.ore.Ore.MAGNESITE.kgPerBlock() * Tuning.MGO_IN_MGCO3));
+	public static final ResourceKey<Item> EMPTY_DRUM_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("empty_drum"));
+	public static final Item EMPTY_DRUM = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(EMPTY_DRUM_KEY),
+			"208 L (55 gallon) open-head steel drum");
+	/** A drum of yellowcake from the mill's drum filler. */
+	public static final ResourceKey<Item> YELLOWCAKE_DRUM_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("yellowcake_drum"));
+	public static final Item YELLOWCAKE_DRUM = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(1).setId(YELLOWCAKE_DRUM_KEY),
+			String.format("%,.0f kg of uranium ore concentrate (magnesium diuranate)", Tuning.DRUM_NET_KG),
+			String.format("%.0f %% U3O8: %,.0f kg of U3O8, %,.0f kg of uranium", Tuning.YELLOWCAKE_U3O8 * 100, Tuning.DRUM_NET_KG * Tuning.YELLOWCAKE_U3O8,
+					Tuning.DRUM_NET_KG * Tuning.YELLOWCAKE_U3O8 * dev.wildcatter.ore.Ore.U_IN_U3O8));
+
 	/** A bucket of crude oil. It burns in a firebox (as long as lava) and leaves the bucket behind. */
 	public static final ResourceKey<Item> CRUDE_OIL_BUCKET_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("crude_oil_bucket"));
 	public static final Item CRUDE_OIL_BUCKET = new Item(new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET).setId(CRUDE_OIL_BUCKET_KEY));
@@ -87,6 +101,9 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, FIELD_MANUAL_KEY, FIELD_MANUAL);
 		Registry.register(BuiltInRegistries.ITEM, SEISMOGRAPH_KEY, SEISMOGRAPH);
 		Registry.register(BuiltInRegistries.ITEM, SCINTILLOMETER_KEY, SCINTILLOMETER);
+		Registry.register(BuiltInRegistries.ITEM, MAGNESIA_KEY, MAGNESIA);
+		Registry.register(BuiltInRegistries.ITEM, EMPTY_DRUM_KEY, EMPTY_DRUM);
+		Registry.register(BuiltInRegistries.ITEM, YELLOWCAKE_DRUM_KEY, YELLOWCAKE_DRUM);
 		Registry.register(BuiltInRegistries.ITEM, CRUDE_OIL_BUCKET_KEY, CRUDE_OIL_BUCKET);
 		Registry.register(BuiltInRegistries.ITEM, PLASTIC_SHEET_KEY, PLASTIC_SHEET);
 		Registry.register(BuiltInRegistries.ITEM, STEEL_INGOT_KEY, STEEL_INGOT);

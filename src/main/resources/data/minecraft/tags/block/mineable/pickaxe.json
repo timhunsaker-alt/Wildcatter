@@ -194,6 +194,22 @@
     "wildcatter:scheelite_ore",
     "wildcatter:cobaltite_ore",
     "wildcatter:pyrolusite_ore",
-    "wildcatter:phosphate_ore"
+    "wildcatter:phosphate_ore",
+    "wildcatter:sulfur_melter",
+    "wildcatter:drying_tower",
+    "wildcatter:main_blower",
+    "wildcatter:sulfur_furnace",
+    "wildcatter:waste_heat_boiler",
+    "wildcatter:converter",
+    "wildcatter:interpass_absorber",
+    "wildcatter:final_absorber",
+    "wildcatter:jaw_crusher",
+    "wildcatter:sag_mill",
+    "wildcatter:leach_tank",
+    "wildcatter:ccd_thickener",
+    "wildcatter:sx_circuit",
+    "wildcatter:precipitation_tank",
+    "wildcatter:yellowcake_dryer",
+    "wildcatter:drum_filler"
   ]
 }

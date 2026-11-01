@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BBB",
+    "XCX",
+    "BBB"
+  ],
+  "key": {
+    "B": "minecraft:iron_block",
+    "X": "wildcatter:crankshaft",
+    "C": "minecraft:copper_block"
+  },
+  "result": {
+    "id": "wildcatter:sag_mill",
+    "count": 1
+  }
+}

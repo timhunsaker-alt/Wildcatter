@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "SBS",
+    "BPB"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "B": "minecraft:bricks"
+  },
+  "result": {
+    "id": "wildcatter:final_absorber",
+    "count": 1
+  }
+}

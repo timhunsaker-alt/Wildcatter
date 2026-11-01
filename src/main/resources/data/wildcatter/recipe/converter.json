@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BPB",
+    "BVB",
+    "BPB"
+  ],
+  "key": {
+    "B": "minecraft:iron_block",
+    "P": "wildcatter:gas_line",
+    "V": "minecraft:lapis_block"
+  },
+  "result": {
+    "id": "wildcatter:converter",
+    "count": 1
+  }
+}

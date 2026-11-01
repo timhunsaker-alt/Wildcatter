@@ -475,6 +475,33 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 7b: the sulfuric acid plant and the uranium mill (specs: docs/multiblocks/acid-plant.md, uranium-mill.md)
+- **Acid plant** (150 t/day, sulfur-burning double contact, double absorption), eight true-size parts:
+  - the SULFUR MELTER (sulfur by hopper, melted on the boiler's steam, or gas or LPG from cold);
+  - the DRYING TOWER, the MAIN BLOWER (250 kW, 4.16 kV) and the SULFUR FURNACE, which form by touching;
+  - the WASTE HEAT BOILER (water from a pump; 1.2 t of steam a tonne of acid);
+  - the CONVERTER with the INTERPASS and FINAL ABSORBERS against it: 98.5 % acid out to a stock tank.
+  - 0.57 kg/s of sulfur makes 1.74 kg/s of acid. Without the interpass absorber the plant converts 95 % instead of 99.8 %, and the
+    stack's SO2 rises 25 times.
+- **Uranium mill** (White Mesa size, 20.8 kg/s of ore), eight true-size parts:
+  - JAW CRUSHER (75 kW, 480 V) against the SAG MILL (522 kW, 4.16 kV);
+  - LEACH TANK (70 kg of acid and 1.5 kg of pyrolusite a tonne of ore, 93 % of the uranium dissolved);
+  - CCD THICKENER (wash ratio 2.5, tailings counted);
+  - SX CIRCUIT (amine in a 10,000 L kerosene charge, stripped with salt water to 25 g/L);
+  - PRECIPITATION TANK (magnesia), with the YELLOWCAKE DRYER (0.5 MW of gas or LPG) and the DRUM FILLER against it.
+  - A drum holds 400 kg of concentrate at 80 % U3O8. About 7½ uranium-ore blocks fill one; the mill fills about 4.4 an hour.
+    Pitchblende is fed no faster than SX takes its uranium, so it saves digging, not time.
+- **New pipe products:** molten sulfur, burner gas, sulfuric acid, ore and leach slurry, pregnant and strip liquor. The slurries
+  and liquors carry their uranium with them; no stock tank holds them, nor molten sulfur. A stock tank holds acid.
+- **New items:** Magnesia (a furnace calcines magnesite), Empty Drum (208 L, from iron), Yellowcake Drum. Ludo icons, 4 credits.
+- **Hoppers** feed the parts that take solids (sulfur, ore, pyrolusite, salt, magnesia, drums) from on top; the drum filler's
+  full drums go to a hopper under it.
+- **Water pumps** now fill any machine that takes water (the boiler, the final absorber, the SAG mill and the thickener).
+- **Big motors:** a 250 kW blower or a 522 kW SAG mill started across the line takes a lone 500 kW diesel set down on
+  frequency, as it would in real life. The game tests parallel two and three sets. Soft starters and drives stay in ROADMAP Ideas.
+- **Game tests** `acidPlant` and `uraniumMill`, with screenshots. The mill test gives the drum filler 380 kg by a hook rather than
+  wait 14 minutes for a first drum; the mill's own yellowcake finishes it.
+
 ## Phase 7a: the ores (spec: docs/ores.md; Phase 7 waves in ROADMAP)
 - **27 real ores**, one block each, drawn as the mineral in its real host rock:
   - uranium ore and pitchblende, native sulfur, rock salt, potash, fluorspar, heavy mineral sand, bauxite;

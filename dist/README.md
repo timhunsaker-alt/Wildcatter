@@ -38,6 +38,8 @@ Put the jar in your instance's `mods` folder next to:
   zinc, tin, nickel, chromium, platinum, molybdenum, lithium, boron, silver, tungsten, cobalt, manganese, phosphate and more,
   each where the real ore is found, richer than real. A furnace makes lead, tin, zinc and silver ingots. A scintillometer finds
   uranium. Only newly explored chunks have the ores.
+- A sulfuric acid plant (150 t a day from sulfur) and a uranium mill: crush, grind, leach, wash, solvent extraction and
+  precipitation with magnesia, into 400 kg drums of yellowcake. Hoppers feed the ore and reagents.
 - The Field Manual item explains how to build each machine.
 
 ## Older worlds

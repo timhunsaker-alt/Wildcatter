@@ -169,6 +169,12 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("ores")) {
 				ores(context, server);
 			}
+			if (only("acidPlant")) {
+				acidPlant(context, server);
+			}
+			if (only("uraniumMill")) {
+				uraniumMill(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -3913,6 +3919,263 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	}
 
 	// ---- Phase 7a: the ores (docs/ores.md) ------------------------------------------------------------------------------
+
+	/** Tops up the water of each water user (a boiler, an absorber, a SAG mill, a thickener) as a pump would, as the cracker test does. */
+	private void water(TestServerContext server, BlockPos... mains) {
+		server.computeOnServer(srv -> {
+			for (BlockPos at : mains) {
+				if (srv.overworld().getBlockEntity(at) instanceof dev.wildcatter.block.WaterUser user) {
+					user.addWater(100_000);
+				}
+			}
+			return null;
+		});
+	}
+
+	private int countIn(TestServerContext server, BlockPos hopper, net.minecraft.world.item.Item item) {
+		return server.computeOnServer(srv -> srv.overworld().getBlockEntity(hopper) instanceof net.minecraft.world.Container h
+				? java.util.stream.IntStream.range(0, h.getContainerSize()).map(i -> h.getItem(i).is(item) ? h.getItem(i).getCount() : 0).sum() : -1);
+	}
+
+	/**
+	 * The sulfuric acid plant (7b, docs/multiblocks/acid-plant.md). Every part faces west, so the gas runs east: the drying tower, the
+	 * main blower and the sulfur furnace in a line, the waste heat boiler at the furnace's end with the melter against its north side,
+	 * the converter beyond with the interpass absorber east of it and the final absorber north. Sulfur in a hopper on the melter, start-up
+	 * LPG from a bullet, a diesel set through a backward unit substation for the blower's 4.16 kV. Acid fills a stock tank; with the
+	 * interpass absorber gone the converter runs single absorption and the stack's SO2 rises at least tenfold.
+	 */
+	private void acidPlant(ClientGameTestContext context, TestServerContext server) {
+		int z = -1600;
+		server.runCommand("effect give @p minecraft:slow_falling 600 0 true");
+		server.runCommand("tp @p 18 " + (up + 14) + " " + (z + 22) + " 180 30");
+		context.waitTicks(20);
+		server.runCommand("fill -2 " + (y - 1) + " " + (z - 12) + " 40 " + (y + 22) + " " + (z + 10) + " minecraft:air");
+		server.runCommand("fill -2 " + (y - 1) + " " + (z - 12) + " 40 " + (y - 1) + " " + (z + 10) + " minecraft:stone");
+		net.minecraft.core.Direction west = net.minecraft.core.Direction.WEST;
+		placeBig(server, WildcatterBlocks.DRYING_TOWER, new BlockPos(0, up, z), west);              // x 0-2, z-2..z
+		placeBig(server, WildcatterBlocks.MAIN_BLOWER, new BlockPos(3, up, z), west);               // x 3-7, z-2..z
+		BlockPos furnace = new BlockPos(8, up, z);
+		placeBig(server, WildcatterBlocks.SULFUR_FURNACE, furnace, west);                          // x 8-17, z-2..z
+		BlockPos boiler = new BlockPos(18, up, z);
+		placeBig(server, WildcatterBlocks.WASTE_HEAT_BOILER, boiler, west);                        // x 18-25, z-2..z
+		BlockPos melter = new BlockPos(18, up, z - 3);
+		placeBig(server, WildcatterBlocks.SULFUR_MELTER, melter, west);                            // x 18-25, z-6..z-3
+		BlockPos converter = new BlockPos(27, up, z);
+		placeBig(server, WildcatterBlocks.CONVERTER, converter, west);                             // x 27-31, z-4..z
+		placeBig(server, WildcatterBlocks.INTERPASS_ABSORBER, new BlockPos(32, up, z), west);      // x 32-34, z-2..z
+		BlockPos absorber = new BlockPos(27, up, z - 5);
+		placeBig(server, WildcatterBlocks.FINAL_ABSORBER, absorber, west);                         // x 27-29, z-7..z-5
+		BlockPos tank = new BlockPos(31, up, z - 6);
+		placeBig(server, WildcatterBlocks.STOCK_TANK, tank, west);                                 // x 31-34, z-9..z-6
+		BlockPos bullet = new BlockPos(6, up, z - 8);
+		placeBig(server, WildcatterBlocks.LPG_BULLET, bullet, west);                               // x 6-17, z-10..z-8
+		// molten sulfur: out of the melter's east end, up and over, down to the burner on the furnace's north side
+		pipes(server, z, new int[][] {{26, 0, -5}, {26, 1, -5}, {26, 2, -5}, {26, 3, -5}});
+		for (int x = 8; x <= 25; x++) {
+			put(server, x, up + 3, z - 5, "wildcatter:gas_line");
+		}
+		pipes(server, z, new int[][] {{8, 3, -4}, {8, 3, -3}, {8, 2, -3}, {8, 1, -3}, {8, 0, -3}});
+		pipes(server, z, new int[][] {{26, 0, -1}});                                                  // burner gas, boiler to converter
+		pipes(server, z, new int[][] {{30, 0, -6}});                                                  // acid, final absorber to the stock tank
+		for (int x = 17; x <= 25; x++) {
+			put(server, x, up, z - 7, "wildcatter:gas_line");                                         // start-up LPG along the melter's north side
+		}
+		put(server, 20, up + 3, z - 3, "minecraft:hopper");
+		// power: two diesel sets in parallel on a busway, a backward unit substation to 4.16 kV, the line to the blower's box south of
+		// its main cell. A 250 kW motor started across the line takes one 500 kW set down on frequency
+		BlockPos[] sets = {new BlockPos(4, up, z + 9), new BlockPos(12, up, z + 9)};
+		for (BlockPos set : sets) {
+			genset(server, set, net.minecraft.core.Direction.NORTH, false);                         // x -1..4 and 7-12, z+9..z+10
+			put(server, set.getX() + 1, up, z + 9, "wildcatter:busway_industrial");
+		}
+		for (int x = 5; x <= 14; x++) {
+			put(server, x, up, z + 8, "wildcatter:busway_industrial");
+		}
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, new BlockPos(14, up, z + 8), net.minecraft.core.Direction.EAST, false);   // x 15-18, z+7..z+8
+		for (int zz = z + 2; zz <= z + 8; zz++) {
+			put(server, 19, up, zz, "wildcatter:cable_mv");
+		}
+		for (int x = 3; x <= 18; x++) {
+			put(server, x, up, z + 2, "wildcatter:cable_mv");
+		}
+		put(server, 3, up, z + 1, "wildcatter:cable_mv");
+		fillTank(server, bullet, dev.wildcatter.fluid.Product.LPG, 20_000);
+		water(server, boiler, absorber);
+		for (BlockPos set : sets) {
+			startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 2000);   // the second syncs onto the first
+		}
+		// the sets first, then the plant: sulfur into the melter's hopper once the blower has a live bus to start on
+		server.runCommand("item replace block 20 " + (up + 3) + " " + (z - 3) + " container.0 with wildcatter:sulfur 8");
+		for (int i = 0; i < 6; i++) {
+			context.waitTicks(100);
+			water(server, boiler, absorber);
+		}
+		String m = read(server, 18, up, z - 3), f = read(server, 8, up, z), c = read(server, 27, up, z), t = read(server, 31, up, z - 6);
+		String chain = " | melter " + m + " | furnace " + f + " | boiler " + read(server, 18, up, z) + " | converter " + c + " | absorber " + read(server, 27, up, z - 5)
+				+ " | tank " + t + " | sets " + read(server, 4, up, z + 9) + " / " + read(server, 12, up, z + 9) + " | blower " + read(server, 3, up, z);
+		check(m.contains("melting"), "the melter should melt sulfur: " + chain);
+		check(f.contains("burning"), "the furnace should burn sulfur: " + chain);
+		check(c.contains("double absorption"), "the converter should run double absorption: " + chain);
+		double acid = server.computeOnServer(srv -> ((dev.wildcatter.block.StorageTankBlockEntity) srv.overworld().getBlockEntity(tank)).amount());
+		check(acid > 1, "the stock tank should fill with acid: " + acid + chain);
+		double doubleSo2 = server.computeOnServer(srv -> ((dev.wildcatter.block.ConverterBlockEntity) srv.overworld().getBlockEntity(converter)).stackSo2());
+		server.runCommand("tp @p 16 " + (up + 12) + " " + (z + 22) + " 200 25");
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-acid-plant");
+		// take the interpass absorber away: single absorption, and the stack shows it
+		server.runCommand("fill 32 " + up + " " + (z - 2) + " 34 " + (up + 11) + " " + z + " minecraft:air");
+		water(server, boiler, absorber);
+		context.waitTicks(100);
+		String single = read(server, 27, up, z);
+		double singleSo2 = server.computeOnServer(srv -> ((dev.wildcatter.block.ConverterBlockEntity) srv.overworld().getBlockEntity(converter)).stackSo2());
+		check(single.contains("SINGLE ABSORPTION") && singleSo2 >= doubleSo2 * 10, "without the interpass absorber the stack SO2 should rise tenfold: "
+				+ doubleSo2 + " -> " + singleSo2 + " kg/h | " + single);
+		System.out.println("[wildcatter-test] acid plant ok: " + f + " | " + c + " | tank " + t + " | single: " + singleSo2 + " kg/h vs " + doubleSo2);
+	}
+
+	/**
+	 * The uranium mill (7b, docs/multiblocks/uranium-mill.md). Every part faces west, so the ore goes east: crusher and SAG mill, leach
+	 * tank, CCD thickener, SX circuit, precipitation tank, with the yellowcake dryer and the drum filler against it. Acid from a stock
+	 * tank, LPG for the dryer from a bullet, water and the SX's kerosene by hooks. A diesel set at 480 V for the small motors and a
+	 * second through a backward unit substation for the SAG mill's 4.16 kV. Pitchblende is held to SX's limit; uranium ore then runs at
+	 * the full rate. The filler is given 380 kg by hook, and the mill's own yellowcake must finish the drum into the hopper under it.
+	 */
+	private void uraniumMill(ClientGameTestContext context, TestServerContext server) {
+		int z = -1700;
+		server.runCommand("effect give @p minecraft:slow_falling 600 0 true");
+		server.runCommand("tp @p 28 " + (up + 18) + " " + (z + 26) + " 180 35");
+		context.waitTicks(20);
+		server.runCommand("fill -20 " + (y - 1) + " " + (z - 14) + " 62 " + (y + 11) + " " + (z + 13) + " minecraft:air");
+		server.runCommand("fill -20 " + (y - 1) + " " + (z - 14) + " 62 " + (y - 1) + " " + (z + 13) + " minecraft:stone");
+		net.minecraft.core.Direction west = net.minecraft.core.Direction.WEST;
+		BlockPos crusher = new BlockPos(0, up, z);
+		placeBig(server, WildcatterBlocks.JAW_CRUSHER, crusher, west);                             // x 0-3, z-2..z
+		BlockPos sag = new BlockPos(4, up, z);
+		placeBig(server, WildcatterBlocks.SAG_MILL, sag, west);                                    // x 4-8, z-6..z
+		placeBig(server, WildcatterBlocks.LEACH_TANK, new BlockPos(10, up, z), west);              // x 10-17, z-7..z
+		BlockPos ccd = new BlockPos(19, up, z);
+		placeBig(server, WildcatterBlocks.CCD_THICKENER, ccd, west);                               // x 19-30, z-11..z
+		BlockPos sx = new BlockPos(32, up, z);
+		placeBig(server, WildcatterBlocks.SX_CIRCUIT, sx, west);                                   // x 32-47, z-5..z
+		placeBig(server, WildcatterBlocks.PRECIPITATION_TANK, new BlockPos(49, up, z), west);      // x 49-52, z-3..z
+		placeBig(server, WildcatterBlocks.YELLOWCAKE_DRYER, new BlockPos(53, up, z), west);        // x 53-55, z-2..z
+		BlockPos filler = new BlockPos(56, up, z);
+		placeBig(server, WildcatterBlocks.DRUM_FILLER, filler, west);                              // x 56-57, z-1..z
+		BlockPos acidTank = new BlockPos(10, up, z - 9);
+		placeBig(server, WildcatterBlocks.STOCK_TANK, acidTank, west);                             // x 10-13, z-12..z-9
+		BlockPos bullet = new BlockPos(48, up, z - 5 - 1);
+		placeBig(server, WildcatterBlocks.LPG_BULLET, bullet, west);                               // x 48-59, z-8..z-6
+		pipes(server, z, new int[][] {{9, 0, 0}, {18, 0, 0}, {31, 0, 0}, {48, 0, 0}});              // slurry, slurry, liquor, strip liquor
+		for (int x = 10; x <= 13; x++) {
+			put(server, x, up, z - 8, "wildcatter:gas_line");                                        // acid along the leach tank's north side
+		}
+		pipes(server, z, new int[][] {{53, 0, -3}, {53, 0, -4}, {53, 0, -5}});                       // LPG to the dryer's north side
+		BlockPos under = new BlockPos(56, y, z);
+		put(server, 56, y, z, "minecraft:hopper");
+		// power: 480 V along z+3 with a stub to each small motor's box, south of its main cell...
+		BlockPos lvSet = new BlockPos(20, up, z + 6);
+		genset(server, lvSet, net.minecraft.core.Direction.NORTH, false);                           // x 15-20, z+6..z+7
+		for (int zz = z + 3; zz <= z + 6; zz++) {
+			put(server, 21, up, zz, "wildcatter:cable_industrial");
+		}
+		for (int x = 0; x <= 56; x++) {
+			put(server, x, up, z + 3, "wildcatter:cable_industrial");
+		}
+		for (int x : new int[] {0, 10, 19, 32, 49, 56}) {
+			put(server, x, up, z + 2, "wildcatter:cable_industrial");
+			put(server, x, up, z + 1, "wildcatter:cable_industrial");
+		}
+		sizeCables(server, new BlockPos(0, up, z + 1), new BlockPos(56, up, z + 6), WildcatterBlocks.CABLE_INDUSTRIAL, dev.wildcatter.energy.ConductorSize.AWG_4_0);
+		// ...and 4.16 kV for the SAG mill: three sets in parallel on an 800 A busway, a backward unit substation, and the 4.16 kV line
+		// overhead to the mill's box. A 522 kW motor started across the line draws about six times its current: one 500 kW set cannot
+		// start it (soft starters and drives are in ROADMAP Ideas)
+		BlockPos[] sagSets = {new BlockPos(-12, up, z + 11), new BlockPos(-4, up, z + 11), new BlockPos(4, up, z + 11)};
+		for (BlockPos set : sagSets) {
+			genset(server, set, net.minecraft.core.Direction.NORTH, false);                         // x -17..-12, -9..-4, -1..4; z+11..z+12
+			put(server, set.getX() + 1, up, z + 11, "wildcatter:busway_industrial");
+		}
+		for (int x = -11; x <= 6; x++) {
+			put(server, x, up, z + 10, "wildcatter:busway_industrial");
+		}
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, new BlockPos(6, up, z + 10), net.minecraft.core.Direction.EAST, false);   // x 7-10, z+9..z+10
+		put(server, 11, up, z + 10, "wildcatter:cable_mv");
+		put(server, 11, up, z + 9, "wildcatter:cable_mv");
+		put(server, 11, up, z + 8, "wildcatter:cable_mv");
+		put(server, 11, up + 1, z + 8, "wildcatter:cable_mv");
+		for (int x = 4; x <= 11; x++) {
+			put(server, x, up + 2, z + 8, "wildcatter:cable_mv");
+		}
+		for (int zz = z + 1; zz <= z + 7; zz++) {
+			put(server, 4, up + 2, zz, "wildcatter:cable_mv");
+		}
+		put(server, 4, up + 1, z + 1, "wildcatter:cable_mv");
+		put(server, 4, up, z + 1, "wildcatter:cable_mv");
+		fillTank(server, acidTank, dev.wildcatter.fluid.Product.SULFURIC_ACID, 20_000);
+		fillTank(server, bullet, dev.wildcatter.fluid.Product.LPG, 20_000);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.SxCircuitBlockEntity) srv.overworld().getBlockEntity(sx)).testCharge(Tuning.SX_KEROSENE_CHARGE);
+			return null;
+		});
+		water(server, sag, ccd);
+		startGenset(context, server, lvSet, net.minecraft.core.Direction.NORTH, 2000);
+		for (BlockPos set : sagSets) {
+			startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 2000);   // the second and third sync onto the first
+		}
+		// the sets first, then the mill: ore, reagents and drums into the hoppers
+		put(server, 1, up + 4, z - 1, "minecraft:hopper");
+		server.runCommand("item replace block 1 " + (up + 4) + " " + (z - 1) + " container.0 with wildcatter:pitchblende 1");
+		server.runCommand("item replace block 1 " + (up + 4) + " " + (z - 1) + " container.1 with wildcatter:uraninite 8");
+		put(server, 12, up + 9, z - 2, "minecraft:hopper");
+		server.runCommand("item replace block 12 " + (up + 9) + " " + (z - 2) + " container.0 with wildcatter:pyrolusite 2");
+		put(server, 34, up + 3, z - 2, "minecraft:hopper");
+		server.runCommand("item replace block 34 " + (up + 3) + " " + (z - 2) + " container.0 with wildcatter:halite 2");
+		put(server, 50, up + 5, z - 1, "minecraft:hopper");
+		server.runCommand("item replace block 50 " + (up + 5) + " " + (z - 1) + " container.0 with wildcatter:magnesia 2");
+		put(server, 56, up + 4, z, "minecraft:hopper");
+		server.runCommand("item replace block 56 " + (up + 4) + " " + z + " container.0 with wildcatter:empty_drum 4");
+		for (int i = 0; i < 4; i++) {
+			context.waitTicks(50);
+			water(server, sag, ccd);
+		}
+		String held = read(server, 4, up, z);
+		check(held.contains("60.0 % U3O8") && held.contains("held to SX"), "pitchblende should be held to SX's limit: " + held + " | crusher " + read(server, 0, up, z)
+				+ " | sag sets " + read(server, -12, up, z + 11) + " / " + read(server, 4, up, z + 11));
+		server.computeOnServer(srv -> {   // the rest of the pitchblende block goes; the uranium ore in the hopper follows
+			((dev.wildcatter.block.JawCrusherBlockEntity) srv.overworld().getBlockEntity(crusher)).testClear();
+			return null;
+		});
+		for (int i = 0; i < 8; i++) {
+			context.waitTicks(50);
+			water(server, sag, ccd);
+		}
+		String grind = read(server, 4, up, z), leach = read(server, 10, up, z), thick = read(server, 19, up, z), sxr = read(server, 32, up, z),
+				pt = read(server, 49, up, z), dry = read(server, 53, up, z), fill = read(server, 56, up, z);
+		String chain = " | SAG " + grind + " | leach " + leach + " | CCD " + thick + " | SX " + sxr + " | precipitation " + pt + " | dryer " + dry + " | filler " + fill
+				+ " | lv set " + read(server, 20, up, z + 6) + " | sag sets " + read(server, -12, up, z + 11) + " / " + read(server, 4, up, z + 11);
+		check(grind.contains("grinding") && grind.contains("2.0 % U3O8") && !grind.contains("held to SX"), "uranium ore should grind at the full rate: " + chain);
+		check(leach.contains("leaching"), "the leach tank should leach: " + chain);
+		check(thick.contains("washing") && thick.contains("pregnant liquor"), "the thickener should make pregnant liquor: " + chain);
+		check(sxr.contains("strip liquor"), "the SX circuit should make strip liquor: " + chain);
+		check(pt.contains("precipitating"), "the precipitation tank should precipitate: " + chain);
+		check(dry.contains("drying"), "the dryer should dry yellowcake: " + chain);
+		server.computeOnServer(srv -> {   // 380 kg already in the filler: the mill's own yellowcake finishes the drum
+			((dev.wildcatter.block.DrumFillerBlockEntity) srv.overworld().getBlockEntity(filler)).addYellowcake(380);
+			return null;
+		});
+		int drums = 0;
+		for (int i = 0; i < 30 && drums == 0; i++) {
+			context.waitTicks(50);
+			water(server, sag, ccd);
+			drums = countIn(server, under, WildcatterItems.YELLOWCAKE_DRUM);
+		}
+		check(drums > 0, "a full yellowcake drum should drop into the hopper under the filler: " + read(server, 56, up, z) + " | dryer " + read(server, 53, up, z)
+				+ " | precipitation " + read(server, 49, up, z));
+		server.runCommand("tp @p 26 " + (up + 16) + " " + (z + 24) + " 195 30");
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-uranium-mill");
+		System.out.println("[wildcatter-test] uranium mill ok: " + held + " | " + grind + " | " + thick + " | " + sxr + " | " + dry + " | drums " + drums);
+	}
+
 	/**
 	 * Every vein, the evaporite beds, the Bushveld reef and a salt dome are placed into rock with /place feature and must
 	 * leave their ore; every ore drops its mineral; a furnace smelts galena; the scintillometer hears a pitchblende pod.

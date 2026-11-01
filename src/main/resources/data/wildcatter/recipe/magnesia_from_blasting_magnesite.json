@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:blasting",
+  "cookingtime": 100,
+  "experience": 0.3,
+  "group": "magnesia",
+  "ingredient": "wildcatter:magnesite",
+  "result": {
+    "id": "wildcatter:magnesia"
+  }
+}

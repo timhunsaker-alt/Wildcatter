@@ -27,6 +27,8 @@ not a go-ahead to build: that waits for the roadmap phase (ROADMAP.md). Nothing 
 | [cracker.md](cracker.md) | 5d | new: steam cracker, cold box, polyethylene reactor and pelletizer (plastic) |
 | [gas-turbine.md](gas-turbine.md) | 6a | new: 16.5 MW gas turbine, 13.8 kV generator breaker and bus duct, 25 MVA GSU, load bank |
 | [combined-cycle.md](combined-cycle.md) | 6a | new: HRSG, 5 MW steam turbine, air-cooled condenser, feed pump |
+| [acid-plant.md](acid-plant.md) | 7b | new: sulfur melter, drying tower, main blower, sulfur furnace, waste heat boiler, converter, interpass and final absorbers |
+| [uranium-mill.md](uranium-mill.md) | 7b | new: jaw crusher, SAG mill, leach tank, CCD thickener, SX circuit, precipitation tank, yellowcake dryer, drum filler |
 | [aeroderivative.md](aeroderivative.md) | 6b | new: 45 MW aeroderivative peaker, 3,000 A generator breaker, 60 MVA GSU and 60 MVA substation transformer |
 
 ## Shared rules

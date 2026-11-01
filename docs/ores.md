@@ -94,11 +94,12 @@ The furnace (and the blast furnace, twice as fast) smelts only what really smelt
 | cassiterite | tin |
 | sphalerite | zinc |
 | acanthite | silver |
+| magnesite | magnesia (MgO), the uranium mill's precipitant: calcining, added in 7b |
 
 Every other mineral waits for its plant:
-- 7b: sulfur and uranium ore.
+- 7b: sulfur, uranium ore, pitchblende, pyrolusite and rock salt (uranium-mill.md, acid-plant.md).
 - 7d: fluorspar.
-- 7f: heavy mineral sand, magnesite and dolomite.
+- 7f: heavy mineral sand and dolomite.
 - Phase 8: borax and silver.
 - The rest go to the plants listed under Ideas in ROADMAP.
 

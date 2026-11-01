@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "B B",
+    "BXB",
+    "SCS"
+  ],
+  "key": {
+    "B": "minecraft:iron_block",
+    "X": "wildcatter:crankshaft",
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_block"
+  },
+  "result": {
+    "id": "wildcatter:jaw_crusher",
+    "count": 1
+  }
+}

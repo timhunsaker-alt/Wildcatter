@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SXS",
+    "SCS",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "X": "minecraft:piston",
+    "C": "minecraft:cauldron",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:precipitation_tank",
+    "count": 1
+  }
+}

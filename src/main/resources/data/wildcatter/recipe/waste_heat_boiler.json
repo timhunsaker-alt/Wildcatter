@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SSS",
+    "PWP",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "W": "minecraft:water_bucket"
+  },
+  "result": {
+    "id": "wildcatter:waste_heat_boiler",
+    "count": 1
+  }
+}

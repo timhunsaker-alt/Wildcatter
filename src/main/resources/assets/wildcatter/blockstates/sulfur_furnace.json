@@ -1,0 +1,1354 @@
+{
+ "variants": {
+  "facing=north,piece=0": {
+   "model": "wildcatter:block/sulfur_furnace/p0"
+  },
+  "facing=north,piece=1": {
+   "model": "wildcatter:block/sulfur_furnace/p1"
+  },
+  "facing=north,piece=2": {
+   "model": "wildcatter:block/sulfur_furnace/p2"
+  },
+  "facing=north,piece=3": {
+   "model": "wildcatter:block/sulfur_furnace/p3"
+  },
+  "facing=north,piece=4": {
+   "model": "wildcatter:block/sulfur_furnace/p4"
+  },
+  "facing=north,piece=5": {
+   "model": "wildcatter:block/sulfur_furnace/p5"
+  },
+  "facing=north,piece=6": {
+   "model": "wildcatter:block/sulfur_furnace/p6"
+  },
+  "facing=north,piece=7": {
+   "model": "wildcatter:block/sulfur_furnace/p7"
+  },
+  "facing=north,piece=8": {
+   "model": "wildcatter:block/sulfur_furnace/p8"
+  },
+  "facing=north,piece=9": {
+   "model": "wildcatter:block/sulfur_furnace/p9"
+  },
+  "facing=north,piece=10": {
+   "model": "wildcatter:block/sulfur_furnace/p10"
+  },
+  "facing=north,piece=11": {
+   "model": "wildcatter:block/sulfur_furnace/p11"
+  },
+  "facing=north,piece=12": {
+   "model": "wildcatter:block/sulfur_furnace/p12"
+  },
+  "facing=north,piece=13": {
+   "model": "wildcatter:block/sulfur_furnace/p13"
+  },
+  "facing=north,piece=14": {
+   "model": "wildcatter:block/sulfur_furnace/p14"
+  },
+  "facing=north,piece=15": {
+   "model": "wildcatter:block/sulfur_furnace/p15"
+  },
+  "facing=north,piece=16": {
+   "model": "wildcatter:block/sulfur_furnace/p16"
+  },
+  "facing=north,piece=17": {
+   "model": "wildcatter:block/sulfur_furnace/p17"
+  },
+  "facing=north,piece=18": {
+   "model": "wildcatter:block/sulfur_furnace/p18"
+  },
+  "facing=north,piece=19": {
+   "model": "wildcatter:block/sulfur_furnace/p19"
+  },
+  "facing=north,piece=20": {
+   "model": "wildcatter:block/sulfur_furnace/p20"
+  },
+  "facing=north,piece=21": {
+   "model": "wildcatter:block/sulfur_furnace/p21"
+  },
+  "facing=north,piece=22": {
+   "model": "wildcatter:block/sulfur_furnace/p22"
+  },
+  "facing=north,piece=23": {
+   "model": "wildcatter:block/sulfur_furnace/p23"
+  },
+  "facing=north,piece=24": {
+   "model": "wildcatter:block/sulfur_furnace/p24"
+  },
+  "facing=north,piece=25": {
+   "model": "wildcatter:block/sulfur_furnace/p25"
+  },
+  "facing=north,piece=26": {
+   "model": "wildcatter:block/sulfur_furnace/p26"
+  },
+  "facing=north,piece=27": {
+   "model": "wildcatter:block/sulfur_furnace/p27"
+  },
+  "facing=north,piece=28": {
+   "model": "wildcatter:block/sulfur_furnace/p28"
+  },
+  "facing=north,piece=29": {
+   "model": "wildcatter:block/sulfur_furnace/p29"
+  },
+  "facing=north,piece=30": {
+   "model": "wildcatter:block/sulfur_furnace/p30"
+  },
+  "facing=north,piece=31": {
+   "model": "wildcatter:block/sulfur_furnace/p31"
+  },
+  "facing=north,piece=32": {
+   "model": "wildcatter:block/sulfur_furnace/p32"
+  },
+  "facing=north,piece=33": {
+   "model": "wildcatter:block/sulfur_furnace/p33"
+  },
+  "facing=north,piece=34": {
+   "model": "wildcatter:block/sulfur_furnace/p34"
+  },
+  "facing=north,piece=35": {
+   "model": "wildcatter:block/sulfur_furnace/p35"
+  },
+  "facing=north,piece=36": {
+   "model": "wildcatter:block/sulfur_furnace/p36"
+  },
+  "facing=north,piece=37": {
+   "model": "wildcatter:block/sulfur_furnace/p37"
+  },
+  "facing=north,piece=38": {
+   "model": "wildcatter:block/sulfur_furnace/p38"
+  },
+  "facing=north,piece=39": {
+   "model": "wildcatter:block/sulfur_furnace/p39"
+  },
+  "facing=north,piece=40": {
+   "model": "wildcatter:block/sulfur_furnace/p40"
+  },
+  "facing=north,piece=41": {
+   "model": "wildcatter:block/sulfur_furnace/p41"
+  },
+  "facing=north,piece=42": {
+   "model": "wildcatter:block/sulfur_furnace/p42"
+  },
+  "facing=north,piece=43": {
+   "model": "wildcatter:block/sulfur_furnace/p43"
+  },
+  "facing=north,piece=44": {
+   "model": "wildcatter:block/sulfur_furnace/p44"
+  },
+  "facing=north,piece=45": {
+   "model": "wildcatter:block/sulfur_furnace/p45"
+  },
+  "facing=north,piece=46": {
+   "model": "wildcatter:block/sulfur_furnace/p46"
+  },
+  "facing=north,piece=47": {
+   "model": "wildcatter:block/sulfur_furnace/p47"
+  },
+  "facing=north,piece=48": {
+   "model": "wildcatter:block/sulfur_furnace/p48"
+  },
+  "facing=north,piece=49": {
+   "model": "wildcatter:block/sulfur_furnace/p49"
+  },
+  "facing=north,piece=50": {
+   "model": "wildcatter:block/sulfur_furnace/p50"
+  },
+  "facing=north,piece=51": {
+   "model": "wildcatter:block/sulfur_furnace/p51"
+  },
+  "facing=north,piece=52": {
+   "model": "wildcatter:block/sulfur_furnace/p52"
+  },
+  "facing=north,piece=53": {
+   "model": "wildcatter:block/sulfur_furnace/p53"
+  },
+  "facing=north,piece=54": {
+   "model": "wildcatter:block/sulfur_furnace/p54"
+  },
+  "facing=north,piece=55": {
+   "model": "wildcatter:block/sulfur_furnace/p55"
+  },
+  "facing=north,piece=56": {
+   "model": "wildcatter:block/sulfur_furnace/p56"
+  },
+  "facing=north,piece=57": {
+   "model": "wildcatter:block/sulfur_furnace/p57"
+  },
+  "facing=north,piece=58": {
+   "model": "wildcatter:block/sulfur_furnace/p58"
+  },
+  "facing=north,piece=59": {
+   "model": "wildcatter:block/sulfur_furnace/p59"
+  },
+  "facing=north,piece=60": {
+   "model": "wildcatter:block/sulfur_furnace/p60"
+  },
+  "facing=north,piece=61": {
+   "model": "wildcatter:block/sulfur_furnace/p61"
+  },
+  "facing=north,piece=62": {
+   "model": "wildcatter:block/sulfur_furnace/p62"
+  },
+  "facing=north,piece=63": {
+   "model": "wildcatter:block/sulfur_furnace/p63"
+  },
+  "facing=north,piece=64": {
+   "model": "wildcatter:block/sulfur_furnace/p64"
+  },
+  "facing=north,piece=65": {
+   "model": "wildcatter:block/sulfur_furnace/p65"
+  },
+  "facing=north,piece=66": {
+   "model": "wildcatter:block/sulfur_furnace/p66"
+  },
+  "facing=north,piece=67": {
+   "model": "wildcatter:block/sulfur_furnace/p67"
+  },
+  "facing=north,piece=68": {
+   "model": "wildcatter:block/sulfur_furnace/p68"
+  },
+  "facing=north,piece=69": {
+   "model": "wildcatter:block/sulfur_furnace/p69"
+  },
+  "facing=north,piece=70": {
+   "model": "wildcatter:block/sulfur_furnace/p70"
+  },
+  "facing=north,piece=71": {
+   "model": "wildcatter:block/sulfur_furnace/p71"
+  },
+  "facing=north,piece=72": {
+   "model": "wildcatter:block/sulfur_furnace/p72"
+  },
+  "facing=north,piece=73": {
+   "model": "wildcatter:block/sulfur_furnace/p73"
+  },
+  "facing=north,piece=74": {
+   "model": "wildcatter:block/sulfur_furnace/p74"
+  },
+  "facing=north,piece=75": {
+   "model": "wildcatter:block/sulfur_furnace/p75"
+  },
+  "facing=north,piece=76": {
+   "model": "wildcatter:block/sulfur_furnace/p76"
+  },
+  "facing=north,piece=77": {
+   "model": "wildcatter:block/sulfur_furnace/p77"
+  },
+  "facing=north,piece=78": {
+   "model": "wildcatter:block/sulfur_furnace/p78"
+  },
+  "facing=north,piece=79": {
+   "model": "wildcatter:block/sulfur_furnace/p79"
+  },
+  "facing=north,piece=80": {
+   "model": "wildcatter:block/sulfur_furnace/p80"
+  },
+  "facing=north,piece=81": {
+   "model": "wildcatter:block/sulfur_furnace/p81"
+  },
+  "facing=north,piece=82": {
+   "model": "wildcatter:block/sulfur_furnace/p82"
+  },
+  "facing=north,piece=83": {
+   "model": "wildcatter:block/sulfur_furnace/p83"
+  },
+  "facing=north,piece=84": {
+   "model": "wildcatter:block/sulfur_furnace/p84"
+  },
+  "facing=north,piece=85": {
+   "model": "wildcatter:block/sulfur_furnace/p85"
+  },
+  "facing=north,piece=86": {
+   "model": "wildcatter:block/sulfur_furnace/p86"
+  },
+  "facing=north,piece=87": {
+   "model": "wildcatter:block/sulfur_furnace/p87"
+  },
+  "facing=north,piece=88": {
+   "model": "wildcatter:block/sulfur_furnace/p88"
+  },
+  "facing=north,piece=89": {
+   "model": "wildcatter:block/sulfur_furnace/p89"
+  },
+  "facing=east,piece=0": {
+   "model": "wildcatter:block/sulfur_furnace/p0",
+   "y": 90
+  },
+  "facing=east,piece=1": {
+   "model": "wildcatter:block/sulfur_furnace/p1",
+   "y": 90
+  },
+  "facing=east,piece=2": {
+   "model": "wildcatter:block/sulfur_furnace/p2",
+   "y": 90
+  },
+  "facing=east,piece=3": {
+   "model": "wildcatter:block/sulfur_furnace/p3",
+   "y": 90
+  },
+  "facing=east,piece=4": {
+   "model": "wildcatter:block/sulfur_furnace/p4",
+   "y": 90
+  },
+  "facing=east,piece=5": {
+   "model": "wildcatter:block/sulfur_furnace/p5",
+   "y": 90
+  },
+  "facing=east,piece=6": {
+   "model": "wildcatter:block/sulfur_furnace/p6",
+   "y": 90
+  },
+  "facing=east,piece=7": {
+   "model": "wildcatter:block/sulfur_furnace/p7",
+   "y": 90
+  },
+  "facing=east,piece=8": {
+   "model": "wildcatter:block/sulfur_furnace/p8",
+   "y": 90
+  },
+  "facing=east,piece=9": {
+   "model": "wildcatter:block/sulfur_furnace/p9",
+   "y": 90
+  },
+  "facing=east,piece=10": {
+   "model": "wildcatter:block/sulfur_furnace/p10",
+   "y": 90
+  },
+  "facing=east,piece=11": {
+   "model": "wildcatter:block/sulfur_furnace/p11",
+   "y": 90
+  },
+  "facing=east,piece=12": {
+   "model": "wildcatter:block/sulfur_furnace/p12",
+   "y": 90
+  },
+  "facing=east,piece=13": {
+   "model": "wildcatter:block/sulfur_furnace/p13",
+   "y": 90
+  },
+  "facing=east,piece=14": {
+   "model": "wildcatter:block/sulfur_furnace/p14",
+   "y": 90
+  },
+  "facing=east,piece=15": {
+   "model": "wildcatter:block/sulfur_furnace/p15",
+   "y": 90
+  },
+  "facing=east,piece=16": {
+   "model": "wildcatter:block/sulfur_furnace/p16",
+   "y": 90
+  },
+  "facing=east,piece=17": {
+   "model": "wildcatter:block/sulfur_furnace/p17",
+   "y": 90
+  },
+  "facing=east,piece=18": {
+   "model": "wildcatter:block/sulfur_furnace/p18",
+   "y": 90
+  },
+  "facing=east,piece=19": {
+   "model": "wildcatter:block/sulfur_furnace/p19",
+   "y": 90
+  },
+  "facing=east,piece=20": {
+   "model": "wildcatter:block/sulfur_furnace/p20",
+   "y": 90
+  },
+  "facing=east,piece=21": {
+   "model": "wildcatter:block/sulfur_furnace/p21",
+   "y": 90
+  },
+  "facing=east,piece=22": {
+   "model": "wildcatter:block/sulfur_furnace/p22",
+   "y": 90
+  },
+  "facing=east,piece=23": {
+   "model": "wildcatter:block/sulfur_furnace/p23",
+   "y": 90
+  },
+  "facing=east,piece=24": {
+   "model": "wildcatter:block/sulfur_furnace/p24",
+   "y": 90
+  },
+  "facing=east,piece=25": {
+   "model": "wildcatter:block/sulfur_furnace/p25",
+   "y": 90
+  },
+  "facing=east,piece=26": {
+   "model": "wildcatter:block/sulfur_furnace/p26",
+   "y": 90
+  },
+  "facing=east,piece=27": {
+   "model": "wildcatter:block/sulfur_furnace/p27",
+   "y": 90
+  },
+  "facing=east,piece=28": {
+   "model": "wildcatter:block/sulfur_furnace/p28",
+   "y": 90
+  },
+  "facing=east,piece=29": {
+   "model": "wildcatter:block/sulfur_furnace/p29",
+   "y": 90
+  },
+  "facing=east,piece=30": {
+   "model": "wildcatter:block/sulfur_furnace/p30",
+   "y": 90
+  },
+  "facing=east,piece=31": {
+   "model": "wildcatter:block/sulfur_furnace/p31",
+   "y": 90
+  },
+  "facing=east,piece=32": {
+   "model": "wildcatter:block/sulfur_furnace/p32",
+   "y": 90
+  },
+  "facing=east,piece=33": {
+   "model": "wildcatter:block/sulfur_furnace/p33",
+   "y": 90
+  },
+  "facing=east,piece=34": {
+   "model": "wildcatter:block/sulfur_furnace/p34",
+   "y": 90
+  },
+  "facing=east,piece=35": {
+   "model": "wildcatter:block/sulfur_furnace/p35",
+   "y": 90
+  },
+  "facing=east,piece=36": {
+   "model": "wildcatter:block/sulfur_furnace/p36",
+   "y": 90
+  },
+  "facing=east,piece=37": {
+   "model": "wildcatter:block/sulfur_furnace/p37",
+   "y": 90
+  },
+  "facing=east,piece=38": {
+   "model": "wildcatter:block/sulfur_furnace/p38",
+   "y": 90
+  },
+  "facing=east,piece=39": {
+   "model": "wildcatter:block/sulfur_furnace/p39",
+   "y": 90
+  },
+  "facing=east,piece=40": {
+   "model": "wildcatter:block/sulfur_furnace/p40",
+   "y": 90
+  },
+  "facing=east,piece=41": {
+   "model": "wildcatter:block/sulfur_furnace/p41",
+   "y": 90
+  },
+  "facing=east,piece=42": {
+   "model": "wildcatter:block/sulfur_furnace/p42",
+   "y": 90
+  },
+  "facing=east,piece=43": {
+   "model": "wildcatter:block/sulfur_furnace/p43",
+   "y": 90
+  },
+  "facing=east,piece=44": {
+   "model": "wildcatter:block/sulfur_furnace/p44",
+   "y": 90
+  },
+  "facing=east,piece=45": {
+   "model": "wildcatter:block/sulfur_furnace/p45",
+   "y": 90
+  },
+  "facing=east,piece=46": {
+   "model": "wildcatter:block/sulfur_furnace/p46",
+   "y": 90
+  },
+  "facing=east,piece=47": {
+   "model": "wildcatter:block/sulfur_furnace/p47",
+   "y": 90
+  },
+  "facing=east,piece=48": {
+   "model": "wildcatter:block/sulfur_furnace/p48",
+   "y": 90
+  },
+  "facing=east,piece=49": {
+   "model": "wildcatter:block/sulfur_furnace/p49",
+   "y": 90
+  },
+  "facing=east,piece=50": {
+   "model": "wildcatter:block/sulfur_furnace/p50",
+   "y": 90
+  },
+  "facing=east,piece=51": {
+   "model": "wildcatter:block/sulfur_furnace/p51",
+   "y": 90
+  },
+  "facing=east,piece=52": {
+   "model": "wildcatter:block/sulfur_furnace/p52",
+   "y": 90
+  },
+  "facing=east,piece=53": {
+   "model": "wildcatter:block/sulfur_furnace/p53",
+   "y": 90
+  },
+  "facing=east,piece=54": {
+   "model": "wildcatter:block/sulfur_furnace/p54",
+   "y": 90
+  },
+  "facing=east,piece=55": {
+   "model": "wildcatter:block/sulfur_furnace/p55",
+   "y": 90
+  },
+  "facing=east,piece=56": {
+   "model": "wildcatter:block/sulfur_furnace/p56",
+   "y": 90
+  },
+  "facing=east,piece=57": {
+   "model": "wildcatter:block/sulfur_furnace/p57",
+   "y": 90
+  },
+  "facing=east,piece=58": {
+   "model": "wildcatter:block/sulfur_furnace/p58",
+   "y": 90
+  },
+  "facing=east,piece=59": {
+   "model": "wildcatter:block/sulfur_furnace/p59",
+   "y": 90
+  },
+  "facing=east,piece=60": {
+   "model": "wildcatter:block/sulfur_furnace/p60",
+   "y": 90
+  },
+  "facing=east,piece=61": {
+   "model": "wildcatter:block/sulfur_furnace/p61",
+   "y": 90
+  },
+  "facing=east,piece=62": {
+   "model": "wildcatter:block/sulfur_furnace/p62",
+   "y": 90
+  },
+  "facing=east,piece=63": {
+   "model": "wildcatter:block/sulfur_furnace/p63",
+   "y": 90
+  },
+  "facing=east,piece=64": {
+   "model": "wildcatter:block/sulfur_furnace/p64",
+   "y": 90
+  },
+  "facing=east,piece=65": {
+   "model": "wildcatter:block/sulfur_furnace/p65",
+   "y": 90
+  },
+  "facing=east,piece=66": {
+   "model": "wildcatter:block/sulfur_furnace/p66",
+   "y": 90
+  },
+  "facing=east,piece=67": {
+   "model": "wildcatter:block/sulfur_furnace/p67",
+   "y": 90
+  },
+  "facing=east,piece=68": {
+   "model": "wildcatter:block/sulfur_furnace/p68",
+   "y": 90
+  },
+  "facing=east,piece=69": {
+   "model": "wildcatter:block/sulfur_furnace/p69",
+   "y": 90
+  },
+  "facing=east,piece=70": {
+   "model": "wildcatter:block/sulfur_furnace/p70",
+   "y": 90
+  },
+  "facing=east,piece=71": {
+   "model": "wildcatter:block/sulfur_furnace/p71",
+   "y": 90
+  },
+  "facing=east,piece=72": {
+   "model": "wildcatter:block/sulfur_furnace/p72",
+   "y": 90
+  },
+  "facing=east,piece=73": {
+   "model": "wildcatter:block/sulfur_furnace/p73",
+   "y": 90
+  },
+  "facing=east,piece=74": {
+   "model": "wildcatter:block/sulfur_furnace/p74",
+   "y": 90
+  },
+  "facing=east,piece=75": {
+   "model": "wildcatter:block/sulfur_furnace/p75",
+   "y": 90
+  },
+  "facing=east,piece=76": {
+   "model": "wildcatter:block/sulfur_furnace/p76",
+   "y": 90
+  },
+  "facing=east,piece=77": {
+   "model": "wildcatter:block/sulfur_furnace/p77",
+   "y": 90
+  },
+  "facing=east,piece=78": {
+   "model": "wildcatter:block/sulfur_furnace/p78",
+   "y": 90
+  },
+  "facing=east,piece=79": {
+   "model": "wildcatter:block/sulfur_furnace/p79",
+   "y": 90
+  },
+  "facing=east,piece=80": {
+   "model": "wildcatter:block/sulfur_furnace/p80",
+   "y": 90
+  },
+  "facing=east,piece=81": {
+   "model": "wildcatter:block/sulfur_furnace/p81",
+   "y": 90
+  },
+  "facing=east,piece=82": {
+   "model": "wildcatter:block/sulfur_furnace/p82",
+   "y": 90
+  },
+  "facing=east,piece=83": {
+   "model": "wildcatter:block/sulfur_furnace/p83",
+   "y": 90
+  },
+  "facing=east,piece=84": {
+   "model": "wildcatter:block/sulfur_furnace/p84",
+   "y": 90
+  },
+  "facing=east,piece=85": {
+   "model": "wildcatter:block/sulfur_furnace/p85",
+   "y": 90
+  },
+  "facing=east,piece=86": {
+   "model": "wildcatter:block/sulfur_furnace/p86",
+   "y": 90
+  },
+  "facing=east,piece=87": {
+   "model": "wildcatter:block/sulfur_furnace/p87",
+   "y": 90
+  },
+  "facing=east,piece=88": {
+   "model": "wildcatter:block/sulfur_furnace/p88",
+   "y": 90
+  },
+  "facing=east,piece=89": {
+   "model": "wildcatter:block/sulfur_furnace/p89",
+   "y": 90
+  },
+  "facing=south,piece=0": {
+   "model": "wildcatter:block/sulfur_furnace/p0",
+   "y": 180
+  },
+  "facing=south,piece=1": {
+   "model": "wildcatter:block/sulfur_furnace/p1",
+   "y": 180
+  },
+  "facing=south,piece=2": {
+   "model": "wildcatter:block/sulfur_furnace/p2",
+   "y": 180
+  },
+  "facing=south,piece=3": {
+   "model": "wildcatter:block/sulfur_furnace/p3",
+   "y": 180
+  },
+  "facing=south,piece=4": {
+   "model": "wildcatter:block/sulfur_furnace/p4",
+   "y": 180
+  },
+  "facing=south,piece=5": {
+   "model": "wildcatter:block/sulfur_furnace/p5",
+   "y": 180
+  },
+  "facing=south,piece=6": {
+   "model": "wildcatter:block/sulfur_furnace/p6",
+   "y": 180
+  },
+  "facing=south,piece=7": {
+   "model": "wildcatter:block/sulfur_furnace/p7",
+   "y": 180
+  },
+  "facing=south,piece=8": {
+   "model": "wildcatter:block/sulfur_furnace/p8",
+   "y": 180
+  },
+  "facing=south,piece=9": {
+   "model": "wildcatter:block/sulfur_furnace/p9",
+   "y": 180
+  },
+  "facing=south,piece=10": {
+   "model": "wildcatter:block/sulfur_furnace/p10",
+   "y": 180
+  },
+  "facing=south,piece=11": {
+   "model": "wildcatter:block/sulfur_furnace/p11",
+   "y": 180
+  },
+  "facing=south,piece=12": {
+   "model": "wildcatter:block/sulfur_furnace/p12",
+   "y": 180
+  },
+  "facing=south,piece=13": {
+   "model": "wildcatter:block/sulfur_furnace/p13",
+   "y": 180
+  },
+  "facing=south,piece=14": {
+   "model": "wildcatter:block/sulfur_furnace/p14",
+   "y": 180
+  },
+  "facing=south,piece=15": {
+   "model": "wildcatter:block/sulfur_furnace/p15",
+   "y": 180
+  },
+  "facing=south,piece=16": {
+   "model": "wildcatter:block/sulfur_furnace/p16",
+   "y": 180
+  },
+  "facing=south,piece=17": {
+   "model": "wildcatter:block/sulfur_furnace/p17",
+   "y": 180
+  },
+  "facing=south,piece=18": {
+   "model": "wildcatter:block/sulfur_furnace/p18",
+   "y": 180
+  },
+  "facing=south,piece=19": {
+   "model": "wildcatter:block/sulfur_furnace/p19",
+   "y": 180
+  },
+  "facing=south,piece=20": {
+   "model": "wildcatter:block/sulfur_furnace/p20",
+   "y": 180
+  },
+  "facing=south,piece=21": {
+   "model": "wildcatter:block/sulfur_furnace/p21",
+   "y": 180
+  },
+  "facing=south,piece=22": {
+   "model": "wildcatter:block/sulfur_furnace/p22",
+   "y": 180
+  },
+  "facing=south,piece=23": {
+   "model": "wildcatter:block/sulfur_furnace/p23",
+   "y": 180
+  },
+  "facing=south,piece=24": {
+   "model": "wildcatter:block/sulfur_furnace/p24",
+   "y": 180
+  },
+  "facing=south,piece=25": {
+   "model": "wildcatter:block/sulfur_furnace/p25",
+   "y": 180
+  },
+  "facing=south,piece=26": {
+   "model": "wildcatter:block/sulfur_furnace/p26",
+   "y": 180
+  },
+  "facing=south,piece=27": {
+   "model": "wildcatter:block/sulfur_furnace/p27",
+   "y": 180
+  },
+  "facing=south,piece=28": {
+   "model": "wildcatter:block/sulfur_furnace/p28",
+   "y": 180
+  },
+  "facing=south,piece=29": {
+   "model": "wildcatter:block/sulfur_furnace/p29",
+   "y": 180
+  },
+  "facing=south,piece=30": {
+   "model": "wildcatter:block/sulfur_furnace/p30",
+   "y": 180
+  },
+  "facing=south,piece=31": {
+   "model": "wildcatter:block/sulfur_furnace/p31",
+   "y": 180
+  },
+  "facing=south,piece=32": {
+   "model": "wildcatter:block/sulfur_furnace/p32",
+   "y": 180
+  },
+  "facing=south,piece=33": {
+   "model": "wildcatter:block/sulfur_furnace/p33",
+   "y": 180
+  },
+  "facing=south,piece=34": {
+   "model": "wildcatter:block/sulfur_furnace/p34",
+   "y": 180
+  },
+  "facing=south,piece=35": {
+   "model": "wildcatter:block/sulfur_furnace/p35",
+   "y": 180
+  },
+  "facing=south,piece=36": {
+   "model": "wildcatter:block/sulfur_furnace/p36",
+   "y": 180
+  },
+  "facing=south,piece=37": {
+   "model": "wildcatter:block/sulfur_furnace/p37",
+   "y": 180
+  },
+  "facing=south,piece=38": {
+   "model": "wildcatter:block/sulfur_furnace/p38",
+   "y": 180
+  },
+  "facing=south,piece=39": {
+   "model": "wildcatter:block/sulfur_furnace/p39",
+   "y": 180
+  },
+  "facing=south,piece=40": {
+   "model": "wildcatter:block/sulfur_furnace/p40",
+   "y": 180
+  },
+  "facing=south,piece=41": {
+   "model": "wildcatter:block/sulfur_furnace/p41",
+   "y": 180
+  },
+  "facing=south,piece=42": {
+   "model": "wildcatter:block/sulfur_furnace/p42",
+   "y": 180
+  },
+  "facing=south,piece=43": {
+   "model": "wildcatter:block/sulfur_furnace/p43",
+   "y": 180
+  },
+  "facing=south,piece=44": {
+   "model": "wildcatter:block/sulfur_furnace/p44",
+   "y": 180
+  },
+  "facing=south,piece=45": {
+   "model": "wildcatter:block/sulfur_furnace/p45",
+   "y": 180
+  },
+  "facing=south,piece=46": {
+   "model": "wildcatter:block/sulfur_furnace/p46",
+   "y": 180
+  },
+  "facing=south,piece=47": {
+   "model": "wildcatter:block/sulfur_furnace/p47",
+   "y": 180
+  },
+  "facing=south,piece=48": {
+   "model": "wildcatter:block/sulfur_furnace/p48",
+   "y": 180
+  },
+  "facing=south,piece=49": {
+   "model": "wildcatter:block/sulfur_furnace/p49",
+   "y": 180
+  },
+  "facing=south,piece=50": {
+   "model": "wildcatter:block/sulfur_furnace/p50",
+   "y": 180
+  },
+  "facing=south,piece=51": {
+   "model": "wildcatter:block/sulfur_furnace/p51",
+   "y": 180
+  },
+  "facing=south,piece=52": {
+   "model": "wildcatter:block/sulfur_furnace/p52",
+   "y": 180
+  },
+  "facing=south,piece=53": {
+   "model": "wildcatter:block/sulfur_furnace/p53",
+   "y": 180
+  },
+  "facing=south,piece=54": {
+   "model": "wildcatter:block/sulfur_furnace/p54",
+   "y": 180
+  },
+  "facing=south,piece=55": {
+   "model": "wildcatter:block/sulfur_furnace/p55",
+   "y": 180
+  },
+  "facing=south,piece=56": {
+   "model": "wildcatter:block/sulfur_furnace/p56",
+   "y": 180
+  },
+  "facing=south,piece=57": {
+   "model": "wildcatter:block/sulfur_furnace/p57",
+   "y": 180
+  },
+  "facing=south,piece=58": {
+   "model": "wildcatter:block/sulfur_furnace/p58",
+   "y": 180
+  },
+  "facing=south,piece=59": {
+   "model": "wildcatter:block/sulfur_furnace/p59",
+   "y": 180
+  },
+  "facing=south,piece=60": {
+   "model": "wildcatter:block/sulfur_furnace/p60",
+   "y": 180
+  },
+  "facing=south,piece=61": {
+   "model": "wildcatter:block/sulfur_furnace/p61",
+   "y": 180
+  },
+  "facing=south,piece=62": {
+   "model": "wildcatter:block/sulfur_furnace/p62",
+   "y": 180
+  },
+  "facing=south,piece=63": {
+   "model": "wildcatter:block/sulfur_furnace/p63",
+   "y": 180
+  },
+  "facing=south,piece=64": {
+   "model": "wildcatter:block/sulfur_furnace/p64",
+   "y": 180
+  },
+  "facing=south,piece=65": {
+   "model": "wildcatter:block/sulfur_furnace/p65",
+   "y": 180
+  },
+  "facing=south,piece=66": {
+   "model": "wildcatter:block/sulfur_furnace/p66",
+   "y": 180
+  },
+  "facing=south,piece=67": {
+   "model": "wildcatter:block/sulfur_furnace/p67",
+   "y": 180
+  },
+  "facing=south,piece=68": {
+   "model": "wildcatter:block/sulfur_furnace/p68",
+   "y": 180
+  },
+  "facing=south,piece=69": {
+   "model": "wildcatter:block/sulfur_furnace/p69",
+   "y": 180
+  },
+  "facing=south,piece=70": {
+   "model": "wildcatter:block/sulfur_furnace/p70",
+   "y": 180
+  },
+  "facing=south,piece=71": {
+   "model": "wildcatter:block/sulfur_furnace/p71",
+   "y": 180
+  },
+  "facing=south,piece=72": {
+   "model": "wildcatter:block/sulfur_furnace/p72",
+   "y": 180
+  },
+  "facing=south,piece=73": {
+   "model": "wildcatter:block/sulfur_furnace/p73",
+   "y": 180
+  },
+  "facing=south,piece=74": {
+   "model": "wildcatter:block/sulfur_furnace/p74",
+   "y": 180
+  },
+  "facing=south,piece=75": {
+   "model": "wildcatter:block/sulfur_furnace/p75",
+   "y": 180
+  },
+  "facing=south,piece=76": {
+   "model": "wildcatter:block/sulfur_furnace/p76",
+   "y": 180
+  },
+  "facing=south,piece=77": {
+   "model": "wildcatter:block/sulfur_furnace/p77",
+   "y": 180
+  },
+  "facing=south,piece=78": {
+   "model": "wildcatter:block/sulfur_furnace/p78",
+   "y": 180
+  },
+  "facing=south,piece=79": {
+   "model": "wildcatter:block/sulfur_furnace/p79",
+   "y": 180
+  },
+  "facing=south,piece=80": {
+   "model": "wildcatter:block/sulfur_furnace/p80",
+   "y": 180
+  },
+  "facing=south,piece=81": {
+   "model": "wildcatter:block/sulfur_furnace/p81",
+   "y": 180
+  },
+  "facing=south,piece=82": {
+   "model": "wildcatter:block/sulfur_furnace/p82",
+   "y": 180
+  },
+  "facing=south,piece=83": {
+   "model": "wildcatter:block/sulfur_furnace/p83",
+   "y": 180
+  },
+  "facing=south,piece=84": {
+   "model": "wildcatter:block/sulfur_furnace/p84",
+   "y": 180
+  },
+  "facing=south,piece=85": {
+   "model": "wildcatter:block/sulfur_furnace/p85",
+   "y": 180
+  },
+  "facing=south,piece=86": {
+   "model": "wildcatter:block/sulfur_furnace/p86",
+   "y": 180
+  },
+  "facing=south,piece=87": {
+   "model": "wildcatter:block/sulfur_furnace/p87",
+   "y": 180
+  },
+  "facing=south,piece=88": {
+   "model": "wildcatter:block/sulfur_furnace/p88",
+   "y": 180
+  },
+  "facing=south,piece=89": {
+   "model": "wildcatter:block/sulfur_furnace/p89",
+   "y": 180
+  },
+  "facing=west,piece=0": {
+   "model": "wildcatter:block/sulfur_furnace/p0",
+   "y": 270
+  },
+  "facing=west,piece=1": {
+   "model": "wildcatter:block/sulfur_furnace/p1",
+   "y": 270
+  },
+  "facing=west,piece=2": {
+   "model": "wildcatter:block/sulfur_furnace/p2",
+   "y": 270
+  },
+  "facing=west,piece=3": {
+   "model": "wildcatter:block/sulfur_furnace/p3",
+   "y": 270
+  },
+  "facing=west,piece=4": {
+   "model": "wildcatter:block/sulfur_furnace/p4",
+   "y": 270
+  },
+  "facing=west,piece=5": {
+   "model": "wildcatter:block/sulfur_furnace/p5",
+   "y": 270
+  },
+  "facing=west,piece=6": {
+   "model": "wildcatter:block/sulfur_furnace/p6",
+   "y": 270
+  },
+  "facing=west,piece=7": {
+   "model": "wildcatter:block/sulfur_furnace/p7",
+   "y": 270
+  },
+  "facing=west,piece=8": {
+   "model": "wildcatter:block/sulfur_furnace/p8",
+   "y": 270
+  },
+  "facing=west,piece=9": {
+   "model": "wildcatter:block/sulfur_furnace/p9",
+   "y": 270
+  },
+  "facing=west,piece=10": {
+   "model": "wildcatter:block/sulfur_furnace/p10",
+   "y": 270
+  },
+  "facing=west,piece=11": {
+   "model": "wildcatter:block/sulfur_furnace/p11",
+   "y": 270
+  },
+  "facing=west,piece=12": {
+   "model": "wildcatter:block/sulfur_furnace/p12",
+   "y": 270
+  },
+  "facing=west,piece=13": {
+   "model": "wildcatter:block/sulfur_furnace/p13",
+   "y": 270
+  },
+  "facing=west,piece=14": {
+   "model": "wildcatter:block/sulfur_furnace/p14",
+   "y": 270
+  },
+  "facing=west,piece=15": {
+   "model": "wildcatter:block/sulfur_furnace/p15",
+   "y": 270
+  },
+  "facing=west,piece=16": {
+   "model": "wildcatter:block/sulfur_furnace/p16",
+   "y": 270
+  },
+  "facing=west,piece=17": {
+   "model": "wildcatter:block/sulfur_furnace/p17",
+   "y": 270
+  },
+  "facing=west,piece=18": {
+   "model": "wildcatter:block/sulfur_furnace/p18",
+   "y": 270
+  },
+  "facing=west,piece=19": {
+   "model": "wildcatter:block/sulfur_furnace/p19",
+   "y": 270
+  },
+  "facing=west,piece=20": {
+   "model": "wildcatter:block/sulfur_furnace/p20",
+   "y": 270
+  },
+  "facing=west,piece=21": {
+   "model": "wildcatter:block/sulfur_furnace/p21",
+   "y": 270
+  },
+  "facing=west,piece=22": {
+   "model": "wildcatter:block/sulfur_furnace/p22",
+   "y": 270
+  },
+  "facing=west,piece=23": {
+   "model": "wildcatter:block/sulfur_furnace/p23",
+   "y": 270
+  },
+  "facing=west,piece=24": {
+   "model": "wildcatter:block/sulfur_furnace/p24",
+   "y": 270
+  },
+  "facing=west,piece=25": {
+   "model": "wildcatter:block/sulfur_furnace/p25",
+   "y": 270
+  },
+  "facing=west,piece=26": {
+   "model": "wildcatter:block/sulfur_furnace/p26",
+   "y": 270
+  },
+  "facing=west,piece=27": {
+   "model": "wildcatter:block/sulfur_furnace/p27",
+   "y": 270
+  },
+  "facing=west,piece=28": {
+   "model": "wildcatter:block/sulfur_furnace/p28",
+   "y": 270
+  },
+  "facing=west,piece=29": {
+   "model": "wildcatter:block/sulfur_furnace/p29",
+   "y": 270
+  },
+  "facing=west,piece=30": {
+   "model": "wildcatter:block/sulfur_furnace/p30",
+   "y": 270
+  },
+  "facing=west,piece=31": {
+   "model": "wildcatter:block/sulfur_furnace/p31",
+   "y": 270
+  },
+  "facing=west,piece=32": {
+   "model": "wildcatter:block/sulfur_furnace/p32",
+   "y": 270
+  },
+  "facing=west,piece=33": {
+   "model": "wildcatter:block/sulfur_furnace/p33",
+   "y": 270
+  },
+  "facing=west,piece=34": {
+   "model": "wildcatter:block/sulfur_furnace/p34",
+   "y": 270
+  },
+  "facing=west,piece=35": {
+   "model": "wildcatter:block/sulfur_furnace/p35",
+   "y": 270
+  },
+  "facing=west,piece=36": {
+   "model": "wildcatter:block/sulfur_furnace/p36",
+   "y": 270
+  },
+  "facing=west,piece=37": {
+   "model": "wildcatter:block/sulfur_furnace/p37",
+   "y": 270
+  },
+  "facing=west,piece=38": {
+   "model": "wildcatter:block/sulfur_furnace/p38",
+   "y": 270
+  },
+  "facing=west,piece=39": {
+   "model": "wildcatter:block/sulfur_furnace/p39",
+   "y": 270
+  },
+  "facing=west,piece=40": {
+   "model": "wildcatter:block/sulfur_furnace/p40",
+   "y": 270
+  },
+  "facing=west,piece=41": {
+   "model": "wildcatter:block/sulfur_furnace/p41",
+   "y": 270
+  },
+  "facing=west,piece=42": {
+   "model": "wildcatter:block/sulfur_furnace/p42",
+   "y": 270
+  },
+  "facing=west,piece=43": {
+   "model": "wildcatter:block/sulfur_furnace/p43",
+   "y": 270
+  },
+  "facing=west,piece=44": {
+   "model": "wildcatter:block/sulfur_furnace/p44",
+   "y": 270
+  },
+  "facing=west,piece=45": {
+   "model": "wildcatter:block/sulfur_furnace/p45",
+   "y": 270
+  },
+  "facing=west,piece=46": {
+   "model": "wildcatter:block/sulfur_furnace/p46",
+   "y": 270
+  },
+  "facing=west,piece=47": {
+   "model": "wildcatter:block/sulfur_furnace/p47",
+   "y": 270
+  },
+  "facing=west,piece=48": {
+   "model": "wildcatter:block/sulfur_furnace/p48",
+   "y": 270
+  },
+  "facing=west,piece=49": {
+   "model": "wildcatter:block/sulfur_furnace/p49",
+   "y": 270
+  },
+  "facing=west,piece=50": {
+   "model": "wildcatter:block/sulfur_furnace/p50",
+   "y": 270
+  },
+  "facing=west,piece=51": {
+   "model": "wildcatter:block/sulfur_furnace/p51",
+   "y": 270
+  },
+  "facing=west,piece=52": {
+   "model": "wildcatter:block/sulfur_furnace/p52",
+   "y": 270
+  },
+  "facing=west,piece=53": {
+   "model": "wildcatter:block/sulfur_furnace/p53",
+   "y": 270
+  },
+  "facing=west,piece=54": {
+   "model": "wildcatter:block/sulfur_furnace/p54",
+   "y": 270
+  },
+  "facing=west,piece=55": {
+   "model": "wildcatter:block/sulfur_furnace/p55",
+   "y": 270
+  },
+  "facing=west,piece=56": {
+   "model": "wildcatter:block/sulfur_furnace/p56",
+   "y": 270
+  },
+  "facing=west,piece=57": {
+   "model": "wildcatter:block/sulfur_furnace/p57",
+   "y": 270
+  },
+  "facing=west,piece=58": {
+   "model": "wildcatter:block/sulfur_furnace/p58",
+   "y": 270
+  },
+  "facing=west,piece=59": {
+   "model": "wildcatter:block/sulfur_furnace/p59",
+   "y": 270
+  },
+  "facing=west,piece=60": {
+   "model": "wildcatter:block/sulfur_furnace/p60",
+   "y": 270
+  },
+  "facing=west,piece=61": {
+   "model": "wildcatter:block/sulfur_furnace/p61",
+   "y": 270
+  },
+  "facing=west,piece=62": {
+   "model": "wildcatter:block/sulfur_furnace/p62",
+   "y": 270
+  },
+  "facing=west,piece=63": {
+   "model": "wildcatter:block/sulfur_furnace/p63",
+   "y": 270
+  },
+  "facing=west,piece=64": {
+   "model": "wildcatter:block/sulfur_furnace/p64",
+   "y": 270
+  },
+  "facing=west,piece=65": {
+   "model": "wildcatter:block/sulfur_furnace/p65",
+   "y": 270
+  },
+  "facing=west,piece=66": {
+   "model": "wildcatter:block/sulfur_furnace/p66",
+   "y": 270
+  },
+  "facing=west,piece=67": {
+   "model": "wildcatter:block/sulfur_furnace/p67",
+   "y": 270
+  },
+  "facing=west,piece=68": {
+   "model": "wildcatter:block/sulfur_furnace/p68",
+   "y": 270
+  },
+  "facing=west,piece=69": {
+   "model": "wildcatter:block/sulfur_furnace/p69",
+   "y": 270
+  },
+  "facing=west,piece=70": {
+   "model": "wildcatter:block/sulfur_furnace/p70",
+   "y": 270
+  },
+  "facing=west,piece=71": {
+   "model": "wildcatter:block/sulfur_furnace/p71",
+   "y": 270
+  },
+  "facing=west,piece=72": {
+   "model": "wildcatter:block/sulfur_furnace/p72",
+   "y": 270
+  },
+  "facing=west,piece=73": {
+   "model": "wildcatter:block/sulfur_furnace/p73",
+   "y": 270
+  },
+  "facing=west,piece=74": {
+   "model": "wildcatter:block/sulfur_furnace/p74",
+   "y": 270
+  },
+  "facing=west,piece=75": {
+   "model": "wildcatter:block/sulfur_furnace/p75",
+   "y": 270
+  },
+  "facing=west,piece=76": {
+   "model": "wildcatter:block/sulfur_furnace/p76",
+   "y": 270
+  },
+  "facing=west,piece=77": {
+   "model": "wildcatter:block/sulfur_furnace/p77",
+   "y": 270
+  },
+  "facing=west,piece=78": {
+   "model": "wildcatter:block/sulfur_furnace/p78",
+   "y": 270
+  },
+  "facing=west,piece=79": {
+   "model": "wildcatter:block/sulfur_furnace/p79",
+   "y": 270
+  },
+  "facing=west,piece=80": {
+   "model": "wildcatter:block/sulfur_furnace/p80",
+   "y": 270
+  },
+  "facing=west,piece=81": {
+   "model": "wildcatter:block/sulfur_furnace/p81",
+   "y": 270
+  },
+  "facing=west,piece=82": {
+   "model": "wildcatter:block/sulfur_furnace/p82",
+   "y": 270
+  },
+  "facing=west,piece=83": {
+   "model": "wildcatter:block/sulfur_furnace/p83",
+   "y": 270
+  },
+  "facing=west,piece=84": {
+   "model": "wildcatter:block/sulfur_furnace/p84",
+   "y": 270
+  },
+  "facing=west,piece=85": {
+   "model": "wildcatter:block/sulfur_furnace/p85",
+   "y": 270
+  },
+  "facing=west,piece=86": {
+   "model": "wildcatter:block/sulfur_furnace/p86",
+   "y": 270
+  },
+  "facing=west,piece=87": {
+   "model": "wildcatter:block/sulfur_furnace/p87",
+   "y": 270
+  },
+  "facing=west,piece=88": {
+   "model": "wildcatter:block/sulfur_furnace/p88",
+   "y": 270
+  },
+  "facing=west,piece=89": {
+   "model": "wildcatter:block/sulfur_furnace/p89",
+   "y": 270
+  }
+ }
+}

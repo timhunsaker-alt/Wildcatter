@@ -19,7 +19,7 @@ import org.jspecify.annotations.Nullable;
  * fresh water, through coils in a gas-fired radiant box. Feed in on the north face of its front cells, fuel gas on the east face of
  * its bottom cells, water off a water pipe on their west face; hot cracked gas out of the south face of its back cells.
  */
-public class CrackingFurnaceBlockEntity extends PlantUnitBlockEntity {
+public class CrackingFurnaceBlockEntity extends PlantUnitBlockEntity implements WaterUser {
 	private double water;
 	private double cracked;
 	private double firing;
@@ -49,11 +49,12 @@ public class CrackingFurnaceBlockEntity extends PlantUnitBlockEntity {
 	// ---- its boiler feed water, from a pump on water pipe ---------------------------------------------------------------------
 	private static final double WATER_HOLD = 200.0;
 
-	/** 0 to 1, for the pump's level switch. */
+	@Override
 	public double waterLevel() {
 		return water / WATER_HOLD;
 	}
 
+	@Override
 	public int addWater(int litres) {
 		int fits = (int) Math.max(0, Math.min(litres, WATER_HOLD - water));
 		water += fits;

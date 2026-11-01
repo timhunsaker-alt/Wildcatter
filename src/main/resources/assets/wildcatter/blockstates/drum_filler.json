@@ -1,0 +1,244 @@
+{
+ "variants": {
+  "facing=north,piece=0": {
+   "model": "wildcatter:block/drum_filler/p0"
+  },
+  "facing=north,piece=1": {
+   "model": "wildcatter:block/drum_filler/p1"
+  },
+  "facing=north,piece=2": {
+   "model": "wildcatter:block/drum_filler/p2"
+  },
+  "facing=north,piece=3": {
+   "model": "wildcatter:block/drum_filler/p3"
+  },
+  "facing=north,piece=4": {
+   "model": "wildcatter:block/drum_filler/p4"
+  },
+  "facing=north,piece=5": {
+   "model": "wildcatter:block/drum_filler/p5"
+  },
+  "facing=north,piece=6": {
+   "model": "wildcatter:block/drum_filler/p6"
+  },
+  "facing=north,piece=7": {
+   "model": "wildcatter:block/drum_filler/p7"
+  },
+  "facing=north,piece=8": {
+   "model": "wildcatter:block/drum_filler/p8"
+  },
+  "facing=north,piece=9": {
+   "model": "wildcatter:block/drum_filler/p9"
+  },
+  "facing=north,piece=10": {
+   "model": "wildcatter:block/drum_filler/p10"
+  },
+  "facing=north,piece=11": {
+   "model": "wildcatter:block/drum_filler/p11"
+  },
+  "facing=north,piece=12": {
+   "model": "wildcatter:block/drum_filler/p12"
+  },
+  "facing=north,piece=13": {
+   "model": "wildcatter:block/drum_filler/p13"
+  },
+  "facing=north,piece=14": {
+   "model": "wildcatter:block/drum_filler/p14"
+  },
+  "facing=north,piece=15": {
+   "model": "wildcatter:block/drum_filler/p15"
+  },
+  "facing=east,piece=0": {
+   "model": "wildcatter:block/drum_filler/p0",
+   "y": 90
+  },
+  "facing=east,piece=1": {
+   "model": "wildcatter:block/drum_filler/p1",
+   "y": 90
+  },
+  "facing=east,piece=2": {
+   "model": "wildcatter:block/drum_filler/p2",
+   "y": 90
+  },
+  "facing=east,piece=3": {
+   "model": "wildcatter:block/drum_filler/p3",
+   "y": 90
+  },
+  "facing=east,piece=4": {
+   "model": "wildcatter:block/drum_filler/p4",
+   "y": 90
+  },
+  "facing=east,piece=5": {
+   "model": "wildcatter:block/drum_filler/p5",
+   "y": 90
+  },
+  "facing=east,piece=6": {
+   "model": "wildcatter:block/drum_filler/p6",
+   "y": 90
+  },
+  "facing=east,piece=7": {
+   "model": "wildcatter:block/drum_filler/p7",
+   "y": 90
+  },
+  "facing=east,piece=8": {
+   "model": "wildcatter:block/drum_filler/p8",
+   "y": 90
+  },
+  "facing=east,piece=9": {
+   "model": "wildcatter:block/drum_filler/p9",
+   "y": 90
+  },
+  "facing=east,piece=10": {
+   "model": "wildcatter:block/drum_filler/p10",
+   "y": 90
+  },
+  "facing=east,piece=11": {
+   "model": "wildcatter:block/drum_filler/p11",
+   "y": 90
+  },
+  "facing=east,piece=12": {
+   "model": "wildcatter:block/drum_filler/p12",
+   "y": 90
+  },
+  "facing=east,piece=13": {
+   "model": "wildcatter:block/drum_filler/p13",
+   "y": 90
+  },
+  "facing=east,piece=14": {
+   "model": "wildcatter:block/drum_filler/p14",
+   "y": 90
+  },
+  "facing=east,piece=15": {
+   "model": "wildcatter:block/drum_filler/p15",
+   "y": 90
+  },
+  "facing=south,piece=0": {
+   "model": "wildcatter:block/drum_filler/p0",
+   "y": 180
+  },
+  "facing=south,piece=1": {
+   "model": "wildcatter:block/drum_filler/p1",
+   "y": 180
+  },
+  "facing=south,piece=2": {
+   "model": "wildcatter:block/drum_filler/p2",
+   "y": 180
+  },
+  "facing=south,piece=3": {
+   "model": "wildcatter:block/drum_filler/p3",
+   "y": 180
+  },
+  "facing=south,piece=4": {
+   "model": "wildcatter:block/drum_filler/p4",
+   "y": 180
+  },
+  "facing=south,piece=5": {
+   "model": "wildcatter:block/drum_filler/p5",
+   "y": 180
+  },
+  "facing=south,piece=6": {
+   "model": "wildcatter:block/drum_filler/p6",
+   "y": 180
+  },
+  "facing=south,piece=7": {
+   "model": "wildcatter:block/drum_filler/p7",
+   "y": 180
+  },
+  "facing=south,piece=8": {
+   "model": "wildcatter:block/drum_filler/p8",
+   "y": 180
+  },
+  "facing=south,piece=9": {
+   "model": "wildcatter:block/drum_filler/p9",
+   "y": 180
+  },
+  "facing=south,piece=10": {
+   "model": "wildcatter:block/drum_filler/p10",
+   "y": 180
+  },
+  "facing=south,piece=11": {
+   "model": "wildcatter:block/drum_filler/p11",
+   "y": 180
+  },
+  "facing=south,piece=12": {
+   "model": "wildcatter:block/drum_filler/p12",
+   "y": 180
+  },
+  "facing=south,piece=13": {
+   "model": "wildcatter:block/drum_filler/p13",
+   "y": 180
+  },
+  "facing=south,piece=14": {
+   "model": "wildcatter:block/drum_filler/p14",
+   "y": 180
+  },
+  "facing=south,piece=15": {
+   "model": "wildcatter:block/drum_filler/p15",
+   "y": 180
+  },
+  "facing=west,piece=0": {
+   "model": "wildcatter:block/drum_filler/p0",
+   "y": 270
+  },
+  "facing=west,piece=1": {
+   "model": "wildcatter:block/drum_filler/p1",
+   "y": 270
+  },
+  "facing=west,piece=2": {
+   "model": "wildcatter:block/drum_filler/p2",
+   "y": 270
+  },
+  "facing=west,piece=3": {
+   "model": "wildcatter:block/drum_filler/p3",
+   "y": 270
+  },
+  "facing=west,piece=4": {
+   "model": "wildcatter:block/drum_filler/p4",
+   "y": 270
+  },
+  "facing=west,piece=5": {
+   "model": "wildcatter:block/drum_filler/p5",
+   "y": 270
+  },
+  "facing=west,piece=6": {
+   "model": "wildcatter:block/drum_filler/p6",
+   "y": 270
+  },
+  "facing=west,piece=7": {
+   "model": "wildcatter:block/drum_filler/p7",
+   "y": 270
+  },
+  "facing=west,piece=8": {
+   "model": "wildcatter:block/drum_filler/p8",
+   "y": 270
+  },
+  "facing=west,piece=9": {
+   "model": "wildcatter:block/drum_filler/p9",
+   "y": 270
+  },
+  "facing=west,piece=10": {
+   "model": "wildcatter:block/drum_filler/p10",
+   "y": 270
+  },
+  "facing=west,piece=11": {
+   "model": "wildcatter:block/drum_filler/p11",
+   "y": 270
+  },
+  "facing=west,piece=12": {
+   "model": "wildcatter:block/drum_filler/p12",
+   "y": 270
+  },
+  "facing=west,piece=13": {
+   "model": "wildcatter:block/drum_filler/p13",
+   "y": 270
+  },
+  "facing=west,piece=14": {
+   "model": "wildcatter:block/drum_filler/p14",
+   "y": 270
+  },
+  "facing=west,piece=15": {
+   "model": "wildcatter:block/drum_filler/p15",
+   "y": 270
+  }
+ }
+}
