@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "SBS",
+    "SIS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "B": "minecraft:blast_furnace",
+    "I": "minecraft:iron_bars"
+  },
+  "result": {
+    "id": "wildcatter:fluorinator",
+    "count": 1
+  }
+}

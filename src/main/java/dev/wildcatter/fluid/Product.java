@@ -59,7 +59,13 @@ public enum Product {
 	/** Lixiviant the IX columns have stripped, back to the injectors; it carries its oxygen. */
 	BARREN_LIXIVIANT("barren lixiviant", false),
 	/** IX eluate, acidified: salt brine with about 15 g/L of U3O8, for the precipitation tank. */
-	ELUATE("eluate", false);
+	ELUATE("eluate", false),
+	/** From a steam reformer (docs/multiblocks/conversion.md), for the reduction reactor. */
+	HYDROGEN("hydrogen", true),
+	/** Anhydrous hydrogen fluoride, from fluorspar: for the hydrofluorinator and the fluorine cells. */
+	ANHYDROUS_HF("anhydrous HF", false),
+	/** From the fluorine cells, for the fluorinator. Counted in kg. */
+	FLUORINE("fluorine", true);
 
 	private final String label;
 	private final boolean gas;
@@ -80,7 +86,7 @@ public enum Product {
 
 	public String unit() {
 		return switch (this) {
-			case HOT_CRACKED_GAS, CRACKED_GAS, COMPRESSED_CRACKED_GAS, BURNER_GAS, ORE_SLURRY, LEACH_SLURRY -> "kg";
+			case HOT_CRACKED_GAS, CRACKED_GAS, COMPRESSED_CRACKED_GAS, BURNER_GAS, ORE_SLURRY, LEACH_SLURRY, FLUORINE -> "kg";
 			default -> gas ? "m3" : "L";
 		};
 	}
@@ -88,7 +94,7 @@ public enum Product {
 	/** False for liquids no stock tank holds: molten sulfur freezes, and the mill's slurries and liquors carry their uranium. */
 	public boolean tanked() {
 		return switch (this) {
-			case MOLTEN_SULFUR, ORE_SLURRY, LEACH_SLURRY, PREGNANT_LIQUOR, STRIP_LIQUOR, PREGNANT_LIXIVIANT, BARREN_LIXIVIANT, ELUATE -> false;
+			case MOLTEN_SULFUR, ORE_SLURRY, LEACH_SLURRY, PREGNANT_LIQUOR, STRIP_LIQUOR, PREGNANT_LIXIVIANT, BARREN_LIXIVIANT, ELUATE, ANHYDROUS_HF -> false;
 			default -> !gas;
 		};
 	}

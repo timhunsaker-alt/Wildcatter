@@ -475,6 +475,32 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 7d: conversion to UF6 (spec: docs/multiblocks/conversion.md)
+- **The Metropolis dry process at quarter size:** 12 fluorine cells, 0.075 kg of U a second, a 48Y cylinder (12,501 kg of UF6)
+  about every 31 hours.
+- **Main line**, each part against the next:
+  - REDUCTION REACTOR: yellowcake drums in by hopper, empties out under it, 8.47 g of hydrogen a kg of U.
+  - HYDROFLUORINATOR: 0.51 kg of anhydrous HF a kg of U, the magnesia's share included.
+  - FLUORINATOR: 0.18 kg of fluorine a kg of U, the feed's impurities kept as ash.
+  - COLD TRAPS and DISTILLATION COLUMNS, at 480 V.
+  - CYLINDER FILLER: empty 48Y cylinders in by hopper, full ones out.
+- **Reagent plants:**
+  - STEAM REFORMER: 30 Nm3/h of hydrogen on gas or LPG at 0.45 m3 a m3, with pumped water.
+  - HF KILN and HF COLUMN: fluorspar by hopper, acid and fuel by pipe, anhydrous HF out. Per kg of HF: 2.165 kg of fluorspar,
+    2.6 kg of acid, 5 MJ of fuel; anhydrite counted.
+  - RECTIFIER (4.16 kV, 12-pulse, 0.95 power factor) against the FLUORINE CELL HOUSE: 12 KF·2HF cells at 9 V and 6 kA,
+    108 V DC, about 0.67 MW from the AC side.
+- **The rectifier and the AC grid:** it is an AC load on the grid (Tim's decision). The DC side is worked out in it and shown in
+  its readout. `circuit/DriveLoad` now takes a power factor and a frequency floor; the rectifier has no floor, so it does not shed
+  load.
+- **New pipe products:** hydrogen, anhydrous HF (no stock tank holds it), fluorine.
+- **New items:** Empty 48Y Cylinder and 48Y Cylinder of UF6, with Ludo icons (2 credits).
+- **Game test** `conversion`:
+  - three diesel sets, two of them paralleled through a backward unit substation to 4.16 kV for the rectifier;
+  - the rectifier drives 5.4 kA (603 kW at 59.5 Hz), the cells make 44 kg/h of fluorine, the line carries uranium through;
+  - a cylinder topped up by hook to 3 kg short is finished and drops into the hopper under the filler;
+  - the empty drum comes out under the reducer.
+
 ## Phase 7c: the ISR wellfield (spec: docs/multiblocks/isr-wellfield.md)
 - **Roll-front deposits** (`well/RollFront.java`): seed-placed crescent bands of uranium in desert and badlands sandstone.
   - Shape: arcs of radius 40-80 blocks, 15-30 blocks across and 3-6 thick.

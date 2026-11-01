@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BBB",
+    "PFP",
+    "SXS"
+  ],
+  "key": {
+    "B": "minecraft:bricks",
+    "P": "wildcatter:gas_line",
+    "F": "minecraft:blast_furnace",
+    "S": "wildcatter:steel_ingot",
+    "X": "wildcatter:crankshaft"
+  },
+  "result": {
+    "id": "wildcatter:hf_kiln",
+    "count": 1
+  }
+}

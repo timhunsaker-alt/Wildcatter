@@ -275,6 +275,37 @@ public final class Tuning {
 	public static final double IX_ELUATE_G_PER_L = 15.0;           // U3O8 in the eluate (GEIS: 8-20 g/L U)
 	public static final double IX_ELUATE_ACID_G_PER_L = 10.0;      // sulfuric acid to break the carbonate complex (proposed)
 
+	// ---- Conversion to UF6 (docs/multiblocks/conversion.md, approved 2026-11-01) ---------------------------------------------
+	public static final int F2_CELLS = 12;                         // KF.2HF cells in series: the quarter-size plant
+	public static final double F2_CELL_KA = 6.0;                   // kA through each
+	public static final double F2_CELL_VOLTS = 9.0;                // 8-10 V a cell
+	public static final double F2_CURRENT_EFFICIENCY = 0.95;
+	public static final double F2_KG_PER_KAH = 0.709;              // Faraday: 38 g of F2 for two moles of electrons
+	public static final double F2_HF_PER_F2 = 1.053;               // kg of HF a kg of F2
+	public static final double F2_COOLING_LPS = 0.19;              // make-up water: two thirds of 650 kW evaporated
+	public static final double RECTIFIER_EFFICIENCY = 0.97;        // (unverified)
+	public static final double RECTIFIER_POWER_FACTOR = 0.95;      // 12-pulse diode bridge (unverified)
+	public static final double CONV_F2_PER_U = 0.18;               // kg of F2 a kg of U (0.160 ideal)
+	public static final double CONV_H2_PER_U = 8.47e-3;            // kg of H2 a kg of U: U(VI) to U(IV)
+	public static final double H2_KG_PER_M3 = 0.0899;
+	public static final double CONV_HF_PER_U = 0.43 + 0.084;       // kg of HF a kg of U: 25-30 % excess, and the MgF2
+	public static final double UF6_PER_U = 1.479;                  // kg of UF6 a kg of U
+	public static final double CYLINDER_48Y_KG = 12_501.0;         // UF6 (ANSI N14.1)
+	public static final double CYLINDER_48Y_TARE = 2_359.0;
+	public static final double SMR_M3H = 30.0;                     // H2 the packaged reformer makes (proposed)
+	public static final double SMR_GAS_PER_H2 = 0.45;              // m3 of natural gas a m3 of H2, feed and fuel
+	public static final double SMR_WATER_PER_H2 = 0.015;           // litres of water a m3 of H2: steam:carbon 3
+	public static final double HF_KILN_KGS = 0.06;                 // anhydrous HF a second (proposed)
+	public static final double HF_FLUORSPAR_PER_HF = 2.165;        // kg of CaF2 a kg of HF (Buss ChemTech)
+	public static final double HF_ACID_PER_HF = 2.6;               // kg of H2SO4 a kg of HF
+	public static final double HF_FUEL_J_PER_KG = 5.0e6;
+	public static final double HF_ANHYDRITE_PER_HF = 3.6;          // kg of CaSO4 a kg of HF (unverified)
+	public static final double AHF_KG_PER_L = 0.99;
+	public static final double HF_KILN_WATTS = 15_000.0;           // its drive, 480 V
+	public static final double COLD_TRAP_WATTS = 30_000.0;         // refrigeration, 480 V (unverified)
+	public static final double REBOILER_WATTS = 20_000.0;          // electric, 480 V (unverified)
+	public static final double CYLINDER_FILLER_WATTS = 5_000.0;    // 480 V (unverified)
+
 	// ---- The gas turbine and combined cycle (docs/multiblocks/gas-turbine.md, combined-cycle.md, approved 2026-10-31) -------
 	public static final double GT_WATTS = 16_500_000.0;            // ISO rating, Solar Titan 130 class
 	public static final double GT_HEAT_RATE = 10_230.0;            // kJ/kWh: 35 %

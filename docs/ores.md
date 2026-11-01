@@ -102,7 +102,7 @@ The furnace (and the blast furnace, twice as fast) smelts only what really smelt
 
 Every other mineral waits for its plant:
 - 7b: sulfur, uranium ore, pitchblende, pyrolusite and rock salt (uranium-mill.md, acid-plant.md).
-- 7d: fluorspar.
+- 7d: fluorspar, roasted with sulfuric acid in the HF kiln (multiblocks/conversion.md).
 - 7f: heavy mineral sand and dolomite.
 - Phase 8: borax and silver.
 - The rest go to the plants listed under Ideas in ROADMAP.

@@ -375,6 +375,18 @@ public final class WildcatterBlocks {
 	public static final Block HEADER_HOUSE = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.HEADER_HOUSE);
 	public static final Block OXYGEN_GENERATOR = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.OXYGEN_GENERATOR);
 	public static final Block IX_COLUMNS = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.IX_COLUMNS);
+	// 7d: conversion to UF6 (docs/multiblocks/conversion.md)
+	public static final Block REDUCTION_REACTOR = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.REDUCTION_REACTOR);
+	public static final Block HYDROFLUORINATOR = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.HYDROFLUORINATOR);
+	public static final Block FLUORINATOR = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.FLUORINATOR);
+	public static final Block COLD_TRAPS = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.COLD_TRAPS);
+	public static final Block DISTILLATION_COLUMNS = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.DISTILLATION_COLUMNS);
+	public static final Block CYLINDER_FILLER = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.CYLINDER_FILLER);
+	public static final Block STEAM_REFORMER = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.STEAM_REFORMER);
+	public static final Block HF_KILN = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.HF_KILN);
+	public static final Block HF_COLUMN = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.HF_COLUMN);
+	public static final Block RECTIFIER = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.RECTIFIER);
+	public static final Block FLUORINE_CELL_HOUSE = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.FLUORINE_CELL_HOUSE);
 	public static final Block ISR_WELLHEAD = block("isr_wellhead", props -> new dev.wildcatter.block.IsrWellheadBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL)));
 	/** The gas turbine and combined cycle (docs/multiblocks/gas-turbine.md, combined-cycle.md). */
@@ -460,6 +472,15 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<dev.wildcatter.block.OxygenGeneratorBlockEntity> OXYGEN_GENERATOR_ENTITY = entity(dev.wildcatter.block.OxygenGeneratorBlockEntity::new, OXYGEN_GENERATOR);
 	public static final BlockEntityType<dev.wildcatter.block.IxColumnsBlockEntity> IX_COLUMNS_ENTITY = entity(dev.wildcatter.block.IxColumnsBlockEntity::new, IX_COLUMNS);
 	public static final BlockEntityType<dev.wildcatter.block.IsrWellheadBlockEntity> ISR_WELLHEAD_ENTITY = entity(dev.wildcatter.block.IsrWellheadBlockEntity::new, ISR_WELLHEAD);
+	public static final BlockEntityType<dev.wildcatter.block.ReductionReactorBlockEntity> REDUCTION_REACTOR_ENTITY = entity(dev.wildcatter.block.ReductionReactorBlockEntity::new, REDUCTION_REACTOR);
+	public static final BlockEntityType<dev.wildcatter.block.ConversionStageBlockEntity> CONVERSION_STAGE_ENTITY = entity((pos, state) -> new dev.wildcatter.block.ConversionStageBlockEntity(WildcatterBlocks.CONVERSION_STAGE_ENTITY, pos, state), HYDROFLUORINATOR, FLUORINATOR);
+	public static final BlockEntityType<dev.wildcatter.block.Uf6StageBlockEntity> UF6_STAGE_ENTITY = entity((pos, state) -> new dev.wildcatter.block.Uf6StageBlockEntity(WildcatterBlocks.UF6_STAGE_ENTITY, pos, state), COLD_TRAPS, DISTILLATION_COLUMNS);
+	public static final BlockEntityType<dev.wildcatter.block.CylinderFillerBlockEntity> CYLINDER_FILLER_ENTITY = entity(dev.wildcatter.block.CylinderFillerBlockEntity::new, CYLINDER_FILLER);
+	public static final BlockEntityType<dev.wildcatter.block.SteamReformerBlockEntity> STEAM_REFORMER_ENTITY = entity(dev.wildcatter.block.SteamReformerBlockEntity::new, STEAM_REFORMER);
+	public static final BlockEntityType<dev.wildcatter.block.HfKilnBlockEntity> HF_KILN_ENTITY = entity(dev.wildcatter.block.HfKilnBlockEntity::new, HF_KILN);
+	public static final BlockEntityType<dev.wildcatter.block.HfColumnBlockEntity> HF_COLUMN_ENTITY = entity(dev.wildcatter.block.HfColumnBlockEntity::new, HF_COLUMN);
+	public static final BlockEntityType<dev.wildcatter.block.RectifierBlockEntity> RECTIFIER_ENTITY = entity(dev.wildcatter.block.RectifierBlockEntity::new, RECTIFIER);
+	public static final BlockEntityType<dev.wildcatter.block.FluorineCellHouseBlockEntity> FLUORINE_CELL_HOUSE_ENTITY = entity(dev.wildcatter.block.FluorineCellHouseBlockEntity::new, FLUORINE_CELL_HOUSE);
 	public static final BlockEntityType<dev.wildcatter.block.DehydratorBlockEntity> DEHYDRATOR_ENTITY = entity(dev.wildcatter.block.DehydratorBlockEntity::new, TEG_DEHYDRATOR);
 	public static final BlockEntityType<dev.wildcatter.block.ChillerBlockEntity> CHILLER_ENTITY = entity(dev.wildcatter.block.ChillerBlockEntity::new, NGL_CHILLER);
 	public static final BlockEntityType<dev.wildcatter.block.StabilizerBlockEntity> STABILIZER_ENTITY = entity(dev.wildcatter.block.StabilizerBlockEntity::new, STABILIZER);
@@ -561,6 +582,11 @@ public final class WildcatterBlocks {
 
 	private static Block acidPart(dev.wildcatter.block.AcidPlantPartBlock.Part part) {
 		return block(part.id(), props -> new dev.wildcatter.block.AcidPlantPartBlock(props.mapColor(MapColor.COLOR_GRAY)
+				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
+	}
+
+	private static Block conversionPart(dev.wildcatter.block.ConversionPartBlock.Part part) {
+		return block(part.id(), props -> new dev.wildcatter.block.ConversionPartBlock(props.mapColor(MapColor.COLOR_GRAY)
 				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
 	}
 
@@ -761,6 +787,9 @@ public final class WildcatterBlocks {
 			add(((dev.wildcatter.block.WellfieldPartBlock) part).part().id(), part);
 		}
 		add("isr_wellhead", ISR_WELLHEAD);
+		for (Block part : new Block[] {REDUCTION_REACTOR, HYDROFLUORINATOR, FLUORINATOR, COLD_TRAPS, DISTILLATION_COLUMNS, CYLINDER_FILLER, STEAM_REFORMER, HF_KILN, HF_COLUMN, RECTIFIER, FLUORINE_CELL_HOUSE}) {
+			add(((dev.wildcatter.block.ConversionPartBlock) part).part().id(), part);
+		}
 		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("rotor"), ROTOR);   // no item: it is never placed
 		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("mcc_bucket"), MCC_BUCKET);   // its item is WildcatterItems.MCC_BUCKET
 		add("mcc_section", MCC_SECTION);
@@ -842,6 +871,15 @@ public final class WildcatterBlocks {
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("oxygen_generator"), OXYGEN_GENERATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("ix_columns"), IX_COLUMNS_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("isr_wellhead"), ISR_WELLHEAD_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("reduction_reactor"), REDUCTION_REACTOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("conversion_stage"), CONVERSION_STAGE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("uf6_stage"), UF6_STAGE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("cylinder_filler"), CYLINDER_FILLER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("steam_reformer"), STEAM_REFORMER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("hf_kiln"), HF_KILN_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("hf_column"), HF_COLUMN_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rectifier"), RECTIFIER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("fluorine_cell_house"), FLUORINE_CELL_HOUSE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("turbine_generator"), TURBINE_GENERATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("genset_control_panel"), GENSET_CONTROL_PANEL_ENTITY);
 	}

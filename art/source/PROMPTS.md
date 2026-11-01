@@ -91,3 +91,11 @@ no brand names".
 `submersible_pump`: `item-icon`, `Photorealistic 3D`, 2 variations, a kept: "A single 4 inch stainless steel electric submersible
 water well pump, long slim cylinder with the motor section below the pump stages and intake screen, a flat black power cable
 coming off the top, lying diagonally, game item icon, plain white background, no text".
+
+## Phase 7d (2026-11-01): the 48Y cylinders (art/source/ore/)
+`item-icon`, `Photorealistic 3D`, 2 variations, the side views (b) kept so the pair match:
+- `empty_48y_cylinder`: "A single empty 48Y uranium hexafluoride shipping cylinder: a long horizontal 48 inch steel pressure
+  cylinder with domed ends, painted grey-white, two stiffening rings, a small valve protector at one end, no markings, game item
+  icon, plain white background, no text".
+- `uf6_cylinder_48y`: the same, "full of UF6 ... a yellow and black radioactive trefoil label and a white UN 2978 placard with a
+  black 7".

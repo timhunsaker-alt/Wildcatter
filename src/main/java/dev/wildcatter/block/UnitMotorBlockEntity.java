@@ -75,6 +75,10 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "precipitation_tank" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PRECIP_AGITATOR_WATTS);
 				case "drum_filler" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.DRUM_FILLER_WATTS);
 				case "oxygen_generator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.O2_GENERATOR_WATTS);
+				case "cold_traps" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.COLD_TRAP_WATTS);
+				case "distillation_columns" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.REBOILER_WATTS);
+				case "cylinder_filler" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CYLINDER_FILLER_WATTS);
+				case "hf_kiln" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.HF_KILN_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -115,6 +119,10 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "precipitation_tank" -> "precipitation agitator";
 			case "drum_filler" -> "drum filler";
 			case "oxygen_generator" -> "oxygen generator's air compressor";
+			case "cold_traps" -> "refrigeration";
+			case "distillation_columns" -> "reboiler";
+			case "cylinder_filler" -> "filler";
+			case "hf_kiln" -> "kiln drive";
 			default -> kind();
 		};
 	}

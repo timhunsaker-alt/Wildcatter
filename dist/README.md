@@ -42,6 +42,8 @@ Put the jar in your instance's `mods` folder next to:
   precipitation with magnesia, into 400 kg drums of yellowcake. Hoppers feed the ore and reagents.
 - In-situ recovery: roll-front uranium under deserts, found by the gamma log of a drilled hole, won by 5-spot well patterns,
   a header house with an oxygen generator, and ion-exchange columns whose eluate feeds the mill's precipitation tank.
+- Conversion to UF6: reduction, hydrofluorination and fluorination in fluid beds, cold traps and distillation, into 48Y
+  cylinders; hydrogen from a steam reformer, HF from fluorspar, fluorine from 12 cells on a 4.16 kV rectifier.
 - The Field Manual item explains how to build each machine.
 
 ## Older worlds

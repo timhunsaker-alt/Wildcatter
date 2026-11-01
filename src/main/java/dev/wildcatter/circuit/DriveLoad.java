@@ -20,6 +20,8 @@ public final class DriveLoad {
 	private static final double RAMP_PER_SECOND = 0.1;
 
 	private final Voltage voltage;
+	private final double powerFactor;
+	private final double frequencyFloor;
 	private double demand;
 	/** The share of the demand the power management lets the drives take. */
 	private double limit;
@@ -35,7 +37,17 @@ public final class DriveLoad {
 	private double hertz;
 
 	public DriveLoad(Voltage voltage) {
+		this(voltage, Tuning.LAND_RIG_POWER_FACTOR, Tuning.LAND_RIG_FREQUENCY_FLOOR);
+	}
+
+	/**
+	 * A front end of another power factor and frequency floor (0: it never sheds): a fluorine cell rectifier's
+	 * (docs/multiblocks/conversion.md), which has no power management to hold the island's frequency.
+	 */
+	public DriveLoad(Voltage voltage, double powerFactor, double frequencyFloor) {
 		this.voltage = voltage;
+		this.powerFactor = powerFactor;
+		this.frequencyFloor = frequencyFloor;
 	}
 
 	public Voltage voltage() {
@@ -64,9 +76,9 @@ public final class DriveLoad {
 		double take = demand * limit;
 		if (take > 1 && !undervoltage) {
 			// each phase of the star draws a third of it at the line-to-neutral voltage
-			double z = voltage.lineToLine() * voltage.lineToLine() / (take / Tuning.LAND_RIG_POWER_FACTOR);
-			double r = z * Tuning.LAND_RIG_POWER_FACTOR;
-			double x = z * Math.sqrt(1 - Tuning.LAND_RIG_POWER_FACTOR * Tuning.LAND_RIG_POWER_FACTOR);
+			double z = voltage.lineToLine() * voltage.lineToLine() / (take / powerFactor);
+			double r = z * powerFactor;
+			double x = z * Math.sqrt(1 - powerFactor * powerFactor);
 			star = circuit.node();
 			for (int k = 0; k < 3; k++) {
 				branch[k] = circuit.impedance(hot[k], star, r, x);
@@ -102,7 +114,7 @@ public final class DriveLoad {
 			return;
 		}
 		undervoltage = false;
-		double floor = ElectricalStandard.active().hertz() * Tuning.LAND_RIG_FREQUENCY_FLOOR;
+		double floor = ElectricalStandard.active().hertz() * frequencyFloor;
 		if (hertz < floor) {
 			limit = Math.max(0, limit * 0.85 - 0.02);   // shed at once
 		} else if (hertz >= floor + ElectricalStandard.active().hertz() * 0.003) {

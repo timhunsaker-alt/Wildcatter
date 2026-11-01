@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "GXG",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_block",
+    "G": "minecraft:coal_block",
+    "X": "minecraft:cauldron",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:fluorine_cell_house",
+    "count": 1
+  }
+}

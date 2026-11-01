@@ -306,5 +306,18 @@
   "block.wildcatter.isr_wellhead": "ISR Well",
   "block.wildcatter.header_house": "Header House (25 producers, 480 V)",
   "block.wildcatter.oxygen_generator": "Oxygen Generator (PSA, 50 Nm3/h)",
-  "block.wildcatter.ix_columns": "IX Columns (lead and lag)"
+  "block.wildcatter.ix_columns": "IX Columns (lead and lag)",
+  "item.wildcatter.empty_48y_cylinder": "Empty 48Y Cylinder",
+  "item.wildcatter.uf6_cylinder_48y": "48Y Cylinder of UF6 (natural)",
+  "block.wildcatter.reduction_reactor": "Reduction Reactor (fluid bed)",
+  "block.wildcatter.hydrofluorinator": "Hydrofluorinator (two fluid beds)",
+  "block.wildcatter.fluorinator": "Fluorinator (fluid bed)",
+  "block.wildcatter.cold_traps": "Cold Traps (30 kW, 480 V)",
+  "block.wildcatter.distillation_columns": "UF6 Distillation Columns",
+  "block.wildcatter.cylinder_filler": "48Y Cylinder Filler",
+  "block.wildcatter.steam_reformer": "Steam Reformer (30 Nm3/h hydrogen)",
+  "block.wildcatter.hf_kiln": "HF Kiln (rotary)",
+  "block.wildcatter.hf_column": "HF Column",
+  "block.wildcatter.rectifier": "Rectifier (12-pulse, 4.16 kV)",
+  "block.wildcatter.fluorine_cell_house": "Fluorine Cell House (12 cells)"
 }

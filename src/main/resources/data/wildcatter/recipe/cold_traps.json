@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "IXI",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "I": "minecraft:packed_ice",
+    "X": "minecraft:piston"
+  },
+  "result": {
+    "id": "wildcatter:cold_traps",
+    "count": 1
+  }
+}

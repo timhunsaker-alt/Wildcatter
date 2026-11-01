@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SHS",
+    "SBS",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "B": "minecraft:blast_furnace",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:reduction_reactor",
+    "count": 1
+  }
+}

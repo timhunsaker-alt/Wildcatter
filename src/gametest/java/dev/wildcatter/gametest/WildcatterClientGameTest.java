@@ -178,6 +178,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("isrWellfield")) {
 				isrWellfield(context, server);
 			}
+			if (only("conversion")) {
+				conversion(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -4373,6 +4376,164 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		} finally {
 			ReservoirData.testSeed = null;
 		}
+	}
+
+
+	/**
+	 * Conversion to UF6 (7d, docs/multiblocks/conversion.md). The main line runs south in a column, every part facing north and
+	 * touching the next: reduction reactor, hydrofluorinator, fluorinator, cold traps, distillation columns, cylinder filler; their
+	 * reagents on the east faces, their 480 V boxes on the west. North: the steam reformer. East: the HF kiln and its column, an LPG
+	 * bullet and an acid tank. Beside the line: the fluorine cell house with its rectifier against its east side, on 4.16 kV from two
+	 * paralleled diesel sets and a backward unit substation. Hydrogen, HF and fluorine must flow; the rectifier must drive about
+	 * 6 kA; the line must carry uranium to the filler; a cylinder the hook has filled to just under full must be finished and drop
+	 * into the hopper under the filler; empty drums must come out under the reducer.
+	 */
+	private void conversion(ClientGameTestContext context, TestServerContext server) {
+		int z = -1900;
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 12 " + (up + 24) + " " + (z + 40) + " 180 40");
+		context.waitTicks(20);
+		server.runCommand("fill -4 " + (y - 1) + " " + (z - 11) + " 42 " + (y + 12) + " " + (z + 27) + " minecraft:air");
+		server.runCommand("fill -4 " + (y - 1) + " " + (z - 11) + " 42 " + (y - 1) + " " + (z + 27) + " minecraft:stone");
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		// the main line, south down x 0-2
+		BlockPos reducer = new BlockPos(0, up, z);
+		placeBig(server, WildcatterBlocks.REDUCTION_REACTOR, reducer, north);                  // z..z+2
+		placeBig(server, WildcatterBlocks.HYDROFLUORINATOR, new BlockPos(0, up, z + 3), north);  // z+3..z+8
+		placeBig(server, WildcatterBlocks.FLUORINATOR, new BlockPos(0, up, z + 9), north);       // z+9..z+11
+		placeBig(server, WildcatterBlocks.COLD_TRAPS, new BlockPos(0, up, z + 12), north);       // z+12..z+17
+		placeBig(server, WildcatterBlocks.DISTILLATION_COLUMNS, new BlockPos(0, up, z + 18), north);   // z+18..z+20
+		BlockPos filler = new BlockPos(0, up, z + 21);
+		placeBig(server, WildcatterBlocks.CYLINDER_FILLER, filler, north);                       // z+21..z+26
+		// the supply plants
+		BlockPos reformer = new BlockPos(8, up, z - 6);
+		placeBig(server, WildcatterBlocks.STEAM_REFORMER, reformer, north);                       // x 8-10, z-6..z-3
+		placeBig(server, WildcatterBlocks.HF_KILN, new BlockPos(14, up, z), north);              // x 14-16, z..z+9
+		placeBig(server, WildcatterBlocks.HF_COLUMN, new BlockPos(12, up, z + 2), north);         // x 12-13, z+2..z+3
+		BlockPos bullet = new BlockPos(18, up, z - 6);
+		placeBig(server, WildcatterBlocks.LPG_BULLET, bullet, north);                             // x 18-20, z-6..z+5
+		BlockPos acidTank = new BlockPos(18, up, z + 7);
+		placeBig(server, WildcatterBlocks.STOCK_TANK, acidTank, north);                           // x 18-21, z+7..z+10
+		BlockPos cells = new BlockPos(5, up, z + 12);
+		placeBig(server, WildcatterBlocks.FLUORINE_CELL_HOUSE, cells, north);                     // x 5-10, z+12..z+23
+		BlockPos rectifier = new BlockPos(13, up, z + 17);
+		placeBig(server, WildcatterBlocks.RECTIFIER, rectifier, net.minecraft.core.Direction.SOUTH);   // x 11-13, z+14..z+17, its box east
+		// hydrogen: the reformer's back, down and west to the reducer's east side
+		pipes(server, z, new int[][] {{9, 0, -2}, {9, 0, -1}, {9, 0, 0}, {9, 0, 1}, {8, 0, 1}, {7, 0, 1}, {6, 0, 1}, {5, 0, 1}, {4, 0, 1}, {3, 0, 1}});
+		// anhydrous HF: the column's south side west to the hydrofluorinator, a branch south to the cell house's front
+		pipes(server, z, new int[][] {{12, 0, 4}, {12, 0, 5}});
+		for (int x = 3; x <= 11; x++) {
+			put(server, x, up, z + 5, "wildcatter:gas_line");
+		}
+		for (int zz = z + 6; zz <= z + 11; zz++) {
+			put(server, 6, up, zz, "wildcatter:gas_line");
+		}
+		// fluorine: the cell house's back, west and up x 4 to the fluorinator's east side
+		pipes(server, z, new int[][] {{7, 0, 24}, {6, 0, 24}, {5, 0, 24}, {4, 0, 24}});
+		for (int zz = z + 10; zz <= z + 23; zz++) {
+			put(server, 4, up, zz, "wildcatter:gas_line");
+		}
+		put(server, 3, up, z + 10, "wildcatter:gas_line");
+		// LPG to the kiln and the reformer; acid to the kiln
+		put(server, 17, up, z + 1, "wildcatter:gas_line");
+		for (int x = 11; x <= 17; x++) {
+			put(server, x, up, z - 5, "wildcatter:gas_line");
+		}
+		put(server, 17, up, z + 8, "wildcatter:gas_line");
+		// hoppers: drums on the reducer and the empties under it, fluorspar on the kiln, cylinders on the filler and under it
+		put(server, 1, up + 10, z + 1, "minecraft:hopper");
+		server.runCommand("item replace block 1 " + (up + 10) + " " + (z + 1) + " container.0 with wildcatter:yellowcake_drum 1");
+		server.runCommand("item replace block 1 " + (up + 10) + " " + (z + 1) + " container.1 with wildcatter:yellowcake_drum 1");
+		BlockPos drumsOut = new BlockPos(1, y, z + 1);
+		put(server, 1, y, z + 1, "minecraft:hopper");
+		put(server, 15, up + 4, z + 4, "minecraft:hopper");
+		server.runCommand("item replace block 15 " + (up + 4) + " " + (z + 4) + " container.0 with wildcatter:fluorite 2");
+		put(server, 1, up + 3, z + 23, "minecraft:hopper");
+		server.runCommand("item replace block 1 " + (up + 3) + " " + (z + 23) + " container.0 with wildcatter:empty_48y_cylinder 2");
+		BlockPos cylindersOut = new BlockPos(1, y, z + 23);
+		put(server, 1, y, z + 23, "minecraft:hopper");
+		fillTank(server, bullet, dev.wildcatter.fluid.Product.LPG, 20_000);
+		fillTank(server, acidTank, dev.wildcatter.fluid.Product.SULFURIC_ACID, 20_000);
+		water(server, reformer);
+		// 480 V: a set north, its line along z-10, west to x -2 and down the line's boxes; a branch to the kiln's box over the LPG pipe
+		BlockPos lvSet = new BlockPos(26, up, z - 9);
+		genset(server, lvSet, north, false);                                                    // x 21-26, z-9..z-8
+		java.util.List<int[]> cable = new java.util.ArrayList<>();
+		cable.add(new int[] {27, 0, -9});
+		for (int x = -2; x <= 27; x++) {
+			cable.add(new int[] {x, 0, -10});
+		}
+		for (int zz = -9; zz <= 21; zz++) {
+			cable.add(new int[] {-2, 0, zz});
+		}
+		for (int zz : new int[] {12, 18, 21}) {
+			cable.add(new int[] {-1, 0, zz});
+		}
+		for (int[] c : new int[][] {{14, 0, -9}, {14, 0, -8}, {14, 0, -7}, {14, 0, -6}, {14, 1, -6}, {14, 1, -5}, {14, 1, -4}, {14, 0, -4}, {14, 0, -3}, {14, 0, -2},
+				{14, 0, -1}, {13, 0, -1}, {13, 0, 0}}) {
+			cable.add(c);
+		}
+		for (int[] c : cable) {
+			put(server, c[0], up + c[1], z + c[2], "wildcatter:cable_industrial");
+		}
+		// 4.16 kV: two sets on a busway, a backward unit substation, the line north and west to the rectifier's box
+		BlockPos[] mvSets = {new BlockPos(26, up, z + 20), new BlockPos(34, up, z + 20)};
+		for (BlockPos set : mvSets) {
+			genset(server, set, north, false);                                                   // x 21-26 and 29-34, z+20..z+21
+			put(server, set.getX() + 1, up, z + 20, "wildcatter:busway_industrial");
+		}
+		for (int x = 27; x <= 36; x++) {
+			put(server, x, up, z + 19, "wildcatter:busway_industrial");
+		}
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, new BlockPos(36, up, z + 19), net.minecraft.core.Direction.EAST, false);   // x 37-40, z+18..z+19
+		for (int zz = z + 16; zz <= z + 19; zz++) {
+			put(server, 41, up, zz, "wildcatter:cable_mv");
+		}
+		for (int x = 14; x <= 40; x++) {
+			put(server, x, up, z + 16, "wildcatter:cable_mv");
+		}
+		put(server, 14, up, z + 17, "wildcatter:cable_mv");
+		startGenset(context, server, lvSet, north, 2000);
+		for (BlockPos set : mvSets) {
+			startGenset(context, server, set, north, 2000);
+		}
+		// both sets on the bus before the 0.67 MW of cells: their cooling water now, and they start
+		water(server, reformer, cells);
+		for (int i = 0; i < 12; i++) {
+			context.waitTicks(50);
+			water(server, reformer, cells);
+		}
+		String chain = " | reformer " + read(server, 8, up, z - 6) + " | kiln " + read(server, 14, up, z) + " | column " + read(server, 12, up, z + 2)
+				+ " | cells " + read(server, 5, up, z + 12) + " | rectifier " + read(server, 13, up, z + 17) + " | reducer " + read(server, 0, up, z)
+				+ " | hydrofluorinator " + read(server, 0, up, z + 3) + " | fluorinator " + read(server, 0, up, z + 9) + " | traps " + read(server, 0, up, z + 12)
+				+ " | columns " + read(server, 0, up, z + 18) + " | filler " + read(server, 0, up, z + 21) + " | lv " + read(server, 26, up, z - 9)
+				+ " | mv " + read(server, 26, up, z + 20);
+		check(read(server, 8, up, z - 6).contains("reforming"), "the reformer should make hydrogen: " + chain);
+		check(read(server, 12, up, z + 2).contains("condensing"), "the HF column should make anhydrous HF: " + chain);
+		check(read(server, 5, up, z + 12).contains("kg/h of fluorine"), "the cell house should make fluorine: " + chain);
+		double amps = server.computeOnServer(srv -> ((dev.wildcatter.block.RectifierBlockEntity) srv.overworld().getBlockEntity(rectifier)).dcAmps());
+		check(amps > 5_000, "the rectifier should drive about 6 kA: " + amps + chain);
+		check(read(server, 0, up, z).contains("reducing") && read(server, 0, up, z + 3).contains("hydrofluorinating")
+				&& read(server, 0, up, z + 9).contains("fluorinating"), "the line should reduce, hydrofluorinate and fluorinate: " + chain);
+		int empties = countIn(server, drumsOut, WildcatterItems.EMPTY_DRUM);
+		check(empties > 0, "the empty drum should come out under the reducer: " + empties + chain);
+		server.computeOnServer(srv -> {   // a cylinder all but full: the plant's own UF6 finishes it
+			((dev.wildcatter.block.CylinderFillerBlockEntity) srv.overworld().getBlockEntity(filler)).addUf6(Tuning.CYLINDER_48Y_KG - 3);
+			return null;
+		});
+		int full = 0;
+		for (int i = 0; i < 40 && full == 0; i++) {
+			context.waitTicks(50);
+			water(server, reformer, cells);
+			full = countIn(server, cylindersOut, WildcatterItems.UF6_CYLINDER_48Y);
+		}
+		check(full > 0, "a full 48Y cylinder should drop into the hopper under the filler: " + read(server, 0, up, z + 21) + " | columns " + read(server, 0, up, z + 18)
+				+ " | traps " + read(server, 0, up, z + 12) + " | fluorinator " + read(server, 0, up, z + 9));
+		server.runCommand("tp @p 18 " + (up + 18) + " " + (z + 38) + " 165 30");
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-conversion");
+		System.out.println("[wildcatter-test] conversion ok: " + read(server, 13, up, z + 17) + " | " + read(server, 5, up, z + 12) + " | " + read(server, 0, up, z)
+				+ " | full cylinders " + full);
 	}
 
 	/**

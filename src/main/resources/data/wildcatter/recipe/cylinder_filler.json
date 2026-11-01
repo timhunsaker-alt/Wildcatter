@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SHS",
+    "SXS",
+    "BBB"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "X": "minecraft:piston",
+    "B": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:cylinder_filler",
+    "count": 1
+  }
+}

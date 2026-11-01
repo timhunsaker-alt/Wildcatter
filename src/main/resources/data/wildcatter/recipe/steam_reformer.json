@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SBS",
+    "PFP",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "B": "minecraft:bricks",
+    "P": "wildcatter:gas_line",
+    "F": "minecraft:blast_furnace"
+  },
+  "result": {
+    "id": "wildcatter:steam_reformer",
+    "count": 1
+  }
+}

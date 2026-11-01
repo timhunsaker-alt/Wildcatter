@@ -30,6 +30,7 @@ not a go-ahead to build: that waits for the roadmap phase (ROADMAP.md). Nothing 
 | [acid-plant.md](acid-plant.md) | 7b | new: sulfur melter, drying tower, main blower, sulfur furnace, waste heat boiler, converter, interpass and final absorbers |
 | [uranium-mill.md](uranium-mill.md) | 7b | new: jaw crusher, SAG mill, leach tank, CCD thickener, SX circuit, precipitation tank, yellowcake dryer, drum filler |
 | [isr-wellfield.md](isr-wellfield.md) | 7c | new: ISR wells, header house, oxygen generator, IX columns |
+| [conversion.md](conversion.md) | 7d | new: reduction reactor, hydrofluorinator, fluorinator, cold traps, distillation columns, cylinder filler, steam reformer, HF kiln and column, rectifier, fluorine cell house |
 | [aeroderivative.md](aeroderivative.md) | 6b | new: 45 MW aeroderivative peaker, 3,000 A generator breaker, 60 MVA GSU and 60 MVA substation transformer |
 
 ## Shared rules

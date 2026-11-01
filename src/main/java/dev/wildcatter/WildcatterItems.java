@@ -49,6 +49,15 @@ public final class WildcatterItems {
 	public static final Item SUBMERSIBLE_PUMP = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(SUBMERSIBLE_PUMP_KEY),
 			"4 in submersible, 7.5 hp, 480 V", String.format("%.1f L/s; click it into an ISR well to make a producer", Tuning.ISR_PRODUCER_LPS));
 
+	/** 7d: a 48Y cylinder, empty and full of natural UF6 (docs/multiblocks/conversion.md). */
+	public static final ResourceKey<Item> EMPTY_48Y_CYLINDER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("empty_48y_cylinder"));
+	public static final Item EMPTY_48Y_CYLINDER = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(4).setId(EMPTY_48Y_CYLINDER_KEY),
+			String.format("48 in steel UF6 cylinder (ANSI N14.1), %,.0f kg tare", Tuning.CYLINDER_48Y_TARE));
+	public static final ResourceKey<Item> UF6_CYLINDER_48Y_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("uf6_cylinder_48y"));
+	public static final Item UF6_CYLINDER_48Y = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(1).setId(UF6_CYLINDER_48Y_KEY),
+			String.format("%,.0f kg of natural UF6, %,.0f kg of uranium", Tuning.CYLINDER_48Y_KG, Tuning.CYLINDER_48Y_KG / Tuning.UF6_PER_U),
+			"0.711 % U-235, as mined");
+
 	/** A bucket of crude oil. It burns in a firebox (as long as lava) and leaves the bucket behind. */
 	public static final ResourceKey<Item> CRUDE_OIL_BUCKET_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("crude_oil_bucket"));
 	public static final Item CRUDE_OIL_BUCKET = new Item(new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET).setId(CRUDE_OIL_BUCKET_KEY));
@@ -110,6 +119,8 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, EMPTY_DRUM_KEY, EMPTY_DRUM);
 		Registry.register(BuiltInRegistries.ITEM, YELLOWCAKE_DRUM_KEY, YELLOWCAKE_DRUM);
 		Registry.register(BuiltInRegistries.ITEM, SUBMERSIBLE_PUMP_KEY, SUBMERSIBLE_PUMP);
+		Registry.register(BuiltInRegistries.ITEM, EMPTY_48Y_CYLINDER_KEY, EMPTY_48Y_CYLINDER);
+		Registry.register(BuiltInRegistries.ITEM, UF6_CYLINDER_48Y_KEY, UF6_CYLINDER_48Y);
 		Registry.register(BuiltInRegistries.ITEM, CRUDE_OIL_BUCKET_KEY, CRUDE_OIL_BUCKET);
 		Registry.register(BuiltInRegistries.ITEM, PLASTIC_SHEET_KEY, PLASTIC_SHEET);
 		Registry.register(BuiltInRegistries.ITEM, STEEL_INGOT_KEY, STEEL_INGOT);

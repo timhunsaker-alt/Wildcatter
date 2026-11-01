@@ -1756,6 +1756,48 @@ lang.update({f"item.{ns}.submersible_pump": "Submersible Pump (7.5 hp, 480 V)", 
 	f"block.{ns}.ix_columns": "IX Columns (lead and lag)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 7d: conversion to UF6 (docs/multiblocks/conversion.md) --------------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/conversion.py; here loot, names, tags, recipes and the cylinders.
+CONVERSION_PARTS = ("reduction_reactor", "hydrofluorinator", "fluorinator", "cold_traps", "distillation_columns", "cylinder_filler",
+	"steam_reformer", "hf_kiln", "hf_column", "rectifier", "fluorine_cell_house")
+for name in CONVERSION_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in CONVERSION_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("reduction_reactor", ["SHS", "SBS", "SPS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:blast_furnace", "P": P_}, "reduction_reactor")
+shaped("hydrofluorinator", ["SPS", "BSB", "SPS"], {"S": S_, "P": P_, "B": "minecraft:blast_furnace"}, "hydrofluorinator")
+shaped("fluorinator", ["SPS", "SBS", "SIS"], {"S": S_, "P": P_, "B": "minecraft:blast_furnace", "I": "minecraft:iron_bars"}, "fluorinator")
+shaped("cold_traps", ["SPS", "IXI", "SSS"], {"S": S_, "P": P_, "I": "minecraft:packed_ice", "X": "minecraft:piston"}, "cold_traps")
+shaped("distillation_columns", ["SPS", "S S", "SFS"], {"S": S_, "P": P_, "F": "minecraft:furnace"}, "distillation_columns")
+shaped("cylinder_filler", ["SHS", "SXS", "BBB"], {"S": S_, "H": "minecraft:hopper", "X": "minecraft:piston", "B": "minecraft:iron_block"}, "cylinder_filler")
+shaped("steam_reformer", ["SBS", "PFP", "SSS"], {"S": S_, "B": "minecraft:bricks", "P": P_, "F": "minecraft:blast_furnace"}, "steam_reformer")
+shaped("hf_kiln", ["BBB", "PFP", "SXS"], {"B": "minecraft:bricks", "P": P_, "F": "minecraft:blast_furnace", "S": S_, "X": f"{ns}:crankshaft"}, "hf_kiln")
+shaped("hf_column", ["SPS", "S S", "SPS"], {"S": "minecraft:iron_ingot", "P": P_}, "hf_column")
+shaped("rectifier", ["CRC", "CSC", "CRC"], {"C": "minecraft:copper_block", "R": "minecraft:redstone_block", "S": S_}, "rectifier")
+shaped("fluorine_cell_house", ["SCS", "GXG", "SPS"], {"S": S_, "C": "minecraft:copper_block", "G": "minecraft:coal_block", "X": "minecraft:cauldron", "P": P_}, "fluorine_cell_house")
+shaped("empty_48y_cylinder", ["SSS", "S S", "SSS"], {"S": S_}, "empty_48y_cylinder")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in {"empty_48y_cylinder": ("Empty 48Y Cylinder", (200, 200, 195)), "uf6_cylinder_48y": ("48Y Cylinder of UF6 (natural)", (210, 200, 120))}.items():
+	if os.path.exists(f"{ORE_ART}/{item}.png"):
+		shutil.copy(f"{ORE_ART}/{item}.png", f"{ASSETS}/textures/item/ore/{item}.png")
+		item_tex = f"{ns}:item/ore/{item}"
+	else:
+		tex(f"{item}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+		item_tex = f"{ns}:item/{item}_placeholder"
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": item_tex}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.reduction_reactor": "Reduction Reactor (fluid bed)", f"block.{ns}.hydrofluorinator": "Hydrofluorinator (two fluid beds)",
+	f"block.{ns}.fluorinator": "Fluorinator (fluid bed)", f"block.{ns}.cold_traps": "Cold Traps (30 kW, 480 V)",
+	f"block.{ns}.distillation_columns": "UF6 Distillation Columns", f"block.{ns}.cylinder_filler": "48Y Cylinder Filler",
+	f"block.{ns}.steam_reformer": "Steam Reformer (30 Nm3/h hydrogen)", f"block.{ns}.hf_kiln": "HF Kiln (rotary)",
+	f"block.{ns}.hf_column": "HF Column", f"block.{ns}.rectifier": "Rectifier (12-pulse, 4.16 kV)",
+	f"block.{ns}.fluorine_cell_house": "Fluorine Cell House (12 cells)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)
