@@ -110,3 +110,11 @@ coming off the top, lying diagonally, game item icon, plain white background, no
 - `tails_cylinder_48y` (a kept): "A single weathered 48Y depleted uranium hexafluoride storage cylinder seen from the side ... dull
   dark grey paint with some rust streaks, two stiffening rings, a small valve protector at one end, a white UN 2978 placard with a
   black 7".
+
+## Phase 7f (2026-11-01): the zirconium tubes (art/source/ore/)
+`item-icon`, `Photorealistic 3D`, 2 variations each, a kept:
+- `zircaloy_tube`: "A small bundle of three long thin seamless metal tubes, dull silver-grey zirconium alloy nuclear fuel
+  cladding, open ends showing thin walls, lying diagonally, game item icon, plain white background, no text".
+- `guide_thimble`: "A single long thin metal guide tube for a nuclear fuel assembly, dull silver-grey zirconium alloy, slightly
+  wider than a pencil, with a narrower dashpot section near the lower end and a threaded end plug, lying diagonally, game item
+  icon, plain white background, no text".

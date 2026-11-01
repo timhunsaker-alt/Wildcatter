@@ -67,7 +67,9 @@ public enum Product {
 	/** From the fluorine cells, for the fluorinator. Counted in kg. */
 	FLUORINE("fluorine", true),
 	/** UF6 gas on a cascade header (docs/multiblocks/enrichment.md), from a feed station. Counted in kg; real UF6 is a solid in its cylinders. */
-	UF6("UF6", true);
+	UF6("UF6", true),
+	/** From a chlor-alkali or magnesium cell (docs/multiblocks/zirconium.md), for the chlorinators. Counted in kg. */
+	CHLORINE("chlorine", true);
 
 	private final String label;
 	private final boolean gas;
@@ -88,7 +90,7 @@ public enum Product {
 
 	public String unit() {
 		return switch (this) {
-			case HOT_CRACKED_GAS, CRACKED_GAS, COMPRESSED_CRACKED_GAS, BURNER_GAS, ORE_SLURRY, LEACH_SLURRY, FLUORINE, UF6 -> "kg";
+			case HOT_CRACKED_GAS, CRACKED_GAS, COMPRESSED_CRACKED_GAS, BURNER_GAS, ORE_SLURRY, LEACH_SLURRY, FLUORINE, UF6, CHLORINE -> "kg";
 			default -> gas ? "m3" : "L";
 		};
 	}

@@ -328,6 +328,56 @@ public final class Tuning {
 	public static final double PRODUCT_TAKEOFF_WATTS = 15_000.0;   // refrigeration, 480 V (unverified)
 	public static final double TAILS_TAKEOFF_WATTS = 30_000.0;     // refrigeration, 480 V (unverified)
 
+	// ---- The zirconium plant (docs/multiblocks/zirconium.md, approved 2026-11-01) ---------------------------------------------
+	public static final double ZR_LINE_KGS = 10.0 / 3600;          // Zircaloy-4 a second: a small line (proposed)
+	public static final double ZR_STAGE_HOLD_KG = 50.0;            // metal a stage holds for the next
+	public static final double ZIRCON_RECOVERY = 0.90;             // of the zircon, through the separator (proposed)
+	public static final double HM_ZIRCON = 0.25;                   // of the heavy minerals (docs/ores.md)
+	public static final double HM_ILMENITE = 0.55;
+	public static final double HM_RUTILE = 0.05;
+	public static final double HM_MONAZITE = 0.03;
+	public static final double ZR_IN_ZIRCON = 91.22 / 183.31;      // ZrSiO4
+	public static final double ZR_HF_FRACTION = 0.02;              // of the metal in zircon (1-3 %, unverified)
+	public static final double ZR_CARBON_EXCESS = 1.10;
+	public static final double KROLL_MG_EXCESS = 1.25;             // Mg charged over the 2 Mg a Zr (proposed)
+	public static final double ZIRCALOY_SN = 0.015;                // Zircaloy-4: 1.2-1.7 % Sn
+	public static final double ZIRCALOY_FE = 0.0021;               // 0.18-0.24 % Fe
+	public static final double ZIRCALOY_CR = 0.0010;               // 0.07-0.13 % Cr
+	public static final double IRON_INGOT_KG = 100.0;              // an iron ingot, for the VAR furnace (proposed)
+	public static final double COAL_KG = 150.0;                    // a piece of coal: a ninth of a 1,350 kg coal block (proposed)
+	public static final double COAL_CARBON = 0.80;
+	public static final double ZIRCALOY_DENSITY = 6.56;            // g/cm3
+	public static final double CLAD_OD_MM = 9.50;                  // 17x17 fuel rod cladding
+	public static final double CLAD_WALL_MM = 0.57;
+	public static final double CLAD_LENGTH_M = 3.85;
+	public static final double THIMBLE_OD_MM = 12.24;              // 17x17 guide thimble
+	public static final double THIMBLE_WALL_MM = 0.41;
+	public static final double THIMBLE_LENGTH_M = 4.0;
+	public static final double MG_CELL_KA = 14.0;                  // a monopolar MgCl2 cell (unverified)
+	public static final double MG_CELL_VOLTS = 5.0;
+	public static final double MG_CURRENT_EFFICIENCY = 0.90;
+	public static final double MG_KG_PER_KAH = 0.4534;             // Faraday: 24.3 g for two moles of electrons
+	public static final double MG_CELL_HOLD_KG = 400.0;            // MgCl2 it holds; Mg the same in metal
+	public static final double MGCL2_CHLORINATOR_KGH = 30.0;       // the magnesia chlorinator (proposed)
+	public static final int CA_CELLS = 6;                          // a small bipolar membrane electrolyser
+	public static final double CA_CELL_KA = 2.8;
+	public static final double CA_CELL_VOLTS = 3.1;
+	public static final double CA_CURRENT_EFFICIENCY = 0.96;
+	public static final double CL2_KG_PER_KAH = 1.3227;            // Faraday: 70.9 g for two moles of electrons
+	public static final double CA_SALT_PER_CL2 = 1.65;             // kg of NaCl a kg of Cl2
+	public static final double CA_WATER_PER_CL2 = 3.0;             // litres a kg of Cl2, making 32 % caustic (unverified)
+	public static final double NAOH_PER_CL2 = 1.128;
+	public static final double CHLOR_ALKALI_HOLD_KG = 50.0;        // salt and water it holds, in kg and L
+	public static final double MINERAL_SEPARATOR_WATTS = 30_000.0; // 480 V (unverified)
+	public static final double CHLORINATOR_WATTS = 15_000.0;       // its fluidizing blower
+	public static final double HAFNIUM_COLUMN_WATTS = 50_000.0;
+	public static final double KROLL_WATTS = 100_000.0;
+	public static final double VACUUM_DISTILLATION_WATTS = 100_000.0;
+	public static final double VAR_WATTS = 20_000.0;               // 1 kWh/kg a melt, twice
+	public static final double EXTRUSION_PRESS_WATTS = 250_000.0;  // its hydraulic pumps, 4.16 kV
+	public static final double PILGER_WATTS = 75_000.0;
+	public static final double ANNEAL_FURNACE_WATTS = 100_000.0;
+
 	// ---- The gas turbine and combined cycle (docs/multiblocks/gas-turbine.md, combined-cycle.md, approved 2026-10-31) -------
 	public static final double GT_WATTS = 16_500_000.0;            // ISO rating, Solar Titan 130 class
 	public static final double GT_HEAT_RATE = 10_230.0;            // kJ/kWh: 35 %

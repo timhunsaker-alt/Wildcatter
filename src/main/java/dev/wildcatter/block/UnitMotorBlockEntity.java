@@ -82,6 +82,15 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "feed_station" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.FEED_STATION_WATTS);
 				case "product_takeoff" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PRODUCT_TAKEOFF_WATTS);
 				case "tails_takeoff" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.TAILS_TAKEOFF_WATTS);
+				case "mineral_separator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.MINERAL_SEPARATOR_WATTS);
+				case "chlorinator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CHLORINATOR_WATTS);
+				case "hafnium_column" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.HAFNIUM_COLUMN_WATTS);
+				case "kroll_reactor" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.KROLL_WATTS);
+				case "vacuum_distillation" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.VACUUM_DISTILLATION_WATTS);
+				case "var_furnace" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.VAR_WATTS);
+				case "extrusion_press" -> new Motor(true, Voltage.MEDIUM, Tuning.EXTRUSION_PRESS_WATTS);
+				case "pilger_mill" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PILGER_WATTS);
+				case "vacuum_anneal_furnace" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ANNEAL_FURNACE_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -128,6 +137,12 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "hf_kiln" -> "kiln drive";
 			case "feed_station" -> "heater";
 			case "product_takeoff", "tails_takeoff" -> "refrigeration";
+			case "mineral_separator" -> "separators";
+			case "chlorinator" -> "fluidizing blower";
+			case "hafnium_column", "kroll_reactor", "vacuum_distillation", "vacuum_anneal_furnace" -> "furnace";
+			case "var_furnace" -> "arc supply";
+			case "extrusion_press" -> "hydraulic pumps";
+			case "pilger_mill" -> "mill drive";
 			default -> kind();
 		};
 	}

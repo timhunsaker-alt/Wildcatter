@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SHS",
+    "CBC",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "C": "minecraft:copper_block",
+    "B": "minecraft:blast_furnace"
+  },
+  "result": {
+    "id": "wildcatter:var_furnace",
+    "count": 1
+  }
+}

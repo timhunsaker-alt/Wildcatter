@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SXS",
+    "IRI",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "X": "minecraft:piston",
+    "I": "minecraft:iron_block",
+    "R": "wildcatter:crankshaft"
+  },
+  "result": {
+    "id": "wildcatter:pilger_mill",
+    "count": 1
+  }
+}

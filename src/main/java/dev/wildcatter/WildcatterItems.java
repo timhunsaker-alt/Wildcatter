@@ -71,6 +71,16 @@ public final class WildcatterItems {
 			String.format("%,.0f kg of depleted UF6, %,.0f kg of uranium", Tuning.CYLINDER_48Y_KG, Tuning.CYLINDER_48Y_KG / Tuning.UF6_PER_U),
 			String.format("%.2f %% U-235: the cascade's tails", Tuning.ASSAY_TAILS * 100));
 
+	/** 7f: the zirconium plant's tubes (docs/multiblocks/zirconium.md), for the 17x17 assembly. */
+	public static final ResourceKey<Item> ZIRCALOY_TUBE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("zircaloy_tube"));
+	public static final Item ZIRCALOY_TUBE = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(64).setId(ZIRCALOY_TUBE_KEY),
+			String.format("Zircaloy-4 fuel cladding, %.2f mm OD, %.2f mm wall, %.2f m", Tuning.CLAD_OD_MM, Tuning.CLAD_WALL_MM, Tuning.CLAD_LENGTH_M),
+			String.format("%.0f g; 264 make a 17x17 assembly's rods", dev.wildcatter.fluid.Zirconium.claddingKg() * 1000));
+	public static final ResourceKey<Item> GUIDE_THIMBLE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("guide_thimble"));
+	public static final Item GUIDE_THIMBLE = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(64).setId(GUIDE_THIMBLE_KEY),
+			String.format("Zircaloy-4 guide thimble, %.2f mm OD, %.2f mm wall, %.1f m", Tuning.THIMBLE_OD_MM, Tuning.THIMBLE_WALL_MM, Tuning.THIMBLE_LENGTH_M),
+			"24 for the control rods and 1 instrument tube in a 17x17 assembly");
+
 	/** A bucket of crude oil. It burns in a firebox (as long as lava) and leaves the bucket behind. */
 	public static final ResourceKey<Item> CRUDE_OIL_BUCKET_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("crude_oil_bucket"));
 	public static final Item CRUDE_OIL_BUCKET = new Item(new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET).setId(CRUDE_OIL_BUCKET_KEY));
@@ -137,6 +147,8 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, EMPTY_30B_CYLINDER_KEY, EMPTY_30B_CYLINDER);
 		Registry.register(BuiltInRegistries.ITEM, LEU_CYLINDER_30B_KEY, LEU_CYLINDER_30B);
 		Registry.register(BuiltInRegistries.ITEM, TAILS_CYLINDER_48Y_KEY, TAILS_CYLINDER_48Y);
+		Registry.register(BuiltInRegistries.ITEM, ZIRCALOY_TUBE_KEY, ZIRCALOY_TUBE);
+		Registry.register(BuiltInRegistries.ITEM, GUIDE_THIMBLE_KEY, GUIDE_THIMBLE);
 		Registry.register(BuiltInRegistries.ITEM, CRUDE_OIL_BUCKET_KEY, CRUDE_OIL_BUCKET);
 		Registry.register(BuiltInRegistries.ITEM, PLASTIC_SHEET_KEY, PLASTIC_SHEET);
 		Registry.register(BuiltInRegistries.ITEM, STEEL_INGOT_KEY, STEEL_INGOT);

@@ -1831,6 +1831,48 @@ lang.update({f"block.{ns}.centrifuge": "Gas Centrifuge (TC-21 class)", f"block.{
 	f"block.{ns}.tails_takeoff": "Tails Take-off (48Y)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 7f: the zirconium plant (docs/multiblocks/zirconium.md) ----------------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/zirconium.py; here loot, names, tags, recipes and the tubes.
+ZIRCONIUM_PARTS = ("mineral_separator", "chlorinator", "hafnium_column", "kroll_reactor", "vacuum_distillation", "var_furnace", "extrusion_press",
+	"pilger_mill", "vacuum_anneal_furnace", "magnesium_cell", "magnesia_chlorinator", "chlor_alkali_cell")
+for name in ZIRCONIUM_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in ZIRCONIUM_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("mineral_separator", ["SHS", "IRI", "SSS"], {"S": S_, "H": "minecraft:hopper", "I": "minecraft:iron_block", "R": "minecraft:redstone"}, "mineral_separator")
+shaped("chlorinator", ["SHS", "BFB", "SPS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace", "P": P_}, "chlorinator")
+shaped("hafnium_column", ["SPS", "S S", "SFS"], {"S": S_, "P": P_, "F": "minecraft:furnace"}, "hafnium_column")
+shaped("kroll_reactor", ["SPS", "SBS", "SSS"], {"S": S_, "P": P_, "B": "minecraft:blast_furnace"}, "kroll_reactor")
+shaped("vacuum_distillation", ["SGS", "SBS", "SSS"], {"S": S_, "G": "minecraft:glass", "B": "minecraft:blast_furnace"}, "vacuum_distillation")
+shaped("var_furnace", ["SHS", "CBC", "SSS"], {"S": S_, "H": "minecraft:hopper", "C": "minecraft:copper_block", "B": "minecraft:blast_furnace"}, "var_furnace")
+shaped("extrusion_press", ["SXS", "IAI", "SXS"], {"S": S_, "X": "minecraft:piston", "I": "minecraft:iron_block", "A": "minecraft:anvil"}, "extrusion_press")
+shaped("pilger_mill", ["SXS", "IRI", "SSS"], {"S": S_, "X": "minecraft:piston", "I": "minecraft:iron_block", "R": f"{ns}:crankshaft"}, "pilger_mill")
+shaped("vacuum_anneal_furnace", ["SSS", "GFG", "SSS"], {"S": S_, "G": "minecraft:glass", "F": "minecraft:furnace"}, "vacuum_anneal_furnace")
+shaped("magnesium_cell", ["CBC", "SXS", "SSS"], {"C": "minecraft:copper_block", "B": "minecraft:bricks", "S": S_, "X": "minecraft:cauldron"}, "magnesium_cell")
+shaped("magnesia_chlorinator", ["SHS", "BFB", "SPS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:furnace", "P": P_}, "magnesia_chlorinator")
+shaped("chlor_alkali_cell", ["CPC", "SXS", "SHS"], {"C": "minecraft:copper_block", "P": P_, "S": S_, "X": "minecraft:cauldron", "H": "minecraft:hopper"}, "chlor_alkali_cell")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in {"zircaloy_tube": ("Zircaloy-4 Cladding Tube", (190, 190, 185)), "guide_thimble": ("Zircaloy-4 Guide Thimble", (175, 175, 170))}.items():
+	if os.path.exists(f"{ORE_ART}/{item}.png"):
+		shutil.copy(f"{ORE_ART}/{item}.png", f"{ASSETS}/textures/item/ore/{item}.png")
+		item_tex = f"{ns}:item/ore/{item}"
+	else:
+		tex(f"{item}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+		item_tex = f"{ns}:item/{item}_placeholder"
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": item_tex}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.mineral_separator": "Mineral Separator (magnetic, electrostatic)", f"block.{ns}.chlorinator": "Chlorinator (fluid bed)",
+	f"block.{ns}.hafnium_column": "Hafnium Column (extractive distillation)", f"block.{ns}.kroll_reactor": "Kroll Reactor",
+	f"block.{ns}.vacuum_distillation": "Vacuum Distillation Furnace", f"block.{ns}.var_furnace": "VAR Furnace (vacuum arc remelting)",
+	f"block.{ns}.extrusion_press": "Extrusion Press", f"block.{ns}.pilger_mill": "Pilger Mill", f"block.{ns}.vacuum_anneal_furnace": "Vacuum Anneal Furnace",
+	f"block.{ns}.magnesium_cell": "Magnesium Cell (14 kA)", f"block.{ns}.magnesia_chlorinator": "Magnesia Chlorinator",
+	f"block.{ns}.chlor_alkali_cell": "Chlor-alkali Cell (membrane)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

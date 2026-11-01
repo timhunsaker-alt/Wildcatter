@@ -230,6 +230,18 @@
     "wildcatter:frequency_converter",
     "wildcatter:feed_station",
     "wildcatter:product_takeoff",
-    "wildcatter:tails_takeoff"
+    "wildcatter:tails_takeoff",
+    "wildcatter:mineral_separator",
+    "wildcatter:chlorinator",
+    "wildcatter:hafnium_column",
+    "wildcatter:kroll_reactor",
+    "wildcatter:vacuum_distillation",
+    "wildcatter:var_furnace",
+    "wildcatter:extrusion_press",
+    "wildcatter:pilger_mill",
+    "wildcatter:vacuum_anneal_furnace",
+    "wildcatter:magnesium_cell",
+    "wildcatter:magnesia_chlorinator",
+    "wildcatter:chlor_alkali_cell"
   ]
 }

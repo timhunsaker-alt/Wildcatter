@@ -393,6 +393,19 @@ public final class WildcatterBlocks {
 	public static final Block FEED_STATION = enrichmentPart(dev.wildcatter.block.EnrichmentPartBlock.Part.FEED_STATION);
 	public static final Block PRODUCT_TAKEOFF = enrichmentPart(dev.wildcatter.block.EnrichmentPartBlock.Part.PRODUCT_TAKEOFF);
 	public static final Block TAILS_TAKEOFF = enrichmentPart(dev.wildcatter.block.EnrichmentPartBlock.Part.TAILS_TAKEOFF);
+	// 7f: the zirconium plant (docs/multiblocks/zirconium.md)
+	public static final Block MINERAL_SEPARATOR = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.MINERAL_SEPARATOR);
+	public static final Block CHLORINATOR = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.CHLORINATOR);
+	public static final Block HAFNIUM_COLUMN = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.HAFNIUM_COLUMN);
+	public static final Block KROLL_REACTOR = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.KROLL_REACTOR);
+	public static final Block VACUUM_DISTILLATION = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.VACUUM_DISTILLATION);
+	public static final Block VAR_FURNACE = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.VAR_FURNACE);
+	public static final Block EXTRUSION_PRESS = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.EXTRUSION_PRESS);
+	public static final Block PILGER_MILL = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.PILGER_MILL);
+	public static final Block VACUUM_ANNEAL_FURNACE = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.VACUUM_ANNEAL_FURNACE);
+	public static final Block MAGNESIUM_CELL = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.MAGNESIUM_CELL);
+	public static final Block MAGNESIA_CHLORINATOR = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.MAGNESIA_CHLORINATOR);
+	public static final Block CHLOR_ALKALI_CELL = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.CHLOR_ALKALI_CELL);
 	public static final Block ISR_WELLHEAD = block("isr_wellhead", props -> new dev.wildcatter.block.IsrWellheadBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL)));
 	/** The gas turbine and combined cycle (docs/multiblocks/gas-turbine.md, combined-cycle.md). */
@@ -491,6 +504,13 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<dev.wildcatter.block.FrequencyConverterBlockEntity> FREQUENCY_CONVERTER_ENTITY = entity(dev.wildcatter.block.FrequencyConverterBlockEntity::new, FREQUENCY_CONVERTER);
 	public static final BlockEntityType<dev.wildcatter.block.FeedStationBlockEntity> FEED_STATION_ENTITY = entity(dev.wildcatter.block.FeedStationBlockEntity::new, FEED_STATION);
 	public static final BlockEntityType<dev.wildcatter.block.TakeoffBlockEntity> TAKEOFF_ENTITY = entity(dev.wildcatter.block.TakeoffBlockEntity::new, PRODUCT_TAKEOFF, TAILS_TAKEOFF);
+	public static final BlockEntityType<dev.wildcatter.block.ZrLineBlockEntity> ZR_LINE_ENTITY = entity(dev.wildcatter.block.ZrLineBlockEntity::new, MINERAL_SEPARATOR, HAFNIUM_COLUMN, VACUUM_DISTILLATION, VAR_FURNACE, EXTRUSION_PRESS, VACUUM_ANNEAL_FURNACE);
+	public static final BlockEntityType<dev.wildcatter.block.ChlorinatorBlockEntity> CHLORINATOR_ENTITY = entity(dev.wildcatter.block.ChlorinatorBlockEntity::new, CHLORINATOR);
+	public static final BlockEntityType<dev.wildcatter.block.KrollReactorBlockEntity> KROLL_REACTOR_ENTITY = entity(dev.wildcatter.block.KrollReactorBlockEntity::new, KROLL_REACTOR);
+	public static final BlockEntityType<dev.wildcatter.block.PilgerMillBlockEntity> PILGER_MILL_ENTITY = entity(dev.wildcatter.block.PilgerMillBlockEntity::new, PILGER_MILL);
+	public static final BlockEntityType<dev.wildcatter.block.MagnesiumCellBlockEntity> MAGNESIUM_CELL_ENTITY = entity(dev.wildcatter.block.MagnesiumCellBlockEntity::new, MAGNESIUM_CELL);
+	public static final BlockEntityType<dev.wildcatter.block.MagnesiaChlorinatorBlockEntity> MAGNESIA_CHLORINATOR_ENTITY = entity(dev.wildcatter.block.MagnesiaChlorinatorBlockEntity::new, MAGNESIA_CHLORINATOR);
+	public static final BlockEntityType<dev.wildcatter.block.ChlorAlkaliCellBlockEntity> CHLOR_ALKALI_CELL_ENTITY = entity(dev.wildcatter.block.ChlorAlkaliCellBlockEntity::new, CHLOR_ALKALI_CELL);
 	public static final BlockEntityType<dev.wildcatter.block.DehydratorBlockEntity> DEHYDRATOR_ENTITY = entity(dev.wildcatter.block.DehydratorBlockEntity::new, TEG_DEHYDRATOR);
 	public static final BlockEntityType<dev.wildcatter.block.ChillerBlockEntity> CHILLER_ENTITY = entity(dev.wildcatter.block.ChillerBlockEntity::new, NGL_CHILLER);
 	public static final BlockEntityType<dev.wildcatter.block.StabilizerBlockEntity> STABILIZER_ENTITY = entity(dev.wildcatter.block.StabilizerBlockEntity::new, STABILIZER);
@@ -597,6 +617,11 @@ public final class WildcatterBlocks {
 
 	private static Block conversionPart(dev.wildcatter.block.ConversionPartBlock.Part part) {
 		return block(part.id(), props -> new dev.wildcatter.block.ConversionPartBlock(props.mapColor(MapColor.COLOR_GRAY)
+				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
+	}
+
+	private static Block zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part part) {
+		return block(part.id(), props -> new dev.wildcatter.block.ZirconiumPartBlock(props.mapColor(MapColor.COLOR_GRAY)
 				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
 	}
 
@@ -808,6 +833,9 @@ public final class WildcatterBlocks {
 		for (Block part : new Block[] {CENTRIFUGE, FREQUENCY_CONVERTER, FEED_STATION, PRODUCT_TAKEOFF, TAILS_TAKEOFF}) {
 			add(((dev.wildcatter.block.EnrichmentPartBlock) part).part().id(), part);
 		}
+		for (Block part : new Block[] {MINERAL_SEPARATOR, CHLORINATOR, HAFNIUM_COLUMN, KROLL_REACTOR, VACUUM_DISTILLATION, VAR_FURNACE, EXTRUSION_PRESS, PILGER_MILL, VACUUM_ANNEAL_FURNACE, MAGNESIUM_CELL, MAGNESIA_CHLORINATOR, CHLOR_ALKALI_CELL}) {
+			add(((dev.wildcatter.block.ZirconiumPartBlock) part).part().id(), part);
+		}
 		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("rotor"), ROTOR);   // no item: it is never placed
 		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("mcc_bucket"), MCC_BUCKET);   // its item is WildcatterItems.MCC_BUCKET
 		add("mcc_section", MCC_SECTION);
@@ -902,6 +930,13 @@ public final class WildcatterBlocks {
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("frequency_converter"), FREQUENCY_CONVERTER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("feed_station"), FEED_STATION_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("takeoff"), TAKEOFF_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("zr_line"), ZR_LINE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("chlorinator"), CHLORINATOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("kroll_reactor"), KROLL_REACTOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("pilger_mill"), PILGER_MILL_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("magnesium_cell"), MAGNESIUM_CELL_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("magnesia_chlorinator"), MAGNESIA_CHLORINATOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("chlor_alkali_cell"), CHLOR_ALKALI_CELL_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("turbine_generator"), TURBINE_GENERATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("genset_control_panel"), GENSET_CONTROL_PANEL_ENTITY);
 	}

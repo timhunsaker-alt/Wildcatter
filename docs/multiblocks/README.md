@@ -31,6 +31,7 @@ not a go-ahead to build: that waits for the roadmap phase (ROADMAP.md). Nothing 
 | [uranium-mill.md](uranium-mill.md) | 7b | new: jaw crusher, SAG mill, leach tank, CCD thickener, SX circuit, precipitation tank, yellowcake dryer, drum filler |
 | [isr-wellfield.md](isr-wellfield.md) | 7c | new: ISR wells, header house, oxygen generator, IX columns |
 | [conversion.md](conversion.md) | 7d | new: reduction reactor, hydrofluorinator, fluorinator, cold traps, distillation columns, cylinder filler, steam reformer, HF kiln and column, rectifier, fluorine cell house |
+| [zirconium.md](zirconium.md) | 7f | new: mineral separator, chlorinator, hafnium column, Kroll reactor, vacuum distillation, VAR furnace, extrusion press, pilger mill, vacuum anneal furnace, magnesium cell, magnesia chlorinator, chlor-alkali cell; reuses the rectifier |
 | [enrichment.md](enrichment.md) | 7e | new: centrifuge (TC-21 class), frequency converter, feed station, product and tails take-offs |
 | [aeroderivative.md](aeroderivative.md) | 6b | new: 45 MW aeroderivative peaker, 3,000 A generator breaker, 60 MVA GSU and 60 MVA substation transformer |
 

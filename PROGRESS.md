@@ -475,6 +475,35 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 7f: the zirconium plant (spec: docs/multiblocks/zirconium.md)
+- **Zircon to Zircaloy-4 tube**, 10 kg an hour: an assembly's 264 cladding tubes (0.404 kg, 9.50 x 0.57 mm, 3.85 m) and 25 guide
+  thimbles in about 12 hours (`fluid/Zirconium.java`, unit-tested).
+- **Tim's decisions:** two waves (7f zirconium, 7g fuel); the Kroll magnesium recycled through a magnesium cell, make-up chlorine
+  from a chlor-alkali cell, make-up magnesium from chlorinated magnesia.
+- **The line**, each part against the next (metal passed in kg):
+  - MINERAL SEPARATOR: heavy mineral sand by hopper; 90 % of the zircon on; ilmenite, rutile and monazite counted.
+  - CHLORINATOR: 2.01 kg of zircon, 0.58 kg of carbon (coal or charcoal) and 3.11 kg of chlorine a kg of Zr; SiCl4 and CO counted.
+  - HAFNIUM COLUMN: extractive distillation; 2 % of the metal out as HfCl4.
+  - KROLL REACTOR: magnesium from the magnesium cell at 25 % excess, the MgCl2 back to it.
+  - VACUUM DISTILLATION: the excess magnesium back to the cell.
+  - VAR FURNACE: 1.5 % tin, 0.21 % iron, 0.10 % chromium from tin ingots, iron ingots and chromite.
+  - EXTRUSION PRESS (4.16 kV), PILGER MILL (sneak-click for cladding or thimble dies), VACUUM ANNEAL FURNACE (tubes out below).
+- **The chlorine and magnesium loop:**
+  - MAGNESIUM CELL: 14 kA at 5 V on a rectifier, 5.7 kg of Mg an hour, its chlorine out on a pipe.
+  - MAGNESIA CHLORINATOR: tops up the cell's MgCl2 from magnesia, coal and chlorine.
+  - CHLOR-ALKALI CELL: 6 membrane cells at 2.8 kA on a rectifier, 21 kg of chlorine and 6.7 m3 of hydrogen an hour from rock salt
+    and pumped water; caustic soda counted.
+  - Both cells reuse the 7d RECTIFIER.
+- **New pipe product:** chlorine (kg). **New items:** Zircaloy-4 Cladding Tube and Guide Thimble, with Ludo icons (2 credits).
+- **Game test** `zirconium`:
+  - two paralleled 480 V sets on an 800 A busway down the line; two more through a backward unit substation to 4.16 kV;
+  - the chlor-alkali cell makes 19 kg/h of chlorine and 6 m3/h of hydrogen at 2.5 kA; the magnesia chlorinator starts the
+    magnesium cell (12.6 kA, 5.1 kg/h of magnesium);
+  - the separator and chlorinator run on their feeds; with a hook's kilogram in each stage, every next stage runs (the Kroll
+    reactor at 9.8 kg/h of sponge);
+  - a nearly rolled cladding tube, and after a die change a guide thimble, drop into the hopper under the anneal furnace;
+  - without the hafnium column the Kroll reactor reads NOT BUILT.
+
 ## Phase 7e: the centrifuge cascade (spec: docs/multiblocks/enrichment.md)
 - **Natural UF6 to 4.95 % LEU** in 30B cylinders, tails at 0.25 % in 48Ys: 10.20 kg of feed and 7.81 SWU a kg of product
   (`fluid/Enrichment.java`, unit-tested).
@@ -696,6 +725,9 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- The zirconium line runs as a steady flow: the real Kroll retort and VAR heats are batches. Its game test gives each stage a
+  kilogram by hook rather than waiting hours for the metal to arrive. The plant's 480 V load needs a busway: a single cable
+  burns.
 - The frequency converter is a fixed-impedance load like the other drives: when the 12.47 kV bus sags, it gets less than it
   asks for and the machines slow (1,184 Hz at 12,258 V), where a real drive would draw more current.
 - Phase 6 is complete (6a and 6b); Tim checks the peaker in a real session. The turbines' generator couplings do not turn on

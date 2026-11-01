@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SGS",
+    "SBS",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "G": "minecraft:glass",
+    "B": "minecraft:blast_furnace"
+  },
+  "result": {
+    "id": "wildcatter:vacuum_distillation",
+    "count": 1
+  }
+}

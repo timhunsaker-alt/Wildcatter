@@ -47,6 +47,9 @@ Put the jar in your instance's `mods` folder next to:
 - A centrifuge cascade: true-size gas centrifuges on one header pipe with a feed station, product and tails take-offs and a
   12.47 kV frequency converter, enriching natural UF6 to 4.95 % in 30B cylinders. It needs at least 11 machines, each 571 kW:
   power it from the aeroderivative.
+- A zirconium plant: zircon from beach sand, chlorinated, freed of hafnium, reduced with magnesium by the Kroll process, melted
+  into Zircaloy-4, extruded and pilgered into fuel cladding and guide thimbles; a magnesium cell and a chlor-alkali cell on
+  rectifiers keep it in chlorine and magnesium.
 - The Field Manual item explains how to build each machine.
 
 ## Older worlds

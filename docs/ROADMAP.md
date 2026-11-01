@@ -111,6 +111,9 @@ and the Field Manual has a page for each new system.
     size, 12 fluorine cells, about 0.7 MW at 4.16 kV (decided in the 7d plan).
   - Enrichment: Urenco TC-21 class centrifuges, each doing 1000x its real separative work at the real 50 kWh a SWU, about 571 kW
     a machine; at least 11 machines (one a stage) on 12.47 kV frequency converters (decided in the 7e plan).
+  - Fuel fabrication is two waves, 7f the zirconium plant and 7g the fuel plant. The Kroll magnesium is recycled through a
+    magnesium cell, make-up chlorine comes from a chlor-alkali cell on rock salt, make-up magnesium from chlorinated magnesia
+    (decided in the 7f plan).
   - Process chemicals from the existing chain plus real ores. Tim: "make sure we have all ore types from real world with exaggerated numbers".
 - Waves (each is planned with its numbers before it is built):
   - 7a: every real ore type as worldgen, plus a gamma scintillometer (docs/ores.md). DONE.
@@ -118,7 +121,9 @@ and the Field Manual has a page for each new system.
   - 7c: ISR wellfields (late; docs/multiblocks/isr-wellfield.md). DONE.
   - 7d: conversion to UF6 (a methane reformer for hydrogen, HF from fluorspar, fluorine cells on a DC rectifier, 48Y cylinders; docs/multiblocks/conversion.md). DONE.
   - 7e: the centrifuge cascade (a high-frequency converter, 4.95 % LEU in 30B cylinders; docs/multiblocks/enrichment.md). DONE.
-  - 7f: fuel fabrication (pellets, Zircaloy tube from zircon by the Kroll process, rods, the 17×17 assembly).
+  - 7f: the zirconium plant: zircon to Zircaloy-4 cladding tube and guide thimbles by chlorination, hafnium separation, the Kroll
+    process, VAR melting, extrusion and pilgering (docs/multiblocks/zirconium.md). DONE.
+  - 7g: the fuel plant (UO2 by the dry route, pellets, sintering, rods with helium, the 17×17 assembly).
 
 ## Phase 8 — Pressurized water reactor (PWR)
 - Reactor vessel, control rods, primary loop, pressurizer, steam generator, secondary loop to turbine.
@@ -152,3 +157,6 @@ and the Field Manual has a page for each new system.
   stability monitoring), a disposal well for the bleed, satellite IX with trucked resin.
 - Enrichment: centrifuge spin-up and coast-down hours, machine crashes, cooling water to the casings, the product sampling autoclave
   and blending, cylinder heels, a choice of product assay.
+- Zirconium: SiCl4 to fumed silica; uses for the chlor-alkali caustic soda; hafnium metal for control rods; Pidgeon magnesium from
+  dolomite; the aluminothermic chromium step; scrap recycle and yields; Kroll and VAR batch timing.
+- A titanium pigment plant for the separator's ilmenite and rutile.

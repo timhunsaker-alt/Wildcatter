@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "S S",
+    "SFS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "F": "minecraft:furnace"
+  },
+  "result": {
+    "id": "wildcatter:hafnium_column",
+    "count": 1
+  }
+}

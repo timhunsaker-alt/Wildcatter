@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "CBC",
+    "SXS",
+    "SSS"
+  ],
+  "key": {
+    "C": "minecraft:copper_block",
+    "B": "minecraft:bricks",
+    "S": "wildcatter:steel_ingot",
+    "X": "minecraft:cauldron"
+  },
+  "result": {
+    "id": "wildcatter:magnesium_cell",
+    "count": 1
+  }
+}

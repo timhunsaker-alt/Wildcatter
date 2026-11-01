@@ -327,5 +327,19 @@
   "block.wildcatter.frequency_converter": "Frequency Converter (12.47 kV, 1,225 Hz)",
   "block.wildcatter.feed_station": "Feed Station (48Y)",
   "block.wildcatter.product_takeoff": "Product Take-off (30B)",
-  "block.wildcatter.tails_takeoff": "Tails Take-off (48Y)"
+  "block.wildcatter.tails_takeoff": "Tails Take-off (48Y)",
+  "item.wildcatter.zircaloy_tube": "Zircaloy-4 Cladding Tube",
+  "item.wildcatter.guide_thimble": "Zircaloy-4 Guide Thimble",
+  "block.wildcatter.mineral_separator": "Mineral Separator (magnetic, electrostatic)",
+  "block.wildcatter.chlorinator": "Chlorinator (fluid bed)",
+  "block.wildcatter.hafnium_column": "Hafnium Column (extractive distillation)",
+  "block.wildcatter.kroll_reactor": "Kroll Reactor",
+  "block.wildcatter.vacuum_distillation": "Vacuum Distillation Furnace",
+  "block.wildcatter.var_furnace": "VAR Furnace (vacuum arc remelting)",
+  "block.wildcatter.extrusion_press": "Extrusion Press",
+  "block.wildcatter.pilger_mill": "Pilger Mill",
+  "block.wildcatter.vacuum_anneal_furnace": "Vacuum Anneal Furnace",
+  "block.wildcatter.magnesium_cell": "Magnesium Cell (14 kA)",
+  "block.wildcatter.magnesia_chlorinator": "Magnesia Chlorinator",
+  "block.wildcatter.chlor_alkali_cell": "Chlor-alkali Cell (membrane)"
 }

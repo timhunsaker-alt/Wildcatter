@@ -184,6 +184,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("cascade")) {
 				cascade(context, server);
 			}
+			if (only("zirconium")) {
+				zirconium(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -4741,6 +4744,190 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(read(server, -20, up, zg - 5).contains("NO DRIVE") && read(server, 5, up, zg).contains("NO DRIVE"),
 				"without the converter the machines should lose their drive: " + read(server, -20, up, zg - 5) + " | " + read(server, 5, up, zg));
 		System.out.println("[wildcatter-test] cascade ok: " + ok + " | 30B " + leu + ", tails " + depleted + ", emptied " + empty);
+	}
+
+	/**
+	 * The zirconium plant (7f, docs/multiblocks/zirconium.md). The line runs south down x 0-2, each part against the next; the
+	 * magnesium cell against the Kroll reactor and the vacuum distillation, with the magnesia chlorinator north of it and a rectifier
+	 * east; the chlor-alkali cell north-east with its own rectifier. One chlorine run joins both cells to both chlorinators. Two
+	 * paralleled sets give 480 V down x -2; two more through a backward unit substation give 4.16 kV to both rectifiers and to the
+	 * extrusion press, which faces south so its box is on the east. Both cells must make chlorine, the magnesia chlorinator must start
+	 * the magnesium loop, each stage must run once the one before it holds metal, a nearly rolled tube and then a guide thimble must
+	 * drop into the hopper under the anneal furnace, and without the hafnium column the Kroll reactor must say so.
+	 */
+	private void zirconium(ClientGameTestContext context, TestServerContext server) {
+		int z = -2300;
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 10 " + (up + 24) + " " + (z + 30) + " 180 40");
+		context.waitTicks(20);
+		for (int zz = z - 12; zz <= z + 52; zz += 21) {   // /fill takes at most 32,768 blocks
+			server.runCommand("fill -20 " + (y - 1) + " " + zz + " 47 " + (y + 14) + " " + Math.min(zz + 20, z + 52) + " minecraft:air");
+		}
+		server.runCommand("fill -20 " + (y - 1) + " " + (z - 12) + " 47 " + (y - 1) + " " + (z + 52) + " minecraft:stone");
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		net.minecraft.core.Direction south = net.minecraft.core.Direction.SOUTH;
+		// the line, south down x 0-2
+		placeBig(server, WildcatterBlocks.MINERAL_SEPARATOR, new BlockPos(0, up, z), north);          // z..z+5
+		BlockPos chlorinator = new BlockPos(0, up, z + 6);
+		placeBig(server, WildcatterBlocks.CHLORINATOR, chlorinator, north);                           // z+6..z+8
+		BlockPos hafnium = new BlockPos(0, up, z + 9);
+		placeBig(server, WildcatterBlocks.HAFNIUM_COLUMN, hafnium, north);                            // z+9..z+11
+		BlockPos kroll = new BlockPos(0, up, z + 12);
+		placeBig(server, WildcatterBlocks.KROLL_REACTOR, kroll, north);                               // z+12..z+14
+		BlockPos distillation = new BlockPos(0, up, z + 15);
+		placeBig(server, WildcatterBlocks.VACUUM_DISTILLATION, distillation, north);                  // z+15..z+17
+		BlockPos var = new BlockPos(0, up, z + 18);
+		placeBig(server, WildcatterBlocks.VAR_FURNACE, var, north);                                   // z+18..z+20
+		BlockPos press = new BlockPos(2, up, z + 28);
+		placeBig(server, WildcatterBlocks.EXTRUSION_PRESS, press, south);                             // z+21..z+28, its box east at x 3
+		BlockPos pilger = new BlockPos(0, up, z + 29);
+		placeBig(server, WildcatterBlocks.PILGER_MILL, pilger, north);                                // z+29..z+38
+		placeBig(server, WildcatterBlocks.VACUUM_ANNEAL_FURNACE, new BlockPos(0, up, z + 39), north); // z+39..z+46
+		// the magnesium loop and the chlor-alkali cell
+		BlockPos cell = new BlockPos(3, up, z + 12);
+		placeBig(server, WildcatterBlocks.MAGNESIUM_CELL, cell, north);                              // x 3-5, z+12..z+17
+		BlockPos magnesia = new BlockPos(3, up, z + 9);
+		placeBig(server, WildcatterBlocks.MAGNESIA_CHLORINATOR, magnesia, north);                    // x 3-5, z+9..z+11
+		BlockPos mgRectifier = new BlockPos(8, up, z + 16);
+		placeBig(server, WildcatterBlocks.RECTIFIER, mgRectifier, south);                            // x 6-8, z+13..z+16, its box east at x 9
+		BlockPos chlorAlkali = new BlockPos(12, up, z);
+		placeBig(server, WildcatterBlocks.CHLOR_ALKALI_CELL, chlorAlkali, north);                    // x 12-14, z..z+5
+		BlockPos caRectifier = new BlockPos(17, up, z + 4);
+		placeBig(server, WildcatterBlocks.RECTIFIER, caRectifier, south);                            // x 15-17, z+1..z+4, its box east at x 18
+		// chlorine: the chlor-alkali cell's back and the magnesium cell's front east, to the chlorinator's east side and the magnesia
+		// chlorinator's front
+		pipes(server, z, new int[][] {{13, 0, 6}, {13, 0, 7}, {13, 0, 8}, {6, 0, 12}, {6, 0, 11}, {6, 0, 10}, {6, 0, 9}});
+		for (int x = 3; x <= 12; x++) {
+			put(server, x, up, z + 8, "wildcatter:gas_line");
+		}
+		// hoppers
+		put(server, 1, up + 4, z + 2, "minecraft:hopper");
+		server.runCommand("item replace block 1 " + (up + 4) + " " + (z + 2) + " container.0 with wildcatter:heavy_mineral 2");
+		put(server, 1, up + 10, z + 7, "minecraft:hopper");
+		server.runCommand("item replace block 1 " + (up + 10) + " " + (z + 7) + " container.0 with minecraft:coal 4");
+		put(server, 4, up + 6, z + 10, "minecraft:hopper");
+		server.runCommand("item replace block 4 " + (up + 6) + " " + (z + 10) + " container.0 with wildcatter:magnesia 1");
+		server.runCommand("item replace block 4 " + (up + 6) + " " + (z + 10) + " container.1 with minecraft:coal 2");
+		put(server, 1, up + 8, z + 19, "minecraft:hopper");
+		server.runCommand("item replace block 1 " + (up + 8) + " " + (z + 19) + " container.0 with wildcatter:tin_ingot 1");
+		server.runCommand("item replace block 1 " + (up + 8) + " " + (z + 19) + " container.1 with minecraft:iron_ingot 1");
+		server.runCommand("item replace block 1 " + (up + 8) + " " + (z + 19) + " container.2 with wildcatter:chromite 1");
+		put(server, 13, up + 3, z + 2, "minecraft:hopper");
+		server.runCommand("item replace block 13 " + (up + 3) + " " + (z + 2) + " container.0 with wildcatter:halite 1");
+		BlockPos tubesOut = new BlockPos(1, y, z + 42);
+		put(server, 1, y, z + 42, "minecraft:hopper");
+		// 480 V: two sets on a busway north-west, down x -2 with a stub to each box at x -1
+		BlockPos[] lvSets = {new BlockPos(-12, up, z - 8), new BlockPos(-4, up, z - 8)};
+		for (BlockPos set : lvSets) {
+			genset(server, set, north, false);                                                     // x -17..-12 and -9..-4, z-8..z-7
+			put(server, set.getX() + 1, up, z - 8, "wildcatter:busway_industrial");
+		}
+		for (int x = -11; x <= -3; x++) {
+			put(server, x, up, z - 9, "wildcatter:busway_industrial");
+		}
+		for (int zz = z - 9; zz <= z + 39; zz++) {   // the plant's 0.5 MW is about 600 A: an 800 A busway down the line
+			put(server, -2, up, zz, "wildcatter:busway_industrial");
+		}
+		for (int zz : new int[] {0, 6, 9, 12, 15, 18, 29, 39}) {
+			put(server, -1, up, z + zz, "wildcatter:cable_industrial");
+		}
+		sizeCables(server, new BlockPos(-1, up, z), new BlockPos(-1, up, z + 39), WildcatterBlocks.CABLE_INDUSTRIAL, dev.wildcatter.energy.ConductorSize.KCMIL_500);
+		// 4.16 kV: two sets on a busway east, a backward unit substation, west along z+16 to the magnesium cell's rectifier, north up
+		// x 18 to the chlor-alkali cell's, and south down x 45 and west along z+28 to the press
+		BlockPos[] mvSets = {new BlockPos(30, up, z + 20), new BlockPos(38, up, z + 20)};
+		for (BlockPos set : mvSets) {
+			genset(server, set, north, false);                                                     // x 25-30 and 33-38, z+20..z+21
+			put(server, set.getX() + 1, up, z + 20, "wildcatter:busway_industrial");
+		}
+		for (int x = 31; x <= 40; x++) {
+			put(server, x, up, z + 19, "wildcatter:busway_industrial");
+		}
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, new BlockPos(40, up, z + 19), net.minecraft.core.Direction.EAST, false);   // x 41-44, z+18..z+19
+		java.util.List<int[]> mv = new java.util.ArrayList<>();
+		for (int zz = z + 16; zz <= z + 28; zz++) {
+			mv.add(new int[] {45, zz});
+		}
+		for (int x = 9; x <= 44; x++) {
+			mv.add(new int[] {x, z + 16});
+		}
+		for (int zz = z + 4; zz <= z + 15; zz++) {
+			mv.add(new int[] {18, zz});
+		}
+		for (int x = 3; x <= 44; x++) {
+			mv.add(new int[] {x, z + 28});
+		}
+		for (int[] c : mv) {
+			put(server, c[0], up, c[1], "wildcatter:cable_mv");
+		}
+		for (BlockPos set : lvSets) {
+			startGenset(context, server, set, north, 2000);
+		}
+		for (BlockPos set : mvSets) {
+			startGenset(context, server, set, north, 2000);
+		}
+		water(server, chlorAlkali);
+		for (int i = 0; i < 12; i++) {
+			context.waitTicks(50);
+			water(server, chlorAlkali);
+		}
+		String cells = " | chlor-alkali " + read(server, 12, up, z) + " | its rectifier " + read(server, 17, up, z + 4) + " | magnesia chlorinator " + read(server, 3, up, z + 9)
+				+ " | magnesium cell " + read(server, 3, up, z + 12) + " | its rectifier " + read(server, 8, up, z + 16) + " | mv " + read(server, 30, up, z + 20);
+		check(read(server, 12, up, z).contains("kg/h of chlorine") && read(server, 12, up, z).contains("m3/h of hydrogen"), "the chlor-alkali cell should make chlorine and hydrogen: " + cells);
+		check(read(server, 3, up, z + 12).contains("kg/h of magnesium"), "the magnesia chlorinator should start the magnesium cell: " + cells);
+		check(read(server, 17, up, z + 4).contains("kA") && read(server, 8, up, z + 16).contains("kA"), "both rectifiers should drive their cells: " + cells);
+		check(read(server, 0, up, z).contains("separating"), "the separator should separate the heavy minerals: " + read(server, 0, up, z) + " | lv set " + read(server, -12, up, z - 8)
+				+ " | second " + read(server, -4, up, z - 8) + " | busway " + read(server, -5, up, z - 9) + " | column " + read(server, -2, up, z - 5) + " / " + read(server, -2, up, z) + " | stub " + read(server, -1, up, z));
+		check(read(server, 0, up, z + 6).contains("chlorinating"), "the chlorinator should chlorinate the zircon: " + read(server, 0, up, z + 6) + cells);
+		// metal in each stage: the next one runs
+		server.computeOnServer(srv -> {
+			for (BlockPos at : new BlockPos[] {chlorinator, hafnium, kroll, distillation, var, press}) {
+				((dev.wildcatter.block.ZrStage) srv.overworld().getBlockEntity(at)).addZirconium(1.0);
+			}
+			return null;
+		});
+		context.waitTicks(200);
+		String line = " | hafnium " + read(server, 0, up, z + 9) + " | kroll " + read(server, 0, up, z + 12) + " | distillation " + read(server, 0, up, z + 15)
+				+ " | var " + read(server, 0, up, z + 18) + " | press " + read(server, 2, up, z + 28) + " | pilger " + read(server, 0, up, z + 29) + cells;
+		check(read(server, 0, up, z + 9).contains("distilling"), "the hafnium column should run: " + line);
+		check(read(server, 0, up, z + 12).contains("reducing"), "the Kroll reactor should reduce: " + line);
+		check(read(server, 0, up, z + 15).contains("boiling off"), "the vacuum distillation should run: " + line);
+		check(read(server, 0, up, z + 18).contains("remelting"), "the VAR furnace should melt Zircaloy-4: " + line);
+		check(read(server, 2, up, z + 28).contains("extruding"), "the extrusion press should extrude: " + line);
+		check(read(server, 0, up, z + 29).contains("rolling a cladding tube"), "the pilger mill should roll cladding: " + line);
+		// a tube all but rolled: it drops into the hopper under the anneal furnace
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.PilgerMillBlockEntity) srv.overworld().getBlockEntity(pilger)).addProgressForTest(dev.wildcatter.fluid.Zirconium.claddingKg() - 0.002);
+			return null;
+		});
+		int tubes = 0;
+		for (int i = 0; i < 20 && tubes == 0; i++) {
+			context.waitTicks(20);
+			tubes = countIn(server, tubesOut, WildcatterItems.ZIRCALOY_TUBE);
+		}
+		check(tubes > 0, "a cladding tube should drop into the hopper under the anneal furnace: " + read(server, 0, up, z + 29) + " | " + read(server, 0, up, z + 39));
+		// new dies: a guide thimble
+		server.computeOnServer(srv -> {
+			dev.wildcatter.block.PilgerMillBlockEntity mill = (dev.wildcatter.block.PilgerMillBlockEntity) srv.overworld().getBlockEntity(pilger);
+			mill.changeDies();
+			((dev.wildcatter.block.ZrStage) srv.overworld().getBlockEntity(press)).addZirconium(1.0);
+			mill.addProgressForTest(dev.wildcatter.fluid.Zirconium.thimbleKg() - 0.002);
+			return null;
+		});
+		int thimbles = 0;
+		for (int i = 0; i < 20 && thimbles == 0; i++) {
+			context.waitTicks(20);
+			thimbles = countIn(server, tubesOut, WildcatterItems.GUIDE_THIMBLE);
+		}
+		check(thimbles > 0, "a guide thimble should drop into the hopper after the die change: " + read(server, 0, up, z + 29));
+		server.runCommand("tp @p 22 " + (up + 18) + " " + (z + 44) + " 145 30");
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-zirconium");
+		String ok = read(server, 12, up, z) + " | " + read(server, 3, up, z + 12) + " | " + read(server, 0, up, z + 12) + " | " + read(server, 0, up, z + 18);
+		// without the hafnium column the Kroll reactor says so
+		server.computeOnServer(srv -> srv.overworld().destroyBlock(hafnium, false));
+		context.waitTicks(40);
+		check(read(server, 0, up, z + 12).contains("HAFNIUM COLUMN"), "without its hafnium column the Kroll reactor should say so: " + read(server, 0, up, z + 12));
+		System.out.println("[wildcatter-test] zirconium ok: " + ok + " | tubes " + tubes + ", thimbles " + thimbles);
 	}
 
 	/**
