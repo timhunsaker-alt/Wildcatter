@@ -1408,6 +1408,29 @@ save_json(f"{ASSETS}/lang/en_us.json", lang)
 ROTOR_PARTS += ("injection_pump_coupling",)
 save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ROTOR_PARTS}})
 
+# ---- Phase 5b: the gas plant (docs/multiblocks/gas-plant.md) ------------------------------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/gas_plant.py; here loot, names, tags, recipes and the rotors.
+GAS_PLANT_PARTS = ("gas_compressor", "teg_dehydrator", "ngl_chiller", "refrigeration_compressor", "stabilizer", "lpg_bullet")
+for name in GAS_PLANT_PARTS:
+	big_part_loot(name)
+for tag in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
+	t["values"] += [f"{ns}:{n}" for n in GAS_PLANT_PARTS]
+	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
+shaped("gas_compressor", ["SPS", "CXC", "SBS"], {"S": S_, "P": f"{ns}:gas_line", "C": "minecraft:copper_block", "X": f"{ns}:crankshaft", "B": "minecraft:iron_block"}, "gas_compressor")
+shaped("teg_dehydrator", ["SPS", "SGS", "SFS"], {"S": S_, "P": f"{ns}:gas_line", "G": "minecraft:glass", "F": "minecraft:furnace"}, "teg_dehydrator")
+shaped("ngl_chiller", ["SPS", "IWI", "SPS"], {"S": S_, "P": f"{ns}:gas_line", "I": "minecraft:packed_ice", "W": "minecraft:white_wool"}, "ngl_chiller")
+shaped("refrigeration_compressor", ["SCS", "CXC", "SPS"], {"S": S_, "C": "minecraft:copper_ingot", "X": f"{ns}:crankshaft", "P": f"{ns}:gas_line"}, "refrigeration_compressor")
+shaped("stabilizer", ["SPS", "S S", "SFS"], {"S": S_, "P": f"{ns}:gas_line", "F": "minecraft:furnace"}, "stabilizer")
+shaped("lpg_bullet", ["SSS", "SPS", "SSS"], {"S": "minecraft:iron_block", "P": f"{ns}:gas_line"}, "lpg_bullet")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({"block.wildcatter.gas_compressor": "Gas Compressor (400 hp, 4.16 kV)", "block.wildcatter.teg_dehydrator": "TEG Dehydrator (3 MMscfd)",
+	"block.wildcatter.ngl_chiller": "NGL Chiller", "block.wildcatter.refrigeration_compressor": "Refrigeration Compressor (150 hp)",
+	"block.wildcatter.stabilizer": "Stabilizer (debutanizer, 12 m)", "block.wildcatter.lpg_bullet": "LPG Bullet (18,000 gal)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+ROTOR_PARTS += ("gas_compressor_coupling", "gas_compressor_fan", "refrigeration_coupling")
+save_json(f"{ASSETS}/blockstates/rotor.json", {"variants": {f"part={p}": {"model": f"{ns}:block/rotor_{p}"} for p in ROTOR_PARTS}})
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

@@ -108,6 +108,7 @@ public class PipeBlock extends Block {
 				: block instanceof GasWellheadBlock gas && neighbour.getValue(gas.piece()) == 0 || block instanceof OilWellheadBlock || block instanceof FireboxBlock
 						|| block instanceof RefineryBlock || block == dev.wildcatter.WildcatterBlocks.REFINERY_COLUMN
 						|| block instanceof LeasePartBlock || block instanceof DisposalWellheadBlock
+						|| block instanceof GasPlantPartBlock gasPlant && gasPlant.part() != GasPlantPartBlock.Part.REFRIGERATION_COMPRESSOR
 						|| block instanceof GensetPartBlock part && (part.part() == GensetPartBlock.Part.FUEL_TANK || part.part() == GensetPartBlock.Part.GAS_ENGINE)
 						|| block instanceof SteamPlantPartBlock burner && burner.part() == SteamPlantPartBlock.Part.BURNER;
 	}

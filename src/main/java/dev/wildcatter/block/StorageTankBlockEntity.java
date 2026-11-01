@@ -22,9 +22,10 @@ import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 /**
- * A 400 bbl (64,000 L) lease tank (docs/multiblocks/lease.md): the steel stock tank holds one liquid product, set by its first fill
- * (crude or diesel); the fiberglass water tank holds produced water. Pipe joins the side faces of its bottom ring. It fills from the
- * process outlets on those runs (never from another tank) and gives to whatever draws on them after the outlets are drawn.
+ * A storage tank (docs/multiblocks/lease.md, gas-plant.md): the 400 bbl (64,000 L) steel stock tank holds one liquid product, set by
+ * its first fill (crude, diesel or natural gasoline); the fiberglass water tank holds produced water; the 18,000 gallon LPG bullet
+ * holds 58,000 L of LPG. Pipe joins the side faces of its bottom layer. It fills from the process outlets on those runs (never from
+ * another tank) and gives to whatever draws on them after the outlets are drawn.
  */
 public class StorageTankBlockEntity extends BlockEntity implements Inspectable, BigPartEntity, FluidNode {
 	private @Nullable Product product;
@@ -39,9 +40,17 @@ public class StorageTankBlockEntity extends BlockEntity implements Inspectable, 
 		return getBlockState().getBlock() instanceof LeasePartBlock part && part.part() == LeasePartBlock.Part.WATER_TANK;
 	}
 
+	private boolean bullet() {
+		return getBlockState().getBlock() instanceof GasPlantPartBlock;
+	}
+
 	/** What it may hold. */
 	public boolean accepts(Product p) {
-		return water() ? p == Product.PRODUCED_WATER : p == Product.CRUDE || p == Product.DIESEL;
+		return water() ? p == Product.PRODUCED_WATER : bullet() ? p == Product.LPG : p == Product.CRUDE || p == Product.DIESEL || p == Product.NATURAL_GASOLINE;
+	}
+
+	public double capacity() {
+		return bullet() ? Tuning.LPG_BULLET_LITERS : Tuning.STOCK_TANK_LITERS;
 	}
 
 	/** Game test hook. */
@@ -68,7 +77,7 @@ public class StorageTankBlockEntity extends BlockEntity implements Inspectable, 
 	private void add(Product p, double litres) {
 		if (litres > 0) {
 			product = p;
-			amount = Math.min(Tuning.STOCK_TANK_LITERS, amount + litres);
+			amount = Math.min(capacity(), amount + litres);
 			setChanged();
 		}
 	}
@@ -106,13 +115,13 @@ public class StorageTankBlockEntity extends BlockEntity implements Inspectable, 
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, StorageTankBlockEntity tank) {
-		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0 || tank.amount >= Tuning.STOCK_TANK_LITERS) {
+		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0 || tank.amount >= tank.capacity()) {
 			return;
 		}
 		for (Lines.Line line : Lines.lines(level, tank.ring())) {
 			Product p = line.run().product();
 			if (p != null && tank.accepts(p) && (tank.product == null || tank.product == p || tank.amount < 0.5)) {
-				tank.add(p, Lines.pull(line, p, Tuning.STOCK_TANK_LITERS - tank.amount, Pull.TANK, tank));
+				tank.add(p, Lines.pull(line, p, tank.capacity() - tank.amount, Pull.TANK, tank));
 			}
 		}
 	}
@@ -145,7 +154,7 @@ public class StorageTankBlockEntity extends BlockEntity implements Inspectable, 
 			if (level.isClientSide()) {
 				return true;
 			}
-			if (!accepts(poured) || (product != null && product != poured && amount >= 0.5) || amount + 1000 > Tuning.STOCK_TANK_LITERS) {
+			if (!accepts(poured) || (product != null && product != poured && amount >= 0.5) || amount + 1000 > capacity()) {
 				player.sendOverlayMessage(inspect());
 				return true;
 			}
@@ -163,9 +172,9 @@ public class StorageTankBlockEntity extends BlockEntity implements Inspectable, 
 
 	@Override
 	public Component inspect() {
-		String kind = water() ? "Water tank (400 bbl fiberglass, 64,000 L)" : "Stock tank (400 bbl API 12F, 64,000 L)";
-		String holds = amount < 0.5 ? "empty" : String.format("%s %,.0f L (%.0f%%)", product == null ? "?" : product.label(), amount, amount / Tuning.STOCK_TANK_LITERS * 100);
-		return Component.literal(kind + ": " + holds + (amount >= Tuning.STOCK_TANK_LITERS ? ", FULL" : ""));
+		String kind = water() ? "Water tank (400 bbl fiberglass, 64,000 L)" : bullet() ? "LPG bullet (18,000 gal, 250 psi, 58,000 L)" : "Stock tank (400 bbl API 12F, 64,000 L)";
+		String holds = amount < 0.5 ? "empty" : String.format("%s %,.0f L (%.0f%%)", product == null ? "?" : product.label(), amount, amount / capacity() * 100);
+		return Component.literal(kind + ": " + holds + (amount >= capacity() ? ", FULL" : ""));
 	}
 
 	@Override

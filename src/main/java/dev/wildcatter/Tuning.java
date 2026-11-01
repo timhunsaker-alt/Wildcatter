@@ -144,6 +144,23 @@ public final class Tuning {
 	public static final double INJECTION_PUMP_START = 2_000.0;     // litres waiting: the water tank's level switch, about 0.2 m up the tank
 	public static final double INJECTION_PUMP_SLIP = 0.011;        // its two-pole motor: 3,560 rpm at 60 Hz, 2,967 at 50 Hz
 
+	// ---- The gas plant (docs/multiblocks/gas-plant.md, approved 2026-10-31) -----------------------------------------------
+	public static final double GAS_COMPRESSOR_WATTS = 300_000.0;   // 400 hp, 4.16 kV: two stages, 125 to 1,000 psi at 3 MMscfd
+	public static final double GAS_COMPRESSOR_M3S = 1.0;           // 3 million scf a day at full voltage
+	public static final int GAS_COMPRESSOR_POLES = 6;              // 1,190 rpm at 60 Hz, 990 at 50 Hz
+	public static final double GAS_COMPRESSOR_SLIP = 0.008;
+	public static final double GAS_COMPRESSOR_UNLOADED_SECONDS = 15.0;   // with nothing to do it runs unloaded this long, then stops
+	public static final double DEHYDRATOR_M3S = 1.0;               // a 3 MMscfd packaged TEG unit
+	public static final double GLYCOL_FUEL = 0.005;                // the reboiler burns this share of the gas
+	public static final double CHILLER_M3S = 1.0;
+	public static final double CHILLER_RESIDUE = 0.955;            // m3 of pipeline gas per m3 in: the gas shrinks 4.5 %
+	public static final double CHILLER_NGL_PER_M3 = 0.20;          // litres of Y-grade per m3: about 1.5 gallons per Mcf
+	public static final double REFRIGERATION_WATTS = 112_000.0;    // a 150 hp propane screw compressor, 480 V
+	public static final double STABILIZER_LPS = 0.5;               // litres of Y-grade a second
+	public static final double STABILIZER_LPG = 0.80;              // of the Y-grade: propane and butane overhead, the rest C5+
+	public static final double LPG_BULLET_LITERS = 58_000.0;       // an 18,000 gallon (68 m3) bullet at its 85 % fill
+	public static final double PLANT_HOLD_SECONDS = 5.0;           // each process part holds this much of its output
+
 	// ---- Refining and engines ----------------------------------------------------------------------------------------
 	public static final double REFINERY_WATTS = 2000.0;       // 110 V, 18 A
 	public static final double REFINERY_CRUDE_PER_TICK = 0.5; // at full voltage

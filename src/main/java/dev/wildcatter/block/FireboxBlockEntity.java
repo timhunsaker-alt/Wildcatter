@@ -153,10 +153,10 @@ public class FireboxBlockEntity extends BaseContainerBlockEntity implements Worl
 					}
 					yield sum;
 				}
-				case WET_GAS, GAS -> Lines.pull(line, product, need / Tuning.GAS_FUEL_TICKS_PER_UNIT, FluidNode.Pull.MACHINE, this) * Tuning.GAS_FUEL_TICKS_PER_UNIT;
+				case WET_GAS, GAS, COMPRESSED_GAS, DRIED_GAS, PIPELINE_GAS -> Lines.pull(line, product, need / Tuning.GAS_FUEL_TICKS_PER_UNIT, FluidNode.Pull.MACHINE, this) * Tuning.GAS_FUEL_TICKS_PER_UNIT;
 				case CRUDE -> Lines.pull(line, product, need / Tuning.OIL_FUEL_TICKS_PER_UNIT, FluidNode.Pull.MACHINE, this) * Tuning.OIL_FUEL_TICKS_PER_UNIT;
 				case DIESEL -> Lines.pull(line, product, need / Tuning.DIESEL_FUEL_TICKS_PER_UNIT, FluidNode.Pull.MACHINE, this) * Tuning.DIESEL_FUEL_TICKS_PER_UNIT;
-				case PRODUCED_WATER -> 0;
+				case PRODUCED_WATER, Y_GRADE, LPG, NATURAL_GASOLINE -> 0;
 			};
 			if (ticks > 0) {
 				burnLeft += ticks;

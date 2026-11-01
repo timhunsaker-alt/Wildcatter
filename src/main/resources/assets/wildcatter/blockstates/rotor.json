@@ -95,6 +95,15 @@
     },
     "part=injection_pump_coupling": {
       "model": "wildcatter:block/rotor_injection_pump_coupling"
+    },
+    "part=gas_compressor_coupling": {
+      "model": "wildcatter:block/rotor_gas_compressor_coupling"
+    },
+    "part=gas_compressor_fan": {
+      "model": "wildcatter:block/rotor_gas_compressor_fan"
+    },
+    "part=refrigeration_coupling": {
+      "model": "wildcatter:block/rotor_refrigeration_coupling"
     }
   }
 }

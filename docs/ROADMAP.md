@@ -81,7 +81,8 @@ and the Field Manual has a page for each new system.
 - Refinery products: LPG, gasoline, kerosene, diesel, residue. Steam cracker → ethylene → plastic.
 - Waves (decided with Tim on 2026-10-31: follow the chain; wells give a real mixed stream; each run of steel pipe carries one
   product): 5a the lease (separator, stock and water tanks, flare, injection pump and disposal well; docs/multiblocks/lease.md);
-  5b gas processing (dehydration, NGL and LPG recovery) and a motor-driven compressor station; 5c the crude distillation unit at
+  5b gas processing (dehydration, NGL and LPG recovery) and a motor-driven compressor (decided with Tim: a 4.16 kV electric drive;
+  dry pipeline gas plus LPG; only big burners need processed gas; docs/multiblocks/gas-plant.md); 5c the crude distillation unit at
   true size with a real crude assay (LPG, gasoline, kerosene, diesel, residue); 5d a steam cracker, ethylene, polyethylene and
   plastic.
 - Tim checks each wave in a real session before the next starts.
@@ -101,3 +102,4 @@ and the Field Manual has a page for each new system.
 
 ## Ideas (not scheduled)
 - Switches and panels. Better wire, ground and breaker art. Saving the Ludo sound sources.
+- A sales gas pipeline and meter station, so a gas plant's residue gas has a buyer besides engines and the flare.

@@ -71,6 +71,17 @@ public class LeasePartBlock extends BigPartBlock {
 		return new int[] {dx, cell.getY() - main.getY(), dz};
 	}
 
+	/** The cell at {@code x, y, z} in the part's own frame. */
+	static BlockPos at(BlockPos main, BlockState state, int x, int y, int z) {
+		int dx = x, dz = z;
+		for (int i = 0; i < BigParts.turns(state); i++) {
+			int t = dx;
+			dx = -dz;
+			dz = t;
+		}
+		return main.offset(dx, y, dz);
+	}
+
 	/** A side written in the part's own frame, turned the way the part faces. */
 	static Direction world(BlockState state, Direction local) {
 		Direction out = local;

@@ -22,6 +22,7 @@ not a go-ahead to build: that waits for the roadmap phase (ROADMAP.md). Nothing 
 | [well-site.md](well-site.md) | 4.5g | one-block rig, pumpjack and gas wellhead; fat pipes |
 | [land-rig.md](land-rig.md) | 4.5h | new: the late-game land rig, and deep fields |
 | [lease.md](lease.md) | 5a | new: separator, stock and water tanks, flare, injection pump and disposal well |
+| [gas-plant.md](gas-plant.md) | 5b | new: gas compressor, TEG dehydrator, NGL chiller and its refrigeration compressor, stabilizer, LPG bullet |
 
 ## Shared rules
 - One **controller** block validates the structure and holds all state. Parts have no logic of their own beyond

@@ -459,6 +459,22 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   well's wet gas, and `refining` takes its diesel off the column.
 - **FTB kit:** New World (2) has a `wildcatter_kit` datapack: `/function wildcatter:kit/land_rig` gives the land rig and its power.
 
+## Phase 5b: the gas plant
+- **Spec:** docs/multiblocks/gas-plant.md (approved with the plan, 2026-10-31).
+- **Parts** (`GasPlantPartBlock`): a two-stage reciprocating gas compressor on a 400 hp (300 kW) 4.16 kV six-pole motor (125 to
+  1,000 psi, 1.0 m³/s; it unloads when idle and stops after 15 s), a packaged TEG dehydrator (no power; its reboiler burns 0.5 %),
+  an NGL chiller (0.955 m³ of pipeline gas and 0.20 L of raw NGL a m³), the 150 hp 480 V propane refrigeration compressor that
+  cools the chiller its skid touches, a 12 m debutanizer stabilizer (80 % LPG, 20 % natural gasoline) and an 18,000 gallon LPG
+  bullet (58,000 L). Wet gas in the chiller reads HYDRATES; with no refrigeration, NO REFRIGERATION.
+- **Products:** compressed gas, dried gas, pipeline gas, raw NGL, LPG, natural gasoline. The steam plant burner takes pipeline gas
+  only; gas gensets take separator or pipeline gas; fireboxes any gas; stock tanks also hold natural gasoline; LPG only goes in a
+  bullet. A flare takes the excess of any gas part above three quarters full.
+- **Moving parts:** the compressor's coupling and cooler fan (1,190 rpm, shown at rpm / 10), the refrigeration coupling.
+- **Models:** `gas_plant.py` (six parts, three rotors). No Ludo credits.
+- **Game tests:** new scene `gasPlant` (a gas set on separator gas powers the plant: 4.16 kV through a backward unit substation to
+  the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
+  second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
+
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.
@@ -470,8 +486,11 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - Phase 4.5 is complete with 4.5h. Phase 5a (the lease) is in; gas processing (5b), the distillation unit (5c) and the cracker
   (5d) follow. The refinery is still the Phase 1 one-block base with columns until 5c.
 - Gas-well condensate goes out of the separator as crude until 5c gives it its own assay.
+- The wire-heat rule burns a correctly sized cable on a big motor's start (a 150 hp motor's 4/0 in about a second); the gas plant
+  test feeds it 500 kcmil. A fix is proposed in docs/multiblocks/gas-plant.md, waiting for Tim.
+- Gas has no sales pipeline yet: a gas plant's residue gas goes to engines, burners or a flare.
+- The gas plant's reboiler and stabilizer heat are not drawn from any fuel but the dehydrator's 0.5 %.
 - Pipe arms join every face of a lease part, though only its nozzles connect; the Power Meter on a pipe says what a run carries.
-- The lease test's screenshot frames the edge of the lease, not the tanks; the parts have been checked in model previews, not in play.
 - The land rig's power limit works on frequency, so on a small set it holds back well below the set's rating until the
   frequency control catches up (30 s); a real rig's power management also reads the gensets' kW.
 - The land rig's motors are inside the drive house's load: there are no cables drawn from the drive house to the pumps and

@@ -19,8 +19,8 @@ import net.minecraft.world.level.storage.ValueOutput;
 
 /**
  * A 10 m elevated flare (docs/multiblocks/lease.md): the knockout pot at its foot, the riser and the tip with its pilot. Gas comes in
- * at the bottom cell. It burns only what a separator's back-pressure valve lets go when the gas side is three quarters full: the gas
- * no burner or engine on the lease is taking. It never takes a gas well's own gas.
+ * at the bottom cell. It burns only what a separator's or a gas plant part's back-pressure valve lets go when it is three quarters
+ * full: the gas no burner, engine or plant is taking. It never takes a gas well's own gas.
  */
 public class FlareStackBlockEntity extends BlockEntity implements Inspectable, BigPartEntity, dev.wildcatter.kinetic.Sounding {
 	private final dev.wildcatter.kinetic.RunningSound running = new dev.wildcatter.kinetic.RunningSound();
@@ -44,7 +44,13 @@ public class FlareStackBlockEntity extends BlockEntity implements Inspectable, B
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
 			return;
 		}
-		flare.burned = Lines.pull(level, flare.inlet(), Product.GAS, Tuning.SEPARATOR_GAS_M3S * Tuning.WELL_INTERVAL / 20.0 * 4, FluidNode.Pull.FLARE, flare);
+		flare.burned = 0;
+		for (Lines.Line line : Lines.lines(level, flare.inlet())) {   // whatever gas its line carries: a separator's, or a gas plant's
+			Product gas = line.run().product();
+			if (gas != null && gas.gas()) {
+				flare.burned += Lines.pull(line, gas, Tuning.SEPARATOR_GAS_M3S * Tuning.WELL_INTERVAL / 20.0 * 4, FluidNode.Pull.FLARE, flare);
+			}
+		}
 		flare.quiet = flare.burned > 1e-6 ? 0 : flare.quiet + 1;
 		flare.running.update(flare, flare.quiet < 10);   // the flame dies back two seconds after the gas stops
 	}
@@ -69,7 +75,7 @@ public class FlareStackBlockEntity extends BlockEntity implements Inspectable, B
 	public Component inspect() {
 		return Component.literal("Flare stack (10 m): " + (burning()
 				? String.format("BURNING %.2f m3/s of gas the lease cannot use", burned * 20.0 / Tuning.WELL_INTERVAL)
-				: "pilot lit, nothing to burn (it takes only a separator's excess gas, through the bottom cell)"));
+				: "pilot lit, nothing to burn (it takes only the excess gas of a separator or a gas plant, through the bottom cell)"));
 	}
 
 	@Override

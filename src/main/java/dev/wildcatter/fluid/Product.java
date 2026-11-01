@@ -10,10 +10,22 @@ public enum Product {
 	/** A gas well's stream: gas with its condensate and a little water, counted as m3 of gas. */
 	WET_GAS("wet gas", true),
 	CRUDE("crude", false),
-	/** Separated (dry) gas, as gas engines and the steam plant burner need. */
+	/** Separator gas: the liquids taken out, as gas engines need. Big burners need it processed into pipeline gas. */
 	GAS("gas", true),
 	PRODUCED_WATER("produced water", false),
-	DIESEL("diesel", false);
+	DIESEL("diesel", false),
+	/** Separator gas after a compressor: at 1,000 psi, still wet (docs/multiblocks/gas-plant.md). */
+	COMPRESSED_GAS("compressed gas", true),
+	/** Compressed gas a glycol dehydrator has dried. */
+	DRIED_GAS("dried gas", true),
+	/** A gas plant's residue gas: dry, its heavier parts taken out, what big burners and turbines need. */
+	PIPELINE_GAS("pipeline gas", true),
+	/** Raw natural gas liquids out of a chiller, before the stabilizer splits them. */
+	Y_GRADE("raw NGL (Y-grade)", false),
+	/** Propane and butane. */
+	LPG("LPG", false),
+	/** The C5+ out of the bottom of a stabilizer. */
+	NATURAL_GASOLINE("natural gasoline", false);
 
 	private final String label;
 	private final boolean gas;

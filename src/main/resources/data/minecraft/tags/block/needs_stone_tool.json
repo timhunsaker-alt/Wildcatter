@@ -64,6 +64,12 @@
     "wildcatter:water_tank",
     "wildcatter:flare_stack",
     "wildcatter:injection_pump",
-    "wildcatter:disposal_wellhead"
+    "wildcatter:disposal_wellhead",
+    "wildcatter:gas_compressor",
+    "wildcatter:teg_dehydrator",
+    "wildcatter:ngl_chiller",
+    "wildcatter:refrigeration_compressor",
+    "wildcatter:stabilizer",
+    "wildcatter:lpg_bullet"
   ]
 }

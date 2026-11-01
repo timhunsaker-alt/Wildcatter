@@ -184,5 +184,11 @@
   "block.wildcatter.water_tank": "Water Tank (400 bbl fiberglass)",
   "block.wildcatter.flare_stack": "Flare Stack (10 m)",
   "block.wildcatter.injection_pump": "Injection Pump (H-pump, 100 hp)",
-  "block.wildcatter.disposal_wellhead": "Disposal Wellhead (saltwater disposal)"
+  "block.wildcatter.disposal_wellhead": "Disposal Wellhead (saltwater disposal)",
+  "block.wildcatter.gas_compressor": "Gas Compressor (400 hp, 4.16 kV)",
+  "block.wildcatter.teg_dehydrator": "TEG Dehydrator (3 MMscfd)",
+  "block.wildcatter.ngl_chiller": "NGL Chiller",
+  "block.wildcatter.refrigeration_compressor": "Refrigeration Compressor (150 hp)",
+  "block.wildcatter.stabilizer": "Stabilizer (debutanizer, 12 m)",
+  "block.wildcatter.lpg_bullet": "LPG Bullet (18,000 gal)"
 }

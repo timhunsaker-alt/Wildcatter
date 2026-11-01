@@ -258,9 +258,14 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		}
 		List<Lines.Face> faces = Lines.faces(dev.wildcatter.multiblock.BigParts.cellsAt(level, engine()));   // a gas line to any cell of the engine
 		double got = Lines.pull(level, faces, Product.GAS, want, FluidNode.Pull.MACHINE, null);
+		double piped = Lines.pull(level, faces, Product.PIPELINE_GAS, want - got, FluidNode.Pull.MACHINE, null);   // a gas plant's gas does as well
+		got += piped;
 		gasBuffer += got;
 		dev.wildcatter.fluid.Run wrong = got > 0 ? null : Lines.wrong(level, faces, Product.GAS);
-		supply = got > 0 || gasBuffer > 0 ? "gas from a separator"
+		if (wrong != null && wrong.carries(Product.PIPELINE_GAS)) {
+			wrong = null;
+		}
+		supply = piped > 0 ? "pipeline gas" : got > 0 || gasBuffer > 0 ? "gas from a separator"
 				: wrong != null && wrong.carries(Product.WET_GAS) ? "WET GAS: put a separator between the well and the engine"
 				: wrong != null ? "NO GAS: its gas line is " + wrong.describe()
 				: "NO GAS: run a gas line from a separator's gas side to the engine";

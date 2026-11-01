@@ -148,6 +148,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("lease")) {
 				lease(context, server);
 			}
+			if (only("gasPlant")) {
+				gasPlant(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -2200,6 +2203,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	 */
 	private void lease(ClientGameTestContext context, TestServerContext server) {
 		int z = -1020;
+		server.runCommand("effect give @p minecraft:slow_falling 600 0 true");   // the camera stands high: no fall, no lost chunks
 		server.runCommand("tp @p 20 " + (up + 8) + " " + (z + 22) + " 160 25");
 		context.waitTicks(20);   // let the chunks load before building there
 		server.runCommand("fill 4 " + (y - 1) + " " + (z - 10) + " 46 " + (y + 12) + " " + (z + 16) + " minecraft:air");
@@ -2300,6 +2304,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			check(gasGen.contains("RUNNING") && gasGen.contains("gas from a separator"), "a gas genset on separator gas should run: " + gasGen);
 			String run = server.computeOnServer(srv -> dev.wildcatter.block.Lines.line(srv.overworld(), new BlockPos(30, up + 2, z)).run().describe());
 			check(run.equals("carrying gas"), "the gas run should carry gas: " + run);
+			server.runCommand("tp @p 18 " + (up + 7) + " " + (z + 16) + " 210 20");   // aimed just before the shot: the player falls between
 			context.waitTicks(3);
 			context.takeScreenshot("wildcatter-lease");
 			// buckets: crude poured in, and taken back out
@@ -2333,6 +2338,149 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			String jackShut = read(server, 20, up, z);
 			check(jackShut.contains("SHUT IN"), "a pumpjack with its flowline backed up should stop: " + jackShut);
 			System.out.println("[wildcatter-test] lease ok: " + jack + " | " + sep + " | " + oilTank + " | " + flare + " | " + pump + " | " + gasGen + " | " + blocked + " | " + shut);
+		} finally {
+			ReservoirData.testSeed = null;
+		}
+	}
+
+	/**
+	 * The gas plant (5b, docs/multiblocks/gas-plant.md): a gas well and separator; a 1 MW gas set on the separator's gas powers the
+	 * plant (480 V to the refrigeration compressor, a backward unit substation to 4.16 kV for the gas compressor). The train runs west
+	 * to east: compressor, dehydrator, chiller (the refrigeration compressor against its south side), the stabilizer, an LPG bullet
+	 * and a stock tank of natural gasoline; a second gas set runs on the pipeline gas. Without refrigeration the chiller stops, and
+	 * fed wet gas it reads HYDRATES.
+	 */
+	private void gasPlant(ClientGameTestContext context, TestServerContext server) {
+		int z = -1080;
+		server.runCommand("effect give @p minecraft:slow_falling 600 0 true");   // the camera stands high: no fall, no lost chunks
+		server.runCommand("tp @p 28 " + (up + 14) + " " + (z + 20) + " 180 35");
+		context.waitTicks(20);   // let the chunks load before building there
+		server.runCommand("fill 4 " + (y - 1) + " " + (z - 12) + " 50 " + (y + 13) + " " + (z + 8) + " minecraft:air");
+		server.runCommand("fill 4 " + (y - 1) + " " + (z - 12) + " 50 " + (y - 1) + " " + (z + 8) + " minecraft:stone");
+		long seed = -1;
+		for (long s = 1; s < 2_000_000 && seed < 0; s++) {
+			Reservoir gas = Reservoir.at(s, 8, z);   // under the Christmas tree
+			if (gas != null && !gas.deep() && gas.kind() == Reservoir.Kind.GAS && gas.units() > 100_000) {
+				seed = s;
+			}
+		}
+		check(seed >= 0, "no seed puts a gas field under the gas plant's well");
+		ReservoirData.testSeed = seed;
+		try {
+			// the lease: the tree, a separator (x 10-13, z-1..z, inlet west)
+			placeBig(server, WildcatterBlocks.GAS_WELLHEAD, new BlockPos(8, up, z), net.minecraft.core.Direction.NORTH);
+			placeBig(server, WildcatterBlocks.SEPARATOR, new BlockPos(10, up, z), net.minecraft.core.Direction.WEST);
+			// the plant, flowing east: compressor x 18-26, dehydrator x 28-32, chiller x 34-40 (all z-3..z, facing west, inlets west)
+			placeBig(server, WildcatterBlocks.GAS_COMPRESSOR, new BlockPos(18, up, z), net.minecraft.core.Direction.WEST);
+			placeBig(server, WildcatterBlocks.TEG_DEHYDRATOR, new BlockPos(28, up, z - 1), net.minecraft.core.Direction.WEST);
+			placeBig(server, WildcatterBlocks.NGL_CHILLER, new BlockPos(34, up, z - 1), net.minecraft.core.Direction.WEST);
+			BlockPos refrigeration = new BlockPos(34, up, z + 2);   // x 34-39, z..z+2: against the chiller's south side
+			placeBig(server, WildcatterBlocks.REFRIGERATION_COMPRESSOR, refrigeration, net.minecraft.core.Direction.WEST);
+			placeBig(server, WildcatterBlocks.STABILIZER, new BlockPos(43, up, z - 3), net.minecraft.core.Direction.NORTH);   // x 43-44, z-3..z-2
+			placeBig(server, WildcatterBlocks.LPG_BULLET, new BlockPos(46, up, z - 8), net.minecraft.core.Direction.NORTH);   // x 46-48, z-8..z+3
+			placeBig(server, WildcatterBlocks.STOCK_TANK, new BlockPos(42, up, z + 2), net.minecraft.core.Direction.NORTH);   // x 42-45, z+2..z+5
+			// power: a gas set south of the separator; a unit substation off its panel to 4.16 kV, its second terminal at 480 V
+			BlockPos power = new BlockPos(16, up, z + 3);
+			genset(server, power, net.minecraft.core.Direction.NORTH, true);   // engine x 11-14, z+3..z+4
+			inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, power, net.minecraft.core.Direction.EAST, false);   // x 17-20, z+2..z+3
+			for (int[] p : new int[][] {{21, 3}, {21, 2}, {21, 1}, {22, 1}}) {
+				put(server, p[0], up, z + p[1], "wildcatter:cable_mv");   // to the compressor motor's box, its south face at x 22
+			}
+			put(server, 17, up, z + 4, "wildcatter:cable_industrial");
+			for (int x = 17; x <= 34; x++) {
+				put(server, x, up, z + 5, "wildcatter:cable_industrial");
+			}
+			put(server, 34, up, z + 4, "wildcatter:cable_industrial");
+			put(server, 34, up, z + 3, "wildcatter:cable_industrial");   // the refrigeration compressor's box, its main cell's south face
+			server.computeOnServer(srv -> {   // 150 hp draws about 170 A, 1,000 A starting: 500 kcmil (the wire-heat rule burns 4/0 on the start)
+				for (BlockPos at : BlockPos.betweenClosed(17, up, z + 3, 34, up, z + 5)) {
+					if (srv.overworld().getBlockEntity(at) instanceof dev.wildcatter.block.MultiCableBlockEntity cable && cable.getBlockState().is(WildcatterBlocks.CABLE_INDUSTRIAL)) {
+						cable.setSize(dev.wildcatter.energy.ConductorSize.KCMIL_500);
+					}
+				}
+				return null;
+			});
+			// the pipes
+			put(server, 9, up, z, "wildcatter:gas_line");   // the tree to the separator
+			for (int x = 13; x <= 16; x++) {
+				put(server, x, up + 2, z, "wildcatter:gas_line");   // separator gas off the top...
+			}
+			put(server, 16, up + 1, z, "wildcatter:gas_line");
+			put(server, 16, up, z, "wildcatter:gas_line");
+			put(server, 17, up, z, "wildcatter:gas_line");   // ...to the compressor's suction
+			for (int[] p : new int[][] {{14, 2, 1}, {14, 2, 2}, {14, 1, 2}, {14, 0, 2}}) {
+				put(server, p[0], up + p[1], z + p[2], "wildcatter:gas_line");   // and to the power set's engine
+			}
+			put(server, 27, up, z - 1, "wildcatter:gas_line");   // compressor to dehydrator
+			put(server, 33, up, z - 1, "wildcatter:gas_line");   // dehydrator to chiller
+			for (int[] p : new int[][] {{41, 0, -2}, {41, 0, -3}, {41, 0, -4}, {42, 0, -4}, {43, 0, -4}}) {
+				put(server, p[0], up + p[1], z + p[2], "wildcatter:gas_line");   // Y-grade to the stabilizer
+			}
+			put(server, 45, up, z - 3, "wildcatter:gas_line");   // LPG to the bullet
+			for (int zz = z - 1; zz <= z + 1; zz++) {
+				put(server, 43, up, zz, "wildcatter:gas_line");   // natural gasoline to the stock tank
+			}
+			BlockPos sales = new BlockPos(40, up, z - 10);   // the second gas set, on pipeline gas: engine x 35-38, z-10..z-9
+			genset(server, sales, net.minecraft.core.Direction.NORTH, true);
+			put(server, 41, up + 1, z - 1, "wildcatter:gas_line");   // pipeline gas, out of the chiller's back upper layer
+			for (int zz = z - 8; zz <= z - 1; zz++) {
+				put(server, 41, up + 2, zz, "wildcatter:gas_line");
+			}
+			put(server, 41, up + 1, z - 8, "wildcatter:gas_line");
+			for (int x = 37; x <= 41; x++) {
+				put(server, x, up, z - 8, "wildcatter:gas_line");
+			}
+			placeBig(server, WildcatterBlocks.FLARE_STACK, new BlockPos(41, up, z - 9), net.minecraft.core.Direction.NORTH);   // the residue gas no one takes
+
+			startGenset(context, server, power, net.minecraft.core.Direction.NORTH, 0);
+			context.waitTicks(200);   // the plant fills with pipeline gas before the second set cranks on it
+			server.computeOnServer(srv -> {
+				panel(srv, sales).setWantRun(true);
+				return null;
+			});
+			context.waitTicks(400);
+			String comp = read(server, 20, up, z);
+			check(comp.contains("compressing") && comp.contains("running"), "the gas compressor should compress separator gas: " + comp + " | sep " + read(server, 11, up, z)
+					+ " | set " + read(server, 16, up, z + 3) + " | dehy " + read(server, 30, up, z - 1) + " | chill " + read(server, 36, up, z - 1)
+					+ " | refr " + read(server, 35, up, z + 1) + " | cable " + read(server, 34, up, z + 3) + " | stab " + read(server, 43, up, z - 3));
+			float rpm = context.computeOnClient(client -> client.level.getBlockEntity(new BlockPos(18, up, z)) instanceof dev.wildcatter.block.GasCompressorBlockEntity c ? c.spin().rpm() : -1F);
+			double sixPole = 120.0 * dev.wildcatter.energy.ElectricalStandard.active().hertz() / Tuning.GAS_COMPRESSOR_POLES * (1 - Tuning.GAS_COMPRESSOR_SLIP);
+			check(Math.abs(rpm - sixPole) < 5, "the client should see the compressor's coupling at about " + sixPole + " rpm: " + rpm);
+			String dehy = read(server, 30, up, z - 1);
+			check(dehy.contains("drying"), "the dehydrator should dry the compressed gas: " + dehy);
+			String chill = read(server, 36, up, z - 1);
+			check(chill.contains("chilling"), "the chiller should make pipeline gas and NGL: " + chill + " | " + read(server, 35, up, z + 1));
+			String stab = read(server, 43, up, z - 3);
+			check(stab.contains("splitting"), "the stabilizer should split the NGL: " + stab);
+			String bullet = read(server, 47, up, z - 3);
+			check(bullet.contains("LPG bullet") && bullet.contains("LPG ") && !bullet.contains("empty"), "the bullet should fill with LPG: " + bullet);
+			String tank = read(server, 43, up, z + 3);
+			check(tank.contains("natural gasoline"), "the stock tank should fill with natural gasoline: " + tank);
+			String salesSet = read(server, 40, up, z - 10);
+			check(salesSet.contains("RUNNING") && salesSet.contains("pipeline gas"), "a gas set on the plant's pipeline gas should run: " + salesSet);
+			server.runCommand("tp @p 30 " + (up + 9) + " " + (z + 15) + " 200 22");   // aimed just before the shot: the player falls between
+			context.waitTicks(3);
+			context.takeScreenshot("wildcatter-gas-plant");
+			// no refrigeration: the chiller stops
+			server.computeOnServer(srv -> srv.overworld().destroyBlock(refrigeration, false));
+			String warm = "";
+			for (int waited = 0; waited < 200 && !warm.contains("NO REFRIGERATION"); waited += 20) {
+				context.waitTicks(20);
+				warm = read(server, 36, up, z - 1);
+			}
+			check(warm.contains("NO REFRIGERATION"), "without its refrigeration compressor the chiller should stop: " + warm);
+			// the dehydrator bypassed: wet compressed gas reaches the chiller
+			server.computeOnServer(srv -> srv.overworld().destroyBlock(new BlockPos(28, up, z - 1), false));
+			for (int x = 28; x <= 32; x++) {
+				put(server, x, up, z - 1, "wildcatter:gas_line");
+			}
+			String hydrates = "";
+			for (int waited = 0; waited < 200 && !hydrates.contains("HYDRATES"); waited += 20) {
+				context.waitTicks(20);
+				hydrates = read(server, 36, up, z - 1);
+			}
+			check(hydrates.contains("HYDRATES"), "wet gas in the chiller should freeze: " + hydrates);
+			System.out.println("[wildcatter-test] gas plant ok: " + comp + " | " + dehy + " | " + chill + " | " + stab + " | " + bullet + " | " + tank + " | " + salesSet + " | " + hydrates);
 		} finally {
 			ReservoirData.testSeed = null;
 		}

@@ -21,6 +21,9 @@ Put the jar in your instance's `mods` folder next to:
 - The lease: wells now bring up oil, water and gas together. A separator splits them; oil goes to stock tanks, gas to engines,
   burners and a flare, and produced water to a water tank, an injection pump and a disposal well on a dry hole. Each run of steel
   pipe carries one product; the Power Meter on a pipe says what, or BLOCKED where two meet.
+- The gas plant: a 4.16 kV gas compressor, a glycol dehydrator, an NGL chiller with its refrigeration compressor and a
+  stabilizer turn separator gas into pipeline gas, LPG (in an LPG bullet) and natural gasoline. The steam plant burner now
+  needs pipeline gas.
 - The Field Manual item explains how to build each machine.
 
 ## Older worlds
