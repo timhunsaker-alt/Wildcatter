@@ -208,9 +208,13 @@ public final class Tuning {
 	public static final double TURBINE_STEAM_SMOOTHING = 0.3; // how fast the output follows the steam supply
 
 	// ---- Wire heating (the sizes, their resistance and ampacity are in energy/ConductorSize) ---------------------
-	/** A wire carrying twice its rating burns out after about this long. Hotter, faster. */
-	public static final double WIRE_BURN_SECONDS_AT_2X = 6.0;
-	public static final double WIRE_COOL_SECONDS = 20.0;
+	/**
+	 * A conductor's temperature rise follows its current with this time constant (energy/WireHeat): copper and its insulation take
+	 * minutes to heat, so a motor's two-second start passes and a sustained overload does not. Approved by Tim, 2026-10-31.
+	 */
+	public static final double WIRE_HEAT_SECONDS = 120.0;
+	/** It burns out when its temperature rise reaches this many times its rated rise (75 C wire in 30 C air: about 110 C). */
+	public static final double WIRE_BURN_RISE = 1.8;
 
 	// ---- Wool insulation: it wears with time, current and weather ------------------------------------------------
 	public static final double WOOL_LIFE_TICKS = 72000;       // three game days of ordinary use

@@ -749,7 +749,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			((WireBlockEntity) srv.overworld().getBlockEntity(new BlockPos(12, up, 11))).setWear(1.0);
 			return null;
 		});
-		context.waitTicks(100);
+		for (int waited = 0; waited < 1200 && !(isAir(server, 12, up, 10) || isAir(server, 12, up, 11)); waited += 20) {
+			context.waitTicks(20);   // the wire heats over seconds (energy/WireHeat)
+		}
 		check(breaker(server, 13, 10) == BreakerBlock.Position.ON, "a short before the breaker must not trip it; the breaker only guards what is after it");
 		check(isAir(server, 12, up, 10) || isAir(server, 12, up, 11), "a short before the breaker should burn out the wire");
 		System.out.println("[wildcatter-test] short upstream of the breaker: breaker stayed on, the wire burned");
@@ -778,9 +780,12 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(20);
 		put(server, 14, up, 10, "wildcatter:wire_hot");
 		put(server, 14, up, 11, "wildcatter:wire_neutral");
-		context.waitTicks(200);
-		boolean burnt = isAir(server, 12, up, 10) || isAir(server, 13, up, 10) || isAir(server, 14, up, 10) || isAir(server, 14, up, 11)
-				|| isAir(server, 11, up, 11) || isAir(server, 12, up, 11) || isAir(server, 13, up, 11);
+		boolean burnt = false;
+		for (int waited = 0; waited < 1200 && !burnt; waited += 20) {
+			context.waitTicks(20);
+			burnt = isAir(server, 12, up, 10) || isAir(server, 13, up, 10) || isAir(server, 14, up, 10) || isAir(server, 14, up, 11)
+					|| isAir(server, 11, up, 11) || isAir(server, 12, up, 11) || isAir(server, 13, up, 11);
+		}
 		check(burnt, "a dead short with no breaker should burn out a wire");
 		System.out.println("[wildcatter-test] unprotected short: a wire burned out");
 	}
@@ -1951,8 +1956,8 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	}
 
 	/**
-	 * Conductor sizes: a 40 m run of 12 AWG drops more voltage than the same run in 6 AWG; a 6 AWG cable feeding five 15 kW heaters
-	 * (90 A) burns out where 2 AWG holds; a 4/0 ACSR span may not be as long as a 1/0 one; a wire placed without a size takes its
+	 * Conductor sizes: a 40 m run of 12 AWG drops more voltage than the same run in 6 AWG; a 10 AWG cable feeding five 15 kW heaters
+	 * (90 A, three times its rating) burns out where 2 AWG holds; a 4/0 ACSR span may not be as long as a 1/0 one; a wire placed without a size takes its
 	 * tier's standard one; and a broken wire drops with its size.
 	 */
 	private void conductorSizes(ClientGameTestContext context, TestServerContext server) {
@@ -1981,7 +1986,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		System.out.println("[wildcatter-test] voltage drop ok: 12 AWG " + thin + " | 6 AWG " + thick);
 		server.runCommand("fill 6 " + (y - 1) + " " + z + " 56 " + (y + 1) + " " + (z + 1) + " minecraft:air");
 
-		// 2. ampacity: 90 A through one block of cable, 2 AWG (115 A) holds and 6 AWG (65 A) burns
+		// 2. ampacity: 90 A through one block of cable, 2 AWG (115 A) holds and 10 AWG (30 A, three times over) burns
 		int zc = z - 8;
 		BlockPos set = new BlockPos(12, up, zc);
 		genset(server, set, net.minecraft.core.Direction.NORTH, false);   // the skid runs west
@@ -2005,7 +2010,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(holds.contains("2 AWG") && !isAir(server, 13, up, zc) && cableAmps(holds) > 70,
 				"2 AWG should carry the five heaters' 90 A without burning: " + holds);
 		server.computeOnServer(srv -> {
-			((dev.wildcatter.block.MultiCableBlockEntity) srv.overworld().getBlockEntity(new BlockPos(13, up, zc))).setSize(dev.wildcatter.energy.ConductorSize.AWG_6);
+			((dev.wildcatter.block.MultiCableBlockEntity) srv.overworld().getBlockEntity(new BlockPos(13, up, zc))).setSize(dev.wildcatter.energy.ConductorSize.AWG_10);
 			return null;
 		});
 		String burning = "";
@@ -2013,7 +2018,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			burning = read(server, 13, up, zc);
 			context.waitTicks(20);
 		}
-		check(isAir(server, 13, up, zc) && burning.contains("HEATING"), "6 AWG carrying 90 A should heat and burn out: " + burning);
+		check(isAir(server, 13, up, zc) && burning.contains("HEATING"), "10 AWG carrying 90 A should heat and burn out: " + burning);
 		System.out.println("[wildcatter-test] ampacity ok: " + holds + " | " + burning);
 
 		// 3. spans: 40 m is fine for 1/0 ACSR on distribution poles, too long for 4/0
@@ -2240,7 +2245,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			for (int x = 14; x <= 21; x++) {
 				put(server, x, up, z + 10, "wildcatter:cable_industrial");   // to the H-pump's terminal box, the west face of its main cell
 			}
-			server.computeOnServer(srv -> {   // a 100 hp motor draws about 124 A: 4/0 cable, not the 115 A default (2 AWG burns up on its start)
+			server.computeOnServer(srv -> {   // a 100 hp motor draws about 112 A: 4/0 cable for it, not the 115 A default at its limit
 				for (BlockPos at : BlockPos.betweenClosed(12, up, z, 21, up, z + 10)) {
 					if (srv.overworld().getBlockEntity(at) instanceof dev.wildcatter.block.MultiCableBlockEntity cable) {
 						cable.setSize(dev.wildcatter.energy.ConductorSize.AWG_4_0);
@@ -2392,10 +2397,10 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			}
 			put(server, 34, up, z + 4, "wildcatter:cable_industrial");
 			put(server, 34, up, z + 3, "wildcatter:cable_industrial");   // the refrigeration compressor's box, its main cell's south face
-			server.computeOnServer(srv -> {   // 150 hp draws about 170 A, 1,000 A starting: 500 kcmil (the wire-heat rule burns 4/0 on the start)
+			server.computeOnServer(srv -> {   // 150 hp draws about 170 A: 4/0 (230 A), which carries its start too
 				for (BlockPos at : BlockPos.betweenClosed(17, up, z + 3, 34, up, z + 5)) {
 					if (srv.overworld().getBlockEntity(at) instanceof dev.wildcatter.block.MultiCableBlockEntity cable && cable.getBlockState().is(WildcatterBlocks.CABLE_INDUSTRIAL)) {
-						cable.setSize(dev.wildcatter.energy.ConductorSize.KCMIL_500);
+						cable.setSize(dev.wildcatter.energy.ConductorSize.AWG_4_0);
 					}
 				}
 				return null;

@@ -57,10 +57,10 @@ New on steel pipe: compressed gas (out of a compressor), dried gas (out of a deh
   genset is not how compressors run, and each start drew six times full-load current.
 - A flare stack takes the excess of any gas part, not only a separator's: a gas plant's residue gas with no buyer goes to it
   above three quarters full, as a real plant's relief does. Without one the plant backs up to what its buyers take.
-- Wire heating and motor starts (FOR TIM): the wire-heat rule burns a cable at 2x its rating in 6 s, faster above. A 150 hp motor
-  starting at 6x its full-load current on the NEC-sized 4/0 cable (230 A) burns it in about a second; real copper would carry that
-  start for minutes. The test feeds the refrigeration compressor 500 kcmil. Proposed: a heating time constant of a few minutes
-  (an I-squared-t curve) so starts pass and sustained overloads still burn.
+- Wire heating and motor starts: the old wire-heat rule burned a cable at 2x its rating in 6 s, and burned a 150 hp motor's
+  NEC-sized 4/0 on its start. Tim approved the fix (2026-10-31): a conductor's temperature rise follows the square of its current
+  with a 120 s time constant and burns out at 1.8 times its rated rise (energy/WireHeat). A start passes; twice the rating burns
+  in about 37 s, three times in about 13 s, a dead short in a quarter of a second.
 
 ## Game test
 `gasPlant`: a gas well and separator; a 1 MW gas set on separator gas powers the plant (480 V to the refrigeration compressor, a

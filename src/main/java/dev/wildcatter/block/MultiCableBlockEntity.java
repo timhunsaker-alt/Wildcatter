@@ -99,12 +99,8 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 		}
 		lineVolts = circuit.across(node[Conductor.A.ordinal()], node[Conductor.B.ordinal()]);
 		double ratio = worst / size().amps();
-		if (ratio > 1.0) {
-			heat += (ratio * ratio - 1.0) / 3.0 * ticks / (20.0 * Tuning.WIRE_BURN_SECONDS_AT_2X);
-		} else {
-			heat = Math.max(0, heat - ticks / (20.0 * Tuning.WIRE_COOL_SECONDS));
-		}
-		if (heat >= 1.0 && level instanceof ServerLevel server) {
+		heat = dev.wildcatter.energy.WireHeat.step(heat, ratio, ticks / 20.0);
+		if (dev.wildcatter.energy.WireHeat.burnt(heat) && level instanceof ServerLevel server) {
 			server.sendParticles(ParticleTypes.LARGE_SMOKE, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5, 10, 0.2, 0.2, 0.2, 0.02);
 			server.playSound(null, worldPosition, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.6F, 1.6F);
 			server.destroyBlock(worldPosition, false);
@@ -125,7 +121,7 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 			text.append(String.format("%s %.0f V %.1f A, ", conductor.name(), volts[k], amps[k]));
 		}
 		text.append(String.format("N %.1f A, A to B %.0f V; %.0f A per conductor allowed%s, %.1f Hz", amps[Conductor.N.ordinal()],
-				lineVolts, size().amps(), heat > 0.05 ? ", HEATING " + Math.round(heat * 100) + "%" : "", hertz));
+				lineVolts, size().amps(), dev.wildcatter.energy.WireHeat.readout(heat), hertz));
 		return Component.literal(text.toString());
 	}
 

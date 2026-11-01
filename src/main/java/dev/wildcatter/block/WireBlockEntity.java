@@ -121,13 +121,9 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		amps = circuit.through(node);
 		double ratio = amps / ampacity();
 
-		// Heat: a wire past its rating warms up, faster the harder it is pushed; under its rating it cools.
-		if (ratio > 1.0) {
-			heat += (ratio * ratio - 1.0) / 3.0 * ticks / (20.0 * Tuning.WIRE_BURN_SECONDS_AT_2X);
-		} else {
-			heat = Math.max(0, heat - ticks / (20.0 * Tuning.WIRE_COOL_SECONDS));
-		}
-		if (heat >= 1.0 && level instanceof ServerLevel server) {
+		// Heat: its temperature follows the square of its current over a couple of minutes (energy/WireHeat)
+		heat = dev.wildcatter.energy.WireHeat.step(heat, ratio, ticks / 20.0);
+		if (dev.wildcatter.energy.WireHeat.burnt(heat) && level instanceof ServerLevel server) {
 			burnOut(server);
 			return;
 		}
@@ -188,7 +184,7 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 				: wear >= 1.0 ? "wool worn OUT, bare " + metal() : "wool " + Math.round(wear * 100) + "% worn";
 		return Component.literal(getBlockState().getValue(CableBlock.CONDUCTOR).label() + " wire (" + block.voltage().label() + (block.voltage() == Voltage.LOW ? "" : ", " + fmt(block.voltage().nominal()) + " V to neutral") + ", " + size().label() + ", " + insulation + "): "
 				+ fmt(volts) + " V, " + fmt(amps) + " A of " + fmt(ampacity()) + " A allowed"
-				+ (heat > 0.05 ? ", HEATING " + Math.round(heat * 100) + "%" : "") + String.format(", %.1f Hz", hertz));
+				+ (dev.wildcatter.energy.WireHeat.readout(heat)) + String.format(", %.1f Hz", hertz));
 	}
 
 	private static String fmt(double value) {

@@ -475,6 +475,11 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Wire heating (approved by Tim, 2026-10-31)
+- A conductor's temperature rise follows the square of its current with a 120 s time constant and burns out at 1.8 times its
+  rated rise (`energy/WireHeat`, unit-tested). A motor's start no longer burns the cable sized for it; twice the rating burns in
+  about 37 s, three times in about 13 s, a dead short in a quarter of a second. The game tests that burn wires now wait for it.
+
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.
@@ -486,8 +491,6 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - Phase 4.5 is complete with 4.5h. Phase 5a (the lease) is in; gas processing (5b), the distillation unit (5c) and the cracker
   (5d) follow. The refinery is still the Phase 1 one-block base with columns until 5c.
 - Gas-well condensate goes out of the separator as crude until 5c gives it its own assay.
-- The wire-heat rule burns a correctly sized cable on a big motor's start (a 150 hp motor's 4/0 in about a second); the gas plant
-  test feeds it 500 kcmil. A fix is proposed in docs/multiblocks/gas-plant.md, waiting for Tim.
 - Gas has no sales pipeline yet: a gas plant's residue gas goes to engines, burners or a flare.
 - The gas plant's reboiler and stabilizer heat are not drawn from any fuel but the dehydrator's 0.5 %.
 - Pipe arms join every face of a lease part, though only its nozzles connect; the Power Meter on a pipe says what a run carries.
