@@ -148,7 +148,12 @@ and the Field Manual has a page for each new system.
     docs/multiblocks/turbine-island.md.
   - 8c: the hyperbolic natural-draft cooling tower (Tim asked for the iconic tower; Calder Hall's 50 MWe units each had an 88 m
     one), closing the circulating water loop. It needs a true-size shell rendered as one model.
-  - 8d: SCRAM and safety (decay heat, xenon, residual heat removal, spent fuel pool, refuelling machine, dosimeter).
+  - 8c DONE.
+  - 8d: after the trip: decay heat, xenon, the cooldown and residual heat removal, core damage and a hydrogen blast
+    (docs/multiblocks/reactor.md).
+  - 8e: the refuelling machine, irradiated fuel, the spent fuel pool and its cooling, radiation and the dosimeter.
+- Decided with Tim on 2026-11-01 (the 8d plan): two waves (8d, 8e); losing cooling ends in core damage and a hydrogen blast;
+  radiation in 8e is a real dose with real effects (nausea and weakness at a few Sv, death about 8 Sv).
 - Decided with Tim on 2026-11-01 (the 8c plan): the tower rises lift by lift as it is fed; a tenth of the real concrete (the steel
   about a hundredth); the wet bulb from the biome.
 - Decided with Tim on 2026-11-01 (the 8b plan): the tower gets its own wave after the turbine island; a new 60 MVA two-pole
@@ -201,5 +206,5 @@ and the Field Manual has a page for each new system.
     - how a spec is chosen and shown (a ghost preview?);
     - whether it builds anything, or only machines with a spec;
     - whether it can take a plant apart too.
-- Reactor: the real 55 C/h heat-up limit; full OT-delta-T and OP-delta-T trips; the pressurizer relief tank; a containment
+- Reactor: a containment building with hydrogen recombiners and igniters; low-temperature overpressure protection; the real 55 C/h heat-up limit; full OT-delta-T and OP-delta-T trips; the pressurizer relief tank; a containment
   building; silver-indium-cadmium and hafnium rods; helium in the B4C rodlets; a buyer for the borax plant's sodium sulfate.

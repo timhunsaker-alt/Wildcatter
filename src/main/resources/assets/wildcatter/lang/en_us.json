@@ -367,6 +367,8 @@
   "block.wildcatter.pressurizer": "Pressurizer",
   "block.wildcatter.cvcs_skid": "CVCS Skid (charging, letdown, boron)",
   "block.wildcatter.aux_feed_pump": "Aux Feed Pump (75 hp)",
+  "block.wildcatter.rhr_pump": "RHR Pump (200 kW, 4.16 kV)",
+  "block.wildcatter.rhr_heat_exchanger": "RHR Heat Exchanger",
   "block.wildcatter.borax_dissolver": "Borax Dissolver",
   "block.wildcatter.boric_acid_crystallizer": "Boric Acid Crystallizer",
   "block.wildcatter.b4c_furnace": "B4C Furnace (Acheson)",

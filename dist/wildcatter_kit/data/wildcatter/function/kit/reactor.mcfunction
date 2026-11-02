@@ -10,6 +10,8 @@ give @s wildcatter:reactor_coolant_pump 2
 give @s wildcatter:pressurizer
 give @s wildcatter:cvcs_skid
 give @s wildcatter:aux_feed_pump
+give @s wildcatter:rhr_pump
+give @s wildcatter:rhr_heat_exchanger
 give @s wildcatter:fuel_assembly 9
 give @s wildcatter:rcca 5
 give @s wildcatter:boric_acid 12

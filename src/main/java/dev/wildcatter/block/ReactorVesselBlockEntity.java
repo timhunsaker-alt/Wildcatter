@@ -80,6 +80,8 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 		}
 		sgs.sort(Comparator.comparingInt((SteamGeneratorBlockEntity s) -> s.getBlockPos().getZ()).thenComparingInt(s -> s.getBlockPos().getX()));
 		UnitMotorBlockEntity pzr = motor(around, "pressurizer");
+		UnitMotorBlockEntity rhrPump = motor(around, "rhr_pump");
+		RhrHeatExchangerBlockEntity rhrHx = rhrPump == null ? null : Touching.find(level, rhrPump.getBlockPos(), RhrHeatExchangerBlockEntity.class, h -> true);
 		ReactorCoolantPumpBlockEntity[] pumps = new ReactorCoolantPumpBlockEntity[2];
 		for (int l = 0; l < sgs.size(); l++) {
 			List<BlockEntity> sgAround = Touching.parts(level, sgs.get(l).getBlockPos());
@@ -120,6 +122,11 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 			in.feed[l] = sg != null ? sg.pullFeed(level, reactor.feedWanted(l, dt)) : 0;
 		}
 
+		// the RHR: its pump runs while the plant is under 177 C and 2.9 MPa, its exchanger on the circulating water
+		in.rhrPump = rhrPump != null && rhrHx != null && reactor.rhrPermit() && reactor.tavg() > Tuning.RHR_HOLD_C ? rhrPump.drive(level) : 0;
+		double rhrKg = in.rhrPump > 0 ? rhrHx.pull(level, Tuning.RHR_CW_KGS * dt) : 0;
+		in.rhrWaterKgs = rhrKg / dt;
+		in.rhrWaterC = rhrHx != null ? rhrHx.inC() : Tuning.LAKE_C;
 		in.turbineTripped = false;
 		for (SteamGeneratorBlockEntity sg : sgs) {
 			in.turbineTripped |= sg.turbineTripped(level.getGameTime());
@@ -128,6 +135,16 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 
 		if (cvcs != null) {
 			cvcs.use(reactor.boricAcidUsed(), reactor.waterUsed());
+		}
+		if (rhrHx != null) {
+			double warmed = in.rhrWaterKgs > 0 ? in.rhrWaterC + reactor.rhrHeat() / (in.rhrWaterKgs * 4186) : in.rhrWaterC;
+			rhrHx.giveBack(rhrKg, warmed, !reactor.rhrPermit() ? String.format("idle: the RHR cuts in under %.0f C and %.1f MPa", Tuning.RHR_MAX_C, Tuning.RHR_MAX_MPA)
+					: String.format("taking %.2f MW into %.0f kg/s of circulating water at %.1f C", reactor.rhrHeat() / 1e6, in.rhrWaterKgs, in.rhrWaterC));
+		}
+		if (reactor.takeBlast()) {
+			// the hydrogen in the island's building air ignites at the pressurizer's top (or the vessel's, without one)
+			BlockPos at = pzr != null ? pzr.getBlockPos().above(8) : worldPosition.above(12);
+			level.explode(null, at.getX() + 0.5, at.getY(), at.getZ() + 0.5, Tuning.H2_BLAST_POWER, Level.ExplosionInteraction.BLOCK);
 		}
 		for (int l = 0; l < sgs.size(); l++) {
 			String status = String.format("loop %s: level %.0f %%, %.2f MPa, feed %.1f kg/s, dump valve %.1f kg/s, to its pipe %.1f kg/s; pump %s", l == 0 ? "A" : "B",
@@ -187,14 +204,17 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 	@Override
 	public Component inspect() {
 		Reactor r = reactor;
-		String state = !parts.isEmpty() ? parts : r.tripped() ? "TRIPPED: " + r.trip() : r.power() < 1e-4 ? "SUBCRITICAL" : "CRITICAL";
+		String state = r.exploded() ? "HYDROGEN EXPLOSION; CORE DAMAGE" : r.coreDamaged() ? "CORE DAMAGE" : !parts.isEmpty() ? parts
+				: r.tripped() ? "TRIPPED: " + r.trip() : r.power() < 1e-4 ? "SUBCRITICAL" : "CRITICAL";
 		String power = r.power() < 1e-4 ? String.format("source range %.0f cps", r.power() * 1e10) : String.format("power %.2f %% (%.1f MW)", r.power() * 100,
 				r.power() * Reactor.ratedWatts() / 1e6);
-		String setpoint = r.setpoint() < 0 ? "TRIP" : String.format("%.0f %%", r.setpoint() * 100);
+		String setpoint = r.setpoint() == Reactor.COOLDOWN ? "COOLDOWN" : r.setpoint() < 0 ? "TRIP" : String.format("%.0f %%", r.setpoint() * 100);
 		return Component.literal(String.format("Reactor: %s; %s, startup rate %.2f dpm; setpoint %s%s; rods: shutdown bank %.0f, bank D %.0f of %d steps; "
-				+ "boron %.0f ppm; Tavg %.1f C (Thot %.1f, Tcold %.1f); pressurizer %.2f MPa; RCS %.0f t; core %d of %d assemblies, %d of %d RCCAs, burnup %.2f GWd/t",
+				+ "boron %.0f ppm, xenon %.0f pcm; decay heat %.2f %% (%.1f MW); Tavg %.1f C (Thot %.1f, Tcold %.1f), fuel %.0f C; pressurizer %.2f MPa; RCS %.1f t; "
+				+ "RHR %.2f MW; H2 %.1f kg; core %d of %d assemblies, %d of %d RCCAs, burnup %.2f GWd/t",
 				state, power, r.startupRate(), setpoint, r.held().isEmpty() ? "" : ", HELD: " + r.held(), r.shutdownBank(), r.bankD(), Tuning.ROD_STEPS, r.ppm(),
-				r.tavg(), r.thot(), r.tcold(), r.pressure(), r.waterKg() / 1000, r.assemblies(), Tuning.CORE_ASSEMBLIES, r.rccas(), Tuning.RCCAS,
+				r.xenonPcm(), r.decayHeat() * 100, r.decayHeat() * Reactor.ratedWatts() / 1e6, r.tavg(), r.thot(), r.tcold(), r.fuelC(), r.pressure(), r.waterKg() / 1000,
+				r.rhrHeat() / 1e6, r.h2(), r.assemblies(), Tuning.CORE_ASSEMBLIES, r.rccas(), Tuning.RCCAS,
 				r.assemblies() > 0 ? r.burnup(0) : 0));
 	}
 

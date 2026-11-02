@@ -32,7 +32,9 @@ public class ReactorPartBlock extends BigPartBlock implements net.minecraft.worl
 		REACTOR_COOLANT_PUMP("reactor_coolant_pump", Footprint.box(2, 5, 2, 0, 0)),
 		PRESSURIZER("pressurizer", Footprint.box(2, 8, 2, 0, 0)),
 		CVCS_SKID("cvcs_skid", Footprint.box(3, 3, 6, 0, 0)),
-		AUX_FEED_PUMP("aux_feed_pump", Footprint.box(2, 2, 4, 0, 0));
+		AUX_FEED_PUMP("aux_feed_pump", Footprint.box(2, 2, 4, 0, 0)),
+		RHR_PUMP("rhr_pump", Footprint.box(2, 3, 2, 0, 0)),
+		RHR_HEAT_EXCHANGER("rhr_heat_exchanger", Footprint.box(2, 6, 2, 0, 0));
 
 		private final String id;
 		private final Footprint footprint;
@@ -67,6 +69,7 @@ public class ReactorPartBlock extends BigPartBlock implements net.minecraft.worl
 			case REACTOR_COOLANT_PUMP -> new ReactorCoolantPumpBlockEntity(pos, state);
 			case CVCS_SKID -> new CvcsBlockEntity(pos, state);
 			case AUX_FEED_PUMP -> new AuxFeedPumpBlockEntity(pos, state);
+			case RHR_HEAT_EXCHANGER -> new RhrHeatExchangerBlockEntity(pos, state);
 			default -> new UnitMotorBlockEntity(pos, state);
 		};
 	}
@@ -78,7 +81,7 @@ public class ReactorPartBlock extends BigPartBlock implements net.minecraft.worl
 			case REACTOR_VESSEL -> {
 				return level.isClientSide() ? null : createTickerHelper(type, WildcatterBlocks.REACTOR_VESSEL_ENTITY, ReactorVesselBlockEntity::tick);
 			}
-			case REACTOR_CONSOLE, STEAM_GENERATOR -> {
+			case REACTOR_CONSOLE, STEAM_GENERATOR, RHR_HEAT_EXCHANGER -> {
 				return null;
 			}
 			default -> {

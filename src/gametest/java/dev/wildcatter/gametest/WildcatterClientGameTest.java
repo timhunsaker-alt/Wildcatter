@@ -202,6 +202,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("coolingTower")) {
 				coolingTower(context, server);
 			}
+			if (only("reactorSafety")) {
+				reactorSafety(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -5807,6 +5810,107 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(80);
 		context.takeScreenshot("wildcatter-cooling-tower");
 		System.out.println("[wildcatter-test] coolingTower ok: " + hot);
+	}
+
+	/**
+	 * After the trip (8d, docs/multiblocks/reactor.md): a vessel with its CRDM head, an RHR pump against its north face and the RHR
+	 * exchanger against the pump, a CW pump in a pool north-east piping water to the exchanger, and three diesel sets through a backward
+	 * unit substation for their 4.16 kV. Hooks give the core a full-power history and trip it: decay heat and xenon; then put it at
+	 * 170 C and 2.5 MPa for the RHR; then drain it with the fuel at 1,150 C: core damage, hydrogen and the blast. The vessel stands.
+	 */
+	private void reactorSafety(ClientGameTestContext context, TestServerContext server) {
+		int z = -3900;
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 14 " + (up + 18) + " " + (z + 16) + " 150 40");
+		context.waitTicks(20);
+		for (int zz = z - 20; zz <= z + 10; zz += 15) {
+			server.runCommand("fill -26 " + (y - 1) + " " + zz + " 16 " + (y + 15) + " " + Math.min(zz + 14, z + 10) + " minecraft:air");
+		}
+		server.runCommand("fill -26 " + (y - 4) + " " + (z - 20) + " 16 " + (y - 1) + " " + (z + 10) + " minecraft:stone");
+		server.runCommand("fill 7 " + (up - 3) + " " + (z - 14) + " 13 " + (up - 1) + " " + (z - 6) + " minecraft:water");
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		BlockPos vessel = new BlockPos(0, up, z);
+		placeBig(server, WildcatterBlocks.REACTOR_VESSEL, vessel, north);
+		placeBig(server, WildcatterBlocks.CRDM_HEAD, new BlockPos(0, up + 10, z), north);
+		placeBig(server, WildcatterBlocks.RHR_PUMP, new BlockPos(0, up, z - 2), north);              // x 0-1, z-2..z-1, against the vessel
+		placeBig(server, WildcatterBlocks.RHR_HEAT_EXCHANGER, new BlockPos(2, up, z - 2), north);    // x 2-3, against the pump
+		placeBig(server, WildcatterBlocks.CIRCULATING_WATER_PUMP, new BlockPos(8, up - 3, z - 12), north);   // x 8-10, z-12..z-10, in the pool
+		for (int zz = z - 11; zz <= z - 4; zz++) {
+			put(server, 11, up, zz, "wildcatter:gas_line");
+		}
+		for (int x = 2; x <= 11; x++) {
+			put(server, x, up, z - 3, "wildcatter:gas_line");
+		}
+		// 4.16 kV: three sets, a backward unit substation, north to the CW pump's box and round to the RHR pump's
+		BlockPos[] mvSets = {new BlockPos(-22, up, z - 13), new BlockPos(-14, up, z - 13), new BlockPos(-6, up, z - 13)};
+		for (BlockPos set : mvSets) {
+			genset(server, set, north, false);
+			put(server, set.getX() + 1, up, z - 13, "wildcatter:busway_industrial");
+		}
+		for (int x = -21; x <= 2; x++) {
+			put(server, x, up, z - 14, "wildcatter:busway_industrial");
+		}
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, new BlockPos(2, up, z - 14), net.minecraft.core.Direction.EAST, false);   // x 3-6
+		for (BlockPos set : mvSets) {
+			startGenset(context, server, set, north, 2000);
+		}
+		for (int zz = z - 14; zz <= z - 12; zz++) {
+			put(server, 7, up, zz, "wildcatter:cable_mv");
+		}
+		context.waitTicks(100);
+		for (int x = -1; x <= 6; x++) {
+			put(server, x, up, z - 13, "wildcatter:cable_mv");
+		}
+		for (int zz = z - 12; zz <= z - 2; zz++) {
+			put(server, -1, up, zz, "wildcatter:cable_mv");
+		}
+		// a long run at full power, then a trip: decay heat and xenon
+		dev.wildcatter.fluid.Reactor[] r = new dev.wildcatter.fluid.Reactor[1];
+		server.computeOnServer(srv -> {
+			r[0] = ((dev.wildcatter.block.ReactorVesselBlockEntity) srv.overworld().getBlockEntity(vessel)).reactor();
+			((dev.wildcatter.block.ReactorVesselBlockEntity) srv.overworld().getBlockEntity(vessel)).setHotStandbyForTest(1500);
+			r[0].setHistoryForTest(1.0);
+			r[0].setSetpoint(-1);
+			return null;
+		});
+		context.waitTicks(40);
+		double[] after = server.computeOnServer(srv -> new double[] {r[0].decayHeat(), r[0].xenonPcm()});
+		String trip = read(server, 0, up, z);
+		check(after[0] > 0.04 && after[0] < 0.10, "a few seconds after the trip the decay heat should be about 6 %: " + trip);
+		check(after[1] < -2500, "the xenon should be at its full-power level and building: " + trip);
+		// cooled to 170 C and 2.5 MPa: the RHR cuts in and takes the heat into the circulating water
+		server.computeOnServer(srv -> {
+			r[0].setCooldownForTest(170, 2.5);
+			return null;
+		});
+		double rhr = 0;
+		for (int i = 0; i < 30 && rhr < 3e5; i++) {
+			context.waitTicks(20);
+			rhr = server.computeOnServer(srv -> r[0].rhrHeat());
+		}
+		String rhrRead = read(server, 0, up, z) + " | RHR " + read(server, 2, up, z - 2) + " | pump " + read(server, 0, up, z - 2) + " | CW " + read(server, 8, up - 3, z - 12);
+		check(rhr > 3e5, "the RHR should take the decay heat into the circulating water: " + rhrRead);
+		// loss of all cooling: the RHR's power cut, the RCS drained to a quarter, the fuel at 1,150 C
+		put(server, -1, up, z - 2, "minecraft:air");
+		server.computeOnServer(srv -> {
+			r[0].setInventoryForTest(0.25 * Tuning.RCS_WATER_KG);
+			r[0].setFuelForTest(1150);
+			return null;
+		});
+		boolean exploded = false;
+		for (int i = 0; i < 60 && !exploded; i++) {
+			context.waitTicks(20);
+			exploded = server.computeOnServer(srv -> r[0].exploded());
+		}
+		String damage = read(server, 0, up, z);
+		check(server.computeOnServer(srv -> r[0].coreDamaged()), "the cladding should fail over 1,200 C: " + damage);
+		check(exploded && damage.contains("HYDROGEN EXPLOSION"), "the hydrogen should ignite: " + damage);
+		check(stateAt(server, vessel).is(WildcatterBlocks.REACTOR_VESSEL) && stateAt(server, vessel.above(10)).is(WildcatterBlocks.CRDM_HEAD),
+				"the vessel and its head should stand through the blast");
+		server.runCommand("tp @p 14 " + (up + 8) + " " + (z + 14) + " 135 20");
+		context.waitTicks(20);
+		context.takeScreenshot("wildcatter-reactor-safety");
+		System.out.println("[wildcatter-test] reactorSafety ok: " + trip + " | " + rhrRead + " | " + damage);
 	}
 
 	/**

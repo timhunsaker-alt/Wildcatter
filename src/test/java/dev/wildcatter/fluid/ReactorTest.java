@@ -157,6 +157,106 @@ class ReactorTest {
 		assertEquals(Tuning.RCS_MPA, r.pressure(), 0.3);
 	}
 
+	private static Reactor loadedHot() {
+		Reactor r = new Reactor();
+		for (int i = 0; i < 9; i++) {
+			r.loadAssembly(0);
+		}
+		for (int i = 0; i < 5; i++) {
+			r.loadRcca();
+		}
+		r.setHotStandbyForTest(1500);
+		return r;
+	}
+
+	@Test
+	void decayHeatFollowsWayWigner() {
+		Reactor r = loadedHot();
+		r.setHistoryForTest(1.0);
+		Reactor.Inputs in = inputs();
+		double t = 0;
+		double[] at = {1, 3600, 86400};
+		int k = 0;
+		while (k < at.length) {
+			double dt = t < 10 ? 0.05 : t < 4000 ? 1 : 60;
+			step(r, in, dt);
+			t += dt;
+			if (t >= at[k]) {
+				double ww = 0.0622 * Math.pow(t, -0.2);
+				assertEquals(1, r.decayHeat() / ww, 0.15, "decay heat at " + at[k] + " s: " + r.decayHeat() + " against " + ww);
+				k++;
+			}
+		}
+	}
+
+	@Test
+	void xenonHoldsTheCoreDownAndPeaksAfterATrip() {
+		assertEquals(1.0, Reactor.xenonEquilibrium(1.0), 1e-9);
+		Reactor r = loadedHot();
+		r.setHistoryForTest(1.0);
+		assertEquals(-2800, r.xenonPcm(), 1);
+		Reactor.Inputs in = inputs();
+		double peak = 0, when = 0;
+		for (double t = 0; t < 30 * 3600; t += 60) {
+			step(r, in, 60);
+			if (-r.xenonPcm() > peak) {
+				peak = -r.xenonPcm();
+				when = t;
+			}
+		}
+		assertTrue(peak > 3500 && peak < 6000, "the xenon peak " + peak);
+		assertEquals(8, when / 3600, 1.5, "the peak about 8 h after the trip");
+	}
+
+	@Test
+	void withNoCoolingTheCoreFailsAndItsHydrogenExplodes() {
+		Reactor r = loadedHot();
+		r.setHistoryForTest(1.0);
+		Reactor.Inputs in = inputs();
+		in.loop[0] = in.loop[1] = false;
+		in.pump[0] = in.pump[1] = 0;
+		in.pumpPower[0] = in.pumpPower[1] = 0;
+		in.cvcs = false;
+		r.setInventoryForTest(0.3 * Tuning.RCS_WATER_KG);
+		boolean blast = false;
+		double t = 0;
+		for (; t < 3 * 3600 && !blast; t += 1) {
+			step(r, in, 1);
+			blast |= r.takeBlast();
+		}
+		assertTrue(r.coreDamaged(), "the core should be damaged: fuel " + r.fuelC());
+		assertTrue(blast && r.exploded(), "the hydrogen should explode: " + r.h2() + " kg");
+		assertTrue(r.tripped() && r.trip().startsWith("CORE DAMAGE"), r.trip());
+		r.setSetpoint(0.02);
+		run(r, in, 5, 0.2);
+		assertTrue(r.tripped(), "a damaged core cannot be reset");
+	}
+
+	@Test
+	void theCooldownAndTheRhrBringItToColdShutdown() {
+		Reactor r = loadedHot();
+		r.setHistoryForTest(1.0);
+		Reactor.Inputs in = inputs();
+		r.setSetpoint(-1);
+		r.setSetpoint(Reactor.COOLDOWN);
+		double t = 0;
+		while (!r.rhrPermit() && t < 3600) {
+			step(r, in, 0.2);
+			t += 0.2;
+		}
+		assertTrue(r.rhrPermit(), "the dump valves and spray should bring it under 177 C and 2.9 MPa: " + r.tavg() + " C, " + r.pressure() + " MPa");
+		in.rhrPump = 1;
+		in.rhrWaterKgs = Tuning.RHR_CW_KGS;
+		in.rhrWaterC = 25;
+		in.pump[0] = in.pump[1] = 0;
+		in.pumpPower[0] = in.pumpPower[1] = 0;
+		for (int i = 0; i < 3600 && r.tavg() > 60; i++) {
+			step(r, in, 1);
+		}
+		assertTrue(r.tavg() < 60, "the RHR should take it to cold shutdown: " + r.tavg());
+		assertTrue(!r.coreDamaged());
+	}
+
 	private static Reactor.Inputs inputs() {
 		Reactor.Inputs in = new Reactor.Inputs();
 		in.crdm = true;

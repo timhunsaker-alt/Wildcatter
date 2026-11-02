@@ -475,6 +475,31 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 8d: after the trip (spec: docs/multiblocks/reactor.md, "After the trip")
+- **Tim's decisions:**
+  - two waves (8d after the trip; 8e refuelling, spent fuel and radiation);
+  - losing cooling ends in core damage and a hydrogen blast;
+  - radiation in 8e is a real dose with real effects.
+- **Decay heat:**
+  - Way-Wigner fitted as 8 groups on the power history: 6.2 % at 1 s, 1.2 % at 1 h, 0.64 % at a day;
+  - it takes its place in the core's heat, so a tripped core keeps heating the RCS.
+- **Xenon:** iodine and xenon (real yields and half-lives, σφ 6×10⁻⁵ /s); −2,800 pcm at full power, peaking about 8 h after a trip
+  near −4,600 pcm.
+- **COOLDOWN** on the console (between TRIP and 0):
+  - the dump valves lower the temperature at 55 °C/h (compressed as the heat-up), with auxiliary spray lowering the pressure;
+  - below 177 °C and 2.9 MPa the RHR PUMP (200 kW, 4.16 kV) and the RHR HEAT EXCHANGER (UA 60 kW/°C, on circulating water with its
+    temperature) take it to 50 °C.
+- **Core damage:**
+  - the RCS boils off through the PORVs, and below 60 % of its water the core uncovers;
+  - the uncovered share of the decay heat goes into the fuel;
+  - over 1,200 °C CORE DAMAGE latches (no reset);
+  - Zircaloy and steam make hydrogen, and at 18 kg (4 % of 5,000 m³) it explodes, power 6, at the pressurizer;
+  - the vessel and head (blast resistance 1,200) stand.
+- **Game test** `reactorSafety`, by hooks:
+  - the decay heat about 5-6 % just after the trip, with xenon at −2,800 pcm;
+  - at 170 °C the RHR takes about 9 MW into a CW pump's water;
+  - drained to a quarter with the fuel at 1,150 °C, the cladding fails, about 19 kg of H2 explodes, and the vessel stands.
+
 ## Phase 8c: the hyperbolic natural-draft cooling tower (spec: docs/multiblocks/natural-draft-tower.md)
 - **Tim's decisions:**
   - the tower rises lift by lift as it is fed;
@@ -839,6 +864,8 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- Phase 8d: hydrogen goes into a notional 5,000 m³ of building air; there is no containment building, recombiners or igniters
+  (ROADMAP Ideas). A damaged core waits for 8e's refuelling machine. The game test reaches damage by hooks, not hours of boil-off.
 - Phase 8c: the tower's shell is drawn by one renderer and made solid by invisible blocks; no visible block model. Humidity is a
   three-step proxy, as the biome's downfall is private. The game test builds the shell by hook rather than over 13 minutes, and
   does not run the whole plant on the tower (turbineIsland still uses a lake).

@@ -513,6 +513,34 @@ public final class Tuning {
 	public static final double UAT_VA = 7_500_000.0;               // 13.8/4.16 kV (proposed)
 	public static final double UAT_PERCENT_Z = 7.0;
 
+	// ---- After the trip: decay heat, xenon, RHR, core damage (docs/multiblocks/reactor.md, 8d, approved 2026-11-01) --------------
+	public static final double[] DECAY_LAMBDA = {3.0, 0.3, 0.03, 3e-3, 3e-4, 3e-5, 3e-6, 3e-7};   // /s, a fit to Way-Wigner
+	public static final double[] DECAY_SHARE = {0.068467, 0.023723, 0.015488, 0.009964, 0.005755, 0.004623, 0.000871, 0.005296};
+	public static final double IODINE_LAMBDA = Math.log(2) / (6.57 * 3600);
+	public static final double XENON_LAMBDA = Math.log(2) / (9.14 * 3600);
+	public static final double XENON_BURNOUT = 6.0e-5;             // /s at full power: sigma-phi at about 2.3e13 n/cm2s (proposed)
+	public static final double XENON_DIRECT = 0.24 / (6.39 + 0.24);  // of xenon made directly, not by iodine
+	public static final double XENON_WORTH = 0.028;                // at full-power equilibrium (textbook)
+	public static final double COOLDOWN_C_PER_H = 55.0;            // the operators' cooldown on the dump valves, compressed as the heat-up
+	public static final double COOLDOWN_FLOOR_C = 120.0;
+	public static final double PZR_SUBCOOLING_C = 30.0;           // the pressure held over saturation while cooling down
+	public static final double RHR_MAX_C = 177.0;                  // 350 F
+	public static final double RHR_MAX_MPA = 2.9;                  // 425 psig
+	public static final double RHR_HOLD_C = 50.0;                  // cold shutdown
+	public static final double RHR_WATTS = 200_000.0;              // 4.16 kV (proposed)
+	public static final double RHR_UA_W_PER_C = 60_000.0;          // (proposed)
+	public static final double RHR_CW_KGS = 200.0;                 // circulating water through its exchanger (proposed)
+	public static final double RCS_LATENT_J_PER_KG = 1.0e6;        // near 15.5 MPa
+	public static final double CORE_UNCOVERED = 0.60;              // of the RCS inventory
+	public static final double FUEL_HEAT_J_PER_C = 1.8e6;          // 4.7 t of UO2 and 1.05 t of Zircaloy
+	public static final double FUEL_STEAM_COOLING_W_PER_C = 1_000.0;     // what the steam round uncovered fuel takes (proposed)
+	public static final double CLAD_FAIL_C = 1200.0;
+	public static final double CORE_ZR_KG = 1050.0;
+	public static final double ZR_OXIDATION_J_PER_KG = 6.42e6;     // 586 kJ/mol
+	public static final double H2_PER_ZR = 0.044;
+	public static final double H2_IGNITE_KG = 18.0;                // 4 % of 5,000 m3 of the island's building air (proposed)
+	public static final float H2_BLAST_POWER = 6.0F;               // (proposed)
+
 	// ---- The natural-draft cooling tower (docs/multiblocks/natural-draft-tower.md, approved 2026-11-01) --------------------------
 	public static final double TOWER_SHELL_BASE_Y = 8.0;           // over the basin floor; the raker columns below
 	public static final double TOWER_THROAT_Y = 62.0;

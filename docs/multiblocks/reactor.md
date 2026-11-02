@@ -222,3 +222,56 @@ z7    . . . Q Q . . . .
   - the console sits against the vessel's east face three blocks up, so the feedwater pipe runs under it;
   - the aux feed pump has a diesel set of its own;
   - the pressurizer and aux feed stubs are 500 kcmil, as the zirconium and fuel plants' stubs are.
+
+## After the trip (8d, APPROVED 2026-11-01 with the Phase 8d plan)
+Decided with Tim on 2026-11-01:
+- Two waves: 8d is after the trip, 8e the refuelling machine, spent fuel pool and radiation.
+- Losing cooling ends in core damage and a hydrogen blast.
+- Radiation (8e) is a real dose with real effects.
+
+**Decay heat:** Way-Wigner, 0.0622 [t^−0.2 − (t + T)^−0.2], fitted as 8 exponential groups that follow the plant's power history.
+- After a long run at full power: **6.2 % at 1 s, 1.2 % at 1 h, 0.64 % at 1 day** of 155 MW, within 15 % of the formula.
+- It keeps heating the RCS after a trip. The steam generators (aux feed and dump valves) or the RHR must carry it away.
+
+**Xenon:**
+- **Data:** I-135 (6.39 %, 6.57 h) and Xe-135 (0.24 % direct, 9.14 h), burning out at a full-power σφ of **6×10⁻⁵ /s**
+  (about 2.3×10¹³ n/cm²s) *(proposed)*.
+- **Worth:** **−2,800 pcm** at full-power equilibrium.
+- **After a trip** it peaks about **8 h** later near **−4,600 pcm**, so a restart then needs a dilution.
+- **The planned 10 h** is the high-flux textbook figure; a PWR's flux gives about 8 h.
+
+**Cooldown:**
+- **On the console:** a **COOLDOWN** setting, between TRIP and 0.
+  - The rods stay in.
+  - The dump valves lower the steam generators' saturation temperature at **55 °C an hour**, compressed 80× as the heat-up is.
+  - Auxiliary spray off the charging pump holds the pressure 30 °C over saturation.
+- **The RHR** cuts in below **177 °C and 2.9 MPa** and holds **50 °C** (cold shutdown).
+- **A plant cooling on its own** loses heat at real speed.
+
+**RHR parts:**
+| Part | Cells | Real basis |
+|---|---|---|
+| `rhr_pump` | 2 x 3 x 2 | The residual heat removal pump, against the vessel. **200 kW at 4.16 kV**, 100 kg/s *(proposed)*. It runs only below 177 °C and 2.9 MPa. |
+| `rhr_heat_exchanger` | 2 x 6 x 2 | The vertical RHR exchanger, against the pump. **UA 60 kW/°C** *(proposed)* against circulating water.<br>• The water comes in on the north face of its bottom cells (with its temperature, from a CW pump), up to 200 kg/s.<br>• It goes out warmed on the south face. |
+
+**Core damage:**
+- **Boil-off:** with more heat than goes out, the RCS reaches saturation and boils off through the PORVs at about 1 MJ/kg.
+- **Uncovered core:** below **60 %** of the inventory the core uncovers. Fully uncovered at 20 %.
+- **The fuel heats:** the uncovered share of the decay heat goes into the fuel and cladding (1.8 MJ/°C). The steam round it
+  takes only 1 kW/°C *(proposed)*. The coolant gets only the covered share.
+- **Cladding failure:** above **1,200 °C** the cladding fails: **CORE DAMAGE**, latched. The reactor cannot be reset; 8e defuels it.
+- **Zircaloy oxidation:** it runs away with temperature (0.1 % a second at 1,200 °C, ×e every 100 °C, at most 5 % a second
+  *(proposed)*).
+  - It adds 6.42 MJ/kg Zr.
+  - It makes **0.044 kg of H2 per kg of Zr**, up to about 46 kg from the core's 1.05 t.
+- **Hydrogen:** it goes out through the PORVs into the island's building air, counted as **5,000 m³** *(proposed; no containment
+  building yet)*.
+- **The blast:** at **4 %, about 18 kg**, it ignites: an explosion of power **6** at the pressurizer's top.
+  - The vessel and CRDM head (blast resistance 1,200) stand; lighter parts round them can break.
+  - The vessel reads **HYDROGEN EXPLOSION; CORE DAMAGE**.
+
+**Game test `reactorSafety`** (all with hooks):
+- **After a trip:** a full-power history then a trip. The decay heat is about 6 % and xenon is at −2,800 pcm and building.
+- **RHR:** at 170 °C and 2.5 MPa the RHR pump starts and the exchanger takes the heat into a CW pump's water from a pool.
+- **Loss of cooling:** with the RHR's power cut, the RCS at a quarter and the fuel at 1,150 °C, the cladding fails and the
+  hydrogen explodes. The vessel and head stand.

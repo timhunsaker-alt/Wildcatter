@@ -39,6 +39,9 @@ public class ReactorConsoleBlockEntity extends PlantUnitBlockEntity {
 		}
 		double set = vessel.reactor().nextSetpoint();
 		vessel.setChanged();
+		if (set == dev.wildcatter.fluid.Reactor.COOLDOWN) {
+			return "Reactor console: COOLDOWN (rods in; the dump valves lower the temperature 55 C an hour, the RHR takes it under 177 C)";
+		}
 		return set < 0 ? "Reactor console: TRIP (all rods in)" : String.format("Reactor console: setpoint %.0f %% (%s)", set * 100,
 				vessel.reactor().tripped() ? "resetting the trip" : "rods under automatic control");
 	}

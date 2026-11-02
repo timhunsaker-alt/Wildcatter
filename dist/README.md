@@ -62,6 +62,8 @@ Put the jar in your instance's `mods` folder next to:
   transformer for the plant's own 4.16 kV. 51 MW at full power.
 - An 88 m hyperbolic natural-draft cooling tower that rises lift by lift as you feed it concrete and steel, its basin a real pond
   for the circulating water pumps; it cools the condenser's water toward the biome's wet bulb, with a plume over the top.
+- After a trip the core keeps making decay heat and xenon builds. The console's COOLDOWN takes the plant down on the dump valves
+  to the RHR and cold shutdown. Lose all cooling and the core is damaged, and its hydrogen can explode round the vessel.
 - The Field Manual item explains how to build each machine.
 
 ## Older worlds

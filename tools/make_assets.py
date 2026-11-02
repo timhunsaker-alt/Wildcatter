@@ -1916,7 +1916,7 @@ save_json(f"{ASSETS}/lang/en_us.json", lang)
 
 # ---- Phase 8a: the nuclear island and the boron plant (docs/multiblocks/reactor.md, boron.md) -----------------------------
 # blockstates, models, shapes and items come from tools/models/reactor.py and boron.py; here loot, names, tags, recipes and the items.
-REACTOR_PARTS = ("reactor_vessel", "crdm_head", "reactor_console", "steam_generator", "reactor_coolant_pump", "pressurizer", "cvcs_skid", "aux_feed_pump",
+REACTOR_PARTS = ("reactor_vessel", "crdm_head", "reactor_console", "steam_generator", "reactor_coolant_pump", "pressurizer", "cvcs_skid", "aux_feed_pump", "rhr_pump", "rhr_heat_exchanger",
 	"borax_dissolver", "boric_acid_crystallizer", "b4c_furnace", "rcca_bench")
 for name in REACTOR_PARTS:
 	big_part_loot(name)
@@ -1933,6 +1933,8 @@ shaped("reactor_coolant_pump", ["SCS", "SXS", "SIS"], {"S": S_, "C": "minecraft:
 shaped("pressurizer", ["SPS", "SRS", "SIS"], {"S": S_, "P": P_, "R": "minecraft:redstone_block", "I": "minecraft:iron_block"}, "pressurizer")
 shaped("cvcs_skid", ["SHS", "PXP", "SSS"], {"S": S_, "H": "minecraft:hopper", "P": P_, "X": "minecraft:piston"}, "cvcs_skid")
 shaped("aux_feed_pump", ["SPS", "SXS", "SSS"], {"S": S_, "P": P_, "X": "minecraft:piston"}, "aux_feed_pump")
+shaped("rhr_pump", ["SCS", "SXS", "SPS"], {"S": S_, "C": "minecraft:copper_block", "X": "minecraft:piston", "P": P_}, "rhr_pump")
+shaped("rhr_heat_exchanger", ["SPS", "SCS", "SPS"], {"S": S_, "P": P_, "C": "minecraft:copper_ingot"}, "rhr_heat_exchanger")
 shaped("borax_dissolver", ["SHS", "SCS", "SSS"], {"S": S_, "H": "minecraft:hopper", "C": "minecraft:cauldron"}, "borax_dissolver")
 shaped("boric_acid_crystallizer", ["SCS", "SXS", "SHS"], {"S": S_, "C": "minecraft:cauldron", "X": "minecraft:piston", "H": "minecraft:hopper"}, "boric_acid_crystallizer")
 shaped("b4c_furnace", ["BCB", "BFB", "SSS"], {"B": "minecraft:bricks", "C": "minecraft:copper_block", "F": "minecraft:blast_furnace", "S": S_}, "b4c_furnace")
@@ -1953,6 +1955,7 @@ lang.update({f"block.{ns}.reactor_vessel": "Reactor Vessel (9 assemblies)", f"bl
 	f"block.{ns}.reactor_console": "Reactor Console", f"block.{ns}.steam_generator": "Steam Generator (U-tube)",
 	f"block.{ns}.reactor_coolant_pump": "Reactor Coolant Pump (500 kW)", f"block.{ns}.pressurizer": "Pressurizer",
 	f"block.{ns}.cvcs_skid": "CVCS Skid (charging, letdown, boron)", f"block.{ns}.aux_feed_pump": "Aux Feed Pump (75 hp)",
+	f"block.{ns}.rhr_pump": "RHR Pump (200 kW, 4.16 kV)", f"block.{ns}.rhr_heat_exchanger": "RHR Heat Exchanger",
 	f"block.{ns}.borax_dissolver": "Borax Dissolver", f"block.{ns}.boric_acid_crystallizer": "Boric Acid Crystallizer",
 	f"block.{ns}.b4c_furnace": "B4C Furnace (Acheson)", f"block.{ns}.rcca_bench": "RCCA Bench"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)

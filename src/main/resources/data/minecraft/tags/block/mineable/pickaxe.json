@@ -261,6 +261,8 @@
     "wildcatter:pressurizer",
     "wildcatter:cvcs_skid",
     "wildcatter:aux_feed_pump",
+    "wildcatter:rhr_pump",
+    "wildcatter:rhr_heat_exchanger",
     "wildcatter:borax_dissolver",
     "wildcatter:boric_acid_crystallizer",
     "wildcatter:b4c_furnace",

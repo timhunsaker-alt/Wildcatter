@@ -7,7 +7,9 @@ match ReactorPartBlock's):
 - reactor_coolant_pump, 2 x 5 x 2: the pump casing, motor stand, 4.16 kV motor and flywheel;
 - pressurizer, 2 x 8 x 2: the vessel on its skirt, its relief and safety valves on top;
 - cvcs_skid, 3 x 3 x 6: the volume control tank, boric acid tank, demineralizer, exchangers and charging pump;
-- aux_feed_pump, 2 x 2 x 4: the motor, coupling and pump on a skid, the feedwater out of its south end."""
+- aux_feed_pump, 2 x 2 x 4: the motor, coupling and pump on a skid, the feedwater out of its south end;
+- rhr_pump, 2 x 3 x 2: the residual heat removal pump and its 4.16 kV motor (8d);
+- rhr_heat_exchanger, 2 x 6 x 2: the vertical RHR exchanger, circulating water in north and out south (8d)."""
 import mlib
 import plantlib as g
 
@@ -107,7 +109,20 @@ AF.pipe([(1.0, 0.5, 3.1), (1.0, 0.5, 4.0)], 3, "steel")                     # fe
 box480(AF, 0.3, 0.4)
 AF.collide((0.2, 0.0, 0.2), (1.8, 1.1, 3.9))
 
+RH = model("rhr_pump", 2, 3, 2, "blue")
+RH.cylinder("y", (1.0, 1.0), 0.6, 0.0, 1.0, "steel", 12)                    # the pump casing
+RH.cylinder("y", (1.0, 1.0), 0.55, 1.0, 2.8, "blue", 12)                    # its 4.16 kV motor
+box480(RH, 1.2, 0.3)
+RH.collide((0.3, 0.0, 0.3), (1.7, 2.8, 1.7))
+
+RX = model("rhr_heat_exchanger", 2, 6, 2, "steel")
+RX.cylinder("y", (1.0, 1.0), 0.75, 0.3, 5.6, "steel", 14)                   # the vertical shell
+RX.cylinder("y", (1.0, 1.0), 0.6, 5.6, 5.95, "steel", 12)                   # its head
+RX.pipe([(1.0, 0.5, 0.0), (1.0, 0.5, 0.3)], 6, "steel")                     # circulating water in, the north
+RX.pipe([(1.0, 0.5, 1.7), (1.0, 0.5, 2.0)], 6, "steel")                     # and out, the south
+RX.collide((0.25, 0.0, 0.25), (1.75, 5.95, 1.75))
+
 M = RV
-EXTRA = [CH, CO, SG, RP, PZ, CV, AF]
+EXTRA = [CH, CO, SG, RP, PZ, CV, AF, RH, RX]
 for extra in EXTRA:
 	extra.export_args = {"blockstate": True, "item": True}
