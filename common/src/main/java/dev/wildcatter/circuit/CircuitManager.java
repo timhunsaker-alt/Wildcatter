@@ -18,12 +18,17 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
  * Keeps track of every circuit part in loaded chunks, groups the ones that touch, and solves each group every few ticks
- * (and straight away when something changes).
+ * (and straight away when something changes). A pass that takes longer than {@link Tuning#SOLVE_BUDGET_NANOS} finishes over
+ * the next ticks rather than stalling the server.
  */
 public final class CircuitManager {
 	private static final Map<ResourceKey<Level>, Set<BlockPos>> PARTS = new HashMap<>();
 	private static final Map<ResourceKey<Level>, Long> LAST_SOLVE = new HashMap<>();
 	private static final Set<ResourceKey<Level>> DIRTY = new HashSet<>();
+	/** A pass that ran out of its tick's time budget, finishing over the next ticks. */
+	private static final Map<ResourceKey<Level>, SolvePass<List<BlockPos>>> PASSES = new HashMap<>();
+	/** When each group was solved in the last finished pass, by its key. */
+	private static final Map<ResourceKey<Level>, Map<Long, Long>> GROUP_SOLVED = new HashMap<>();
 	/** The frequency of each island of generators, keyed by the lowest block position in it. */
 	private static final Map<ResourceKey<Level>, Map<Long, Island>> ISLANDS = new HashMap<>();
 	private static dev.wildcatter.energy.ElectricalStandard lastStandard;
@@ -34,6 +39,8 @@ public final class CircuitManager {
 		LAST_SOLVE.clear();
 		DIRTY.clear();
 		ISLANDS.clear();
+		PASSES.clear();
+		GROUP_SOLVED.clear();
 	}
 
 	private static final class Island {
@@ -73,15 +80,36 @@ public final class CircuitManager {
 			return;
 		}
 		long now = level.getGameTime();
-		boolean due = DIRTY.remove(level.dimension()) || now % Tuning.SOLVE_INTERVAL == 0;
-		if (!due) {
-			return;
+		ResourceKey<Level> dim = level.dimension();
+		SolvePass<List<BlockPos>> pass = PASSES.get(dim);
+		if (pass == null) {
+			// a pass already under way finishes first; a change during it starts the next one
+			if (!SolvePass.due(DIRTY.remove(dim), now, Tuning.SOLVE_INTERVAL)) {
+				return;
+			}
+			int ticks = (int) Math.max(1, now - LAST_SOLVE.getOrDefault(dim, now - Tuning.SOLVE_INTERVAL));
+			LAST_SOLVE.put(dim, now);
+			pass = new SolvePass<>(groups(level, registered), now, ticks, CircuitManager::groupKey, GROUP_SOLVED.getOrDefault(dim, Map.of()));
+			PASSES.put(dim, pass);
 		}
-		int ticks = (int) Math.max(1, now - LAST_SOLVE.getOrDefault(level.dimension(), now - Tuning.SOLVE_INTERVAL));
-		LAST_SOLVE.put(level.dimension(), now);
+		SolvePass<List<BlockPos>> running = pass;
+		running.run(now, Tuning.SOLVE_BUDGET_NANOS, System::nanoTime, (group, ticks) -> solveGroup(level, group, ticks, running.live));
+		if (running.done()) {
+			PASSES.remove(dim);
+			GROUP_SOLVED.put(dim, running.solvedAt());
+			ISLANDS.computeIfAbsent(dim, k -> new HashMap<>()).keySet().retainAll(running.live);
+		} else {
+			deferredTicks++;
+		}
+	}
 
+	/** Ticks on which a pass ran out of its time budget and left groups for the next tick: the game test can read it. */
+	public static volatile long deferredTicks;
+
+	/** The connected groups of parts: each is solved on its own. */
+	private static List<List<BlockPos>> groups(ServerLevel level, Set<BlockPos> registered) {
 		Set<BlockPos> seen = new HashSet<>();
-		Set<Long> live = new HashSet<>();
+		List<List<BlockPos>> groups = new ArrayList<>();
 		for (BlockPos start : new ArrayList<>(registered)) {
 			if (seen.contains(start)) {
 				continue;
@@ -110,9 +138,9 @@ public final class CircuitManager {
 					}
 				}
 			}
-			solveGroup(level, group, ticks, live);
+			groups.add(group);
 		}
-		ISLANDS.computeIfAbsent(level.dimension(), k -> new HashMap<>()).keySet().retainAll(live);
+		return groups;
 	}
 
 	/** The biggest circuit solved since the last {@link #resetSolveStats} and how long its solve took: the game test reads these. */
@@ -124,8 +152,13 @@ public final class CircuitManager {
 		largestNanos = 0;
 	}
 
+	/** A group's identity: its lowest block position (also its frequency island's key). */
+	private static long groupKey(List<BlockPos> group) {
+		return group.stream().mapToLong(BlockPos::asLong).min().orElse(0L);
+	}
+
 	private static void solveGroup(ServerLevel level, List<BlockPos> group, int ticks, Set<Long> live) {
-		long key = group.stream().mapToLong(BlockPos::asLong).min().orElse(0L);
+		long key = groupKey(group);
 		dev.wildcatter.energy.ElectricalStandard standard = dev.wildcatter.energy.ElectricalStandard.active();
 		if (standard != lastStandard) {
 			ISLANDS.clear();   // a different standard (another world, in the same session) has a different nominal frequency: start over
@@ -142,7 +175,8 @@ public final class CircuitManager {
 			circuit.setHertz(hertz);
 			parts.clear();
 			for (BlockPos pos : group) {
-				BlockEntity be = level.getBlockEntity(pos);
+				// a group deferred to a later tick may reach into a chunk that has since unloaded: skip it rather than load it again
+				BlockEntity be = level.isLoaded(pos) ? level.getBlockEntity(pos) : null;
 				if (be instanceof CircuitPart part && !be.isRemoved()) {
 					parts.add(part);
 					part.build(circuit);

@@ -130,6 +130,12 @@ datapack (`wildcatter_kit.zip`) as a Release. Every push also builds and keeps t
 - **The fuel chain:** `ores`, `acidPlant`, `uraniumMill`, `isrWellfield`, `conversion`, `cascade`, `zirconium`, `fuel`.
 - **The reactor:** `boron`, `reactor`, `turbineIsland`, `coolingTower`, `reactorSafety`, `fuelHandling`.
 
+## Grid performance
+
+Each level solves its grid when something changes and every 4 ticks otherwise. Solving takes at most about 10 ms per tick
+(`Tuning.SOLVE_BUDGET_NANOS`); groups past that wait for the next tick. Radial feeders solve in about 1 ms at 2,000–4,000 nodes.
+A dense 4,000-node mesh takes about 25 ms. Measurements and limits are in [docs/grid-performance.md](docs/grid-performance.md).
+
 ## Art and assets
 - **Redo the art:** `python3 tools/process_art.py && python3 tools/make_assets.py` (needs Pillow). Ludo prompts are in
   `art/source/PROMPTS.md`.

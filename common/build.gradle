@@ -18,6 +18,10 @@ dependencies {
 
 test {
 	useJUnitPlatform()
+	// -Dwildcatter.bench=true runs the grid solve benchmark (GridSolveBenchmark) and prints its table
+	def bench = providers.systemProperty('wildcatter.bench').getOrElse('false')
+	systemProperty 'wildcatter.bench', bench
+	testLogging.showStandardStreams = bench == 'true'
 }
 
 configurations {

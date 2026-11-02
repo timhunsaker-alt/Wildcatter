@@ -11,6 +11,7 @@ public final class Tuning {
 	// ---- The circuit simulation --------------------------------------------------------------------------------
 	public static final int SOLVE_INTERVAL = 4;               // ticks between solves of every circuit (and one at once when something changes)
 	public static final int MAX_CIRCUIT_NODES = 4000;         // bigger groups are not simulated (the banded phasor solve stays a few ms well past this)
+	public static final long SOLVE_BUDGET_NANOS = 10_000_000L; // per level per tick: circuit groups past it wait for the next tick (one always runs); docs/grid-performance.md
 	public static final double GROUND_TIE_OHMS = 0.001;       // neutral is bonded to ground where the power comes in
 	public static final double SHORT_CONTACT_OHMS = 0.02;     // two bare wires of opposite roles touching: a short
 	public static final double CONTACT_OHMS = 0.002;          // a wire meeting a machine's terminal
