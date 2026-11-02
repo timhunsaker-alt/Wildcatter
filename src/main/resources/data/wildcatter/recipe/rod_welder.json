@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "GRG",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_block",
+    "G": "minecraft:glass",
+    "R": "minecraft:redstone_block"
+  },
+  "result": {
+    "id": "wildcatter:rod_welder",
+    "count": 1
+  }
+}

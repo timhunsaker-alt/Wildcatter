@@ -67,3 +67,9 @@ New on steel pipe: compressed gas (out of a compressor), dried gas (out of a deh
 backward unit substation to 4.16 kV for the gas compressor); the train fills an LPG bullet and a stock tank of natural gasoline,
 and a second gas set runs on its pipeline gas. With the dehydrator bypassed the chiller reads HYDRATES; with the refrigeration
 compressor taken away, NO REFRIGERATION.
+
+## Helium (added in 7g, with fuel.md)
+A `helium_recovery_unit` (3 x 6 x 4) takes pipeline gas off the pipe at the north face of its front cells and puts it back there
+without its helium: 0.4 % of the gas (proposed; Hugoton-Panhandle gas holds 0.3-0.8 %), up to 1.0 m3/s. It is a nitrogen-rejection
+cold box with helium PSA, 75 kW at 480 V, and fills 8.5 m3 helium cylinders for the fuel plant's rod welder: empties by a hopper on
+top, full ones out below. The game test `gasPlant` sets one on the plant's pipeline gas line (fuel.md).

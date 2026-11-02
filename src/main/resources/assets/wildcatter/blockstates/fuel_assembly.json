@@ -1,0 +1,79 @@
+{
+ "variants": {
+  "facing=north,piece=0": {
+   "model": "wildcatter:block/fuel_assembly/p0"
+  },
+  "facing=north,piece=1": {
+   "model": "wildcatter:block/fuel_assembly/p1"
+  },
+  "facing=north,piece=2": {
+   "model": "wildcatter:block/fuel_assembly/p2"
+  },
+  "facing=north,piece=3": {
+   "model": "wildcatter:block/fuel_assembly/p3"
+  },
+  "facing=north,piece=4": {
+   "model": "wildcatter:block/fuel_assembly/p4"
+  },
+  "facing=east,piece=0": {
+   "model": "wildcatter:block/fuel_assembly/p0",
+   "y": 90
+  },
+  "facing=east,piece=1": {
+   "model": "wildcatter:block/fuel_assembly/p1",
+   "y": 90
+  },
+  "facing=east,piece=2": {
+   "model": "wildcatter:block/fuel_assembly/p2",
+   "y": 90
+  },
+  "facing=east,piece=3": {
+   "model": "wildcatter:block/fuel_assembly/p3",
+   "y": 90
+  },
+  "facing=east,piece=4": {
+   "model": "wildcatter:block/fuel_assembly/p4",
+   "y": 90
+  },
+  "facing=south,piece=0": {
+   "model": "wildcatter:block/fuel_assembly/p0",
+   "y": 180
+  },
+  "facing=south,piece=1": {
+   "model": "wildcatter:block/fuel_assembly/p1",
+   "y": 180
+  },
+  "facing=south,piece=2": {
+   "model": "wildcatter:block/fuel_assembly/p2",
+   "y": 180
+  },
+  "facing=south,piece=3": {
+   "model": "wildcatter:block/fuel_assembly/p3",
+   "y": 180
+  },
+  "facing=south,piece=4": {
+   "model": "wildcatter:block/fuel_assembly/p4",
+   "y": 180
+  },
+  "facing=west,piece=0": {
+   "model": "wildcatter:block/fuel_assembly/p0",
+   "y": 270
+  },
+  "facing=west,piece=1": {
+   "model": "wildcatter:block/fuel_assembly/p1",
+   "y": 270
+  },
+  "facing=west,piece=2": {
+   "model": "wildcatter:block/fuel_assembly/p2",
+   "y": 270
+  },
+  "facing=west,piece=3": {
+   "model": "wildcatter:block/fuel_assembly/p3",
+   "y": 270
+  },
+  "facing=west,piece=4": {
+   "model": "wildcatter:block/fuel_assembly/p4",
+   "y": 270
+  }
+ }
+}

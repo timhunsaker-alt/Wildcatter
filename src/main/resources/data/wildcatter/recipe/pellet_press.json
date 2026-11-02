@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "GXG",
+    "SIS",
+    "SSS"
+  ],
+  "key": {
+    "G": "minecraft:glass",
+    "X": "minecraft:piston",
+    "S": "wildcatter:steel_ingot",
+    "I": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:pellet_press",
+    "count": 1
+  }
+}

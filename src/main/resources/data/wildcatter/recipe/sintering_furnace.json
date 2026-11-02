@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SSS",
+    "BFB",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "B": "minecraft:bricks",
+    "F": "minecraft:blast_furnace",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:sintering_furnace",
+    "count": 1
+  }
+}

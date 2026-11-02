@@ -242,6 +242,16 @@
     "wildcatter:vacuum_anneal_furnace",
     "wildcatter:magnesium_cell",
     "wildcatter:magnesia_chlorinator",
-    "wildcatter:chlor_alkali_cell"
+    "wildcatter:chlor_alkali_cell",
+    "wildcatter:uf6_autoclave",
+    "wildcatter:idr_kiln",
+    "wildcatter:granulator",
+    "wildcatter:pellet_press",
+    "wildcatter:sintering_furnace",
+    "wildcatter:pellet_grinder",
+    "wildcatter:rod_loader",
+    "wildcatter:rod_welder",
+    "wildcatter:assembly_fixture",
+    "wildcatter:helium_recovery_unit"
   ]
 }

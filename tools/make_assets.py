@@ -1873,6 +1873,47 @@ lang.update({f"block.{ns}.mineral_separator": "Mineral Separator (magnetic, elec
 	f"block.{ns}.chlor_alkali_cell": "Chlor-alkali Cell (membrane)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 7g: the fuel plant (docs/multiblocks/fuel.md) -------------------------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/fuel.py; here loot, names, tags, recipes and the items.
+FUEL_PARTS = ("uf6_autoclave", "idr_kiln", "granulator", "pellet_press", "sintering_furnace", "pellet_grinder", "rod_loader", "rod_welder",
+	"assembly_fixture", "helium_recovery_unit", "fuel_assembly")
+for name in FUEL_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in FUEL_PARTS if n != "fuel_assembly"]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("uf6_autoclave", ["SHS", "SFS", "SSS"], {"S": S_, "H": "minecraft:hopper", "F": "minecraft:furnace"}, "uf6_autoclave")
+shaped("idr_kiln", ["SPS", "BFB", "SXS"], {"S": S_, "P": P_, "B": "minecraft:bricks", "F": "minecraft:blast_furnace", "X": f"{ns}:crankshaft"}, "idr_kiln")
+shaped("granulator", ["SHS", "XGX", "SSS"], {"S": S_, "H": "minecraft:hopper", "X": "minecraft:piston", "G": "minecraft:grindstone"}, "granulator")
+shaped("pellet_press", ["GXG", "SIS", "SSS"], {"G": "minecraft:glass", "X": "minecraft:piston", "S": S_, "I": "minecraft:iron_block"}, "pellet_press")
+shaped("sintering_furnace", ["SSS", "BFB", "SPS"], {"S": S_, "B": "minecraft:bricks", "F": "minecraft:blast_furnace", "P": P_}, "sintering_furnace")
+shaped("pellet_grinder", ["SGS", "SXS", "SSS"], {"S": S_, "G": "minecraft:grindstone", "X": "minecraft:piston"}, "pellet_grinder")
+shaped("rod_loader", ["GHG", "SXS", "SSS"], {"G": "minecraft:glass", "H": "minecraft:hopper", "S": S_, "X": "minecraft:piston"}, "rod_loader")
+shaped("rod_welder", ["SCS", "GRG", "SSS"], {"S": S_, "C": "minecraft:copper_block", "G": "minecraft:glass", "R": "minecraft:redstone_block"}, "rod_welder")
+shaped("assembly_fixture", ["SXS", "IAI", "SSS"], {"S": S_, "X": "minecraft:piston", "I": "minecraft:iron_block", "A": "minecraft:anvil"}, "assembly_fixture")
+shaped("helium_recovery_unit", ["SPS", "IXI", "SPS"], {"S": S_, "P": P_, "I": "minecraft:packed_ice", "X": "minecraft:piston"}, "helium_recovery_unit")
+shaped("empty_helium_cylinder", [" S ", "S S", "SSS"], {"S": S_}, "empty_helium_cylinder")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in {"spacer_grid": ("Spacer Grid (Zircaloy-4)", (180, 180, 175)), "empty_helium_cylinder": ("Empty Helium Cylinder", (150, 150, 150)),
+		"helium_cylinder": ("Helium Cylinder", (140, 120, 90))}.items():
+	if os.path.exists(f"{ORE_ART}/{item}.png"):
+		shutil.copy(f"{ORE_ART}/{item}.png", f"{ASSETS}/textures/item/ore/{item}.png")
+		item_tex = f"{ns}:item/ore/{item}"
+	else:
+		tex(f"{item}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+		item_tex = f"{ns}:item/{item}_placeholder"
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": item_tex}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.uf6_autoclave": "UF6 Autoclave (30B)", f"block.{ns}.idr_kiln": "IDR Kiln (dry route)", f"block.{ns}.granulator": "Granulator",
+	f"block.{ns}.pellet_press": "Pellet Press (rotary)", f"block.{ns}.sintering_furnace": "Sintering Furnace (pusher, 1,750 C)",
+	f"block.{ns}.pellet_grinder": "Pellet Grinder (centreless)", f"block.{ns}.rod_loader": "Rod Loader", f"block.{ns}.rod_welder": "Rod Welder (helium, 2 MPa)",
+	f"block.{ns}.assembly_fixture": "Assembly Fixture", f"block.{ns}.helium_recovery_unit": "Helium Recovery Unit",
+	f"block.{ns}.fuel_assembly": "Fuel Assembly (17x17, 4.95 %)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

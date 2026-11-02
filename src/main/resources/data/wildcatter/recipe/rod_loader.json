@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "GHG",
+    "SXS",
+    "SSS"
+  ],
+  "key": {
+    "G": "minecraft:glass",
+    "H": "minecraft:hopper",
+    "S": "wildcatter:steel_ingot",
+    "X": "minecraft:piston"
+  },
+  "result": {
+    "id": "wildcatter:rod_loader",
+    "count": 1
+  }
+}

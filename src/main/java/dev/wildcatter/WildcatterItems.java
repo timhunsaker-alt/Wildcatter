@@ -80,6 +80,17 @@ public final class WildcatterItems {
 	public static final Item GUIDE_THIMBLE = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(64).setId(GUIDE_THIMBLE_KEY),
 			String.format("Zircaloy-4 guide thimble, %.2f mm OD, %.2f mm wall, %.1f m", Tuning.THIMBLE_OD_MM, Tuning.THIMBLE_WALL_MM, Tuning.THIMBLE_LENGTH_M),
 			"24 for the control rods and 1 instrument tube in a 17x17 assembly");
+	public static final ResourceKey<Item> SPACER_GRID_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("spacer_grid"));
+	public static final Item SPACER_GRID = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(64).setId(SPACER_GRID_KEY),
+			String.format("Zircaloy-4 mid grid for a 17x17 assembly, %.1f kg", Tuning.SPACER_GRID_KG), "6 to an assembly, with 2 end grids");
+
+	/** 7g: helium cylinders (docs/multiblocks/fuel.md), from the gas plant's helium recovery unit to the rod welder. */
+	public static final ResourceKey<Item> EMPTY_HELIUM_CYLINDER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("empty_helium_cylinder"));
+	public static final Item EMPTY_HELIUM_CYLINDER = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(EMPTY_HELIUM_CYLINDER_KEY),
+			"Steel gas cylinder, 300 cf at 2,400 psi");
+	public static final ResourceKey<Item> HELIUM_CYLINDER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("helium_cylinder"));
+	public static final Item HELIUM_CYLINDER = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(HELIUM_CYLINDER_KEY),
+			String.format("%.1f m3 of helium, 99.995 %%", Tuning.HELIUM_CYLINDER_M3), "fills about 21,000 fuel rods at 2 MPa");
 
 	/** A bucket of crude oil. It burns in a firebox (as long as lava) and leaves the bucket behind. */
 	public static final ResourceKey<Item> CRUDE_OIL_BUCKET_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("crude_oil_bucket"));
@@ -149,6 +160,9 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, TAILS_CYLINDER_48Y_KEY, TAILS_CYLINDER_48Y);
 		Registry.register(BuiltInRegistries.ITEM, ZIRCALOY_TUBE_KEY, ZIRCALOY_TUBE);
 		Registry.register(BuiltInRegistries.ITEM, GUIDE_THIMBLE_KEY, GUIDE_THIMBLE);
+		Registry.register(BuiltInRegistries.ITEM, SPACER_GRID_KEY, SPACER_GRID);
+		Registry.register(BuiltInRegistries.ITEM, EMPTY_HELIUM_CYLINDER_KEY, EMPTY_HELIUM_CYLINDER);
+		Registry.register(BuiltInRegistries.ITEM, HELIUM_CYLINDER_KEY, HELIUM_CYLINDER);
 		Registry.register(BuiltInRegistries.ITEM, CRUDE_OIL_BUCKET_KEY, CRUDE_OIL_BUCKET);
 		Registry.register(BuiltInRegistries.ITEM, PLASTIC_SHEET_KEY, PLASTIC_SHEET);
 		Registry.register(BuiltInRegistries.ITEM, STEEL_INGOT_KEY, STEEL_INGOT);

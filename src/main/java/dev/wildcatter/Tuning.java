@@ -377,6 +377,42 @@ public final class Tuning {
 	public static final double EXTRUSION_PRESS_WATTS = 250_000.0;  // its hydraulic pumps, 4.16 kV
 	public static final double PILGER_WATTS = 75_000.0;
 	public static final double ANNEAL_FURNACE_WATTS = 100_000.0;
+	public static final double SPACER_GRID_KG = 0.9;               // a Zircaloy mid grid (proposed)
+
+	// ---- The fuel plant (docs/multiblocks/fuel.md, approved 2026-11-01) --------------------------------------------------------
+	public static final double FUEL_LINE_U_KGS = 50.0 / 3600;      // kg of U a second: a small line (proposed)
+	public static final double FUEL_STAGE_HOLD_KG = 100.0;         // U a stage holds for the next
+	public static final double PELLET_DIAMETER_MM = 8.19;          // 17x17
+	public static final double PELLET_LENGTH_MM = 9.83;
+	public static final double UO2_THEORETICAL_DENSITY = 10.96;    // g/cm3
+	public static final double PELLET_DENSITY_FRACTION = 0.95;
+	public static final double PELLET_DISH_CHAMFER = 0.015;        // of the cylinder's volume
+	public static final double ROD_STACK_M = 3.66;                 // 144 in active length
+	public static final int ASSEMBLY_RODS = 264;
+	public static final int ASSEMBLY_THIMBLES = 25;                // 24 guide thimbles and 1 instrument tube
+	public static final int ASSEMBLY_MID_GRIDS = 6;                // and 2 end grids
+	public static final double ASSEMBLY_STEEL_KG = 20.0;           // nozzles, end grids, springs (unverified)
+	public static final double ROD_STEEL_KG = 2.0 / 264;           // a rod's spring and plugs
+	public static final double STEEL_INGOT_KG = 100.0;             // (proposed, as the iron ingot)
+	public static final double U_IN_UO2 = 238.03 / 270.03;
+	public static final double IDR_H2_EXCESS = 1.5;                // (proposed)
+	public static final double IDR_WATER_EXCESS = 3.0;             // (proposed)
+	public static final double SINTER_H2_M3H = 15.0;               // the pusher furnace's atmosphere (proposed)
+	public static final double GRIND_SWARF = 0.005;                // (proposed)
+	public static final double ROD_HELIUM_L = 0.4;                 // at STP: about 20 cm3 at 2 MPa (estimate)
+	public static final double HELIUM_CYLINDER_M3 = 8.5;           // 300 cf at 2,400 psi
+	public static final double GAS_HELIUM_FRACTION = 0.004;        // Hugoton-Panhandle gas holds 0.3-0.8 % (proposed)
+	public static final double HELIUM_UNIT_M3S = 1.0;              // pipeline gas it can treat (proposed)
+	public static final double AUTOCLAVE_WATTS = 30_000.0;         // all 480 V (unverified)
+	public static final double IDR_KILN_WATTS = 150_000.0;
+	public static final double GRANULATOR_WATTS = 30_000.0;
+	public static final double PELLET_PRESS_WATTS = 30_000.0;
+	public static final double SINTERING_FURNACE_WATTS = 250_000.0;
+	public static final double PELLET_GRINDER_WATTS = 20_000.0;
+	public static final double ROD_LOADER_WATTS = 15_000.0;
+	public static final double ROD_WELDER_WATTS = 30_000.0;
+	public static final double ASSEMBLY_FIXTURE_WATTS = 10_000.0;
+	public static final double HELIUM_UNIT_WATTS = 75_000.0;
 
 	// ---- The gas turbine and combined cycle (docs/multiblocks/gas-turbine.md, combined-cycle.md, approved 2026-10-31) -------
 	public static final double GT_WATTS = 16_500_000.0;            // ISO rating, Solar Titan 130 class

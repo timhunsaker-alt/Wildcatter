@@ -341,5 +341,19 @@
   "block.wildcatter.vacuum_anneal_furnace": "Vacuum Anneal Furnace",
   "block.wildcatter.magnesium_cell": "Magnesium Cell (14 kA)",
   "block.wildcatter.magnesia_chlorinator": "Magnesia Chlorinator",
-  "block.wildcatter.chlor_alkali_cell": "Chlor-alkali Cell (membrane)"
+  "block.wildcatter.chlor_alkali_cell": "Chlor-alkali Cell (membrane)",
+  "item.wildcatter.spacer_grid": "Spacer Grid (Zircaloy-4)",
+  "item.wildcatter.empty_helium_cylinder": "Empty Helium Cylinder",
+  "item.wildcatter.helium_cylinder": "Helium Cylinder",
+  "block.wildcatter.uf6_autoclave": "UF6 Autoclave (30B)",
+  "block.wildcatter.idr_kiln": "IDR Kiln (dry route)",
+  "block.wildcatter.granulator": "Granulator",
+  "block.wildcatter.pellet_press": "Pellet Press (rotary)",
+  "block.wildcatter.sintering_furnace": "Sintering Furnace (pusher, 1,750 C)",
+  "block.wildcatter.pellet_grinder": "Pellet Grinder (centreless)",
+  "block.wildcatter.rod_loader": "Rod Loader",
+  "block.wildcatter.rod_welder": "Rod Welder (helium, 2 MPa)",
+  "block.wildcatter.assembly_fixture": "Assembly Fixture",
+  "block.wildcatter.helium_recovery_unit": "Helium Recovery Unit",
+  "block.wildcatter.fuel_assembly": "Fuel Assembly (17x17, 4.95 %)"
 }

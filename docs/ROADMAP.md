@@ -114,6 +114,8 @@ and the Field Manual has a page for each new system.
   - Fuel fabrication is two waves, 7f the zirconium plant and 7g the fuel plant. The Kroll magnesium is recycled through a
     magnesium cell, make-up chlorine comes from a chlor-alkali cell on rock salt, make-up magnesium from chlorinated magnesia
     (decided in the 7f plan).
+  - Fuel: helium from a recovery unit at the gas plant; steel stands in for the stainless and Inconel hardware until a nickel
+    smelter exists, the mid grids Zircaloy from the pilger mill; the assembly a placeable full-height block (decided in the 7g plan).
   - Process chemicals from the existing chain plus real ores. Tim: "make sure we have all ore types from real world with exaggerated numbers".
 - Waves (each is planned with its numbers before it is built):
   - 7a: every real ore type as worldgen, plus a gamma scintillometer (docs/ores.md). DONE.
@@ -123,7 +125,7 @@ and the Field Manual has a page for each new system.
   - 7e: the centrifuge cascade (a high-frequency converter, 4.95 % LEU in 30B cylinders; docs/multiblocks/enrichment.md). DONE.
   - 7f: the zirconium plant: zircon to Zircaloy-4 cladding tube and guide thimbles by chlorination, hafnium separation, the Kroll
     process, VAR melting, extrusion and pilgering (docs/multiblocks/zirconium.md). DONE.
-  - 7g: the fuel plant (UO2 by the dry route, pellets, sintering, rods with helium, the 17×17 assembly).
+  - 7g: the fuel plant (UO2 by the dry route, pellets, sintering, rods with helium, the 17×17 assembly; docs/multiblocks/fuel.md). DONE.
 
 ## Phase 8 — Pressurized water reactor (PWR)
 - Reactor vessel, control rods, primary loop, pressurizer, steam generator, secondary loop to turbine.
@@ -160,3 +162,5 @@ and the Field Manual has a page for each new system.
 - Zirconium: SiCl4 to fumed silica; uses for the chlor-alkali caustic soda; hafnium metal for control rods; Pidgeon magnesium from
   dolomite; the aluminothermic chromium step; scrap recycle and yields; Kroll and VAR batch timing.
 - A titanium pigment plant for the separator's ilmenite and rutile.
+- Fuel: the kiln's HF back to the conversion plant; zinc stearate lubricant and pore formers; a nickel smelter for real Inconel and
+  stainless hardware; pellet inspection, rod X-ray and helium leak tests; IFBA and gadolinia burnable absorbers; rejects and scrap.

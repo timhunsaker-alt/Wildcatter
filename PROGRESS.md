@@ -475,6 +475,31 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 7g: the fuel plant (spec: docs/multiblocks/fuel.md)
+- **LEU UF6 to 17x17 assemblies**, 50 kg of U an hour: a pellet is 5.31 g of UO2 (8.19 x 9.83 mm, 95 % dense), 372 to a rod
+  (1.741 kg of U), 264 rods to an assembly (459.6 kg of U, about 667 kg) in about 9 hours; a 30B is about 31 hours and 3.3
+  assemblies (`fluid/Fuel.java`, unit-tested).
+- **Tim's decisions:** helium from a recovery unit at the gas plant; steel for the stainless and Inconel hardware, Zircaloy mid
+  grids from the pilger mill; the assembly a placeable 1x5x1 block.
+- **The line**, each part against the next (uranium passed in kg):
+  - UF6 AUTOCLAVE (30B by hopper, the empty out below);
+  - IDR KILN (0.141 m3 of hydrogen and 0.45 L of water a kg of U; 0.504 kg of HF counted);
+  - GRANULATOR, PELLET PRESS;
+  - SINTERING FURNACE (1,750 C, 15 m3/h of hydrogen);
+  - PELLET GRINDER (0.5 % swarf counted);
+  - ROD LOADER (tubes and steel by hopper), ROD WELDER (helium at 2 MPa, 0.4 L a rod; cylinders by hopper; a 264-rod rack);
+  - ASSEMBLY FIXTURE (25 thimbles, 6 spacer grids, 20 kg of steel), the assembly out below.
+- **FUEL ASSEMBLY:** a 1x5x1 block, 214 mm square and 4.06 m tall; its item carries it.
+- **Helium:** a HELIUM RECOVERY UNIT at the gas plant treats pipeline gas (0.4 % helium) on its pipe and fills 8.5 m3 cylinders.
+- **The pilger mill** has a third die, grid strip, for spacer grids.
+- **New items:** Spacer Grid, Helium Cylinder and its empty, Fuel Assembly. Ludo icons for the first three (3 credits).
+- **Game tests:**
+  - `fuel`: two sets on a busway down the line, each part's stub connected once the sets are on line; a steam reformer on LPG
+    for the hydrogen. Every stage runs (the kiln at 57 kg of U an hour, the furnace at 237 kW); the fixture builds its skeleton
+    from its hopper; with 263 rods in it and one in the rack, an assembly drops into the hopper under it; the emptied 30B drops
+    under the autoclave; an assembly stands for the screenshot.
+  - `gasPlant`: the helium recovery unit treats the pipeline gas and fills a cylinder; the gas set still runs through it.
+
 ## Phase 7f: the zirconium plant (spec: docs/multiblocks/zirconium.md)
 - **Zircon to Zircaloy-4 tube**, 10 kg an hour: an assembly's 264 cladding tubes (0.404 kg, 9.50 x 0.57 mm, 3.85 m) and 25 guide
   thimbles in about 12 hours (`fluid/Zirconium.java`, unit-tested).
@@ -725,6 +750,9 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- Phase 7 is complete through 7g. Tim checks the fuel chain in a real session. The fuel test connects each part's 480 V after
+  the sets are on line: closed onto the whole plant at once, the first set tripped.
+- Helium is taken from all pipeline gas at 0.4 %; real fields differ (most hold far less).
 - The zirconium line runs as a steady flow: the real Kroll retort and VAR heats are batches. Its game test gives each stage a
   kilogram by hook rather than waiting hours for the metal to arrive. The plant's 480 V load needs a busway: a single cable
   burns.

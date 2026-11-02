@@ -118,3 +118,14 @@ coming off the top, lying diagonally, game item icon, plain white background, no
 - `guide_thimble`: "A single long thin metal guide tube for a nuclear fuel assembly, dull silver-grey zirconium alloy, slightly
   wider than a pencil, with a narrower dashpot section near the lower end and a threaded end plug, lying diagonally, game item
   icon, plain white background, no text".
+
+## Phase 7g (2026-11-01): the fuel plant's items (art/source/ore/)
+`item-icon`, `Photorealistic 3D`, 2 variations each:
+- `spacer_grid` (b kept): "A single square nuclear fuel assembly spacer grid seen at an angle: an egg-crate lattice of thin
+  interlocking dull silver zirconium alloy strips forming a 17 by 17 grid of square cells, with small springs and mixing vanes,
+  game item icon, plain white background, no text".
+- `helium_cylinder` (a kept): "A single tall industrial compressed gas cylinder for helium, painted brown with a steel valve and a
+  protective cap removed, standing upright, slightly angled, game item icon, plain white background, no text".
+- `empty_helium_cylinder` (a kept): "A single tall industrial compressed gas cylinder, plain grey steel, empty, with a closed valve
+  and a steel protective cap screwed on, standing upright, slightly angled, game item icon, plain white background, no text".
+The fuel assembly's item is its block model.

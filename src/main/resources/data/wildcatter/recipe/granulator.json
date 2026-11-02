@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SHS",
+    "XGX",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "X": "minecraft:piston",
+    "G": "minecraft:grindstone"
+  },
+  "result": {
+    "id": "wildcatter:granulator",
+    "count": 1
+  }
+}

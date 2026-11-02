@@ -406,6 +406,19 @@ public final class WildcatterBlocks {
 	public static final Block MAGNESIUM_CELL = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.MAGNESIUM_CELL);
 	public static final Block MAGNESIA_CHLORINATOR = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.MAGNESIA_CHLORINATOR);
 	public static final Block CHLOR_ALKALI_CELL = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.CHLOR_ALKALI_CELL);
+	// 7g: the fuel plant (docs/multiblocks/fuel.md), and the gas plant's helium recovery unit
+	public static final Block UF6_AUTOCLAVE = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.UF6_AUTOCLAVE);
+	public static final Block IDR_KILN = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.IDR_KILN);
+	public static final Block GRANULATOR = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.GRANULATOR);
+	public static final Block PELLET_PRESS = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.PELLET_PRESS);
+	public static final Block SINTERING_FURNACE = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.SINTERING_FURNACE);
+	public static final Block PELLET_GRINDER = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.PELLET_GRINDER);
+	public static final Block ROD_LOADER = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.ROD_LOADER);
+	public static final Block ROD_WELDER = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.ROD_WELDER);
+	public static final Block ASSEMBLY_FIXTURE = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.ASSEMBLY_FIXTURE);
+	public static final Block HELIUM_RECOVERY_UNIT = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.HELIUM_RECOVERY_UNIT);
+	public static final Block FUEL_ASSEMBLY = block("fuel_assembly", props -> new dev.wildcatter.block.FuelAssemblyBlock(props.mapColor(MapColor.METAL)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).noOcclusion()));
 	public static final Block ISR_WELLHEAD = block("isr_wellhead", props -> new dev.wildcatter.block.IsrWellheadBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL)));
 	/** The gas turbine and combined cycle (docs/multiblocks/gas-turbine.md, combined-cycle.md). */
@@ -511,6 +524,10 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<dev.wildcatter.block.MagnesiumCellBlockEntity> MAGNESIUM_CELL_ENTITY = entity(dev.wildcatter.block.MagnesiumCellBlockEntity::new, MAGNESIUM_CELL);
 	public static final BlockEntityType<dev.wildcatter.block.MagnesiaChlorinatorBlockEntity> MAGNESIA_CHLORINATOR_ENTITY = entity(dev.wildcatter.block.MagnesiaChlorinatorBlockEntity::new, MAGNESIA_CHLORINATOR);
 	public static final BlockEntityType<dev.wildcatter.block.ChlorAlkaliCellBlockEntity> CHLOR_ALKALI_CELL_ENTITY = entity(dev.wildcatter.block.ChlorAlkaliCellBlockEntity::new, CHLOR_ALKALI_CELL);
+	public static final BlockEntityType<dev.wildcatter.block.FuelLineBlockEntity> FUEL_LINE_ENTITY = entity(dev.wildcatter.block.FuelLineBlockEntity::new, UF6_AUTOCLAVE, IDR_KILN, GRANULATOR, PELLET_PRESS, SINTERING_FURNACE, PELLET_GRINDER, ROD_LOADER);
+	public static final BlockEntityType<dev.wildcatter.block.RodWelderBlockEntity> ROD_WELDER_ENTITY = entity(dev.wildcatter.block.RodWelderBlockEntity::new, ROD_WELDER);
+	public static final BlockEntityType<dev.wildcatter.block.AssemblyFixtureBlockEntity> ASSEMBLY_FIXTURE_ENTITY = entity(dev.wildcatter.block.AssemblyFixtureBlockEntity::new, ASSEMBLY_FIXTURE);
+	public static final BlockEntityType<dev.wildcatter.block.HeliumRecoveryBlockEntity> HELIUM_RECOVERY_ENTITY = entity(dev.wildcatter.block.HeliumRecoveryBlockEntity::new, HELIUM_RECOVERY_UNIT);
 	public static final BlockEntityType<dev.wildcatter.block.DehydratorBlockEntity> DEHYDRATOR_ENTITY = entity(dev.wildcatter.block.DehydratorBlockEntity::new, TEG_DEHYDRATOR);
 	public static final BlockEntityType<dev.wildcatter.block.ChillerBlockEntity> CHILLER_ENTITY = entity(dev.wildcatter.block.ChillerBlockEntity::new, NGL_CHILLER);
 	public static final BlockEntityType<dev.wildcatter.block.StabilizerBlockEntity> STABILIZER_ENTITY = entity(dev.wildcatter.block.StabilizerBlockEntity::new, STABILIZER);
@@ -544,7 +561,7 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<CoolingTowerBlockEntity> COOLING_TOWER_ENTITY = entity(CoolingTowerBlockEntity::new, COOLING_TOWER);
 	/** The plain true-size parts that only remember they have grown (block/BigPartBlockEntity). */
 	public static final BlockEntityType<dev.wildcatter.block.BigPartBlockEntity> BIG_PART_ENTITY = entity(dev.wildcatter.block.BigPartBlockEntity::new, COOLING_FILL, DRIFT_ELIMINATOR, RELAY_PANEL,
-			WOOD_POLE_30, WOOD_POLE_40, WOOD_POLE_75, CROSSARM_DIST, CROSSBEAM_138, X_BRACE_138);
+			WOOD_POLE_30, WOOD_POLE_40, WOOD_POLE_75, CROSSARM_DIST, CROSSBEAM_138, X_BRACE_138, FUEL_ASSEMBLY);
 	public static final BlockEntityType<dev.wildcatter.block.StationBusBlockEntity> STATION_BUS_ENTITY = entity(dev.wildcatter.block.StationBusBlockEntity::new, BUS_HV, BUS_DIST);
 
 	private WildcatterBlocks() {
@@ -617,6 +634,11 @@ public final class WildcatterBlocks {
 
 	private static Block conversionPart(dev.wildcatter.block.ConversionPartBlock.Part part) {
 		return block(part.id(), props -> new dev.wildcatter.block.ConversionPartBlock(props.mapColor(MapColor.COLOR_GRAY)
+				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
+	}
+
+	private static Block fuelPart(dev.wildcatter.block.FuelPartBlock.Part part) {
+		return block(part.id(), props -> new dev.wildcatter.block.FuelPartBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
 				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
 	}
 
@@ -836,6 +858,10 @@ public final class WildcatterBlocks {
 		for (Block part : new Block[] {MINERAL_SEPARATOR, CHLORINATOR, HAFNIUM_COLUMN, KROLL_REACTOR, VACUUM_DISTILLATION, VAR_FURNACE, EXTRUSION_PRESS, PILGER_MILL, VACUUM_ANNEAL_FURNACE, MAGNESIUM_CELL, MAGNESIA_CHLORINATOR, CHLOR_ALKALI_CELL}) {
 			add(((dev.wildcatter.block.ZirconiumPartBlock) part).part().id(), part);
 		}
+		for (Block part : new Block[] {UF6_AUTOCLAVE, IDR_KILN, GRANULATOR, PELLET_PRESS, SINTERING_FURNACE, PELLET_GRINDER, ROD_LOADER, ROD_WELDER, ASSEMBLY_FIXTURE, HELIUM_RECOVERY_UNIT}) {
+			add(((dev.wildcatter.block.FuelPartBlock) part).part().id(), part);
+		}
+		add("fuel_assembly", FUEL_ASSEMBLY);
 		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("rotor"), ROTOR);   // no item: it is never placed
 		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("mcc_bucket"), MCC_BUCKET);   // its item is WildcatterItems.MCC_BUCKET
 		add("mcc_section", MCC_SECTION);
@@ -937,6 +963,10 @@ public final class WildcatterBlocks {
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("magnesium_cell"), MAGNESIUM_CELL_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("magnesia_chlorinator"), MAGNESIA_CHLORINATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("chlor_alkali_cell"), CHLOR_ALKALI_CELL_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("fuel_line"), FUEL_LINE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rod_welder"), ROD_WELDER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("assembly_fixture"), ASSEMBLY_FIXTURE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("helium_recovery_unit"), HELIUM_RECOVERY_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("turbine_generator"), TURBINE_GENERATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("genset_control_panel"), GENSET_CONTROL_PANEL_ENTITY);
 	}
@@ -948,6 +978,7 @@ public final class WildcatterBlocks {
 		Item.Properties props = new Item.Properties().setId(itemKey).useBlockDescriptionPrefix();
 		Item item = block instanceof CableBlock wire ? new ConductorItem(block, props, wire.voltage(), ConductorSize.Kind.WIRE)
 				: block instanceof MultiCableBlock cable ? new ConductorItem(block, props, cable.voltage(), cable.busway() ? ConductorSize.Kind.BUSWAY : ConductorSize.Kind.CABLE)
+				: block instanceof dev.wildcatter.block.FuelAssemblyBlock ? new dev.wildcatter.item.FuelAssemblyItem(block, props.stacksTo(1))
 				: block instanceof dev.wildcatter.multiblock.BigPart ? new dev.wildcatter.item.BigPartItem(block, props)
 				: new BlockItem(block, props);
 		Registry.register(BuiltInRegistries.ITEM, itemKey, item);

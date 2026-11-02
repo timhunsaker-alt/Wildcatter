@@ -15,10 +15,10 @@ import net.minecraft.world.level.storage.ValueOutput;
 /**
  * The cold pilger mill (docs/multiblocks/zirconium.md): four passes from the extrusion press's hollows down to the tube, with the
  * vacuum anneal furnace it touches annealing between them (75 kW, 480 V). Its dies make cladding tube (9.50 x 0.57 mm) or guide
- * thimble (12.24 x 0.41 mm); sneak-click to change them, which scraps the tube on the mill. Finished tubes go to the furnace's bins.
+ * thimble (12.24 x 0.41 mm), or the strip for a spacer grid (fuel.md); sneak-click to change them, which scraps the tube on the mill. Finished tubes go to the furnace's bins.
  */
 public class PilgerMillBlockEntity extends UnitMotorBlockEntity {
-	private boolean thimble;
+	private int die;           // 0 cladding tube, 1 guide thimble, 2 grid strip
 	private double progress;   // kg of the tube on the mill
 	private double scrap;
 	private String unit = "starting";
@@ -28,25 +28,25 @@ public class PilgerMillBlockEntity extends UnitMotorBlockEntity {
 	}
 
 	private double tubeKg() {
-		return thimble ? Zirconium.thimbleKg() : Zirconium.claddingKg();
+		return die == 1 ? Zirconium.thimbleKg() : die == 2 ? Tuning.SPACER_GRID_KG : Zirconium.claddingKg();
 	}
 
 	private String tubeName() {
-		return thimble ? String.format("guide thimble (%.2f x %.2f mm)", Tuning.THIMBLE_OD_MM, Tuning.THIMBLE_WALL_MM)
-				: String.format("cladding tube (%.2f x %.2f mm)", Tuning.CLAD_OD_MM, Tuning.CLAD_WALL_MM);
+		return die == 1 ? String.format("guide thimble (%.2f x %.2f mm)", Tuning.THIMBLE_OD_MM, Tuning.THIMBLE_WALL_MM)
+				: die == 2 ? "spacer grid's strip" : String.format("cladding tube (%.2f x %.2f mm)", Tuning.CLAD_OD_MM, Tuning.CLAD_WALL_MM);
 	}
 
-	/** A sneak-click: the other dies. The tube on the mill is scrapped. */
+	/** A sneak-click: the next dies, cladding, thimble, grid strip. The tube on the mill is scrapped. */
 	public String changeDies() {
-		thimble = !thimble;
+		die = (die + 1) % 3;
 		scrap += progress;
 		progress = 0;
 		setChanged();
 		return "Pilger mill: dies changed, now making " + tubeName();
 	}
 
-	public boolean thimble() {
-		return thimble;
+	public int die() {
+		return die;
 	}
 
 	/** For the game test: the tube on the mill brought along by {@code kg}. */
@@ -68,7 +68,7 @@ public class PilgerMillBlockEntity extends UnitMotorBlockEntity {
 			return;
 		}
 		if (progress >= tubeKg() - 1e-9) {
-			ItemStack tube = new ItemStack(thimble ? WildcatterItems.GUIDE_THIMBLE : WildcatterItems.ZIRCALOY_TUBE);
+			ItemStack tube = new ItemStack(die == 1 ? WildcatterItems.GUIDE_THIMBLE : die == 2 ? WildcatterItems.SPACER_GRID : WildcatterItems.ZIRCALOY_TUBE);
 			if (!furnace.deliver(tube)) {
 				unit = "FULL: take the finished tubes from the anneal furnace (empty hand, or a hopper under it)";
 				return;
@@ -100,7 +100,7 @@ public class PilgerMillBlockEntity extends UnitMotorBlockEntity {
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
-		output.putBoolean("thimble", thimble);
+		output.putInt("die", die);
 		output.putDouble("progress", progress);
 		output.putDouble("scrap", scrap);
 	}
@@ -108,7 +108,7 @@ public class PilgerMillBlockEntity extends UnitMotorBlockEntity {
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
-		thimble = input.getBooleanOr("thimble", false);
+		die = input.getIntOr("die", input.getBooleanOr("thimble", false) ? 1 : 0);
 		progress = input.getDoubleOr("progress", 0);
 		scrap = input.getDoubleOr("scrap", 0);
 	}

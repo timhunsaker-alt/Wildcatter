@@ -91,6 +91,16 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "extrusion_press" -> new Motor(true, Voltage.MEDIUM, Tuning.EXTRUSION_PRESS_WATTS);
 				case "pilger_mill" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PILGER_WATTS);
 				case "vacuum_anneal_furnace" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ANNEAL_FURNACE_WATTS);
+				case "uf6_autoclave" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.AUTOCLAVE_WATTS);
+				case "idr_kiln" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.IDR_KILN_WATTS);
+				case "granulator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.GRANULATOR_WATTS);
+				case "pellet_press" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PELLET_PRESS_WATTS);
+				case "sintering_furnace" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.SINTERING_FURNACE_WATTS);
+				case "pellet_grinder" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PELLET_GRINDER_WATTS);
+				case "rod_loader" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ROD_LOADER_WATTS);
+				case "rod_welder" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ROD_WELDER_WATTS);
+				case "assembly_fixture" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ASSEMBLY_FIXTURE_WATTS);
+				case "helium_recovery_unit" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.HELIUM_UNIT_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -143,6 +153,16 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "var_furnace" -> "arc supply";
 			case "extrusion_press" -> "hydraulic pumps";
 			case "pilger_mill" -> "mill drive";
+			case "uf6_autoclave" -> "heaters";
+			case "idr_kiln" -> "kiln heaters and drive";
+			case "granulator" -> "granulator";
+			case "pellet_press" -> "press";
+			case "sintering_furnace" -> "furnace";
+			case "pellet_grinder" -> "grinder";
+			case "rod_loader" -> "loader";
+			case "rod_welder" -> "welding sets";
+			case "assembly_fixture" -> "fixture drives";
+			case "helium_recovery_unit" -> "cold box compressors";
 			default -> kind();
 		};
 	}

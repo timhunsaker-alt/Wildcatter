@@ -187,6 +187,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("zirconium")) {
 				zirconium(context, server);
 			}
+			if (only("fuel")) {
+				fuel(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -2452,6 +2455,18 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 				put(server, x, up, z - 8, "wildcatter:gas_line");
 			}
 			placeBig(server, WildcatterBlocks.FLARE_STACK, new BlockPos(41, up, z - 9), net.minecraft.core.Direction.NORTH);   // the residue gas no one takes
+			// 7g: a helium recovery unit on the pipeline gas, its front against the run at z-8; its own 480 V set west of it
+			BlockPos helium = new BlockPos(37, up, z - 7);
+			placeBig(server, WildcatterBlocks.HELIUM_RECOVERY_UNIT, helium, net.minecraft.core.Direction.NORTH);   // x 37-39, z-7..z-4
+			put(server, 38, up + 6, z - 5, "minecraft:hopper");
+			server.runCommand("item replace block 38 " + (up + 6) + " " + (z - 5) + " container.0 with wildcatter:empty_helium_cylinder 1");
+			BlockPos heliumOut = new BlockPos(38, y, z - 5);
+			put(server, 38, y, z - 5, "minecraft:hopper");
+			BlockPos heliumSet = new BlockPos(34, up, z - 6);
+			genset(server, heliumSet, net.minecraft.core.Direction.NORTH, false);                     // x 29-34, z-6..z-5
+			for (int[] p : new int[][] {{35, -6}, {35, -7}, {36, -7}}) {
+				put(server, p[0], up, z + p[1], "wildcatter:cable_industrial");
+			}
 
 			put(server, 14, up + 1, z - 1, "wildcatter:gas_line");   // on the separator's oil nozzle: a gas well's liquid is condensate
 			startGenset(context, server, power, net.minecraft.core.Direction.NORTH, 0);
@@ -2482,6 +2497,22 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			check(tank.contains("natural gasoline"), "the stock tank should fill with natural gasoline: " + tank);
 			String salesSet = read(server, 40, up, z - 10);
 			check(salesSet.contains("RUNNING") && salesSet.contains("pipeline gas"), "a gas set on the plant's pipeline gas should run: " + salesSet);
+			// the helium recovery unit: on its own set, it treats the pipeline gas and fills a cylinder a hook has nearly filled
+			startGenset(context, server, heliumSet, net.minecraft.core.Direction.NORTH, 2000);
+			context.waitTicks(200);
+			String he = read(server, 37, up, z - 7);
+			check(he.contains("treating") && he.contains("m3/h of helium"), "the helium recovery unit should take helium out of the pipeline gas: " + he + " | set " + read(server, 34, up, z - 6));
+			server.computeOnServer(srv -> {
+				((dev.wildcatter.block.HeliumRecoveryBlockEntity) srv.overworld().getBlockEntity(helium)).setHeliumForTest(Tuning.HELIUM_CYLINDER_M3 - 0.002);
+				return null;
+			});
+			int cylinders = 0;
+			for (int i = 0; i < 20 && cylinders == 0; i++) {
+				context.waitTicks(20);
+				cylinders = countIn(server, heliumOut, WildcatterItems.HELIUM_CYLINDER);
+			}
+			check(cylinders > 0, "a full helium cylinder should drop into the hopper under the unit: " + read(server, 37, up, z - 7));
+			check(read(server, 40, up, z - 10).contains("RUNNING"), "the gas set should still run on the treated gas: " + read(server, 40, up, z - 10));
 			server.runCommand("tp @p 30 " + (up + 9) + " " + (z + 15) + " 200 22");   // aimed just before the shot: the player falls between
 			context.waitTicks(3);
 			context.takeScreenshot("wildcatter-gas-plant");
@@ -4928,6 +4959,150 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(40);
 		check(read(server, 0, up, z + 12).contains("HAFNIUM COLUMN"), "without its hafnium column the Kroll reactor should say so: " + read(server, 0, up, z + 12));
 		System.out.println("[wildcatter-test] zirconium ok: " + ok + " | tubes " + tubes + ", thimbles " + thimbles);
+	}
+
+	/**
+	 * The fuel plant (7g, docs/multiblocks/fuel.md). The line runs south down x 0-2, each part against the next, from the UF6
+	 * autoclave to the assembly fixture. North-east, the conversion plant's steam reformer on LPG from a bullet makes the hydrogen,
+	 * piped to the east sides of the kiln and the sintering furnace. Two paralleled sets give 480 V down an 800 A busway at x -2.
+	 * Each stage must run once the one before it holds uranium; the fixture must build its skeleton from its hopper and, with 263
+	 * rods in it, drop a finished assembly into the hopper under it once the welder racks the 264th; an emptied 30B must drop under
+	 * the autoclave. An assembly stands beside the line for the screenshot.
+	 */
+	private void fuel(ClientGameTestContext context, TestServerContext server) {
+		int z = -2500;
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 10 " + (up + 24) + " " + (z + 40) + " 180 40");
+		context.waitTicks(20);
+		for (int zz = z - 12; zz <= z + 66; zz += 21) {   // /fill takes at most 32,768 blocks
+			server.runCommand("fill -20 " + (y - 1) + " " + zz + " 24 " + (y + 14) + " " + Math.min(zz + 20, z + 66) + " minecraft:air");
+		}
+		server.runCommand("fill -20 " + (y - 1) + " " + (z - 12) + " 24 " + (y - 1) + " " + (z + 66) + " minecraft:stone");
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		BlockPos autoclave = new BlockPos(0, up, z);
+		placeBig(server, WildcatterBlocks.UF6_AUTOCLAVE, autoclave, north);                     // z..z+3
+		BlockPos kiln = new BlockPos(0, up, z + 4);
+		placeBig(server, WildcatterBlocks.IDR_KILN, kiln, north);                               // z+4..z+13
+		BlockPos granulator = new BlockPos(0, up, z + 14);
+		placeBig(server, WildcatterBlocks.GRANULATOR, granulator, north);                       // z+14..z+17
+		BlockPos press = new BlockPos(0, up, z + 18);
+		placeBig(server, WildcatterBlocks.PELLET_PRESS, press, north);                          // z+18..z+21
+		BlockPos furnace = new BlockPos(0, up, z + 22);
+		placeBig(server, WildcatterBlocks.SINTERING_FURNACE, furnace, north);                   // z+22..z+33
+		BlockPos grinder = new BlockPos(0, up, z + 34);
+		placeBig(server, WildcatterBlocks.PELLET_GRINDER, grinder, north);                      // z+34..z+37
+		BlockPos loader = new BlockPos(0, up, z + 38);
+		placeBig(server, WildcatterBlocks.ROD_LOADER, loader, north);                           // z+38..z+47
+		BlockPos welder = new BlockPos(0, up, z + 48);
+		placeBig(server, WildcatterBlocks.ROD_WELDER, welder, north);                           // z+48..z+53
+		BlockPos fixture = new BlockPos(0, up, z + 54);
+		placeBig(server, WildcatterBlocks.ASSEMBLY_FIXTURE, fixture, north);                    // z+54..z+63
+		// hydrogen: a steam reformer on LPG, its back to a pipe west along z+6 and down x 3 past the kiln to the furnace
+		BlockPos reformer = new BlockPos(8, up, z + 2);
+		placeBig(server, WildcatterBlocks.STEAM_REFORMER, reformer, north);                     // x 8-10, z+2..z+5
+		BlockPos bullet = new BlockPos(14, up, z - 2);
+		placeBig(server, WildcatterBlocks.LPG_BULLET, bullet, north);                           // x 14-16, z-2..z+9
+		for (int x = 11; x <= 13; x++) {
+			put(server, x, up, z + 3, "wildcatter:gas_line");
+		}
+		for (int x = 3; x <= 9; x++) {
+			put(server, x, up, z + 6, "wildcatter:gas_line");
+		}
+		for (int zz = z + 7; zz <= z + 22; zz++) {
+			put(server, 3, up, zz, "wildcatter:gas_line");
+		}
+		// hoppers
+		put(server, 1, up + 3, z + 1, "minecraft:hopper");
+		server.runCommand("item replace block 1 " + (up + 3) + " " + (z + 1) + " container.0 with wildcatter:leu_cylinder_30b 1");
+		BlockPos emptiesOut = new BlockPos(1, y, z + 1);
+		put(server, 1, y, z + 1, "minecraft:hopper");
+		put(server, 1, up + 3, z + 40, "minecraft:hopper");
+		server.runCommand("item replace block 1 " + (up + 3) + " " + (z + 40) + " container.0 with wildcatter:zircaloy_tube 16");
+		server.runCommand("item replace block 1 " + (up + 3) + " " + (z + 40) + " container.1 with wildcatter:steel_ingot 1");
+		put(server, 1, up + 3, z + 50, "minecraft:hopper");
+		server.runCommand("item replace block 1 " + (up + 3) + " " + (z + 50) + " container.0 with wildcatter:helium_cylinder 1");
+		put(server, 1, up + 6, z + 58, "minecraft:hopper");
+		server.runCommand("item replace block 1 " + (up + 6) + " " + (z + 58) + " container.0 with wildcatter:guide_thimble 25");
+		server.runCommand("item replace block 1 " + (up + 6) + " " + (z + 58) + " container.1 with wildcatter:spacer_grid 6");
+		server.runCommand("item replace block 1 " + (up + 6) + " " + (z + 58) + " container.2 with wildcatter:steel_ingot 1");
+		BlockPos assemblyOut = new BlockPos(1, y, z + 58);
+		put(server, 1, y, z + 58, "minecraft:hopper");
+		fillTank(server, bullet, dev.wildcatter.fluid.Product.LPG, 20_000);
+		water(server, reformer, kiln);
+		// 480 V: two sets on a busway north-west, an 800 A busway down x -2, a 500 kcmil stub to each box at x -1
+		BlockPos[] sets = {new BlockPos(-12, up, z - 8), new BlockPos(-4, up, z - 8)};
+		for (BlockPos set : sets) {
+			genset(server, set, north, false);                                                   // x -17..-12 and -9..-4, z-8..z-7
+			put(server, set.getX() + 1, up, z - 8, "wildcatter:busway_industrial");
+		}
+		for (int x = -11; x <= -3; x++) {
+			put(server, x, up, z - 9, "wildcatter:busway_industrial");
+		}
+		for (int zz = z - 9; zz <= z + 54; zz++) {
+			put(server, -2, up, zz, "wildcatter:busway_industrial");
+		}
+		for (BlockPos set : sets) {
+			startGenset(context, server, set, north, 2000);
+		}
+		// the sets on the bus first, then each part's stub
+		for (int zz : new int[] {0, 4, 14, 18, 22, 34, 38, 48, 54}) {
+			put(server, -1, up, z + zz, "wildcatter:cable_industrial");
+			sizeCables(server, new BlockPos(-1, up, z + zz), new BlockPos(-1, up, z + zz), WildcatterBlocks.CABLE_INDUSTRIAL, dev.wildcatter.energy.ConductorSize.KCMIL_500);
+			context.waitTicks(40);
+			String set = read(server, -12, up, z - 8);
+			check(set.contains("RUNNING") && set.contains("breaker CLOSED"), "the sets should carry the part at z+" + zz + ": " + set + " | " + read(server, 0, up, z + zz)
+					+ " | stub " + read(server, -1, up, z + zz));
+		}
+		for (int i = 0; i < 12; i++) {
+			context.waitTicks(50);
+			water(server, reformer, kiln);
+		}
+		String head = " | autoclave " + read(server, 0, up, z) + " | kiln " + read(server, 0, up, z + 4) + " | reformer " + read(server, 8, up, z + 2) + " | set " + read(server, -12, up, z - 8);
+		check(read(server, 0, up, z).contains("vaporizing"), "the autoclave should vaporize the 30B's UF6: " + head);
+		check(read(server, 0, up, z + 4).contains("converting"), "the kiln should turn the UF6 into UO2 on the reformer's hydrogen: " + head);
+		check(read(server, 0, up, z + 54).contains("pulling rods"), "the fixture should build its skeleton from its hopper: " + read(server, 0, up, z + 54));
+		// uranium in each stage: the next one runs
+		server.computeOnServer(srv -> {
+			for (BlockPos at : new BlockPos[] {kiln, granulator, press, furnace, grinder}) {
+				((dev.wildcatter.block.FuelStage) srv.overworld().getBlockEntity(at)).addFuelU(1.0);
+			}
+			((dev.wildcatter.block.FuelStage) srv.overworld().getBlockEntity(loader)).addFuelU(dev.wildcatter.fluid.Fuel.rodU());
+			return null;
+		});
+		for (int i = 0; i < 4; i++) {
+			context.waitTicks(50);
+			water(server, reformer, kiln);
+		}
+		String line = " | granulator " + read(server, 0, up, z + 14) + " | press " + read(server, 0, up, z + 18) + " | furnace " + read(server, 0, up, z + 22)
+				+ " | grinder " + read(server, 0, up, z + 34) + " | loader " + read(server, 0, up, z + 38) + " | welder " + read(server, 0, up, z + 48);
+		check(read(server, 0, up, z + 14).contains("granulating"), "the granulator should run: " + line);
+		check(read(server, 0, up, z + 18).contains("pressing"), "the press should run: " + line);
+		check(read(server, 0, up, z + 22).contains("sintering"), "the sintering furnace should run on hydrogen: " + line);
+		check(read(server, 0, up, z + 34).contains("grinding"), "the grinder should run: " + line);
+		check(read(server, 0, up, z + 38).contains("loading"), "the rod loader should load a tube: " + line);
+		check(read(server, 0, up, z + 48).contains("welding"), "the welder should fill and weld a rod: " + line);
+		// 263 rods in the skeleton and one in the rack: the assembly is finished
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.AssemblyFixtureBlockEntity) srv.overworld().getBlockEntity(fixture)).setRodsForTest(Tuning.ASSEMBLY_RODS - 1);
+			((dev.wildcatter.block.RodWelderBlockEntity) srv.overworld().getBlockEntity(welder)).setRackForTest(1);
+			((dev.wildcatter.block.FuelLineBlockEntity) srv.overworld().getBlockEntity(autoclave)).setUf6ForTest(0.05);
+			return null;
+		});
+		int assemblies = 0, empties = 0;
+		for (int i = 0; i < 20 && (assemblies == 0 || empties == 0); i++) {
+			context.waitTicks(20);
+			assemblies = countIn(server, assemblyOut, WildcatterBlocks.FUEL_ASSEMBLY.asItem());
+			empties = countIn(server, emptiesOut, WildcatterItems.EMPTY_30B_CYLINDER);
+		}
+		check(assemblies > 0, "a finished fuel assembly should drop into the hopper under the fixture: " + read(server, 0, up, z + 54) + " | " + read(server, 0, up, z + 48));
+		check(empties > 0, "the emptied 30B should drop under the autoclave: " + read(server, 0, up, z));
+		placeBig(server, WildcatterBlocks.FUEL_ASSEMBLY, new BlockPos(5, up, z + 58), north);
+		check(stateAt(server, new BlockPos(5, up + 4, z + 58)).is(WildcatterBlocks.FUEL_ASSEMBLY), "a fuel assembly should stand five blocks tall");
+		server.runCommand("tp @p 14 " + (up + 9) + " " + (z + 66) + " 140 25");
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-fuel");
+		System.out.println("[wildcatter-test] fuel ok: " + read(server, 0, up, z + 4) + " | " + read(server, 0, up, z + 22) + " | " + read(server, 0, up, z + 48)
+				+ " | " + read(server, 0, up, z + 54) + " | assemblies " + assemblies + ", empty 30Bs " + empties);
 	}
 
 	/**

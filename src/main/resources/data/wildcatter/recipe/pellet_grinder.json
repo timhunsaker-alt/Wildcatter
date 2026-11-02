@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SGS",
+    "SXS",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "G": "minecraft:grindstone",
+    "X": "minecraft:piston"
+  },
+  "result": {
+    "id": "wildcatter:pellet_grinder",
+    "count": 1
+  }
+}

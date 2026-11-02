@@ -50,6 +50,8 @@ Put the jar in your instance's `mods` folder next to:
 - A zirconium plant: zircon from beach sand, chlorinated, freed of hafnium, reduced with magnesium by the Kroll process, melted
   into Zircaloy-4, extruded and pilgered into fuel cladding and guide thimbles; a magnesium cell and a chlor-alkali cell on
   rectifiers keep it in chlorine and magnesium.
+- A fuel plant: the 30B's UF6 turned to UO2 by the dry route, pressed and sintered into pellets, loaded into Zircaloy rods filled
+  with helium from a recovery unit at the gas plant, and built into true-size 17x17 assemblies that stand 4 m tall.
 - The Field Manual item explains how to build each machine.
 
 ## Older worlds
