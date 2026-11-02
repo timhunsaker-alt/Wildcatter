@@ -1,6 +1,6 @@
 # Wildcatter
 
-A Fabric mod for Minecraft Java 26.3 (Java 25): a realistic power and industry mod. You find oil and gas, raise steam, build
+A Minecraft Java 26.3 mod (Java 25) for **Fabric and NeoForge**: a realistic power and industry mod. You find oil and gas, raise steam, build
 gensets, turbines and a real grid, and work up through the nuclear fuel chain to a pressurized water reactor. Every machine is a
 true-size multiblock of real parts, with real voltages, ratings and chemistry. The electrical model (three-phase phasor solve,
 frequency, protection) is in `docs/ELECTRICAL_MODEL.md`. What is built, phase by phase, is in `PROGRESS.md`. What comes next is in
@@ -36,13 +36,17 @@ frequency, protection) is in `docs/ELECTRICAL_MODEL.md`. What is built, phase by
   - after the trip: decay heat, xenon, a COOLDOWN to cold shutdown on the RHR, and core damage with a hydrogen blast if
     cooling is lost (8d).
   - refuelling at outages, a spent fuel pool, and real radiation dose with a dosimeter (8e).
-- **Other mods:** plug adapters feed Team Reborn Energy machines (Tech Reborn and others) at 1 W = 1 E/t (Phase 9a). A NeoForge
-  jar with FE (for Mekanism) is next.
+- **Other mods:** plug adapters feed Team Reborn Energy machines (Tech Reborn and others) on Fabric at 1 W = 1 E/t (Phase 9a).
+  The NeoForge jar runs the same mod (9b); FE for Mekanism and other NeoForge mods comes in 9c.
 - **The Field Manual** item explains every machine. Art and sounds are made with Ludo (`art/`).
 
 ## Install
-Copy `dist/wildcatter-0.1.0.jar` into your instance's `mods/` folder with Fabric Loader and Fabric API for 26.3.
-Tech Reborn (6.2.1, with RebornCore 6.2.0) is optional: plugs feed its machines.
+Testers get the jars from the GitHub **Releases** page (or `dist/`):
+- **Fabric:** `wildcatter-fabric-0.2.0.jar` in `mods/` with Fabric Loader 0.20.1+ and Fabric API for 26.3. Tech Reborn (6.2.1,
+  with RebornCore 6.2.0) is optional: plugs feed its machines.
+- **NeoForge:** `wildcatter-neoforge-0.2.0.jar` in `mods/` with NeoForge 26.3.0.101 or newer.
+
+Use one jar, not both.
 `dist/README.md` has the player notes.
 
 ## Testing in game: the kits
@@ -82,21 +86,35 @@ Tech Reborn (6.2.1, with RebornCore 6.2.0) is optional: plugs feed its machines.
 **Reading a machine:** right-click any part with an empty hand. Sneak-right-click changes a setting where a part has one: the
 console's power setpoint, the CVCS boron target, a coolant pump's switch, the HP turbine's trip reset, the refuelling machine's REFUEL/DEFUEL, a genset's sync mode, the pilger mill's dies.
 
+## The code: one codebase, two loaders
+- `common/`: nearly everything (the solver, circuits, plants, blocks, items, renderers, the Field Manual), compiled against
+  plain Minecraft, so it cannot reach a loader's API. Its assets and data are shared. Its unit tests live here.
+- `fabric/`: the Fabric entry points, Fabric's biome API for the ores, Team Reborn Energy, and the client game test.
+- `neoforge/`: the NeoForge entry points, a mixin that tells the circuit manager when block entities load and unload, the ores'
+  biome modifiers, and the NeoForge smoke scenes.
+- `dev.wildcatter.platform.Platform` is the small seam between them (the config folder, which mods are loaded).
+
 ## Testing: automated
-JDK 25 required.
+JDK 25 required. NeoForge's build tools also need a JDK 21, which Gradle finds or downloads.
 
 ```bash
-./gradlew build                                   # compile, unit tests, jar in build/libs/
-./gradlew test                                    # unit tests only (plain-Java physics and chemistry)
-./gradlew runClientGameTest                       # every in-game scene, about an hour
-WILDCATTER_ONLY=reactor ./gradlew runClientGameTest           # one scene
-WILDCATTER_ONLY=boron,reactor ./gradlew runClientGameTest     # several scenes
+./gradlew build                                   # all three projects, unit tests, jars in fabric/ and neoforge/build/libs/
+./gradlew :common:test                            # unit tests only (plain-Java physics and chemistry)
+./gradlew :fabric:runClientGameTest               # every in-game scene on Fabric, about an hour and a half
+WILDCATTER_ONLY=reactor ./gradlew :fabric:runClientGameTest           # one scene
+WILDCATTER_ONLY=boron,reactor ./gradlew :fabric:runClientGameTest     # several scenes
+./gradlew :neoforge:runGameTestServer             # the NeoForge smoke scenes (registers, lamp, plug, ores)
+./gradlew :neoforge:runClient                     # play on NeoForge
 ```
 On a Mac, run `caffeinate -u -t 30` just before launching the test client: it needs the display awake. Screenshots land in
-`build/run/clientGameTest/screenshots/`.
+`fabric/build/run/clientGameTest/screenshots/`.
+
+**A release for testers:** `git tag v0.2.0 && git push --tags`. GitHub Actions builds both jars and publishes them with the kit
+datapack (`wildcatter_kit.zip`) as a Release. Every push also builds and keeps the jars as a run artifact.
 
 **The game-test scenes**, by area:
 - **Other mods:** `teamRebornEnergy` (a plug fills a real Team Reborn Energy storage).
+- **NeoForge smoke scenes:** `registers`, `lamp`, `plug`, `ores`.
 - **Basics:**
   - `lowVoltageLoop`, `transformerChain`, `steamLoop`, `wells`;
   - `refining` (the 4.16 kV tier).

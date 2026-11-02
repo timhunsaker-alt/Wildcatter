@@ -475,6 +475,36 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 9b: the NeoForge port (one codebase, two jars)
+- **Layout:** a multi-loader project after jaredlll08's MultiLoader-Template for 26.3. Every file moved with `git mv`, so its history
+  follows.
+  - `common/`: nearly everything, compiled against plain Minecraft (NeoForm 26.3-1), with the shared assets and data, and the unit
+    tests.
+  - `fabric/`: the entry points, Fabric's biome API for the ores, Team Reborn Energy, and the client game test.
+  - `neoforge/`: the entry points (NeoForge 26.3.0.101), a `LevelChunk` mixin that tells the circuit manager when block
+    entities load and unload (Fabric API's block entity events hook the same places), the ores' biome modifiers, and the smoke scenes.
+- **The seam:** `dev.wildcatter.platform.Platform` (config folder, loaded mods), found by `ServiceLoader`. `Wildcatter` and
+  `WildcatterClient` in common hold the handlers both loaders call; each loader's entry point wires its own events to them.
+- **NeoForge registration:** everything registers in the first `RegisterEvent`, while NeoForge has the registries open; the
+  creative tab registers there too.
+- **Ores:** `OreGen.placements()` and `OreGen.biomes()` are now the table. Fabric adds the features in code; `tools/make_assets.py`
+  writes one NeoForge `add_features` biome modifier per feature (25). `OreGenTest` checks they agree.
+- **Sized conductor recipes** (224) use each loader's component ingredient (`fabric:components`, `neoforge:components`), so
+  `make_assets.py` writes a copy into each loader's resources instead of the shared data.
+- **Two vanilla calls replace Fabric API extensions:** `ItemStack.getCraftingRemainder()` became the item's
+  `getCraftingRemainder()` (firebox ash), and the creative tab's contents take a plain consumer.
+- **Jars:** `wildcatter-fabric-0.2.0.jar` (Team Reborn Energy bundled) and `wildcatter-neoforge-0.2.0.jar`. The version went to
+  0.2.0.
+- **CI and releases:** each push builds both jars, runs the unit tests and the NeoForge smoke scenes, and keeps the jars as a run
+  artifact. Pushing a tag `v*` publishes a GitHub Release with both jars and `wildcatter_kit.zip` (`.github/workflows/release.yml`).
+- **NeoForge smoke scenes** (`./gradlew :neoforge:runGameTestServer`), all 5 passing (4 of ours and vanilla's `always_pass`):
+  - `registers`: 297 blocks, 368 items, 116 block entity types, the creative tab, and the Field Manual's pages;
+  - `lamp`: the starter plant lights a lamp at 120 V, 0.50 A, 60 W;
+  - `plug`: a NEMA 5-15 plug hands 930 W to a stand-in (92,975 in 100 ticks, the same as on Fabric);
+  - `ores`: 25 biome modifiers, and the salt domes are in the plains.
+- **Fabric:** the full client game test passes on the new layout. Two scenes (`plugs`, `solverBudget`) now teleport first so they
+  run on their own.
+
 ## Phase 9a: Team Reborn Energy on Fabric (Phase 9 waves in ROADMAP)
 - **Plugs feed Team Reborn Energy:** a plug adapter now hands its power to any Team Reborn Energy storage beside it (Tech Reborn's
   machines, batteries and cables, and other Fabric mods on that API). It finds them through `EnergyStorage.SIDED` on the face toward
@@ -914,7 +944,10 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
-- Phase 9a: plugs feed Team Reborn Energy on Fabric only. There is no NeoForge jar or FE yet (9b and 9c); Mekanism for 26.3 is
+- Phase 9b: on NeoForge, plugs feed nothing yet: FE comes in 9c. The NeoForge client loads with no errors (`:neoforge:runClient`), but no in-world screenshot was taken: quick-play into a
+  prepared world did not open it, and window capture is not permitted here. It has not been played. NeoForge's build tools need a JDK 21 beside the JDK 25. The `solverBudget` scene's 5 ms limit can trip when the machine
+  is busy (6.1 ms once while a download ran; 1.0 ms alone).
+- Phase 9a: plugs feed Team Reborn Energy on Fabric only. Mekanism for 26.3 is
   unreleased. Tech Reborn itself has not been tried in a real play session, only the API with a stand-in storage.
 - Phase 8e: the pool digs 13 m down from its controller: near the world's floor (or a superflat world) it cannot. Irradiated
   fuel has no casks yet (ROADMAP Ideas). Dose is a point-source line-of-sight sum; there is no contamination. The test sets the

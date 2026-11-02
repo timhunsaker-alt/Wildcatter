@@ -1,0 +1,12 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "dev.wildcatter.neoforge.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"LevelChunkMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

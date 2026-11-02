@@ -2,7 +2,7 @@
 """Converts the Ludo sound effects (mp3 / wav) into the mono Ogg Vorbis files Minecraft wants.
 
 Usage: python3 tools/process_sounds.py [folder]   (needs numpy and soundfile; the folder defaults to art/sound_source)
-Keep the Ludo sources in art/sound_source/<name>.mp3|wav. Writes src/main/resources/assets/wildcatter/sounds/*.ogg and sounds.json.
+Keep the Ludo sources in art/sound_source/<name>.mp3|wav. Writes common/src/main/resources/assets/wildcatter/sounds/*.ogg and sounds.json.
 One-shots are trimmed of silence and faded at both ends. Loops (docs/kinetics-and-sound.md) are left whole, because Ludo made
 them to loop seamlessly and trimming would put a click in the seam.
 """
@@ -11,7 +11,7 @@ import numpy as np
 import soundfile as sf
 
 src = sys.argv[1] if len(sys.argv) > 1 else "art/sound_source"
-out = "src/main/resources/assets/wildcatter/sounds"
+out = "common/src/main/resources/assets/wildcatter/sounds"
 os.makedirs(out, exist_ok=True)
 ONE_SHOTS = ("turbine_hum", "boiler_hiss", "breaker_trip", "breaker_click", "zap", "structure_formed", "engine_crank", "sync_bang", "disconnect_arc", "hv_breaker", "fuse_pop", "flashover")
 LOOPS = ("diesel_idle", "diesel_load", "gas_engine", "alternator_whine", "fan", "turbine_whine", "burner_roar", "motor_hum")
@@ -36,6 +36,6 @@ for name in ONE_SHOTS + LOOPS:
 	sf.write(f"{out}/{name}.ogg", mono, rate, format="OGG", subtype="VORBIS")
 	print(name, f"{len(mono) / rate:.2f}s")
 present = [n for n in ONE_SHOTS + LOOPS if os.path.exists(f"{out}/{n}.ogg")]
-with open("src/main/resources/assets/wildcatter/sounds.json", "w") as f:
+with open("common/src/main/resources/assets/wildcatter/sounds.json", "w") as f:
 	json.dump({n: {"sounds": [f"wildcatter:{n}"], "subtitle": f"subtitles.wildcatter.{n}"} for n in present}, f, indent=2)
 	f.write("\n")

@@ -6,7 +6,7 @@ Placeholders only: real art comes from Ludo once the shapes settle. Run from the
 import json, os, random, shutil
 from PIL import Image, ImageDraw
 
-ROOT = "src/main/resources"
+ROOT = "common/src/main/resources"
 ASSETS = f"{ROOT}/assets/wildcatter"
 DATA = f"{ROOT}/data/wildcatter"
 ns = "wildcatter"
@@ -1319,6 +1319,28 @@ for name, family in FAMILY.items():
 		recipe = json.load(open(path))
 		recipe["result"]["components"] = {SIZE_KEY: big}
 		save_json(path, recipe)
+# Sized ingredients are loader data: Fabric's "fabric:components" and NeoForge's "neoforge:components" ingredients (Phase 9b).
+# The recipes that use one leave the shared data for a copy in each loader's resources.
+LOADER_RECIPES = {"fabric": "fabric/src/main/resources/data/wildcatter/recipe", "neoforge": "neoforge/src/main/resources/data/wildcatter/recipe"}
+for d in LOADER_RECIPES.values():
+	if os.path.isdir(d):
+		shutil.rmtree(d)
+def _neoforge_ingredient(i):
+	if isinstance(i, dict) and i.get("fabric:type") == "fabric:components":
+		return {"neoforge:ingredient_type": "neoforge:components", "items": i["base"], "components": i["components"], "strict": False}
+	return i
+for fname in sorted(os.listdir(recipe_dir)):
+	path = f"{recipe_dir}/{fname}"
+	if "fabric:type" not in open(path).read():
+		continue
+	recipe = json.load(open(path))
+	save_json(f"{LOADER_RECIPES['fabric']}/{fname}", recipe)
+	if "key" in recipe:
+		recipe["key"] = {k: _neoforge_ingredient(v) for k, v in recipe["key"].items()}
+	else:
+		recipe["ingredients"] = [_neoforge_ingredient(i) for i in recipe["ingredients"]]
+	save_json(f"{LOADER_RECIPES['neoforge']}/{fname}", recipe)
+	os.remove(path)
 # conductor blocks drop themselves; CableBlock and MultiCableBlock put the size on the drop
 for name in [n for n in FAMILY if n not in SPOOLS] + ["busway_lv", "busway_industrial", "bus_duct_gen"]:
 	save_json(f"{DATA}/loot_table/blocks/{name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
@@ -1536,7 +1558,7 @@ save_json(f"{ASSETS}/lang/en_us.json", lang)
 # The ore list (ids, names, tool) is read from Ore.java so the two never disagree; the veins (size, count, height, host rock)
 # are here. Textures and icons are the Ludo pictures processed into art/final/ore by tools/process_art.py.
 import re
-_ore_src = open("src/main/java/dev/wildcatter/ore/Ore.java").read()
+_ore_src = open("common/src/main/java/dev/wildcatter/ore/Ore.java").read()
 ORES = [(m.group(1), m.group(2), m.group(3), m.group(4)) for m in
 	re.finditer(r'^\t[A-Z_]+\("(\w+)", "([^"]+)", "([^"]+)",.*?Tool\.(\w+)\)[,;]', _ore_src, re.M | re.S)]
 assert len(ORES) == 27, len(ORES)
@@ -2031,6 +2053,34 @@ lang.update({f"item.{ns}.dosimeter": "Dosimeter (electronic personal)", f"block.
 	"death.attack.wildcatter.radiation": "%1$s died of radiation sickness",
 	"death.attack.wildcatter.radiation.player": "%1$s died of radiation sickness"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+# ---- Phase 9b: NeoForge biome modifiers, one per placed ore feature -------------------------------------------------------
+# The same table as OreGen.placements() and OreGen.biomes() (Fabric adds the features in code); OreGenTest checks they agree.
+NF_MODIFIERS = "neoforge/src/main/resources/data/wildcatter/neoforge/biome_modifier"
+ORE_BIOMES = {
+	"EVERYWHERE": ["#minecraft:is_overworld"], "DEEP": ["#minecraft:is_overworld"],
+	"DESERT_BADLANDS": ["minecraft:desert", "#minecraft:is_badlands"], "EVAPORITE": ["minecraft:desert", "#minecraft:is_badlands"],
+	"SALT_DOME": ["minecraft:plains", "minecraft:sunflower_plains", "minecraft:swamp", "minecraft:mangrove_swamp", "#minecraft:is_beach"],
+	"BEACH": ["#minecraft:is_beach"], "TROPICS": ["#minecraft:is_jungle", "#minecraft:is_savanna"],
+	"MOUNTAINS": ["#minecraft:is_mountain"], "MOUNTAINS_BADLANDS": ["#minecraft:is_mountain", "#minecraft:is_badlands"],
+	"PLAINS_BADLANDS": ["minecraft:plains", "minecraft:sunflower_plains", "#minecraft:is_badlands"],
+	"OCEAN_BEACH": ["#minecraft:is_ocean", "#minecraft:is_beach"],
+}
+_ore_where = {m.group(1): m.group(2) for m in re.finditer(r'^\t[A-Z_]+\("(\w+)",.*?Where\.(\w+), Tool\.\w+\)[,;]', _ore_src, re.M | re.S)}
+assert len(_ore_where) == 27, len(_ore_where)
+_placements = {f"ore_{k}": w for k, w in _ore_where.items() if k not in ("sulfur", "halite", "sylvite", "chromite", "platinum")}
+_placements.update({"salt_dome": "SALT_DOME", "evaporite_beds": "EVAPORITE", "bushveld_reef": "EVERYWHERE"})
+def _holder_set(entries):
+	tags = [e for e in entries if e.startswith("#")]
+	ids = [e for e in entries if not e.startswith("#")]
+	parts = tags + ([ids] if ids else [])
+	return parts[0] if len(parts) == 1 else {"type": "neoforge:or", "values": parts}
+if os.path.isdir(NF_MODIFIERS):
+	for f in os.listdir(NF_MODIFIERS):
+		os.remove(f"{NF_MODIFIERS}/{f}")
+for name, where in _placements.items():
+	save_json(f"{NF_MODIFIERS}/{name}.json", {"type": "neoforge:add_features", "biomes": _holder_set(ORE_BIOMES[where]),
+		"features": f"{ns}:{name}", "step": "underground_ores"})
 
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys

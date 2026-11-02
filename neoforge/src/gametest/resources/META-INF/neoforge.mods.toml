@@ -1,0 +1,16 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "CC0-1.0"
+
+[[mods]]
+modId = "wildcatter_gametest"
+version = "1.0.0"
+displayName = "Wildcatter game tests (NeoForge)"
+description = '''The NeoForge smoke scenes.'''
+
+[[dependencies.wildcatter_gametest]]
+modId = "wildcatter"
+type = "required"
+versionRange = "*"
+ordering = "AFTER"
+side = "BOTH"

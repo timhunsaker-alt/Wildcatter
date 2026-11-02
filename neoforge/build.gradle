@@ -1,0 +1,68 @@
+plugins {
+	id 'multiloader-loader'
+	id 'net.neoforged.moddev'
+}
+
+// the smoke scenes live apart from the mod, as their own small test mod
+sourceSets {
+	gametest {
+		compileClasspath += main.compileClasspath + main.output
+		runtimeClasspath += main.runtimeClasspath + main.output
+	}
+}
+
+neoForge {
+	version = neoforge_version
+	runs {
+		configureEach {
+			systemProperty('neoforge.enabledGameTestNamespaces', mod_id)
+		}
+		client {
+			client()
+			gameDirectory = project.file('runs/client')
+			// -PquickPlay=<world> opens that world straight away (the smoke screenshot uses it)
+			if (project.hasProperty('quickPlay')) {
+				programArguments.addAll('--quickPlaySingleplayer', project.property('quickPlay').toString())
+			}
+		}
+		server {
+			server()
+			gameDirectory = project.file('runs/server')
+			programArgument('--nogui')
+		}
+		// The NeoForge smoke scenes: ./gradlew :neoforge:runGameTestServer
+		gameTestServer {
+			type = 'gameTestServer'
+			gameDirectory = project.file('runs/gametest')
+			sourceSet = sourceSets.gametest
+		}
+	}
+	mods {
+		"${mod_id}" {
+			sourceSet sourceSets.main
+		}
+		"wildcatter_gametest" {
+			sourceSet sourceSets.gametest
+		}
+	}
+}
+
+
+// Implement mcgradleconventions loader attribute
+def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+['apiElements', 'runtimeElements', 'sourcesElements'].each { variant ->
+	configurations.named(variant) {
+		attributes {
+			attribute(loaderAttribute, 'neoforge')
+		}
+	}
+}
+sourceSets.configureEach {
+	[it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName, it.getTaskName(null, 'jarJar')].findAll { configurations.findByName(it) != null }.each { variant ->
+		configurations.named(variant) {
+			attributes {
+				attribute(loaderAttribute, 'neoforge')
+			}
+		}
+	}
+}

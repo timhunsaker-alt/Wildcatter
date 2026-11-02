@@ -14,7 +14,7 @@ import json, math, os
 
 NS = "wildcatter"
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
-ASSETS = os.path.join(ROOT, "src/main/resources/assets", NS)
+ASSETS = os.path.join(ROOT, "common/src/main/resources/assets", NS)
 FACES = ("north", "south", "west", "east", "up", "down")
 # NPS pipe outside diameters in metres (ASME B36.10)
 NPS_OD = {0.5: 0.0213, 0.75: 0.0267, 1: 0.0334, 1.5: 0.0483, 2: 0.0603, 3: 0.0889, 4: 0.1143, 6: 0.1683, 8: 0.2191, 10: 0.2730, 12: 0.3239}

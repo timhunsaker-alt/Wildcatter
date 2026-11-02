@@ -1,0 +1,12 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": {
+    "type": "neoforge:or",
+    "values": [
+      "#minecraft:is_ocean",
+      "#minecraft:is_beach"
+    ]
+  },
+  "features": "wildcatter:ore_phosphate",
+  "step": "underground_ores"
+}

@@ -1,12 +1,28 @@
 pluginManagement {
 	repositories {
-		maven {
-			name = 'Fabric'
-			url = 'https://maven.fabricmc.net/'
-		}
-		mavenCentral()
 		gradlePluginPortal()
+		mavenCentral()
+		exclusiveContent {
+			forRepository {
+				maven {
+					name = 'Fabric'
+					url = uri('https://maven.fabricmc.net')
+				}
+			}
+			filter {
+				includeGroupAndSubgroups('net.fabricmc')
+			}
+		}
 	}
 }
 
+plugins {
+	id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
+// One codebase, two jars (Phase 9b): common holds nearly everything; fabric and neoforge hold each loader's entry points.
 rootProject.name = 'wildcatter'
+includeBuild('build-logic')
+include('common')
+include('fabric')
+include('neoforge')

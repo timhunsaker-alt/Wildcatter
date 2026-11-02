@@ -1,0 +1,42 @@
+plugins {
+	id 'multiloader-loader'
+	id 'net.fabricmc.fabric-loom'
+}
+
+// Automated in-game tests: ./gradlew :fabric:runClientGameTest builds the plants in a real world and checks they work.
+fabricApi {
+	configureTests {
+		createSourceSet = true
+		modId = "wildcatter-gametest"
+		enableGameTests = false
+		enableClientGameTests = true
+	}
+}
+
+dependencies {
+	minecraft("com.mojang:minecraft:${minecraft_version}")
+	implementation("net.fabricmc:fabric-loader:${fabric_loader_version}")
+	implementation("net.fabricmc.fabric-api:fabric-api:${fabric_version}")
+	// Team Reborn Energy: plug adapters hand power to Tech Reborn and other mods on it. Bundled in the jar (MIT).
+	implementation("teamreborn:energy:${tr_energy_version}") { transitive = false }
+	include("teamreborn:energy:${tr_energy_version}") { transitive = false }
+}
+
+// Implement mcgradleconventions loader attribute
+def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+['apiElements', 'runtimeElements', 'sourcesElements', 'includeInternal', 'modCompileClasspath'].each { variant ->
+	configurations.named(variant) {
+		attributes {
+			attribute(loaderAttribute, 'fabric')
+		}
+	}
+}
+sourceSets.configureEach {
+	[it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName].each { variant ->
+		configurations.named(variant) {
+			attributes {
+				attribute(loaderAttribute, 'fabric')
+			}
+		}
+	}
+}

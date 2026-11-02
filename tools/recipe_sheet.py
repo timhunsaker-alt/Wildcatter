@@ -5,7 +5,7 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 JAR = glob.glob(f"{ROOT}/.gradle/loom-cache/minecraftMaven/net/minecraft/minecraft-merged-*/*/*.jar")[0]
 zf = zipfile.ZipFile(JAR)
-MOD = f"{ROOT}/src/main/resources/assets/wildcatter/textures"
+MOD = f"{ROOT}/common/src/main/resources/assets/wildcatter/textures"
 S = 48
 FONT = ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial Bold.ttf", 15)
 SMALL = ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial.ttf", 12)
@@ -102,7 +102,7 @@ def main(out):
 	# for three representative conductors
 	smallest = ("__awg_12.json", "__acsr_sparrow.json", "__mv_1_0.json")
 	chains = ("wire_hot__", "dist_wire_hot__", "cable_industrial__")
-	files = [f for f in sorted(glob.glob(f"{ROOT}/src/main/resources/data/wildcatter/recipe/*.json"))
+	files = [f for f in sorted(glob.glob(f"{ROOT}/common/src/main/resources/data/wildcatter/recipe/*.json") + glob.glob(f"{ROOT}/fabric/src/main/resources/data/wildcatter/recipe/*.json"))
 		if "__" not in os.path.basename(f) or f.endswith(smallest) or ("_from_" in f and os.path.basename(f).startswith(chains))]
 	ims = [render(f) for f in files]
 	w, h = ims[0].size

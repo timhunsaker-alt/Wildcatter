@@ -1,0 +1,12 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": {
+    "type": "neoforge:or",
+    "values": [
+      "#minecraft:is_mountain",
+      "#minecraft:is_badlands"
+    ]
+  },
+  "features": "wildcatter:ore_acanthite",
+  "step": "underground_ores"
+}

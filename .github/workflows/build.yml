@@ -12,12 +12,20 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '25'
+          # 21 for NeoForge's build tools, 25 (the last, the default) for the mod
+          java-version: |
+            21
+            25
       - uses: gradle/actions/setup-gradle@v4
       - run: chmod +x gradlew
-      - run: ./gradlew build test --stacktrace
+      - run: ./gradlew build --stacktrace
+      # the NeoForge smoke scenes run headless; the Fabric client game test needs a display and runs on the Mac
+      - run: ./gradlew :neoforge:runGameTestServer --stacktrace
       - uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: wildcatter-jar
-          path: build/libs/*.jar
+          name: wildcatter-jars
+          path: |
+            fabric/build/libs/wildcatter-fabric-*.jar
+            neoforge/build/libs/wildcatter-neoforge-*.jar
+            !**/*-sources.jar

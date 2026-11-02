@@ -1,0 +1,48 @@
+name: Release
+
+# Pushing a tag such as v0.2.0 builds both jars and publishes them, with the kit datapack, as a GitHub Release for testers.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: |
+            21
+            25
+      - uses: gradle/actions/setup-gradle@v4
+      - run: chmod +x gradlew
+      - run: ./gradlew build --stacktrace
+      - name: Zip the kit datapack
+        run: cd dist && zip -r ../wildcatter_kit.zip wildcatter_kit
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          prev=$(git describe --tags --abbrev=0 "${GITHUB_REF_NAME}^" 2>/dev/null || true)
+          if [ -n "$prev" ]; then range="$prev..$GITHUB_REF_NAME"; else range="$GITHUB_REF_NAME"; fi
+          {
+            echo "Wildcatter $GITHUB_REF_NAME for Minecraft 26.3."
+            echo
+            echo "- **Fabric:** wildcatter-fabric-*.jar (with Fabric API; Tech Reborn optional)."
+            echo "- **NeoForge:** wildcatter-neoforge-*.jar."
+            echo "- **Kits:** unzip wildcatter_kit.zip into a world's datapacks folder and run /reload."
+            echo
+            echo "## Changes"
+            git log --pretty='- %s' "$range"
+          } > notes.md
+          gh release create "$GITHUB_REF_NAME" --title "Wildcatter $GITHUB_REF_NAME" --notes-file notes.md \
+            $(ls fabric/build/libs/wildcatter-fabric-*.jar neoforge/build/libs/wildcatter-neoforge-*.jar | grep -v sources) \
+            wildcatter_kit.zip

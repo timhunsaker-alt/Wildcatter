@@ -1,0 +1,15 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": {
+    "type": "neoforge:or",
+    "values": [
+      "#minecraft:is_badlands",
+      [
+        "minecraft:plains",
+        "minecraft:sunflower_plains"
+      ]
+    ]
+  },
+  "features": "wildcatter:ore_bentonite",
+  "step": "underground_ores"
+}

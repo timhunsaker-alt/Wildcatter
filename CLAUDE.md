@@ -23,7 +23,8 @@ If a request conflicts with these docs, point out the conflict and ask before do
 - For any piece of equipment, state its real-world counterpart and the values used (voltage, kVA, PF, etc.).
 - No abstract energy units in grid code. Conversion to other mods' energy happens only in plug adapters.
 - Never hardcode a voltage or frequency. Read them from the world's electrical standard (NA or IEC).
-- Keep the solver package free of Minecraft and Fabric imports.
+- Keep the solver package free of Minecraft and loader imports (`common/src/main/java/dev/wildcatter/solver`).
+- Loader code stays in `fabric/` and `neoforge/`; `common/` reaches a loader only through `dev.wildcatter.platform.Platform`.
 
 ## Multiblocks
 - Write `docs/multiblocks/<name>.md` before any code: layered ASCII grid (bottom to top),

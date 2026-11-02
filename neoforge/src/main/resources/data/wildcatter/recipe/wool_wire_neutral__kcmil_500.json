@@ -1,0 +1,46 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "wildcatter:wire_neutral",
+      "components": {
+        "wildcatter:conductor_size": "kcmil_500"
+      },
+      "strict": false
+    },
+    {
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "wildcatter:wire_neutral",
+      "components": {
+        "wildcatter:conductor_size": "kcmil_500"
+      },
+      "strict": false
+    },
+    {
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "wildcatter:wire_neutral",
+      "components": {
+        "wildcatter:conductor_size": "kcmil_500"
+      },
+      "strict": false
+    },
+    {
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "wildcatter:wire_neutral",
+      "components": {
+        "wildcatter:conductor_size": "kcmil_500"
+      },
+      "strict": false
+    },
+    "#minecraft:wool"
+  ],
+  "result": {
+    "id": "wildcatter:wool_wire_neutral",
+    "count": 4,
+    "components": {
+      "wildcatter:conductor_size": "kcmil_500"
+    }
+  }
+}

@@ -1,0 +1,173 @@
+package dev.wildcatter.neoforge.gametest;
+
+import dev.wildcatter.Wildcatter;
+import dev.wildcatter.WildcatterBlocks;
+import dev.wildcatter.WildcatterItems;
+import dev.wildcatter.block.BoilerBlockEntity;
+import dev.wildcatter.block.LoadBlock;
+import dev.wildcatter.energy.EnergyBridge;
+import dev.wildcatter.energy.HostEnergy;
+import dev.wildcatter.energy.Inspectable;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.gametest.framework.FunctionGameTestInstance;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.gametest.framework.TestData;
+import net.minecraft.gametest.framework.TestEnvironmentDefinition;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CampfireBlock;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.event.RegisterGameTestsEvent;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import net.neoforged.neoforge.registries.RegisterEvent;
+
+/**
+ * The NeoForge smoke scenes (Phase 9b): the mod registers, a starter plant lights a lamp through the circuit manager's block entity
+ * hook, a plug hands power to a stand-in machine, and the ores reach their biomes. The physics is covered by the Fabric client game
+ * test. Run with {@code ./gradlew :neoforge:runGameTestServer}.
+ */
+@Mod("wildcatter_gametest")
+public class WildcatterNeoForgeGameTests {
+	private static final String[] SCENES = {"registers", "lamp", "plug", "ores"};
+
+	public WildcatterNeoForgeGameTests(IEventBus modBus) {
+		modBus.addListener(RegisterEvent.class, event -> event.register(Registries.TEST_FUNCTION, helper -> {
+			helper.register(id("registers"), (Consumer<GameTestHelper>) WildcatterNeoForgeGameTests::registers);
+			helper.register(id("lamp"), (Consumer<GameTestHelper>) WildcatterNeoForgeGameTests::lamp);
+			helper.register(id("plug"), (Consumer<GameTestHelper>) WildcatterNeoForgeGameTests::plug);
+			helper.register(id("ores"), (Consumer<GameTestHelper>) WildcatterNeoForgeGameTests::ores);
+		}));
+		modBus.addListener(RegisterGameTestsEvent.class, event -> {
+			Holder<TestEnvironmentDefinition<?>> plain = event.registerEnvironment(id("plain"));
+			for (String scene : SCENES) {
+				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
+						new TestData<>(plain, Identifier.withDefaultNamespace("empty"), 400, 1, true)));
+			}
+		});
+	}
+
+	private static Identifier id(String path) {
+		return Identifier.fromNamespaceAndPath("wildcatter_gametest", path);
+	}
+
+	private static void check(GameTestHelper helper, boolean ok, String message) {
+		helper.assertTrue(ok, Component.literal(message));
+	}
+
+	private static String read(GameTestHelper helper, BlockPos pos) {
+		return helper.getLevel().getBlockEntity(helper.absolutePos(pos)) instanceof Inspectable i ? i.inspect().getString() : "(no readout)";
+	}
+
+	/** Every block, item and block entity type is registered, and the Field Manual has its pages. */
+	private static void registers(GameTestHelper helper) {
+		long blocks = BuiltInRegistries.BLOCK.keySet().stream().filter(k -> k.getNamespace().equals(Wildcatter.MOD_ID)).count();
+		long items = BuiltInRegistries.ITEM.keySet().stream().filter(k -> k.getNamespace().equals(Wildcatter.MOD_ID)).count();
+		long entities = BuiltInRegistries.BLOCK_ENTITY_TYPE.keySet().stream().filter(k -> k.getNamespace().equals(Wildcatter.MOD_ID)).count();
+		check(helper, blocks > 250 && items > 300 && entities > 100, "registered " + blocks + " blocks, " + items + " items, " + entities + " block entity types");
+		check(helper, BuiltInRegistries.CREATIVE_MODE_TAB.containsKey(Wildcatter.id("wildcatter")), "the creative tab is registered");
+		check(helper, new ItemStack(WildcatterItems.FIELD_MANUAL).has(DataComponents.WRITTEN_BOOK_CONTENT), "the Field Manual carries its pages");
+		System.out.println("[wildcatter-neoforge-test] registers ok: " + blocks + " blocks, " + items + " items, " + entities + " block entity types");
+		helper.succeed();
+	}
+
+	/** The 120 V starter plant: a boiler on a campfire and its turbine, a hot and a neutral wire, and a lamp. */
+	private static void plant(GameTestHelper helper) {
+		for (int x = -1; x <= 6; x++) {
+			for (int z = -1; z <= 2; z++) {
+				helper.setBlock(x, 0, z, Blocks.STONE);
+			}
+		}
+		helper.setBlock(0, 1, 0, Blocks.CAMPFIRE.defaultBlockState().setValue(CampfireBlock.LIT, true));
+		helper.setBlock(0, 2, 0, WildcatterBlocks.BOILER);
+		helper.setBlock(1, 2, 0, WildcatterBlocks.STEAM_TURBINE);
+		helper.getBlockEntity(new BlockPos(0, 2, 0), BoilerBlockEntity.class).addWater(4000);
+	}
+
+	private static void wire(GameTestHelper helper, int x, int z, String id) {
+		helper.setBlock(x, 2, z, BuiltInRegistries.BLOCK.getValue(Wildcatter.id(id)));
+	}
+
+	/** The plant lights a lamp: the block entity hook, the solver and the ticking all work on NeoForge. */
+	private static void lamp(GameTestHelper helper) {
+		plant(helper);
+		wire(helper, 2, 0, "wool_wire_hot");
+		wire(helper, 3, 0, "wool_wire_hot");
+		wire(helper, 4, 0, "wool_wire_hot");
+		helper.setBlock(5, 2, 0, WildcatterBlocks.ELECTRIC_LAMP);
+		for (int x = 1; x <= 5; x++) {
+			wire(helper, x, 1, "wool_wire_neutral");
+		}
+		BlockPos lamp = new BlockPos(5, 2, 0);
+		helper.succeedWhen(() -> {
+			check(helper, helper.getLevel().getBlockState(helper.absolutePos(lamp)).getValue(LoadBlock.LIT), "the lamp should light: " + read(helper, lamp));
+			String reading = read(helper, lamp);
+			check(helper, reading.matches(".*\\b(11[0-9]|120) V, 0\\.[45]\\d A.*"), "lamp volts and amps look wrong: " + reading);
+			System.out.println("[wildcatter-neoforge-test] lamp ok: " + reading);
+		});
+	}
+
+	/** A NEMA 5-15 plug hands the plant's power to a stand-in machine (FE comes in 9c). */
+	private static void plug(GameTestHelper helper) {
+		plant(helper);
+		wire(helper, 2, 0, "wool_wire_hot");
+		for (int x = 1; x <= 3; x++) {
+			wire(helper, x, 1, "wool_wire_neutral");
+		}
+		wire(helper, 3, 0, "receptacle_nema_5_15");
+		wire(helper, 4, 0, "plug_nema_5_15");
+		helper.setBlock(5, 2, 0, Blocks.IRON_BLOCK);
+		BlockPos machine = helper.absolutePos(new BlockPos(5, 2, 0));
+		AtomicLong delivered = new AtomicLong();
+		EnergyBridge.clearTests();
+		EnergyBridge.registerForTest(target -> target.pos().equals(machine) ? new HostEnergy() {
+			@Override
+			public long demand() {
+				return 1000;
+			}
+
+			@Override
+			public long insert(long amount) {
+				delivered.addAndGet(amount);
+				return amount;
+			}
+		} : null);
+		helper.runAfterDelay(160, () -> {
+			long before = delivered.get();
+			helper.runAfterDelay(100, () -> {
+				long gained = delivered.get() - before;
+				String plug = read(helper, new BlockPos(4, 2, 0));
+				EnergyBridge.clearTests();
+				check(helper, plug.contains("delivering") && gained > 70_000 && gained < 120_000, "the plug should hand over about 930 a tick (" + gained + " in 100 ticks): " + plug);
+				System.out.println("[wildcatter-neoforge-test] plug ok: " + plug + " | gained " + gained);
+				helper.succeed();
+			});
+		});
+	}
+
+	/** The biome modifiers load, one per placed ore feature, and put the salt domes into the plains. */
+	private static void ores(GameTestHelper helper) {
+		var access = helper.getLevel().registryAccess();
+		long modifiers = access.lookupOrThrow(NeoForgeRegistries.Keys.BIOME_MODIFIERS).listElementIds()
+				.filter(k -> k.identifier().getNamespace().equals(Wildcatter.MOD_ID)).count();
+		check(helper, modifiers == dev.wildcatter.ore.OreGen.placements().size(), modifiers + " biome modifiers, expected " + dev.wildcatter.ore.OreGen.placements().size());
+		ResourceKey<PlacedFeature> saltDome = ResourceKey.create(Registries.PLACED_FEATURE, Wildcatter.id("salt_dome"));
+		boolean inPlains = access.lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.PLAINS).value().getGenerationSettings().features().stream()
+				.anyMatch(step -> step.stream().anyMatch(f -> f.is(saltDome)));
+		check(helper, inPlains, "the salt domes should generate in the plains");
+		System.out.println("[wildcatter-neoforge-test] ores ok: " + modifiers + " biome modifiers; salt domes in the plains");
+		helper.succeed();
+	}
+}
