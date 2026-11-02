@@ -475,6 +475,37 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 8c: the hyperbolic natural-draft cooling tower (spec: docs/multiblocks/natural-draft-tower.md)
+- **Tim's decisions:**
+  - the tower rises lift by lift as it is fed;
+  - a tenth of the real concrete (the steel about a hundredth, as offered);
+  - the wet bulb from the biome.
+- **The tower** (`fluid/CoolingTower.java`, unit-tested):
+  - Calder Hall's 88 m;
+  - a hyperboloid from 30 m radius at 8 m to a 17 m throat at 62 m and 20.8 m at the top;
+  - 54 lifts of 1.5 m, 0.40-0.18 m thick;
+  - about 430 gray concrete and 44 steel ingots in all, and 64 plastic sheets for the fill.
+- **Cooling:**
+  - wet bulb (Stull) + 8 °C × (Q / 104 MW)^0.6, with a 2-minute lag;
+  - evaporation Q / 2.45 MJ/kg (42 kg/s at full load), blowdown a quarter of it, make-up off a pump;
+  - no fans, no power.
+- **NATURAL-DRAFT COOLING TOWER:** the controller at the basin's edge, the centre 34 m in front.
+  - Materials by a hopper on top.
+  - It builds the basin and digs and fills a 3 m pond, then the raker columns, then the shell lift by lift, then the fill.
+  - Invisible TOWER SHELL blocks make it solid.
+  - CoolingTowerRenderer draws it as one smooth model, with a cloud plume over the top while it rejects heat.
+- **The loop:**
+  - COOLING_WATER carries its temperature;
+  - a CW pump in the tower's basin gives the tower's cold water, and in a lake 20 °C;
+  - the condenser counts the inlet temperature for its vacuum and gives the warmed water back on its south side, to the
+    tower's riser on top of the controller.
+- **Game test** `coolingTower`:
+  - the basin is poured from the hopper and the pond fills;
+  - the shell blocks stand at 30, 17 and 20.7 m at 8.5, 62.5 and 87.5 m;
+  - a pump in the basin draws from the tower;
+  - at about 102 MW the cold water sits 8.0 °C over a 10.5 °C wet bulb, with 41.6 kg/s of evaporation, and the plume is on;
+  - screenshot.
+
 ## Phase 8b: the turbine island (spec: docs/multiblocks/turbine-island.md)
 - **Tim's decisions:** the hyperbolic natural-draft tower gets its own wave (8c), so 8b cools the condenser once-through from a
   lake or river; a new 60 MVA hydrogen-cooled generator. Waves: 8b turbine island, 8c tower, 8d SCRAM and safety. The
@@ -808,7 +839,10 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
-- Phase 8b: the condenser is cooled once-through; the hyperbolic tower is 8c. The turbine island's game test starts on a gas
+- Phase 8c: the tower's shell is drawn by one renderer and made solid by invisible blocks; no visible block model. Humidity is a
+  three-step proxy, as the biome's downfall is private. The game test builds the shell by hook rather than over 13 minutes, and
+  does not run the whole plant on the tower (turbineIsland still uses a lake).
+- Phase 8b: the turbine island's game test cools once-through from a pool. The turbine island's game test starts on a gas
   turbine's 13.8 kV bus, not a 138 kV grid line. The governor follows the generator's last output, so a sudden load step is met
   over a few seconds.
 - Phase 8a: without the turbine, steam is vented and the plant runs at a few percent on the aux feed. No decay heat, xenon

@@ -31,8 +31,9 @@ frequency, protection) is in `docs/ELECTRICAL_MODEL.md`. What is built, phase by
 - **The reactor (Phase 8, in progress):**
   - a boron plant (boric acid, boron carbide control rods);
   - the nuclear island of a 9-assembly, two-loop PWR that goes critical and makes steam (8a);
-  - the turbine island: a 51 MW turbine generator onto 13.8 kV and the 60 MVA GSU, cooled once-through from a lake (8b).
-  - Next: the hyperbolic natural-draft cooling tower (8c), then SCRAM and safety (8d).
+  - the turbine island: a 51 MW turbine generator onto 13.8 kV and the 60 MVA GSU, cooled once-through from a lake (8b);
+  - an 88 m hyperbolic natural-draft cooling tower, built lift by lift, closing the circulating water loop (8c).
+  - Next: SCRAM and safety (8d).
 - **The Field Manual** item explains every machine. Art and sounds are made with Ludo (`art/`).
 
 ## Install
@@ -62,6 +63,7 @@ Copy `dist/wildcatter-0.1.0.jar` into your instance's `mods/` folder with Fabric
 | `/function wildcatter:kit/fuel` | the fuel plant and the helium recovery unit |
 | `/function wildcatter:kit/boron` | the boron plant (boric acid, B4C, RCCAs) |
 | `/function wildcatter:kit/reactor` | the nuclear island, 9 fuel assemblies, 5 RCCAs and boric acid |
+| `/function wildcatter:kit/cooling_tower` | the natural-draft cooling tower's controller and its materials (concrete, steel, plastic) |
 | `/function wildcatter:kit/turbine_island` | the turbine island: turbines, 60 MVA generator, condenser, feed train, CW pumps, UAT |
 
 **Useful vanilla commands:**
@@ -100,7 +102,7 @@ On a Mac, run `caffeinate -u -t 30` just before launching the test client: it ne
   - `bigParts`, `towerParts`, `substationParts`, `lineParts`, `buildingGear`.
 - **Oil and gas:** `landRig`, `lease`, `gasPlant`, `toppingUnit`, `crudeUnit`, `cracker`.
 - **The fuel chain:** `ores`, `acidPlant`, `uraniumMill`, `isrWellfield`, `conversion`, `cascade`, `zirconium`, `fuel`.
-- **The reactor:** `boron`, `reactor`, `turbineIsland`.
+- **The reactor:** `boron`, `reactor`, `turbineIsland`, `coolingTower`.
 
 ## Art and assets
 - **Redo the art:** `python3 tools/process_art.py && python3 tools/make_assets.py` (needs Pillow). Ludo prompts are in

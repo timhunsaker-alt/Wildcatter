@@ -128,7 +128,11 @@ public class HpTurbineBlockEntity extends BlockEntity implements Inspectable, Bi
 		double design = TurbineCycle.cwNeeded(TurbineCycle.rejectedWatts(2 * dev.wildcatter.fluid.Reactor.steamPerGenerator(), Tuning.TG60_WATTS));
 		double needed = Math.max(TurbineCycle.cwNeeded(rejected), design * 0.3);
 		cwKgs = cond == null ? 0 : cond.pullCooling(level, needed * dt) / dt;
-		kpa = cwKgs < 1 ? 101.3 : TurbineCycle.backPressureKpa(rejected, cwKgs);
+		double inC = cond == null ? Tuning.LAKE_C : cond.inC();
+		kpa = cwKgs < 1 ? 101.3 : TurbineCycle.backPressureKpa(rejected, cwKgs, inC);
+		if (cond != null && cwKgs > 0) {
+			cond.giveBack(cwKgs * dt, inC + TurbineCycle.rise(rejected, cwKgs));
+		}
 
 		// the trips
 		if (!tripped && speed > 0.05) {
@@ -176,7 +180,8 @@ public class HpTurbineBlockEntity extends BlockEntity implements Inspectable, Bi
 		dumpKgs = canDeliver > 0 ? steamKgs * Math.max(0, 1 - delivered / canDeliver) : 0;
 		rejected = TurbineCycle.rejectedWatts(steamKgs, delivered);
 		if (cond != null) {
-			cond.status(String.format("%.1f kPa, circulating water %,.0f kg/s, steam dump %.1f kg/s, hotwell %.1f t", kpa, cwKgs, dumpKgs, hotwell / 1000));
+			cond.status(String.format("%.1f kPa, circulating water %,.0f kg/s in at %.1f C, steam dump %.1f kg/s, hotwell %.1f t", kpa, cwKgs, cond.inC(), dumpKgs,
+					hotwell / 1000));
 		}
 		running.update(this, speed > 0.05);
 	}

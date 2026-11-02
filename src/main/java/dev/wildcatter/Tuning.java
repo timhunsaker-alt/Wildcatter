@@ -513,6 +513,38 @@ public final class Tuning {
 	public static final double UAT_VA = 7_500_000.0;               // 13.8/4.16 kV (proposed)
 	public static final double UAT_PERCENT_Z = 7.0;
 
+	// ---- The natural-draft cooling tower (docs/multiblocks/natural-draft-tower.md, approved 2026-11-01) --------------------------
+	public static final double TOWER_SHELL_BASE_Y = 8.0;           // over the basin floor; the raker columns below
+	public static final double TOWER_THROAT_Y = 62.0;
+	public static final double TOWER_THROAT_R = 17.0;
+	public static final double TOWER_SHAPE_B = 37.1;               // the hyperbola's: 30 m at the base, 20.8 m at the top
+	public static final double TOWER_TOP_Y = 88.0;                 // Calder Hall's 88 m (textbook)
+	public static final double TOWER_LIFT_M = 1.5;
+	public static final double TOWER_SHELL_BASE_T = 0.40;          // m of concrete, tapering to the top's (unverified)
+	public static final double TOWER_SHELL_TOP_T = 0.18;
+	public static final double TOWER_BASIN_R = 31.0;
+	public static final double TOWER_BASIN_DEPTH = 3.0;
+	public static final double TOWER_CENTRE = 34.0;                // from the controller's main cell, in front of it
+	public static final double TOWER_CONCRETE_SHARE = 0.10;        // a block for each 10 real m3 (Tim, 2026-11-01)
+	public static final double TOWER_REBAR_KG_PER_M3 = 1.0;        // a hundredth of 100 kg/m3 (Tim's 44 ingots)
+	public static final int TOWER_BASIN_CONCRETE = 100;
+	public static final int TOWER_BASIN_STEEL = 10;
+	public static final int TOWER_COLUMNS_CONCRETE = 15;
+	public static final int TOWER_COLUMNS_STEEL = 2;
+	public static final int TOWER_FILL_STEEL = 4;
+	public static final int TOWER_FILL_PLASTIC = 64;
+	public static final double TOWER_BASIN_SECONDS = 60.0;         // compressed: real towers take months
+	public static final double TOWER_COLUMNS_SECONDS = 30.0;
+	public static final double TOWER_LIFT_SECONDS = 15.0;
+	public static final double TOWER_FILL_SECONDS = 30.0;
+	public static final double TOWER_DESIGN_W = 104e6;
+	public static final double TOWER_APPROACH_C = 8.0;             // at design (unverified)
+	public static final double TOWER_LAG_S = 120.0;
+	public static final double LATENT_J_PER_KG = 2.45e6;
+	public static final double TOWER_CYCLES = 5.0;                 // of concentration: blowdown a quarter of evaporation
+	public static final double LAKE_C = 20.0;
+	public static final double TOWER_MIN_COLD_C = 4.0;            // no colder: the basin would freeze (proposed)
+
 	// ---- The boron plant (docs/multiblocks/boron.md, approved 2026-11-01) ------------------------------------------------------
 	public static final double BORIC_ACID_KGS = 50.0 / 3600;       // (proposed)
 	public static final double B4C_KGS = 5.0 / 3600;               // (proposed)

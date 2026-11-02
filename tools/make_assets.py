@@ -1988,6 +1988,18 @@ lang.update({f"block.{ns}.turbine_valve_chest": "Turbine Valve Chest", f"block.{
 	f"block.{ns}.unit_auxiliary_transformer": "Unit Auxiliary Transformer (7.5 MVA, 13.8/4.16 kV)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 8c: the natural-draft cooling tower (docs/multiblocks/natural-draft-tower.md) ------------------------------------
+big_part_loot("natural_draft_tower")
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	t["values"] = [v for v in t["values"] if v != f"{ns}:natural_draft_tower"] + [f"{ns}:natural_draft_tower"]
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("natural_draft_tower", ["CCC", "CPC", "CHC"], {"C": "minecraft:gray_concrete", "P": P_, "H": "minecraft:hopper"}, "natural_draft_tower")
+save_json(f"{ASSETS}/blockstates/tower_shell.json", {"variants": {"": {"model": "minecraft:block/barrier"}}})   # drawn by the tower's renderer
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({f"block.{ns}.natural_draft_tower": "Natural-Draft Cooling Tower (88 m)", f"block.{ns}.tower_shell": "Cooling Tower Shell"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

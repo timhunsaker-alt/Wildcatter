@@ -11,7 +11,9 @@ footprints match TurbineIslandPartBlock's, TurbinePartBlock's TG_GENERATOR_60 an
 - main_feed_pump, 2 x 2 x 5: motor, coupling and barrel pump on a skid;
 - hp_feedwater_heater, 2 x 3 x 8: the horizontal U-tube heater shells, feedwater out to the south;
 - circulating_water_pump, 3 x 8 x 3: the column and bell down in the intake, the discharge head and motor above;
-- unit_auxiliary_transformer, 4 x 4 x 4: the 7.5 MVA tank, radiators, three 13.8 kV bushings over the front."""
+- unit_auxiliary_transformer, 4 x 4 x 4: the 7.5 MVA tank, radiators, three 13.8 kV bushings over the front;
+- natural_draft_tower, 4 x 3 x 4: the cooling tower's basin outlet structure with its sluice gate and hot-water riser (the tower itself
+  is drawn by CoolingTowerRenderer)."""
 import mlib
 import plantlib as g
 
@@ -128,7 +130,15 @@ UA.box((-0.2, 0.4, 0.6), (1.0, 1.8, 0.95), "grey")                          # th
 UA.decal((2.6, 1.0, -1.8), (2.61, 1.8, -0.6), "ratingplate", "east", "blue")
 UA.collide((-1.0, 0.0, -2.9), (3.0, 2.9, 0.95))
 
+ND = model("natural_draft_tower", 4, 3, 4, "concrete")
+ND.box((0.0, 0.0, 0.0), (4.0, 1.2, 4.0), "concrete")                         # the outlet structure's walls
+ND.box((0.4, 1.2, 0.4), (3.6, 1.5, 3.6), "grating")                          # its deck
+ND.box((0.6, 0.0, -0.01), (3.4, 1.0, 0.0), "steel")                          # the sluice gate toward the basin
+ND.cylinder("y", (2.0, 2.4), 0.45, 1.5, 3.0, "steel", 12)                    # the hot-water riser
+ND.box((0.5, 1.5, 0.5), (1.1, 2.6, 1.1), "grey")                             # the controls cabinet
+ND.collide((0.0, 0.0, 0.0), (4.0, 1.5, 4.0))
+
 M = HP
-EXTRA = [VC, MS, LP, TG, CD, CP, DA, FP, HX, CW, UA]
+EXTRA = [VC, MS, LP, TG, CD, CP, DA, FP, HX, CW, UA, ND]
 for extra in EXTRA:
 	extra.export_args = {"blockstate": True, "item": True}

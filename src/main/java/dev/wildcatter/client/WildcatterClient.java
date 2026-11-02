@@ -22,6 +22,7 @@ public class WildcatterClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.INSULATOR_ENTITY, context -> new SpanRenderer());
+		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.NATURAL_DRAFT_TOWER_ENTITY, context -> new CoolingTowerRenderer());
 		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.GENSET_PART_ENTITY, context -> new KineticRenderer<>(context));
 		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.COOLING_TOWER_ENTITY, context -> new KineticRenderer<>(context));
 		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(dev.wildcatter.WildcatterBlocks.STEAM_PLANT_PART_ENTITY, context -> new KineticRenderer<>(context));

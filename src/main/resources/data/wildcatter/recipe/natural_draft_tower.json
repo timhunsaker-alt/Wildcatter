@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "CCC",
+    "CPC",
+    "CHC"
+  ],
+  "key": {
+    "C": "minecraft:gray_concrete",
+    "P": "wildcatter:gas_line",
+    "H": "minecraft:hopper"
+  },
+  "result": {
+    "id": "wildcatter:natural_draft_tower",
+    "count": 1
+  }
+}

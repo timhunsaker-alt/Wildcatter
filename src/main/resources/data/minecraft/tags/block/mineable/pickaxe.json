@@ -276,6 +276,7 @@
     "wildcatter:main_feed_pump",
     "wildcatter:hp_feedwater_heater",
     "wildcatter:circulating_water_pump",
-    "wildcatter:unit_auxiliary_transformer"
+    "wildcatter:unit_auxiliary_transformer",
+    "wildcatter:natural_draft_tower"
   ]
 }

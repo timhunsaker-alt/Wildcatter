@@ -27,10 +27,19 @@ public final class TurbineCycle {
 		return Steam.psat(Math.min(condensingC(cwFraction), 370)) * 1000;
 	}
 
-	/** The condenser's absolute pressure, kPa, rejecting {@code watts} into {@code cwKgs} of circulating water. */
+	/** The condenser's absolute pressure, kPa, rejecting {@code watts} into {@code cwKgs} of circulating water coming in at 20 C. */
 	public static double backPressureKpa(double watts, double cwKgs) {
-		double rise = watts / (WATER_CP * Math.max(cwKgs, 1));
-		return Steam.psat(Math.min(Tuning.CW_INLET_C + rise + Tuning.CONDENSER_TTD_C, 370)) * 1000;
+		return backPressureKpa(watts, cwKgs, Tuning.CW_INLET_C);
+	}
+
+	/** The same with the water coming in at {@code inC} (a cooling tower's cold water, 8c). */
+	public static double backPressureKpa(double watts, double cwKgs, double inC) {
+		return Steam.psat(Math.min(inC + rise(watts, cwKgs) + Tuning.CONDENSER_TTD_C, 370)) * 1000;
+	}
+
+	/** C the circulating water warms through the condenser. */
+	public static double rise(double watts, double cwKgs) {
+		return watts / (WATER_CP * Math.max(cwKgs, 1));
 	}
 
 	/** The share of the design output at {@code kpa} back pressure. */

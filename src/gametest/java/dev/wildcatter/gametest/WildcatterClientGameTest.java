@@ -199,6 +199,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("turbineIsland")) {
 				turbineIsland(context, server);
 			}
+			if (only("coolingTower")) {
+				coolingTower(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -5727,6 +5730,83 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(tripped.contains("TRIPPED") && tripped.contains("VACUUM"), "losing the circulating water should trip the turbine on low vacuum: " + tripped);
 		check(!r[0].tripped(), "below P-9 the reactor should stay up on the dump valves: " + read(server, 0, up, z));
 		System.out.println("[wildcatter-test] turbineIsland ok: " + running + " | " + tripped + " | " + read(server, 0, up, z));
+	}
+
+	/**
+	 * The hyperbolic natural-draft cooling tower (8c, docs/multiblocks/natural-draft-tower.md). Its controller at 0, up, z faces north,
+	 * so the tower's centre is at 2, z-32. The basin is built from concrete and steel fed by hopper; a hook builds the rest. The pond fills,
+	 * the shell's blocks stand on the hyperbola, a pump in the basin sees the tower's water, and with 104 MW of heat the cold water
+	 * settles 8 C over the wet bulb and the plume rises.
+	 */
+	private void coolingTower(ClientGameTestContext context, TestServerContext server) {
+		int z = -3700;
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 30 " + (up + 20) + " " + (z + 30) + " 150 30");
+		context.waitTicks(20);
+		server.runCommand("fill -35 " + (y - 4) + " " + (z - 70) + " 40 " + (y - 1) + " " + (z + 5) + " minecraft:stone");
+		for (int zz = z - 70; zz <= z + 5; zz += 38) {
+			server.runCommand("fill -35 " + y + " " + zz + " 40 " + (y + 10) + " " + Math.min(zz + 37, z + 5) + " minecraft:air");
+		}
+		BlockPos main = new BlockPos(0, up, z);
+		placeBig(server, WildcatterBlocks.NATURAL_DRAFT_TOWER, main, net.minecraft.core.Direction.NORTH);   // x 0-3, z..z+3
+		put(server, 1, up + 3, z + 1, "minecraft:hopper");
+		server.runCommand("item replace block 1 " + (up + 3) + " " + (z + 1) + " container.0 with minecraft:gray_concrete 64");
+		server.runCommand("item replace block 1 " + (up + 3) + " " + (z + 1) + " container.1 with minecraft:gray_concrete 40");
+		server.runCommand("item replace block 1 " + (up + 3) + " " + (z + 1) + " container.2 with wildcatter:steel_ingot 12");
+		context.waitTicks(100);
+		String pouring = read(server, 0, up, z);
+		check(pouring.contains("BASIN"), "the controller should start on the basin: " + pouring);
+		int stage = 0;
+		for (int i = 0; i < 60 && stage == 0; i++) {
+			context.waitTicks(40);
+			stage = server.computeOnServer(srv -> ((dev.wildcatter.block.NaturalDraftTowerBlockEntity) srv.overworld().getBlockEntity(main)).stage());
+		}
+		check(stage == dev.wildcatter.block.NaturalDraftTowerBlockEntity.COLUMNS, "the basin should be poured from the hopper's concrete and steel: " + read(server, 0, up, z));
+		double cx = 2.0, cz = z - 32.0;
+		check(stateAt(server, BlockPos.containing(cx, up - 2, cz)).is(net.minecraft.world.level.block.Blocks.WATER), "the pond should be dug and filled");
+		check(stateAt(server, BlockPos.containing(cx + 31.5, up, cz)).is(WildcatterBlocks.TOWER_SHELL), "the rim should stand at 31-32 m");
+		// the rest by hook: the raker columns, 54 lifts and the fill
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.NaturalDraftTowerBlockEntity) srv.overworld().getBlockEntity(main)).buildForTest(srv.overworld(), dev.wildcatter.fluid.CoolingTower.lifts());
+			return null;
+		});
+		for (double h : new double[] {8.5, 62.5, 87.5}) {
+			double r = dev.wildcatter.fluid.CoolingTower.radius(h);
+			int hy = up + (int) Math.floor(h);
+			int found = server.computeOnServer(srv -> {
+				for (int dx = 0; dx <= 34; dx++) {
+					if (srv.overworld().getBlockState(BlockPos.containing(cx + dx, hy, cz)).is(WildcatterBlocks.TOWER_SHELL)) {
+						return dx;
+					}
+				}
+				return -1;
+			});
+			check(Math.abs(found - r) <= 1.5, "the shell should stand at " + String.format("%.1f", r) + " m at " + h + " m: found " + found);
+		}
+		context.waitTicks(10);   // the readout catches up on its next interval
+		String built = read(server, 0, up, z);
+		check(built.contains("BUILT"), "the tower should be built: " + built);
+		// a pump standing in the basin sees the tower's water
+		boolean inBasin = server.computeOnServer(srv -> dev.wildcatter.block.NaturalDraftTowerBlockEntity.basinAt(srv.overworld(), BlockPos.containing(cx + 10, up - 3, cz)) != null);
+		check(inBasin, "a pump in the basin should draw from the tower");
+		// 104 MW of heat: the cold water settles 8 C over the wet bulb, it evaporates and the plume rises
+		water(server, main);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.NaturalDraftTowerBlockEntity) srv.overworld().getBlockEntity(main)).setHeatForTest(srv.overworld(), 104e6);
+			return null;
+		});
+		context.waitTicks(8);
+		double[] t = server.computeOnServer(srv -> {
+			var tower = (dev.wildcatter.block.NaturalDraftTowerBlockEntity) srv.overworld().getBlockEntity(main);
+			return new double[] {tower.coldC(), tower.wetBulbC(), tower.plume() ? 1 : 0};
+		});
+		String hot = read(server, 0, up, z);
+		check(Math.abs(t[0] - t[1] - 8.0) < 0.5 || t[0] <= Tuning.TOWER_MIN_COLD_C + 0.01, "the cold water should settle 8 C over the wet bulb: " + hot);
+		check(t[2] > 0 && hot.contains("evaporation 4"), "it should evaporate about 42 kg/s and raise its plume: " + hot);
+		server.runCommand("tp @p " + (cx + 36) + " " + (up + 4) + " " + (cz + 36) + " 135 -28");   // inside the test client's 5-chunk fog
+		context.waitTicks(80);
+		context.takeScreenshot("wildcatter-cooling-tower");
+		System.out.println("[wildcatter-test] coolingTower ok: " + hot);
 	}
 
 	/**

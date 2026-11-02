@@ -60,6 +60,8 @@ Put the jar in your instance's `mods` folder next to:
 - The turbine island: HP and LP turbines with a moisture separator reheater, a 60 MVA generator onto 13.8 kV, a condenser
   cooled once-through by circulating water pumps standing in a lake, the condensate and feed trains, and a unit auxiliary
   transformer for the plant's own 4.16 kV. 51 MW at full power.
+- An 88 m hyperbolic natural-draft cooling tower that rises lift by lift as you feed it concrete and steel, its basin a real pond
+  for the circulating water pumps; it cools the condenser's water toward the biome's wet bulb, with a plume over the top.
 - The Field Manual item explains how to build each machine.
 
 ## Older worlds

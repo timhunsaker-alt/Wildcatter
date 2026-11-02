@@ -382,5 +382,7 @@
   "block.wildcatter.main_feed_pump": "Main Feed Pump (500 kW, 4.16 kV)",
   "block.wildcatter.hp_feedwater_heater": "HP Feedwater Heater",
   "block.wildcatter.circulating_water_pump": "Circulating Water Pump (300 kW, 4.16 kV)",
-  "block.wildcatter.unit_auxiliary_transformer": "Unit Auxiliary Transformer (7.5 MVA, 13.8/4.16 kV)"
+  "block.wildcatter.unit_auxiliary_transformer": "Unit Auxiliary Transformer (7.5 MVA, 13.8/4.16 kV)",
+  "block.wildcatter.natural_draft_tower": "Natural-Draft Cooling Tower (88 m)",
+  "block.wildcatter.tower_shell": "Cooling Tower Shell"
 }

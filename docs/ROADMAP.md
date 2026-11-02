@@ -149,6 +149,8 @@ and the Field Manual has a page for each new system.
   - 8c: the hyperbolic natural-draft cooling tower (Tim asked for the iconic tower; Calder Hall's 50 MWe units each had an 88 m
     one), closing the circulating water loop. It needs a true-size shell rendered as one model.
   - 8d: SCRAM and safety (decay heat, xenon, residual heat removal, spent fuel pool, refuelling machine, dosimeter).
+- Decided with Tim on 2026-11-01 (the 8c plan): the tower rises lift by lift as it is fed; a tenth of the real concrete (the steel
+  about a hundredth); the wet bulb from the biome.
 - Decided with Tim on 2026-11-01 (the 8b plan): the tower gets its own wave after the turbine island; a new 60 MVA two-pole
   hydrogen-cooled generator part.
 

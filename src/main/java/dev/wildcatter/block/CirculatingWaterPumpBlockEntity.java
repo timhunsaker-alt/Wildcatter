@@ -62,6 +62,12 @@ public class CirculatingWaterPumpBlockEntity extends UnitMotorBlockEntity {
 
 	@Override
 	protected void work(Level level) {
+		NaturalDraftTowerBlockEntity tower = NaturalDraftTowerBlockEntity.basinAt(level, worldPosition);
+		if (tower != null && tower.dry()) {
+			unit = "NO WATER: the cooling tower's basin is low (it needs make-up water)";
+			return;
+		}
+		double temp = tower != null ? tower.coldC() : Tuning.LAKE_C;
 		water = countWater(level);
 		if (water < Tuning.CW_INTAKE_WATER_BLOCKS) {
 			unit = String.format("NO WATER: its suction must stand in a lake or river (%d of %d water blocks round its bottom 3 cells)", water,
@@ -79,8 +85,8 @@ public class CirculatingWaterPumpBlockEntity extends UnitMotorBlockEntity {
 			return;
 		}
 		double kg = Math.min(Tuning.CW_PUMP_KGS * seconds() * strength, room);
-		add(Product.COOLING_WATER, kg);
-		unit = String.format("pumping %,.0f kg/s", kg / seconds());
+		addMixed(Product.COOLING_WATER, kg, new double[] {temp, 0, 0, 0, 0});
+		unit = String.format("pumping %,.0f kg/s at %.1f C from %s", kg / seconds(), temp, tower != null ? "the cooling tower's basin" : "the lake");
 	}
 
 	private BlockPos boxCell() {
