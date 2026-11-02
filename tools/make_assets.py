@@ -1914,6 +1914,49 @@ lang.update({f"block.{ns}.uf6_autoclave": "UF6 Autoclave (30B)", f"block.{ns}.id
 	f"block.{ns}.fuel_assembly": "Fuel Assembly (17x17, 4.95 %)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 8a: the nuclear island and the boron plant (docs/multiblocks/reactor.md, boron.md) -----------------------------
+# blockstates, models, shapes and items come from tools/models/reactor.py and boron.py; here loot, names, tags, recipes and the items.
+REACTOR_PARTS = ("reactor_vessel", "crdm_head", "reactor_console", "steam_generator", "reactor_coolant_pump", "pressurizer", "cvcs_skid", "aux_feed_pump",
+	"borax_dissolver", "boric_acid_crystallizer", "b4c_furnace", "rcca_bench")
+for name in REACTOR_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in REACTOR_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("reactor_vessel", ["SIS", "IBI", "SIS"], {"S": S_, "I": "minecraft:iron_block", "B": "minecraft:blast_furnace"}, "reactor_vessel")
+shaped("crdm_head", ["CCC", "SRS", "SIS"], {"C": "minecraft:copper_block", "S": S_, "R": "minecraft:redstone_block", "I": "minecraft:iron_block"}, "crdm_head")
+shaped("reactor_console", ["GGG", "RCR", "SSS"], {"G": "minecraft:glass_pane", "R": "minecraft:redstone", "C": "minecraft:comparator", "S": S_}, "reactor_console")
+shaped("steam_generator", ["SPS", "SIS", "SPS"], {"S": S_, "P": P_, "I": "minecraft:iron_block"}, "steam_generator")
+shaped("reactor_coolant_pump", ["SCS", "SXS", "SIS"], {"S": S_, "C": "minecraft:copper_block", "X": f"{ns}:crankshaft", "I": "minecraft:iron_block"}, "reactor_coolant_pump")
+shaped("pressurizer", ["SPS", "SRS", "SIS"], {"S": S_, "P": P_, "R": "minecraft:redstone_block", "I": "minecraft:iron_block"}, "pressurizer")
+shaped("cvcs_skid", ["SHS", "PXP", "SSS"], {"S": S_, "H": "minecraft:hopper", "P": P_, "X": "minecraft:piston"}, "cvcs_skid")
+shaped("aux_feed_pump", ["SPS", "SXS", "SSS"], {"S": S_, "P": P_, "X": "minecraft:piston"}, "aux_feed_pump")
+shaped("borax_dissolver", ["SHS", "SCS", "SSS"], {"S": S_, "H": "minecraft:hopper", "C": "minecraft:cauldron"}, "borax_dissolver")
+shaped("boric_acid_crystallizer", ["SCS", "SXS", "SHS"], {"S": S_, "C": "minecraft:cauldron", "X": "minecraft:piston", "H": "minecraft:hopper"}, "boric_acid_crystallizer")
+shaped("b4c_furnace", ["BCB", "BFB", "SSS"], {"B": "minecraft:bricks", "C": "minecraft:copper_block", "F": "minecraft:blast_furnace", "S": S_}, "b4c_furnace")
+shaped("rcca_bench", ["GHG", "SAS", "SSS"], {"G": "minecraft:glass", "H": "minecraft:hopper", "S": S_, "A": "minecraft:anvil"}, "rcca_bench")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in {"boric_acid": ("Boric Acid (25 kg bag)", (235, 235, 225)), "b4c_pellets": ("Boron Carbide Pellets (1 kg tray)", (60, 60, 65)),
+		"rcca": ("RCCA (B4C control rods)", (170, 170, 170))}.items():
+	if os.path.exists(f"{ORE_ART}/{item}.png"):
+		shutil.copy(f"{ORE_ART}/{item}.png", f"{ASSETS}/textures/item/ore/{item}.png")
+		item_tex = f"{ns}:item/ore/{item}"
+	else:
+		tex(f"{item}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+		item_tex = f"{ns}:item/{item}_placeholder"
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": item_tex}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.reactor_vessel": "Reactor Vessel (9 assemblies)", f"block.{ns}.crdm_head": "CRDM Head (5 rod drives)",
+	f"block.{ns}.reactor_console": "Reactor Console", f"block.{ns}.steam_generator": "Steam Generator (U-tube)",
+	f"block.{ns}.reactor_coolant_pump": "Reactor Coolant Pump (500 kW)", f"block.{ns}.pressurizer": "Pressurizer",
+	f"block.{ns}.cvcs_skid": "CVCS Skid (charging, letdown, boron)", f"block.{ns}.aux_feed_pump": "Aux Feed Pump (75 hp)",
+	f"block.{ns}.borax_dissolver": "Borax Dissolver", f"block.{ns}.boric_acid_crystallizer": "Boric Acid Crystallizer",
+	f"block.{ns}.b4c_furnace": "B4C Furnace (Acheson)", f"block.{ns}.rcca_bench": "RCCA Bench"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

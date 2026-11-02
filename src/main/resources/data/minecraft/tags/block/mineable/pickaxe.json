@@ -252,6 +252,18 @@
     "wildcatter:rod_loader",
     "wildcatter:rod_welder",
     "wildcatter:assembly_fixture",
-    "wildcatter:helium_recovery_unit"
+    "wildcatter:helium_recovery_unit",
+    "wildcatter:reactor_vessel",
+    "wildcatter:crdm_head",
+    "wildcatter:reactor_console",
+    "wildcatter:steam_generator",
+    "wildcatter:reactor_coolant_pump",
+    "wildcatter:pressurizer",
+    "wildcatter:cvcs_skid",
+    "wildcatter:aux_feed_pump",
+    "wildcatter:borax_dissolver",
+    "wildcatter:boric_acid_crystallizer",
+    "wildcatter:b4c_furnace",
+    "wildcatter:rcca_bench"
   ]
 }

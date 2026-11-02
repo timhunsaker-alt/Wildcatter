@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SHS",
+    "SCS",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "C": "minecraft:cauldron"
+  },
+  "result": {
+    "id": "wildcatter:borax_dissolver",
+    "count": 1
+  }
+}

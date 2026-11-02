@@ -101,6 +101,15 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "rod_welder" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ROD_WELDER_WATTS);
 				case "assembly_fixture" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ASSEMBLY_FIXTURE_WATTS);
 				case "helium_recovery_unit" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.HELIUM_UNIT_WATTS);
+				case "crdm_head" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CRDM_WATTS);
+				case "pressurizer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PZR_HEATER_WATTS);
+				case "cvcs_skid" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CVCS_WATTS);
+				case "aux_feed_pump" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.AFW_WATTS);
+				case "reactor_coolant_pump" -> new Motor(true, Voltage.MEDIUM, Tuning.RCP_WATTS);
+				case "borax_dissolver" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.DISSOLVER_WATTS);
+				case "boric_acid_crystallizer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CRYSTALLIZER_WATTS);
+				case "b4c_furnace" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.B4C_FURNACE_WATTS);
+				case "rcca_bench" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.RCCA_BENCH_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -163,6 +172,15 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "rod_welder" -> "welding sets";
 			case "assembly_fixture" -> "fixture drives";
 			case "helium_recovery_unit" -> "cold box compressors";
+			case "crdm_head" -> "rod drive power";
+			case "pressurizer" -> "heaters";
+			case "cvcs_skid" -> "charging pump";
+			case "aux_feed_pump" -> "aux feed pump";
+			case "reactor_coolant_pump" -> "pump motor";
+			case "borax_dissolver" -> "agitator and heaters";
+			case "boric_acid_crystallizer" -> "centrifuge and dryer";
+			case "b4c_furnace" -> "furnace transformer";
+			case "rcca_bench" -> "welders";
 			default -> kind();
 		};
 	}
@@ -267,6 +285,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "air_cooled_condenser" -> "Air-cooled condenser (four 50 hp fans, " + Voltage.INDUSTRIAL.label() + ")";
 			case "hrsg_feed_pump" -> "HRSG feed pump (60 hp, " + Voltage.INDUSTRIAL.label() + ")";
 			case "main_blower" -> "Main blower (" + Math.round(Tuning.ACID_BLOWER_WATTS / 1000) + " kW, " + Voltage.MEDIUM.label() + ")";
+			case "crdm_head" -> "CRDM head (5 magnetic-jack rod drives, " + Math.round(Tuning.CRDM_WATTS / 1000) + " kW, " + Voltage.INDUSTRIAL.label() + ")";
+			case "pressurizer" -> "Pressurizer (heaters " + Math.round(Tuning.PZR_HEATER_WATTS / 1000) + " kW, " + Voltage.INDUSTRIAL.label() + ")";
 			default -> kind();
 		};
 		return Component.literal(label + ": " + (wanted ? motor().describe() : "idle: its unit is not running it") + heldReadout() + "; "

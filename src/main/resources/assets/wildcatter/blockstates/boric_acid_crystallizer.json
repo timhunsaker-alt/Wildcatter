@@ -1,0 +1,814 @@
+{
+ "variants": {
+  "facing=north,piece=0": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p0"
+  },
+  "facing=north,piece=1": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p1"
+  },
+  "facing=north,piece=2": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p2"
+  },
+  "facing=north,piece=3": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p3"
+  },
+  "facing=north,piece=4": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p4"
+  },
+  "facing=north,piece=5": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p5"
+  },
+  "facing=north,piece=6": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p6"
+  },
+  "facing=north,piece=7": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p7"
+  },
+  "facing=north,piece=8": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p8"
+  },
+  "facing=north,piece=9": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p9"
+  },
+  "facing=north,piece=10": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p10"
+  },
+  "facing=north,piece=11": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p11"
+  },
+  "facing=north,piece=12": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p12"
+  },
+  "facing=north,piece=13": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p13"
+  },
+  "facing=north,piece=14": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p14"
+  },
+  "facing=north,piece=15": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p15"
+  },
+  "facing=north,piece=16": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p16"
+  },
+  "facing=north,piece=17": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p17"
+  },
+  "facing=north,piece=18": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p18"
+  },
+  "facing=north,piece=19": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p19"
+  },
+  "facing=north,piece=20": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p20"
+  },
+  "facing=north,piece=21": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p21"
+  },
+  "facing=north,piece=22": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p22"
+  },
+  "facing=north,piece=23": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p23"
+  },
+  "facing=north,piece=24": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p24"
+  },
+  "facing=north,piece=25": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p25"
+  },
+  "facing=north,piece=26": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p26"
+  },
+  "facing=north,piece=27": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p27"
+  },
+  "facing=north,piece=28": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p28"
+  },
+  "facing=north,piece=29": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p29"
+  },
+  "facing=north,piece=30": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p30"
+  },
+  "facing=north,piece=31": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p31"
+  },
+  "facing=north,piece=32": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p32"
+  },
+  "facing=north,piece=33": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p33"
+  },
+  "facing=north,piece=34": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p34"
+  },
+  "facing=north,piece=35": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p35"
+  },
+  "facing=north,piece=36": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p36"
+  },
+  "facing=north,piece=37": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p37"
+  },
+  "facing=north,piece=38": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p38"
+  },
+  "facing=north,piece=39": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p39"
+  },
+  "facing=north,piece=40": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p40"
+  },
+  "facing=north,piece=41": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p41"
+  },
+  "facing=north,piece=42": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p42"
+  },
+  "facing=north,piece=43": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p43"
+  },
+  "facing=north,piece=44": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p44"
+  },
+  "facing=north,piece=45": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p45"
+  },
+  "facing=north,piece=46": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p46"
+  },
+  "facing=north,piece=47": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p47"
+  },
+  "facing=north,piece=48": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p48"
+  },
+  "facing=north,piece=49": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p49"
+  },
+  "facing=north,piece=50": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p50"
+  },
+  "facing=north,piece=51": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p51"
+  },
+  "facing=north,piece=52": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p52"
+  },
+  "facing=north,piece=53": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p53"
+  },
+  "facing=east,piece=0": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p0",
+   "y": 90
+  },
+  "facing=east,piece=1": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p1",
+   "y": 90
+  },
+  "facing=east,piece=2": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p2",
+   "y": 90
+  },
+  "facing=east,piece=3": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p3",
+   "y": 90
+  },
+  "facing=east,piece=4": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p4",
+   "y": 90
+  },
+  "facing=east,piece=5": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p5",
+   "y": 90
+  },
+  "facing=east,piece=6": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p6",
+   "y": 90
+  },
+  "facing=east,piece=7": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p7",
+   "y": 90
+  },
+  "facing=east,piece=8": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p8",
+   "y": 90
+  },
+  "facing=east,piece=9": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p9",
+   "y": 90
+  },
+  "facing=east,piece=10": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p10",
+   "y": 90
+  },
+  "facing=east,piece=11": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p11",
+   "y": 90
+  },
+  "facing=east,piece=12": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p12",
+   "y": 90
+  },
+  "facing=east,piece=13": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p13",
+   "y": 90
+  },
+  "facing=east,piece=14": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p14",
+   "y": 90
+  },
+  "facing=east,piece=15": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p15",
+   "y": 90
+  },
+  "facing=east,piece=16": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p16",
+   "y": 90
+  },
+  "facing=east,piece=17": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p17",
+   "y": 90
+  },
+  "facing=east,piece=18": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p18",
+   "y": 90
+  },
+  "facing=east,piece=19": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p19",
+   "y": 90
+  },
+  "facing=east,piece=20": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p20",
+   "y": 90
+  },
+  "facing=east,piece=21": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p21",
+   "y": 90
+  },
+  "facing=east,piece=22": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p22",
+   "y": 90
+  },
+  "facing=east,piece=23": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p23",
+   "y": 90
+  },
+  "facing=east,piece=24": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p24",
+   "y": 90
+  },
+  "facing=east,piece=25": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p25",
+   "y": 90
+  },
+  "facing=east,piece=26": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p26",
+   "y": 90
+  },
+  "facing=east,piece=27": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p27",
+   "y": 90
+  },
+  "facing=east,piece=28": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p28",
+   "y": 90
+  },
+  "facing=east,piece=29": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p29",
+   "y": 90
+  },
+  "facing=east,piece=30": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p30",
+   "y": 90
+  },
+  "facing=east,piece=31": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p31",
+   "y": 90
+  },
+  "facing=east,piece=32": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p32",
+   "y": 90
+  },
+  "facing=east,piece=33": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p33",
+   "y": 90
+  },
+  "facing=east,piece=34": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p34",
+   "y": 90
+  },
+  "facing=east,piece=35": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p35",
+   "y": 90
+  },
+  "facing=east,piece=36": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p36",
+   "y": 90
+  },
+  "facing=east,piece=37": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p37",
+   "y": 90
+  },
+  "facing=east,piece=38": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p38",
+   "y": 90
+  },
+  "facing=east,piece=39": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p39",
+   "y": 90
+  },
+  "facing=east,piece=40": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p40",
+   "y": 90
+  },
+  "facing=east,piece=41": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p41",
+   "y": 90
+  },
+  "facing=east,piece=42": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p42",
+   "y": 90
+  },
+  "facing=east,piece=43": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p43",
+   "y": 90
+  },
+  "facing=east,piece=44": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p44",
+   "y": 90
+  },
+  "facing=east,piece=45": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p45",
+   "y": 90
+  },
+  "facing=east,piece=46": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p46",
+   "y": 90
+  },
+  "facing=east,piece=47": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p47",
+   "y": 90
+  },
+  "facing=east,piece=48": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p48",
+   "y": 90
+  },
+  "facing=east,piece=49": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p49",
+   "y": 90
+  },
+  "facing=east,piece=50": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p50",
+   "y": 90
+  },
+  "facing=east,piece=51": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p51",
+   "y": 90
+  },
+  "facing=east,piece=52": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p52",
+   "y": 90
+  },
+  "facing=east,piece=53": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p53",
+   "y": 90
+  },
+  "facing=south,piece=0": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p0",
+   "y": 180
+  },
+  "facing=south,piece=1": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p1",
+   "y": 180
+  },
+  "facing=south,piece=2": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p2",
+   "y": 180
+  },
+  "facing=south,piece=3": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p3",
+   "y": 180
+  },
+  "facing=south,piece=4": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p4",
+   "y": 180
+  },
+  "facing=south,piece=5": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p5",
+   "y": 180
+  },
+  "facing=south,piece=6": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p6",
+   "y": 180
+  },
+  "facing=south,piece=7": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p7",
+   "y": 180
+  },
+  "facing=south,piece=8": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p8",
+   "y": 180
+  },
+  "facing=south,piece=9": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p9",
+   "y": 180
+  },
+  "facing=south,piece=10": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p10",
+   "y": 180
+  },
+  "facing=south,piece=11": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p11",
+   "y": 180
+  },
+  "facing=south,piece=12": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p12",
+   "y": 180
+  },
+  "facing=south,piece=13": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p13",
+   "y": 180
+  },
+  "facing=south,piece=14": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p14",
+   "y": 180
+  },
+  "facing=south,piece=15": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p15",
+   "y": 180
+  },
+  "facing=south,piece=16": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p16",
+   "y": 180
+  },
+  "facing=south,piece=17": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p17",
+   "y": 180
+  },
+  "facing=south,piece=18": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p18",
+   "y": 180
+  },
+  "facing=south,piece=19": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p19",
+   "y": 180
+  },
+  "facing=south,piece=20": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p20",
+   "y": 180
+  },
+  "facing=south,piece=21": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p21",
+   "y": 180
+  },
+  "facing=south,piece=22": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p22",
+   "y": 180
+  },
+  "facing=south,piece=23": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p23",
+   "y": 180
+  },
+  "facing=south,piece=24": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p24",
+   "y": 180
+  },
+  "facing=south,piece=25": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p25",
+   "y": 180
+  },
+  "facing=south,piece=26": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p26",
+   "y": 180
+  },
+  "facing=south,piece=27": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p27",
+   "y": 180
+  },
+  "facing=south,piece=28": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p28",
+   "y": 180
+  },
+  "facing=south,piece=29": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p29",
+   "y": 180
+  },
+  "facing=south,piece=30": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p30",
+   "y": 180
+  },
+  "facing=south,piece=31": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p31",
+   "y": 180
+  },
+  "facing=south,piece=32": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p32",
+   "y": 180
+  },
+  "facing=south,piece=33": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p33",
+   "y": 180
+  },
+  "facing=south,piece=34": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p34",
+   "y": 180
+  },
+  "facing=south,piece=35": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p35",
+   "y": 180
+  },
+  "facing=south,piece=36": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p36",
+   "y": 180
+  },
+  "facing=south,piece=37": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p37",
+   "y": 180
+  },
+  "facing=south,piece=38": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p38",
+   "y": 180
+  },
+  "facing=south,piece=39": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p39",
+   "y": 180
+  },
+  "facing=south,piece=40": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p40",
+   "y": 180
+  },
+  "facing=south,piece=41": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p41",
+   "y": 180
+  },
+  "facing=south,piece=42": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p42",
+   "y": 180
+  },
+  "facing=south,piece=43": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p43",
+   "y": 180
+  },
+  "facing=south,piece=44": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p44",
+   "y": 180
+  },
+  "facing=south,piece=45": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p45",
+   "y": 180
+  },
+  "facing=south,piece=46": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p46",
+   "y": 180
+  },
+  "facing=south,piece=47": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p47",
+   "y": 180
+  },
+  "facing=south,piece=48": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p48",
+   "y": 180
+  },
+  "facing=south,piece=49": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p49",
+   "y": 180
+  },
+  "facing=south,piece=50": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p50",
+   "y": 180
+  },
+  "facing=south,piece=51": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p51",
+   "y": 180
+  },
+  "facing=south,piece=52": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p52",
+   "y": 180
+  },
+  "facing=south,piece=53": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p53",
+   "y": 180
+  },
+  "facing=west,piece=0": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p0",
+   "y": 270
+  },
+  "facing=west,piece=1": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p1",
+   "y": 270
+  },
+  "facing=west,piece=2": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p2",
+   "y": 270
+  },
+  "facing=west,piece=3": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p3",
+   "y": 270
+  },
+  "facing=west,piece=4": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p4",
+   "y": 270
+  },
+  "facing=west,piece=5": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p5",
+   "y": 270
+  },
+  "facing=west,piece=6": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p6",
+   "y": 270
+  },
+  "facing=west,piece=7": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p7",
+   "y": 270
+  },
+  "facing=west,piece=8": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p8",
+   "y": 270
+  },
+  "facing=west,piece=9": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p9",
+   "y": 270
+  },
+  "facing=west,piece=10": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p10",
+   "y": 270
+  },
+  "facing=west,piece=11": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p11",
+   "y": 270
+  },
+  "facing=west,piece=12": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p12",
+   "y": 270
+  },
+  "facing=west,piece=13": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p13",
+   "y": 270
+  },
+  "facing=west,piece=14": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p14",
+   "y": 270
+  },
+  "facing=west,piece=15": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p15",
+   "y": 270
+  },
+  "facing=west,piece=16": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p16",
+   "y": 270
+  },
+  "facing=west,piece=17": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p17",
+   "y": 270
+  },
+  "facing=west,piece=18": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p18",
+   "y": 270
+  },
+  "facing=west,piece=19": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p19",
+   "y": 270
+  },
+  "facing=west,piece=20": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p20",
+   "y": 270
+  },
+  "facing=west,piece=21": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p21",
+   "y": 270
+  },
+  "facing=west,piece=22": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p22",
+   "y": 270
+  },
+  "facing=west,piece=23": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p23",
+   "y": 270
+  },
+  "facing=west,piece=24": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p24",
+   "y": 270
+  },
+  "facing=west,piece=25": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p25",
+   "y": 270
+  },
+  "facing=west,piece=26": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p26",
+   "y": 270
+  },
+  "facing=west,piece=27": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p27",
+   "y": 270
+  },
+  "facing=west,piece=28": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p28",
+   "y": 270
+  },
+  "facing=west,piece=29": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p29",
+   "y": 270
+  },
+  "facing=west,piece=30": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p30",
+   "y": 270
+  },
+  "facing=west,piece=31": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p31",
+   "y": 270
+  },
+  "facing=west,piece=32": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p32",
+   "y": 270
+  },
+  "facing=west,piece=33": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p33",
+   "y": 270
+  },
+  "facing=west,piece=34": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p34",
+   "y": 270
+  },
+  "facing=west,piece=35": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p35",
+   "y": 270
+  },
+  "facing=west,piece=36": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p36",
+   "y": 270
+  },
+  "facing=west,piece=37": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p37",
+   "y": 270
+  },
+  "facing=west,piece=38": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p38",
+   "y": 270
+  },
+  "facing=west,piece=39": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p39",
+   "y": 270
+  },
+  "facing=west,piece=40": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p40",
+   "y": 270
+  },
+  "facing=west,piece=41": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p41",
+   "y": 270
+  },
+  "facing=west,piece=42": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p42",
+   "y": 270
+  },
+  "facing=west,piece=43": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p43",
+   "y": 270
+  },
+  "facing=west,piece=44": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p44",
+   "y": 270
+  },
+  "facing=west,piece=45": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p45",
+   "y": 270
+  },
+  "facing=west,piece=46": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p46",
+   "y": 270
+  },
+  "facing=west,piece=47": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p47",
+   "y": 270
+  },
+  "facing=west,piece=48": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p48",
+   "y": 270
+  },
+  "facing=west,piece=49": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p49",
+   "y": 270
+  },
+  "facing=west,piece=50": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p50",
+   "y": 270
+  },
+  "facing=west,piece=51": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p51",
+   "y": 270
+  },
+  "facing=west,piece=52": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p52",
+   "y": 270
+  },
+  "facing=west,piece=53": {
+   "model": "wildcatter:block/boric_acid_crystallizer/p53",
+   "y": 270
+  }
+ }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "SXS",
+    "SHS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:cauldron",
+    "X": "minecraft:piston",
+    "H": "minecraft:hopper"
+  },
+  "result": {
+    "id": "wildcatter:boric_acid_crystallizer",
+    "count": 1
+  }
+}

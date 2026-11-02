@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "SRS",
+    "SIS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "R": "minecraft:redstone_block",
+    "I": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:pressurizer",
+    "count": 1
+  }
+}

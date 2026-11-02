@@ -129,3 +129,12 @@ coming off the top, lying diagonally, game item icon, plain white background, no
 - `empty_helium_cylinder` (a kept): "A single tall industrial compressed gas cylinder, plain grey steel, empty, with a closed valve
   and a steel protective cap screwed on, standing upright, slightly angled, game item icon, plain white background, no text".
 The fuel assembly's item is its block model.
+
+## Phase 8a (2026-11-01): the boron plant's items (art/source/ore/)
+`item-icon`, `Photorealistic 3D`, 2 variations each:
+- `boric_acid` (a kept): "A single white woven polypropylene 25 kg industrial chemical sack, filled and sealed, slightly angled,
+  plain with no printing, game item icon, plain white background, no text".
+- `b4c_pellets` (b kept): "A small shallow stainless steel tray holding many small dark grey matte cylindrical ceramic boron carbide
+  pellets in neat rows, seen at an angle, game item icon, plain white background, no text".
+- `rcca` (a kept): "A nuclear reactor rod cluster control assembly: a small stainless steel spider hub with radial vanes at the top
+  holding a cluster of 24 long thin parallel silver rods hanging down, seen diagonally, game item icon, plain white background, no text".

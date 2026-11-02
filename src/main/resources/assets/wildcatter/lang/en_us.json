@@ -355,5 +355,20 @@
   "block.wildcatter.rod_welder": "Rod Welder (helium, 2 MPa)",
   "block.wildcatter.assembly_fixture": "Assembly Fixture",
   "block.wildcatter.helium_recovery_unit": "Helium Recovery Unit",
-  "block.wildcatter.fuel_assembly": "Fuel Assembly (17x17, 4.95 %)"
+  "block.wildcatter.fuel_assembly": "Fuel Assembly (17x17, 4.95 %)",
+  "item.wildcatter.boric_acid": "Boric Acid (25 kg bag)",
+  "item.wildcatter.b4c_pellets": "Boron Carbide Pellets (1 kg tray)",
+  "item.wildcatter.rcca": "RCCA (B4C control rods)",
+  "block.wildcatter.reactor_vessel": "Reactor Vessel (9 assemblies)",
+  "block.wildcatter.crdm_head": "CRDM Head (5 rod drives)",
+  "block.wildcatter.reactor_console": "Reactor Console",
+  "block.wildcatter.steam_generator": "Steam Generator (U-tube)",
+  "block.wildcatter.reactor_coolant_pump": "Reactor Coolant Pump (500 kW)",
+  "block.wildcatter.pressurizer": "Pressurizer",
+  "block.wildcatter.cvcs_skid": "CVCS Skid (charging, letdown, boron)",
+  "block.wildcatter.aux_feed_pump": "Aux Feed Pump (75 hp)",
+  "block.wildcatter.borax_dissolver": "Borax Dissolver",
+  "block.wildcatter.boric_acid_crystallizer": "Boric Acid Crystallizer",
+  "block.wildcatter.b4c_furnace": "B4C Furnace (Acheson)",
+  "block.wildcatter.rcca_bench": "RCCA Bench"
 }

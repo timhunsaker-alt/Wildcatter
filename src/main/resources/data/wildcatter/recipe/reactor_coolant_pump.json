@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "SXS",
+    "SIS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_block",
+    "X": "wildcatter:crankshaft",
+    "I": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:reactor_coolant_pump",
+    "count": 1
+  }
+}

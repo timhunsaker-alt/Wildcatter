@@ -475,6 +475,35 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 8a: the nuclear island and the boron plant (specs: docs/multiblocks/reactor.md, boron.md)
+- **Tim's decisions:** a core of 9 full-height assemblies at real power density (155 MW thermal), burnup 100x, boric acid plus
+  control rods, boron carbide rods (hafnium would take about 1,400 h of the 7f line), two loops. Waves: 8a the nuclear island,
+  8b the turbine island, 8c SCRAM and safety.
+- **Plant model** (`fluid/Reactor.java`, `PointKinetics.java`, `Steam.java`, unit-tested):
+  - six-group point kinetics with the prompt jump (a +100 pcm step gives the inhour 55 s period);
+  - reactivity from the assemblies' burnup (+16,000 pcm fresh, -380 a GWd/t), the rods' S-curves (6,000 pcm in 5 RCCAs), boron
+    (-10 pcm/ppm), Doppler and the moderator;
+  - the loops' heat balance, two steam generators (UA 3.2 MW/K each; 43 kg/s of steam each at full power), the pressurizer
+    (heaters and spray hold 15.51 MPa), IAPWS-IF97 saturation;
+  - trips: manual, high flux (109 % and 25 % below P-10), low flow, a pump lost above P-8, pressurizer pressure low and high,
+    overtemperature, steam generator low-low level, CRDM power lost;
+  - heat-up compressed 80x while the plant gains heat: cold to hot standby on the pumps in about half an hour.
+- **Parts:** REACTOR VESSEL (controller; assemblies and RCCAs by right-click while cold), CRDM HEAD, REACTOR CONSOLE (sneak-click
+  steps the setpoint, TRIP resets on leaving it), STEAM GENERATOR (STEAM out of its top, FEEDWATER in on its east side, dump
+  valve), REACTOR COOLANT PUMP (500 kW, 4.16 kV, flywheel coastdown, sneak-click stop/start), PRESSURIZER (150 kW heaters), CVCS
+  SKID (fills, borates and dilutes; boric acid bags by hopper; sneak-click steps the boron target), AUX FEED PUMP (5 kg/s, 56 kW).
+- **Boron plant:** BORAX DISSOLVER (borax, sulfuric acid, water: 50 kg/h of boric acid), BORIC ACID CRYSTALLIZER (25 kg bags),
+  B4C FURNACE (boric acid and coal: 5 kg/h of B4C in 1 kg trays), RCCA BENCH (9 trays and 20 kg of steel make an RCCA).
+- **New products:** STEAM and FEEDWATER on pipes, in kg. **New items:** Boric Acid, B4C Pellets, RCCA (Ludo icons, 3 credits).
+- **Game tests:**
+  - `boron`: two sets on a busway; the dissolver and crystallizer run on borax, a tank of acid and pumped water; a bag, a tray
+    and an RCCA drop.
+  - `reactor`: the island laid out as the spec. Pump A on three sets through a backward unit substation, pump B on two more
+    through a second one, 480 V on a busway, the aux feed pump on its own set. At hot standby (1,500 ppm, 15.5 MPa) both pumps
+    run; with the shutdown bank out the core goes critical and holds 2 % (3.1 MW) on bank D at about 104 steps, the dump valves
+    venting while the aux feed holds the levels; one pump stopped below P-8 it runs on; a manual trip drops the rods and power;
+    after a reset, cutting the CRDM head's power trips it.
+
 ## Phase 7g: the fuel plant (spec: docs/multiblocks/fuel.md)
 - **LEU UF6 to 17x17 assemblies**, 50 kg of U an hour: a pellet is 5.31 g of UO2 (8.19 x 9.83 mm, 95 % dense), 372 to a rod
   (1.741 kg of U), 264 rods to an assembly (459.6 kg of U, about 667 kg) in about 9 hours; a 30B is about 31 hours and 3.3
@@ -750,6 +779,11 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- Phase 8a: no turbine yet (8b), so steam is vented and the plant runs at a few percent on the aux feed. No decay heat, xenon
+  or fuel damage (8c). Irradiated assemblies stay in the vessel until the refuelling machine (8c). The feedwater is counted at
+  227 C even from the aux feed. Starting the second 500 kW coolant pump on the same three-set island as the first drops the
+  island: the game test feeds each pump its own sets and unit substation. In the boron scene a single set on a busway never
+  closed its breaker, even with a load on the bus; the cause is not found yet (the scene uses two sets, as the fuel scene does).
 - Phase 7 is complete through 7g. Tim checks the fuel chain in a real session. The fuel test connects each part's 480 V after
   the sets are on line: closed onto the whole plant at once, the first set tripped.
 - Helium is taken from all pipeline gas at 0.4 %; real fields differ (most hold far less).

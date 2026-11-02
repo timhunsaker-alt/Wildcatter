@@ -52,6 +52,11 @@ Put the jar in your instance's `mods` folder next to:
   rectifiers keep it in chlorine and magnesium.
 - A fuel plant: the 30B's UF6 turned to UO2 by the dry route, pressed and sintered into pellets, loaded into Zircaloy rods filled
   with helium from a recovery unit at the gas plant, and built into true-size 17x17 assemblies that stand 4 m tall.
+- A boron plant: borax and sulfuric acid into boric acid bags, and boron carbide pellets from an arc furnace built into control
+  rod clusters (RCCAs).
+- A pressurized water reactor's nuclear island: a vessel of 9 assemblies (155 MW of heat), the CRDM head, two loops of steam
+  generator and 4.16 kV coolant pump, the pressurizer, the CVCS that sets the boron, the console and an aux feed pump. It goes
+  critical and makes steam; the turbine comes in 8b, so for now the dump valves vent it at a few percent power.
 - The Field Manual item explains how to build each machine.
 
 ## Older worlds

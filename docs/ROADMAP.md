@@ -99,7 +99,7 @@ and the Field Manual has a page for each new system.
   2026-11-01; docs/multiblocks/aeroderivative.md); 6c an art pass with new Ludo materials and signs on the Phase 5 and 6
   parts (Tim, 2026-11-01).
 
-## Phase 7 — Nuclear fuel chain — CURRENT (started 2026-11-01)
+## Phase 7 — Nuclear fuel chain — DONE (2026-11-01)
 - Uranium ore → yellowcake → UF6 → centrifuge cascade enrichment → pellets → rods → assemblies.
 - Decided with Tim on 2026-11-01:
   - Uranium from both ore blocks with a mill (early) and ISR wellfields (late).
@@ -127,9 +127,24 @@ and the Field Manual has a page for each new system.
     process, VAR melting, extrusion and pilgering (docs/multiblocks/zirconium.md). DONE.
   - 7g: the fuel plant (UO2 by the dry route, pellets, sintering, rods with helium, the 17×17 assembly; docs/multiblocks/fuel.md). DONE.
 
-## Phase 8 — Pressurized water reactor (PWR)
+## Phase 8 — Pressurized water reactor (PWR) — CURRENT (started 2026-11-01)
 - Reactor vessel, control rods, primary loop, pressurizer, steam generator, secondary loop to turbine.
 - SCRAM, decay heat, spent fuel pool, dosimeter.
+- Decided with Tim on 2026-11-01:
+  - A core of 9 full-height 17×17 assemblies (3×3) at real power density, about 155 MW thermal. The small core goes critical as
+    a full core would: a written exception, like the cascade's 1000x.
+  - Burnup 100x: real power, the uranium used 100 times faster, so an assembly lasts about 320 h at full power and the core is
+    refuelled a third at a time.
+  - Boric acid in the coolant (a CVCS) plus control rods, the boric acid from borax ore.
+  - Boron carbide rods, as in Combustion Engineering PWRs, from the same borax plant (hafnium would take about 1,400 h of the 7f
+    line for one set).
+  - Two loops, as a 2-loop Westinghouse plant: two steam generators and two reactor coolant pumps.
+- Waves:
+  - 8a: the nuclear island (vessel, CRDMs, console, two steam generators and pumps, pressurizer, CVCS, aux feed) and the boron
+    plant (boric acid, B4C, RCCAs); docs/multiblocks/reactor.md, boron.md.
+  - 8b: the turbine island (HP/LP turbine, moisture separator reheater, condenser and cooling, main feed, the 13.8 kV generator
+    and GSU).
+  - 8c: SCRAM and safety (decay heat, xenon, residual heat removal, spent fuel pool, refuelling machine, dosimeter).
 
 ## Phase 9 — Bridges
 - NeoForge port and Mekanism / other mod energy bridges.
@@ -164,3 +179,5 @@ and the Field Manual has a page for each new system.
 - A titanium pigment plant for the separator's ilmenite and rutile.
 - Fuel: the kiln's HF back to the conversion plant; zinc stearate lubricant and pore formers; a nickel smelter for real Inconel and
   stainless hardware; pellet inspection, rod X-ray and helium leak tests; IFBA and gadolinia burnable absorbers; rejects and scrap.
+- Reactor: the real 55 C/h heat-up limit; full OT-delta-T and OP-delta-T trips; the pressurizer relief tank; a containment
+  building; silver-indium-cadmium and hafnium rods; helium in the B4C rodlets; a buyer for the borax plant's sodium sulfate.

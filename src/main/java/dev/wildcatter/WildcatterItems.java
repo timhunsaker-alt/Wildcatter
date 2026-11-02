@@ -91,6 +91,17 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> HELIUM_CYLINDER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("helium_cylinder"));
 	public static final Item HELIUM_CYLINDER = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(HELIUM_CYLINDER_KEY),
 			String.format("%.1f m3 of helium, 99.995 %%", Tuning.HELIUM_CYLINDER_M3), "fills about 21,000 fuel rods at 2 MPa");
+	// 8a: the boron plant (docs/multiblocks/boron.md)
+	public static final ResourceKey<Item> BORIC_ACID_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("boric_acid"));
+	public static final Item BORIC_ACID = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(64).setId(BORIC_ACID_KEY),
+			String.format("%.0f kg bag of boric acid (H3BO3), %.2f kg of boron", Tuning.BORIC_ACID_BAG_KG, Tuning.BORIC_ACID_BAG_KG * Tuning.B_IN_BORIC_ACID),
+			"for the CVCS's tank, or the B4C furnace");
+	public static final ResourceKey<Item> B4C_PELLETS_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("b4c_pellets"));
+	public static final Item B4C_PELLETS = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(64).setId(B4C_PELLETS_KEY),
+			"1 kg tray of boron carbide pellets, 70 % dense", "9 trays to an RCCA's 24 rodlets");
+	public static final ResourceKey<Item> RCCA_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("rcca"));
+	public static final Item RCCA = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(1).setId(RCCA_KEY),
+			"Rod cluster control assembly: 24 B4C rodlets on a spider", "5 to the reactor's core; load it by right-click on the cold vessel");
 
 	/** A bucket of crude oil. It burns in a firebox (as long as lava) and leaves the bucket behind. */
 	public static final ResourceKey<Item> CRUDE_OIL_BUCKET_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("crude_oil_bucket"));
@@ -163,6 +174,9 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, SPACER_GRID_KEY, SPACER_GRID);
 		Registry.register(BuiltInRegistries.ITEM, EMPTY_HELIUM_CYLINDER_KEY, EMPTY_HELIUM_CYLINDER);
 		Registry.register(BuiltInRegistries.ITEM, HELIUM_CYLINDER_KEY, HELIUM_CYLINDER);
+		Registry.register(BuiltInRegistries.ITEM, BORIC_ACID_KEY, BORIC_ACID);
+		Registry.register(BuiltInRegistries.ITEM, B4C_PELLETS_KEY, B4C_PELLETS);
+		Registry.register(BuiltInRegistries.ITEM, RCCA_KEY, RCCA);
 		Registry.register(BuiltInRegistries.ITEM, CRUDE_OIL_BUCKET_KEY, CRUDE_OIL_BUCKET);
 		Registry.register(BuiltInRegistries.ITEM, PLASTIC_SHEET_KEY, PLASTIC_SHEET);
 		Registry.register(BuiltInRegistries.ITEM, STEEL_INGOT_KEY, STEEL_INGOT);

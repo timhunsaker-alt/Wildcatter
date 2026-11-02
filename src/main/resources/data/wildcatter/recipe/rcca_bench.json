@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "GHG",
+    "SAS",
+    "SSS"
+  ],
+  "key": {
+    "G": "minecraft:glass",
+    "H": "minecraft:hopper",
+    "S": "wildcatter:steel_ingot",
+    "A": "minecraft:anvil"
+  },
+  "result": {
+    "id": "wildcatter:rcca_bench",
+    "count": 1
+  }
+}

@@ -190,6 +190,12 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("fuel")) {
 				fuel(context, server);
 			}
+			if (only("boron")) {
+				boron(context, server);
+			}
+			if (only("reactor")) {
+				reactor(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -5103,6 +5109,315 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.takeScreenshot("wildcatter-fuel");
 		System.out.println("[wildcatter-test] fuel ok: " + read(server, 0, up, z + 4) + " | " + read(server, 0, up, z + 22) + " | " + read(server, 0, up, z + 48)
 				+ " | " + read(server, 0, up, z + 54) + " | assemblies " + assemblies + ", empty 30Bs " + empties);
+	}
+
+	// ---- Phase 8a: the boron plant and the nuclear island (docs/multiblocks/boron.md, reactor.md) -----------------------------
+
+	/**
+	 * The boron plant down x 0-2, every part facing north: the dissolver with the crystallizer against it, the B4C furnace and the
+	 * RCCA bench. Borax, boric acid, coal, pellets and steel by hopper; sulfuric acid from a stock tank; a diesel set on a busway.
+	 */
+	private void boron(ClientGameTestContext context, TestServerContext server) {
+		int z = -2700;
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 10 " + (up + 14) + " " + (z + 28) + " 180 40");
+		context.waitTicks(20);
+		for (int zz = z - 12; zz <= z + 24; zz += 21) {
+			server.runCommand("fill -20 " + (y - 1) + " " + zz + " 16 " + (y + 10) + " " + Math.min(zz + 20, z + 24) + " minecraft:air");
+		}
+		server.runCommand("fill -20 " + (y - 1) + " " + (z - 12) + " 16 " + (y - 1) + " " + (z + 24) + " minecraft:stone");
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		BlockPos dissolver = new BlockPos(0, up, z);
+		placeBig(server, WildcatterBlocks.BORAX_DISSOLVER, dissolver, north);                     // z..z+2
+		BlockPos crystallizer = new BlockPos(0, up, z + 3);
+		placeBig(server, WildcatterBlocks.BORIC_ACID_CRYSTALLIZER, crystallizer, north);          // z+3..z+5
+		BlockPos furnace = new BlockPos(0, up, z + 6);
+		placeBig(server, WildcatterBlocks.B4C_FURNACE, furnace, north);                           // z+6..z+11
+		BlockPos bench = new BlockPos(0, up, z + 12);
+		placeBig(server, WildcatterBlocks.RCCA_BENCH, bench, north);                              // z+12..z+19
+		BlockPos acidTank = new BlockPos(6, up, z);
+		placeBig(server, WildcatterBlocks.STOCK_TANK, acidTank, north);
+		for (int x = 3; x <= 5; x++) {
+			put(server, x, up, z + 1, "wildcatter:gas_line");
+		}
+		fillTank(server, acidTank, dev.wildcatter.fluid.Product.SULFURIC_ACID, 20_000);
+		put(server, 1, up + 4, z + 1, "minecraft:hopper");
+		server.runCommand("item replace block 1 " + (up + 4) + " " + (z + 1) + " container.0 with wildcatter:borax 1");
+		BlockPos bagsOut = new BlockPos(1, y, z + 4);
+		put(server, 1, y, z + 4, "minecraft:hopper");
+		put(server, 1, up + 4, z + 8, "minecraft:hopper");
+		server.runCommand("item replace block 1 " + (up + 4) + " " + (z + 8) + " container.0 with wildcatter:boric_acid 4");
+		server.runCommand("item replace block 1 " + (up + 4) + " " + (z + 8) + " container.1 with minecraft:coal 2");
+		BlockPos traysOut = new BlockPos(1, y, z + 8);
+		put(server, 1, y, z + 8, "minecraft:hopper");
+		put(server, 1, up + 3, z + 14, "minecraft:hopper");
+		server.runCommand("item replace block 1 " + (up + 3) + " " + (z + 14) + " container.0 with wildcatter:b4c_pellets 9");
+		server.runCommand("item replace block 1 " + (up + 3) + " " + (z + 14) + " container.1 with wildcatter:steel_ingot 1");
+		BlockPos rccaOut = new BlockPos(1, y, z + 14);
+		put(server, 1, y, z + 14, "minecraft:hopper");
+		water(server, dissolver);
+		// 480 V: two sets north-west on a busway, an 800 A busway down x -2, a stub to each box at x -1 (as the fuel scene)
+		BlockPos[] sets = {new BlockPos(-12, up, z - 8), new BlockPos(-4, up, z - 8)};
+		for (BlockPos set : sets) {
+			genset(server, set, north, false);                                                     // x -17..-12 and -9..-4, z-8..z-7
+			put(server, set.getX() + 1, up, z - 8, "wildcatter:busway_industrial");
+		}
+		for (int x = -11; x <= -3; x++) {
+			put(server, x, up, z - 9, "wildcatter:busway_industrial");
+		}
+		for (int zz = z - 9; zz <= z + 12; zz++) {
+			put(server, -2, up, zz, "wildcatter:busway_industrial");
+		}
+		for (BlockPos set : sets) {
+			startGenset(context, server, set, north, 2000);
+		}
+		for (int zz : new int[] {0, 3, 6, 12}) {
+			put(server, -1, up, z + zz, "wildcatter:cable_industrial");
+			sizeCables(server, new BlockPos(-1, up, z + zz), new BlockPos(-1, up, z + zz), WildcatterBlocks.CABLE_INDUSTRIAL, dev.wildcatter.energy.ConductorSize.KCMIL_500);
+			context.waitTicks(40);
+		}
+		for (int i = 0; i < 6; i++) {
+			context.waitTicks(50);
+			water(server, dissolver);
+		}
+		String all = " | dissolver " + read(server, 0, up, z) + " | crystallizer " + read(server, 0, up, z + 3) + " | furnace " + read(server, 0, up, z + 6)
+				+ " | bench " + read(server, 0, up, z + 12) + " | set " + read(server, -12, up, z - 8);
+		check(read(server, 0, up, z).contains("dissolving"), "the dissolver should dissolve borax in sulfuric acid: " + all);
+		check(read(server, 0, up, z + 3).contains("crystallizing"), "the crystallizer should take the liquor: " + all);
+		check(read(server, 0, up, z + 6).contains("reducing"), "the furnace should make B4C: " + all);
+		check(read(server, 0, up, z + 12).contains("rodlets"), "the bench should start an RCCA: " + all);
+		server.computeOnServer(srv -> {
+			for (BlockPos at : new BlockPos[] {crystallizer, furnace, bench}) {
+				((dev.wildcatter.block.BoronLineBlockEntity) srv.overworld().getBlockEntity(at)).setNearlyDoneForTest();
+			}
+			return null;
+		});
+		int bags = 0, trays = 0, rccas = 0;
+		for (int i = 0; i < 20 && (bags == 0 || trays == 0 || rccas == 0); i++) {
+			context.waitTicks(20);
+			water(server, dissolver);
+			bags = countIn(server, bagsOut, WildcatterItems.BORIC_ACID);
+			trays = countIn(server, traysOut, WildcatterItems.B4C_PELLETS);
+			rccas = countIn(server, rccaOut, WildcatterItems.RCCA);
+		}
+		check(bags > 0, "a bag of boric acid should drop under the crystallizer: " + read(server, 0, up, z + 3));
+		check(trays > 0, "a tray of B4C pellets should drop under the furnace: " + read(server, 0, up, z + 6));
+		check(rccas > 0, "an RCCA should drop under the bench: " + read(server, 0, up, z + 12));
+		server.runCommand("tp @p 12 " + (up + 7) + " " + (z + 24) + " 135 25");
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-boron");
+		System.out.println("[wildcatter-test] boron ok: " + read(server, 0, up, z) + " | " + read(server, 0, up, z + 6) + " | bags " + bags + ", trays " + trays
+				+ ", RCCAs " + rccas);
+	}
+
+	/**
+	 * The nuclear island (docs/multiblocks/reactor.md), laid out as the spec with the vessel's main cell at 0, up, z: loop A north,
+	 * loop B south, the pressurizer against A, the CVCS west, the console against the vessel's east face (raised, so the feedwater
+	 * pipe runs under it). Power: three diesel sets through a backward unit substation for the pumps' 4.16 kV, two sets on a busway
+	 * for 480 V, and a set of its own for the aux feed pump.
+	 */
+	private void reactor(ClientGameTestContext context, TestServerContext server) {
+		int z = -2900;
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 12 " + (up + 26) + " " + (z + 24) + " 160 45");
+		context.waitTicks(20);
+		for (int zz = z - 20; zz <= z + 20; zz += 20) {
+			server.runCommand("fill -26 " + (y - 1) + " " + zz + " 20 " + (y + 15) + " " + Math.min(zz + 19, z + 20) + " minecraft:air");
+		}
+		server.runCommand("fill -26 " + (y - 1) + " " + (z - 20) + " 20 " + (y - 1) + " " + (z + 20) + " minecraft:stone");
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		BlockPos vessel = new BlockPos(0, up, z);
+		placeBig(server, WildcatterBlocks.REACTOR_VESSEL, vessel, north);                         // x 0-2, z..z+2, y up..up+9
+		placeBig(server, WildcatterBlocks.CRDM_HEAD, new BlockPos(0, up + 10, z), north);
+		placeBig(server, WildcatterBlocks.STEAM_GENERATOR, new BlockPos(0, up, z - 3), north);    // loop A, z-3..z-1
+		BlockPos pumpA = new BlockPos(0, up, z - 5);
+		placeBig(server, WildcatterBlocks.REACTOR_COOLANT_PUMP, pumpA, north);                    // z-5..z-4
+		placeBig(server, WildcatterBlocks.PRESSURIZER, new BlockPos(-2, up, z - 3), north);       // x -2..-1, z-3..z-2
+		placeBig(server, WildcatterBlocks.STEAM_GENERATOR, new BlockPos(0, up, z + 3), north);    // loop B, z+3..z+5
+		BlockPos pumpB = new BlockPos(0, up, z + 6);
+		placeBig(server, WildcatterBlocks.REACTOR_COOLANT_PUMP, pumpB, north);                    // z+6..z+7
+		BlockPos cvcs = new BlockPos(-3, up, z);
+		placeBig(server, WildcatterBlocks.CVCS_SKID, cvcs, north);                                // x -3..-1, z..z+5
+		placeBig(server, WildcatterBlocks.REACTOR_CONSOLE, new BlockPos(3, up + 3, z + 1), north);   // x 3-5, raised
+		BlockPos afw = new BlockPos(12, up, z);
+		placeBig(server, WildcatterBlocks.AUX_FEED_PUMP, afw, north);                             // x 12-13, z..z+3
+		// feedwater: south of the aux feed pump, west along z+4 past loop B's steam generator, north up x 3 to loop A's
+		for (int x = 3; x <= 12; x++) {
+			put(server, x, up, z + 4, "wildcatter:gas_line");
+		}
+		for (int zz = z - 1; zz <= z + 3; zz++) {
+			put(server, 3, up, zz, "wildcatter:gas_line");
+		}
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.ReactorVesselBlockEntity) srv.overworld().getBlockEntity(vessel)).setHotStandbyForTest(1500);
+			((dev.wildcatter.block.CvcsBlockEntity) srv.overworld().getBlockEntity(cvcs)).setAcidForTest(500);
+			((dev.wildcatter.block.ReactorCoolantPumpBlockEntity) srv.overworld().getBlockEntity(pumpB)).setOnForTest(false);
+			return null;
+		});
+		water(server, cvcs, afw);
+		// 480 V: two sets south-west on a busway up x -5, stubs to the CVCS, the pressurizer and (up a riser) the CRDM head
+		BlockPos[] lvSets = {new BlockPos(-14, up, z + 14), new BlockPos(-6, up, z + 14)};
+		for (BlockPos set : lvSets) {
+			genset(server, set, north, false);                                                     // x -19..-14 and -11..-6, z+14..z+15
+			put(server, set.getX() + 1, up, z + 14, "wildcatter:busway_industrial");
+		}
+		for (int x = -13; x <= -5; x++) {
+			put(server, x, up, z + 13, "wildcatter:busway_industrial");
+		}
+		for (int zz = z - 3; zz <= z + 13; zz++) {
+			put(server, -5, up, zz, "wildcatter:busway_industrial");
+		}
+		// 4.16 kV: three sets north-west, a backward unit substation, a cable round the north to pump A and down x 14 to pump B
+		BlockPos[] mvSets = {new BlockPos(-22, up, z - 13), new BlockPos(-14, up, z - 13), new BlockPos(-6, up, z - 13)};
+		for (BlockPos set : mvSets) {
+			genset(server, set, north, false);                                                     // z-13..z-12
+			put(server, set.getX() + 1, up, z - 13, "wildcatter:busway_industrial");
+		}
+		for (int x = -21; x <= 2; x++) {
+			put(server, x, up, z - 14, "wildcatter:busway_industrial");
+		}
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, new BlockPos(2, up, z - 14), net.minecraft.core.Direction.EAST, false);   // x 3-6, z-15..z-14
+		BlockPos[] mvSetsB = {new BlockPos(2, up, z + 14), new BlockPos(10, up, z + 14)};
+		for (BlockPos set : mvSetsB) {
+			genset(server, set, north, false);                                                     // x -3..2 and 5..10, z+14..z+15
+			put(server, set.getX() + 1, up, z + 14, "wildcatter:busway_industrial");
+		}
+		for (int x = 3; x <= 11; x++) {
+			put(server, x, up, z + 13, "wildcatter:busway_industrial");
+		}
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, new BlockPos(11, up, z + 13), net.minecraft.core.Direction.EAST, false);   // x 12-15, z+12..z+13
+		// the aux feed pump's own set, its terminal against the pump's box
+		BlockPos afwSet = new BlockPos(10, up, z);
+		genset(server, afwSet, north, false);                                                     // x 5-10, z..z+1
+		for (BlockPos set : lvSets) {
+			startGenset(context, server, set, north, 2000);
+		}
+		for (BlockPos set : mvSets) {
+			startGenset(context, server, set, north, 2000);
+		}
+		for (BlockPos set : mvSetsB) {
+			startGenset(context, server, set, north, 2000);
+		}
+		put(server, 11, up, z, "wildcatter:cable_industrial");   // a lone set is solved only with a load on its bus
+		sizeCables(server, new BlockPos(11, up, z), new BlockPos(11, up, z), WildcatterBlocks.CABLE_INDUSTRIAL, dev.wildcatter.energy.ConductorSize.KCMIL_500);
+		startGenset(context, server, afwSet, north, 2000);
+		// 480 V stubs, one at a time: the CVCS, the pressurizer, the CRDM head's riser
+		put(server, -4, up, z, "wildcatter:cable_industrial");
+		context.waitTicks(40);
+		put(server, -4, up, z - 3, "wildcatter:cable_industrial");
+		put(server, -3, up, z - 3, "wildcatter:cable_industrial");
+		sizeCables(server, new BlockPos(-4, up, z - 3), new BlockPos(-3, up, z - 3), WildcatterBlocks.CABLE_INDUSTRIAL, dev.wildcatter.energy.ConductorSize.KCMIL_500);
+		context.waitTicks(40);
+		for (int yy = up; yy <= up + 10; yy++) {
+			put(server, -4, yy, z - 1, "wildcatter:cable_industrial");
+		}
+		for (int x = -3; x <= -1; x++) {
+			put(server, x, up + 10, z - 1, "wildcatter:cable_industrial");
+		}
+		put(server, -1, up + 10, z, "wildcatter:cable_industrial");
+		context.waitTicks(40);
+		String lv = read(server, -14, up, z + 14);
+		check(lv.contains("RUNNING") && lv.contains("breaker CLOSED"), "the 480 V sets should carry the island's 480 V loads: " + lv);
+		// 4.16 kV to the pumps
+		java.util.List<int[]> mv = new java.util.ArrayList<>();
+		for (int zz = z - 14; zz <= z - 12; zz++) {
+			mv.add(new int[] {7, zz});
+		}
+		for (int x = -1; x <= 14; x++) {
+			mv.add(new int[] {x, z - 12});
+		}
+		for (int zz = z - 11; zz <= z - 5; zz++) {
+			mv.add(new int[] {-1, zz});
+		}
+		// pump B on an island of its own: two sets south, a second backward unit substation, west along z+10 and up x -1
+		for (int zz = z + 10; zz <= z + 13; zz++) {
+			mv.add(new int[] {16, zz});
+		}
+		for (int x = -1; x <= 15; x++) {
+			mv.add(new int[] {x, z + 10});
+		}
+		for (int zz = z + 6; zz <= z + 9; zz++) {
+			mv.add(new int[] {-1, zz});
+		}
+		for (int[] c : mv) {
+			put(server, c[0], up, c[1], "wildcatter:cable_mv");
+		}
+		context.waitTicks(300);
+		String island = " | vessel " + read(server, 0, up, z) + " | pump A " + read(server, 0, up, z - 5) + " | MV set " + read(server, -6, up, z - 13)
+				+ " | CRDM " + read(server, 0, up + 10, z);
+		check(read(server, 0, up, z - 5).contains("flow 100"), "pump A should run on 4.16 kV: " + island);
+		check(read(server, 0, up, z).contains("shut down") && read(server, 0, up, z).contains("pressurizer 15."), "the reactor should stand shut down at hot standby, 15.5 MPa: " + island);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.ReactorCoolantPumpBlockEntity) srv.overworld().getBlockEntity(pumpB)).setOnForTest(true);
+			return null;
+		});
+		context.waitTicks(300);
+		check(read(server, 0, up, z + 6).contains("flow 100"), "pump B should start too: " + read(server, 0, up, z + 6) + " | " + read(server, 2, up, z + 14));
+		// the startup: the shutdown bank out and the core just short of critical (the hooks shorten the waits), the setpoint 2 %
+		dev.wildcatter.fluid.Reactor[] r = new dev.wildcatter.fluid.Reactor[1];
+		server.computeOnServer(srv -> {
+			r[0] = ((dev.wildcatter.block.ReactorVesselBlockEntity) srv.overworld().getBlockEntity(vessel)).reactor();
+			r[0].setSetpoint(0.02);
+			r[0].setRodsForTest(Tuning.ROD_STEPS, 100);
+			r[0].holdPowerForTest(2e-3);
+			return null;
+		});
+		boolean critical = false;
+		double peak = 0;
+		for (int i = 0; i < 150; i++) {
+			context.waitTicks(40);
+			water(server, cvcs, afw);
+			double rate = server.computeOnServer(srv -> r[0].startupRate());
+			double p = server.computeOnServer(srv -> r[0].power());
+			critical |= rate > 0.2;
+			peak = Math.max(peak, p);
+			if (critical && p > 0.019) {
+				break;
+			}
+		}
+		String now = " | vessel " + read(server, 0, up, z) + " | SG A " + read(server, 0, up, z - 3);
+		check(critical, "the reactor should go critical with a positive startup rate: " + now);
+		for (int i = 0; i < 15; i++) {
+			context.waitTicks(40);
+			water(server, cvcs, afw);
+		}
+		double held = server.computeOnServer(srv -> r[0].power());
+		now = " | vessel " + read(server, 0, up, z) + " | SG A " + read(server, 0, up, z - 3) + " | SG B " + read(server, 0, up, z + 3) + " | AFW " + read(server, 12, up, z);
+		check(!r[0].tripped() && Math.abs(held - 0.02) < 0.005, "it should hold about 2 % on bank D: " + held + now);
+		double vented = server.computeOnServer(srv -> r[0].vented(0) + r[0].vented(1));
+		check(vented > 0, "the dump valves should vent the steam: " + now);
+		check(server.computeOnServer(srv -> r[0].sgLevel(0)) > 0.9, "the aux feed pump should hold the levels: " + now);
+		// pump B stopped at 2 %: it runs on one loop
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.ReactorCoolantPumpBlockEntity) srv.overworld().getBlockEntity(pumpB)).setOnForTest(false);
+			return null;
+		});
+		context.waitTicks(400);
+		check(!r[0].tripped(), "one loop below P-8 should run on: " + read(server, 0, up, z));
+		server.runCommand("tp @p 15 " + (up + 17) + " " + (z + 17) + " 140 32");
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-reactor");
+		String running = read(server, 0, up, z);
+		// a manual trip
+		server.computeOnServer(srv -> {
+			r[0].setSetpoint(-1);
+			return null;
+		});
+		context.waitTicks(400);
+		String trip = read(server, 0, up, z);
+		check(r[0].tripped() && trip.contains("MANUAL TRIP") && r[0].power() < 0.001 && r[0].bankD() == 0 && r[0].shutdownBank() == 0,
+				"a manual trip should drop all rods and the power: " + trip);
+		// reset, and cut the CRDM head's power while the shutdown bank comes out
+		server.computeOnServer(srv -> {
+			r[0].setSetpoint(0);
+			return null;
+		});
+		context.waitTicks(100);
+		put(server, -1, up + 10, z, "minecraft:air");
+		context.waitTicks(100);
+		String cut = read(server, 0, up, z);
+		check(cut.contains("CRDM POWER LOST"), "losing the CRDM head's power should trip it: " + cut);
+		System.out.println("[wildcatter-test] reactor ok: " + running + " | " + trip + " | " + cut);
 	}
 
 	/**

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BCB",
+    "BFB",
+    "SSS"
+  ],
+  "key": {
+    "B": "minecraft:bricks",
+    "C": "minecraft:copper_block",
+    "F": "minecraft:blast_furnace",
+    "S": "wildcatter:steel_ingot"
+  },
+  "result": {
+    "id": "wildcatter:b4c_furnace",
+    "count": 1
+  }
+}

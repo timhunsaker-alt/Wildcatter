@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "CCC",
+    "SRS",
+    "SIS"
+  ],
+  "key": {
+    "C": "minecraft:copper_block",
+    "S": "wildcatter:steel_ingot",
+    "R": "minecraft:redstone_block",
+    "I": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:crdm_head",
+    "count": 1
+  }
+}

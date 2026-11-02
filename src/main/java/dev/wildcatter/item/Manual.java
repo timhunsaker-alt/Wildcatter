@@ -2,6 +2,7 @@ package dev.wildcatter.item;
 
 import dev.wildcatter.Tuning;
 import dev.wildcatter.energy.Voltage;
+import dev.wildcatter.fluid.Reactor;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.network.chat.Component;
@@ -171,6 +172,17 @@ public final class Manual {
 
 				"FUEL RODS AND ASSEMBLY\n\nAfter the grinder: the ROD LOADER (cladding tubes and steel ingots on top) puts " + dev.wildcatter.fluid.Fuel.pelletsPerRod() + " pellets in each tube; the ROD WELDER (helium cylinders on top) fills each rod with helium at 2 MPa and welds it shut; the ASSEMBLY FIXTURE (25 guide thimbles, 6 spacer grids and steel on top) pulls 264 rods into the skeleton. The assembly drops into a hopper under it: " + String.format("%.0f", dev.wildcatter.fluid.Fuel.assemblyU()) + " kg of uranium. Stand it up anywhere: it is 4 m tall.\n\n"
 						+ "Helium comes from the HELIUM RECOVERY UNIT on a gas plant's pipeline gas (empty cylinders on top). Spacer grids come from the pilger mill's third die.",
+
+				"BORIC ACID AND BORON CARBIDE\n\nThe BORAX DISSOLVER (borax on top, sulfuric acid on its east side, pumped water) and the BORIC ACID CRYSTALLIZER against it make " + Math.round(Tuning.BORIC_ACID_KGS * 3600) + " kg of boric acid an hour, in " + Math.round(Tuning.BORIC_ACID_BAG_KG) + " kg bags. The reactor's coolant carries it.\n\n"
+						+ "The B4C FURNACE (boric acid and coal on top) makes boron carbide pellets, a 1 kg tray every " + Math.round(1 / Tuning.B4C_KGS / 60) + " minutes. The RCCA BENCH (9 trays and a steel ingot on top) builds a control rod cluster of 24 rodlets. The reactor takes 5.",
+
+				"THE REACTOR CORE AND RODS\n\nThe REACTOR VESSEL holds 9 fuel assemblies and 5 RCCAs: right-click them in while it is cold, empty of pressure and its pumps are stopped. The core makes " + Math.round(Reactor.ratedWatts() / 1e6) + " MW of heat at full power. An assembly lasts about " + Math.round(Reactor.cycleHours() * 3) + " hours at full power; refuel a third of the core at a time.\n\n"
+						+ "The CRDM HEAD sits on the vessel and moves the rods. The four edge rods are the shutdown bank, out before startup. The centre rod, bank D, holds the power. The CVCS SKID (boric acid bags on top, pumped water) sets the boron: sneak-click to change its target. Boron holds most of the core's reactivity; dilute it as the fuel burns.\n\n"
+						+ "The REACTOR CONSOLE, against the vessel: sneak-click to step the setpoint. TRIP drops every rod in 2 s. Leave TRIP to reset once the cause has cleared.",
+
+				"THE PRIMARY LOOP AND STARTUP\n\nEach loop is a STEAM GENERATOR against the vessel with a REACTOR COOLANT PUMP (" + Math.round(Tuning.RCP_WATTS / 1000) + " kW, " + Voltage.MEDIUM.label() + ") against it. The PRESSURIZER goes against the vessel or a steam generator. Feedwater goes in at the steam generator's bottom east side; steam comes out of its top.\n\n"
+						+ "Startup: fill the RCS through the CVCS at the boron target. Heat the pressurizer to " + Tuning.RCP_SEAL_MPA + " MPa so the pumps can run. The pumps' heat brings the loop to " + Tuning.TAVG_NO_LOAD + " C in about half an hour, and the pressurizer to " + Tuning.RCS_MPA + " MPa. Set a power on the console: the shutdown bank comes out and bank D pulls to criticality, at most 1 decade a minute.\n\n"
+						+ "Without a turbine, the AUX FEED PUMP feeds the steam generators and their dump valves vent the steam: about " + Math.round(Tuning.AFW_KGS / Reactor.steamPerGenerator() / 2 * 100) + " % power. Trips: high flux, low flow, pressure, overtemperature, low steam generator level, lost rod drive power.",
 
 				"SEPARATIVE WORK\n\nA SWU measures the work of splitting uranium. Each kg of " + String.format("%.2f", Tuning.ASSAY_PRODUCT * 100) + " % product takes " + String.format("%.1f", dev.wildcatter.fluid.Enrichment.feedPerProduct()) + " kg of natural uranium and " + String.format("%.1f", dev.wildcatter.fluid.Enrichment.swuPerProduct()) + " SWU, and leaves " + String.format("%.1f", dev.wildcatter.fluid.Enrichment.tailsPerProduct()) + " kg of " + String.format("%.2f", Tuning.ASSAY_TAILS * 100) + " % tails.\n\n"
 						+ "A machine does " + String.format("%.1f", dev.wildcatter.fluid.Enrichment.machineSwuPerSecond() * 3600) + " SWU an hour at full speed. " + dev.wildcatter.fluid.Enrichment.stages() + " machines fill a 30B (" + String.format("%,.0f", Tuning.CYLINDER_30B_KG) + " kg of UF6) in about " + Math.round(dev.wildcatter.fluid.Enrichment.hoursPer30b(dev.wildcatter.fluid.Enrichment.stages())) + " hours and use most of what one conversion plant makes.",
