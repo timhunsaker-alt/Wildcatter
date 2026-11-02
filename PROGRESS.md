@@ -113,7 +113,7 @@ All of them go in the hot wire: in at the back, out at the front. Sneak and righ
 
 ## Phase 2e and 2f: receptacles, plug adapters, feeder relays
 - **Receptacles and plug adapters** (NEMA 5-15, 5-20, 14-50; CEE 7; IEC 60309 blue): wire a receptacle, set the plug of the same type against it (it will not stay beside another type) and put an FE machine or cable beside the plug. The plug draws real current, as many watts as the attached machines demand (1 W = 1 FE/t, `wattsPerFe` in the config), has no protection, delivers nothing on the wrong voltage, and burns out with its receptacle after 30 s above 120 % of its rating. Two parts: `energy/EnergyBridge` + `HostEnergy` (plain Java) are the only meeting point with other mods.
-- **Not done:** the Team Reborn Energy adapter (no confirmed 26.3 build; nothing is registered by default, so plugs deliver to no one until an adapter registers). The three-phase plugs came in Phase 3e.
+- **Not done then:** the Team Reborn Energy adapter. It came in Phase 9a. The three-phase plugs came in Phase 3e.
 - **Under-Frequency Relay (DIST)** for 12.47 kV feeders: same behaviour as the low voltage relay.
 - Game test: a plug hands 923 FE/t (92k FE in 100 ticks) to a stand-in machine; a CEE 7 plug is refused beside a NEMA receptacle and delivers nothing on 120 V; a plug above its rating burns with its receptacle; the feeder relay sheds a pole transformer's overload at 59.0 Hz and the turbine stays on.
 
@@ -474,6 +474,28 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - **Game tests:** new scene `gasPlant` (a gas set on separator gas powers the plant: 4.16 kV through a backward unit substation to
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
+
+## Phase 9a: Team Reborn Energy on Fabric (Phase 9 waves in ROADMAP)
+- **Plugs feed Team Reborn Energy:** a plug adapter now hands its power to any Team Reborn Energy storage beside it (Tech Reborn's
+  machines, batteries and cables, and other Fabric mods on that API). It finds them through `EnergyStorage.SIDED` on the face toward
+  the plug (`energy/TeamRebornEnergy`).
+  - Its demand is what the storage would take this tick (a simulated insert that is never committed).
+  - The rate is 1 W = 1 E/t, sharing the FE setting (`wattsPerFe` in `config/wildcatter.properties`).
+  - The readout names the unit: "delivering 930 W (930 E/t)".
+- **Bundled:** Team Reborn Energy 5.0.0 (MIT) is inside the jar, so nothing extra needs installing. Tech Reborn is recommended,
+  not required.
+- **Tick by tick:** the plug still measures and draws on its 4-tick interval, but now hands the energy over evenly each tick. Before,
+  it gave four ticks' worth at once, and a real storage, which caps each insert at its own rate, would have lost three quarters.
+- **The game test's stand-in machines** are kept apart from the real providers (`EnergyBridge.registerForTest`), so a scene no
+  longer wipes the Team Reborn one.
+- **Game test `teamRebornEnergy`:**
+  - a gold block registered as a real `SimpleEnergyStorage` (1,000,000 E, 1,000 E a tick) beside a NEMA 5-15 plug gains
+    92,975 E in 100 ticks: 930 E/t, all the starter plant gives;
+  - the plug draws 8.0 A at 116 V;
+  - once the storage is full, the plug draws 0 A.
+  - `plugs` and `threePhase` still pass.
+- **Unit test:** `HostEnergyTest` (the per-tick split loses no remainder).
+- Resolves Phase 2's "Not done: the Team Reborn Energy adapter".
 
 ## Phase 8e: refuelling, the spent fuel pool and radiation (spec: docs/multiblocks/fuel-handling.md); Phase 8 done
 - **Tim's decisions:**
@@ -892,6 +914,8 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- Phase 9a: plugs feed Team Reborn Energy on Fabric only. There is no NeoForge jar or FE yet (9b and 9c); Mekanism for 26.3 is
+  unreleased. Tech Reborn itself has not been tried in a real play session, only the API with a stand-in storage.
 - Phase 8e: the pool digs 13 m down from its controller: near the world's floor (or a superflat world) it cannot. Irradiated
   fuel has no casks yet (ROADMAP Ideas). Dose is a point-source line-of-sight sum; there is no contamination. The test sets the
   core's history and the moves' time by hooks.
@@ -959,4 +983,4 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 ## Ideas not started
 - Switches and panels.
 - Better wire, ground and breaker art.
-- A Mekanism / NeoForge bridge.
+- A Mekanism / NeoForge bridge: Phase 9b and 9c.

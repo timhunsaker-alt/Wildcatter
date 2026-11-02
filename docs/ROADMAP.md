@@ -163,10 +163,24 @@ and the Field Manual has a page for each new system.
 - Decided with Tim on 2026-11-01 (the 8b plan): the tower gets its own wave after the turbine island; a new 60 MVA two-pole
   hydrogen-cooled generator part.
 
-## Phase 9 — Bridges — CURRENT (next; not started, its plan waits for Tim)
+## Phase 9 — Bridges — CURRENT (started 2026-11-02)
 - NeoForge port and Mekanism / other mod energy bridges.
+- **9a: Team Reborn Energy on Fabric.** Plugs feed Tech Reborn and other Team Reborn Energy mods (bundled, MIT). DONE 2026-11-02.
+- **9b: the NeoForge port.** One codebase, two jars:
+  - a plain multi-loader project (common, fabric and neoforge subprojects, Loom and ModDevGradle);
+  - a small platform interface of our own, and no extra mod for players.
+- **9c: FE on NeoForge.** Plugs feed NeoForge's energy capability. Mekanism takes FE, so it needs no code of its own. It is checked
+  against a stand-in until Mekanism for 26.3 is released (on its dev branch, 10.8.0, as of 2026-11-02).
+- **Testing:** the Fabric client game test stays the full suite. NeoForge gets a few GameTest smoke scenes and a runClient
+  screenshot.
+- Decided with Tim on 2026-11-02:
+  - three waves, Team Reborn first;
+  - plain multi-loader;
+  - smoke scenes on NeoForge;
+  - 1 W = 1 E/t, sharing the FE setting.
 
 ## Ideas (not scheduled)
+- Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released.
 - Switches and panels. Better wire, ground and breaker art. Saving the Ludo sound sources.
 - Soft starters and drives for big motors, so a 250 hp pump can start on a small island.
 - A sales gas pipeline and meter station, so a gas plant's residue gas has a buyer besides engines and the flare.

@@ -17,6 +17,7 @@ and makes no claim to teach or certify electrical work.
 | Link to other mods | Receptacle + crafted plug adapters |
 | Plug overload | Plug draws real current; upstream breaker or fuse trips |
 | Watts → FE | 1 W = 1 FE/t by default, configurable |
+| Watts → Team Reborn E | 1 W = 1 E/t, the same setting as FE (Tim, 2026-11-02) |
 
 ## Electrical standards (chosen per world, fixed after world creation)
 | Level | North American (60 Hz) | IEC (50 Hz) | Phases |
@@ -86,6 +87,9 @@ voltage transformers (wye-grounded, 1 MΩ a phase) give the 13.8 kV bus its grou
 - A **plug adapter** is crafted to match one receptacle type. It only fits a receptacle of the same
   type, as in real life. The adapter outputs FE to adjacent machines or to other mods' cables;
   many machines can share one plug.
+- On Fabric it feeds any **Team Reborn Energy** storage (Tech Reborn and others), found through
+  `EnergyStorage.SIDED` on the face toward the plug. It asks each one what it would take this tick and
+  hands the energy over evenly tick by tick. FE on NeoForge comes with the port (Phase 9b and 9c).
 - The plug draws real current equal to the power the connected machines pull, converted at the
   configured rate (default 1 W = 1 FE/t). It has no internal limit and no protection of its own:
   if the machines pull more than the circuit allows, the upstream breaker or fuse trips.

@@ -36,10 +36,13 @@ frequency, protection) is in `docs/ELECTRICAL_MODEL.md`. What is built, phase by
   - after the trip: decay heat, xenon, a COOLDOWN to cold shutdown on the RHR, and core damage with a hydrogen blast if
     cooling is lost (8d).
   - refuelling at outages, a spent fuel pool, and real radiation dose with a dosimeter (8e).
+- **Other mods:** plug adapters feed Team Reborn Energy machines (Tech Reborn and others) at 1 W = 1 E/t (Phase 9a). A NeoForge
+  jar with FE (for Mekanism) is next.
 - **The Field Manual** item explains every machine. Art and sounds are made with Ludo (`art/`).
 
 ## Install
 Copy `dist/wildcatter-0.1.0.jar` into your instance's `mods/` folder with Fabric Loader and Fabric API for 26.3.
+Tech Reborn (6.2.1, with RebornCore 6.2.0) is optional: plugs feed its machines.
 `dist/README.md` has the player notes.
 
 ## Testing in game: the kits
@@ -56,6 +59,7 @@ Copy `dist/wildcatter-0.1.0.jar` into your instance's `mods/` folder with Fabric
 | `/function wildcatter:kit/cracker` | the steam cracker and polyethylene line |
 | `/function wildcatter:kit/gas_turbine` | the gas turbine, HRSG and steam turbine (combined cycle) |
 | `/function wildcatter:kit/peaker` | the 45 MW aeroderivative peaker |
+| `/function wildcatter:kit/plugs` | every receptacle and plug adapter, wire, a breaker and the 120 V starter plant |
 | `/function wildcatter:kit/ores` | one of every ore, the minerals and the scintillometer |
 | `/function wildcatter:kit/mill` | the sulfuric acid plant and the uranium mill |
 | `/function wildcatter:kit/isr` | the ISR wellfield |
@@ -92,6 +96,7 @@ On a Mac, run `caffeinate -u -t 30` just before launching the test client: it ne
 `build/run/clientGameTest/screenshots/`.
 
 **The game-test scenes**, by area:
+- **Other mods:** `teamRebornEnergy` (a plug fills a real Team Reborn Energy storage).
 - **Basics:**
   - `lowVoltageLoop`, `transformerChain`, `steamLoop`, `wells`;
   - `refining` (the 4.16 kV tier).

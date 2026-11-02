@@ -23,6 +23,9 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	// Team Reborn Energy: plug adapters hand power to Tech Reborn and other mods on it. Bundled in the jar (MIT).
+	implementation("teamreborn:energy:${project.tr_energy_version}") { transitive = false }
+	include("teamreborn:energy:${project.tr_energy_version}") { transitive = false }
 }
 
 processResources {

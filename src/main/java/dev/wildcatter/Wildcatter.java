@@ -43,6 +43,10 @@ public class Wildcatter implements ModInitializer {
 		WildcatterItems.register();
 		dev.wildcatter.ore.OreBlocks.register();
 		dev.wildcatter.ore.OreGen.register();
+		// plugs hand power to Team Reborn Energy machines (bundled, so always loaded on Fabric)
+		if (net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("team_reborn_energy")) {
+			dev.wildcatter.energy.TeamRebornEnergy.register();
+		}
 
 		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, id("wildcatter"), FabricCreativeModeTab.builder()
 				.title(Component.translatable("itemGroup.wildcatter"))

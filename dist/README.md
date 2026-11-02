@@ -9,6 +9,10 @@ Put the jar in your instance's `mods` folder next to:
 - Fabric API
 - Java 25
 
+Optional: **Tech Reborn** 6.2.1 with RebornCore 6.2.0 (Fabric, 26.3). Set a plug adapter against its receptacle and put a Tech
+Reborn machine, battery or cable beside the plug: it takes the plug's power at 1 W = 1 E/t. Team Reborn Energy is already inside
+the Wildcatter jar.
+
 ## What's in it
 - Power from a 120 V starter turbine up to a 138 kV substation.
 - Gensets, a 1 MW steam plant with its cooling tower, oil wells and a refinery.

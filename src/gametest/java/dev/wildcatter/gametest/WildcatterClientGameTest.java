@@ -208,6 +208,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("fuelHandling")) {
 				fuelHandling(context, server);
 			}
+			if (only("teamRebornEnergy")) {
+				teamRebornEnergy(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -1222,6 +1225,8 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	/** Receptacles and plugs: a matching plug delivers FE for the watts it draws, a wrong type does not fit, the wrong voltage delivers nothing, an overload burns it. */
 	private void plugs(ClientGameTestContext context, TestServerContext server) {
 		int z = -124;
+		server.runCommand("tp @p 14 " + (up + 1) + " " + (z + 5) + " 180 15");   // load the scene's chunks first
+		context.waitTicks(20);
 		server.runCommand("fill 8 " + y + " " + (z - 3) + " 22 " + (y + 5) + " " + (z + 4) + " minecraft:air");
 		plant(server, z);
 		put(server, 12, up, z, "wildcatter:wool_wire_hot");
@@ -1232,8 +1237,8 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		put(server, 14, up, z, "wildcatter:plug_nema_5_15");
 		put(server, 15, up, z, "minecraft:iron_block");        // stands in for another mod's machine: it takes 1000 FE per tick
 		java.util.concurrent.atomic.AtomicLong delivered = new java.util.concurrent.atomic.AtomicLong();
-		dev.wildcatter.energy.EnergyBridge.clear();
-		dev.wildcatter.energy.EnergyBridge.register(target -> target.level().getBlockState(target.pos()).is(net.minecraft.world.level.block.Blocks.IRON_BLOCK)
+		dev.wildcatter.energy.EnergyBridge.clearTests();
+		dev.wildcatter.energy.EnergyBridge.registerForTest(target -> target.level().getBlockState(target.pos()).is(net.minecraft.world.level.block.Blocks.IRON_BLOCK)
 				? new dev.wildcatter.energy.HostEnergy() {
 					@Override
 					public long demand() {
@@ -1278,9 +1283,48 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(120);
 		dev.wildcatter.block.PlugAdapterBlockEntity.testRatingScale = null;
 		dev.wildcatter.block.PlugAdapterBlockEntity.testBurnSeconds = null;
-		dev.wildcatter.energy.EnergyBridge.clear();
+		dev.wildcatter.energy.EnergyBridge.clearTests();
 		check(isAir(server, 14, up, z) && isAir(server, 13, up, z), "a plug held above its rating should burn out with its receptacle");
 		System.out.println("[wildcatter-test] plugs ok: " + plug + " | " + wrong + " | FE gained " + gained);
+	}
+
+	/** A real Team Reborn Energy storage beside a plug: found through the API, filled tick by tick at its own rate, and drawing nothing once full. */
+	private static final team.reborn.energy.api.base.SimpleEnergyStorage TR_STORAGE = new team.reborn.energy.api.base.SimpleEnergyStorage(1_000_000, 1000, 0);
+
+	private void teamRebornEnergy(ClientGameTestContext context, TestServerContext server) {
+		int z = -4300;
+		server.runCommand("tp @p 14 " + (up + 1) + " " + (z + 5) + " 180 15");   // load the scene's chunks first
+		context.waitTicks(20);
+		// a gold block stands in for a Tech Reborn battery: a 1,000,000 E storage that takes 1,000 E a tick
+		team.reborn.energy.api.EnergyStorage.SIDED.registerForBlocks((level, pos, state, entity, side) -> TR_STORAGE, net.minecraft.world.level.block.Blocks.GOLD_BLOCK);
+		server.runCommand("fill 8 " + y + " " + (z - 3) + " 22 " + (y + 5) + " " + (z + 4) + " minecraft:air");
+		plant(server, z);
+		put(server, 12, up, z, "wildcatter:wool_wire_hot");
+		for (int x = 11; x <= 13; x++) {
+			put(server, x, up, z + 1, "wildcatter:wool_wire_neutral");
+		}
+		server.runCommand("fill 13 " + (up - 1) + " " + z + " 15 " + (up - 1) + " " + z + " minecraft:smooth_stone");   // a bench to stand them on
+		put(server, 13, up, z, "wildcatter:receptacle_nema_5_15[attach=down]");
+		put(server, 14, up, z, "wildcatter:plug_nema_5_15[attach=down]");
+		put(server, 15, up, z, "minecraft:gold_block");
+		server.runCommand("tp @p 14 " + (up + 1) + " " + (z + 4) + " 180 25");
+		context.waitTicks(160);
+		long before = TR_STORAGE.amount;
+		context.waitTicks(100);
+		long gained = TR_STORAGE.amount - before;
+		String plug = read(server, 14, up, z);
+		check(plug.contains("E/t") && gained > 70_000 && gained < 120_000, "a plug should fill a Team Reborn storage at its 1,000 E a tick (" + gained + " E in 100 ticks): " + plug);
+		check(plug.contains(" 8.") || plug.contains(" 7.") || plug.contains(" 9."), "1,000 W at 120 V is about 8.3 A: " + plug);
+		server.runCommand("tp @p 14.5 " + (up + 0.3) + " " + (z + 2.6) + " 180 35");
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-team-reborn-energy");
+
+		// full, it asks for nothing and the plug draws nothing
+		server.runOnServer(srv -> TR_STORAGE.amount = TR_STORAGE.getCapacity());
+		context.waitTicks(80);
+		String full = read(server, 14, up, z);
+		check(full.contains("delivering 0 W") && full.contains(", 0.0 A"), "a full storage should draw nothing: " + full);
+		System.out.println("[wildcatter-test] team reborn energy ok: " + plug + " | " + full + " | E gained " + gained);
 	}
 
 	/** An under-frequency relay on a 12.47 kV feeder sheds a pole transformer's overload and keeps the generator on line. */
@@ -1422,8 +1466,8 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		put(server, 11, up, z + 4, "wildcatter:plug_nema_l22_30");
 		put(server, 11, up, z + 5, "minecraft:iron_block");
 		java.util.concurrent.atomic.AtomicLong delivered = new java.util.concurrent.atomic.AtomicLong();
-		dev.wildcatter.energy.EnergyBridge.clear();
-		dev.wildcatter.energy.EnergyBridge.register(target -> target.level().getBlockState(target.pos()).is(net.minecraft.world.level.block.Blocks.IRON_BLOCK)
+		dev.wildcatter.energy.EnergyBridge.clearTests();
+		dev.wildcatter.energy.EnergyBridge.registerForTest(target -> target.level().getBlockState(target.pos()).is(net.minecraft.world.level.block.Blocks.IRON_BLOCK)
 				? new dev.wildcatter.energy.HostEnergy() {
 					@Override
 					public long demand() {
@@ -1447,7 +1491,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			boolean wrongFits = server.computeOnServer(srv -> dev.wildcatter.block.PlugAdapterBlock.fits(srv.overworld(), new BlockPos(11, up, z + 4), dev.wildcatter.energy.PlugType.NEMA_L21_30));
 			check(!wrongFits, "an L21-30 plug must not fit an L22-30 receptacle");
 		} finally {
-			dev.wildcatter.energy.EnergyBridge.clear();
+			dev.wildcatter.energy.EnergyBridge.clearTests();
 		}
 		check(plug.contains("delivering") && gained > 700_000 && gained < 1_200_000, "an L22-30 plug should hand over about 10,000 FE per tick (" + gained + " in 100 ticks): " + plug);
 		System.out.println("[wildcatter-test] three-phase plug ok: " + plug + " | FE gained " + gained);

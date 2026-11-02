@@ -21,9 +21,10 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * The plug draws real current from the grid: as many watts as the machines beside it would take (1 W per FE/t by default), no
- * more than the circuit gives. It has no protection of its own, so the breaker or fuse upstream trips on an overload. Held above its
- * rating it heats the receptacle until both burn out. On the wrong voltage it delivers nothing.
+ * The plug draws real current from the grid: as many watts as the machines beside it would take (1 W per FE/t or E/t by
+ * default), no more than the circuit gives, handed over evenly tick by tick. It has no protection of its own, so the breaker or
+ * fuse upstream trips on an overload. Held above its rating it heats the receptacle until both burn out. On the wrong voltage it
+ * delivers nothing.
  */
 public class PlugAdapterBlockEntity extends BlockEntity implements CircuitPart, Inspectable {
 	private static final int INTERVAL = 4;
@@ -48,6 +49,11 @@ public class PlugAdapterBlockEntity extends BlockEntity implements CircuitPart, 
 	private int burnTicks;
 	private long delivered;
 	private String status = "starting";
+	/** The sinks found at the last interval, their demand then (per tick), and the FE the grid delivered for the interval. */
+	private List<HostEnergy> sinks = List.of();
+	private long[] sinkDemand = new long[0];
+	private long sinkTotal;
+	private long intervalFe;
 
 	public PlugAdapterBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.PLUG_ADAPTER_ENTITY, pos, state);
@@ -136,7 +142,7 @@ public class PlugAdapterBlockEntity extends BlockEntity implements CircuitPart, 
 		}
 		for (Direction face : Direction.values()) {
 			if (!matchingFace(face)) {
-				HostEnergy sink = EnergyBridge.find(level, worldPosition.relative(face));
+				HostEnergy sink = EnergyBridge.find(level, worldPosition.relative(face), face.getOpposite());
 				if (sink != null) {
 					found.add(sink);
 				}
@@ -162,31 +168,38 @@ public class PlugAdapterBlockEntity extends BlockEntity implements CircuitPart, 
 			dev.wildcatter.circuit.CircuitManager.markDirty(server);
 			return;
 		}
-		if ((level.getGameTime() + pos.hashCode()) % INTERVAL != 0) {
-			return;
+		int phase = (int) Math.floorMod(level.getGameTime() + pos.hashCode(), (long) INTERVAL);
+		if (phase == 0) {
+			plug.sinks = plug.sinks();
+			plug.sinkDemand = new long[plug.sinks.size()];
+			long demand = 0;
+			for (int i = 0; i < plug.sinks.size(); i++) {
+				plug.sinkDemand[i] = Math.max(0, plug.sinks.get(i).demand());
+				demand += plug.sinkDemand[i];
+			}
+			plug.sinkTotal = demand;
+			double wattsPerFe = EnergyBridge.wattsPerFe();
+			double wanted = demand * wattsPerFe;
+			if (Math.abs(wanted - plug.demandWatts) > 0.5) {
+				plug.demandWatts = wanted;
+				dev.wildcatter.circuit.CircuitManager.markDirty(server);
+			}
+			// what the grid actually delivered, handed over evenly through the interval: a real storage takes only so much a tick
+			double watts = plug.wrongVoltage ? 0 : plug.drawnWatts;
+			plug.intervalFe = Math.round(watts / wattsPerFe * INTERVAL);
+			String unit = plug.sinks.isEmpty() ? "FE" : plug.sinks.get(0).unit();
+			plug.status = plug.sinks.isEmpty() ? "nothing beside it takes power"
+					: plug.wrongVoltage ? "WRONG VOLTAGE: this plug needs " + Math.round(plug.type().volts()) + " V"
+					: String.format("delivering %.0f W (%.0f %s/t)", watts, watts / wattsPerFe, unit);
+			plug.setChanged();
 		}
-		List<HostEnergy> sinks = plug.sinks();
-		long demand = 0;
-		for (HostEnergy sink : sinks) {
-			demand += Math.max(0, sink.demand());
+		long fe = HostEnergy.perTick(plug.intervalFe, INTERVAL, phase);
+		for (int i = 0; i < plug.sinks.size() && fe > 0 && plug.sinkTotal > 0; i++) {
+			long share = Math.round(fe * (double) plug.sinkDemand[i] / plug.sinkTotal);
+			if (share > 0) {
+				plug.delivered += plug.sinks.get(i).insert(share);
+			}
 		}
-		double wattsPerFe = EnergyBridge.wattsPerFe();
-		double wanted = demand * wattsPerFe;
-		if (Math.abs(wanted - plug.demandWatts) > 0.5) {
-			plug.demandWatts = wanted;
-			dev.wildcatter.circuit.CircuitManager.markDirty(server);
-		}
-		// hand over what the grid actually delivered since the last visit, as FE per tick for the interval
-		double watts = plug.wrongVoltage ? 0 : plug.drawnWatts;
-		long fe = Math.round(watts / wattsPerFe * INTERVAL);
-		for (HostEnergy sink : sinks) {
-			long share = demand > 0 ? Math.round(fe * (double) Math.max(0, sink.demand()) / demand) : 0;
-			plug.delivered += sink.insert(share);
-		}
-		plug.status = sinks.isEmpty() ? "nothing beside it takes power"
-				: plug.wrongVoltage ? "WRONG VOLTAGE: this plug needs " + Math.round(plug.type().volts()) + " V"
-				: String.format("delivering %.0f W (%.0f FE/t)", watts, watts / wattsPerFe);
-		plug.setChanged();
 	}
 
 	@Override
