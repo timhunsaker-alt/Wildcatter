@@ -144,3 +144,20 @@ The fuel assembly's item is its block model.
 - `dosimeter` (a kept): "A single small handheld electronic personal radiation dosimeter: a compact rugged yellow and dark grey
   plastic device with a small LCD display showing digits, a pocket clip and a radiation trefoil symbol, seen at a slight angle, game
   item icon, plain white background, no text".
+
+## Launcher backgrounds (2026-11-02)
+Ludo `createImage`, image_type `splash`, art_style `Voxel Art`, aspect 16:9, 2 variations each (sources in `art/source/launcher/`,
+the picks upscaled with `upscaleImage` and cropped to 1920x1080 and 2560x1440 in `art/final/launcher/` and `dist/launcher/`).
+Every prompt opens with "Wide cinematic landscape in a blocky voxel world (cube-built terrain like a block sandbox game):" and ends
+with "no text, no logos, no people".
+- **cooling_tower** (pick `tower_a`): a giant hyperbolic natural-draft concrete cooling tower releasing a tall white steam plume at
+  golden hour, beside a pressurized water reactor plant with a domed containment and turbine hall, high-voltage transmission towers
+  across rolling green hills, warm sunset sky.
+- **oilfield** (pick `oilfield_a`): a West Texas style oil field at dusk, a tall steel drilling rig derrick lit with work lights,
+  several pumpjacks nodding in a row, storage tanks and a gas flare burning orange, desert scrub and red mesas, purple and orange sky.
+- **grid** (pick `grid_b`): an electrical substation at blue hour with large power transformers, steel gantries, insulators and
+  circuit breakers, wooden utility poles with crossarms carrying wires along a country road to a small village with warm lit
+  windows, a small brick steam power plant with a smokestack in the distance.
+- **refinery** (pick `refinery_a`): an oil refinery and gas plant at night, tall distillation columns, pipe racks and spherical
+  storage tanks lit by hundreds of small lights, a flare stack burning, a gas turbine power plant with exhaust stacks beside it,
+  reflections on a calm river in the foreground, starry dark blue sky.
