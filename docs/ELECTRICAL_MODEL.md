@@ -89,7 +89,9 @@ voltage transformers (wye-grounded, 1 MΩ a phase) give the 13.8 kV bus its grou
   many machines can share one plug.
 - On Fabric it feeds any **Team Reborn Energy** storage (Tech Reborn and others), found through
   `EnergyStorage.SIDED` on the face toward the plug. It asks each one what it would take this tick and
-  hands the energy over evenly tick by tick. FE on NeoForge comes with the port (Phase 9b and 9c).
+  hands the energy over evenly tick by tick.
+- On NeoForge it feeds any **FE** energy handler (Mekanism and others), found through
+  `Capabilities.Energy.BLOCK` on the face toward the plug, the same way (Phase 9c).
 - The plug draws real current equal to the power the connected machines pull, converted at the
   configured rate (default 1 W = 1 FE/t). It has no internal limit and no protection of its own:
   if the machines pull more than the circuit allows, the upstream breaker or fuse trips.

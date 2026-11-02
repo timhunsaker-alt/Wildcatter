@@ -37,7 +37,7 @@ frequency, protection) is in `docs/ELECTRICAL_MODEL.md`. What is built, phase by
     cooling is lost (8d).
   - refuelling at outages, a spent fuel pool, and real radiation dose with a dosimeter (8e).
 - **Other mods:** plug adapters feed Team Reborn Energy machines (Tech Reborn and others) on Fabric at 1 W = 1 E/t (Phase 9a).
-  The NeoForge jar runs the same mod (9b); FE for Mekanism and other NeoForge mods comes in 9c.
+  On NeoForge they feed FE machines (Mekanism and others) at 1 W = 1 FE/t (9b, 9c).
 - **The Field Manual** item explains every machine. Art and sounds are made with Ludo (`art/`).
 
 ## Install

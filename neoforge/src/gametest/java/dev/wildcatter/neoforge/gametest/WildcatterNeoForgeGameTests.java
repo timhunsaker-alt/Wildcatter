@@ -5,10 +5,7 @@ import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.WildcatterItems;
 import dev.wildcatter.block.BoilerBlockEntity;
 import dev.wildcatter.block.LoadBlock;
-import dev.wildcatter.energy.EnergyBridge;
-import dev.wildcatter.energy.HostEnergy;
 import dev.wildcatter.energy.Inspectable;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -30,13 +27,17 @@ import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
+import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
 /**
  * The NeoForge smoke scenes (Phase 9b): the mod registers, a starter plant lights a lamp through the circuit manager's block entity
- * hook, a plug hands power to a stand-in machine, and the ores reach their biomes. The physics is covered by the Fabric client game
+ * hook, a plug fills a real FE storage, and the ores reach their biomes. The physics is covered by the Fabric client game
  * test. Run with {@code ./gradlew :neoforge:runGameTestServer}.
  */
 @Mod("wildcatter_gametest")
@@ -50,6 +51,7 @@ public class WildcatterNeoForgeGameTests {
 			helper.register(id("plug"), (Consumer<GameTestHelper>) WildcatterNeoForgeGameTests::plug);
 			helper.register(id("ores"), (Consumer<GameTestHelper>) WildcatterNeoForgeGameTests::ores);
 		}));
+		modBus.addListener(RegisterCapabilitiesEvent.class, event -> event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, entity, side) -> STORAGE, Blocks.GOLD_BLOCK));
 		modBus.addListener(RegisterGameTestsEvent.class, event -> {
 			Holder<TestEnvironmentDefinition<?>> plain = event.registerEnvironment(id("plain"));
 			for (String scene : SCENES) {
@@ -119,7 +121,10 @@ public class WildcatterNeoForgeGameTests {
 		});
 	}
 
-	/** A NEMA 5-15 plug hands the plant's power to a stand-in machine (FE comes in 9c). */
+	/** A real NeoForge energy handler on a gold block: 1,000,000 FE, taking 1,000 FE a tick (a stand-in for a Mekanism cube). */
+	private static final SimpleEnergyHandler STORAGE = new SimpleEnergyHandler(1_000_000, 1000, 0);
+
+	/** A NEMA 5-15 plug fills the FE storage beside it, and draws nothing once it is full. */
 	private static void plug(GameTestHelper helper) {
 		plant(helper);
 		wire(helper, 2, 0, "wool_wire_hot");
@@ -128,33 +133,31 @@ public class WildcatterNeoForgeGameTests {
 		}
 		wire(helper, 3, 0, "receptacle_nema_5_15");
 		wire(helper, 4, 0, "plug_nema_5_15");
-		helper.setBlock(5, 2, 0, Blocks.IRON_BLOCK);
-		BlockPos machine = helper.absolutePos(new BlockPos(5, 2, 0));
-		AtomicLong delivered = new AtomicLong();
-		EnergyBridge.clearTests();
-		EnergyBridge.registerForTest(target -> target.pos().equals(machine) ? new HostEnergy() {
-			@Override
-			public long demand() {
-				return 1000;
-			}
-
-			@Override
-			public long insert(long amount) {
-				delivered.addAndGet(amount);
-				return amount;
-			}
-		} : null);
+		helper.setBlock(5, 2, 0, Blocks.GOLD_BLOCK);
 		helper.runAfterDelay(160, () -> {
-			long before = delivered.get();
+			long before = STORAGE.getAmountAsLong();
 			helper.runAfterDelay(100, () -> {
-				long gained = delivered.get() - before;
+				long gained = STORAGE.getAmountAsLong() - before;
 				String plug = read(helper, new BlockPos(4, 2, 0));
-				EnergyBridge.clearTests();
-				check(helper, plug.contains("delivering") && gained > 70_000 && gained < 120_000, "the plug should hand over about 930 a tick (" + gained + " in 100 ticks): " + plug);
-				System.out.println("[wildcatter-neoforge-test] plug ok: " + plug + " | gained " + gained);
-				helper.succeed();
+				check(helper, plug.contains("FE/t") && gained > 70_000 && gained < 120_000, "the plug should fill the FE storage at about 930 FE a tick (" + gained + " in 100 ticks): " + plug);
+				fill();
+				helper.runAfterDelay(80, () -> {
+					String full = read(helper, new BlockPos(4, 2, 0));
+					check(helper, full.contains("delivering 0 W") && full.contains(", 0.0 A"), "a full storage should draw nothing: " + full);
+					System.out.println("[wildcatter-neoforge-test] plug ok: " + plug + " | full: " + full + " | FE gained " + gained);
+					helper.succeed();
+				});
 			});
 		});
+	}
+
+	private static void fill() {
+		try (Transaction t = Transaction.openRoot()) {
+			while (STORAGE.insert(Integer.MAX_VALUE, t) > 0) {
+				// the handler takes at most 1,000 a call: fill it the rest of the way
+			}
+			t.commit();
+		}
 	}
 
 	/** The biome modifiers load, one per placed ore feature, and put the salt domes into the plains. */

@@ -10,8 +10,8 @@ There is one jar for each mod loader; use the one your instance runs, not both.
 - Fabric API
 - Java 25
 
-**NeoForge:** put `wildcatter-neoforge-0.2.0.jar` in `mods` with NeoForge 26.3.0.101 or newer and Java 25. On NeoForge plugs do not
-feed other mods' machines yet (FE comes next).
+**NeoForge:** put `wildcatter-neoforge-0.2.0.jar` in `mods` with NeoForge 26.3.0.101 or newer and Java 25. On NeoForge plugs feed FE
+machines (Mekanism and others) at 1 W = 1 FE/t.
 
 Optional on Fabric: **Tech Reborn** 6.2.1 with RebornCore 6.2.0 (Fabric, 26.3). Set a plug adapter against its receptacle and put a Tech
 Reborn machine, battery or cable beside the plug: it takes the plug's power at 1 W = 1 E/t. Team Reborn Energy is already inside

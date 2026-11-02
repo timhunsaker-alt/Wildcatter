@@ -27,3 +27,11 @@ type = "required"
 versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"
+
+# Mekanism takes the plugs' FE through NeoForge's energy capability; nothing in Wildcatter needs it
+[[dependencies.${mod_id}]]
+modId = "mekanism"
+type = "optional"
+versionRange = "*"
+ordering = "NONE"
+side = "BOTH"

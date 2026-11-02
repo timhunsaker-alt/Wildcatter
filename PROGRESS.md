@@ -475,6 +475,18 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 9c: plugs feed FE on NeoForge (Phase 9 done)
+- **`NeoForgeEnergy`:** a plug adapter on NeoForge hands its power to any FE energy handler beside it, found through
+  `Capabilities.Energy.BLOCK` on the face toward the plug. Mekanism, and most NeoForge tech mods, use this capability.
+  - Its demand is a simulated insert in a root transaction that is never committed.
+  - The rate is 1 W = 1 FE/t (the config's `wattsPerFe`).
+  - It mirrors 9a's Team Reborn Energy provider; the plug's tick-by-tick delivery is shared.
+- `neoforge.mods.toml` lists Mekanism as optional (no code needs it).
+- **NeoForge smoke scene `plug`:** a gold block registered as a real `SimpleEnergyHandler` (1,000,000 FE, 1,000 FE a tick) fills
+  at 930 FE/t (8.0 A at 116 V), and the plug draws 0 A once it is full.
+- **The Field Manual's plugs page** names FE machines on NeoForge.
+- **Release:** Phase 9 ends with the first GitHub Release, v0.2.0.
+
 ## Phase 9b: the NeoForge port (one codebase, two jars)
 - **Layout:** a multi-loader project after jaredlll08's MultiLoader-Template for 26.3. Every file moved with `git mv`, so its history
   follows.
@@ -944,7 +956,9 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
-- Phase 9b: on NeoForge, plugs feed nothing yet: FE comes in 9c. The NeoForge client loads with no errors (`:neoforge:runClient`), but no in-world screenshot was taken: quick-play into a
+- Phase 9c: Mekanism has not been tried: it is not yet released for 26.3. Plugs were checked against a real NeoForge energy
+  handler on a stand-in block.
+- Phase 9b: the NeoForge client loads with no errors (`:neoforge:runClient`), but no in-world screenshot was taken: quick-play into a
   prepared world did not open it, and window capture is not permitted here. It has not been played. NeoForge's build tools need a JDK 21 beside the JDK 25. The `solverBudget` scene's 5 ms limit can trip when the machine
   is busy (6.1 ms once while a download ran; 1.0 ms alone).
 - Phase 9a: plugs feed Team Reborn Energy on Fabric only. Mekanism for 26.3 is

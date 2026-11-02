@@ -163,13 +163,13 @@ and the Field Manual has a page for each new system.
 - Decided with Tim on 2026-11-01 (the 8b plan): the tower gets its own wave after the turbine island; a new 60 MVA two-pole
   hydrogen-cooled generator part.
 
-## Phase 9 — Bridges — CURRENT (started 2026-11-02)
+## Phase 9 — Bridges — DONE (2026-11-02; 9a-9c; released as v0.2.0)
 - NeoForge port and Mekanism / other mod energy bridges.
 - **9a: Team Reborn Energy on Fabric.** Plugs feed Tech Reborn and other Team Reborn Energy mods (bundled, MIT). DONE 2026-11-02.
 - **9b: the NeoForge port.** DONE 2026-11-02. One codebase, two jars:
   - a plain multi-loader project (common, fabric and neoforge subprojects, Loom and ModDevGradle);
   - a small platform interface of our own, and no extra mod for players.
-- **9c: FE on NeoForge.** Plugs feed NeoForge's energy capability. Mekanism takes FE, so it needs no code of its own. It is checked
+- **9c: FE on NeoForge.** DONE 2026-11-02. Plugs feed NeoForge's energy capability. Mekanism takes FE, so it needs no code of its own. It is checked
   against a stand-in until Mekanism for 26.3 is released (on its dev branch, 10.8.0, as of 2026-11-02).
 - **Testing:** the Fabric client game test stays the full suite. NeoForge gets a few GameTest smoke scenes and a runClient
   screenshot.
@@ -178,7 +178,9 @@ and the Field Manual has a page for each new system.
   - plain multi-loader;
   - smoke scenes on NeoForge;
   - 1 W = 1 E/t, sharing the FE setting;
-  - testers' builds: a tag `v*` publishes a GitHub Release with both jars and the kit datapack; `dist/` stays.
+  - testers' builds: a tag `v*` publishes a GitHub Release with both jars and the kit datapack; `dist/` stays;
+  - the first release, v0.2.0, at the end of Phase 9.
+- No phase is CURRENT until Tim picks the next one (from Ideas below).
 
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released.

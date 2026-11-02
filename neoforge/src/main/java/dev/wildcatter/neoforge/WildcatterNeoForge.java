@@ -32,6 +32,7 @@ public class WildcatterNeoForge {
 			if (!registered) {   // the first registry event: every registry is open while they fire
 				registered = true;
 				Wildcatter.register();
+				NeoForgeEnergy.register();   // plugs hand power to FE machines (Mekanism and others)
 				Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, Wildcatter.id("wildcatter"), CreativeModeTab.builder()
 						.title(Wildcatter.tabTitle())
 						.icon(Wildcatter::tabIcon)
