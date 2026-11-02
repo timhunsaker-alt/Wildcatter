@@ -40,6 +40,12 @@ public final class RadiationTicker {
 	private static final Map<UUID, Double> RATES = new HashMap<>();
 	private static final Map<UUID, Double> ORE = new HashMap<>();
 
+	/** Forgets every player's dose rates; called when the server stops. */
+	public static void clearAll() {
+		RATES.clear();
+		ORE.clear();
+	}
+
 	/** The dose rate a player had last second, Sv/h. */
 	public static double rate(ServerPlayer player) {
 		return RATES.getOrDefault(player.getUUID(), 0.0);

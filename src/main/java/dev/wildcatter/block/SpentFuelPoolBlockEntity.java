@@ -31,6 +31,11 @@ public class SpentFuelPoolBlockEntity extends UnitMotorBlockEntity implements Wa
 	private static final Map<ResourceKey<Level>, Set<BlockPos>> POOLS = new HashMap<>();
 	private static final double MAKEUP_HOLD = 1000.0;
 
+	/** Forgets every pool; called when the server stops so a new world starts clean. */
+	public static void clearAll() {
+		POOLS.clear();
+	}
+
 	private final List<SpentFuel.Assembly> racks = new ArrayList<>();
 	private boolean dug;
 	private double tempC = 30;

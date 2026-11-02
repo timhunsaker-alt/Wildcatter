@@ -51,6 +51,11 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 
 	private static final java.util.Map<net.minecraft.resources.ResourceKey<Level>, java.util.Set<BlockPos>> VESSELS = new java.util.HashMap<>();
 
+	/** Forgets every vessel; called when the server stops so a new world starts clean. */
+	public static void clearAll() {
+		VESSELS.clear();
+	}
+
 	/** The vessels in a level, for the dose (8e). */
 	public static java.util.Set<BlockPos> vessels(Level level) {
 		return VESSELS.getOrDefault(level.dimension(), java.util.Set.of());

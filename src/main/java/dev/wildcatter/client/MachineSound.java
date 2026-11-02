@@ -20,6 +20,11 @@ public class MachineSound extends AbstractTickableSoundInstance {
 	private static final Map<BlockPos, MachineSound> PLAYING = new HashMap<>();
 	private static final float FADE_PER_TICK = 0.05F;
 
+	/** Forgets every playing loop; called on disconnect so a new world starts clean. */
+	public static void clearAll() {
+		PLAYING.clear();
+	}
+
 	private final BlockEntity machine;
 	private final SoundEvent event;
 	private float fade = 0;

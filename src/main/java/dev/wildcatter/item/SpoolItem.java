@@ -34,6 +34,11 @@ public class SpoolItem extends Item {
 	/** The first insulator each player has clicked. Not saved: it is only ever a moment between two clicks. */
 	private static final Map<UUID, Pending> PENDING = new HashMap<>();
 
+	/** Drops half-finished spool runs; called when the server stops. */
+	public static void clearAll() {
+		PENDING.clear();
+	}
+
 	private final Voltage tier;
 	private final boolean covered;
 

@@ -43,6 +43,11 @@ public class NaturalDraftTowerBlockEntity extends PlantUnitBlockEntity implement
 	private static final Map<ResourceKey<Level>, Set<BlockPos>> TOWERS = new HashMap<>();
 	private static final double MAKEUP_HOLD = 1000.0;
 
+	/** Forgets every tower; called when the server stops so a new world starts clean. */
+	public static void clearAll() {
+		TOWERS.clear();
+	}
+
 	private final NonNullList<ItemStack> slots = NonNullList.withSize(3, ItemStack.EMPTY);
 	private int stage;
 	private int lifts;

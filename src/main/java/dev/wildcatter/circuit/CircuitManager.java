@@ -28,6 +28,14 @@ public final class CircuitManager {
 	private static final Map<ResourceKey<Level>, Map<Long, Island>> ISLANDS = new HashMap<>();
 	private static dev.wildcatter.energy.ElectricalStandard lastStandard;
 
+	/** Forgets every part, island and solve time; called when the server stops so a new world starts clean. */
+	public static void clearAll() {
+		PARTS.clear();
+		LAST_SOLVE.clear();
+		DIRTY.clear();
+		ISLANDS.clear();
+	}
+
 	private static final class Island {
 		final dev.wildcatter.solver.FrequencyIsland frequency;
 		double outsideSeconds;

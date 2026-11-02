@@ -58,6 +58,15 @@ public class Wildcatter implements ModInitializer {
 		ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register(CircuitManager::register);
 		ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register(CircuitManager::unregister);
 		ServerLifecycleEvents.SERVER_STARTED.register(dev.wildcatter.energy.StandardData::apply);
+		// Static per-world state must not survive into the next world opened in the same session.
+		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+			CircuitManager.clearAll();
+			dev.wildcatter.block.SpentFuelPoolBlockEntity.clearAll();
+			dev.wildcatter.block.NaturalDraftTowerBlockEntity.clearAll();
+			dev.wildcatter.block.ReactorVesselBlockEntity.clearAll();
+			dev.wildcatter.radiation.RadiationTicker.clearAll();
+			dev.wildcatter.item.SpoolItem.clearAll();
+		});
 		ServerTickEvents.END_LEVEL_TICK.register(CircuitManager::tick);
 		ServerTickEvents.END_SERVER_TICK.register(dev.wildcatter.radiation.RadiationTicker::tick);
 		net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents.AFTER_RESPAWN.register((old, now, alive) -> dev.wildcatter.radiation.RadiationTicker.respawned(now));
