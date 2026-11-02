@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SSS",
+    "PIP",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "I": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:moisture_separator_reheater",
+    "count": 1
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "PIP",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "I": "minecraft:copper_block"
+  },
+  "result": {
+    "id": "wildcatter:main_condenser",
+    "count": 1
+  }
+}

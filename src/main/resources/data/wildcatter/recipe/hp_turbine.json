@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SIS",
+    "TXT",
+    "SIS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "I": "minecraft:iron_block",
+    "T": "wildcatter:turbine_casing",
+    "X": "wildcatter:crankshaft"
+  },
+  "result": {
+    "id": "wildcatter:hp_turbine",
+    "count": 1
+  }
+}

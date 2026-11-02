@@ -88,6 +88,28 @@ class ReactorTest {
 	}
 
 	@Test
+	void aTurbineTripTripsTheReactorOnlyAboveP9() {
+		Reactor r = new Reactor();
+		for (int i = 0; i < 9; i++) {
+			r.loadAssembly(0);
+		}
+		for (int i = 0; i < 5; i++) {
+			r.loadRcca();
+		}
+		r.setHotStandbyForTest(1500);
+		Reactor.Inputs in = inputs();
+		r.setSetpoint(0.02);
+		run(r, in, 600, 0.2);
+		in.turbineTripped = true;
+		run(r, in, 5, 0.2);
+		assertTrue(!r.tripped(), "below P-9 a turbine trip leaves it up: " + r.trip());
+		r.setRodsForTest(Tuning.ROD_STEPS, Tuning.ROD_STEPS);
+		r.holdPowerForTest(0.6);
+		run(r, in, 0.2, 0.2);
+		assertEquals("TURBINE TRIP (above P-9)", r.trip());
+	}
+
+	@Test
 	void losingTheRodDrivesTrips() {
 		Reactor r = new Reactor();
 		for (int i = 0; i < 9; i++) {

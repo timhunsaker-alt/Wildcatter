@@ -26,6 +26,7 @@ public final class Reactor {
 		public double charging;                       // 0 to 1: the charging pump
 		public double boricAcid;                      // kg in the CVCS's tank
 		public double water;                          // kg of makeup water the CVCS holds
+		public boolean turbineTripped;                // the turbine on its steam has tripped (turbine-island.md)
 	}
 
 	// fuel
@@ -223,6 +224,11 @@ public final class Reactor {
 	/** Whether a steam generator has steam for its pipe. */
 	public boolean steaming(int loop) {
 		return sgPressure(loop) > 1.0;
+	}
+
+	/** The share of its steam a steam generator offers its pipe: the turbine's governor valves hold the header at 7.0 MPa. */
+	public double headerShare(int loop) {
+		return Math.max(0, Math.min(1, (sgPressure(loop) - Tuning.STEAM_HEADER_MPA) / 0.2));
 	}
 
 	public boolean loadable(boolean pumpsStopped) {
@@ -461,6 +467,8 @@ public final class Reactor {
 			tripNow("HIGH FLUX, LOW SETPOINT (25 %)");
 		} else if (p > Tuning.P7 && flow < Tuning.TRIP_LOW_FLOW) {
 			tripNow("LOW RCS FLOW");
+		} else if (p > Tuning.P9 && in.turbineTripped) {
+			tripNow("TURBINE TRIP (above P-9)");
 		} else if (p > Tuning.P8 && (in.pump[0] < Tuning.TRIP_LOW_FLOW || in.pump[1] < Tuning.TRIP_LOW_FLOW)) {
 			tripNow("REACTOR COOLANT PUMP LOST");
 		} else if (p > Tuning.P7 && mpa < Tuning.TRIP_LOW_MPA) {

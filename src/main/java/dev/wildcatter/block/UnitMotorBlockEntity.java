@@ -110,6 +110,9 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "boric_acid_crystallizer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CRYSTALLIZER_WATTS);
 				case "b4c_furnace" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.B4C_FURNACE_WATTS);
 				case "rcca_bench" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.RCCA_BENCH_WATTS);
+				case "condensate_pump" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CONDENSATE_PUMP_WATTS);
+				case "main_feed_pump" -> new Motor(true, Voltage.MEDIUM, Tuning.MAIN_FEED_PUMP_WATTS);
+				case "circulating_water_pump" -> new Motor(true, Voltage.MEDIUM, Tuning.CW_PUMP_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -181,6 +184,9 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "boric_acid_crystallizer" -> "centrifuge and dryer";
 			case "b4c_furnace" -> "furnace transformer";
 			case "rcca_bench" -> "welders";
+			case "condensate_pump" -> "condensate pump";
+			case "main_feed_pump" -> "feed pump";
+			case "circulating_water_pump" -> "circulating water pump";
 			default -> kind();
 		};
 	}
@@ -286,6 +292,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "hrsg_feed_pump" -> "HRSG feed pump (60 hp, " + Voltage.INDUSTRIAL.label() + ")";
 			case "main_blower" -> "Main blower (" + Math.round(Tuning.ACID_BLOWER_WATTS / 1000) + " kW, " + Voltage.MEDIUM.label() + ")";
 			case "crdm_head" -> "CRDM head (5 magnetic-jack rod drives, " + Math.round(Tuning.CRDM_WATTS / 1000) + " kW, " + Voltage.INDUSTRIAL.label() + ")";
+			case "condensate_pump" -> "Condensate pump (" + Math.round(Tuning.CONDENSATE_PUMP_WATTS / 1000) + " kW, " + Voltage.INDUSTRIAL.label() + ")";
+			case "main_feed_pump" -> "Main feed pump (" + Math.round(Tuning.MAIN_FEED_PUMP_WATTS / 1000) + " kW, " + Voltage.MEDIUM.label() + ")";
 			case "pressurizer" -> "Pressurizer (heaters " + Math.round(Tuning.PZR_HEATER_WATTS / 1000) + " kW, " + Voltage.INDUSTRIAL.label() + ")";
 			default -> kind();
 		};

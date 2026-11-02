@@ -451,6 +451,20 @@ public final class WildcatterBlocks {
 	public static final Block AERO_GENERATOR = turbinePart(dev.wildcatter.block.TurbinePartBlock.Part.AERO_GENERATOR);
 	public static final Block AERO_EXHAUST_STACK = turbinePart(dev.wildcatter.block.TurbinePartBlock.Part.AERO_EXHAUST_STACK);
 	public static final Block GEN_BREAKER_3000 = turbinePart(dev.wildcatter.block.TurbinePartBlock.Part.GEN_BREAKER_3000);
+	// 8b: the turbine island (docs/multiblocks/turbine-island.md)
+	public static final Block TURBINE_VALVE_CHEST = islandPart(dev.wildcatter.block.TurbineIslandPartBlock.Part.TURBINE_VALVE_CHEST);
+	public static final Block HP_TURBINE = islandPart(dev.wildcatter.block.TurbineIslandPartBlock.Part.HP_TURBINE);
+	public static final Block MOISTURE_SEPARATOR_REHEATER = islandPart(dev.wildcatter.block.TurbineIslandPartBlock.Part.MOISTURE_SEPARATOR_REHEATER);
+	public static final Block LP_TURBINE = islandPart(dev.wildcatter.block.TurbineIslandPartBlock.Part.LP_TURBINE);
+	public static final Block MAIN_CONDENSER = islandPart(dev.wildcatter.block.TurbineIslandPartBlock.Part.MAIN_CONDENSER);
+	public static final Block CONDENSATE_PUMP = islandPart(dev.wildcatter.block.TurbineIslandPartBlock.Part.CONDENSATE_PUMP);
+	public static final Block DEAERATOR = islandPart(dev.wildcatter.block.TurbineIslandPartBlock.Part.DEAERATOR);
+	public static final Block MAIN_FEED_PUMP = islandPart(dev.wildcatter.block.TurbineIslandPartBlock.Part.MAIN_FEED_PUMP);
+	public static final Block HP_FEEDWATER_HEATER = islandPart(dev.wildcatter.block.TurbineIslandPartBlock.Part.HP_FEEDWATER_HEATER);
+	public static final Block CIRCULATING_WATER_PUMP = islandPart(dev.wildcatter.block.TurbineIslandPartBlock.Part.CIRCULATING_WATER_PUMP);
+	public static final Block TG_GENERATOR_60 = turbinePart(dev.wildcatter.block.TurbinePartBlock.Part.TG_GENERATOR_60);
+	public static final Block UNIT_AUX_TRANSFORMER = block("unit_auxiliary_transformer", props -> new dev.wildcatter.block.UatTransformerBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.MEDIUM, Voltage.GENERATOR, Tuning.UAT_VA, Tuning.UAT_PERCENT_Z));
 	public static final Block GSU_60 = block("gsu_60", props -> new dev.wildcatter.block.Gsu60TransformerBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.GENERATOR, Voltage.HIGH, Tuning.GSU60_VA, Tuning.GSU60_PERCENT_Z, false, "gsu_60"));
 	public static final Block SUBSTATION_TRANSFORMER_60 = block("substation_transformer_60", props -> new dev.wildcatter.block.Gsu60TransformerBlock(props.mapColor(MapColor.COLOR_GRAY)
@@ -482,9 +496,9 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<dev.wildcatter.block.SeparatorBlockEntity> SEPARATOR_ENTITY = entity(dev.wildcatter.block.SeparatorBlockEntity::new, SEPARATOR);
 	public static final BlockEntityType<dev.wildcatter.block.StorageTankBlockEntity> STORAGE_TANK_ENTITY = entity(dev.wildcatter.block.StorageTankBlockEntity::new, STOCK_TANK, WATER_TANK, LPG_BULLET);
 	public static final BlockEntityType<dev.wildcatter.block.GasCompressorBlockEntity> GAS_COMPRESSOR_ENTITY = entity(dev.wildcatter.block.GasCompressorBlockEntity::new, GAS_COMPRESSOR, REFRIGERATION_COMPRESSOR, CRACKED_GAS_COMPRESSOR);
-	public static final BlockEntityType<dev.wildcatter.block.UnitMotorBlockEntity> UNIT_MOTOR_ENTITY = entity(dev.wildcatter.block.UnitMotorBlockEntity::new, TOPPING_SKID, DESALTER, CRUDE_CHARGE_PUMP, OVERHEAD_CONDENSER, AIR_COOLED_CONDENSER, HRSG_FEED_PUMP, MAIN_BLOWER, CRDM_HEAD, PRESSURIZER);
+	public static final BlockEntityType<dev.wildcatter.block.UnitMotorBlockEntity> UNIT_MOTOR_ENTITY = entity(dev.wildcatter.block.UnitMotorBlockEntity::new, TOPPING_SKID, DESALTER, CRUDE_CHARGE_PUMP, OVERHEAD_CONDENSER, AIR_COOLED_CONDENSER, HRSG_FEED_PUMP, MAIN_BLOWER, CRDM_HEAD, PRESSURIZER, CONDENSATE_PUMP, MAIN_FEED_PUMP);
 	public static final BlockEntityType<dev.wildcatter.block.GasTurbineBlockEntity> GAS_TURBINE_ENTITY = entity(dev.wildcatter.block.GasTurbineBlockEntity::new, GAS_TURBINE, AERO_TURBINE);
-	public static final BlockEntityType<dev.wildcatter.block.GeneratorPartBlockEntity> GENERATOR_PART_ENTITY = entity(dev.wildcatter.block.GeneratorPartBlockEntity::new, GT_GENERATOR, ST_GENERATOR, AERO_GENERATOR);
+	public static final BlockEntityType<dev.wildcatter.block.GeneratorPartBlockEntity> GENERATOR_PART_ENTITY = entity(dev.wildcatter.block.GeneratorPartBlockEntity::new, GT_GENERATOR, ST_GENERATOR, AERO_GENERATOR, TG_GENERATOR_60);
 	public static final BlockEntityType<dev.wildcatter.block.GenBreakerBlockEntity> GEN_BREAKER_ENTITY = entity(dev.wildcatter.block.GenBreakerBlockEntity::new, GEN_BREAKER, GEN_BREAKER_3000);
 	public static final BlockEntityType<dev.wildcatter.block.HrsgBlockEntity> HRSG_ENTITY = entity(dev.wildcatter.block.HrsgBlockEntity::new, HRSG);
 	public static final BlockEntityType<dev.wildcatter.block.SteamCycleBlockEntity> STEAM_CYCLE_ENTITY = entity(dev.wildcatter.block.SteamCycleBlockEntity::new, STEAM_TURBINE_5);
@@ -548,6 +562,11 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<dev.wildcatter.block.CvcsBlockEntity> CVCS_ENTITY = entity(dev.wildcatter.block.CvcsBlockEntity::new, CVCS_SKID);
 	public static final BlockEntityType<dev.wildcatter.block.AuxFeedPumpBlockEntity> AUX_FEED_PUMP_ENTITY = entity(dev.wildcatter.block.AuxFeedPumpBlockEntity::new, AUX_FEED_PUMP);
 	public static final BlockEntityType<dev.wildcatter.block.BoronLineBlockEntity> BORON_LINE_ENTITY = entity(dev.wildcatter.block.BoronLineBlockEntity::new, BORAX_DISSOLVER, BORIC_ACID_CRYSTALLIZER, B4C_FURNACE, RCCA_BENCH);
+	public static final BlockEntityType<dev.wildcatter.block.HpTurbineBlockEntity> HP_TURBINE_ENTITY = entity(dev.wildcatter.block.HpTurbineBlockEntity::new, HP_TURBINE);
+	public static final BlockEntityType<dev.wildcatter.block.CondenserBlockEntity> CONDENSER_ENTITY = entity(dev.wildcatter.block.CondenserBlockEntity::new, MAIN_CONDENSER);
+	public static final BlockEntityType<dev.wildcatter.block.DeaeratorBlockEntity> DEAERATOR_ENTITY = entity(dev.wildcatter.block.DeaeratorBlockEntity::new, DEAERATOR);
+	public static final BlockEntityType<dev.wildcatter.block.HpHeaterBlockEntity> HP_HEATER_ENTITY = entity(dev.wildcatter.block.HpHeaterBlockEntity::new, HP_FEEDWATER_HEATER);
+	public static final BlockEntityType<dev.wildcatter.block.CirculatingWaterPumpBlockEntity> CW_PUMP_ENTITY = entity(dev.wildcatter.block.CirculatingWaterPumpBlockEntity::new, CIRCULATING_WATER_PUMP);
 	public static final BlockEntityType<dev.wildcatter.block.DehydratorBlockEntity> DEHYDRATOR_ENTITY = entity(dev.wildcatter.block.DehydratorBlockEntity::new, TEG_DEHYDRATOR);
 	public static final BlockEntityType<dev.wildcatter.block.ChillerBlockEntity> CHILLER_ENTITY = entity(dev.wildcatter.block.ChillerBlockEntity::new, NGL_CHILLER);
 	public static final BlockEntityType<dev.wildcatter.block.StabilizerBlockEntity> STABILIZER_ENTITY = entity(dev.wildcatter.block.StabilizerBlockEntity::new, STABILIZER);
@@ -568,7 +587,7 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<dev.wildcatter.block.PowerTransformerBlockEntity> POWER_TRANSFORMER_ENTITY = entity(dev.wildcatter.block.PowerTransformerBlockEntity::new, POWER_TRANSFORMER);
 	public static final BlockEntityType<dev.wildcatter.block.DisconnectSwitchBlockEntity> DISCONNECT_ENTITY = entity(dev.wildcatter.block.DisconnectSwitchBlockEntity::new, DISCONNECT_HV, DISCONNECT_DIST);
 	public static final BlockEntityType<TransformerBlockEntity> TRANSFORMER_ENTITY = entity(TransformerBlockEntity::new, TRANSFORMER, SUBSTATION_TRANSFORMER, POLE_TRANSFORMER,
-			PADMOUNT_208, PADMOUNT_480, UNIT_SUBSTATION, GSU_TRANSFORMER, GSU_25, GSU_60, SUBSTATION_TRANSFORMER_60);
+			PADMOUNT_208, PADMOUNT_480, UNIT_SUBSTATION, GSU_TRANSFORMER, GSU_25, GSU_60, SUBSTATION_TRANSFORMER_60, UNIT_AUX_TRANSFORMER);
 
 	public static final BlockEntityType<FireboxBlockEntity> FIREBOX_ENTITY = entity(FireboxBlockEntity::new, FIREBOX);
 	public static final BlockEntityType<PumpBlockEntity> PUMP_ENTITY = entity(PumpBlockEntity::new, PUMP);
@@ -580,7 +599,7 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<dev.wildcatter.block.TowerBasinBlockEntity> TOWER_BASIN_ENTITY = entity(dev.wildcatter.block.TowerBasinBlockEntity::new, TOWER_BASIN);
 	public static final BlockEntityType<CoolingTowerBlockEntity> COOLING_TOWER_ENTITY = entity(CoolingTowerBlockEntity::new, COOLING_TOWER);
 	/** The plain true-size parts that only remember they have grown (block/BigPartBlockEntity). */
-	public static final BlockEntityType<dev.wildcatter.block.BigPartBlockEntity> BIG_PART_ENTITY = entity(dev.wildcatter.block.BigPartBlockEntity::new, COOLING_FILL, DRIFT_ELIMINATOR, RELAY_PANEL,
+	public static final BlockEntityType<dev.wildcatter.block.BigPartBlockEntity> BIG_PART_ENTITY = entity(dev.wildcatter.block.BigPartBlockEntity::new, COOLING_FILL, DRIFT_ELIMINATOR, RELAY_PANEL, TURBINE_VALVE_CHEST, MOISTURE_SEPARATOR_REHEATER, LP_TURBINE,
 			WOOD_POLE_30, WOOD_POLE_40, WOOD_POLE_75, CROSSARM_DIST, CROSSBEAM_138, X_BRACE_138, FUEL_ASSEMBLY);
 	public static final BlockEntityType<dev.wildcatter.block.StationBusBlockEntity> STATION_BUS_ENTITY = entity(dev.wildcatter.block.StationBusBlockEntity::new, BUS_HV, BUS_DIST);
 
@@ -655,6 +674,11 @@ public final class WildcatterBlocks {
 	private static Block conversionPart(dev.wildcatter.block.ConversionPartBlock.Part part) {
 		return block(part.id(), props -> new dev.wildcatter.block.ConversionPartBlock(props.mapColor(MapColor.COLOR_GRAY)
 				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
+	}
+
+	private static Block islandPart(dev.wildcatter.block.TurbineIslandPartBlock.Part part) {
+		return block(part.id(), props -> new dev.wildcatter.block.TurbineIslandPartBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
+				.strength(5.0F, 12.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
 	}
 
 	private static Block reactorPart(dev.wildcatter.block.ReactorPartBlock.Part part) {
@@ -895,6 +919,11 @@ public final class WildcatterBlocks {
 		for (Block part : new Block[] {REACTOR_VESSEL, CRDM_HEAD, REACTOR_CONSOLE, STEAM_GENERATOR, REACTOR_COOLANT_PUMP, PRESSURIZER, CVCS_SKID, AUX_FEED_PUMP}) {
 			add(((dev.wildcatter.block.ReactorPartBlock) part).part().id(), part);
 		}
+		for (Block part : new Block[] {TURBINE_VALVE_CHEST, HP_TURBINE, MOISTURE_SEPARATOR_REHEATER, LP_TURBINE, MAIN_CONDENSER, CONDENSATE_PUMP, DEAERATOR, MAIN_FEED_PUMP, HP_FEEDWATER_HEATER, CIRCULATING_WATER_PUMP}) {
+			add(((dev.wildcatter.block.TurbineIslandPartBlock) part).part().id(), part);
+		}
+		add("tg_generator_60", TG_GENERATOR_60);
+		add("unit_auxiliary_transformer", UNIT_AUX_TRANSFORMER);
 		for (Block part : new Block[] {BORAX_DISSOLVER, BORIC_ACID_CRYSTALLIZER, B4C_FURNACE, RCCA_BENCH}) {
 			add(((dev.wildcatter.block.BoronPartBlock) part).part().id(), part);
 		}
@@ -1010,6 +1039,11 @@ public final class WildcatterBlocks {
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("cvcs_skid"), CVCS_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("aux_feed_pump"), AUX_FEED_PUMP_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("boron_line"), BORON_LINE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("hp_turbine"), HP_TURBINE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("main_condenser"), CONDENSER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("deaerator"), DEAERATOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("hp_feedwater_heater"), HP_HEATER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("circulating_water_pump"), CW_PUMP_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("turbine_generator"), TURBINE_GENERATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("genset_control_panel"), GENSET_CONTROL_PANEL_ENTITY);
 	}

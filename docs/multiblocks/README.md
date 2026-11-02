@@ -34,6 +34,7 @@ not a go-ahead to build: that waits for the roadmap phase (ROADMAP.md). Nothing 
 | [fuel.md](fuel.md) | 7g | new: UF6 autoclave, IDR kiln, granulator, pellet press, sintering furnace, pellet grinder, rod loader, rod welder, assembly fixture, fuel assembly, helium recovery unit (at the gas plant) |
 | [zirconium.md](zirconium.md) | 7f | new: mineral separator, chlorinator, hafnium column, Kroll reactor, vacuum distillation, VAR furnace, extrusion press, pilger mill, vacuum anneal furnace, magnesium cell, magnesia chlorinator, chlor-alkali cell; reuses the rectifier |
 | [reactor.md](reactor.md) | 8a | new: reactor vessel, CRDM head, reactor console, steam generator, reactor coolant pump, pressurizer, CVCS skid, aux feed pump |
+| [turbine-island.md](turbine-island.md) | 8b | new: turbine valve chest, HP turbine, moisture separator reheater, LP turbine, 60 MVA generator, main condenser, condensate pump, deaerator, main feed pump, HP feedwater heater, circulating water pump, unit auxiliary transformer; reuses the 3,000 A breaker, bus duct and 60 MVA GSU |
 | [boron.md](boron.md) | 8a | new: borax dissolver, boric acid crystallizer, B4C furnace, RCCA bench |
 | [enrichment.md](enrichment.md) | 7e | new: centrifuge (TC-21 class), frequency converter, feed station, product and tails take-offs |
 | [aeroderivative.md](aeroderivative.md) | 6b | new: 45 MW aeroderivative peaker, 3,000 A generator breaker, 60 MVA GSU and 60 MVA substation transformer |

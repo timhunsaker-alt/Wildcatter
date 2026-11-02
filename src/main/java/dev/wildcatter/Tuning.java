@@ -488,6 +488,31 @@ public final class Tuning {
 	public static final double SUR_WITHDRAW_DPM = 1.0;
 	public static final double SUR_INSERT_DPM = 1.5;
 
+	// ---- The turbine island (docs/multiblocks/turbine-island.md, approved 2026-11-01) -------------------------------------------
+	public static final double STEAM_KG_PER_KWH_PWR = 6.1;         // saturated steam, HP, MSR and LP (textbook, unverified)
+	public static final double TG60_WATTS = 51_000_000.0;          // 60 MVA at 0.85 PF
+	public static final double CW_INLET_C = 20.0;
+	public static final double CW_RISE_C = 10.0;                   // at full flow
+	public static final double CONDENSER_TTD_C = 5.0;              // across the tubes (unverified)
+	public static final double VACUUM_LOSS_PER_KPA = 0.01;         // of output, over the design vacuum (unverified)
+	public static final double LOW_VACUUM_TRIP_KPA = 25.0;
+	public static final double CW_PUMP_KGS = 1250.0;               // each (proposed)
+	public static final double CW_PUMP_WATTS = 300_000.0;          // 4.16 kV (proposed)
+	public static final int CW_INTAKE_WATER_BLOCKS = 12;
+	public static final double CONDENSATE_PUMP_KGS = 43.0;         // each, 50 % (proposed)
+	public static final double CONDENSATE_PUMP_WATTS = 150_000.0;  // 480 V
+	public static final double MAIN_FEED_PUMP_KGS = 43.0;          // each, 50 %
+	public static final double MAIN_FEED_PUMP_WATTS = 500_000.0;   // 4.16 kV
+	public static final double DEAERATOR_KG = 30_000.0;
+	public static final double HOTWELL_KG_PWR = 10_000.0;
+	public static final double DEAERATOR_LOW = 0.10;               // a turbine trip under it
+	public static final double TURBINE_ROLL_SECONDS = 120.0;
+	public static final double STEAM_HEADER_MPA = 7.0;
+	public static final double STEAM_DUMP = 0.40;                  // of full steam, to the condenser (proposed)
+	public static final double P9 = 0.50;
+	public static final double UAT_VA = 7_500_000.0;               // 13.8/4.16 kV (proposed)
+	public static final double UAT_PERCENT_Z = 7.0;
+
 	// ---- The boron plant (docs/multiblocks/boron.md, approved 2026-11-01) ------------------------------------------------------
 	public static final double BORIC_ACID_KGS = 50.0 / 3600;       // (proposed)
 	public static final double B4C_KGS = 5.0 / 3600;               // (proposed)

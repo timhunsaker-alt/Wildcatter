@@ -475,6 +475,35 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 8b: the turbine island (spec: docs/multiblocks/turbine-island.md)
+- **Tim's decisions:** the hyperbolic natural-draft tower gets its own wave (8c), so 8b cools the condenser once-through from a
+  lake or river; a new 60 MVA hydrogen-cooled generator. Waves: 8b turbine island, 8c tower, 8d SCRAM and safety. The
+  construction crane idea is in ROADMAP Ideas.
+- **The cycle** (`fluid/TurbineCycle.java`, unit-tested):
+  - 6.1 kg of steam a kWh, so 86 kg/s makes 51 MW and the condenser rejects 104 MW into about 2,500 kg/s of water;
+  - the vacuum follows the water (5.6 kPa at full flow, the output down 1 % a kPa over it);
+  - the low-vacuum trip at 25 kPa.
+- **Parts:** TURBINE VALVE CHEST, HP TURBINE (controller), MOISTURE SEPARATOR REHEATER, LP TURBINE, 60 MVA TURBINE GENERATOR
+  (13.8 kV), MAIN CONDENSER, 2 CONDENSATE PUMPS (150 kW, 480 V), DEAERATOR (30 t, make-up off a pump), 2 MAIN FEED PUMPS
+  (500 kW, 4.16 kV), HP FEEDWATER HEATER (FEEDWATER out), 2 CIRCULATING WATER PUMPS (300 kW, 4.16 kV; their bottom 3 cells in
+  water), UNIT AUXILIARY TRANSFORMER (13.8/4.16 kV, 7.5 MVA). Reuses the 3,000 A breaker and bus duct and the 60 MVA GSU.
+- **How it runs:**
+  - the steam generators offer steam above a 7.0 MPa header;
+  - the governor admits what the generator can use, and a steam dump up to 40 % takes the rest;
+  - the turbine rolls up in 2 minutes and the generator synchronizes.
+- **Trips:**
+  - low vacuum, deaerator low, a generator trip or a lost part trips the turbine (sneak-click to reset);
+  - the steam generators hear of it through their steam pipe, and the reactor trips on it above P-9 (50 %).
+- **New product:** COOLING_WATER (kg).
+- **Game test** `turbineIsland`:
+  - **Layout:** the 8a island with the turbine island beside it, the CW pumps in a dug pool.
+  - **Power:** the 16.5 MW gas turbine on the 13.8 kV bus as offsite power, the UAT feeding the plant's 4.16 kV and, through a
+    unit substation, 480 V.
+  - **Checks:**
+    - both coolant pumps, both CW pumps and the feed and condensate pumps run;
+    - at 25 % the turbine rolls, its generator synchronizes and carries more than 8 MW;
+    - cutting the CW pumps' power trips the turbine on low vacuum while the reactor stays up below P-9.
+
 ## Phase 8a: the nuclear island and the boron plant (specs: docs/multiblocks/reactor.md, boron.md)
 - **Tim's decisions:** a core of 9 full-height assemblies at real power density (155 MW thermal), burnup 100x, boric acid plus
   control rods, boron carbide rods (hafnium would take about 1,400 h of the 7f line), two loops. Waves: 8a the nuclear island,
@@ -779,7 +808,10 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
-- Phase 8a: no turbine yet (8b), so steam is vented and the plant runs at a few percent on the aux feed. No decay heat, xenon
+- Phase 8b: the condenser is cooled once-through; the hyperbolic tower is 8c. The turbine island's game test starts on a gas
+  turbine's 13.8 kV bus, not a 138 kV grid line. The governor follows the generator's last output, so a sudden load step is met
+  over a few seconds.
+- Phase 8a: without the turbine, steam is vented and the plant runs at a few percent on the aux feed. No decay heat, xenon
   or fuel damage (8c). Irradiated assemblies stay in the vessel until the refuelling machine (8c). The feedwater is counted at
   227 C even from the aux feed. Starting the second 500 kW coolant pump on the same three-set island as the first drops the
   island: the game test feeds each pump its own sets and unit substation. In the boron scene a single set on a busway never

@@ -56,7 +56,10 @@ Put the jar in your instance's `mods` folder next to:
   rod clusters (RCCAs).
 - A pressurized water reactor's nuclear island: a vessel of 9 assemblies (155 MW of heat), the CRDM head, two loops of steam
   generator and 4.16 kV coolant pump, the pressurizer, the CVCS that sets the boron, the console and an aux feed pump. It goes
-  critical and makes steam; the turbine comes in 8b, so for now the dump valves vent it at a few percent power.
+  critical and makes steam.
+- The turbine island: HP and LP turbines with a moisture separator reheater, a 60 MVA generator onto 13.8 kV, a condenser
+  cooled once-through by circulating water pumps standing in a lake, the condensate and feed trains, and a unit auxiliary
+  transformer for the plant's own 4.16 kV. 51 MW at full power.
 - The Field Manual item explains how to build each machine.
 
 ## Older worlds

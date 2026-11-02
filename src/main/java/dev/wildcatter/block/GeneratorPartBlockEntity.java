@@ -67,6 +67,7 @@ public class GeneratorPartBlockEntity extends BlockEntity implements CircuitPart
 		return switch (kind()) {
 			case "st_generator" -> Tuning.ST_WATTS;
 			case "aero_generator" -> Tuning.AERO_WATTS;
+			case "tg_generator_60" -> Tuning.TG60_WATTS;
 			default -> Tuning.GT_WATTS;
 		};
 	}
@@ -147,6 +148,7 @@ public class GeneratorPartBlockEntity extends BlockEntity implements CircuitPart
 		return switch (kind()) {
 			case "st_generator" -> 4;
 			case "aero_generator" -> 7;
+			case "tg_generator_60" -> 8;
 			default -> 6;
 		};
 	}
@@ -248,6 +250,7 @@ public class GeneratorPartBlockEntity extends BlockEntity implements CircuitPart
 		String name = switch (kind()) {
 			case "st_generator" -> "Steam turbine generator (6.25 MVA, ";
 			case "aero_generator" -> "Aeroderivative generator (56.25 MVA, ";
+			case "tg_generator_60" -> "Turbine generator (60 MVA, hydrogen-cooled, ";
 			default -> "Gas turbine generator (20.6 MVA, ";
 		};
 		return Component.literal(name + Voltage.GENERATOR.label() + "): " + status());

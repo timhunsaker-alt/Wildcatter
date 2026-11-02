@@ -120,6 +120,10 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 			in.feed[l] = sg != null ? sg.pullFeed(level, reactor.feedWanted(l, dt)) : 0;
 		}
 
+		in.turbineTripped = false;
+		for (SteamGeneratorBlockEntity sg : sgs) {
+			in.turbineTripped |= sg.turbineTripped(level.getGameTime());
+		}
 		reactor.step(in, dt);
 
 		if (cvcs != null) {
@@ -129,7 +133,7 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 			String status = String.format("loop %s: level %.0f %%, %.2f MPa, feed %.1f kg/s, dump valve %.1f kg/s, to its pipe %.1f kg/s; pump %s", l == 0 ? "A" : "B",
 					reactor.sgLevel(l) * 100, reactor.sgPressure(l), in.feed[l] / dt, reactor.vented(l) / dt, in.steamTaken[l] / dt,
 					pumps[l] == null ? "NONE" : String.format("%.0f %%", pumps[l].flow() * 100));
-			sgs.get(l).refill(reactor.steaming(l), status);
+			sgs.get(l).refill(reactor.steaming(l), reactor.headerShare(l), status);
 		}
 	}
 

@@ -142,9 +142,15 @@ and the Field Manual has a page for each new system.
 - Waves:
   - 8a: the nuclear island (vessel, CRDMs, console, two steam generators and pumps, pressurizer, CVCS, aux feed) and the boron
     plant (boric acid, B4C, RCCAs); docs/multiblocks/reactor.md, boron.md.
-  - 8b: the turbine island (HP/LP turbine, moisture separator reheater, condenser and cooling, main feed, the 13.8 kV generator
-    and GSU).
-  - 8c: SCRAM and safety (decay heat, xenon, residual heat removal, spent fuel pool, refuelling machine, dosimeter).
+  - 8a DONE.
+  - 8b: the turbine island (HP turbine, moisture separator reheater, double-flow LP turbine, condenser cooled once-through from a
+    lake or river intake, condensate and feed trains, a 60 MVA 13.8 kV generator, the 60 MVA GSU, a unit auxiliary transformer);
+    docs/multiblocks/turbine-island.md.
+  - 8c: the hyperbolic natural-draft cooling tower (Tim asked for the iconic tower; Calder Hall's 50 MWe units each had an 88 m
+    one), closing the circulating water loop. It needs a true-size shell rendered as one model.
+  - 8d: SCRAM and safety (decay heat, xenon, residual heat removal, spent fuel pool, refuelling machine, dosimeter).
+- Decided with Tim on 2026-11-01 (the 8b plan): the tower gets its own wave after the turbine island; a new 60 MVA two-pole
+  hydrogen-cooled generator part.
 
 ## Phase 9 — Bridges
 - NeoForge port and Mekanism / other mod energy bridges.
@@ -179,5 +185,19 @@ and the Field Manual has a page for each new system.
 - A titanium pigment plant for the separator's ilmenite and rutile.
 - Fuel: the kiln's HF back to the conversion plant; zinc stearate lubricant and pore formers; a nickel smelter for real Inconel and
   stainless hardware; pellet inspection, rod X-ray and helium leak tests; IFBA and gadolinia burnable absorbers; rejects and scrap.
+- Construction cranes (Tim, 2026-11-01): a stationary heavy-lift crane that builds a plant from a design spec.
+  - **Real counterparts:** tower cranes, crawler cranes, and ring cranes such as Mammoet's SGC-250 "Big Carl" at Hinkley Point C,
+    which lifts whole reactor-building modules.
+  - **How it would work:** you place the crane and pick a spec (a blueprint item, made from one of the docs/multiblocks layouts).
+    It lifts parts from a chest or hopper beside it into their places, one by one at a real lifting speed. Its slewing and hoist
+    motors draw power, or a diesel engine drives them.
+  - **Limits:** its reach and its load chart limit what it can set; a vessel or steam generator needs a big crane.
+  - **Bigger projects** (a whole PWR, a cooling tower) use more than one crane. They split the spec between them, or lift
+    together in a tandem lift.
+  - **Open decisions:**
+    - crane types and sizes;
+    - how a spec is chosen and shown (a ghost preview?);
+    - whether it builds anything, or only machines with a spec;
+    - whether it can take a plant apart too.
 - Reactor: the real 55 C/h heat-up limit; full OT-delta-T and OP-delta-T trips; the pressurizer relief tank; a containment
   building; silver-indium-cadmium and hafnium rods; helium in the B4C rodlets; a buyer for the borax plant's sodium sulfate.

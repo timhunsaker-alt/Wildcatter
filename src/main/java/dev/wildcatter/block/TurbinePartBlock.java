@@ -39,7 +39,8 @@ public class TurbinePartBlock extends BigPartBlock {
 		AERO_INLET_HOUSE("aero_inlet_house", Footprint.box(6, 8, 5, 0, 0)),
 		AERO_GENERATOR("aero_generator", Footprint.box(4, 4, 7, 0, 0)),
 		AERO_EXHAUST_STACK("aero_exhaust_stack", Footprint.box(4, 14, 4, 0, 0)),
-		GEN_BREAKER_3000("gen_breaker_3000", Footprint.box(2, 3, 2, 0, 0));
+		GEN_BREAKER_3000("gen_breaker_3000", Footprint.box(2, 3, 2, 0, 0)),
+		TG_GENERATOR_60("tg_generator_60", Footprint.box(4, 4, 8, 0, 0));
 
 		private final String id;
 		private final Footprint footprint;
@@ -69,7 +70,7 @@ public class TurbinePartBlock extends BigPartBlock {
 	protected BlockEntity createMain(BlockPos pos, BlockState state) {
 		return switch (part) {
 			case GAS_TURBINE, AERO_TURBINE -> new GasTurbineBlockEntity(pos, state);
-			case GT_GENERATOR, ST_GENERATOR, AERO_GENERATOR -> new GeneratorPartBlockEntity(pos, state);
+			case GT_GENERATOR, ST_GENERATOR, AERO_GENERATOR, TG_GENERATOR_60 -> new GeneratorPartBlockEntity(pos, state);
 			case GEN_BREAKER, GEN_BREAKER_3000 -> new GenBreakerBlockEntity(pos, state);
 			case HRSG -> new HrsgBlockEntity(pos, state);
 			case STEAM_TURBINE_5 -> new SteamCycleBlockEntity(pos, state);
@@ -91,7 +92,7 @@ public class TurbinePartBlock extends BigPartBlock {
 		}
 		return switch (part) {
 			case GAS_TURBINE, AERO_TURBINE -> createTickerHelper(type, WildcatterBlocks.GAS_TURBINE_ENTITY, GasTurbineBlockEntity::tick);
-			case GT_GENERATOR, ST_GENERATOR, AERO_GENERATOR -> createTickerHelper(type, WildcatterBlocks.GENERATOR_PART_ENTITY, GeneratorPartBlockEntity::tick);
+			case GT_GENERATOR, ST_GENERATOR, AERO_GENERATOR, TG_GENERATOR_60 -> createTickerHelper(type, WildcatterBlocks.GENERATOR_PART_ENTITY, GeneratorPartBlockEntity::tick);
 			case HRSG -> createTickerHelper(type, WildcatterBlocks.HRSG_ENTITY, HrsgBlockEntity::tick);
 			case STEAM_TURBINE_5 -> createTickerHelper(type, WildcatterBlocks.STEAM_CYCLE_ENTITY, SteamCycleBlockEntity::tick);
 			case AIR_COOLED_CONDENSER, HRSG_FEED_PUMP -> createTickerHelper(type, WildcatterBlocks.UNIT_MOTOR_ENTITY, UnitMotorBlockEntity::tick);

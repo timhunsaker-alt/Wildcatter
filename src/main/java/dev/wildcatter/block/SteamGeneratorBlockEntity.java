@@ -21,6 +21,7 @@ import org.jspecify.annotations.Nullable;
  */
 public class SteamGeneratorBlockEntity extends PlantUnitBlockEntity {
 	private double offered;   // steam it held after its last refill, kg
+	private long turbineTrip = -1000;
 	private String unit = "NOT BUILT: set it against the REACTOR VESSEL";
 
 	public SteamGeneratorBlockEntity(BlockPos pos, BlockState state) {
@@ -51,10 +52,22 @@ public class SteamGeneratorBlockEntity extends PlantUnitBlockEntity {
 		return kg <= 1e-9 ? 0 : Lines.pull(level, feed(), Product.FEEDWATER, kg, Pull.MACHINE, this);
 	}
 
-	/** Tops up the steam it offers its pipe, or empties it when the steam generator has no pressure. */
-	public void refill(boolean steaming, String status) {
+	/** The turbine on its steam pipe has tripped (turbine-island.md). */
+	public void markTurbineTrip(long now) {
+		turbineTrip = now;
+	}
+
+	public boolean turbineTripped(long now) {
+		return now - turbineTrip < 20;
+	}
+
+	/**
+	 * Tops up the steam it offers its pipe ({@code share} of a full top-up: the turbine's governor valves hold the header), or empties
+	 * it when the steam generator has no pressure.
+	 */
+	public void refill(boolean steaming, double share, String status) {
 		if (steaming) {
-			add(Product.STEAM, room(Product.STEAM));
+			add(Product.STEAM, room(Product.STEAM) * share);
 		} else {
 			held.put(Product.STEAM, 0.0);
 		}

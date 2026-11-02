@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "SCS",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "C": "minecraft:copper_block"
+  },
+  "result": {
+    "id": "wildcatter:hp_feedwater_heater",
+    "count": 1
+  }
+}

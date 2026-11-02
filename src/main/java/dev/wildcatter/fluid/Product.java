@@ -73,7 +73,9 @@ public enum Product {
 	/** Saturated main steam from a reactor's steam generators (docs/multiblocks/reactor.md), for the turbine (8b). Counted in kg. */
 	STEAM("main steam", true),
 	/** Feedwater for a steam generator, from the aux feed pump (and in 8b the main feed pumps). Counted in kg. */
-	FEEDWATER("feedwater", false);
+	FEEDWATER("feedwater", false),
+	/** Circulating water from an intake (or, in 8c, a cooling tower's basin) through a condenser (docs/multiblocks/turbine-island.md). Counted in kg. */
+	COOLING_WATER("circulating water", false);
 
 	private final String label;
 	private final boolean gas;
@@ -94,7 +96,7 @@ public enum Product {
 
 	public String unit() {
 		return switch (this) {
-			case HOT_CRACKED_GAS, CRACKED_GAS, COMPRESSED_CRACKED_GAS, BURNER_GAS, ORE_SLURRY, LEACH_SLURRY, FLUORINE, UF6, CHLORINE, STEAM, FEEDWATER -> "kg";
+			case HOT_CRACKED_GAS, CRACKED_GAS, COMPRESSED_CRACKED_GAS, BURNER_GAS, ORE_SLURRY, LEACH_SLURRY, FLUORINE, UF6, CHLORINE, STEAM, FEEDWATER, COOLING_WATER -> "kg";
 			default -> gas ? "m3" : "L";
 		};
 	}
@@ -102,7 +104,7 @@ public enum Product {
 	/** False for liquids no stock tank holds: molten sulfur freezes, and the mill's slurries and liquors carry their uranium. */
 	public boolean tanked() {
 		return switch (this) {
-			case MOLTEN_SULFUR, ORE_SLURRY, LEACH_SLURRY, PREGNANT_LIQUOR, STRIP_LIQUOR, PREGNANT_LIXIVIANT, BARREN_LIXIVIANT, ELUATE, ANHYDROUS_HF, FEEDWATER -> false;
+			case MOLTEN_SULFUR, ORE_SLURRY, LEACH_SLURRY, PREGNANT_LIQUOR, STRIP_LIQUOR, PREGNANT_LIXIVIANT, BARREN_LIXIVIANT, ELUATE, ANHYDROUS_HF, FEEDWATER, COOLING_WATER -> false;
 			default -> !gas;
 		};
 	}

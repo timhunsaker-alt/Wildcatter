@@ -264,6 +264,18 @@
     "wildcatter:borax_dissolver",
     "wildcatter:boric_acid_crystallizer",
     "wildcatter:b4c_furnace",
-    "wildcatter:rcca_bench"
+    "wildcatter:rcca_bench",
+    "wildcatter:turbine_valve_chest",
+    "wildcatter:hp_turbine",
+    "wildcatter:moisture_separator_reheater",
+    "wildcatter:lp_turbine",
+    "wildcatter:tg_generator_60",
+    "wildcatter:main_condenser",
+    "wildcatter:condensate_pump",
+    "wildcatter:deaerator",
+    "wildcatter:main_feed_pump",
+    "wildcatter:hp_feedwater_heater",
+    "wildcatter:circulating_water_pump",
+    "wildcatter:unit_auxiliary_transformer"
   ]
 }

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SXS",
+    "PCP",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "X": "minecraft:piston",
+    "P": "wildcatter:gas_line",
+    "C": "minecraft:copper_block"
+  },
+  "result": {
+    "id": "wildcatter:main_feed_pump",
+    "count": 1
+  }
+}

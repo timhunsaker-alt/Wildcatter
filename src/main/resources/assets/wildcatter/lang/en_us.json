@@ -370,5 +370,17 @@
   "block.wildcatter.borax_dissolver": "Borax Dissolver",
   "block.wildcatter.boric_acid_crystallizer": "Boric Acid Crystallizer",
   "block.wildcatter.b4c_furnace": "B4C Furnace (Acheson)",
-  "block.wildcatter.rcca_bench": "RCCA Bench"
+  "block.wildcatter.rcca_bench": "RCCA Bench",
+  "block.wildcatter.turbine_valve_chest": "Turbine Valve Chest",
+  "block.wildcatter.hp_turbine": "HP Turbine (51 MW plant)",
+  "block.wildcatter.moisture_separator_reheater": "Moisture Separator Reheater",
+  "block.wildcatter.lp_turbine": "LP Turbine (double-flow)",
+  "block.wildcatter.tg_generator_60": "Turbine Generator (60 MVA, 13.8 kV, H2-cooled)",
+  "block.wildcatter.main_condenser": "Main Condenser",
+  "block.wildcatter.condensate_pump": "Condensate Pump (150 kW)",
+  "block.wildcatter.deaerator": "Deaerator",
+  "block.wildcatter.main_feed_pump": "Main Feed Pump (500 kW, 4.16 kV)",
+  "block.wildcatter.hp_feedwater_heater": "HP Feedwater Heater",
+  "block.wildcatter.circulating_water_pump": "Circulating Water Pump (300 kW, 4.16 kV)",
+  "block.wildcatter.unit_auxiliary_transformer": "Unit Auxiliary Transformer (7.5 MVA, 13.8/4.16 kV)"
 }

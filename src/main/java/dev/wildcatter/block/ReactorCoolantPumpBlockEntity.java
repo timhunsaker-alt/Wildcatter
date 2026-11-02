@@ -28,7 +28,7 @@ public class ReactorCoolantPumpBlockEntity extends UnitMotorBlockEntity {
 	public void operate(Level level, boolean permit, String why, double dt) {
 		held = on && !permit ? why : "";
 		power = on && permit ? drive(level) : 0;
-		if (power > 0.9) {
+		if (power > 0.3) {   // running, a voltage sag or not: only a stopped motor lets the flywheel carry it down
 			flow = Math.min(1, flow + dt / 10);
 		} else {
 			flow = flow / (1 + flow * dt / Tuning.RCP_COASTDOWN_S);

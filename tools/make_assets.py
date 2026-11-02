@@ -1957,6 +1957,37 @@ lang.update({f"block.{ns}.reactor_vessel": "Reactor Vessel (9 assemblies)", f"bl
 	f"block.{ns}.b4c_furnace": "B4C Furnace (Acheson)", f"block.{ns}.rcca_bench": "RCCA Bench"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 8b: the turbine island (docs/multiblocks/turbine-island.md) ---------------------------------------------------
+ISLAND_PARTS = ("turbine_valve_chest", "hp_turbine", "moisture_separator_reheater", "lp_turbine", "tg_generator_60", "main_condenser", "condensate_pump",
+	"deaerator", "main_feed_pump", "hp_feedwater_heater", "circulating_water_pump", "unit_auxiliary_transformer")
+for name in ISLAND_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in ISLAND_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("turbine_valve_chest", ["SPS", "IRI", "SPS"], {"S": S_, "P": P_, "I": "minecraft:iron_block", "R": "minecraft:redstone"}, "turbine_valve_chest")
+shaped("hp_turbine", ["SIS", "TXT", "SIS"], {"S": S_, "I": "minecraft:iron_block", "T": f"{ns}:turbine_casing", "X": f"{ns}:crankshaft"}, "hp_turbine")
+shaped("moisture_separator_reheater", ["SSS", "PIP", "SSS"], {"S": S_, "P": P_, "I": "minecraft:iron_block"}, "moisture_separator_reheater")
+shaped("lp_turbine", ["TIT", "TXT", "SIS"], {"S": S_, "I": "minecraft:iron_block", "T": f"{ns}:turbine_casing", "X": f"{ns}:crankshaft"}, "lp_turbine")
+shaped("tg_generator_60", ["CDC", "GCG", "CDC"], {"C": CB_, "D": "minecraft:diamond", "G": f"{ns}:aero_generator"}, "tg_generator_60")
+shaped("main_condenser", ["SPS", "PIP", "SPS"], {"S": S_, "P": P_, "I": "minecraft:copper_block"}, "main_condenser")
+shaped("condensate_pump", ["S S", "SXS", "SPS"], {"S": S_, "X": "minecraft:piston", "P": P_}, "condensate_pump")
+shaped("deaerator", ["SPS", "S S", "SSS"], {"S": S_, "P": P_}, "deaerator")
+shaped("main_feed_pump", ["SXS", "PCP", "SSS"], {"S": S_, "X": "minecraft:piston", "P": P_, "C": CB_}, "main_feed_pump")
+shaped("hp_feedwater_heater", ["SPS", "SCS", "SPS"], {"S": S_, "P": P_, "C": "minecraft:copper_block"}, "hp_feedwater_heater")
+shaped("circulating_water_pump", ["SCS", "SXS", "SPS"], {"S": S_, "C": CB_, "X": "minecraft:piston", "P": P_}, "circulating_water_pump")
+shaped("unit_auxiliary_transformer", ["SCS", "CTC", "SCS"], {"S": S_, "C": CB_, "T": f"{ns}:unit_substation"}, "unit_auxiliary_transformer")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({f"block.{ns}.turbine_valve_chest": "Turbine Valve Chest", f"block.{ns}.hp_turbine": "HP Turbine (51 MW plant)",
+	f"block.{ns}.moisture_separator_reheater": "Moisture Separator Reheater", f"block.{ns}.lp_turbine": "LP Turbine (double-flow)",
+	f"block.{ns}.tg_generator_60": "Turbine Generator (60 MVA, 13.8 kV, H2-cooled)", f"block.{ns}.main_condenser": "Main Condenser",
+	f"block.{ns}.condensate_pump": "Condensate Pump (150 kW)", f"block.{ns}.deaerator": "Deaerator", f"block.{ns}.main_feed_pump": "Main Feed Pump (500 kW, 4.16 kV)",
+	f"block.{ns}.hp_feedwater_heater": "HP Feedwater Heater", f"block.{ns}.circulating_water_pump": "Circulating Water Pump (300 kW, 4.16 kV)",
+	f"block.{ns}.unit_auxiliary_transformer": "Unit Auxiliary Transformer (7.5 MVA, 13.8/4.16 kV)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

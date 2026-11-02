@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "SXS",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_block",
+    "X": "minecraft:piston",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:circulating_water_pump",
+    "count": 1
+  }
+}
