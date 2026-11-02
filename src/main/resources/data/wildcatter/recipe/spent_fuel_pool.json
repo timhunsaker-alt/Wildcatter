@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "CCC",
+    "CPC",
+    "CHC"
+  ],
+  "key": {
+    "C": "minecraft:light_gray_concrete",
+    "P": "wildcatter:gas_line",
+    "H": "minecraft:copper_block"
+  },
+  "result": {
+    "id": "wildcatter:spent_fuel_pool",
+    "count": 1
+  }
+}

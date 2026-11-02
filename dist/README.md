@@ -64,6 +64,8 @@ Put the jar in your instance's `mods` folder next to:
   for the circulating water pumps; it cools the condenser's water toward the biome's wet bulb, with a plume over the top.
 - After a trip the core keeps making decay heat and xenon builds. The console's COOLDOWN takes the plant down on the dump valves
   to the RHR and cold shutdown. Lose all cooling and the core is damaged, and its hydrogen can explode round the vessel.
+- Refuelling: a refuelling machine runs the outage (REFUEL a third of the core, or DEFUEL it all), sending spent fuel down a
+  transfer tube to a 12 m deep spent fuel pool. Radiation is real: carry a dosimeter, and keep the fuel under water.
 - The Field Manual item explains how to build each machine.
 
 ## Older worlds

@@ -127,7 +127,7 @@ and the Field Manual has a page for each new system.
     process, VAR melting, extrusion and pilgering (docs/multiblocks/zirconium.md). DONE.
   - 7g: the fuel plant (UO2 by the dry route, pellets, sintering, rods with helium, the 17×17 assembly; docs/multiblocks/fuel.md). DONE.
 
-## Phase 8 — Pressurized water reactor (PWR) — CURRENT (started 2026-11-01)
+## Phase 8 — Pressurized water reactor (PWR) — DONE (2026-11-02; waves 8a-8e; full suite 62 scenes passed)
 - Reactor vessel, control rods, primary loop, pressurizer, steam generator, secondary loop to turbine.
 - SCRAM, decay heat, spent fuel pool, dosimeter.
 - Decided with Tim on 2026-11-01:
@@ -151,7 +151,11 @@ and the Field Manual has a page for each new system.
   - 8c DONE.
   - 8d: after the trip: decay heat, xenon, the cooldown and residual heat removal, core damage and a hydrogen blast
     (docs/multiblocks/reactor.md).
-  - 8e: the refuelling machine, irradiated fuel, the spent fuel pool and its cooling, radiation and the dosimeter.
+  - 8d DONE.
+  - 8e: the refuelling machine, irradiated fuel, the spent fuel pool and its cooling, radiation and the dosimeter
+    (docs/multiblocks/fuel-handling.md).
+- Decided with Tim on 2026-11-02 (the 8e plan): the refuelling machine runs the outage (REFUEL, DEFUEL); irradiated fuel is never an
+  item; the vessel counts as inside its primary shield.
 - Decided with Tim on 2026-11-01 (the 8d plan): two waves (8d, 8e); losing cooling ends in core damage and a hydrogen blast;
   radiation in 8e is a real dose with real effects (nausea and weakness at a few Sv, death about 8 Sv).
 - Decided with Tim on 2026-11-01 (the 8c plan): the tower rises lift by lift as it is fed; a tenth of the real concrete (the steel
@@ -159,7 +163,7 @@ and the Field Manual has a page for each new system.
 - Decided with Tim on 2026-11-01 (the 8b plan): the tower gets its own wave after the turbine island; a new 60 MVA two-pole
   hydrogen-cooled generator part.
 
-## Phase 9 — Bridges
+## Phase 9 — Bridges — CURRENT (next; not started, its plan waits for Tim)
 - NeoForge port and Mekanism / other mod energy bridges.
 
 ## Ideas (not scheduled)
@@ -206,5 +210,5 @@ and the Field Manual has a page for each new system.
     - how a spec is chosen and shown (a ghost preview?);
     - whether it builds anything, or only machines with a spec;
     - whether it can take a plant apart too.
-- Reactor: a containment building with hydrogen recombiners and igniters; low-temperature overpressure protection; the real 55 C/h heat-up limit; full OT-delta-T and OP-delta-T trips; the pressurizer relief tank; a containment
+- Reactor: dry cask storage for the pool's oldest fuel; contamination and decontamination; fresh-fuel inspection; a containment building with hydrogen recombiners and igniters; low-temperature overpressure protection; the real 55 C/h heat-up limit; full OT-delta-T and OP-delta-T trips; the pressurizer relief tank; a containment
   building; silver-indium-cadmium and hafnium rods; helium in the B4C rodlets; a buyer for the borax plant's sodium sulfate.

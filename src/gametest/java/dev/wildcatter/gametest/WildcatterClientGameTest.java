@@ -205,6 +205,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("reactorSafety")) {
 				reactorSafety(context, server);
 			}
+			if (only("fuelHandling")) {
+				fuelHandling(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -5911,6 +5914,146 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(20);
 		context.takeScreenshot("wildcatter-reactor-safety");
 		System.out.println("[wildcatter-test] reactorSafety ok: " + trip + " | " + rhrRead + " | " + damage);
+	}
+
+	/**
+	 * Fuel handling (8e, docs/multiblocks/fuel-handling.md): a vessel at cold shutdown with a burned core; the refuelling machine against
+	 * its north face, the fuel transfer system north of the machine, the spent fuel pool's controller north of that with its pool dug
+	 * in front; two diesel sets on a busway. REFUEL (moves sped up) sends the 3 most-burned to the pool and loads 3 fresh; the pool
+	 * shields them; drained, the dose over it is lethal; an acute dose brings its effects; DEFUEL clears a damaged core.
+	 */
+	private void fuelHandling(ClientGameTestContext context, TestServerContext server) {
+		int z = -4100;
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 10 " + (up + 14) + " " + (z + 6) + " 160 40");
+		context.waitTicks(20);
+		// the test world is superflat a few blocks over its floor: the scene stands on a 16 m stone platform so the pool can be dug
+		for (int zz = z - 30; zz <= z + 6; zz += 18) {
+			server.runCommand("fill -20 " + up + " " + zz + " 12 " + (up + 15) + " " + Math.min(zz + 17, z + 6) + " minecraft:stone");
+			server.runCommand("fill -20 " + (up + 16) + " " + zz + " 12 " + (up + 28) + " " + Math.min(zz + 17, z + 6) + " minecraft:air");
+		}
+		int up = this.up + 16;   // the platform's top
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		BlockPos vessel = new BlockPos(0, up, z);
+		placeBig(server, WildcatterBlocks.REACTOR_VESSEL, vessel, north);
+		BlockPos machine = new BlockPos(0, up, z - 4);
+		placeBig(server, WildcatterBlocks.REFUELLING_MACHINE, machine, north);                       // x 0-3, z-4..z-1
+		placeBig(server, WildcatterBlocks.FUEL_TRANSFER_SYSTEM, new BlockPos(0, up, z - 10), north);  // x 0-1, z-10..z-5
+		BlockPos pool = new BlockPos(0, up, z - 14);
+		placeBig(server, WildcatterBlocks.SPENT_FUEL_POOL, pool, north);                             // x 0-3, z-14..z-11; the pool z-20..z-15
+		put(server, 1, up + 4, z - 3, "minecraft:hopper");
+		server.runCommand("item replace block 1 " + (up + 4) + " " + (z - 3) + " container.0 with wildcatter:fuel_assembly 1");
+		server.runCommand("item replace block 1 " + (up + 4) + " " + (z - 3) + " container.1 with wildcatter:fuel_assembly 1");
+		server.runCommand("item replace block 1 " + (up + 4) + " " + (z - 3) + " container.2 with wildcatter:fuel_assembly 1");
+		BlockPos[] sets = {new BlockPos(-12, up, z - 26), new BlockPos(-4, up, z - 26)};
+		for (BlockPos set : sets) {
+			genset(server, set, north, false);
+			put(server, set.getX() + 1, up, z - 26, "wildcatter:busway_industrial");
+		}
+		for (int x = -11; x <= -3; x++) {
+			put(server, x, up, z - 27, "wildcatter:busway_industrial");
+		}
+		for (int zz = z - 27; zz <= z - 3; zz++) {
+			put(server, -2, up, zz, "wildcatter:busway_industrial");
+		}
+		for (BlockPos set : sets) {
+			startGenset(context, server, set, north, 2000);
+		}
+		for (int zz : new int[] {-4, -14}) {
+			put(server, -1, up, z + zz, "wildcatter:cable_industrial");
+			context.waitTicks(40);
+		}
+		// a burned core at cold shutdown, a long run behind it
+		dev.wildcatter.fluid.Reactor[] r = new dev.wildcatter.fluid.Reactor[1];
+		server.computeOnServer(srv -> {
+			var v = (dev.wildcatter.block.ReactorVesselBlockEntity) srv.overworld().getBlockEntity(vessel);
+			r[0] = v.reactor();
+			v.setHotStandbyForTest(1500);
+			r[0].setColdForTest();
+			r[0].setBurnupsForTest(33, 33, 33, 17, 17, 17, 8, 8, 8);
+			r[0].setHistoryForTest(1.0, 7 * 86400);   // shut down a week ago, as an outage is
+			r[0].setSetpoint(-1);
+			((dev.wildcatter.block.RefuellingMachineBlockEntity) srv.overworld().getBlockEntity(machine)).setMoveSecondsForTest(1);
+			return null;
+		});
+		context.waitTicks(60);
+		String probe = server.computeOnServer(srv -> {
+			var p = (dev.wildcatter.block.SpentFuelPoolBlockEntity) srv.overworld().getBlockEntity(pool);
+			return p.cell(2, 2, 6).toShortString() + "=" + srv.overworld().getBlockState(p.cell(2, 2, 6)) + ", " + p.cell(2, 2, 1).toShortString() + "="
+					+ srv.overworld().getBlockState(p.cell(2, 2, 1));
+		});
+		check(stateAt(server, new BlockPos(1, up - 6, z - 17)).is(net.minecraft.world.level.block.Blocks.WATER), "the pool should be dug and full: " + probe + " | "
+				+ read(server, 0, up, z - 14));
+		String began = server.computeOnServer(srv -> ((dev.wildcatter.block.RefuellingMachineBlockEntity) srv.overworld().getBlockEntity(machine)).nextMode(srv.overworld()));
+		check(began.contains("REFUEL"), "a sneak-click should start REFUEL: " + began);
+		int racks = 0;
+		for (int i = 0; i < 40 && racks < 3; i++) {
+			context.waitTicks(20);
+			racks = server.computeOnServer(srv -> ((dev.wildcatter.block.SpentFuelPoolBlockEntity) srv.overworld().getBlockEntity(pool)).racks().size());
+		}
+		context.waitTicks(200);
+		double[] core = server.computeOnServer(srv -> {
+			double fresh = 0, max = 0;
+			for (int i = 0; i < r[0].assemblies(); i++) {
+				fresh += r[0].burnup(i) < 0.01 ? 1 : 0;
+				max = Math.max(max, r[0].burnup(i));
+			}
+			return new double[] {r[0].assemblies(), fresh, max};
+		});
+		String outage = read(server, 0, up, z - 4) + " | " + read(server, 0, up, z - 14);
+		check(racks == 3, "REFUEL should send 3 assemblies to the pool: " + outage);
+		check(core[0] == 9 && core[1] == 3 && core[2] < 20, "the core should hold 3 fresh and the 6 less burned: " + java.util.Arrays.toString(core) + " | " + outage);
+		// shielded by the pool's water, then drained
+		net.minecraft.world.phys.Vec3 over = new net.minecraft.world.phys.Vec3(2.5, up + 0.5, z - 17.5);
+		double shielded = server.computeOnServer(srv -> dev.wildcatter.radiation.RadiationTicker.rateAt(srv.overworld(), over, null));
+		check(shielded < 1e-4, "the pool's water should shield the fuel: " + dev.wildcatter.fluid.Radiation.rateText(shielded));
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.SpentFuelPoolBlockEntity) srv.overworld().getBlockEntity(pool)).setWaterForTest(srv.overworld(), 2 * 36_000);
+			return null;
+		});
+		double bare = server.computeOnServer(srv -> dev.wildcatter.radiation.RadiationTicker.rateAt(srv.overworld(), over, null));
+		check(bare > 1, "with the pool drained the dose over it should be lethal: " + dev.wildcatter.fluid.Radiation.rateText(bare));
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.SpentFuelPoolBlockEntity) srv.overworld().getBlockEntity(pool)).setWaterForTest(srv.overworld(), Tuning.POOL_WATER_KG);
+			return null;
+		});
+		// an acute dose brings its effects
+		server.computeOnServer(srv -> {
+			var player = srv.getPlayerList().getPlayers().get(0);
+			dev.wildcatter.radiation.DoseData.get(srv.overworld()).of(player.getStringUUID())[1] = 3.5;
+			return null;
+		});
+		context.waitTicks(40);
+		boolean sick = server.computeOnServer(srv -> {
+			var player = srv.getPlayerList().getPlayers().get(0);
+			return player.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS) && player.hasEffect(net.minecraft.world.effect.MobEffects.SLOWNESS);
+		});
+		server.computeOnServer(srv -> {
+			var player = srv.getPlayerList().getPlayers().get(0);
+			dev.wildcatter.radiation.DoseData.get(srv.overworld()).of(player.getStringUUID())[1] = 0;
+			player.removeAllEffects();
+			return null;
+		});
+		check(sick, "3.5 Sv should bring radiation sickness");
+		// a damaged core: DEFUEL takes it all out and clears it
+		server.computeOnServer(srv -> {
+			r[0].setDamagedForTest();
+			var m = (dev.wildcatter.block.RefuellingMachineBlockEntity) srv.overworld().getBlockEntity(machine);
+			m.nextMode(srv.overworld());   // REFUEL
+			m.nextMode(srv.overworld());   // DEFUEL
+			return null;
+		});
+		for (int i = 0; i < 40 && server.computeOnServer(srv -> r[0].assemblies()) > 0; i++) {
+			context.waitTicks(20);
+		}
+		check(server.computeOnServer(srv -> r[0].assemblies() == 0 && !r[0].coreDamaged()), "DEFUEL should empty the core and clear its damage: " + read(server, 0, up, z));
+		int stored = server.computeOnServer(srv -> ((dev.wildcatter.block.SpentFuelPoolBlockEntity) srv.overworld().getBlockEntity(pool)).racks().size());
+		check(stored == 12, "the pool should hold 12: " + stored);
+		server.runCommand("tp @p 2.0 " + (up + 6) + " " + (z - 24.5) + " 0 38");   // over the pool's far end, looking down at its racks
+		context.waitTicks(20);
+		context.takeScreenshot("wildcatter-spent-fuel-pool");
+		System.out.println("[wildcatter-test] fuelHandling ok: " + outage + " | shielded " + dev.wildcatter.fluid.Radiation.rateText(shielded) + ", drained "
+				+ dev.wildcatter.fluid.Radiation.rateText(bare) + " | " + read(server, 0, up, z - 14));
 	}
 
 	/**

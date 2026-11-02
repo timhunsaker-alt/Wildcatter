@@ -386,5 +386,11 @@
   "block.wildcatter.circulating_water_pump": "Circulating Water Pump (300 kW, 4.16 kV)",
   "block.wildcatter.unit_auxiliary_transformer": "Unit Auxiliary Transformer (7.5 MVA, 13.8/4.16 kV)",
   "block.wildcatter.natural_draft_tower": "Natural-Draft Cooling Tower (88 m)",
-  "block.wildcatter.tower_shell": "Cooling Tower Shell"
+  "block.wildcatter.tower_shell": "Cooling Tower Shell",
+  "item.wildcatter.dosimeter": "Dosimeter (electronic personal)",
+  "block.wildcatter.refuelling_machine": "Refuelling Machine",
+  "block.wildcatter.fuel_transfer_system": "Fuel Transfer System",
+  "block.wildcatter.spent_fuel_pool": "Spent Fuel Pool (6 x 6 m, 12 m deep)",
+  "death.attack.wildcatter.radiation": "%1$s died of radiation sickness",
+  "death.attack.wildcatter.radiation.player": "%1$s died of radiation sickness"
 }

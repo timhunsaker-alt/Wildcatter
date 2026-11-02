@@ -541,6 +541,31 @@ public final class Tuning {
 	public static final double H2_IGNITE_KG = 18.0;                // 4 % of 5,000 m3 of the island's building air (proposed)
 	public static final float H2_BLAST_POWER = 6.0F;               // (proposed)
 
+	// ---- Fuel handling, the spent fuel pool and radiation (docs/multiblocks/fuel-handling.md, approved 2026-11-02) ----------
+	public static final double FUEL_MOVE_SECONDS = 60.0;           // compressed: real moves take 1-2 h
+	public static final int RELOAD_ASSEMBLIES = 3;
+	public static final int POOL_RACKS = 36;
+	public static final int POOL_SIDE = 6;
+	public static final int POOL_DEPTH = 12;
+	public static final double POOL_WATER_KG = POOL_SIDE * POOL_SIDE * POOL_DEPTH * 1000.0;
+	public static final double POOL_UA_W_PER_C = 80_000.0;         // (proposed)
+	public static final double POOL_CW_KGS = 100.0;
+	public static final double POOL_LATENT_J_PER_KG = 2.26e6;
+	public static final double POOL_FUEL_TOP_M = 4.1;              // the racks' top over the floor
+	public static final double REFUELLING_WATTS = 30_000.0;
+	public static final double POOL_PUMP_WATTS = 75_000.0;
+	public static final double SV_H_PER_MW_AT_1M = 1000.0;         // an irradiated assembly, by its decay heat (proposed)
+	public static final double VESSEL_SV_H_AT_1M = 0.010;          // at full power, inside its primary shield (Tim, 2026-11-02)
+	public static final double DAMAGED_CORE_SV_H_AT_1M = 1.0;
+	public static final double ORE_USV_H_PER_CPS = 0.002;          // (proposed)
+	public static final double WATER_BLOCK_SHIELD = 1.0 / 300;     // a block: about 8 half-value layers of ~1 MeV gamma
+	public static final double SOLID_BLOCK_SHIELD = 1.0 / 1000;
+	public static final double DOSE_RANGE = 64.0;
+	public static final double ACUTE_HALF_LIFE_S = 24 * 3600.0;    // repair (proposed)
+	public static final double SV_NAUSEA = 1.0, SV_SICK = 3.0, SV_WITHER = 6.0, SV_LETHAL = 8.0;
+	public static final double ALARM_RATE_SV_H = 1e-3;
+	public static final double ALARM_DOSE_SV = 0.020;              // the occupational year (ICRP)
+
 	// ---- The natural-draft cooling tower (docs/multiblocks/natural-draft-tower.md, approved 2026-11-01) --------------------------
 	public static final double TOWER_SHELL_BASE_Y = 8.0;           // over the basin floor; the raker columns below
 	public static final double TOWER_THROAT_Y = 62.0;

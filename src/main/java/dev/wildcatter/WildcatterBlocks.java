@@ -426,6 +426,9 @@ public final class WildcatterBlocks {
 	public static final Block PRESSURIZER = reactorPart(dev.wildcatter.block.ReactorPartBlock.Part.PRESSURIZER);
 	public static final Block CVCS_SKID = reactorPart(dev.wildcatter.block.ReactorPartBlock.Part.CVCS_SKID);
 	public static final Block AUX_FEED_PUMP = reactorPart(dev.wildcatter.block.ReactorPartBlock.Part.AUX_FEED_PUMP);
+	public static final Block REFUELLING_MACHINE = handlingPart(dev.wildcatter.block.FuelHandlingPartBlock.Part.REFUELLING_MACHINE);
+	public static final Block FUEL_TRANSFER_SYSTEM = handlingPart(dev.wildcatter.block.FuelHandlingPartBlock.Part.FUEL_TRANSFER_SYSTEM);
+	public static final Block SPENT_FUEL_POOL = handlingPart(dev.wildcatter.block.FuelHandlingPartBlock.Part.SPENT_FUEL_POOL);
 	public static final Block RHR_PUMP = reactorPart(dev.wildcatter.block.ReactorPartBlock.Part.RHR_PUMP);
 	public static final Block RHR_HEAT_EXCHANGER = reactorPart(dev.wildcatter.block.ReactorPartBlock.Part.RHR_HEAT_EXCHANGER);
 	public static final Block BORAX_DISSOLVER = boronPart(dev.wildcatter.block.BoronPartBlock.Part.BORAX_DISSOLVER);
@@ -570,6 +573,8 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<dev.wildcatter.block.AuxFeedPumpBlockEntity> AUX_FEED_PUMP_ENTITY = entity(dev.wildcatter.block.AuxFeedPumpBlockEntity::new, AUX_FEED_PUMP);
 	public static final BlockEntityType<dev.wildcatter.block.BoronLineBlockEntity> BORON_LINE_ENTITY = entity(dev.wildcatter.block.BoronLineBlockEntity::new, BORAX_DISSOLVER, BORIC_ACID_CRYSTALLIZER, B4C_FURNACE, RCCA_BENCH);
 	public static final BlockEntityType<dev.wildcatter.block.NaturalDraftTowerBlockEntity> NATURAL_DRAFT_TOWER_ENTITY = entity(dev.wildcatter.block.NaturalDraftTowerBlockEntity::new, NATURAL_DRAFT_TOWER);
+	public static final BlockEntityType<dev.wildcatter.block.RefuellingMachineBlockEntity> REFUELLING_MACHINE_ENTITY = entity(dev.wildcatter.block.RefuellingMachineBlockEntity::new, REFUELLING_MACHINE);
+	public static final BlockEntityType<dev.wildcatter.block.SpentFuelPoolBlockEntity> SPENT_FUEL_POOL_ENTITY = entity(dev.wildcatter.block.SpentFuelPoolBlockEntity::new, SPENT_FUEL_POOL);
 	public static final BlockEntityType<dev.wildcatter.block.RhrHeatExchangerBlockEntity> RHR_HX_ENTITY = entity(dev.wildcatter.block.RhrHeatExchangerBlockEntity::new, RHR_HEAT_EXCHANGER);
 	public static final BlockEntityType<dev.wildcatter.block.HpTurbineBlockEntity> HP_TURBINE_ENTITY = entity(dev.wildcatter.block.HpTurbineBlockEntity::new, HP_TURBINE);
 	public static final BlockEntityType<dev.wildcatter.block.CondenserBlockEntity> CONDENSER_ENTITY = entity(dev.wildcatter.block.CondenserBlockEntity::new, MAIN_CONDENSER);
@@ -608,7 +613,7 @@ public final class WildcatterBlocks {
 	public static final BlockEntityType<dev.wildcatter.block.TowerBasinBlockEntity> TOWER_BASIN_ENTITY = entity(dev.wildcatter.block.TowerBasinBlockEntity::new, TOWER_BASIN);
 	public static final BlockEntityType<CoolingTowerBlockEntity> COOLING_TOWER_ENTITY = entity(CoolingTowerBlockEntity::new, COOLING_TOWER);
 	/** The plain true-size parts that only remember they have grown (block/BigPartBlockEntity). */
-	public static final BlockEntityType<dev.wildcatter.block.BigPartBlockEntity> BIG_PART_ENTITY = entity(dev.wildcatter.block.BigPartBlockEntity::new, COOLING_FILL, DRIFT_ELIMINATOR, RELAY_PANEL, TURBINE_VALVE_CHEST, MOISTURE_SEPARATOR_REHEATER, LP_TURBINE,
+	public static final BlockEntityType<dev.wildcatter.block.BigPartBlockEntity> BIG_PART_ENTITY = entity(dev.wildcatter.block.BigPartBlockEntity::new, COOLING_FILL, DRIFT_ELIMINATOR, RELAY_PANEL, FUEL_TRANSFER_SYSTEM, TURBINE_VALVE_CHEST, MOISTURE_SEPARATOR_REHEATER, LP_TURBINE,
 			WOOD_POLE_30, WOOD_POLE_40, WOOD_POLE_75, CROSSARM_DIST, CROSSBEAM_138, X_BRACE_138, FUEL_ASSEMBLY);
 	public static final BlockEntityType<dev.wildcatter.block.StationBusBlockEntity> STATION_BUS_ENTITY = entity(dev.wildcatter.block.StationBusBlockEntity::new, BUS_HV, BUS_DIST);
 
@@ -683,6 +688,11 @@ public final class WildcatterBlocks {
 	private static Block conversionPart(dev.wildcatter.block.ConversionPartBlock.Part part) {
 		return block(part.id(), props -> new dev.wildcatter.block.ConversionPartBlock(props.mapColor(MapColor.COLOR_GRAY)
 				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
+	}
+
+	private static Block handlingPart(dev.wildcatter.block.FuelHandlingPartBlock.Part part) {
+		return block(part.id(), props -> new dev.wildcatter.block.FuelHandlingPartBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
+				.strength(5.0F, 12.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
 	}
 
 	private static Block islandPart(dev.wildcatter.block.TurbineIslandPartBlock.Part part) {
@@ -935,6 +945,9 @@ public final class WildcatterBlocks {
 		}
 		add("tg_generator_60", TG_GENERATOR_60);
 		add("natural_draft_tower", NATURAL_DRAFT_TOWER);
+		for (Block part : new Block[] {REFUELLING_MACHINE, FUEL_TRANSFER_SYSTEM, SPENT_FUEL_POOL}) {
+			add(((dev.wildcatter.block.FuelHandlingPartBlock) part).part().id(), part);
+		}
 		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("tower_shell"), TOWER_SHELL);   // no item: the tower places it
 		add("unit_auxiliary_transformer", UNIT_AUX_TRANSFORMER);
 		for (Block part : new Block[] {BORAX_DISSOLVER, BORIC_ACID_CRYSTALLIZER, B4C_FURNACE, RCCA_BENCH}) {
@@ -1054,6 +1067,8 @@ public final class WildcatterBlocks {
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("boron_line"), BORON_LINE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("hp_turbine"), HP_TURBINE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rhr_heat_exchanger"), RHR_HX_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("refuelling_machine"), REFUELLING_MACHINE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("spent_fuel_pool"), SPENT_FUEL_POOL_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("natural_draft_tower"), NATURAL_DRAFT_TOWER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("main_condenser"), CONDENSER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("deaerator"), DEAERATOR_ENTITY);

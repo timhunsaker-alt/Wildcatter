@@ -475,6 +475,34 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 8e: refuelling, the spent fuel pool and radiation (spec: docs/multiblocks/fuel-handling.md); Phase 8 done
+- **Tim's decisions:**
+  - the refuelling machine runs the outage;
+  - irradiated fuel is never an item;
+  - the vessel counts as inside its primary shield;
+  - real dose and effects.
+- **REFUELLING MACHINE** against the vessel (30 kW, 480 V), working at cold shutdown, a move a minute:
+  - REFUEL: the 3 most-burned to the pool, a 3-move shuffle, 3 fresh from its hopper;
+  - DEFUEL: the whole core, which clears a damaged one.
+- **FUEL TRANSFER SYSTEM** between the machine and the **SPENT FUEL POOL**.
+- **The pool's controller** (75 kW, 480 V):
+  - it digs a 6 × 6 m pool 12 m deep in front of itself, lines it and fills it;
+  - its 36 racks are drawn with their assemblies (Cherenkov blue while hot);
+  - each assembly keeps its own decay heat;
+  - cooling is on circulating water; without it the pool heats, boils off and loses its top layers; make-up off a pump.
+- **Radiation** (`fluid/Radiation.java`, `radiation/RadiationTicker`, `DoseData`):
+  - **Sources, each second:** each assembly (1,000 Sv/h at 1 m per MW of decay heat), the vessel at power (10 mSv/h at 1 m at
+    full power), a damaged core (1 Sv/h at 1 m), and ore (by the scintillometer's counts).
+  - **Shielding:** water ×1/300 and other full blocks ×1/1000 a block, with inverse square.
+  - **Dose:** lifetime, and an acute dose that halves daily.
+  - **Effects:** nausea and weakness from 1 Sv, hunger and slowness from 3, wither from 6, death by radiation at 8.
+  - **DOSIMETER** (Ludo icon): it reads and alarms.
+- **Game test** `fuelHandling`, on a 16 m platform (the test world's floor is only a few blocks down):
+  - REFUEL puts 3 in the pool and leaves 3 fresh and 6 burned in the core;
+  - the full pool reads 0 µSv/h over it, and drained about 1.7 Sv/h;
+  - 3.5 Sv brings weakness and slowness;
+  - DEFUEL empties a damaged core and clears it (12 in the pool).
+
 ## Phase 8d: after the trip (spec: docs/multiblocks/reactor.md, "After the trip")
 - **Tim's decisions:**
   - two waves (8d after the trip; 8e refuelling, spent fuel and radiation);
@@ -864,6 +892,9 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- Phase 8e: the pool digs 13 m down from its controller: near the world's floor (or a superflat world) it cannot. Irradiated
+  fuel has no casks yet (ROADMAP Ideas). Dose is a point-source line-of-sight sum; there is no contamination. The test sets the
+  core's history and the moves' time by hooks.
 - Phase 8d: hydrogen goes into a notional 5,000 m³ of building air; there is no containment building, recombiners or igniters
   (ROADMAP Ideas). A damaged core waits for 8e's refuelling machine. The game test reaches damage by hooks, not hours of boil-off.
 - Phase 8c: the tower's shell is drawn by one renderer and made solid by invisible blocks; no visible block model. Humidity is a

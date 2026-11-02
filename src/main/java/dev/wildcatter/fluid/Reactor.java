@@ -325,6 +325,47 @@ public final class Reactor {
 		return true;
 	}
 
+	/** The index of the assembly with the most burnup (the next to go to the pool). */
+	public int mostBurned() {
+		int best = 0;
+		for (int i = 1; i < assemblies; i++) {
+			if (burnup[i] > burnup[best]) {
+				best = i;
+			}
+		}
+		return best;
+	}
+
+	/**
+	 * Takes assembly {@code i} out for the pool (8e): its record carries its burnup and its decay heat groups (each assembly's share is
+	 * the core's, a fraction of its own power), and whether the core was damaged. Taking the last one out clears a damaged core.
+	 */
+	public SpentFuel.Assembly removeAssembly(int i) {
+		SpentFuel.Assembly out = new SpentFuel.Assembly(burnup[i], decay, coreDamaged);
+		for (int k = i; k < assemblies - 1; k++) {
+			burnup[k] = burnup[k + 1];
+		}
+		assemblies--;
+		burnup[assemblies] = 0;
+		for (int g = 0; g < decay.length; g++) {
+			decay[g] *= assemblies / (assemblies + 1.0);
+		}
+		if (assemblies == 0 && coreDamaged) {
+			clearDamage();
+		}
+		return out;
+	}
+
+	/** A defuelled core: the damage, its hydrogen and the trip's cause cleared. */
+	public void clearDamage() {
+		coreDamaged = false;
+		exploded = false;
+		h2 = 0;
+		zrOxidized = 0;
+		fuelC = tavg;
+		trip = "shut down";
+	}
+
 	public boolean loadRcca() {
 		if (rccas >= Tuning.RCCAS) {
 			return false;
@@ -372,10 +413,34 @@ public final class Reactor {
 	}
 
 	/** For the game test and unit tests: filled and borated, at hot standby with the pressurizer at its pressure. */
+	/** For the game test: filled and cold (30 C, no pressure), rods in. */
+	public void setColdForTest() {
+		waterKg = Tuning.RCS_WATER_KG;
+		tavg = thot = tcold = pzrC = fuelC = 30;
+		sgC[0] = sgC[1] = 30;
+	}
+
+	/** For the game test: the assemblies' burnups. */
+	public void setBurnupsForTest(double... gwd) {
+		System.arraycopy(gwd, 0, burnup, 0, Math.min(gwd.length, assemblies));
+	}
+
+	/** For the game test: a damaged core. */
+	public void setDamagedForTest() {
+		coreDamaged = true;
+		tripped = true;
+		trip = "CORE DAMAGE";
+	}
+
 	/** For the game test and unit tests: a long run at {@code power}, its decay heat groups, iodine and xenon at equilibrium. */
 	public void setHistoryForTest(double power) {
+		setHistoryForTest(power, 0);
+	}
+
+	/** The same, shut down {@code ageSeconds} ago (the decay heat only). */
+	public void setHistoryForTest(double power, double ageSeconds) {
 		for (int i = 0; i < decay.length; i++) {
-			decay[i] = Tuning.DECAY_SHARE[i] * power;
+			decay[i] = Tuning.DECAY_SHARE[i] * power * Math.exp(-Tuning.DECAY_LAMBDA[i] * ageSeconds);
 		}
 		iodine = power;
 		xenon = xenonEquilibrium(power);

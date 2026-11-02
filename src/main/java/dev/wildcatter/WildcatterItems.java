@@ -91,6 +91,9 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> HELIUM_CYLINDER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("helium_cylinder"));
 	public static final Item HELIUM_CYLINDER = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(HELIUM_CYLINDER_KEY),
 			String.format("%.1f m3 of helium, 99.995 %%", Tuning.HELIUM_CYLINDER_M3), "fills about 21,000 fuel rods at 2 MPa");
+	// 8e: the dosimeter (docs/multiblocks/fuel-handling.md)
+	public static final ResourceKey<Item> DOSIMETER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("dosimeter"));
+	public static final Item DOSIMETER = new dev.wildcatter.item.DosimeterItem(new Item.Properties().stacksTo(1).setId(DOSIMETER_KEY));
 	// 8a: the boron plant (docs/multiblocks/boron.md)
 	public static final ResourceKey<Item> BORIC_ACID_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("boric_acid"));
 	public static final Item BORIC_ACID = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(64).setId(BORIC_ACID_KEY),
@@ -177,6 +180,7 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, BORIC_ACID_KEY, BORIC_ACID);
 		Registry.register(BuiltInRegistries.ITEM, B4C_PELLETS_KEY, B4C_PELLETS);
 		Registry.register(BuiltInRegistries.ITEM, RCCA_KEY, RCCA);
+		Registry.register(BuiltInRegistries.ITEM, DOSIMETER_KEY, DOSIMETER);
 		Registry.register(BuiltInRegistries.ITEM, CRUDE_OIL_BUCKET_KEY, CRUDE_OIL_BUCKET);
 		Registry.register(BuiltInRegistries.ITEM, PLASTIC_SHEET_KEY, PLASTIC_SHEET);
 		Registry.register(BuiltInRegistries.ITEM, STEEL_INGOT_KEY, STEEL_INGOT);

@@ -138,3 +138,9 @@ The fuel assembly's item is its block model.
   pellets in neat rows, seen at an angle, game item icon, plain white background, no text".
 - `rcca` (a kept): "A nuclear reactor rod cluster control assembly: a small stainless steel spider hub with radial vanes at the top
   holding a cluster of 24 long thin parallel silver rods hanging down, seen diagonally, game item icon, plain white background, no text".
+
+## Phase 8e (2026-11-02): the dosimeter (art/source/ore/)
+`item-icon`, `Photorealistic 3D`, 2 variations:
+- `dosimeter` (a kept): "A single small handheld electronic personal radiation dosimeter: a compact rugged yellow and dark grey
+  plastic device with a small LCD display showing digits, a pocket clip and a radiation trefoil symbol, seen at a slight angle, game
+  item icon, plain white background, no text".

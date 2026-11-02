@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "III",
+    "SXS",
+    "S S"
+  ],
+  "key": {
+    "I": "minecraft:iron_block",
+    "S": "wildcatter:steel_ingot",
+    "X": "minecraft:piston"
+  },
+  "result": {
+    "id": "wildcatter:refuelling_machine",
+    "count": 1
+  }
+}

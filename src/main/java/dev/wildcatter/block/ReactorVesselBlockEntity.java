@@ -49,8 +49,24 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 		return 0;
 	}
 
+	private static final java.util.Map<net.minecraft.resources.ResourceKey<Level>, java.util.Set<BlockPos>> VESSELS = new java.util.HashMap<>();
+
+	/** The vessels in a level, for the dose (8e). */
+	public static java.util.Set<BlockPos> vessels(Level level) {
+		return VESSELS.getOrDefault(level.dimension(), java.util.Set.of());
+	}
+
+	@Override
+	public void setRemoved() {
+		super.setRemoved();
+		if (level != null && !level.isClientSide()) {
+			VESSELS.getOrDefault(level.dimension(), java.util.Set.of()).remove(worldPosition);
+		}
+	}
+
 	public static void tick(Level level, BlockPos pos, BlockState state, ReactorVesselBlockEntity vessel) {
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL == 0) {
+			VESSELS.computeIfAbsent(level.dimension(), k -> new java.util.HashSet<>()).add(pos.immutable());
 			vessel.step(level);
 			vessel.setChanged();
 		}
@@ -155,6 +171,11 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 	}
 
 	// ---- fuel ----------------------------------------------------------------------------------------------------------------------
+	/** Cold, depressurized, its pumps stopped: the refuelling machine may work (8e). */
+	public boolean openForRefuelling() {
+		return reactor.loadable(pumpsStopped);
+	}
+
 	/** A right-click with an assembly or an RCCA: loads it if the vessel is cold, depressurized and its pumps stopped. */
 	public String load(ItemStack stack) {
 		if (!reactor.loadable(pumpsStopped)) {

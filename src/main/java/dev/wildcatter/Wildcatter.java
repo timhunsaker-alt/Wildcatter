@@ -55,6 +55,8 @@ public class Wildcatter implements ModInitializer {
 		ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register(CircuitManager::unregister);
 		ServerLifecycleEvents.SERVER_STARTED.register(dev.wildcatter.energy.StandardData::apply);
 		ServerTickEvents.END_LEVEL_TICK.register(CircuitManager::tick);
+		ServerTickEvents.END_SERVER_TICK.register(dev.wildcatter.radiation.RadiationTicker::tick);
+		net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents.AFTER_RESPAWN.register((old, now, alive) -> dev.wildcatter.radiation.RadiationTicker.respawned(now));
 	}
 
 	/**

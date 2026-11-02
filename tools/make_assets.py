@@ -2003,6 +2003,35 @@ lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
 lang.update({f"block.{ns}.natural_draft_tower": "Natural-Draft Cooling Tower (88 m)", f"block.{ns}.tower_shell": "Cooling Tower Shell"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 8e: fuel handling and the dosimeter (docs/multiblocks/fuel-handling.md) -----------------------------------------
+HANDLING_PARTS = ("refuelling_machine", "fuel_transfer_system", "spent_fuel_pool")
+for name in HANDLING_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in HANDLING_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("refuelling_machine", ["III", "SXS", "S S"], {"I": "minecraft:iron_block", "S": S_, "X": "minecraft:piston"}, "refuelling_machine")
+shaped("fuel_transfer_system", ["SPS", "SXS", "SPS"], {"S": S_, "P": P_, "X": "minecraft:piston"}, "fuel_transfer_system")
+shaped("spent_fuel_pool", ["CCC", "CPC", "CHC"], {"C": "minecraft:light_gray_concrete", "P": P_, "H": "minecraft:copper_block"}, "spent_fuel_pool")
+shaped("dosimeter", [" G ", "RCR", " I "], {"G": "minecraft:glass_pane", "R": "minecraft:redstone", "C": "minecraft:comparator", "I": "minecraft:iron_ingot"}, "dosimeter")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+item = "dosimeter"
+if os.path.exists(f"{ORE_ART}/{item}.png"):
+	shutil.copy(f"{ORE_ART}/{item}.png", f"{ASSETS}/textures/item/ore/{item}.png")
+	item_tex = f"{ns}:item/ore/{item}"
+else:
+	tex(f"{item}_placeholder", lambda img, d: noise(img, (220, 190, 40), 10), "item")
+	item_tex = f"{ns}:item/{item}_placeholder"
+save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": item_tex}})
+save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+lang.update({f"item.{ns}.dosimeter": "Dosimeter (electronic personal)", f"block.{ns}.refuelling_machine": "Refuelling Machine",
+	f"block.{ns}.fuel_transfer_system": "Fuel Transfer System", f"block.{ns}.spent_fuel_pool": "Spent Fuel Pool (6 x 6 m, 12 m deep)",
+	"death.attack.wildcatter.radiation": "%1$s died of radiation sickness",
+	"death.attack.wildcatter.radiation.player": "%1$s died of radiation sickness"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)
