@@ -1,0 +1,31 @@
+package dev.wildcatter;
+
+import static dev.wildcatter.BlockFactory.*;
+
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+
+/** The nuclear island and the boron plant. Reached through {@link WildcatterBlocks}, which registers them. */
+public interface NuclearBlocks {
+	// 8a: the nuclear island (docs/multiblocks/reactor.md) and the boron plant (boron.md)
+	Block REACTOR_VESSEL = reactorPart(dev.wildcatter.block.ReactorPartBlock.Part.REACTOR_VESSEL);
+	Block CRDM_HEAD = reactorPart(dev.wildcatter.block.ReactorPartBlock.Part.CRDM_HEAD);
+	Block REACTOR_CONSOLE = reactorPart(dev.wildcatter.block.ReactorPartBlock.Part.REACTOR_CONSOLE);
+	Block STEAM_GENERATOR = reactorPart(dev.wildcatter.block.ReactorPartBlock.Part.STEAM_GENERATOR);
+	Block REACTOR_COOLANT_PUMP = reactorPart(dev.wildcatter.block.ReactorPartBlock.Part.REACTOR_COOLANT_PUMP);
+	Block PRESSURIZER = reactorPart(dev.wildcatter.block.ReactorPartBlock.Part.PRESSURIZER);
+	Block CVCS_SKID = reactorPart(dev.wildcatter.block.ReactorPartBlock.Part.CVCS_SKID);
+	Block AUX_FEED_PUMP = reactorPart(dev.wildcatter.block.ReactorPartBlock.Part.AUX_FEED_PUMP);
+	Block REFUELLING_MACHINE = handlingPart(dev.wildcatter.block.FuelHandlingPartBlock.Part.REFUELLING_MACHINE);
+	Block FUEL_TRANSFER_SYSTEM = handlingPart(dev.wildcatter.block.FuelHandlingPartBlock.Part.FUEL_TRANSFER_SYSTEM);
+	Block SPENT_FUEL_POOL = handlingPart(dev.wildcatter.block.FuelHandlingPartBlock.Part.SPENT_FUEL_POOL);
+	Block RHR_PUMP = reactorPart(dev.wildcatter.block.ReactorPartBlock.Part.RHR_PUMP);
+	Block RHR_HEAT_EXCHANGER = reactorPart(dev.wildcatter.block.ReactorPartBlock.Part.RHR_HEAT_EXCHANGER);
+	Block BORAX_DISSOLVER = boronPart(dev.wildcatter.block.BoronPartBlock.Part.BORAX_DISSOLVER);
+	Block BORIC_ACID_CRYSTALLIZER = boronPart(dev.wildcatter.block.BoronPartBlock.Part.BORIC_ACID_CRYSTALLIZER);
+	Block B4C_FURNACE = boronPart(dev.wildcatter.block.BoronPartBlock.Part.B4C_FURNACE);
+	Block RCCA_BENCH = boronPart(dev.wildcatter.block.BoronPartBlock.Part.RCCA_BENCH);
+	Block FUEL_ASSEMBLY = block("fuel_assembly", props -> new dev.wildcatter.block.FuelAssemblyBlock(props.mapColor(MapColor.METAL)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).noOcclusion()));
+}

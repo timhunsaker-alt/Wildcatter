@@ -9,6 +9,7 @@ import dev.wildcatter.Tuning;
  * should do. Temperatures in C, pressures in MPa, masses in kg. Plain Java, so it is unit-tested without Minecraft.
  */
 public final class Reactor {
+	// The state is package-private: ReactorNeutronics, ReactorThermal, ReactorProtection, ReactorCvcs and ReactorSaves step and save it.
 	/** The console's setpoints; the first is TRIP. */
 	public static final double[] SETPOINTS = {-1, -2, 0, 0.02, 0.05, 0.10, 0.25, 0.50, 0.75, 1.00};
 	/** The console's COOLDOWN setpoint: rods in, the dump valves lower the temperature, the RHR takes it to cold shutdown. */
@@ -35,95 +36,83 @@ public final class Reactor {
 	}
 
 	// fuel
-	private final double[] burnup = new double[Tuning.CORE_ASSEMBLIES];   // GWd/t
-	private int assemblies;
-	private int rccas;
+	final double[] burnup = new double[Tuning.CORE_ASSEMBLIES];   // GWd/t
+	int assemblies;
+	int rccas;
 	// rods
-	private double shutdownBank;
-	private double bankD;
-	private int setpoint;                        // index into SETPOINTS
-	private boolean tripped = true;
-	private String trip = "shut down";
-	private boolean lowRangeBlocked;
+	double shutdownBank;
+	double bankD;
+	int setpoint;                        // index into SETPOINTS
+	boolean tripped = true;
+	String trip = "shut down";
+	boolean lowRangeBlocked;
 	// coolant
-	private double waterKg;
-	private double ppm;
-	private double targetPpm = 1500;
-	private double tavg = 20;
-	private double thot = 20;
-	private double tcold = 20;
-	private double pzrC = 20;
-	private double flow;
-	private final double[] sgC = {20, 20};
-	private final double[] sgKg = {Tuning.SG_WATER_KG, Tuning.SG_WATER_KG};
-	private final double[] lastSteam = new double[2];
-	private final double[] vented = new double[2];
-	private final PointKinetics kinetics = new PointKinetics();
+	double waterKg;
+	double ppm;
+	double targetPpm = 1500;
+	double tavg = 20;
+	double thot = 20;
+	double tcold = 20;
+	double pzrC = 20;
+	double flow;
+	final double[] sgC = {20, 20};
+	final double[] sgKg = {Tuning.SG_WATER_KG, Tuning.SG_WATER_KG};
+	final double[] lastSteam = new double[2];
+	final double[] vented = new double[2];
+	final PointKinetics kinetics = new PointKinetics();
 	// 8d: decay heat (fractions of full power, by group), iodine and xenon (of their full-power equilibrium), the cooldown, damage
-	private final double[] decay = new double[Tuning.DECAY_LAMBDA.length];
-	private double iodine;
-	private double xenon;
-	private double cooldownC = Double.NaN;
-	private double rhrHeat;
-	private double fuelC = 20;
-	private double zrOxidized;
-	private double h2;
-	private boolean coreDamaged;
-	private boolean exploded;
-	private boolean blast;
+	final double[] decay = new double[Tuning.DECAY_LAMBDA.length];
+	double iodine;
+	double xenon;
+	double cooldownC = Double.NaN;
+	double rhrHeat;
+	double fuelC = 20;
+	double zrOxidized;
+	double h2;
+	boolean coreDamaged;
+	boolean exploded;
+	boolean blast;
 	// what the CVCS did this step: boric acid used (negative: recovered) and makeup water used
-	private double boricAcidUsed;
-	private double waterUsed;
-	private String cvcsState = "idle";
-	private String held = "";
+	double boricAcidUsed;
+	double waterUsed;
+	String cvcsState = "idle";
+	String held = "";
 
-	// ---- numbers -----------------------------------------------------------------------------------------------------------------
-	/** W of heat an assembly makes at full power: its rods' length at the average linear heat rate. */
+	// ---- numbers (ReactorDesign) -----------------------------------------------------------------------------------------------
 	public static double assemblyWatts() {
-		return Tuning.ASSEMBLY_RODS * Tuning.ROD_STACK_M * Tuning.LINEAR_HEAT_KW_M * 1000;
+		return ReactorDesign.assemblyWatts();
 	}
 
-	/** W of heat the core makes at full power. */
 	public static double ratedWatts() {
-		return Tuning.CORE_ASSEMBLIES * assemblyWatts();
+		return ReactorDesign.ratedWatts();
 	}
 
-	/** GWd/t a second at full power, with the burnup speed-up. */
 	public static double burnupPerSecond() {
-		return assemblyWatts() / 1e6 / (Fuel.assemblyU() / 1000) / 86400 / 1000 * Tuning.BURNUP_SPEEDUP;
+		return ReactorDesign.burnupPerSecond();
 	}
 
-	/** Hours at full power of one cycle, a third of the discharge burnup. */
 	public static double cycleHours() {
-		return Tuning.DISCHARGE_GWD_T / 3 / burnupPerSecond() / 3600;
+		return ReactorDesign.cycleHours();
 	}
 
-	/** kg/s of steam a steam generator makes at full power. */
 	public static double steamPerGenerator() {
-		return ratedWatts() / 2 / (Steam.hg(Steam.psat(Tuning.TAVG_FULL_LOAD - ratedWatts() / 2 / Tuning.SG_UA_W_PER_C)) - Steam.hf(Tuning.FEEDWATER_C));
+		return ReactorDesign.steamPerGenerator();
 	}
 
-	/** kg/s of coolant a loop carries for the core's rated delta-T. */
 	public static double loopFlow() {
-		return ratedWatts() / 2 / (Steam.CP_COOLANT * Tuning.CORE_DT);
+		return ReactorDesign.loopFlow();
 	}
 
-	/** The rods' worth with the most reactive one (the centre) stuck out, less the power defect at full power: the shutdown margin. */
 	public static double shutdownMargin() {
-		double rods = 4 * Tuning.ROD_WORTH_EDGE;
-		double defect = -Tuning.DOPPLER_PER_C * Tuning.FUEL_RISE_C - Tuning.MTC_AT_0_PPM * (Tuning.TAVG_FULL_LOAD - Tuning.TAVG_NO_LOAD);
-		return rods - defect;
+		return ReactorDesign.shutdownMargin();
 	}
 
-	/** The fraction of a rod's worth still in at {@code steps} withdrawn: the S-curve. */
 	static double inserted(double steps) {
-		double x = Math.max(0, Math.min(1, steps / Tuning.ROD_STEPS));
-		return 1 - (x - Math.sin(2 * Math.PI * x) / (2 * Math.PI));
+		return ReactorDesign.inserted(steps);
 	}
 
-	/** The moderator temperature coefficient at {@code ppm}, per C: linear between its two points, never positive. */
 	static double mtc(double ppm) {
-		return Math.min(0, Tuning.MTC_AT_0_PPM + (Tuning.MTC_AT_1500_PPM - Tuning.MTC_AT_0_PPM) * ppm / 1500);
+		return ReactorDesign.mtc(ppm);
 	}
 
 	// ---- state ---------------------------------------------------------------------------------------------------------------------
@@ -284,7 +273,7 @@ public final class Reactor {
 	}
 
 	/** The pressure held while cooling down: saturation 30 C over the hot leg, no higher than normal. */
-	private double cooldownMpa() {
+	double cooldownMpa() {
 		return Math.min(Tuning.RCS_MPA, Steam.psat(thot + Tuning.PZR_SUBCOOLING_C));
 	}
 
@@ -467,7 +456,7 @@ public final class Reactor {
 
 	/** Xenon at equilibrium at {@code power}, of its full-power level. */
 	static double xenonEquilibrium(double power) {
-		return (Tuning.XENON_LAMBDA + Tuning.XENON_BURNOUT) * power / (Tuning.XENON_LAMBDA + Tuning.XENON_BURNOUT * power);
+		return ReactorDesign.xenonEquilibrium(power);
 	}
 
 	public void setHotStandbyForTest(double ppm) {
@@ -490,7 +479,7 @@ public final class Reactor {
 		kinetics.hold(power);
 	}
 
-	private void tripNow(String why) {
+	void tripNow(String why) {
 		if (!tripped) {
 			tripped = true;
 			trip = why;
@@ -531,243 +520,17 @@ public final class Reactor {
 			}
 		}
 
-		cvcs(in, dt);
+		ReactorCvcs.step(this, in, dt);
 
-		// reactivity and kinetics
-		double fuel = 0;
-		for (int i = 0; i < assemblies; i++) {
-			fuel += Tuning.ASSEMBLY_RHO_FRESH - Tuning.ASSEMBLY_RHO_PER_GWD * burnup[i];
-		}
-		fuel = assemblies == 0 ? -1 : fuel / Tuning.CORE_ASSEMBLIES - (Tuning.CORE_ASSEMBLIES - assemblies) * 0.05;
-		double centre = rccas > 0 ? Tuning.ROD_WORTH_CENTRE : 0;
-		double edges = Math.max(0, rccas - 1) * Tuning.ROD_WORTH_EDGE;
-		double rods = centre * inserted(bankD) + edges * inserted(shutdownBank);
-		double tfuel = tavg + Tuning.FUEL_RISE_C * power();
-		double rho = fuel - rods + Tuning.BORON_PER_PPM * ppm + Tuning.DOPPLER_PER_C * (tfuel - Tuning.TAVG_NO_LOAD)
-				+ mtc(ppm) * (tavg - Tuning.TAVG_NO_LOAD);
-		rho -= Tuning.XENON_WORTH * xenon;
-		if (!full()) {
-			rho = Math.min(rho, -0.05);   // no moderator
-		}
-		kinetics.step(rho, dt);
-		double p = power();
+		double p = ReactorNeutronics.kinetics(this, dt);
 
-		// decay heat, iodine and xenon follow the fissions (at real speed: the burnup speed-up is not theirs)
-		double prompt = 0;
-		for (int i = 0; i < decay.length; i++) {
-			double e = Math.exp(-Tuning.DECAY_LAMBDA[i] * dt);
-			decay[i] = decay[i] * e + Tuning.DECAY_SHARE[i] * p * (1 - e);
-			prompt += Tuning.DECAY_SHARE[i];
-		}
-		double made = Tuning.XENON_LAMBDA + Tuning.XENON_BURNOUT;   // xenon made a second at full power, of its equilibrium
-		iodine += (Tuning.IODINE_LAMBDA * p - Tuning.IODINE_LAMBDA * iodine) * dt;
-		xenon += (made * Tuning.XENON_DIRECT * p + made * (1 - Tuning.XENON_DIRECT) * iodine - (Tuning.XENON_LAMBDA + Tuning.XENON_BURNOUT * p) * xenon) * dt;
+		double prompt = ReactorNeutronics.decayAndXenon(this, p, dt);
 
-		// the primary's heat
-		// each steam generator's heat over the step (J), worked out as the exponential approach of the two sides so a long step is stable
-		double[] f = new double[2];
-		double uncovered = assemblies == 0 ? 0 : Math.max(0, Math.min(1, (Tuning.CORE_UNCOVERED - waterKg / Tuning.RCS_WATER_KG) / 0.4));
-		double heat = (p * (1 - prompt) + decayHeat() * (1 - uncovered)) * ratedWatts();   // an uncovered core's share heats the fuel
-		double sgHeat = 0;
-		double[] q = new double[2];
-		double speed = tavg < Tuning.TAVG_NO_LOAD ? Tuning.HEATUP_SPEEDUP : 1;
-		int loops = (in.loop[0] ? 1 : 0) + (in.loop[1] ? 1 : 0);
-		for (int l = 0; l < 2; l++) {
-			f[l] = in.loop[l] ? Math.max(in.pump[l], Tuning.NATURAL_CIRCULATION) : 0;
-			heat += in.pumpPower[l] * Tuning.RCP_WATTS * Tuning.RCP_HEAT;
-			if (in.loop[l]) {
-				double wet = Math.min(1, sgKg[l] / (0.3 * Tuning.SG_WATER_KG));
-				double ua = Tuning.SG_UA_W_PER_C * Math.pow(f[l], 0.8) * wet;
-				double primary = Tuning.RCS_HEAT_J_PER_C / speed / loops;
-				double secondary = Tuning.SG_HEAT_J_PER_C / (sgC[l] < Tuning.TAVG_NO_LOAD ? Tuning.HEATUP_SPEEDUP : 1);
-				double both = 1 / primary + 1 / secondary;
-				q[l] = (tavg - sgC[l]) * (1 - Math.exp(-ua * both * dt)) / both;
-				sgHeat += q[l];
-			}
-		}
-		flow = (f[0] + f[1]) / 2;
-		double loss = Tuning.RCS_LOSS_W * (tavg - 20) / (Tuning.TAVG_NO_LOAD - 20);
-		// the RHR: its exchanger on the circulating water, holding cold shutdown
-		rhrHeat = 0;
-		if (in.rhrPump > 0 && rhrPermit() && tavg > Tuning.RHR_HOLD_C && in.rhrWaterKgs > 0) {
-			double dT = Math.max(0, tavg - in.rhrWaterC);
-			rhrHeat = Math.min(Tuning.RHR_UA_W_PER_C * dT, in.rhrWaterKgs * 4186 * dT * 0.8) * in.rhrPump;
-		}
-		boolean controlled = coolingDown();
-		if (waterKg > 1) {
-			double joules = (heat - loss) * dt - sgHeat;
-			// the heat-up is compressed; so is the operators' cooldown (and the RHR's); a cool-down on its own is not
-			tavg += joules * (joules > 0 || controlled ? speed : 1) / Tuning.RCS_HEAT_J_PER_C - rhrHeat * dt * speed / Tuning.RCS_HEAT_J_PER_C;
-			// with more heat than goes out, the coolant boils off through the PORVs
-			double tsat = Steam.tsat(pressure());
-			if (tavg > tsat) {
-				double boil = (tavg - tsat) * Tuning.RCS_HEAT_J_PER_C * Math.min(1, waterKg / Tuning.RCS_WATER_KG) / Tuning.RCS_LATENT_J_PER_KG;
-				waterKg = Math.max(0, waterKg - boil);
-				tavg = tsat;
-			}
-		}
-		double dt33 = p * ratedWatts() / (Math.max(flow, Tuning.NATURAL_CIRCULATION) * 2 * loopFlow() * Steam.CP_COOLANT);
-		thot = tavg + dt33 / 2;
-		tcold = tavg - dt33 / 2;
-		if (controlled) {
-			if (Double.isNaN(cooldownC)) {
-				cooldownC = Math.min(sgC[0], sgC[1]);
-			}
-			cooldownC = Math.max(Tuning.COOLDOWN_FLOOR_C, cooldownC - Tuning.COOLDOWN_C_PER_H / 3600 * Tuning.HEATUP_SPEEDUP * dt);
-		} else {
-			cooldownC = Double.NaN;
-		}
+		ReactorThermal.step(this, in, dt, p, prompt, before, anyPump);
 
-		// the steam generators' secondary sides
-		for (int l = 0; l < 2; l++) {
-			vented[l] = 0;
-			if (!in.loop[l]) {
-				continue;
-			}
-			double mpa = Steam.psat(sgC[l]);
-			double adv = controlled ? Steam.psat(cooldownC) : Tuning.SG_ADV_MPA;
-			double vent = mpa > adv ? Math.min(Tuning.SG_ADV_KGS, Tuning.SG_ADV_KGS * (mpa - adv) / 0.1) * dt : 0;
-			vent = Math.min(vent, sgKg[l]);
-			vented[l] = vent;
-			double out = Math.min(in.steamTaken[l] + vent, sgKg[l]);
-			lastSteam[l] = out;
-			double latent = Steam.hg(mpa) - Steam.hf(sgC[l]);
-			double sub = Steam.hf(sgC[l]) - Steam.hf(Tuning.FEEDWATER_C);
-			double sgSpeed = sgC[l] < Tuning.TAVG_NO_LOAD ? Tuning.HEATUP_SPEEDUP : 1;
-			double joules = q[l] - out * latent - in.feed[l] * sub;
-			sgC[l] += joules * (joules > 0 || controlled ? sgSpeed : 1) / Tuning.SG_HEAT_J_PER_C;
-			sgKg[l] = Math.max(0, sgKg[l] + in.feed[l] - out);
-		}
+		ReactorNeutronics.burn(this, p, dt);
 
-		// the pressurizer
-		if (!in.pressurizer) {
-			pzrC = Math.max(Math.min(pzrC, tavg), pzrC - 2 * dt);
-		} else if (full()) {
-			double pzrSpeed = tavg < Tuning.TAVG_NO_LOAD ? Tuning.HEATUP_SPEEDUP : 1;
-			double gain = in.heaters * Tuning.PZR_HEATER_WATTS - Tuning.PZR_LOSS_W * (pzrC - 20) / (344.8 - 20);
-			pzrC += gain * dt * (gain > 0 ? pzrSpeed : 1) / Tuning.PZR_HEAT_J_PER_C + Tuning.PZR_SURGE * (tavg - before);
-			if (controlled && pressure() > cooldownMpa() + 0.2) {
-				pzrC = Math.max(Steam.tsat(cooldownMpa()), pzrC - Tuning.PZR_SPRAY_C_PER_S * pzrSpeed * dt);   // auxiliary spray off the charging pump
-			} else if (pressure() > Tuning.PZR_SPRAY_MPA && anyPump) {
-				pzrC = Math.max(tcold, pzrC - Tuning.PZR_SPRAY_C_PER_S * dt);
-			}
-			pzrC = Math.min(pzrC, Steam.tsat(Tuning.PORV_MPA));
-		} else {
-			pzrC = tavg;
-		}
-
-		// an uncovered core: its share of the decay heat goes into the fuel, and over 1,200 C the cladding fails and burns in the steam
-		if (uncovered > 0) {
-			fuelC = Math.max(fuelC, tavg);
-			double rate = fuelC > 900 ? Math.min(0.05, 1e-3 * Math.exp((fuelC - Tuning.CLAD_FAIL_C) / 100)) : 0;
-			double zr = rate * (Tuning.CORE_ZR_KG - zrOxidized) * dt * uncovered;
-			zrOxidized += zr;
-			h2 += zr * Tuning.H2_PER_ZR;
-			fuelC += (uncovered * decayHeat() * ratedWatts() * dt + zr * Tuning.ZR_OXIDATION_J_PER_KG
-					- Tuning.FUEL_STEAM_COOLING_W_PER_C * (fuelC - tavg) * dt) / Tuning.FUEL_HEAT_J_PER_C;
-		} else {
-			fuelC = tavg + Tuning.FUEL_RISE_C * p;
-		}
-		if (!coreDamaged && fuelC >= Tuning.CLAD_FAIL_C) {
-			coreDamaged = true;
-			tripped = false;
-			tripNow("CORE DAMAGE (the cladding failed at 1,200 C)");
-		}
-		if (!exploded && h2 >= Tuning.H2_IGNITE_KG) {
-			exploded = true;
-			blast = true;
-		}
-
-		// burnup
-		for (int i = 0; i < assemblies; i++) {
-			burnup[i] += p * burnupPerSecond() * dt;
-		}
-
-		// the trips
-		double mpa = pressure();
-		if (p > Tuning.P7) {
-			lowRangeBlocked = true;
-		} else if (p < Tuning.P7 * 0.9) {
-			lowRangeBlocked = false;
-		}
-		if (!in.crdm && (shutdownBank > 0 || bankD > 0 || !tripped)) {
-			tripNow("CRDM POWER LOST");
-		} else if (p > Tuning.TRIP_FLUX) {
-			tripNow("HIGH FLUX (109 %)");
-		} else if (!lowRangeBlocked && p > Tuning.TRIP_FLUX_LOW) {
-			tripNow("HIGH FLUX, LOW SETPOINT (25 %)");
-		} else if (p > Tuning.P7 && flow < Tuning.TRIP_LOW_FLOW) {
-			tripNow("LOW RCS FLOW");
-		} else if (p > Tuning.P9 && in.turbineTripped) {
-			tripNow("TURBINE TRIP (above P-9)");
-		} else if (p > Tuning.P8 && (in.pump[0] < Tuning.TRIP_LOW_FLOW || in.pump[1] < Tuning.TRIP_LOW_FLOW)) {
-			tripNow("REACTOR COOLANT PUMP LOST");
-		} else if (p > Tuning.P7 && mpa < Tuning.TRIP_LOW_MPA) {
-			tripNow("LOW PRESSURIZER PRESSURE");
-		} else if (mpa > Tuning.TRIP_HIGH_MPA) {
-			tripNow("HIGH PRESSURIZER PRESSURE");
-		} else if (full() && (thot > Tuning.TRIP_THOT_C || thot > Steam.tsat(mpa) - 3) && (shutdownBank > 0 || !tripped)) {
-			tripNow("OVERTEMPERATURE");
-		} else if ((in.loop[0] && sgLevel(0) < Tuning.SG_LOW_LOW) || (in.loop[1] && sgLevel(1) < Tuning.SG_LOW_LOW)) {
-			tripNow("STEAM GENERATOR LOW-LOW LEVEL");
-		} else if (tripped && SETPOINTS[setpoint] >= 0 && !coreDamaged) {
-			tripped = false;
-			trip = "";
-		}
-	}
-
-	private void cvcs(Inputs in, double dt) {
-		if (!in.cvcs) {
-			cvcsState = "NOT BUILT";
-			return;
-		}
-		if (in.charging <= 0) {
-			cvcsState = "charging pump stopped";
-			return;
-		}
-		double baPerPpmKg = 1e-6 / Tuning.B_IN_BORIC_ACID;   // kg of boric acid a ppm a kg of water
-		if (!full()) {
-			double kg = Math.min(Math.min(Tuning.RCS_FILL_KGS * in.charging * dt, in.water), Tuning.RCS_WATER_KG - waterKg);
-			double acid = targetPpm * kg * baPerPpmKg;
-			if (acid > in.boricAcid) {
-				cvcsState = "NO BORIC ACID: filling waits for bags in its hopper";
-				return;
-			}
-			if (kg <= 1e-9) {
-				cvcsState = "NO WATER: filling waits for its makeup pump";
-				return;
-			}
-			ppm = (ppm * waterKg + targetPpm * kg) / (waterKg + kg);
-			waterKg += kg;
-			boricAcidUsed = acid;
-			waterUsed = kg;
-			cvcsState = String.format("filling the RCS at %.0f kg/s, %.0f ppm: %.0f of %.0f t", kg / dt, targetPpm, waterKg / 1000, Tuning.RCS_WATER_KG / 1000);
-			return;
-		}
-		double kg = Tuning.CVCS_KGS * in.charging * dt;
-		if (ppm < targetPpm - 0.5) {
-			double gain = Math.min((Tuning.BORIC_ACID_TANK_PPM - ppm) * kg / waterKg, targetPpm - ppm);
-			double acid = gain * waterKg * baPerPpmKg;
-			if (acid > in.boricAcid) {
-				cvcsState = "NO BORIC ACID: put bags in its hopper";
-				return;
-			}
-			ppm += gain;
-			boricAcidUsed = acid;
-			cvcsState = String.format("borating toward %.0f ppm", targetPpm);
-		} else if (ppm > targetPpm + 0.5) {
-			if (in.water < kg) {
-				cvcsState = "NO WATER: diluting waits for its makeup pump";
-				return;
-			}
-			double loss = Math.min(ppm * kg / waterKg, ppm - targetPpm);
-			ppm -= loss;
-			boricAcidUsed = -loss * waterKg * baPerPpmKg;   // recovered from the letdown
-			waterUsed = kg;
-			cvcsState = String.format("diluting toward %.0f ppm", targetPpm);
-		} else {
-			cvcsState = String.format("holding %.0f ppm", ppm);
-		}
+		ReactorProtection.trips(this, in, p);
 	}
 
 	// ---- saving ----------------------------------------------------------------------------------------------------------------
@@ -779,80 +542,10 @@ public final class Reactor {
 	}
 
 	public void save(Store out) {
-		for (int i = 0; i < burnup.length; i++) {
-			out.put("burnup" + i, burnup[i]);
-		}
-		out.put("assemblies", assemblies);
-		out.put("rccas", rccas);
-		out.put("shutdownBank", shutdownBank);
-		out.put("bankD", bankD);
-		out.put("setpoint", setpoint);
-		out.put("tripped", tripped ? 1 : 0);
-		out.put("waterKg", waterKg);
-		out.put("ppm", ppm);
-		out.put("targetPpm", targetPpm);
-		out.put("tavg", tavg);
-		out.put("pzrC", pzrC);
-		for (int l = 0; l < 2; l++) {
-			out.put("sgC" + l, sgC[l]);
-			out.put("sgKg" + l, sgKg[l]);
-		}
-		out.put("power", kinetics.power());
-		for (int i = 0; i < decay.length; i++) {
-			out.put("decay" + i, decay[i]);
-		}
-		out.put("iodine", iodine);
-		out.put("xenon", xenon);
-		out.put("fuelC", fuelC);
-		out.put("zrOxidized", zrOxidized);
-		out.put("h2", h2);
-		out.put("coreDamaged", coreDamaged ? 1 : 0);
-		out.put("exploded", exploded ? 1 : 0);
-		for (int i = 0; i < 6; i++) {
-			out.put("precursor" + i, kinetics.precursors()[i]);
-		}
+		ReactorSaves.save(this, out);
 	}
 
 	public void load(Store in) {
-		for (int i = 0; i < burnup.length; i++) {
-			burnup[i] = in.get("burnup" + i, 0);
-		}
-		assemblies = (int) in.get("assemblies", 0);
-		rccas = (int) in.get("rccas", 0);
-		shutdownBank = in.get("shutdownBank", 0);
-		bankD = in.get("bankD", 0);
-		setpoint = (int) in.get("setpoint", 0);
-		tripped = in.get("tripped", 1) > 0.5;
-		trip = tripped ? "shut down" : "";
-		waterKg = in.get("waterKg", 0);
-		ppm = in.get("ppm", 0);
-		targetPpm = in.get("targetPpm", 1500);
-		tavg = thot = tcold = in.get("tavg", 20);
-		pzrC = in.get("pzrC", 20);
-		for (int l = 0; l < 2; l++) {
-			sgC[l] = in.get("sgC" + l, 20);
-			sgKg[l] = in.get("sgKg" + l, Tuning.SG_WATER_KG);
-		}
-		double[] c = new double[6];
-		for (int i = 0; i < 6; i++) {
-			c[i] = in.get("precursor" + i, 0);
-		}
-		kinetics.load(in.get("power", 0), c);
-		for (int i = 0; i < decay.length; i++) {
-			decay[i] = in.get("decay" + i, 0);
-		}
-		iodine = in.get("iodine", 0);
-		xenon = in.get("xenon", 0);
-		fuelC = in.get("fuelC", tavg);
-		zrOxidized = in.get("zrOxidized", 0);
-		h2 = in.get("h2", 0);
-		coreDamaged = in.get("coreDamaged", 0) > 0.5;
-		exploded = in.get("exploded", 0) > 0.5;
-		if (coreDamaged) {
-			trip = "CORE DAMAGE";
-		}
-		if (in.get("precursor0", -1) < 0) {
-			kinetics.hold(Tuning.NEUTRON_SOURCE / 0.05);
-		}
+		ReactorSaves.load(this, in);
 	}
 }
