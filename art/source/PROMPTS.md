@@ -161,3 +161,14 @@ with "no text, no logos, no people".
 - **refinery** (pick `refinery_a`): an oil refinery and gas plant at night, tall distillation columns, pipe racks and spherical
   storage tanks lit by hundreds of small lights, a flare stack burning, a gas turbine power plant with exhaust stacks beside it,
   reflections on a calm river in the foreground, starry dark blue sky.
+- **More oil fields** (Tim's son's favourite, 2026-11-02), same opening and ending:
+  - **oilfield_night** (pick `oil_night_b`): a tall steel drilling rig derrick at night lit up with bright work lights from top to
+    bottom, a gas flare burning orange beside it lighting the ground, pumpjacks silhouetted nearby, storage tanks, a starry dark
+    blue sky with a crescent moon over desert mesas.
+  - **oilfield_sunrise** (pick `oil_sunrise_a`): a long row of oil pumpjacks nodding across golden prairie grass at sunrise, a
+    wooden lease road with steel pipelines alongside, oil storage tanks and a separator in the middle distance, a windmill, long
+    shadows and a bright orange sun on the horizon.
+  - **oilfield_rig** (pick `oil_rigfloor_a`): a low-angle view looking up at a huge land drilling rig from its rig floor, the steel
+    lattice mast towering into a dramatic sunset sky, drill pipe stands racked in the derrick, the drawworks and rotary table in
+    the foreground, mud tanks and a diesel engine house beside it.
+  - The FTB instance picture is a 256x256 crop of **oilfield** (`wildcatter_oilfield_square.png`).
