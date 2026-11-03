@@ -127,8 +127,8 @@ MC.box((0.1, 0.0, 0.1), (2.9, 1.8, 5.9), "hipaint")                          # t
 MC.box((0.0, 1.8, 0.0), (3.0, 2.0, 6.0), "grey")                              # its lid
 for z in (1.0, 2.5, 4.0, 5.2):
 	MC.cylinder("y", (1.0, z), 0.18, 2.0, 2.8, "dark", 8)                    # the graphite anodes
-for y in (0.6, 1.2):
-	MC.box((2.9, y, 2.5), (3.0, y + 0.12, 3.5), "copper")                    # the bus bars, east
+for y in (0.4, 2.1):
+	MC.box((2.9, y, 3.1), (3.0, y + 0.12, 3.9), "copper")                    # the DC terminals, east at z 3: + over -
 MC.pipe([(2.2, 2.4, 0.5), (2.2, 2.4, 0.4), (2.2, 0.5, 0.4), (3.0, 0.5, 0.4)], 2, "steel")   # chlorine out, the east front
 MC.collide((0.1, 0.0, 0.1), (2.9, 2.0, 5.9))
 
@@ -148,8 +148,8 @@ for i in range(7):
 	z = 1.4 + i * 0.5
 	CA.box((0.5, 0.3, z), (2.3, 2.1, z + 0.3), "padgreen")                  # the bipolar elements
 CA.cylinder("y", (1.4, 0.6), 0.4, 0.2, 2.6, "galv", 12)                     # the brine tank and salt hopper
-for y in (0.6, 1.2):
-	CA.box((2.4, y, 2.6), (3.0, y + 0.12, 3.4), "copper")                    # the bus bars, east
+for y in (0.4, 2.1):
+	CA.box((2.4, y, 3.1), (3.0, y + 0.12, 3.9), "copper")                    # the DC terminals, east at z 3: + over -
 CA.pipe([(1.5, 0.5, 5.2), (1.5, 0.5, 6.0)], 2, "steel")                     # chlorine out, the back
 CA.pipe([(2.4, 0.5, 0.0), (2.4, 0.5, 0.4)], 2, "steel")                     # hydrogen out, the front
 CA.collide((0.4, 0.0, 0.2), (2.6, 2.6, 5.8))

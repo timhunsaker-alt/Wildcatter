@@ -19,11 +19,12 @@ import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 /**
- * The chlor-alkali cell (docs/multiblocks/zirconium.md): a small bipolar membrane electrolyser, 6 cells at 2.8 kA and 3.1 V from the
- * rectifier it touches, 96 % current efficiency. Brine from rock salt (a hopper on top) and pumped water. Chlorine out of the south
+ * The chlor-alkali cell (docs/multiblocks/zirconium.md, dc-bus.md): a small bipolar membrane electrolyser, 6 cells at 2.8 kA and 3.1 V,
+ * a DC load on its terminals (east face, z 3) or on the rectifier it touches, 96 % current efficiency. Brine from rock salt (a hopper on top) and pumped water. Chlorine out of the south
  * face of its back cells, hydrogen out of the north face of its front cells; the caustic soda is counted.
  */
-public class ChlorAlkaliCellBlockEntity extends PlantUnitBlockEntity implements HopperFed, WaterUser {
+public class ChlorAlkaliCellBlockEntity extends PlantUnitBlockEntity implements HopperFed, WaterUser, dev.wildcatter.circuit.CircuitPart, Electrolysis.Part {
+	private final Electrolysis dc = new Electrolysis(new dev.wildcatter.circuit.DcCell(Tuning.CA_CELLS, Tuning.CA_CELL_BACK_EMF, Tuning.CA_CELL_VOLTS, Tuning.CA_CELL_KA * 1000), 2, 3, Direction.EAST);
 	private static final double WATER_HOLD = 400.0;
 	private final NonNullList<ItemStack> slots = NonNullList.withSize(1, ItemStack.EMPTY);
 	private double salt, water, naoh;
@@ -76,17 +77,17 @@ public class ChlorAlkaliCellBlockEntity extends PlantUnitBlockEntity implements 
 		if (c.salt <= 1e-6 && !c.useOne().isEmpty()) {
 			c.salt += Ore.HALITE.kgPerBlock();
 		}
-		RectifierBlockEntity rectifier = Touching.find(level, pos, RectifierBlockEntity.class, r -> true);
-		boolean work = rectifier != null && c.salt > 1e-6 && c.water > 0.01 && c.room(Product.CHLORINE) > 1e-6;
-		c.share = rectifier == null ? 0 : rectifier.supply(work ? Zirconium.chlorAlkaliWatts() : 0, Zirconium.chlorAlkaliVolts());
-		if (rectifier == null) {
-			c.status = "NO DC: set a RECTIFIER against it";
-		} else if (c.salt <= 1e-6) {
+		boolean work = c.salt > 1e-6 && c.water > 0.01 && c.room(Product.CHLORINE) > 1e-6;
+		c.dc.setDrawing(level, work);
+		c.share = c.dc.share();
+		if (c.salt <= 1e-6) {
 			c.status = "NO SALT: put rock salt in its hopper";
 		} else if (c.water <= 0.01) {
 			c.status = "NO WATER: pump water to it";
 		} else if (!work) {
 			c.status = "idle: its chlorine has nowhere to go (pipe its back end to a chlorinator)";
+		} else if (c.dc.amps() < 1) {
+			c.status = "NO DC: set a RECTIFIER against it, or run DC bus bars to its terminals (east face)";
 		} else {
 			double cl2 = Math.min(Math.min(Zirconium.chlorAlkaliKgs() * seconds() * c.share, c.room(Product.CHLORINE)),
 					Math.min(c.salt / Tuning.CA_SALT_PER_CL2, c.water / Tuning.CA_WATER_PER_CL2));
@@ -95,10 +96,30 @@ public class ChlorAlkaliCellBlockEntity extends PlantUnitBlockEntity implements 
 			c.add(Product.CHLORINE, cl2);
 			c.add(Product.HYDROGEN, cl2 * Zirconium.hydrogenM3PerCl2());   // what has nowhere to go is vented
 			c.naoh += cl2 * Tuning.NAOH_PER_CL2;
-			c.status = cl2 > 1e-9 ? String.format("%d cells at %.1f V and %.2f kA: %.1f kg/h of chlorine, %.1f m3/h of hydrogen", Tuning.CA_CELLS, Tuning.CA_CELL_VOLTS,
-					Tuning.CA_CELL_KA * c.share, cl2 / seconds() * 3600, cl2 * Zirconium.hydrogenM3PerCl2() / seconds() * 3600) : "starting: waiting for DC from the rectifier";
+			c.status = cl2 > 1e-9 ? String.format("%d cells at %.1f V and %.2f kA: %.1f kg/h of chlorine, %.1f m3/h of hydrogen", Tuning.CA_CELLS, c.dc.volts() / Tuning.CA_CELLS,
+					c.dc.amps() / 1000, cl2 / seconds() * 3600, cl2 * Zirconium.hydrogenM3PerCl2() / seconds() * 3600) : "starting: waiting for DC from the rectifier";
 		}
 		c.setChanged();
+	}
+
+	@Override
+	public Electrolysis electrolysis() {
+		return dc;
+	}
+
+	@Override
+	public boolean hasPort(Direction face, dev.wildcatter.circuit.Conductor role, dev.wildcatter.energy.Voltage voltage) {
+		return false;
+	}
+
+	@Override
+	public void build(dev.wildcatter.circuit.Circuit circuit) {
+		dc.build(circuit, this);
+	}
+
+	@Override
+	public void apply(dev.wildcatter.circuit.Circuit circuit, int ticks) {
+		dc.apply(circuit);
 	}
 
 	@Override

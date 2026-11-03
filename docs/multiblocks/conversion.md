@@ -14,6 +14,7 @@ Three supporting plants make the reagents:
 
 Decided with Tim on 2026-11-01:
 - **DC:** the rectifier is an ordinary three-phase AC load. Its DC side (volts, kA, cells in series) is worked out inside it and shown in its readouts, with no DC tier in the solver.
+  **Superseded in 10b1** (Tim, 2026-11-03): the DC side is now solved on the circuit, with bus bars (docs/multiblocks/dc-bus.md).
 - **Size:** the plant is **quarter size**: 12 fluorine cells, about 0.7 MW at 4.16 kV.
 
 Sources:
@@ -77,6 +78,10 @@ The main line passes its solids and its UF6 by touching, the way they move insid
   - the cell house's fluorine goes out of the south face of its back cells (z 11, bottom), and its HF comes in on the north face of its front cells (z 0, bottom).
 - **480 V boxes:** on the west face of the main cell of each powered part: cold traps, distillation columns, cylinder filler and HF kiln.
 - **4.16 kV:** on the rectifier, the west face of its main cell.
+- **DC (10b1, dc-bus.md):**
+  - the rectifier's + and − terminals are on its east face at z 2 (+ at y 2, − at y 0);
+  - the cell house's are on its west face at z 6 (+ at y 2, − at y 0);
+  - set against each other they join directly, as before; otherwise run DC bus bars between them.
 - **Water:** the reformer and the cell house take water off a pump.
 - **Hoppers:** drums on the reducer, fluorspar on the kiln and empty cylinders on the filler go in from on top. Empty drums and full cylinders come out to a hopper under the part.
 
@@ -88,7 +93,8 @@ The main line passes its solids and its UF6 by touching, the way they move insid
   - cold traps and columns: their 480 V.
 - **Rates:** each stage is rated at the plant's 0.075 kg of U a second, with a fifth more to catch up.
 - **The cell house:** it asks the rectifier for its 6 kA. Its fluorine follows the share of power the rectifier gets.
-  - With no rectifier against it: NO DC.
+  - From 10b1, its fluorine follows the DC current through it (dc-bus.md). A rectifier set against it takes its 6 kA as its setpoint.
+  - With no current: NO DC.
   - Without HF or water it stops.
 - **Removing a part** stops what needs it.
 

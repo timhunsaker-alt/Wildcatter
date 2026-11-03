@@ -1279,6 +1279,36 @@ lang.update({"block.wildcatter.soft_starter": "Soft Starter (480 V)", "block.wil
 	"item.wildcatter.mcc_soft_starter_bucket": "MCC Bucket (soft starter)", "item.wildcatter.mcc_drive_bucket": "MCC Bucket (drive, up to 100 hp)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 10b1: DC bus bars (docs/multiblocks/dc-bus.md) ------------------------------------------------------------------
+# A metre of bare copper flat bar on two porcelain standoffs, drawn along z; the blockstate turns it to x (y 90) or up (x 90).
+# 4 kA: 4 bars of 100 x 10 mm; 16 kA: 8 bars of 200 x 10 mm (1.6 and 3.2 sixteenths tall, a sixteenth wide).
+DC_BUSES = {"dc_bus_4k": (4, 1.6), "dc_bus_16k": (8, 3.2)}
+for name, (bars, tall) in DC_BUSES.items():
+	els = []
+	for z in (3, 11):
+		els.append(cuboid([7, 0, z], [9, 5, z + 2], "#glaze"))          # the porcelain standoff
+		els.append(cuboid([4, 5, z], [12, 6, z + 2], "#steel"))        # its bar clamp
+	pitch = 7.0 / bars
+	for k in range(bars):
+		x = 4.5 + k * pitch
+		els.append(cuboid([round(x, 3), 6, 0], [round(x + pitch * 0.6, 3), round(6 + tall, 3), 16], "#copper"))
+	save_json(f"{ASSETS}/models/block/{name}.json", {"textures": {"glaze": f"{ns}:block/mat/mat_porcelain_brown", "steel": f"{ns}:block/mat/mat_galvanized",
+		"copper": f"{ns}:block/mat/mat_copper", "particle": f"{ns}:block/mat/mat_copper"}, "elements": els})
+	save_json(f"{ASSETS}/blockstates/{name}.json", {"variants": {"axis=z": {"model": f"{ns}:block/{name}"}, "axis=x": {"model": f"{ns}:block/{name}", "y": 90},
+		"axis=y": {"model": f"{ns}:block/{name}", "x": 90}}})
+	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{name}"}})
+	save_json(f"{DATA}/loot_table/blocks/{name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],
+		"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+shaped("dc_bus_4k", ["CCC", "B B"], {"C": "minecraft:copper_ingot", "B": "minecraft:brick"}, "dc_bus_4k", 4)
+shaped("dc_bus_16k", ["KKK", "B B"], {"K": "minecraft:copper_block", "B": "minecraft:brick"}, "dc_bus_16k", 4)
+for tag in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
+	t["values"] += [f"{ns}:{n}" for n in DC_BUSES if f"{ns}:{n}" not in t["values"]]
+	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({"block.wildcatter.dc_bus_4k": "DC Bus Bar (4 kA copper)", "block.wildcatter.dc_bus_16k": "DC Bus Bar (16 kA copper)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # Every conductor item and the sizes it comes in (the Java side: energy/ConductorSize).
 BUILDING = ["awg_12", "awg_10", "awg_6", "awg_2", "awg_4_0", "kcmil_500"]
 ACSR = ["acsr_sparrow", "acsr_raven", "acsr_penguin", "acsr_linnet", "acsr_drake"]

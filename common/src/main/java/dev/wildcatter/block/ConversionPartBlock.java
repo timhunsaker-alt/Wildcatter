@@ -111,6 +111,13 @@ public class ConversionPartBlock extends BigPartBlock implements net.minecraft.w
 			return InteractionResult.SUCCESS;
 		}
 		BlockEntity entity = level.getBlockEntity(main(pos, state));
+		if (entity instanceof RectifierBlockEntity rectifier) {
+			if (player.isShiftKeyDown()) {
+				rectifier.nextSetpoint();
+			} else {
+				rectifier.reset();
+			}
+		}
 		if (entity instanceof CylinderFillerBlockEntity filler && filler.full() > 0) {
 			filler.giveAll(player);
 			return InteractionResult.SUCCESS;

@@ -182,7 +182,7 @@ and the Field Manual has a page for each new system.
   - the first release, v0.2.0, at the end of Phase 9.
 
 ## Phase 10 — Machines and grid at scale — CURRENT (picked by Tim 2026-11-02, from Ideas)
-- **10a: soft starters and drives for big motors** — CURRENT (specs: `docs/multiblocks/soft-starter.md`, `vfd.md`).
+- **10a: soft starters and drives for big motors** — DONE 2026-11-03 (specs: `docs/multiblocks/soft-starter.md`, `vfd.md`).
   - **Gear:** real cabinets wired between the breaker and the motor, at 480 V (standalone cabinets and MCC buckets) and 4.16 kV
     (a true-size soft-starter cabinet and a drive lineup).
   - **Soft starter:** SCRs hold the current at a dial setting of 2-5 x full-load amps (3.5 x default), then a bypass contactor
@@ -191,7 +191,19 @@ and the Field Manual has a page for each new system.
   - **Drive houses:** the existing drive houses also take constant power.
   - **Docs cleanup:** stale known gaps and duplicate ideas.
 - **10b: the DC tier and aluminium.** Bus bars that can short and shock, in the solver; then a Bayer refinery and Hall–Héroult pots,
-  a very large DC load (from the 7a bauxite). The DC tier also feeds the conversion fluorine cells.
+  a very large DC load (from the 7a bauxite). The DC tier also feeds the conversion fluorine cells. Three waves:
+  - **10b1: the DC tier** — CURRENT (spec: `docs/multiblocks/dc-bus.md`):
+    - DC bus bars on the solver (copper, 4 kA and 16 kA);
+    - the rectifier becomes a current-regulated DC source with a setpoint dial and a ground-fault detector;
+    - the fluorine, magnesium and chlor-alkali cells become DC loads on it. This supersedes 7d's "no DC tier in the solver".
+  - **10b2: the Bayer refinery and AlF3.** Bauxite to alumina, with caustic soda from the chlor-alkali cell (made a real pipe product)
+    and lime from a lime kiln. AlF3 from the conversion HF.
+  - **10b3: anodes and the potline:**
+    - a delayed coker on the crude unit's residue, and a calciner, for petroleum coke;
+    - coal-tar pitch from coking coal;
+    - an anode plant that forms and bakes the blocks;
+    - the potline's rectifiers and aluminium bus;
+    - 180 kA prebake Hall–Héroult pots at true size, the player choosing how many in series.
 - **10c: construction cranes.** Tim's idea of 2026-11-01. A stationary heavy-lift crane builds a plant from a design spec. Its open
   decisions are asked at the start of 10c:
   - crane types and sizes;
@@ -214,6 +226,13 @@ and the Field Manual has a page for each new system.
   - relay protection for the 13.8 kV bus;
   - a short-time overload rule for rated transformers (IEEE C57.109 through-fault, about I²t = 1250 pu²·s) in place of the pole
     transformer's 150 % for 10 s. That would let direct starts slow down with V² too (from 10a, 2026-11-02).
+- Decided with Tim on 2026-11-03 (the 10b plan):
+  - three waves (10b1, 10b2, 10b3);
+  - 180 kA prebake pots;
+  - anodes from a delayed coker and pitch;
+  - the Bayer refinery's caustic from chlor-alkali and its lime from a lime kiln;
+  - the DC system ungrounded with a ground-fault detector;
+  - a cell touching its rectifier still works.
 - Decided with Tim on 2026-11-02:
   - these 4, in this order;
   - for 10a, real separate cabinets at 480 V and 4.16 kV, with the values above.

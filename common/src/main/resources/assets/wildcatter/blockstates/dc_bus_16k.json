@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "axis=z": {
+      "model": "wildcatter:block/dc_bus_16k"
+    },
+    "axis=x": {
+      "model": "wildcatter:block/dc_bus_16k",
+      "y": 90
+    },
+    "axis=y": {
+      "model": "wildcatter:block/dc_bus_16k",
+      "x": 90
+    }
+  }
+}

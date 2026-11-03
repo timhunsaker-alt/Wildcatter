@@ -475,6 +475,60 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 10b1: the DC tier (spec: docs/multiblocks/dc-bus.md)
+- **DC on the same solver:**
+  - a DC network is resistors and EMFs at 0°, solved in the same group as the rectifier's AC side;
+  - DC terminals use their own role and voltage key (`Circuit.dcPort`), so nothing AC joins them;
+  - the solver's smallest impedance is now 1 nΩ, so a 180 kA string of 40 pots on nΩ bus solves to 0.1 % (`DcSolveTest`).
+- **The rectifier** (`circuit/DcSupply`):
+  - **regulation:** a current-regulated source with a setpoint dial (1-16 kA, 6 kA default). It rises at most 15 V/s, up to
+    150 V, and comes down at once;
+  - **diode bridge:** it is off while below the load's own voltage;
+  - **trips:** on DC overcurrent, 1.25 x for 1 s, or 2 x at once when its terminals collapse (a bolted short). A cell closing
+    onto the open-circuit 150 V overshoots for a moment and is pulled back, not tripped;
+  - **AC side:** the DC output / 0.97 at PF 0.95. The fluorine house is back at 668 kW, as in 7d;
+  - **ground-fault detector:** 10 kΩ from each pole to earth; it names the faulted pole.
+- **Cells** (`circuit/DcCell`, `block/Electrolysis`):
+  - the fluorine house, the magnesium cell and the chlor-alkali cell are now DC loads, each a back-EMF behind a resistance;
+  - what they make goes with the current through them;
+  - an idle cell opens its circuit;
+  - + and − terminals two cells apart on one face;
+  - **touching:** a cell set against its rectifier still works, joined directly, and the rectifier takes its rated current.
+- **Bus bars:** `dc_bus_4k` and `dc_bus_16k`, bare copper on porcelain standoffs, laid along an axis.
+  - They join any bar or DC terminal they touch.
+  - Against a ground wire, a bar is a ground fault.
+  - They heat and burn open as wires do.
+  - From 120 V DC to earth they shock, at half the 480 V tier's strength per volt (`Shock.zapDc`).
+- **Field Manual:** a DC: RECTIFIERS AND BUS BARS page; the fluorine and the chlorine-and-magnesium pages point to it.
+- **Unit tests:**
+  - `DcSolveTest`: the potline string; a ground fault puts the other pole at full voltage;
+  - `DcTest`:
+    - 6 kA held through 1, 4 and 12 cells;
+    - capped at 150 V;
+    - the detector's ±V/2 and fault;
+    - open circuit at 150 V;
+    - a cell closing onto it does not trip;
+    - a short trips, and resets.
+- **Game test `dcTier`:**
+  - **on the bus:** a magnesium cell 8 m away on 16 kA bus. The rectifier holds 14.00 kA at 5 V, 77 kW of AC, and the poles read
+    ±3 V. The cell makes 5.7 kg/h of magnesium;
+  - **ground fault:** a ground wire against the − bus is named, with no trip;
+  - **burn:** a 4 kA bar in the run burns open;
+  - **open:** the rectifier rises to 150 V. With − faulted, the + bus is at 150 V and shocks a pig;
+  - **short:** a bar across the runs trips it at 1,308 kA;
+  - **touching:** a magnesium cell against its rectifier takes 14 kA.
+- **Reruns pass:**
+  - conversion: 108 V, 6.00 kA, 668 kW;
+  - zirconium: chlor-alkali 2.80 kA, magnesium 14.0 kA;
+  - fuel, cascade, plugs;
+  - the NeoForge smoke scenes.
+- **Changed from the plan while building:**
+  - DC uses a hidden role key, not a new `Conductor` value: that would have added a state to every cable block;
+  - + sits at y 2 and − at y 0, so the first bars off them don't touch;
+  - the scene runs the magnesium cell on the bus, not the fluorine house: anhydrous HF can't be stocked in a tank;
+  - the rectifier's internal resistance is 0.1 mΩ (0.5 mΩ was planned): at 0.5 mΩ, its own drop was counted as power on top of
+    its 97 %.
+
 ## Phase 10a: soft starters and drives for big motors (specs: docs/multiblocks/soft-starter.md, vfd.md)
 - **Motors** (`circuit/Motor`):
   - behind a ramping soft starter (`Circuit.softStarted`) the starting torque goes with V², so the start takes longer. A direct
@@ -821,7 +875,7 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   - RECTIFIER (4.16 kV, 12-pulse, 0.95 power factor) against the FLUORINE CELL HOUSE: 12 KF·2HF cells at 9 V and 6 kA,
     108 V DC, about 0.67 MW from the AC side.
 - **The rectifier and the AC grid:** it is an AC load on the grid (Tim's decision). The DC side is worked out in it and shown in
-  its readout. `circuit/DriveLoad` now takes a power factor and a frequency floor; the rectifier has no floor, so it does not shed
+  its readout. (Superseded in 10b1: the DC side is now on the solver, with bus bars.) `circuit/DriveLoad` now takes a power factor and a frequency floor; the rectifier has no floor, so it does not shed
   load.
 - **New pipe products:** hydrogen, anhydrous HF (no stock tank holds it), fluorine.
 - **New items:** Empty 48Y Cylinder and 48Y Cylinder of UF6, with Ludo icons (2 credits).
@@ -1003,6 +1057,10 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- Phase 10b1:
+  - the bus bars' standoffs stand on the floor of their own cell, so a run carried up in the air shows them hanging (no
+    supports or structure yet);
+  - the chlor-alkali caustic soda is still only counted (10b2 makes it a pipe product).
 - Phase 9c: Mekanism has not been tried: it is not yet released for 26.3. Plugs were checked against a real NeoForge energy
   handler on a stand-in block.
 - Phase 9b: the NeoForge client loads with no errors (`:neoforge:runClient`), but no in-world screenshot was taken: quick-play into a

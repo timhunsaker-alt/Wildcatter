@@ -15,11 +15,12 @@ import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 /**
- * The fluorine cell house (docs/multiblocks/conversion.md): 12 KF·2HF cells in series, 9 V and 6 kA each, from the rectifier
- * touching it. Anhydrous HF in on the north face of its front cells; fluorine out of the south face of its back cells, 95 % of
+ * The fluorine cell house (docs/multiblocks/conversion.md, dc-bus.md): 12 KF·2HF cells in series, 9 V and 6 kA each, a DC load
+ * on its terminals (west face, z 6) or on the rectifier touching it. Anhydrous HF in on the north face of its front cells; fluorine out of the south face of its back cells, 95 % of
  * Faraday's 0.709 kg a kAh. Its cooling tower's make-up water comes off a pump; the cathode hydrogen goes up its vent.
  */
-public class FluorineCellHouseBlockEntity extends PlantUnitBlockEntity implements WaterUser {
+public class FluorineCellHouseBlockEntity extends PlantUnitBlockEntity implements WaterUser, dev.wildcatter.circuit.CircuitPart, Electrolysis.Part {
+	private final Electrolysis dc = new Electrolysis(new dev.wildcatter.circuit.DcCell(Tuning.F2_CELLS, Tuning.F2_CELL_BACK_EMF, Tuning.F2_CELL_VOLTS, Tuning.F2_CELL_KA * 1000), 0, 6, Direction.WEST);
 	private double water;
 	private double share;
 
@@ -58,27 +59,47 @@ public class FluorineCellHouseBlockEntity extends PlantUnitBlockEntity implement
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
 			return;
 		}
-		RectifierBlockEntity rectifier = Touching.find(level, pos, RectifierBlockEntity.class, r -> true);
 		double waiting = Lines.available(level, h.hf(), Product.ANHYDROUS_HF, Pull.MACHINE, h) * Tuning.AHF_KG_PER_L;
-		boolean work = rectifier != null && waiting > 1e-6 && h.water > 0.01 && h.room(Product.FLUORINE) > 1e-6;
-		h.share = rectifier == null ? 0 : rectifier.supply(work ? Conversion.dcWatts() : 0, Conversion.dcVolts());
-		if (rectifier == null) {
-			h.status = "NO DC: set a RECTIFIER against it";
-		} else if (waiting <= 1e-6) {
+		boolean work = waiting > 1e-6 && h.water > 0.01 && h.room(Product.FLUORINE) > 1e-6;
+		h.dc.setDrawing(level, work);
+		h.share = h.dc.share();
+		if (waiting <= 1e-6) {
 			h.status = "NO HF: pipe anhydrous HF to the north face of its front";
 		} else if (h.water <= 0.01) {
 			h.status = "NO COOLING WATER: pump water to it";
 		} else if (!work) {
 			h.status = "idle: its fluorine has nowhere to go (pipe its back end to a fluorinator)";
+		} else if (h.dc.amps() < 1) {
+			h.status = "NO DC: set a RECTIFIER against it, or run DC bus bars to its terminals (west face)";
 		} else {
 			double f2 = Math.min(Math.min(Conversion.fluorineKgs() * seconds() * h.share, h.room(Product.FLUORINE)), waiting / Tuning.F2_HF_PER_F2);
 			Lines.pull(level, h.hf(), Product.ANHYDROUS_HF, f2 * Tuning.F2_HF_PER_F2 / Tuning.AHF_KG_PER_L, Pull.MACHINE, h);
 			h.water = Math.max(0, h.water - Tuning.F2_COOLING_LPS * seconds() * h.share);
 			h.add(Product.FLUORINE, f2);
-			h.status = f2 > 1e-7 ? String.format("%d cells at %.1f V and %.2f kA: %.1f kg/h of fluorine", Tuning.F2_CELLS, Tuning.F2_CELL_VOLTS,
-					Tuning.F2_CELL_KA * h.share, f2 / seconds() * 3600) : "starting: waiting for DC from the rectifier";
+			h.status = f2 > 1e-7 ? String.format("%d cells at %.1f V and %.2f kA: %.1f kg/h of fluorine", Tuning.F2_CELLS, h.dc.volts() / Tuning.F2_CELLS,
+					h.dc.amps() / 1000, f2 / seconds() * 3600) : "starting: waiting for DC from the rectifier";
 		}
 		h.setChanged();
+	}
+
+	@Override
+	public Electrolysis electrolysis() {
+		return dc;
+	}
+
+	@Override
+	public boolean hasPort(Direction face, dev.wildcatter.circuit.Conductor role, dev.wildcatter.energy.Voltage voltage) {
+		return false;
+	}
+
+	@Override
+	public void build(dev.wildcatter.circuit.Circuit circuit) {
+		dc.build(circuit, this);
+	}
+
+	@Override
+	public void apply(dev.wildcatter.circuit.Circuit circuit, int ticks) {
+		dc.apply(circuit);
 	}
 
 	@Override

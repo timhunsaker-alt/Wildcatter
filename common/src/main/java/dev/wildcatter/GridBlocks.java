@@ -169,6 +169,11 @@ public interface GridBlocks {
 	Block DRIVE_MV_CONTROL = block("drive_mv_control", props -> new dev.wildcatter.block.StarterCabinetBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(3.5F, 7.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), dev.wildcatter.multiblock.Footprint.box(1, 3, 2, 0, 0), "drive_mv_control",
 			dev.wildcatter.block.Starter.Kind.DRIVE, Voltage.MEDIUM, Tuning.CABINET_SETTINGS_MV, true));
+	/** Bare copper DC bus bars on standoff insulators (docs/multiblocks/dc-bus.md). */
+	Block DC_BUS_4K = block("dc_bus_4k", props -> new dev.wildcatter.block.DcBusBarBlock(props.mapColor(MapColor.COLOR_ORANGE)
+			.strength(3.0F, 6.0F).sound(SoundType.COPPER).requiresCorrectToolForDrops().noOcclusion(), Tuning.DC_BUS_4K_AMPS, Tuning.DC_BUS_4K_OHMS_PER_M, "4 kA"));
+	Block DC_BUS_16K = block("dc_bus_16k", props -> new dev.wildcatter.block.DcBusBarBlock(props.mapColor(MapColor.COLOR_ORANGE)
+			.strength(3.0F, 6.0F).sound(SoundType.COPPER).requiresCorrectToolForDrops().noOcclusion(), Tuning.DC_BUS_16K_AMPS, Tuning.DC_BUS_16K_OHMS_PER_M, "16 kA"));
 	Block DRIVE_MV_TRANSFORMER = block("drive_mv_transformer", props -> new dev.wildcatter.block.DriveSectionBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(3.5F, 7.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), dev.wildcatter.multiblock.Footprint.box(2, 3, 2, 0, 0), "drive_mv_transformer"));
 	Block DRIVE_MV_CELLS = block("drive_mv_cells", props -> new dev.wildcatter.block.DriveSectionBlock(props.mapColor(MapColor.COLOR_GRAY)

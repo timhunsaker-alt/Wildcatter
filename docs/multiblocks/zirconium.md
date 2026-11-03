@@ -71,6 +71,13 @@ The metal passes from part to part by touching, as it moves inside a real plant.
 
 **Reused:** the conversion plant's `rectifier` (4.16 kV, 12-pulse; conversion.md). Each cell asks the rectifier it touches for its DC. A cell needs its own rectifier, as each real potline has.
 
+**From 10b1 (dc-bus.md):**
+- the cells are DC loads on the circuit;
+- each cell's + and − terminals are on its east face at z 3 (+ at y 2, − at y 0);
+- a rectifier set against a cell joins it directly and takes its rated current as its setpoint;
+- otherwise, run DC bus bars between them;
+- output follows the current through the cell.
+
 ## Products and items
 - **Chlorine:** a new pipe product (kg, a gas). Hydrogen is the conversion plant's.
 - **Zircaloy-4 cladding tube:** 9.50 x 0.57 mm, 3.85 m, 0.404 kg.
@@ -93,7 +100,7 @@ The metal passes from part to part by touching, as it moves inside a real plant.
   - Each one reads what stops it: NO CHLORINE, NO CARBON, NO MAGNESIUM, NO TIN, NO IRON, NO CHROMIUM, NO ANNEAL FURNACE.
   - A part with nothing set against it reads NOT BUILT and names the part it needs.
 - **The cells:** each asks its rectifier for its DC, and its output follows the share it gets.
-  - With no rectifier against it: NO DC.
+  - With no current through it: NO DC.
   - The chlor-alkali cell stops without salt or water.
   - The magnesium cell stops without MgCl2.
 - **Removing a part** stops what needs it.

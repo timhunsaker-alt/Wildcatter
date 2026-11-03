@@ -56,6 +56,17 @@ public final class Shock {
 		zapScaled(level, victim, voltage, source, (float) Math.min(1.0, Math.abs(volts) / voltage.nominal()));
 	}
 
+	/**
+	 * A DC shock (docs/multiblocks/dc-bus.md): nothing below 120 V, the ripple-free DC extra-low-voltage limit; above it the 480 V
+	 * tier's shock at {@code volts} / 600 V, halved, as DC is a few times less dangerous than AC at the same current.
+	 */
+	public static void zapDc(ServerLevel level, LivingEntity victim, BlockPos source, double volts) {
+		if (Math.abs(volts) < Tuning.DC_SHOCK_MIN_VOLTS) {
+			return;
+		}
+		zapScaled(level, victim, Voltage.INDUSTRIAL, source, (float) (Math.min(1.0, Math.abs(volts) / Tuning.DC_SHOCK_FULL_VOLTS) * Tuning.DC_SHOCK_FACTOR));
+	}
+
 	/** Shocks {@code victim} at full strength. */
 	public static void zap(ServerLevel level, LivingEntity victim, Voltage voltage, BlockPos source) {
 		zapScaled(level, victim, voltage, source, 1.0F);

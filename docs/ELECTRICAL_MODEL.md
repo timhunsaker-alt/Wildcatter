@@ -94,6 +94,24 @@ voltage transformers (wye-grounded, 1 MΩ a phase) give the 13.8 kV bus its grou
 - **Losses:** I²R in conductors; transformer copper and core losses. Conductor ampacity depends on
   size and material; exceeding it heats and eventually damages the conductor.
 
+## DC (electrolysis; Phase 10b1, `docs/multiblocks/dc-bus.md`)
+- **On the same solver:** a DC network is resistors and EMFs at 0°, so the phasor solver solves it exactly. A rectifier's DC side is
+  in the same group as its AC side, with no branch between them; its AC side is a constant-power load taking the DC watts of
+  the last solve / 0.97 at PF 0.95.
+- **Terminals:** DC ports use their own role and voltage key, so nothing AC joins them. A bus bar has no polarity: its voltage
+  is whatever the cells along it make it.
+- **The rectifier:**
+  - it regulates current: each solve it moves its EMF toward its setpoint (at most 15 V/s, up to 150 V);
+  - while its EMF is below the load's own voltage it is off, as a diode bridge is;
+  - it trips on DC overcurrent: 1.25 x for 1 s, or 2 x at once.
+- **Cells:** a back-EMF in series with a resistance; what they make goes with the current through them.
+- **Grounding:**
+  - ungrounded: a detector ties each pole to earth through 10 kΩ, so the poles sit at ±V/2;
+  - a pole that touches earth (a ground wire) alarms the detector, and puts the other pole at full voltage to earth.
+- **Shock:** a bare bar at 120 V DC or more to earth shocks (the IEC ripple-free ELV limit), at half the AC 480 V tier's strength
+  per volt.
+- **Small impedances:** the solver's smallest impedance is 1 nΩ (it was 1 µΩ), so bus bars of a few µΩ/m solve true.
+
 ## Receptacles and plugs (link to other mods)
 - A **receptacle** is a grid block wired like any load point (phase conductors + N + G as needed).
 - A **plug adapter** is crafted to match one receptacle type. It only fits a receptacle of the same

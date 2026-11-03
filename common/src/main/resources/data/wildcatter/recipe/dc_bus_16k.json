@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "KKK",
+    "B B"
+  ],
+  "key": {
+    "K": "minecraft:copper_block",
+    "B": "minecraft:brick"
+  },
+  "result": {
+    "id": "wildcatter:dc_bus_16k",
+    "count": 4
+  }
+}

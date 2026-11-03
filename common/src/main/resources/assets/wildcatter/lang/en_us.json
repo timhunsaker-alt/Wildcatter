@@ -178,6 +178,8 @@
   "block.wildcatter.drive_mv_control": "MV Drive: Output and Control Section (4.16 kV)",
   "item.wildcatter.mcc_soft_starter_bucket": "MCC Bucket (soft starter)",
   "item.wildcatter.mcc_drive_bucket": "MCC Bucket (drive, up to 100 hp)",
+  "block.wildcatter.dc_bus_4k": "DC Bus Bar (4 kA copper)",
+  "block.wildcatter.dc_bus_16k": "DC Bus Bar (16 kA copper)",
   "block.wildcatter.oil_wellhead": "Oil Wellhead (rod pumping)",
   "block.wildcatter.rig_substructure": "Land Rig Substructure (the controller, 9 x 9 m)",
   "block.wildcatter.rig_mast": "Land Rig Mast (43 m)",

@@ -21,7 +21,8 @@ public final class PhasorSolver {
 	public static final int GROUND = 0;
 	/** Stops floating pieces of circuit making the equations unsolvable: a tiny leak to ground at every node. */
 	private static final double LEAK = 1e-12;
-	private static final double MIN_OHMS = 1e-6;
+	/** The smallest impedance allowed: 1 nOhm, below a metre of a potline's aluminium bus (docs/multiblocks/dc-bus.md). */
+	private static final double MIN_OHMS = 1e-9;
 
 	private enum Kind { IMPEDANCE, INDUCTOR, CAPACITOR }
 

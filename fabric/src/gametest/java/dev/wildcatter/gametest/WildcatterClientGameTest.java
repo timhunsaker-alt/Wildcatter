@@ -214,6 +214,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("drives")) {
 				drives(context, server);
 			}
+			if (only("dcTier")) {
+				dcTier(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -1534,6 +1537,135 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(3);
 		context.takeScreenshot("wildcatter-drives-mcc");
 		System.out.println("[wildcatter-test] drives ok");
+	}
+
+	/**
+	 * The DC tier (docs/multiblocks/dc-bus.md). A rectifier on a diesel set through a backward unit substation to 4.16 kV drives a
+	 * magnesium cell 8 m away over 16 kA bus bars at its 14 kA setpoint, its poles split about earth. A ground wire against the - bus
+	 * is a ground fault; a 4 kA bar in the run burns open. Open, the rectifier rises to 150 V; with its - pole faulted the + bus
+	 * shocks, and a bar across the runs is a short that trips it. A second magnesium cell set against its rectifier, with no bus, takes
+	 * its 14 kA as before.
+	 */
+	private void dcTier(ClientGameTestContext context, TestServerContext server) {
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		net.minecraft.core.Direction south = net.minecraft.core.Direction.SOUTH;
+		java.util.function.IntConsumer clear = z -> {
+			server.runCommand("fill 0 " + (y - 1) + " " + (z - 8) + " 36 " + (y + 8) + " " + (z + 16) + " minecraft:air");
+			server.runCommand("fill 0 " + (y - 1) + " " + (z - 8) + " 36 " + (y - 1) + " " + (z + 16) + " minecraft:stone");
+		};
+		server.runCommand("effect give @p minecraft:slow_falling 600 0 true");
+		// ---- a magnesium cell 8 m from its rectifier, on 16 kA bus
+		final int z = -4900;
+		server.runCommand("tp @p 24 " + (up + 10) + " " + (z + 14) + " 180 35");
+		context.waitTicks(20);
+		clear.accept(z);
+		BlockPos set = new BlockPos(10, up, z);
+		genset(server, set, north, false);
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, set, net.minecraft.core.Direction.EAST, false);   // 4.16 kV out at x 15
+		for (int x = 15; x <= 17; x++) {
+			put(server, x, up, z, "wildcatter:cable_mv");
+		}
+		BlockPos rectifier = new BlockPos(18, up, z);
+		placeBig(server, WildcatterBlocks.RECTIFIER, rectifier, north);   // x 18-20, z..z+3, its box west at x 17, + and - east at z+2
+		for (int x = 21; x <= 28; x++) {
+			put(server, x, up + 2, z + 2, "wildcatter:dc_bus_16k[axis=x]");   // +
+			put(server, x, up, z + 2, "wildcatter:dc_bus_16k[axis=x]");       // -
+		}
+		BlockPos cell = new BlockPos(31, up, z + 5);
+		placeBig(server, WildcatterBlocks.MAGNESIUM_CELL, cell, south);   // x 29-31, z..z+5, its terminals west at z+2
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.MagnesiumCellBlockEntity) srv.overworld().getBlockEntity(cell)).addMgCl2(Tuning.MG_CELL_HOLD_KG);
+			dev.wildcatter.block.RectifierBlockEntity r = rectifier(srv, rectifier);
+			for (int k = 0; k < 4; k++) {
+				r.nextSetpoint();   // 6 kA to 14 kA, the magnesium cell's
+			}
+			return null;
+		});
+		startGenset(context, server, set, north, 2000);
+		context.waitTicks(400);
+		String run = read(server, rectifier.getX(), up, rectifier.getZ()) + " | " + read(server, cell.getX(), up, cell.getZ()) + " | + bus " + read(server, 24, up + 2, z + 2)
+				+ " | - bus " + read(server, 24, up, z + 2) + " | " + read(server, set.getX(), up, set.getZ());
+		System.out.println("[wildcatter-test] dcTier: bus run: " + run);
+		double amps = server.computeOnServer(srv -> rectifier(srv, rectifier).dcAmps());
+		check(Math.abs(amps - 14_000) < 14_000 * 0.02, "the rectifier should hold its 14 kA setpoint: " + amps + " | " + run);
+		check(read(server, cell.getX(), up, cell.getZ()).contains("kg/h of magnesium"), "the cell should make magnesium on the bus: " + run);
+		check(read(server, rectifier.getX(), up, rectifier.getZ()).contains("ground OK"), "the detector should read healthy: " + run);
+		double plus = server.computeOnServer(srv -> rectifier(srv, rectifier).dc().plusToEarth());
+		double line = server.computeOnServer(srv -> rectifier(srv, rectifier).dc().volts());
+		check(line > 4 && line < 7 && Math.abs(plus - line / 2) < 0.5, "about 5 V, the + pole at half of it to earth: " + plus + " of " + line);
+		server.runCommand("tp @p 25 " + (up + 5) + " " + (z + 9) + " 160 30");   // aimed just before the shot: the player falls between
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-dc-bus");
+
+		// a ground wire against the - bus: a ground fault on -
+		put(server, 24, up, z + 3, "wildcatter:ground_wire");
+		context.waitTicks(40);
+		String fault = read(server, rectifier.getX(), up, rectifier.getZ());
+		check(fault.contains("GROUND FAULT on -"), "the detector should name the - pole: " + fault);
+		check(!fault.contains("TRIPPED"), "a ground fault alarms but does not trip: " + fault);
+		put(server, 24, up, z + 3, "minecraft:air");
+
+		// a 4 kA bar in the - run carries the cell's 14 kA, and burns open
+		put(server, 26, up, z + 2, "wildcatter:dc_bus_4k[axis=x]");
+		boolean burnt = false;
+		for (int i = 0; i < 60 && !burnt; i++) {
+			context.waitTicks(20);
+			burnt = isAir(server, 26, up, z + 2);
+		}
+		check(burnt, "a 4 kA bar carrying 14 kA should burn open: " + read(server, 26, up, z + 2) + " | " + read(server, rectifier.getX(), up, rectifier.getZ()));
+
+		// open, it rises to 150 V; with - faulted to earth the + bus is at 150 V, and it shocks
+		put(server, 22, up, z + 3, "wildcatter:ground_wire");
+		context.waitTicks(300);
+		String open = read(server, rectifier.getX(), up, rectifier.getZ());
+		System.out.println("[wildcatter-test] dcTier: open and faulted: " + open + " | + bus " + read(server, 23, up + 2, z + 2));
+		check(open.contains("DC 150 V") && open.contains("GROUND FAULT on -"), "open, it should stand at 150 V with - faulted: " + open);
+		put(server, 23, up + 1, z + 1, "minecraft:stone");
+		server.runCommand("summon minecraft:pig 23.5 " + (up + 2) + " " + (z + 1.5) + " {NoAI:1b,Tags:[\"dcshock\"]}");
+		context.waitTicks(40);
+		float health = server.computeOnServer(srv -> srv.overworld().getEntitiesOfClass(net.minecraft.world.entity.animal.pig.Pig.class,
+				new net.minecraft.world.phys.AABB(new BlockPos(23, up + 2, z + 1)).inflate(2), e -> e.entityTags().contains("dcshock")).stream()
+				.findFirst().map(net.minecraft.world.entity.LivingEntity::getHealth).orElse(-1F));
+		check(health >= 0 && health < 10F, "the + bus at 150 V to earth should shock the pig beside it: " + health);
+		server.runCommand("kill @e[tag=dcshock]");
+		// a bar across the + and - runs is a short through its 0.1 mOhm, far past its setpoint with its terminals collapsed: it trips
+		put(server, 24, up + 1, z + 2, "wildcatter:dc_bus_16k[axis=y]");
+		context.waitTicks(40);
+		String shorted = read(server, rectifier.getX(), up, rectifier.getZ());
+		System.out.println("[wildcatter-test] dcTier: short: " + shorted);
+		check(shorted.contains("TRIPPED (DC overcurrent"), "a short across the 150 V bus should trip the rectifier: " + shorted);
+
+		// ---- a magnesium cell set against its rectifier, as in 7f: no bus, its 14 kA taken from the cell
+		final int z2 = -4960;
+		server.runCommand("tp @p 22 " + (up + 10) + " " + (z2 + 14) + " 180 35");
+		context.waitTicks(20);
+		clear.accept(z2);
+		BlockPos set2 = new BlockPos(10, up, z2);
+		genset(server, set2, north, false);
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, set2, net.minecraft.core.Direction.EAST, false);
+		for (int x = 15; x <= 17; x++) {
+			put(server, x, up, z2, "wildcatter:cable_mv");
+		}
+		BlockPos rectifier2 = new BlockPos(18, up, z2);
+		placeBig(server, WildcatterBlocks.RECTIFIER, rectifier2, north);   // x 18-20
+		BlockPos cell2 = new BlockPos(21, up, z2);
+		placeBig(server, WildcatterBlocks.MAGNESIUM_CELL, cell2, north);   // x 21-23, against the rectifier's east side
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.MagnesiumCellBlockEntity) srv.overworld().getBlockEntity(cell2)).addMgCl2(Tuning.MG_CELL_HOLD_KG);
+			return null;
+		});
+		startGenset(context, server, set2, north, 2000);
+		context.waitTicks(400);
+		String touching = read(server, rectifier2.getX(), up, rectifier2.getZ()) + " | " + read(server, cell2.getX(), up, cell2.getZ());
+		System.out.println("[wildcatter-test] dcTier: touching: " + touching);
+		double amps2 = server.computeOnServer(srv -> rectifier(srv, rectifier2).dcAmps());
+		check(touching.contains("setpoint 14 kA, the cell's") && Math.abs(amps2 - 14_000) < 14_000 * 0.02, "set against its cell, the rectifier should take its 14 kA: " + amps2 + " | " + touching);
+		check(read(server, cell2.getX(), up, cell2.getZ()).contains("kg/h of magnesium"), "the touching cell should make magnesium: " + touching);
+		System.out.println("[wildcatter-test] dcTier ok");
+	}
+
+	private dev.wildcatter.block.RectifierBlockEntity rectifier(net.minecraft.server.MinecraftServer srv, BlockPos at) {
+		return (dev.wildcatter.block.RectifierBlockEntity) srv.overworld().getBlockEntity(at);
 	}
 
 	/** Presses a starter cabinet's start button, on the server thread. */

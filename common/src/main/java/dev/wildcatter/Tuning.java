@@ -286,6 +286,30 @@ public final class Tuning {
 	public static final double F2_COOLING_LPS = 0.19;              // make-up water: two thirds of 650 kW evaporated
 	public static final double RECTIFIER_EFFICIENCY = 0.97;        // (unverified)
 	public static final double RECTIFIER_POWER_FACTOR = 0.95;      // 12-pulse diode bridge (unverified)
+
+	// ---- DC tier (docs/multiblocks/dc-bus.md, approved with the 10b1 plan 2026-11-03; all proposed) ------------------------------
+	public static final double DC_BUS_4K_AMPS = 4000;              // 4 x 100 x 10 mm copper, about 1 A/mm2 bare in air
+	public static final double DC_BUS_4K_OHMS_PER_M = 5.2e-6;      // at 75 C
+	public static final double DC_BUS_16K_AMPS = 16000;            // 8 x 200 x 10 mm copper
+	public static final double DC_BUS_16K_OHMS_PER_M = 1.3e-6;
+	public static final double[] RECTIFIER_SETPOINTS_KA = {1, 2, 2.8, 4, 6, 8, 10, 12, 14, 16};
+	public static final int RECTIFIER_SETPOINT_DEFAULT = 4;        // 6 kA, the fluorine cell house's
+	public static final double RECTIFIER_MAX_DC_VOLTS = 150.0;     // 16 kA x 150 V = 2.4 MW
+	public static final double RECTIFIER_DC_OHMS = 0.1e-3;         // its regulation: about 1 % of 150 V at 16 kA (its losses are the 97 %)
+	public static final double RECTIFIER_RAMP_VOLTS_PER_S = 15.0;  // an on-load tap changer steps in seconds
+	public static final double RECTIFIER_OVERCURRENT = 1.25;       // x setpoint for RECTIFIER_OVERCURRENT_SECONDS: it trips
+	public static final double RECTIFIER_OVERCURRENT_SECONDS = 1.0;
+	public static final double RECTIFIER_OVERCURRENT_INSTANT = 2.0; // x setpoint with its terminals collapsed (a bolted short): it trips at once
+	public static final double RECTIFIER_SHORT_VOLTS = 0.5;         // terminals below this share of its EMF: collapsed
+	public static final double DC_JOINT_OHMS = 2e-6;               // a bolted bus bar joint, a few micro-ohms
+	public static final double DC_DETECTOR_OHMS = 10_000;          // each pole to earth through the ground-fault detector
+	public static final double DC_DETECTOR_ALARM = 0.30;           // a pole's share of the voltage outside 30-70 %: GROUND FAULT
+	public static final double DC_SHOCK_MIN_VOLTS = 120.0;         // IEC 61201 ripple-free DC ELV limit
+	public static final double DC_SHOCK_FULL_VOLTS = 600.0;        // the 480 V tier's shock at this, halved (IEC 60479-1)
+	public static final double DC_SHOCK_FACTOR = 0.5;
+	public static final double F2_CELL_BACK_EMF = 2.9;             // KF.2HF decomposition
+	public static final double MG_CELL_BACK_EMF = 2.5;             // MgCl2 at 700 C
+	public static final double CA_CELL_BACK_EMF = 2.2;             // membrane cell, reversible
 	public static final double CONV_F2_PER_U = 0.18;               // kg of F2 a kg of U (0.160 ideal)
 	public static final double CONV_H2_PER_U = 8.47e-3;            // kg of H2 a kg of U: U(VI) to U(IV)
 	public static final double H2_KG_PER_M3 = 0.0899;

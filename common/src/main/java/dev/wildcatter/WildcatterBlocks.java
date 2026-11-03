@@ -50,6 +50,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.MccSectionBlockEntity> MCC_SECTION_ENTITY = entity(dev.wildcatter.block.MccSectionBlockEntity::new, MCC_SECTION);
 	public static final BlockEntityType<dev.wildcatter.block.StarterCabinetBlockEntity> STARTER_CABINET_ENTITY = entity(dev.wildcatter.block.StarterCabinetBlockEntity::new,
 			SOFT_STARTER, DRIVE_CABINET, SOFT_STARTER_MV, DRIVE_MV_CONTROL);
+	public static final BlockEntityType<dev.wildcatter.block.DcBusBarBlockEntity> DC_BUS_ENTITY = entity(dev.wildcatter.block.DcBusBarBlockEntity::new, DC_BUS_4K, DC_BUS_16K);
 	public static final BlockEntityType<dev.wildcatter.block.DriveSectionBlock.Entity> DRIVE_SECTION_ENTITY = entity(dev.wildcatter.block.DriveSectionBlock.Entity::new,
 			DRIVE_MV_TRANSFORMER, DRIVE_MV_CELLS);
 	public static final BlockEntityType<dev.wildcatter.block.GensetPartBlockEntity> GENSET_PART_ENTITY = entity(dev.wildcatter.block.GensetPartBlockEntity::new,
@@ -386,6 +387,8 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		add("drive_mv_transformer", DRIVE_MV_TRANSFORMER);
 		add("drive_mv_cells", DRIVE_MV_CELLS);
 		add("drive_mv_control", DRIVE_MV_CONTROL);
+		add("dc_bus_4k", DC_BUS_4K);
+		add("dc_bus_16k", DC_BUS_16K);
 		add("padmount_208", PADMOUNT_208);
 		add("padmount_480", PADMOUNT_480);
 		add("unit_substation", UNIT_SUBSTATION);
@@ -415,6 +418,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("mcc_section"), MCC_SECTION_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("starter_cabinet"), STARTER_CABINET_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("drive_section"), DRIVE_SECTION_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("dc_bus"), DC_BUS_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("genset_part"), GENSET_PART_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("tower_basin"), TOWER_BASIN_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("power_transformer"), POWER_TRANSFORMER_ENTITY);

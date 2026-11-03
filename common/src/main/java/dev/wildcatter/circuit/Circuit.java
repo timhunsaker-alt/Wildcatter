@@ -85,6 +85,33 @@ public final class Circuit {
 		network.port(cell(pos), face.ordinal(), conductor.ordinal(), BUS, node, Tuning.CONTACT_OHMS / 2, false);
 	}
 
+	/**
+	 * The role and voltage keys of DC (docs/multiblocks/dc-bus.md): a bus bar has no polarity of its own, its voltage is whatever
+	 * the cells along it make it, so every DC terminal is the one role. Nothing AC joins it.
+	 */
+	private static final int DC_ROLE = 8;
+	private static final int DC = 65;
+
+	/** A DC terminal: a bus bar, a rectifier's or a cell's. {@code exposed}: bare bar, which shorts against bare bar of another run. */
+	public void dcPort(BlockPos pos, Direction face, int node, double halfOhms, boolean exposed) {
+		network.port(cell(pos), face.ordinal(), DC_ROLE, DC, node, halfOhms, exposed);
+	}
+
+	/** Signed DC volts from a node to earth. */
+	public double dcVolts(int node) {
+		return network.voltagePhasor(node).re();
+	}
+
+	/** Signed DC amps through a branch, from its first node to its second. */
+	public double dcAmps(int branchId) {
+		return network.currentPhasor(branchId).re();
+	}
+
+	/** Signed DC amps out of a source's + terminal. */
+	public double dcSourceAmps(int sourceId) {
+		return network.sourceCurrentPhasor(sourceId).re();
+	}
+
 	/** The phases of a hot conductor: a single-phase load or a single-pole breaker takes whichever one is on that face. */
 	private static final int ANY_PHASE = (1 << Conductor.A.ordinal()) | (1 << Conductor.B.ordinal()) | (1 << Conductor.C.ordinal());
 

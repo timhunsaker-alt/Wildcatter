@@ -128,8 +128,8 @@ RC.box((0.3, 0.2, 0.3), (2.0, 2.4, 2.0), "grey")                            # th
 RC.fins((0.25, 0.4, 0.3), (0.3, 2.2, 2.0), "z", 8, 0.02, "radfin")
 RC.box((0.3, 0.2, 2.2), (2.6, 3.0, 3.8), "grey")                            # the diode cubicle
 RC.decal((0.29, 1.2, 2.6), (0.3, 1.8, 3.2), "danger", "west", "grey")
-for y in (0.8, 1.4):
-	RC.box((2.6, y, 2.6), (3.0, y + 0.12, 3.4), "copper")                   # the DC bus bars, east
+for y in (0.4, 2.4):
+	RC.box((2.6, y, 2.1), (3.0, y + 0.12, 2.9), "copper")                   # the DC terminals, east at z 2: + over -
 RC.box((0.0, 0.6, 0.4), (0.3, 1.4, 1.0), "grey")                            # its 4.16 kV box, west
 RC.collide((0.3, 0.0, 0.3), (2.6, 3.0, 3.8))
 
@@ -140,8 +140,8 @@ CH.box((0.2, 0.2, 0.2), (5.8, 3.4, 11.8), "louvre")                         # th
 CH.box((0.1, 3.4, 0.1), (5.9, 3.55, 11.9), "grey")
 for z in (2.0, 5.0, 8.0, 11.0):
 	CH.box((2.6, 3.55, z - 0.4), (3.4, 3.95, z + 0.4), "galv")              # its roof vents
-for y in (0.8, 1.4):
-	CH.box((0.0, y, 5.6), (0.2, y + 0.12, 6.4), "copper")                   # the DC bus bars in, west
+for y in (0.4, 2.4):
+	CH.box((0.0, y, 6.1), (0.2, y + 0.12, 6.9), "copper")                   # the DC terminals, west at z 6: + over -
 CH.pipe([(3.0, 0.5, 0.0), (3.0, 0.5, 0.2)], 2, "steel")                     # anhydrous HF in, the front
 CH.pipe([(3.0, 0.5, 11.8), (3.0, 0.5, 12.0)], 2, "steel")                   # fluorine out, the back
 CH.collide((0.2, 0.0, 0.2), (5.8, 3.55, 11.8))

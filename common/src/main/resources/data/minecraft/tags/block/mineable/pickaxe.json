@@ -123,6 +123,8 @@
     "wildcatter:drive_mv_transformer",
     "wildcatter:drive_mv_cells",
     "wildcatter:drive_mv_control",
+    "wildcatter:dc_bus_4k",
+    "wildcatter:dc_bus_16k",
     "wildcatter:oil_wellhead",
     "wildcatter:rig_substructure",
     "wildcatter:rig_mast",

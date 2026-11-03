@@ -13,7 +13,9 @@ frequency, protection) is in `docs/ELECTRICAL_MODEL.md`. What is built, phase by
   - Service drops and receptacles with plugs.
   - Shocks, arc reach and grounding.
 - **Gensets and synchronizing:** diesel and gas gensets built part by part, paralleled with a synchroscope. Motors, MCCs and
-  starters.
+  starters; soft starters and variable-frequency drives at 480 V and 4.16 kV (10a).
+- **DC:** current-regulated rectifiers and bare copper bus bars to the electrolysis cells, on the same solver: shorts, ground
+  faults and DC shock (10b1).
 - **Oil and gas:**
   - seismic surveys, a land rig and wells;
   - the lease (separator, tanks, pumpjacks);
