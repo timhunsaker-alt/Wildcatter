@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "CTC",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_block",
+    "T": "wildcatter:transformer"
+  },
+  "result": {
+    "id": "wildcatter:drive_mv_transformer",
+    "count": 1
+  }
+}

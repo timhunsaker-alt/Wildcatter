@@ -49,14 +49,44 @@ public class MccSectionBlockEntity extends BlockEntity implements CircuitPart, I
 		return space >= 0 && space < SPACES ? buckets[space] : null;
 	}
 
-	/** Puts a bucket into an empty space; false if the space is taken. */
+	/** Puts a combination starter bucket into an empty space; false if the space is taken. */
 	public boolean install(int space) {
+		return install(space, Starter.Kind.DIRECT);
+	}
+
+	/** Puts a bucket of {@code kind} into an empty space; false if the space is taken. */
+	public boolean install(int space, Starter.Kind kind) {
 		if (space < 0 || space >= SPACES || buckets[space] != null) {
 			return false;
 		}
-		buckets[space] = new Starter();
+		buckets[space] = bucketOf(kind);
 		show(space);
 		return true;
+	}
+
+	/** A bucket of each kind: the starter's dial for the combination and soft starters, up to 100 hp for the drive. */
+	private static Starter bucketOf(Starter.Kind kind) {
+		return switch (kind) {
+			case DIRECT -> new Starter();
+			case SOFT -> new Starter(Starter.Kind.SOFT, Voltage.INDUSTRIAL, Tuning.OVERLOAD_SETTINGS);
+			case DRIVE -> new Starter(Starter.Kind.DRIVE, Voltage.INDUSTRIAL, Tuning.DRIVE_BUCKET_SETTINGS);
+		};
+	}
+
+	/** The item a bucket of {@code kind} is. */
+	public static net.minecraft.world.item.Item itemOf(Starter.Kind kind) {
+		return switch (kind) {
+			case DIRECT -> WildcatterItems.MCC_BUCKET;
+			case SOFT -> WildcatterItems.MCC_SOFT_STARTER_BUCKET;
+			case DRIVE -> WildcatterItems.MCC_DRIVE_BUCKET;
+		};
+	}
+
+	public void nextLimitSetting(int space) {
+		if (buckets[space] != null && buckets[space].kind() == Starter.Kind.SOFT) {
+			buckets[space].nextLimitSetting();
+			setChanged();
+		}
 	}
 
 	public void pushButton(int space) {
@@ -203,7 +233,7 @@ public class MccSectionBlockEntity extends BlockEntity implements CircuitPart, I
 		if (level != null) {
 			for (Starter bucket : buckets) {
 				if (bucket != null) {
-					Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(WildcatterItems.MCC_BUCKET));
+					Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(itemOf(bucket.kind())));
 				}
 			}
 		}
@@ -227,6 +257,7 @@ public class MccSectionBlockEntity extends BlockEntity implements CircuitPart, I
 		for (int space = 0; space < SPACES; space++) {
 			output.putBoolean("has" + space, buckets[space] != null);
 			if (buckets[space] != null) {
+				output.putString("kind" + space, buckets[space].kind().name());
 				buckets[space].save(output, "b" + space + "_");
 			}
 		}
@@ -237,7 +268,13 @@ public class MccSectionBlockEntity extends BlockEntity implements CircuitPart, I
 		super.loadAdditional(input);
 		grown = input.getBooleanOr("grown", false);
 		for (int space = 0; space < SPACES; space++) {
-			buckets[space] = input.getBooleanOr("has" + space, false) ? new Starter() : null;
+			Starter.Kind kind = Starter.Kind.DIRECT;
+			for (Starter.Kind k : Starter.Kind.values()) {
+				if (k.name().equals(input.getStringOr("kind" + space, ""))) {
+					kind = k;
+				}
+			}
+			buckets[space] = input.getBooleanOr("has" + space, false) ? bucketOf(kind) : null;
 			if (buckets[space] != null) {
 				buckets[space].load(input, "b" + space + "_");
 			}

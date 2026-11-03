@@ -1250,6 +1250,35 @@ lang.update({"block.wildcatter.mcc_section": "MCC Starter Section (480 V, three 
 	"block.wildcatter.mcc_incoming": "MCC Incoming Section (480 V, main breaker)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 10a: soft starters and drives (docs/multiblocks/soft-starter.md, vfd.md) -------------------------------------
+# blockstates, models and items come from tools/models/drives.py; here loot, names, tags, the bucket items and recipes.
+DRIVE_PARTS = ("soft_starter", "drive_cabinet", "soft_starter_mv", "drive_mv_transformer", "drive_mv_cells", "drive_mv_control")
+for name in DRIVE_PARTS:
+	big_part_loot(name)
+for name, decal in (("mcc_soft_starter_bucket", "decal_relays"), ("mcc_drive_bucket", "decal_controller")):
+	save_json(f"{ASSETS}/models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:block/mat/{decal}"}})
+	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{name}"}})
+shaped("soft_starter", ["SCS", "QMQ", "SSS"], {"S": S_, "C": "minecraft:comparator", "Q": "minecraft:quartz", "M": f"{ns}:motor_starter"}, "soft_starter")
+shaped("drive_cabinet", ["SCS", "QMQ", "SRS"], {"S": S_, "C": "minecraft:comparator", "Q": "minecraft:quartz_block", "M": f"{ns}:motor_starter",
+	"R": "minecraft:repeater"}, "drive_cabinet")
+shaped("soft_starter_mv", ["SIS", "SMS", "SCS"], {"S": S_, "I": "minecraft:iron_block", "M": f"{ns}:soft_starter", "C": "minecraft:copper_block"}, "soft_starter_mv")
+shaped("drive_mv_transformer", ["SCS", "CTC", "SSS"], {"S": S_, "C": "minecraft:copper_block", "T": f"{ns}:transformer"}, "drive_mv_transformer")
+shaped("drive_mv_cells", ["SQS", "QDQ", "SQS"], {"S": S_, "Q": "minecraft:quartz_block", "D": f"{ns}:drive_cabinet"}, "drive_mv_cells")
+shaped("drive_mv_control", ["SCS", "SDS", "SSS"], {"S": S_, "C": "minecraft:comparator", "D": f"{ns}:drive_cabinet"}, "drive_mv_control")
+shaped("mcc_soft_starter_bucket", ["QMQ", " C "], {"Q": "minecraft:quartz", "M": f"{ns}:mcc_bucket", "C": "minecraft:comparator"}, "mcc_soft_starter_bucket")
+shaped("mcc_drive_bucket", ["QMQ", "RCR"], {"Q": "minecraft:quartz_block", "M": f"{ns}:mcc_bucket", "C": "minecraft:comparator", "R": "minecraft:repeater"},
+	"mcc_drive_bucket")
+for tag in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
+	t["values"] += [f"{ns}:{n}" for n in DRIVE_PARTS]
+	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({"block.wildcatter.soft_starter": "Soft Starter (480 V)", "block.wildcatter.drive_cabinet": "Variable-Frequency Drive (480 V)",
+	"block.wildcatter.soft_starter_mv": "Soft Starter (4.16 kV)", "block.wildcatter.drive_mv_transformer": "MV Drive: Input Transformer Section (4.16 kV)",
+	"block.wildcatter.drive_mv_cells": "MV Drive: Power Cell Section (4.16 kV)", "block.wildcatter.drive_mv_control": "MV Drive: Output and Control Section (4.16 kV)",
+	"item.wildcatter.mcc_soft_starter_bucket": "MCC Bucket (soft starter)", "item.wildcatter.mcc_drive_bucket": "MCC Bucket (drive, up to 100 hp)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # Every conductor item and the sizes it comes in (the Java side: energy/ConductorSize).
 BUILDING = ["awg_12", "awg_10", "awg_6", "awg_2", "awg_4_0", "kcmil_500"]
 ACSR = ["acsr_sparrow", "acsr_raven", "acsr_penguin", "acsr_linnet", "acsr_drake"]

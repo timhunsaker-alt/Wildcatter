@@ -1,6 +1,5 @@
 package dev.wildcatter.block;
 
-import dev.wildcatter.WildcatterItems;
 import dev.wildcatter.WildcatterSounds;
 import dev.wildcatter.circuit.CircuitManager;
 import dev.wildcatter.item.PowerMeterItem;
@@ -85,16 +84,30 @@ public class MccSectionBlock extends BigPartBlock {
 	@Override
 	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
 			InteractionHand hand, BlockHitResult hit) {
+		MccSectionBlockEntity section = section(level, pos, state);
+		if (stack.getItem() instanceof PowerMeterItem && player.isShiftKeyDown() && section != null && section.bucket(space(pos, state)) != null
+				&& section.bucket(space(pos, state)).kind() == Starter.Kind.SOFT) {
+			if (!level.isClientSide()) {
+				section.nextLimitSetting(space(pos, state));   // the Power Meter, sneaking: a soft starter's current-limit dial
+				player.sendOverlayMessage(section.inspect(space(pos, state)));
+			}
+			return InteractionResult.SUCCESS;
+		}
 		InteractionResult read = PowerMeterItem.readIfMeter(stack, level, BigParts.main(pos, state), player);
 		if (read != null) {
 			return read;
 		}
-		if (!stack.is(WildcatterItems.MCC_BUCKET)) {
+		Starter.Kind kind = null;
+		for (Starter.Kind k : Starter.Kind.values()) {
+			if (stack.is(MccSectionBlockEntity.itemOf(k))) {
+				kind = k;
+			}
+		}
+		if (kind == null) {
 			return InteractionResult.TRY_WITH_EMPTY_HAND;
 		}
-		MccSectionBlockEntity section = section(level, pos, state);
 		if (!level.isClientSide() && section != null) {
-			if (section.install(space(pos, state))) {
+			if (section.install(space(pos, state), kind)) {
 				stack.consume(1, player);
 				level.playSound(null, pos, WildcatterSounds.BREAKER_CLICK, SoundSource.BLOCKS, 0.8F, 0.7F);
 				CircuitManager.markDirty(level);

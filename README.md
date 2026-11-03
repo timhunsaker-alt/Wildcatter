@@ -95,7 +95,10 @@ console's power setpoint, the CVCS boron target, a coolant pump's switch, the HP
 - `dev.wildcatter.platform.Platform` is the small seam between them (the config folder, which mods are loaded).
 
 ## Testing: automated
-JDK 25 required. NeoForge's build tools also need a JDK 21, which Gradle finds or downloads.
+JDK 25 required. NeoForge's build tools also need a JDK 21, which Gradle finds or downloads. To point it at a JDK 21 that is not
+installed system-wide, name it in an environment variable and pass
+`-Dorg.gradle.java.installations.fromEnv=JDK21` (with `JDK21=/path/to/jdk21`). Start a fresh daemon (`./gradlew --stop`) after
+changing toolchain settings: a running daemon keeps the JDKs it already probed.
 
 ```bash
 ./gradlew build                                   # all three projects, unit tests, jars in fabric/ and neoforge/build/libs/

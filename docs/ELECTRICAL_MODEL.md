@@ -78,6 +78,18 @@ voltage transformers (wye-grounded, 1 MΩ a phase) give the 13.8 kV bus its grou
   (NA: 7.2 kV → 120/240 center-tap), three-phase pad-mount.
 - **Generators:** voltage source behind impedance, rated kVA, inertia, governor.
 - **Loads:** resistive (lamp, heater); motor (inductive, PF ≈ 0.8, inrush current on start).
+  - **Start time:**
+    - a direct start takes its flat 2 s;
+    - behind a ramping soft starter the torque goes with V², so the start runs longer;
+    - decided with Tim, 2026-11-02: V² everywhere would burn unit substations on direct starts under the 150 %/10 s transformer
+      rule; a realistic short-time rule (IEEE C57.109) is listed for 10d.
+  - **Soft starter:** SCRs hold the starting current at 2-5 x full-load amps, then a bypass contactor closes
+    (`docs/multiblocks/soft-starter.md`).
+  - **Drive (VFD):**
+    - the line side is a constant-power load at PF 0.95 and 97 % efficiency;
+    - the motor side is the drive's own three-phase source, ramping over 10 s, so a drive-fed motor never draws locked-rotor current
+      (`docs/multiblocks/vfd.md`).
+  - **Drive houses:** the rig drive house, the header house, the frequency converter and the rectifier also take constant power.
   Pumps and pumpjacks become motor loads and draw power only while running.
 - **Losses:** I²R in conductors; transformer copper and core losses. Conductor ampacity depends on
   size and material; exceeding it heats and eventually damages the conductor.

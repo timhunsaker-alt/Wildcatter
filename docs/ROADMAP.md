@@ -180,17 +180,51 @@ and the Field Manual has a page for each new system.
   - 1 W = 1 E/t, sharing the FE setting;
   - testers' builds: a tag `v*` publishes a GitHub Release with both jars and the kit datapack; `dist/` stays;
   - the first release, v0.2.0, at the end of Phase 9.
-- No phase is CURRENT until Tim picks the next one (from Ideas below).
+
+## Phase 10 — Machines and grid at scale — CURRENT (picked by Tim 2026-11-02, from Ideas)
+- **10a: soft starters and drives for big motors** — CURRENT (specs: `docs/multiblocks/soft-starter.md`, `vfd.md`).
+  - **Gear:** real cabinets wired between the breaker and the motor, at 480 V (standalone cabinets and MCC buckets) and 4.16 kV
+    (a true-size soft-starter cabinet and a drive lineup).
+  - **Soft starter:** SCRs hold the current at a dial setting of 2-5 x full-load amps (3.5 x default), then a bypass contactor
+    closes at 1.25 x.
+  - **VFD:** a 6-pulse front end at PF 0.95, 97 % efficient, a 10 s ramp, 1.5 x for 60 s; it takes constant power from the line.
+  - **Drive houses:** the existing drive houses also take constant power.
+  - **Docs cleanup:** stale known gaps and duplicate ideas.
+- **10b: the DC tier and aluminium.** Bus bars that can short and shock, in the solver; then a Bayer refinery and Hall–Héroult pots,
+  a very large DC load (from the 7a bauxite). The DC tier also feeds the conversion fluorine cells.
+- **10c: construction cranes.** Tim's idea of 2026-11-01. A stationary heavy-lift crane builds a plant from a design spec. Its open
+  decisions are asked at the start of 10c:
+  - crane types and sizes;
+  - how a spec is chosen and shown;
+  - whether it builds anything, or only machines with a spec;
+  - whether it can take a plant apart.
+
+  Real counterparts: tower, crawler and ring cranes (Mammoet's SGC-250 "Big Carl" at Hinkley Point C, which lifts whole
+  reactor-building modules), with their load charts.
+  - **How it would work:** you place the crane and pick a spec (a blueprint item, made from one of the docs/multiblocks layouts).
+    It lifts parts from a chest or hopper beside it into their places, one by one at a real lifting speed. Its slewing and hoist
+    motors draw power, or a diesel engine drives them.
+  - **Limits:** its reach and its load chart limit what it can set; a vessel or steam generator needs a big crane.
+  - **Bigger projects** (a whole PWR, a cooling tower) use more than one crane. They split the spec between them, or lift
+    together in a tandem lift.
+- **10d: the grid finish:**
+  - switches and panels;
+  - better wire, ground and breaker art;
+  - true-size MV, DIST and HV breakers and a rated 4.16/138 kV step-up in place of the one-block stand-ins;
+  - relay protection for the 13.8 kV bus;
+  - a short-time overload rule for rated transformers (IEEE C57.109 through-fault, about I²t = 1250 pu²·s) in place of the pole
+    transformer's 150 % for 10 s. That would let direct starts slow down with V² too (from 10a, 2026-11-02).
+- Decided with Tim on 2026-11-02:
+  - these 4, in this order;
+  - for 10a, real separate cabinets at 480 V and 4.16 kV, with the values above.
 
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released.
-- Switches and panels. Better wire, ground and breaker art. Saving the Ludo sound sources.
-- Soft starters and drives for big motors, so a 250 hp pump can start on a small island.
+- Saving the Ludo sound sources.
 - A sales gas pipeline and meter station, so a gas plant's residue gas has a buyer besides engines and the flare.
 - Plants for the 7a ores that the fuel chain doesn't use:
-  - aluminium (the Bayer process, then Hall–Héroult pots, a very large DC load);
   - chlor-alkali from rock salt;
-  - a titanium pigment plant from ilmenite and rutile;
+  - a titanium pigment plant from ilmenite and rutile (the separator's);
   - lithium from spodumene;
   - ferroalloys (chromium, manganese, molybdenum, tungsten);
   - a nickel smelter;
@@ -201,7 +235,6 @@ and the Field Manual has a page for each new system.
 - The acid plant's waste heat boiler steam to a steam turbine (about 2 kg/s of 40 bar steam).
 - Lined tailings cells for the mill's thickener underflow.
 - Uranium from phosphoric acid (phosphate rock).
-- A DC tier in the solver (bus bars that can short and shock), for the fluorine cells and later aluminium pots.
 - Conversion: the fluorine cells' cathode hydrogen to the reducer; retiring the fluorinator's ash bed; regenerating the KOH
   scrubbers; a full-size plant.
 - ISR: bottled CO2 for the lixiviant, monitor-well rings and excursions, groundwater restoration (sweep, reverse osmosis,
@@ -210,22 +243,6 @@ and the Field Manual has a page for each new system.
   and blending, cylinder heels, a choice of product assay.
 - Zirconium: SiCl4 to fumed silica; uses for the chlor-alkali caustic soda; hafnium metal for control rods; Pidgeon magnesium from
   dolomite; the aluminothermic chromium step; scrap recycle and yields; Kroll and VAR batch timing.
-- A titanium pigment plant for the separator's ilmenite and rutile.
 - Fuel: the kiln's HF back to the conversion plant; zinc stearate lubricant and pore formers; a nickel smelter for real Inconel and
   stainless hardware; pellet inspection, rod X-ray and helium leak tests; IFBA and gadolinia burnable absorbers; rejects and scrap.
-- Construction cranes (Tim, 2026-11-01): a stationary heavy-lift crane that builds a plant from a design spec.
-  - **Real counterparts:** tower cranes, crawler cranes, and ring cranes such as Mammoet's SGC-250 "Big Carl" at Hinkley Point C,
-    which lifts whole reactor-building modules.
-  - **How it would work:** you place the crane and pick a spec (a blueprint item, made from one of the docs/multiblocks layouts).
-    It lifts parts from a chest or hopper beside it into their places, one by one at a real lifting speed. Its slewing and hoist
-    motors draw power, or a diesel engine drives them.
-  - **Limits:** its reach and its load chart limit what it can set; a vessel or steam generator needs a big crane.
-  - **Bigger projects** (a whole PWR, a cooling tower) use more than one crane. They split the spec between them, or lift
-    together in a tandem lift.
-  - **Open decisions:**
-    - crane types and sizes;
-    - how a spec is chosen and shown (a ghost preview?);
-    - whether it builds anything, or only machines with a spec;
-    - whether it can take a plant apart too.
-- Reactor: dry cask storage for the pool's oldest fuel; contamination and decontamination; fresh-fuel inspection; a containment building with hydrogen recombiners and igniters; low-temperature overpressure protection; the real 55 C/h heat-up limit; full OT-delta-T and OP-delta-T trips; the pressurizer relief tank; a containment
-  building; silver-indium-cadmium and hafnium rods; helium in the B4C rodlets; a buyer for the borax plant's sodium sulfate.
+- Reactor: dry cask storage for the pool's oldest fuel; contamination and decontamination; fresh-fuel inspection; a containment building with hydrogen recombiners and igniters; low-temperature overpressure protection; the real 55 C/h heat-up limit; full OT-delta-T and OP-delta-T trips; the pressurizer relief tank; silver-indium-cadmium and hafnium rods; helium in the B4C rodlets; a buyer for the borax plant's sodium sulfate.

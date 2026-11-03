@@ -69,26 +69,53 @@ public final class Network {
 	}
 
 	public int resistor(int a, int b, double ohms) {
-		int id = solver.resistor(a, b, ohms);
-		resistorsAt.computeIfAbsent(a, k -> new ArrayList<>()).add(id);
-		resistorsAt.computeIfAbsent(b, k -> new ArrayList<>()).add(id);
-		return id;
+		return branch(a, b, solver.resistor(a, b, ohms));
 	}
 
 	/** An inductor: its reactance follows the frequency (motor windings). */
 	public int inductor(int a, int b, double henries) {
-		int id = solver.inductor(a, b, henries);
-		resistorsAt.computeIfAbsent(a, k -> new ArrayList<>()).add(id);
-		resistorsAt.computeIfAbsent(b, k -> new ArrayList<>()).add(id);
-		return id;
+		return branch(a, b, solver.inductor(a, b, henries));
 	}
 
 	/** A general impedance (ohms resistance and reactance at the circuit's frequency). */
 	public int impedance(int a, int b, Complex z) {
-		int id = solver.impedance(a, b, z);
+		return branch(a, b, solver.impedance(a, b, z));
+	}
+
+	private final Map<Integer, List<Integer>> neighbours = new HashMap<>();
+
+	private int branch(int a, int b, int id) {
 		resistorsAt.computeIfAbsent(a, k -> new ArrayList<>()).add(id);
 		resistorsAt.computeIfAbsent(b, k -> new ArrayList<>()).add(id);
+		neighbours.computeIfAbsent(a, k -> new ArrayList<>()).add(b);
+		neighbours.computeIfAbsent(b, k -> new ArrayList<>()).add(a);
 		return id;
+	}
+
+	/**
+	 * True if {@code from} reaches one of {@code targets} through resistors and impedances alone: not through the ground, a
+	 * source or a transformer. Asked after {@link #solve}, when the terminals are joined.
+	 */
+	public boolean reaches(int from, java.util.Set<Integer> targets) {
+		if (targets.isEmpty()) {
+			return false;
+		}
+		java.util.ArrayDeque<Integer> queue = new java.util.ArrayDeque<>();
+		java.util.Set<Integer> seen = new java.util.HashSet<>();
+		queue.add(from);
+		seen.add(from);
+		while (!queue.isEmpty()) {
+			int node = queue.poll();
+			if (targets.contains(node)) {
+				return true;
+			}
+			for (int next : neighbours.getOrDefault(node, List.of())) {
+				if (next != PhasorSolver.GROUND && seen.add(next)) {
+					queue.add(next);
+				}
+			}
+		}
+		return false;
 	}
 
 	/** The frequency the circuit is solved at. */

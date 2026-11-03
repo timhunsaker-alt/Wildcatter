@@ -1,0 +1,521 @@
+{
+ "textures": {
+  "engine": "wildcatter:block/mat/mat_paint_engine",
+  "gasgreen": "wildcatter:block/mat/mat_paint_pad_green",
+  "grey": "wildcatter:block/mat/mat_paint_ansi61",
+  "blue": "wildcatter:block/mat/mat_paint_ansi70",
+  "iron": "wildcatter:block/mat/mat_cast_iron",
+  "dark": "wildcatter:block/mat/mat_oil_dark",
+  "galv": "wildcatter:block/mat/mat_galvanized",
+  "steel": "wildcatter:block/mat/mat_stainless",
+  "rubber": "wildcatter:block/mat/mat_rubber",
+  "copper": "wildcatter:block/mat/mat_copper",
+  "brass": "wildcatter:block/mat/mat_brass",
+  "lagging": "wildcatter:block/mat/mat_aluminium_lagging",
+  "checker": "wildcatter:block/mat/mat_checker_plate",
+  "nameplate": "wildcatter:block/mat/decal_nameplate",
+  "danger": "wildcatter:block/mat/decal_danger_hv",
+  "gauge": "wildcatter:block/mat/decal_gauge",
+  "controller": "wildcatter:block/mat/decal_controller",
+  "engineplate": "wildcatter:block/mat/decal_engine_plate",
+  "louvre": "wildcatter:block/mat/mat_enclosure_louvre",
+  "filter": "wildcatter:block/mat/mat_filter_house",
+  "radfin": "wildcatter:block/mat/mat_radiator_fins",
+  "grating": "wildcatter:block/mat/mat_grating",
+  "finned": "wildcatter:block/mat/mat_finned_tube",
+  "hipaint": "wildcatter:block/mat/mat_hitemp_aluminium",
+  "annunciator": "wildcatter:block/mat/decal_annunciator",
+  "arcflash": "wildcatter:block/mat/decal_arc_flash",
+  "nfpa": "wildcatter:block/mat/decal_nfpa",
+  "flammable": "wildcatter:block/mat/decal_flammable",
+  "ratingplate": "wildcatter:block/mat/decal_rating_plate",
+  "pipe_crude": "wildcatter:block/mat/decal_pipe_crude",
+  "pipe_gas": "wildcatter:block/mat/decal_pipe_gas",
+  "pipe_lpg": "wildcatter:block/mat/decal_pipe_lpg",
+  "pipe_water": "wildcatter:block/mat/decal_pipe_water",
+  "pipe_diesel": "wildcatter:block/mat/decal_pipe_diesel",
+  "pipe_steam": "wildcatter:block/mat/decal_pipe_steam",
+  "concrete": "wildcatter:block/mat/mat_concrete",
+  "polymer": "wildcatter:block/mat/mat_polymer_grey",
+  "padgreen": "wildcatter:block/mat/mat_paint_pad_green",
+  "porcelain": "wildcatter:block/mat/mat_porcelain_brown",
+  "relays": "wildcatter:block/mat/decal_relays",
+  "pushbuttons": "wildcatter:block/mat/decal_pushbuttons",
+  "bulb": "wildcatter:block/mat/mat_bulb_lit",
+  "particle": "wildcatter:block/mat/mat_paint_ansi61"
+ },
+ "elements": [
+  {
+   "from": [
+    0.0,
+    0,
+    5.792
+   ],
+   "to": [
+    14.4,
+    9.6,
+    16
+   ],
+   "faces": {
+    "north": {
+     "texture": "#grey",
+     "uv": [
+      1.6,
+      6.4,
+      16.0,
+      16
+     ]
+    },
+    "west": {
+     "texture": "#grey",
+     "uv": [
+      5.792,
+      6.4,
+      16,
+      16
+     ]
+    },
+    "east": {
+     "texture": "#grey",
+     "uv": [
+      0,
+      6.4,
+      10.208,
+      16
+     ]
+    },
+    "up": {
+     "texture": "#grey",
+     "uv": [
+      0.0,
+      5.792,
+      14.4,
+      16
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    -0.064,
+    9.6,
+    5.6
+   ],
+   "to": [
+    0,
+    10.08,
+    16
+   ],
+   "faces": {
+    "north": {
+     "texture": "#grey",
+     "uv": [
+      0,
+      5.92,
+      0.064,
+      6.4
+     ]
+    },
+    "west": {
+     "texture": "#grey",
+     "uv": [
+      5.6,
+      5.92,
+      16,
+      6.4
+     ]
+    },
+    "up": {
+     "texture": "#grey",
+     "uv": [
+      15.936,
+      5.6,
+      16,
+      16
+     ]
+    },
+    "down": {
+     "texture": "#grey",
+     "uv": [
+      15.936,
+      0,
+      16,
+      10.4
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    0,
+    9.6,
+    5.6
+   ],
+   "to": [
+    14.464,
+    10.08,
+    16
+   ],
+   "faces": {
+    "north": {
+     "texture": "#grey",
+     "uv": [
+      1.536,
+      5.92,
+      16,
+      6.4
+     ]
+    },
+    "east": {
+     "texture": "#grey",
+     "uv": [
+      0,
+      5.92,
+      10.4,
+      6.4
+     ]
+    },
+    "up": {
+     "texture": "#grey",
+     "uv": [
+      0,
+      5.6,
+      14.464,
+      16
+     ]
+    },
+    "down": {
+     "texture": "#grey",
+     "uv": [
+      0,
+      0,
+      14.464,
+      10.4
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    0.32,
+    0,
+    5.6
+   ],
+   "to": [
+    14.08,
+    8.8,
+    5.792
+   ],
+   "faces": {
+    "north": {
+     "texture": "#grey",
+     "uv": [
+      1.92,
+      7.2,
+      15.68,
+      16
+     ]
+    },
+    "south": {
+     "texture": "#grey",
+     "uv": [
+      0.32,
+      7.2,
+      14.08,
+      16
+     ]
+    },
+    "west": {
+     "texture": "#grey",
+     "uv": [
+      5.6,
+      7.2,
+      5.792,
+      16
+     ]
+    },
+    "east": {
+     "texture": "#grey",
+     "uv": [
+      10.208,
+      7.2,
+      10.4,
+      16
+     ]
+    },
+    "up": {
+     "texture": "#grey",
+     "uv": [
+      0.32,
+      5.6,
+      14.08,
+      5.792
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    4.0,
+    0,
+    5.552
+   ],
+   "to": [
+    10.4,
+    1.6,
+    5.6
+   ],
+   "faces": {
+    "north": {
+     "texture": "#controller",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "south": {
+     "texture": "#grey",
+     "uv": [
+      4.0,
+      14.4,
+      10.4,
+      16
+     ]
+    },
+    "west": {
+     "texture": "#grey",
+     "uv": [
+      5.552,
+      14.4,
+      5.6,
+      16
+     ]
+    },
+    "east": {
+     "texture": "#grey",
+     "uv": [
+      10.4,
+      14.4,
+      10.448,
+      16
+     ]
+    },
+    "up": {
+     "texture": "#grey",
+     "uv": [
+      4.0,
+      5.552,
+      10.4,
+      5.6
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    4.8,
+    3.2,
+    5.552
+   ],
+   "to": [
+    9.6,
+    6.4,
+    5.6
+   ],
+   "faces": {
+    "north": {
+     "texture": "#pushbuttons",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "south": {
+     "texture": "#grey",
+     "uv": [
+      4.8,
+      9.6,
+      9.6,
+      12.8
+     ]
+    },
+    "west": {
+     "texture": "#grey",
+     "uv": [
+      5.552,
+      9.6,
+      5.6,
+      12.8
+     ]
+    },
+    "east": {
+     "texture": "#grey",
+     "uv": [
+      10.4,
+      9.6,
+      10.448,
+      12.8
+     ]
+    },
+    "up": {
+     "texture": "#grey",
+     "uv": [
+      4.8,
+      5.552,
+      9.6,
+      5.6
+     ]
+    },
+    "down": {
+     "texture": "#grey",
+     "uv": [
+      4.8,
+      10.4,
+      9.6,
+      10.448
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    10.56,
+    1.92,
+    5.408
+   ],
+   "to": [
+    11.2,
+    2.56,
+    5.6
+   ],
+   "faces": {
+    "north": {
+     "texture": "#bulb",
+     "uv": [
+      4.8,
+      13.44,
+      5.44,
+      14.08
+     ]
+    },
+    "south": {
+     "texture": "#bulb",
+     "uv": [
+      10.56,
+      13.44,
+      11.2,
+      14.08
+     ]
+    },
+    "west": {
+     "texture": "#bulb",
+     "uv": [
+      5.408,
+      13.44,
+      5.6,
+      14.08
+     ]
+    },
+    "east": {
+     "texture": "#bulb",
+     "uv": [
+      10.4,
+      13.44,
+      10.592,
+      14.08
+     ]
+    },
+    "up": {
+     "texture": "#bulb",
+     "uv": [
+      10.56,
+      5.408,
+      11.2,
+      5.6
+     ]
+    },
+    "down": {
+     "texture": "#bulb",
+     "uv": [
+      10.56,
+      10.4,
+      11.2,
+      10.592
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    0.64,
+    3.2,
+    5.472
+   ],
+   "to": [
+    0.96,
+    3.68,
+    5.6
+   ],
+   "faces": {
+    "north": {
+     "texture": "#galv",
+     "uv": [
+      15.04,
+      12.32,
+      15.36,
+      12.8
+     ]
+    },
+    "south": {
+     "texture": "#galv",
+     "uv": [
+      0.64,
+      12.32,
+      0.96,
+      12.8
+     ]
+    },
+    "west": {
+     "texture": "#galv",
+     "uv": [
+      5.472,
+      12.32,
+      5.6,
+      12.8
+     ]
+    },
+    "east": {
+     "texture": "#galv",
+     "uv": [
+      10.4,
+      12.32,
+      10.528,
+      12.8
+     ]
+    },
+    "up": {
+     "texture": "#galv",
+     "uv": [
+      0.64,
+      5.472,
+      0.96,
+      5.6
+     ]
+    },
+    "down": {
+     "texture": "#galv",
+     "uv": [
+      0.64,
+      10.4,
+      0.96,
+      10.528
+     ]
+    }
+   }
+  }
+ ]
+}

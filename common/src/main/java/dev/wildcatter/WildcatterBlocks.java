@@ -48,6 +48,10 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<MotorStarterBlockEntity> MOTOR_STARTER_ENTITY = entity(MotorStarterBlockEntity::new, MOTOR_STARTER, MCC_BUCKET);
 	public static final BlockEntityType<MccIncomingBlockEntity> MCC_INCOMING_ENTITY = entity(MccIncomingBlockEntity::new, MCC_INCOMING);
 	public static final BlockEntityType<dev.wildcatter.block.MccSectionBlockEntity> MCC_SECTION_ENTITY = entity(dev.wildcatter.block.MccSectionBlockEntity::new, MCC_SECTION);
+	public static final BlockEntityType<dev.wildcatter.block.StarterCabinetBlockEntity> STARTER_CABINET_ENTITY = entity(dev.wildcatter.block.StarterCabinetBlockEntity::new,
+			SOFT_STARTER, DRIVE_CABINET, SOFT_STARTER_MV, DRIVE_MV_CONTROL);
+	public static final BlockEntityType<dev.wildcatter.block.DriveSectionBlock.Entity> DRIVE_SECTION_ENTITY = entity(dev.wildcatter.block.DriveSectionBlock.Entity::new,
+			DRIVE_MV_TRANSFORMER, DRIVE_MV_CELLS);
 	public static final BlockEntityType<dev.wildcatter.block.GensetPartBlockEntity> GENSET_PART_ENTITY = entity(dev.wildcatter.block.GensetPartBlockEntity::new,
 			DIESEL_ENGINE_PART, GAS_ENGINE_PART, ALTERNATOR, RADIATOR, FUEL_TANK, EXHAUST_STACK, BASE_FRAME, EXHAUST_SILENCER_LARGE);
 	public static final BlockEntityType<dev.wildcatter.block.SteamPlantPartBlockEntity> STEAM_PLANT_PART_ENTITY = entity(dev.wildcatter.block.SteamPlantPartBlockEntity::new,
@@ -376,6 +380,12 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("rotor"), ROTOR);   // no item: it is never placed
 		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("mcc_bucket"), MCC_BUCKET);   // its item is WildcatterItems.MCC_BUCKET
 		add("mcc_section", MCC_SECTION);
+		add("soft_starter", SOFT_STARTER);
+		add("drive_cabinet", DRIVE_CABINET);
+		add("soft_starter_mv", SOFT_STARTER_MV);
+		add("drive_mv_transformer", DRIVE_MV_TRANSFORMER);
+		add("drive_mv_cells", DRIVE_MV_CELLS);
+		add("drive_mv_control", DRIVE_MV_CONTROL);
 		add("padmount_208", PADMOUNT_208);
 		add("padmount_480", PADMOUNT_480);
 		add("unit_substation", UNIT_SUBSTATION);
@@ -403,6 +413,8 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("motor_starter"), MOTOR_STARTER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("mcc_incoming"), MCC_INCOMING_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("mcc_section"), MCC_SECTION_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("starter_cabinet"), STARTER_CABINET_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("drive_section"), DRIVE_SECTION_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("genset_part"), GENSET_PART_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("tower_basin"), TOWER_BASIN_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("power_transformer"), POWER_TRANSFORMER_ENTITY);

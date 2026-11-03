@@ -156,6 +156,23 @@ public interface GridBlocks {
 	/** A motor control center's starter section at true size: three bucket spaces (docs/multiblocks/motor-control-center.md). */
 	Block MCC_SECTION = block("mcc_section", props -> new dev.wildcatter.block.MccSectionBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+	/** Soft starters and drives for big motors (docs/multiblocks/soft-starter.md, vfd.md). */
+	Block SOFT_STARTER = block("soft_starter", props -> new dev.wildcatter.block.StarterCabinetBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), dev.wildcatter.multiblock.Footprint.box(1, 2, 1, 0, 0), "soft_starter",
+			dev.wildcatter.block.Starter.Kind.SOFT, Voltage.INDUSTRIAL, Tuning.CABINET_SETTINGS_LV, false));
+	Block DRIVE_CABINET = block("drive_cabinet", props -> new dev.wildcatter.block.StarterCabinetBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), dev.wildcatter.multiblock.Footprint.box(1, 2, 1, 0, 0), "drive_cabinet",
+			dev.wildcatter.block.Starter.Kind.DRIVE, Voltage.INDUSTRIAL, Tuning.CABINET_SETTINGS_LV, false));
+	Block SOFT_STARTER_MV = block("soft_starter_mv", props -> new dev.wildcatter.block.StarterCabinetBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(3.5F, 7.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), dev.wildcatter.multiblock.Footprint.box(1, 3, 1, 0, 0), "soft_starter_mv",
+			dev.wildcatter.block.Starter.Kind.SOFT, Voltage.MEDIUM, Tuning.CABINET_SETTINGS_MV, false));
+	Block DRIVE_MV_CONTROL = block("drive_mv_control", props -> new dev.wildcatter.block.StarterCabinetBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(3.5F, 7.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), dev.wildcatter.multiblock.Footprint.box(1, 3, 2, 0, 0), "drive_mv_control",
+			dev.wildcatter.block.Starter.Kind.DRIVE, Voltage.MEDIUM, Tuning.CABINET_SETTINGS_MV, true));
+	Block DRIVE_MV_TRANSFORMER = block("drive_mv_transformer", props -> new dev.wildcatter.block.DriveSectionBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(3.5F, 7.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), dev.wildcatter.multiblock.Footprint.box(2, 3, 2, 0, 0), "drive_mv_transformer"));
+	Block DRIVE_MV_CELLS = block("drive_mv_cells", props -> new dev.wildcatter.block.DriveSectionBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(3.5F, 7.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), dev.wildcatter.multiblock.Footprint.box(2, 3, 2, 0, 0), "drive_mv_cells"));
 	Block THREE_PHASE_HEATER = block("three_phase_heater", props -> new ThreePhaseHeaterBlock(props.mapColor(MapColor.COLOR_RED)
 			.strength(2.0F).sound(SoundType.METAL).lightLevel(state -> state.getValue(LoadBlock.LIT) ? 7 : 0), Voltage.INDUSTRIAL, Tuning.THREE_PHASE_HEATER_WATTS));
 	Block ELECTRIC_LAMP = block("electric_lamp", props -> new LoadBlock(props.mapColor(MapColor.COLOR_YELLOW)

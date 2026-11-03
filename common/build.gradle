@@ -6,6 +6,8 @@ plugins {
 // Common compiles against plain vanilla Minecraft (NeoForm), so nothing here can reach a loader's API.
 neoForge {
 	neoFormVersion = neo_form_version
+	// unit tests may use plain Minecraft types (BlockPos, Direction) to drive circuit parts
+	addModdingDependenciesTo(sourceSets.test)
 }
 
 dependencies {

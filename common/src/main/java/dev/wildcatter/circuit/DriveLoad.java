@@ -13,6 +13,9 @@ import net.minecraft.core.Direction;
  * island's frequency stays at or above {@link Tuning#LAND_RIG_FREQUENCY_FLOOR} of the standard's: it picks load up gently
  * (10 % a second) and sheds it at once when the frequency sags. Below {@link Tuning#LAND_RIG_UNDERVOLTAGE} of its rated voltage
  * the drives stop, and they start again when the voltage is back.
+ * <p>
+ * A drive regulates its output, so it takes constant power from the line: its impedance is sized from the voltage it measured
+ * last, and as the bus sags it draws more current (docs/multiblocks/vfd.md).
  */
 public final class DriveLoad {
 	private static final Conductor[] PHASES = {Conductor.A, Conductor.B, Conductor.C};
@@ -76,7 +79,8 @@ public final class DriveLoad {
 		double take = demand * limit;
 		if (take > 1 && !undervoltage) {
 			// each phase of the star draws a third of it at the line-to-neutral voltage
-			double z = voltage.lineToLine() * voltage.lineToLine() / (take / powerFactor);
+			double at = volts > voltage.lineToLine() * 0.5 ? volts : voltage.lineToLine();   // constant power: from the voltage it sees
+			double z = at * at / (take / powerFactor);
 			double r = z * powerFactor;
 			double x = z * Math.sqrt(1 - powerFactor * powerFactor);
 			star = circuit.node();

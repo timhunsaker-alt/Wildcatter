@@ -211,6 +211,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("teamRebornEnergy")) {
 				teamRebornEnergy(context, server);
 			}
+			if (only("drives")) {
+				drives(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -1286,6 +1289,274 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		dev.wildcatter.energy.EnergyBridge.clearTests();
 		check(isAir(server, 14, up, z) && isAir(server, 13, up, z), "a plug held above its rating should burn out with its receptacle");
 		System.out.println("[wildcatter-test] plugs ok: " + plug + " | " + wrong + " | FE gained " + gained);
+	}
+
+	/**
+	 * Soft starters and drives (Phase 10a, docs/multiblocks/soft-starter.md, vfd.md). The 250 hp 4.16 kV charge pump on one 500 kW
+	 * set (a diesel set, a backward unit substation to 4.16 kV): direct on line it cannot start; behind the 4.16 kV soft starter it
+	 * starts with the current held at the dial and bypasses; behind the 4.16 kV drive lineup it starts at rated current and a 0.95
+	 * line power factor, and breaking the cell section stops it. Two 500 kW coolant pumps on one three-set island, each on its own
+	 * drive, both run. A 480 V MCC's soft-starter and drive buckets each run a 60 hp pump.
+	 */
+	private void drives(ClientGameTestContext context, TestServerContext server) {
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		java.util.function.IntConsumer clear = z -> {
+			server.runCommand("fill 0 " + (y - 1) + " " + (z - 8) + " 30 " + (y + 8) + " " + (z + 16) + " minecraft:air");
+			server.runCommand("fill 0 " + (y - 1) + " " + (z - 8) + " 30 " + (y - 1) + " " + (z + 16) + " minecraft:stone");
+		};
+		server.runCommand("effect give @p minecraft:slow_falling 600 0 true");
+		// ---- direct on line: the pump starts at locked-rotor current
+		int z = -4600;
+		server.runCommand("tp @p 16 " + (up + 12) + " " + (z + 14) + " 180 35");
+		context.waitTicks(20);
+		clear.accept(z);
+		BlockPos set = new BlockPos(10, up, z);
+		genset(server, set, north, false);
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, set, net.minecraft.core.Direction.EAST, false);   // 4.16 kV out at x 15
+		for (int x = 15; x <= 22; x++) {
+			put(server, x, up, z, "wildcatter:cable_mv");
+		}
+		BlockPos pump = new BlockPos(23, up, z);
+		placeBig(server, WildcatterBlocks.CRUDE_CHARGE_PUMP, pump, north);   // x 23-24, z..z+4; its box on the west of its main cell
+		startGenset(context, server, set, north, 2000);
+		double dolPeak = 0;
+		for (int t = 0; t < 200; t += 10) {
+			runMotors(context, server, java.util.List.of(pump), 10);
+			BlockPos p0 = pump;
+			dolPeak = Math.max(dolPeak, server.computeOnServer(srv -> ((dev.wildcatter.block.UnitMotorBlockEntity) srv.overworld().getBlockEntity(p0)).motor().amps()));
+		}
+		String dol = read(server, pump.getX(), up, pump.getZ());
+		System.out.println("[wildcatter-test] drives: direct on line: peak " + dolPeak + " A; " + dol + " | " + read(server, set.getX(), up, set.getZ()));
+		check(dolPeak > 4.5 * 32.4, "direct on line the pump should draw about 6 x its full-load amps: " + dolPeak);
+
+		// ---- the 4.16 kV soft starter: its line on its top, its motor out of the back of its bottom cell
+		z = -4640;
+		server.runCommand("tp @p 16 " + (up + 12) + " " + (z + 14) + " 180 35");
+		context.waitTicks(20);
+		clear.accept(z);
+		set = new BlockPos(10, up, z);
+		genset(server, set, north, false);
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, set, net.minecraft.core.Direction.EAST, false);
+		for (int k = 0; k <= 3; k++) {
+			put(server, 15, up + k, z, "wildcatter:cable_mv");
+		}
+		for (int x = 16; x <= 21; x++) {
+			put(server, x, up + 3, z, "wildcatter:cable_mv");
+		}
+		BlockPos soft = new BlockPos(21, up, z);
+		placeBig(server, WildcatterBlocks.SOFT_STARTER_MV, soft, north);   // its back to the south
+		put(server, 21, up, z + 1, "wildcatter:cable_mv");
+		put(server, 22, up, z + 1, "wildcatter:cable_mv");
+		pump = new BlockPos(23, up, z + 1);
+		placeBig(server, WildcatterBlocks.CRUDE_CHARGE_PUMP, pump, north);
+		startGenset(context, server, set, north, 2000);
+		press(server, soft);
+		double softPeak = 0;
+		String ramping = "";
+		for (int t = 0; t < 600; t += 10) {
+			runMotors(context, server, java.util.List.of(pump), 10);
+			double amps = server.computeOnServer(srv -> ((dev.wildcatter.block.StarterCabinetBlockEntity) srv.overworld().getBlockEntity(soft)).starter().lineAmps());
+			softPeak = Math.max(softPeak, amps);
+			String now = read(server, soft.getX(), up, soft.getZ());
+			if (now.contains("RAMPING") && ramping.isEmpty()) {
+				ramping = now;
+			}
+		}
+		String softRead = read(server, soft.getX(), up, soft.getZ());
+		String softPump = read(server, pump.getX(), up, pump.getZ());
+		System.out.println("[wildcatter-test] drives: soft starter: peak " + softPeak + " A; " + ramping + " | " + softRead + " | " + softPump + " | " + read(server, set.getX(), up, set.getZ()));
+		check(ramping.contains("RAMPING, limit 3.5 x 32 A"), "the soft starter should ramp at its 3.5 x limit: " + ramping);
+		check(softPeak < 3.5 * 32 * 1.1 && softPeak < dolPeak * 0.75, "the line current should stay at the limit, below the direct start's " + dolPeak + ": " + softPeak);
+		check(softRead.contains("BYPASSED"), "the soft starter should bypass once the pump is up to speed: " + softRead);
+		check(softPump.contains("running,"), "the pump should run behind the soft starter: " + softPump);
+		server.runCommand("tp @p 24 " + (up + 4) + " " + (z - 7) + " 32 20");   // aimed just before the shot: the player falls between
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-soft-starter");
+
+		// ---- the 4.16 kV drive lineup: line in at the transformer section's west end, motor out at the control section's east end
+		z = -4680;
+		server.runCommand("tp @p 18 " + (up + 9) + " " + (z + 12) + " 180 30");
+		context.waitTicks(20);
+		clear.accept(z);
+		set = new BlockPos(10, up, z);
+		genset(server, set, north, false);
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, set, net.minecraft.core.Direction.EAST, false);
+		put(server, 15, up, z, "wildcatter:cable_mv");
+		put(server, 16, up, z, "wildcatter:cable_mv");
+		placeBig(server, WildcatterBlocks.DRIVE_MV_TRANSFORMER, new BlockPos(17, up, z), north);   // x 17-18
+		placeBig(server, WildcatterBlocks.DRIVE_MV_CELLS, new BlockPos(19, up, z), north);         // x 19-20
+		BlockPos control = new BlockPos(21, up, z);
+		placeBig(server, WildcatterBlocks.DRIVE_MV_CONTROL, control, north);
+		put(server, 22, up, z, "wildcatter:cable_mv");
+		pump = new BlockPos(23, up, z);
+		placeBig(server, WildcatterBlocks.CRUDE_CHARGE_PUMP, pump, north);
+		startGenset(context, server, set, north, 2000);
+		press(server, control);
+		double drivePeak = 0;
+		String driveRamp = "";
+		for (int t = 0; t < 300; t += 10) {
+			runMotors(context, server, java.util.List.of(pump), 10);
+			drivePeak = Math.max(drivePeak, server.computeOnServer(srv -> ((dev.wildcatter.block.StarterCabinetBlockEntity) srv.overworld().getBlockEntity(control)).starter().lineAmps()));
+			String now = read(server, control.getX(), up, control.getZ());
+			if (now.contains("RAMPING") && driveRamp.isEmpty() && t > 60) {
+				driveRamp = now;
+			}
+		}
+		String driveRead = read(server, control.getX(), up, control.getZ());
+		String drivePump = read(server, pump.getX(), up, pump.getZ());
+		double pf = server.computeOnServer(srv -> ((dev.wildcatter.block.StarterCabinetBlockEntity) srv.overworld().getBlockEntity(control)).starter().linePowerFactor());
+		System.out.println("[wildcatter-test] drives: drive: peak " + drivePeak + " A, PF " + pf + "; " + driveRamp + " | " + driveRead + " | " + drivePump);
+		check(driveRamp.contains("RAMPING") && driveRamp.contains("Hz"), "the drive should ramp its frequency: " + driveRamp);
+		check(drivePeak <= 1.5 * 32.4, "the line current should stay within 1.5 x full-load amps: " + drivePeak);
+		check(pf >= 0.94, "the drive's line power factor should be about 0.95: " + pf);
+		check(driveRead.contains("RUNNING 60.0 Hz"), "the drive should reach full frequency: " + driveRead);
+		check(drivePump.contains("running,"), "the pump should run on the drive: " + drivePump);
+		server.runCommand("tp @p 20 " + (up + 3) + " " + (z - 7) + " 10 15");   // aimed just before the shot: the player falls between
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-drive-lineup");
+		BlockPos cellPiece = new BlockPos(20, up + 1, z);
+		server.computeOnServer(srv -> srv.overworld().destroyBlock(cellPiece, true));   // a piece of the cell section
+		runMotors(context, server, java.util.List.of(pump), 60);
+		String broken = read(server, control.getX(), up, control.getZ());
+		check(broken.contains("NOT BUILT") && broken.contains("power cell section"), "the drive should name its missing cell section: " + broken);
+		check(!read(server, pump.getX(), up, pump.getZ()).contains("running,"), "the pump should stop with the drive broken: " + read(server, pump.getX(), up, pump.getZ()));
+
+		// ---- two 500 kW coolant pumps on one three-set island, each on its own drive
+		z = -4740;
+		server.runCommand("tp @p 18 " + (up + 14) + " " + (z + 20) + " 180 35");
+		context.waitTicks(20);
+		clear.accept(z);
+		BlockPos[] sets = {new BlockPos(10, up, z), new BlockPos(10, up, z + 4), new BlockPos(10, up, z + 8)};
+		for (BlockPos s : sets) {
+			genset(server, s, north, false);
+			inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, s, net.minecraft.core.Direction.EAST, false);
+		}
+		for (int zz = z; zz <= z + 8; zz++) {
+			put(server, 15, up, zz, "wildcatter:cable_mv");   // the 4.16 kV bus joining the three unit substations
+		}
+		BlockPos[] controls = {new BlockPos(21, up, z), new BlockPos(21, up, z + 4)};
+		BlockPos[] pumps = {new BlockPos(23, up, z), new BlockPos(23, up, z + 4)};
+		for (int i = 0; i < 2; i++) {
+			int zz = controls[i].getZ();
+			put(server, 16, up, zz, "wildcatter:cable_mv");
+			placeBig(server, WildcatterBlocks.DRIVE_MV_TRANSFORMER, new BlockPos(17, up, zz), north);
+			placeBig(server, WildcatterBlocks.DRIVE_MV_CELLS, new BlockPos(19, up, zz), north);
+			placeBig(server, WildcatterBlocks.DRIVE_MV_CONTROL, controls[i], north);
+			put(server, 22, up, zz, "wildcatter:cable_mv");
+			placeBig(server, WildcatterBlocks.REACTOR_COOLANT_PUMP, pumps[i], north);   // x 23-24, two deep, five high
+		}
+		sizeCables(server, new BlockPos(15, up, z), new BlockPos(22, up, z + 8), WildcatterBlocks.CABLE_MV, dev.wildcatter.energy.ConductorSize.MV_4_0);
+		for (BlockPos s : sets) {
+			startGenset(context, server, s, north, 2000);
+		}
+		server.computeOnServer(srv -> {
+			for (BlockPos c : controls) {
+				for (int k = 0; k < 4; k++) {
+					((dev.wildcatter.block.StarterCabinetBlockEntity) srv.overworld().getBlockEntity(c)).nextOverloadSetting();   // 32 A to 80 A: a 500 kW pump is 87 A
+				}
+			}
+			return null;
+		});
+		press(server, controls[0]);
+		runMotors(context, server, java.util.List.of(pumps), 300);
+		press(server, controls[1]);
+		runMotors(context, server, java.util.List.of(pumps), 300);
+		for (int i = 0; i < 2; i++) {
+			String p = read(server, pumps[i].getX(), up, pumps[i].getZ());
+			check(p.contains("running,"), "coolant pump " + (i + 1) + " should run on its drive: " + p + " | " + read(server, controls[i].getX(), up, controls[i].getZ()));
+		}
+		for (BlockPos s : sets) {
+			String st = read(server, s.getX(), up, s.getZ());
+			check(st.contains("RUNNING") && st.contains("breaker CLOSED"), "the island should stay up with both pumps on drives: " + st);
+		}
+		System.out.println("[wildcatter-test] drives: two coolant pumps: " + read(server, pumps[0].getX(), up, pumps[0].getZ()) + " | " + read(server, pumps[1].getX(), up, pumps[1].getZ()));
+		server.runCommand("tp @p 19 " + (up + 8) + " " + (z - 8) + " 10 35");   // aimed just before the shot: the player falls between
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-drives-coolant-pumps");
+
+		// ---- a 480 V MCC: a soft-starter bucket and a drive bucket, each running a 60 hp pump
+		z = -4800;
+		server.runCommand("tp @p 12 " + (up + 4) + " " + (z + 7) + " 200 20");
+		context.waitTicks(20);
+		clear.accept(z);
+		net.minecraft.core.Direction south = net.minecraft.core.Direction.SOUTH;
+		placeBig(server, WildcatterBlocks.MCC_INCOMING, new BlockPos(14, up, z), south);
+		placeBig(server, WildcatterBlocks.MCC_SECTION, new BlockPos(15, up, z), south);
+		set = new BlockPos(13, up, z);
+		genset(server, set, north, false);
+		for (int k = 0; k <= 3; k++) {
+			put(server, 14, up + k, z + 1, "wildcatter:cable_industrial");
+		}
+		put(server, 14, up + 3, z, "wildcatter:cable_industrial");
+		check(clickWith(server, new BlockPos(15, up, z), south, new ItemStack(WildcatterItems.MCC_SOFT_STARTER_BUCKET)), "a soft-starter bucket should click into an empty space");
+		check(clickWith(server, new BlockPos(15, up + 2, z), south, new ItemStack(WildcatterItems.MCC_DRIVE_BUCKET)), "a drive bucket should click into an empty space");
+		// the soft starter's pump, off the back of the bottom bucket
+		put(server, 15, up, z - 1, "wildcatter:cable_industrial");
+		put(server, 15, up, z - 2, "wildcatter:cable_industrial");
+		BlockPos pumpA = new BlockPos(16, up, z - 2);
+		placeBig(server, WildcatterBlocks.HRSG_FEED_PUMP, pumpA, north);   // x 16-17, z-2..z+1
+		// the drive's pump, off the back of the top bucket (clear of the bottom one's cable), round the incoming section
+		put(server, 15, up + 2, z - 1, "wildcatter:cable_industrial");
+		put(server, 14, up + 2, z - 1, "wildcatter:cable_industrial");
+		put(server, 14, up + 1, z - 1, "wildcatter:cable_industrial");
+		for (int zz = z - 2; zz >= z - 6; zz--) {
+			put(server, 14, up + 1, zz, "wildcatter:cable_industrial");
+		}
+		put(server, 14, up, z - 6, "wildcatter:cable_industrial");
+		put(server, 15, up, z - 6, "wildcatter:cable_industrial");
+		BlockPos pumpB = new BlockPos(16, up, z - 6);
+		placeBig(server, WildcatterBlocks.HRSG_FEED_PUMP, pumpB, north);   // x 16-17, z-6..z-3
+		sizeCables(server, new BlockPos(14, up, z - 6), new BlockPos(15, up + 3, z + 1), WildcatterBlocks.CABLE_INDUSTRIAL, dev.wildcatter.energy.ConductorSize.AWG_4_0);
+		startGenset(context, server, set, north, 1000);
+		final int zm = z;
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.MccIncomingBlockEntity) srv.overworld().getBlockEntity(new BlockPos(14, up, zm))).nextRating();   // 225 A for two 60 hp pumps
+			dev.wildcatter.block.MccSectionBlockEntity section = section(srv, 15, zm);
+			for (int k = 0; k < 5; k++) {
+				section.nextOverloadSetting(0);   // 11 A to 63 A on the soft starter...
+				section.nextOverloadSetting(2);   // ...and the drive
+			}
+			section.nextLimitSetting(0);          // 3.5 x to 4 x
+			section.pushButton(0);
+			section.pushButton(2);
+			return null;
+		});
+		runMotors(context, server, java.util.List.of(pumpA, pumpB), 300);
+		String bucketSoft = read(server, 15, up, z);
+		String bucketA = server.computeOnServer(srv -> section(srv, 15, zm).inspect(0).getString());
+		String bucketB = server.computeOnServer(srv -> section(srv, 15, zm).inspect(2).getString());
+		System.out.println("[wildcatter-test] drives: MCC: " + bucketSoft + " | " + bucketA + " | " + bucketB + " | " + read(server, 14, up, z));
+		check(bucketA.contains("BYPASSED") && bucketA.contains("limit 4.0 x"), "the soft-starter bucket should bypass, its dial at 4 x: " + bucketA);
+		check(bucketB.contains("RUNNING 60.0 Hz"), "the drive bucket should run at full frequency: " + bucketB);
+		check(read(server, pumpA.getX(), up, pumpA.getZ()).contains("running,"), "the soft starter's pump should run: " + read(server, pumpA.getX(), up, pumpA.getZ()));
+		check(read(server, pumpB.getX(), up, pumpB.getZ()).contains("running,"), "the drive's pump should run: " + read(server, pumpB.getX(), up, pumpB.getZ()));
+		server.runCommand("tp @p 15 " + (up + 2) + " " + (z + 5) + " 180 12");   // aimed just before the shot: the player falls between
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-drives-mcc");
+		System.out.println("[wildcatter-test] drives ok");
+	}
+
+	/** Presses a starter cabinet's start button, on the server thread. */
+	private void press(TestServerContext server, BlockPos main) {
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.StarterCabinetBlockEntity) srv.overworld().getBlockEntity(main)).pushButton();
+			return null;
+		});
+	}
+
+	/** Waits {@code ticks}, calling on the motors every 10 ticks as their units would, so they want to run. */
+	private void runMotors(ClientGameTestContext context, TestServerContext server, java.util.List<BlockPos> motors, int ticks) {
+		for (int t = 0; t < ticks; t += 10) {
+			server.computeOnServer(srv -> {
+				for (BlockPos m : motors) {
+					if (srv.overworld().getBlockEntity(m) instanceof dev.wildcatter.block.UnitMotorBlockEntity motor) {
+						motor.drive(srv.overworld());
+					}
+				}
+				return null;
+			});
+			context.waitTicks(10);
+		}
 	}
 
 	/** A real Team Reborn Energy storage beside a plug: found through the API, filled tick by tick at its own rate, and drawing nothing once full. */

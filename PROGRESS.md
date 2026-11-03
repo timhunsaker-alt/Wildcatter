@@ -118,7 +118,7 @@ All of them go in the hot wire: in at the back, out at the front. Sneak and righ
 - Game test: a plug hands 923 FE/t (92k FE in 100 ticks) to a stand-in machine; a CEE 7 plug is refused beside a NEMA receptacle and delivers nothing on 120 V; a plug above its rating burns with its receptacle; the feeder relay sheds a pole transformer's overload at 59.0 Hz and the turbine stays on.
 
 ## Phase 2 summary
-Distribution tier, insulators and spans, pole transformer, fused cutout, service drop, receptacles and plugs, feeder relays are all built and covered by the game test. Known gaps: span ampacity, 4.16 kV spans, conductor sizes, transformer impedance, neutral earthing at the house, flashover shattering path untested, Team Reborn adapter.
+Distribution tier, insulators and spans, pole transformer, fused cutout, service drop, receptacles and plugs, feeder relays are all built and covered by the game test. Known gaps: span ampacity, 4.16 kV spans, conductor sizes, transformer impedance, neutral earthing at the house, flashover shattering path untested.
 
 ## Phase 3a: phasor solver in the blocks (no commit yet; held until after Tim's workday)
 - Every block now solves on the complex phasor solver (`solver/Network` builds a `PhasorSolver`; the old real-valued `Solver` is gone). The whole Phase 0 to 2 game test passes unchanged on it.
@@ -474,6 +474,53 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - **Game tests:** new scene `gasPlant` (a gas set on separator gas powers the plant: 4.16 kV through a backward unit substation to
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
+
+## Phase 10a: soft starters and drives for big motors (specs: docs/multiblocks/soft-starter.md, vfd.md)
+- **Motors** (`circuit/Motor`):
+  - behind a ramping soft starter (`Circuit.softStarted`) the starting torque goes with V², so the start takes longer. A direct
+    start keeps its flat 2 s: Tim's choice, 2026-11-02. With V² everywhere, the reactor scene's direct-started 500 kW pumps
+    burned their 1 MVA unit substation under the 150 %/10 s rule;
+  - a motor wired to a drive's output (`Circuit.driveFed`, a conductor-only search in `Network.reaches`) accelerates at its rated
+    current instead of locked-rotor current, and runs once its drive is at full voltage.
+- **One `Starter`, three kinds:**
+  - **direct:** the combination starter, as before;
+  - **soft:**
+    - while ramping, each pole is a series reactance it sets every solve to hold the current at its limit dial (2-5 x the
+      full-load amps, 3.5 x default);
+    - the bypass closes at 1.25 x;
+  - **drive:**
+    - the line side is a constant-power star at PF 0.95 drawing the output / 0.97;
+    - the motor side is its own three-phase source, ramping over 10 s;
+    - above 1.5 x the full-load amps the ramp holds, and after 60 s it trips;
+    - below 90 % line voltage it stops and restarts;
+  - all three have the class 10 overload relay.
+- **Gear (all true size, `tools/models/drives.py`):**
+  - the 480 V soft starter and drive cabinets (1 x 2 x 1);
+  - soft-starter and drive buckets for the MCC;
+  - the 4.16 kV soft starter (1 x 3 x 1);
+  - the 4.16 kV drive lineup: input transformer section, power cell section, output and control section (5 x 3 x 2, checked by
+    the control section; `DriveLineup`).
+  - **Terminals:**
+    - a cabinet's line goes in on the top or the back of its top cell, and its motor out of the back of its bottom cell;
+    - the lineup's line goes in at the transformer section's outer end or its top, and its motor out at the control section's
+      outer end.
+- **Constant power for the existing drives:** `DriveLoad` now sizes its impedance from the voltage it measures, so the rig drive
+  house, the header house, the frequency converter and the rectifier draw more current as the bus sags.
+- **Field Manual:** a SOFT STARTERS AND DRIVES page. The MOTORS and MOTOR CONTROL pages point to it.
+- **Unit tests (`DrivesTest`, which now has Minecraft types on the classpath):**
+  - direct on line draws about 6 x;
+  - the soft starter holds 3.5 x, starts in 4-10 s and bypasses;
+  - the drive keeps within 1.5 x, runs after its 10 s ramp, PF > 0.94, and its line power is the motor's / 0.97;
+  - a direct start takes the same time on a weak bus;
+  - `DriveLoad` takes the same power at 95 % voltage, at 1/0.95 the current.
+- **Game test `drives`:**
+  - **250 hp charge pump on one 500 kW set:**
+    - direct on line: 172 A peak;
+    - behind the 4.16 kV soft starter: held at 112 A (3.5 x 32 A), then BYPASSED;
+    - behind the 4.16 kV drive: a 28.9 A line peak at PF 0.95, then RUNNING at 60 Hz;
+    - breaking the cell section stops it and names the section.
+  - **Two 500 kW coolant pumps on one three-set island, each on its own drive:** both run, and all three sets stay on line.
+  - **A 480 V MCC:** a soft-starter bucket and a drive bucket each run a 60 hp pump.
 
 ## Phase 9c: plugs feed FE on NeoForge (Phase 9 done)
 - **`NeoForgeEnergy`:** a plug adapter on NeoForge hands its power to any FE energy handler beside it, found through
@@ -974,19 +1021,18 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - Phase 8b: the turbine island's game test cools once-through from a pool. The turbine island's game test starts on a gas
   turbine's 13.8 kV bus, not a 138 kV grid line. The governor follows the generator's last output, so a sudden load step is met
   over a few seconds.
-- Phase 8a: without the turbine, steam is vented and the plant runs at a few percent on the aux feed. No decay heat, xenon
-  or fuel damage (8c). Irradiated assemblies stay in the vessel until the refuelling machine (8c). The feedwater is counted at
-  227 C even from the aux feed. Starting the second 500 kW coolant pump on the same three-set island as the first drops the
-  island: the game test feeds each pump its own sets and unit substation. In the boron scene a single set on a busway never
-  closed its breaker, even with a load on the bus; the cause is not found yet (the scene uses two sets, as the fuel scene does).
+- Phase 8a: without the turbine, steam is vented and the plant runs at a few percent on the aux feed. The feedwater is counted at
+  227 C even from the aux feed. Starting the second 500 kW coolant pump direct on line on the same three-set island as the first drops the island. On
+  4.16 kV drives two run on one three-set island (10a, the `drives` scene), but the reactor scene still feeds each pump its own
+  sets and unit substation. In the boron scene a single set on a busway never closed its breaker, even with a load on the bus;
+  the cause is not found yet (the scene uses two sets, as the fuel scene does). A lead from 10a: in AUTO a set closes onto a
+  dead bus only when its potential transformer reads the bus as not live, so that set must read the busway as live.
 - Phase 7 is complete through 7g. Tim checks the fuel chain in a real session. The fuel test connects each part's 480 V after
   the sets are on line: closed onto the whole plant at once, the first set tripped.
 - Helium is taken from all pipeline gas at 0.4 %; real fields differ (most hold far less).
 - The zirconium line runs as a steady flow: the real Kroll retort and VAR heats are batches. Its game test gives each stage a
   kilogram by hook rather than waiting hours for the metal to arrive. The plant's 480 V load needs a busway: a single cable
   burns.
-- The frequency converter is a fixed-impedance load like the other drives: when the 12.47 kV bus sags, it gets less than it
-  asks for and the machines slow (1,184 Hz at 12,258 V), where a real drive would draw more current.
 - Phase 6 is complete (6a and 6b); Tim checks the peaker in a real session. The turbines' generator couplings do not turn on
   screen (the condenser fans and feed pump do). The test skips each turbine's start and ramp with hooks.
 - The aeroderivative's exhaust stack is drawn as an octagon; its SCR housing is blank (no NOx chemistry).
@@ -995,7 +1041,10 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - Gasoline and kerosene have no engine of their own yet: kerosene and diesel are for the Phase 6 gas turbine.
 - The cracker test tops up the furnace's water with a hook; the pump feeding a furnace is wired but not exercised in a test.
 - The cracker's pyrolysis gasoline and fuel oil are held at the quench tower (20 L) and need a pipe away in a long run.
-- A 250 hp charge pump starting direct on line needs more than one 500 kW set; there are no soft starters or drives for big motors.
+- Phase 10a: the 250 hp charge pump does start direct on line on one 500 kW set (172 A peak at 4.16 kV); the older gap saying it
+  needed two sets no longer holds (the crude unit scene still uses two). The soft starter and drive look the same in every state
+  (no run lights on their models), and the MCC's soft-starter and drive buckets show the combination starter's door. The drive's
+  motor side is solved at the island's frequency; only its readout and the motor's ramp follow the drive's own.
 - Gas has no sales pipeline yet: a gas plant's residue gas goes to engines, burners or a flare.
 - The gas plant's reboiler and stabilizer heat are not drawn from any fuel but the dehydrator's 0.5 %.
 - Pipe arms join every face of a lease part, though only its nozzles connect; the Power Meter on a pipe says what a run carries.
@@ -1003,7 +1052,7 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   frequency control catches up (30 s); a real rig's power management also reads the gensets' kW.
 - The land rig's motors are inside the drive house's load: there are no cables drawn from the drive house to the pumps and
   drawworks.
-- There is no blowout preventer stack in the cellar yet. The single-pole MV, DIST and HV breakers, the DIST under-frequency relay and the unrated `transformer` and `substation_transformer` stay one-block stand-ins (decided with Tim, until Phase 6).
+- There is no blowout preventer stack in the cellar yet. The single-pole MV, DIST and HV breakers, the DIST under-frequency relay and the unrated `transformer` and `substation_transformer` stay one-block stand-ins (decided with Tim; their true-size gear is Phase 10d).
 - Wall-mounted gear sits 0.55 m up its cell; a player wanting it higher places it a block up.
 - Pumpjack and rig collision is the still frame: the moving beam, crank and pipe do not push anything.
 - The pumpjack's linkage and the rig's head have been checked in test screenshots, not watched in a real play session.
@@ -1017,7 +1066,7 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - The alternator is drawn 1 m long for both sets; a real 1 MW frame is about 1.6 m.
 - The old genset `*_placeholder` textures are still generated (the rotor texture is still used by the tower fan and disconnect blades).
 - The brass swatch keeps a faint tile line.
-- The 4.16 kV to 138 kV step-up is still the single-block `substation_transformer` (Y-Y, unrated windings) until bigger plants (Phase 6).
+- The 4.16 kV to 138 kV step-up is still the single-block `substation_transformer` (Y-Y, unrated windings) until Phase 10d.
 - The test skips the steam plant's five-minute warm-up with a hook (it checks the drum starts rising, then jumps to pressure).
 - A small genset cannot drive enough fault current through the 20 MVA substation to reach real relay settings; the test scales the relays down. In play, such a source's own protection clears a feeder fault first.
 - The 1/0 and 4/0 MV cable ampacities are from the NEC 310.60 table family but not checked line by line (500 kcmil, 450 A, is).
@@ -1028,6 +1077,5 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - Only the fused cutout shocks on touch; enclosed gear is dead-front by design.
 
 ## Ideas not started
-- Switches and panels.
-- Better wire, ground and breaker art.
-- A Mekanism / NeoForge bridge: Phase 9b and 9c.
+Ideas live in one list: `docs/ROADMAP.md`, "Ideas (not scheduled)". Phase 10 took switches and panels, the art, drives, the DC tier
+and cranes from it.

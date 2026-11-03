@@ -14,6 +14,10 @@ import net.minecraft.core.Direction;
  *
  * Three-phase motors also read the phase rotation (A, B, C or the reverse: a reversed motor runs backward) and notice
  * single-phasing: with one phase lost a running motor stalls and draws locked-rotor current until something trips.
+ *
+ * Behind a ramping soft starter its starting torque goes with the square of its voltage, so the start takes longer
+ * (docs/multiblocks/soft-starter.md); a direct start takes {@link Tuning#MOTOR_START_SECONDS} whatever the voltage. Fed from a drive's output (docs/multiblocks/vfd.md) it never draws locked-rotor current:
+ * it accelerates at its rated current as the drive ramps up, and runs once the drive is at full voltage.
  */
 public final class Motor {
 	public enum State { STOPPED, STARTING, RUNNING }
@@ -40,6 +44,8 @@ public final class Motor {
 	private double amps;
 	private double watts;
 	private boolean supplied;
+	/** Wired to a drive's output, as of the last solve. */
+	private boolean driveFed;
 
 	public Motor(boolean threePhase, Voltage voltage, double ratedWatts) {
 		this.threePhase = threePhase;
@@ -74,10 +80,15 @@ public final class Motor {
 		neutral = circuit.node();
 		java.util.Arrays.fill(branch, -1);
 		if (state != State.STOPPED) {
-			boolean locked = state == State.STARTING || stalled;
+			boolean locked = (state == State.STARTING && !driveFed) || stalled;
 			double amps = fullLoadAmps() * (locked ? Tuning.MOTOR_LOCKED_ROTOR_MULTIPLE : 1.0);
 			double pf = locked ? Tuning.MOTOR_LOCKED_ROTOR_POWER_FACTOR : Tuning.MOTOR_POWER_FACTOR;
 			double z = voltage.nominal() / amps;
+			if (state == State.STARTING && driveFed && !stalled) {
+				// accelerating on a drive: its rated current at whatever voltage the drive has reached
+				double lineToNeutral = threePhase ? volts / Math.sqrt(3) : volts;
+				z = Math.max(lineToNeutral, voltage.nominal() * 0.05) / amps;
+			}
 			double r = z * pf;
 			double x = z * Math.sqrt(1 - pf * pf);
 			if (threePhase) {
@@ -134,6 +145,9 @@ public final class Motor {
 		}
 		amps = most;
 		double dt = ticks / 20.0;
+		driveFed = circuit.driveFed(hot[0]);
+		boolean softStarted = circuit.softStarted(hot[0]);
+		double nominal = threePhase ? voltage.lineToLine() : voltage.nominal();
 
 		if (!wanted) {
 			state = State.STOPPED;
@@ -141,16 +155,17 @@ public final class Motor {
 		} else {
 			switch (state) {
 				case STOPPED -> {
-					if (supplied) {
+					if (supplied || (driveFed && volts >= 1.0)) {
 						state = State.STARTING;
 						startSeconds = 0;
 					}
 				}
 				case STARTING -> {
-					startSeconds += dt;
+					// on a soft starter the torque, and so the pace of the start, goes with the square of the voltage
+					startSeconds += softStarted ? dt * Math.min(1.0, Math.pow(volts / nominal, 2)) : dt;
 					if (volts < 1.0) {
 						state = State.STOPPED;
-					} else if (startSeconds >= Tuning.MOTOR_START_SECONDS) {
+					} else if (driveFed ? volts >= nominal * Tuning.DRIVE_AT_SPEED : startSeconds >= Tuning.MOTOR_START_SECONDS) {
 						state = State.RUNNING;
 					}
 				}
@@ -220,7 +235,7 @@ public final class Motor {
 			return "STALLED: a phase is missing, drawing locked-rotor current (" + reading + ")";
 		}
 		if (state == State.STARTING) {
-			return "starting, inrush " + reading;
+			return (driveFed ? "accelerating on its drive, " : "starting, inrush ") + reading;
 		}
 		if (reversed) {
 			return "RUNNING BACKWARD: swap two phases (" + reading + ")";

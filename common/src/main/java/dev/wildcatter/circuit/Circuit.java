@@ -161,6 +161,30 @@ public final class Circuit {
 		return network.currentPhasor(branchId);
 	}
 
+	private final java.util.Set<Integer> driveOutputs = new java.util.HashSet<>();
+
+	/** A drive's inverter output terminal (docs/multiblocks/vfd.md): a motor wired to it starts at its drive's pace. */
+	public void markDriveOutput(int node) {
+		driveOutputs.add(node);
+	}
+
+	/** After the solve: true if {@code node} is wired to a drive's output (through conductors, not ground or a transformer). */
+	public boolean driveFed(int node) {
+		return network.reaches(node, driveOutputs);
+	}
+
+	private final java.util.Set<Integer> softStartOutputs = new java.util.HashSet<>();
+
+	/** A soft starter's motor terminal while it ramps (docs/multiblocks/soft-starter.md): its motor starts on reduced torque. */
+	public void markSoftStart(int node) {
+		softStartOutputs.add(node);
+	}
+
+	/** After the solve: true if {@code node} is wired to a ramping soft starter. */
+	public boolean softStarted(int node) {
+		return network.reaches(node, softStartOutputs);
+	}
+
 	/** How much current is passing through a node: half the sum of everything flowing in and out of it. */
 	public double through(int node) {
 		return network.through(node);

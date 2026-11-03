@@ -714,6 +714,24 @@ public final class Tuning {
 	public static final double OVERLOAD_CLASS_SECONDS = 10.0;   // class 10: trips within 10 s at 6 times the setting
 	public static final double OVERLOAD_COOL_SECONDS = 120.0;
 	public static final double MCP_MULTIPLE = 13.0;             // the motor circuit protector trips at once at 13 times the setting (NEC 430.52)
+	// Soft starters and drives (docs/multiblocks/soft-starter.md, vfd.md; proposed, approved with the 10a plan 2026-11-02)
+	public static final double[] SOFT_START_LIMITS = {2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0};   // current limit, x full-load amps
+	public static final int SOFT_START_LIMIT_DEFAULT = 3;          // 3.5 x
+	public static final double SOFT_START_BYPASS = 1.25;           // the bypass closes when the current falls to this x full-load amps
+	public static final double SOFT_START_NO_MOTOR_SECONDS = 2.0;  // no inrush seen this long: nothing to ramp, it bypasses
+	/** The 480 V cabinets' dial: the starter's, then NEC 430.250 full-load current at 460 V for 75, 100, 125, 150, 200 and 250 hp. */
+	public static final double[] CABINET_SETTINGS_LV = {1.5, 3, 5, 8, 11, 16, 22, 32, 45, 63, 96, 124, 156, 180, 240, 302};
+	/** The 480 V drive bucket's dial: up to 100 hp. */
+	public static final double[] DRIVE_BUCKET_SETTINGS = {1.5, 3, 5, 8, 11, 16, 22, 32, 45, 63, 96, 124};
+	/** The 4.16 kV cabinets' dial (IEC R10 steps): the 250 hp charge pump is 32 A, a 500 kW coolant pump 87 A. */
+	public static final double[] CABINET_SETTINGS_MV = {10, 16, 25, 32, 40, 50, 63, 80, 100, 125};
+	public static final double DRIVE_LINE_POWER_FACTOR = 0.95;     // a 6-pulse diode front end
+	public static final double DRIVE_EFFICIENCY = 0.97;
+	public static final double DRIVE_RAMP_SECONDS = 10.0;          // 0 to full frequency and voltage, volts per hertz held
+	public static final double DRIVE_CURRENT_LIMIT = 1.5;          // x full-load amps, heavy duty...
+	public static final double DRIVE_LIMIT_SECONDS = 60.0;         // ...for this long, then it trips on overcurrent
+	public static final double DRIVE_AT_SPEED = 0.98;              // a drive-fed motor runs once the drive is at this share of full voltage
+	public static final double DRIVE_OUTPUT_OHMS = 0.001;          // the inverter's output impedance: stiff
 	public static final int MCC_MAX_BUCKETS = 6;                 // the water pump starts below this full, and stops when the boilers are full
 	public static final double THREE_PHASE_HEATER_WATTS = 15_000.0;   // an industrial duct or unit heater (docs/phase3-three-phase.md, proposed)
 	public static final double PADMOUNT_208_VA = 75_000;      // 12.47 kV to 208Y/120 V
