@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SHS",
+    "GXG",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "G": "minecraft:grindstone",
+    "X": "wildcatter:crankshaft",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:paste_plant",
+    "count": 1
+  }
+}

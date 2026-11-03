@@ -18,6 +18,8 @@ frequency, protection) is in `docs/ELECTRICAL_MODEL.md`. What is built, phase by
   faults and DC shock (10b1).
 - **Alumina:** a true-size Bayer refinery from bauxite to bagged alumina, with caustic soda from chlor-alkali cells, lime from a
   shaft kiln on a new limestone rock, AlF3 from the conversion plant's HF, and chlorine in ton containers (10b2).
+- **Anodes:** a delayed coker and rotary calciner on the crude unit's residue, by-product coke ovens and a tar still for pitch, and
+  an anode plant that mixes, presses, bakes and rods prebake anodes, with butt recycle (10b3a).
 - **Oil and gas:**
   - seismic surveys, a land rig and wells;
   - the lease (separator, tanks, pumpjacks);

@@ -7,7 +7,7 @@ import net.minecraft.world.level.Level;
 
 /**
  * A gas burner on a process part: an acid plant's melter starting cold, a mill's yellowcake dryer. Any natural gas on its pipe, or
- * LPG, as a cracking furnace fires on it.
+ * LPG, as a cracking furnace fires on it; or coker gas and coke oven gas by their heating value (docs/multiblocks/delayed-coker.md).
  */
 final class GasFiring {
 	private GasFiring() {
@@ -19,7 +19,8 @@ final class GasFiring {
 		for (Lines.Line line : Lines.lines(level, faces)) {
 			Product p = line.run().product();
 			double per = p == Product.PIPELINE_GAS || p == Product.GAS || p == Product.DRIED_GAS || p == Product.COMPRESSED_GAS ? Tuning.GAS_JOULES_PER_M3
-					: p == Product.LPG ? Tuning.LPG_JOULES_PER_L : 0;
+					: p == Product.LPG ? Tuning.LPG_JOULES_PER_L : p == Product.COKER_GAS ? Tuning.COKER_GAS_JOULES_PER_M3
+					: p == Product.COKE_OVEN_GAS ? Tuning.COKE_OVEN_GAS_JOULES_PER_M3 : 0;
 			if (per > 0 && got < joules) {
 				got += Lines.pull(line, p, (joules - got) / per, FluidNode.Pull.MACHINE, self) * per;
 			}

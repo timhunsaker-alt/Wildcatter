@@ -89,6 +89,23 @@ public interface FuelCycleBlocks {
 	Block ALF3_REACTOR = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.ALF3_REACTOR);
 	Block BAGGING_STATION = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.BAGGING_STATION);
 	Block CHLORINE_FILLER = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.CHLORINE_FILLER);
+	// 10b3a: the delayed coker and calciner, the coke ovens and tar still, the anode plant (docs/multiblocks/delayed-coker.md, coke-ovens.md, anode-plant.md)
+	Block COKER_FRACTIONATOR = carbonPart(dev.wildcatter.block.CarbonPartBlock.Part.COKER_FRACTIONATOR);
+	Block COKER_HEATER = carbonPart(dev.wildcatter.block.CarbonPartBlock.Part.COKER_HEATER);
+	Block COKE_DRUM = carbonPart(dev.wildcatter.block.CarbonPartBlock.Part.COKE_DRUM);
+	Block COKE_PIT = carbonPart(dev.wildcatter.block.CarbonPartBlock.Part.COKE_PIT);
+	Block COKE_KILN = carbonPart(dev.wildcatter.block.CarbonPartBlock.Part.COKE_KILN);
+	Block COKE_COOLER = carbonPart(dev.wildcatter.block.CarbonPartBlock.Part.COKE_COOLER);
+	Block COAL_TOWER = carbonPart(dev.wildcatter.block.CarbonPartBlock.Part.COAL_TOWER);
+	Block COKE_OVEN_BATTERY = carbonPart(dev.wildcatter.block.CarbonPartBlock.Part.COKE_OVEN_BATTERY);
+	Block PUSHER_MACHINE = carbonPart(dev.wildcatter.block.CarbonPartBlock.Part.PUSHER_MACHINE);
+	Block COKE_QUENCH_TOWER = carbonPart(dev.wildcatter.block.CarbonPartBlock.Part.COKE_QUENCH_TOWER);
+	Block BYPRODUCT_PLANT = carbonPart(dev.wildcatter.block.CarbonPartBlock.Part.BYPRODUCT_PLANT);
+	Block TAR_STILL = carbonPart(dev.wildcatter.block.CarbonPartBlock.Part.TAR_STILL);
+	Block PASTE_PLANT = carbonPart(dev.wildcatter.block.CarbonPartBlock.Part.PASTE_PLANT);
+	Block FORMING_PRESS = carbonPart(dev.wildcatter.block.CarbonPartBlock.Part.FORMING_PRESS);
+	Block BAKING_FURNACE = carbonPart(dev.wildcatter.block.CarbonPartBlock.Part.BAKING_FURNACE);
+	Block RODDING_SHOP = carbonPart(dev.wildcatter.block.CarbonPartBlock.Part.RODDING_SHOP);
 	/** A placed block of red mud filter cake, for a dry stack. */
 	Block RED_MUD = block("red_mud", props -> new Block(props.mapColor(MapColor.TERRACOTTA_RED).strength(0.8F).sound(SoundType.MUD)));
 	Block ISR_WELLHEAD = block("isr_wellhead", props -> new dev.wildcatter.block.IsrWellheadBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)

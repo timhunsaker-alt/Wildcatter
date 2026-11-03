@@ -64,7 +64,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.SeparatorBlockEntity> SEPARATOR_ENTITY = entity(dev.wildcatter.block.SeparatorBlockEntity::new, SEPARATOR);
 	public static final BlockEntityType<dev.wildcatter.block.StorageTankBlockEntity> STORAGE_TANK_ENTITY = entity(dev.wildcatter.block.StorageTankBlockEntity::new, STOCK_TANK, WATER_TANK, LPG_BULLET);
 	public static final BlockEntityType<dev.wildcatter.block.GasCompressorBlockEntity> GAS_COMPRESSOR_ENTITY = entity(dev.wildcatter.block.GasCompressorBlockEntity::new, GAS_COMPRESSOR, REFRIGERATION_COMPRESSOR, CRACKED_GAS_COMPRESSOR);
-	public static final BlockEntityType<dev.wildcatter.block.UnitMotorBlockEntity> UNIT_MOTOR_ENTITY = entity(dev.wildcatter.block.UnitMotorBlockEntity::new, TOPPING_SKID, DESALTER, CRUDE_CHARGE_PUMP, OVERHEAD_CONDENSER, AIR_COOLED_CONDENSER, HRSG_FEED_PUMP, MAIN_BLOWER, CRDM_HEAD, PRESSURIZER, CONDENSATE_PUMP, MAIN_FEED_PUMP, RHR_PUMP);
+	public static final BlockEntityType<dev.wildcatter.block.UnitMotorBlockEntity> UNIT_MOTOR_ENTITY = entity(dev.wildcatter.block.UnitMotorBlockEntity::new, TOPPING_SKID, DESALTER, CRUDE_CHARGE_PUMP, OVERHEAD_CONDENSER, AIR_COOLED_CONDENSER, HRSG_FEED_PUMP, MAIN_BLOWER, CRDM_HEAD, PRESSURIZER, CONDENSATE_PUMP, MAIN_FEED_PUMP, RHR_PUMP, PUSHER_MACHINE);
 	public static final BlockEntityType<dev.wildcatter.block.GasTurbineBlockEntity> GAS_TURBINE_ENTITY = entity(dev.wildcatter.block.GasTurbineBlockEntity::new, GAS_TURBINE, AERO_TURBINE);
 	public static final BlockEntityType<dev.wildcatter.block.GeneratorPartBlockEntity> GENERATOR_PART_ENTITY = entity(dev.wildcatter.block.GeneratorPartBlockEntity::new, GT_GENERATOR, ST_GENERATOR, AERO_GENERATOR, TG_GENERATOR_60);
 	public static final BlockEntityType<dev.wildcatter.block.GenBreakerBlockEntity> GEN_BREAKER_ENTITY = entity(dev.wildcatter.block.GenBreakerBlockEntity::new, GEN_BREAKER, GEN_BREAKER_3000);
@@ -128,6 +128,21 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.Alf3ReactorBlockEntity> ALF3_REACTOR_ENTITY = entity(dev.wildcatter.block.Alf3ReactorBlockEntity::new, ALF3_REACTOR);
 	public static final BlockEntityType<dev.wildcatter.block.BaggingStationBlockEntity> BAGGING_STATION_ENTITY = entity(dev.wildcatter.block.BaggingStationBlockEntity::new, BAGGING_STATION);
 	public static final BlockEntityType<dev.wildcatter.block.ChlorineFillerBlockEntity> CHLORINE_FILLER_ENTITY = entity(dev.wildcatter.block.ChlorineFillerBlockEntity::new, CHLORINE_FILLER);
+	public static final BlockEntityType<dev.wildcatter.block.CokerFractionatorBlockEntity> COKER_FRACTIONATOR_ENTITY = entity(dev.wildcatter.block.CokerFractionatorBlockEntity::new, COKER_FRACTIONATOR);
+	public static final BlockEntityType<dev.wildcatter.block.CokerHeaterBlockEntity> COKER_HEATER_ENTITY = entity(dev.wildcatter.block.CokerHeaterBlockEntity::new, COKER_HEATER);
+	public static final BlockEntityType<dev.wildcatter.block.CokeDrumBlockEntity> COKE_DRUM_ENTITY = entity(dev.wildcatter.block.CokeDrumBlockEntity::new, COKE_DRUM);
+	public static final BlockEntityType<dev.wildcatter.block.CokePitBlockEntity> COKE_PIT_ENTITY = entity(dev.wildcatter.block.CokePitBlockEntity::new, COKE_PIT);
+	public static final BlockEntityType<dev.wildcatter.block.CokeKilnBlockEntity> COKE_KILN_ENTITY = entity(dev.wildcatter.block.CokeKilnBlockEntity::new, COKE_KILN);
+	public static final BlockEntityType<dev.wildcatter.block.CokeCoolerBlockEntity> COKE_COOLER_ENTITY = entity(dev.wildcatter.block.CokeCoolerBlockEntity::new, COKE_COOLER);
+	public static final BlockEntityType<dev.wildcatter.block.CoalTowerBlockEntity> COAL_TOWER_ENTITY = entity(dev.wildcatter.block.CoalTowerBlockEntity::new, COAL_TOWER);
+	public static final BlockEntityType<dev.wildcatter.block.CokeOvenBatteryBlockEntity> COKE_OVEN_BATTERY_ENTITY = entity(dev.wildcatter.block.CokeOvenBatteryBlockEntity::new, COKE_OVEN_BATTERY);
+	public static final BlockEntityType<dev.wildcatter.block.CokeQuenchTowerBlockEntity> COKE_QUENCH_TOWER_ENTITY = entity(dev.wildcatter.block.CokeQuenchTowerBlockEntity::new, COKE_QUENCH_TOWER);
+	public static final BlockEntityType<dev.wildcatter.block.ByproductPlantBlockEntity> BYPRODUCT_PLANT_ENTITY = entity(dev.wildcatter.block.ByproductPlantBlockEntity::new, BYPRODUCT_PLANT);
+	public static final BlockEntityType<dev.wildcatter.block.TarStillBlockEntity> TAR_STILL_ENTITY = entity(dev.wildcatter.block.TarStillBlockEntity::new, TAR_STILL);
+	public static final BlockEntityType<dev.wildcatter.block.PastePlantBlockEntity> PASTE_PLANT_ENTITY = entity(dev.wildcatter.block.PastePlantBlockEntity::new, PASTE_PLANT);
+	public static final BlockEntityType<dev.wildcatter.block.FormingPressBlockEntity> FORMING_PRESS_ENTITY = entity(dev.wildcatter.block.FormingPressBlockEntity::new, FORMING_PRESS);
+	public static final BlockEntityType<dev.wildcatter.block.BakingFurnaceBlockEntity> BAKING_FURNACE_ENTITY = entity(dev.wildcatter.block.BakingFurnaceBlockEntity::new, BAKING_FURNACE);
+	public static final BlockEntityType<dev.wildcatter.block.RoddingShopBlockEntity> RODDING_SHOP_ENTITY = entity(dev.wildcatter.block.RoddingShopBlockEntity::new, RODDING_SHOP);
 	public static final BlockEntityType<dev.wildcatter.block.FuelLineBlockEntity> FUEL_LINE_ENTITY = entity(dev.wildcatter.block.FuelLineBlockEntity::new, UF6_AUTOCLAVE, IDR_KILN, GRANULATOR, PELLET_PRESS, SINTERING_FURNACE, PELLET_GRINDER, ROD_LOADER);
 	public static final BlockEntityType<dev.wildcatter.block.RodWelderBlockEntity> ROD_WELDER_ENTITY = entity(dev.wildcatter.block.RodWelderBlockEntity::new, ROD_WELDER);
 	public static final BlockEntityType<dev.wildcatter.block.AssemblyFixtureBlockEntity> ASSEMBLY_FIXTURE_ENTITY = entity(dev.wildcatter.block.AssemblyFixtureBlockEntity::new, ASSEMBLY_FIXTURE);
@@ -371,6 +386,9 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 			add(((dev.wildcatter.block.AluminaPartBlock) part).part().id(), part);
 		}
 		add("red_mud", RED_MUD);
+		for (Block part : new Block[] {COKER_FRACTIONATOR, COKER_HEATER, COKE_DRUM, COKE_PIT, COKE_KILN, COKE_COOLER, COAL_TOWER, COKE_OVEN_BATTERY, PUSHER_MACHINE, COKE_QUENCH_TOWER, BYPRODUCT_PLANT, TAR_STILL, PASTE_PLANT, FORMING_PRESS, BAKING_FURNACE, RODDING_SHOP}) {
+			add(((dev.wildcatter.block.CarbonPartBlock) part).part().id(), part);
+		}
 		for (Block part : new Block[] {UF6_AUTOCLAVE, IDR_KILN, GRANULATOR, PELLET_PRESS, SINTERING_FURNACE, PELLET_GRINDER, ROD_LOADER, ROD_WELDER, ASSEMBLY_FIXTURE, HELIUM_RECOVERY_UNIT}) {
 			add(((dev.wildcatter.block.FuelPartBlock) part).part().id(), part);
 		}
@@ -512,6 +530,21 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("alf3_reactor"), ALF3_REACTOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("bagging_station"), BAGGING_STATION_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("chlorine_filler"), CHLORINE_FILLER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("coker_fractionator"), COKER_FRACTIONATOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("coker_heater"), COKER_HEATER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("coke_drum"), COKE_DRUM_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("coke_pit"), COKE_PIT_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("coke_kiln"), COKE_KILN_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("coke_cooler"), COKE_COOLER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("coal_tower"), COAL_TOWER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("coke_oven_battery"), COKE_OVEN_BATTERY_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("coke_quench_tower"), COKE_QUENCH_TOWER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("byproduct_plant"), BYPRODUCT_PLANT_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("tar_still"), TAR_STILL_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("paste_plant"), PASTE_PLANT_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("forming_press"), FORMING_PRESS_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("baking_furnace"), BAKING_FURNACE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rodding_shop"), RODDING_SHOP_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("fuel_line"), FUEL_LINE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rod_welder"), ROD_WELDER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("assembly_fixture"), ASSEMBLY_FIXTURE_ENTITY);

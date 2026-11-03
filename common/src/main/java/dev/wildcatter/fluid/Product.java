@@ -88,7 +88,17 @@ public enum Product {
 	POLISHED_LIQUOR("polished liquor", false),
 	HYDRATE_SLURRY("hydrate slurry", false),
 	SPENT_LIQUOR("spent liquor", false),
-	STRONG_LIQUOR("strong liquor", false);
+	STRONG_LIQUOR("strong liquor", false),
+	/** Off a coker fractionator (docs/multiblocks/delayed-coker.md): methane to butane and hydrogen, for the plant's gas burners. */
+	COKER_GAS("coker gas", true),
+	/** Out of a coke oven battery's collecting main, carrying its tar (docs/multiblocks/coke-ovens.md). */
+	RAW_COKE_OVEN_GAS("raw coke oven gas", true),
+	/** Cleaned in the by-product plant, about 18 MJ/m3. */
+	COKE_OVEN_GAS("coke oven gas", true),
+	/** Condensed in the by-product plant, for the tar still. Counted in kg. */
+	COAL_TAR("coal tar", false),
+	/** The tar still's residue, the anodes' binder, kept hot. Counted in kg. */
+	PITCH("coal-tar pitch", false);
 
 	private final String label;
 	private final boolean gas;
@@ -110,7 +120,7 @@ public enum Product {
 	public String unit() {
 		return switch (this) {
 			case HOT_CRACKED_GAS, CRACKED_GAS, COMPRESSED_CRACKED_GAS, BURNER_GAS, ORE_SLURRY, LEACH_SLURRY, FLUORINE, UF6, CHLORINE, STEAM, FEEDWATER, COOLING_WATER,
-					CAUSTIC_SODA, PROCESS_STEAM, BAUXITE_SLURRY, DIGESTED_SLURRY, GREEN_LIQUOR, MUD_SLURRY, POLISHED_LIQUOR, HYDRATE_SLURRY, SPENT_LIQUOR, STRONG_LIQUOR -> "kg";
+					CAUSTIC_SODA, PROCESS_STEAM, BAUXITE_SLURRY, DIGESTED_SLURRY, GREEN_LIQUOR, MUD_SLURRY, POLISHED_LIQUOR, HYDRATE_SLURRY, SPENT_LIQUOR, STRONG_LIQUOR, COAL_TAR, PITCH -> "kg";
 			default -> gas ? "m3" : "L";
 		};
 	}

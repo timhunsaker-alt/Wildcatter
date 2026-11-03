@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BBB",
+    "BFB",
+    "BBB"
+  ],
+  "key": {
+    "B": "minecraft:bricks",
+    "F": "minecraft:blast_furnace"
+  },
+  "result": {
+    "id": "wildcatter:coke_oven_battery",
+    "count": 1
+  }
+}

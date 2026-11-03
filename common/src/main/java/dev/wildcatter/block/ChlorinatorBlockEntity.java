@@ -11,7 +11,6 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -64,7 +63,7 @@ public class ChlorinatorBlockEntity extends UnitMotorBlockEntity implements ZrSt
 
 	@Override
 	public boolean takes(ItemStack stack) {
-		return stack.is(Items.COAL) || stack.is(Items.CHARCOAL);
+		return SolidCarbon.is(stack);
 	}
 
 	@Override
@@ -75,8 +74,8 @@ public class ChlorinatorBlockEntity extends UnitMotorBlockEntity implements ZrSt
 			return;
 		}
 		double rate = Tuning.ZR_LINE_KGS * 1.2 * seconds();
-		if (carbon < rate * Zirconium.carbonPerZr() && !useOne().isEmpty()) {
-			carbon += Tuning.COAL_KG * Tuning.COAL_CARBON;
+		if (carbon < rate * Zirconium.carbonPerZr() && fed() > 0) {
+			carbon += SolidCarbon.carbonKg(useOne());
 		}
 		double cl2 = Lines.available(level, chlorine(), Product.CHLORINE, Pull.MACHINE, this);
 		if (up.zirconium() < 1e-9) {
@@ -84,7 +83,7 @@ public class ChlorinatorBlockEntity extends UnitMotorBlockEntity implements ZrSt
 			return;
 		}
 		if (carbon <= 1e-9) {
-			unit = "NO CARBON: put coal or charcoal in its hopper";
+			unit = "NO CARBON: put coal, charcoal or coke in its hopper";
 			return;
 		}
 		if (cl2 <= 1e-9) {

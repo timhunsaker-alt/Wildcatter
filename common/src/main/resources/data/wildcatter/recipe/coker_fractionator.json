@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "SWS",
+    "SPS"
+  ],
+  "key": {
+    "S": "minecraft:iron_block",
+    "P": "wildcatter:gas_line",
+    "W": "minecraft:white_wool"
+  },
+  "result": {
+    "id": "wildcatter:coker_fractionator",
+    "count": 1
+  }
+}

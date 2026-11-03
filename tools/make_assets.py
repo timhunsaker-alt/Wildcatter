@@ -2022,6 +2022,56 @@ lang.update({f"block.{ns}.ball_mill": "Ball Mill (110 kW, 480 V)", f"block.{ns}.
 	f"block.{ns}.bagging_station": "Bagging Station (FIBC)", f"block.{ns}.chlorine_filler": "Chlorine Filler (ton containers)", f"block.{ns}.red_mud": "Red Mud (filter cake)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 10b3a: coke, pitch and anodes (docs/multiblocks/delayed-coker.md, coke-ovens.md, anode-plant.md) -------------------
+# blockstates, models, shapes and items come from tools/models/carbon.py; here loot, names, tags, recipes and the items.
+CARBON_PARTS = ("coker_fractionator", "coker_heater", "coke_drum", "coke_pit", "coke_kiln", "coke_cooler", "coal_tower", "coke_oven_battery",
+	"pusher_machine", "coke_quench_tower", "byproduct_plant", "tar_still", "paste_plant", "forming_press", "baking_furnace", "rodding_shop")
+for name in CARBON_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in CARBON_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("coker_fractionator", ["SPS", "SWS", "SPS"], {"S": "minecraft:iron_block", "P": P_, "W": "minecraft:white_wool"}, "coker_fractionator")
+shaped("coker_heater", ["SPS", "BFB", "SXS"], {"S": S_, "P": P_, "B": "minecraft:bricks", "F": "minecraft:blast_furnace", "X": "minecraft:piston"}, "coker_heater")
+shaped("coke_drum", ["SSS", "S S", "SXS"], {"S": "minecraft:iron_block", "X": "minecraft:piston"}, "coke_drum")
+shaped("coke_pit", ["SPS", "C C", "CXC"], {"S": S_, "P": P_, "C": "minecraft:smooth_stone", "X": f"{ns}:crankshaft"}, "coke_pit")
+shaped("coke_kiln", ["BBB", "FXF", "BBB"], {"B": "minecraft:bricks", "F": "minecraft:blast_furnace", "X": f"{ns}:crankshaft"}, "coke_kiln")
+shaped("coke_cooler", ["SSS", "WXW", "SSS"], {"S": S_, "W": "minecraft:water_bucket", "X": f"{ns}:crankshaft"}, "coke_cooler")
+shaped("coal_tower", ["SHS", "C C", "SXS"], {"S": S_, "H": "minecraft:hopper", "C": "minecraft:smooth_stone", "X": "minecraft:piston"}, "coal_tower")
+shaped("coke_oven_battery", ["BBB", "BFB", "BBB"], {"B": "minecraft:bricks", "F": "minecraft:blast_furnace"}, "coke_oven_battery")
+shaped("pusher_machine", ["SXS", "IRI", "SSS"], {"S": S_, "X": "minecraft:piston", "I": "minecraft:iron_block", "R": "minecraft:rail"}, "pusher_machine")
+shaped("coke_quench_tower", ["CWC", "C C", "SRS"], {"C": "minecraft:smooth_stone", "W": "minecraft:water_bucket", "S": S_, "R": "minecraft:rail"}, "coke_quench_tower")
+shaped("byproduct_plant", ["SPS", "CXC", "SPS"], {"S": S_, "P": P_, "C": "minecraft:copper_block", "X": f"{ns}:crankshaft"}, "byproduct_plant")
+shaped("tar_still", ["SPS", "SFS", "SPS"], {"S": S_, "P": P_, "F": "minecraft:furnace"}, "tar_still")
+shaped("paste_plant", ["SHS", "GXG", "SPS"], {"S": S_, "H": "minecraft:hopper", "G": "minecraft:grindstone", "X": f"{ns}:crankshaft", "P": P_}, "paste_plant")
+shaped("forming_press", ["SXS", "SIS", "SSS"], {"S": S_, "X": "minecraft:piston", "I": "minecraft:iron_block"}, "forming_press")
+shaped("baking_furnace", ["BHB", "BFB", "BBB"], {"B": "minecraft:bricks", "H": "minecraft:hopper", "F": "minecraft:blast_furnace"}, "baking_furnace")
+shaped("rodding_shop", ["SXS", "IFI", "SSS"], {"S": S_, "X": "minecraft:piston", "I": "minecraft:iron_block", "F": "minecraft:blast_furnace"}, "rodding_shop")
+shaped("anode_rod_copper", ["C", "C", "S"], {"C": "minecraft:copper_ingot", "S": f"{ns}:steel_ingot"}, "anode_rod")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in {"green_petroleum_coke": ("Green Petroleum Coke (1 t)", (40, 40, 42)), "calcined_coke_bag": ("Bulk Bag of Calcined Coke", (70, 70, 74)),
+		"metallurgical_coke": ("Metallurgical Coke", (90, 90, 96)), "green_anode": ("Green Anode", (34, 34, 36)), "baked_anode": ("Baked Anode", (60, 60, 64)),
+		"rodded_anode": ("Rodded Anode", (110, 110, 116)), "spent_anode": ("Spent Anode (butt on its rod)", (120, 110, 100)),
+		"crushed_butts": ("Crushed Anode Butts", (66, 64, 62)), "anode_rod": ("Anode Rod", (190, 120, 80))}.items():
+	if os.path.exists(f"{ORE_ART}/{item}.png"):
+		shutil.copy(f"{ORE_ART}/{item}.png", f"{ASSETS}/textures/item/ore/{item}.png")
+		item_tex = f"{ns}:item/ore/{item}"
+	else:
+		tex(f"{item}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+		item_tex = f"{ns}:item/{item}_placeholder"
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": item_tex}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.coker_fractionator": "Coker Fractionator", f"block.{ns}.coker_heater": "Coker Heater (495 C)", f"block.{ns}.coke_drum": "Coke Drum",
+	f"block.{ns}.coke_pit": "Coke Pit (hydraulic decoking, 4.16 kV)", f"block.{ns}.coke_kiln": "Coke Calcining Kiln (rotary)", f"block.{ns}.coke_cooler": "Coke Cooler (rotary)",
+	f"block.{ns}.coal_tower": "Coal Tower", f"block.{ns}.coke_oven_battery": "Coke Oven Battery (13 slot ovens)", f"block.{ns}.pusher_machine": "Coke Pusher Machine",
+	f"block.{ns}.coke_quench_tower": "Coke Quench Tower", f"block.{ns}.byproduct_plant": "By-product Plant (4.16 kV exhauster)", f"block.{ns}.tar_still": "Tar Still",
+	f"block.{ns}.paste_plant": "Anode Paste Plant (4.16 kV)", f"block.{ns}.forming_press": "Anode Forming Press (vibro-compactor)",
+	f"block.{ns}.baking_furnace": "Ring Baking Furnace", f"block.{ns}.rodding_shop": "Rodding Shop"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 7g: the fuel plant (docs/multiblocks/fuel.md) -------------------------------------------------------------------
 # blockstates, models, shapes and items come from tools/models/fuel.py; here loot, names, tags, recipes and the items.
 FUEL_PARTS = ("uf6_autoclave", "idr_kiln", "granulator", "pellet_press", "sintering_furnace", "pellet_grinder", "rod_loader", "rod_welder",

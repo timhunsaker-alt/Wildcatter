@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SSS",
+    "WXW",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "W": "minecraft:water_bucket",
+    "X": "wildcatter:crankshaft"
+  },
+  "result": {
+    "id": "wildcatter:coke_cooler",
+    "count": 1
+  }
+}

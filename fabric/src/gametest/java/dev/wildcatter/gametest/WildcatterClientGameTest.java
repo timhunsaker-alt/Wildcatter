@@ -223,6 +223,15 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("alf3Lime")) {
 				alf3Lime(context, server);
 			}
+			if (only("coker")) {
+				coker(context, server);
+			}
+			if (only("cokeOvens")) {
+				cokeOvens(context, server);
+			}
+			if (only("anodes")) {
+				anodes(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -1913,6 +1922,443 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(3);
 		context.takeScreenshot("wildcatter-lime-alf3");
 		System.out.println("[wildcatter-test] alf3Lime ok: " + lime + " quicklime bag, " + alf3 + " AlF3 bag, " + tons + " ton container, " + String.format("%.2f", caustic) + " kg of caustic in the tank" + state);
+	}
+
+	/**
+	 * The delayed coker and calciner (10b3a, docs/multiblocks/delayed-coker.md). The coke pit at x 0-5 with two drums on its east half;
+	 * the heater east of the pit, turned to face east so its box is on its north side, against both drums; the fractionator east of
+	 * the heater, a stock tank of residue at its front, tanks on its gas oil and naphtha and a flare on its coker gas. South-east, the
+	 * calcining kiln, its cooler and a bagging station in a line. LPG bullets fire the heater and the kiln. A diesel set's 480 V on a
+	 * busway down x 18; a second, through a backward unit substation, the pit's 4.16 kV jet pump.
+	 */
+	private void coker(ClientGameTestContext context, TestServerContext server) {
+		final int z = -5500;
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		server.runCommand("effect give @p minecraft:slow_falling 1200 0 true");
+		server.runCommand("tp @p 10 " + (up + 30) + " " + (z + 40) + " 160 40");
+		context.waitTicks(20);
+		for (int zz = z - 16; zz <= z + 50; zz += 13) {   // /fill takes at most 32,768 blocks
+			server.runCommand("fill -27 " + (y - 1) + " " + zz + " 30 " + (y + 24) + " " + Math.min(zz + 12, z + 50) + " minecraft:air");
+		}
+		for (int zz = z - 16; zz <= z + 50; zz += 40) {
+			server.runCommand("fill -27 " + (y - 1) + " " + zz + " 30 " + (y - 1) + " " + Math.min(zz + 39, z + 50) + " minecraft:stone");
+		}
+		BlockPos pit = new BlockPos(0, up, z);
+		placeBig(server, WildcatterBlocks.COKE_PIT, pit, north);                            // x 0-5, z..z+7
+		BlockPos drumA = new BlockPos(3, up + 4, z);
+		placeBig(server, WildcatterBlocks.COKE_DRUM, drumA, north);                         // x 3-5, z..z+2, on the pit
+		BlockPos drumB = new BlockPos(3, up + 4, z + 3);
+		placeBig(server, WildcatterBlocks.COKE_DRUM, drumB, north);                         // x 3-5, z+3..z+5
+		BlockPos heater = new BlockPos(11, up, z + 1);
+		placeBig(server, WildcatterBlocks.COKER_HEATER, heater, net.minecraft.core.Direction.EAST);   // x 6-11, z+1..z+4; box north, fuel south
+		BlockPos column = new BlockPos(12, up, z - 1);
+		placeBig(server, WildcatterBlocks.COKER_FRACTIONATOR, column, north);               // x 12-14, z-1..z+1
+		BlockPos residue = new BlockPos(12, up, z - 6);
+		placeBig(server, WildcatterBlocks.STOCK_TANK, residue, north);                      // x 12-15, z-6..z-3
+		BlockPos dieselTank = new BlockPos(10, up, z + 6);
+		placeBig(server, WildcatterBlocks.STOCK_TANK, dieselTank, north);                   // x 10-13, z+6..z+9
+		BlockPos gasolineTank = new BlockPos(14, up, z + 6);
+		placeBig(server, WildcatterBlocks.STOCK_TANK, gasolineTank, north);                 // x 14-17, z+6..z+9
+		BlockPos bullet = new BlockPos(6, up, z + 6);
+		placeBig(server, WildcatterBlocks.LPG_BULLET, bullet, north);                       // x 6-8, z+6..z+17
+		placeBig(server, WildcatterBlocks.FLARE_STACK, new BlockPos(16, up, z), north);     // the coker gas no one takes
+		BlockPos kiln = new BlockPos(20, up, z);
+		placeBig(server, WildcatterBlocks.COKE_KILN, kiln, north);                          // x 20-22, z..z+29
+		BlockPos cooler = new BlockPos(20, up, z + 30);
+		placeBig(server, WildcatterBlocks.COKE_COOLER, cooler, north);                      // x 20-21, z+30..z+41
+		BlockPos bagger = new BlockPos(20, up, z + 42);
+		placeBig(server, WildcatterBlocks.BAGGING_STATION, bagger, north);                  // x 20-21, z+42..z+43
+		BlockPos kilnBullet = new BlockPos(24, up, z + 10);
+		placeBig(server, WildcatterBlocks.LPG_BULLET, kilnBullet, north);                   // x 24-26, z+10..z+21
+		java.util.List<int[]> runs = new java.util.ArrayList<>();
+		runs.add(new int[] {13, 0, -2});                                        // residue: the tank to the fractionator's front
+		for (int zz = 2; zz <= 5; zz++) {
+			runs.add(new int[] {12, 0, zz});                                    // gas oil: x 12 south to its tank
+			runs.add(new int[] {14, 0, zz});                                    // naphtha: x 14 south to its tank
+		}
+		runs.add(new int[] {15, 0, 0});                                         // coker gas: the fractionator's east side to the flare
+		runs.add(new int[] {8, 0, 5});                                          // LPG: the bullet to the heater's fuel side
+		runs.add(new int[] {23, 0, 12});                                        // LPG: the second bullet to the kiln
+		pipes(server, z, runs.toArray(new int[0][]));
+		put(server, 21, up + 3, z + 1, "minecraft:hopper");
+		server.runCommand("item replace block 21 " + (up + 3) + " " + (z + 1) + " container.0 with wildcatter:green_petroleum_coke 1");
+		put(server, 20, up + 4, z + 42, "minecraft:hopper");
+		server.runCommand("item replace block 20 " + (up + 4) + " " + (z + 42) + " container.0 with wildcatter:empty_bulk_bag 2");
+		BlockPos cokeOut = new BlockPos(1, y, z + 4);
+		put(server, 1, y, z + 4, "minecraft:hopper");
+		BlockPos bagsOut = new BlockPos(20, y, z + 42);
+		put(server, 20, y, z + 42, "minecraft:hopper");
+		// 480 V: a set north-west, a busway along z-9 and down x 18
+		BlockPos lvSet = new BlockPos(-4, up, z - 8);
+		genset(server, lvSet, north, false);                                                 // x -9..-4, z-8..z-7
+		put(server, -3, up, z - 8, "wildcatter:busway_industrial");
+		for (int x = -3; x <= 18; x++) {
+			put(server, x, up, z - 9, "wildcatter:busway_industrial");
+		}
+		for (int zz = z - 9; zz <= z + 42; zz++) {
+			put(server, 18, up, zz, "wildcatter:busway_industrial");
+		}
+		for (int zz : new int[] {0, 30, 42}) {
+			put(server, 19, up, z + zz, "wildcatter:cable_industrial");         // the kiln, cooler and bagging station
+		}
+		for (int zz = z - 8; zz <= z; zz++) {
+			put(server, 11, up, zz, "wildcatter:cable_industrial");             // the fractionator (at z-1) and the heater (at z)
+		}
+		for (int zz = z - 8; zz <= z - 1; zz++) {
+			put(server, 2, up, zz, "wildcatter:cable_industrial");              // up to the drums on the pit
+		}
+		for (int yy = up + 1; yy <= up + 4; yy++) {
+			put(server, 2, yy, z - 1, "wildcatter:cable_industrial");
+		}
+		for (int zz = z; zz <= z + 3; zz++) {
+			put(server, 2, up + 4, zz, "wildcatter:cable_industrial");
+		}
+		// 4.16 kV: a set south-west through a backward unit substation, north and east to the pit's box at x -1
+		BlockPos mvSet = new BlockPos(-20, up, z + 20);
+		genset(server, mvSet, north, false);                                                 // x -25..-20, z+20..z+21
+		BlockPos mvOut = inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, mvSet, net.minecraft.core.Direction.EAST, false);
+		for (int zz = z; zz <= mvOut.getZ(); zz++) {
+			put(server, mvOut.getX(), up, zz, "wildcatter:cable_mv");
+		}
+		for (int x = mvOut.getX() + 1; x <= -1; x++) {
+			put(server, x, up, z, "wildcatter:cable_mv");
+		}
+		fillTank(server, residue, dev.wildcatter.fluid.Product.RESIDUE, 40_000);
+		fillTank(server, bullet, dev.wildcatter.fluid.Product.LPG, 20_000);
+		fillTank(server, kilnBullet, dev.wildcatter.fluid.Product.LPG, 20_000);
+		water(server, pit);
+		startGenset(context, server, lvSet, north, 2000);
+		startGenset(context, server, mvSet, north, 2000);
+		BlockPos[] parts = {column, heater, kiln};
+		String[] doing = {"fractionating", "coking", "calcining"};
+		java.util.function.Supplier<String> all = () -> " | fractionator " + read(server, column.getX(), up, column.getZ()) + " | heater " + read(server, heater.getX(), up, heater.getZ())
+				+ " | drum A " + read(server, drumA.getX(), drumA.getY(), drumA.getZ()) + " | drum B " + read(server, drumB.getX(), drumB.getY(), drumB.getZ()) + " | pit "
+				+ read(server, 0, up, z) + " | kiln " + read(server, kiln.getX(), up, kiln.getZ()) + " | cooler " + read(server, cooler.getX(), up, cooler.getZ());
+		boolean running = false;
+		for (int i = 0; i < 30 && !running; i++) {
+			context.waitTicks(40);
+			running = true;
+			for (int k = 0; k < parts.length; k++) {
+				running &= read(server, parts[k].getX(), up, parts[k].getZ()).contains(doing[k]);
+			}
+		}
+		String state = all.get();
+		System.out.println("[wildcatter-test] coker: running" + state);
+		for (int k = 0; k < parts.length; k++) {
+			check(read(server, parts[k].getX(), up, parts[k].getZ()).contains(doing[k]), "the coker should run (" + doing[k] + "):" + state);
+		}
+		check(state.contains("FILLING"), "one drum should be filling:" + state);
+		// a little coke in the drum that is not filling and almost a piece in the pit; almost a bag in the cooler
+		server.computeOnServer(srv -> {
+			for (BlockPos d : new BlockPos[] {drumA, drumB}) {
+				if (srv.overworld().getBlockEntity(d) instanceof dev.wildcatter.block.CokeDrumBlockEntity drum && !drum.filling()) {
+					drum.addCoke(20);
+				}
+			}
+			((dev.wildcatter.block.CokePitBlockEntity) srv.overworld().getBlockEntity(pit)).addCoke(Tuning.GREEN_COKE_KG - 5);
+			((dev.wildcatter.block.CokeCoolerBlockEntity) srv.overworld().getBlockEntity(cooler)).addCoke(Tuning.BULK_BAG_KG - 5);
+			return null;
+		});
+		int coke = 0;
+		int bags = 0;
+		for (int i = 0; i < 30 && (coke == 0 || bags == 0); i++) {
+			context.waitTicks(20);
+			water(server, pit);
+			coke = countIn(server, cokeOut, WildcatterItems.GREEN_COKE);
+			bags = countIn(server, bagsOut, WildcatterItems.CALCINED_COKE_BAG);
+		}
+		state = all.get();
+		check(coke > 0, "a piece of green coke should drop under the pit:" + state);
+		check(bags > 0, "a bag of calcined coke should drop under the bagging station:" + state + " | bagger " + read(server, bagger.getX(), up, bagger.getZ()));
+		java.util.function.Function<BlockPos, Double> tank = at -> server.computeOnServer(srv -> srv.overworld().getBlockEntity(at) instanceof dev.wildcatter.block.StorageTankBlockEntity t
+				? t.amount() : 0.0);
+		double diesel = tank.apply(dieselTank);
+		double gasoline = tank.apply(gasolineTank);
+		check(diesel > 0 && gasoline > 0, "gas oil and naphtha should come into their tanks: " + diesel + " L, " + gasoline + " L" + state);
+		server.runCommand("tp @p 34 " + (up + 26) + " " + (z + 46) + " 135 30");   // aimed just before the shot: the player falls between
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-coker");
+		System.out.println("[wildcatter-test] coker ok: " + coke + " green coke, " + bags + " calcined coke bag, " + String.format("%.0f L of gas oil, %.0f L of naphtha", diesel, gasoline) + state);
+	}
+
+	/**
+	 * The coke ovens and tar still (10b3a, docs/multiblocks/coke-ovens.md). The battery at x 0-9, the coal tower at its north end, the
+	 * pusher machine on its west side and the quench tower (turned to face south, so its box is on its east side) on its east. Its raw
+	 * gas goes south to the by-product plant, which flares its coke oven gas and pipes its tar east to the tar still; the still's pitch
+	 * and tar oils go to stock tanks. A diesel set's 480 V on a busway along z-9 and down x 20 for the battery's parts, a second set for
+	 * the still, and a third through a backward unit substation for the exhauster's 4.16 kV.
+	 */
+	private void cokeOvens(ClientGameTestContext context, TestServerContext server) {
+		final int z = -5700;
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		server.runCommand("effect give @p minecraft:slow_falling 1200 0 true");
+		server.runCommand("tp @p 10 " + (up + 30) + " " + (z + 45) + " 170 40");
+		context.waitTicks(20);
+		for (int zz = z - 16; zz <= z + 40; zz += 13) {
+			server.runCommand("fill -34 " + (y - 1) + " " + zz + " 30 " + (y + 24) + " " + Math.min(zz + 12, z + 40) + " minecraft:air");
+		}
+		for (int zz = z - 16; zz <= z + 40; zz += 40) {
+			server.runCommand("fill -34 " + (y - 1) + " " + zz + " 30 " + (y - 1) + " " + Math.min(zz + 39, z + 40) + " minecraft:stone");
+		}
+		BlockPos battery = new BlockPos(0, up, z);
+		placeBig(server, WildcatterBlocks.COKE_OVEN_BATTERY, battery, north);               // x 0-9, z..z+15
+		BlockPos tower = new BlockPos(3, up, z - 4);
+		placeBig(server, WildcatterBlocks.COAL_TOWER, tower, north);                        // x 3-6, z-4..z-1
+		BlockPos pusher = new BlockPos(-4, up, z + 1);
+		placeBig(server, WildcatterBlocks.PUSHER_MACHINE, pusher, north);                   // x -4..-1, z+1..z+16
+		BlockPos quench = new BlockPos(14, up, z + 9);
+		placeBig(server, WildcatterBlocks.COKE_QUENCH_TOWER, quench, net.minecraft.core.Direction.SOUTH);   // x 10-14, z+5..z+9; box east
+		BlockPos plant = new BlockPos(2, up, z + 18);
+		placeBig(server, WildcatterBlocks.BYPRODUCT_PLANT, plant, north);                   // x 2-6, z+18..z+25
+		placeBig(server, WildcatterBlocks.FLARE_STACK, new BlockPos(4, up, z + 27), north); // the coke oven gas no one takes
+		BlockPos still = new BlockPos(12, up, z + 25);
+		placeBig(server, WildcatterBlocks.TAR_STILL, still, north);                         // x 12-14, z+25..z+27
+		BlockPos bullet = new BlockPos(16, up, z + 14);
+		placeBig(server, WildcatterBlocks.LPG_BULLET, bullet, north);                       // x 16-18, z+14..z+25
+		BlockPos pitchTank = new BlockPos(9, up, z + 29);
+		placeBig(server, WildcatterBlocks.STOCK_TANK, pitchTank, north);                    // x 9-12, z+29..z+32
+		BlockPos oilTank = new BlockPos(14, up, z + 29);
+		placeBig(server, WildcatterBlocks.STOCK_TANK, oilTank, north);                      // x 14-17, z+29..z+32
+		java.util.List<int[]> runs = new java.util.ArrayList<>();
+		runs.add(new int[] {3, 0, 16});                                         // raw gas: the battery's back to the by-product plant
+		runs.add(new int[] {3, 0, 17});
+		runs.add(new int[] {4, 0, 26});                                         // coke oven gas to the flare
+		for (int x = 7; x <= 12; x++) {
+			runs.add(new int[] {x, 0, 24});                                     // tar: the plant's east side to the still's front
+		}
+		runs.add(new int[] {15, 0, 25});                                        // LPG: the bullet to the still
+		runs.add(new int[] {12, 0, 28});                                        // pitch to its tank
+		runs.add(new int[] {14, 0, 28});                                        // tar oils to theirs
+		pipes(server, z, runs.toArray(new int[0][]));
+		put(server, 4, up + 12, z - 3, "minecraft:hopper");
+		server.runCommand("item replace block 4 " + (up + 12) + " " + (z - 3) + " container.0 with minecraft:coal_block 6");
+		BlockPos cokeOut = new BlockPos(12, y, z + 7);
+		put(server, 12, y, z + 7, "minecraft:hopper");
+		// 480 V for the battery's parts: a set north-west, a busway along z-9 and down x 20
+		BlockPos lvSet = new BlockPos(-12, up, z - 8);
+		BlockPos lvSet2 = new BlockPos(-20, up, z - 8);
+		for (BlockPos set : new BlockPos[] {lvSet, lvSet2}) {
+			genset(server, set, north, false);                                               // x -17..-12 and -25..-20, z-8..z-7
+			put(server, set.getX() + 1, up, z - 8, "wildcatter:busway_industrial");
+		}
+		for (int x = -19; x <= 20; x++) {
+			put(server, x, up, z - 9, "wildcatter:busway_industrial");
+		}
+		for (int zz = z - 9; zz <= z + 9; zz++) {
+			put(server, 20, up, zz, "wildcatter:busway_industrial");
+		}
+		for (int x = 15; x <= 19; x++) {
+			put(server, x, up, z + 9, "wildcatter:cable_industrial");           // the quench tower's box
+		}
+		for (int zz = z - 8; zz <= z; zz++) {
+			put(server, -1, up, zz, "wildcatter:cable_industrial");             // the battery's box
+		}
+		for (int zz = z - 8; zz <= z - 4; zz++) {
+			put(server, 2, up, zz, "wildcatter:cable_industrial");              // the coal tower's
+		}
+		for (int zz = z - 8; zz <= z + 1; zz++) {
+			put(server, -5, up, zz, "wildcatter:cable_industrial");             // the pusher's
+		}
+		// 480 V for the still: a set south, a cable north up x 8 and east along z+25 to its box at x 11
+		BlockPos stillSet = new BlockPos(7, up, z + 35);
+		genset(server, stillSet, north, false);                                              // x 2-7, z+35..z+36
+		put(server, 8, up, z + 35, "wildcatter:busway_industrial");
+		for (int zz = z + 25; zz <= z + 34; zz++) {
+			put(server, 8, up, zz, "wildcatter:cable_industrial");
+		}
+		for (int x = 9; x <= 11; x++) {
+			put(server, x, up, z + 25, "wildcatter:cable_industrial");
+		}
+		// 4.16 kV for the exhauster: two sets west, paralleled on a short busway, through a backward unit substation, east along z+18
+		BlockPos mvSet = new BlockPos(-28, up, z + 18);
+		BlockPos mvSet2 = new BlockPos(-28, up, z + 22);
+		for (BlockPos set : new BlockPos[] {mvSet, mvSet2}) {
+			genset(server, set, north, false);                                               // x -33..-28, z+18..z+19 and z+22..z+23
+		}
+		for (int zz = z + 18; zz <= z + 22; zz++) {
+			put(server, -27, up, zz, "wildcatter:busway_industrial");
+		}
+		BlockPos mvOut = inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, new BlockPos(-27, up, z + 18), net.minecraft.core.Direction.EAST, false);
+		for (int x = mvOut.getX(); x <= 1; x++) {
+			put(server, x, up, z + 18, "wildcatter:cable_mv");
+		}
+		fillTank(server, bullet, dev.wildcatter.fluid.Product.LPG, 20_000);
+		water(server, quench);
+		startGenset(context, server, mvSet, north, 2000);       // the exhauster's sets first, so they are up before there is gas
+		startGenset(context, server, mvSet2, north, 2000);
+		startGenset(context, server, stillSet, north, 2000);
+		startGenset(context, server, lvSet, north, 2000);
+		startGenset(context, server, lvSet2, north, 2000);
+		java.util.function.Supplier<String> all = () -> " | battery " + read(server, 0, up, z) + " | tower " + read(server, tower.getX(), up, tower.getZ()) + " | quench "
+				+ read(server, quench.getX(), up, quench.getZ()) + " | by-product plant " + read(server, plant.getX(), up, plant.getZ()) + " | still "
+				+ read(server, still.getX(), up, still.getZ());
+		boolean running = false;
+		for (int i = 0; i < 30 && !running; i++) {
+			context.waitTicks(40);
+			water(server, quench);
+			running = read(server, 0, up, z).contains("coking") && read(server, plant.getX(), up, plant.getZ()).contains("cleaning")
+					&& read(server, still.getX(), up, still.getZ()).contains("distilling");
+		}
+		String state = all.get();
+		System.out.println("[wildcatter-test] cokeOvens: running" + state);
+		check(read(server, 0, up, z).contains("coking"), "the battery should coke coal:" + state);
+		check(read(server, plant.getX(), up, plant.getZ()).contains("cleaning") && state.contains("coke oven gas"), "the by-product plant should clean the gas and hold coke oven gas:" + state);
+		check(read(server, still.getX(), up, still.getZ()).contains("distilling"), "the tar still should distil tar:" + state);
+		int coke = 0;
+		for (int i = 0; i < 60 && coke == 0; i++) {
+			context.waitTicks(20);
+			water(server, quench);
+			coke = countIn(server, cokeOut, WildcatterItems.MET_COKE);
+		}
+		check(coke > 0, "metallurgical coke should drop under the quench tower:" + all.get());
+		double pitch = server.computeOnServer(srv -> srv.overworld().getBlockEntity(pitchTank) instanceof dev.wildcatter.block.StorageTankBlockEntity t
+				&& t.product() == dev.wildcatter.fluid.Product.PITCH ? t.amount() : 0.0);
+		check(pitch > 0, "pitch should come into its tank: " + pitch + all.get());
+		server.runCommand("tp @p 30 " + (up + 24) + " " + (z + 40) + " 135 30");
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-coke-ovens");
+		// the exhauster unpowered: the battery's gas has nowhere to go
+		put(server, 0, up, z + 18, "minecraft:air");
+		String battery0 = "";
+		for (int i = 0; i < 20 && !battery0.contains("nowhere to go"); i++) {
+			context.waitTicks(20);
+			water(server, quench);
+			battery0 = read(server, 0, up, z);
+		}
+		check(battery0.contains("nowhere to go"), "with the exhauster unpowered the battery should stop, its gas with nowhere to go: " + battery0);
+		System.out.println("[wildcatter-test] cokeOvens ok: " + coke + " coke, " + String.format("%.1f kg of pitch", pitch) + "; " + battery0);
+	}
+
+	/**
+	 * The anode plant (10b3a, docs/multiblocks/anode-plant.md). The paste plant with a stock tank of pitch on its east side and the
+	 * forming press against its back; the ring baking furnace east, an LPG bullet on its fuel side; the rodding shop south of the
+	 * press. A set's 480 V for the press and the rodding shop from the west, another for the furnace from the north, and a third through
+	 * a backward unit substation for the paste plant's 4.16 kV.
+	 */
+	private void anodes(ClientGameTestContext context, TestServerContext server) {
+		final int z = -5900;
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		server.runCommand("effect give @p minecraft:slow_falling 1200 0 true");
+		server.runCommand("tp @p 10 " + (up + 26) + " " + (z + 40) + " 170 40");
+		context.waitTicks(20);
+		for (int zz = z - 22; zz <= z + 32; zz += 13) {
+			server.runCommand("fill -27 " + (y - 1) + " " + zz + " 30 " + (y + 16) + " " + Math.min(zz + 12, z + 32) + " minecraft:air");
+		}
+		for (int zz = z - 22; zz <= z + 32; zz += 40) {
+			server.runCommand("fill -27 " + (y - 1) + " " + zz + " 30 " + (y - 1) + " " + Math.min(zz + 39, z + 32) + " minecraft:stone");
+		}
+		BlockPos paste = new BlockPos(0, up, z);
+		placeBig(server, WildcatterBlocks.PASTE_PLANT, paste, north);                       // x 0-4, z..z+5
+		BlockPos press = new BlockPos(0, up, z + 6);
+		placeBig(server, WildcatterBlocks.FORMING_PRESS, press, north);                     // x 0-3, z+6..z+9
+		BlockPos pitchTank = new BlockPos(6, up, z + 1);
+		placeBig(server, WildcatterBlocks.STOCK_TANK, pitchTank, north);                    // x 6-9, z+1..z+4
+		BlockPos furnace = new BlockPos(14, up, z);
+		placeBig(server, WildcatterBlocks.BAKING_FURNACE, furnace, north);                  // x 14-23, z..z+23
+		BlockPos bullet = new BlockPos(25, up, z + 2);
+		placeBig(server, WildcatterBlocks.LPG_BULLET, bullet, north);                       // x 25-27, z+2..z+13
+		BlockPos shop = new BlockPos(0, up, z + 14);
+		placeBig(server, WildcatterBlocks.RODDING_SHOP, shop, north);                       // x 0-3, z+14..z+25
+		pipes(server, z, new int[][] {{5, 0, 2}, {24, 0, 3}});                // pitch to the paste plant; LPG to the furnace
+		put(server, 2, up + 10, z + 2, "minecraft:hopper");
+		server.runCommand("item replace block 2 " + (up + 10) + " " + (z + 2) + " container.0 with wildcatter:calcined_coke_bag 2");
+		server.runCommand("item replace block 2 " + (up + 10) + " " + (z + 2) + " container.1 with wildcatter:crushed_butts 2");
+		put(server, 16, up + 5, z + 2, "minecraft:hopper");
+		server.runCommand("item replace block 16 " + (up + 5) + " " + (z + 2) + " container.0 with wildcatter:green_anode 2");
+		put(server, 1, up + 5, z + 15, "minecraft:hopper");
+		server.runCommand("item replace block 1 " + (up + 5) + " " + (z + 15) + " container.0 with wildcatter:spent_anode 1");
+		server.runCommand("item replace block 1 " + (up + 5) + " " + (z + 15) + " container.1 with minecraft:iron_ingot 2");
+		BlockPos greenOut = new BlockPos(1, y, z + 7);
+		BlockPos bakedOut = new BlockPos(16, y, z + 5);
+		BlockPos shopOut = new BlockPos(1, y, z + 16);
+		for (BlockPos h : new BlockPos[] {greenOut, bakedOut, shopOut}) {
+			put(server, h.getX(), h.getY(), h.getZ(), "minecraft:hopper");
+		}
+		// 480 V for the press and the rodding shop: a set west, a busway along z+10 and down x -4, stubs to their boxes at x -1
+		BlockPos lvSet = new BlockPos(-12, up, z + 10);
+		genset(server, lvSet, north, false);                                                 // x -17..-12, z+10..z+11
+		for (int x = -11; x <= -4; x++) {
+			put(server, x, up, z + 10, "wildcatter:busway_industrial");
+		}
+		for (int zz = z + 6; zz <= z + 14; zz++) {
+			put(server, -4, up, zz, "wildcatter:busway_industrial");
+		}
+		for (int zz : new int[] {6, 14}) {
+			for (int x = -3; x <= -1; x++) {
+				put(server, x, up, z + zz, "wildcatter:cable_industrial");
+			}
+		}
+		sizeCables(server, new BlockPos(-3, up, z + 6), new BlockPos(-1, up, z + 14), WildcatterBlocks.CABLE_INDUSTRIAL, dev.wildcatter.energy.ConductorSize.KCMIL_500);
+		// 480 V for the furnace: a set north, a cable down x 13 to its box
+		BlockPos furnaceSet = new BlockPos(12, up, z - 8);
+		genset(server, furnaceSet, north, false);                                            // x 7-12, z-8..z-7
+		put(server, 13, up, z - 8, "wildcatter:busway_industrial");
+		for (int zz = z - 7; zz <= z; zz++) {
+			put(server, 13, up, zz, "wildcatter:cable_industrial");
+		}
+		// 4.16 kV for the paste plant: a set north-west through a backward unit substation, east along z-16 and down x -1
+		BlockPos mvSet = new BlockPos(-20, up, z - 16);
+		genset(server, mvSet, north, false);                                                 // x -25..-20, z-16..z-15
+		BlockPos mvOut = inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, mvSet, net.minecraft.core.Direction.EAST, false);
+		for (int x = mvOut.getX(); x <= -1; x++) {
+			put(server, x, up, z - 16, "wildcatter:cable_mv");
+		}
+		for (int zz = z - 15; zz <= z; zz++) {
+			put(server, -1, up, zz, "wildcatter:cable_mv");
+		}
+		fillTank(server, pitchTank, dev.wildcatter.fluid.Product.PITCH, 5_000);
+		fillTank(server, bullet, dev.wildcatter.fluid.Product.LPG, 20_000);
+		startGenset(context, server, lvSet, north, 2000);
+		startGenset(context, server, furnaceSet, north, 2000);
+		startGenset(context, server, mvSet, north, 2000);
+		java.util.function.Supplier<String> all = () -> " | paste plant " + read(server, 0, up, z) + " | press " + read(server, 0, up, z + 6) + " | furnace "
+				+ read(server, furnace.getX(), up, furnace.getZ()) + " | rodding shop " + read(server, 0, up, z + 14);
+		boolean running = false;
+		for (int i = 0; i < 30 && !running; i++) {
+			context.waitTicks(40);
+			running = read(server, 0, up, z).contains("mixing") && read(server, furnace.getX(), up, furnace.getZ()).contains("firing");
+		}
+		String state = all.get();
+		System.out.println("[wildcatter-test] anodes: running" + state);
+		check(read(server, 0, up, z).contains("mixing"), "the paste plant should mix paste:" + state);
+		check(read(server, furnace.getX(), up, furnace.getZ()).contains("firing"), "the furnace should fire:" + state);
+		// almost an anode's paste, almost an anode fired, and the rodding shop's minute mostly done
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.PastePlantBlockEntity) srv.overworld().getBlockEntity(paste)).addPaste(Tuning.GREEN_ANODE_KG);
+			((dev.wildcatter.block.BakingFurnaceBlockEntity) srv.overworld().getBlockEntity(furnace)).addBaking(0.995);
+			((dev.wildcatter.block.RoddingShopBlockEntity) srv.overworld().getBlockEntity(shop)).addWork(Tuning.RODDING_SECONDS - 2);
+			return null;
+		});
+		int green = 0, baked = 0, butts = 0;
+		for (int i = 0; i < 30 && (green == 0 || baked == 0 || butts == 0); i++) {
+			context.waitTicks(20);
+			green = countIn(server, greenOut, WildcatterItems.GREEN_ANODE);
+			baked = countIn(server, bakedOut, WildcatterItems.BAKED_ANODE);
+			butts = countIn(server, shopOut, WildcatterItems.CRUSHED_BUTTS);
+		}
+		state = all.get();
+		check(green > 0, "the forming press should drop a green anode:" + state);
+		check(baked > 0, "the furnace should drop a baked anode:" + state);
+		check(butts > 0, "the rodding shop should strip the spent anode into crushed butts:" + state);
+		// the baked anode carried to the rodding shop's hopper, which rods it on the stripped rod
+		server.runCommand("item replace block 1 " + (up + 5) + " " + (z + 15) + " container.2 with wildcatter:baked_anode 1");
+		int rodded = 0;
+		for (int i = 0; i < 30 && rodded == 0; i++) {
+			context.waitTicks(20);
+			if (i == 2) {
+				server.computeOnServer(srv -> {
+					((dev.wildcatter.block.RoddingShopBlockEntity) srv.overworld().getBlockEntity(shop)).addWork(Tuning.RODDING_SECONDS - 2);
+					return null;
+				});
+			}
+			rodded = countIn(server, shopOut, WildcatterItems.RODDED_ANODE);
+		}
+		state = all.get();
+		check(rodded > 0, "the rodding shop should drop a rodded anode:" + state);
+		server.runCommand("tp @p 32 " + (up + 20) + " " + (z + 36) + " 140 30");
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-anode-plant");
+		System.out.println("[wildcatter-test] anodes ok: " + green + " green, " + baked + " baked, " + butts + " crushed butts, " + rodded + " rodded" + state);
 	}
 
 	private void dcTier(ClientGameTestContext context, TestServerContext server) {

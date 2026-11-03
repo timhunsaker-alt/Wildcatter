@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SXS",
+    "IFI",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "X": "minecraft:piston",
+    "I": "minecraft:iron_block",
+    "F": "minecraft:blast_furnace"
+  },
+  "result": {
+    "id": "wildcatter:rodding_shop",
+    "count": 1
+  }
+}

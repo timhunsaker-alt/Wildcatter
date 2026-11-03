@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "C C",
+    "CXC"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "C": "minecraft:smooth_stone",
+    "X": "wildcatter:crankshaft"
+  },
+  "result": {
+    "id": "wildcatter:coke_pit",
+    "count": 1
+  }
+}

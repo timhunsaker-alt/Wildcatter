@@ -97,6 +97,9 @@ public class SteamPlantPartBlockEntity extends BlockEntity implements CircuitPar
 		if (stack.is(Items.CHARCOAL)) {
 			return Tuning.CHARCOAL_JOULES;
 		}
+		if (stack.is(dev.wildcatter.WildcatterItems.MET_COKE)) {
+			return Tuning.MET_COKE_JOULES;
+		}
 		if (stack.is(Items.COAL_BLOCK)) {
 			return Tuning.COAL_JOULES * 9;
 		}

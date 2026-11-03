@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "CXC",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "C": "minecraft:copper_block",
+    "X": "wildcatter:crankshaft"
+  },
+  "result": {
+    "id": "wildcatter:byproduct_plant",
+    "count": 1
+  }
+}

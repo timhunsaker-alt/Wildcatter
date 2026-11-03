@@ -196,7 +196,7 @@ and the Field Manual has a page for each new system.
     - DC bus bars on the solver (copper, 4 kA and 16 kA);
     - the rectifier becomes a current-regulated DC source with a setpoint dial and a ground-fault detector;
     - the fluorine, magnesium and chlor-alkali cells become DC loads on it. This supersedes 7d's "no DC tier in the solver".
-  - **10b2: the Bayer refinery and AlF3** — CURRENT (specs: `docs/multiblocks/bayer-refinery.md`, `alumina-plant.md`). Bauxite
+  - **10b2: the Bayer refinery and AlF3** — DONE 2026-11-03 (specs: `docs/multiblocks/bayer-refinery.md`, `alumina-plant.md`). Bauxite
     to alumina, with caustic soda from the chlor-alkali cell (made a real pipe product) and lime from a lime kiln. AlF3 from the
     conversion HF. Decided with Tim on 2026-11-03:
     - 105 t a day of alumina, for a 40-pot line;
@@ -206,12 +206,25 @@ and the Field Manual has a page for each new system.
     - a new limestone rock;
     - red mud as filter cake for a dry stack;
     - the products in 1 t bulk bags.
-  - **10b3: anodes and the potline:**
-    - a delayed coker on the crude unit's residue, and a calciner, for petroleum coke;
-    - coal-tar pitch from coking coal;
-    - an anode plant that forms and bakes the blocks;
-    - the potline's rectifiers and aluminium bus;
-    - 180 kA prebake Hall–Héroult pots at true size, the player choosing how many in series.
+  - **10b3: anodes and the potline** — CURRENT. Two waves:
+    - **10b3a: carbon and anodes** — DONE 2026-11-03 (specs: `docs/multiblocks/delayed-coker.md`, `coke-ovens.md`, `anode-plant.md`):
+      - a delayed coker on the crude unit's residue, and a rotary calciner, for petroleum coke;
+      - coal-tar pitch from by-product coke ovens and a tar still;
+      - an anode plant that mixes, forms, bakes and rods the blocks, with butt recycle.
+    - **10b3b: the potline** (spec: `docs/multiblocks/potline.md`):
+      - the potline's rectiformers and aluminium bus;
+      - 180 kA prebake Hall–Héroult pots at true size, the player choosing how many in series;
+      - a fume treatment centre, a tapping crucible and a casting machine.
+    - Decided with Tim on 2026-11-03:
+      - up to 40 pots, about 180 V and 33 MVA;
+      - 4 x 60 kA rectiformers on 138 kV, three carrying the line and one spare;
+      - pots side by side join in series through their own risers, so bus is only placed at the row ends, crossovers and the
+        rectifier run;
+      - the pots have anode effects, freeze after about 4 h without current, and have a fume treatment centre;
+      - a coker sized for the line, about 2 L/s of residue;
+      - vanilla coal as coking coal in by-product coke ovens, the coke working wherever coal does and the gas going to a gas line;
+      - a rodding shop with butt recycle;
+      - a vacuum tapping crucible and a casting machine making 22.7 kg ingots.
 - **10c: construction cranes.** Tim's idea of 2026-11-01. A stationary heavy-lift crane builds a plant from a design spec. Its open
   decisions are asked at the start of 10c:
   - crane types and sizes;

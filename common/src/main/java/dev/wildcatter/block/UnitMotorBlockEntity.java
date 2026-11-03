@@ -130,6 +130,22 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "alf3_reactor" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ALF3_WATTS);
 				case "bagging_station" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BAGGING_WATTS);
 				case "chlorine_filler" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CL2_FILLER_WATTS);
+				case "coker_fractionator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.COKER_FRACTIONATOR_WATTS);
+				case "coker_heater" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.COKER_PUMP_WATTS);
+				case "coke_drum" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.COKE_DRUM_WATTS);
+				case "coke_pit" -> new Motor(true, Voltage.MEDIUM, Tuning.COKE_CUTTER_WATTS);
+				case "coke_kiln" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.COKE_KILN_WATTS);
+				case "coke_cooler" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.COKE_COOLER_WATTS);
+				case "coal_tower" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.COAL_TOWER_WATTS);
+				case "coke_oven_battery" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LARRY_CAR_WATTS);
+				case "pusher_machine" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PUSHER_WATTS);
+				case "coke_quench_tower" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.QUENCH_PUMP_WATTS);
+				case "byproduct_plant" -> new Motor(true, Voltage.MEDIUM, Tuning.EXHAUSTER_WATTS);
+				case "tar_still" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.TAR_STILL_WATTS);
+				case "paste_plant" -> new Motor(true, Voltage.MEDIUM, Tuning.PASTE_PLANT_WATTS);
+				case "forming_press" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.FORMING_PRESS_WATTS);
+				case "baking_furnace" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BAKING_FAN_WATTS);
+				case "rodding_shop" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.RODDING_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -217,6 +233,21 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "alf3_reactor" -> "fluidizing fan";
 			case "bagging_station" -> "filler";
 			case "chlorine_filler" -> "refrigeration";
+			case "coker_fractionator", "tar_still" -> "pumps";
+			case "coker_heater" -> "charge pump";
+			case "coke_drum" -> "unheading hydraulics";
+			case "coke_pit" -> "jet pump";
+			case "coke_kiln" -> "kiln drive";
+			case "coke_cooler" -> "cooler drive";
+			case "coal_tower" -> "conveyor";
+			case "coke_oven_battery" -> "larry car";
+			case "pusher_machine" -> "pusher";
+			case "coke_quench_tower" -> "quench pump";
+			case "byproduct_plant" -> "exhauster";
+			case "paste_plant" -> "mixer";
+			case "forming_press" -> "vibro-compactor";
+			case "baking_furnace" -> "exhaust fan";
+			case "rodding_shop" -> "induction furnace";
 			default -> kind();
 		};
 	}
@@ -326,6 +357,7 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "condensate_pump" -> "Condensate pump (" + Math.round(Tuning.CONDENSATE_PUMP_WATTS / 1000) + " kW, " + Voltage.INDUSTRIAL.label() + ")";
 			case "main_feed_pump" -> "Main feed pump (" + Math.round(Tuning.MAIN_FEED_PUMP_WATTS / 1000) + " kW, " + Voltage.MEDIUM.label() + ")";
 			case "pressurizer" -> "Pressurizer (heaters " + Math.round(Tuning.PZR_HEATER_WATTS / 1000) + " kW, " + Voltage.INDUSTRIAL.label() + ")";
+			case "pusher_machine" -> "Coke pusher machine (" + Math.round(Tuning.PUSHER_WATTS / 1000) + " kW, " + Voltage.INDUSTRIAL.label() + ")";
 			default -> kind();
 		};
 		return Component.literal(label + ": " + (wanted ? motor().describe() : "idle: its unit is not running it") + heldReadout() + "; "

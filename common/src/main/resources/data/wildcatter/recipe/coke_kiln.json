@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BBB",
+    "FXF",
+    "BBB"
+  ],
+  "key": {
+    "B": "minecraft:bricks",
+    "F": "minecraft:blast_furnace",
+    "X": "wildcatter:crankshaft"
+  },
+  "result": {
+    "id": "wildcatter:coke_kiln",
+    "count": 1
+  }
+}

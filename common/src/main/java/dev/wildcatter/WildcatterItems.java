@@ -129,6 +129,35 @@ public final class WildcatterItems {
 	public static final Item CHLORINE_TON_CONTAINER = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(1).setId(CHLORINE_TON_CONTAINER_KEY),
 			String.format("%,.0f kg (2,000 lb) of liquid chlorine", Tuning.CL2_TON_KG));
 
+	// 10b3a: coke and anodes (docs/multiblocks/delayed-coker.md, coke-ovens.md, anode-plant.md)
+	public static final ResourceKey<Item> GREEN_COKE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("green_petroleum_coke"));
+	public static final Item GREEN_COKE = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(GREEN_COKE_KEY),
+			String.format("%,.0f kg of green (raw) sponge coke", Tuning.GREEN_COKE_KG), "for the coke calciner");
+	public static final ResourceKey<Item> CALCINED_COKE_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("calcined_coke_bag"));
+	public static final Item CALCINED_COKE_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(CALCINED_COKE_BAG_KEY),
+			String.format("%,.0f kg of calcined petroleum coke", Tuning.BULK_BAG_KG), "for the anode paste plant");
+	public static final ResourceKey<Item> MET_COKE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("metallurgical_coke"));
+	public static final Item MET_COKE = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(64).setId(MET_COKE_KEY),
+			String.format("%.1f kg of blast-furnace coke, %.0f %% carbon", Tuning.MET_COKE_KG, Tuning.MET_COKE_CARBON * 100), "works wherever coal does");
+	public static final ResourceKey<Item> GREEN_ANODE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("green_anode"));
+	public static final Item GREEN_ANODE = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(GREEN_ANODE_KEY),
+			String.format("Green prebake anode, %,.0f kg, 1.6 x 0.8 x 0.6 m", Tuning.GREEN_ANODE_KG), "for the baking furnace");
+	public static final ResourceKey<Item> BAKED_ANODE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("baked_anode"));
+	public static final Item BAKED_ANODE = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(BAKED_ANODE_KEY),
+			String.format("Baked prebake anode, %,.0f kg", Tuning.BAKED_ANODE_KG), "for the rodding shop");
+	public static final ResourceKey<Item> RODDED_ANODE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("rodded_anode"));
+	public static final Item RODDED_ANODE = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(RODDED_ANODE_KEY),
+			String.format("Rodded anode: a %,.0f kg baked block cast onto its rod", Tuning.BAKED_ANODE_KG), "for the potline");
+	public static final ResourceKey<Item> SPENT_ANODE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("spent_anode"));
+	public static final Item SPENT_ANODE = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(SPENT_ANODE_KEY),
+			String.format("Spent anode: a %,.0f kg butt on its rod", Tuning.BUTT_KG), "strip it in the rodding shop");
+	public static final ResourceKey<Item> CRUSHED_BUTTS_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("crushed_butts"));
+	public static final Item CRUSHED_BUTTS = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(CRUSHED_BUTTS_KEY),
+			String.format("%,.0f kg of cleaned, crushed anode butts", Tuning.BUTT_KG), "for the anode paste plant");
+	public static final ResourceKey<Item> ANODE_ROD_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("anode_rod"));
+	public static final Item ANODE_ROD = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(ANODE_ROD_KEY),
+			"Anode rod: a stem with its steel yoke and stubs", "reused round and round");
+
 	/** A bucket of crude oil. It burns in a firebox (as long as lava) and leaves the bucket behind. */
 	public static final ResourceKey<Item> CRUDE_OIL_BUCKET_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("crude_oil_bucket"));
 	public static final Item CRUDE_OIL_BUCKET = new Item(new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET).setId(CRUDE_OIL_BUCKET_KEY));
@@ -217,6 +246,15 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, QUICKLIME_BAG_KEY, QUICKLIME_BAG);
 		Registry.register(BuiltInRegistries.ITEM, EMPTY_TON_CONTAINER_KEY, EMPTY_TON_CONTAINER);
 		Registry.register(BuiltInRegistries.ITEM, CHLORINE_TON_CONTAINER_KEY, CHLORINE_TON_CONTAINER);
+		Registry.register(BuiltInRegistries.ITEM, GREEN_COKE_KEY, GREEN_COKE);
+		Registry.register(BuiltInRegistries.ITEM, CALCINED_COKE_BAG_KEY, CALCINED_COKE_BAG);
+		Registry.register(BuiltInRegistries.ITEM, MET_COKE_KEY, MET_COKE);
+		Registry.register(BuiltInRegistries.ITEM, GREEN_ANODE_KEY, GREEN_ANODE);
+		Registry.register(BuiltInRegistries.ITEM, BAKED_ANODE_KEY, BAKED_ANODE);
+		Registry.register(BuiltInRegistries.ITEM, RODDED_ANODE_KEY, RODDED_ANODE);
+		Registry.register(BuiltInRegistries.ITEM, SPENT_ANODE_KEY, SPENT_ANODE);
+		Registry.register(BuiltInRegistries.ITEM, CRUSHED_BUTTS_KEY, CRUSHED_BUTTS);
+		Registry.register(BuiltInRegistries.ITEM, ANODE_ROD_KEY, ANODE_ROD);
 		Registry.register(BuiltInRegistries.ITEM, CRUDE_OIL_BUCKET_KEY, CRUDE_OIL_BUCKET);
 		Registry.register(BuiltInRegistries.ITEM, PLASTIC_SHEET_KEY, PLASTIC_SHEET);
 		Registry.register(BuiltInRegistries.ITEM, STEEL_INGOT_KEY, STEEL_INGOT);

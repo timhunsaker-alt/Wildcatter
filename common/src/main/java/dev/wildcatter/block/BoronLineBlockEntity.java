@@ -61,7 +61,7 @@ public class BoronLineBlockEntity extends UnitMotorBlockEntity implements Hopper
 	private boolean takes(int slot, ItemStack stack) {
 		return switch (kind()) {
 			case "borax_dissolver" -> slot == 0 && stack.is(boraxItem());
-			case "b4c_furnace" -> slot == 0 && stack.is(WildcatterItems.BORIC_ACID) || slot == 1 && (stack.is(Items.COAL) || stack.is(Items.CHARCOAL));
+			case "b4c_furnace" -> slot == 0 && stack.is(WildcatterItems.BORIC_ACID) || slot == 1 && SolidCarbon.is(stack);
 			case "rcca_bench" -> slot == 0 && stack.is(WildcatterItems.B4C_PELLETS) || slot == 1 && stack.is(WildcatterItems.STEEL_INGOT);
 			default -> false;
 		};
@@ -224,8 +224,8 @@ public class BoronLineBlockEntity extends UnitMotorBlockEntity implements Hopper
 			acid += Tuning.BORIC_ACID_BAG_KG;
 		}
 		if (carbon < rate * Boron.carbonPerB4c() && slots.get(1).getCount() > 0) {
+			carbon += SolidCarbon.carbonKg(slots.get(1));
 			slots.get(1).shrink(1);
-			carbon += Tuning.COAL_KG * Tuning.COAL_CARBON;
 		}
 		if (progress >= 1 - 1e-9) {
 			if (!out(WildcatterItems.B4C_PELLETS)) {

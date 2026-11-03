@@ -475,6 +475,44 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 10b3a: coke, pitch and anodes (specs: docs/multiblocks/delayed-coker.md, coke-ovens.md, anode-plant.md)
+10b3 is two waves (Tim, 2026-11-03): 10b3a the carbon and anodes, 10b3b the potline. All parts are true size (`block/CarbonPartBlock`),
+sized for a 40-pot line.
+- **The delayed coker:** 169 t of residue a day (about 2 L/s, a fifth of the big crude unit's):
+  - the fractionator, the heater (495 C, 1.1 MJ/kg of gas, coker gas or LPG), two coke drums on the coke pit, and the pit's 4.16 kV
+    jet pump that cuts the drum not filling;
+  - yields 15 % coke, 65 % gas oil (the diesel line), 13 % naphtha (gasoline) and 7 % coker gas;
+  - the drums switch once the filling one holds a tonne and the other is cut out.
+- **The coke calciner:** a rotary kiln (78 % yield, 1.5 MJ/kg of gas) against a rotary cooler, bagged by a bagging station.
+- **The coke ovens:** 240 t of vanilla coal a day:
+  - the coal tower, a battery of 13 slot ovens with its pusher machine and coke quench tower;
+  - the by-product plant (4.16 kV exhauster) keeps 40 % of the gas for the underfiring and sends out coke oven gas (18 MJ/m3) and
+    tar; the tar still makes 55 % pitch, the tar oils onto the residue line;
+  - metallurgical coke (112.5 kg, one per coal) works wherever coal does (`block/SolidCarbon`): the chlorinators' and the B4C
+    furnace's carbon, the steam plant's burner.
+- **The anode plant:** 25 anodes a day:
+  - the paste plant (4.16 kV; 65 % calcined coke, 20 % crushed butts, 15 % pitch; with no butts it makes them up with coke);
+  - the forming press (1,275 kg green anodes), the ring baking furnace (2.4 MJ/kg) and the rodding shop;
+  - the rodding shop strips a spent anode into its rod and 303 kg of crushed butts, and rods a baked anode with an iron ingot;
+  - the anode rod is three copper ingots over a steel ingot (the aluminium recipe comes in 10b3b).
+- **Gas burners** (`GasFiring`) now fire on coker gas and coke oven gas by their heating value.
+- **New pipe products:** coker gas, raw coke oven gas, coke oven gas, coal tar and pitch (tar and pitch in kg, both tanked).
+- **Items:** green petroleum coke, calcined coke bags, metallurgical coke, green, baked, rodded and spent anodes, crushed butts,
+  anode rods.
+- **`FillerBlockEntity`** takes more than one input slot (the rodding shop's four).
+- **Models:** `tools/models/carbon.py`, 16 parts.
+- **Field Manual:** new pages PETROLEUM COKE AND PITCH and ANODES.
+- **Unit tests:** `CarbonTest`: the yields add up, the coker's calcined coke and the ovens' pitch cover the anodes, the anode recipe
+  and the baking fuel.
+- **Game test `coker`:** the fractionator takes 2.24 kg/s of residue, the heater cokes on 2.5 MW of LPG, one drum fills while the pit
+  cuts the other; gas oil and naphtha fill their tanks; a piece of green coke drops under the pit and a calcined coke bag under the
+  bagging station (both seeded almost full); the kiln calcines 950 kg/h.
+- **Game test `cokeOvens`:** the battery cokes 3.27 kg/s of coal, the by-product plant cleans 1.26 m3/s of raw gas and the still makes
+  230 kg/h of pitch into its tank; coke drops under the quench tower; with the exhauster unpowered the battery stops, its gas with
+  nowhere to go.
+- **Game test `anodes`:** the paste plant mixes 1.5 t/h, the press drops a green anode and the furnace a baked one; the rodding shop
+  strips a spent anode into crushed butts and rods a baked anode on the freed rod.
+
 ## Phase 10b2: the Bayer refinery, lime, AlF3 and chlorine (specs: docs/multiblocks/bayer-refinery.md, alumina-plant.md)
 - **The refinery:** 105 t of alumina a day (Tim, 2026-11-03), enough for a 40-pot 180 kA line. It is the full flowsheet as true-size
   parts (`block/AluminaPartBlock`):
@@ -1114,13 +1152,21 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   - the bus bars' standoffs stand on the floor of their own cell, so a run carried up in the air shows them hanging (no
     supports or structure yet);
   - the chlor-alkali caustic soda is still only counted (fixed in 10b2: it is a pipe product).
+- Phase 10b3a:
+  - residence times are not modelled: the 18 h coking, the drums' 12-24 h fill and the furnace's two-week firing run as steady
+    flow (the drums switch at a tonne);
+  - most of the metallurgical coke has no user in the mod beyond carbon and burner fuel; coke oven gas and coker gas fire only the
+    plant's gas burners, not engines or turbines;
+  - no ammonia, light oil or gas desulfurizing at the by-product plant; no vacuum unit ahead of the coker;
+  - nothing uses the rodded anodes until 10b3b's pots;
+  - the new items have `*_placeholder` textures.
 - Phase 10b2:
   - the Bayer liquor's first fill is waived: the evaporator starts with 10 minutes of strong liquor;
   - each stream carries its alumina in a fixed share. Silica, soda in the mud and liquor strength are not tracked, and the soda
     loss is one make-up figure;
   - residence times (36 h precipitation, 1 h digestion) are not modelled: the plant runs as a steady flow with 5 s holds;
   - the new items, the limestone ore and the red mud block have `*_placeholder` textures;
-  - nothing uses the alumina, AlF3 or ton containers until 10b3 (and chlorine has no buyer).
+  - nothing uses the alumina, AlF3 or ton containers until 10b3b (and chlorine has no buyer).
 - Phase 9c: Mekanism has not been tried: it is not yet released for 26.3. Plugs were checked against a real NeoForge energy
   handler on a stand-in block.
 - Phase 9b: the NeoForge client loads with no errors (`:neoforge:runClient`), but no in-world screenshot was taken: quick-play into a

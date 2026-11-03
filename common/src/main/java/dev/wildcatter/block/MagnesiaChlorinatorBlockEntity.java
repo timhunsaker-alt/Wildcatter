@@ -13,7 +13,6 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -54,11 +53,11 @@ public class MagnesiaChlorinatorBlockEntity extends PlantUnitBlockEntity impleme
 
 	@Override
 	public boolean takes(ItemStack stack) {
-		return stack.is(WildcatterItems.MAGNESIA) || stack.is(Items.COAL) || stack.is(Items.CHARCOAL);
+		return stack.is(WildcatterItems.MAGNESIA) || SolidCarbon.is(stack);
 	}
 
 	private boolean takes(int slot, ItemStack stack) {
-		return slot == 0 && stack.is(WildcatterItems.MAGNESIA) || slot == 1 && (stack.is(Items.COAL) || stack.is(Items.CHARCOAL));
+		return slot == 0 && stack.is(WildcatterItems.MAGNESIA) || slot == 1 && SolidCarbon.is(stack);
 	}
 
 	@Override
@@ -95,8 +94,9 @@ public class MagnesiaChlorinatorBlockEntity extends PlantUnitBlockEntity impleme
 		if (m.mgo < rate * Zirconium.mgoPerMgCl2() && m.useFrom(0)) {
 			m.mgo += Ore.MAGNESITE.kgPerBlock() * Tuning.MGO_IN_MGCO3;
 		}
+		double each = SolidCarbon.carbonKg(m.slots.get(1));
 		if (m.carbon < rate * Zirconium.carbonPerMgCl2() && m.useFrom(1)) {
-			m.carbon += Tuning.COAL_KG * Tuning.COAL_CARBON;
+			m.carbon += each;
 		}
 		double cl2 = Lines.available(level, m.chlorine(), Product.CHLORINE, Pull.MACHINE, m);
 		if (cell == null) {
@@ -106,7 +106,7 @@ public class MagnesiaChlorinatorBlockEntity extends PlantUnitBlockEntity impleme
 		} else if (m.mgo <= 1e-9) {
 			m.status = "NO MAGNESIA: put magnesia in its hopper";
 		} else if (m.carbon <= 1e-9) {
-			m.status = "NO CARBON: put coal or charcoal in its hopper";
+			m.status = "NO CARBON: put coal, charcoal or coke in its hopper";
 		} else if (cl2 <= 1e-9) {
 			m.status = "NO CHLORINE: pipe chlorine to the north face of its front";
 		} else {

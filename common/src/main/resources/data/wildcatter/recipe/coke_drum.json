@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SSS",
+    "S S",
+    "SXS"
+  ],
+  "key": {
+    "S": "minecraft:iron_block",
+    "X": "minecraft:piston"
+  },
+  "result": {
+    "id": "wildcatter:coke_drum",
+    "count": 1
+  }
+}
