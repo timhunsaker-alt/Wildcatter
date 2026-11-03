@@ -192,12 +192,20 @@ and the Field Manual has a page for each new system.
   - **Docs cleanup:** stale known gaps and duplicate ideas.
 - **10b: the DC tier and aluminium.** Bus bars that can short and shock, in the solver; then a Bayer refinery and Hall–Héroult pots,
   a very large DC load (from the 7a bauxite). The DC tier also feeds the conversion fluorine cells. Three waves:
-  - **10b1: the DC tier** — CURRENT (spec: `docs/multiblocks/dc-bus.md`):
+  - **10b1: the DC tier** — DONE 2026-11-03 (spec: `docs/multiblocks/dc-bus.md`):
     - DC bus bars on the solver (copper, 4 kA and 16 kA);
     - the rectifier becomes a current-regulated DC source with a setpoint dial and a ground-fault detector;
     - the fluorine, magnesium and chlor-alkali cells become DC loads on it. This supersedes 7d's "no DC tier in the solver".
-  - **10b2: the Bayer refinery and AlF3.** Bauxite to alumina, with caustic soda from the chlor-alkali cell (made a real pipe product)
-    and lime from a lime kiln. AlF3 from the conversion HF.
+  - **10b2: the Bayer refinery and AlF3** — CURRENT (specs: `docs/multiblocks/bayer-refinery.md`, `alumina-plant.md`). Bauxite
+    to alumina, with caustic soda from the chlor-alkali cell (made a real pipe product) and lime from a lime kiln. AlF3 from the
+    conversion HF. Decided with Tim on 2026-11-03:
+    - 105 t a day of alumina, for a 40-pot line;
+    - the full flowsheet, each step its own part;
+    - process steam from a gas-fired package boiler;
+    - surplus chlorine into 1-ton containers;
+    - a new limestone rock;
+    - red mud as filter cake for a dry stack;
+    - the products in 1 t bulk bags.
   - **10b3: anodes and the potline:**
     - a delayed coker on the crude unit's residue, and a calciner, for petroleum coke;
     - coal-tar pitch from coking coal;

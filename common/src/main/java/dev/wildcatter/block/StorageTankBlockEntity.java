@@ -174,7 +174,7 @@ public class StorageTankBlockEntity extends BlockEntity implements Inspectable, 
 	@Override
 	public Component inspect() {
 		String kind = water() ? "Water tank (400 bbl fiberglass, 64,000 L)" : bullet() ? "LPG bullet (18,000 gal, 250 psi, 58,000 L)" : "Stock tank (400 bbl API 12F, 64,000 L)";
-		String holds = amount < 0.5 ? "empty" : String.format("%s %,.0f L (%.0f%%)", product == null ? "?" : product.label(), amount, amount / capacity() * 100);
+		String holds = amount < 0.5 ? "empty" : String.format("%s %,.0f %s (%.0f%%)", product == null ? "?" : product.label(), amount, product == null ? "L" : product.unit(), amount / capacity() * 100);
 		return Component.literal(kind + ": " + holds + (amount >= capacity() ? ", FULL" : ""));
 	}
 

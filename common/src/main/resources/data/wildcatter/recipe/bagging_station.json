@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SHS",
+    "S S",
+    "IXI"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "I": "minecraft:iron_bars",
+    "X": "minecraft:piston"
+  },
+  "result": {
+    "id": "wildcatter:bagging_station",
+    "count": 1
+  }
+}

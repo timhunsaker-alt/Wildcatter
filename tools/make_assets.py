@@ -1620,7 +1620,7 @@ import re
 _ore_src = open("common/src/main/java/dev/wildcatter/ore/Ore.java").read()
 ORES = [(m.group(1), m.group(2), m.group(3), m.group(4)) for m in
 	re.finditer(r'^\t[A-Z_]+\("(\w+)", "([^"]+)", "([^"]+)",.*?Tool\.(\w+)\)[,;]', _ore_src, re.M | re.S)]
-assert len(ORES) == 27, len(ORES)
+assert len(ORES) == 28, len(ORES)
 ORE_TOOL_TAG = {"SHOVEL": None, "STONE": "needs_stone_tool", "IRON": "needs_iron_tool"}
 ORE_ART = "art/final/ore"
 os.makedirs(f"{ASSETS}/textures/block/ore", exist_ok=True)
@@ -1721,6 +1721,7 @@ VEINS = {
 	"cobaltite": (6, 3, -32, 32, STONE),
 	"pyrolusite": (12, 2, 0, 48, STONE),
 	"phosphate": (14, 3, 30, 60, any_of(STONE, tag("minecraft:sand"), block_is("minecraft:gravel"))),
+	"limestone": (48, 1, 40, 90, any_of(STONE, tag("minecraft:dirt"))),   # 10b2: thick beds (docs/ores.md)
 }
 WG = f"{DATA}/worldgen"
 def placed(name, count, lo, hi, square=True):
@@ -1954,6 +1955,73 @@ lang.update({f"block.{ns}.mineral_separator": "Mineral Separator (magnetic, elec
 	f"block.{ns}.chlor_alkali_cell": "Chlor-alkali Cell (membrane)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 10b2: the Bayer refinery, lime kiln, AlF3, bags and chlorine (docs/multiblocks/bayer-refinery.md, alumina-plant.md) ----
+# blockstates, models, shapes and items come from tools/models/alumina.py; here loot, names, tags, recipes, the bags and red mud.
+ALUMINA_PARTS = ("ball_mill", "digester", "flash_tanks", "settler", "mud_washer", "residue_filter_press", "polishing_filter", "precipitator",
+	"hydrate_filter", "calciner", "evaporator", "causticizer", "package_boiler", "lime_kiln", "alf3_reactor", "bagging_station", "chlorine_filler")
+for name in ALUMINA_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in ALUMINA_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("ball_mill", ["BBB", "XCX", "SHS"], {"B": B_, "X": f"{ns}:crankshaft", "C": "minecraft:iron_block", "S": S_, "H": "minecraft:hopper"}, "ball_mill")
+shaped("digester", ["SXS", "SWS", "SPS"], {"S": S_, "X": "minecraft:piston", "W": "minecraft:white_wool", "P": P_}, "digester")
+shaped("flash_tanks", ["SPS", "SWS", "SPS"], {"S": S_, "P": P_, "W": "minecraft:white_wool"}, "flash_tanks")
+shaped("settler", ["SXS", "CCC", " P "], {"S": S_, "X": "minecraft:piston", "C": "minecraft:smooth_stone", "P": P_}, "settler")
+shaped("mud_washer", ["SXS", "CWC", " P "], {"S": S_, "X": "minecraft:piston", "C": "minecraft:smooth_stone", "W": "minecraft:water_bucket", "P": P_}, "mud_washer")
+shaped("residue_filter_press", ["SPS", "XLX", "SSS"], {"S": S_, "P": P_, "X": "minecraft:piston", "L": "minecraft:paper"}, "residue_filter_press")
+shaped("polishing_filter", ["SPS", "SLS", "SPS"], {"S": S_, "P": P_, "L": "minecraft:paper"}, "polishing_filter")
+shaped("precipitator", ["SXS", "S S", "SPS"], {"S": "minecraft:iron_block", "X": "minecraft:piston", "P": P_}, "precipitator")
+shaped("hydrate_filter", ["SLS", "PXP", "SSS"], {"S": S_, "L": "minecraft:paper", "P": P_, "X": "minecraft:piston"}, "hydrate_filter")
+shaped("calciner", ["SPS", "BFB", "SXS"], {"S": S_, "P": P_, "B": "minecraft:bricks", "F": "minecraft:blast_furnace", "X": f"{ns}:crankshaft"}, "calciner")
+shaped("evaporator", ["SPS", "WCW", "SPS"], {"S": S_, "P": P_, "W": "minecraft:white_wool", "C": "minecraft:copper_block"}, "evaporator")
+shaped("causticizer", ["SHS", "SXS", "SSS"], {"S": S_, "H": "minecraft:hopper", "X": "minecraft:piston"}, "causticizer")
+shaped("package_boiler", ["SPS", "BWB", "SFS"], {"S": S_, "P": P_, "B": "minecraft:bricks", "W": "minecraft:water_bucket", "F": "minecraft:furnace"}, "package_boiler")
+shaped("lime_kiln", ["SHS", "BFB", "BBB"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace"}, "lime_kiln")
+shaped("alf3_reactor", ["SHS", "BFB", "SPS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:furnace", "P": P_}, "alf3_reactor")
+shaped("bagging_station", ["SHS", "S S", "IXI"], {"S": S_, "H": "minecraft:hopper", "I": "minecraft:iron_bars", "X": "minecraft:piston"}, "bagging_station")
+shaped("chlorine_filler", ["SPS", "CXC", "SSS"], {"S": S_, "P": P_, "C": "minecraft:copper_ingot", "X": "minecraft:piston"}, "chlorine_filler")
+shaped("empty_bulk_bag", ["SWS", "W W", "SWS"], {"S": "minecraft:string", "W": "minecraft:white_wool"}, "empty_bulk_bag", 2)
+shaped("empty_ton_container", ["SSS", "V V", "SSS"], {"S": S_, "V": "minecraft:lever"}, "empty_ton_container")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in {"empty_bulk_bag": ("Empty Bulk Bag (FIBC, 1 t)", (225, 225, 215)), "alumina_bag": ("Bulk Bag of Alumina", (240, 240, 236)),
+		"hydrate_bag": ("Bulk Bag of Hydrate (Al(OH)3)", (232, 228, 214)), "alf3_bag": ("Bulk Bag of AlF3", (214, 222, 230)),
+		"quicklime_bag": ("Bulk Bag of Quicklime", (238, 236, 226)), "empty_ton_container": ("Empty Chlorine Ton Container", (120, 130, 125)),
+		"chlorine_ton_container": ("Chlorine Ton Container (907 kg)", (150, 170, 90))}.items():
+	if os.path.exists(f"{ORE_ART}/{item}.png"):
+		shutil.copy(f"{ORE_ART}/{item}.png", f"{ASSETS}/textures/item/ore/{item}.png")
+		item_tex = f"{ns}:item/ore/{item}"
+	else:
+		tex(f"{item}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+		item_tex = f"{ns}:item/{item}_placeholder"
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": item_tex}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+# red mud: a plain block of filter cake for a dry stack
+if os.path.exists(f"{ORE_ART}/red_mud.png"):
+	shutil.copy(f"{ORE_ART}/red_mud.png", f"{ASSETS}/textures/block/ore/red_mud.png")
+	mud_tex = f"{ns}:block/ore/red_mud"
+else:
+	tex("red_mud_placeholder", lambda img, d: noise(img, (150, 62, 40), 16))
+	mud_tex = f"{ns}:block/red_mud_placeholder"
+block_model("red_mud", "minecraft:block/cube_all", {"all": mud_tex})
+save_json(f"{ASSETS}/blockstates/red_mud.json", {"variants": {"": {"model": f"{ns}:block/red_mud"}}})
+save_json(f"{ASSETS}/items/red_mud.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/red_mud"}})
+save_json(f"{DATA}/loot_table/blocks/red_mud.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:red_mud"}],
+	"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+t = json.load(open(f"{ROOT}/data/minecraft/tags/block/mineable/shovel.json"))
+t["values"] = [v for v in t["values"] if v != f"{ns}:red_mud"] + [f"{ns}:red_mud"]
+save_json(f"{ROOT}/data/minecraft/tags/block/mineable/shovel.json", t)
+lang.update({f"block.{ns}.ball_mill": "Ball Mill (110 kW, 480 V)", f"block.{ns}.digester": "Digester (145 C)", f"block.{ns}.flash_tanks": "Flash Tanks",
+	f"block.{ns}.settler": "Settler (red mud thickener)", f"block.{ns}.mud_washer": "Mud Washer", f"block.{ns}.residue_filter_press": "Residue Filter Press",
+	f"block.{ns}.polishing_filter": "Polishing Filters", f"block.{ns}.precipitator": "Precipitator (2,035 m3)", f"block.{ns}.hydrate_filter": "Hydrate Filter (pan)",
+	f"block.{ns}.calciner": "Calciner (gas suspension, 4.16 kV fan)", f"block.{ns}.evaporator": "Evaporator (three-effect)", f"block.{ns}.causticizer": "Causticizer",
+	f"block.{ns}.package_boiler": "Package Boiler (10 t/h)", f"block.{ns}.lime_kiln": "Lime Kiln (shaft)", f"block.{ns}.alf3_reactor": "AlF3 Reactor (fluid bed)",
+	f"block.{ns}.bagging_station": "Bagging Station (FIBC)", f"block.{ns}.chlorine_filler": "Chlorine Filler (ton containers)", f"block.{ns}.red_mud": "Red Mud (filter cake)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 7g: the fuel plant (docs/multiblocks/fuel.md) -------------------------------------------------------------------
 # blockstates, models, shapes and items come from tools/models/fuel.py; here loot, names, tags, recipes and the items.
 FUEL_PARTS = ("uf6_autoclave", "idr_kiln", "granulator", "pellet_press", "sintering_furnace", "pellet_grinder", "rod_loader", "rod_welder",
@@ -2124,9 +2192,10 @@ ORE_BIOMES = {
 	"MOUNTAINS": ["#minecraft:is_mountain"], "MOUNTAINS_BADLANDS": ["#minecraft:is_mountain", "#minecraft:is_badlands"],
 	"PLAINS_BADLANDS": ["minecraft:plains", "minecraft:sunflower_plains", "#minecraft:is_badlands"],
 	"OCEAN_BEACH": ["#minecraft:is_ocean", "#minecraft:is_beach"],
+	"PLAINS_FOREST": ["minecraft:plains", "minecraft:sunflower_plains", "#minecraft:is_forest", "#minecraft:is_river"],
 }
 _ore_where = {m.group(1): m.group(2) for m in re.finditer(r'^\t[A-Z_]+\("(\w+)",.*?Where\.(\w+), Tool\.\w+\)[,;]', _ore_src, re.M | re.S)}
-assert len(_ore_where) == 27, len(_ore_where)
+assert len(_ore_where) == 28, len(_ore_where)
 _placements = {f"ore_{k}": w for k, w in _ore_where.items() if k not in ("sulfur", "halite", "sylvite", "chromite", "platinum")}
 _placements.update({"salt_dome": "SALT_DOME", "evaporite_beds": "EVAPORITE", "bushveld_reef": "EVERYWHERE"})
 def _holder_set(entries):

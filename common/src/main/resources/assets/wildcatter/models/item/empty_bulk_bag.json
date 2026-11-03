@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "wildcatter:item/empty_bulk_bag_placeholder"
+  }
+}

@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "wildcatter:heavy_mineral_ore",
-    "wildcatter:bentonite_ore"
+    "wildcatter:bentonite_ore",
+    "wildcatter:red_mud"
   ]
 }

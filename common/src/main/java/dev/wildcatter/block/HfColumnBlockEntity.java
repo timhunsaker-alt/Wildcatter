@@ -29,6 +29,11 @@ public class HfColumnBlockEntity extends PlantUnitBlockEntity {
 		return Tuning.HF_KILN_KGS / Tuning.AHF_KG_PER_L * Tuning.PLANT_HOLD_SECONDS * 4;
 	}
 
+	/** For the game test: anhydrous HF as if condensed. */
+	public void addHf(double litres) {
+		add(Product.ANHYDROUS_HF, litres);
+	}
+
 	public static void tick(Level level, BlockPos pos, BlockState state, HfColumnBlockEntity c) {
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
 			return;

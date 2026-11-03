@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SSS",
+    "V V",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "V": "minecraft:lever"
+  },
+  "result": {
+    "id": "wildcatter:empty_ton_container",
+    "count": 1
+  }
+}

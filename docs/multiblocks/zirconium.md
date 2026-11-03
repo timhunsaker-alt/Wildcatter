@@ -32,7 +32,7 @@ A figure marked *(unverified)* is textbook, an estimate or a proposal.
 heavy minerals (hopper) -> MINERAL SEPARATOR -> CHLORINATOR -> HAFNIUM COLUMN -> KROLL REACTOR -> VACUUM DISTILLATION
                                                  ^ Cl2 pipe, coal (hopper)             ^ Mg, MgCl2 back: MAGNESIUM CELL ^ Mg back
   -> VAR FURNACE (tin, iron, chromite by hopper) -> EXTRUSION PRESS -> PILGER MILL -> VACUUM ANNEAL FURNACE -> tubes (hopper under it)
-CHLOR-ALKALI CELL (rock salt by hopper, pumped water) against a RECTIFIER: Cl2 and hydrogen out on pipes, NaOH counted
+CHLOR-ALKALI CELL (rock salt by hopper, pumped water) against a RECTIFIER: Cl2, hydrogen and (from 10b2) 32 % caustic out on pipes
 MAGNESIUM CELL against a RECTIFIER, the Kroll reactor, the vacuum distillation and the MAGNESIA CHLORINATOR: Cl2 out on a pipe
 MAGNESIA CHLORINATOR (magnesia and coal by hopper, Cl2 pipe): make-up MgCl2 for the magnesium cell
 ```
@@ -67,7 +67,7 @@ The metal passes from part to part by touching, as it moves inside a real plant.
 | `vacuum_anneal_furnace` | 3 x 3 x 8 | Anneals at 675-700 °C between the passes and a final stress relief, against the pilger mill.<br>• **100 kW at 480 V**.<br>• Finished tubes go out to a hopper under it, or to an empty hand. |
 | `magnesium_cell` | 3 x 3 x 6 | A monopolar MgCl2 cell at about 700 °C: **14 kA at 5 V (70 kW DC)** from the rectifier it touches.<br>• 90 % current efficiency (0.453 kg of Mg a kAh): about 12 kWh/kg of Mg *(unverified)*, 5.7 kg of Mg an hour.<br>• Its chlorine goes out on the pipe at the east face of its front cells. |
 | `magnesia_chlorinator` | 3 x 6 x 3 | An IG Farben shaft chlorinator, MgO + C + Cl2 -> MgCl2 + CO, at 800-1,000 °C.<br>• Magnesia and coal by a hopper on top; chlorine off the pipe at the north face of its front cells.<br>• **30 kg of MgCl2 an hour** *(proposed)*.<br>• It tops up the magnesium cell it touches while the cell holds less than a quarter of its MgCl2. |
-| `chlor_alkali_cell` | 3 x 3 x 6 | A small bipolar membrane electrolyser: **6 cells at 2.8 kA and 3.1 V (52 kW DC)**, 96 % current efficiency.<br>• **21 kg of Cl2 an hour**, 2.4 kWh/kg.<br>• Inputs: rock salt by a hopper on top (1.65 kg a kg of Cl2); water off a pump (**3 L a kg of Cl2**, making 32 % caustic *(unverified)*).<br>• Outputs: chlorine on the pipe at the south face of its back cells; **hydrogen** (0.32 m³ a kg of Cl2) at the north face of its front cells; NaOH counted (1.128 kg a kg of Cl2).<br>• Against a rectifier. |
+| `chlor_alkali_cell` | 3 x 3 x 6 | A small bipolar membrane electrolyser: **6 cells at 2.8 kA and 3.1 V (52 kW DC)**, 96 % current efficiency.<br>• **21 kg of Cl2 an hour**, 2.4 kWh/kg.<br>• Inputs: rock salt by a hopper on top (1.65 kg a kg of Cl2); water off a pump (**3 L a kg of Cl2**, making 32 % caustic *(unverified)*).<br>• Outputs: chlorine on the pipe at the south face of its back cells; **hydrogen** (0.32 m³ a kg of Cl2) at the north face of its front cells; NaOH (1.128 kg a kg of Cl2) as 32 % caustic soda out of the west face of its back cells (z 5, bottom) since 10b2 (alumina-plant.md); it stops when the caustic has nowhere to go.<br>• Against a rectifier. |
 
 **Reused:** the conversion plant's `rectifier` (4.16 kV, 12-pulse; conversion.md). Each cell asks the rectifier it touches for its DC. A cell needs its own rectifier, as each real potline has.
 
@@ -89,7 +89,7 @@ The metal passes from part to part by touching, as it moves inside a real plant.
 - **Chlorinator:** chlorine in on the east face of its bottom cells.
 - **Magnesium cell:** chlorine out of the east face of its front cells (z 0, bottom).
 - **Magnesia chlorinator:** chlorine in on the north face of its front cells (z 0, bottom).
-- **Chlor-alkali cell:** chlorine out of the south face of its back cells (z 5, bottom); hydrogen out of the north face of its front cells (z 0, bottom).
+- **Chlor-alkali cell:** chlorine out of the south face of its back cells (z 5, bottom); hydrogen out of the north face of its front cells (z 0, bottom); caustic soda out of the west face of its back cells (z 5, bottom), from 10b2.
 - **Hoppers:**
   - in from on top: heavy minerals on the separator; coal on the chlorinator; magnesia and coal on the magnesia chlorinator; tin, iron and chromite on the VAR furnace; rock salt on the chlor-alkali cell;
   - out to a hopper under the anneal furnace: finished tubes.
@@ -107,7 +107,7 @@ The metal passes from part to part by touching, as it moves inside a real plant.
 
 ## Left out (ROADMAP Ideas)
 - SiCl4 to fumed silica.
-- Uses for the caustic soda.
+- Uses for the caustic soda: since 10b2 it is piped to the Bayer refinery (bayer-refinery.md).
 - Ilmenite and rutile for a titanium pigment plant.
 - Hafnium metal for control rods.
 - Pidgeon magnesium from dolomite.

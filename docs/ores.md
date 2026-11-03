@@ -41,6 +41,7 @@ keep their real grade. A block is 1 m3 of rock at its host's density. The list l
 | Cobalt Ore | cobaltite CoAsS | 0.1-0.5 % Co | 9 % | Cobalt, Ontario |
 | Manganese Ore | pyrolusite MnO2 | 30-48 % Mn (textbook) | 80 % | Kalahari |
 | Phosphate Rock | francolite | 18-40 % P2O5, 70-200 ppm U | 80 %, 1,300 ppm U | Bone Valley, Khouribga |
+| Limestone (10b2) | calcite CaCO3 | 90-98 % CaCO3 | 95 % (2,470 kg) | Rogers City, Michigan; Buxton |
 
 "Textbook" marks a value from standard geology references that the research could not check against a source.
 
@@ -72,6 +73,7 @@ Ordinary veins (vanilla `minecraft:ore` features). Count is veins per chunk; "1 
 | Tungsten / Cobalt Ore | 7 / 6 | 3 | -16 to 48 / -32 to 32 | overworld | stone |
 | Manganese Ore | 12 | 2 | 0 to 48 | overworld | stone |
 | Phosphate Rock | 14 | 3 | 30 to 60 | ocean, beaches | stone, sand, gravel |
+| Limestone (10b2) | 48 | 1 | 40 to 90 | plains, forests, rivers | stone, dirt |
 
 Three ores need their own shapes:
 - **Salt domes** (`wildcatter:salt_dome`, about 1 in 150 chunks in plains, swamp, mangrove and beach):

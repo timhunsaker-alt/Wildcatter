@@ -106,6 +106,29 @@ public final class WildcatterItems {
 	public static final Item RCCA = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(1).setId(RCCA_KEY),
 			"Rod cluster control assembly: 24 B4C rodlets on a spider", "5 to the reactor's core; load it by right-click on the cold vessel");
 
+	// 10b2: bulk bags and chlorine ton containers (docs/multiblocks/alumina-plant.md)
+	public static final ResourceKey<Item> EMPTY_BULK_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("empty_bulk_bag"));
+	public static final Item EMPTY_BULK_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(EMPTY_BULK_BAG_KEY),
+			String.format("Woven polypropylene FIBC, %,.0f kg", Tuning.BULK_BAG_KG));
+	public static final ResourceKey<Item> ALUMINA_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("alumina_bag"));
+	public static final Item ALUMINA_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(ALUMINA_BAG_KEY),
+			String.format("%,.0f kg of smelter-grade alumina (Al2O3)", Tuning.BULK_BAG_KG), "for the potline (10b3)");
+	public static final ResourceKey<Item> HYDRATE_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("hydrate_bag"));
+	public static final Item HYDRATE_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(HYDRATE_BAG_KEY),
+			String.format("%,.0f kg of aluminium hydroxide (gibbsite hydrate)", Tuning.BULK_BAG_KG), "for the AlF3 reactor");
+	public static final ResourceKey<Item> ALF3_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("alf3_bag"));
+	public static final Item ALF3_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(ALF3_BAG_KEY),
+			String.format("%,.0f kg of aluminium fluoride (AlF3)", Tuning.BULK_BAG_KG), "the potline's bath additive (10b3)");
+	public static final ResourceKey<Item> QUICKLIME_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("quicklime_bag"));
+	public static final Item QUICKLIME_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(QUICKLIME_BAG_KEY),
+			String.format("%,.0f kg of quicklime (CaO)", Tuning.BULK_BAG_KG), "for the refinery's causticizer");
+	public static final ResourceKey<Item> EMPTY_TON_CONTAINER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("empty_ton_container"));
+	public static final Item EMPTY_TON_CONTAINER = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(4).setId(EMPTY_TON_CONTAINER_KEY),
+			String.format("Welded steel chlorine ton container, %,.0f kg tare", Tuning.CL2_TON_TARE));
+	public static final ResourceKey<Item> CHLORINE_TON_CONTAINER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("chlorine_ton_container"));
+	public static final Item CHLORINE_TON_CONTAINER = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(1).setId(CHLORINE_TON_CONTAINER_KEY),
+			String.format("%,.0f kg (2,000 lb) of liquid chlorine", Tuning.CL2_TON_KG));
+
 	/** A bucket of crude oil. It burns in a firebox (as long as lava) and leaves the bucket behind. */
 	public static final ResourceKey<Item> CRUDE_OIL_BUCKET_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("crude_oil_bucket"));
 	public static final Item CRUDE_OIL_BUCKET = new Item(new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET).setId(CRUDE_OIL_BUCKET_KEY));
@@ -187,6 +210,13 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, B4C_PELLETS_KEY, B4C_PELLETS);
 		Registry.register(BuiltInRegistries.ITEM, RCCA_KEY, RCCA);
 		Registry.register(BuiltInRegistries.ITEM, DOSIMETER_KEY, DOSIMETER);
+		Registry.register(BuiltInRegistries.ITEM, EMPTY_BULK_BAG_KEY, EMPTY_BULK_BAG);
+		Registry.register(BuiltInRegistries.ITEM, ALUMINA_BAG_KEY, ALUMINA_BAG);
+		Registry.register(BuiltInRegistries.ITEM, HYDRATE_BAG_KEY, HYDRATE_BAG);
+		Registry.register(BuiltInRegistries.ITEM, ALF3_BAG_KEY, ALF3_BAG);
+		Registry.register(BuiltInRegistries.ITEM, QUICKLIME_BAG_KEY, QUICKLIME_BAG);
+		Registry.register(BuiltInRegistries.ITEM, EMPTY_TON_CONTAINER_KEY, EMPTY_TON_CONTAINER);
+		Registry.register(BuiltInRegistries.ITEM, CHLORINE_TON_CONTAINER_KEY, CHLORINE_TON_CONTAINER);
 		Registry.register(BuiltInRegistries.ITEM, CRUDE_OIL_BUCKET_KEY, CRUDE_OIL_BUCKET);
 		Registry.register(BuiltInRegistries.ITEM, PLASTIC_SHEET_KEY, PLASTIC_SHEET);
 		Registry.register(BuiltInRegistries.ITEM, STEEL_INGOT_KEY, STEEL_INGOT);

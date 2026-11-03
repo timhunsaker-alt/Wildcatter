@@ -475,6 +475,59 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Phase 10b2: the Bayer refinery, lime, AlF3 and chlorine (specs: docs/multiblocks/bayer-refinery.md, alumina-plant.md)
+- **The refinery:** 105 t of alumina a day (Tim, 2026-11-03), enough for a 40-pot 180 kA line. It is the full flowsheet as true-size
+  parts (`block/AluminaPartBlock`):
+  - **the line** (`BayerStageBlockEntity`): ball mill, digester (145 C, process steam) against the flash tanks, settler, mud washer,
+    polishing filters, precipitator, evaporator and package boiler;
+  - **the parts that move solids:** the residue filter press (red mud blocks, for a dry stack), the hydrate filter (sneak-click sends
+    a share to bags), the gas-suspension calciner (4.16 kV fan) and the causticizer.
+- **The mass balance** (`fluid/Bayer`): each stream carries its alumina in a fixed share, so a part's output is its input times a
+  ratio. Per kg of alumina:
+  - 2.057 kg of bauxite (a block gives 1,021 kg);
+  - 16.25 kg of strong liquor;
+  - 0.1875 kg of 32 % caustic (60 kg of NaOH a t);
+  - 40 g of lime;
+  - 1.98 kg of steam;
+  - 3.0 MJ at the calciner;
+  - 0.752 kg of red mud cake.
+- **The liquor loop:** the evaporator returns strong liquor only as fast as its caustic and lime allow, so short supply slows the whole
+  plant. The first fill is waived: the evaporator starts with 10 minutes of strong liquor in storage, and banks what comes back over.
+- **Lime, AlF3 and chlorine:**
+  - limestone, a new rock (`Ore.LIMESTONE`, plains, forests and rivers);
+  - the lime kiln (10 t/d, 4.0 GJ a t);
+  - the AlF3 reactor (50 kg/h, on the HF column's anhydrous HF);
+  - the bagging station (1 t bulk bags of alumina, hydrate, AlF3 or quicklime, from whatever it touches);
+  - the chlorine filler (907 kg ton containers).
+- **The chlor-alkali cell:** its NaOH is now 32 % caustic soda out of the west face of its back cells. It stops when the caustic has
+  nowhere to go, and caustic a saved cell had counted comes into its hold. Stock tanks hold caustic, and their readout now names
+  the product's unit.
+- **New pipe products:** caustic soda, process steam, and the eight Bayer slurries and liquors (kg; only caustic is tanked).
+- **Items:**
+  - the empty bulk bag;
+  - alumina, hydrate, AlF3 and quicklime bags;
+  - empty and full chlorine ton containers;
+  - the red mud block.
+- **Models:** `tools/models/alumina.py`, 17 parts.
+- **Field Manual:** new pages ALUMINA: THE BAYER PROCESS and LIME, ALF3 AND CHLORINE. The chlorine-and-magnesium page now notes
+  the caustic outlet.
+- **Unit tests:** `BayerTest`, covering:
+  - the streams against the spec;
+  - the loop's balance, both the liquor and the total mass;
+  - 11 chlor-alkali cells for the full rate;
+  - one boiler;
+  - lime per block and AlF3 stoichiometry.
+- **Game test `bayer`:**
+  - **the whole refinery on four diesel sets:** every part runs in flow order. The mill grinds 2.9 kg/s of bauxite in 22.8 kg/s of
+    strong liquor, and the calciner makes 1.36 kg/s of alumina on 4.1 MW of LPG, both still catching up;
+  - **products:** an alumina bag drops under the bagging station and a red mud block under the press; red mud places as a block;
+  - **caustic cut off:** the evaporator reads NO CAUSTIC.
+- **Game test `alf3Lime`:**
+  - the lime kiln fills a quicklime bag (407 kg/h of lime on 452 kW of gas);
+  - the AlF3 reactor fills an AlF3 bag (48.9 kg/h on 34.9 kg/h of HF);
+  - the chlor-alkali cell on its rectifier (2.80 kA) sends chlorine to the filler, which fills a ton container, and its caustic to
+    a tank.
+
 ## Phase 10b1: the DC tier (spec: docs/multiblocks/dc-bus.md)
 - **DC on the same solver:**
   - a DC network is resistors and EMFs at 0°, solved in the same group as the rectifier's AC side;
@@ -1060,7 +1113,14 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - Phase 10b1:
   - the bus bars' standoffs stand on the floor of their own cell, so a run carried up in the air shows them hanging (no
     supports or structure yet);
-  - the chlor-alkali caustic soda is still only counted (10b2 makes it a pipe product).
+  - the chlor-alkali caustic soda is still only counted (fixed in 10b2: it is a pipe product).
+- Phase 10b2:
+  - the Bayer liquor's first fill is waived: the evaporator starts with 10 minutes of strong liquor;
+  - each stream carries its alumina in a fixed share. Silica, soda in the mud and liquor strength are not tracked, and the soda
+    loss is one make-up figure;
+  - residence times (36 h precipitation, 1 h digestion) are not modelled: the plant runs as a steady flow with 5 s holds;
+  - the new items, the limestone ore and the red mud block have `*_placeholder` textures;
+  - nothing uses the alumina, AlF3 or ton containers until 10b3 (and chlorine has no buyer).
 - Phase 9c: Mekanism has not been tried: it is not yet released for 26.3. Plugs were checked against a real NeoForge energy
   handler on a stand-in block.
 - Phase 9b: the NeoForge client loads with no errors (`:neoforge:runClient`), but no in-world screenshot was taken: quick-play into a

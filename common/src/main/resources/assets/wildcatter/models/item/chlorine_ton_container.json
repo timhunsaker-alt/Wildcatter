@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "wildcatter:item/chlorine_ton_container_placeholder"
+  }
+}

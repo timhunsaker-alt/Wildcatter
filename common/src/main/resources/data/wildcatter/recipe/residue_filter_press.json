@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "XLX",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "X": "minecraft:piston",
+    "L": "minecraft:paper"
+  },
+  "result": {
+    "id": "wildcatter:residue_filter_press",
+    "count": 1
+  }
+}

@@ -16,6 +16,8 @@ frequency, protection) is in `docs/ELECTRICAL_MODEL.md`. What is built, phase by
   starters; soft starters and variable-frequency drives at 480 V and 4.16 kV (10a).
 - **DC:** current-regulated rectifiers and bare copper bus bars to the electrolysis cells, on the same solver: shorts, ground
   faults and DC shock (10b1).
+- **Alumina:** a true-size Bayer refinery from bauxite to bagged alumina, with caustic soda from chlor-alkali cells, lime from a
+  shaft kiln on a new limestone rock, AlF3 from the conversion plant's HF, and chlorine in ton containers (10b2).
 - **Oil and gas:**
   - seismic surveys, a land rig and wells;
   - the lease (separator, tanks, pumpjacks);

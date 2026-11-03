@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SWS",
+    "W W",
+    "SWS"
+  ],
+  "key": {
+    "S": "minecraft:string",
+    "W": "minecraft:white_wool"
+  },
+  "result": {
+    "id": "wildcatter:empty_bulk_bag",
+    "count": 2
+  }
+}

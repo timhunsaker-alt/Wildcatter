@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "BWB",
+    "SFS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "B": "minecraft:bricks",
+    "W": "minecraft:water_bucket",
+    "F": "minecraft:furnace"
+  },
+  "result": {
+    "id": "wildcatter:package_boiler",
+    "count": 1
+  }
+}

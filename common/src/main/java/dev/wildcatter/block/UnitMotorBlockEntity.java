@@ -114,6 +114,22 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "rhr_pump" -> new Motor(true, Voltage.MEDIUM, Tuning.RHR_WATTS);
 				case "main_feed_pump" -> new Motor(true, Voltage.MEDIUM, Tuning.MAIN_FEED_PUMP_WATTS);
 				case "circulating_water_pump" -> new Motor(true, Voltage.MEDIUM, Tuning.CW_PUMP_WATTS);
+				case "ball_mill" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BALL_MILL_WATTS);
+				case "digester" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.DIGESTER_WATTS);
+				case "flash_tanks" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.FLASH_PUMP_WATTS);
+				case "settler", "mud_washer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.SETTLER_RAKE_WATTS);
+				case "residue_filter_press" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.FILTER_PRESS_WATTS);
+				case "polishing_filter" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.POLISHING_FILTER_WATTS);
+				case "precipitator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PRECIPITATOR_WATTS);
+				case "hydrate_filter" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.HYDRATE_FILTER_WATTS);
+				case "calciner" -> new Motor(true, Voltage.MEDIUM, Tuning.CALCINER_FAN_WATTS);
+				case "evaporator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.EVAPORATOR_WATTS);
+				case "causticizer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CAUSTICIZER_WATTS);
+				case "package_boiler" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PROCESS_BOILER_WATTS);
+				case "lime_kiln" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LIME_KILN_WATTS);
+				case "alf3_reactor" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ALF3_WATTS);
+				case "bagging_station" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BAGGING_WATTS);
+				case "chlorine_filler" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CL2_FILLER_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -189,6 +205,18 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "rhr_pump" -> "RHR pump";
 			case "main_feed_pump" -> "feed pump";
 			case "circulating_water_pump" -> "circulating water pump";
+			case "ball_mill" -> "mill motor";
+			case "digester", "precipitator", "causticizer" -> "agitator";
+			case "flash_tanks", "polishing_filter", "evaporator" -> "pumps";
+			case "settler", "mud_washer" -> "rake drive";
+			case "residue_filter_press" -> "hydraulics";
+			case "hydrate_filter" -> "vacuum pump";
+			case "calciner" -> "ID fan";
+			case "package_boiler" -> "feed pump and fan";
+			case "lime_kiln" -> "blower";
+			case "alf3_reactor" -> "fluidizing fan";
+			case "bagging_station" -> "filler";
+			case "chlorine_filler" -> "refrigeration";
 			default -> kind();
 		};
 	}

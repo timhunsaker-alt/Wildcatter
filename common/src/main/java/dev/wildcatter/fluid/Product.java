@@ -75,7 +75,20 @@ public enum Product {
 	/** Feedwater for a steam generator, from the aux feed pump (and in 8b the main feed pumps). Counted in kg. */
 	FEEDWATER("feedwater", false),
 	/** Circulating water from an intake (or, in 8c, a cooling tower's basin) through a condenser (docs/multiblocks/turbine-island.md). Counted in kg. */
-	COOLING_WATER("circulating water", false);
+	COOLING_WATER("circulating water", false),
+	/** 32 % NaOH from a chlor-alkali cell (docs/multiblocks/alumina-plant.md), the Bayer refinery's make-up. Counted in kg. */
+	CAUSTIC_SODA("caustic soda (32 %)", false),
+	/** 10 bar saturated steam from a package boiler (docs/multiblocks/bayer-refinery.md), for the digester and evaporator. Counted in kg. */
+	PROCESS_STEAM("process steam", true),
+	/** The Bayer refinery's streams (docs/multiblocks/bayer-refinery.md), in kg; each carries its alumina in a fixed share. */
+	BAUXITE_SLURRY("bauxite slurry", false),
+	DIGESTED_SLURRY("digested slurry", false),
+	GREEN_LIQUOR("green liquor", false),
+	MUD_SLURRY("red mud slurry", false),
+	POLISHED_LIQUOR("polished liquor", false),
+	HYDRATE_SLURRY("hydrate slurry", false),
+	SPENT_LIQUOR("spent liquor", false),
+	STRONG_LIQUOR("strong liquor", false);
 
 	private final String label;
 	private final boolean gas;
@@ -96,7 +109,8 @@ public enum Product {
 
 	public String unit() {
 		return switch (this) {
-			case HOT_CRACKED_GAS, CRACKED_GAS, COMPRESSED_CRACKED_GAS, BURNER_GAS, ORE_SLURRY, LEACH_SLURRY, FLUORINE, UF6, CHLORINE, STEAM, FEEDWATER, COOLING_WATER -> "kg";
+			case HOT_CRACKED_GAS, CRACKED_GAS, COMPRESSED_CRACKED_GAS, BURNER_GAS, ORE_SLURRY, LEACH_SLURRY, FLUORINE, UF6, CHLORINE, STEAM, FEEDWATER, COOLING_WATER,
+					CAUSTIC_SODA, PROCESS_STEAM, BAUXITE_SLURRY, DIGESTED_SLURRY, GREEN_LIQUOR, MUD_SLURRY, POLISHED_LIQUOR, HYDRATE_SLURRY, SPENT_LIQUOR, STRONG_LIQUOR -> "kg";
 			default -> gas ? "m3" : "L";
 		};
 	}
@@ -104,7 +118,8 @@ public enum Product {
 	/** False for liquids no stock tank holds: molten sulfur freezes, and the mill's slurries and liquors carry their uranium. */
 	public boolean tanked() {
 		return switch (this) {
-			case MOLTEN_SULFUR, ORE_SLURRY, LEACH_SLURRY, PREGNANT_LIQUOR, STRIP_LIQUOR, PREGNANT_LIXIVIANT, BARREN_LIXIVIANT, ELUATE, ANHYDROUS_HF, FEEDWATER, COOLING_WATER -> false;
+			case MOLTEN_SULFUR, ORE_SLURRY, LEACH_SLURRY, PREGNANT_LIQUOR, STRIP_LIQUOR, PREGNANT_LIXIVIANT, BARREN_LIXIVIANT, ELUATE, ANHYDROUS_HF, FEEDWATER, COOLING_WATER,
+					BAUXITE_SLURRY, DIGESTED_SLURRY, GREEN_LIQUOR, MUD_SLURRY, POLISHED_LIQUOR, HYDRATE_SLURRY, SPENT_LIQUOR, STRONG_LIQUOR -> false;
 			default -> !gas;
 		};
 	}

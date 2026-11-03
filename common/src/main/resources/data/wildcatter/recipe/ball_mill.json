@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BBB",
+    "XCX",
+    "SHS"
+  ],
+  "key": {
+    "B": "minecraft:iron_block",
+    "X": "wildcatter:crankshaft",
+    "C": "minecraft:iron_block",
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper"
+  },
+  "result": {
+    "id": "wildcatter:ball_mill",
+    "count": 1
+  }
+}

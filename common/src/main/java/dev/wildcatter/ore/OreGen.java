@@ -49,6 +49,7 @@ public final class OreGen {
 			case MOUNTAINS_BADLANDS -> List.of("#minecraft:is_mountain", "#minecraft:is_badlands");
 			case PLAINS_BADLANDS -> List.of("minecraft:plains", "minecraft:sunflower_plains", "#minecraft:is_badlands");
 			case OCEAN_BEACH -> List.of("#minecraft:is_ocean", "#minecraft:is_beach");
+			case PLAINS_FOREST -> List.of("minecraft:plains", "minecraft:sunflower_plains", "#minecraft:is_forest", "#minecraft:is_river");
 		};
 	}
 }

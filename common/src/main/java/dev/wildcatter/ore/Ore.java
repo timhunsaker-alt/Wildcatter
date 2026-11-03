@@ -34,10 +34,11 @@ public enum Ore {
 	SCHEELITE("scheelite", "Tungsten Ore", "Scheelite", "CaWO4", "0.3-1 % WO3 (Pine Creek)", 0.065, "WO3", 2.9, Where.EVERYWHERE, Tool.STONE),
 	COBALTITE("cobaltite", "Cobalt Ore", "Cobaltite", "CoAsS", "0.1-0.5 % Co (Cobalt, Ontario)", 0.09, "cobaltite", 2.7, Where.EVERYWHERE, Tool.STONE),
 	PYROLUSITE("pyrolusite", "Manganese Ore", "Pyrolusite", "MnO2", "30-48 % Mn (Kalahari; textbook figure)", 0.80, "manganese oxides", 3.2, Where.EVERYWHERE, Tool.STONE),
-	PHOSPHATE("phosphate", "Phosphate Rock", "Phosphate Rock", "Ca5(PO4,CO3)3F (francolite)", "18-40 % P2O5 and 70-200 ppm U (Bone Valley, Khouribga)", 0.80, "apatite", 2.6, Where.OCEAN_BEACH, Tool.STONE);
+	PHOSPHATE("phosphate", "Phosphate Rock", "Phosphate Rock", "Ca5(PO4,CO3)3F (francolite)", "18-40 % P2O5 and 70-200 ppm U (Bone Valley, Khouribga)", 0.80, "apatite", 2.6, Where.OCEAN_BEACH, Tool.STONE),
+	LIMESTONE("limestone", "Limestone", "Limestone", "CaCO3 (calcite)", "90-98 % CaCO3 (Rogers City, Michigan; Buxton)", 0.95, "CaCO3", 2.6, Where.PLAINS_FOREST, Tool.STONE);
 
 	/** The biomes an ore generates in; OreGen turns each into a biome selector. */
-	public enum Where { EVERYWHERE, DEEP, DESERT_BADLANDS, EVAPORITE, SALT_DOME, BEACH, TROPICS, MOUNTAINS, MOUNTAINS_BADLANDS, PLAINS_BADLANDS, OCEAN_BEACH }
+	public enum Where { EVERYWHERE, DEEP, DESERT_BADLANDS, EVAPORITE, SALT_DOME, BEACH, TROPICS, MOUNTAINS, MOUNTAINS_BADLANDS, PLAINS_BADLANDS, OCEAN_BEACH, PLAINS_FOREST }
 
 	/** The lowest tool that mines it. */
 	public enum Tool { SHOVEL, STONE, IRON }

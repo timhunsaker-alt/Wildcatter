@@ -71,6 +71,26 @@ public interface FuelCycleBlocks {
 	Block ROD_WELDER = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.ROD_WELDER);
 	Block ASSEMBLY_FIXTURE = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.ASSEMBLY_FIXTURE);
 	Block HELIUM_RECOVERY_UNIT = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.HELIUM_RECOVERY_UNIT);
+	// 10b2: the Bayer refinery, lime kiln, AlF3 reactor, bagging station and chlorine filler (docs/multiblocks/bayer-refinery.md, alumina-plant.md)
+	Block BALL_MILL = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.BALL_MILL);
+	Block DIGESTER = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.DIGESTER);
+	Block FLASH_TANKS = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.FLASH_TANKS);
+	Block SETTLER = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.SETTLER);
+	Block MUD_WASHER = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.MUD_WASHER);
+	Block RESIDUE_FILTER_PRESS = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.RESIDUE_FILTER_PRESS);
+	Block POLISHING_FILTER = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.POLISHING_FILTER);
+	Block PRECIPITATOR = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.PRECIPITATOR);
+	Block HYDRATE_FILTER = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.HYDRATE_FILTER);
+	Block CALCINER = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.CALCINER);
+	Block EVAPORATOR = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.EVAPORATOR);
+	Block CAUSTICIZER = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.CAUSTICIZER);
+	Block PACKAGE_BOILER = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.PACKAGE_BOILER);
+	Block LIME_KILN = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.LIME_KILN);
+	Block ALF3_REACTOR = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.ALF3_REACTOR);
+	Block BAGGING_STATION = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.BAGGING_STATION);
+	Block CHLORINE_FILLER = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.CHLORINE_FILLER);
+	/** A placed block of red mud filter cake, for a dry stack. */
+	Block RED_MUD = block("red_mud", props -> new Block(props.mapColor(MapColor.TERRACOTTA_RED).strength(0.8F).sound(SoundType.MUD)));
 	Block ISR_WELLHEAD = block("isr_wellhead", props -> new dev.wildcatter.block.IsrWellheadBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL)));
 }
