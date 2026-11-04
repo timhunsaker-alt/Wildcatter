@@ -9,7 +9,7 @@
   "key": {
     "S": "wildcatter:steel_ingot",
     "D": "minecraft:diamond",
-    "T": "wildcatter:substation_transformer",
+    "T": "wildcatter:substation_transformer_10",
     "C": "minecraft:copper_block"
   },
   "result": {

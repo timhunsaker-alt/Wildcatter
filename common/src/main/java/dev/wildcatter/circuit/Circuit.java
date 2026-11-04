@@ -85,6 +85,14 @@ public final class Circuit {
 		network.port(cell(pos), face.ordinal(), conductor.ordinal(), BUS, node, Tuning.CONTACT_OHMS / 2, false);
 	}
 
+	/** The voltage key of the main bus inside a 4.16 kV switchgear lineup: only switchgear sections join on it. */
+	private static final int SWITCHGEAR_BUS = 66;
+
+	/** A terminal on a switchgear lineup's main bus, on a face where two sections touch. Nothing else joins it. */
+	public void switchgearBusPort(BlockPos pos, Direction face, Conductor conductor, int node) {
+		network.port(cell(pos), face.ordinal(), conductor.ordinal(), SWITCHGEAR_BUS, node, Tuning.CONTACT_OHMS / 2, false);
+	}
+
 	/**
 	 * The role and voltage keys of DC (docs/multiblocks/dc-bus.md): a bus bar has no polarity of its own, its voltage is whatever
 	 * the cells along it make it, so every DC terminal is the one role. Nothing AC joins it.

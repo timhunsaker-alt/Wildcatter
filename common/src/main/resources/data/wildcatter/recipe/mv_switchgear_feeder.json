@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SGS",
+    "SRS",
+    "SCS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "G": "minecraft:glass_pane",
+    "R": "minecraft:comparator",
+    "C": "minecraft:copper_ingot"
+  },
+  "result": {
+    "id": "wildcatter:mv_switchgear_feeder",
+    "count": 1
+  }
+}

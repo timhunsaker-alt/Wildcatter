@@ -944,6 +944,14 @@ public final class Tuning {
 	public static final double FEEDER_51_PICKUP = 1.0;             // feeder 51: at the breaker's rating, moderately inverse, time dial 1
 	public static final double FEEDER_50_MULTIPLE = 8.0;           // feeder 50: instantaneous at 8 x the breaker's rating
 	public static final double GROUNDING_SET_OHMS = 0.001;         // a grounding cluster: each phase to earth through 2/0 copper (ASTM F855)
+	// 10d2: the 4.16 kV switchgear and the breaker relay cabinet (docs/multiblocks/mv-switchgear.md, breaker-relay-cabinet.md)
+	public static final int[] SWITCHGEAR_FRAME_AMPS = {1200, 2000, 3000};   // 5 kV metal-clad vacuum breakers (VCP-W 5 class)
+	public static final int[] RELAY_PICKUP_STEPS = {5, 10, 25, 50, 100, 200, 400, 600, 1200};   // 51 pickup in amps (proposed: 50:5 CT, 0.5 A tap at the bottom)
+	public static final int RELAY_PICKUP_START = 4;                // a new relay starts at 100 A
+	public static final double RELAY_50_OF_PICKUP = 8.0;           // 50 at 8 x the 51 pickup
+	// the 10 MVA 4.16/138 kV power transformer (docs/multiblocks/power-transformer-10.md)
+	public static final double STEP_UP_10_VA = 10_000_000.0;       // 4.16 kV delta / 138 kV grounded wye, ONAN
+	public static final double STEP_UP_10_PERCENT_Z = 7.5;
 	public static final double DISCONNECT_ARC_AMPS = 10.0;         // opening a disconnect above this draws an arc (proposed: they break only magnetizing current)
 	public static final double ARC_FLASH_REACH = 3.0;              // blocks: who is burned by a disconnect's arc (proposed)
 	// ---- Steam plant (docs/multiblocks/steam-plant.md; Phase 4 plan, approved 2026-10-30) ----

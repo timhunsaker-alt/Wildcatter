@@ -245,9 +245,6 @@ def tinted_breaker(color):
 
 tex("switch_body", tinted_breaker((200, 170, 40)))
 tex("relay_body", tinted_breaker((150, 70, 190)))
-tex("mv_breaker_body", tinted_breaker((60, 90, 170)))
-tex("dist_breaker_body", tinted_breaker((60, 150, 90)))
-tex("hv_breaker_body", tinted_breaker((170, 60, 60)))
 
 
 def wood(base, grain):
@@ -263,7 +260,7 @@ tex("insulator", plain((200, 200, 210)))
 tex("breaker_lever_on", lever((60, 190, 90)))
 tex("breaker_lever_off", lever((120, 120, 126)))
 tex("breaker_lever_tripped", lever((220, 60, 50)))
-for name, t in (("transformer", ((96, 102, 112), (225, 225, 215))), ("substation", ((70, 90, 130), (200, 215, 240))), ("distribution", ((60, 115, 85), (205, 235, 215))), ("pole_tx", ((112, 118, 124), (232, 232, 224)))):
+for name, t in (("distribution", ((60, 115, 85), (205, 235, 215))), ("pole_tx", ((112, 118, 124), (232, 232, 224)))):
 	tex(f"{name}_front", transformer_front(*t))
 	tex(f"{name}_side", transformer_side(t[0]))
 	tex(f"{name}_top", transformer_top(t[0]))
@@ -367,14 +364,9 @@ save_json(f"{ASSETS}/blockstates/steam_turbine.json", {"variants": {
 	f"running={running}": {"model": f"{ns}:block/steam_turbine{'_running' if running == 'true' else ''}"} for running in ("false", "true")}})
 
 # Phase 4.5e: the pole transformer is drawn at true size in its cell by tools/models/pole_transformer.py; its blockstate is here
-save_json(f"{ASSETS}/blockstates/pole_transformer.json", {"variants": {f"facing={facing}": {"model": f"{ns}:block/pole_transformer/p0", **({"y": y} if y else {})}
-	for facing, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270))}})
-for tname, t in (("transformer", "transformer"), ("substation_transformer", "substation")):
-	save_json(f"{ASSETS}/models/block/{tname}.json", {"parent": "minecraft:block/orientable", "textures": {
-		"front": f"{ns}:block/{t}_front", "side": f"{ns}:block/{t}_side", "top": f"{ns}:block/{t}_top", "bottom": f"{ns}:block/{t}_top"}})
-	save_json(f"{ASSETS}/blockstates/{tname}.json", {"variants": {
-		"facing=north": {"model": f"{ns}:block/{tname}"}, "facing=east": {"model": f"{ns}:block/{tname}", "y": 90},
-		"facing=south": {"model": f"{ns}:block/{tname}", "y": 180}, "facing=west": {"model": f"{ns}:block/{tname}", "y": 270}}})
+for pole_unit in ("pole_transformer", "pole_transformer_mv"):   # 10d2: the 4.16 kV unit (docs/multiblocks/poles.md)
+	save_json(f"{ASSETS}/blockstates/{pole_unit}.json", {"variants": {f"facing={facing}": {"model": f"{ns}:block/{pole_unit}/p0", **({"y": y} if y else {})}
+		for facing, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270))}})
 
 
 def cuboid(frm, to, texture="#cable"):
@@ -382,9 +374,8 @@ def cuboid(frm, to, texture="#cable"):
 	return {"from": frm, "to": to, "faces": faces}
 
 
-# The breaker: a box with a lever. On leans one way, off the other, tripped sits in the middle. The 4.16 kV and
-# 138 kV ones are bigger (a wider, taller body and a longer lever) and tinted blue and red.
-for prefix, wide in (("", 0), ("mv_", 1), ("dist_", 1), ("hv_", 2)):
+# The breaker: a box with a lever. On leans one way, off the other, tripped sits in the middle.
+for prefix, wide in (("", 0),):
 	for position, angle in (("on", -30), ("off", 30), ("tripped", 0)):
 		top = 10 + 3 * wide
 		lever_el = cuboid([7, top, 7], [9, top + 5 + wide, 9], "#lever")
@@ -407,9 +398,6 @@ rotations = {"north": 0, "east": 90, "south": 180, "west": 270}
 save_json(f"{ASSETS}/blockstates/switch.json", {"variants": {
 	f"facing={facing},position={position}": {"model": f"{ns}:block/switch_{'on' if position == 'on' else 'off'}", "y": y}
 	for facing, y in rotations.items() for position in ("on", "off", "tripped")}})
-save_json(f"{ASSETS}/blockstates/ufls_relay_dist.json", {"variants": {
-	f"facing={facing},position={position}": {"model": f"{ns}:block/relay_{'on' if position == 'on' else 'off'}", "y": y}
-	for facing, y in rotations.items() for position in ("on", "off", "tripped")}})
 # the fused cutout (Phase 4.5e: tools/models/fused_cutout.py draws it at true size): when the link blows the tube drops open
 save_json(f"{ASSETS}/blockstates/fused_cutout.json", {"variants": {
 	f"blown={blown},facing={facing}": {"model": f"{ns}:block/fused_cutout{'_blown' if blown == 'true' else ''}/p0", "y": y}
@@ -420,7 +408,7 @@ save_json(f"{ASSETS}/blockstates/ufls_relay.json", {"variants": {
 save_json(f"{ASSETS}/blockstates/fuse.json", {"variants": {
 	f"blown={blown},facing={facing}": {"model": f"{ns}:block/fuse_{'blown' if blown == 'true' else 'good'}", "y": y}
 	for facing, y in rotations.items() for blown in ("false", "true")}})
-for prefix in ("", "mv_", "dist_", "hv_"):
+for prefix in ("",):
 	save_json(f"{ASSETS}/blockstates/{prefix}breaker.json", {"variants": {
 		f"facing={facing},position={position}": {"model": f"{ns}:block/{prefix}breaker_{position}", "y": y}
 		for facing, y in rotations.items() for position in ("on", "off", "tripped")}})
@@ -622,8 +610,8 @@ WIRES = BARE_WIRES + WOOL_WIRES + PLASTIC_WIRES
 ITEM_MODELS = {"firebox": "block/firebox", "pump": "block/pump", "pipe": "block/pipe_inventory", "gas_line": "block/gas_line_inventory", "drilling_rig": "block/drilling_rig", "cooling_tower": "block/cooling_tower", "cooling_fill": "block/cooling_fill",
 	"pumpjack": "block/pumpjack",
 	"gas_wellhead": "block/gas_wellhead", "casing": "block/casing", "boiler": "block/boiler", "steam_turbine": "block/steam_turbine", "electric_lamp": "block/electric_lamp",
-	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "fuse": "block/fuse_good", "fused_cutout": "block/fused_cutout/item", "dist_breaker": "block/dist_breaker_on", "pole_transformer": "block/pole_transformer/item", "switch": "block/switch_on", "ufls_relay": "block/relay_on", "ufls_relay_dist": "block/relay_on", "mv_breaker": "block/mv_breaker_on", "hv_breaker": "block/hv_breaker_on", "pole": "block/pole", "crossarm": "block/crossarm_x", "transformer": "block/transformer",
-	"substation_transformer": "block/substation_transformer", "ground_rod": "block/ground_rod",
+	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "fuse": "block/fuse_good", "fused_cutout": "block/fused_cutout/item", "pole_transformer": "block/pole_transformer/item", "switch": "block/switch_on", "ufls_relay": "block/relay_on", "pole": "block/pole", "crossarm": "block/crossarm_x", "pole_transformer_mv": "block/pole_transformer_mv/item",
+	"ground_rod": "block/ground_rod",
 	"power_meter": "item/power_meter", "field_manual": "item/field_manual", "seismograph": "item/seismograph", "crude_oil_bucket": "item/crude_oil_bucket", "plastic_sheet": "item/plastic_sheet", "diesel_bucket": "item/diesel_bucket", "steel_ingot": "item/steel_ingot", "conductor_spool_lv": "item/conductor_spool_lv", "conductor_spool_dist": "item/conductor_spool_dist", "conductor_spool_hv": "item/conductor_spool_hv", "covered_conductor_spool_lv": "item/covered_conductor_spool_lv", "covered_conductor_spool_dist": "item/covered_conductor_spool_dist", "covered_conductor_spool_hv": "item/covered_conductor_spool_hv", "insulator_lv": "block/insulator_lv_a", **{f"receptacle_{p}": f"block/receptacle_{p}" for p in PLUG_COLORS}, **{f"plug_{p}": f"block/plug_{p}" for p in PLUG_COLORS}, "insulator_dist": "block/insulator_dist_a", "insulator_hv": "block/insulator_hv_a"}
 ITEM_MODELS.update({w: f"block/{w}_inventory" for w in WIRES})
 for name, model in ITEM_MODELS.items():
@@ -666,15 +654,11 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 	"block.wildcatter.switch": "Switch (LV)",
 	"block.wildcatter.fused_cutout": "Fused Cutout (DIST)",
 	"block.wildcatter.ufls_relay": "Under-Frequency Relay (LV)",
-	"block.wildcatter.ufls_relay_dist": "Under-Frequency Relay (DIST)",
-	"block.wildcatter.mv_breaker": "Circuit Breaker (MV)",
-	"block.wildcatter.dist_breaker": "Circuit Breaker (DIST)",
 	"block.wildcatter.dist_wire_hot": "Bare Line, red (DIST)",
 	"block.wildcatter.dist_wire_neutral": "Bare Line, black (DIST)",
 	"block.wildcatter.dist_plastic_wire_hot": "Plastic Line, red (DIST)",
 	"block.wildcatter.dist_plastic_wire_neutral": "Plastic Line, black (DIST)",
 	"block.wildcatter.pole_transformer": "Pole-Mount Transformer (DIST / LV, 25 kVA)",
-	"block.wildcatter.hv_breaker": "Circuit Breaker (HV)",
 	"block.wildcatter.insulator_lv": "Insulator (LV, 1 kV)",
 	"block.wildcatter.insulator_dist": "Pin Insulator (DIST, 15 kV)",
 	"block.wildcatter.insulator_hv": "Suspension Insulator (HV, 138 kV)",
@@ -690,8 +674,6 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 	"block.wildcatter.crossarm": "Pole Crossarm",
 	"block.wildcatter.electric_lamp": "Electric Lamp (60 W)",
 	"block.wildcatter.electric_heater": "Electric Heater (1500 W)",
-	"block.wildcatter.transformer": "Transformer (LV / MV)",
-	"block.wildcatter.substation_transformer": "Substation Transformer (MV / HV)",
 	"subtitles.wildcatter.turbine_hum": "Turbine hums",
 	"subtitles.wildcatter.boiler_hiss": "Boiler hisses",
 	"subtitles.wildcatter.breaker_trip": "Breaker trips",
@@ -708,7 +690,7 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 })
 
 # ---- loot: every block drops itself ---------------------------------------------------------------
-BLOCKS = ("cooling_tower", "cooling_fill", "boiler", "firebox", "pipe", "gas_line", "drilling_rig", "pumpjack", "gas_wellhead", "pump", "steam_turbine", "transformer", "substation_transformer", "electric_lamp", "electric_heater", "breaker", "fuse", "fused_cutout", "switch", "ufls_relay", "ufls_relay_dist", "mv_breaker", "dist_breaker", "pole_transformer", "hv_breaker", "pole", "crossarm", "insulator_lv", "insulator_dist", "insulator_hv", "ground_rod") + tuple(f"receptacle_{p}" for p in PLUG_COLORS) + tuple(f"plug_{p}" for p in PLUG_COLORS) + WIRES
+BLOCKS = ("cooling_tower", "cooling_fill", "boiler", "firebox", "pipe", "gas_line", "drilling_rig", "pumpjack", "gas_wellhead", "pump", "steam_turbine", "electric_lamp", "electric_heater", "breaker", "fuse", "fused_cutout", "switch", "ufls_relay", "pole_transformer", "pole_transformer_mv", "pole", "crossarm", "insulator_lv", "insulator_dist", "insulator_hv", "ground_rod") + tuple(f"receptacle_{p}" for p in PLUG_COLORS) + tuple(f"plug_{p}" for p in PLUG_COLORS) + WIRES
 for name in BLOCKS:
 	save_json(f"{DATA}/loot_table/blocks/{name}.json", {
 		"type": "minecraft:block",
@@ -718,7 +700,7 @@ for name in BLOCKS:
 save_json(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json", {"values": [f"{ns}:{n}" for n in BLOCKS if n not in ("pole", "crossarm")]})
 save_json(f"{ROOT}/data/minecraft/tags/block/mineable/axe.json", {"values": [f"{ns}:pole", f"{ns}:crossarm"]})
 save_json(f"{ROOT}/data/minecraft/tags/block/climbable.json", {"values": [f"{ns}:pole"]})
-save_json(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json", {"values": [f"{ns}:{n}" for n in ("boiler", "firebox", "mv_breaker", "dist_breaker", "pole_transformer", "hv_breaker", "pump", "drilling_rig", "pumpjack", "gas_wellhead", "cooling_tower", "cooling_fill", "steam_turbine", "transformer", "substation_transformer")]})
+save_json(f"{ROOT}/data/minecraft/tags/block/needs_stone_tool.json", {"values": [f"{ns}:{n}" for n in ("boiler", "firebox", "pole_transformer", "pole_transformer_mv", "pump", "drilling_rig", "pumpjack", "gas_wellhead", "cooling_tower", "cooling_fill", "steam_turbine")]})
 
 # ---- recipes (early game: iron, copper, redstone, glass, dye, wool) ----------------------------------------
 def shaped(name, pattern, key, result, count=1):
@@ -756,13 +738,9 @@ shaped("ground_rod", ["C", "C", "C"], {"C": "minecraft:copper_ingot"}, "ground_r
 shapeless("ground_wire", [f"{ns}:wire_neutral", "minecraft:green_dye"], "ground_wire")
 shaped("fused_cutout", ["BCB", "NFN", " I "], {"B": "minecraft:brick", "C": "minecraft:copper_ingot", "N": "minecraft:iron_nugget", "F": f"{ns}:fuse", "I": "minecraft:iron_ingot"}, "fused_cutout")
 shaped("fuse", ["GGG", "ICI", "GGG"], {"G": "minecraft:glass_pane", "I": "minecraft:iron_nugget", "C": "minecraft:copper_ingot"}, "fuse", 2)
-shaped("ufls_relay_dist", ["ICI", "RBR", "III"], {"I": "minecraft:iron_ingot", "C": "minecraft:comparator", "R": "minecraft:redstone", "B": f"{ns}:dist_breaker"}, "ufls_relay_dist")
 shaped("ufls_relay", ["ICI", "RBR", "III"], {"I": "minecraft:iron_ingot", "C": "minecraft:comparator", "R": "minecraft:redstone", "B": f"{ns}:breaker"}, "ufls_relay")
 shaped("switch", ["I I", "ICI", "III"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot"}, "switch")
 shaped("breaker", ["ICI", "IRI", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, "breaker")
-shaped("mv_breaker", ["IBI", "CRC", "IBI"], {"I": "minecraft:iron_ingot", "B": f"{ns}:breaker", "C": "minecraft:copper_ingot", "R": "minecraft:redstone_block"}, "mv_breaker")
-shaped("dist_breaker", ["IBI", "GRG", "IBI"], {"I": "minecraft:iron_ingot", "B": f"{ns}:mv_breaker", "G": "minecraft:gold_ingot", "R": "minecraft:redstone_block"}, "dist_breaker")
-shaped("hv_breaker", ["DBD", "IRI", "DBD"], {"I": "minecraft:iron_block", "B": f"{ns}:mv_breaker", "D": "minecraft:diamond", "R": "minecraft:redstone_block"}, "hv_breaker")
 for tier, wire, sheets in (("lv", "wire_hot", 1), ("dist", "dist_wire_hot", 2), ("hv", "hv_wire_hot", 3)):
 	shaped(f"conductor_spool_{tier}", ["WWW", "WSW", "WWW"], {"W": f"{ns}:{wire}", "S": "minecraft:stick"}, f"conductor_spool_{tier}")
 	shapeless(f"covered_conductor_spool_{tier}", [f"{ns}:conductor_spool_{tier}"] + [f"{ns}:plastic_sheet"] * sheets, f"covered_conductor_spool_{tier}")
@@ -774,9 +752,8 @@ for pid, dye, copper in (("nema_5_15", "minecraft:white_dye", 1), ("nema_5_20", 
 	shapeless(f"plug_{pid}", [f"{ns}:receptacle_{pid}", "minecraft:redstone", "minecraft:iron_ingot"], f"plug_{pid}")
 shaped("pole", ["L", "L", "L"], {"L": "#minecraft:logs"}, "pole", 3)
 shaped("crossarm", ["PPP", " N "], {"P": "#minecraft:planks", "N": "minecraft:iron_nugget"}, "crossarm", 2)
-shaped("transformer", ["ICI", "ICI", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot"}, "transformer")
-shaped("pole_transformer", ["ICI", "CTC", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "T": f"{ns}:transformer"}, "pole_transformer")
-shaped("substation_transformer", ["IDI", "TCT", "IDI"], {"I": "minecraft:iron_ingot", "D": "minecraft:diamond", "T": "wildcatter:transformer", "C": "minecraft:copper_block"}, "substation_transformer")
+shaped("pole_transformer_mv", ["ICI", "ICI", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot"}, "pole_transformer_mv")
+shaped("pole_transformer", ["ICI", "CTC", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "T": f"{ns}:pole_transformer_mv"}, "pole_transformer")
 shaped("electric_lamp", [" G ", "GRG", " C "], {"G": "minecraft:glass_pane", "R": "minecraft:redstone", "C": "minecraft:copper_ingot"}, "electric_lamp")
 shaped("electric_heater", ["III", "CRC", "III"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, "electric_heater")
 # Plastic wire: the same copper as ordinary wire, wrapped in plastic sheet.
@@ -928,9 +905,9 @@ for cable, (wire_hot, wire_neutral) in {"cable_lv": ("wire_hot", "wire_neutral")
 	shaped(cable, ["PHP", "HNH", "PGP"], {"P": f"{ns}:plastic_sheet", "H": f"{ns}:{wire_hot}", "N": f"{ns}:{wire_neutral}", "G": f"{ns}:ground_wire"}, cable, 4)
 shaped("breaker_3p_lv", ["BBB", "IRI"], {"B": f"{ns}:breaker", "I": "minecraft:iron_ingot", "R": "minecraft:redstone"}, "breaker_3p_lv")
 shaped("breaker_3p_industrial", ["BBB", "SRS"], {"B": f"{ns}:breaker", "S": f"{ns}:steel_ingot", "R": "minecraft:redstone_block"}, "breaker_3p_industrial")
-shaped("padmount_208", ["SSS", "TCT", "SSS"], {"S": f"{ns}:steel_ingot", "T": f"{ns}:transformer", "C": "minecraft:copper_block"}, "padmount_208")
-shaped("padmount_480", ["SDS", "TCT", "SSS"], {"S": f"{ns}:steel_ingot", "D": "minecraft:diamond", "T": f"{ns}:transformer", "C": "minecraft:copper_block"}, "padmount_480")
-shaped("unit_substation", ["SDS", "TCT", "SDS"], {"S": f"{ns}:steel_ingot", "D": "minecraft:diamond", "T": f"{ns}:transformer", "C": "minecraft:copper_block"}, "unit_substation")
+shaped("padmount_208", ["SSS", "TCT", "SSS"], {"S": f"{ns}:steel_ingot", "T": f"{ns}:pole_transformer_mv", "C": "minecraft:copper_block"}, "padmount_208")
+shaped("padmount_480", ["SDS", "TCT", "SSS"], {"S": f"{ns}:steel_ingot", "D": "minecraft:diamond", "T": f"{ns}:pole_transformer_mv", "C": "minecraft:copper_block"}, "padmount_480")
+shaped("unit_substation", ["SDS", "TCT", "SDS"], {"S": f"{ns}:steel_ingot", "D": "minecraft:diamond", "T": f"{ns}:pole_transformer_mv", "C": "minecraft:copper_block"}, "unit_substation")
 shaped("motor_starter", ["SBS", "CRC", "SSS"], {"S": f"{ns}:steel_ingot", "B": f"{ns}:breaker_3p_industrial", "C": "minecraft:copper_ingot", "R": "minecraft:repeater"}, "motor_starter")
 shaped("mcc_bucket", ["SMS", "S S"], {"S": f"{ns}:steel_ingot", "M": f"{ns}:motor_starter"}, "mcc_bucket")
 shaped("mcc_incoming", ["SBS", "CCC", "SSS"], {"S": f"{ns}:steel_ingot", "B": f"{ns}:breaker_3p_industrial", "C": "minecraft:copper_block"}, "mcc_incoming")
@@ -1187,9 +1164,9 @@ for tag in ("mineable/pickaxe", "needs_stone_tool"):
 	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
 	t["values"] += [f"{ns}:{n}" for n in SUB + ("chain_link_fence", "barbed_wire_top")]
 	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
-shaped("power_transformer", ["SDS", "TCT", "SDS"], {"S": S_, "D": "minecraft:diamond_block", "T": f"{ns}:substation_transformer", "C": "minecraft:copper_block"}, "power_transformer")
-shapeless("hv_breaker_3p", [f"{ns}:hv_breaker"] * 3 + ["minecraft:comparator"], "hv_breaker_3p")
-shapeless("dist_breaker_3p", [f"{ns}:dist_breaker"] * 3 + ["minecraft:comparator"], "dist_breaker_3p")
+shaped("power_transformer", ["SDS", "TCT", "SDS"], {"S": S_, "D": "minecraft:diamond_block", "T": f"{ns}:substation_transformer_10", "C": "minecraft:copper_block"}, "power_transformer")
+shaped("hv_breaker_3p", ["SCS", "DRD", "SCS"], {"S": S_, "C": "minecraft:copper_block", "D": "minecraft:diamond", "R": "minecraft:comparator"}, "hv_breaker_3p")
+shaped("dist_breaker_3p", ["SCS", "IRI", "SCS"], {"S": S_, "C": "minecraft:copper_block", "I": "minecraft:iron_ingot", "R": "minecraft:comparator"}, "dist_breaker_3p")
 shaped("disconnect_hv", ["I I", "ISI"], {"I": f"{ns}:insulator_hv", "S": S_}, "disconnect_hv")
 shaped("disconnect_dist", ["I I", "ISI"], {"I": f"{ns}:insulator_dist", "S": S_}, "disconnect_dist")
 shaped("bus_hv", ["AAA", "I I"], {"A": "minecraft:iron_ingot", "I": f"{ns}:insulator_hv"}, "bus_hv")
@@ -1262,7 +1239,7 @@ shaped("soft_starter", ["SCS", "QMQ", "SSS"], {"S": S_, "C": "minecraft:comparat
 shaped("drive_cabinet", ["SCS", "QMQ", "SRS"], {"S": S_, "C": "minecraft:comparator", "Q": "minecraft:quartz_block", "M": f"{ns}:motor_starter",
 	"R": "minecraft:repeater"}, "drive_cabinet")
 shaped("soft_starter_mv", ["SIS", "SMS", "SCS"], {"S": S_, "I": "minecraft:iron_block", "M": f"{ns}:soft_starter", "C": "minecraft:copper_block"}, "soft_starter_mv")
-shaped("drive_mv_transformer", ["SCS", "CTC", "SSS"], {"S": S_, "C": "minecraft:copper_block", "T": f"{ns}:transformer"}, "drive_mv_transformer")
+shaped("drive_mv_transformer", ["SCS", "CTC", "SSS"], {"S": S_, "C": "minecraft:copper_block", "T": f"{ns}:pole_transformer_mv"}, "drive_mv_transformer")
 shaped("drive_mv_cells", ["SQS", "QDQ", "SQS"], {"S": S_, "Q": "minecraft:quartz_block", "D": f"{ns}:drive_cabinet"}, "drive_mv_cells")
 shaped("drive_mv_control", ["SCS", "SDS", "SSS"], {"S": S_, "C": "minecraft:comparator", "D": f"{ns}:drive_cabinet"}, "drive_mv_control")
 shaped("mcc_soft_starter_bucket", ["QMQ", " C "], {"Q": "minecraft:quartz", "M": f"{ns}:mcc_bucket", "C": "minecraft:comparator"}, "mcc_soft_starter_bucket")
@@ -1598,7 +1575,7 @@ shaped("aero_generator", ["BCB", "CGC", "BCB"], {"B": B_, "C": CB_, "G": f"{ns}:
 shaped("aero_exhaust_stack", ["S S", "SES", "SBS"], {"S": S_, "E": f"{ns}:gt_exhaust_stack", "B": B_}, "aero_exhaust_stack")
 shaped("gen_breaker_3000", ["SCS", "CGC", "SCS"], {"S": S_, "C": CB_, "G": f"{ns}:gen_breaker"}, "gen_breaker_3000")
 shaped("gsu_60", ["SDS", "TCT", "SDS"], {"S": S_, "D": "minecraft:diamond", "T": f"{ns}:gsu_25", "C": CB_}, "gsu_60")
-shaped("substation_transformer_60", ["SDS", "TCT", "SDS"], {"S": S_, "D": "minecraft:diamond", "T": f"{ns}:substation_transformer", "C": CB_},
+shaped("substation_transformer_60", ["SDS", "TCT", "SDS"], {"S": S_, "D": "minecraft:diamond", "T": f"{ns}:substation_transformer_10", "C": CB_},
 	"substation_transformer_60")
 # the 3,000 A bus duct: three of the 1,200 A duct (any size) and a copper block
 shapeless("bus_duct_gen__bus_duct_3000", [f"{ns}:bus_duct_gen"] * 3 + ["minecraft:copper_block"], "bus_duct_gen")
@@ -2200,6 +2177,29 @@ for t_name in ("mineable/pickaxe", "needs_stone_tool"):
 shaped("ring_crane", ["CCC", "XIX", "III"], {"C": f"{ns}:crawler_crane", "X": f"{ns}:crankshaft", "I": "minecraft:iron_block"}, "ring_crane")
 lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
 lang[f"block.{ns}.ring_crane"] = "Ring Crane (5,000 t)"
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+# ---- Phase 10d2: true-size gear in place of the one-block stand-ins ------------------------------------------------------------------
+# the switchgear sections', the cabinet's and the 10 MVA unit's blockstates, models, shapes and items come from tools/models/mv_switchgear.py,
+# the 4.16 kV pole unit's from tools/models/pole_transformer.py (its blockstate above); here loot, tags, recipes and names.
+D2_PARTS = ("mv_switchgear_main", "mv_switchgear_feeder", "breaker_relay_cabinet", "substation_transformer_10")
+for name in D2_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in D2_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("mv_switchgear_main", ["SGS", "SRS", "SCS"], {"S": S_, "G": "minecraft:glass_pane", "R": "minecraft:comparator", "C": "minecraft:copper_block"}, "mv_switchgear_main")
+shaped("mv_switchgear_feeder", ["SGS", "SRS", "SCS"], {"S": S_, "G": "minecraft:glass_pane", "R": "minecraft:comparator", "C": "minecraft:copper_ingot"}, "mv_switchgear_feeder")
+shaped("breaker_relay_cabinet", ["SGS", "SRS", "SIS"], {"S": S_, "G": "minecraft:glass_pane", "R": "minecraft:comparator", "I": "minecraft:iron_ingot"}, "breaker_relay_cabinet")
+shaped("substation_transformer_10", ["IDI", "TCT", "IDI"], {"I": "minecraft:iron_ingot", "D": "minecraft:diamond", "T": f"{ns}:pole_transformer_mv", "C": "minecraft:copper_block"}, "substation_transformer_10")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang[f"block.{ns}.mv_switchgear_main"] = "4.16 kV Switchgear, Main Section"
+lang[f"block.{ns}.mv_switchgear_feeder"] = "4.16 kV Switchgear, Feeder Section"
+lang[f"block.{ns}.breaker_relay_cabinet"] = "Breaker Relay Cabinet (50/51, 81U)"
+lang[f"block.{ns}.pole_transformer_mv"] = "Pole-Mount Transformer (MV / LV, 25 kVA)"
+lang[f"block.{ns}.substation_transformer_10"] = "Power Transformer (MV / HV, 10 MVA)"
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
 # ---- Phase 10d1: generator bus protection (docs/multiblocks/gen-bus-protection.md) ---------------------------------------------------

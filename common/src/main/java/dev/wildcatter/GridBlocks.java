@@ -127,19 +127,8 @@ public interface GridBlocks {
 	Block PLUG_NEMA_L22_30 = plug("plug_nema_l22_30", PlugType.NEMA_L22_30);
 	Block PLUG_IEC_60309_RED_32 = plug("plug_iec_60309_red_32", PlugType.IEC_60309_RED_32);
 	Block PLUG_IEC_60309_RED_63 = plug("plug_iec_60309_red_63", PlugType.IEC_60309_RED_63);
-	/** The distribution-tier under-frequency relay for feeders. */
-	Block UFLS_RELAY_DIST = block("ufls_relay_dist", props -> new BreakerBlock(props.mapColor(MapColor.COLOR_PURPLE)
-			.strength(3.5F, 7.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.DISTRIBUTION, false, true));
 	/** One-shot protection: cheap, fast, and it has to be replaced after it blows. */
 	Block FUSE = block("fuse", props -> new FuseBlock(props.mapColor(MapColor.COLOR_ORANGE).strength(1.0F).sound(SoundType.GLASS)));
-	/** For 4.16 kV and 138 kV hot lines. Same rules as the 110 V breaker, with ratings to suit the current. */
-	Block MV_BREAKER = block("mv_breaker", props -> new BreakerBlock(props.mapColor(MapColor.COLOR_BLUE)
-			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.MEDIUM));
-	/** For 12.47 kV feeders. */
-	Block DIST_BREAKER = block("dist_breaker", props -> new BreakerBlock(props.mapColor(MapColor.COLOR_GREEN)
-			.strength(3.5F, 7.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.DISTRIBUTION));
-	Block HV_BREAKER = block("hv_breaker", props -> new BreakerBlock(props.mapColor(MapColor.COLOR_RED)
-			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.HIGH));
 	/** Ganged three-pole breakers for three-phase runs. */
 	Block BREAKER_3P_LV = block("breaker_3p_lv", props -> BreakerBlock.threePole(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(1.5F).sound(SoundType.METAL), Voltage.LOW));
@@ -190,13 +179,12 @@ public interface GridBlocks {
 	Block ELECTRIC_HEATER = block("electric_heater", props -> new LoadBlock(props.mapColor(MapColor.COLOR_RED)
 			.strength(1.0F).sound(SoundType.METAL).lightLevel(state -> state.getValue(LoadBlock.LIT) ? 7 : 0), Tuning.HEATER_WATTS));
 
-	/** Steps 110 V up to 4.16 kV and back. */
-	Block TRANSFORMER = block("transformer", props -> new TransformerBlock(props.mapColor(MapColor.COLOR_GRAY)
-			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.LOW, Voltage.MEDIUM));
-	/** Steps 4.16 kV up to 138 kV and back. */
 	/** 12.47 kV (7.2 kV to neutral) down to 120/240 V split-phase, 25 kVA; it hangs on a pole. */
 	Block POLE_TRANSFORMER = block("pole_transformer", props -> new TransformerBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.LOW, Voltage.DISTRIBUTION, Tuning.POLE_TRANSFORMER_VA));
+	/** 10d2: 4.16 kV (2.4 kV to neutral) down to 120/240 V split-phase, 25 kVA; it hangs on a pole (docs/multiblocks/poles.md). */
+	Block POLE_TRANSFORMER_MV = block("pole_transformer_mv", props -> new TransformerBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.LOW, Voltage.MEDIUM, Tuning.POLE_TRANSFORMER_VA));
 	// ---- The distribution substation (docs/multiblocks/substation.md): it replaces the old single-block 138/12.47 kV transformer ----
 	Block POWER_TRANSFORMER = block("power_transformer", props -> new dev.wildcatter.block.PowerTransformerBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(5.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Tuning.SUBSTATION_VA, Tuning.SUBSTATION_PERCENT_Z));
@@ -231,8 +219,6 @@ public interface GridBlocks {
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.MEDIUM, Voltage.DISTRIBUTION, Tuning.GSU_VA, Tuning.GSU_PERCENT_Z));
 	Block UNIT_SUBSTATION = block("unit_substation", props -> dev.wildcatter.block.PadmountBlock.unitSubstation(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.INDUSTRIAL, Voltage.MEDIUM, Tuning.UNIT_SUBSTATION_VA, Tuning.UNIT_SUBSTATION_PERCENT_Z));
-	Block SUBSTATION_TRANSFORMER = block("substation_transformer", props -> new TransformerBlock(props.mapColor(MapColor.COLOR_BLUE)
-			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.MEDIUM, Voltage.HIGH));
 	Block UNIT_AUX_TRANSFORMER = block("unit_auxiliary_transformer", props -> new dev.wildcatter.block.UatTransformerBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.MEDIUM, Voltage.GENERATOR, Tuning.UAT_VA, Tuning.UAT_PERCENT_Z));
 	Block GSU_60 = block("gsu_60", props -> new dev.wildcatter.block.Gsu60TransformerBlock(props.mapColor(MapColor.COLOR_GRAY)
@@ -248,4 +234,16 @@ public interface GridBlocks {
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.GENERATOR, 3, 3, 1, "gen_feeder_breaker"));
 	Block BUS_RELAY_PANEL = block("bus_relay_panel", props -> new dev.wildcatter.block.BusRelayPanelBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+	// ---- 10d2: true-size gear in place of the one-block stand-ins ---------------------------------------------------------------------
+	/** 4.16 kV metal-clad switchgear sections, 1 x 3 x 3, that bus together (docs/multiblocks/mv-switchgear.md). */
+	Block MV_SWITCHGEAR_MAIN = block("mv_switchgear_main", props -> new dev.wildcatter.block.SwitchgearSectionBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(3.5F, 7.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), true, "mv_switchgear_main"));
+	Block MV_SWITCHGEAR_FEEDER = block("mv_switchgear_feeder", props -> new dev.wildcatter.block.SwitchgearSectionBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(3.5F, 7.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), false, "mv_switchgear_feeder"));
+	/** A standalone 12.47 kV or 138 kV breaker's relay, 1 x 2 x 1 (docs/multiblocks/breaker-relay-cabinet.md). */
+	Block BREAKER_RELAY_CABINET = block("breaker_relay_cabinet", props -> new dev.wildcatter.block.BreakerRelayCabinetBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+	/** 10 MVA, 4.16 kV delta / 138 kV grounded wye, 7.5 %Z, 5 x 5 x 4 (docs/multiblocks/power-transformer-10.md). */
+	Block SUBSTATION_TRANSFORMER_10 = block("substation_transformer_10", props -> new dev.wildcatter.block.PowerTransformer10Block(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.MEDIUM, Voltage.HIGH, Tuning.STEP_UP_10_VA, Tuning.STEP_UP_10_PERCENT_Z));
 }

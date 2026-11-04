@@ -9,7 +9,7 @@
   "key": {
     "S": "wildcatter:steel_ingot",
     "D": "minecraft:diamond",
-    "T": "wildcatter:transformer",
+    "T": "wildcatter:pole_transformer_mv",
     "C": "minecraft:copper_block"
   },
   "result": {

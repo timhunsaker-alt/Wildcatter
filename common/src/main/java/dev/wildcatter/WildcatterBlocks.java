@@ -148,6 +148,8 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.CastingMachineBlockEntity> CASTING_MACHINE_ENTITY = entity(dev.wildcatter.block.CastingMachineBlockEntity::new, CASTING_MACHINE);
 	public static final BlockEntityType<dev.wildcatter.block.CraneBlockEntity> CRANE_ENTITY = entity(dev.wildcatter.block.CraneBlockEntity::new, TOWER_CRANE, CRAWLER_CRANE, RING_CRANE);
 	public static final BlockEntityType<dev.wildcatter.block.BusRelayPanelBlockEntity> BUS_RELAY_PANEL_ENTITY = entity(dev.wildcatter.block.BusRelayPanelBlockEntity::new, BUS_RELAY_PANEL);
+	public static final BlockEntityType<dev.wildcatter.block.SwitchgearSectionBlockEntity> SWITCHGEAR_ENTITY = entity(dev.wildcatter.block.SwitchgearSectionBlockEntity::new, MV_SWITCHGEAR_MAIN, MV_SWITCHGEAR_FEEDER);
+	public static final BlockEntityType<dev.wildcatter.block.BreakerRelayCabinetBlockEntity> BREAKER_RELAY_CABINET_ENTITY = entity(dev.wildcatter.block.BreakerRelayCabinetBlockEntity::new, BREAKER_RELAY_CABINET);
 	public static final BlockEntityType<dev.wildcatter.block.SiteMarkerBlockEntity> SITE_MARKER_ENTITY = entity(dev.wildcatter.block.SiteMarkerBlockEntity::new, SITE_MARKER);
 	public static final BlockEntityType<dev.wildcatter.block.RoddingShopBlockEntity> RODDING_SHOP_ENTITY = entity(dev.wildcatter.block.RoddingShopBlockEntity::new, RODDING_SHOP);
 	public static final BlockEntityType<dev.wildcatter.block.FuelLineBlockEntity> FUEL_LINE_ENTITY = entity(dev.wildcatter.block.FuelLineBlockEntity::new, UF6_AUTOCLAVE, IDR_KILN, GRANULATOR, PELLET_PRESS, SINTERING_FURNACE, PELLET_GRINDER, ROD_LOADER);
@@ -179,7 +181,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.GensetControlPanelBlockEntity> GENSET_CONTROL_PANEL_ENTITY = entity(dev.wildcatter.block.GensetControlPanelBlockEntity::new, GENSET_CONTROL_PANEL);
 	public static final BlockEntityType<ThreePhaseHeaterBlockEntity> THREE_PHASE_HEATER_ENTITY = entity(ThreePhaseHeaterBlockEntity::new, THREE_PHASE_HEATER);
 	public static final BlockEntityType<LoadBlockEntity> LOAD_ENTITY = entity(LoadBlockEntity::new, ELECTRIC_LAMP, ELECTRIC_HEATER);
-	public static final BlockEntityType<BreakerBlockEntity> BREAKER_ENTITY = entity(BreakerBlockEntity::new, BREAKER, MV_BREAKER, DIST_BREAKER, HV_BREAKER, SWITCH, UFLS_RELAY, UFLS_RELAY_DIST,
+	public static final BlockEntityType<BreakerBlockEntity> BREAKER_ENTITY = entity(BreakerBlockEntity::new, BREAKER, SWITCH, UFLS_RELAY,
 			BREAKER_3P_LV, BREAKER_3P_INDUSTRIAL, HV_BREAKER_3P, DIST_BREAKER_3P, GEN_FEEDER_BREAKER);
 	public static final BlockEntityType<FuseBlockEntity> FUSE_ENTITY = entity(FuseBlockEntity::new, FUSE, FUSED_CUTOUT);
 	public static final BlockEntityType<ReceptacleBlockEntity> RECEPTACLE_ENTITY = entity(ReceptacleBlockEntity::new, RECEPTACLE_NEMA_5_15, RECEPTACLE_NEMA_5_20, RECEPTACLE_NEMA_14_50, RECEPTACLE_CEE_7, RECEPTACLE_IEC_60309_BLUE,
@@ -189,8 +191,8 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<InsulatorBlockEntity> INSULATOR_ENTITY = entity(InsulatorBlockEntity::new, INSULATOR_LV, INSULATOR_DIST, INSULATOR_HV);
 	public static final BlockEntityType<dev.wildcatter.block.PowerTransformerBlockEntity> POWER_TRANSFORMER_ENTITY = entity(dev.wildcatter.block.PowerTransformerBlockEntity::new, POWER_TRANSFORMER);
 	public static final BlockEntityType<dev.wildcatter.block.DisconnectSwitchBlockEntity> DISCONNECT_ENTITY = entity(dev.wildcatter.block.DisconnectSwitchBlockEntity::new, DISCONNECT_HV, DISCONNECT_DIST);
-	public static final BlockEntityType<TransformerBlockEntity> TRANSFORMER_ENTITY = entity(TransformerBlockEntity::new, TRANSFORMER, SUBSTATION_TRANSFORMER, POLE_TRANSFORMER,
-			PADMOUNT_208, PADMOUNT_480, UNIT_SUBSTATION, GSU_TRANSFORMER, GSU_25, GSU_60, SUBSTATION_TRANSFORMER_60, UNIT_AUX_TRANSFORMER);
+	public static final BlockEntityType<TransformerBlockEntity> TRANSFORMER_ENTITY = entity(TransformerBlockEntity::new, POLE_TRANSFORMER, POLE_TRANSFORMER_MV,
+			PADMOUNT_208, PADMOUNT_480, UNIT_SUBSTATION, GSU_TRANSFORMER, GSU_25, GSU_60, SUBSTATION_TRANSFORMER_60, UNIT_AUX_TRANSFORMER, SUBSTATION_TRANSFORMER_10);
 
 	public static final BlockEntityType<FireboxBlockEntity> FIREBOX_ENTITY = entity(FireboxBlockEntity::new, FIREBOX);
 	public static final BlockEntityType<PumpBlockEntity> PUMP_ENTITY = entity(PumpBlockEntity::new, PUMP);
@@ -293,12 +295,6 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		add("insulator_hv", INSULATOR_HV);
 		add("switch", SWITCH);
 		add("ufls_relay", UFLS_RELAY);
-		add("ufls_relay_dist", UFLS_RELAY_DIST);
-		add("mv_breaker", MV_BREAKER);
-		add("dist_breaker", DIST_BREAKER);
-		add("hv_breaker", HV_BREAKER);
-		add("transformer", TRANSFORMER);
-		add("substation_transformer", SUBSTATION_TRANSFORMER);
 		add("power_transformer", POWER_TRANSFORMER);
 		add("hv_breaker_3p", HV_BREAKER_3P);
 		add("dist_breaker_3p", DIST_BREAKER_3P);
@@ -406,6 +402,11 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		add("ring_crane", RING_CRANE);
 		add("gen_feeder_breaker", GEN_FEEDER_BREAKER);
 		add("bus_relay_panel", BUS_RELAY_PANEL);
+		add("mv_switchgear_main", MV_SWITCHGEAR_MAIN);
+		add("mv_switchgear_feeder", MV_SWITCHGEAR_FEEDER);
+		add("breaker_relay_cabinet", BREAKER_RELAY_CABINET);
+		add("pole_transformer_mv", POLE_TRANSFORMER_MV);
+		add("substation_transformer_10", SUBSTATION_TRANSFORMER_10);
 		for (Block part : new Block[] {UF6_AUTOCLAVE, IDR_KILN, GRANULATOR, PELLET_PRESS, SINTERING_FURNACE, PELLET_GRINDER, ROD_LOADER, ROD_WELDER, ASSEMBLY_FIXTURE, HELIUM_RECOVERY_UNIT}) {
 			add(((dev.wildcatter.block.FuelPartBlock) part).part().id(), part);
 		}
@@ -571,6 +572,8 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("site_marker"), SITE_MARKER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("crane"), CRANE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("bus_relay_panel"), BUS_RELAY_PANEL_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("mv_switchgear"), SWITCHGEAR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("breaker_relay_cabinet"), BREAKER_RELAY_CABINET_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("fuel_line"), FUEL_LINE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rod_welder"), ROD_WELDER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("assembly_fixture"), ASSEMBLY_FIXTURE_ENTITY);

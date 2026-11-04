@@ -274,6 +274,11 @@ and the Field Manual has a page for each new system.
     - a rated 4.16 kV to 120/240 V pole unit, and a 10 MVA 4.16/138 kV transformer;
     - the one-block stand-ins (`mv_breaker`, `dist_breaker`, `hv_breaker`, `ufls_relay_dist`, `transformer`,
       `substation_transformer`) removed.
+    - Specs: `docs/multiblocks/mv-switchgear.md`, `breaker-relay-cabinet.md`, `power-transformer-10.md`, and the 4.16 kV pole unit
+      in `poles.md`.
+    - Decided with Tim on 2026-11-04 (the 10d2 plan): switchgear sections that bus together, a MAIN and a FEEDER part; draw-out
+      breakers that rack (CONNECTED, TEST, DISCONNECTED); a settable 51 pickup on every new relay, set with the Power Meter; the
+      standalone breakers are the yard breakers worked by a relay cabinet; 81U reset by hand; the 4.16 kV pole unit 25 kVA.
   - **10d3: panels and switches:**
     - a 200 A 120/240 V load centre and a 480Y/277 V panelboard with clip-in branch breakers;
     - a 480 V fused safety switch and a 5 kV load-interrupter switch;

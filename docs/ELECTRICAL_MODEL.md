@@ -143,6 +143,12 @@ voltage transformers (wye-grounded, 1 MΩ a phase) give the 13.8 kV bus its grou
 - MV: fused cutouts and reclosers on poles; breakers with relays at substations.
 - The 13.8 kV generator bus (10d1, docs/multiblocks/gen-bus-protection.md): a bus relay panel with 87B bus differential and lockout,
   51V on each generator breaker, and 50/51 on each 15 kV feeder breaker.
+- 4.16 kV (10d2, docs/multiblocks/mv-switchgear.md): metal-clad switchgear, a main and feeder sections that bus together, each a
+  draw-out vacuum breaker (CONNECTED, TEST, DISCONNECTED) with its own 50/51.
+- A standalone 12.47 kV or 138 kV breaker (10d2, docs/multiblocks/breaker-relay-cabinet.md) is a yard breaker worked by a breaker
+  relay cabinet: 50/51, and 81U under-frequency load shedding on a 12.47 kV breaker.
+- The relays' 51 pickup is settable, as a real relay's CT ratio and tap set it: 5 to 1,200 A, up to the breaker's frame, with 50 at
+  8 x the pickup and the IEEE moderately inverse curve at time dial 1.
 - Protective grounds: a grounding clamp set puts three phases to ground on a cable, busway or bus duct. On a dead conductor it keeps
   it safe to work on; on a live one it is a bolted fault.
 - Frequency relays for load shedding and generator protection (see above).

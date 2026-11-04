@@ -15,6 +15,9 @@ frequency, protection) is in `docs/ELECTRICAL_MODEL.md`. What is built, phase by
   - Transformers heat on the IEEE C57.109 through-fault curve, and every motor start goes with V² (10d1).
   - The 13.8 kV generator bus has its own relays (87B bus differential, 51V, feeder 50/51) and 15 kV feeder breakers; a grounding
     clamp set makes a dead bus safe or a live one a bolted fault (10d1).
+  - 4.16 kV metal-clad switchgear (main and feeder sections, draw-out breakers that rack, 50/51 with a settable pickup); a breaker
+    relay cabinet (50/51, 81U) for a standalone 12.47 kV or 138 kV breaker; a 25 kVA 4.16 kV pole transformer and a 10 MVA
+    4.16/138 kV power transformer (10d2).
 - **Gensets and synchronizing:** diesel and gas gensets built part by part, paralleled with a synchroscope. Motors, MCCs and
   starters; soft starters and variable-frequency drives at 480 V and 4.16 kV (10a).
 - **DC:** current-regulated rectifiers and bare copper bus bars to the electrolysis cells, on the same solver: shorts, ground
@@ -141,7 +144,7 @@ datapack (`wildcatter_kit.zip`) as a Release. Every push also builds and keeps t
   - `refining` (the 4.16 kV tier).
 - **The grid:**
   - `frequency`, `distribution`, `spans`, `poleTransformer`, `serviceDrop`, `plugs`;
-  - `feederRelay`, `threePhase`, `solverBudget`, `overheadThreePhase`, `conductorSizes`, `busProtection`.
+  - `feederRelay`, `threePhase`, `solverBudget`, `overheadThreePhase`, `conductorSizes`, `busProtection`, `switchgear`.
 - **Industry and motors:** `industrial`, `motors`, `motorControlCenter`, `motorStarter`, `statorLimit`.
 - **Gensets:** `gensets`, `synchronizing`, `gensetParts`, `gensetFrameRate`.
 - **Thermal power and parts:**

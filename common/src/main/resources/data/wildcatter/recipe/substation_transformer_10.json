@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IDI",
+    "TCT",
+    "IDI"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "D": "minecraft:diamond",
+    "T": "wildcatter:pole_transformer_mv",
+    "C": "minecraft:copper_block"
+  },
+  "result": {
+    "id": "wildcatter:substation_transformer_10",
+    "count": 1
+  }
+}

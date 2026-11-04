@@ -13,7 +13,7 @@ Wildcatter is a Fabric mod for Minecraft 26.3: a realistic power and oil mod bui
 - **Shocks:** touching a bare live conductor hurts. Bare MV and HV lines shock at a distance: 4.16 kV within 2 blocks, 138 kV within 4.
 - **Shorts:** bare hot against bare neutral is a short circuit.
 - **Grounding:** ground rods and ground wire, with "grounded / UNGROUNDED" shown on machines.
-- **Transformers:** step between tiers, including the substation transformer.
+- **Transformers:** step between tiers: pole units at 4.16 kV and 12.47 kV, pad-mounts, unit substations, GSUs, the 138/12.47 kV substation and a 10 MVA 4.16/138 kV unit (10d2).
 - **Loads:** electric lamp and electric heater.
 - **Power Meter:** right-click anything to read volts, amps, watts and status.
 - **Field Manual:** an in-game book with a page for each system.
@@ -22,12 +22,12 @@ Wildcatter is a Fabric mod for Minecraft 26.3: a realistic power and oil mod bui
 | Device | Voltage | Notes |
 |---|---|---|
 | Circuit Breaker | 110 V | Ratings 15 / 20 / 30 / 50 A. Thermal trip on a mild overload, instant trip on a short. Resettable. |
-| MV Breaker | 4.16 kV | Ratings 30 / 60 / 100 / 200 A. Blue. |
-| HV Breaker | 138 kV | Ratings 100 / 200 / 400 / 600 A. Red. |
+| 4.16 kV switchgear | 4.16 kV | Metal-clad main and feeder sections that bus together; draw-out vacuum breakers with 50/51 (10d2). |
+| Breaker relay cabinet | 12.47 kV, 138 kV | Works the yard breaker it touches: 50/51, and 81U on 12.47 kV (10d2). |
 | Switch | 110 V | Yellow. Opens and closes the hot wire by hand and never trips. Protects nothing, so put a breaker or fuse before it. |
 | Fuse | 110 V | One-shot and fast. Blows on a short and cannot be reset. Renew it with a copper ingot. |
 
-All of them go in the hot wire: in at the back, out at the front. Sneak and right-click changes the rating.
+The 110 V devices go in the hot wire: in at the back, out at the front. Sneak and right-click changes the rating.
 
 ## Power generation
 - **Steam:**
@@ -490,6 +490,34 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   - When JEI is in the run (`-Dfabric.addMods`), it presses U and takes a screenshot of the JEI page.
 - **Recommended mods:** `docs/recommended-mods.md` lists the quality-of-life mods with 26.3 builds for Fabric and NeoForge.
   - The Fabric set ran the `coker` and `anodes` scenes alongside Wildcatter, Sodium included, and both passed.
+
+## Phase 10d2: true-size gear; the one-block stand-ins removed (specs: docs/multiblocks/mv-switchgear.md, breaker-relay-cabinet.md, power-transformer-10.md, poles.md)
+- **Removed outright** (decided with Tim, 2026-11-04): `mv_breaker`, `dist_breaker`, `hv_breaker`, `ufls_relay_dist`, `transformer`
+  and `substation_transformer`. Older worlds lose them. Recipes that took them now take the new parts.
+- **4.16 kV metal-clad switchgear** (`mv_switchgear_main`, `mv_switchgear_feeder`, 1 x 3 x 3, VCP-W 5 class):
+  - sections side by side, facing the same way, join their main bus; a lineup takes exactly one main;
+  - the main's cable comes in low on its back, each feeder's leaves its roof;
+  - a draw-out vacuum breaker, 1,200, 2,000 or 3,000 A frame, that racks CONNECTED, TEST, DISCONNECTED, only while open;
+  - its relay: 51 moderately inverse at time dial 1, 50 at 8 x, the pickup set from 5 to 1,200 A with the Power Meter.
+- **Breaker relay cabinet** (`breaker_relay_cabinet`, 1 x 2 x 1, SEL-351 class): it works the `dist_breaker_3p` or `hv_breaker_3p`
+  it touches, with 50/51 and, on 12.47 kV, 81U at the load-shed frequency. Right-click resets it and recloses the breaker.
+- **4.16 kV pole transformer** (`pole_transformer_mv`): 25 kVA, 2.4 kV to 120/240 V, hung on a pole, rated by C57.109.
+- **10 MVA power transformer** (`substation_transformer_10`, 5 x 5 x 4): 4.16 kV delta / 138 kV grounded wye, 7.5 %Z, either way.
+- **Field Manual:** new pages 4.16 KV SWITCHGEAR and BREAKER RELAY CABINET; VOLTAGE LEVELS, FREQUENCY, SUBSTATION and POLE-MOUNT
+  TRANSFORMER updated.
+- **Game test `switchgear`:**
+  - a genset and unit substation feed a main and two feeders; the main reads 1 main and 2 feeders;
+  - feeder 1's 51, its pickup dropped to 5 A under an 8 A load, trips it after 110 ticks, and the main stays closed;
+  - grounds on feeder 3's cable trip it alone by its 50 at 1,196 A;
+  - racked to DISCONNECTED, it refuses to close.
+- **Moved scenes:**
+  - `refining`: its 4.16 kV fault now trips a switchgear feeder (50, 1,196 A) with the main staying closed;
+  - `transformerChain`: two 4.16 kV pole transformers on poles, 2,397 V to neutral on the line;
+  - `spans` and `feederRelay`: a `dist_breaker_3p` and its cabinet; 81U opens it at 58.1 Hz and the reset recloses it;
+  - `potline` and `overheadThreePhase`: the 10 MVA unit, step-down for the fan and step-up to the 138 kV line.
+  - `overheadThreePhase` gives the player slow falling: its last camera spot dropped them to their death, and the next scene's
+    machines then never ticked;
+  - the potline blueprint in the library was exported again with the 10 MVA unit.
 
 ## Phase 10d1: protection (spec: docs/multiblocks/gen-bus-protection.md; ELECTRICAL_MODEL.md updated)
 10d is four waves (Tim, 2026-11-04): 10d1 protection, 10d2 true-size gear, 10d3 panels and switches, 10d4 art and sounds.
@@ -1360,6 +1388,12 @@ sized for a 40-pot line.
   - the bus bars' standoffs stand on the floor of their own cell, so a run carried up in the air shows them hanging (no
     supports or structure yet);
   - the chlor-alkali caustic soda is still only counted (fixed in 10b2: it is a pipe product).
+- Phase 10d2:
+  - racking is instant: no racking time and no remote racking;
+  - no breaker failure protection (50BF): a breaker always opens when its relay trips it;
+  - no bus differential on the 4.16 kV switchgear bus, and no 87T on the 10 MVA unit;
+  - the new relays' curve and dial are fixed; only the pickup (and the switchgear's frame) are set;
+  - the breaker relay cabinet does not reclose by itself (no recloser shots).
 - Phase 10d1:
   - the grounding clamps never burn, however long a fault lasts;
   - there is no transformer (87T) or generator (87G) differential: a fault inside a GSU or a generator is cleared by 51V or the
@@ -1396,7 +1430,6 @@ sized for a 40-pot line.
     not modelled; C2F6 is not counted;
   - spent pot lining has no treatment and no use; a frozen pot is broken and bused around, not shorted out live;
   - the pot's 6 x 6 x 12 cell box stands in for the potroom building, which is not drawn;
-  - the 4.16/138 kV step-down feeding the fan in the scene is the one-block stand-in (true size in 10d);
   - the new items and the aluminium block have `*_placeholder` textures (`aluminium_ingot`, `reacted_alumina_bag`,
     `spent_pot_lining`, `tapping_crucible`, `aluminium_block`).
 - Phase 10b3a:
@@ -1462,7 +1495,7 @@ sized for a 40-pot line.
   frequency control catches up (30 s); a real rig's power management also reads the gensets' kW.
 - The land rig's motors are inside the drive house's load: there are no cables drawn from the drive house to the pumps and
   drawworks.
-- There is no blowout preventer stack in the cellar yet. The single-pole MV, DIST and HV breakers, the DIST under-frequency relay and the unrated `transformer` and `substation_transformer` stay one-block stand-ins (decided with Tim; their true-size gear is Phase 10d).
+- There is no blowout preventer stack in the cellar yet.
 - Wall-mounted gear sits 0.55 m up its cell; a player wanting it higher places it a block up.
 - Pumpjack and rig collision is the still frame: the moving beam, crank and pipe do not push anything.
 - The pumpjack's linkage and the rig's head have been checked in test screenshots, not watched in a real play session.
@@ -1476,7 +1509,6 @@ sized for a 40-pot line.
 - The alternator is drawn 1 m long for both sets; a real 1 MW frame is about 1.6 m.
 - The old genset `*_placeholder` textures are still generated (the rotor texture is still used by the tower fan and disconnect blades).
 - The brass swatch keeps a faint tile line.
-- The 4.16 kV to 138 kV step-up is still the single-block `substation_transformer` (Y-Y, unrated windings) until Phase 10d.
 - The test skips the steam plant's five-minute warm-up with a hook (it checks the drum starts rising, then jumps to pressure).
 - A small genset cannot drive enough fault current through the 20 MVA substation to reach real relay settings; the test scales the relays down. In play, such a source's own protection clears a feeder fault first.
 - The 1/0 and 4/0 MV cable ampacities are from the NEC 310.60 table family but not checked line by line (500 kcmil, 450 A, is).

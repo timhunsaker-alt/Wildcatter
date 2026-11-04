@@ -65,6 +65,17 @@ span and the shock check run between those points. A span's length is still coun
 
 The pole transformer hangs on any pole cell, old or new, its bracket toward the pole when it is clicked onto one.
 
+### The 4.16 kV pole transformer (Phase 10d2, decided with Tim on 2026-11-04)
+- **Part:** `wildcatter:pole_transformer_mv`. It replaces the one-block, unrated `transformer`, which is removed.
+- **Counterpart:** a 25 kVA single-phase conventional pole-top unit for an older 4.16Y/2.4 kV circuit.
+  - The primary is 2,400 V, line to neutral (IEC: 3.3 kV lines, 1.9 kV to neutral).
+  - The secondary is 120/240 V split-phase (230 V IEC).
+  - It is a smaller tank than the 12.47 kV unit, with a 5 kV class H1 bushing (60 kV BIL, three sheds).
+- **Rated:** 25 kVA, with the 12.47 kV unit's impedance and the same IEEE C57.109 overload rule.
+- **Hanging and terminals:** as the 12.47 kV unit. It hangs on a pole, and one must stand beside it. The 4.16 kV comes to its top
+  (H1). The low side is the back, with leg A and the neutral, and the two sides carry leg B.
+- **It runs backward too.** A 120 V source on its low side gives 2.4 kV to neutral on its high side (the `transformerChain` scene).
+
 ## Older worlds
 - The one-block `pole` and `crossarm` stay and keep working with their spans; they are no longer crafted or in the creative tab.
 - Insulators still stand on them (as they did); placed on the new hardware they take the new mounting.

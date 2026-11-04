@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SGS",
+    "SRS",
+    "SIS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "G": "minecraft:glass_pane",
+    "R": "minecraft:comparator",
+    "I": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "wildcatter:breaker_relay_cabinet",
+    "count": 1
+  }
+}

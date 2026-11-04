@@ -16,8 +16,8 @@ transformer, HV breaker, disconnect switches, buswork, low-side breaker and a re
 | Char | Block id | Real part |
 |---|---|---|
 | `T` | `wildcatter:power_transformer` | Power transformer (controller) |
-| `H` | `wildcatter:hv_breaker` | HV circuit breaker (exists) |
-| `L` | `wildcatter:mv_breaker` | Low-side breaker (exists) |
+| `H` | `wildcatter:hv_breaker_3p` | HV circuit breaker, three-pole, true size (the one-block `hv_breaker` was removed in 10d2) |
+| `L` | `wildcatter:dist_breaker_3p` | Low-side breaker, three-pole, true size (the one-block `mv_breaker` was removed in 10d2) |
 | `D` | `wildcatter:disconnect_switch` | Disconnect switch |
 | `B` | `wildcatter:bus` | Buswork |
 | `K` | `wildcatter:relay_panel` | Relay panel |

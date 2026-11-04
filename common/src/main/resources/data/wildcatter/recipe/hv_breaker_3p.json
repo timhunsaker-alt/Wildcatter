@@ -1,12 +1,17 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "redstone",
-  "ingredients": [
-    "wildcatter:hv_breaker",
-    "wildcatter:hv_breaker",
-    "wildcatter:hv_breaker",
-    "minecraft:comparator"
+  "pattern": [
+    "SCS",
+    "DRD",
+    "SCS"
   ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_block",
+    "D": "minecraft:diamond",
+    "R": "minecraft:comparator"
+  },
   "result": {
     "id": "wildcatter:hv_breaker_3p",
     "count": 1

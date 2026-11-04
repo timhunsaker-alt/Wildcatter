@@ -39,6 +39,10 @@ not a go-ahead to build: that waits for the roadmap phase (ROADMAP.md). Nothing 
 | [turbine-island.md](turbine-island.md) | 8b | new: turbine valve chest, HP turbine, moisture separator reheater, LP turbine, 60 MVA generator, main condenser, condensate pump, deaerator, main feed pump, HP feedwater heater, circulating water pump, unit auxiliary transformer; reuses the 3,000 A breaker, bus duct and 60 MVA GSU |
 | [boron.md](boron.md) | 8a | new: borax dissolver, boric acid crystallizer, B4C furnace, RCCA bench |
 | [enrichment.md](enrichment.md) | 7e | new: centrifuge (TC-21 class), frequency converter, feed station, product and tails take-offs |
+| [gen-bus-protection.md](gen-bus-protection.md) | 10d1 | new: bus relay panel, 15 kV feeder breaker, grounding clamp set |
+| [mv-switchgear.md](mv-switchgear.md) | 10d2 | one-block `mv_breaker`: 4.16 kV metal-clad main and feeder sections |
+| [breaker-relay-cabinet.md](breaker-relay-cabinet.md) | 10d2 | one-block `dist_breaker`, `hv_breaker` and `ufls_relay_dist` |
+| [power-transformer-10.md](power-transformer-10.md) | 10d2 | one-block `substation_transformer` (and the one-block `transformer`, by the 4.16 kV pole unit in poles.md) |
 | [aeroderivative.md](aeroderivative.md) | 6b | new: 45 MW aeroderivative peaker, 3,000 A generator breaker, 60 MVA GSU and 60 MVA substation transformer |
 
 ## Shared rules
