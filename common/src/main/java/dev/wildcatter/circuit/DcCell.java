@@ -7,7 +7,7 @@ package dev.wildcatter.circuit;
  */
 public final class DcCell {
 	private final int cells;
-	private final double backEmf;
+	private double backEmf;
 	private final double ohms;
 	private final double ratedAmps;
 	private int branch = -1;
@@ -18,12 +18,22 @@ public final class DcCell {
 	public DcCell(int cells, double backEmf, double ratedVolts, double ratedAmps) {
 		this.cells = cells;
 		this.backEmf = backEmf;
-		this.ohms = cells * (ratedVolts - backEmf) / ratedAmps;
+		// the back-EMF source's own series resistance is part of the rated volts: at a potline's 180 kA it is 0.18 V
+		this.ohms = Math.max(0, cells * (ratedVolts - backEmf) / ratedAmps - dev.wildcatter.solver.Network.IDEAL_OHMS);
 		this.ratedAmps = ratedAmps;
 	}
 
 	public double ratedAmps() {
 		return ratedAmps;
+	}
+
+	/** A pot's anode effect raises it; its resistance stays. Takes effect at the next build. */
+	public void setBackEmf(double volts) {
+		backEmf = volts;
+	}
+
+	public double backEmf() {
+		return backEmf;
 	}
 
 	/** Adds the cells between {@code plus} and {@code minus}; while {@code drawing} is false they are open. */

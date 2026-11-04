@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "I I",
+    "IBI",
+    " I "
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "B": "minecraft:bricks"
+  },
+  "result": {
+    "id": "wildcatter:tapping_crucible",
+    "count": 1
+  }
+}

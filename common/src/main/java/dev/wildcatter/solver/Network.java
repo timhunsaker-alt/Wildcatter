@@ -45,8 +45,11 @@ public final class Network {
 		}
 	}
 
-	/** The internal impedance of an ideal source and the series impedance of an ideal transformer: small enough to be ideal, big enough to solve. */
-	private static final double IDEAL_OHMS = 1e-6;
+	/**
+	 * The internal impedance of an ideal source and the series impedance of an ideal transformer: small enough to be ideal, big enough
+	 * to solve. A part that rates its volts with a source in series takes it out of its own resistance (a potline cell).
+	 */
+	public static final double IDEAL_OHMS = 1e-6;
 
 	private final PhasorSolver solver = new PhasorSolver();
 	private final Map<Cell, List<Port>> ports = new HashMap<>();

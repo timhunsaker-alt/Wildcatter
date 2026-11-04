@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "WHW",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "W": "minecraft:white_wool",
+    "H": "minecraft:hopper"
+  },
+  "result": {
+    "id": "wildcatter:fume_treatment_centre",
+    "count": 1
+  }
+}

@@ -14,6 +14,10 @@ import net.minecraft.core.Direction;
  */
 public final class DcSupply {
 	private final DriveLoad ac;
+	private final double maxVolts;
+	private final double ohms;
+	private final double ramp;
+	private final double efficiency;
 	private int plus;
 	private int minus;
 	private int branch = -1;
@@ -28,8 +32,22 @@ public final class DcSupply {
 	private double overSeconds;
 	private String trip = "";
 
+	/** The 10b1 rectifier: 4.16 kV in, up to 150 V. */
 	public DcSupply(Voltage acVoltage) {
+		this(acVoltage, Tuning.RECTIFIER_MAX_DC_VOLTS, Tuning.RECTIFIER_DC_OHMS, Tuning.RECTIFIER_RAMP_VOLTS_PER_S, Tuning.RECTIFIER_EFFICIENCY);
+	}
+
+	/** A rectifier of its own size: its AC tier, its maximum DC volts, its internal resistance, its ramp in V/s and its efficiency. */
+	public DcSupply(Voltage acVoltage, double maxVolts, double ohms, double ramp, double efficiency) {
 		this.ac = new DriveLoad(acVoltage, Tuning.RECTIFIER_POWER_FACTOR, 0);
+		this.maxVolts = maxVolts;
+		this.ohms = ohms;
+		this.ramp = ramp;
+		this.efficiency = efficiency;
+	}
+
+	public double maxVolts() {
+		return maxVolts;
 	}
 
 	public DriveLoad ac() {
@@ -46,7 +64,7 @@ public final class DcSupply {
 
 	/** Builds the AC front end on {@code acFaces} of {@code pos}, and the DC poles. {@code on}: started and not tripped. */
 	public void build(Circuit circuit, BlockPos pos, java.util.List<Direction> acFaces, boolean on) {
-		ac.setDemand(on ? dcWatts / Tuning.RECTIFIER_EFFICIENCY : 0);
+		ac.setDemand(on ? dcWatts / efficiency : 0);
 		ac.build(circuit, pos, acFaces);
 		plus = circuit.node();
 		minus = circuit.node();
@@ -56,7 +74,7 @@ public final class DcSupply {
 		if (on && tripped().isEmpty() && emf > 0) {
 			int inside = circuit.node();
 			circuit.source(inside, minus, emf);
-			branch = circuit.resistor(inside, plus, Tuning.RECTIFIER_DC_OHMS);
+			branch = circuit.resistor(inside, plus, ohms);
 		}
 	}
 
@@ -87,21 +105,21 @@ public final class DcSupply {
 			tripOn(amps);
 			return;
 		}
-		double step = Tuning.RECTIFIER_RAMP_VOLTS_PER_S * seconds;
+		double step = ramp * seconds;
 		double next;
 		if (amps < 1) {
 			// not conducting: the load stands at its own voltage, so start from there and climb
 			next = Math.max(emf, volts) + step;
 		} else {
-			double slope = Tuning.RECTIFIER_DC_OHMS * 2;   // until two readings give the load's own slope
+			double slope = ohms * 2;   // until two readings give the load's own slope
 			if (!Double.isNaN(lastEmf) && Math.abs(amps - lastAmps) > 1) {
-				slope = Math.max(Tuning.RECTIFIER_DC_OHMS, Math.min(1.0, (emf - lastEmf) / (amps - lastAmps)));
+				slope = Math.max(ohms, Math.min(1.0, (emf - lastEmf) / (amps - lastAmps)));
 			}
 			next = emf + Math.min(step, slope * (setpoint - amps));   // up at the tap changer's pace, down at once
 		}
 		lastEmf = emf;
 		lastAmps = amps;
-		emf = Math.max(0, Math.min(Tuning.RECTIFIER_MAX_DC_VOLTS, next));
+		emf = Math.max(0, Math.min(maxVolts, next));
 	}
 
 	private void tripOn(double at) {
@@ -119,6 +137,15 @@ public final class DcSupply {
 
 	public void reset() {
 		trip = "";
+	}
+
+	/** For the game test and the operator: opens its breaker as a trip would. */
+	public void trip(String why) {
+		trip = why;
+		emf = 0;
+		lastEmf = Double.NaN;
+		dcWatts = 0;
+		overSeconds = 0;
 	}
 
 	public double amps() {

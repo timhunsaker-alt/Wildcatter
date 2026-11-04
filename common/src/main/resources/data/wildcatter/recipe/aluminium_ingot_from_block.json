@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "wildcatter:aluminium_block"
+  ],
+  "result": {
+    "id": "wildcatter:aluminium_ingot",
+    "count": 9
+  }
+}

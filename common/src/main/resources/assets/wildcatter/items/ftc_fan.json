@@ -1,0 +1,6 @@
+{
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/ftc_fan/item"
+ }
+}

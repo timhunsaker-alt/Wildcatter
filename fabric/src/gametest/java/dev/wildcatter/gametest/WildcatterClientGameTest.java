@@ -232,6 +232,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("anodes")) {
 				anodes(context, server);
 			}
+			if (only("potline")) {
+				potline(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -2359,6 +2362,289 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(3);
 		context.takeScreenshot("wildcatter-anode-plant");
 		System.out.println("[wildcatter-test] anodes ok: " + green + " green, " + baked + " baked, " + butts + " crushed butts, " + rodded + " rodded" + state);
+	}
+
+	/**
+	 * The potline (10b3b, docs/multiblocks/potline.md). South-west: the peaker's chain, an aeroderivative through its GSU 60, its 138 kV
+	 * run north and east to a yard of 4 rectiformers along x 44. East of them two rows of 5 pots: row 1 faces north (current east) at
+	 * z-13..z-2, row 2 faces south (current west) at z+2..z+13, a crossover bus along x 90 and the return along z+8 and x 53. Row 1's
+	 * duct is piped from its west end to the fume treatment centre north of it, with a main fan on a diesel set through a backward unit
+	 * substation; the casting machine on a diesel set's 480 V. The line must hold 180 kA at about 45 V, the pots make metal, the centre
+	 * fill a reacted bag, a pot change an anode, a full pot be tapped and cast into ingots; with a unit tripped the line must hold on
+	 * three at 60 kA each, a pot with no alumina must go to an anode effect at about 30 V and clear, and a pot left without current
+	 * past 4 h must freeze and break into spent pot lining.
+	 */
+	private void potline(ClientGameTestContext context, TestServerContext server) {
+		final int z = -6300;
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		net.minecraft.core.Direction south = net.minecraft.core.Direction.SOUTH;
+		server.runCommand("effect give @p minecraft:slow_falling 1200 0 true");
+		server.runCommand("tp @p 70 " + (up + 30) + " " + (z + 40) + " 180 40");
+		context.waitTicks(20);
+		for (int zz = z - 50; zz <= z + 34; zz += 14) {   // /fill takes at most 32,768 blocks
+			server.runCommand("fill 0 " + (y - 1) + " " + zz + " 110 " + (y + 14) + " " + Math.min(zz + 13, z + 34) + " minecraft:air");
+		}
+		for (int zz = z - 50; zz <= z + 34; zz += 40) {
+			server.runCommand("fill 0 " + (y - 1) + " " + zz + " 110 " + (y - 1) + " " + Math.min(zz + 39, z + 34) + " minecraft:stone");
+		}
+		// the power: the peaker's turbine and GSU, as its scene builds them
+		BlockPos gt = new BlockPos(20, up, z);
+		placeBig(server, WildcatterBlocks.AERO_TURBINE, gt, north);                                 // x 20-24, z..z+13
+		placeBig(server, WildcatterBlocks.AERO_INLET_HOUSE, new BlockPos(20, up, z - 5), north);    // x 20-25, z-5..z-1
+		placeBig(server, WildcatterBlocks.AERO_EXHAUST_STACK, new BlockPos(20, up, z + 14), north); // x 20-23, z+14..z+17
+		placeBig(server, WildcatterBlocks.AERO_GENERATOR, new BlockPos(25, up, z + 1), north);      // x 25-28, z+1..z+7
+		placeBig(server, WildcatterBlocks.GEN_BREAKER_3000, new BlockPos(26, up, z + 8), north);    // x 26-27, z+8..z+9
+		placeBig(server, WildcatterBlocks.GSU_60, new BlockPos(36, up, z + 8), north);              // x 33-38, z+4..z+8
+		BlockPos fuelTank = new BlockPos(14, up, z + 4);
+		placeBig(server, WildcatterBlocks.STOCK_TANK, fuelTank, north);                              // x 14-17, z+4..z+7
+		pipes(server, z, new int[][] {{18, 0, 6}, {19, 0, 6}});
+		for (int x = 26; x <= 37; x++) {
+			put(server, x, up, z + 10, "wildcatter:bus_duct_gen");
+		}
+		put(server, 36, up, z + 9, "wildcatter:bus_duct_gen");
+		sizeCables(server, new BlockPos(26, up, z + 9), new BlockPos(37, up, z + 10), WildcatterBlocks.BUS_DUCT_GEN, dev.wildcatter.energy.ConductorSize.BUS_DUCT_3000);
+		BlockPos starter = new BlockPos(10, up, z + 2);
+		genset(server, starter, north, false);                                                    // x 5-10, z+2..z+3
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, starter, net.minecraft.core.Direction.EAST, false);   // x 11-14, z+1..z+2
+		for (int x = 15; x <= 19; x++) {
+			put(server, x, up, z + 2, "wildcatter:cable_mv");
+		}
+		// 138 kV: off the GSU's bushings north along x 36, down, east along z-4 and north up x 44 past the four rectiformers' terminals
+		for (int zz = z - 4; zz <= z + 4; zz++) {
+			put(server, 36, up + 6, zz, "wildcatter:cable_hv");
+		}
+		for (int yy = up; yy <= up + 5; yy++) {
+			put(server, 36, yy, z - 4, "wildcatter:cable_hv");
+		}
+		for (int x = 37; x <= 44; x++) {
+			put(server, x, up, z - 4, "wildcatter:cable_hv");
+		}
+		for (int zz = z - 28; zz <= z - 5; zz++) {
+			put(server, 44, up, zz, "wildcatter:cable_hv");
+		}
+		BlockPos[] units = new BlockPos[4];
+		for (int u = 0; u < 4; u++) {
+			units[u] = new BlockPos(45, up, z - 28 + 6 * u);
+			placeBig(server, WildcatterBlocks.RECTIFORMER, units[u], north);                     // x 45-52, six each along z-28..z-5
+		}
+		// the pots: row 1 facing north at x 60-89, row 2 facing south back from x 89
+		BlockPos[] row1 = new BlockPos[5];
+		BlockPos[] row2 = new BlockPos[5];
+		for (int p = 0; p < 5; p++) {
+			row1[p] = new BlockPos(60 + 6 * p, up, z - 13);
+			placeBig(server, WildcatterBlocks.POT, row1[p], north);                               // x 60+6p..65+6p, z-13..z-2
+			row2[p] = new BlockPos(89 - 6 * p, up, z + 13);
+			placeBig(server, WildcatterBlocks.POT, row2[p], south);                               // x 84-6p..89-6p, z+2..z+13
+		}
+		// the 180 kA bus: the yard's + (x 52, y 2, z-8) to row 1's first riser (x 60, y 1, z-8); row 1's last collector (x 89, y 1)
+		// across x 90 to row 2's first riser at z+8; row 2's last collector (x 60) back along z+8 and x 53 to the yard's - (x 52, y 0)
+		for (int x = 53; x <= 59; x++) {
+			put(server, x, up + 2, z - 8, "wildcatter:dc_bus_180k[axis=x]");
+		}
+		put(server, 59, up + 1, z - 8, "wildcatter:dc_bus_180k[axis=y]");
+		for (int zz = z - 8; zz <= z + 8; zz++) {
+			put(server, 90, up + 1, zz, "wildcatter:dc_bus_180k[axis=z]");
+		}
+		put(server, 59, up + 1, z + 8, "wildcatter:dc_bus_180k[axis=y]");
+		for (int x = 53; x <= 59; x++) {
+			put(server, x, up, z + 8, "wildcatter:dc_bus_180k[axis=x]");
+		}
+		for (int zz = z - 8; zz <= z + 7; zz++) {
+			put(server, 53, up, zz, "wildcatter:dc_bus_180k[axis=z]");
+		}
+		// the fume treatment centre north of row 1, its fan against its north side; row 1's duct from its west end (x 59, y 5, z-8)
+		BlockPos ftc = new BlockPos(60, up, z - 40);
+		placeBig(server, WildcatterBlocks.FUME_TREATMENT_CENTRE, ftc, north);                    // x 60-67, z-40..z-25
+		BlockPos fan = new BlockPos(60, up, z - 46);
+		placeBig(server, WildcatterBlocks.FTC_FAN, fan, north);                                  // x 60-63, z-46..z-41
+		for (int zz = z - 40; zz <= z - 8; zz++) {
+			put(server, 59, up + 5, zz, "wildcatter:gas_line");
+		}
+		for (int yy = up; yy <= up + 4; yy++) {
+			put(server, 59, yy, z - 40, "wildcatter:gas_line");
+		}
+		put(server, 62, up + 12, z - 38, "minecraft:hopper");   // its fresh alumina once the fan's set runs, so the fan starts on a live set
+		BlockPos reactedOut = new BlockPos(62, y, z - 38);
+		put(server, reactedOut.getX(), reactedOut.getY(), reactedOut.getZ(), "minecraft:hopper");
+		// the fan's 4.16 kV off the yard's 138 kV: a step-down at the run's north end (its high side south), cable north and over to a
+		// soft starter, out of its back to the fan's box
+		for (int zz = z - 30; zz <= z - 29; zz++) {
+			put(server, 44, up, zz, "wildcatter:cable_hv");
+		}
+		put(server, 44, up, z - 31, "wildcatter:substation_transformer[facing=south]");
+		for (int zz = z - 48; zz <= z - 32; zz++) {
+			put(server, 44, up, zz, "wildcatter:cable_mv");
+		}
+		for (int yy = up + 1; yy <= up + 3; yy++) {
+			put(server, 44, yy, z - 48, "wildcatter:cable_mv");
+		}
+		for (int x = 45; x <= 57; x++) {
+			put(server, x, up + 3, z - 48, "wildcatter:cable_mv");
+		}
+		BlockPos fanStarter = new BlockPos(57, up, z - 48);
+		placeBig(server, WildcatterBlocks.SOFT_STARTER_MV, fanStarter, north);                   // x 57, y up..up+2; its back to the south
+		for (int[] c : new int[][] {{57, z - 47}, {58, z - 47}, {59, z - 47}, {59, z - 46}}) {
+			put(server, c[0], up, c[1], "wildcatter:cable_mv");
+		}
+		// the casting machine south-west, on a diesel set's 480 V
+		BlockPos caster = new BlockPos(45, up, z + 20);
+		placeBig(server, WildcatterBlocks.CASTING_MACHINE, caster, north);                       // x 45-47, z+20..z+31
+		BlockPos ingotsOut = new BlockPos(46, y, z + 22);
+		put(server, ingotsOut.getX(), ingotsOut.getY(), ingotsOut.getZ(), "minecraft:hopper");
+		BlockPos lvSet = new BlockPos(40, up, z + 20);
+		genset(server, lvSet, north, false);                                                     // x 35-40, z+20..z+21
+		put(server, 41, up, z + 20, "wildcatter:busway_industrial");
+		for (int x = 42; x <= 44; x++) {
+			put(server, x, up, z + 20, "wildcatter:cable_industrial");
+		}
+		// pot row 1's middle pot: rodded anodes on top, a hopper under it for the spent ones
+		BlockPos changer = row1[2];
+		put(server, changer.getX() + 1, up + 6, changer.getZ() + 2, "minecraft:hopper");
+		server.runCommand("item replace block " + (changer.getX() + 1) + " " + (up + 6) + " " + (changer.getZ() + 2) + " container.0 with wildcatter:rodded_anode 2");
+		BlockPos spentOut = new BlockPos(changer.getX() + 1, y, changer.getZ() + 2);
+		put(server, spentOut.getX(), spentOut.getY(), spentOut.getZ(), "minecraft:hopper");
+		// a pot off the line, to freeze
+		BlockPos lone = new BlockPos(100, up, z + 20);
+		placeBig(server, WildcatterBlocks.POT, lone, north);                                     // x 100-105, z+20..z+31
+		// start: the starter set, the turbine, then the sets for the fan and the caster
+		fillTank(server, fuelTank, dev.wildcatter.fluid.Product.KEROSENE, 40_000);
+		startGenset(context, server, starter, north, 2000);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.GasTurbineBlockEntity) srv.overworld().getBlockEntity(gt)).setWantRun(true);
+			return null;
+		});
+		context.waitTicks(200);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.GasTurbineBlockEntity) srv.overworld().getBlockEntity(gt)).skipStartForTest(false);
+			return null;
+		});
+		context.waitTicks(100);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.GasTurbineBlockEntity) srv.overworld().getBlockEntity(gt)).skipRampForTest();
+			return null;
+		});
+		press(server, fanStarter);
+		startGenset(context, server, lvSet, north, 2000);
+		server.runCommand("item replace block 62 " + (up + 12) + " " + (z - 38) + " container.0 with wildcatter:alumina_bag 4");
+		java.util.function.ToDoubleFunction<BlockPos> potAmps = pos -> server.computeOnServer(srv ->
+				((dev.wildcatter.block.PotBlockEntity) srv.overworld().getBlockEntity(pos)).amps());
+		java.util.function.Supplier<String> all = () -> " | unit 1 " + read(server, 45, up, z - 28) + " | unit 4 " + read(server, 45, up, z - 10) + " | pot 1 "
+				+ read(server, 60, up, z - 13) + " | pot 10 " + read(server, 65, up, z + 13) + " | turbine " + read(server, 20, up, z) + " | bus " + read(server, 56, up + 2, z - 8);
+		double amps = 0;
+		for (int i = 0; i < 40 && Math.abs(amps - 180_000) > 3_000; i++) {
+			context.waitTicks(20);
+			amps = potAmps.applyAsDouble(row1[0]);
+		}
+		String state = all.get();
+		System.out.println("[wildcatter-test] potline: running" + state);
+		check(Math.abs(amps - 180_000) < 3_000, "the yard should hold 180 kA through the pots:" + state);
+		java.util.function.ToDoubleFunction<BlockPos> unitAmps = pos -> server.computeOnServer(srv ->
+				((dev.wildcatter.block.RectiformerBlockEntity) srv.overworld().getBlockEntity(pos)).dc().amps());
+		check(read(server, 45, up, z - 28).contains("4 of 4 online") && Math.abs(unitAmps.applyAsDouble(units[0]) - 45_000) < 1_500, "each of four units should carry 45 kA:" + state);
+		double volts = server.computeOnServer(srv -> ((dev.wildcatter.block.RectiformerBlockEntity) srv.overworld().getBlockEntity(units[3])).dc().volts());
+		check(volts > 38 && volts < 55, "ten pots should take about 45 V: " + volts + state);
+		context.waitTicks(Tuning.WELL_INTERVAL * 2);
+		double made = server.computeOnServer(srv -> ((dev.wildcatter.block.PotBlockEntity) srv.overworld().getBlockEntity(row2[4])).metal());
+		check(made > 0, "the pots should make metal:" + state);
+		// the fume treatment centre: almost a bag's worth of gas treated
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.FumeTreatmentCentreBlockEntity) srv.overworld().getBlockEntity(ftc)).addTreated(Tuning.FTC_GAS_PER_BAG - 5);
+			((dev.wildcatter.block.PotBlockEntity) srv.overworld().getBlockEntity(changer)).burnCarbon(dev.wildcatter.fluid.Potline.carbonPerAnode() - 0.05);
+			((dev.wildcatter.block.PotBlockEntity) srv.overworld().getBlockEntity(row2[0])).addMetal(Tuning.POT_METAL_HOLD_KG);
+			return null;
+		});
+		int reacted = 0, spent = 0;
+		for (int i = 0; i < 30 && (reacted == 0 || spent == 0); i++) {
+			context.waitTicks(20);
+			reacted = countIn(server, reactedOut, WildcatterItems.REACTED_ALUMINA_BAG);
+			spent = countIn(server, spentOut, WildcatterItems.SPENT_ANODE);
+		}
+		String ftcRead = read(server, 60, up, z - 40);
+		check(reacted > 0, "the fume treatment centre should fill a reacted alumina bag: " + ftcRead + " | fan " + read(server, 60, up, z - 46) + " | soft starter " + read(server, fanStarter.getX(), up, fanStarter.getZ()) + state);
+		check(spent > 0, "the pot should change an anode and drop the spent one: " + read(server, changer.getX(), up, changer.getZ()));
+		check(read(server, row2[0].getX(), up, row2[0].getZ()).contains("FULL: TAP IT"), "a full pot should ask to be tapped: " + read(server, row2[0].getX(), up, row2[0].getZ()));
+		// tap it and pour the crucible into the casting machine
+		String tapped = server.computeOnServer(srv -> {
+			ItemStack crucible = new ItemStack(WildcatterItems.TAPPING_CRUCIBLE);
+			String t = ((dev.wildcatter.block.PotBlockEntity) srv.overworld().getBlockEntity(row2[0])).tap(crucible).getString();
+			dev.wildcatter.block.CastingMachineBlockEntity c = (dev.wildcatter.block.CastingMachineBlockEntity) srv.overworld().getBlockEntity(caster);
+			return t + " | " + c.pour(crucible).getString();
+		});
+		System.out.println("[wildcatter-test] potline: " + tapped);
+		check(tapped.contains("Tapped 2,726 kg") && tapped.contains("Poured 2,726 kg"), "the crucible should tap the pot and pour into the caster: " + tapped);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.CastingMachineBlockEntity) srv.overworld().getBlockEntity(caster)).addPoured(Tuning.AL_INGOT_KG * 3);
+			return null;
+		});
+		int ingots = 0;
+		for (int i = 0; i < 30 && ingots < 3; i++) {
+			context.waitTicks(20);
+			ingots = countIn(server, ingotsOut, WildcatterItems.ALUMINIUM_INGOT);
+		}
+		check(ingots >= 3, "the casting machine should drop ingots: " + ingots + " | " + read(server, 45, up, z + 20));
+		server.runCommand("tp @p 74 " + (up + 26) + " " + (z + 40) + " 200 38");
+		context.waitTicks(3);
+		context.takeScreenshot("wildcatter-potroom");
+		// a unit trips: the other three carry 60 kA each and the line holds
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.RectiformerBlockEntity) srv.overworld().getBlockEntity(units[0])).trip();
+			return null;
+		});
+		context.waitTicks(100);
+		amps = potAmps.applyAsDouble(row1[0]);
+		state = all.get();
+		check(Math.abs(amps - 180_000) < 3_000, "three units should hold 180 kA: " + amps + state);
+		check(read(server, 45, up, z - 10).contains("3 of 4 online") && Math.abs(unitAmps.applyAsDouble(units[3]) - 60_000) < 1_500, "each of three units should carry 60 kA:" + state);
+		// an anode effect: a pot's alumina taken out
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.PotBlockEntity) srv.overworld().getBlockEntity(row1[1])).emptyAlumina();
+			return null;
+		});
+		String effect = "";
+		for (int i = 0; i < 20 && !effect.contains("ANODE EFFECT"); i++) {
+			context.waitTicks(20);
+			effect = read(server, row1[1].getX(), up, row1[1].getZ());
+		}
+		context.waitTicks(80);   // the rectiformers climb to hold the line
+		double aeVolts = server.computeOnServer(srv -> ((dev.wildcatter.block.PotBlockEntity) srv.overworld().getBlockEntity(row1[1])).volts());
+		amps = potAmps.applyAsDouble(row1[0]);
+		state = all.get();
+		check(effect.contains("ANODE EFFECT"), "a pot with no alumina should go to an anode effect: " + effect);
+		check(aeVolts > 26 && aeVolts < 34, "an anode effect should read about 30 V: " + aeVolts + state);
+		check(Math.abs(amps - 180_000) < 5_000, "the line should still hold 180 kA through an anode effect: " + amps + state);
+		server.computeOnServer(srv -> {
+			dev.wildcatter.block.PotBlockEntity pot = (dev.wildcatter.block.PotBlockEntity) srv.overworld().getBlockEntity(row1[1]);
+			pot.setItem(1, new ItemStack(WildcatterItems.ALUMINA_BAG, 2));
+			pot.addClearing(Tuning.POT_AE_CLEAR_SECONDS - 2);
+			return null;
+		});
+		boolean cleared = false;
+		for (int i = 0; i < 20 && !cleared; i++) {
+			context.waitTicks(20);
+			cleared = !server.computeOnServer(srv -> ((dev.wildcatter.block.PotBlockEntity) srv.overworld().getBlockEntity(row1[1])).effect());
+		}
+		check(cleared, "alumina back, the anode effect should clear: " + read(server, row1[1].getX(), up, row1[1].getZ()));
+		// a freeze: the lone pot past four hours without current, then broken
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.PotBlockEntity) srv.overworld().getBlockEntity(lone)).addCold(Tuning.POT_FREEZE_SECONDS - 5);
+			return null;
+		});
+		String frozen = "";
+		for (int i = 0; i < 20 && !frozen.contains("FROZEN"); i++) {
+			context.waitTicks(20);
+			frozen = read(server, lone.getX(), up, lone.getZ());
+		}
+		check(frozen.contains("FROZEN"), "a pot past 4 h without current should freeze: " + frozen);
+		int lining = server.computeOnServer(srv -> {
+			srv.overworld().destroyBlock(lone, true);
+			return 0;
+		});
+		context.waitTicks(10);
+		lining = server.computeOnServer(srv -> srv.overworld().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+				new net.minecraft.world.phys.AABB(lone).inflate(8), e -> e.getItem().is(WildcatterItems.SPENT_POT_LINING)).size());
+		check(lining > 0, "a frozen pot should break into spent pot lining");
+		System.out.println("[wildcatter-test] potline ok: " + Math.round(made * 1000) / 1000.0 + " kg made, " + reacted + " reacted bag, " + spent + " spent anode, "
+				+ ingots + " ingots, AE " + Math.round(aeVolts) + " V | " + tapped + state);
 	}
 
 	private void dcTier(ClientGameTestContext context, TestServerContext server) {

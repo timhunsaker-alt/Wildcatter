@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "AAA",
+    "AAA",
+    "BAB"
+  ],
+  "key": {
+    "A": "wildcatter:aluminium_block",
+    "B": "minecraft:brick"
+  },
+  "result": {
+    "id": "wildcatter:dc_bus_180k",
+    "count": 1
+  }
+}

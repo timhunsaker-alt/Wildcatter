@@ -120,7 +120,7 @@ public class DcBusBarBlockEntity extends BlockEntity implements CircuitPart, Ins
 
 	@Override
 	public Component inspect() {
-		return Component.literal(String.format("DC bus bar (%s copper): %+.0f V to ground, %.2f kA of %.0f kA allowed%s%s", block().label(), volts, amps / 1000,
+		return Component.literal(String.format("DC bus bar (%s): %+.0f V to ground, %.2f kA of %.0f kA allowed%s%s", block().label(), volts, amps / 1000,
 				block().amps() / 1000, dev.wildcatter.energy.WireHeat.readout(heat), faulted ? "; touching GROUND" : ""));
 	}
 

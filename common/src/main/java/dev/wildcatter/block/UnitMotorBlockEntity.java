@@ -146,6 +146,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "forming_press" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.FORMING_PRESS_WATTS);
 				case "baking_furnace" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BAKING_FAN_WATTS);
 				case "rodding_shop" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.RODDING_WATTS);
+				case "ftc_fan" -> new Motor(true, Voltage.MEDIUM, Tuning.FTC_FAN_WATTS);
+				case "casting_machine" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CASTER_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -248,6 +250,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "forming_press" -> "vibro-compactor";
 			case "baking_furnace" -> "exhaust fan";
 			case "rodding_shop" -> "induction furnace";
+			case "ftc_fan" -> "main fan";
+			case "casting_machine" -> "mould chain";
 			default -> kind();
 		};
 	}
@@ -357,6 +361,7 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "condensate_pump" -> "Condensate pump (" + Math.round(Tuning.CONDENSATE_PUMP_WATTS / 1000) + " kW, " + Voltage.INDUSTRIAL.label() + ")";
 			case "main_feed_pump" -> "Main feed pump (" + Math.round(Tuning.MAIN_FEED_PUMP_WATTS / 1000) + " kW, " + Voltage.MEDIUM.label() + ")";
 			case "pressurizer" -> "Pressurizer (heaters " + Math.round(Tuning.PZR_HEATER_WATTS / 1000) + " kW, " + Voltage.INDUSTRIAL.label() + ")";
+			case "ftc_fan" -> "Fume treatment centre main fan (" + Math.round(Tuning.FTC_FAN_WATTS / 1000) + " kW, " + Voltage.MEDIUM.label() + ")";
 			case "pusher_machine" -> "Coke pusher machine (" + Math.round(Tuning.PUSHER_WATTS / 1000) + " kW, " + Voltage.INDUSTRIAL.label() + ")";
 			default -> kind();
 		};

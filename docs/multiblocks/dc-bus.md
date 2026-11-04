@@ -23,6 +23,8 @@ The counterparts:
 |---|---|---|
 | 4 kA bus bar | 4 x 100 x 10 mm copper, **4 kA**, **5.2 µΩ/m** at 75 °C | about 1 A/mm² for a bare bar in air |
 | 16 kA bus bar | 8 x 200 x 10 mm copper, **16 kA**, **1.3 µΩ/m** at 75 °C | as above |
+| 180 kA aluminium bus (10b3b) | **0.55 m²** of aluminium, **180 kA**, **0.063 µΩ/m** at 90 °C | about 0.33 A/mm², as potline bus is run |
+| 180 kA copper bus (10b3b) | **0.18 m²** of copper, **180 kA**, **0.12 µΩ/m** | about 1 A/mm²; for a first line before any aluminium exists |
 | Rectifier setpoint dial | 1, 2, 2.8, 4, 6, 8, 10, 12, 14, 16 kA | covers today's cells: 2.8 kA chlor-alkali, 6 kA fluorine, 14 kA magnesium |
 | Rectifier maximum DC volts | **150 V**, so 16 kA x 150 V = 2.4 MW | a mid-size electrolysis rectifier |
 | Rectifier internal resistance | 0.1 mΩ | its regulation, about 1 % of 150 V at 16 kA; its losses are in the 97 % efficiency |
@@ -50,6 +52,9 @@ it makes exactly what it did in 7d and 7f.
 | `wildcatter:dc_bus_4k` | 4 kA copper bus bar on standoffs | 1 x 1 x 1 |
 | `wildcatter:dc_bus_16k` | 16 kA copper bus bar on standoffs | 1 x 1 x 1 |
 | `wildcatter:rectifier` | today's rectifier (conversion.md), now a DC source on the solver | 3 x 4 x 4 |
+| `wildcatter:dc_bus_180k` | 180 kA aluminium potline bus (10b3b, potline.md) | 1 x 1 x 1 |
+| `wildcatter:dc_bus_180k_copper` | 180 kA copper bus (10b3b) | 1 x 1 x 1 |
+| `wildcatter:rectiformer` | a 60 kA potline rectiformer on 138 kV (10b3b, potline.md) | 8 x 7 x 6 |
 
 A bus bar is one block, 1 m of bar, placed along an axis like a log (X, Y or Z). It has a terminal on all six faces: it joins
 any bus bar or DC terminal it touches, whatever its axis. Corners are made by placing a bar of the other axis.
@@ -88,6 +93,17 @@ chlor-alkali cell, east face (x = 2), z = 3:     y = 2 +, y = 0 -
 6. **An idle cell** (no feed, or nowhere for its product to go) opens its circuit, so it draws nothing. With nothing drawing,
    the rectifier's voltage rises to its 150 V maximum, the open-circuit voltage.
 
+## Rectifiers of more than one size (10b3b)
+- `DcSupply` takes its AC tier, its maximum volts, its internal resistance and its ramp as parameters.
+  - **The 10b1 rectifier:** 4.16 kV, 150 V, 0.1 mΩ and 15 V/s, unchanged.
+  - **The rectiformer:** 138 kV, 220 V, 37 µΩ and 22 V/s, at 98.5 % efficiency (potline.md).
+- **Line-current sharing:**
+  - rectiformers set side by side form a yard, with their DC terminals joined inside;
+  - the yard holds one line setpoint, which is split equally among the units online, at most 60 kA each;
+  - each unit regulates toward its share as above;
+  - a unit not touching another is a yard of one.
+- **The cell's back-EMF can change while it runs:** a pot's anode effect raises it to 27.65 V (potline.md).
+
 ## Controls and readouts
 - **Rectifier:**
   - sneak and right-click steps the setpoint dial;
@@ -96,7 +112,7 @@ chlor-alkali cell, east face (x = 2), z = 3:     y = 2 +, y = 0 -
     - "DC 108 V, 6.00 kA (setpoint 6 kA), ground OK";
     - "GROUND FAULT on -: + at 108 V to ground";
     - "TRIPPED (DC overcurrent 13.1 kA): right-click to reset".
-- **Bus bar:** "DC bus bar (16 kA copper): +54 V to ground, 6.00 kA of 16 kA allowed".
+- **Bus bar:** "DC bus bar (16 kA copper): +54 V to ground, 6.00 kA of 16 kA allowed"; the 180 kA bars say aluminium or copper.
 - **Power Meter on a bus bar:** the same.
 
 ## Shock
@@ -104,7 +120,7 @@ chlor-alkali cell, east face (x = 2), z = 3:     y = 2 +, y = 0 -
 - **Today's cells:**
   - the 108 V fluorine house can't shock: its poles sit at ±54 V, and even with a ground fault the other pole is at 108 V;
   - an open rectifier at 150 V with one pole faulted puts the other at 150 V, which shocks.
-- **10b3's potline:** about 170 V for 40 pots. It shocks once one pole is faulted to ground.
+- **10b3's potline:** about 175 V for 40 pots (poles at ±88 V), so it shocks once one pole is faulted to ground.
 
 ## Rotation, placing, removal
 - Bus bars take an axis when placed (from the face clicked), like a log.

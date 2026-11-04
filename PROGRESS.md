@@ -491,6 +491,50 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - **Recommended mods:** `docs/recommended-mods.md` lists the quality-of-life mods with 26.3 builds for Fabric and NeoForge.
   - The Fabric set ran the `coker` and `anodes` scenes alongside Wildcatter, Sodium included, and both passed.
 
+## Phase 10b3b: the potline (spec: docs/multiblocks/potline.md; dc-bus.md updated)
+The smelter's second wave (Tim, 2026-11-03): the pots that turn 10b2's alumina and 10b3a's anodes into aluminium. All parts are true
+size (`block/PotlinePartBlock`), sized for a line of up to 40 pots.
+- **Rectiformers** (`RectiformerBlockEntity`): 60 kA and up to 220 V each, on 138 kV.
+  - Set side by side they form a yard, joined inside at their DC terminals. The yard holds one line setpoint (60 to 180 kA), split
+    among the units online, at most 60 kA each: with 4 online each carries 45 kA, and with one tripped the other three carry 60 kA.
+  - `DcSupply` now takes its AC tier, maximum volts, resistance, ramp and efficiency; the 10b1 rectifier is unchanged.
+- **180 kA bus:** aluminium (0.55 m², 0.063 µΩ/m) and copper (0.18 m², 0.12 µΩ/m), larger bars that heat, burn and fault as the
+  10b1 bars do.
+- **Pots** (`PotBlockEntity`), 180 kA prebake:
+  - each is a DC cell of 1.65 V back-EMF, 4.0 V at 180 kA. Pots set side by side join through 1.67 µΩ of risers, so bus is only
+    needed at a row's ends and crossovers;
+  - each makes 56.8 kg/h at 94 % current efficiency, from 1.93 kg of alumina a kg (reacted bags first), 20 kg of AlF3 a t with its
+    gas going to the duct (45 venting), and 0.41 kg of carbon;
+  - it changes an anode every 39 h from rodded anodes in its hopper, dropping the spent one below. An overdue change costs 2 points
+    of current efficiency;
+  - with no alumina it has an anode effect: the back-EMF rises so it reads 30 V, it makes no metal, and it counts CF4 (IPCC slope).
+    It clears 2 minutes after alumina is back;
+  - it holds 2 days of metal (FULL: TAP IT);
+  - below 18 kA for 4 h it freezes and opens the line. Broken, it leaves spent pot lining.
+- **The fume treatment centre:** a pot row's gas passes along its pots' joined ducts to the row's end, and a pipe carries it
+  (POT_GAS) to the centre. With a 250 kW main fan (4.16 kV) against it, it turns a fresh alumina bag into a reacted one for each
+  45,600 m³ of gas treated.
+- **Metal:** the tapping crucible item (8 t, its kg on the stack in a new `metal_kg` component) taps a pot and pours into the ingot
+  casting machine (10 t/h, 480 V), which casts 22.7 kg aluminium ingots.
+- **Items:** aluminium ingot and block, reacted alumina bag, spent pot lining, tapping crucible. Recipes: the 180 kA bars (7
+  aluminium or copper blocks over 2 bricks), the aluminium anode rod.
+- **`DcCell`:** its back-EMF can change while it runs, and its resistance takes out the solver's 1 µΩ source impedance, so a pot reads
+  its rated 4.0 V at 180 kA (a 0.18 V error at potline current, a few mV on the 10b1 cells).
+- **Models:** `tools/models/potline.py`, 5 parts; the 180 kA bars are drawn in `make_assets.py`.
+- **Field Manual:** new pages THE POTLINE and TAPPING AND CASTING.
+- **Unit tests:** `PotlineTest` (the 40-pot balance, the anode life of 29.3 days, the current efficiency, the voltages against the
+  rectiformers, the units' shares, the fume treatment centre); `DcSolveTest`: 40 pots on 4 rectiformers sharing equally, one
+  tripped, and an anode effect needing 26 V more.
+- **Game test `potline`:**
+  - the aeroderivative through its GSU 60 at 138 kV feeds a yard of 4 rectiformers and 10 pots in two rows. The line holds 180 kA at
+    45 V, 45 kA a unit, about 9 MW;
+  - the fume treatment centre (its fan through a 4.16/138 kV step-down and a 4.16 kV soft starter) fills a reacted alumina bag;
+  - a pot drops a spent anode;
+  - a full pot is tapped and poured, and the casting machine drops ingots;
+  - with one unit tripped, the line holds 180 kA on three at 60 kA each;
+  - a pot without alumina reads an anode effect at 30 V and clears;
+  - a pot off the line freezes, and breaks into spent pot lining.
+
 ## Phase 10b3a: coke, pitch and anodes (specs: docs/multiblocks/delayed-coker.md, coke-ovens.md, anode-plant.md)
 10b3 is two waves (Tim, 2026-11-03): 10b3a the carbon and anodes, 10b3b the potline. All parts are true size (`block/CarbonPartBlock`),
 sized for a 40-pot line.
@@ -1168,13 +1212,24 @@ sized for a 40-pot line.
   - the bus bars' standoffs stand on the floor of their own cell, so a run carried up in the air shows them hanging (no
     supports or structure yet);
   - the chlor-alkali caustic soda is still only counted (fixed in 10b2: it is a pipe product).
+- Phase 10b3b:
+  - pot auxiliaries (beam jacks, point feeders, crust breakers) draw no power;
+  - the pots change their own anodes, standing in for the pot tending machine until 10c's cranes; the tapping crucible item stands
+    in for the crucible and its transport vehicle, and the metal does not cool in it;
+  - a new pot starts hot and full (no bake-in or start-up), and potroom magnetics, heat balance, bath chemistry and cathode life are
+    not modelled; C2F6 is not counted;
+  - spent pot lining has no treatment and no use; a frozen pot is broken and bused around, not shorted out live;
+  - the pot's 6 x 6 x 12 cell box stands in for the potroom building, which is not drawn;
+  - the 4.16/138 kV step-down feeding the fan in the scene is the one-block stand-in (true size in 10d);
+  - the new items and the aluminium block have `*_placeholder` textures (`aluminium_ingot`, `reacted_alumina_bag`,
+    `spent_pot_lining`, `tapping_crucible`, `aluminium_block`).
 - Phase 10b3a:
   - residence times are not modelled: the 18 h coking, the drums' 12-24 h fill and the furnace's two-week firing run as steady
     flow (the drums switch at a tonne);
   - most of the metallurgical coke has no user in the mod beyond carbon and burner fuel; coke oven gas and coker gas fire only the
     plant's gas burners, not engines or turbines;
   - no ammonia, light oil or gas desulfurizing at the by-product plant; no vacuum unit ahead of the coker;
-  - nothing uses the rodded anodes until 10b3b's pots;
+  - the rodded anodes are used by 10b3b's pots;
   - the new items have `*_placeholder` textures.
 - Phase 10b2:
   - the Bayer liquor's first fill is waived: the evaporator starts with 10 minutes of strong liquor;
@@ -1182,7 +1237,7 @@ sized for a 40-pot line.
     loss is one make-up figure;
   - residence times (36 h precipitation, 1 h digestion) are not modelled: the plant runs as a steady flow with 5 s holds;
   - the new items, the limestone ore and the red mud block have `*_placeholder` textures;
-  - nothing uses the alumina, AlF3 or ton containers until 10b3b (and chlorine has no buyer).
+  - the alumina and AlF3 now go to 10b3b's pots; the ton containers and the chlorine still have no buyer.
 - Phase 9c: Mekanism has not been tried: it is not yet released for 26.3. Plugs were checked against a real NeoForge energy
   handler on a stand-in block.
 - Phase 9b: the NeoForge client loads with no errors (`:neoforge:runClient`), but no in-world screenshot was taken: quick-play into a

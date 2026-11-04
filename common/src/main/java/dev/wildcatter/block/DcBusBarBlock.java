@@ -25,7 +25,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
 /**
- * A metre of bare copper DC bus bar on standoff insulators (docs/multiblocks/dc-bus.md), laid along an axis like a log. It joins
+ * A metre of bare copper or aluminium DC bus bar on standoff insulators (docs/multiblocks/dc-bus.md), laid along an axis like a log. It joins
  * any bus bar or DC terminal it touches on any face; it carries no polarity of its own.
  */
 public class DcBusBarBlock extends BaseEntityBlock {
@@ -34,16 +34,28 @@ public class DcBusBarBlock extends BaseEntityBlock {
 	private static final VoxelShape X = Block.box(0, 0, 4, 16, 10, 12);
 	private static final VoxelShape Y = Block.box(4, 0, 6, 12, 16, 16);
 	private static final VoxelShape Z = Block.box(4, 0, 0, 12, 10, 16);
+	// the 180 kA potline bus: a 0.55 m2 bar nearly fills its cell
+	private static final VoxelShape HEAVY_X = Block.box(0, 0, 1, 16, 15, 15);
+	private static final VoxelShape HEAVY_Y = Block.box(1, 0, 2, 15, 16, 16);
+	private static final VoxelShape HEAVY_Z = Block.box(1, 0, 0, 15, 15, 16);
 
 	private final double amps;
 	private final double ohmsPerMeter;
 	private final String label;
+	private final boolean heavy;
 
+	/** {@code label}: its rating and metal, "16 kA copper". */
 	public DcBusBarBlock(Properties properties, double amps, double ohmsPerMeter, String label) {
+		this(properties, amps, ohmsPerMeter, label, false);
+	}
+
+	/** {@code heavy}: the 180 kA potline bus, which nearly fills its cell. */
+	public DcBusBarBlock(Properties properties, double amps, double ohmsPerMeter, String label, boolean heavy) {
 		super(properties);
 		this.amps = amps;
 		this.ohmsPerMeter = ohmsPerMeter;
 		this.label = label;
+		this.heavy = heavy;
 		registerDefaultState(stateDefinition.any().setValue(AXIS, Direction.Axis.X));
 	}
 
@@ -73,9 +85,9 @@ public class DcBusBarBlock extends BaseEntityBlock {
 	@Override
 	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
 		return switch (state.getValue(AXIS)) {
-			case X -> X;
-			case Y -> Y;
-			case Z -> Z;
+			case X -> heavy ? HEAVY_X : X;
+			case Y -> heavy ? HEAVY_Y : Y;
+			case Z -> heavy ? HEAVY_Z : Z;
 		};
 	}
 

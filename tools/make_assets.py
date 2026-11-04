@@ -2072,6 +2072,69 @@ lang.update({f"block.{ns}.coker_fractionator": "Coker Fractionator", f"block.{ns
 	f"block.{ns}.baking_furnace": "Ring Baking Furnace", f"block.{ns}.rodding_shop": "Rodding Shop"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 10b3b: the potline (docs/multiblocks/potline.md) ---------------------------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/potline.py; here loot, names, tags, recipes, the 180 kA bus and the items.
+POTLINE_PARTS = ("rectiformer", "pot", "fume_treatment_centre", "ftc_fan", "casting_machine")
+for name in POTLINE_PARTS:
+	big_part_loot(name)
+# the 180 kA bus: a 0.55 m2 aluminium bar (or 0.18 m2 of copper) on two porcelain standoffs, drawn along z like the 10b1 bars
+for name, metal in (("dc_bus_180k", "hipaint"), ("dc_bus_180k_copper", "copper")):
+	els = []
+	for z in (2, 12):
+		els.append(cuboid([6, 0, z], [10, 3, z + 2], "#glaze"))
+	els.append(cuboid([1, 3, 0], [15, 15, 16], "#bar") if metal == "hipaint" else cuboid([3, 3, 0], [13, 11, 16], "#bar"))
+	save_json(f"{ASSETS}/models/block/{name}.json", {"textures": {"glaze": f"{ns}:block/mat/mat_porcelain_brown",
+		"bar": f"{ns}:block/mat/{'mat_hitemp_aluminium' if metal == 'hipaint' else 'mat_copper'}", "particle": f"{ns}:block/mat/mat_galvanized"}, "elements": els})
+	save_json(f"{ASSETS}/blockstates/{name}.json", {"variants": {"axis=z": {"model": f"{ns}:block/{name}"}, "axis=x": {"model": f"{ns}:block/{name}", "y": 90},
+		"axis=y": {"model": f"{ns}:block/{name}", "x": 90}}})
+	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{name}"}})
+	save_json(f"{DATA}/loot_table/blocks/{name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],
+		"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+# the aluminium block: nine ingots
+if os.path.exists(f"{ORE_ART}/aluminium_block.png"):
+	shutil.copy(f"{ORE_ART}/aluminium_block.png", f"{ASSETS}/textures/block/ore/aluminium_block.png")
+	al_tex = f"{ns}:block/ore/aluminium_block"
+else:
+	tex("aluminium_block_placeholder", lambda img, d: noise(img, (200, 204, 210), 8))
+	al_tex = f"{ns}:block/aluminium_block_placeholder"
+block_model("aluminium_block", "minecraft:block/cube_all", {"all": al_tex})
+save_json(f"{ASSETS}/blockstates/aluminium_block.json", {"variants": {"": {"model": f"{ns}:block/aluminium_block"}}})
+save_json(f"{ASSETS}/items/aluminium_block.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/aluminium_block"}})
+save_json(f"{DATA}/loot_table/blocks/aluminium_block.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:aluminium_block"}],
+	"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in POTLINE_PARTS + ("dc_bus_180k", "dc_bus_180k_copper", "aluminium_block")]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("rectiformer", ["CRC", "SKS", "SSS"], {"C": "minecraft:copper_block", "R": "minecraft:redstone_block", "S": S_, "K": "minecraft:comparator"}, "rectiformer")
+shaped("pot", ["IBI", "BKB", "III"], {"I": "minecraft:iron_block", "B": "minecraft:bricks", "K": f"{ns}:calcined_coke_bag"}, "pot")
+shaped("fume_treatment_centre", ["SPS", "WHW", "SSS"], {"S": S_, "P": P_, "W": "minecraft:white_wool", "H": "minecraft:hopper"}, "fume_treatment_centre")
+shaped("ftc_fan", ["SPS", "SXS", "SSS"], {"S": S_, "P": P_, "X": f"{ns}:crankshaft"}, "ftc_fan")
+shaped("casting_machine", ["SCS", "IXI", "SSS"], {"S": S_, "C": "minecraft:cauldron", "I": "minecraft:iron_block", "X": "minecraft:piston"}, "casting_machine")
+shaped("tapping_crucible", ["I I", "IBI", " I "], {"I": "minecraft:iron_ingot", "B": "minecraft:bricks"}, "tapping_crucible")
+shaped("dc_bus_180k", ["AAA", "AAA", "BAB"], {"A": f"{ns}:aluminium_block", "B": "minecraft:brick"}, "dc_bus_180k")
+shaped("dc_bus_180k_copper", ["KKK", "KKK", "BKB"], {"K": "minecraft:copper_block", "B": "minecraft:brick"}, "dc_bus_180k_copper")
+shaped("aluminium_block", ["AAA", "AAA", "AAA"], {"A": f"{ns}:aluminium_ingot"}, "aluminium_block")
+shapeless("aluminium_ingot_from_block", [f"{ns}:aluminium_block"], "aluminium_ingot", 9)
+shaped("anode_rod_aluminium", ["A", "A", "S"], {"A": f"{ns}:aluminium_ingot", "S": f"{ns}:steel_ingot"}, "anode_rod")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in {"aluminium_ingot": ("Aluminium Ingot (22.7 kg)", (196, 200, 206)), "reacted_alumina_bag": ("Bulk Bag of Reacted Alumina", (226, 222, 210)),
+		"spent_pot_lining": ("Spent Pot Lining", (52, 50, 54)), "tapping_crucible": ("Tapping Crucible (8 t)", (150, 76, 60))}.items():
+	if os.path.exists(f"{ORE_ART}/{item}.png"):
+		shutil.copy(f"{ORE_ART}/{item}.png", f"{ASSETS}/textures/item/ore/{item}.png")
+		item_tex = f"{ns}:item/ore/{item}"
+	else:
+		tex(f"{item}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+		item_tex = f"{ns}:item/{item}_placeholder"
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": item_tex}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.rectiformer": "Rectiformer (60 kA, 138 kV)", f"block.{ns}.pot": "Pot (180 kA prebake)", f"block.{ns}.fume_treatment_centre": "Fume Treatment Centre",
+	f"block.{ns}.ftc_fan": "FTC Main Fan (250 kW, 4.16 kV)", f"block.{ns}.casting_machine": "Ingot Casting Machine", f"block.{ns}.aluminium_block": "Block of Aluminium",
+	f"block.{ns}.dc_bus_180k": "DC Bus Bar (180 kA aluminium)", f"block.{ns}.dc_bus_180k_copper": "DC Bus Bar (180 kA copper)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 7g: the fuel plant (docs/multiblocks/fuel.md) -------------------------------------------------------------------
 # blockstates, models, shapes and items come from tools/models/fuel.py; here loot, names, tags, recipes and the items.
 FUEL_PARTS = ("uf6_autoclave", "idr_kiln", "granulator", "pellet_press", "sintering_furnace", "pellet_grinder", "rod_loader", "rod_welder",

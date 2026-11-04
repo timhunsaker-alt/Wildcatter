@@ -20,6 +20,8 @@ frequency, protection) is in `docs/ELECTRICAL_MODEL.md`. What is built, phase by
   shaft kiln on a new limestone rock, AlF3 from the conversion plant's HF, and chlorine in ton containers (10b2).
 - **Anodes:** a delayed coker and rotary calciner on the crude unit's residue, by-product coke ovens and a tar still for pitch, and
   an anode plant that mixes, presses, bakes and rods prebake anodes, with butt recycle (10b3a).
+- **Aluminium:** a Hall–Héroult potline: 138 kV rectiformers sharing the line current, 180 kA aluminium bus, prebake pots with anode
+  changes, anode effects and freezing, a fume treatment centre, a tapping crucible and an ingot casting machine (10b3b).
 - **Oil and gas:**
   - seismic surveys, a land rig and wells;
   - the lease (separator, tanks, pumpjacks);

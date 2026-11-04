@@ -190,7 +190,7 @@ and the Field Manual has a page for each new system.
   - **VFD:** a 6-pulse front end at PF 0.95, 97 % efficient, a 10 s ramp, 1.5 x for 60 s; it takes constant power from the line.
   - **Drive houses:** the existing drive houses also take constant power.
   - **Docs cleanup:** stale known gaps and duplicate ideas.
-- **10b: the DC tier and aluminium.** Bus bars that can short and shock, in the solver; then a Bayer refinery and Hall–Héroult pots,
+- **10b: the DC tier and aluminium** — DONE 2026-11-03. Bus bars that can short and shock, in the solver; then a Bayer refinery and Hall–Héroult pots,
   a very large DC load (from the 7a bauxite). The DC tier also feeds the conversion fluorine cells. Three waves:
   - **10b1: the DC tier** — DONE 2026-11-03 (spec: `docs/multiblocks/dc-bus.md`):
     - DC bus bars on the solver (copper, 4 kA and 16 kA);
@@ -206,7 +206,7 @@ and the Field Manual has a page for each new system.
     - a new limestone rock;
     - red mud as filter cake for a dry stack;
     - the products in 1 t bulk bags.
-  - **10b3: anodes and the potline** — CURRENT. Two waves:
+  - **10b3: anodes and the potline** — DONE 2026-11-03. Two waves:
     - **10b3a: carbon and anodes** — DONE 2026-11-03 (specs: `docs/multiblocks/delayed-coker.md`, `coke-ovens.md`, `anode-plant.md`):
       - a delayed coker on the crude unit's residue, and a rotary calciner, for petroleum coke;
       - coal-tar pitch from by-product coke ovens and a tar still;
@@ -215,7 +215,7 @@ and the Field Manual has a page for each new system.
       - every ore and mineral tooltip says where it is found, what mines it, and what uses it (`ore/OreUses.java`);
       - with JEI installed, U shows a page for each ore (`compat/WildcatterJeiPlugin`);
       - the QoL mod list is in `docs/recommended-mods.md`.
-    - **10b3b: the potline** (spec: `docs/multiblocks/potline.md`):
+    - **10b3b: the potline** — DONE 2026-11-03 (spec: `docs/multiblocks/potline.md`):
       - the potline's rectiformers and aluminium bus;
       - 180 kA prebake Hall–Héroult pots at true size, the player choosing how many in series;
       - a fume treatment centre, a tapping crucible and a casting machine.

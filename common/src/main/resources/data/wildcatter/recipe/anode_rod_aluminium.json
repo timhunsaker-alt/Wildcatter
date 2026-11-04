@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "A",
+    "A",
+    "S"
+  ],
+  "key": {
+    "A": "wildcatter:aluminium_ingot",
+    "S": "wildcatter:steel_ingot"
+  },
+  "result": {
+    "id": "wildcatter:anode_rod",
+    "count": 1
+  }
+}

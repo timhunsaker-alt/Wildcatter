@@ -171,9 +171,14 @@ public interface GridBlocks {
 			dev.wildcatter.block.Starter.Kind.DRIVE, Voltage.MEDIUM, Tuning.CABINET_SETTINGS_MV, true));
 	/** Bare copper DC bus bars on standoff insulators (docs/multiblocks/dc-bus.md). */
 	Block DC_BUS_4K = block("dc_bus_4k", props -> new dev.wildcatter.block.DcBusBarBlock(props.mapColor(MapColor.COLOR_ORANGE)
-			.strength(3.0F, 6.0F).sound(SoundType.COPPER).requiresCorrectToolForDrops().noOcclusion(), Tuning.DC_BUS_4K_AMPS, Tuning.DC_BUS_4K_OHMS_PER_M, "4 kA"));
+			.strength(3.0F, 6.0F).sound(SoundType.COPPER).requiresCorrectToolForDrops().noOcclusion(), Tuning.DC_BUS_4K_AMPS, Tuning.DC_BUS_4K_OHMS_PER_M, "4 kA copper"));
 	Block DC_BUS_16K = block("dc_bus_16k", props -> new dev.wildcatter.block.DcBusBarBlock(props.mapColor(MapColor.COLOR_ORANGE)
-			.strength(3.0F, 6.0F).sound(SoundType.COPPER).requiresCorrectToolForDrops().noOcclusion(), Tuning.DC_BUS_16K_AMPS, Tuning.DC_BUS_16K_OHMS_PER_M, "16 kA"));
+			.strength(3.0F, 6.0F).sound(SoundType.COPPER).requiresCorrectToolForDrops().noOcclusion(), Tuning.DC_BUS_16K_AMPS, Tuning.DC_BUS_16K_OHMS_PER_M, "16 kA copper"));
+	/** The potline's 180 kA bus (docs/multiblocks/potline.md): aluminium, and copper for a first line before any aluminium exists. */
+	Block DC_BUS_180K = block("dc_bus_180k", props -> new dev.wildcatter.block.DcBusBarBlock(props.mapColor(MapColor.METAL)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), Tuning.DC_BUS_180K_AMPS, Tuning.DC_BUS_180K_AL_OHMS_PER_M, "180 kA aluminium", true));
+	Block DC_BUS_180K_COPPER = block("dc_bus_180k_copper", props -> new dev.wildcatter.block.DcBusBarBlock(props.mapColor(MapColor.COLOR_ORANGE)
+			.strength(3.0F, 6.0F).sound(SoundType.COPPER).requiresCorrectToolForDrops().noOcclusion(), Tuning.DC_BUS_180K_AMPS, Tuning.DC_BUS_180K_CU_OHMS_PER_M, "180 kA copper", true));
 	Block DRIVE_MV_TRANSFORMER = block("drive_mv_transformer", props -> new dev.wildcatter.block.DriveSectionBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(3.5F, 7.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), dev.wildcatter.multiblock.Footprint.box(2, 3, 2, 0, 0), "drive_mv_transformer"));
 	Block DRIVE_MV_CELLS = block("drive_mv_cells", props -> new dev.wildcatter.block.DriveSectionBlock(props.mapColor(MapColor.COLOR_GRAY)

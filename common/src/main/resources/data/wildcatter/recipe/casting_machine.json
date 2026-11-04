@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "IXI",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:cauldron",
+    "I": "minecraft:iron_block",
+    "X": "minecraft:piston"
+  },
+  "result": {
+    "id": "wildcatter:casting_machine",
+    "count": 1
+  }
+}

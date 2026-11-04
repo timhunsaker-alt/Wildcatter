@@ -106,6 +106,11 @@ final class BlockFactory {
 				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
 	}
 
+	static Block potlinePart(dev.wildcatter.block.PotlinePartBlock.Part part) {
+		return block(part.id(), props -> new dev.wildcatter.block.PotlinePartBlock(props.mapColor(MapColor.COLOR_GRAY)
+				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
+	}
+
 	static Block enrichmentPart(dev.wildcatter.block.EnrichmentPartBlock.Part part) {
 		return block(part.id(), props -> new dev.wildcatter.block.EnrichmentPartBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
 				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));

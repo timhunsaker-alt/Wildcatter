@@ -98,7 +98,9 @@ public enum Product {
 	/** Condensed in the by-product plant, for the tar still. Counted in kg. */
 	COAL_TAR("coal tar", false),
 	/** The tar still's residue, the anodes' binder, kept hot. Counted in kg. */
-	PITCH("coal-tar pitch", false);
+	PITCH("coal-tar pitch", false),
+	/** A potline row's gas, its HF and dust, along the duct to the fume treatment centre (docs/multiblocks/potline.md). */
+	POT_GAS("pot gas", true);
 
 	private final String label;
 	private final boolean gas;

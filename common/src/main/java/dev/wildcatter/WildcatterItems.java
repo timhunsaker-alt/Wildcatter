@@ -154,6 +154,18 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> CRUSHED_BUTTS_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("crushed_butts"));
 	public static final Item CRUSHED_BUTTS = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(CRUSHED_BUTTS_KEY),
 			String.format("%,.0f kg of cleaned, crushed anode butts", Tuning.BUTT_KG), "for the anode paste plant");
+	// 10b3b: the potline (docs/multiblocks/potline.md)
+	public static final ResourceKey<Item> ALUMINIUM_INGOT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("aluminium_ingot"));
+	public static final Item ALUMINIUM_INGOT = new dev.wildcatter.item.LabelledItem(new Item.Properties().setId(ALUMINIUM_INGOT_KEY),
+			String.format("A %.1f kg (50 lb) primary aluminium ingot", Tuning.AL_INGOT_KG));
+	public static final ResourceKey<Item> REACTED_ALUMINA_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("reacted_alumina_bag"));
+	public static final Item REACTED_ALUMINA_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(REACTED_ALUMINA_BAG_KEY),
+			String.format("%,.0f kg of reacted alumina, carrying the fluoride the fume treatment centre caught", Tuning.BULK_BAG_KG), "the pots take it first");
+	public static final ResourceKey<Item> SPENT_POT_LINING_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("spent_pot_lining"));
+	public static final Item SPENT_POT_LINING = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(SPENT_POT_LINING_KEY),
+			"Spent pot lining: a frozen pot's carbon cathode and refractory, with its fluoride", "no use yet");
+	public static final ResourceKey<Item> TAPPING_CRUCIBLE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("tapping_crucible"));
+	public static final Item TAPPING_CRUCIBLE = new dev.wildcatter.item.TappingCrucibleItem(new Item.Properties().stacksTo(1).setId(TAPPING_CRUCIBLE_KEY));
 	public static final ResourceKey<Item> ANODE_ROD_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("anode_rod"));
 	public static final Item ANODE_ROD = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(ANODE_ROD_KEY),
 			"Anode rod: a stem with its steel yoke and stubs", "reused round and round");
@@ -255,6 +267,10 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, SPENT_ANODE_KEY, SPENT_ANODE);
 		Registry.register(BuiltInRegistries.ITEM, CRUSHED_BUTTS_KEY, CRUSHED_BUTTS);
 		Registry.register(BuiltInRegistries.ITEM, ANODE_ROD_KEY, ANODE_ROD);
+		Registry.register(BuiltInRegistries.ITEM, ALUMINIUM_INGOT_KEY, ALUMINIUM_INGOT);
+		Registry.register(BuiltInRegistries.ITEM, REACTED_ALUMINA_BAG_KEY, REACTED_ALUMINA_BAG);
+		Registry.register(BuiltInRegistries.ITEM, SPENT_POT_LINING_KEY, SPENT_POT_LINING);
+		Registry.register(BuiltInRegistries.ITEM, TAPPING_CRUCIBLE_KEY, TAPPING_CRUCIBLE);
 		Registry.register(BuiltInRegistries.ITEM, CRUDE_OIL_BUCKET_KEY, CRUDE_OIL_BUCKET);
 		Registry.register(BuiltInRegistries.ITEM, PLASTIC_SHEET_KEY, PLASTIC_SHEET);
 		Registry.register(BuiltInRegistries.ITEM, STEEL_INGOT_KEY, STEEL_INGOT);

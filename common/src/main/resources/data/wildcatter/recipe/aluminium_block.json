@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "AAA",
+    "AAA",
+    "AAA"
+  ],
+  "key": {
+    "A": "wildcatter:aluminium_ingot"
+  },
+  "result": {
+    "id": "wildcatter:aluminium_block",
+    "count": 1
+  }
+}
