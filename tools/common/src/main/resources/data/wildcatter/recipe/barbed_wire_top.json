@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "I I",
+    " I ",
+    "I I"
+  ],
+  "key": {
+    "I": "minecraft:iron_nugget"
+  },
+  "result": {
+    "id": "wildcatter:barbed_wire_top",
+    "count": 6
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SGS",
+    "CRC",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "G": "minecraft:glass_pane",
+    "C": "minecraft:comparator",
+    "R": "minecraft:redstone_block"
+  },
+  "result": {
+    "id": "wildcatter:relay_panel",
+    "count": 1
+  }
+}

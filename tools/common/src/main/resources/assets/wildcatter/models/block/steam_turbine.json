@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "wildcatter:block/steam_turbine_end",
+    "side": "wildcatter:block/steam_turbine_side"
+  }
+}

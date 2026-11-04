@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BPB",
+    "BWB",
+    "BFB"
+  ],
+  "key": {
+    "B": "minecraft:iron_block",
+    "P": "wildcatter:pipe",
+    "W": "minecraft:water_bucket",
+    "F": "minecraft:blast_furnace"
+  },
+  "result": {
+    "id": "wildcatter:hrsg",
+    "count": 1
+  }
+}

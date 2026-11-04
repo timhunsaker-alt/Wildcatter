@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BPB",
+    "B B",
+    "BPB"
+  ],
+  "key": {
+    "B": "minecraft:iron_block",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:atmospheric_column",
+    "count": 1
+  }
+}

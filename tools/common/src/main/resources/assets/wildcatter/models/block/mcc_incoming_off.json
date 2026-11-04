@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "wildcatter:block/mcc_incoming_front_off_placeholder",
+    "side": "wildcatter:block/cabinet_side_placeholder",
+    "top": "wildcatter:block/cabinet_side_placeholder",
+    "bottom": "wildcatter:block/cabinet_side_placeholder"
+  }
+}

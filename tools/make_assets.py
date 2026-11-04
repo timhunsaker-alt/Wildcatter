@@ -2170,6 +2170,26 @@ for item, (name, colour) in {"blueprint": ("Blueprint", (40, 80, 170)), "survey_
 lang[f"block.{ns}.site_marker"] = "Site Marker"
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 10c2: the tower and crawler cranes (docs/multiblocks/tower-crane.md, crawler-crane.md) --------------------------------
+# blockstates, models, shapes and items come from tools/models/cranes.py (run after this, it reads the paint); here the paint, loot,
+# names, tags and recipes. The superstructure is drawn by client/CraneRenderer in the same paint.
+tex("mat/mat_paint_crane_yellow_placeholder", lambda img, d: noise(img, (238, 178, 18), 7))
+CRANE_PARTS = ("tower_crane", "crawler_crane")
+for name in CRANE_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in CRANE_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("tower_crane", ["III", "SXS", "SCS"], {"I": "minecraft:iron_block", "S": S_, "X": f"{ns}:crankshaft", "C": "minecraft:iron_chain"}, "tower_crane")
+shaped("crawler_crane", ["SCS", "IXI", "TTT"], {"S": S_, "C": "minecraft:iron_chain", "I": "minecraft:iron_block", "X": f"{ns}:crankshaft",
+	"T": "minecraft:heavy_weighted_pressure_plate"}, "crawler_crane")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang[f"block.{ns}.tower_crane"] = "Tower Crane (16 t, 75 m jib)"
+lang[f"block.{ns}.crawler_crane"] = "Crawler Crane (300 t)"
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 7g: the fuel plant (docs/multiblocks/fuel.md) -------------------------------------------------------------------
 # blockstates, models, shapes and items come from tools/models/fuel.py; here loot, names, tags, recipes and the items.
 FUEL_PARTS = ("uf6_autoclave", "idr_kiln", "granulator", "pellet_press", "sintering_furnace", "pellet_grinder", "rod_loader", "rod_welder",

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "XTX",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_block",
+    "X": "wildcatter:crankshaft",
+    "T": "wildcatter:turbine_casing"
+  },
+  "result": {
+    "id": "wildcatter:steam_turbine_5",
+    "count": 1
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "QMQ",
+    " C "
+  ],
+  "key": {
+    "Q": "minecraft:quartz",
+    "M": "wildcatter:mcc_bucket",
+    "C": "minecraft:comparator"
+  },
+  "result": {
+    "id": "wildcatter:mcc_soft_starter_bucket",
+    "count": 1
+  }
+}

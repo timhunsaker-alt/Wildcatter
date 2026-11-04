@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SSS",
+    "BCB",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "B": "minecraft:iron_bars",
+    "C": "wildcatter:crankshaft"
+  },
+  "result": {
+    "id": "wildcatter:turbine_casing",
+    "count": 1
+  }
+}

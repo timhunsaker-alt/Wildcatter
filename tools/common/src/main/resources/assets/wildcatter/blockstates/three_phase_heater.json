@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "wildcatter:block/three_phase_heater"
+    },
+    "lit=true": {
+      "model": "wildcatter:block/three_phase_heater_lit"
+    }
+  }
+}

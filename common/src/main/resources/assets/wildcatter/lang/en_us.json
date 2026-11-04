@@ -419,6 +419,8 @@
   "item.wildcatter.blueprint": "Blueprint",
   "item.wildcatter.survey_tool": "Survey Tool",
   "block.wildcatter.site_marker": "Site Marker",
+  "block.wildcatter.tower_crane": "Tower Crane (16 t, 75 m jib)",
+  "block.wildcatter.crawler_crane": "Crawler Crane (300 t)",
   "item.wildcatter.spacer_grid": "Spacer Grid (Zircaloy-4)",
   "item.wildcatter.empty_helium_cylinder": "Empty Helium Cylinder",
   "item.wildcatter.helium_cylinder": "Helium Cylinder",

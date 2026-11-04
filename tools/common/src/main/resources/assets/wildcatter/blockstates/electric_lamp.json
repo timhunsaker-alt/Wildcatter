@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "wildcatter:block/electric_lamp"
+    },
+    "lit=true": {
+      "model": "wildcatter:block/electric_lamp_lit"
+    }
+  }
+}

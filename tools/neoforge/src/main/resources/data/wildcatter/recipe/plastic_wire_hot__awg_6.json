@@ -1,0 +1,46 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "wildcatter:wire_hot",
+      "components": {
+        "wildcatter:conductor_size": "awg_6"
+      },
+      "strict": false
+    },
+    {
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "wildcatter:wire_hot",
+      "components": {
+        "wildcatter:conductor_size": "awg_6"
+      },
+      "strict": false
+    },
+    {
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "wildcatter:wire_hot",
+      "components": {
+        "wildcatter:conductor_size": "awg_6"
+      },
+      "strict": false
+    },
+    {
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "wildcatter:wire_hot",
+      "components": {
+        "wildcatter:conductor_size": "awg_6"
+      },
+      "strict": false
+    },
+    "wildcatter:plastic_sheet"
+  ],
+  "result": {
+    "id": "wildcatter:plastic_wire_hot",
+    "count": 4,
+    "components": {
+      "wildcatter:conductor_size": "awg_6"
+    }
+  }
+}

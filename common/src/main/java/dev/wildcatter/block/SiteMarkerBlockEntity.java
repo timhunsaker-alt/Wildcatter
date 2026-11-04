@@ -30,6 +30,8 @@ import org.jspecify.annotations.Nullable;
 public class SiteMarkerBlockEntity extends BlockEntity implements Inspectable {
 	/** The markers the client has loaded, for the ghost. */
 	public static final Set<SiteMarkerBlockEntity> CLIENT = ConcurrentHashMap.newKeySet();
+	/** The markers the server has loaded, for the cranes to find. */
+	public static final Set<SiteMarkerBlockEntity> SERVER = ConcurrentHashMap.newKeySet();
 
 	private String data = "";
 	private int turns;
@@ -38,7 +40,10 @@ public class SiteMarkerBlockEntity extends BlockEntity implements Inspectable {
 	private @Nullable List<Blueprint.Lift> lifts;
 	private int done;
 	private boolean complete;
+	private boolean dismantle;
 	private String next = "";
+	/** Lifts a crane has taken on, by index, and the crane: two cranes never work the same lift (10c3). Not saved. */
+	private final java.util.Map<Integer, BlockPos> claims = new java.util.HashMap<>();
 
 	public SiteMarkerBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.SITE_MARKER_ENTITY, pos, state);
@@ -99,6 +104,59 @@ public class SiteMarkerBlockEntity extends BlockEntity implements Inspectable {
 		return done;
 	}
 
+	/** True while the site is to be taken down, last lift first (docs/blueprints.md, "Site marker"). */
+	public boolean dismantle() {
+		return dismantle;
+	}
+
+	public void toggleMode() {
+		dismantle = !dismantle;
+		claims.clear();
+		recount();
+		setChanged();
+		if (level != null) {
+			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+		}
+	}
+
+	/** Takes lift {@code index} for the crane at {@code crane}; false if another crane has it. */
+	public boolean claim(int index, BlockPos crane) {
+		BlockPos holder = claims.get(index);
+		if (holder != null && !holder.equals(crane)) {
+			return false;
+		}
+		claims.put(index, crane.immutable());
+		return true;
+	}
+
+	public void release(int index, BlockPos crane) {
+		claims.remove(index, crane);
+	}
+
+	/** True if another crane than {@code crane} has lift {@code index}. */
+	public boolean claimedByOther(int index, BlockPos crane) {
+		BlockPos holder = claims.get(index);
+		return holder != null && !holder.equals(crane);
+	}
+
+	/** True if any block or the part of lift {@code lift} stands: something of it to take down. */
+	public boolean liftAnyStands(Blueprint.Lift lift) {
+		Blueprint b = blueprint();
+		if (b == null || level == null) {
+			return false;
+		}
+		if (lift.isPart()) {
+			return Surveys.partStands(level, worldPosition, b.parts().get(lift.part()));
+		}
+		for (int i : lift.blocks()) {
+			Blueprint.Block k = b.blocks().get(i);
+			if (Surveys.blockStands(level, worldPosition, k, states[k.state()])) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/** True if every block and part of lift {@code lift} stands. */
 	public boolean liftStands(Blueprint.Lift lift) {
 		Blueprint b = blueprint();
@@ -126,6 +184,21 @@ public class SiteMarkerBlockEntity extends BlockEntity implements Inspectable {
 		}
 		int count = 0;
 		String first = "";
+		if (dismantle) {
+			for (int i = lifts.size() - 1; i >= 0; i--) {
+				if (liftAnyStands(lifts.get(i))) {
+					count++;
+					if (first.isEmpty()) {
+						first = describe(lifts.get(i));
+					}
+				}
+			}
+			done = count;
+			complete = false;
+			next = first;
+			setChanged();
+			return;
+		}
 		for (Blueprint.Lift lift : lifts) {
 			if (liftStands(lift)) {
 				count++;
@@ -190,6 +263,7 @@ public class SiteMarkerBlockEntity extends BlockEntity implements Inspectable {
 	}
 
 	public static void serverTick(Level level, BlockPos pos, BlockState state, SiteMarkerBlockEntity site) {
+		SERVER.add(site);
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.SITE_CHECK_TICKS == 0) {
 			site.recount();
 		}
@@ -203,6 +277,7 @@ public class SiteMarkerBlockEntity extends BlockEntity implements Inspectable {
 	public void setRemoved() {
 		super.setRemoved();
 		CLIENT.remove(this);
+		SERVER.remove(this);
 	}
 
 	@Override
@@ -215,6 +290,10 @@ public class SiteMarkerBlockEntity extends BlockEntity implements Inspectable {
 			recount();
 		}
 		String name = data.startsWith("lib:") ? BlueprintLibrary.title(data.substring(4)) : b.name();
+		if (dismantle) {
+			return Component.literal(done == 0 ? String.format("Site: %s, DISMANTLE: cleared", name)
+					: String.format("Site: %s, DISMANTLE, %d lifts, %d still stand; next: %s", name, lifts.size(), done, next));
+		}
 		return Component.literal(complete ? String.format("Site: %s, all %d lifts stand: built", name, lifts.size())
 				: String.format("Site: %s, %d lifts, %d done; next: %s", name, lifts.size(), done, next));
 	}
@@ -225,6 +304,7 @@ public class SiteMarkerBlockEntity extends BlockEntity implements Inspectable {
 		output.putString("blueprint", data);
 		output.putInt("turns", turns);
 		output.putBoolean("complete", complete);
+		output.putBoolean("dismantle", dismantle);
 	}
 
 	@Override
@@ -235,6 +315,7 @@ public class SiteMarkerBlockEntity extends BlockEntity implements Inspectable {
 		data = input.getStringOr("blueprint", "");
 		turns = input.getIntOr("turns", 0);
 		complete = input.getBooleanOr("complete", false);
+		dismantle = input.getBooleanOr("dismantle", false);
 		if (!was.equals(data) || wasTurns != turns) {
 			turned = null;
 		}

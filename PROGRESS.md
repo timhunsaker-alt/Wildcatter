@@ -491,6 +491,44 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - **Recommended mods:** `docs/recommended-mods.md` lists the quality-of-life mods with 26.3 builds for Fabric and NeoForge.
   - The Fabric set ran the `coker` and `anodes` scenes alongside Wildcatter, Sodium included, and both passed.
 
+## Phase 10c2: the tower and crawler cranes (specs: docs/multiblocks/tower-crane.md, crawler-crane.md)
+- **The tower crane** (`tower_crane`, after the Liebherr 380 EC-B 16, from its BKL data sheet):
+  - a 6 x 3 x 6 cross base with ballast and the mast foot;
+  - drawn above it: the 355 HC mast to 59.7 m under the hook, the 75 m jib, the counter-jib, the trolley and the hook;
+  - its real chart: 16 t to 19.6 m, then 3.0 t at 75 m. The 3.4 t headline is Litronic's power-plus mode and is left out;
+  - its hoist gears: 16 t at 36 m/min up to 1.9 t at 205 m/min; the trolley at 95 m/min; slewing at 0.8 rpm;
+  - one frequency-converter load (`DriveLoad`) on the industrial voltage at its switch cabinet's west face: the hoist at m g v / 0.85
+    (at most 110 kW), the trolley 10.5 kW, slewing 15 kW, 3 kW standby.
+- **The crawler crane** (`crawler_crane`, after the Liebherr LR 1300, from its technical data):
+  - 9 x 2 x 9 crawlers and carbody; drawn above them: the upper works, the lattice boom at its angle, the pendants and the hook;
+  - its real main-boom chart with the 104 t counterweight: 286.2 t at 4.3 m on 20 m, down to 2.6 t at 80 m on 86 m;
+  - the boom set by sneak-click, 20 to 95 m, between lifts (decided with Tim, 2026-11-04);
+  - parts of line for the load at 150 kN each (1 to 22): the hook at 138 m/min over the parts, held to what 390 kW lifts;
+  - slewing at 1.8 rpm, luffing 15 to 86 degrees in 127 s;
+  - its own diesel: a 750 L tank filled from a steel line to any cell of its crawlers, burning 102 L/h at full load, 15 % idling.
+- **How a crane works** (`crane/LoadChart`, `crane/CraneKind`, `crane/LiftCycle`, plain Java; `block/CraneBlockEntity`):
+  - it takes the nearest site marker in its reach, and the marker's next lift (in DISMANTLE, its last standing one);
+  - it checks the load on the hook against its chart at the lift's radius, read at the farther radius as an operator does; its
+    height under the hook; what its chest holds; and its power;
+  - each lift's steps run at its real speeds: to the pick, rigging (30 s), hoisting clear, slewing and moving out together,
+    lowering, setting (30 s);
+  - a part is placed and grown, a pallet's blocks set, as a hand would (`Surveys.setLift`);
+  - its readout names the step, the load against its chart, or what it waits for: TOO HEAVY, OUT OF REACH, TOO HIGH, WAITING (what
+    the chest lacks), IN THE WAY, CHEST FULL, NO POWER, NO DIESEL, NO SITE.
+- **Dismantling** is the site marker's mode: sneak-click it to switch between BUILD and DISMANTLE (decided with Tim, 2026-11-04).
+  The cranes take the site down, last lift first, into their chests: a part as its item, a pallet's blocks as theirs.
+- **The marker** keeps a claim on each lift a crane has taken, so two cranes never work the same lift (for 10c3).
+- **The renderer** (`client/CraneRenderer`) draws the lattice from textured beams, turning with the slewing angle and moving through
+  each step, with the load hung from its own block models.
+- **Field Manual:** a new page, CRANES; BLUEPRINTS names the marker's mode.
+- **Unit tests:** `LoadChartTest` (the charts, the farther-radius rule, the 15 degree reach) and `LiftCycleTest` (hoist gears, parts
+  of line and the engine limit, the steps' times and power, diesel).
+- **Game test `cranes`:**
+  - a tower crane on a diesel set's 480 V finishes a surveyed site (a stone-brick pad and a 480 V pad-mount) from its chest, then
+    in DISMANTLE lifts the pad-mount back into it;
+  - a crawler fed diesel from a stock tank reads TOO HEAVY for a GSU 60 at 9 m on its 86 m boom, and sets it on its 32 m boom;
+  - screenshots of each crane mid-lift.
+
 ## Phase 10c1: blueprints (spec: docs/blueprints.md)
 10c is three waves (Tim, 2026-11-04): 10c1 blueprints, 10c2 the tower and crawler cranes, 10c3 the ring crane and heavy lifts.
 - **The format** (`blueprint/Blueprint`, plain Java):
@@ -1251,6 +1289,13 @@ sized for a 40-pot line.
   - the bus bars' standoffs stand on the floor of their own cell, so a run carried up in the air shows them hanging (no
     supports or structure yet);
   - the chlor-alkali caustic soda is still only counted (fixed in 10b2: it is a pipe product).
+- Phase 10c2:
+  - the cranes are placed whole: no erection, climbing or boom assembly;
+  - wind is left out, and so are the crawler's travel and ground bearing;
+  - a crawler has only its main boom and the 104 t counterweight chart: no derrick, superlift or luffing jib;
+  - the mast, jib and boom have no collision, and nothing stops a jib passing through a building or another crane;
+  - a world saved mid-lift puts the load back in the chest, and the lift is made again;
+  - the cranes' paint is a `*_placeholder` texture (`mat_paint_crane_yellow_placeholder`).
 - Phase 10c1:
   - a blueprint does not record what blocks hold or how machines are set, nor entities; it cannot be edited, only surveyed again;
   - the site marker stands at the origin corner, so a blueprint with a block in that corner cannot be finished until the marker

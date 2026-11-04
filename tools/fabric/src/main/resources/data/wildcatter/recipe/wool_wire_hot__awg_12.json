@@ -1,0 +1,42 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "fabric:type": "fabric:components",
+      "base": "wildcatter:wire_hot",
+      "components": {
+        "wildcatter:conductor_size": "awg_12"
+      }
+    },
+    {
+      "fabric:type": "fabric:components",
+      "base": "wildcatter:wire_hot",
+      "components": {
+        "wildcatter:conductor_size": "awg_12"
+      }
+    },
+    {
+      "fabric:type": "fabric:components",
+      "base": "wildcatter:wire_hot",
+      "components": {
+        "wildcatter:conductor_size": "awg_12"
+      }
+    },
+    {
+      "fabric:type": "fabric:components",
+      "base": "wildcatter:wire_hot",
+      "components": {
+        "wildcatter:conductor_size": "awg_12"
+      }
+    },
+    "#minecraft:wool"
+  ],
+  "result": {
+    "id": "wildcatter:wool_wire_hot",
+    "count": 4,
+    "components": {
+      "wildcatter:conductor_size": "awg_12"
+    }
+  }
+}

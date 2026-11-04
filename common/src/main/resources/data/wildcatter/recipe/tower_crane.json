@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "III",
+    "SXS",
+    "SCS"
+  ],
+  "key": {
+    "I": "minecraft:iron_block",
+    "S": "wildcatter:steel_ingot",
+    "X": "wildcatter:crankshaft",
+    "C": "minecraft:iron_chain"
+  },
+  "result": {
+    "id": "wildcatter:tower_crane",
+    "count": 1
+  }
+}

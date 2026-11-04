@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SQS",
+    "QDQ",
+    "SQS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "Q": "minecraft:quartz_block",
+    "D": "wildcatter:drive_cabinet"
+  },
+  "result": {
+    "id": "wildcatter:drive_mv_cells",
+    "count": 1
+  }
+}

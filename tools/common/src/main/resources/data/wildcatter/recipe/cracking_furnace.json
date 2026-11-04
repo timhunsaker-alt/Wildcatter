@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BBB",
+    "BFB",
+    "PFP"
+  ],
+  "key": {
+    "B": "minecraft:iron_block",
+    "F": "minecraft:blast_furnace",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:cracking_furnace",
+    "count": 1
+  }
+}

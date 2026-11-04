@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PHP",
+    "HNH",
+    "PGP"
+  ],
+  "key": {
+    "P": "wildcatter:plastic_sheet",
+    "H": "wildcatter:dist_wire_hot",
+    "N": "wildcatter:dist_wire_neutral",
+    "G": "wildcatter:ground_wire"
+  },
+  "result": {
+    "id": "wildcatter:cable_dist",
+    "count": 4,
+    "components": {
+      "wildcatter:conductor_size": "mv_1_0"
+    }
+  }
+}

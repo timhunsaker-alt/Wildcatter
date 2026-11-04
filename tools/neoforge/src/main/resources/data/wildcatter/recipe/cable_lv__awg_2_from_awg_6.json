@@ -1,0 +1,37 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "wildcatter:cable_lv",
+      "components": {
+        "wildcatter:conductor_size": "awg_6"
+      },
+      "strict": false
+    },
+    {
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "wildcatter:cable_lv",
+      "components": {
+        "wildcatter:conductor_size": "awg_6"
+      },
+      "strict": false
+    },
+    {
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "wildcatter:cable_lv",
+      "components": {
+        "wildcatter:conductor_size": "awg_6"
+      },
+      "strict": false
+    }
+  ],
+  "result": {
+    "id": "wildcatter:cable_lv",
+    "count": 1,
+    "components": {
+      "wildcatter:conductor_size": "awg_2"
+    }
+  }
+}

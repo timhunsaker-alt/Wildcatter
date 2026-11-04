@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "facing=north,position=on": {
+      "model": "wildcatter:block/mcc_incoming_on",
+      "y": 0
+    },
+    "facing=north,position=off": {
+      "model": "wildcatter:block/mcc_incoming_off",
+      "y": 0
+    },
+    "facing=north,position=tripped": {
+      "model": "wildcatter:block/mcc_incoming_tripped",
+      "y": 0
+    },
+    "facing=east,position=on": {
+      "model": "wildcatter:block/mcc_incoming_on",
+      "y": 90
+    },
+    "facing=east,position=off": {
+      "model": "wildcatter:block/mcc_incoming_off",
+      "y": 90
+    },
+    "facing=east,position=tripped": {
+      "model": "wildcatter:block/mcc_incoming_tripped",
+      "y": 90
+    },
+    "facing=south,position=on": {
+      "model": "wildcatter:block/mcc_incoming_on",
+      "y": 180
+    },
+    "facing=south,position=off": {
+      "model": "wildcatter:block/mcc_incoming_off",
+      "y": 180
+    },
+    "facing=south,position=tripped": {
+      "model": "wildcatter:block/mcc_incoming_tripped",
+      "y": 180
+    },
+    "facing=west,position=on": {
+      "model": "wildcatter:block/mcc_incoming_on",
+      "y": 270
+    },
+    "facing=west,position=off": {
+      "model": "wildcatter:block/mcc_incoming_off",
+      "y": 270
+    },
+    "facing=west,position=tripped": {
+      "model": "wildcatter:block/mcc_incoming_tripped",
+      "y": 270
+    }
+  }
+}

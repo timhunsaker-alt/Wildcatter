@@ -117,6 +117,9 @@ A figure marked *(proposed)* is an estimate or a proposal.
   - the marker draws the ghost for every player within 128 m of the site's box until each block and part of it stands;
   - its readout: "Site: Potline, 312 lifts, 41 done; next: Pot (60 t) at 66, 64, -6313";
   - breaking the marker drops it and leaves what is built.
+  - **its mode (10c2):** sneak-right-click switches it between BUILD and DISMANTLE (decided with Tim, 2026-11-04). Every crane
+    working the site follows it. In DISMANTLE the cranes take its lifts down, last first, and the readout counts what still stands:
+    "Site: Potline, DISMANTLE, 312 lifts, 270 still stand; next: Pot (60 t) at 66, 64, -6313", then "cleared" when none stand.
 
 ## The library
 - **Where it lives:** `common/src/main/resources/assets/wildcatter/blueprints/<name>.json`, read from the jar, so both the server and

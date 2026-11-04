@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SBS",
+    "CRC",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "B": "wildcatter:breaker_3p_industrial",
+    "C": "minecraft:copper_ingot",
+    "R": "minecraft:repeater"
+  },
+  "result": {
+    "id": "wildcatter:motor_starter",
+    "count": 1
+  }
+}

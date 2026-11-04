@@ -35,6 +35,9 @@ public class SiteMarkerBlock extends BaseEntityBlock {
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 		if (!level.isClientSide() && level.getBlockEntity(pos) instanceof SiteMarkerBlockEntity site) {
+			if (player.isShiftKeyDown()) {
+				site.toggleMode();   // BUILD or DISMANTLE, for every crane on the site
+			}
 			site.recount();
 			player.sendOverlayMessage(site.inspect());
 		}

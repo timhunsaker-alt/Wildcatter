@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "S S",
+    "SWS",
+    "SSS"
+  ],
+  "key": {
+    "S": "minecraft:smooth_stone",
+    "W": "minecraft:water_bucket"
+  },
+  "result": {
+    "id": "wildcatter:tower_basin",
+    "count": 1
+  }
+}

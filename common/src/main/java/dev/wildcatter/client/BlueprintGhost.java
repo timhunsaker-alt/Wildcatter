@@ -46,7 +46,7 @@ public final class BlueprintGhost {
 				SiteMarkerBlockEntity.CLIENT.remove(site);
 				continue;
 			}
-			if (!site.complete()) {
+			if (!site.complete() && !site.dismantle()) {
 				draw(client, site.data(), site.turns(), site.getBlockPos(), MARKER);
 			}
 		}

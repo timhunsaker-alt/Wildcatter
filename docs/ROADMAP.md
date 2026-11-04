@@ -239,6 +239,8 @@ and the Field Manual has a page for each new system.
     - the tower crane (Liebherr 380 EC-B 16) on 480 V, and the crawler crane (Liebherr LR 1300) on its own diesel;
     - their load charts and real speeds;
     - building a site from the crane's chest, and dismantling it back.
+    - From the real data sheets: the 380 EC-B 16 carries 3.0 t at its 75 m tip (3.4 t only in Litronic's power-plus mode).
+      The LR 1300 lifts 286 t at 4.3 m on its 20 m boom, and 2.6 t at 80 m on an 86 m boom, not 25 t as first written.
   - **10c3: the ring crane and heavy lifts** (spec: `docs/multiblocks/ring-crane.md`):
     - the ring crane (Sarens SGC-250 "Big Carl", which set Hinkley Point C's reactor modules; the earlier note named Mammoet in
       error) on its own diesel sets;
@@ -251,6 +253,8 @@ and the Field Manual has a page for each new system.
     - cranes can take a plant apart into their chest;
     - two cranes can share a site and tandem-lift a part;
     - a ghost of the blueprint at its site, locked with a site marker.
+    - for 10c2: the crawler's boom is set by the player (20 to 95 m, the real chart's lengths), and DISMANTLE is the site marker's
+      mode, which every crane on the site follows.
 - **10d: the grid finish:**
   - switches and panels;
   - better wire, ground and breaker art;

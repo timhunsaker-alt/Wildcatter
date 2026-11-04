@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "wildcatter:bus_duct_gen",
+    "wildcatter:bus_duct_gen",
+    "wildcatter:bus_duct_gen",
+    "minecraft:copper_block"
+  ],
+  "result": {
+    "id": "wildcatter:bus_duct_gen",
+    "count": 1,
+    "components": {
+      "wildcatter:conductor_size": "bus_duct_3000"
+    }
+  }
+}

@@ -1,0 +1,519 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "conductor": "a"
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_a_core"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "a"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_a_arm"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "a"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_a_arm",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "a"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_a_arm",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "a"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_a_arm",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "a"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_a_arm",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "a"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_a_arm",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "b"
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_b_core"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "b"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_b_arm"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "b"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_b_arm",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "b"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_b_arm",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "b"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_b_arm",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "b"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_b_arm",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "b"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_b_arm",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "c"
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_c_core"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "c"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_c_arm"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "c"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_c_arm",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "c"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_c_arm",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "c"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_c_arm",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "c"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_c_arm",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "c"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_c_arm",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "n"
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_n_core"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "n"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_n_arm"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "n"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_n_arm",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "n"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_n_arm",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "n"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_n_arm",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "n"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_n_arm",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "n"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_n_arm",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "g"
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_g_core"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "g"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_g_arm"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "g"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_g_arm",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "g"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_g_arm",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "g"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_g_arm",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "g"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_g_arm",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "g"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/industrial_wire_g_arm",
+        "x": 90
+      }
+    }
+  ]
+}

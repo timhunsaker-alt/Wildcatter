@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "PRP",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_block",
+    "P": "wildcatter:gas_line",
+    "R": "minecraft:redstone_block"
+  },
+  "result": {
+    "id": "wildcatter:desalter",
+    "count": 1
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "CCC",
+    "B B"
+  ],
+  "key": {
+    "C": "minecraft:copper_ingot",
+    "B": "minecraft:brick"
+  },
+  "result": {
+    "id": "wildcatter:dc_bus_4k",
+    "count": 4
+  }
+}

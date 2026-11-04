@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SIS",
+    "IWI",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "I": "minecraft:blue_ice",
+    "W": "minecraft:white_wool",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:cold_box",
+    "count": 1
+  }
+}

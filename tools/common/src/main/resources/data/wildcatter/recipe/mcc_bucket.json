@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SMS",
+    "S S"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "M": "wildcatter:motor_starter"
+  },
+  "result": {
+    "id": "wildcatter:mcc_bucket",
+    "count": 1
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "WWW",
+    "WSW",
+    "WWW"
+  ],
+  "key": {
+    "W": {
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "wildcatter:wire_hot",
+      "components": {
+        "wildcatter:conductor_size": "awg_10"
+      },
+      "strict": false
+    },
+    "S": "minecraft:stick"
+  },
+  "result": {
+    "id": "wildcatter:conductor_spool_lv",
+    "count": 1,
+    "components": {
+      "wildcatter:conductor_size": "awg_10"
+    }
+  }
+}

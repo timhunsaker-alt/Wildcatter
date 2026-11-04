@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "wildcatter:block/boiler"
+    },
+    "lit=true": {
+      "model": "wildcatter:block/boiler_lit"
+    }
+  }
+}

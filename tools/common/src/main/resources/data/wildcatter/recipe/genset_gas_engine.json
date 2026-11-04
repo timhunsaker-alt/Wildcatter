@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IHI",
+    "PCP",
+    "PBP"
+  ],
+  "key": {
+    "I": "wildcatter:spark_plug",
+    "H": "wildcatter:cylinder_head",
+    "P": "wildcatter:piston",
+    "C": "wildcatter:crankshaft",
+    "B": "wildcatter:engine_block_casting"
+  },
+  "result": {
+    "id": "wildcatter:genset_gas_engine",
+    "count": 1
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SDS",
+    "TCT",
+    "SDS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "D": "minecraft:diamond_block",
+    "T": "wildcatter:substation_transformer",
+    "C": "minecraft:copper_block"
+  },
+  "result": {
+    "id": "wildcatter:power_transformer",
+    "count": 1
+  }
+}

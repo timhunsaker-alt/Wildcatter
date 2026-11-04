@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "wildcatter:block/electric_heater"
+    },
+    "lit=true": {
+      "model": "wildcatter:block/electric_heater_lit"
+    }
+  }
+}

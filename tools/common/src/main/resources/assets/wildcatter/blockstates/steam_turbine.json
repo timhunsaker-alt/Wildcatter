@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "running=false": {
+      "model": "wildcatter:block/steam_turbine"
+    },
+    "running=true": {
+      "model": "wildcatter:block/steam_turbine_running"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    " S ",
+    "SBS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "B": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:disposal_wellhead",
+    "count": 1
+  }
+}

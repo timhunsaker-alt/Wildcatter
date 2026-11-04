@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "facing=north,run=running": {
+      "model": "wildcatter:block/mcc_bucket_running",
+      "y": 0
+    },
+    "facing=north,run=stopped": {
+      "model": "wildcatter:block/mcc_bucket_stopped",
+      "y": 0
+    },
+    "facing=north,run=tripped": {
+      "model": "wildcatter:block/mcc_bucket_tripped",
+      "y": 0
+    },
+    "facing=east,run=running": {
+      "model": "wildcatter:block/mcc_bucket_running",
+      "y": 90
+    },
+    "facing=east,run=stopped": {
+      "model": "wildcatter:block/mcc_bucket_stopped",
+      "y": 90
+    },
+    "facing=east,run=tripped": {
+      "model": "wildcatter:block/mcc_bucket_tripped",
+      "y": 90
+    },
+    "facing=south,run=running": {
+      "model": "wildcatter:block/mcc_bucket_running",
+      "y": 180
+    },
+    "facing=south,run=stopped": {
+      "model": "wildcatter:block/mcc_bucket_stopped",
+      "y": 180
+    },
+    "facing=south,run=tripped": {
+      "model": "wildcatter:block/mcc_bucket_tripped",
+      "y": 180
+    },
+    "facing=west,run=running": {
+      "model": "wildcatter:block/mcc_bucket_running",
+      "y": 270
+    },
+    "facing=west,run=stopped": {
+      "model": "wildcatter:block/mcc_bucket_stopped",
+      "y": 270
+    },
+    "facing=west,run=tripped": {
+      "model": "wildcatter:block/mcc_bucket_tripped",
+      "y": 270
+    }
+  }
+}

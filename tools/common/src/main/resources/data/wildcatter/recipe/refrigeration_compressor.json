@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "CXC",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_ingot",
+    "X": "wildcatter:crankshaft",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:refrigeration_compressor",
+    "count": 1
+  }
+}

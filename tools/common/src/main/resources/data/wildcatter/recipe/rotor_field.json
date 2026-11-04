@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "CSC",
+    "SIS",
+    "CSC"
+  ],
+  "key": {
+    "C": "minecraft:copper_ingot",
+    "S": "wildcatter:steel_ingot",
+    "I": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:rotor_field",
+    "count": 1
+  }
+}

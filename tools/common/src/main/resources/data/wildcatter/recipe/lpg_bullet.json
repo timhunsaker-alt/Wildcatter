@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SSS",
+    "SPS",
+    "SSS"
+  ],
+  "key": {
+    "S": "minecraft:iron_block",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:lpg_bullet",
+    "count": 1
+  }
+}

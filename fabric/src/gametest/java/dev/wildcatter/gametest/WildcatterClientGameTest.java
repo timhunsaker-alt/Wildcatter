@@ -238,6 +238,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("blueprints")) {
 				blueprints(context, server);
 			}
+			if (only("cranes")) {
+				cranes(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -2781,6 +2784,152 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(seen, "the client should hold the potline's site marker with its blueprint, for the ghost: " + clientSide);
 		context.takeScreenshot("wildcatter-blueprint-ghost");
 		System.out.println("[wildcatter-test] blueprints ok: " + summary + " | " + plan + " | " + built);
+	}
+
+	/**
+	 * Cranes (10c2, docs/multiblocks/tower-crane.md, crawler-crane.md). A tower crane on a diesel set's 480 V finishes a surveyed site
+	 * (a stone-brick pad with a 480 V pad-mount on it, seeded with all but its last two lifts) from its chest, at its real speeds under
+	 * /tick sprint; its marker then goes to DISMANTLE and the crane must lift the pad-mount back into its chest. A crawler crane fed
+	 * diesel from a stock tank must read TOO HEAVY for a GSU 60 (90 t) at 9 m on its 86 m boom, and set it on its 32 m boom.
+	 */
+	private void cranes(ClientGameTestContext context, TestServerContext server) {
+		final int z = -6800;
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		server.runCommand("effect give @p minecraft:slow_falling 600 0 true");
+		server.runCommand("tp @p 40 " + (up + 30) + " " + (z + 45) + " 180 30");
+		context.waitTicks(20);
+		for (int zz = z - 20; zz <= z + 40; zz += 20) {
+			server.runCommand("fill 0 " + (y - 1) + " " + zz + " 80 " + (y + 12) + " " + Math.min(zz + 19, z + 40) + " minecraft:air");
+			server.runCommand("fill 0 " + (y - 1) + " " + zz + " 80 " + (y - 1) + " " + Math.min(zz + 19, z + 40) + " minecraft:stone");
+		}
+		// ---- the tower crane, fed from a diesel set's 480 V terminals by cable to its switch cabinet
+		BlockPos tower = new BlockPos(20, y, z);
+		placeBig(server, WildcatterBlocks.TOWER_CRANE, tower, north);                    // x 20-25, z..z+5, its cabinet's terminal on the west face
+		BlockPos set = new BlockPos(12, up, z);
+		genset(server, set, north, false);                                               // its terminals on the panel's east face
+		put(server, 13, up, z, "wildcatter:cable_industrial");
+		for (int x = 13; x <= 19; x++) {
+			put(server, x, y, z, "wildcatter:cable_industrial");
+		}
+		// its site: surveyed in place, cleared, its marker set at the box's empty corner
+		BlockPos origin = new BlockPos(30, y, z + 10);
+		for (int x = 31; x <= 35; x++) {
+			for (int zz = z + 11; zz <= z + 15; zz++) {
+				put(server, x, y, zz, "minecraft:stone_bricks");
+			}
+		}
+		placeBig(server, WildcatterBlocks.PADMOUNT_480, new BlockPos(33, y + 1, z + 13), north);
+		String towerData = server.computeOnServer(srv -> dev.wildcatter.item.SurveyToolItem.record(srv.overworld(), origin, origin.offset(6, 4, 6)).compressed());
+		server.runCommand("fill " + origin.getX() + " " + y + " " + origin.getZ() + " " + (origin.getX() + 6) + " " + (y + 4) + " " + (origin.getZ() + 6) + " minecraft:air");
+		String seeded = server.computeOnServer(srv -> {
+			srv.overworld().setBlock(origin, WildcatterBlocks.SITE_MARKER.defaultBlockState(), 3);
+			dev.wildcatter.block.SiteMarkerBlockEntity marker = (dev.wildcatter.block.SiteMarkerBlockEntity) srv.overworld().getBlockEntity(origin);
+			marker.set(towerData, 0);
+			java.util.List<dev.wildcatter.blueprint.Blueprint.Lift> lifts = marker.lifts();
+			for (int i = 0; i < lifts.size() - 2; i++) {
+				dev.wildcatter.blueprint.Surveys.setLift(srv.overworld(), origin, marker.blueprint(), marker.states(), lifts.get(i));
+			}
+			marker.recount();
+			return lifts.size() + " lifts, the last " + marker.describe(lifts.get(lifts.size() - 1));
+		});
+		put(server, 26, y, z + 2, "minecraft:chest");
+		server.runCommand("item replace block 26 " + y + " " + (z + 2) + " container.0 with minecraft:stone_bricks 64");
+		server.runCommand("item replace block 26 " + y + " " + (z + 2) + " container.1 with wildcatter:padmount_480 1");
+		startGenset(context, server, set, north, 2000);
+		System.out.println("[wildcatter-test] cranes: tower site " + seeded + " | " + read(server, tower.getX(), tower.getY(), tower.getZ()));
+		// ---- the crawler crane, fed diesel from a stock tank by pipe to its west crawler
+		BlockPos crawler = new BlockPos(60, y, z);
+		placeBig(server, WildcatterBlocks.CRAWLER_CRANE, crawler, north);                // x 60-68, z..z+8, its centre at 64.5, z+4.5
+		BlockPos tank = new BlockPos(52, y, z + 2);
+		placeBig(server, WildcatterBlocks.STOCK_TANK, tank, north);                      // x 52-55, z+2..z+5
+		fillTank(server, tank, dev.wildcatter.fluid.Product.DIESEL, 5_000);   // first: a run carries what its sources offer when it is laid
+		for (int x = 56; x <= 59; x++) {
+			put(server, x, y, z + 3, "wildcatter:gas_line");   // the steel process line
+		}
+		// its site: a GSU 60 surveyed in place 9 m north of its centre, then taken away
+		BlockPos gsuOrigin = new BlockPos(61, y, z - 8);
+		placeBig(server, WildcatterBlocks.GSU_60, new BlockPos(65, y, z - 3), north);    // x 62-67, z-7..z-3
+		String gsuData = server.computeOnServer(srv -> dev.wildcatter.item.SurveyToolItem.record(srv.overworld(), gsuOrigin, gsuOrigin.offset(7, 9, 6)).compressed());
+		server.runCommand("fill 61 " + y + " " + (z - 8) + " 68 " + (y + 9) + " " + (z - 2) + " minecraft:air");
+		server.computeOnServer(srv -> {
+			srv.overworld().setBlock(gsuOrigin, WildcatterBlocks.SITE_MARKER.defaultBlockState(), 3);
+			((dev.wildcatter.block.SiteMarkerBlockEntity) srv.overworld().getBlockEntity(gsuOrigin)).set(gsuData, 0);
+			return null;
+		});
+		put(server, 69, y, z + 4, "minecraft:chest");   // its GSU goes in once the tower crane is done, so each is seen at work
+		// on the 86 m boom the GSU is too heavy at 9 m
+		server.computeOnServer(srv -> {
+			dev.wildcatter.block.CraneBlockEntity c = (dev.wildcatter.block.CraneBlockEntity) srv.overworld().getBlockEntity(crawler);
+			while (c.boom() != 12) {
+				c.nextBoom();
+			}
+			return null;
+		});
+		context.waitTicks(60);
+		String heavy = read(server, crawler.getX(), crawler.getY(), crawler.getZ());
+		System.out.println("[wildcatter-test] cranes: crawler on its 86 m boom | " + heavy);
+		check(heavy.contains("TOO HEAVY") && heavy.contains("86 m boom"), "the GSU 60 should be too heavy for the 86 m boom at 9 m: " + heavy);
+		check(!heavy.contains("diesel 0 of"), "the crawler should have drawn diesel from the stock tank: " + heavy);
+		server.computeOnServer(srv -> {
+			dev.wildcatter.block.CraneBlockEntity c = (dev.wildcatter.block.CraneBlockEntity) srv.overworld().getBlockEntity(crawler);
+			while (c.boom() != 3) {
+				c.nextBoom();
+			}
+			return null;
+		});
+		// both cranes work at their real speeds, sped up; each is caught mid-lift for a screenshot
+		server.runCommand("tick sprint 40000");
+		String towerLift = waitFor(context, server, () -> server.computeOnServer(srv -> ((dev.wildcatter.block.CraneBlockEntity) srv.overworld().getBlockEntity(tower)).carrying()), 2400);
+		server.runCommand("tick sprint stop");
+		context.waitTicks(10);
+		server.runCommand("tp @p -25 " + (y + 30) + " " + (z + 55) + " -137 0");
+		context.waitTicks(30);
+		System.out.println("[wildcatter-test] cranes: tower mid-lift " + towerLift + " | " + read(server, tower.getX(), tower.getY(), tower.getZ()));
+		context.takeScreenshot("wildcatter-tower-crane-lift");
+		server.runCommand("tick sprint 40000");
+		String built = waitFor(context, server, () -> read(server, origin.getX(), origin.getY(), origin.getZ()).contains("built"), 3000);
+		String towerRead = read(server, tower.getX(), tower.getY(), tower.getZ());
+		String site = read(server, origin.getX(), origin.getY(), origin.getZ());
+		System.out.println("[wildcatter-test] cranes: tower built " + built + " | " + site + " | " + towerRead);
+		check(site.contains("built"), "the tower crane should finish its site: " + site + " | " + towerRead);
+		server.runCommand("item replace block 69 " + y + " " + (z + 4) + " container.0 with wildcatter:gsu_60 1");
+		String crawlerLift = waitFor(context, server, () -> server.computeOnServer(srv -> ((dev.wildcatter.block.CraneBlockEntity) srv.overworld().getBlockEntity(crawler)).carrying()), 3000);
+		server.runCommand("tick sprint stop");
+		context.waitTicks(10);
+		server.runCommand("tp @p 95 " + (y + 20) + " " + (z + 30) + " 130 7");
+		context.waitTicks(30);
+		System.out.println("[wildcatter-test] cranes: crawler mid-lift " + crawlerLift + " | " + read(server, crawler.getX(), crawler.getY(), crawler.getZ()));
+		context.takeScreenshot("wildcatter-crawler-crane-lift");
+		server.runCommand("tick sprint 40000");
+		String gsuSet = waitFor(context, server, () -> read(server, gsuOrigin.getX(), gsuOrigin.getY(), gsuOrigin.getZ()).contains("built"), 3000);
+		String gsuSite = read(server, gsuOrigin.getX(), gsuOrigin.getY(), gsuOrigin.getZ());
+		String crawlerRead = read(server, crawler.getX(), crawler.getY(), crawler.getZ());
+		System.out.println("[wildcatter-test] cranes: crawler set " + gsuSet + " | " + gsuSite + " | " + crawlerRead);
+		check(gsuSite.contains("built"), "the crawler crane on its 32 m boom should set the GSU 60: " + gsuSite + " | " + crawlerRead);
+		// the tower site to DISMANTLE: the pad-mount, its last lift, comes out first into the chest
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.SiteMarkerBlockEntity) srv.overworld().getBlockEntity(origin)).toggleMode();
+			return null;
+		});
+		String out = waitFor(context, server, () -> server.computeOnServer(srv -> srv.overworld().getBlockEntity(new BlockPos(26, y, z + 2)) instanceof net.minecraft.world.Container chest
+				&& java.util.stream.IntStream.range(0, chest.getContainerSize()).anyMatch(i -> chest.getItem(i).is(WildcatterBlocks.PADMOUNT_480.asItem()))), 3000);
+		server.runCommand("tick sprint stop");
+		String down = read(server, origin.getX(), origin.getY(), origin.getZ());
+		System.out.println("[wildcatter-test] cranes: dismantle " + out + " | " + down + " | " + read(server, tower.getX(), tower.getY(), tower.getZ()));
+		check(out.startsWith("yes"), "dismantling should lift the pad-mount back into the tower crane's chest: " + down);
+		check(down.contains("DISMANTLE"), "the marker should read DISMANTLE: " + down);
+		System.out.println("[wildcatter-test] cranes ok: " + heavy + " | " + site + " | " + gsuSite + " | " + down);
+	}
+
+	/** Waits (in client ticks of 10) until {@code done} holds or {@code limit} ticks pass; "yes after N ticks" or "NO after N ticks". */
+	private String waitFor(ClientGameTestContext context, TestServerContext server, java.util.function.BooleanSupplier done, int limit) {
+		for (int t = 0; t < limit; t += 10) {
+			if (done.getAsBoolean()) {
+				return "yes after " + t + " ticks";
+			}
+			context.waitTicks(10);
+		}
+		return done.getAsBoolean() ? "yes after " + limit + " ticks" : "NO after " + limit + " ticks";
 	}
 
 	private void dcTier(ClientGameTestContext context, TestServerContext server) {

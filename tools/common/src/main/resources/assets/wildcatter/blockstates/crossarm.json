@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "wildcatter:block/crossarm_x"
+    },
+    "axis=z": {
+      "model": "wildcatter:block/crossarm_z"
+    }
+  }
+}

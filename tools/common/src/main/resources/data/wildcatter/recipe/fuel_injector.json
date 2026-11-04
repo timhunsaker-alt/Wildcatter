@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "wildcatter:steel_ingot",
+    "minecraft:iron_nugget",
+    "minecraft:redstone"
+  ],
+  "result": {
+    "id": "wildcatter:fuel_injector",
+    "count": 2
+  }
+}

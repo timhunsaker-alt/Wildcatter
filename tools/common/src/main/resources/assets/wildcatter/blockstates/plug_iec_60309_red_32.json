@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "wildcatter:block/plug_iec_60309_red_32"
+    }
+  }
+}

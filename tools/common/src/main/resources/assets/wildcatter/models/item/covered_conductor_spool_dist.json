@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "wildcatter:item/covered_conductor_spool_dist"
+  }
+}

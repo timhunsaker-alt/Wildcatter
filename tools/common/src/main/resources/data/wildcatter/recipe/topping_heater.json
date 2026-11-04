@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SSS",
+    "SFS",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "F": "minecraft:blast_furnace",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:topping_heater",
+    "count": 1
+  }
+}

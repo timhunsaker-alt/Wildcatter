@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SWS",
+    "WRW",
+    "SXS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "W": "wildcatter:stator_winding",
+    "R": "wildcatter:rotor_field",
+    "X": "wildcatter:exciter"
+  },
+  "result": {
+    "id": "wildcatter:turbine_generator",
+    "count": 1
+  }
+}

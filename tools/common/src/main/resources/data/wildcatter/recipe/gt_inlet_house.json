@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SWS",
+    "SWS",
+    "S S"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "W": "minecraft:white_wool"
+  },
+  "result": {
+    "id": "wildcatter:gt_inlet_house",
+    "count": 1
+  }
+}

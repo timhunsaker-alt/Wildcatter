@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "SWS",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "W": "minecraft:water_bucket"
+  },
+  "result": {
+    "id": "wildcatter:quench_tower",
+    "count": 1
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "S S",
+    "S S",
+    "SBS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "B": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:gt_exhaust_stack",
+    "count": 1
+  }
+}

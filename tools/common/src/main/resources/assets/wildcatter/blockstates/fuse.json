@@ -1,0 +1,36 @@
+{
+  "variants": {
+    "blown=false,facing=north": {
+      "model": "wildcatter:block/fuse_good",
+      "y": 0
+    },
+    "blown=true,facing=north": {
+      "model": "wildcatter:block/fuse_blown",
+      "y": 0
+    },
+    "blown=false,facing=east": {
+      "model": "wildcatter:block/fuse_good",
+      "y": 90
+    },
+    "blown=true,facing=east": {
+      "model": "wildcatter:block/fuse_blown",
+      "y": 90
+    },
+    "blown=false,facing=south": {
+      "model": "wildcatter:block/fuse_good",
+      "y": 180
+    },
+    "blown=true,facing=south": {
+      "model": "wildcatter:block/fuse_blown",
+      "y": 180
+    },
+    "blown=false,facing=west": {
+      "model": "wildcatter:block/fuse_good",
+      "y": 270
+    },
+    "blown=true,facing=west": {
+      "model": "wildcatter:block/fuse_blown",
+      "y": 270
+    }
+  }
+}

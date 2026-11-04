@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "SGS",
+    "SFS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "G": "minecraft:glass",
+    "F": "minecraft:furnace"
+  },
+  "result": {
+    "id": "wildcatter:teg_dehydrator",
+    "count": 1
+  }
+}

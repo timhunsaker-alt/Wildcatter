@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "fabric:type": "fabric:components",
+      "base": "wildcatter:cable_mv",
+      "components": {
+        "wildcatter:conductor_size": "mv_4_0"
+      }
+    },
+    {
+      "fabric:type": "fabric:components",
+      "base": "wildcatter:cable_mv",
+      "components": {
+        "wildcatter:conductor_size": "mv_4_0"
+      }
+    }
+  ],
+  "result": {
+    "id": "wildcatter:cable_mv",
+    "count": 1,
+    "components": {
+      "wildcatter:conductor_size": "mv_500"
+    }
+  }
+}
