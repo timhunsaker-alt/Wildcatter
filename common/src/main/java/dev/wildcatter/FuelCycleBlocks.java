@@ -115,6 +115,7 @@ public interface FuelCycleBlocks {
 	// 10c2: the cranes (docs/multiblocks/tower-crane.md, crawler-crane.md)
 	Block TOWER_CRANE = cranePart(dev.wildcatter.block.CranePartBlock.Part.TOWER_CRANE);
 	Block CRAWLER_CRANE = cranePart(dev.wildcatter.block.CranePartBlock.Part.CRAWLER_CRANE);
+	Block RING_CRANE = cranePart(dev.wildcatter.block.CranePartBlock.Part.RING_CRANE);
 	/** A blueprint's site (docs/blueprints.md). */
 	Block SITE_MARKER = block("site_marker", props -> new dev.wildcatter.block.SiteMarkerBlock(props.mapColor(MapColor.COLOR_ORANGE)
 			.strength(0.5F).sound(SoundType.WOOD).noOcclusion()));

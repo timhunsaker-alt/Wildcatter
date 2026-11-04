@@ -1,14 +1,16 @@
 package dev.wildcatter.crane;
 
 /**
- * What each crane can do (docs/multiblocks/tower-crane.md, crawler-crane.md): its chart, its height under the hook, its speeds and
- * what its drives draw. Plain Java, so it is unit-tested without Minecraft.
+ * What each crane can do (docs/multiblocks/tower-crane.md, crawler-crane.md, ring-crane.md): its chart, its height under the hook,
+ * its speeds and what its drives draw. Plain Java, so it is unit-tested without Minecraft.
  */
 public enum CraneKind {
 	/** Liebherr 380 EC-B 16 Litronic, 75 m jib, free-standing. */
 	TOWER,
 	/** Liebherr LR 1300, main boom, 104 t counterweight. */
-	CRAWLER;
+	CRAWLER,
+	/** Sarens SGC-250, 118 m or 160.5 m main boom, 5,200 t counterweight. */
+	RING;
 
 	public static final double G = 9.81;
 
@@ -35,21 +37,107 @@ public enum CraneKind {
 	public static final double CRAWLER_FULL_LOAD_LPH = 102;            // 220 g/kWh at 390 kW (proposed)
 	public static final double CRAWLER_TANK_LITRES = 750;
 
+	// ---- ring crane (Sarens SGC brochure; Sarens, Cat and Bosch Rexroth releases) ----------------------------------------------------
+	public static final double RING_LINE_M_MIN = 20;                    // each winch, layer 1
+	public static final int RING_WINCHES = 6;
+	public static final double RING_LINE_PULL_KN = 536;
+	public static final int RING_MAX_PARTS = 60;
+	public static final double RING_SLEW_DEG_MIN = 6;
+	public static final double RING_ENGINE_WATTS = 12 * 310_000;
+	public static final double RING_HOOK_BLOCK_TONNES = 104.6;
+	public static final double RING_LUFF_DEG_S = 0.1;                   // (proposed)
+	public static final double RING_SLEW_WATTS = 600_000, RING_LUFF_WATTS = 750_000;   // (proposed)
+	public static final double RING_BOOM_FOOT_OUT = 18, RING_BOOM_FOOT_UP = 6;      // (proposed)
+	public static final double RING_HEAD_DROP = 14.5 + 4;               // the hook block and the boom head (proposed)
+	public static final double RING_FULL_LOAD_LPH = 975;               // 220 g/kWh at 3.72 MW (proposed)
+	public static final double RING_TANK_LITRES = 6_000;               // 1,000 L a power pack (proposed)
+
 	/** Rigging a load at the pick or at its place, and landing and unhooking it, s (proposed). */
 	public static final double RIG_SECONDS = 30;
 
 	public LoadChart chart(int boom) {
-		return this == TOWER ? LoadChart.tower() : LoadChart.crawler(boom);
+		return switch (this) {
+			case TOWER -> LoadChart.tower();
+			case CRAWLER -> LoadChart.crawler(boom);
+			case RING -> LoadChart.ring(boom);
+		};
 	}
 
 	public String title() {
-		return this == TOWER ? "Tower crane (16 t, 75 m jib)" : "Crawler crane (300 t)";
+		return switch (this) {
+			case TOWER -> "Tower crane (16 t, 75 m jib)";
+			case CRAWLER -> "Crawler crane (300 t)";
+			case RING -> "Ring crane (5,000 t)";
+		};
+	}
+
+	/** True for the cranes with a luffing boom the player sets. */
+	public boolean hasBoom() {
+		return this != TOWER;
+	}
+
+	/** True for the cranes on their own diesel. */
+	public boolean diesel() {
+		return this != TOWER;
+	}
+
+	public int booms() {
+		return switch (this) {
+			case TOWER -> 1;
+			case CRAWLER -> LoadChart.CRAWLER_BOOMS.length;
+			case RING -> LoadChart.RING_BOOMS.length;
+		};
+	}
+
+	/** Boom {@code boom}'s length, m; the jib's for the tower crane. */
+	public double boomLength(int boom) {
+		return switch (this) {
+			case TOWER -> 75;
+			case CRAWLER -> LoadChart.CRAWLER_BOOMS[boom];
+			case RING -> LoadChart.RING_BOOMS[boom];
+		};
+	}
+
+	/** The boom to start on: the crawler's 32 m, the ring crane's 118 m. */
+	public int firstBoom() {
+		return this == CRAWLER ? 3 : 0;
+	}
+
+	public String boomName(int boom) {
+		double l = boomLength(boom);
+		return l == Math.rint(l) ? String.format("%.0f m", l) : String.format("%.1f m", l);
+	}
+
+	private double footOut() {
+		return this == RING ? RING_BOOM_FOOT_OUT : LoadChart.BOOM_FOOT_OUT;
+	}
+
+	private double footUp() {
+		return this == RING ? RING_BOOM_FOOT_UP : LoadChart.BOOM_FOOT_UP;
+	}
+
+	/** The boom's foot: how far ahead of the slewing centre and how high, m. */
+	public double[] boomFoot() {
+		return new double[] {footOut(), footUp()};
+	}
+
+	public double tankLitres() {
+		return this == RING ? RING_TANK_LITRES : CRAWLER_TANK_LITRES;
+	}
+
+	/** The hook block's own mass where it is not in the 2 % rigging rule, t: the ring crane's 104.6 t main hook. */
+	public double hookBlockTonnes() {
+		return this == RING ? RING_HOOK_BLOCK_TONNES : 0;
 	}
 
 	/** The crawler's boom angle at {@code radius} on boom {@code boom}, degrees. */
 	public static double boomDegrees(int boom, double radius) {
-		double length = LoadChart.CRAWLER_BOOMS[boom];
-		double c = Math.clamp((radius - LoadChart.BOOM_FOOT_OUT) / length, 0, 1);
+		return CRAWLER.boomAngle(boom, radius);
+	}
+
+	/** The boom's angle at {@code radius} on boom {@code boom}, degrees. */
+	public double boomAngle(int boom, double radius) {
+		double c = Math.clamp((radius - footOut()) / boomLength(boom), 0, 1);
 		return Math.toDegrees(Math.acos(c));
 	}
 
@@ -58,13 +146,20 @@ public enum CraneKind {
 		if (this == TOWER) {
 			return TOWER_HOOK_HEIGHT;
 		}
-		double length = LoadChart.CRAWLER_BOOMS[boom];
-		return LoadChart.BOOM_FOOT_UP + length * Math.sin(Math.toRadians(boomDegrees(boom, radius))) - CRAWLER_HEAD_DROP;
+		double drop = this == RING ? RING_HEAD_DROP : CRAWLER_HEAD_DROP;
+		return footUp() + boomLength(boom) * Math.sin(Math.toRadians(boomAngle(boom, radius))) - drop;
 	}
 
 	/** The parts of line the crawler's hook block is reeved with for {@code tonnes} on the hook. */
 	public static int partsOfLine(double tonnes) {
 		return (int) Math.clamp(Math.ceil(tonnes * G / CRAWLER_LINE_PULL_KN), 1, CRAWLER_MAX_PARTS);
+	}
+
+	/** The parts of line the ring crane's main hook is reeved with for {@code tonnes}: in sixes, one share for each winch. */
+	public static int ringPartsOfLine(double tonnes) {
+		int parts = (int) Math.ceil(tonnes * G / RING_LINE_PULL_KN);
+		parts = (parts + RING_WINCHES - 1) / RING_WINCHES * RING_WINCHES;
+		return Math.clamp(parts, RING_WINCHES, RING_MAX_PARTS);
 	}
 
 	/** Hook speed with {@code tonnes} on it, m/min. */
@@ -81,15 +176,23 @@ public enum CraneKind {
 			}
 			return best;
 		}
-		double reeved = CRAWLER_ROPE_M_MIN / partsOfLine(tonnes);
-		double powered = CRAWLER_HYDRAULIC_EFFICIENCY * CRAWLER_ENGINE_WATTS / (Math.max(tonnes, 0.5) * 1000 * G) * 60;
+		double reeved = this == RING ? RING_WINCHES * RING_LINE_M_MIN / ringPartsOfLine(tonnes) : CRAWLER_ROPE_M_MIN / partsOfLine(tonnes);
+		double powered = CRAWLER_HYDRAULIC_EFFICIENCY * engineWatts() / (Math.max(tonnes, 0.5) * 1000 * G) * 60;
 		return Math.min(reeved, powered);
+	}
+
+	private double engineWatts() {
+		return this == RING ? RING_ENGINE_WATTS : CRAWLER_ENGINE_WATTS;
 	}
 
 	/** Seconds to slew {@code degrees}. */
 	public double slewSeconds(double degrees) {
-		double rpm = this == TOWER ? TOWER_SLEW_RPM : CRAWLER_SLEW_RPM;
-		return Math.abs(degrees) / (rpm * 6.0);
+		double degreesPerSecond = switch (this) {
+			case TOWER -> TOWER_SLEW_RPM * 6.0;
+			case CRAWLER -> CRAWLER_SLEW_RPM * 6.0;
+			case RING -> RING_SLEW_DEG_MIN / 60.0;
+		};
+		return Math.abs(degrees) / degreesPerSecond;
 	}
 
 	/** Seconds to move the hook out or in from {@code from} to {@code to} m: the trolley, or luffing the boom. */
@@ -97,26 +200,40 @@ public enum CraneKind {
 		if (this == TOWER) {
 			return Math.abs(to - from) / TOWER_TROLLEY_M_MIN * 60;
 		}
-		return Math.abs(boomDegrees(boom, to) - boomDegrees(boom, from)) / CRAWLER_LUFF_DEG_S;
+		return Math.abs(boomAngle(boom, to) - boomAngle(boom, from)) / (this == RING ? RING_LUFF_DEG_S : CRAWLER_LUFF_DEG_S);
 	}
 
 	/** Watts the hoist takes lifting {@code tonnes} at {@code metresPerMinute}. */
 	public double hoistWatts(double tonnes, double metresPerMinute) {
 		double lift = tonnes * 1000 * G * metresPerMinute / 60;
-		return this == TOWER ? Math.min(TOWER_HOIST_WATTS, lift / TOWER_HOIST_EFFICIENCY) : Math.min(CRAWLER_ENGINE_WATTS, lift / CRAWLER_HYDRAULIC_EFFICIENCY);
+		return this == TOWER ? Math.min(TOWER_HOIST_WATTS, lift / TOWER_HOIST_EFFICIENCY) : Math.min(engineWatts(), lift / CRAWLER_HYDRAULIC_EFFICIENCY);
 	}
 
 	public double slewWatts() {
-		return this == TOWER ? TOWER_SLEW_WATTS : CRAWLER_SLEW_WATTS;
+		return switch (this) {
+			case TOWER -> TOWER_SLEW_WATTS;
+			case CRAWLER -> CRAWLER_SLEW_WATTS;
+			case RING -> RING_SLEW_WATTS;
+		};
 	}
 
 	public double outWatts() {
-		return this == TOWER ? TOWER_TROLLEY_WATTS : CRAWLER_LUFF_WATTS;
+		return switch (this) {
+			case TOWER -> TOWER_TROLLEY_WATTS;
+			case CRAWLER -> CRAWLER_LUFF_WATTS;
+			case RING -> RING_LUFF_WATTS;
+		};
 	}
 
 	/** The crawler's diesel a second with its drives taking {@code watts}, litres. */
 	public static double litresPerSecond(double watts) {
-		double share = Math.clamp(watts / CRAWLER_ENGINE_WATTS, 0, 1);
-		return CRAWLER_FULL_LOAD_LPH / 3600.0 * (0.15 + 0.85 * share);
+		return CRAWLER.dieselPerSecond(watts);
+	}
+
+	/** This crane's diesel a second with its drives taking {@code watts}, litres: 15 % idling, the rest with the load. */
+	public double dieselPerSecond(double watts) {
+		double share = Math.clamp(watts / engineWatts(), 0, 1);
+		double full = this == RING ? RING_FULL_LOAD_LPH : CRAWLER_FULL_LOAD_LPH;
+		return full / 3600.0 * (0.15 + 0.85 * share);
 	}
 }

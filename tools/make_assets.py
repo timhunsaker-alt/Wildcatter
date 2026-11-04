@@ -2190,6 +2190,18 @@ lang[f"block.{ns}.tower_crane"] = "Tower Crane (16 t, 75 m jib)"
 lang[f"block.{ns}.crawler_crane"] = "Crawler Crane (300 t)"
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 10c3: the ring crane (docs/multiblocks/ring-crane.md) ------------------------------------------------------------------------
+# its ring's blockstate, models, shapes and item come from tools/models/cranes.py; the upper works are drawn by client/CraneRenderer.
+big_part_loot("ring_crane")
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	t["values"] = [v for v in t["values"] if v != f"{ns}:ring_crane"] + [f"{ns}:ring_crane"]
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("ring_crane", ["CCC", "XIX", "III"], {"C": f"{ns}:crawler_crane", "X": f"{ns}:crankshaft", "I": "minecraft:iron_block"}, "ring_crane")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang[f"block.{ns}.ring_crane"] = "Ring Crane (5,000 t)"
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 7g: the fuel plant (docs/multiblocks/fuel.md) -------------------------------------------------------------------
 # blockstates, models, shapes and items come from tools/models/fuel.py; here loot, names, tags, recipes and the items.
 FUEL_PARTS = ("uf6_autoclave", "idr_kiln", "granulator", "pellet_press", "sintering_furnace", "pellet_grinder", "rod_loader", "rod_welder",

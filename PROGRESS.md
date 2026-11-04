@@ -491,6 +491,47 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - **Recommended mods:** `docs/recommended-mods.md` lists the quality-of-life mods with 26.3 builds for Fabric and NeoForge.
   - The Fabric set ran the `coker` and `anodes` scenes alongside Wildcatter, Sodium included, and both passed.
 
+## Phase 10c3: the ring crane, shared sites and tandem lifts (specs: docs/multiblocks/ring-crane.md; docs/blueprints.md); 10c done
+- **The ring crane** (`ring_crane`, after the Sarens SGC-250 "Big Carl", from Sarens' SGC brochure):
+  - its 48.5 m ring at true size: 616 cells of mats, two ring beams and their rails, 1 m high, the inside left free;
+  - drawn above it, turning with the slew:
+    - 128 bogies;
+    - the front platform with the boom foot, and the rear platform with 52 counterweight boxes of 100 t;
+    - six power packs;
+    - the double lattice main boom, the backmast and pendants;
+    - the 14.5 m, 104.6 t main hook block;
+  - both main booms by sneak-click (decided with Tim, 2026-11-04):
+    - 118 m: 5,000 t at 40 m down to 1,554 t at 120 m;
+    - 160.5 m: 3,114 t at 45 m down to 838 t at 170 m;
+    - capped at the main hook's 3,200 t;
+  - 6 winches at 20 m/min, reeved in sixes at 536 kN a line: 20 m/min light, 2 m/min on 60 parts; slewing 6 degrees a minute;
+  - 12 diesels of 310 kW (3.72 MW) on a 6,000 L tank, piped to any cell of its ring. The plan's "about 2 MW of diesel sets" was
+    corrected from the real crane;
+  - its chest is a **laydown** (decided with Tim): its chart starts 40 m out, so it picks from the chest nearest it within its
+    chart, read at that chest's real radius.
+- **Sharing a site** (`SiteMarkerBlockEntity`, `CraneBlockEntity.findWork`; decided with Tim):
+  - every crane in reach of a marker works it, and no lift is taken twice;
+  - a crane passes over a lift it cannot make, but never onto one that rests on a lift not yet set, or on another crane's hook
+    (`Blueprint.restsOn`). Dismantling works the same way backward;
+  - the marker's readout counts the cranes working it.
+- **Tandem lifts** (decided with Tim): a part too heavy for every crane alone goes up on two.
+  - The crane with it in its chest leads.
+  - Each crane carries half, plus its own hook block, within 80 % of its chart (25 % to spare).
+  - Both run the same steps at the slower crane's times (`LiftCycle.together`).
+  - The hooks are at the part's two ends; the lead draws the load between them.
+  - Both hold if either loses power. If either is broken the lift is called off, and the part goes back to the lead's chest.
+- **Field Manual:** a new page, HEAVY LIFTS; CRANES says how a crane works ahead.
+- **Unit tests:**
+  - `LoadChartTest`: the ring charts and the hook cap;
+  - `LiftCycleTest`: reeving in sixes, slewing, hook height, diesel, and a tandem's merged times and shares;
+  - `BlueprintTest`: rests-on.
+- **Game test `heavyLift`:**
+  - the ring crane reads 2,850 t at 60 m on its 160.5 m boom, and 3,831 t capped at 3,200 t on its 118 m boom;
+  - it sets a reactor vessel (288.2 t with its hook block) 60 m out from its laydown chest 45 m out;
+  - two crawlers on their 32 m booms share a site: alone each reads TOO HEAVY for its GSU 60 (91.8 t against 89.5 t at 16 m); in
+    tandem each takes 45.9 t against 80 % of 89.5 t; between them they set the three pallets, and no lift is set twice;
+  - screenshots of the ring crane mid-lift and of the tandem lift.
+
 ## Phase 10c2: the tower and crawler cranes (specs: docs/multiblocks/tower-crane.md, crawler-crane.md)
 - **The tower crane** (`tower_crane`, after the Liebherr 380 EC-B 16, from its BKL data sheet):
   - a 6 x 3 x 6 cross base with ballast and the mast foot;
@@ -1289,6 +1330,12 @@ sized for a 40-pot line.
   - the bus bars' standoffs stand on the floor of their own cell, so a run carried up in the air shows them hanging (no
     supports or structure yet);
   - the chlor-alkali caustic soda is still only counted (fixed in 10b2: it is a pipe product).
+- Phase 10c3:
+  - the ring crane stands where it is placed: no relocation on rails, as a real one moves between lifting positions;
+  - it carries no heavy-duty jib, and no hook arrangement for its 5,000 t: its chart is capped at the 3,200 t main hook;
+  - no wind (its 14 m/s limit) and no ground bearing on its mats;
+  - a tandem lift's hooks keep to the line between the two cranes; the part does not turn as two real hooks would turn it;
+  - its paint is the same `mat_paint_crane_yellow_placeholder`.
 - Phase 10c2:
   - the cranes are placed whole: no erection, climbing or boom assembly;
   - wind is left out, and so are the crawler's travel and ground bearing;

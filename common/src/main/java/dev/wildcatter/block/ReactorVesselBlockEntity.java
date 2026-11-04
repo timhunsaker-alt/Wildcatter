@@ -65,7 +65,7 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 	public void setRemoved() {
 		super.setRemoved();
 		if (level != null && !level.isClientSide()) {
-			VESSELS.getOrDefault(level.dimension(), java.util.Set.of()).remove(worldPosition);
+			java.util.Optional.ofNullable(VESSELS.get(level.dimension())).ifPresent(set -> set.remove(worldPosition));
 		}
 	}
 

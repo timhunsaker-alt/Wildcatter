@@ -199,6 +199,49 @@ public final class Blueprint {
 		return out;
 	}
 
+	/** A lift's box, in blueprint cells: x0, y0, z0, x1, y1, z1. */
+	public int[] box(Lift lift) {
+		if (lift.isPart()) {
+			Part p = parts.get(lift.part());
+			return new int[] {p.x0(), p.y0(), p.z0(), p.x1(), p.y1(), p.z1()};
+		}
+		int[] out = {Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE};
+		for (int i : lift.blocks()) {
+			Block k = blocks.get(i);
+			out[0] = Math.min(out[0], k.x());
+			out[1] = Math.min(out[1], k.y());
+			out[2] = Math.min(out[2], k.z());
+			out[3] = Math.max(out[3], k.x());
+			out[4] = Math.max(out[4], k.y());
+			out[5] = Math.max(out[5], k.z());
+		}
+		return out;
+	}
+
+	/**
+	 * For each lift, the earlier lifts it rests on (docs/blueprints.md, "Sharing and tandem lifts"): their x-z boxes overlap and its
+	 * bottom is above theirs. A crane working ahead never takes a lift before the lifts it rests on are set.
+	 */
+	public List<int[]> restsOn(List<Lift> lifts) {
+		List<int[]> boxes = new ArrayList<>(lifts.size());
+		for (Lift l : lifts) {
+			boxes.add(box(l));
+		}
+		List<int[]> out = new ArrayList<>(lifts.size());
+		for (int a = 0; a < lifts.size(); a++) {
+			int[] A = boxes.get(a);
+			List<Integer> under = new ArrayList<>();
+			for (int b = 0; b < a; b++) {
+				int[] B = boxes.get(b);
+				if (A[1] > B[1] && A[0] <= B[3] && B[0] <= A[3] && A[2] <= B[5] && B[2] <= A[5]) {
+					under.add(b);
+				}
+			}
+			out.add(under.stream().mapToInt(Integer::intValue).toArray());
+		}
+		return out;
+	}
+
 	// ---- JSON and the item's compressed form ---------------------------------------------------------------------------------
 	public String toJson() {
 		JsonObject o = new JsonObject();

@@ -89,6 +89,36 @@ class BlueprintTest {
 	}
 
 	@Test
+	void aLiftRestsOnTheEarlierLiftsUnderIt() {
+		Blueprint b = sample();
+		List<Blueprint.Lift> lifts = b.lifts(new double[] {2.4, 0.1}, new double[] {30, 5}, 16);
+		List<int[]> rests = b.restsOn(lifts);
+		assertEquals(lifts.size(), rests.size());
+		assertEquals(0, rests.get(0).length, "the first lift rests on nothing");
+		int upper = -1, cable = -1;
+		for (int i = 0; i < lifts.size(); i++) {
+			Blueprint.Lift l = lifts.get(i);
+			if (l.isPart() && l.part() == 1) {
+				upper = i;
+			}
+			if (!l.isPart() && l.y() == 1) {
+				cable = i;
+			}
+		}
+		int u = upper;
+		assertTrue(java.util.Arrays.stream(rests.get(u)).anyMatch(j -> j == 0), "the upper part rests on the lower");
+		for (int j : rests.get(cable)) {
+			assertTrue(j < cable && lifts.get(j).y() < 1);
+		}
+		assertTrue(rests.get(cable).length >= 1, "the cable rests on the floor pallet under it");
+		for (int i = 0; i < lifts.size(); i++) {
+			if (lifts.get(i).y() == 0) {
+				assertEquals(0, rests.get(i).length, "nothing on the floor layer rests on anything");
+			}
+		}
+	}
+
+	@Test
 	void aPalletKeepsToOneSquare() {
 		Blueprint b = sample();
 		for (Blueprint.Lift l : b.lifts(new double[] {0.1, 0.1}, new double[] {30, 5}, 100)) {

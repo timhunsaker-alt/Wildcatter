@@ -62,6 +62,37 @@ public final class LiftCycle {
 		return steps;
 	}
 
+	/** Two cranes' steps for one tandem lift, run together. */
+	public record Tandem(List<Step> lead, List<Step> follower) {
+	}
+
+	/**
+	 * A tandem lift (docs/blueprints.md, "Sharing and tandem lifts"): the two cranes' own plans, step by step, each step taking the
+	 * longer of the two times, so both move at the slower crane's speed. Each keeps its own hook path and its own drives' draw.
+	 */
+	public static Tandem together(List<Step> lead, List<Step> follower) {
+		if (lead.size() != follower.size()) {
+			throw new IllegalArgumentException("a tandem lift needs the same steps on both cranes");
+		}
+		List<Step> a = new ArrayList<>(lead.size());
+		List<Step> b = new ArrayList<>(lead.size());
+		for (int i = 0; i < lead.size(); i++) {
+			Step x = lead.get(i), y = follower.get(i);
+			double s = Math.max(x.seconds(), y.seconds());
+			a.add(new Step(x.phase(), s, x.from(), x.to(), x.loaded(), x.watts()));
+			b.add(new Step(y.phase(), s, y.from(), y.to(), y.loaded(), y.watts()));
+		}
+		return new Tandem(a, b);
+	}
+
+	/** One crane's share of a tandem lift of {@code tonnes} on the hooks, t: half, plus its own hook block. */
+	public static double tandemShare(CraneKind kind, double tonnes) {
+		return tonnes / 2 + kind.hookBlockTonnes();
+	}
+
+	/** The part of a crane's chart a tandem share may use: 25 % to spare. */
+	public static final double TANDEM_USE = 0.8;
+
 	/** The shorter way round from {@code from} to {@code to}, degrees, -180 to 180. */
 	public static double turn(double from, double to) {
 		double d = (to - from) % 360;

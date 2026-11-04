@@ -39,4 +39,22 @@ class LoadChartTest {
 		assertTrue(twentyThree.reaches(23.5));
 		assertFalse(twentyThree.reaches(24));
 	}
+
+	@Test
+	void theRingCraneReadsItsTwoMainBoomsCappedAtItsHook() {
+		LoadChart main = LoadChart.ring(0);                               // 118 m
+		assertEquals(5000, main.chartFigure(40), 1e-9);
+		assertEquals(3200, main.capacity(40), 1e-9);                     // the main hook's 3,200 t
+		assertTrue(main.capped(60));
+		assertEquals(3831, main.chartFigure(55), 1e-9);                   // read at 60 m
+		assertEquals(1554, main.capacity(120), 1e-9);
+		assertFalse(main.capped(120));
+		assertFalse(main.reaches(39));
+		assertFalse(main.reaches(121));
+		LoadChart longBoom = LoadChart.ring(1);                           // 160.5 m
+		assertEquals(2850, longBoom.capacity(60), 1e-9);
+		assertEquals(838, longBoom.capacity(170), 1e-9);
+		assertFalse(longBoom.reaches(44));
+		assertEquals(170, longBoom.maxRadius(), 1e-9);
+	}
 }

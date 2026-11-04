@@ -229,22 +229,28 @@ and the Field Manual has a page for each new system.
       - vanilla coal as coking coal in by-product coke ovens, the coke working wherever coal does and the gas going to a gas line;
       - a rodding shop with butt recycle;
       - a vacuum tapping crucible and a casting machine making 22.7 kg ingots.
-- **10c: construction cranes** — CURRENT. Tim's idea of 2026-11-01. Cranes build a plant from a blueprint. Three waves:
-  - **10c1: blueprints** (spec: `docs/blueprints.md`):
+- **10c: construction cranes** — DONE 2026-11-04. Tim's idea of 2026-11-01. Cranes build a plant from a blueprint. Three waves:
+  - **10c1: blueprints** — DONE 2026-11-04 (spec: `docs/blueprints.md`):
     - a survey tool records any built plant onto a blueprint;
     - a library of the mod's plants, made from the game test scenes;
     - the ghost and the site marker;
     - the lift list, the pallets and the part masses.
-  - **10c2: the tower and crawler cranes** (specs: `docs/multiblocks/tower-crane.md`, `crawler-crane.md`):
+  - **10c2: the tower and crawler cranes** — DONE 2026-11-04 (specs: `docs/multiblocks/tower-crane.md`, `crawler-crane.md`):
     - the tower crane (Liebherr 380 EC-B 16) on 480 V, and the crawler crane (Liebherr LR 1300) on its own diesel;
     - their load charts and real speeds;
     - building a site from the crane's chest, and dismantling it back.
     - From the real data sheets: the 380 EC-B 16 carries 3.0 t at its 75 m tip (3.4 t only in Litronic's power-plus mode).
       The LR 1300 lifts 286 t at 4.3 m on its 20 m boom, and 2.6 t at 80 m on an 86 m boom, not 25 t as first written.
-  - **10c3: the ring crane and heavy lifts** (spec: `docs/multiblocks/ring-crane.md`):
+  - **10c3: the ring crane and heavy lifts** — DONE 2026-11-04 (spec: `docs/multiblocks/ring-crane.md`):
     - the ring crane (Sarens SGC-250 "Big Carl", which set Hinkley Point C's reactor modules; the earlier note named Mammoet in
-      error) on its own diesel sets;
+      error) on its own diesel engines;
     - cranes sharing one site, and tandem lifts.
+    - From Sarens' SGC brochure: 5,000 t at 40 m on the 118 m main boom, 1,554 t at 120 m; 3,114 t at 45 m to 838 t at 170 m on the
+      160.5 m boom; a 48.5 m ring and 5,200 t of counterweight; 6 degrees/min slewing; 20 m/min line speed on 6 main winches.
+      Its power is 12 Cat diesels of 310 kW (3.72 MW) driving hydraulics, not the "about 2 MW of diesel sets" first written.
+    - Decided with Tim on 2026-11-04: both main booms, stepped by sneak-click; a laydown chest within its chart range; a crane
+      works ahead past a lift it cannot make, but never onto a lift resting on one not yet set; a tandem lift comes from the lead's
+      chest, in equal halves, each at most 80 % of its crane's chart.
   - Decided with Tim on 2026-11-04:
     - a tower, a crawler and a ring crane, powered as real ones (the tower crane on 480 V, the others on their own diesel);
     - blueprints from both a library (power plants, oil and gas, nuclear, smelter) and a survey tool;
@@ -255,7 +261,7 @@ and the Field Manual has a page for each new system.
     - a ghost of the blueprint at its site, locked with a site marker.
     - for 10c2: the crawler's boom is set by the player (20 to 95 m, the real chart's lengths), and DISMANTLE is the site marker's
       mode, which every crane on the site follows.
-- **10d: the grid finish:**
+- **10d: the grid finish** — next:
   - switches and panels;
   - better wire, ground and breaker art;
   - true-size MV, DIST and HV breakers and a rated 4.16/138 kV step-up in place of the one-block stand-ins;

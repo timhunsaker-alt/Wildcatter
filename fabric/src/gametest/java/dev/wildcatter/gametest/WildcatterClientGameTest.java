@@ -241,6 +241,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("cranes")) {
 				cranes(context, server);
 			}
+			if (only("heavyLift")) {
+				heavyLift(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -2919,6 +2922,144 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(out.startsWith("yes"), "dismantling should lift the pad-mount back into the tower crane's chest: " + down);
 		check(down.contains("DISMANTLE"), "the marker should read DISMANTLE: " + down);
 		System.out.println("[wildcatter-test] cranes ok: " + heavy + " | " + site + " | " + gsuSite + " | " + down);
+	}
+
+	/**
+	 * 10c3 (docs/multiblocks/ring-crane.md, docs/blueprints.md "Sharing and tandem lifts"): the ring crane sets a reactor vessel from
+	 * its laydown chest 45 m out; then two crawlers share one site, setting its pallets between them and its GSU 60 in tandem.
+	 */
+	private void heavyLift(ClientGameTestContext context, TestServerContext server) {
+		final int z = -7200;
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 100 " + (up + 40) + " " + (z + 5) + " 180 30");   // between both areas, so all their chunks load
+		context.waitTicks(60);
+		for (int zz = z - 50; zz <= z + 60; zz += 20) {
+			int z2 = Math.min(zz + 19, z + 60);
+			for (int[] xs : new int[][] {{28, 92}, {122, 166}}) {
+				server.runCommand("fill " + xs[0] + " " + (y - 1) + " " + zz + " " + xs[1] + " " + (y + 12) + " " + z2 + " minecraft:air");
+				server.runCommand("fill " + xs[0] + " " + (y - 1) + " " + zz + " " + xs[1] + " " + (y - 1) + " " + z2 + " minecraft:stone");
+			}
+		}
+		// ---- the ring crane: its ring x 36-84, z..z+48, its centre at 60.5, z+24.5, its boom north at rest
+		BlockPos ring = new BlockPos(60, y, z);
+		placeBig(server, WildcatterBlocks.RING_CRANE, ring, north);
+		BlockPos tank = new BlockPos(57, y, z + 23);
+		placeBig(server, WildcatterBlocks.STOCK_TANK, tank, north);                      // x 57-60, z+23..z+26, inside the ring
+		fillTank(server, tank, dev.wildcatter.fluid.Product.DIESEL, 8_000);
+		for (int x = 61; x <= 79; x++) {
+			put(server, x, y, z + 24, "wildcatter:gas_line");                             // to the ring's inner edge at x 80
+		}
+		// its site: a reactor vessel surveyed 60 m north of the centre, then taken away
+		BlockPos vesselOrigin = new BlockPos(58, y, z - 38);
+		placeBig(server, WildcatterBlocks.REACTOR_VESSEL, new BlockPos(59, y, z - 37), north);   // x 59-61, z-37..z-35: its centre 60 m out
+		String vesselData = server.computeOnServer(srv -> dev.wildcatter.item.SurveyToolItem.record(srv.overworld(), vesselOrigin, vesselOrigin.offset(4, 9, 4)).compressed());
+		server.runCommand("fill 58 " + y + " " + (z - 38) + " 62 " + (y + 9) + " " + (z - 34) + " minecraft:air");
+		server.computeOnServer(srv -> {
+			srv.overworld().setBlock(vesselOrigin, WildcatterBlocks.SITE_MARKER.defaultBlockState(), 3);
+			((dev.wildcatter.block.SiteMarkerBlockEntity) srv.overworld().getBlockEntity(vesselOrigin)).set(vesselData, 0);
+			return null;
+		});
+		// its laydown: a chest 45 m out, 10 degrees west of north
+		put(server, 52, y, z - 20, "minecraft:chest");
+		// the 160.5 m boom reads less at 60 m; back to the 118 m boom, capped at its hook
+		String charts = server.computeOnServer(srv -> {
+			dev.wildcatter.block.CraneBlockEntity c = (dev.wildcatter.block.CraneBlockEntity) srv.overworld().getBlockEntity(ring);
+			c.nextBoom();
+			String longBoom = c.boom() + ":" + c.chart().capacity(60);
+			c.nextBoom();
+			return longBoom + " | " + c.boom() + ":" + c.chart().chartFigure(60) + ":" + c.chart().capacity(60);
+		});
+		System.out.println("[wildcatter-test] heavyLift: ring charts at 60 m " + charts);
+		check(charts.equals("1:2850.0 | 0:3831.0:3200.0"), "the ring crane's charts at 60 m should read 2,850 t on 160.5 m, and 3,831 t capped at 3,200 t on 118 m: " + charts);
+		context.waitTicks(60);
+		String waiting = read(server, ring.getX(), ring.getY(), ring.getZ());
+		System.out.println("[wildcatter-test] heavyLift: ring waiting | " + waiting);
+		check(waiting.contains("118 m boom") && waiting.contains("WAITING") && !waiting.contains("diesel 0 of"),
+				"the ring crane should have diesel and wait for the vessel in its laydown chest: " + waiting);
+		server.runCommand("item replace block 52 " + y + " " + (z - 20) + " container.0 with wildcatter:reactor_vessel 1");
+		server.runCommand("tick sprint 80000");
+		String ringLift = waitFor(context, server, () -> server.computeOnServer(srv -> ((dev.wildcatter.block.CraneBlockEntity) srv.overworld().getBlockEntity(ring)).carrying()), 4000);
+		server.runCommand("tick sprint stop");
+		context.waitTicks(10);
+		String lifting = read(server, ring.getX(), ring.getY(), ring.getZ());
+		server.runCommand("tp @p 115 " + (y + 35) + " " + (z + 30) + " 129 -8");   // near enough that its chunks keep ticking
+		context.waitTicks(40);
+		System.out.println("[wildcatter-test] heavyLift: ring mid-lift " + ringLift + " | " + lifting);
+		check(lifting.contains("288.2 t on the hook") && lifting.contains("3200.0 t at 60 m"),
+				"the ring crane should carry the vessel and its 104.6 t hook block against its capped chart at 60 m: " + lifting);
+		context.takeScreenshot("wildcatter-ring-crane-lift");
+		server.runCommand("tp @p 100 " + (up + 40) + " " + (z + 5) + " 180 30");
+		server.runCommand("tick sprint 80000");
+		String vesselSet = waitFor(context, server, () -> read(server, vesselOrigin.getX(), vesselOrigin.getY(), vesselOrigin.getZ()).contains("built"), 8000);
+		server.runCommand("tick sprint stop");
+		String vesselSite = read(server, vesselOrigin.getX(), vesselOrigin.getY(), vesselOrigin.getZ());
+		System.out.println("[wildcatter-test] heavyLift: vessel set " + vesselSet + " | " + vesselSite + " | " + read(server, ring.getX(), ring.getY(), ring.getZ()));
+		check(vesselSite.contains("built"), "the ring crane should set the reactor vessel: " + vesselSite + " | " + read(server, ring.getX(), ring.getY(), ring.getZ()));
+		// ---- two crawlers, 20 m apart, share one site: a GSU 60 between them and three pallets of stone bricks
+		BlockPos lead = new BlockPos(130, y, z + 10);                                    // x 130-138, z+10..z+18, centre 134.5, z+14.5
+		BlockPos second = new BlockPos(150, y, z + 10);                                  // x 150-158, centre 154.5, z+14.5
+		placeBig(server, WildcatterBlocks.CRAWLER_CRANE, lead, north);
+		placeBig(server, WildcatterBlocks.CRAWLER_CRANE, second, north);
+		BlockPos tank2 = new BlockPos(143, y, z + 16);                                   // x 143-146, z+16..z+19, between them
+		placeBig(server, WildcatterBlocks.STOCK_TANK, tank2, north);
+		fillTank(server, tank2, dev.wildcatter.fluid.Product.DIESEL, 3_000);
+		for (int x : new int[] {139, 140, 141, 142, 147, 148, 149}) {
+			put(server, x, y, z + 17, "wildcatter:gas_line");
+		}
+		BlockPos siteOrigin = new BlockPos(140, y, z - 3);                               // the box x 140-154, z-3..z+6
+		placeBig(server, WildcatterBlocks.GSU_60, new BlockPos(145, y, z + 4), north);   // x 142-147, z..z+4: 16 m from each crane's centre
+		for (int x : new int[] {140, 141, 148, 149, 150, 151, 152, 153, 154}) {
+			put(server, x, y, z + 6, "minecraft:stone_bricks");                          // three pallets: x 140-141, 148-149 and 150-154
+		}
+		String siteData = server.computeOnServer(srv -> dev.wildcatter.item.SurveyToolItem.record(srv.overworld(), siteOrigin, siteOrigin.offset(14, 9, 9)).compressed());
+		server.runCommand("fill 140 " + y + " " + (z - 3) + " 154 " + (y + 9) + " " + (z + 6) + " minecraft:air");
+		String lifts = server.computeOnServer(srv -> {
+			srv.overworld().setBlock(siteOrigin, WildcatterBlocks.SITE_MARKER.defaultBlockState(), 3);
+			dev.wildcatter.block.SiteMarkerBlockEntity m = (dev.wildcatter.block.SiteMarkerBlockEntity) srv.overworld().getBlockEntity(siteOrigin);
+			m.set(siteData, 0);
+			return m.lifts().size() + " lifts, first " + m.describe(m.lifts().get(0));
+		});
+		put(server, 139, y, z + 14, "minecraft:chest");                                  // the lead's, against its east crawler
+		put(server, 159, y, z + 14, "minecraft:chest");                                  // the second's, against its east crawler
+		context.waitTicks(80);
+		String alone = read(server, lead.getX(), lead.getY(), lead.getZ());
+		System.out.println("[wildcatter-test] heavyLift: shared site " + lifts + " | lead alone " + alone);
+		check(alone.contains("TOO HEAVY") && alone.contains("89.5 t at 16 m"), "the GSU 60 should be too heavy for one crawler at 16 m: " + alone);
+		check(!alone.contains("diesel 0 of"), "the lead crawler should have drawn diesel: " + alone);
+		server.runCommand("item replace block 139 " + y + " " + (z + 14) + " container.0 with wildcatter:gsu_60 1");
+		server.runCommand("item replace block 139 " + y + " " + (z + 14) + " container.1 with minecraft:stone_bricks 32");
+		server.runCommand("item replace block 159 " + y + " " + (z + 14) + " container.0 with minecraft:stone_bricks 64");
+		server.runCommand("tp @p 144 " + (y + 30) + " " + (z + 50) + " 180 25");
+		server.runCommand("tick sprint 40000");
+		String[] tandemRead = new String[1];
+		String tandem = waitFor(context, server, () -> {
+			String r = read(server, lead.getX(), lead.getY(), lead.getZ());
+			boolean on = r.contains("TANDEM") && server.computeOnServer(srv -> ((dev.wildcatter.block.CraneBlockEntity) srv.overworld().getBlockEntity(lead)).carrying());
+			if (on) {
+				tandemRead[0] = r;
+			}
+			return on;
+		}, 4000);
+		server.runCommand("tick sprint stop");
+		server.runCommand("tp @p 144 " + (y + 20) + " " + (z + 42) + " 180 5");
+		context.waitTicks(30);
+		System.out.println("[wildcatter-test] heavyLift: tandem " + tandem + " | " + tandemRead[0] + " | " + read(server, second.getX(), second.getY(), second.getZ()));
+		check(tandemRead[0] != null && tandemRead[0].contains("45.9 of 91.8 t") && tandemRead[0].contains("80 % 71.6 t"),
+				"the two crawlers should lift the GSU 60 in tandem, 45.9 t each against 80 % of 89.5 t: " + tandemRead[0]);
+		context.takeScreenshot("wildcatter-tandem-lift");
+		server.runCommand("tick sprint 40000");
+		String built = waitFor(context, server, () -> read(server, siteOrigin.getX(), siteOrigin.getY(), siteOrigin.getZ()).contains("built"), 6000);
+		server.runCommand("tick sprint stop");
+		String shared = read(server, siteOrigin.getX(), siteOrigin.getY(), siteOrigin.getZ());
+		String twice = server.computeOnServer(srv -> {
+			dev.wildcatter.block.SiteMarkerBlockEntity m = (dev.wildcatter.block.SiteMarkerBlockEntity) srv.overworld().getBlockEntity(siteOrigin);
+			return m.workers() + " cranes, " + m.setTwice() + " set twice";
+		});
+		System.out.println("[wildcatter-test] heavyLift: shared site built " + built + " | " + shared + " | " + twice);
+		check(shared.contains("built") && shared.contains("worked by 2 cranes"), "both crawlers should build the shared site: " + shared + " | " + twice);
+		check(twice.endsWith(" 0 set twice"), "no lift should be set twice: " + twice);
+		System.out.println("[wildcatter-test] heavyLift ok: " + charts + " | " + vesselSite + " | " + tandemRead[0] + " | " + shared);
 	}
 
 	/** Waits (in client ticks of 10) until {@code done} holds or {@code limit} ticks pass; "yes after N ticks" or "NO after N ticks". */

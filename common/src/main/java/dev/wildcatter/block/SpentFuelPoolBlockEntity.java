@@ -202,7 +202,7 @@ public class SpentFuelPoolBlockEntity extends UnitMotorBlockEntity implements Wa
 	public void setRemoved() {
 		super.setRemoved();
 		if (level != null && !level.isClientSide()) {
-			POOLS.getOrDefault(level.dimension(), Set.of()).remove(worldPosition);
+			java.util.Optional.ofNullable(POOLS.get(level.dimension())).ifPresent(set -> set.remove(worldPosition));
 		}
 	}
 

@@ -4,7 +4,11 @@ client/CraneRenderer. The slewing centre is the middle of each box.
 - tower_crane, 6 x 3 x 6: four corner pads with spindle jacks and outrigger arms, the cross frame, the ballast slabs and the mast
   foot to 3 m; the switch cabinet on the main cell, its terminal on the west face;
 - crawler_crane, 9 x 2 x 9: the two crawlers (track frames, shoes, idler and drive tumblers) down the west and east sides, the carbody
-  between them with its carbody counterweight, and the slewing ring."""
+  between them with its carbody counterweight, and the slewing ring;
+- ring_crane (docs/multiblocks/ring-crane.md), the ring only: the 616 cells of a 49 x 49 square whose centres lie 20 to 24.25 m from
+  its middle, 1 m high, its main cell the north cell of the middle column. The ring mats, and the two ring beams with their rails,
+  drawn cell by cell as straight boxes. The bogies, platforms, counterweight and boom above it turn, so the renderer draws them."""
+import math
 import mlib
 import plantlib as g
 
@@ -85,6 +89,29 @@ CC.collide((7.6, 0.0, 0.2), (9.0, 1.3, 8.8))
 CC.collide((1.4, 0.4, 1.6), (7.6, 1.6, 7.4))
 CC.collide((2.8, 1.6, 2.8), (6.2, 2.0, 6.2))
 
+# ---- the ring crane's ring --------------------------------------------------------------------------------------------------------------
+RING, MAIN = 49, 24
+INNER, OUTER = 20.0, 24.25
+BEAMS = (21.2, 23.4)   # the two ring beams' centre lines, m from the middle (the bogies run on them)
+
+
+def in_ring(x, z):
+	return INNER <= math.hypot(x + 0.5 - RING / 2, z + 0.5 - RING / 2) <= OUTER
+
+
+RING_CELLS = [(0, 0, 0)] + [(x - MAIN, 0, z) for z in range(RING) for x in range(RING) if (x, z) != (MAIN, 0) and in_ring(x, z)]
+RC = mlib.Model("ring_crane", RING_CELLS, dict(TEX), TEX["yellow"])
+for (cx, _, cz) in RING_CELLS:
+	x, z = cx + MAIN, cz
+	d = math.hypot(x + 0.5 - RING / 2, z + 0.5 - RING / 2)
+	RC.box((cx, 0.0, cz), (cx + 1, 0.12, cz + 1), "dark")                                    # the steel ring spreader mats
+	for beam in BEAMS:
+		if abs(d - beam) < 0.62:
+			RC.box((cx + 0.05, 0.12, cz + 0.05), (cx + 0.95, 0.75, cz + 0.95), "yellow")   # the ring beam, a box girder
+			RC.box((cx + 0.3, 0.75, cz + 0.3), (cx + 0.7, 0.85, cz + 0.7), "iron")          # its rail
+	RC.collide((cx, 0.0, cz), (cx + 1, 0.85 if any(abs(d - b) < 0.62 for b in BEAMS) else 0.12, cz + 1))
+
 M = TC
-EXTRA = [CC]
+EXTRA = [CC, RC]
 CC.export_args = {"blockstate": True, "item": True}
+RC.export_args = {"blockstate": True, "item": True}

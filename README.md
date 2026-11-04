@@ -24,8 +24,9 @@ frequency, protection) is in `docs/ELECTRICAL_MODEL.md`. What is built, phase by
   changes, anode effects and freezing, a fume treatment centre, a tapping crucible and an ingot casting machine (10b3b).
 - **Blueprints:** survey any plant onto a blueprint, or pick one of 26 from the library; its ghost and site marker show what to build
   and the lifts it takes (10c1).
-- **Cranes:** a 16 t tower crane on 480 V and a 300 t crawler crane on its own diesel, on their real load charts and speeds, build
-  a site lift by lift from their chest and take it apart again (10c2).
+- **Cranes:** a 16 t tower crane on 480 V, a 300 t crawler crane and a 5,000 t ring crane on their own diesel, on their real load
+  charts and speeds. They build a site lift by lift from their chest and take it apart again. Several cranes can share a site, and
+  two lift a part in tandem when it is too heavy for one (10c2, 10c3).
 - **Oil and gas:**
   - seismic surveys, a land rig and wells;
   - the lease (separator, tanks, pumpjacks);
@@ -146,7 +147,7 @@ datapack (`wildcatter_kit.zip`) as a Release. Every push also builds and keeps t
 - **Oil and gas:** `landRig`, `lease`, `gasPlant`, `toppingUnit`, `crudeUnit`, `cracker`.
 - **The fuel chain:** `ores`, `acidPlant`, `uraniumMill`, `isrWellfield`, `conversion`, `cascade`, `zirconium`, `fuel`.
 - **The reactor:** `boron`, `reactor`, `turbineIsland`, `coolingTower`, `reactorSafety`, `fuelHandling`.
-- **Blueprints and cranes:** `blueprints`, `cranes`.
+- **Blueprints and cranes:** `blueprints`, `cranes`, `heavyLift`.
 
 ## Grid performance
 

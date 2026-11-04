@@ -8,7 +8,6 @@ import dev.wildcatter.block.SiteMarkerBlockEntity;
 import dev.wildcatter.blueprint.Blueprint;
 import dev.wildcatter.blueprint.Surveys;
 import dev.wildcatter.crane.CraneKind;
-import dev.wildcatter.crane.LoadChart;
 import dev.wildcatter.multiblock.BigPart;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +32,12 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Draws what stands above a crane's base (docs/multiblocks/tower-crane.md, crawler-crane.md): the tower crane's lattice mast, its
- * slewing platform and cab, its 75 m jib and counter-jib, the trolley, the ropes and the hook; or the crawler's upper works, its
- * lattice boom at its length and angle, the pendants, the ropes and the hook. The load on the hook is drawn from its own block models.
- * Everything turns with the slewing angle and moves through the step the crane is in.
+ * Draws what stands above a crane's base (docs/multiblocks/tower-crane.md, crawler-crane.md, ring-crane.md): the tower crane's
+ * lattice mast, its slewing platform and cab, its 75 m jib and counter-jib, the trolley, the ropes and the hook; the crawler's upper
+ * works, its lattice boom at its length and angle, the pendants, the ropes and the hook; or the ring crane's bogies, platforms,
+ * counterweight boxes, backmast and double boom, and its 14.5 m hook block. The load on the hook is drawn from its own block models;
+ * in a tandem lift the lead crane draws it midway between the two hooks. Everything turns with the slewing angle and moves through
+ * the step the crane is in.
  */
 public class CraneRenderer implements BlockEntityRenderer<CraneBlockEntity, CraneRenderer.State> {
 	private static final BlockDisplayContext CONTEXT = BlockDisplayContext.create();
@@ -49,6 +50,7 @@ public class CraneRenderer implements BlockEntityRenderer<CraneBlockEntity, Cran
 		final List<BlockModelRenderState> load = new ArrayList<>();
 		final List<double[]> at = new ArrayList<>();   // each load model's corner, from the block
 		int loadModels;
+		double loadTop;             // the load's height, m: the ring crane's hook block hangs above it
 	}
 
 	private final BlockModelResolver resolver;
@@ -77,15 +79,34 @@ public class CraneRenderer implements BlockEntityRenderer<CraneBlockEntity, Cran
 		state.radius = hook[1];
 		state.height = hook[2];
 		state.loadModels = 0;
+		state.loadTop = 0;
 		if (crane.carrying() && crane.site() != null && crane.getLevel() != null
 				&& crane.getLevel().getBlockEntity(crane.site()) instanceof SiteMarkerBlockEntity marker && marker.lifts() != null
 				&& crane.lift() >= 0 && crane.lift() < marker.lifts().size()) {
-			extractLoad(state, marker, marker.lifts().get(crane.lift()), pos);
+			double rad = Math.toRadians(state.deg);
+			double hx = state.cx + Math.sin(rad) * state.radius, hy = state.height, hz = state.cz - Math.cos(rad) * state.radius;
+			boolean draw = crane.leading();
+			if (crane.partner() != null && crane.getLevel().getBlockEntity(crane.partner()) instanceof CraneBlockEntity other) {
+				double[] there = other.hookWorld(time);   // a tandem lift: the load hangs between the two hooks
+				hx = (hx + there[0] - pos.getX()) / 2;
+				hy = (hy + there[1] - pos.getY()) / 2;
+				hz = (hz + there[2] - pos.getZ()) / 2;
+			}
+			if (draw) {
+				extractLoad(state, marker, marker.lifts().get(crane.lift()), hx, hy, hz);
+			} else {
+				state.loadTop = loadHeight(marker, marker.lifts().get(crane.lift()));
+			}
 		}
 	}
 
-	/** The load's block models, hung with the middle of its bottom at the hook. */
-	private void extractLoad(State state, SiteMarkerBlockEntity marker, Blueprint.Lift lift, BlockPos pos) {
+	private static double loadHeight(SiteMarkerBlockEntity marker, Blueprint.Lift lift) {
+		int[] box = marker.blueprint().box(lift);
+		return box[4] - box[1] + 1;
+	}
+
+	/** The load's block models, hung with the middle of its bottom at hx, hy, hz from the block. */
+	private void extractLoad(State state, SiteMarkerBlockEntity marker, Blueprint.Lift lift, double hx, double hy, double hz) {
 		Blueprint b = marker.blueprint();
 		BlockState[] states = marker.states();
 		List<Object[]> cells = new ArrayList<>();   // {state, x, y, z} in the site
@@ -119,9 +140,7 @@ public class CraneRenderer implements BlockEntityRenderer<CraneBlockEntity, Cran
 			z1 = Math.max(z1, (int) cell[3]);
 		}
 		double midX = (x0 + x1 + 1) / 2.0, midZ = (z0 + z1 + 1) / 2.0;
-		double rad = Math.toRadians(state.deg);
-		double hx = state.cx + Math.sin(rad) * state.radius;
-		double hz = state.cz - Math.cos(rad) * state.radius;
+		state.loadTop = loadHeight(marker, lift);
 		for (Object[] cell : cells) {
 			if (state.loadModels >= state.load.size()) {
 				state.load.add(new BlockModelRenderState());
@@ -130,7 +149,7 @@ public class CraneRenderer implements BlockEntityRenderer<CraneBlockEntity, Cran
 			resolver.update(state.load.get(state.loadModels), (BlockState) cell[0], CONTEXT);
 			double[] at = state.at.get(state.loadModels);
 			at[0] = hx + (int) cell[1] - midX;
-			at[1] = state.height + (int) cell[2] - y0;
+			at[1] = hy + (int) cell[2] - y0;
 			at[2] = hz + (int) cell[3] - midZ;
 			state.loadModels++;
 		}
@@ -150,10 +169,10 @@ public class CraneRenderer implements BlockEntityRenderer<CraneBlockEntity, Cran
 		int light = 0xF00000;   // full sky light: it stands in the open
 		collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(TextureAtlas.LOCATION_BLOCKS), (pose, v) -> {
 			Frame f = new Frame(pose, v, light, state.cx, state.cz, state.deg);
-			if (state.kind == CraneKind.TOWER) {
-				tower(f, state, yellow, concrete, dark, rope, grey);
-			} else {
-				crawler(f, state, yellow, concrete, dark, rope, grey);
+			switch (state.kind) {
+				case TOWER -> tower(f, state, yellow, concrete, dark, rope, grey);
+				case CRAWLER -> crawler(f, state, yellow, concrete, dark, rope, grey);
+				case RING -> ring(f, state, yellow, concrete, dark, rope, grey);
 			}
 		});
 		for (int i = 0; i < state.loadModels; i++) {
@@ -239,9 +258,9 @@ public class CraneRenderer implements BlockEntityRenderer<CraneBlockEntity, Cran
 		f.beam(yellow, -2.0, 3.4, 1.2, -1.0, frameTop, 0.8, 0.22);
 		f.beam(yellow, -1.0, frameTop, -0.8, -1.0, frameTop, 0.8, 0.2);
 		// the boom: its foot 1.5 m out and 2.7 m up, at the angle that puts the hook at its radius
-		double length = LoadChart.CRAWLER_BOOMS[s.boom];
-		double angle = Math.toRadians(CraneKind.boomDegrees(s.boom, s.radius));
-		double fu = LoadChart.BOOM_FOOT_OUT, fy = LoadChart.BOOM_FOOT_UP;
+		double length = s.kind.boomLength(s.boom);
+		double angle = Math.toRadians(s.kind.boomAngle(s.boom, s.radius));
+		double fu = s.kind.boomFoot()[0], fy = s.kind.boomFoot()[1];
 		double tu = fu + length * Math.cos(angle), ty = fy + length * Math.sin(angle);
 		double half = 1.0;   // the boom's lattice, 2 m square out of its 3 m foot
 		double nu = -Math.sin(angle), ny = Math.cos(angle);   // across the boom, in its plane
@@ -270,6 +289,93 @@ public class CraneRenderer implements BlockEntityRenderer<CraneBlockEntity, Cran
 		f.box(dark, r - 0.12, s.height + 1.0, -0.12, r + 0.12, hookTop - 1.2, 0.12);
 		f.beam(rope, r, s.height + 1.0, 0, r - 0.8, s.height + 0.02, 0, 0.03);
 		f.beam(rope, r, s.height + 1.0, 0, r + 0.8, s.height + 0.02, 0, 0.03);
+	}
+
+	// ---- the ring crane ----------------------------------------------------------------------------------------------------------------
+	private static final double RING_BEAM_IN = 21.2, RING_BEAM_OUT = 23.4;   // as tools/models/cranes.py
+
+	private static void ring(Frame f, State s, TextureAtlasSprite yellow, TextureAtlasSprite concrete, TextureAtlasSprite dark,
+			TextureAtlasSprite rope, TextureAtlasSprite grey) {
+		f.fixed = false;
+		// the bogies on both ring beams, a group under each platform (128 in all: 32 a group on each beam)
+		for (double centre : new double[] {0, 180}) {
+			for (int i = 0; i < 32; i++) {
+				double a = Math.toRadians(centre - 31 + i * 2.0);
+				for (double r : new double[] {RING_BEAM_IN, RING_BEAM_OUT}) {
+					double u = r * Math.cos(a), w = r * Math.sin(a);
+					f.box(dark, u - 0.45, 0.85, w - 0.45, u + 0.45, 1.6, w + 0.45);
+				}
+			}
+		}
+		// the front platform with the boom foot, the rear one with the counterweight, and the beams between them
+		f.box(yellow, 14.0, 1.6, -11.0, 25.0, 4.0, 11.0);
+		f.box(yellow, -25.0, 1.6, -13.0, -14.0, 4.0, 13.0);
+		f.box(yellow, -14.0, 2.2, -9.5, 14.0, 3.6, -7.5);
+		f.box(yellow, -14.0, 2.2, 7.5, 14.0, 3.6, 9.5);
+		f.box(grey, 10.0, 4.0, 10.0, 14.0, 7.0, 13.0);                      // the operator's cab
+		for (int k = 0; k < 6; k++) {                                       // the six power packs
+			f.box(grey, -13.0 + k * 4.4, 3.6, -13.5, -9.8 + k * 4.4, 6.2, -10.0);
+		}
+		// 52 counterweight boxes of 100 t, 6.06 x 2.44 x 2.59 m: 13 across, 2 deep, 2 high
+		for (int row = 0; row < 2; row++) {
+			for (int tier = 0; tier < 2; tier++) {
+				for (int k = 0; k < 13; k++) {
+					double u0 = -24.6 + row * 6.15, w0 = -15.9 + k * 2.45, y0 = 4.0 + tier * 2.6;
+					f.box(concrete, u0, y0, w0, u0 + 6.06, y0 + 2.59, w0 + 2.40);
+				}
+			}
+		}
+		// the double main boom: two lattice legs 10 m apart, 4 m square, joined at the head
+		double[] foot = s.kind.boomFoot();
+		double length = s.kind.boomLength(s.boom);
+		double angle = Math.toRadians(s.kind.boomAngle(s.boom, s.radius));
+		double fu = foot[0], fy = foot[1];
+		double tu = fu + length * Math.cos(angle), ty = fy + length * Math.sin(angle);
+		double nu = -Math.sin(angle), ny = Math.cos(angle);
+		double half = 2.0;
+		for (double leg : new double[] {-5.0, 5.0}) {
+			for (double a : new double[] {-half, half}) {
+				for (double b : new double[] {-half, half}) {
+					f.beam(yellow, fu + nu * a, fy + ny * a, leg + b, tu + nu * a, ty + ny * a, leg + b * 0.4, 0.5);
+				}
+			}
+			int bays = (int) Math.ceil(length / 6.0);
+			for (int i = 0; i < bays; i++) {
+				double t0 = (double) i / bays, t1 = (double) (i + 1) / bays;
+				double u0 = fu + (tu - fu) * t0, y0 = fy + (ty - fy) * t0, u1 = fu + (tu - fu) * t1, y1 = fy + (ty - fy) * t1;
+				f.beam(yellow, u0 - nu * half, y0 - ny * half, leg - half, u1 + nu * half, y1 + ny * half, leg - half, 0.25);
+				f.beam(yellow, u0 - nu * half, y0 - ny * half, leg + half, u1 + nu * half, y1 + ny * half, leg + half, 0.25);
+				f.beam(yellow, u0 + nu * half, y0 + ny * half, leg - half, u1 + nu * half, y1 + ny * half, leg + half, 0.25);
+			}
+		}
+		int ties = (int) Math.ceil(length / 24.0);
+		for (int i = 0; i <= ties; i++) {                                   // the ties between the two legs
+			double t = (double) i / ties;
+			f.beam(yellow, fu + (tu - fu) * t, fy + (ty - fy) * t, -5.0 + half, fu + (tu - fu) * t, fy + (ty - fy) * t, 5.0 - half, 0.3);
+		}
+		f.box(yellow, tu - 2.0, ty - 2.0, -7.0, tu + 2.0, ty + 1.5, 7.0);     // the boom head and its sheaves
+		// the backmast over the rear platform, its backstays to the counterweight, its pendants to the boom head
+		double mu = -6.0, my = 0.55 * length;
+		for (double leg : new double[] {-5.0, 5.0}) {
+			f.beam(yellow, 14.0, 4.0, leg, mu, my, leg * 0.6, 0.9);
+			f.beam(rope, mu, my, leg * 0.6, -22.0, 9.2, leg * 2.0, 0.2);
+			f.beam(rope, mu, my, leg * 0.6, tu, ty + 1.0, leg, 0.2);
+		}
+		f.box(yellow, mu - 1.5, my - 1.5, -4.0, mu + 1.5, my + 1.5, 4.0);   // the mast head
+		// the falls and the 14.5 m main hook block, hung above the load
+		double r = s.radius;
+		double hookBottom = s.height + s.loadTop + 3.0;
+		double hookTop = hookBottom + 14.5;
+		for (double w : new double[] {-1.5, -0.5, 0.5, 1.5}) {
+			f.beam(rope, r, ty - 2.0, w, r, hookTop, w, 0.12);
+		}
+		f.box(yellow, r - 2.5, hookTop - 6.0, -2.5, r + 2.5, hookTop, 2.5);       // the sheave block
+		f.box(dark, r - 1.6, hookBottom + 2.0, -1.6, r + 1.6, hookTop - 6.0, 1.6);   // the beam and trunnions
+		f.box(dark, r - 0.6, hookBottom, -0.6, r + 0.6, hookBottom + 2.0, 0.6);      // the hook
+		double top = s.height + s.loadTop;
+		for (double[] c : new double[][] {{-2, -2}, {-2, 2}, {2, -2}, {2, 2}}) {
+			f.beam(rope, r, hookBottom, 0, r + c[0], top, c[1], 0.12);          // the slings to the load's top
+		}
 	}
 
 	// ---- geometry ----------------------------------------------------------------------------------------------------------------------
@@ -388,6 +494,6 @@ public class CraneRenderer implements BlockEntityRenderer<CraneBlockEntity, Cran
 
 	@Override
 	public int getViewDistance() {
-		return 256;
+		return 384;   // the ring crane's 160.5 m boom
 	}
 }

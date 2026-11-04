@@ -9,15 +9,22 @@ public final class LoadChart {
 	private final double[] radii;
 	private final double[] tonnes;
 	private final double maxRadius;
+	/** What the hook block itself may carry, t: no figure is read above it. */
+	private final double cap;
 
 	/** {@code radii} rising, each with its tonnes; the hook works from the first radius to {@code maxRadius}. */
 	public LoadChart(double[] radii, double[] tonnes, double maxRadius) {
+		this(radii, tonnes, maxRadius, Double.MAX_VALUE);
+	}
+
+	public LoadChart(double[] radii, double[] tonnes, double maxRadius, double cap) {
 		if (radii.length == 0 || radii.length != tonnes.length) {
 			throw new IllegalArgumentException("a chart needs a figure at each radius");
 		}
 		this.radii = radii.clone();
 		this.tonnes = tonnes.clone();
 		this.maxRadius = maxRadius;
+		this.cap = cap;
 	}
 
 	public double minRadius() {
@@ -34,6 +41,16 @@ public final class LoadChart {
 
 	/** Tonnes the hook may carry at {@code radius} m, hook block and rigging included; 0 outside the chart. */
 	public double capacity(double radius) {
+		return Math.min(chartFigure(radius), cap);
+	}
+
+	/** True if the hook block's own limit is below the chart's figure at {@code radius}. */
+	public boolean capped(double radius) {
+		return chartFigure(radius) > cap;
+	}
+
+	/** The chart's own figure at {@code radius}, before the hook block's limit; 0 outside the chart. */
+	public double chartFigure(double radius) {
 		if (!reaches(radius)) {
 			return 0;
 		}
@@ -123,5 +140,21 @@ public final class LoadChart {
 	/** The crawler's chart on boom {@code index} of {@link #CRAWLER_BOOMS}. */
 	public static LoadChart crawler(int index) {
 		return CRAWLER_CHARTS[index];
+	}
+
+	// ---- the Sarens SGC-250, main boom configurations (SGC brochure sgr.d.marc.0180) ------------------------------------------------
+	/** The main booms, m. */
+	public static final double[] RING_BOOMS = {118, 160.5};
+	/** The main hook's safe working load, t: the chart is capped here (docs/multiblocks/ring-crane.md, proposed). */
+	public static final double RING_HOOK_SWL = 3_200;
+	private static final LoadChart[] RING_CHARTS = {
+			new LoadChart(new double[] {40, 50, 60, 70, 80, 90, 100, 110, 120},
+					new double[] {5000, 4362, 3831, 3327, 2746, 2321, 2001, 1756, 1554}, 120, RING_HOOK_SWL),
+			new LoadChart(new double[] {45, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170},
+					new double[] {3114, 3017, 2850, 2694, 2349, 2089, 1866, 1621, 1424, 1260, 1126, 1009, 913, 838}, 170, RING_HOOK_SWL)};
+
+	/** The ring crane's chart on boom {@code index} of {@link #RING_BOOMS}. */
+	public static LoadChart ring(int index) {
+		return RING_CHARTS[index];
 	}
 }

@@ -175,6 +175,50 @@ A figure marked *(proposed)* is an estimate or a proposal.
   fence or pane joins to are not compared, since it redraws them from its new neighbours.
 - **Changes:** a block in the way is not broken; the marker's readout names it ("IN THE WAY: minecraft:oak_log at 12, 64, 30").
 
+## Sharing and tandem lifts (10c3, decided with Tim 2026-11-04)
+Several cranes may work one site: every crane in reach of a marker takes its lifts from it. This follows a real project's lift
+plan, where each lift is given to the crane whose chart holds it, and the heaviest go up in tandem.
+
+**Who takes which lift:**
+- No two cranes ever take the same lift: the marker keeps a claim on each lift a crane has on its hook.
+- **Working ahead:** a crane takes the earliest lift it can make, and may pass over one it cannot (too heavy, out of reach, too
+  high, or not in its chest). It may not take a lift that **rests on** a lift that is not yet set, or that is on another crane's
+  hook.
+  - **Rests on:** lift A rests on an earlier lift B when their x-z boxes overlap and A's bottom is above B's bottom.
+- **Dismantling, the same backward:** a crane takes the last lift that still stands. It passes over one it cannot take. It may not
+  take a lift while a later lift resting on it still stands or is on a hook.
+- So the heavy lifts wait for the crane whose chart holds them, and a lighter crane keeps building around them.
+- **When a crane has nothing:** it reads the first lift it could not make and why, as one crane alone does.
+- **The marker's readout** adds the cranes working it: "Site: Potline, 312 lifts, 41 done, worked by 2 cranes; next: ...".
+
+**Tandem lifts:**
+- **When:** a part is too heavy for one crane alone at its radius.
+- **The partner:** the crane that found the lift (the lead) looks for a second crane on the same site. The second crane must be
+  idle and have power or diesel.
+- **The lead's chest:** the part comes from the lead's chest. Both cranes must reach that pick and the part's place, and both must
+  be tall enough.
+- **Equal halves:** each crane is hooked at one end of the part, and the part's centre is its middle, so each carries half of what
+  is on the hook, plus its own hook block (the ring crane's 104.6 t; the others' is in the 2 %).
+- **25 % to spare:** each half may be at most 80 % of that crane's chart, read at the farther of its pick and set radii. This is
+  the usual tandem derating.
+- **Together:** both cranes run the same steps at once, and each step takes the longer of the two cranes' times, so they slew,
+  luff, trolley and hoist at the slower crane's speed.
+  - The hooks are at the part's two ends, along the line between the two cranes' centres.
+  - If either crane loses power or diesel, both hold.
+  - If either is broken, or the world is saved mid-lift, the lift is called off and the part goes back to the lead's chest.
+- **Readouts:**
+  - Lead: "TANDEM with the Crawler crane at 80, 64, -7190: 45.9 of 91.8 t, chart 89.5 t at 16 m, 80 % 71.6 t".
+  - Follower: "TANDEM with the Crawler crane at ...: SLEWING ...".
+  - No partner: "TOO HEAVY: GSU 60 (90 t), 91.8 t on the hook, chart 89.5 t at 16 m; no second crane in reach can take half with
+    25 % to spare".
+
+**Game test (`heavyLift`, part 2):**
+- Two crawlers, both on their 32 m booms, share one site. The site holds a GSU 60 about 16 m from each and three pallets of stone
+  bricks.
+- Alone, the GSU reads TOO HEAVY (91.8 t against 89.5 t). In tandem each crane takes 45.9 t, under its 71.6 t.
+- The site is built. The GSU goes up in tandem, each crawler sets at least one lift, and no lift is set twice.
+- Screenshot: the tandem lift.
+
 ## Left out (Known gaps)
 - Contents and states are not recorded.
 - A blueprint cannot be edited; survey it again.

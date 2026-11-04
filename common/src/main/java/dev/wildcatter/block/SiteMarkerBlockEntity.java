@@ -38,11 +38,19 @@ public class SiteMarkerBlockEntity extends BlockEntity implements Inspectable {
 	private @Nullable Blueprint turned;
 	private @Nullable BlockState[] states;
 	private @Nullable List<Blueprint.Lift> lifts;
+	/** For each lift, the earlier lifts it rests on, and the later lifts resting on it (docs/blueprints.md, "Sharing and tandem lifts"). */
+	private @Nullable List<int[]> restsOn;
+	private @Nullable List<List<Integer>> carries;
+	/** What of each lift stood at the last count: all of it, and any of it. */
+	private boolean @Nullable [] standsAll, standsAny;
+	/** For this session: how often each lift was set by a crane, and the cranes that worked the site. Not saved. */
+	private final java.util.Map<Integer, Integer> setCount = new java.util.HashMap<>();
+	private final Set<BlockPos> workers = new java.util.HashSet<>();
 	private int done;
 	private boolean complete;
 	private boolean dismantle;
 	private String next = "";
-	/** Lifts a crane has taken on, by index, and the crane: two cranes never work the same lift (10c3). Not saved. */
+	/** Lifts a crane has taken on, by index, and the crane: two cranes never work the same lift. Not saved. */
 	private final java.util.Map<Integer, BlockPos> claims = new java.util.HashMap<>();
 
 	public SiteMarkerBlockEntity(BlockPos pos, BlockState state) {
@@ -81,6 +89,18 @@ public class SiteMarkerBlockEntity extends BlockEntity implements Inspectable {
 				states[i] = raw[i] == null ? null : Surveys.turned(raw[i], turns);
 			}
 			lifts = Surveys.lifts(turned);
+			restsOn = turned.restsOn(lifts);
+			carries = new java.util.ArrayList<>();
+			for (int i = 0; i < lifts.size(); i++) {
+				carries.add(new java.util.ArrayList<>());
+			}
+			for (int i = 0; i < lifts.size(); i++) {
+				for (int j : restsOn.get(i)) {
+					carries.get(j).add(i);
+				}
+			}
+			standsAll = null;
+			standsAny = null;
 		}
 		return turned;
 	}
@@ -139,6 +159,66 @@ public class SiteMarkerBlockEntity extends BlockEntity implements Inspectable {
 		return holder != null && !holder.equals(crane);
 	}
 
+	/** True if all of lift {@code i} stood at the last count. */
+	public boolean stands(int i) {
+		if (standsAll == null) {
+			recount();
+		}
+		return standsAll != null && standsAll[i];
+	}
+
+	/** True if anything of lift {@code i} stood at the last count. */
+	public boolean anyStands(int i) {
+		if (standsAny == null) {
+			recount();
+		}
+		return standsAny != null && standsAny[i];
+	}
+
+	/** True if lift {@code i} may be built now: every lift it rests on stands, and none is on a crane's hook. */
+	public boolean openForBuild(int i) {
+		for (int j : restsOn.get(i)) {
+			if (!stands(j) || claims.containsKey(j)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/** True if lift {@code i} may be taken down now: no lift resting on it still stands or is on a crane's hook. */
+	public boolean openForDismantle(int i) {
+		for (int k : carries.get(i)) {
+			if (anyStands(k) || claims.containsKey(k)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/** A crane set lift {@code i}; {@code also} worked it with it (a tandem partner), or null. */
+	public void recordSet(int i, BlockPos crane, @Nullable BlockPos also) {
+		setCount.merge(i, 1, Integer::sum);
+		workers.add(crane.immutable());
+		if (also != null) {
+			workers.add(also.immutable());
+		}
+	}
+
+	/** A crane took a lift down: it worked the site. */
+	public void recordWorker(BlockPos crane) {
+		workers.add(crane.immutable());
+	}
+
+	/** How many lifts were set more than once this session (never, if two cranes keep to their claims). */
+	public int setTwice() {
+		return (int) setCount.values().stream().filter(n -> n > 1).count();
+	}
+
+	/** The cranes that worked the site this session. */
+	public int workers() {
+		return workers.size();
+	}
+
 	/** True if any block or the part of lift {@code lift} stands: something of it to take down. */
 	public boolean liftAnyStands(Blueprint.Lift lift) {
 		Blueprint b = blueprint();
@@ -184,9 +264,17 @@ public class SiteMarkerBlockEntity extends BlockEntity implements Inspectable {
 		}
 		int count = 0;
 		String first = "";
+		boolean[] all = new boolean[lifts.size()];
+		boolean[] any = new boolean[lifts.size()];
+		for (int i = 0; i < lifts.size(); i++) {
+			all[i] = liftStands(lifts.get(i));
+			any[i] = all[i] || liftAnyStands(lifts.get(i));
+		}
+		standsAll = all;
+		standsAny = any;
 		if (dismantle) {
 			for (int i = lifts.size() - 1; i >= 0; i--) {
-				if (liftAnyStands(lifts.get(i))) {
+				if (any[i]) {
 					count++;
 					if (first.isEmpty()) {
 						first = describe(lifts.get(i));
@@ -199,8 +287,9 @@ public class SiteMarkerBlockEntity extends BlockEntity implements Inspectable {
 			setChanged();
 			return;
 		}
-		for (Blueprint.Lift lift : lifts) {
-			if (liftStands(lift)) {
+		for (int i = 0; i < lifts.size(); i++) {
+			Blueprint.Lift lift = lifts.get(i);
+			if (all[i]) {
 				count++;
 			} else if (first.isEmpty()) {
 				first = describe(lift);
@@ -290,12 +379,13 @@ public class SiteMarkerBlockEntity extends BlockEntity implements Inspectable {
 			recount();
 		}
 		String name = data.startsWith("lib:") ? BlueprintLibrary.title(data.substring(4)) : b.name();
+		String by = workers.isEmpty() ? "" : String.format(", worked by %d crane%s", workers.size(), workers.size() == 1 ? "" : "s");
 		if (dismantle) {
-			return Component.literal(done == 0 ? String.format("Site: %s, DISMANTLE: cleared", name)
-					: String.format("Site: %s, DISMANTLE, %d lifts, %d still stand; next: %s", name, lifts.size(), done, next));
+			return Component.literal(done == 0 ? String.format("Site: %s, DISMANTLE: cleared%s", name, by)
+					: String.format("Site: %s, DISMANTLE, %d lifts, %d still stand%s; next: %s", name, lifts.size(), done, by, next));
 		}
-		return Component.literal(complete ? String.format("Site: %s, all %d lifts stand: built", name, lifts.size())
-				: String.format("Site: %s, %d lifts, %d done; next: %s", name, lifts.size(), done, next));
+		return Component.literal(complete ? String.format("Site: %s, all %d lifts stand: built%s", name, lifts.size(), by)
+				: String.format("Site: %s, %d lifts, %d done%s; next: %s", name, lifts.size(), done, by, next));
 	}
 
 	@Override

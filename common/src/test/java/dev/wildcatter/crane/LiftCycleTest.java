@@ -51,6 +51,41 @@ class LiftCycleTest {
 	}
 
 	@Test
+	void theRingCraneReevesInSixesAndSlewsSixDegreesAMinute() {
+		assertEquals(6, CraneKind.ringPartsOfLine(288.2));                // a reactor vessel and the hook block: 2,827 kN, under 6 x 536
+		assertEquals(12, CraneKind.ringPartsOfLine(400));                 // 3,924 kN: 8 lines, rounded up to 12
+		assertEquals(60, CraneKind.ringPartsOfLine(3200));
+		assertEquals(20.0, CraneKind.RING.hoistMetresPerMinute(288.2), 1e-9);   // 120 m/min on 6 parts
+		assertEquals(2.0, CraneKind.RING.hoistMetresPerMinute(3200), 1e-9);     // on 60 parts, under its 3.72 MW
+		assertEquals(30 * 60, CraneKind.RING.slewSeconds(180), 1e-9);            // a half turn in 30 min
+		assertEquals(104.6, CraneKind.RING.hookBlockTonnes(), 1e-9);
+		// the 118 m boom at 40 m stands at about 80 degrees, its hook about 104 m up
+		assertEquals(Math.toDegrees(Math.acos(22.0 / 118)), CraneKind.RING.boomAngle(0, 40), 1e-9);
+		double h = CraneKind.RING.hookHeight(0, 40);
+		assertTrue(h > 100 && h < 106, "hook height " + h);
+		assertEquals(975 / 3600.0, CraneKind.RING.dieselPerSecond(3_720_000), 1e-12);
+	}
+
+	@Test
+	void aTandemLiftMovesAtTheSlowerCranesTimes() {
+		LiftCycle.Hook at = new LiftCycle.Hook(0, 6, 2);
+		LiftCycle.Hook pickA = new LiftCycle.Hook(0, 6, 1), setA = new LiftCycle.Hook(30, 16, 1);
+		LiftCycle.Hook pickB = new LiftCycle.Hook(200, 18, 1), setB = new LiftCycle.Hook(170, 15, 1);
+		double share = LiftCycle.tandemShare(CraneKind.CRAWLER, 91.8);
+		assertEquals(45.9, share, 1e-9);
+		List<LiftCycle.Step> a = LiftCycle.plan(CraneKind.CRAWLER, 3, at, pickA, setA, 12, share);
+		List<LiftCycle.Step> b = LiftCycle.plan(CraneKind.CRAWLER, 3, new LiftCycle.Hook(200, 6, 2), pickB, setB, 12, share);
+		LiftCycle.Tandem t = LiftCycle.together(a, b);
+		for (int i = 0; i < a.size(); i++) {
+			assertEquals(Math.max(a.get(i).seconds(), b.get(i).seconds()), t.lead().get(i).seconds(), 1e-9);
+			assertEquals(t.lead().get(i).seconds(), t.follower().get(i).seconds(), 1e-9);
+			assertEquals(b.get(i).to(), t.follower().get(i).to());       // each keeps its own hook path
+		}
+		assertEquals(LiftCycle.seconds(t.lead()), LiftCycle.seconds(t.follower()), 1e-9);
+		assertEquals(0.5 * 91.8 + 104.6, LiftCycle.tandemShare(CraneKind.RING, 91.8), 1e-9);
+	}
+
+	@Test
 	void theCrawlerBurnsMoreUnderLoad() {
 		assertEquals(102 / 3600.0 * 0.15, CraneKind.litresPerSecond(0), 1e-12);
 		assertEquals(102 / 3600.0, CraneKind.litresPerSecond(390_000), 1e-12);

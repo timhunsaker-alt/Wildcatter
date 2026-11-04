@@ -230,7 +230,7 @@ public class NaturalDraftTowerBlockEntity extends PlantUnitBlockEntity implement
 				}
 			}
 		}
-		TOWERS.getOrDefault(level.dimension(), Set.of()).remove(worldPosition);
+		java.util.Optional.ofNullable(TOWERS.get(level.dimension())).ifPresent(set -> set.remove(worldPosition));
 	}
 
 	/** The tower whose basin holds {@code pos}, if any. */
@@ -498,7 +498,7 @@ public class NaturalDraftTowerBlockEntity extends PlantUnitBlockEntity implement
 	public void setRemoved() {
 		super.setRemoved();
 		if (level != null && !level.isClientSide()) {
-			TOWERS.getOrDefault(level.dimension(), Set.of()).remove(worldPosition);
+			java.util.Optional.ofNullable(TOWERS.get(level.dimension())).ifPresent(set -> set.remove(worldPosition));
 		}
 	}
 
