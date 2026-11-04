@@ -229,21 +229,28 @@ and the Field Manual has a page for each new system.
       - vanilla coal as coking coal in by-product coke ovens, the coke working wherever coal does and the gas going to a gas line;
       - a rodding shop with butt recycle;
       - a vacuum tapping crucible and a casting machine making 22.7 kg ingots.
-- **10c: construction cranes.** Tim's idea of 2026-11-01. A stationary heavy-lift crane builds a plant from a design spec. Its open
-  decisions are asked at the start of 10c:
-  - crane types and sizes;
-  - how a spec is chosen and shown;
-  - whether it builds anything, or only machines with a spec;
-  - whether it can take a plant apart.
-
-  Real counterparts: tower, crawler and ring cranes (Mammoet's SGC-250 "Big Carl" at Hinkley Point C, which lifts whole
-  reactor-building modules), with their load charts.
-  - **How it would work:** you place the crane and pick a spec (a blueprint item, made from one of the docs/multiblocks layouts).
-    It lifts parts from a chest or hopper beside it into their places, one by one at a real lifting speed. Its slewing and hoist
-    motors draw power, or a diesel engine drives them.
-  - **Limits:** its reach and its load chart limit what it can set; a vessel or steam generator needs a big crane.
-  - **Bigger projects** (a whole PWR, a cooling tower) use more than one crane. They split the spec between them, or lift
-    together in a tandem lift.
+- **10c: construction cranes** — CURRENT. Tim's idea of 2026-11-01. Cranes build a plant from a blueprint. Three waves:
+  - **10c1: blueprints** (spec: `docs/blueprints.md`):
+    - a survey tool records any built plant onto a blueprint;
+    - a library of the mod's plants, made from the game test scenes;
+    - the ghost and the site marker;
+    - the lift list, the pallets and the part masses.
+  - **10c2: the tower and crawler cranes** (specs: `docs/multiblocks/tower-crane.md`, `crawler-crane.md`):
+    - the tower crane (Liebherr 380 EC-B 16) on 480 V, and the crawler crane (Liebherr LR 1300) on its own diesel;
+    - their load charts and real speeds;
+    - building a site from the crane's chest, and dismantling it back.
+  - **10c3: the ring crane and heavy lifts** (spec: `docs/multiblocks/ring-crane.md`):
+    - the ring crane (Sarens SGC-250 "Big Carl", which set Hinkley Point C's reactor modules; the earlier note named Mammoet in
+      error) on its own diesel sets;
+    - cranes sharing one site, and tandem lifts.
+  - Decided with Tim on 2026-11-04:
+    - a tower, a crawler and a ring crane, powered as real ones (the tower crane on 480 V, the others on their own diesel);
+    - blueprints from both a library (power plants, oil and gas, nuclear, smelter) and a survey tool;
+    - any block can be in a blueprint. Ordinary blocks go up on pallets of up to 64, and big parts one to a lift;
+    - real lift speeds;
+    - cranes can take a plant apart into their chest;
+    - two cranes can share a site and tandem-lift a part;
+    - a ghost of the blueprint at its site, locked with a site marker.
 - **10d: the grid finish:**
   - switches and panels;
   - better wire, ground and breaker art;

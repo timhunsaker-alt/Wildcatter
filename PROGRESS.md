@@ -491,6 +491,45 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - **Recommended mods:** `docs/recommended-mods.md` lists the quality-of-life mods with 26.3 builds for Fabric and NeoForge.
   - The Fabric set ran the `coker` and `anodes` scenes alongside Wildcatter, Sodium included, and both passed.
 
+## Phase 10c1: blueprints (spec: docs/blueprints.md)
+10c is three waves (Tim, 2026-11-04): 10c1 blueprints, 10c2 the tower and crawler cranes, 10c3 the ring crane and heavy lifts.
+- **The format** (`blueprint/Blueprint`, plain Java):
+  - a box facing north from its north-west bottom corner, holding a palette of block states and every ordinary block;
+  - each true-size part as one entry (its id, facing, main cell and box), and each wire's and cable's conductor size;
+  - JSON, or gzipped in base64 on an item;
+  - turning by quarter turns.
+- **The lift list:**
+  - bottom up, the parts first on each layer;
+  - then pallets of at most 64 blocks of one 5 x 5 m square, at most 16 t each (the tower crane's most).
+- **Masses** (`blueprint/Masses`): the heavy parts' own figures (reactor vessel 180 t, GSU 60 90 t, pot 60 t, and so on); the rest
+  by kind from their footprint box; ordinary blocks by material from their sound type; 2 % rigging on the hook, at least 0.5 t.
+- **The survey tool** records any box of up to 128 x 96 x 128 onto a blueprint in the off hand. Contents and machine states are not
+  recorded.
+- **The blueprint** item: blank, a library plant (sneak-right-click steps through 26), or a survey. Its tooltip gives size, parts,
+  blocks, the heaviest part and the lift count.
+- **The ghost** (`client/BlueprintGhost`, on the same gizmo hook as the part placement ghost):
+  - held, a blueprint is drawn where it would stand, turned the way you face;
+  - parts are outline boxes, red where something is in the way;
+  - blocks not yet standing are translucent cubes in their map colour, within 32 m, at most 4,096.
+- **The site marker:** right-click with a blueprint sets it at the origin.
+  - It keeps the ghost up for every player within 128 m of the site's box until the site is built.
+  - A block counts as built when it is the same block set the same way; the sides a cable or fence joins to are not compared,
+    since it redraws them from its new neighbours.
+  - Every 2 s it counts the lifts that stand; its readout names the next lift, its mass, and what is IN THE WAY.
+  - `Surveys.setLift` sets a lift as a hand placement would; the cranes will use it.
+- **The library:** 26 plants, from the steam plant to the potline, exported from their game test scenes with
+  `WILDCATTER_EXPORT_BLUEPRINTS` and shipped as JSON in the jar. The ISR wellfield is left out (its wells must stand on its ore).
+- **Field Manual:** a new page, BLUEPRINTS.
+- **Unit tests:**
+  - `BlueprintTest`: JSON and the compressed form, turning, the lift order, the pallets' cap and squares;
+  - `MassesTest`.
+- **Game test `blueprints`:**
+  - a genset, a unit substation, cable and a stone-brick apron are surveyed;
+  - the site is set 50 m east, facing east, and its lift list checked;
+  - it is built lift by lift and reads built;
+  - every library blueprint loads with every block and part known;
+  - the potline's ghost is drawn at a marker, and the client must hold the marker with its blueprint.
+
 ## Phase 10b3b: the potline (spec: docs/multiblocks/potline.md; dc-bus.md updated)
 The smelter's second wave (Tim, 2026-11-03): the pots that turn 10b2's alumina and 10b3a's anodes into aluminium. All parts are true
 size (`block/PotlinePartBlock`), sized for a line of up to 40 pots.
@@ -1212,6 +1251,14 @@ sized for a 40-pot line.
   - the bus bars' standoffs stand on the floor of their own cell, so a run carried up in the air shows them hanging (no
     supports or structure yet);
   - the chlor-alkali caustic soda is still only counted (fixed in 10b2: it is a pipe product).
+- Phase 10c1:
+  - a blueprint does not record what blocks hold or how machines are set, nor entities; it cannot be edited, only surveyed again;
+  - the site marker stands at the origin corner, so a blueprint with a block in that corner cannot be finished until the marker
+    is broken;
+  - the ghost draws blocks as coloured cubes, not their models;
+  - a site's ghost shows only while its marker's chunk is loaded on the client, so a big plant seen from far beyond its marker
+    (past the server's view distance) shows none;
+  - the survey tool, the blueprint and the site marker's flag have `*_placeholder` textures.
 - Phase 10b3b:
   - pot auxiliaries (beam jacks, point feeders, crust breakers) draw no power;
   - the pots change their own anodes, standing in for the pot tending machine until 10c's cranes; the tapping crucible item stands

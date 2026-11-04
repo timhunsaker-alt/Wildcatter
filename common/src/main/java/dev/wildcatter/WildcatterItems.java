@@ -166,6 +166,11 @@ public final class WildcatterItems {
 			"Spent pot lining: a frozen pot's carbon cathode and refractory, with its fluoride", "no use yet");
 	public static final ResourceKey<Item> TAPPING_CRUCIBLE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("tapping_crucible"));
 	public static final Item TAPPING_CRUCIBLE = new dev.wildcatter.item.TappingCrucibleItem(new Item.Properties().stacksTo(1).setId(TAPPING_CRUCIBLE_KEY));
+	// 10c1: blueprints (docs/blueprints.md)
+	public static final ResourceKey<Item> BLUEPRINT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("blueprint"));
+	public static final Item BLUEPRINT = new dev.wildcatter.item.BlueprintItem(new Item.Properties().stacksTo(1).setId(BLUEPRINT_KEY));
+	public static final ResourceKey<Item> SURVEY_TOOL_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("survey_tool"));
+	public static final Item SURVEY_TOOL = new dev.wildcatter.item.SurveyToolItem(new Item.Properties().stacksTo(1).setId(SURVEY_TOOL_KEY));
 	public static final ResourceKey<Item> ANODE_ROD_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("anode_rod"));
 	public static final Item ANODE_ROD = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(ANODE_ROD_KEY),
 			"Anode rod: a stem with its steel yoke and stubs", "reused round and round");
@@ -271,6 +276,8 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, REACTED_ALUMINA_BAG_KEY, REACTED_ALUMINA_BAG);
 		Registry.register(BuiltInRegistries.ITEM, SPENT_POT_LINING_KEY, SPENT_POT_LINING);
 		Registry.register(BuiltInRegistries.ITEM, TAPPING_CRUCIBLE_KEY, TAPPING_CRUCIBLE);
+		Registry.register(BuiltInRegistries.ITEM, BLUEPRINT_KEY, BLUEPRINT);
+		Registry.register(BuiltInRegistries.ITEM, SURVEY_TOOL_KEY, SURVEY_TOOL);
 		Registry.register(BuiltInRegistries.ITEM, CRUDE_OIL_BUCKET_KEY, CRUDE_OIL_BUCKET);
 		Registry.register(BuiltInRegistries.ITEM, PLASTIC_SHEET_KEY, PLASTIC_SHEET);
 		Registry.register(BuiltInRegistries.ITEM, STEEL_INGOT_KEY, STEEL_INGOT);

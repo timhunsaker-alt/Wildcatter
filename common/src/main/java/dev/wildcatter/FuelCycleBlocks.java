@@ -112,6 +112,9 @@ public interface FuelCycleBlocks {
 	Block FUME_TREATMENT_CENTRE = potlinePart(dev.wildcatter.block.PotlinePartBlock.Part.FUME_TREATMENT_CENTRE);
 	Block FTC_FAN = potlinePart(dev.wildcatter.block.PotlinePartBlock.Part.FTC_FAN);
 	Block CASTING_MACHINE = potlinePart(dev.wildcatter.block.PotlinePartBlock.Part.CASTING_MACHINE);
+	/** A blueprint's site (docs/blueprints.md). */
+	Block SITE_MARKER = block("site_marker", props -> new dev.wildcatter.block.SiteMarkerBlock(props.mapColor(MapColor.COLOR_ORANGE)
+			.strength(0.5F).sound(SoundType.WOOD).noOcclusion()));
 	/** Nine aluminium ingots. */
 	Block ALUMINIUM_BLOCK = block("aluminium_block", props -> new Block(props.mapColor(MapColor.METAL).strength(5.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
 	/** A placed block of red mud filter cake, for a dry stack. */

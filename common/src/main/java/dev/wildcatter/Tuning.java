@@ -468,6 +468,11 @@ public final class Tuning {
 	public static final double CASTER_HOLD_KG = 8_000.0;
 	public static final double CASTER_WATTS = 15_000.0;
 	public static final double AL_INGOT_KG = 22.7;                 // 50 lb
+	// 10c1: blueprints (docs/blueprints.md), proposed
+	public static final double PALLET_CAP_TONNES = 16.0;           // the tower crane's most: a pallet never weighs more
+	public static final int SITE_CHECK_TICKS = 40;                 // a site marker counts what stands this often
+	public static final int GHOST_BLOCKS = 4096;                   // ordinary blocks a ghost draws at most
+	public static final double GHOST_RANGE = 32.0;                 // m from the player
 	public static final double CONV_F2_PER_U = 0.18;               // kg of F2 a kg of U (0.160 ideal)
 	public static final double CONV_H2_PER_U = 8.47e-3;            // kg of H2 a kg of U: U(VI) to U(IV)
 	public static final double H2_KG_PER_M3 = 0.0899;

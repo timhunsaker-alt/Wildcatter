@@ -2135,6 +2135,41 @@ lang.update({f"block.{ns}.rectiformer": "Rectiformer (60 kA, 138 kV)", f"block.{
 	f"block.{ns}.dc_bus_180k": "DC Bus Bar (180 kA aluminium)", f"block.{ns}.dc_bus_180k_copper": "DC Bus Bar (180 kA copper)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 10c1: blueprints (docs/blueprints.md) --------------------------------------------------------------------------------
+# the site marker: a surveyor's wooden stake with an orange flag
+els = [cuboid([7, 0, 7], [9, 12, 9], "#stake"), cuboid([9, 9, 7.5], [13, 12, 8.5], "#flag")]
+if os.path.exists(f"{ORE_ART}/site_marker.png"):
+	shutil.copy(f"{ORE_ART}/site_marker.png", f"{ASSETS}/textures/block/ore/site_marker.png")
+	flag_tex = f"{ns}:block/ore/site_marker"
+else:
+	tex("site_marker_placeholder", lambda img, d: noise(img, (230, 120, 30), 10))
+	flag_tex = f"{ns}:block/site_marker_placeholder"
+save_json(f"{ASSETS}/models/block/site_marker.json", {"textures": {"stake": f"{ns}:block/mat/mat_wood_fir", "flag": flag_tex, "particle": f"{ns}:block/mat/mat_wood_fir"},
+	"elements": els})
+save_json(f"{ASSETS}/blockstates/site_marker.json", {"variants": {"": {"model": f"{ns}:block/site_marker"}}})
+save_json(f"{ASSETS}/items/site_marker.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/site_marker"}})
+save_json(f"{DATA}/loot_table/blocks/site_marker.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:site_marker"}],
+	"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+t = json.load(open(f"{ROOT}/data/minecraft/tags/block/mineable/axe.json")) if os.path.exists(f"{ROOT}/data/minecraft/tags/block/mineable/axe.json") else {"values": []}
+t["values"] = [v for v in t["values"] if v != f"{ns}:site_marker"] + [f"{ns}:site_marker"]
+save_json(f"{ROOT}/data/minecraft/tags/block/mineable/axe.json", t)
+shaped("blueprint", [" B ", "PPP"], {"B": "minecraft:blue_dye", "P": "minecraft:paper"}, "blueprint")
+shaped("survey_tool", ["S", "C", "P"], {"S": "minecraft:spyglass", "C": "minecraft:compass", "P": "minecraft:paper"}, "survey_tool")
+shaped("site_marker", ["W", "S"], {"W": "minecraft:orange_wool", "S": "minecraft:stick"}, "site_marker", 4)
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in {"blueprint": ("Blueprint", (40, 80, 170)), "survey_tool": ("Survey Tool", (180, 150, 60))}.items():
+	if os.path.exists(f"{ORE_ART}/{item}.png"):
+		shutil.copy(f"{ORE_ART}/{item}.png", f"{ASSETS}/textures/item/ore/{item}.png")
+		item_tex = f"{ns}:item/ore/{item}"
+	else:
+		tex(f"{item}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+		item_tex = f"{ns}:item/{item}_placeholder"
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": item_tex}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang[f"block.{ns}.site_marker"] = "Site Marker"
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 7g: the fuel plant (docs/multiblocks/fuel.md) -------------------------------------------------------------------
 # blockstates, models, shapes and items come from tools/models/fuel.py; here loot, names, tags, recipes and the items.
 FUEL_PARTS = ("uf6_autoclave", "idr_kiln", "granulator", "pellet_press", "sintering_furnace", "pellet_grinder", "rod_loader", "rod_welder",

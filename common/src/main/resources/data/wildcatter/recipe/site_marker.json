@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "W",
+    "S"
+  ],
+  "key": {
+    "W": "minecraft:orange_wool",
+    "S": "minecraft:stick"
+  },
+  "result": {
+    "id": "wildcatter:site_marker",
+    "count": 4
+  }
+}

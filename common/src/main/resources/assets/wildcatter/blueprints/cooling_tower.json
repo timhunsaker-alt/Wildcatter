@@ -1,0 +1,1 @@
+{"name":"Natural draft cooling tower","size":[76,11,76],"palette":["minecraft:hopper[enabled\u003dtrue,facing\u003ddown]"],"blocks":[36,4,71,0],"parts":[{"id":"wildcatter:natural_draft_tower","turns":0,"at":[35,1,70,35,1,70,38,3,73]}],"sizes":{}}

@@ -235,6 +235,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("potline")) {
 				potline(context, server);
 			}
+			if (only("blueprints")) {
+				blueprints(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -1725,6 +1728,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		for (int x = mvOut.getX() + 1; x <= -1; x++) {
 			put(server, x, up, z + 62, "wildcatter:cable_mv");
 		}
+		exportBlueprint(server, "bayer_refinery", new BlockPos(-27, y, z - 16), new BlockPos(44, y + 24, z + 80));   // the library (docs/blueprints.md)
 		fillTank(server, bullet, dev.wildcatter.fluid.Product.LPG, 20_000);
 		fillTank(server, calcinerBullet, dev.wildcatter.fluid.Product.LPG, 20_000);
 		fillTank(server, causticTank, dev.wildcatter.fluid.Product.CAUSTIC_SODA, 20_000);
@@ -1882,6 +1886,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		for (int x = 18; x < mvOut.getX(); x++) {
 			put(server, x, up, z + 4, "wildcatter:cable_mv");
 		}
+		exportBlueprint(server, "alumina_plant", new BlockPos(-20, y, z - 16), new BlockPos(40, y + 16, z + 24));   // the library (docs/blueprints.md)
 		fillTank(server, bullet, dev.wildcatter.fluid.Product.LPG, 20_000);
 		server.computeOnServer(srv -> {
 			((dev.wildcatter.block.HfColumnBlockEntity) srv.overworld().getBlockEntity(column)).addHf(10);
@@ -2026,6 +2031,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		for (int x = mvOut.getX() + 1; x <= -1; x++) {
 			put(server, x, up, z, "wildcatter:cable_mv");
 		}
+		exportBlueprint(server, "coker", new BlockPos(-27, y, z - 16), new BlockPos(30, y + 24, z + 50));   // the library (docs/blueprints.md)
 		fillTank(server, residue, dev.wildcatter.fluid.Product.RESIDUE, 40_000);
 		fillTank(server, bullet, dev.wildcatter.fluid.Product.LPG, 20_000);
 		fillTank(server, kilnBullet, dev.wildcatter.fluid.Product.LPG, 20_000);
@@ -2185,6 +2191,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		for (int x = mvOut.getX(); x <= 1; x++) {
 			put(server, x, up, z + 18, "wildcatter:cable_mv");
 		}
+		exportBlueprint(server, "coke_ovens", new BlockPos(-34, y, z - 16), new BlockPos(30, y + 24, z + 40));   // the library (docs/blueprints.md)
 		fillTank(server, bullet, dev.wildcatter.fluid.Product.LPG, 20_000);
 		water(server, quench);
 		startGenset(context, server, mvSet, north, 2000);       // the exhauster's sets first, so they are up before there is gas
@@ -2309,6 +2316,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		for (int zz = z - 15; zz <= z; zz++) {
 			put(server, -1, up, zz, "wildcatter:cable_mv");
 		}
+		exportBlueprint(server, "anode_plant", new BlockPos(-27, y, z - 22), new BlockPos(30, y + 16, z + 32));   // the library (docs/blueprints.md)
 		fillTank(server, pitchTank, dev.wildcatter.fluid.Product.PITCH, 5_000);
 		fillTank(server, bullet, dev.wildcatter.fluid.Product.LPG, 20_000);
 		startGenset(context, server, lvSet, north, 2000);
@@ -2506,6 +2514,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		// a pot off the line, to freeze
 		BlockPos lone = new BlockPos(100, up, z + 20);
 		placeBig(server, WildcatterBlocks.POT, lone, north);                                     // x 100-105, z+20..z+31
+		exportBlueprint(server, "potline", new BlockPos(0, y, z - 50), new BlockPos(110, y + 14, z + 34));   // the library (docs/blueprints.md)
 		// start: the starter set, the turbine, then the sets for the fan and the caster
 		fillTank(server, fuelTank, dev.wildcatter.fluid.Product.KEROSENE, 40_000);
 		startGenset(context, server, starter, north, 2000);
@@ -2645,6 +2654,133 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(lining > 0, "a frozen pot should break into spent pot lining");
 		System.out.println("[wildcatter-test] potline ok: " + Math.round(made * 1000) / 1000.0 + " kg made, " + reacted + " reacted bag, " + spent + " spent anode, "
 				+ ingots + " ingots, AE " + Math.round(aeVolts) + " V | " + tapped + state);
+	}
+
+	/**
+	 * Blueprints (10c1, docs/blueprints.md). A diesel set, a unit substation and its 4.16 kV cable with a stone-brick apron are surveyed
+	 * onto a blueprint; it must hold each block and part with the cable's size. Its site marker is set 50 m east, turned to face east,
+	 * and its lift list must put the parts before the blocks of their layer in pallets of at most 64. The site is then built lift by
+	 * lift as a hand would, and its marker must read it built. Every library blueprint must load with every block and part known. The
+	 * potline's ghost is drawn at a marker for the screenshot.
+	 */
+	private void blueprints(ClientGameTestContext context, TestServerContext server) {
+		final int z = -6500;
+		server.runCommand("effect give @p minecraft:slow_falling 600 0 true");
+		server.runCommand("tp @p 30 " + (up + 18) + " " + (z + 24) + " 180 40");
+		context.waitTicks(20);
+		for (int zz = z - 10; zz <= z + 130; zz += 20) {
+			server.runCommand("fill -70 " + (y - 1) + " " + zz + " 80 " + (y + 10) + " " + Math.min(zz + 19, z + 130) + " minecraft:air");
+			server.runCommand("fill -70 " + (y - 1) + " " + zz + " 80 " + (y - 1) + " " + Math.min(zz + 19, z + 130) + " minecraft:stone");
+		}
+		BlockPos set = new BlockPos(12, up, z);
+		genset(server, set, net.minecraft.core.Direction.NORTH, false);                       // x 7-12, z..z+1
+		BlockPos mvOut = inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, set, net.minecraft.core.Direction.EAST, false);   // x 13-16
+		for (int x = mvOut.getX(); x <= mvOut.getX() + 3; x++) {
+			put(server, x, up, z, "wildcatter:cable_mv");
+		}
+		sizeCables(server, new BlockPos(mvOut.getX(), up, z), new BlockPos(mvOut.getX() + 3, up, z), WildcatterBlocks.CABLE_MV, dev.wildcatter.energy.ConductorSize.MV_500);
+		for (int x = 6; x <= 20; x++) {
+			put(server, x, y, z + 3, "minecraft:stone_bricks");
+		}
+		BlockPos lo = new BlockPos(5, y, z - 3);
+		BlockPos hi = new BlockPos(21, y + 5, z + 3);
+		String data = server.computeOnServer(srv -> dev.wildcatter.item.SurveyToolItem.record(srv.overworld(), lo, hi).compressed());
+		dev.wildcatter.blueprint.Blueprint surveyed = dev.wildcatter.blueprint.Blueprint.decompress(data);
+		String summary = surveyed.name() + ": " + surveyed.parts().size() + " parts, " + surveyed.blocks().size() + " blocks, palette " + surveyed.palette();
+		System.out.println("[wildcatter-test] blueprints: surveyed " + summary);
+		check(surveyed.parts().stream().anyMatch(p -> p.id().equals("wildcatter:unit_substation")), "the survey should hold the unit substation as a part: " + summary);
+		check(surveyed.palette().stream().filter(st -> st.startsWith("minecraft:stone_bricks")).count() == 1
+				&& surveyed.blocks().stream().filter(k -> surveyed.palette().get(k.state()).startsWith("minecraft:stone_bricks")).count() == 15, "the survey should hold the 15 stone bricks: " + summary);
+		check(surveyed.sizes().containsValue(dev.wildcatter.energy.ConductorSize.MV_500.getSerializedName()), "the survey should hold the cable's size: " + surveyed.sizes());
+		// its site 50 m east, turned to face east
+		BlockPos site = new BlockPos(60, y, z);
+		server.computeOnServer(srv -> {
+			srv.overworld().setBlock(site, WildcatterBlocks.SITE_MARKER.defaultBlockState(), 3);
+			((dev.wildcatter.block.SiteMarkerBlockEntity) srv.overworld().getBlockEntity(site)).set(data, 1);
+			return null;
+		});
+		String plan = server.computeOnServer(srv -> {
+			dev.wildcatter.block.SiteMarkerBlockEntity marker = (dev.wildcatter.block.SiteMarkerBlockEntity) srv.overworld().getBlockEntity(site);
+			java.util.List<dev.wildcatter.blueprint.Blueprint.Lift> lifts = marker.lifts();
+			StringBuilder out = new StringBuilder();
+			int lastY = -1;
+			boolean palletOnLayer = false;
+			for (dev.wildcatter.blueprint.Blueprint.Lift lift : lifts) {
+				if (lift.y() != lastY) {
+					lastY = lift.y();
+					palletOnLayer = false;
+				}
+				if (lift.isPart() && palletOnLayer) {
+					out.append(" PART AFTER A PALLET ON LAYER ").append(lift.y());
+				}
+				if (!lift.isPart()) {
+					palletOnLayer = true;
+					if (lift.blocks().size() > dev.wildcatter.blueprint.Blueprint.PALLET_BLOCKS) {
+						out.append(" PALLET OF ").append(lift.blocks().size());
+					}
+				}
+			}
+			return lifts.size() + " lifts" + out;
+		});
+		System.out.println("[wildcatter-test] blueprints: site " + plan + " | " + read(server, site.getX(), site.getY(), site.getZ()));
+		check(!plan.contains("PART AFTER") && !plan.contains("PALLET OF"), "the lift list should put parts first on each layer, in pallets of at most 64: " + plan);
+		// built lift by lift, as a hand would
+		boolean set0 = server.computeOnServer(srv -> {
+			dev.wildcatter.block.SiteMarkerBlockEntity marker = (dev.wildcatter.block.SiteMarkerBlockEntity) srv.overworld().getBlockEntity(site);
+			boolean ok = true;
+			for (dev.wildcatter.blueprint.Blueprint.Lift lift : marker.lifts()) {
+				ok &= dev.wildcatter.blueprint.Surveys.setLift(srv.overworld(), site, marker.blueprint(), marker.states(), lift);
+			}
+			marker.recount();
+			return ok;
+		});
+		String built = read(server, site.getX(), site.getY(), site.getZ());
+		System.out.println("[wildcatter-test] blueprints: built " + built);
+		check(set0 && built.contains("built"), "the site, built lift by lift, should read built: " + built);
+		// every library blueprint loads, with every block and part known
+		String library = server.computeOnServer(srv -> {
+			StringBuilder bad = new StringBuilder();
+			for (String name : dev.wildcatter.blueprint.BlueprintLibrary.names()) {
+				dev.wildcatter.blueprint.Blueprint b = dev.wildcatter.blueprint.BlueprintLibrary.load(name);
+				if (b == null) {
+					bad.append(" MISSING ").append(name);
+					continue;
+				}
+				net.minecraft.world.level.block.state.BlockState[] states = dev.wildcatter.blueprint.Surveys.states(b);
+				for (int i = 0; i < states.length; i++) {
+					if (states[i] == null) {
+						bad.append(" ").append(name).append(": unknown ").append(b.palette().get(i));
+					}
+				}
+				for (dev.wildcatter.blueprint.Blueprint.Part p : b.parts()) {
+					if (dev.wildcatter.blueprint.Surveys.partState(p) == null) {
+						bad.append(" ").append(name).append(": unknown part ").append(p.id());
+					}
+				}
+			}
+			return bad.toString();
+		});
+		check(library.isEmpty(), "every library blueprint should load:" + library);
+		// the potline's ghost at a marker, for the screenshot
+		BlockPos ghost = new BlockPos(-60, y, z + 40);
+		server.computeOnServer(srv -> {
+			srv.overworld().setBlock(ghost, WildcatterBlocks.SITE_MARKER.defaultBlockState(), 3);
+			((dev.wildcatter.block.SiteMarkerBlockEntity) srv.overworld().getBlockEntity(ghost)).set("lib:potline", 0);
+			return null;
+		});
+		server.runCommand("tp @p -76 " + (up + 24) + " " + (z + 26) + " -45 25");   // beside its marker, so the marker's chunk is loaded
+		context.waitTicks(60);
+		boolean seen = context.computeOnClient(client -> dev.wildcatter.block.SiteMarkerBlockEntity.CLIENT.stream()
+				.anyMatch(s -> s.getBlockPos().equals(ghost) && "lib:potline".equals(s.data()) && s.blueprint() != null));
+		String clientSide = context.computeOnClient(client -> {
+			var be = client.level.getBlockEntity(ghost);
+			return "markers " + dev.wildcatter.block.SiteMarkerBlockEntity.CLIENT.size() + ", block " + client.level.getBlockState(ghost) + ", entity "
+					+ (be instanceof dev.wildcatter.block.SiteMarkerBlockEntity m ? "data " + m.data().length() + " chars, blueprint " + (m.blueprint() != null) : String.valueOf(be))
+					+ ", player " + client.player.blockPosition();
+		});
+		check(seen, "the client should hold the potline's site marker with its blueprint, for the ghost: " + clientSide);
+		context.takeScreenshot("wildcatter-blueprint-ghost");
+		System.out.println("[wildcatter-test] blueprints ok: " + summary + " | " + plan + " | " + built);
 	}
 
 	private void dcTier(ClientGameTestContext context, TestServerContext server) {
@@ -3666,6 +3802,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		String idle = read(server, 12, up, z);
 		check(idle.contains("Diesel genset (500 kW") && idle.contains("STOPPED"), "a complete diesel skid should form a stopped genset: " + idle);
 		check(read(server, 12, up, z - 6).contains("Gas genset (1000 kW"), "a gas skid should form a gas genset: " + read(server, 12, up, z - 6));
+		exportBlueprint(server, "genset", new BlockPos(4, y, z - 10), new BlockPos(22, y + 4, z + 4));   // the library (docs/blueprints.md)
 		startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 1000);
 		context.waitTicks(40);
 		String running = read(server, 12, up, z);
@@ -3865,6 +4002,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			put(server, 40, up, z - 2, "wildcatter:gas_line");   // against the gas engine's back
 			put(server, 36, up, z + 1, "wildcatter:gas_line");   // the flare's branch
 
+			exportBlueprint(server, "lease", new BlockPos(4, y, z - 10), new BlockPos(46, y + 12, z + 16));   // the library (docs/blueprints.md)
 			startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 1000);
 			server.computeOnServer(srv -> {   // a day's water already in the tank, so the H-pump's level switch calls it
 				((dev.wildcatter.block.StorageTankBlockEntity) srv.overworld().getBlockEntity(new BlockPos(28, up, z + 3))).testFill(dev.wildcatter.fluid.Product.PRODUCED_WATER, 20_000);
@@ -4037,6 +4175,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			}
 
 			put(server, 14, up + 1, z - 1, "wildcatter:gas_line");   // on the separator's oil nozzle: a gas well's liquid is condensate
+			exportBlueprint(server, "gas_plant", new BlockPos(4, y, z - 12), new BlockPos(50, y + 13, z + 8));   // the library (docs/blueprints.md)
 			startGenset(context, server, power, net.minecraft.core.Direction.NORTH, 0);
 			context.waitTicks(200);   // the plant fills with pipeline gas before the second set cranks on it
 			String condensate = pipeReading(server, new BlockPos(14, up + 1, z - 1));
@@ -4257,6 +4396,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		BlockPos set2 = new BlockPos(10, up, z + 16);
 		genset(server, set2, net.minecraft.core.Direction.NORTH, false);   // x 5-10, z+16..z+17, its terminals against the cable at x 11
 		sizeCables(server, new BlockPos(4, up, z), new BlockPos(30, up, z + 24), WildcatterBlocks.CABLE_INDUSTRIAL, dev.wildcatter.energy.ConductorSize.AWG_4_0);
+		exportBlueprint(server, "crude_unit", new BlockPos(2, y, z - 10), new BlockPos(34, y + 14, z + 26));   // the library (docs/blueprints.md)
 		fillTank(server, fuel, dev.wildcatter.fluid.Product.RESIDUE, 30_000);
 		startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 2000);
 		startGenset(context, server, set2, net.minecraft.core.Direction.NORTH, 2000);
@@ -4354,6 +4494,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			put(server, 31, up, zz, "wildcatter:cable_industrial");   // the reactor's box
 		}
 		sizeCables(server, new BlockPos(25, up, z + 1), new BlockPos(41, up + 1, z + 6), WildcatterBlocks.CABLE_INDUSTRIAL, dev.wildcatter.energy.ConductorSize.AWG_4_0);
+		exportBlueprint(server, "cracker", new BlockPos(0, y, z - 10), new BlockPos(46, y + 16, z + 10));   // the library (docs/blueprints.md)
 		fillTank(server, bullet, dev.wildcatter.fluid.Product.LPG, 20_000);
 		server.computeOnServer(srv -> {   // a day's boiler feed water in the furnace (a pump on water pipe tops it up in play)
 			((dev.wildcatter.block.CrackingFurnaceBlockEntity) srv.overworld().getBlockEntity(furnace)).addWater(200);
@@ -4455,6 +4596,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			put(server, x, up, z + 22, "wildcatter:cable_industrial");   // to the feed pump's box, the west face of its main cell
 		}
 		sizeCables(server, new BlockPos(11, up, z + 3), new BlockPos(20, up, z + 22), WildcatterBlocks.CABLE_INDUSTRIAL, dev.wildcatter.energy.ConductorSize.AWG_4_0);
+		exportBlueprint(server, "combined_cycle", new BlockPos(2, y, z - 8), new BlockPos(36, y + 12, z + 27));   // the library (docs/blueprints.md)
 		fillTank(server, fuelTank, dev.wildcatter.fluid.Product.KEROSENE, 40_000);
 		context.waitTicks(30);
 		// no 4.16 kV yet: the starter cannot turn it
@@ -4571,6 +4713,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		for (int x = 15; x <= 19; x++) {
 			put(server, x, up, z + 2, "wildcatter:cable_mv");   // to the starter's box, the west face of the package at z+2
 		}
+		exportBlueprint(server, "aeroderivative", new BlockPos(2, y, z - 14), new BlockPos(44, y + 16, z + 22));   // the library (docs/blueprints.md)
 		fillTank(server, fuelTank, dev.wildcatter.fluid.Product.KEROSENE, 40_000);
 		startGenset(context, server, set, north, 2000);
 		server.computeOnServer(srv -> {
@@ -4714,6 +4857,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			for (int h = up + 1; h <= pad + 1; h++) {
 				put(server, hx - 7, h, hz + 7, "wildcatter:cable_mv");
 			}
+			exportBlueprint(server, "land_rig", new BlockPos(0, y, -452), new BlockPos(47, y + 6, -424));   // the library (docs/blueprints.md)
 			startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 1000);
 			context.waitTicks(100);
 			String filling = read(server, origin.getX(), origin.getY(), origin.getZ());
@@ -4920,6 +5064,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		put(server, 10, up, z + 5, "wildcatter:cable_industrial");
 		put(server, 10, up, z + 4, "wildcatter:cable_industrial");
 		put(server, 10, up, z + 3, "wildcatter:cable_industrial");
+		exportBlueprint(server, "steam_plant", new BlockPos(0, y, z - 6), new BlockPos(24, y + 8, z + 9));   // the library (docs/blueprints.md)
 		startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 1000);
 		String rolling = "";
 		for (int waited = 0; waited < 1600; waited += 40) {
@@ -5358,6 +5503,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(40);
 		String formed = read(server, 16, up, z + 2);
 		check(formed.contains("relays") && !formed.contains("needs"), "with every part in place the yard should form: " + formed);
+		exportBlueprint(server, "substation", new BlockPos(0, y, z - 16), new BlockPos(40, y + 9, z + 12));   // the library (docs/blueprints.md)
 		server.runCommand("tp @p 6 " + (up + 7) + " " + (z - 8) + " -45 25");
 		context.waitTicks(10);
 		context.takeScreenshot("wildcatter-substation-built");
@@ -5610,6 +5756,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			put(server, x, up, z + 2, "wildcatter:cable_mv");
 		}
 		put(server, 3, up, z + 1, "wildcatter:cable_mv");
+		exportBlueprint(server, "acid_plant", new BlockPos(-2, y, z - 12), new BlockPos(40, y + 22, z + 10));   // the library (docs/blueprints.md)
 		fillTank(server, bullet, dev.wildcatter.fluid.Product.LPG, 20_000);
 		water(server, boiler, absorber);
 		for (BlockPos set : sets) {
@@ -5728,6 +5875,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			return null;
 		});
 		water(server, sag, ccd);
+		exportBlueprint(server, "uranium_mill", new BlockPos(-20, y, z - 14), new BlockPos(62, y + 11, z + 13));   // the library (docs/blueprints.md)
 		startGenset(context, server, lvSet, net.minecraft.core.Direction.NORTH, 2000);
 		for (BlockPos set : sagSets) {
 			startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 2000);   // the second and third sync onto the first
@@ -6098,6 +6246,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			put(server, x, up, z + 16, "wildcatter:cable_mv");
 		}
 		put(server, 14, up, z + 17, "wildcatter:cable_mv");
+		exportBlueprint(server, "conversion", new BlockPos(-4, y, z - 11), new BlockPos(42, y + 12, z + 27));   // the library (docs/blueprints.md)
 		startGenset(context, server, lvSet, north, 2000);
 		for (BlockPos set : mvSets) {
 			startGenset(context, server, set, north, 2000);
@@ -6257,6 +6406,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		for (int[] c : lv) {
 			put(server, c[0], up, c[1], "wildcatter:cable_industrial");
 		}
+		exportBlueprint(server, "enrichment", new BlockPos(-30, y, z - 40), new BlockPos(44, y + 16, z + 22));   // the library (docs/blueprints.md)
 		// start: the starter set, the turbine, then the stations' set
 		fillTank(server, fuelTank, dev.wildcatter.fluid.Product.KEROSENE, 40_000);
 		startGenset(context, server, starter, north, 2000);
@@ -6458,6 +6608,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		for (int[] c : mv) {
 			put(server, c[0], up, c[1], "wildcatter:cable_mv");
 		}
+		exportBlueprint(server, "zirconium", new BlockPos(-20, y, z - 12), new BlockPos(47, y + 14, z + 52));   // the library (docs/blueprints.md)
 		for (BlockPos set : lvSets) {
 			startGenset(context, server, set, north, 2000);
 		}
@@ -6609,6 +6760,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		for (int zz = z - 9; zz <= z + 54; zz++) {
 			put(server, -2, up, zz, "wildcatter:busway_industrial");
 		}
+		exportBlueprint(server, "fuel_plant", new BlockPos(-20, y, z - 12), new BlockPos(24, y + 14, z + 66));   // the library (docs/blueprints.md)
 		for (BlockPos set : sets) {
 			startGenset(context, server, set, north, 2000);
 		}
@@ -6730,6 +6882,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		for (int zz = z - 9; zz <= z + 12; zz++) {
 			put(server, -2, up, zz, "wildcatter:busway_industrial");
 		}
+		exportBlueprint(server, "boron", new BlockPos(-20, y, z - 12), new BlockPos(16, y + 10, z + 24));   // the library (docs/blueprints.md)
 		for (BlockPos set : sets) {
 			startGenset(context, server, set, north, 2000);
 		}
@@ -6862,6 +7015,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		}
 		put(server, 11, up, z, "wildcatter:cable_industrial");   // a lone set is solved only with a load on its bus
 		sizeCables(server, new BlockPos(11, up, z), new BlockPos(11, up, z), WildcatterBlocks.CABLE_INDUSTRIAL, dev.wildcatter.energy.ConductorSize.KCMIL_500);
+		exportBlueprint(server, "pwr", new BlockPos(-26, y, z - 20), new BlockPos(20, y + 15, z + 20));   // the library (docs/blueprints.md)
 		startGenset(context, server, afwSet, north, 2000);
 		// 480 V stubs, one at a time: the CVCS, the pressurizer, the CRDM head's riser
 		put(server, -4, up, z, "wildcatter:cable_industrial");
@@ -7189,6 +7343,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		});
 		water(server, cvcs, afw, da);
 		// the gas turbine on: starter set, purge skipped, onto the dead 13.8 kV bus
+		exportBlueprint(server, "turbine_island", new BlockPos(-10, y, z - 20), new BlockPos(80, y + 20, z + 40));   // the library (docs/blueprints.md)
 		startGenset(context, server, starterSet, north, 2000);
 		server.computeOnServer(srv -> {
 			((dev.wildcatter.block.GasTurbineBlockEntity) srv.overworld().getBlockEntity(gt)).setWantRun(true);
@@ -7361,6 +7516,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(t[2] > 0 && hot.contains("evaporation 4"), "it should evaporate about 42 kg/s and raise its plume: " + hot);
 		server.runCommand("tp @p " + (cx + 36) + " " + (up + 4) + " " + (cz + 36) + " 135 -28");   // inside the test client's 5-chunk fog
 		context.waitTicks(80);
+		exportBlueprint(server, "cooling_tower", new BlockPos(-35, y, z - 70), new BlockPos(40, y + 10, z + 5));   // the library (docs/blueprints.md)
 		context.takeScreenshot("wildcatter-cooling-tower");
 		System.out.println("[wildcatter-test] coolingTower ok: " + hot);
 	}
@@ -7743,6 +7899,22 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			}
 			return n;
 		});
+	}
+
+	/** With WILDCATTER_EXPORT_BLUEPRINTS set, records a scene's built plant into the library folder (docs/blueprints.md, "The library"). */
+	private void exportBlueprint(TestServerContext server, String name, BlockPos a, BlockPos b) {
+		String dir = System.getenv("WILDCATTER_EXPORT_BLUEPRINTS");
+		if (dir == null || dir.isBlank()) {
+			return;
+		}
+		String json = server.computeOnServer(srv -> dev.wildcatter.blueprint.Surveys.record(srv.overworld(), dev.wildcatter.blueprint.BlueprintLibrary.title(name), a, b).toJson());
+		try {
+			java.nio.file.Files.createDirectories(java.nio.file.Path.of(dir));
+			java.nio.file.Files.writeString(java.nio.file.Path.of(dir, name + ".json"), json);
+		} catch (java.io.IOException e) {
+			throw new IllegalStateException(e);
+		}
+		System.out.println("[wildcatter-test] blueprint " + name + " exported: " + json.length() + " chars");
 	}
 
 	private void fieldManual(TestServerContext server) {

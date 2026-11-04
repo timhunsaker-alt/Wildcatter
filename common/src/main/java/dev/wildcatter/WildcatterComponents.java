@@ -20,11 +20,29 @@ public final class WildcatterComponents {
 			.networkSynchronized(ByteBufCodecs.DOUBLE)
 			.build();
 
+	/** A blueprint's data: "lib:<name>" or a surveyed blueprint's compressed form (docs/blueprints.md). */
+	public static final DataComponentType<String> BLUEPRINT = DataComponentType.<String>builder()
+			.persistent(com.mojang.serialization.Codec.STRING)
+			.networkSynchronized(ByteBufCodecs.STRING_UTF8)
+			.build();
+	/** The survey tool's two corners. */
+	public static final DataComponentType<net.minecraft.core.BlockPos> SURVEY_A = DataComponentType.<net.minecraft.core.BlockPos>builder()
+			.persistent(net.minecraft.core.BlockPos.CODEC)
+			.networkSynchronized(net.minecraft.core.BlockPos.STREAM_CODEC)
+			.build();
+	public static final DataComponentType<net.minecraft.core.BlockPos> SURVEY_B = DataComponentType.<net.minecraft.core.BlockPos>builder()
+			.persistent(net.minecraft.core.BlockPos.CODEC)
+			.networkSynchronized(net.minecraft.core.BlockPos.STREAM_CODEC)
+			.build();
+
 	private WildcatterComponents() {
 	}
 
 	public static void register() {
 		Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wildcatter.id("conductor_size"), CONDUCTOR_SIZE);
 		Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wildcatter.id("metal_kg"), METAL_KG);
+		Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wildcatter.id("blueprint"), BLUEPRINT);
+		Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wildcatter.id("survey_a"), SURVEY_A);
+		Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wildcatter.id("survey_b"), SURVEY_B);
 	}
 }

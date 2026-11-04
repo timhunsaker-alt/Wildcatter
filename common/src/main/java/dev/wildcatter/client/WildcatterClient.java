@@ -67,6 +67,7 @@ public final class WildcatterClient {
 		net.minecraft.client.Minecraft client = net.minecraft.client.Minecraft.getInstance();
 		try (var gizmos = client.levelRenderer.collectPerFrameRenderThreadGizmos()) {
 			GhostOutline.draw(client);
+			BlueprintGhost.draw(client);
 		}
 	}
 

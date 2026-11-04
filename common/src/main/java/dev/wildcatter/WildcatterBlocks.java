@@ -146,6 +146,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.PotBlockEntity> POT_ENTITY = entity(dev.wildcatter.block.PotBlockEntity::new, POT);
 	public static final BlockEntityType<dev.wildcatter.block.FumeTreatmentCentreBlockEntity> FUME_TREATMENT_CENTRE_ENTITY = entity(dev.wildcatter.block.FumeTreatmentCentreBlockEntity::new, FUME_TREATMENT_CENTRE);
 	public static final BlockEntityType<dev.wildcatter.block.CastingMachineBlockEntity> CASTING_MACHINE_ENTITY = entity(dev.wildcatter.block.CastingMachineBlockEntity::new, CASTING_MACHINE);
+	public static final BlockEntityType<dev.wildcatter.block.SiteMarkerBlockEntity> SITE_MARKER_ENTITY = entity(dev.wildcatter.block.SiteMarkerBlockEntity::new, SITE_MARKER);
 	public static final BlockEntityType<dev.wildcatter.block.RoddingShopBlockEntity> RODDING_SHOP_ENTITY = entity(dev.wildcatter.block.RoddingShopBlockEntity::new, RODDING_SHOP);
 	public static final BlockEntityType<dev.wildcatter.block.FuelLineBlockEntity> FUEL_LINE_ENTITY = entity(dev.wildcatter.block.FuelLineBlockEntity::new, UF6_AUTOCLAVE, IDR_KILN, GRANULATOR, PELLET_PRESS, SINTERING_FURNACE, PELLET_GRINDER, ROD_LOADER);
 	public static final BlockEntityType<dev.wildcatter.block.RodWelderBlockEntity> ROD_WELDER_ENTITY = entity(dev.wildcatter.block.RodWelderBlockEntity::new, ROD_WELDER);
@@ -397,6 +398,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 			add(((dev.wildcatter.block.PotlinePartBlock) part).part().id(), part);
 		}
 		add("aluminium_block", ALUMINIUM_BLOCK);
+		add("site_marker", SITE_MARKER);
 		for (Block part : new Block[] {UF6_AUTOCLAVE, IDR_KILN, GRANULATOR, PELLET_PRESS, SINTERING_FURNACE, PELLET_GRINDER, ROD_LOADER, ROD_WELDER, ASSEMBLY_FIXTURE, HELIUM_RECOVERY_UNIT}) {
 			add(((dev.wildcatter.block.FuelPartBlock) part).part().id(), part);
 		}
@@ -559,6 +561,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("pot"), POT_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("fume_treatment_centre"), FUME_TREATMENT_CENTRE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("casting_machine"), CASTING_MACHINE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("site_marker"), SITE_MARKER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("fuel_line"), FUEL_LINE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rod_welder"), ROD_WELDER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("assembly_fixture"), ASSEMBLY_FIXTURE_ENTITY);

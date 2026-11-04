@@ -22,6 +22,8 @@ frequency, protection) is in `docs/ELECTRICAL_MODEL.md`. What is built, phase by
   an anode plant that mixes, presses, bakes and rods prebake anodes, with butt recycle (10b3a).
 - **Aluminium:** a Hall–Héroult potline: 138 kV rectiformers sharing the line current, 180 kA aluminium bus, prebake pots with anode
   changes, anode effects and freezing, a fume treatment centre, a tapping crucible and an ingot casting machine (10b3b).
+- **Blueprints:** survey any plant onto a blueprint, or pick one of 26 from the library; its ghost and site marker show what to build
+  and the lifts it takes (10c1).
 - **Oil and gas:**
   - seismic surveys, a land rig and wells;
   - the lease (separator, tanks, pumpjacks);

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "S",
+    "C",
+    "P"
+  ],
+  "key": {
+    "S": "minecraft:spyglass",
+    "C": "minecraft:compass",
+    "P": "minecraft:paper"
+  },
+  "result": {
+    "id": "wildcatter:survey_tool",
+    "count": 1
+  }
+}
