@@ -150,7 +150,8 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 	}
 
 	/** The biggest current through any pole. */
-	private double mostAmps(Circuit circuit) {
+	/** The largest pole current in this solve: what a relay's CTs on it read. */
+	public double mostAmps(Circuit circuit) {
 		double most = 0;
 		for (int link : links) {
 			most = Math.max(most, circuit.current(link));
@@ -235,7 +236,7 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 		amps = 0;
 		setPosition(BreakerBlock.Position.TRIPPED);
 		if (level instanceof ServerLevel server) {
-			boolean big = voltage() == Voltage.HIGH || voltage() == Voltage.DISTRIBUTION || voltage() == Voltage.MEDIUM;   // power breakers bang, panel breakers snap
+			boolean big = voltage() == Voltage.HIGH || voltage() == Voltage.DISTRIBUTION || voltage() == Voltage.MEDIUM || voltage() == Voltage.GENERATOR;   // power breakers bang, panel breakers snap
 			server.playSound(null, worldPosition, big ? WildcatterSounds.HV_BREAKER : WildcatterSounds.BREAKER_TRIP, SoundSource.BLOCKS, big ? 1.5F : 1.0F, 1.0F);
 			CircuitManager.markDirty(server);
 		}
@@ -269,6 +270,10 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 				case OFF -> "OPEN";
 				case TRIPPED -> "TRIPPED by the relay panel (" + lastTrip + "); reset it at the relay panel";
 			};
+			if (voltage() == Voltage.GENERATOR) {   // 10d1: a feeder off the generator bus (docs/multiblocks/gen-bus-protection.md)
+				return Component.literal(String.format("Feeder breaker (%s metal-clad, vacuum, %,d A, opened by the bus relay panel): %s; sneak and right-click changes the rating",
+						voltage().label(), rating(), state));
+			}
 			return Component.literal("Substation breaker (" + voltage().label() + ", three-pole, relay operated): " + state);
 		}
 		if (plainSwitch()) {

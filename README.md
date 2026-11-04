@@ -12,6 +12,9 @@ frequency, protection) is in `docs/ELECTRICAL_MODEL.md`. What is built, phase by
   - True-size poles, spans, pad-mounts, unit substations and a 138/12.47 kV substation.
   - Service drops and receptacles with plugs.
   - Shocks, arc reach and grounding.
+  - Transformers heat on the IEEE C57.109 through-fault curve, and every motor start goes with V² (10d1).
+  - The 13.8 kV generator bus has its own relays (87B bus differential, 51V, feeder 50/51) and 15 kV feeder breakers; a grounding
+    clamp set makes a dead bus safe or a live one a bolted fault (10d1).
 - **Gensets and synchronizing:** diesel and gas gensets built part by part, paralleled with a synchroscope. Motors, MCCs and
   starters; soft starters and variable-frequency drives at 480 V and 4.16 kV (10a).
 - **DC:** current-regulated rectifiers and bare copper bus bars to the electrolysis cells, on the same solver: shorts, ground
@@ -138,7 +141,7 @@ datapack (`wildcatter_kit.zip`) as a Release. Every push also builds and keeps t
   - `refining` (the 4.16 kV tier).
 - **The grid:**
   - `frequency`, `distribution`, `spans`, `poleTransformer`, `serviceDrop`, `plugs`;
-  - `feederRelay`, `threePhase`, `solverBudget`, `overheadThreePhase`, `conductorSizes`.
+  - `feederRelay`, `threePhase`, `solverBudget`, `overheadThreePhase`, `conductorSizes`, `busProtection`.
 - **Industry and motors:** `industrial`, `motors`, `motorControlCenter`, `motorStarter`, `statorLimit`.
 - **Gensets:** `gensets`, `synchronizing`, `gensetParts`, `gensetFrameRate`.
 - **Thermal power and parts:**

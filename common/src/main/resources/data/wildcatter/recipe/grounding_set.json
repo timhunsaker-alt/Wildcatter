@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "CCC",
+    " I ",
+    " T "
+  ],
+  "key": {
+    "C": "minecraft:copper_ingot",
+    "I": "minecraft:iron_ingot",
+    "T": "minecraft:stick"
+  },
+  "result": {
+    "id": "wildcatter:grounding_set",
+    "count": 1
+  }
+}

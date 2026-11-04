@@ -171,6 +171,9 @@ public final class WildcatterItems {
 	public static final Item BLUEPRINT = new dev.wildcatter.item.BlueprintItem(new Item.Properties().stacksTo(1).setId(BLUEPRINT_KEY));
 	public static final ResourceKey<Item> SURVEY_TOOL_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("survey_tool"));
 	public static final Item SURVEY_TOOL = new dev.wildcatter.item.SurveyToolItem(new Item.Properties().stacksTo(1).setId(SURVEY_TOOL_KEY));
+	// 10d1: the grounding clamp set (docs/multiblocks/gen-bus-protection.md)
+	public static final ResourceKey<Item> GROUNDING_SET_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("grounding_set"));
+	public static final Item GROUNDING_SET = new dev.wildcatter.item.GroundingSetItem(new Item.Properties().stacksTo(1).setId(GROUNDING_SET_KEY));
 	public static final ResourceKey<Item> ANODE_ROD_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("anode_rod"));
 	public static final Item ANODE_ROD = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(ANODE_ROD_KEY),
 			"Anode rod: a stem with its steel yoke and stubs", "reused round and round");
@@ -278,6 +281,7 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, TAPPING_CRUCIBLE_KEY, TAPPING_CRUCIBLE);
 		Registry.register(BuiltInRegistries.ITEM, BLUEPRINT_KEY, BLUEPRINT);
 		Registry.register(BuiltInRegistries.ITEM, SURVEY_TOOL_KEY, SURVEY_TOOL);
+		Registry.register(BuiltInRegistries.ITEM, GROUNDING_SET_KEY, GROUNDING_SET);
 		Registry.register(BuiltInRegistries.ITEM, CRUDE_OIL_BUCKET_KEY, CRUDE_OIL_BUCKET);
 		Registry.register(BuiltInRegistries.ITEM, PLASTIC_SHEET_KEY, PLASTIC_SHEET);
 		Registry.register(BuiltInRegistries.ITEM, STEEL_INGOT_KEY, STEEL_INGOT);

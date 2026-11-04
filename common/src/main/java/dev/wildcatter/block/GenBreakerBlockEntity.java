@@ -68,12 +68,26 @@ public class GenBreakerBlockEntity extends BlockEntity implements CircuitPart, I
 
 	@Override
 	public void apply(Circuit circuit, int ticks) {
-		amps = circuit.through(node[0]);
+		amps = phaseAmps(circuit);
+	}
+
+	/** The largest phase current through it in this solve, for the bus relay panel's CTs. */
+	public double phaseAmps(Circuit circuit) {
+		double most = 0;
+		for (int k = 0; k < 3; k++) {
+			most = Math.max(most, circuit.through(node[k]));
+		}
+		return most;
+	}
+
+	/** The generator against its front, or null. */
+	public GeneratorPartBlockEntity generator() {
+		return level == null ? null : Touching.find(level, worldPosition, GeneratorPartBlockEntity.class, g -> true);
 	}
 
 	@Override
 	public Component inspect() {
-		GeneratorPartBlockEntity gen = level == null ? null : Touching.find(level, worldPosition, GeneratorPartBlockEntity.class, g -> true);
+		GeneratorPartBlockEntity gen = generator();
 		String state = gen == null ? "no generator against it" : gen.breakerClosed() ? String.format("CLOSED, carrying %.0f A", amps) : "OPEN (" + gen.status() + ")";
 		boolean big = getBlockState().is(WildcatterBlocks.GEN_BREAKER_3000);
 		return Component.literal("Generator circuit breaker (15 kV vacuum, " + (big ? "3,000 A, 50 kA" : "1,200 A, 40 kA") + "): " + state);

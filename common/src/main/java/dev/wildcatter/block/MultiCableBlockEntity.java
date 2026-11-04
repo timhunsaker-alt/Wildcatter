@@ -27,7 +27,8 @@ import net.minecraft.world.level.storage.ValueOutput;
 /**
  * One block of three-phase cable: five conductors (A, B, C, N, G), each a node with the tier's wire resistance. The ground
  * conductor is tied to earth at every piece, as a wire's G is. Each conductor heats on its own current; the hottest one decides
- * when the cable burns.
+ * when the cable burns. A grounding clamp set (docs/multiblocks/gen-bus-protection.md) puts A, B and C to that ground here: on a
+ * dead cable it keeps it at earth, on a live one it is a bolted fault.
  */
 public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, Inspectable {
 	private static final Conductor[] CONDUCTORS = Conductor.values();
@@ -40,6 +41,9 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 	private double hertz = dev.wildcatter.energy.ElectricalStandard.active().hertz();
 	/** Null for a cable placed before sizes: it takes its tier's standard size. */
 	private ConductorSize size;
+	/** Protective grounds applied here, and their branches in the last build. */
+	private boolean grounded;
+	private int[] clamps = new int[0];
 
 	public MultiCableBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.MULTI_CABLE_ENTITY, pos, state);
@@ -86,6 +90,38 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 				circuit.port(worldPosition, face, conductor, voltage(), node[k], half, false);
 			}
 		}
+		clamps = new int[0];
+		if (grounded) {
+			int g = node[Conductor.G.ordinal()];
+			clamps = new int[] {circuit.resistor(node[Conductor.A.ordinal()], g, Tuning.GROUNDING_SET_OHMS),
+					circuit.resistor(node[Conductor.B.ordinal()], g, Tuning.GROUNDING_SET_OHMS), circuit.resistor(node[Conductor.C.ordinal()], g, Tuning.GROUNDING_SET_OHMS)};
+		}
+	}
+
+	public boolean grounded() {
+		return grounded;
+	}
+
+	/** Puts the grounding clamps on or takes them off; on a live cable putting them on is a bolted fault, and it flashes. */
+	public void setGrounded(boolean on) {
+		if (on && !grounded && level instanceof ServerLevel server && Math.abs(lineVolts) > 50) {
+			server.playSound(null, worldPosition, dev.wildcatter.WildcatterSounds.FLASHOVER, SoundSource.BLOCKS, 1.5F, 1.0F);
+			server.sendParticles(ParticleTypes.ELECTRIC_SPARK, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5, 40, 0.4, 0.4, 0.4, 0.3);
+		}
+		grounded = on;
+		setChanged();
+		if (level != null) {
+			CircuitManager.markDirty(level);
+		}
+	}
+
+	/** The current through the grounds, the largest phase's, in this solve: what flows into a fault here. */
+	public double groundAmps(Circuit circuit) {
+		double most = 0;
+		for (int clamp : clamps) {
+			most = Math.max(most, circuit.current(clamp));
+		}
+		return most;
 	}
 
 	@Override
@@ -115,7 +151,8 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 
 	@Override
 	public Component inspect() {
-		StringBuilder text = new StringBuilder((block().busway() ? "Busway (" : "Three-phase cable (") + voltage().label() + ", " + size().label() + ", insulated): ");
+		StringBuilder text = new StringBuilder((block().busway() ? "Busway (" : "Three-phase cable (") + voltage().label() + ", " + size().label() + ", insulated): "
+				+ (grounded ? "GROUNDED (protective grounds applied), " : ""));
 		for (Conductor conductor : new Conductor[] {Conductor.A, Conductor.B, Conductor.C}) {
 			int k = conductor.ordinal();
 			text.append(String.format("%s %.0f V %.1f A, ", conductor.name(), volts[k], amps[k]));
@@ -129,6 +166,7 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
 		output.putDouble("heat", heat);
+		output.putBoolean("grounded", grounded);
 		if (size != null) {
 			output.putString("size", size.getSerializedName());
 		}
@@ -138,6 +176,7 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
 		heat = input.getDoubleOr("heat", 0);
+		grounded = input.getBooleanOr("grounded", false);
 		size = ConductorSize.byId(input.getStringOr("size", ""));
 	}
 

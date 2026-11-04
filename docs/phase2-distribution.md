@@ -20,7 +20,7 @@ Every number and mechanic below that is not in ELECTRICAL_MODEL is a proposal wi
 | Insulator ratings | low voltage 1 kV, distribution 15 kV (pin), 138 kV (suspension) | standard insulator classes |
 | Span resistance | the tier's wire resistance per block times the span length | existing wire model |
 | Pole-mount transformer | 25 kVA, 7.2 kV to 120/240 V (NA) or 230 V (IEC), 2.5 % impedance | common single-phase pole-top unit |
-| Transformer overload | above 100 % it heats; fails at 150 % for 10 s | simplified cooling limit |
+| Transformer overload | above 100 % it heats; fails when (I² − 1)·t reaches 1,250 pu²·s (150 % for about 17 min); 150 % for 10 s until 10d1 | IEEE C57.109 through-fault curve |
 | Fused cutout (K link) | 6, 10, 15, 25, 40, 65, 100 A | standard K-link ratings |
 | Receptacle burn | sustained 120 % of the plug rating for 30 s | simplified thermal limit |
 | 138 kV to 12.47 kV transformer | 20 MVA stand-in block | the Phase 4 substation multiblock replaces it |

@@ -242,4 +242,10 @@ public interface GridBlocks {
 	Block GSU_25 = block("gsu_25", props -> new dev.wildcatter.block.Gsu25TransformerBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.GENERATOR, Voltage.HIGH, Tuning.GSU25_VA, Tuning.GSU25_PERCENT_Z));
 	Block BUS_DUCT_GEN = busway("bus_duct_gen", Voltage.GENERATOR);
+	// ---- 10d1: the generator bus's protection (docs/multiblocks/gen-bus-protection.md) ----------------------------------------------
+	/** A 15 kV metal-clad vacuum breaker cubicle on a feeder off the generator bus: 3 along the line, 3 tall, 1 across; relay-operated. */
+	Block GEN_FEEDER_BREAKER = block("gen_feeder_breaker", props -> new dev.wildcatter.block.BigBreakerBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.GENERATOR, 3, 3, 1, "gen_feeder_breaker"));
+	Block BUS_RELAY_PANEL = block("bus_relay_panel", props -> new dev.wildcatter.block.BusRelayPanelBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
 }

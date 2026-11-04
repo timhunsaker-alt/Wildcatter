@@ -38,7 +38,7 @@ as long to reach speed.
 1. **Stopped:** the contactor is open.
 2. **Ramping:** the line connects to the motor through one series impedance per phase. Each tick the starter changes that impedance
    so the measured current stays at the dial setting. The motor's start progress goes with (V/Vn)² while the starter ramps, so it takes longer
-   at the lower voltage (`circuit/Motor`; a direct start keeps its flat 2 s).
+   at the lower voltage (`circuit/Motor`; since 10d1 a direct start goes with V² too).
 3. **Bypassed:** once the current falls to 1.25 x, the bypass closes (the closed-contact resistance), and the readout says
    BYPASSED.
 4. **Overload:** the relay heats as on the combination starter. A start that never ends (a stalled or overloaded machine) trips

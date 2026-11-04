@@ -74,15 +74,16 @@ voltage transformers (wye-grounded, 1 MΩ a phase) give the 13.8 kV bus its grou
 
 ## Components
 - **Transformers:** turns ratio + series impedance (%Z), kVA rating, overheating on sustained overload.
+  - **Short-time rule (10d1, IEEE C57.109):** a rated transformer fails when `(I² − 1)·t` reaches 1,250 pu²·s, I being its
+    most loaded phase's current over its rated current: 150 % for about 17 minutes, 200 % for 7, a 6 x motor inrush for 36 s,
+    25 x for 2 s. Below its rating it cools back over 10 minutes. It replaced the 150 %/10 s rule.
   Connections: Δ–Y (substation, generator step-up), Y–Y, single-phase pole-mount
   (NA: 7.2 kV → 120/240 center-tap), three-phase pad-mount.
 - **Generators:** voltage source behind impedance, rated kVA, inertia, governor.
 - **Loads:** resistive (lamp, heater); motor (inductive, PF ≈ 0.8, inrush current on start).
-  - **Start time:**
-    - a direct start takes its flat 2 s;
-    - behind a ramping soft starter the torque goes with V², so the start runs longer;
-    - decided with Tim, 2026-11-02: V² everywhere would burn unit substations on direct starts under the 150 %/10 s transformer
-      rule; a realistic short-time rule (IEEE C57.109) is listed for 10d.
+  - **Start time:** a start takes 2 s at full voltage and goes with V² below it: a start at 80 % takes about 3 s, drawing its
+    locked-rotor current all that time. This holds for direct starts and soft starts alike (decided with Tim on 2026-11-04, with
+    the C57.109 rule; until then a direct start kept a flat 2 s).
   - **Soft starter:** SCRs hold the starting current at 2-5 x full-load amps, then a bypass contactor closes
     (`docs/multiblocks/soft-starter.md`).
   - **Drive (VFD):**
@@ -140,6 +141,10 @@ voltage transformers (wye-grounded, 1 MΩ a phase) give the 13.8 kV bus its grou
 ## Protection
 - LV: breakers (thermal + magnetic), fuses — as built.
 - MV: fused cutouts and reclosers on poles; breakers with relays at substations.
+- The 13.8 kV generator bus (10d1, docs/multiblocks/gen-bus-protection.md): a bus relay panel with 87B bus differential and lockout,
+  51V on each generator breaker, and 50/51 on each 15 kV feeder breaker.
+- Protective grounds: a grounding clamp set puts three phases to ground on a cable, busway or bus duct. On a dead conductor it keeps
+  it safe to work on; on a live one it is a bolted fault.
 - Frequency relays for load shedding and generator protection (see above).
 - Coordination: the device closest to a fault should trip first. The Power Meter or a relay screen
   shows which device tripped and why.

@@ -15,8 +15,9 @@ import net.minecraft.core.Direction;
  * Three-phase motors also read the phase rotation (A, B, C or the reverse: a reversed motor runs backward) and notice
  * single-phasing: with one phase lost a running motor stalls and draws locked-rotor current until something trips.
  *
- * Behind a ramping soft starter its starting torque goes with the square of its voltage, so the start takes longer
- * (docs/multiblocks/soft-starter.md); a direct start takes {@link Tuning#MOTOR_START_SECONDS} whatever the voltage. Fed from a drive's output (docs/multiblocks/vfd.md) it never draws locked-rotor current:
+ * Its starting torque goes with the square of its voltage, so a start takes {@link Tuning#MOTOR_START_SECONDS} at full voltage
+ * and longer below it, direct on line or behind a ramping soft starter alike (docs/ELECTRICAL_MODEL.md, "Start time";
+ * docs/multiblocks/soft-starter.md). Fed from a drive's output (docs/multiblocks/vfd.md) it never draws locked-rotor current:
  * it accelerates at its rated current as the drive ramps up, and runs once the drive is at full voltage.
  */
 public final class Motor {
@@ -146,7 +147,6 @@ public final class Motor {
 		amps = most;
 		double dt = ticks / 20.0;
 		driveFed = circuit.driveFed(hot[0]);
-		boolean softStarted = circuit.softStarted(hot[0]);
 		double nominal = threePhase ? voltage.lineToLine() : voltage.nominal();
 
 		if (!wanted) {
@@ -161,8 +161,8 @@ public final class Motor {
 					}
 				}
 				case STARTING -> {
-					// on a soft starter the torque, and so the pace of the start, goes with the square of the voltage
-					startSeconds += softStarted ? dt * Math.min(1.0, Math.pow(volts / nominal, 2)) : dt;
+					// the torque, and so the pace of the start, goes with the square of the voltage (direct or soft-started)
+					startSeconds += dt * Math.min(1.0, Math.pow(volts / nominal, 2));
 					if (volts < 1.0) {
 						state = State.STOPPED;
 					} else if (driveFed ? volts >= nominal * Tuning.DRIVE_AT_SPEED : startSeconds >= Tuning.MOTOR_START_SECONDS) {

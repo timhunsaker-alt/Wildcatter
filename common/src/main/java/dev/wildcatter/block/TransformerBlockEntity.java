@@ -58,7 +58,7 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 	/** Both windings' resistance seen from the high side, per phase. */
 	private double seriesOhms;
 	/** 0 to 1: how close an overloaded pole transformer is to failing. */
-	private double heat;
+	private final dev.wildcatter.circuit.TransformerHeating heating = new dev.wildcatter.circuit.TransformerHeating();
 	private boolean failed;
 	/** The game test sets this to give a pole transformer a small rating. Null in play. */
 	public static volatile Double testRatedVa;
@@ -225,18 +225,24 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 			lossWatts += lowBAmps / ratio * lowBAmps / ratio * seriesOhms;
 		}
 		double rated = ratedVa();
-		if (rated > 0) {
-			double loading = va / rated;
-			double dt = ticks / 20.0;
-			if (loading > 1.0) {
-				heat += (loading - 1.0) * 2.0 * dt / Tuning.POLE_TRANSFORMER_FAIL_SECONDS;   // 150 % for the fail time takes it from cold to failed
-			} else {
-				heat = Math.max(0, heat - dt / Tuning.POLE_TRANSFORMER_COOL_SECONDS);
-			}
-			if (heat >= 1.0) {
-				failed = true;
-			}
+		if (rated > 0 && heating.step(perUnit(rated, delta, deltaHigh), ticks / 20.0)) {
+			failed = true;   // IEEE C57.109: its windings' (I² - 1)·t has reached its limit
 		}
+	}
+
+	/** The most loaded low-side winding's current over its rated current: a split-phase leg, a delta winding or a wye phase. */
+	private double perUnit(double rated, boolean delta, boolean deltaHigh) {
+		double volts = block().low().nominal();
+		double windingAmps = split ? rated / (2 * volts) : phases == 1 ? rated / volts
+				: delta ? rated / (3 * volts * Math.sqrt(3)) : rated / (3 * volts);
+		double most = 0;
+		for (int k = 0; k < phases; k++) {
+			most = Math.max(most, lowAmps[k]);
+		}
+		if (split) {
+			most = Math.max(most, lowBAmps);
+		}
+		return most / windingAmps;
 	}
 
 	/** A pole transformer that has overheated burns out. */
@@ -262,9 +268,19 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 		return most;
 	}
 
+	/** "within its rating", or how hot it is and how long it lasts at this load (IEEE C57.109). */
+	private String heatText() {
+		double left = heating.secondsToFail();
+		if (heating.ratio() > 1.0) {
+			String when = left >= 120 ? String.format("%.0f min", left / 60) : String.format("%.0f s", left);
+			return String.format("OVERLOADED at %.0f%%, heating %d%%, fails in %s at this load", heating.ratio() * 100, Math.round(heating.level() * 100), when);
+		}
+		return heating.level() > 0.05 ? String.format("cooling, %d%% heated", Math.round(heating.level() * 100)) : "within its rating";
+	}
+
 	@Override
 	public Component inspect() {
-		String rating = ratedVa() > 0 ? String.format("rated %.0f kVA, %s; ", ratedVa() / 1000.0, heat > 0.05 ? "OVERLOADED, heating " + Math.round(heat * 100) + "%" : "within its rating") : "";
+		String rating = ratedVa() > 0 ? String.format("rated %.0f kVA, %s; ", ratedVa() / 1000.0, heatText()) : "";
 		String legB = split ? String.format("leg B %.0f V %.1f A (A to B %.0f V), ", lowBVolts, lowBAmps, legsVolts) : "";
 		String bc = phases == 3 ? String.format("B %.0f V %.1f A, C %.0f V %.1f A, ", lowVolts[1], lowAmps[1], lowVolts[2], lowAmps[2]) : "";
 		String kind = block().deltaLow() ? String.format("Delta-wye generator step-up (line side %+.0f degrees) ", shiftDegrees)

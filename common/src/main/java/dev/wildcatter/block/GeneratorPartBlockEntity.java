@@ -205,6 +205,22 @@ public class GeneratorPartBlockEntity extends BlockEntity implements CircuitPart
 		}
 	}
 
+	// ---- for the bus relay panel (docs/multiblocks/gen-bus-protection.md) ------------------------------------------------------------
+	/** Its full-load current at its nameplate: its kVA over three phases at the generator voltage to neutral. */
+	public double fullLoadAmps() {
+		return nameplateWatts() / Tuning.GENERATOR_RATED_PF / (3 * Voltage.GENERATOR.nominal());
+	}
+
+	/** Its terminal voltage as a share of rated, from the last solve; 0 while it is off. */
+	public double voltsPerUnit() {
+		return volts / Voltage.GENERATOR.nominal();
+	}
+
+	/** Its largest phase current, from the last solve. */
+	public double phaseAmps() {
+		return amps;
+	}
+
 	// ---- Generator ---------------------------------------------------------------------------------------------------------------
 	@Override
 	public double ratedWatts() {

@@ -147,6 +147,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.FumeTreatmentCentreBlockEntity> FUME_TREATMENT_CENTRE_ENTITY = entity(dev.wildcatter.block.FumeTreatmentCentreBlockEntity::new, FUME_TREATMENT_CENTRE);
 	public static final BlockEntityType<dev.wildcatter.block.CastingMachineBlockEntity> CASTING_MACHINE_ENTITY = entity(dev.wildcatter.block.CastingMachineBlockEntity::new, CASTING_MACHINE);
 	public static final BlockEntityType<dev.wildcatter.block.CraneBlockEntity> CRANE_ENTITY = entity(dev.wildcatter.block.CraneBlockEntity::new, TOWER_CRANE, CRAWLER_CRANE, RING_CRANE);
+	public static final BlockEntityType<dev.wildcatter.block.BusRelayPanelBlockEntity> BUS_RELAY_PANEL_ENTITY = entity(dev.wildcatter.block.BusRelayPanelBlockEntity::new, BUS_RELAY_PANEL);
 	public static final BlockEntityType<dev.wildcatter.block.SiteMarkerBlockEntity> SITE_MARKER_ENTITY = entity(dev.wildcatter.block.SiteMarkerBlockEntity::new, SITE_MARKER);
 	public static final BlockEntityType<dev.wildcatter.block.RoddingShopBlockEntity> RODDING_SHOP_ENTITY = entity(dev.wildcatter.block.RoddingShopBlockEntity::new, RODDING_SHOP);
 	public static final BlockEntityType<dev.wildcatter.block.FuelLineBlockEntity> FUEL_LINE_ENTITY = entity(dev.wildcatter.block.FuelLineBlockEntity::new, UF6_AUTOCLAVE, IDR_KILN, GRANULATOR, PELLET_PRESS, SINTERING_FURNACE, PELLET_GRINDER, ROD_LOADER);
@@ -179,7 +180,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<ThreePhaseHeaterBlockEntity> THREE_PHASE_HEATER_ENTITY = entity(ThreePhaseHeaterBlockEntity::new, THREE_PHASE_HEATER);
 	public static final BlockEntityType<LoadBlockEntity> LOAD_ENTITY = entity(LoadBlockEntity::new, ELECTRIC_LAMP, ELECTRIC_HEATER);
 	public static final BlockEntityType<BreakerBlockEntity> BREAKER_ENTITY = entity(BreakerBlockEntity::new, BREAKER, MV_BREAKER, DIST_BREAKER, HV_BREAKER, SWITCH, UFLS_RELAY, UFLS_RELAY_DIST,
-			BREAKER_3P_LV, BREAKER_3P_INDUSTRIAL, HV_BREAKER_3P, DIST_BREAKER_3P);
+			BREAKER_3P_LV, BREAKER_3P_INDUSTRIAL, HV_BREAKER_3P, DIST_BREAKER_3P, GEN_FEEDER_BREAKER);
 	public static final BlockEntityType<FuseBlockEntity> FUSE_ENTITY = entity(FuseBlockEntity::new, FUSE, FUSED_CUTOUT);
 	public static final BlockEntityType<ReceptacleBlockEntity> RECEPTACLE_ENTITY = entity(ReceptacleBlockEntity::new, RECEPTACLE_NEMA_5_15, RECEPTACLE_NEMA_5_20, RECEPTACLE_NEMA_14_50, RECEPTACLE_CEE_7, RECEPTACLE_IEC_60309_BLUE,
 			RECEPTACLE_NEMA_L21_30, RECEPTACLE_NEMA_L22_30, RECEPTACLE_IEC_60309_RED_32, RECEPTACLE_IEC_60309_RED_63);
@@ -403,6 +404,8 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		add("tower_crane", TOWER_CRANE);
 		add("crawler_crane", CRAWLER_CRANE);
 		add("ring_crane", RING_CRANE);
+		add("gen_feeder_breaker", GEN_FEEDER_BREAKER);
+		add("bus_relay_panel", BUS_RELAY_PANEL);
 		for (Block part : new Block[] {UF6_AUTOCLAVE, IDR_KILN, GRANULATOR, PELLET_PRESS, SINTERING_FURNACE, PELLET_GRINDER, ROD_LOADER, ROD_WELDER, ASSEMBLY_FIXTURE, HELIUM_RECOVERY_UNIT}) {
 			add(((dev.wildcatter.block.FuelPartBlock) part).part().id(), part);
 		}
@@ -567,6 +570,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("casting_machine"), CASTING_MACHINE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("site_marker"), SITE_MARKER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("crane"), CRANE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("bus_relay_panel"), BUS_RELAY_PANEL_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("fuel_line"), FUEL_LINE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rod_welder"), ROD_WELDER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("assembly_fixture"), ASSEMBLY_FIXTURE_ENTITY);

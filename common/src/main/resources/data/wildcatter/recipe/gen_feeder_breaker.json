@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SIS",
+    "SXS",
+    "SCS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "I": "minecraft:iron_block",
+    "X": "wildcatter:hv_breaker_3p",
+    "C": "minecraft:copper_ingot"
+  },
+  "result": {
+    "id": "wildcatter:gen_feeder_breaker",
+    "count": 1
+  }
+}

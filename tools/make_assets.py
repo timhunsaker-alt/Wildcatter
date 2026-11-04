@@ -2202,6 +2202,28 @@ lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
 lang[f"block.{ns}.ring_crane"] = "Ring Crane (5,000 t)"
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 10d1: generator bus protection (docs/multiblocks/gen-bus-protection.md) ---------------------------------------------------
+# the feeder breaker's and the panel's blockstates, models, shapes and items come from tools/models/gen_bus.py; here loot, tags, recipes,
+# names and the grounding set (its texture a placeholder until 10d4's art).
+for name in ("gen_feeder_breaker", "bus_relay_panel"):
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:gen_feeder_breaker", f"{ns}:bus_relay_panel"]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("gen_feeder_breaker", ["SIS", "SXS", "SCS"], {"S": S_, "I": "minecraft:iron_block", "X": f"{ns}:hv_breaker_3p", "C": "minecraft:copper_ingot"}, "gen_feeder_breaker")
+shaped("bus_relay_panel", ["SGS", "SRS", "SCS"], {"S": S_, "G": "minecraft:glass_pane", "R": "minecraft:comparator", "C": "minecraft:copper_ingot"}, "bus_relay_panel")
+shaped("grounding_set", ["CCC", " I ", " T "], {"C": "minecraft:copper_ingot", "I": "minecraft:iron_ingot", "T": "minecraft:stick"}, "grounding_set")
+tex("grounding_set_placeholder", lambda img, d: noise(img, (190, 110, 60), 12), "item")
+save_json(f"{ASSETS}/models/item/grounding_set.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/grounding_set_placeholder"}})
+save_json(f"{ASSETS}/items/grounding_set.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/grounding_set"}})
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang[f"block.{ns}.gen_feeder_breaker"] = "15 kV Feeder Breaker (metal-clad, vacuum)"
+lang[f"block.{ns}.bus_relay_panel"] = "Generator Bus Relay Panel (87B, 51V, 50/51)"
+lang[f"item.{ns}.grounding_set"] = "Grounding Clamp Set"
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 7g: the fuel plant (docs/multiblocks/fuel.md) -------------------------------------------------------------------
 # blockstates, models, shapes and items come from tools/models/fuel.py; here loot, names, tags, recipes and the items.
 FUEL_PARTS = ("uf6_autoclave", "idr_kiln", "granulator", "pellet_press", "sintering_furnace", "pellet_grinder", "rod_loader", "rod_welder",

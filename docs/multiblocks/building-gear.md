@@ -20,7 +20,7 @@ Each gets a `mount`: `wall` when clicked against the side of a block, otherwise 
 | `breaker_3p_industrial` | 3-pole enclosed breaker, 480 V class | about 0.4 × 0.8 × 0.2 m |
 | `motor_starter` | combination starter, NEMA 12: disconnect handle, start/stop buttons, run and trip lights | about 0.4 × 0.75 × 0.25 m |
 
-The single-pole MV, DIST and HV breakers and the DIST under-frequency relay stay one-block stand-ins (Phase 6).
+The single-pole MV, DIST and HV breakers and the DIST under-frequency relay are one-block stand-ins; Phase 10d2 removes them for true-size gear (decided with Tim, 2026-11-04).
 
 ## Gear wired on every face
 Each gets an `attach`: the face of its cell it is mounted on (a wall, the floor or the ceiling).

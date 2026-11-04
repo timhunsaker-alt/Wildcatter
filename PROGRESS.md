@@ -491,6 +491,36 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - **Recommended mods:** `docs/recommended-mods.md` lists the quality-of-life mods with 26.3 builds for Fabric and NeoForge.
   - The Fabric set ran the `coker` and `anodes` scenes alongside Wildcatter, Sodium included, and both passed.
 
+## Phase 10d1: protection (spec: docs/multiblocks/gen-bus-protection.md; ELECTRICAL_MODEL.md updated)
+10d is four waves (Tim, 2026-11-04): 10d1 protection, 10d2 true-size gear, 10d3 panels and switches, 10d4 art and sounds.
+- **Transformer short-time rule** (`circuit/TransformerHeating`):
+  - every rated transformer now heats on the IEEE C57.109 through-fault curve: it fails when `(I² − 1)·t` reaches 1,250 pu²·s, I
+    being its most loaded winding's current over rated;
+  - 150 % lasts about 17 minutes, 200 % about 7, a 6 x inrush 36 s, 25 x 2 s; below rating it cools back over 10 minutes;
+  - it replaced the 150 %/10 s rule; the readout gives how long it has at its present load.
+- **Every motor start goes with V²** (decided with Tim): a direct start on a sagging supply runs longer, as a soft start already did.
+- **Generator bus protection:**
+  - **The panel:** a bus relay panel (`bus_relay_panel`, 1 x 3 x 1) stands against the 13.8 kV bus duct, and finds its zone up to
+    the generator breakers and feeder breakers.
+  - **87B bus differential:** the current going into a fault on the bus (by Kirchhoff, what enters it and leaves at no breaker)
+    against a percentage restraint trips every breaker on the bus, and 86B locks out until the panel is reset.
+  - **51V:** on each generator breaker (pickup 1.5 x full load, restrained down to a quarter by the voltage, IEEE very inverse).
+  - **50/51:** on each feeder breaker (51 at its rating, moderately inverse; 50 at 8 x).
+  - **The panel's reset** releases 86B, closes the feeders it opened and resets the generators it tripped.
+- **The 15 kV feeder breaker** (`gen_feeder_breaker`, 3 x 3 x 1): a metal-clad vacuum cubicle, 1,200, 2,000 or 3,000 A, opened
+  only by the panel.
+- **The grounding clamp set** (`grounding_set`, ASTM F855 class): right-click a cable, busway or bus duct to put A, B and C to
+  ground. On a dead conductor it keeps it at earth; on a live one it is a bolted fault with a flash.
+- **Field Manual:** a new page, GENERATOR BUS PROTECTION; POLE-MOUNT TRANSFORMER and MOTORS follow the new rules.
+- **Unit tests:** `TransformerHeatingTest`, `BusProtectionTest` (87B, voltage restraint, the C37.112 curves, the time element),
+  and `DrivesTest`'s direct start now slows on a weak supply.
+- **Game test `busProtection`:**
+  - a gas turbine on its bus with two feeder breakers to load banks, and the panel;
+  - grounds on the bus trip the generator and both feeders by 87B and lock out, and a reset brings them back;
+  - grounds past feeder 1 trip it alone by its 50;
+  - the same grounds on the now dead section read GROUNDED and trip nothing.
+- **Other scenes:** `poleTransformer` checks the new readout at 4 x and a burn-out at 25 x.
+
 ## Phase 10c3: the ring crane, shared sites and tandem lifts (specs: docs/multiblocks/ring-crane.md; docs/blueprints.md); 10c done
 - **The ring crane** (`ring_crane`, after the Sarens SGC-250 "Big Carl", from Sarens' SGC brochure):
   - its 48.5 m ring at true size: 616 cells of mats, two ring beams and their rails, 1 m high, the inside left free;
@@ -1330,6 +1360,13 @@ sized for a 40-pot line.
   - the bus bars' standoffs stand on the floor of their own cell, so a run carried up in the air shows them hanging (no
     supports or structure yet);
   - the chlor-alkali caustic soda is still only counted (fixed in 10b2: it is a pipe product).
+- Phase 10d1:
+  - the grounding clamps never burn, however long a fault lasts;
+  - there is no transformer (87T) or generator (87G) differential: a fault inside a GSU or a generator is cleared by 51V or the
+    stator trip;
+  - the relay settings are fixed, except each feeder breaker's rating;
+  - a 138 kV source back-feeding the GSU onto a bus fault is not opened by 87B: it has no breaker on the bus side;
+  - the grounding set's texture is `grounding_set_placeholder`.
 - Phase 10c3:
   - the ring crane stands where it is placed: no relocation on rails, as a real one moves between lifting positions;
   - it carries no heavy-duty jib, and no hook arrangement for its 5,000 t: its chart is capped at the 3,200 t main hook;
@@ -1410,7 +1447,6 @@ sized for a 40-pot line.
 - Phase 6 is complete (6a and 6b); Tim checks the peaker in a real session. The turbines' generator couplings do not turn on
   screen (the condenser fans and feed pump do). The test skips each turbine's start and ramp with hooks.
 - The aeroderivative's exhaust stack is drawn as an octagon; its SCR housing is blank (no NOx chemistry).
-- The 13.8 kV bus has no relay protection of its own: the generators trip on stator overcurrent and frequency.
 - Phase 5 is complete with 5c and 5d (the lease, the gas plant, the crude units, the cracker). Tim checks each in a real session.
 - Gasoline and kerosene have no engine of their own yet: kerosene and diesel are for the Phase 6 gas turbine.
 - The cracker test tops up the furnace's water with a hook; the pump feeding a furnace is wired but not exercised in a test.

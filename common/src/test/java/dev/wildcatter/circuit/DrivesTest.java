@@ -89,10 +89,11 @@ class DrivesTest {
 	}
 
 	@Test
-	void aDirectStartTakesItsTimeWhateverTheVoltage() {
-		Run stiff = run(new Starter(Starter.Kind.DIRECT, Voltage.MEDIUM, Tuning.CABINET_SETTINGS_MV), 0.01, 6);
-		Run weak = run(new Starter(Starter.Kind.DIRECT, Voltage.MEDIUM, Tuning.CABINET_SETTINGS_MV), 6.0, 6);
-		assertEquals(stiff.seconds(), weak.seconds(), 0.21, "only a soft start goes with V squared (Tim, 2026-11-02)");
+	void aDirectStartOnASaggingSupplyTakesLonger() {
+		Run stiff = run(new Starter(Starter.Kind.DIRECT, Voltage.MEDIUM, Tuning.CABINET_SETTINGS_MV), 0.01, 20);
+		Run weak = run(new Starter(Starter.Kind.DIRECT, Voltage.MEDIUM, Tuning.CABINET_SETTINGS_MV), 6.0, 20);
+		assertEquals(Tuning.MOTOR_START_SECONDS, stiff.seconds(), 0.21, "on a stiff supply a direct start takes its 2 s");
+		assertTrue(weak.seconds() > stiff.seconds() * 1.2, "every start goes with V squared (Tim, 2026-11-04): " + stiff.seconds() + " s stiff, " + weak.seconds() + " s weak");
 	}
 
 	@Test

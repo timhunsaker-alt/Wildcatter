@@ -244,6 +244,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("heavyLift")) {
 				heavyLift(context, server);
 			}
+			if (only("busProtection")) {
+				busProtection(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -1169,14 +1172,17 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(unit.contains("25 kVA") && unit.contains("within its rating"), "the pole transformer should show its rating and be within it: " + unit);
 		check(lit(server, 21, z) && lit(server, 20, z + 1), "lamps on both legs of the pole transformer should light: A " + read(server, 21, up, z) + " | B " + read(server, 20, up, z + 1));
 		context.takeScreenshot("wildcatter-pole-transformer");
-		// overload it: rate it at 30 VA for the test, with two lamps (120 VA) on it
+		// overload it: rate it at 30 VA for the test with two lamps (120 VA) on it, 4 x on each leg. Under IEEE C57.109 that lasts
+		// (I² - 1)·t = 1250 pu²·s: about 83 s, so it reads OVERLOADED with its time left
 		dev.wildcatter.block.TransformerBlockEntity.testRatedVa = 30.0;
 		context.waitTicks(30);
 		String heating = read(server, 20, up, z);
-		check(heating.contains("OVERLOADED") || isAir(server, 20, up, z), "an overloaded pole transformer should say so or already have failed: " + heating);
-		context.waitTicks(120);
+		check(heating.matches(".*OVERLOADED at (39\\d|40\\d)%.*") && heating.contains("fails in"), "a pole transformer at 4 x should read OVERLOADED with its time left: " + heating);
+		// at 25 x it lasts 2 s
+		dev.wildcatter.block.TransformerBlockEntity.testRatedVa = 4.8;
+		context.waitTicks(100);
 		dev.wildcatter.block.TransformerBlockEntity.testRatedVa = null;
-		check(isAir(server, 20, up, z), "a pole transformer at four times its rating should burn out");
+		check(isAir(server, 20, up, z), "a pole transformer at 25 times its rating should burn out in about 2 s: " + read(server, 20, up, z));
 		System.out.println("[wildcatter-test] pole transformer ok: " + unit + " | " + heating);
 	}
 
@@ -3060,6 +3066,141 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(shared.contains("built") && shared.contains("worked by 2 cranes"), "both crawlers should build the shared site: " + shared + " | " + twice);
 		check(twice.endsWith(" 0 set twice"), "no lift should be set twice: " + twice);
 		System.out.println("[wildcatter-test] heavyLift ok: " + charts + " | " + vesselSite + " | " + tandemRead[0] + " | " + shared);
+	}
+
+	/**
+	 * 10d1 (docs/multiblocks/gen-bus-protection.md): a gas turbine's 13.8 kV bus with two feeder breakers to load banks and its relay
+	 * panel. Grounds on the bus trip everything by 87B and lock out; grounds past a feeder trip that feeder alone by its 50; grounds on
+	 * a dead section trip nothing.
+	 */
+	private void busProtection(ClientGameTestContext context, TestServerContext server) {
+		final int z = -7500;
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 30 " + (up + 18) + " " + (z + 34) + " 180 30");
+		context.waitTicks(20);
+		server.runCommand("fill 2 " + (y - 1) + " " + (z - 8) + " 40 " + (y + 12) + " " + (z + 24) + " minecraft:air");
+		server.runCommand("fill 2 " + (y - 1) + " " + (z - 8) + " 40 " + (y - 1) + " " + (z + 24) + " minecraft:stone");
+		BlockPos gt = new BlockPos(20, up, z);
+		placeBig(server, WildcatterBlocks.GAS_TURBINE, gt, north);                                   // x 20-23, z..z+9
+		placeBig(server, WildcatterBlocks.GT_INLET_HOUSE, new BlockPos(20, up, z - 4), north);       // x 20-23, z-4..z-1
+		placeBig(server, WildcatterBlocks.GT_GENERATOR, new BlockPos(24, up, z + 1), north);         // x 24-27, z+1..z+6
+		placeBig(server, WildcatterBlocks.GEN_BREAKER, new BlockPos(25, up, z + 7), north);          // x 25-26, z+7..z+8
+		placeBig(server, WildcatterBlocks.HRSG, new BlockPos(20, up, z + 10), north);                // x 20-24, z+10..z+21, its exhaust
+		BlockPos fuelTank = new BlockPos(14, up, z + 4);
+		placeBig(server, WildcatterBlocks.STOCK_TANK, fuelTank, north);                              // x 14-17, z+4..z+7
+		pipes(server, z, new int[][] {{18, 0, 6}, {19, 0, 6}});                                     // kerosene to the fuel nozzle
+		// the bus: from the generator breaker east to x 28, and south to z+12; the panel against it
+		for (int x = 25; x <= 28; x++) {
+			put(server, x, up, z + 9, "wildcatter:bus_duct_gen");
+		}
+		for (int zz = z + 10; zz <= z + 12; zz++) {
+			put(server, 28, up, zz, "wildcatter:bus_duct_gen");
+		}
+		placeBig(server, WildcatterBlocks.BUS_RELAY_PANEL, new BlockPos(27, up, z + 10), north);
+		// feeder 1 at z+9 and feeder 2 at z+12, each 3 along the line (x 29-31); past each, duct to its load bank
+		placeBig(server, WildcatterBlocks.GEN_FEEDER_BREAKER, new BlockPos(29, up, z + 9), north);
+		placeBig(server, WildcatterBlocks.GEN_FEEDER_BREAKER, new BlockPos(29, up, z + 12), north);
+		for (int x = 32; x <= 37; x++) {
+			put(server, x, up, z + 9, "wildcatter:bus_duct_gen");
+		}
+		for (int x = 32; x <= 34; x++) {
+			put(server, x, up, z + 12, "wildcatter:bus_duct_gen");
+		}
+		placeBig(server, WildcatterBlocks.LOAD_BANK, new BlockPos(35, up, z + 10), north);           // x 35-37, z+10..z+15, fed at z+9
+		placeBig(server, WildcatterBlocks.LOAD_BANK, new BlockPos(32, up, z + 13), north);           // x 32-34, z+13..z+18, fed at z+12
+		// station power for the starter: a diesel set and a backward unit substation, 4.16 kV to the turbine's west face
+		BlockPos set = new BlockPos(10, up, z + 2);
+		genset(server, set, north, false);
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, set, net.minecraft.core.Direction.EAST, false);
+		for (int x = 15; x <= 19; x++) {
+			put(server, x, up, z + 2, "wildcatter:cable_mv");
+		}
+		fillTank(server, fuelTank, dev.wildcatter.fluid.Product.KEROSENE, 40_000);
+		startGenset(context, server, set, north, 2000);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.GasTurbineBlockEntity) srv.overworld().getBlockEntity(gt)).setWantRun(true);
+			return null;
+		});
+		context.waitTicks(200);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.GasTurbineBlockEntity) srv.overworld().getBlockEntity(gt)).skipStartForTest();
+			for (BlockPos bank : new BlockPos[] {new BlockPos(35, up, z + 10), new BlockPos(32, up, z + 13)}) {
+				((dev.wildcatter.block.LoadBankBlockEntity) srv.overworld().getBlockEntity(bank)).setSteps(4);
+			}
+			return null;
+		});
+		context.waitTicks(200);
+		String running = read(server, 20, up, z);
+		String panel = read(server, 27, up, z + 10);
+		System.out.println("[wildcatter-test] busProtection: " + running + " | " + panel);
+		check(running.contains("breaker CLOSED"), "the gas turbine should be on its bus: " + running);
+		check(panel.contains("1 generator breaker, 2 feeders") && panel.contains("87B ready"), "the panel should find its zone: " + panel);
+		check(read(server, 35, up, z + 10).matches(".*taking [1-9].*") && read(server, 32, up, z + 13).matches(".*taking [1-9].*"), "both load banks should run through their feeders: "
+				+ read(server, 35, up, z + 10) + " | " + read(server, 32, up, z + 13));
+		server.runCommand("tp @p 39 " + (up + 7) + " " + (z + 3) + " 55 32");   // from the north-east, over the feeder breakers to the panel
+		context.waitTicks(20);
+		context.takeScreenshot("wildcatter-bus-protection");
+		java.util.function.Consumer<BlockPos> grounds = at -> server.computeOnServer(srv -> {
+			dev.wildcatter.block.MultiCableBlockEntity duct = (dev.wildcatter.block.MultiCableBlockEntity) srv.overworld().getBlockEntity(at);
+			duct.setGrounded(!duct.grounded());
+			return null;
+		});
+		// ---- a bus fault: grounds on the bus between the breakers
+		BlockPos onBus = new BlockPos(28, up, z + 10);
+		grounds.accept(onBus);
+		context.waitTicks(20);
+		String busTrip = read(server, 27, up, z + 10);
+		String gen = read(server, 24, up, z + 1);
+		String f1 = read(server, 29, up, z + 9);
+		String f2 = read(server, 29, up, z + 12);
+		System.out.println("[wildcatter-test] busProtection: bus fault | " + busTrip + " | " + gen + " | " + f1 + " | " + f2);
+		check(busTrip.contains("87B BUS DIFFERENTIAL TRIP") && busTrip.contains("LOCKED OUT"), "grounds on the bus should trip 87B and lock out: " + busTrip);
+		check(gen.contains("TRIPPED") && gen.contains("87B"), "87B should trip the generator: " + gen);
+		check(f1.contains("TRIPPED") && f2.contains("TRIPPED"), "87B should trip both feeders: " + f1 + " | " + f2);
+		// grounds off, the panel reset: the feeders close, the generator is reset, and its turbine (which ran down with the unit trip)
+		// starts again, synchronizes onto the dead bus and closes
+		grounds.accept(onBus);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.BusRelayPanelBlockEntity) srv.overworld().getBlockEntity(new BlockPos(27, up, z + 10))).reset();
+			return null;
+		});
+		context.waitTicks(100);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.GasTurbineBlockEntity) srv.overworld().getBlockEntity(gt)).skipStartForTest();
+			return null;
+		});
+		context.waitTicks(200);
+		String back = read(server, 35, up, z + 10);
+		System.out.println("[wildcatter-test] busProtection: reset | " + read(server, 27, up, z + 10) + " | " + read(server, 20, up, z) + " | " + back);
+		check(back.matches(".*taking [1-9].*"), "after the reset and a restart the load bank should run again: " + back + " | " + read(server, 20, up, z));
+		// ---- a feeder fault: grounds past feeder 1 trip it alone by its 50
+		BlockPos pastFeeder = new BlockPos(33, up, z + 9);
+		grounds.accept(pastFeeder);
+		context.waitTicks(20);
+		String feederTrip = read(server, 29, up, z + 9);
+		String stillOn = read(server, 24, up, z + 1);
+		String notLocked = read(server, 27, up, z + 10);
+		System.out.println("[wildcatter-test] busProtection: feeder fault | " + feederTrip + " | " + stillOn + " | " + notLocked + " | " + read(server, 29, up, z + 12));
+		check(feederTrip.contains("TRIPPED") && feederTrip.contains("50"), "grounds past feeder 1 should trip it by its 50: " + feederTrip);
+		check(stillOn.contains("CLOSED") && !notLocked.contains("LOCKED OUT") && read(server, 29, up, z + 12).contains("CLOSED"),
+				"a feeder fault should leave the generator, the other feeder and 87B alone: " + stillOn + " | " + notLocked);
+		// ---- the same grounds on the section now dead: GROUNDED, and nothing more trips
+		context.waitTicks(60);
+		String dead = read(server, 33, up, z + 9);
+		System.out.println("[wildcatter-test] busProtection: dead section | " + dead + " | " + read(server, 24, up, z + 1));
+		check(dead.contains("GROUNDED") && read(server, 24, up, z + 1).contains("CLOSED") && read(server, 32, up, z + 13).matches(".*taking [1-9].*"),
+				"grounds on a dead section should read GROUNDED and trip nothing: " + dead);
+		// grounds off and the panel reset: feeder 1, opened by its own 50, closes again
+		grounds.accept(pastFeeder);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.BusRelayPanelBlockEntity) srv.overworld().getBlockEntity(new BlockPos(27, up, z + 10))).reset();
+			return null;
+		});
+		context.waitTicks(40);
+		String reclosed = read(server, 29, up, z + 9);
+		check(reclosed.contains("CLOSED") && read(server, 35, up, z + 10).matches(".*taking [1-9].*"), "the panel's reset should close feeder 1 again: " + reclosed);
+		System.out.println("[wildcatter-test] busProtection ok: " + busTrip + " | " + feederTrip + " | " + reclosed);
 	}
 
 	/** Waits (in client ticks of 10) until {@code done} holds or {@code limit} ticks pass; "yes after N ticks" or "NO after N ticks". */

@@ -57,8 +57,8 @@ public final class Tuning {
 	public static final int SPOOL_SPAN_BLOCKS = 1024;          // how much span a conductor spool holds: 1,024 m
 	public static final int INSULATOR_FLASHOVER_TICKS = 60;    // an under-rated insulator under load lasts this long
 	public static final double POLE_TRANSFORMER_VA = 25_000;     // a 25 kVA pole-top unit
-	public static final double POLE_TRANSFORMER_FAIL_SECONDS = 10.0;   // at 150 % of its rating it fails in this long
-	public static final double POLE_TRANSFORMER_COOL_SECONDS = 30.0;
+	public static final double TRANSFORMER_I2T_PU2S = 1250.0;   // IEEE C57.109 through-fault curve: (I^2 - 1) t to failure, per unit (25 x for 2 s)
+	public static final double TRANSFORMER_COOL_SECONDS = 600.0;   // back from its limit to cold at or below rating (proposed; the oil's own time constant is hours)
 	public static final double TRANSFORMER_X_OVER_R = 5.0;   // reactance to resistance of a distribution transformer's impedance
 	public static final double POLE_TRANSFORMER_PERCENT_Z = 2.5;   // nameplate impedance of a 25 kVA pole-top unit (docs/phase3-three-phase.md)
 	public static final double RECEPTACLE_BURN_SECONDS = 30.0;  // sustained 120 % of the plug rating for this long burns the receptacle
@@ -935,6 +935,15 @@ public final class Tuning {
 	public static final double RELAY_51_PICKUP = 1.5;              // time overcurrent picks up at 150 % of full-load current
 	public static final double RELAY_50_MULTIPLE = 8.0;            // instantaneous at 800 %
 	public static final double RELAY_TIME_DIAL = 1.0;              // IEEE C37.112 moderately inverse: t = TD x (0.0515 / (M^0.02 - 1) + 0.114)
+	// the generator bus's relay panel (docs/multiblocks/gen-bus-protection.md; proposed settings)
+	public static final double BUS_87_MIN_PICKUP = 0.2;            // 87B floor: a share of the largest breaker's rating
+	public static final double BUS_87_SLOPE = 0.3;                 // 87B restraint: a share of the current through the bus's boundary
+	public static final double GEN_51V_PICKUP = 1.5;               // 51V: 150 % of full-load amps at full voltage (IEEE C37.102)
+	public static final double GEN_51V_FLOOR = 0.25;               // restrained down to 25 % of that at 25 % voltage and below
+	public static final double GEN_51V_TIME_DIAL = 1.0;            // IEEE C37.112 very inverse
+	public static final double FEEDER_51_PICKUP = 1.0;             // feeder 51: at the breaker's rating, moderately inverse, time dial 1
+	public static final double FEEDER_50_MULTIPLE = 8.0;           // feeder 50: instantaneous at 8 x the breaker's rating
+	public static final double GROUNDING_SET_OHMS = 0.001;         // a grounding cluster: each phase to earth through 2/0 copper (ASTM F855)
 	public static final double DISCONNECT_ARC_AMPS = 10.0;         // opening a disconnect above this draws an arc (proposed: they break only magnetizing current)
 	public static final double ARC_FLASH_REACH = 3.0;              // blocks: who is burned by a disconnect's arc (proposed)
 	// ---- Steam plant (docs/multiblocks/steam-plant.md; Phase 4 plan, approved 2026-10-30) ----
@@ -960,7 +969,7 @@ public final class Tuning {
 	public static final int[] BREAKER_AMPS = {15, 20, 30, 50};               // 110 V
 	public static final int[] BREAKER_AMPS_MEDIUM = {30, 60, 100, 200};      // 4.16 kV: a 100 kW generator makes 24 A
 	public static final int[] BREAKER_AMPS_HIGH = {100, 200, 400, 600};      // 138 kV
-	public static final int[] BREAKER_AMPS_GENERATOR = {600, 1200};          // 13.8 kV: generator circuit breakers
+	public static final int[] BREAKER_AMPS_GENERATOR = {1200, 2000, 3000};   // 15 kV metal-clad feeder breakers (VCP-W 15 class)
 	public static final int[] BREAKER_AMPS_DISTRIBUTION = {200, 400, 600, 1200};   // feeder breakers
 	public static final int[] BREAKER_AMPS_INDUSTRIAL = {20, 30, 60, 100, 225, 400};   // 480 V frames and trips
 	public static final double BREAKER_MAGNETIC_MULTIPLE = 8; // instant trip at this many times the rating: a short circuit

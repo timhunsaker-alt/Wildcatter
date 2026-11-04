@@ -296,6 +296,8 @@
     "wildcatter:tower_crane",
     "wildcatter:crawler_crane",
     "wildcatter:ring_crane",
+    "wildcatter:gen_feeder_breaker",
+    "wildcatter:bus_relay_panel",
     "wildcatter:uf6_autoclave",
     "wildcatter:idr_kiln",
     "wildcatter:granulator",

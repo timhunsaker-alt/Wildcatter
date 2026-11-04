@@ -261,13 +261,36 @@ and the Field Manual has a page for each new system.
     - a ghost of the blueprint at its site, locked with a site marker.
     - for 10c2: the crawler's boom is set by the player (20 to 95 m, the real chart's lengths), and DISMANTLE is the site marker's
       mode, which every crane on the site follows.
-- **10d: the grid finish** — next:
-  - switches and panels;
-  - better wire, ground and breaker art;
-  - true-size MV, DIST and HV breakers and a rated 4.16/138 kV step-up in place of the one-block stand-ins;
-  - relay protection for the 13.8 kV bus;
-  - a short-time overload rule for rated transformers (IEEE C57.109 through-fault, about I²t = 1250 pu²·s) in place of the pole
-    transformer's 150 % for 10 s. That would let direct starts slow down with V² too (from 10a, 2026-11-02).
+- **10d: the grid finish** — CURRENT. Four waves:
+  - **10d1: protection** (spec: `docs/multiblocks/gen-bus-protection.md`):
+    - an IEEE C57.109 short-time rule for rated transformers ((I² − 1)·t = 1250 pu²·s) in place of the pole transformer's 150 % for
+      10 s, so direct starts go with V² too (from 10a, 2026-11-02);
+    - relay protection for the 13.8 kV bus: a bus relay panel (87B and 86B, 51V on each generator breaker, 50/51 on each 15 kV feeder
+      breaker);
+    - a grounding clamp set that faults a live bus or keeps a dead one safe.
+  - **10d2: true-size gear:**
+    - a 4.16 kV metal-clad switchgear lineup;
+    - standalone DIST and HV breakers, each with its own relay cabinet (81U on DIST);
+    - a rated 4.16 kV to 120/240 V pole unit, and a 10 MVA 4.16/138 kV transformer;
+    - the one-block stand-ins (`mv_breaker`, `dist_breaker`, `hv_breaker`, `ufls_relay_dist`, `transformer`,
+      `substation_transformer`) removed.
+  - **10d3: panels and switches:**
+    - a 200 A 120/240 V load centre and a 480Y/277 V panelboard with clip-in branch breakers;
+    - a 480 V fused safety switch and a 5 kV load-interrupter switch;
+    - an automatic transfer switch.
+  - **10d4: art and sounds:**
+    - better wire, ground and breaker art;
+    - the Ludo sound sources kept.
+  - Decided with Tim on 2026-11-04:
+    - all four kinds of switches and panels;
+    - the stand-ins removed outright;
+    - 87B, 51V and feeder 50/51 on the 13.8 kV bus;
+    - V² for every motor start;
+    - four waves;
+    - a relay cabinet for each standalone DIST and HV breaker;
+    - a rated 4.16 kV pole unit in place of `transformer`;
+    - a 10 MVA, 7.5 %Z 4.16/138 kV unit (delta at 4.16 kV, grounded wye at 138 kV) in place of `substation_transformer`;
+    - a grounding clamp set for bus faults.
 - Decided with Tim on 2026-11-03 (the 10b plan):
   - three waves (10b1, 10b2, 10b3);
   - 180 kA prebake pots;
