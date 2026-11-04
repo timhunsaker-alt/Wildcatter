@@ -53,6 +53,7 @@ Testers get the jars from the GitHub **Releases** page (or `dist/`):
 - **NeoForge:** `wildcatter-neoforge-0.2.0.jar` in `mods/` with NeoForge 26.3.0.101 or newer.
 
 Use one jar, not both.
+Quality-of-life mods that work alongside it (Sodium, JEI, JourneyMap, WorldEdit and others) are listed in `docs/recommended-mods.md`.
 `dist/README.md` has the player notes.
 
 ## Testing in game: the kits
@@ -99,6 +100,7 @@ console's power setpoint, the CVCS boron target, a coolant pump's switch, the HP
 - `neoforge/`: the NeoForge entry points, a mixin that tells the circuit manager when block entities load and unload, the ores'
   biome modifiers, and the NeoForge smoke scenes.
 - `dev.wildcatter.platform.Platform` is the small seam between them (the config folder, which mods are loaded).
+- `common/.../compat/WildcatterJeiPlugin` uses JEI's loader-neutral API, compile-only. JEI is optional and not bundled.
 
 ## Testing: automated
 JDK 25 required. NeoForge's build tools also need a JDK 21, which Gradle finds or downloads. To point it at a JDK 21 that is not

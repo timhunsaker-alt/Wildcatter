@@ -8,7 +8,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -40,7 +39,7 @@ public final class OreBlocks {
 			Block block = new Block(props);
 			Registry.register(BuiltInRegistries.BLOCK, key, block);
 			ResourceKey<Item> itemKey = ResourceKey.create(Registries.ITEM, Wildcatter.id(ore.blockId()));
-			Registry.register(BuiltInRegistries.ITEM, itemKey, new BlockItem(block, new Item.Properties().setId(itemKey).useBlockDescriptionPrefix()));
+			Registry.register(BuiltInRegistries.ITEM, itemKey, new OreBlockItem(block, new Item.Properties().setId(itemKey).useBlockDescriptionPrefix(), ore));
 			BLOCKS.put(ore, block);
 
 			ResourceKey<Item> mineralKey = ResourceKey.create(Registries.ITEM, Wildcatter.id(ore.key));

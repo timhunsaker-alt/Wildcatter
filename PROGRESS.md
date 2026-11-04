@@ -475,6 +475,22 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   the compressor, 480 V to the refrigeration compressor; 0.93 m³/s through the train; LPG and natural gasoline in their tanks; a
   second set on pipeline gas; the residue flared; NO REFRIGERATION and HYDRATES).
 
+## Side wave: ore tooltips and JEI pages (docs/ores.md, "Tooltips and JEI")
+- **Tooltips:** every ore block and its mineral now say:
+  - where the ore is found;
+  - the tool that mines it;
+  - each plant that takes it and what that plant makes, or "No use yet". Twelve ores have no user yet.
+- **One source:** the lines come from `ore/OreUses.java`. Its switches are exhaustive, and `OreUsesTest` checks every ore is
+  covered.
+- **JEI:** with JEI installed, U over an ore, a mineral, the four furnace ingots or magnesia opens a Wildcatter information page.
+  - JEI is optional and not bundled: Wildcatter compiles against its loader-neutral API only.
+  - NeoForge finds the plugin by `@JeiPlugin`, Fabric by the `jei_mod_plugin` entrypoint.
+- **Game test:** the `ores` scene checks three tooltips: rock salt, galena ore and barite.
+  - It takes a screenshot of the hovered tooltip.
+  - When JEI is in the run (`-Dfabric.addMods`), it presses U and takes a screenshot of the JEI page.
+- **Recommended mods:** `docs/recommended-mods.md` lists the quality-of-life mods with 26.3 builds for Fabric and NeoForge.
+  - The Fabric set ran the `coker` and `anodes` scenes alongside Wildcatter, Sodium included, and both passed.
+
 ## Phase 10b3a: coke, pitch and anodes (specs: docs/multiblocks/delayed-coker.md, coke-ovens.md, anode-plant.md)
 10b3 is two waves (Tim, 2026-11-03): 10b3a the carbon and anodes, 10b3b the potline. All parts are true size (`block/CarbonPartBlock`),
 sized for a 40-pot line.

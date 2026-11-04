@@ -7407,7 +7407,44 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		server.runCommand("tp @p 44.5 " + (up + 1) + " " + (z + 15.5) + " 180 0");
 		context.waitTicks(40);
 		context.takeScreenshot("wildcatter-ores");
-		System.out.println("[wildcatter-test] ores ok: " + scint + " | " + found + "salt dome " + salt + " salt, " + sulfur + " sulfur");
+
+		// the tooltips say where each ore is found, what mines it and what uses it (OreUses)
+		String saltTip = tooltip(context, new ItemStack(dev.wildcatter.ore.OreBlocks.MINERALS.get(dev.wildcatter.ore.Ore.HALITE)));
+		String galenaTip = tooltip(context, new ItemStack(dev.wildcatter.ore.OreBlocks.block(dev.wildcatter.ore.Ore.GALENA)));
+		String bariteTip = tooltip(context, new ItemStack(dev.wildcatter.ore.OreBlocks.MINERALS.get(dev.wildcatter.ore.Ore.BARITE)));
+		check(saltTip.contains("Used in chlor-alkali cells") && saltTip.contains("Found: salt domes"), "rock salt's tooltip should say where it is found and what uses it: " + saltTip);
+		check(galenaTip.contains("Used in a furnace (lead ingot)") && galenaTip.contains("Mined with a stone pickaxe"), "galena ore's tooltip should say it smelts to lead: " + galenaTip);
+		check(bariteTip.contains("No use yet"), "barite's tooltip should say it has no use yet: " + bariteTip);
+		// the picture: rock salt in the first hotbar slot, the inventory open and the cursor over it
+		server.runCommand("clear @p");
+		server.runCommand("item replace entity @p hotbar.0 with wildcatter:halite");
+		context.waitTicks(5);
+		context.setScreen(() -> new net.minecraft.client.gui.screens.inventory.InventoryScreen(net.minecraft.client.Minecraft.getInstance().player));
+		context.waitTicks(10);
+		double[] at = context.computeOnClient(client -> {
+			double scale = client.getWindow().getGuiScale();
+			int left = (client.getWindow().getGuiScaledWidth() - 176) / 2, top = (client.getWindow().getGuiScaledHeight() - 166) / 2;
+			return new double[] {(left + 8 + 8) * scale, (top + 142 + 8) * scale};
+		});
+		context.getInput().setCursorPos(at[0], at[1]);
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-ore-tooltip");
+		// with JEI in the run (fabric.addMods), U over the slot opens Wildcatter's information page for rock salt
+		if (net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("jei")) {
+			context.getInput().pressKey(com.mojang.blaze3d.platform.InputConstants.KEY_U);
+			context.waitTicks(20);
+			String page = context.computeOnClient(client -> client.gui.screen() == null ? "none" : client.gui.screen().getClass().getName());
+			check(page.contains("jei"), "U over rock salt should open JEI's page: " + page);
+			context.takeScreenshot("wildcatter-ore-jei");
+		}
+		context.setScreen(() -> null);
+		System.out.println("[wildcatter-test] ores ok: " + scint + " | " + found + "salt dome " + salt + " salt, " + sulfur + " sulfur | rock salt: " + saltTip);
+	}
+
+	/** An item's tooltip as the player sees it, one line after another. */
+	private static String tooltip(ClientGameTestContext context, ItemStack stack) {
+		return context.computeOnClient(client -> String.join(" / ", stack.getTooltipLines(net.minecraft.world.item.Item.TooltipContext.of(client.level), client.player,
+				net.minecraft.world.item.TooltipFlag.Default.NORMAL).stream().map(net.minecraft.network.chat.Component::getString).toList()));
 	}
 
 	private static int count(TestServerContext server, net.minecraft.world.level.block.Block block, BlockPos from, BlockPos to) {

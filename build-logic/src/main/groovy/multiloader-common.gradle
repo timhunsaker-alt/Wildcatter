@@ -6,6 +6,21 @@ base {
     archivesName = "${mod_id}-${project.name}"
 }
 
+// JEI's API, compile-only: Wildcatter adds JEI information pages when JEI is installed and runs without it.
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'BlameJared'
+                url = uri('https://maven.blamejared.com')
+            }
+        }
+        filter {
+            includeGroup('mezz.jei')
+        }
+    }
+}
+
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(java_version)
     withSourcesJar()

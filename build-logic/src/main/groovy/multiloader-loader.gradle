@@ -18,6 +18,8 @@ dependencies {
             attribute(loaderAttribute, 'common')
         }
     }
+    // the loaders compile common's sources too, so they need JEI's API on their compile path (not bundled)
+    compileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
     commonJava(project(path: ':common', configuration: 'commonJava'))
     commonResources(project(path: ':common', configuration: 'commonResources'))
 }

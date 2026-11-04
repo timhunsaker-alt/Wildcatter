@@ -211,6 +211,10 @@ and the Field Manual has a page for each new system.
       - a delayed coker on the crude unit's residue, and a rotary calciner, for petroleum coke;
       - coal-tar pitch from by-product coke ovens and a tar still;
       - an anode plant that mixes, forms, bakes and rods the blocks, with butt recycle.
+    - **Side wave: ore tooltips and JEI pages**, DONE 2026-11-03, at Tim's request before 10b3b:
+      - every ore and mineral tooltip says where it is found, what mines it, and what uses it (`ore/OreUses.java`);
+      - with JEI installed, U shows a page for each ore (`compat/WildcatterJeiPlugin`);
+      - the QoL mod list is in `docs/recommended-mods.md`.
     - **10b3b: the potline** (spec: `docs/multiblocks/potline.md`):
       - the potline's rectiformers and aluminium bus;
       - 180 kA prebake Hall–Héroult pots at true size, the player choosing how many in series;

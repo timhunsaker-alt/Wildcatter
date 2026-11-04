@@ -27,5 +27,13 @@ public class MineralItem extends Item {
 		tooltip.accept(Component.literal(ore.formula).withStyle(ChatFormatting.GRAY));
 		tooltip.accept(Component.literal("This ore: " + ore.gradeText()).withStyle(ChatFormatting.GRAY));
 		tooltip.accept(Component.literal("Real ore: " + ore.realGrade).withStyle(ChatFormatting.DARK_GRAY));
+		usage(ore, tooltip);
+	}
+
+	/** Where it is found, what mines it and what uses it (OreUses), shared with the ore block's tooltip. */
+	static void usage(Ore ore, Consumer<Component> tooltip) {
+		for (String line : OreUses.lines(ore)) {
+			tooltip.accept(Component.literal(line).withStyle(line.startsWith("Used") ? ChatFormatting.DARK_AQUA : ChatFormatting.GRAY));
+		}
 	}
 }

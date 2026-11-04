@@ -110,6 +110,17 @@ Every other mineral waits for its plant:
 - 8a: borax, dissolved in sulfuric acid for boric acid and reduced to boron carbide (multiblocks/boron.md). Silver waits.
 - The rest go to the plants listed under Ideas in ROADMAP.
 
+## Tooltips and JEI
+- **The tooltip** of every ore block and its mineral gives:
+  - the mineral, its formula and this ore's grade;
+  - where it is found;
+  - the tool that mines it;
+  - each plant that takes it, or "No use yet".
+- **The source:** the lines live in `ore/OreUses.java`. A wave that gives an ore a new user updates it in the same change, and
+  `OreUsesTest` keeps every ore covered.
+- **With JEI installed,** U over an ore or its mineral opens an information page with the same facts and the real grade. The
+  four furnace ingots and magnesia also have a page. JEI is optional.
+
 ## Scintillometer
 A handheld gamma scintillometer finds uranium.
 - **Reading:** a count rate in counts per second (cps). Background is 50 cps (proposed). Each block holding uranium within 16 blocks adds 50,000 cps × its U3O8 fraction ÷ distance² (m, at least 1):
