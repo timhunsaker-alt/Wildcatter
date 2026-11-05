@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "P",
+    "X",
+    "P"
+  ],
+  "key": {
+    "P": "minecraft:paper",
+    "X": "minecraft:copper_block"
+  },
+  "result": {
+    "id": "wildcatter:fuse_class_j_200",
+    "count": 3
+  }
+}

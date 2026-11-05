@@ -46,3 +46,7 @@ The boiler's pipes and fire still attach at its bottom cell; an older world's on
 ## Game test
 `buildingGear`: a breaker clicked on a wall takes the wall mount and runs along it, a receptacle and a lamp take the faces they
 are clicked on, a lamp lights through a wall breaker; screenshots of a wall of gear and the starter plant.
+
+Phase 10d3 adds the true-size panels and switches beside these one-block parts: the load centre and panelboard with gutter blocks
+and clip-in branch breakers (panelboards.md), the 480 V fused safety switches (safety-switch.md), the 5 kV load-interrupter switches
+(load-interrupter.md) and the transfer switch (ats.md). The one-block breakers, fuse and switch stay.

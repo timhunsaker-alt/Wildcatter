@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "I",
+    "C",
+    "I"
+  ],
+  "key": {
+    "I": "minecraft:iron_nugget",
+    "C": "wildcatter:cable_lv"
+  },
+  "result": {
+    "id": "wildcatter:branch_cable",
+    "count": 3
+  }
+}

@@ -952,6 +952,26 @@ public final class Tuning {
 	// the 10 MVA 4.16/138 kV power transformer (docs/multiblocks/power-transformer-10.md)
 	public static final double STEP_UP_10_VA = 10_000_000.0;       // 4.16 kV delta / 138 kV grounded wye, ONAN
 	public static final double STEP_UP_10_PERCENT_Z = 7.5;
+	// ---- 10d3: panels and switches (docs/multiblocks/panelboards.md, safety-switch.md, load-interrupter.md, ats.md) -------------
+	public static final int LOAD_CENTRE_MAIN_AMPS = 200;            // a 200 A, 40-space main-breaker load centre
+	public static final int LOAD_CENTRE_SPACES = 40;
+	public static final int PANELBOARD_MAIN_AMPS = 225;             // a 225 A, 42-circuit 480Y/277 V lighting panelboard
+	public static final int PANELBOARD_SPACES = 42;
+	public static final double CLASS_J_SECONDS_AT_2X = 80.0;        // class J time-delay: carries 500 % for 10 s (UL 248-8)
+	public static final double CLASS_J_INSTANT_MULTIPLE = 15.0;     // current-limiting above this (proposed)
+	public static final double E_FUSE_SECONDS_AT_2X = 384.0;        // E-rated: melts in 300 s at 220 % (ANSI C37.46, up to 100E)
+	public static final double E_FUSE_SECONDS_AT_2X_LARGE = 768.0;  // 600 s above 100E
+	public static final double E_FUSE_INSTANT_MULTIPLE = 20.0;      // current-limiting above this (proposed)
+	public static final int LIS_LOAD_BREAK_AMPS = 600;             // a 5 kV metal-enclosed load-interrupter (IEEE C37.20.3)
+	public static final int ATS_AMPS = 400;                         // a 400 A open-transition ATS (UL 1008)
+	public static final double ATS_DROPOUT = 0.85;                  // normal fails below this share of its nominal on any phase
+	public static final double ATS_PICKUP = 0.90;                   // normal restored, and emergency acceptable, at this
+	public static final double ATS_EMERGENCY_HERTZ = 0.95;          // emergency acceptable at this share of nominal frequency
+	public static final double ATS_TDES_SECONDS = 3.0;              // engine-start delay (3 s)
+	public static final double ATS_TDNE_SECONDS = 1.0;              // transfer to emergency (0 s; proposed 1 s)
+	public static final double ATS_NEUTRAL_SECONDS = 1.0;           // the neutral position, open transition (proposed)
+	public static final double ATS_TDEN_SECONDS = 30.0;             // retransfer to normal (30 min, scaled for the game)
+	public static final double ATS_TDEC_SECONDS = 30.0;             // engine cooldown (5 min, scaled for the game)
 	public static final double DISCONNECT_ARC_AMPS = 10.0;         // opening a disconnect above this draws an arc (proposed: they break only magnetizing current)
 	public static final double ARC_FLASH_REACH = 3.0;              // blocks: who is burned by a disconnect's arc (proposed)
 	// ---- Steam plant (docs/multiblocks/steam-plant.md; Phase 4 plan, approved 2026-10-30) ----

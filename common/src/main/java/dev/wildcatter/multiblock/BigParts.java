@@ -290,7 +290,8 @@ public final class BigParts {
 		synchronized (SHAPES) {
 			shapes = SHAPES.computeIfAbsent(part.shapeName(), name -> load(name, part.footprint().pieces()));
 		}
-		return shapes[Math.floorMod(turns(state), 4)][state.getValue(part.piece())];
+		VoxelShape[] turned = shapes[Math.floorMod(turns(state), 4)];
+		return turned[Math.min(state.getValue(part.piece()), turned.length - 1)];   // a one-cell part's piece property still runs 0 to 1
 	}
 
 	/** Reads {@code assets/wildcatter/shapes/<name>.json}: per piece, a list of [x1, y1, z1, x2, y2, z2] boxes in sixteenths, facing north. */

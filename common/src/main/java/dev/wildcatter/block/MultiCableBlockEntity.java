@@ -74,7 +74,7 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 
 	@Override
 	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
-		return voltage == voltage();
+		return voltage == voltage() && block().joins(getBlockState(), face);
 	}
 
 	@Override
@@ -87,7 +87,9 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 				circuit.ground(node[k]);
 			}
 			for (Direction face : Direction.values()) {
-				circuit.port(worldPosition, face, conductor, voltage(), node[k], half, false);
+				if (block().joins(getBlockState(), face)) {
+					circuit.port(worldPosition, face, conductor, voltage(), node[k], half, false);
+				}
 			}
 		}
 		clamps = new int[0];

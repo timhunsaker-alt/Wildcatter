@@ -147,6 +147,13 @@ voltage transformers (wye-grounded, 1 MΩ a phase) give the 13.8 kV bus its grou
   draw-out vacuum breaker (CONNECTED, TEST, DISCONNECTED) with its own 50/51.
 - A standalone 12.47 kV or 138 kV breaker (10d2, docs/multiblocks/breaker-relay-cabinet.md) is a yard breaker worked by a breaker
   relay cabinet: 50/51, and 81U under-frequency load shedding on a 12.47 kV breaker.
+- Panels (10d3, docs/multiblocks/panelboards.md): a 120/240 V load centre and a 480Y/277 V panelboard, each a thermal-magnetic
+  main, with clip-in thermal-magnetic branch breakers in gutter blocks beside it, one space each. The GFCI breaker trips at 5 mA of
+  hot-to-neutral imbalance (an RCD at 30 mA under IEC).
+- Fuses (10d3): class J time-delay fuses in the 480 V safety switch (safety-switch.md), E-rated current-limiting power fuses in the
+  fused 5 kV load-interrupter (load-interrupter.md). A load-interrupter opens load up to 600 A but not a fault.
+- Transfer (10d3, docs/multiblocks/ats.md): a 480 V open-transition ATS starts a standby genset by redstone and moves the load
+  over; the two sources are never paralleled through it.
 - The relays' 51 pickup is settable, as a real relay's CT ratio and tap set it: 5 to 1,200 A, up to the breaker's frame, with 50 at
   8 x the pickup and the IEEE moderately inverse curve at time dial 1.
 - Protective grounds: a grounding clamp set puts three phases to ground on a cable, busway or bus duct. On a dead conductor it keeps
@@ -155,7 +162,7 @@ voltage transformers (wye-grounded, 1 MΩ a phase) give the 13.8 kV bus its grou
 - Coordination: the device closest to a fault should trip first. The Power Meter or a relay screen
   shows which device tripped and why.
 - Grounding: neutral bonded to ground only at the transformer and at the service entrance.
-  Ground faults return through the ground path. GFCI / RCD later.
+  Ground faults return through the ground path. GFCI / RCD: the panel's GFCI breaker (10d3).
 
 ## Poles and overhead lines
 - Overhead MV/HV lines are spans strung between insulators, not wire blocks.

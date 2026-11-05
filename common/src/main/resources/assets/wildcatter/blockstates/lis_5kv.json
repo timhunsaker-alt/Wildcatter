@@ -1,0 +1,274 @@
+{
+ "variants": {
+  "facing=north,piece=0,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p0"
+  },
+  "facing=north,piece=0,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p0"
+  },
+  "facing=north,piece=0,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p0"
+  },
+  "facing=north,piece=1,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p1"
+  },
+  "facing=north,piece=1,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p1"
+  },
+  "facing=north,piece=1,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p1"
+  },
+  "facing=north,piece=2,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p2"
+  },
+  "facing=north,piece=2,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p2"
+  },
+  "facing=north,piece=2,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p2"
+  },
+  "facing=north,piece=3,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p3"
+  },
+  "facing=north,piece=3,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p3"
+  },
+  "facing=north,piece=3,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p3"
+  },
+  "facing=north,piece=4,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p4"
+  },
+  "facing=north,piece=4,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p4"
+  },
+  "facing=north,piece=4,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p4"
+  },
+  "facing=north,piece=5,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p5"
+  },
+  "facing=north,piece=5,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p5"
+  },
+  "facing=north,piece=5,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p5"
+  },
+  "facing=east,piece=0,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p0",
+   "y": 90
+  },
+  "facing=east,piece=0,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p0",
+   "y": 90
+  },
+  "facing=east,piece=0,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p0",
+   "y": 90
+  },
+  "facing=east,piece=1,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p1",
+   "y": 90
+  },
+  "facing=east,piece=1,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p1",
+   "y": 90
+  },
+  "facing=east,piece=1,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p1",
+   "y": 90
+  },
+  "facing=east,piece=2,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p2",
+   "y": 90
+  },
+  "facing=east,piece=2,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p2",
+   "y": 90
+  },
+  "facing=east,piece=2,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p2",
+   "y": 90
+  },
+  "facing=east,piece=3,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p3",
+   "y": 90
+  },
+  "facing=east,piece=3,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p3",
+   "y": 90
+  },
+  "facing=east,piece=3,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p3",
+   "y": 90
+  },
+  "facing=east,piece=4,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p4",
+   "y": 90
+  },
+  "facing=east,piece=4,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p4",
+   "y": 90
+  },
+  "facing=east,piece=4,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p4",
+   "y": 90
+  },
+  "facing=east,piece=5,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p5",
+   "y": 90
+  },
+  "facing=east,piece=5,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p5",
+   "y": 90
+  },
+  "facing=east,piece=5,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p5",
+   "y": 90
+  },
+  "facing=south,piece=0,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p0",
+   "y": 180
+  },
+  "facing=south,piece=0,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p0",
+   "y": 180
+  },
+  "facing=south,piece=0,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p0",
+   "y": 180
+  },
+  "facing=south,piece=1,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p1",
+   "y": 180
+  },
+  "facing=south,piece=1,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p1",
+   "y": 180
+  },
+  "facing=south,piece=1,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p1",
+   "y": 180
+  },
+  "facing=south,piece=2,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p2",
+   "y": 180
+  },
+  "facing=south,piece=2,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p2",
+   "y": 180
+  },
+  "facing=south,piece=2,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p2",
+   "y": 180
+  },
+  "facing=south,piece=3,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p3",
+   "y": 180
+  },
+  "facing=south,piece=3,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p3",
+   "y": 180
+  },
+  "facing=south,piece=3,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p3",
+   "y": 180
+  },
+  "facing=south,piece=4,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p4",
+   "y": 180
+  },
+  "facing=south,piece=4,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p4",
+   "y": 180
+  },
+  "facing=south,piece=4,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p4",
+   "y": 180
+  },
+  "facing=south,piece=5,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p5",
+   "y": 180
+  },
+  "facing=south,piece=5,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p5",
+   "y": 180
+  },
+  "facing=south,piece=5,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p5",
+   "y": 180
+  },
+  "facing=west,piece=0,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p0",
+   "y": 270
+  },
+  "facing=west,piece=0,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p0",
+   "y": 270
+  },
+  "facing=west,piece=0,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p0",
+   "y": 270
+  },
+  "facing=west,piece=1,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p1",
+   "y": 270
+  },
+  "facing=west,piece=1,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p1",
+   "y": 270
+  },
+  "facing=west,piece=1,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p1",
+   "y": 270
+  },
+  "facing=west,piece=2,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p2",
+   "y": 270
+  },
+  "facing=west,piece=2,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p2",
+   "y": 270
+  },
+  "facing=west,piece=2,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p2",
+   "y": 270
+  },
+  "facing=west,piece=3,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p3",
+   "y": 270
+  },
+  "facing=west,piece=3,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p3",
+   "y": 270
+  },
+  "facing=west,piece=3,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p3",
+   "y": 270
+  },
+  "facing=west,piece=4,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p4",
+   "y": 270
+  },
+  "facing=west,piece=4,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p4",
+   "y": 270
+  },
+  "facing=west,piece=4,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p4",
+   "y": 270
+  },
+  "facing=west,piece=5,state=closed": {
+   "model": "wildcatter:block/lis_5kv/p5",
+   "y": 270
+  },
+  "facing=west,piece=5,state=open": {
+   "model": "wildcatter:block/lis_5kv_open/p5",
+   "y": 270
+  },
+  "facing=west,piece=5,state=wrecked": {
+   "model": "wildcatter:block/lis_5kv_wrecked/p5",
+   "y": 270
+  }
+ }
+}

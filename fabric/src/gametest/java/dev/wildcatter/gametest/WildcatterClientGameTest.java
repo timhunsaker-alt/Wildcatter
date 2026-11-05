@@ -250,6 +250,12 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("switchgear")) {
 				switchgear(context, server);
 			}
+			if (only("panels")) {
+				panels(context, server);
+			}
+			if (only("ats")) {
+				ats(context, server);
+			}
 			fieldManual(server);
 		}
 	}
@@ -3337,6 +3343,410 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		System.out.println("[wildcatter-test] switchgear: racked | " + racked);
 		check(refused && racked.contains("DISCONNECTED") && !racked.contains("CLOSED"), "a breaker racked to DISCONNECTED should refuse to close: " + racked);
 		System.out.println("[wildcatter-test] switchgear ok: " + lineup + " | " + f1Trip + " | " + f3Trip + " | " + racked);
+	}
+
+	/**
+	 * 10d3: panels and switches (docs/multiblocks/panelboards.md, safety-switch.md, load-interrupter.md). A load centre on a pole unit
+	 * with four gutters; a panelboard and a fused safety switch on a genset's 480 V; a fused and a plain 5 kV load-interrupter in a
+	 * 4.16 kV run between two unit substations.
+	 */
+	private void panels(ClientGameTestContext context, TestServerContext server) {
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		java.util.function.Function<BlockPos, dev.wildcatter.block.PanelGutterBlockEntity> gutter = at -> server.computeOnServer(srv ->
+				(dev.wildcatter.block.PanelGutterBlockEntity) srv.overworld().getBlockEntity(at));
+		java.util.function.BiConsumer<BlockPos, String> clip = (at, item) -> server.computeOnServer(srv -> {
+			dev.wildcatter.block.PanelGutterBlockEntity g = (dev.wildcatter.block.PanelGutterBlockEntity) srv.overworld().getBlockEntity(at);
+			String refused = g.install(WildcatterItems.BRANCH_BREAKERS.get(item));
+			check(refused == null, item + " should clip into the gutter at " + at.toShortString() + ": " + refused);
+			g.setClosed(true);
+			dev.wildcatter.circuit.CircuitManager.markDirty(srv.overworld());
+			return null;
+		});
+		// ---- the load centre: a genset, a 480 V pad-mount run backward to 12.47 kV, a 25 kVA pole unit, 120/240 V to the panel
+		final int z = -7700;
+		server.runCommand("tp @p 22 " + (up + 3) + " " + (z - 8) + " 0 20");
+		context.waitTicks(20);
+		server.runCommand("fill 2 " + (y - 1) + " " + (z - 8) + " 34 " + (y + 8) + " " + (z + 8) + " minecraft:air");
+		server.runCommand("fill 2 " + (y - 1) + " " + (z - 8) + " 34 " + (y - 1) + " " + (z + 8) + " minecraft:stone");
+		BlockPos set = new BlockPos(10, up, z);
+		genset(server, set, north, false);
+		inlineTransformer(server, WildcatterBlocks.PADMOUNT_480, set, net.minecraft.core.Direction.EAST, true);   // 12.47 kV out at x 13
+		for (int x = 13; x <= 15; x++) {
+			put(server, x, up, z, "wildcatter:dist_wire_hot");
+		}
+		put(server, 16, up, z - 1, "wildcatter:pole");
+		put(server, 16, up, z, "wildcatter:pole_transformer[facing=west]");
+		// leg A and the neutral off its back, leg B and the neutral off its south side, joined in one cable up and over to the panel's top
+		put(server, 17, up, z, "wildcatter:cable_lv");
+		put(server, 16, up, z + 1, "wildcatter:cable_lv");
+		put(server, 17, up, z + 1, "wildcatter:cable_lv");
+		put(server, 17, up + 1, z + 1, "wildcatter:cable_lv");
+		for (int x = 17; x <= 22; x++) {
+			put(server, x, up + 2, z + 1, "wildcatter:cable_lv");
+		}
+		put(server, 22, up + 2, z + 2, "wildcatter:cable_lv");
+		put(server, 22, up + 2, z + 3, "wildcatter:cable_lv");
+		final int zp = z + 3;
+		server.runCommand("fill 19 " + up + " " + (zp + 1) + " 25 " + (up + 3) + " " + (zp + 1) + " minecraft:bricks");   // the wall
+		BlockPos centre = new BlockPos(22, up + 1, zp);
+		placeBig(server, WildcatterBlocks.LOAD_CENTRE, centre, north);
+		BlockPos g1 = new BlockPos(22, up, zp);        // space 1, below the panel: phase A
+		BlockPos g2 = new BlockPos(23, up + 1, zp);    // space 2, left of it as you face it: phase B
+		BlockPos g3 = new BlockPos(21, up + 1, zp);    // space 3, right of it: phase A (a 2-pole: A-B)
+		BlockPos g4 = new BlockPos(23, up, zp);        // space 4, below space 2: phase B
+		for (BlockPos g : new BlockPos[] {g1, g2, g3, g4}) {
+			placeBig(server, WildcatterBlocks.PANEL_GUTTER, g, north);
+		}
+		// branch cable straight out of each gutter's front, north
+		for (int zz = z + 1; zz <= z + 2; zz++) {
+			put(server, 22, up, zz, "wildcatter:branch_cable[axis=z]");
+			put(server, 23, up + 1, zz, "wildcatter:branch_cable[axis=z]");
+		}
+		put(server, 21, up + 1, z + 2, "wildcatter:branch_cable[axis=z]");
+		for (int zz = z - 1; zz <= z + 2; zz++) {
+			put(server, 23, up, zz, "wildcatter:branch_cable[axis=z]");
+		}
+		put(server, 22, up, z, "wildcatter:electric_heater");          // space 1: one 1,500 W heater
+		put(server, 23, up + 1, z, "wildcatter:electric_lamp");        // space 2, the GFCI: a lamp
+		put(server, 23, up, z - 2, "wildcatter:cable_lv");             // space 4: two heaters off a box at the end of its run
+		put(server, 24, up, z - 2, "wildcatter:electric_heater");
+		put(server, 23, up, z - 3, "wildcatter:electric_heater");
+		clip.accept(g1, "branch_breaker_1p_20");
+		clip.accept(g2, "gfci_breaker_1p_20");
+		clip.accept(g3, "branch_breaker_2p_30");
+		startGenset(context, server, set, north, 1000);
+		context.waitTicks(80);
+		String panel = read(server, centre.getX(), centre.getY(), centre.getZ());
+		String s1 = read(server, g1.getX(), g1.getY(), g1.getZ());
+		String s2 = read(server, g2.getX(), g2.getY(), g2.getZ());
+		String s3 = read(server, g3.getX(), g3.getY(), g3.getZ());
+		System.out.println("[wildcatter-test] panels: " + panel + " | " + s1 + " | " + s2 + " | " + s3 + " | " + read(server, 16, up, z));
+		check(panel.contains("Load centre") && panel.contains("ON") && panel.contains("4 spaces of 40 used (3 breakers)"), "the load centre should count its breakers' poles: " + panel);
+		check(s1.contains("Space 1 (phase A)") && s1.matches(".*ON, 1[0-3]\\.\\d A.*"), "space 1 should carry its heater on phase A: " + s1);
+		check(s2.contains("Space 2 (phase B)") && s2.contains("GFCI") && s2.contains("imbalance 0.0 mA"), "space 2's GFCI should carry its lamp, balanced: " + s2);
+		check(s3.contains("Space 3 (phase A-B)") && s3.matches(".*\\b2[2-4]\\d V across its poles.*"), "the 2-pole breaker should read about 240 V across its poles: " + s3);
+		check(server.computeOnServer(srv -> srv.overworld().getBlockState(new BlockPos(23, up + 1, z)).getValue(LoadBlock.LIT)), "the GFCI's lamp should be lit");
+		// a closed breaker won't come out
+		boolean held = server.computeOnServer(srv -> ((dev.wildcatter.block.PanelGutterBlockEntity) srv.overworld().getBlockEntity(g1)).pull() == null);
+		check(held, "a closed breaker should not come out of its gutter");
+		server.runCommand("tp @p 21 " + (up + 2) + " " + z + " -15 12");   // from the north, onto the gutters' fronts and the panel
+		context.waitTicks(20);
+		context.takeScreenshot("wildcatter-panels");
+		// ---- an overload: a 15 A breaker in space 4 with two 1,500 W heaters (25 A) trips on its thermal element; the main holds
+		clip.accept(g4, "branch_breaker_1p_15");
+		String trip4 = waitFor(context, server, () -> gutter.apply(g4).tripped(), 600);
+		String s4 = read(server, g4.getX(), g4.getY(), g4.getZ());
+		String mainOn = read(server, centre.getX(), centre.getY(), centre.getZ());
+		System.out.println("[wildcatter-test] panels: overload " + trip4 + " | " + s4 + " | " + mainOn);
+		check(s4.contains("Space 4 (phase B)") && s4.contains("TRIPPED (overload"), "the 15 A breaker should trip on two heaters: " + s4);
+		check(mainOn.contains(": ON") && mainOn.contains("5 spaces of 40 used (4 breakers)"), "the main should stay on: " + mainOn);
+		// ---- a ground fault: the grounding set on the GFCI's branch cable
+		BlockPos gfciRun = new BlockPos(23, up + 1, z + 1);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.MultiCableBlockEntity) srv.overworld().getBlockEntity(gfciRun)).setGrounded(true);
+			return null;
+		});
+		context.waitTicks(20);
+		String gfci = read(server, g2.getX(), g2.getY(), g2.getZ());
+		String s1Still = read(server, g1.getX(), g1.getY(), g1.getZ());
+		System.out.println("[wildcatter-test] panels: ground fault | " + gfci + " | " + s1Still);
+		check(gfci.contains("TRIPPED (ground fault"), "grounds on the GFCI's branch should trip it on ground fault: " + gfci);
+		check(s1Still.contains("ON,"), "a ground fault on space 2 should leave space 1 on: " + s1Still);
+
+		// ---- the panelboard and the safety switch on a genset's 480Y/277 V
+		final int z2 = z - 30;
+		server.runCommand("fill 2 " + (y - 1) + " " + (z2 - 8) + " 34 " + (y + 8) + " " + (z2 + 8) + " minecraft:air");
+		server.runCommand("fill 2 " + (y - 1) + " " + (z2 - 8) + " 34 " + (y - 1) + " " + (z2 + 8) + " minecraft:stone");
+		server.runCommand("tp @p 16 " + (up + 3) + " " + (z2 - 8) + " 0 20");
+		context.waitTicks(20);
+		BlockPos set2 = new BlockPos(10, up, z2);
+		genset(server, set2, north, false);
+		for (int x = 11; x <= 13; x++) {
+			put(server, x, up, z2, "wildcatter:cable_industrial");
+		}
+		for (int zz = z2 + 1; zz <= z2 + 4; zz++) {
+			put(server, 13, up, zz, "wildcatter:cable_industrial");
+		}
+		put(server, 14, up, z2 + 4, "wildcatter:cable_industrial");
+		put(server, 15, up, z2 + 4, "wildcatter:cable_industrial");
+		put(server, 16, up, z2 + 4, "wildcatter:cable_industrial");     // into the panelboard's back
+		BlockPos board = new BlockPos(16, up, z2 + 3);
+		placeBig(server, WildcatterBlocks.PANELBOARD_480, board, north);
+		BlockPos b1 = new BlockPos(17, up, z2 + 3);   // space 1: a 3-pole 30 A, phases A-B-C
+		BlockPos b2 = new BlockPos(15, up, z2 + 3);   // space 2: a 1-pole 277 V 20 A, phase B
+		placeBig(server, WildcatterBlocks.PANEL_GUTTER, b1, north);
+		placeBig(server, WildcatterBlocks.PANEL_GUTTER, b2, north);
+		put(server, 17, up, z2 + 2, "wildcatter:branch_cable_industrial[axis=z]");
+		put(server, 17, up, z2 + 1, "wildcatter:branch_cable_industrial[axis=z]");
+		put(server, 17, up, z2, "wildcatter:cable_industrial");
+		put(server, 18, up, z2, "wildcatter:three_phase_heater");
+		put(server, 16, up, z2, "wildcatter:three_phase_heater");
+		put(server, 17, up, z2 - 1, "wildcatter:three_phase_heater");
+		put(server, 15, up, z2 + 2, "wildcatter:branch_cable_industrial[axis=z]");
+		clip.accept(b2, "branch_breaker_277_1p_20");
+		// the safety switch: teed off the feed at x 13, up and over into its top; its load out of its bottom to a heater
+		for (int zz = z2 - 3; zz <= z2 - 1; zz++) {
+			put(server, 13, up, zz, "wildcatter:cable_industrial");
+		}
+		put(server, 13, up + 1, z2 - 3, "wildcatter:cable_industrial");
+		put(server, 13, up + 2, z2 - 3, "wildcatter:cable_industrial");
+		put(server, 14, up + 2, z2 - 3, "wildcatter:cable_industrial");
+		put(server, 15, up + 2, z2 - 3, "wildcatter:cable_industrial");
+		BlockPos sw = new BlockPos(15, up + 1, z2 - 3);
+		placeBig(server, WildcatterBlocks.SAFETY_SWITCH_100, sw, north);
+		put(server, 15, up, z2 - 3, "wildcatter:cable_industrial");
+		put(server, 16, up, z2 - 3, "wildcatter:three_phase_heater");
+		java.util.function.Function<String, String> fitFuse = item -> server.computeOnServer(srv -> {
+			String refused = ((dev.wildcatter.block.SafetySwitchBlockEntity) srv.overworld().getBlockEntity(sw)).fit(WildcatterItems.CARTRIDGE_FUSES.get(item));
+			return refused == null ? "" : refused;
+		});
+		for (int k = 0; k < 3; k++) {
+			check(fitFuse.apply("fuse_class_j_30").isEmpty(), "a 30 A class J fuse should fit the switch with its handle OFF");
+		}
+		check(!fitFuse.apply("fuse_class_j_30").isEmpty(), "a fourth fuse should not fit");
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.SafetySwitchBlockEntity) srv.overworld().getBlockEntity(sw)).setOn(true);
+			return null;
+		});
+		startGenset(context, server, set2, north, 1000);
+		context.waitTicks(60);
+		String boardRead = read(server, board.getX(), board.getY(), board.getZ());
+		String swRead = read(server, sw.getX(), sw.getY(), sw.getZ());
+		System.out.println("[wildcatter-test] panels: " + boardRead + " | " + read(server, b2.getX(), b2.getY(), b2.getZ()) + " | " + swRead);
+		check(boardRead.contains("Panelboard") && boardRead.contains("ON"), "the panelboard should be on: " + boardRead);
+		check(swRead.contains("Safety switch") && swRead.matches(".*ON, 1[5-9] A.*") && swRead.contains("A good, B good, C good"), "the safety switch should carry its 15 kW heater: " + swRead);
+		// an overload: a 3-pole 30 A breaker with three 15 kW heaters (about 54 A)
+		clip.accept(b1, "branch_breaker_480_3p_30");
+		String tripB1 = waitFor(context, server, () -> gutter.apply(b1).tripped(), 600);
+		String b1Read = read(server, b1.getX(), b1.getY(), b1.getZ());
+		System.out.println("[wildcatter-test] panels: panelboard overload " + tripB1 + " | " + b1Read);
+		check(b1Read.contains("phase A-B-C") && b1Read.contains("TRIPPED (overload"), "the 3-pole 30 A breaker should trip on three heaters: " + b1Read);
+		// a fault on the 277 V branch
+		BlockPos run277 = new BlockPos(15, up, z2 + 2);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.MultiCableBlockEntity) srv.overworld().getBlockEntity(run277)).setGrounded(true);
+			return null;
+		});
+		context.waitTicks(20);
+		String b2Read = read(server, b2.getX(), b2.getY(), b2.getZ());
+		System.out.println("[wildcatter-test] panels: 277 V fault | " + b2Read);
+		check(b2Read.contains("phase B") && b2Read.contains("TRIPPED (short circuit"), "grounds on the 277 V branch should trip it on its magnetic element: " + b2Read);
+		// a fault on the switch's load: its fuses blow and it names the phases
+		BlockPos swLoad = new BlockPos(15, up, z2 - 3);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.MultiCableBlockEntity) srv.overworld().getBlockEntity(swLoad)).setGrounded(true);
+			return null;
+		});
+		context.waitTicks(20);
+		String blown = read(server, sw.getX(), sw.getY(), sw.getZ());
+		System.out.println("[wildcatter-test] panels: switch fault | " + blown + " | " + read(server, set2.getX(), set2.getY(), set2.getZ()));
+		check(blown.contains("BLOWN") && blown.contains("open: fix the fault"), "a fault on the switch's load should blow its fuses: " + blown);
+		check(fitFuse.apply("fuse_class_j_30").startsWith("Handle OFF"), "a fuse should not fit with the handle ON");
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.MultiCableBlockEntity) srv.overworld().getBlockEntity(swLoad)).setGrounded(false);
+			dev.wildcatter.block.SafetySwitchBlockEntity s = (dev.wildcatter.block.SafetySwitchBlockEntity) srv.overworld().getBlockEntity(sw);
+			s.setOn(false);
+			return null;
+		});
+		for (int k = 0; k < 3; k++) {
+			fitFuse.apply("fuse_class_j_30");
+		}
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.SafetySwitchBlockEntity) srv.overworld().getBlockEntity(sw)).setOn(true);
+			return null;
+		});
+		context.waitTicks(40);
+		String refitted = read(server, sw.getX(), sw.getY(), sw.getZ());
+		System.out.println("[wildcatter-test] panels: switch refitted | " + refitted);
+		check(refitted.matches(".*ON, 1[5-9] A.*") && !refitted.contains("BLOWN"), "new fuses should carry the heater again: " + refitted);
+
+		// ---- the load-interrupters: 4.16 kV from a unit substation, through the fused LIS, then the plain one, to a unit substation
+		final int z3 = z - 60;
+		server.runCommand("fill 2 " + (y - 1) + " " + (z3 - 8) + " 40 " + (y + 8) + " " + (z3 + 8) + " minecraft:air");
+		server.runCommand("fill 2 " + (y - 1) + " " + (z3 - 8) + " 40 " + (y - 1) + " " + (z3 + 8) + " minecraft:stone");
+		server.runCommand("tp @p 22 " + (up + 4) + " " + (z3 - 10) + " 0 20");
+		context.waitTicks(20);
+		BlockPos set3 = new BlockPos(10, up, z3);
+		genset(server, set3, north, false);
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, set3, net.minecraft.core.Direction.EAST, false);   // 4.16 kV out at x 15
+		put(server, 15, up, z3, "wildcatter:cable_mv");
+		for (int yy = up; yy <= up + 3; yy++) {
+			put(server, 16, yy, z3, "wildcatter:cable_mv");
+		}
+		put(server, 16, up + 3, z3 - 1, "wildcatter:cable_mv");
+		put(server, 16, up + 3, z3 - 2, "wildcatter:cable_mv");
+		put(server, 17, up + 3, z3 - 2, "wildcatter:cable_mv");
+		put(server, 18, up + 3, z3 - 2, "wildcatter:cable_mv");       // into the fused LIS's roof, at its back
+		BlockPos fused = new BlockPos(18, up, z3 - 3);
+		placeBig(server, WildcatterBlocks.LIS_5KV_FUSED, fused, north);
+		put(server, 18, up, z3 - 1, "wildcatter:cable_mv");           // out of its back, low
+		put(server, 19, up, z3 - 1, "wildcatter:cable_mv");
+		for (int yy = up; yy <= up + 3; yy++) {
+			put(server, 20, yy, z3 - 1, "wildcatter:cable_mv");
+		}
+		put(server, 20, up + 3, z3 - 2, "wildcatter:cable_mv");
+		put(server, 21, up + 3, z3 - 2, "wildcatter:cable_mv");
+		put(server, 22, up + 3, z3 - 2, "wildcatter:cable_mv");       // into the plain LIS's roof
+		BlockPos plain = new BlockPos(22, up, z3 - 3);
+		placeBig(server, WildcatterBlocks.LIS_5KV, plain, north);
+		put(server, 22, up, z3 - 1, "wildcatter:cable_mv");
+		put(server, 23, up, z3 - 1, "wildcatter:cable_mv");
+		inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, new BlockPos(23, up, z3 - 1), net.minecraft.core.Direction.EAST, true);   // x 24-27
+		for (int x = 28; x <= 30; x++) {
+			put(server, x, up, z3 - 1, "wildcatter:cable_industrial");
+		}
+		put(server, 29, up, z3 - 2, "wildcatter:three_phase_heater");
+		put(server, 30, up, z3, "wildcatter:three_phase_heater");
+		java.util.function.Function<BlockPos, dev.wildcatter.block.LoadInterrupterBlockEntity> lis = at -> server.computeOnServer(srv ->
+				(dev.wildcatter.block.LoadInterrupterBlockEntity) srv.overworld().getBlockEntity(at));
+		String fusedRefused = server.computeOnServer(srv -> {
+			dev.wildcatter.block.LoadInterrupterBlockEntity f = (dev.wildcatter.block.LoadInterrupterBlockEntity) srv.overworld().getBlockEntity(fused);
+			for (int k = 0; k < 3; k++) {
+				check(f.fit(WildcatterItems.CARTRIDGE_FUSES.get("fuse_e_10")) == null, "a 10E fuse should fit the open LIS");
+			}
+			f.setClosed(true);
+			String refused = f.fit(WildcatterItems.CARTRIDGE_FUSES.get("fuse_e_10"));
+			((dev.wildcatter.block.LoadInterrupterBlockEntity) srv.overworld().getBlockEntity(plain)).setClosed(true);
+			return refused == null ? "" : refused;
+		});
+		check(fusedRefused.startsWith("Open the switch first"), "a fuse should not fit while the LIS is closed: " + fusedRefused);
+		startGenset(context, server, set3, north, 1000);
+		context.waitTicks(60);
+		String fusedRead = read(server, fused.getX(), fused.getY(), fused.getZ());
+		String plainRead = read(server, plain.getX(), plain.getY(), plain.getZ());
+		System.out.println("[wildcatter-test] panels: LIS | " + fusedRead + " | " + plainRead);
+		check(fusedRead.contains("fused 10E") && fusedRead.matches(".*CLOSED, [1-9] A.*") && fusedRead.contains("A good, B good, C good"), "the fused LIS should carry the load: " + fusedRead);
+		check(plainRead.matches(".*CLOSED, [1-9] A.*"), "the plain LIS should carry the load: " + plainRead);
+		server.runCommand("tp @p 24 " + (up + 3) + " " + (z3 - 8) + " 25 12");   // from the north-east, onto the two switches' fronts
+		context.waitTicks(20);
+		context.takeScreenshot("wildcatter-load-interrupter");
+		// the plain LIS opens its load and closes again
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.LoadInterrupterBlockEntity) srv.overworld().getBlockEntity(plain)).setClosed(false);
+			return null;
+		});
+		context.waitTicks(20);
+		String opened = read(server, plain.getX(), plain.getY(), plain.getZ());
+		check(opened.contains(": OPEN") && !lis.apply(plain).wrecked(), "the plain LIS should open its normal load: " + opened);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.LoadInterrupterBlockEntity) srv.overworld().getBlockEntity(plain)).setClosed(true);
+			return null;
+		});
+		context.waitTicks(40);
+		// with its load-break rating lowered under the load for the test, opening it wrecks it
+		dev.wildcatter.block.LoadInterrupterBlockEntity.testLoadBreakAmps = 1.0;
+		context.waitTicks(10);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.LoadInterrupterBlockEntity) srv.overworld().getBlockEntity(plain)).setClosed(false);
+			return null;
+		});
+		dev.wildcatter.block.LoadInterrupterBlockEntity.testLoadBreakAmps = null;
+		context.waitTicks(20);
+		String wrecked = read(server, plain.getX(), plain.getY(), plain.getZ());
+		System.out.println("[wildcatter-test] panels: LIS opened over its rating | " + wrecked);
+		check(lis.apply(plain).wrecked() && wrecked.contains("WRECKED"), "a LIS opened over its load-break rating should be wrecked: " + wrecked);
+		// a fault between the two: the fused LIS's fuses clear it
+		BlockPos between = new BlockPos(19, up, z3 - 1);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.MultiCableBlockEntity) srv.overworld().getBlockEntity(between)).setGrounded(true);
+			return null;
+		});
+		context.waitTicks(20);
+		String cleared = read(server, fused.getX(), fused.getY(), fused.getZ());
+		System.out.println("[wildcatter-test] panels: LIS fault | " + cleared + " | " + read(server, set3.getX(), set3.getY(), set3.getZ()));
+		check(cleared.contains("BLOWN") && cleared.contains("open: fix the fault"), "the fused LIS's fuses should clear a fault on its load side: " + cleared);
+		System.out.println("[wildcatter-test] panels ok: " + panel + " | " + s4 + " | " + gfci + " | " + b1Read + " | " + blown + " | " + wrecked + " | " + cleared);
+	}
+
+	/**
+	 * 10d3: the transfer switch (docs/multiblocks/ats.md). Genset 1 is the normal source, genset 2 the emergency one, started by the
+	 * ATS's redstone; the load is two 15 kW heaters.
+	 */
+	private void ats(ClientGameTestContext context, TestServerContext server) {
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		final int zn = -7820;
+		final int ze = zn + 8;
+		server.runCommand("fill 2 " + (y - 1) + " " + (zn - 6) + " 30 " + (y + 8) + " " + (ze + 8) + " minecraft:air");
+		server.runCommand("fill 2 " + (y - 1) + " " + (zn - 6) + " 30 " + (y - 1) + " " + (ze + 8) + " minecraft:stone");
+		server.runCommand("tp @p 20 " + (up + 3) + " " + (ze + 8) + " 150 20");
+		context.waitTicks(20);
+		BlockPos normalSet = new BlockPos(10, up, zn);
+		BlockPos standby = new BlockPos(10, up, ze);
+		genset(server, normalSet, north, false);
+		genset(server, standby, north, false);
+		// normal: out of genset 1 east, up and north into the ATS's top
+		for (int x = 11; x <= 13; x++) {
+			put(server, x, up, zn, "wildcatter:cable_industrial");
+		}
+		for (int yy = up + 1; yy <= up + 3; yy++) {
+			put(server, 13, yy, zn, "wildcatter:cable_industrial");
+		}
+		for (int zz = zn + 1; zz <= ze + 1; zz++) {
+			put(server, 13, up + 3, zz, "wildcatter:cable_industrial");
+		}
+		put(server, 12, up + 3, ze + 1, "wildcatter:cable_industrial");
+		// emergency: out of genset 2 east, up and into the ATS's back (it faces east, so its back is west)
+		put(server, 11, up, ze, "wildcatter:cable_industrial");
+		put(server, 11, up + 1, ze, "wildcatter:cable_industrial");
+		put(server, 11, up + 2, ze, "wildcatter:cable_industrial");
+		put(server, 11, up + 2, ze + 1, "wildcatter:cable_industrial");
+		// the load: out of the ATS's bottom to two heaters
+		put(server, 12, up, ze + 1, "wildcatter:cable_industrial");
+		put(server, 13, up, ze + 1, "wildcatter:cable_industrial");
+		put(server, 14, up, ze + 1, "wildcatter:three_phase_heater");
+		put(server, 13, up, ze + 2, "wildcatter:three_phase_heater");
+		server.computeOnServer(srv -> {
+			BlockPos tank = dev.wildcatter.block.GensetSkid.base(standby, north, false);
+			((dev.wildcatter.block.GensetPartBlockEntity) srv.overworld().getBlockEntity(tank)).setFuel(1000);
+			return null;
+		});
+		startGenset(context, server, normalSet, north, 1000);
+		// the ATS goes in with normal live; its engine-start contact to genset 2's panel by a dot of redstone
+		BlockPos ats = new BlockPos(12, up + 1, ze + 1);
+		placeBig(server, WildcatterBlocks.ATS_480, ats, net.minecraft.core.Direction.EAST);
+		put(server, 11, up, ze + 1, "minecraft:stone");
+		put(server, 11, up + 1, ze + 1, "minecraft:redstone_wire");
+		java.util.function.Supplier<dev.wildcatter.block.TransferSwitchBlockEntity> atsBe = () -> server.computeOnServer(srv ->
+				(dev.wildcatter.block.TransferSwitchBlockEntity) srv.overworld().getBlockEntity(ats));
+		context.waitTicks(100);
+		String onNormal = read(server, ats.getX(), ats.getY(), ats.getZ());
+		System.out.println("[wildcatter-test] ats: " + onNormal + " | " + read(server, standby.getX(), up, standby.getZ()));
+		check(onNormal.contains("on NORMAL") && onNormal.contains("engine start off") && onNormal.matches(".*NORMAL, [2-4]\\d A.*"), "the ATS should feed its load from normal: " + onNormal);
+		check(!read(server, standby.getX(), up, standby.getZ()).contains("RUNNING"), "the standby set should be stopped");
+		server.runCommand("tp @p 18 " + (up + 3) + " " + (ze + 6) + " 120 20");
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-ats");
+		// normal fails: genset 1 stops
+		server.computeOnServer(srv -> {
+			panel(srv, normalSet).setWantRun(false);
+			return null;
+		});
+		String toEmergency = waitFor(context, server, () -> atsBe.get().stage() == dev.wildcatter.block.TransferSwitchBlockEntity.Stage.EMERGENCY, 800);
+		context.waitTicks(20);
+		String onEmergency = read(server, ats.getX(), ats.getY(), ats.getZ());
+		String standbyRun = read(server, standby.getX(), up, standby.getZ());
+		System.out.println("[wildcatter-test] ats: normal lost, " + toEmergency + " | " + onEmergency + " | " + standbyRun);
+		check(toEmergency.startsWith("yes") && onEmergency.contains("on EMERGENCY") && onEmergency.contains("engine start ON") && onEmergency.matches(".*EMERGENCY, [2-4]\\d A.*"),
+				"the ATS should start genset 2 and transfer the load: " + onEmergency);
+		check(standbyRun.contains("RUNNING"), "the standby set should run on the ATS's redstone: " + standbyRun);
+		// normal returns: after TDEN it retransfers, after TDEC it drops the call and genset 2 stops
+		server.computeOnServer(srv -> {
+			panel(srv, normalSet).setWantRun(true);
+			return null;
+		});
+		String back = waitFor(context, server, () -> atsBe.get().stage() == dev.wildcatter.block.TransferSwitchBlockEntity.Stage.TDEC, 1400);
+		String cooling = read(server, ats.getX(), ats.getY(), ats.getZ());
+		System.out.println("[wildcatter-test] ats: normal back, " + back + " | " + cooling);
+		check(back.startsWith("yes") && cooling.contains("on NORMAL") && cooling.contains("engine cooldown"), "the ATS should retransfer after TDEN: " + cooling);
+		String done = waitFor(context, server, () -> atsBe.get().stage() == dev.wildcatter.block.TransferSwitchBlockEntity.Stage.NORMAL, 900);
+		context.waitTicks(40);
+		String settled = read(server, ats.getX(), ats.getY(), ats.getZ());
+		String standbyStopped = read(server, standby.getX(), up, standby.getZ());
+		System.out.println("[wildcatter-test] ats: cooled down, " + done + " | " + settled + " | " + standbyStopped);
+		check(done.startsWith("yes") && settled.contains("engine start off"), "after TDEC the ATS should drop its call: " + settled);
+		check(!standbyStopped.contains("RUNNING"), "genset 2 should stop when the call drops: " + standbyStopped);
+		check(!atsBe.get().paralleled(), "the two sources should never be closed together");
+		System.out.println("[wildcatter-test] ats ok: " + onNormal + " | " + onEmergency + " | " + settled);
 	}
 
 	/** Waits (in client ticks of 10) until {@code done} holds or {@code limit} ticks pass; "yes after N ticks" or "NO after N ticks". */

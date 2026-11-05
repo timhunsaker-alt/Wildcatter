@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SIS",
+    "SBS",
+    "SCS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "I": "minecraft:iron_ingot",
+    "B": "wildcatter:breaker",
+    "C": "minecraft:copper_ingot"
+  },
+  "result": {
+    "id": "wildcatter:load_centre",
+    "count": 1
+  }
+}

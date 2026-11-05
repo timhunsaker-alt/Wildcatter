@@ -61,6 +61,8 @@ How the set is built and used:
   - The 480Y/277 V output terminals are on the control panel's east end face, on both lower cells, where cables enter a
     real breaker box.
   - The readout and the start button are on the panel's north face.
+  - **Remote start (10d3, ats.md):** a redstone signal at the control panel runs the set, and the signal dropping stops it: the
+    two-wire start contact a transfer switch closes. Without redstone the start button works as before.
 - **Fuel and gas:**
   - Diesel fills the tank from any of its cells, by bucket or pipe.
   - The gas line connects to any cell of the gas engine.

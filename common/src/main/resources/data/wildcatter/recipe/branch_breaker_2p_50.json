@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BB",
+    "GG"
+  ],
+  "key": {
+    "B": "wildcatter:breaker",
+    "G": "minecraft:gold_nugget"
+  },
+  "result": {
+    "id": "wildcatter:branch_breaker_2p_50",
+    "count": 1
+  }
+}

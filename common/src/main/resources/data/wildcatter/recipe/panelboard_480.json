@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SBS",
+    "SCS",
+    "SBS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "B": "wildcatter:breaker_3p_industrial",
+    "C": "minecraft:copper_block"
+  },
+  "result": {
+    "id": "wildcatter:panelboard_480",
+    "count": 1
+  }
+}

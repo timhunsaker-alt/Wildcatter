@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "Q",
+    "X",
+    "Q"
+  ],
+  "key": {
+    "Q": "minecraft:quartz",
+    "X": "minecraft:gold_nugget"
+  },
+  "result": {
+    "id": "wildcatter:fuse_e_25",
+    "count": 3
+  }
+}

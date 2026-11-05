@@ -93,6 +93,14 @@ public final class Circuit {
 		network.port(cell(pos), face.ordinal(), conductor.ordinal(), SWITCHGEAR_BUS, node, Tuning.CONTACT_OHMS / 2, false);
 	}
 
+	/** The voltage key of the bus inside a load centre or panelboard and its gutters: only those join on it. */
+	private static final int PANEL_BUS = 67;
+
+	/** A terminal on a panel's bus, on a face where the panel and a gutter, or two gutters, touch. Nothing else joins it. */
+	public void panelBusPort(BlockPos pos, Direction face, Conductor conductor, int node) {
+		network.port(cell(pos), face.ordinal(), conductor.ordinal(), PANEL_BUS, node, Tuning.CONTACT_OHMS / 2, false);
+	}
+
 	/**
 	 * The role and voltage keys of DC (docs/multiblocks/dc-bus.md): a bus bar has no polarity of its own, its voltage is whatever
 	 * the cells along it make it, so every DC terminal is the one role. Nothing AC joins it.

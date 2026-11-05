@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "Q",
+    "X",
+    "Q"
+  ],
+  "key": {
+    "Q": "minecraft:quartz",
+    "X": "minecraft:gold_ingot"
+  },
+  "result": {
+    "id": "wildcatter:fuse_e_100",
+    "count": 3
+  }
+}

@@ -75,6 +75,11 @@ public enum ElectricalStandard {
 		return this == NORTH_AMERICAN ? 59.3 : 49.0;
 	}
 
+	/** A GFCI breaker trips above this hot-to-neutral imbalance: 5 mA (UL 943 Class A); an RCD at 30 mA under IEC. */
+	public double groundFaultTripAmps() {
+		return this == NORTH_AMERICAN ? 0.005 : 0.030;
+	}
+
 	/** A generator trips if the frequency stays below this. */
 	public double generatorLowHertz() {
 		return this == NORTH_AMERICAN ? 57.0 : 47.5;

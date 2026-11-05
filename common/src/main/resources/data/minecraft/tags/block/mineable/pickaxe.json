@@ -336,6 +336,14 @@
     "wildcatter:natural_draft_tower",
     "wildcatter:refuelling_machine",
     "wildcatter:fuel_transfer_system",
-    "wildcatter:spent_fuel_pool"
+    "wildcatter:spent_fuel_pool",
+    "wildcatter:load_centre",
+    "wildcatter:panelboard_480",
+    "wildcatter:panel_gutter",
+    "wildcatter:safety_switch_100",
+    "wildcatter:safety_switch_200",
+    "wildcatter:lis_5kv",
+    "wildcatter:lis_5kv_fused",
+    "wildcatter:ats_480"
   ]
 }

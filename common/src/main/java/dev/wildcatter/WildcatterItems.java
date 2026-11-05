@@ -224,6 +224,61 @@ public final class WildcatterItems {
 		}
 	}
 
+	// ---- 10d3: branch breakers and cartridge fuses (docs/multiblocks/panelboards.md, safety-switch.md, load-interrupter.md) ----
+	/** The branch breakers, by item name: one per rating. Load-centre ones are the LOW tier, panelboard ones the INDUSTRIAL tier. */
+	public static final java.util.Map<String, dev.wildcatter.item.BranchBreakerItem> BRANCH_BREAKERS = new java.util.LinkedHashMap<>();
+	/** The cartridge fuses, by item name: class J for the safety switch, E-rated for the fused load-interrupter. */
+	public static final java.util.Map<String, dev.wildcatter.item.CartridgeFuseItem> CARTRIDGE_FUSES = new java.util.LinkedHashMap<>();
+
+	static {
+		branch("branch_breaker_1p_15", Voltage.LOW, 15, 1, false);
+		branch("branch_breaker_1p_20", Voltage.LOW, 20, 1, false);
+		branch("branch_breaker_2p_30", Voltage.LOW, 30, 2, false);
+		branch("branch_breaker_2p_50", Voltage.LOW, 50, 2, false);
+		branch("gfci_breaker_1p_20", Voltage.LOW, 20, 1, true);
+		branch("branch_breaker_277_1p_20", Voltage.INDUSTRIAL, 20, 1, false);
+		branch("branch_breaker_480_3p_20", Voltage.INDUSTRIAL, 20, 3, false);
+		branch("branch_breaker_480_3p_30", Voltage.INDUSTRIAL, 30, 3, false);
+		branch("branch_breaker_480_3p_60", Voltage.INDUSTRIAL, 60, 3, false);
+		branch("branch_breaker_480_3p_100", Voltage.INDUSTRIAL, 100, 3, false);
+		for (int amps : new int[] {30, 60, 100, 200}) {
+			fuse("fuse_class_j_" + amps, dev.wildcatter.item.CartridgeFuseItem.Kind.CLASS_J, amps);
+		}
+		for (int amps : new int[] {10, 25, 50, 100, 200}) {
+			fuse("fuse_e_" + amps, dev.wildcatter.item.CartridgeFuseItem.Kind.E_RATED, amps);
+		}
+	}
+
+	private static void branch(String name, Voltage tier, int amps, int poles, boolean gfci) {
+		BRANCH_BREAKERS.put(name, new dev.wildcatter.item.BranchBreakerItem(new Item.Properties().stacksTo(16)
+				.setId(ResourceKey.create(Registries.ITEM, Wildcatter.id(name))), tier, amps, poles, gfci));
+	}
+
+	private static void fuse(String name, dev.wildcatter.item.CartridgeFuseItem.Kind kind, int amps) {
+		CARTRIDGE_FUSES.put(name, new dev.wildcatter.item.CartridgeFuseItem(new Item.Properties().stacksTo(16)
+				.setId(ResourceKey.create(Registries.ITEM, Wildcatter.id(name))), kind, amps));
+	}
+
+	/** The branch-breaker item of this kind, or null if there is none. */
+	public static dev.wildcatter.item.BranchBreakerItem branchBreaker(Voltage tier, int amps, int poles, boolean gfci) {
+		for (dev.wildcatter.item.BranchBreakerItem item : BRANCH_BREAKERS.values()) {
+			if (item.tier() == tier && item.amps() == amps && item.poles() == poles && item.gfci() == gfci) {
+				return item;
+			}
+		}
+		return null;
+	}
+
+	/** The cartridge-fuse item of this kind and rating, or null if there is none. */
+	public static dev.wildcatter.item.CartridgeFuseItem cartridgeFuse(dev.wildcatter.item.CartridgeFuseItem.Kind kind, int amps) {
+		for (dev.wildcatter.item.CartridgeFuseItem item : CARTRIDGE_FUSES.values()) {
+			if (item.kind() == kind && item.amps() == amps) {
+				return item;
+			}
+		}
+		return null;
+	}
+
 	private static Item spool(String name, Voltage tier, boolean covered) {
 		ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, Wildcatter.id(name));
 		return new SpoolItem(new Item.Properties().durability(Tuning.SPOOL_SPAN_BLOCKS).setId(key), tier, covered);
@@ -291,6 +346,8 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, MCC_DRIVE_BUCKET_KEY, MCC_DRIVE_BUCKET);
 		Registry.register(BuiltInRegistries.ITEM, TOP_DRIVE_KEY, TOP_DRIVE);
 		PARTS.forEach((name, item) -> Registry.register(BuiltInRegistries.ITEM, ResourceKey.create(Registries.ITEM, Wildcatter.id(name)), item));
+		BRANCH_BREAKERS.forEach((name, item) -> Registry.register(BuiltInRegistries.ITEM, ResourceKey.create(Registries.ITEM, Wildcatter.id(name)), item));
+		CARTRIDGE_FUSES.forEach((name, item) -> Registry.register(BuiltInRegistries.ITEM, ResourceKey.create(Registries.ITEM, Wildcatter.id(name)), item));
 		registerSpool("conductor_spool_lv", SPOOL_LV);
 		registerSpool("conductor_spool_dist", SPOOL_DIST);
 		registerSpool("conductor_spool_hv", SPOOL_HV);

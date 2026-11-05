@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "Q",
+    "X",
+    "Q"
+  ],
+  "key": {
+    "Q": "minecraft:quartz",
+    "X": "minecraft:copper_block"
+  },
+  "result": {
+    "id": "wildcatter:fuse_e_200",
+    "count": 3
+  }
+}

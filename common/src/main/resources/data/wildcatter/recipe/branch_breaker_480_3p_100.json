@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "T",
+    "K"
+  ],
+  "key": {
+    "T": "wildcatter:breaker_3p_industrial",
+    "K": "minecraft:copper_block"
+  },
+  "result": {
+    "id": "wildcatter:branch_breaker_480_3p_100",
+    "count": 1
+  }
+}

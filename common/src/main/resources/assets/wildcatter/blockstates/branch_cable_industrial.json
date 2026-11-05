@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "axis=z": {
+      "model": "wildcatter:block/branch_cable_industrial"
+    },
+    "axis=x": {
+      "model": "wildcatter:block/branch_cable_industrial",
+      "y": 90
+    },
+    "axis=y": {
+      "model": "wildcatter:block/branch_cable_industrial",
+      "x": 90
+    }
+  }
+}

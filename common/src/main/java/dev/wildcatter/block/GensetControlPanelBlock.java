@@ -182,6 +182,23 @@ public class GensetControlPanelBlock extends BaseEntityBlock implements BigPart 
 		return InteractionResult.SUCCESS;
 	}
 
+	/** Remote start: a redstone signal at any of the panel's cells runs the set (docs/multiblocks/ats.md). */
+	@Override
+	protected void neighborChanged(BlockState state, Level level, BlockPos pos, net.minecraft.world.level.block.Block neighborBlock,
+			net.minecraft.world.level.redstone.@org.jspecify.annotations.Nullable Orientation orientation, boolean movedByPiston) {
+		if (level.isClientSide()) {
+			return;
+		}
+		BlockPos main = BigParts.main(pos, state);
+		if (level.getBlockEntity(main) instanceof GensetControlPanelBlockEntity panel) {
+			boolean signal = false;
+			for (BlockPos cell : BigParts.cells(main, level.getBlockState(main))) {
+				signal |= level.hasNeighborSignal(cell);
+			}
+			panel.redstone(signal);
+		}
+	}
+
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return state.getValue(piece) == 0 ? new GensetControlPanelBlockEntity(pos, state) : null;

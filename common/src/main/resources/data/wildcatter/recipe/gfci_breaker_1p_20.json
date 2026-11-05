@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "B",
+    "R"
+  ],
+  "key": {
+    "B": "wildcatter:breaker",
+    "R": "minecraft:comparator"
+  },
+  "result": {
+    "id": "wildcatter:gfci_breaker_1p_20",
+    "count": 1
+  }
+}

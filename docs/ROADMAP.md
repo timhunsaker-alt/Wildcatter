@@ -283,6 +283,11 @@ and the Field Manual has a page for each new system.
     - a 200 A 120/240 V load centre and a 480Y/277 V panelboard with clip-in branch breakers;
     - a 480 V fused safety switch and a 5 kV load-interrupter switch;
     - an automatic transfer switch.
+    - Specs: `docs/multiblocks/panelboards.md`, `safety-switch.md`, `load-interrupter.md`, `ats.md`.
+    - Decided with Tim on 2026-11-04 (the 10d3 plan): true-size panels with gutter blocks, one branch space each, the circuit out
+      of the gutter's front; one branch-breaker item per rating; a GFCI breaker; an open-transition 480 V 3-pole ATS that starts a
+      genset by redstone (the genset gets a redstone remote start); cartridge fuse items in the safety switch; a fused and a plain
+      5 kV load-interrupter.
   - **10d4: art and sounds:**
     - better wire, ground and breaker art;
     - the Ludo sound sources kept.

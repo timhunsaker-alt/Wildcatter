@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SLS",
+    "SXS",
+    "SQS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "L": "minecraft:lever",
+    "X": "minecraft:copper_block",
+    "Q": "minecraft:quartz_block"
+  },
+  "result": {
+    "id": "wildcatter:lis_5kv_fused",
+    "count": 1
+  }
+}

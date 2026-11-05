@@ -84,10 +84,19 @@ public class MultiCableBlock extends BaseEntityBlock {
 		neighborChanged(state, level, pos, this, null, movedByPiston);
 	}
 
+	/** Whether it has terminals on {@code face}: a cable on every face, a branch cable only at its ends. */
+	public boolean joins(BlockState state, Direction face) {
+		return true;
+	}
+
 	/** An arm toward every neighbour with a terminal of any conductor at this voltage. */
 	private BlockState withArms(BlockState state, BlockGetter level, BlockPos pos) {
 		for (Direction side : Direction.values()) {
 			boolean joins = false;
+			if (!joins(state, side)) {
+				state = state.setValue(WireShape.ARMS.get(side), false);
+				continue;
+			}
 			for (Conductor conductor : Conductor.values()) {
 				joins |= CircuitPart.portAt(level, pos.relative(side), side.getOpposite(), conductor, voltage);
 			}

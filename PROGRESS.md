@@ -491,6 +491,40 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - **Recommended mods:** `docs/recommended-mods.md` lists the quality-of-life mods with 26.3 builds for Fabric and NeoForge.
   - The Fabric set ran the `coker` and `anodes` scenes alongside Wildcatter, Sodium included, and both passed.
 
+## Phase 10d3: panels and switches (specs: docs/multiblocks/panelboards.md, safety-switch.md, load-interrupter.md, ats.md)
+- **Load centre and panelboard** (`load_centre` 1 x 1 x 1, 200 A main, 40 spaces, 120/240 V; `panelboard_480` 1 x 2 x 1, 225 A
+  main, 42 spaces, 480Y/277 V), on a wall, the service in on the top or back:
+  - **gutters** (`panel_gutter`) set beside the panel each hold one branch space (decided with Tim, 2026-11-04); the chain runs up,
+    down or sideways, its spaces numbered from the panel, each space's stab alternating A, B (A, B, C on the panelboard);
+  - **branch breakers**, one item per rating: 1-pole 15 and 20 A, 2-pole 30 and 50 A, a 1-pole 20 A GFCI (5 mA; an RCD at 30 mA
+    under IEC), and on the panelboard a 1-pole 277 V 20 A and 3-pole 20, 30, 60 and 100 A. Thermal-magnetic, the one-block
+    breaker's curve; the GFCI compares the hot current with the neutral coming back through it;
+  - **branch cable** (`branch_cable`, `branch_cable_industrial`): armored cable laid along one axis that joins only at its two
+    ends, so the runs out of neighbouring gutters stay apart (asked of Tim while building).
+- **480 V fused safety switches** (`safety_switch_100` and `_200`): three class J time-delay fuse items (30, 60, 100, 200 A; 500 % for
+  10 s), fitted and pulled only with the handle OFF; a blown fuse opens its own phase and the switch names it.
+- **5 kV load-interrupter switches** (`lis_5kv`, `lis_5kv_fused`, 1 x 3 x 2): 600 A load-break, fault-close; opened over that it is
+  wrecked in an arc flash. The fused one takes E-rated fuses (10E to 200E; 300 s at 220 %, current-limiting above 20 x).
+- **Automatic transfer switch** (`ats_480`, 1 x 2 x 1, 400 A, open transition): normal fails below 85 %; TDES 3 s, then a redstone
+  engine-start signal; emergency acceptable at 90 % and 95 % of frequency; TDNE 1 s, a 1 s neutral position; retransfer after TDEN
+  30 s, cooldown TDEC 30 s (both scaled from 30 min and 5 min). A sneak right-click runs a test.
+- **Genset remote start:** a redstone signal at the control panel runs the set; its dropping stops it.
+- **Field Manual:** new pages LOAD CENTRE AND PANELBOARD, SAFETY SWITCH, LOAD-INTERRUPTER SWITCH, TRANSFER SWITCH; GENSETS gains
+  remote start.
+- **Game test `panels`:**
+  - a pole unit feeds a load centre with four gutters; the spaces read A, B, A-B, B; the 2-pole reads 239 V across its poles;
+  - a 15 A breaker on two heaters trips on overload at 24 A after 160 ticks, the main staying on;
+  - grounds on the GFCI's branch trip it on ground fault; space 1 stays on;
+  - on a genset's 480 V, a panelboard's 3-pole 30 A trips at 53.7 A after 110 ticks, and its 277 V breaker trips at 7,497 A;
+  - a safety switch carries its 15 kW heater at 18 A; a fault on its load blows its fuses; a fuse won't fit with the handle ON;
+    new fuses bring the heater back;
+  - a fused LIS (10E) and a plain LIS carry 4 A at 4.16 kV; the plain one opens its load, and opened over a lowered load-break
+    rating it is wrecked; a fault between them blows the fused one's fuses, the genset staying on.
+- **Game test `ats`:** genset 1 normal, genset 2 standby on the ATS's redstone; genset 1 stopped, the load is on emergency in 310
+  ticks; genset 1 back, it retransfers after TDEN and genset 2 stops after TDEC; the two sources were never closed together.
+- **ModelLint** allows a one-cell part's blockstate to list piece 0 and 1 (the piece property's two values); `BigParts.shape`
+  clamps the piece for it.
+
 ## Phase 10d2: true-size gear; the one-block stand-ins removed (specs: docs/multiblocks/mv-switchgear.md, breaker-relay-cabinet.md, power-transformer-10.md, poles.md)
 - **Removed outright** (decided with Tim, 2026-11-04): `mv_breaker`, `dist_breaker`, `hv_breaker`, `ufls_relay_dist`, `transformer`
   and `substation_transformer`. Older worlds lose them. Recipes that took them now take the new parts.
@@ -1388,6 +1422,15 @@ sized for a 40-pot line.
   - the bus bars' standoffs stand on the floor of their own cell, so a run carried up in the air shows them hanging (no
     supports or structure yet);
   - the chlor-alkali caustic soda is still only counted (fixed in 10b2: it is a pipe product).
+- Phase 10d3:
+  - no arc-fault (AFCI) breakers: arcing isn't modelled;
+  - a shock to a player isn't current in the circuit, so it doesn't trip a GFCI;
+  - the ATS timers are scaled down from the real defaults; no closed transition or in-phase monitor; the solver gives one
+    frequency to a connected group, so the ATS checks frequency only for emergency;
+  - no breaker or fuse coordination study, no let-through (I²t) of current-limiting fuses, no series ratings;
+  - the branch breaker and fuse items have `*_placeholder` textures (`branch_breaker_placeholder`, `gfci_breaker_placeholder`,
+    `panelboard_breaker_placeholder`, `fuse_class_j_placeholder`, `fuse_e_placeholder`);
+  - the panels' and gutters' handles show on, off and tripped only on the gutters; the panel's main handle is not drawn by state.
 - Phase 10d2:
   - racking is instant: no racking time and no remote racking;
   - no breaker failure protection (50BF): a breaker always opens when its relay trips it;

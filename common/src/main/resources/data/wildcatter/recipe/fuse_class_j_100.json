@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "P",
+    "X",
+    "P"
+  ],
+  "key": {
+    "P": "minecraft:paper",
+    "X": "minecraft:gold_ingot"
+  },
+  "result": {
+    "id": "wildcatter:fuse_class_j_100",
+    "count": 3
+  }
+}

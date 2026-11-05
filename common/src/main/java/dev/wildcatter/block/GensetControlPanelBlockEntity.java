@@ -173,6 +173,25 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		setChanged();
 	}
 
+	/** The redstone at the panel last time it looked: a remote start runs or stops the set only when the signal changes. */
+	private boolean remoteSignal;
+
+	/**
+	 * Remote start (docs/multiblocks/ats.md): a redstone signal at the panel runs the set and its dropping stops it, as a transfer
+	 * switch's two-wire engine-start contact does. Only a change counts, so the start button still works with no redstone.
+	 */
+	public void redstone(boolean signal) {
+		if (signal != remoteSignal) {
+			remoteSignal = signal;
+			wantRun = signal;
+			setChanged();
+		}
+	}
+
+	public boolean remoteSignal() {
+		return remoteSignal;
+	}
+
 	// ---- every tick -----------------------------------------------------------------------------------------------
 	public static void tick(Level level, BlockPos pos, BlockState state, GensetControlPanelBlockEntity panel) {
 		if (!(level instanceof ServerLevel server)) {
@@ -556,6 +575,7 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		output.putBoolean("gas", gas);
 		output.putString("run", run.name());
 		output.putBoolean("wantRun", wantRun);
+		output.putBoolean("remoteSignal", remoteSignal);
 		output.putBoolean("breaker", breakerClosed);
 		output.putBoolean("tripped", tripped);
 		output.putString("tripReason", tripReason);
@@ -577,6 +597,7 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 			run = Run.STOPPED;
 		}
 		wantRun = input.getBooleanOr("wantRun", false);
+		remoteSignal = input.getBooleanOr("remoteSignal", false);
 		breakerClosed = input.getBooleanOr("breaker", false);
 		tripped = input.getBooleanOr("tripped", false);
 		tripReason = input.getStringOr("tripReason", "");

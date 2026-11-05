@@ -36,7 +36,7 @@ public final class Masses {
 		if (has(id, "turbine", "generator", "compressor", "pump", "mill", "fan", "blower", "engine", "alternator")) {
 			return 0.4;
 		}
-		if (has(id, "breaker", "switchgear", "cabinet", "starter", "mcc", "drive_", "control", "panel", "relay")) {
+		if (has(id, "breaker", "switchgear", "cabinet", "starter", "mcc", "drive_", "control", "panel", "relay", "load_centre", "gutter", "safety_switch", "lis_", "ats_")) {
 			return 0.3;
 		}
 		if (has(id, "tower", "stack", "derrick", "rig", "house", "filter", "quench")) {

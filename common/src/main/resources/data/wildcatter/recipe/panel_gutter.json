@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SSS",
+    "C C",
+    "SSS"
+  ],
+  "key": {
+    "S": "minecraft:iron_ingot",
+    "C": "minecraft:copper_ingot"
+  },
+  "result": {
+    "id": "wildcatter:panel_gutter",
+    "count": 4
+  }
+}

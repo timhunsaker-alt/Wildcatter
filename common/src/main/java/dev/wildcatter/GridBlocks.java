@@ -246,4 +246,32 @@ public interface GridBlocks {
 	/** 10 MVA, 4.16 kV delta / 138 kV grounded wye, 7.5 %Z, 5 x 5 x 4 (docs/multiblocks/power-transformer-10.md). */
 	Block SUBSTATION_TRANSFORMER_10 = block("substation_transformer_10", props -> new dev.wildcatter.block.PowerTransformer10Block(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.MEDIUM, Voltage.HIGH, Tuning.STEP_UP_10_VA, Tuning.STEP_UP_10_PERCENT_Z));
+	// ---- 10d3: panels and switches ---------------------------------------------------------------------------------------------------
+	/** A 200 A, 40-space 120/240 V load centre, 1 x 1 x 1 on a wall (docs/multiblocks/panelboards.md). */
+	Block LOAD_CENTRE = block("load_centre", props -> new dev.wildcatter.block.PanelBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(2.5F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.LOW, 1, Tuning.LOAD_CENTRE_MAIN_AMPS, Tuning.LOAD_CENTRE_SPACES, "load_centre"));
+	/** A 225 A, 42-circuit 480Y/277 V panelboard, 1 x 2 x 1 on a wall. */
+	Block PANELBOARD_480 = block("panelboard_480", props -> new dev.wildcatter.block.PanelBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.INDUSTRIAL, 2, Tuning.PANELBOARD_MAIN_AMPS, Tuning.PANELBOARD_SPACES, "panelboard_480"));
+	/** A gutter beside a panel: one branch-breaker space, its circuit out of its front face. */
+	Block PANEL_GUTTER = block("panel_gutter", props -> new dev.wildcatter.block.PanelGutterBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(2.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+	/** Heavy-duty 480 V fusible safety switches with class J fuses (docs/multiblocks/safety-switch.md). */
+	Block SAFETY_SWITCH_100 = block("safety_switch_100", props -> new dev.wildcatter.block.SafetySwitchBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(2.5F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), 1, 100, "safety_switch_100"));
+	Block SAFETY_SWITCH_200 = block("safety_switch_200", props -> new dev.wildcatter.block.SafetySwitchBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(2.5F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), 2, 200, "safety_switch_200"));
+	/** 5 kV metal-enclosed load-interrupter switches, 1 x 3 x 2, plain and fused (docs/multiblocks/load-interrupter.md). */
+	Block LIS_5KV = block("lis_5kv", props -> new dev.wildcatter.block.LoadInterrupterBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(3.5F, 7.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), false, "lis_5kv"));
+	Block LIS_5KV_FUSED = block("lis_5kv_fused", props -> new dev.wildcatter.block.LoadInterrupterBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(3.5F, 7.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), true, "lis_5kv_fused"));
+	/** A 400 A, 480 V open-transition automatic transfer switch, 1 x 2 x 1 on a wall (docs/multiblocks/ats.md). */
+	Block ATS_480 = block("ats_480", props -> new dev.wildcatter.block.TransferSwitchBlock(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+	/** Branch-circuit cable out of a panel gutter: armored, five conductors, joined only at its two ends (docs/multiblocks/panelboards.md). */
+	Block BRANCH_CABLE = block("branch_cable", props -> new dev.wildcatter.block.BranchCableBlock(props.mapColor(MapColor.METAL)
+			.strength(0.8F).sound(SoundType.METAL).noOcclusion(), Voltage.LOW));
+	Block BRANCH_CABLE_INDUSTRIAL = block("branch_cable_industrial", props -> new dev.wildcatter.block.BranchCableBlock(props.mapColor(MapColor.METAL)
+			.strength(0.8F).sound(SoundType.METAL).noOcclusion(), Voltage.INDUSTRIAL));
 }

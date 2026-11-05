@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SLS",
+    "SFS",
+    "SFS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "L": "minecraft:lever",
+    "F": "wildcatter:fuse"
+  },
+  "result": {
+    "id": "wildcatter:safety_switch_200",
+    "count": 1
+  }
+}

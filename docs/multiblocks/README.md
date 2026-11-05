@@ -43,6 +43,10 @@ not a go-ahead to build: that waits for the roadmap phase (ROADMAP.md). Nothing 
 | [mv-switchgear.md](mv-switchgear.md) | 10d2 | one-block `mv_breaker`: 4.16 kV metal-clad main and feeder sections |
 | [breaker-relay-cabinet.md](breaker-relay-cabinet.md) | 10d2 | one-block `dist_breaker`, `hv_breaker` and `ufls_relay_dist` |
 | [power-transformer-10.md](power-transformer-10.md) | 10d2 | one-block `substation_transformer` (and the one-block `transformer`, by the 4.16 kV pole unit in poles.md) |
+| [panelboards.md](panelboards.md) | 10d3 | new: 120/240 V load centre, 480Y/277 V panelboard, gutters and clip-in branch breakers (GFCI) |
+| [safety-switch.md](safety-switch.md) | 10d3 | new: 480 V fused safety switches with class J fuses |
+| [load-interrupter.md](load-interrupter.md) | 10d3 | new: 5 kV load-interrupter switches, plain and fused (E-rated fuses) |
+| [ats.md](ats.md) | 10d3 | new: 480 V open-transition automatic transfer switch; the genset's redstone remote start |
 | [aeroderivative.md](aeroderivative.md) | 6b | new: 45 MW aeroderivative peaker, 3,000 A generator breaker, 60 MVA GSU and 60 MVA substation transformer |
 
 ## Shared rules

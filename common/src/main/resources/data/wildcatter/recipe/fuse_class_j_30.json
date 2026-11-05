@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "P",
+    "X",
+    "P"
+  ],
+  "key": {
+    "P": "minecraft:paper",
+    "X": "minecraft:iron_nugget"
+  },
+  "result": {
+    "id": "wildcatter:fuse_class_j_30",
+    "count": 3
+  }
+}

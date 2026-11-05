@@ -18,6 +18,9 @@ frequency, protection) is in `docs/ELECTRICAL_MODEL.md`. What is built, phase by
   - 4.16 kV metal-clad switchgear (main and feeder sections, draw-out breakers that rack, 50/51 with a settable pickup); a breaker
     relay cabinet (50/51, 81U) for a standalone 12.47 kV or 138 kV breaker; a 25 kVA 4.16 kV pole transformer and a 10 MVA
     4.16/138 kV power transformer (10d2).
+  - A 120/240 V load centre and a 480Y/277 V panelboard with gutters and clip-in branch breakers (GFCI too) and an armored branch
+    cable; 480 V fused safety switches with class J fuses; 5 kV load-interrupter switches, plain and fused; a 480 V automatic
+    transfer switch that starts a standby genset by redstone (10d3).
 - **Gensets and synchronizing:** diesel and gas gensets built part by part, paralleled with a synchroscope. Motors, MCCs and
   starters; soft starters and variable-frequency drives at 480 V and 4.16 kV (10a).
 - **DC:** current-regulated rectifiers and bare copper bus bars to the electrolysis cells, on the same solver: shorts, ground
@@ -144,7 +147,7 @@ datapack (`wildcatter_kit.zip`) as a Release. Every push also builds and keeps t
   - `refining` (the 4.16 kV tier).
 - **The grid:**
   - `frequency`, `distribution`, `spans`, `poleTransformer`, `serviceDrop`, `plugs`;
-  - `feederRelay`, `threePhase`, `solverBudget`, `overheadThreePhase`, `conductorSizes`, `busProtection`, `switchgear`.
+  - `feederRelay`, `threePhase`, `solverBudget`, `overheadThreePhase`, `conductorSizes`, `busProtection`, `switchgear`, `panels`, `ats`.
 - **Industry and motors:** `industrial`, `motors`, `motorControlCenter`, `motorStarter`, `statorLimit`.
 - **Gensets:** `gensets`, `synchronizing`, `gensetParts`, `gensetFrameRate`.
 - **Thermal power and parts:**

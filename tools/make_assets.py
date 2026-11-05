@@ -2412,6 +2412,78 @@ for name, where in _placements.items():
 	save_json(f"{NF_MODIFIERS}/{name}.json", {"type": "neoforge:add_features", "biomes": _holder_set(ORE_BIOMES[where]),
 		"features": f"{ns}:{name}", "step": "underground_ores"})
 
+# ---- Phase 10d3: panels and switches (docs/multiblocks/panelboards.md, safety-switch.md, load-interrupter.md, ats.md) ----------------
+# the parts' blockstates, models, shapes and items come from tools/models/panels.py; here loot, tags, recipes, names and the branch
+# breaker and fuse items (their textures placeholders until 10d4's art). Last in the file, so its placeholders shift no other's noise.
+D3_PARTS = ("load_centre", "panelboard_480", "panel_gutter", "safety_switch_100", "safety_switch_200", "lis_5kv", "lis_5kv_fused", "ats_480")
+for name in D3_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in D3_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("load_centre", ["SIS", "SBS", "SCS"], {"S": S_, "I": "minecraft:iron_ingot", "B": f"{ns}:breaker", "C": "minecraft:copper_ingot"}, "load_centre")
+shaped("panelboard_480", ["SBS", "SCS", "SBS"], {"S": S_, "B": f"{ns}:breaker_3p_industrial", "C": "minecraft:copper_block"}, "panelboard_480")
+shaped("panel_gutter", ["SSS", "C C", "SSS"], {"S": "minecraft:iron_ingot", "C": "minecraft:copper_ingot"}, "panel_gutter", 4)
+shaped("safety_switch_100", ["SLS", "SFS", "SSS"], {"S": S_, "L": "minecraft:lever", "F": f"{ns}:fuse"}, "safety_switch_100")
+shaped("safety_switch_200", ["SLS", "SFS", "SFS"], {"S": S_, "L": "minecraft:lever", "F": f"{ns}:fuse"}, "safety_switch_200")
+shaped("lis_5kv", ["SLS", "SXS", "SSS"], {"S": S_, "L": "minecraft:lever", "X": "minecraft:copper_block"}, "lis_5kv")
+shaped("lis_5kv_fused", ["SLS", "SXS", "SQS"], {"S": S_, "L": "minecraft:lever", "X": "minecraft:copper_block", "Q": "minecraft:quartz_block"}, "lis_5kv_fused")
+shaped("ats_480", ["SRS", "SBS", "SPS"], {"S": S_, "R": "minecraft:comparator", "B": f"{ns}:breaker_3p_industrial", "P": "minecraft:repeater"}, "ats_480")
+BRANCH = {   # item: (its name, its recipe, its placeholder)
+	"branch_breaker_1p_15": ("Branch Breaker, 1-Pole 15 A", (["B", "N"], {"B": f"{ns}:breaker", "N": "minecraft:iron_nugget"}), "branch_breaker"),
+	"branch_breaker_1p_20": ("Branch Breaker, 1-Pole 20 A", (["B", "G"], {"B": f"{ns}:breaker", "G": "minecraft:gold_nugget"}), "branch_breaker"),
+	"branch_breaker_2p_30": ("Branch Breaker, 2-Pole 30 A", (["BB", "NN"], {"B": f"{ns}:breaker", "N": "minecraft:iron_nugget"}), "branch_breaker"),
+	"branch_breaker_2p_50": ("Branch Breaker, 2-Pole 50 A", (["BB", "GG"], {"B": f"{ns}:breaker", "G": "minecraft:gold_nugget"}), "branch_breaker"),
+	"gfci_breaker_1p_20": ("GFCI Breaker, 1-Pole 20 A", (["B", "R"], {"B": f"{ns}:breaker", "R": "minecraft:comparator"}), "gfci_breaker"),
+	"branch_breaker_277_1p_20": ("Panelboard Breaker, 1-Pole 20 A", (["T", "N"], {"T": f"{ns}:breaker_3p_industrial", "N": "minecraft:iron_nugget"}), "panelboard_breaker"),
+	"branch_breaker_480_3p_20": ("Panelboard Breaker, 3-Pole 20 A", (["T", "G"], {"T": f"{ns}:breaker_3p_industrial", "G": "minecraft:gold_nugget"}), "panelboard_breaker"),
+	"branch_breaker_480_3p_30": ("Panelboard Breaker, 3-Pole 30 A", (["T", "C"], {"T": f"{ns}:breaker_3p_industrial", "C": "minecraft:copper_ingot"}), "panelboard_breaker"),
+	"branch_breaker_480_3p_60": ("Panelboard Breaker, 3-Pole 60 A", (["T", "I"], {"T": f"{ns}:breaker_3p_industrial", "I": "minecraft:iron_ingot"}), "panelboard_breaker"),
+	"branch_breaker_480_3p_100": ("Panelboard Breaker, 3-Pole 100 A", (["T", "K"], {"T": f"{ns}:breaker_3p_industrial", "K": "minecraft:copper_block"}), "panelboard_breaker"),
+}
+FUSE_MID = {10: "minecraft:iron_nugget", 25: "minecraft:gold_nugget", 30: "minecraft:iron_nugget", 50: "minecraft:copper_ingot", 60: "minecraft:gold_nugget",
+	100: "minecraft:gold_ingot", 200: "minecraft:copper_block"}
+for amps in (30, 60, 100, 200):
+	BRANCH[f"fuse_class_j_{amps}"] = (f"Class J Fuse, {amps} A", (["P", "X", "P"], {"P": "minecraft:paper", "X": FUSE_MID[amps if amps != 100 else 100]}), "fuse_class_j")
+for amps in (10, 25, 50, 100, 200):
+	BRANCH[f"fuse_e_{amps}"] = (f"E-Rated Power Fuse, {amps}E", (["Q", "X", "Q"], {"Q": "minecraft:quartz", "X": FUSE_MID[amps]}), "fuse_e")
+PLACEHOLDERS = {"branch_breaker": (40, 42, 46), "gfci_breaker": (220, 220, 214), "panelboard_breaker": (70, 74, 80), "fuse_class_j": (190, 160, 100),
+	"fuse_e": (200, 196, 186)}
+for kind, colour in PLACEHOLDERS.items():
+	tex(f"{kind}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (title, (pattern, key), kind) in BRANCH.items():
+	shaped(item, pattern, key, item, 3 if kind.startswith("fuse") else 1)
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{kind}_placeholder"}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = title
+lang[f"block.{ns}.load_centre"] = "Load Centre (residential, 200 A)"
+lang[f"block.{ns}.panelboard_480"] = "Panelboard (industrial LV, 225 A)"
+lang[f"block.{ns}.panel_gutter"] = "Panel Gutter (one branch space)"
+lang[f"block.{ns}.safety_switch_100"] = "Fused Safety Switch (industrial LV, 100 A)"
+lang[f"block.{ns}.safety_switch_200"] = "Fused Safety Switch (industrial LV, 200 A)"
+lang[f"block.{ns}.lis_5kv"] = "Load-Interrupter Switch (MV)"
+lang[f"block.{ns}.lis_5kv_fused"] = "Fused Load-Interrupter Switch (MV)"
+lang[f"block.{ns}.ats_480"] = "Automatic Transfer Switch (industrial LV, 400 A)"
+# the branch cable: armored cable along one axis, joined only at its ends; one model, turned for x and y. Industrial is
+# jacketed darker so the two tiers can be told apart.
+for cable, jacket in (("branch_cable", "block/mat/mat_galvanized"), ("branch_cable_industrial", "block/mat/mat_oil_dark")):
+	save_json(f"{ASSETS}/models/block/{cable}.json", {"parent": "minecraft:block/block", "textures": {"particle": f"{ns}:{jacket}", "side": f"{ns}:{jacket}"},
+		"elements": [{"from": [6.5, 6.5, 0], "to": [9.5, 9.5, 16], "faces": {f: {"texture": "#side", "uv": [0, 0, 3, 16] if f in ("north", "south") else [0, 0, 16, 3]}
+			for f in ("north", "south", "east", "west", "up", "down")}}]})
+	save_json(f"{ASSETS}/blockstates/{cable}.json", {"variants": {"axis=z": {"model": f"{ns}:block/{cable}"},
+		"axis=x": {"model": f"{ns}:block/{cable}", "y": 90}, "axis=y": {"model": f"{ns}:block/{cable}", "x": 90}}})
+	save_json(f"{ASSETS}/items/{cable}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{cable}"}})
+	save_json(f"{DATA}/loot_table/blocks/{cable}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{cable}"}],
+		"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+shaped("branch_cable", ["I", "C", "I"], {"I": "minecraft:iron_nugget", "C": f"{ns}:cable_lv"}, "branch_cable", 3)
+shaped("branch_cable_industrial", ["I", "C", "I"], {"I": "minecraft:iron_nugget", "C": f"{ns}:cable_industrial"}, "branch_cable_industrial", 3)
+lang[f"block.{ns}.branch_cable"] = "Branch Cable (armored, residential)"
+lang[f"block.{ns}.branch_cable_industrial"] = "Branch Cable (armored, industrial LV)"
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

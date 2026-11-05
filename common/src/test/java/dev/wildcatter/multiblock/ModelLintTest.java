@@ -80,7 +80,8 @@ class ModelLintTest {
 				// one look per piece facing north; a part with more states (an MCC section's buckets) has several looks of each piece
 				long northPieces = variants.keySet().stream().filter(k -> k.contains("facing=north"))
 						.map(k -> java.util.Arrays.stream(k.split(",")).filter(p -> p.startsWith("piece=")).findFirst().orElse(k)).distinct().count();
-				assertEquals(northPieces, pieces.size(), name + ": one shape list per piece");
+				// a one-cell part's piece property still runs 0 to 1 (BigParts.pieceProperty), so its blockstate lists both
+				assertEquals(pieces.size() == 1 && northPieces == 2 ? 1 : northPieces, pieces.size(), name + ": one shape list per piece");
 				for (JsonElement piece : pieces) {
 					for (JsonElement box : piece.getAsJsonArray()) {
 						for (JsonElement v : box.getAsJsonArray()) {
