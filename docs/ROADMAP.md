@@ -181,7 +181,7 @@ and the Field Manual has a page for each new system.
   - testers' builds: a tag `v*` publishes a GitHub Release with both jars and the kit datapack; `dist/` stays;
   - the first release, v0.2.0, at the end of Phase 9.
 
-## Phase 10 — Machines and grid at scale — CURRENT (picked by Tim 2026-11-02, from Ideas)
+## Phase 10 — Machines and grid at scale — DONE 2026-11-05 (picked by Tim 2026-11-02, from Ideas)
 - **10a: soft starters and drives for big motors** — DONE 2026-11-03 (specs: `docs/multiblocks/soft-starter.md`, `vfd.md`).
   - **Gear:** real cabinets wired between the breaker and the motor, at 480 V (standalone cabinets and MCC buckets) and 4.16 kV
     (a true-size soft-starter cabinet and a drive lineup).
@@ -315,19 +315,19 @@ and the Field Manual has a page for each new system.
   - these 4, in this order;
   - for 10a, real separate cabinets at 480 V and 4.16 kV, with the values above.
 
+## Phase 11 — Assayed slurry — CURRENT (Tim, 2026-11-05: "build it now", for Tailings R4; released as v0.3.0)
+- **Six concentrator slurries** on steel pipe, liquids counted in kg that no tank holds: mill discharge, fines slurry, conditioned
+  slurry, concentrate slurry, thickened concentrate, tails slurry.
+- **The assay:** the kg of each mineral per kg of slurry, keyed by the mineral's item id, so Tailings' own minerals ride too.
+  Shares are clamped to 0..1 and never add past 1; the rest is water and gangue.
+- **Where it lives:** pipes hold nothing in Wildcatter, so the assay is held and saved by the node that puts the slurry on the pipe
+  (`fluid/SlurryHold`, `block/Assayed`). A pull (`block/Slurry.take`) blends the assays of the sources it drew from by mass.
+- **The Power Meter** on a slurry pipe names its three richest minerals.
+- API only: nothing in Wildcatter makes or uses the slurries; Tailings R4 is the first user. No in-world scene until then (the unit
+  tests drive a pull with stand-in sources).
+- Decided with Tim on 2026-11-05: assay keys are item ids; a v0.3.0 release for Tailings to compile against; the API only.
+
 ## Ideas (not scheduled)
-- **Assayed slurry on the steel pipe (for Tailings).** Proposed in Tailings R2 (2026-11-05), when Tim chose to extend Wildcatter's
-  pipe rather than give Tailings a pipe of its own. It waits for Tim to name the phase that builds it. Tailings' R4 needs it.
-  - **New products**, all counted in kg: `mill discharge`, `fines slurry`, `conditioned slurry`, `concentrate slurry`,
-    `thickened concentrate` and `tails slurry`. They are liquids, as `ORE_SLURRY` is, and no storage tank holds them except
-    where a spec says so.
-  - **The assay:** each joined run carrying one of them also carries an assay, the kg of each mineral per kg of slurry. The
-    minerals are Wildcatter's ore minerals plus the vanilla iron, copper and gold that Tailings treats.
-  - **Mixing:** feeding a run from two sources averages their assays by mass.
-  - **The API:** Tailings reads and writes the assay through a small API on the pipe network, for example
-    `offer(product, kg, assay)` and `take(product, kg)`, which returns the assay with the slurry taken. The assay arithmetic is plain
-    Java, as the rest of `fluid/` is.
-  - **Saving:** the assay is saved with the run's contents.
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released.
 - A sales gas pipeline and meter station, so a gas plant's residue gas has a buyer besides engines and the flare.
 - Plants for the 7a ores that the fuel chain doesn't use:

@@ -100,7 +100,17 @@ public enum Product {
 	/** The tar still's residue, the anodes' binder, kept hot. Counted in kg. */
 	PITCH("coal-tar pitch", false),
 	/** A potline row's gas, its HF and dust, along the duct to the fume treatment centre (docs/multiblocks/potline.md). */
-	POT_GAS("pot gas", true);
+	POT_GAS("pot gas", true),
+	/**
+	 * A concentrator's slurries (Tailings), counted in kg. Each carries an assay, the kg of each mineral per kg of slurry, held by the
+	 * node that puts it on the pipe ({@code block.Slurry}).
+	 */
+	MILL_DISCHARGE("mill discharge", false),
+	FINES_SLURRY("fines slurry", false),
+	CONDITIONED_SLURRY("conditioned slurry", false),
+	CONCENTRATE_SLURRY("concentrate slurry", false),
+	THICKENED_CONCENTRATE("thickened concentrate", false),
+	TAILS_SLURRY("tails slurry", false);
 
 	private final String label;
 	private final boolean gas;
@@ -122,7 +132,8 @@ public enum Product {
 	public String unit() {
 		return switch (this) {
 			case HOT_CRACKED_GAS, CRACKED_GAS, COMPRESSED_CRACKED_GAS, BURNER_GAS, ORE_SLURRY, LEACH_SLURRY, FLUORINE, UF6, CHLORINE, STEAM, FEEDWATER, COOLING_WATER,
-					CAUSTIC_SODA, PROCESS_STEAM, BAUXITE_SLURRY, DIGESTED_SLURRY, GREEN_LIQUOR, MUD_SLURRY, POLISHED_LIQUOR, HYDRATE_SLURRY, SPENT_LIQUOR, STRONG_LIQUOR, COAL_TAR, PITCH -> "kg";
+					CAUSTIC_SODA, PROCESS_STEAM, BAUXITE_SLURRY, DIGESTED_SLURRY, GREEN_LIQUOR, MUD_SLURRY, POLISHED_LIQUOR, HYDRATE_SLURRY, SPENT_LIQUOR, STRONG_LIQUOR, COAL_TAR, PITCH,
+					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY -> "kg";
 			default -> gas ? "m3" : "L";
 		};
 	}
@@ -131,7 +142,8 @@ public enum Product {
 	public boolean tanked() {
 		return switch (this) {
 			case MOLTEN_SULFUR, ORE_SLURRY, LEACH_SLURRY, PREGNANT_LIQUOR, STRIP_LIQUOR, PREGNANT_LIXIVIANT, BARREN_LIXIVIANT, ELUATE, ANHYDROUS_HF, FEEDWATER, COOLING_WATER,
-					BAUXITE_SLURRY, DIGESTED_SLURRY, GREEN_LIQUOR, MUD_SLURRY, POLISHED_LIQUOR, HYDRATE_SLURRY, SPENT_LIQUOR, STRONG_LIQUOR -> false;
+					BAUXITE_SLURRY, DIGESTED_SLURRY, GREEN_LIQUOR, MUD_SLURRY, POLISHED_LIQUOR, HYDRATE_SLURRY, SPENT_LIQUOR, STRONG_LIQUOR,
+					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY -> false;
 			default -> !gas;
 		};
 	}

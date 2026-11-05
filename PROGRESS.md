@@ -491,6 +491,17 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
 - **Recommended mods:** `docs/recommended-mods.md` lists the quality-of-life mods with 26.3 builds for Fabric and NeoForge.
   - The Fabric set ran the `coker` and `anodes` scenes alongside Wildcatter, Sodium included, and both passed.
 
+## Phase 11: assayed slurry (v0.3.0, for Tailings)
+- **Six concentrator slurries** on steel pipe (`Product`): mill discharge, fines slurry, conditioned slurry, concentrate slurry,
+  thickened concentrate and tails slurry. Liquids, counted in kg, held by no tank.
+- **Assays** (`fluid/SlurryAssay`): kg of each mineral per kg, keyed by item id; mass blending, save/load, a meter readout.
+- **Holding and pulling:** a source node keeps a `fluid/SlurryHold` and answers `block/Assayed`; `block/Slurry.take` pulls from the
+  runs on a machine's faces, shared among sources as `Lines.pull` shares them, and returns the kg with their blended assay.
+- **Power Meter** on a slurry pipe: what it carries plus its richest minerals. Field Manual: THE LEASE page, SLURRY.
+- **Tests:** `SlurryTest` (products, blending, clamps, save/load, the readout, the hold) and `SlurryPullTest` (a pull from one and
+  two stand-in sources, never from itself). Nothing in Wildcatter makes a slurry yet, so there is no client scene; Tailings R4 adds
+  the first in-world use.
+
 ## Phase 10d4: art and sounds; Phase 10 done
 - **Ludo art for the grid gear** (decided with Tim, 2026-11-04: grid gear only; wires from a few materials; Tim reviewed a contact
   sheet first). Sources and prompts in `art/source/` and `PROMPTS.md`; `tools/process_art.py`'s 10d4 section makes:

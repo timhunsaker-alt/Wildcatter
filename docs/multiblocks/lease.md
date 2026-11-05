@@ -84,6 +84,14 @@ layer 0      T: the motor's terminal box, the north and west faces of the main c
   its crude and diesel are two runs.
 - Gas wells' water is 0.0112 L per m3 (2 bbl per million scf exactly).
 
+## Assayed slurry (Phase 11, 2026-11-05)
+Six concentrator slurries (mill discharge, fines, conditioned, concentrate, thickened concentrate, tails) run on steel pipe like
+any product: one product a run, counted in kg, held by no tank. Each carries an assay, the kg of each mineral (by item id) per kg.
+- The pipe holds nothing: the source node holds the slurry and its assay (`SlurryHold`, `Assayed`).
+- `Slurry.take(level, faces, product, maxKg, self)` pulls as `Lines.pull` does and returns the kg and their assay, blended by mass
+  across the sources it drew from.
+- The Power Meter on the pipe adds the first holding source's three richest minerals.
+
 ## Game test
 `lease`: an oil field. A powered pumpjack's wellhead to a separator; oil to a stock tank, gas to a gas genset and a flare, water to a
 water tank, an injection pump and a disposal wellhead on a dry hole's casing. The water cut reads 10 %, the stock tank fills, the gas

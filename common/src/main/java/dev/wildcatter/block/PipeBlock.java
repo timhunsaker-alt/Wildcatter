@@ -85,8 +85,9 @@ public class PipeBlock extends Block {
 						+ " lengths joined, carrying fresh water from a pump"));
 			} else {
 				Lines.Line line = Lines.line(level, pos);
+				String assay = Slurry.describe(line);
 				player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Steel pipe (4 in): " + line.pipes().size() + " lengths joined, "
-						+ line.run().describe()));
+						+ line.run().describe() + (assay == null ? "" : " (" + assay + ")")));
 			}
 		}
 		return net.minecraft.world.InteractionResult.SUCCESS;
