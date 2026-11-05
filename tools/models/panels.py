@@ -2,8 +2,8 @@
 - load_centre, 1 x 1 x 1 (docs/multiblocks/panelboards.md): a 200 A main-breaker load centre 0.36 m wide, 1.0 m tall and 0.1 m deep,
   its door, the main's handle through the dead front, the service conduit into its top;
 - panelboard_480, 1 x 2 x 1: a 225 A 480Y/277 V panelboard 0.5 m wide, 1.8 m tall and 0.15 m deep, its door and main;
-- panel_gutter, 1 x 1 x 1: a wireway cover filling the cell's wall, holding one branch breaker (empty, on, off or tripped) and its
-  conduit out of the front;
+- panel_gutter, 1 x 1 x 1: a wireway cover filling the cell's wall, holding one branch breaker (empty, on, off or tripped); its
+  circuit leaves the front in branch cable;
 - safety_switch_100 and safety_switch_200 (safety-switch.md): heavy-duty fusible switches 0.3 x 0.6 m and 0.45 x 1.1 m, the handle on
   the right side (up ON, down OFF), conduit into the top and out of the bottom;
 - lis_5kv and lis_5kv_fused, 1 x 3 x 2 (load-interrupter.md): a 5 kV metal-enclosed switch 0.9 m wide, 2.3 m tall and 1.5 m deep, the
@@ -72,7 +72,6 @@ def gutter(slot):
 		if slot == "tripped":
 			M.box((0.43, 0.62, 0.857), (0.57, 0.66, 0.86), "danger")                       # the trip flag
 		M.decal((0.4, 0.33, 0.858), (0.6, 0.42, 0.86), "nameplate", "north", "dark")
-		conduit(M, 0.5, 0.85, 0.0, 0.3)                                                    # the branch conduit out of the front, down
 	M.collide((0.0, 0.0, 0.88), (1.0, 1.0, 1.0))
 	return M
 

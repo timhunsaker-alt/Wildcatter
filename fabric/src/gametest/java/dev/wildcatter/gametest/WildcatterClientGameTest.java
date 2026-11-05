@@ -2060,9 +2060,10 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		for (int zz = z; zz <= z + 3; zz++) {
 			put(server, 2, up + 4, zz, "wildcatter:cable_industrial");
 		}
-		// 4.16 kV: a set south-west through a backward unit substation, north and east to the pit's box at x -1
+		// 4.16 kV: a 1 MW gas set south-west through a backward unit substation, north and east to the pit's box at x -1. The 400 kW
+		// jet pump starts direct on line, and since every start goes with V² (10d1) a 500 kW diesel set sags and trips on it.
 		BlockPos mvSet = new BlockPos(-20, up, z + 20);
-		genset(server, mvSet, north, false);                                                 // x -25..-20, z+20..z+21
+		genset(server, mvSet, north, true);                                                  // x -27..-20, z+20..z+21
 		BlockPos mvOut = inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, mvSet, net.minecraft.core.Direction.EAST, false);
 		for (int zz = z; zz <= mvOut.getZ(); zz++) {
 			put(server, mvOut.getX(), up, zz, "wildcatter:cable_mv");
@@ -2076,7 +2077,14 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		fillTank(server, kilnBullet, dev.wildcatter.fluid.Product.LPG, 20_000);
 		water(server, pit);
 		startGenset(context, server, lvSet, north, 2000);
-		startGenset(context, server, mvSet, north, 2000);
+		context.waitTicks(30);
+		server.computeOnServer(srv -> {
+			panel(srv, mvSet).setGasForTest(200);   // gas already in its line: no gas plant in this scene
+			panel(srv, mvSet).setWantRun(true);
+			return null;
+		});
+		context.waitTicks(240);
+		check(read(server, mvSet.getX(), up, mvSet.getZ()).contains("breaker CLOSED"), "the gas set should be running: " + read(server, mvSet.getX(), up, mvSet.getZ()));
 		BlockPos[] parts = {column, heater, kiln};
 		String[] doing = {"fractionating", "coking", "calcining"};
 		java.util.function.Supplier<String> all = () -> " | fractionator " + read(server, column.getX(), up, column.getZ()) + " | heater " + read(server, heater.getX(), up, heater.getZ())

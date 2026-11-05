@@ -261,7 +261,7 @@ and the Field Manual has a page for each new system.
     - a ghost of the blueprint at its site, locked with a site marker.
     - for 10c2: the crawler's boom is set by the player (20 to 95 m, the real chart's lengths), and DISMANTLE is the site marker's
       mode, which every crane on the site follows.
-- **10d: the grid finish** — CURRENT. Four waves:
+- **10d: the grid finish** — DONE (2026-11-04). Four waves:
   - **10d1: protection** (spec: `docs/multiblocks/gen-bus-protection.md`):
     - an IEEE C57.109 short-time rule for rated transformers ((I² − 1)·t = 1250 pu²·s) in place of the pole transformer's 150 % for
       10 s, so direct starts go with V² too (from 10a, 2026-11-02);
@@ -291,6 +291,9 @@ and the Field Manual has a page for each new system.
   - **10d4: art and sounds:**
     - better wire, ground and breaker art;
     - the Ludo sound sources kept.
+    - Decided with Tim on 2026-11-04 (the 10d4 plan): grid gear only (wires, ground, the one-block breaker, switch, relay and fuse,
+      `cable_mv`, and the 10d1/10d3 item placeholders); wires from a few Ludo materials tinted per conductor; the six sounds made
+      again and replaced; a contact sheet reviewed before the commit.
   - Decided with Tim on 2026-11-04:
     - all four kinds of switches and panels;
     - the stand-ins removed outright;
@@ -314,7 +317,6 @@ and the Field Manual has a page for each new system.
 
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released.
-- Saving the Ludo sound sources.
 - A sales gas pipeline and meter station, so a gas plant's residue gas has a buyer besides engines and the flare.
 - Plants for the 7a ores that the fuel chain doesn't use:
   - chlor-alkali from rock salt;

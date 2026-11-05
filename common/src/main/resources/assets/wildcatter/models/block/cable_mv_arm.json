@@ -1,7 +1,7 @@
 {
   "textures": {
-    "cable": "wildcatter:block/cable_mv_placeholder",
-    "particle": "wildcatter:block/cable_mv_placeholder"
+    "cable": "wildcatter:block/cable_mv",
+    "particle": "wildcatter:block/cable_mv"
   },
   "elements": [
     {

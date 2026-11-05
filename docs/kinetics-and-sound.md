@@ -17,7 +17,8 @@ Tim asked for machines that visibly move, like the Create mod, with proper sound
 - A looping machine sound (`client/MachineSound`) plays while a machine runs. Its pitch follows speed and its volume follows load.
   It fades out when the machine stops or the block is gone.
 - One-shots: breaker and HV breaker clunks, fuse pop, insulator flashover crack, disconnect arc, out-of-sync bang, engine start crank.
-- Sources come from Ludo (createSoundEffect), are kept in `art/sound_source/`, and are processed by `tools/process_sounds.py`.
+- Sources come from Ludo (createSoundEffect), are kept in `art/sound_source/`, and are processed by `tools/process_sounds.py`. Since
+  10d4 every shipped sound has its source there (the last six were made again; their prompts are in `art/source/PROMPTS.md`).
 
 | Sound | Kind | Machine |
 |---|---|---|

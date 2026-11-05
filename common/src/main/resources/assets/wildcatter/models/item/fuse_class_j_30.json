@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "wildcatter:item/fuse_class_j_placeholder"
+    "layer0": "wildcatter:item/fuse_class_j"
   }
 }

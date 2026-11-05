@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "wildcatter:item/gfci_breaker_placeholder"
+    "layer0": "wildcatter:item/gfci_breaker"
   }
 }

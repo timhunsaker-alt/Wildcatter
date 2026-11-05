@@ -156,8 +156,6 @@ save("transformer_top", darker(ts, 0.85))
 save("substation_front", hue_shift(tf, 0.60))
 save("substation_side", hue_shift(ts, 0.60))
 save("substation_top", darker(hue_shift(ts, 0.60), 0.85))
-if os.path.exists(f"{SRC}/breaker.webp"):
-	save("breaker_body", load("breaker"))
 
 # ---- Phase 3: cable, three-pole breakers, pad-mounts, unit substation, heater, starters and the MCC ------------
 def tint(img, color, k):
@@ -222,6 +220,81 @@ for name in ("busway", "condenser", "tower_basin", "drift_eliminator", "station_
 	if os.path.exists(f"{SRC}/{name}.webp"):
 		save(name, load(name))
 
+# ---- Phase 10d4: wires, ground, the one-block breaker, switch, relay and fuse, and the 4.16 kV cable -------------------
+# Every wire is one of a few Ludo materials (bare copper, aluminium or steel strand, braided wool, PVC jacket), banded in its
+# conductor's colour as the script drawing always was (A red, B orange, C blue, N black, G green). Same names as make_assets.py
+# draws, so these replace them.
+CONDUCTOR_COLORS = {"a": (200, 50, 45), "b": (230, 140, 40), "c": (50, 90, 200), "n": (25, 25, 28), "g": (40, 150, 70)}
+
+
+def banded(img, band, rows):
+	out = img.copy()
+	px = out.load()
+	for y in rows:
+		for x in range(SIZE):
+			px[x, y] = band
+	return out
+
+
+def holes(base, through, share, seed):
+	"""Wool worn through: about {share} of the pixels show the copper under it (a fixed seed, so every run is the same)."""
+	import random
+	rng = random.Random(seed)
+	out = base.copy()
+	px, cu = out.load(), through.load()
+	for x in range(SIZE):
+		for y in range(SIZE):
+			if rng.random() < share:
+				px[x, y] = cu[x, y]
+	return out
+
+
+if os.path.exists(f"{SRC}/wire_copper.webp"):
+	copper, alu, steel = load("wire_copper"), load("wire_aluminium"), load("wire_steel")
+	wool_base = load("wire_wool")
+	# the jacket: its faint extrusion lines brought up, and lit like a round wire (light along the top, shadow along the bottom)
+	pvc = ImageEnhance.Contrast(load("wire_pvc")).enhance(2.5)
+	pvc = glow(pvc, (255, 255, 255), 0.35, lambda x, y: max(0.0, 1 - y * 4))
+	pvc = Image.composite(darker(pvc, 0.75), pvc, Image.linear_gradient("L").resize((SIZE, SIZE)).point(lambda v: 255 if v > 215 else 0))
+	metals = {"": copper, "industrial_": darker(copper, 0.92), "mv_": alu, "dist_": tint(alu, (178, 164, 150), 0.25), "hv_": steel}
+	tiers = {"": (235, 235, 240), "mv_": (225, 230, 245), "dist_": (225, 240, 230), "hv_": (215, 225, 250), "industrial_": (240, 225, 205)}
+	for key, band in CONDUCTOR_COLORS.items():
+		for prefix, metal in metals.items():
+			save(f"{prefix}wire_{key}", banded(metal, band, (10, 11, 20, 21)))
+		dye = band if key != "n" else (45, 45, 50)
+		cloth = ImageChops.multiply(wool_base, Image.new("RGB", wool_base.size, tuple(min(255, int(c * 0.85 + 60)) for c in dye)))   # dyed, the braid kept
+		for wear, share in ((0, 0.0), (1, 0.22), (2, 0.45)):
+			save(f"wool_wire_{key}_{wear}", holes(cloth, copper, share, "abcng".index(key) * 10 + wear))
+		save(f"wool_wire_{key}_3", banded(copper, band if key != "n" else (45, 45, 50), (10, 11, 20, 21)))   # worn to bare copper
+		for prefix, jacket in tiers.items():
+			sheath = ImageChops.multiply(pvc, Image.new("RGB", pvc.size, jacket)) if key != "n" else tint(pvc, (60, 60, 66), 0.8)
+			save(f"{prefix}plastic_wire_{key}", banded(sheath, band, (14, 15, 16, 17)))
+	# the ground wire: green-and-yellow insulated (as IEC marks it, and as the game has always shown G); the rod copper-clad steel
+	save("ground_wire", banded(tint(pvc, (40, 150, 70), 0.7), (240, 220, 60), (8, 9, 22, 23)))
+if os.path.exists(f"{SRC}/ground_rod.webp"):
+	save("ground_rod", load("ground_rod"))
+if os.path.exists(f"{SRC}/breaker.webp"):
+	# Ludo drew the breaker on white: crop to the breaker itself, so its face fills the block's
+	face = Image.open(f"{SRC}/breaker.webp").convert("RGB")
+	dark = face.convert("L").point(lambda v: 255 if v < 200 else 0)
+	body = ImageEnhance.Contrast(face.crop(dark.getbbox()).resize((SIZE, SIZE), Image.BOX)).enhance(1.15)
+	save("breaker_body", body)
+	save("switch_body", tint(body, (200, 170, 40), 0.5))   # the plain switch yellow, the UFLS relay purple, as before
+	save("relay_body", tint(body, (150, 70, 190), 0.5))
+if os.path.exists(f"{SRC}/fuse_cartridge.webp"):
+	full = Image.open(f"{SRC}/fuse_cartridge.webp").convert("RGB")
+	w, h = full.size
+
+	def part(box):
+		return ImageEnhance.Contrast(full.crop(box).resize((SIZE, SIZE), Image.BOX)).enhance(1.15)
+
+	tube = part((int(w * 0.3), int(h * 0.2), int(w * 0.7), int(h * 0.8)))   # the fibre tube, from its middle
+	save("fuse_tube", tube)
+	save("fuse_tube_blown", tint(darker(tube, 0.45), (30, 24, 20), 0.35))   # scorched dark when the element has melted
+	save("fuse_cap", part((0, int(h * 0.2), int(w * 0.09), int(h * 0.8))))   # a brass end cap
+if os.path.exists(f"{SRC}/cable_sheath.webp"):
+	save("cable_mv", tint(load("cable_sheath"), (40, 46, 60), 0.25))   # the 4.16 kV cable, between the LV and the distribution jacket
+
 print("art processed:", len(os.listdir(OUT)), "textures")
 
 
@@ -241,6 +314,10 @@ def icon(name, src=SRC):
 
 for name in ("power_meter", "field_manual", "seismograph", "crude_oil_bucket", "plastic_sheet", "diesel_bucket", "steel_ingot"):
 	icon(name).save(f"{OUT}/{name}.png")
+GRID_ICONS = ("branch_breaker", "gfci_breaker", "panelboard_breaker", "fuse_class_j", "fuse_e", "grounding_set")   # 10d4
+for name in GRID_ICONS:
+	if os.path.exists(f"{SRC}/{name}.webp"):
+		icon(name).save(f"{OUT}/{name}.png")
 GENSET_PART_ICONS = ("engine_block_casting", "piston", "crankshaft", "cylinder_head", "fuel_injector", "spark_plug", "stator_winding", "rotor_field", "exciter")
 for name in GENSET_PART_ICONS:
 	if os.path.exists(f"{SRC}/{name}.webp"):

@@ -172,3 +172,50 @@ with "no text, no logos, no people".
     lattice mast towering into a dramatic sunset sky, drill pipe stands racked in the derrick, the drawworks and rotary table in
     the foreground, mud tanks and a diesel engine house beside it.
   - The FTB instance picture is a 256x256 crop of **oilfield** (`wildcatter_oilfield_square.png`).
+
+## Phase 10d4 (2026-11-04): the grid gear's art, and the six sounds that had no kept source
+Ludo `createImage`, model klimt, 2 variations each, the better one kept (the `_1`/`_2` pick in brackets). `tools/process_art.py`
+(the 10d4 section) turns them into the wire, ground, breaker, fuse and cable textures and the item icons.
+
+Materials: image_type `texture`, art_style `Photorealistic 3D`; each prompt opens "Seamless flat texture, straight-on orthographic
+view, even lighting:" and ends "no text, no logos".
+
+| File | Prompt (after the opening) |
+|---|---|
+| wire_copper (1) | close-up of bare stranded copper electrical conductor, many twisted bright copper strands laid side by side in a helical lay running horizontally across the frame, warm orange-copper metal with slight oxidation, no insulation |
+| wire_aluminium (2) | close-up of an overhead power line ACSR conductor, bright dull-silver aluminium strands twisted in a helical lay running horizontally across the frame, slightly weathered matte aluminium |
+| wire_steel (2) | close-up of galvanized steel stranded wire, grey zinc-coated steel strands twisted in a tight helical lay running horizontally across the frame, dull grey with faint spangle |
+| wire_wool (2) | close-up of old cloth-insulated electrical wire, tightly braided off-white cotton and wool yarn insulation in a diagonal woven braid pattern, slightly fuzzy fibres, light cream colour |
+| wire_pvc (1) | close-up of the smooth white PVC plastic jacket of an electrical cable, slightly glossy, faint lengthwise extrusion lines running horizontally, very subtle surface scuffs, plain white, no printing |
+| ground_rod (1) | close-up of the surface of a copper-clad steel ground rod, smooth reddish copper plating with faint lengthwise drawing marks running vertically and a little brown tarnish |
+
+Gear faces: image_type `asset`, `Photorealistic 3D`.
+
+| File | Prompt |
+|---|---|
+| breaker (1) | A single small molded-case single-pole circuit breaker seen straight on from the front, filling the whole frame edge to edge, no background: dark charcoal grey moulded plastic body, a rectangular toggle slot in the middle, a small white rating label below it, two mounting screws, plain and generic, no brand name, no logo (cropped to the breaker in processing) |
+| fuse_cartridge (2) | A single cylindrical cartridge fuse lying horizontally seen straight on from the side, filling the whole frame edge to edge, no background: a tan brown vulcanized fibre tube in the middle with two shiny brass end caps, plain, generic, no text, no brand name, no logo (the tube and a cap are cropped from it) |
+
+Item icons: image_type `item-icon`, `Photorealistic 3D`; each ends "three-quarter view, centred, plain white background, generic, no
+brand name, no logo".
+
+| File | Prompt |
+|---|---|
+| branch_breaker (1) | A single plug-on single-pole residential circuit breaker, dark grey moulded plastic, black toggle handle on top, small white rating label |
+| gfci_breaker (2) | A single plug-on single-pole ground-fault (GFCI) circuit breaker, white and light grey moulded plastic body, black toggle handle, a small yellow TEST push button and a coiled white neutral pigtail wire |
+| panelboard_breaker (1) | A single three-pole bolt-on industrial molded-case circuit breaker, black moulded body three poles wide with one wide ganged toggle handle, brass terminal screws at the bottom, small rating label |
+| fuse_class_j (1) | A single class J time-delay cartridge fuse, a short cream-coloured fibre tube with two flat silver blade terminals at the ends, a small printed band |
+| fuse_e (2) | A single medium-voltage current-limiting power fuse, a long white glass-reinforced tube with silver metal end ferrules and a small red blown-fuse indicator pin at one end |
+| grounding_set (2) | A lineman's protective grounding clamp set: three heavy aluminium C-clamps with T-handle screws joined by clear-jacketed copper ground cables to a single ground clamp, coiled together |
+
+Sounds (`art/sound_source/`): Ludo `createSoundEffect`, one take each; `tools/process_sounds.py` makes the `.ogg`.
+
+| File | Loop | Duration | Prompt |
+|---|---|---|---|
+| breaker_click.mp3 | no | 0.6 s | a small molded-case circuit breaker toggled by hand, one crisp plastic snap click |
+| breaker_trip.mp3 | no | 0.8 s | an electrical circuit breaker tripping on overload, a sharp spring-loaded mechanical snap followed by a dull plastic thunk |
+| boiler_hiss.wav | yes | 4 s | steady hiss of pressurised steam escaping from a boiler safety valve, constant, no music |
+| turbine_hum.wav | yes | 4 s | a steam turbine generator running at speed, low steady mechanical hum with a faint high whine, constant, industrial, no music |
+| zap.mp3 | no | 0.8 s | a short electric shock, a sharp crackling buzz of electricity arcing for a moment |
+| structure_formed.mp3 | no | 1.5 s | heavy steel machine parts seating into place, a solid metallic clunk followed by a short settling rattle and a low resonant ring |
+

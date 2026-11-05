@@ -83,7 +83,7 @@ The 110 V devices go in the hot wire: in at the back, out at the front. Sneak an
 - `Role` (hot/neutral) is now `Conductor` (A, B, C, N, G). A wire carries one conductor, chosen by right-clicking it with an empty hand; its band shows which (A red, B orange, C blue, N black, G green). Existing wires keep working (hot starts as A, neutral as N). G wires are tied to earth.
 - North American worlds: a transformer's low side is centre-tapped, giving legs A and B 180 degrees apart (B on the transformer's side faces). Loads take A or B and measure against N; the shared neutral carries only the difference. IEC worlds have no leg B.
 - Game test: a lamp on leg B lights, equal lamps on A and B leave the shared neutral at 0.0 A, and with only the A lamp it carries 0.5 A.
-- Not done: wiring the phasor solver into the grid and three-phase (C), the three-pole breaker, a 240 V (A to B) load, and per-phase wear on cables. Wire textures are still script-drawn placeholders (not yet named `*_placeholder`).
+- Not done: wiring the phasor solver into the grid and three-phase (C), the three-pole breaker, a 240 V (A to B) load, and per-phase wear on cables. Wire textures were script-drawn until 10d4, which gave them Ludo art.
 
 ## Phase 1d: dynamic frequency
 - Each island of generators has one frequency (`solver/FrequencyIsland`, plain Java, unit tested): the swing equation with each set's inertia, a governor with 4% droop, and a slow secondary control (AGC) that brings it back to nominal. Load above the generators' rating drags it down; lost load lets it rise.
@@ -490,6 +490,24 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   - When JEI is in the run (`-Dfabric.addMods`), it presses U and takes a screenshot of the JEI page.
 - **Recommended mods:** `docs/recommended-mods.md` lists the quality-of-life mods with 26.3 builds for Fabric and NeoForge.
   - The Fabric set ran the `coker` and `anodes` scenes alongside Wildcatter, Sodium included, and both passed.
+
+## Phase 10d4: art and sounds; Phase 10 done
+- **Ludo art for the grid gear** (decided with Tim, 2026-11-04: grid gear only; wires from a few materials; Tim reviewed a contact
+  sheet first). Sources and prompts in `art/source/` and `PROMPTS.md`; `tools/process_art.py`'s 10d4 section makes:
+  - every wire from five materials (bare copper, aluminium and steel strand, braided wool, PVC jacket), banded in its conductor's
+    colour: the bare wires per tier, wool at its four wear levels (holes through to the copper, from a fixed seed), plastic per tier;
+  - the ground wire (green-and-yellow) and the copper-clad ground rod;
+  - the one-block breaker's face (and the switch and UFLS relay tinted from it), the fuse's tube, blown tube and brass cap;
+  - `cable_mv` from the cable sheath;
+  - item icons for the branch, GFCI and panelboard breakers, the class J and E fuses and the grounding set.
+- **The panel gutter** no longer draws a conduit stub out of its front: its circuit leaves in branch cable.
+- **Sounds:** `boiler_hiss`, `breaker_click`, `breaker_trip`, `structure_formed`, `turbine_hum` and `zap` were made again in Ludo
+  (their old sources were lost), kept in `art/sound_source/`, and processed by `tools/process_sounds.py`. All 20 sounds now have a
+  kept source.
+- **The full client suite** ran at the end of Phase 10. It found one regression from 10d1: in `coker`, the 400 kW jet pump starting
+  direct on line on the 500 kW diesel set now takes long enough (every start goes with V²) that the set trips on stator
+  overcurrent, so no coke is cut. The scene's 4.16 kV now comes from the 1 MW gas set. The coker blueprint in the library still has
+  the diesel set.
 
 ## Phase 10d3: panels and switches (specs: docs/multiblocks/panelboards.md, safety-switch.md, load-interrupter.md, ats.md)
 - **Load centre and panelboard** (`load_centre` 1 x 1 x 1, 200 A main, 40 spaces, 120/240 V; `panelboard_480` 1 x 2 x 1, 225 A
@@ -1428,9 +1446,7 @@ sized for a 40-pot line.
   - the ATS timers are scaled down from the real defaults; no closed transition or in-phase monitor; the solver gives one
     frequency to a connected group, so the ATS checks frequency only for emergency;
   - no breaker or fuse coordination study, no let-through (I²t) of current-limiting fuses, no series ratings;
-  - the branch breaker and fuse items have `*_placeholder` textures (`branch_breaker_placeholder`, `gfci_breaker_placeholder`,
-    `panelboard_breaker_placeholder`, `fuse_class_j_placeholder`, `fuse_e_placeholder`);
-  - the panels' and gutters' handles show on, off and tripped only on the gutters; the panel's main handle is not drawn by state.
+  - only the gutters show on, off and tripped; the panel's main handle is not drawn by state.
 - Phase 10d2:
   - racking is instant: no racking time and no remote racking;
   - no breaker failure protection (50BF): a breaker always opens when its relay trips it;
@@ -1443,7 +1459,6 @@ sized for a 40-pot line.
     stator trip;
   - the relay settings are fixed, except each feeder breaker's rating;
   - a 138 kV source back-feeding the GSU onto a bus fault is not opened by 87B: it has no breaker on the bus side;
-  - the grounding set's texture is `grounding_set_placeholder`.
 - Phase 10c3:
   - the ring crane stands where it is placed: no relocation on rails, as a real one moves between lifting positions;
   - it carries no heavy-duty jib, and no hook arrangement for its 5,000 t: its chart is capped at the 3,200 t main hook;

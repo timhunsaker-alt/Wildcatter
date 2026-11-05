@@ -317,7 +317,8 @@ if os.path.isdir("art/final"):
 		if os.path.isdir(f"art/final/{f}"):
 			continue
 		kind = "item" if f in ("power_meter.png", "field_manual.png", "seismograph.png", "crude_oil_bucket.png", "plastic_sheet.png", "diesel_bucket.png", "steel_ingot.png",
-		"engine_block_casting.png", "piston.png", "crankshaft.png", "cylinder_head.png", "fuel_injector.png", "spark_plug.png", "stator_winding.png", "rotor_field.png", "exciter.png") else "block"
+		"engine_block_casting.png", "piston.png", "crankshaft.png", "cylinder_head.png", "fuel_injector.png", "spark_plug.png", "stator_winding.png", "rotor_field.png", "exciter.png",
+		"branch_breaker.png", "gfci_breaker.png", "panelboard_breaker.png", "fuse_class_j.png", "fuse_e.png", "grounding_set.png") else "block"
 		shutil.copy(f"art/final/{f}", f"{ASSETS}/textures/{kind}/{f}")
 # the materials the true-scale models are drawn in (tools/process_materials.py, tools/models/)
 if os.path.isdir("art/final/mat"):
@@ -2215,8 +2216,8 @@ for t_name in ("mineable/pickaxe", "needs_stone_tool"):
 shaped("gen_feeder_breaker", ["SIS", "SXS", "SCS"], {"S": S_, "I": "minecraft:iron_block", "X": f"{ns}:hv_breaker_3p", "C": "minecraft:copper_ingot"}, "gen_feeder_breaker")
 shaped("bus_relay_panel", ["SGS", "SRS", "SCS"], {"S": S_, "G": "minecraft:glass_pane", "R": "minecraft:comparator", "C": "minecraft:copper_ingot"}, "bus_relay_panel")
 shaped("grounding_set", ["CCC", " I ", " T "], {"C": "minecraft:copper_ingot", "I": "minecraft:iron_ingot", "T": "minecraft:stick"}, "grounding_set")
-tex("grounding_set_placeholder", lambda img, d: noise(img, (190, 110, 60), 12), "item")
-save_json(f"{ASSETS}/models/item/grounding_set.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/grounding_set_placeholder"}})
+tex("grounding_set_placeholder", lambda img, d: noise(img, (190, 110, 60), 12), "item")   # drawn so the noise sequence stays put; 10d4's art replaces it
+save_json(f"{ASSETS}/models/item/grounding_set.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{art('grounding_set')}"}})
 save_json(f"{ASSETS}/items/grounding_set.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/grounding_set"}})
 lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
 lang[f"block.{ns}.gen_feeder_breaker"] = "15 kV Feeder Breaker (metal-clad, vacuum)"
@@ -2452,11 +2453,12 @@ for amps in (10, 25, 50, 100, 200):
 PLACEHOLDERS = {"branch_breaker": (40, 42, 46), "gfci_breaker": (220, 220, 214), "panelboard_breaker": (70, 74, 80), "fuse_class_j": (190, 160, 100),
 	"fuse_e": (200, 196, 186)}
 for kind, colour in PLACEHOLDERS.items():
-	tex(f"{kind}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+	if not os.path.exists(f"art/final/{kind}.png"):   # 10d4 drew them all; last in the file, so leaving them out shifts no other noise
+		tex(f"{kind}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
 lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
 for item, (title, (pattern, key), kind) in BRANCH.items():
 	shaped(item, pattern, key, item, 3 if kind.startswith("fuse") else 1)
-	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{kind}_placeholder"}})
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{art(kind)}"}})
 	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
 	lang[f"item.{ns}.{item}"] = title
 lang[f"block.{ns}.load_centre"] = "Load Centre (residential, 200 A)"
