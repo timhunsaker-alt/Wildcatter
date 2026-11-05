@@ -316,6 +316,18 @@ and the Field Manual has a page for each new system.
   - for 10a, real separate cabinets at 480 V and 4.16 kV, with the values above.
 
 ## Ideas (not scheduled)
+- **Assayed slurry on the steel pipe (for Tailings).** Proposed in Tailings R2 (2026-11-05), when Tim chose to extend Wildcatter's
+  pipe rather than give Tailings a pipe of its own. It waits for Tim to name the phase that builds it. Tailings' R4 needs it.
+  - **New products**, all counted in kg: `mill discharge`, `fines slurry`, `conditioned slurry`, `concentrate slurry`,
+    `thickened concentrate` and `tails slurry`. They are liquids, as `ORE_SLURRY` is, and no storage tank holds them except
+    where a spec says so.
+  - **The assay:** each joined run carrying one of them also carries an assay, the kg of each mineral per kg of slurry. The
+    minerals are Wildcatter's ore minerals plus the vanilla iron, copper and gold that Tailings treats.
+  - **Mixing:** feeding a run from two sources averages their assays by mass.
+  - **The API:** Tailings reads and writes the assay through a small API on the pipe network, for example
+    `offer(product, kg, assay)` and `take(product, kg)`, which returns the assay with the slurry taken. The assay arithmetic is plain
+    Java, as the rest of `fluid/` is.
+  - **Saving:** the assay is saved with the run's contents.
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released.
 - A sales gas pipeline and meter station, so a gas plant's residue gas has a buyer besides engines and the flare.
 - Plants for the 7a ores that the fuel chain doesn't use:
