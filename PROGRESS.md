@@ -517,8 +517,8 @@ Every block now runs on the AC phasor solver. Generators and the big transformer
   kept source.
 - **The full client suite** ran at the end of Phase 10. It found one regression from 10d1: in `coker`, the 400 kW jet pump starting
   direct on line on the 500 kW diesel set now takes long enough (every start goes with V²) that the set trips on stator
-  overcurrent, so no coke is cut. The scene's 4.16 kV now comes from the 1 MW gas set. The coker blueprint in the library still has
-  the diesel set.
+  overcurrent, so no coke is cut. The scene's 4.16 kV now comes from the 1 MW gas set. The coker blueprint in the library moved to the
+  gas set on 2026-11-06 (Tim: as recommended). It needs a gas line run to the engine: blueprints hold no fuel or wells.
 
 ## Phase 10d3: panels and switches (specs: docs/multiblocks/panelboards.md, safety-switch.md, load-interrupter.md, ats.md)
 - **Load centre and panelboard** (`load_centre` 1 x 1 x 1, 200 A main, 40 spaces, 120/240 V; `panelboard_480` 1 x 2 x 1, 225 A

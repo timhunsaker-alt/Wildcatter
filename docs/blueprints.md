@@ -161,6 +161,8 @@ A figure marked *(proposed)* is an estimate or a proposal.
 | `anode_plant` | `anodes` | -27-30; 17; z-22 to z+32 |
 | `potline` | `potline` | 0-110; 15; z-50 to z+34 |
 
+The `coker` blueprint's 4.16 kV comes from the 1 MW gas set (the 400 kW jet pump starting direct on line trips the 500 kW diesel set). Run a gas line to its engine: a blueprint holds no fuel or wells.
+
 - **Left out: the ISR wellfield.** Its wells must stand on the roll front the world gave it, so it is not a plant to copy.
 - **The cooling tower:** its blueprint is the tower's controller and its hopper. The controller pours the shell itself, as it does
   when placed by hand (cooling-tower.md).
