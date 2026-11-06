@@ -327,8 +327,8 @@ and the Field Manual has a page for each new system.
   tests drive a pull with stand-in sources).
 - Decided with Tim on 2026-11-05: assay keys are item ids; a v0.3.0 release for Tailings to compile against; the API only.
 
-## Phase 12 — The lined tailings cell and the process water pump — CURRENT (2026-11-06; Tim: "do whatever is needed for wildcatter")
-Spec: `docs/multiblocks/tailings-cell.md`. For Tailings' Phase 4 and the uranium mill's underflow. Approved by Tim as built. To be released as v0.4.0 once the full client suite passes.
+## Phase 12 — The lined tailings cell and the process water pump — DONE (2026-11-06; Tim: "do whatever is needed for wildcatter")
+Spec: `docs/multiblocks/tailings-cell.md`. For Tailings' Phase 4 and the uranium mill's underflow. Approved by Tim as built. The full client suite passed on 2026-11-06 (2h 47m), and it is released as v0.4.0.
 
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released.

@@ -1595,3 +1595,5 @@ and cranes from it.
 ## Phase 12: the lined tailings cell and the process water pump (2026-11-06)
 
 Spec: docs/multiblocks/tailings-cell.md. Written ahead of a plan, then approved by Tim as built. `cell_liner` and `decant_tower` make a cell of any shape; the tower finds its basin, fills it with visible `settled_tails`, returns water on a water pipe, and reads BREACHED or FULL. The uranium mill's thickener has an optional tails outlet. `process_water_pump` is the water pump on a 37 kW, 480 V motor. Scene `tailingsCell`. Tailings' scenes will take tails over a real pipe.
+
+Phase 12 closed on 2026-11-06: the full client suite passed (BUILD SUCCESSFUL in 2h 47m) and it is released as v0.4.0. No phase is CURRENT until Tim picks the next.
