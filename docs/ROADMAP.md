@@ -315,7 +315,7 @@ and the Field Manual has a page for each new system.
   - these 4, in this order;
   - for 10a, real separate cabinets at 480 V and 4.16 kV, with the values above.
 
-## Phase 11 — Assayed slurry — CURRENT (Tim, 2026-11-05: "build it now", for Tailings R4; released as v0.3.0)
+## Phase 11 — Assayed slurry — DONE 2026-11-05 (Tim: "build it now", for Tailings R4; released as v0.3.0; full client suite passed)
 - **Six concentrator slurries** on steel pipe, liquids counted in kg that no tank holds: mill discharge, fines slurry, conditioned
   slurry, concentrate slurry, thickened concentrate, tails slurry.
 - **The assay:** the kg of each mineral per kg of slurry, keyed by the mineral's item id, so Tailings' own minerals ride too.
