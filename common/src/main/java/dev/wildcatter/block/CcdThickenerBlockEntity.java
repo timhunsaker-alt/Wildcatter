@@ -29,12 +29,23 @@ public class CcdThickenerBlockEntity extends UnitMotorBlockEntity implements Wat
 		super(WildcatterBlocks.CCD_THICKENER_ENTITY, pos, state);
 	}
 
+	private List<Lines.Face> tailsOutlet() {
+		return faces(at -> at[2] == 2 && at[1] == 0 && at[0] == 0, Direction.WEST);
+	}
+
+	private boolean tailsPiped(Level level) {
+		return !Lines.lines(level, tailsOutlet()).isEmpty();
+	}
+
 	private List<Lines.Face> inlet() {
 		return faces(at -> at[2] == 0 && at[1] == 0, Direction.NORTH);
 	}
 
 	@Override
 	protected @Nullable Product nozzle(int[] at, Direction side) {
+		if (at[2] == 2 && at[1] == 0 && at[0] == 0 && side == Direction.WEST) {
+			return Product.TAILS_SLURRY;   // a tails outlet for a lined cell (docs/multiblocks/tailings-cell.md); no pipe, no tails held
+		}
 		return at[2] == 11 && at[1] == 0 && side == Direction.SOUTH ? Product.PREGNANT_LIQUOR : null;
 	}
 
@@ -75,6 +86,14 @@ public class CcdThickenerBlockEntity extends UnitMotorBlockEntity implements Wat
 		double solidsShare = Tuning.MILL_SLURRY_SOLIDS;   // close enough to bound the pull; the true share comes with the slurry
 		double max = Math.min(Tuning.MILL_ORE_KGS / solidsShare * 1.1 * seconds() * strength, waiting);
 		max = Math.min(Math.min(max, water / (solidsShare * Mill.washPerSolids())), room(Product.PREGNANT_LIQUOR) / Mill.liquorPerSlurry(solidsShare));
+		boolean piped = tailsPiped(level);
+		if (piped) {
+			max = Math.min(max, room(Product.TAILS_SLURRY) * Tuning.MILL_TAILS_SOLIDS / solidsShare);
+			if (max < 0.001) {
+				unit = "idle: its tails pipe is full (a lined cell on its west side)";
+				return;
+			}
+		}
 		double[] in = new double[5];
 		double got = max > 0.001 ? pullMixed(level, inlet(), Product.LEACH_SLURRY, max, in) : 0;
 		if (got <= 0) {
@@ -87,6 +106,9 @@ public class CcdThickenerBlockEntity extends UnitMotorBlockEntity implements Wat
 		double u = got * in[0];
 		addMixed(Product.PREGNANT_LIQUOR, liquor, new double[] {liquor > 0 ? u / liquor : 0, 0, 0, 0, 0});
 		tailings += solids / 1000;
+		if (piped) {
+			addMixed(Product.TAILS_SLURRY, solids / Tuning.MILL_TAILS_SOLIDS, new double[] {0, Tuning.MILL_TAILS_SOLIDS, 0, 0, 0});
+		}
 		unit = String.format("washing %.1f kg/s of solids with %.0f L/s of water: %.0f L/s of pregnant liquor at %.1f g/L U3O8", solids / seconds(),
 				solids * Mill.washPerSolids() / seconds(), liquor / seconds(), liquor > 0 ? u / liquor * 1000 : 0);
 	}

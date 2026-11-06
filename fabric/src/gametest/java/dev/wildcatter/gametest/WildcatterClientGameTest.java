@@ -172,6 +172,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("acidPlant")) {
 				acidPlant(context, server);
 			}
+			if (only("tailingsCell")) {
+				tailingsCell(context, server);
+			}
 			if (only("uraniumMill")) {
 				uraniumMill(context, server);
 			}
@@ -6805,6 +6808,65 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	 * second through a backward unit substation for the SAG mill's 4.16 kV. Pitchblende is held to SX's limit; uranium ore then runs at
 	 * the full rate. The filler is given 380 kg by hook, and the mill's own yellowcake must finish the drum into the hopper under it.
 	 */
+	/** The lined cell (docs/multiblocks/tailings-cell.md): finds its basin, fills, reads a broken floor as a breach, and goes on when mended. */
+	private void tailingsCell(ClientGameTestContext context, TestServerContext server) {
+		int z = 420;
+		server.computeOnServer(srv -> {
+			net.minecraft.server.level.ServerLevel level = srv.overworld();
+			for (int x = 0; x <= 9; x++) {
+				for (int zz = z; zz <= z + 9; zz++) {
+					for (int yy = 0; yy <= 3; yy++) {
+						boolean wall = x == 0 || x == 9 || zz == z || zz == z + 9;
+						level.setBlock(new BlockPos(x, up + yy, zz), yy == 0 || wall ? WildcatterBlocks.CELL_LINER.defaultBlockState() : net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+					}
+				}
+			}
+			level.setBlock(new BlockPos(4, up + 1, z + 4), WildcatterBlocks.DECANT_TOWER.defaultBlockState(), 3);
+			return null;
+		});
+		BlockPos tower = new BlockPos(4, up + 1, z + 4);
+		server.runCommand("gamemode spectator @p");
+		server.runCommand("tp @p 15 " + (up + 9) + " " + (z - 6) + " 45 30");
+		context.waitTicks(60);
+		check(cell(server, tower).status().contains("of 420 t"), "an 8 x 8 cell, 3 high, should hold 191 blocks at 2.2 t: " + cell(server, tower).status());
+		server.computeOnServer(srv -> {
+			cell(srv, tower).addSolidsForTest(40 * Tuning.CELL_KG_PER_BLOCK);
+			return null;
+		});
+		context.waitTicks(60);
+		int shown = server.computeOnServer(srv -> {
+			int n = 0;
+			for (BlockPos at : BlockPos.betweenClosed(new BlockPos(1, up + 1, z + 1), new BlockPos(8, up + 3, z + 8))) {
+				n += srv.overworld().getBlockState(at).getBlock() == WildcatterBlocks.SETTLED_TAILS ? 1 : 0;
+			}
+			return n;
+		});
+		check(shown == 40, "forty blocks of settled tails should show, got " + shown);
+		context.takeScreenshot("wildcatter-tailings-cell");
+		server.computeOnServer(srv -> srv.overworld().setBlock(new BlockPos(8, up, z + 8), net.minecraft.world.level.block.Blocks.DIRT.defaultBlockState(), 3));
+		context.waitTicks(60);
+		check(cell(server, tower).status().contains("BREACHED"), "a broken floor should read as a breach: " + cell(server, tower).status());
+		server.computeOnServer(srv -> srv.overworld().setBlock(new BlockPos(8, up, z + 8), WildcatterBlocks.CELL_LINER.defaultBlockState(), 3));
+		context.waitTicks(60);
+		check(!cell(server, tower).status().contains("BREACHED"), "mended, it should go on: " + cell(server, tower).status());
+		server.computeOnServer(srv -> {
+			cell(srv, tower).addSolidsForTest(1000 * Tuning.CELL_KG_PER_BLOCK);
+			return null;
+		});
+		context.waitTicks(60);
+		check(cell(server, tower).status().contains("BREACHED"), "more than it can hold reads as over its walls: " + cell(server, tower).status());
+		server.runCommand("gamemode survival @p");
+		System.out.println("[wildcatter-test] tailingsCell ok: " + cell(server, tower).status());
+	}
+
+	private dev.wildcatter.block.DecantTowerBlockEntity cell(TestServerContext server, BlockPos tower) {
+		return server.computeOnServer(srv -> cell(srv, tower));
+	}
+
+	private static dev.wildcatter.block.DecantTowerBlockEntity cell(net.minecraft.server.MinecraftServer srv, BlockPos tower) {
+		return (dev.wildcatter.block.DecantTowerBlockEntity) srv.overworld().getBlockEntity(tower);
+	}
+
 	private void uraniumMill(ClientGameTestContext context, TestServerContext server) {
 		int z = -1700;
 		server.runCommand("effect give @p minecraft:slow_falling 600 0 true");

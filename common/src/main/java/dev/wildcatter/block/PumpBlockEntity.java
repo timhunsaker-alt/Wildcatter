@@ -29,7 +29,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, dev.wildcatter.kinetic.Sounding, dev.wildcatter.kinetic.Kinetic {
 	private final dev.wildcatter.kinetic.Spin spin = new dev.wildcatter.kinetic.Spin();
 	/** Its induction motor (single-phase); it turns only while there is work. */
-	private final dev.wildcatter.circuit.Motor motor = new dev.wildcatter.circuit.Motor(false, Voltage.LOW, Tuning.PUMP_WATTS);
+	private final dev.wildcatter.circuit.Motor motor;
 	private final dev.wildcatter.kinetic.RunningSound running = new dev.wildcatter.kinetic.RunningSound();
 	/** Set by the machine's own logic: whether it has work for the motor. */
 	private boolean wanted;
@@ -39,6 +39,8 @@ public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspect
 
 	public PumpBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.PUMP_ENTITY, pos, state);
+		motor = state.getBlock() == WildcatterBlocks.PROCESS_WATER_PUMP ? new dev.wildcatter.circuit.Motor(true, Voltage.INDUSTRIAL, Tuning.PROCESS_PUMP_WATTS)
+				: new dev.wildcatter.circuit.Motor(false, Voltage.LOW, Tuning.PUMP_WATTS);
 	}
 
 	public boolean isLive() {

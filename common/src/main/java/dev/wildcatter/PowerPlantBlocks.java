@@ -31,6 +31,15 @@ public interface PowerPlantBlocks {
 	Block PUMP = block("pump", props -> new PumpBlock(props.mapColor(MapColor.COLOR_BLUE)
 			.strength(2.0F, 5.0F).sound(SoundType.METAL)));
 
+	/** The water pump on a 37 kW, 480 V three-phase motor, for a plant with no 110 V supply (docs/multiblocks/tailings-cell.md). */
+	Block PROCESS_WATER_PUMP = block("process_water_pump", props -> new PumpBlock(props.mapColor(MapColor.COLOR_BLUE)
+			.strength(2.0F, 5.0F).sound(SoundType.METAL)));
+	/** The lined tailings cell (docs/multiblocks/tailings-cell.md). */
+	Block CELL_LINER = block("cell_liner", props -> new Block(props.mapColor(MapColor.COLOR_BLACK).strength(1.0F, 3.0F).sound(SoundType.WOOL)));
+	Block SETTLED_TAILS = block("settled_tails", props -> new Block(props.mapColor(MapColor.SAND).strength(0.5F).sound(SoundType.SAND)));
+	Block DECANT_TOWER = block("decant_tower", props -> new dev.wildcatter.block.DecantTowerBlock(props.mapColor(MapColor.STONE)
+			.strength(2.0F, 6.0F).sound(SoundType.STONE).requiresCorrectToolForDrops()));
+
 	/** Carries gas (and pumped crude) from a well to the fireboxes. Never joins a water pipe. */
 	Block GAS_LINE = block("gas_line", props -> new PipeBlock(props.mapColor(MapColor.COLOR_ORANGE)
 			.strength(1.5F, 4.0F).sound(SoundType.METAL).noOcclusion(), PipeBlock.Kind.GAS));

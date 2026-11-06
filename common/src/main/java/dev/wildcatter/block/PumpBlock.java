@@ -57,7 +57,7 @@ public class PumpBlock extends BaseEntityBlock {
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 		if (!level.isClientSide() && level.getBlockEntity(pos) instanceof PumpBlockEntity pump) {
-			if (!Shock.touch((ServerLevel) level, pos, player, Voltage.LOW, pump.isLive())) {
+			if (!Shock.touch((ServerLevel) level, pos, player, this == WildcatterBlocks.PROCESS_WATER_PUMP ? Voltage.INDUSTRIAL : Voltage.LOW, pump.isLive())) {
 				player.sendOverlayMessage(pump.inspect());
 			}
 		}

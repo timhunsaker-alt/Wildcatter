@@ -200,7 +200,8 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 			PADMOUNT_208, PADMOUNT_480, UNIT_SUBSTATION, GSU_TRANSFORMER, GSU_25, GSU_60, SUBSTATION_TRANSFORMER_60, UNIT_AUX_TRANSFORMER, SUBSTATION_TRANSFORMER_10);
 
 	public static final BlockEntityType<FireboxBlockEntity> FIREBOX_ENTITY = entity(FireboxBlockEntity::new, FIREBOX);
-	public static final BlockEntityType<PumpBlockEntity> PUMP_ENTITY = entity(PumpBlockEntity::new, PUMP);
+	public static final BlockEntityType<PumpBlockEntity> PUMP_ENTITY = entity(PumpBlockEntity::new, PUMP, PROCESS_WATER_PUMP);
+	public static final BlockEntityType<dev.wildcatter.block.DecantTowerBlockEntity> DECANT_TOWER_ENTITY = entity(dev.wildcatter.block.DecantTowerBlockEntity::new, DECANT_TOWER);
 
 	public static final BlockEntityType<DrillingRigBlockEntity> DRILLING_RIG_ENTITY = entity(DrillingRigBlockEntity::new, DRILLING_RIG);
 	public static final BlockEntityType<PumpjackBlockEntity> PUMPJACK_ENTITY = entity(PumpjackBlockEntity::new, PUMPJACK);
@@ -250,6 +251,10 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		add("firebox", FIREBOX);
 		add("pipe", PIPE);
 		add("pump", PUMP);
+		add("process_water_pump", PROCESS_WATER_PUMP);
+		add("cell_liner", CELL_LINER);
+		add("settled_tails", SETTLED_TAILS);
+		add("decant_tower", DECANT_TOWER);
 		add("gas_line", GAS_LINE);
 		add("drilling_rig", DRILLING_RIG);
 		add("casing", CASING);
@@ -463,6 +468,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("steam_turbine"), STEAM_TURBINE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("firebox"), FIREBOX_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("pump"), PUMP_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("decant_tower"), DECANT_TOWER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("drilling_rig"), DRILLING_RIG_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("pumpjack"), PUMPJACK_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("gas_wellhead"), GAS_WELLHEAD_ENTITY);

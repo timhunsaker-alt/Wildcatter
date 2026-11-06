@@ -1,0 +1,18 @@
+{
+ "type": "minecraft:crafting_shaped",
+ "category": "building",
+ "pattern": [
+  "BIB",
+  "BPB",
+  "BIB"
+ ],
+ "key": {
+  "B": "minecraft:bricks",
+  "I": "minecraft:iron_bars",
+  "P": "wildcatter:pipe"
+ },
+ "result": {
+  "id": "wildcatter:decant_tower",
+  "count": 1
+ }
+}

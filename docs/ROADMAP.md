@@ -327,6 +327,9 @@ and the Field Manual has a page for each new system.
   tests drive a pull with stand-in sources).
 - Decided with Tim on 2026-11-05: assay keys are item ids; a v0.3.0 release for Tailings to compile against; the API only.
 
+## Phase 12 — The lined tailings cell and the process water pump — CURRENT (2026-11-06; Tim: "do whatever is needed for wildcatter")
+Spec: `docs/multiblocks/tailings-cell.md`. For Tailings' Phase 4 and the uranium mill's underflow. Approved by Tim as built. To be released as v0.4.0 once the full client suite passes.
+
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released.
 - A sales gas pipeline and meter station, so a gas plant's residue gas has a buyer besides engines and the flare.
@@ -341,7 +344,6 @@ and the Field Manual has a page for each new system.
 - Salt domes that trap oil on their flanks, as on the Gulf Coast.
 - The purer yellowcake route: an ammonia plant on pipeline gas, ADU precipitation and a calciner at 750-800 C (94-98 % U3O8).
 - The acid plant's waste heat boiler steam to a steam turbine (about 2 kg/s of 40 bar steam).
-- Lined tailings cells for the mill's thickener underflow.
 - Uranium from phosphoric acid (phosphate rock).
 - Conversion: the fluorine cells' cathode hydrogen to the reducer; retiring the fluorinator's ash bed; regenerating the KOH
   scrubbers; a full-size plant.

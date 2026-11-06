@@ -344,6 +344,8 @@
     "wildcatter:safety_switch_200",
     "wildcatter:lis_5kv",
     "wildcatter:lis_5kv_fused",
-    "wildcatter:ats_480"
+    "wildcatter:ats_480",
+    "wildcatter:decant_tower",
+    "wildcatter:process_water_pump"
   ]
 }

@@ -33,6 +33,12 @@ public final class Tuning {
 	public static final double FIREBOX_FUEL_PER_TICK = 1.0;
 	public static final int FIREBOX_SLOTS = 9;
 	public static final double PUMP_WATTS = 750.0;            // a 110 V motor: 6.8 A
+	public static final double PROCESS_PUMP_WATTS = 37_000.0;  // 480 V three-phase (docs/multiblocks/tailings-cell.md, proposed)
+	public static final double MILL_TAILS_SOLIDS = 0.50;       // the thickener's underflow (proposed)
+	public static final double CELL_KG_PER_BLOCK = 2_200.0;    // settled tails, dry (proposed)
+	public static final double CELL_SLURRY_SOLIDS = 0.40;      // what the tower takes tails as (proposed)
+	public static final double CELL_RECLAIM = 0.75;            // of the slurry's water, back on the water pipe (proposed)
+	public static final int CELL_MAX_AREA = 4096;              // cells of open floor one tower can serve (proposed)
 	public static final int PUMP_WATER_PER_TICK = 40;         // at full voltage
 	public static final int PLUMBING_INTERVAL = 4;            // ticks between pump / drain transfers
 	public static final int PIPE_NETWORK_LIMIT = 512;

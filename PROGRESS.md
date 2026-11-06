@@ -1447,6 +1447,7 @@ sized for a 40-pot line.
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- Phase 12: `cell_liner_placeholder`, `settled_tails_placeholder` and `decant_tower_placeholder` are textures drawn by script, and the process water pump borrows the water pump's model, until the art comes from Ludo.
 - Phase 10b1:
   - the bus bars' standoffs stand on the floor of their own cell, so a run carried up in the air shows them hanging (no
     supports or structure yet);
@@ -1590,3 +1591,7 @@ sized for a 40-pot line.
 ## Ideas not started
 Ideas live in one list: `docs/ROADMAP.md`, "Ideas (not scheduled)". Phase 10 took switches and panels, the art, drives, the DC tier
 and cranes from it.
+
+## Phase 12: the lined tailings cell and the process water pump (2026-11-06)
+
+Spec: docs/multiblocks/tailings-cell.md. Written ahead of a plan, then approved by Tim as built. `cell_liner` and `decant_tower` make a cell of any shape; the tower finds its basin, fills it with visible `settled_tails`, returns water on a water pipe, and reads BREACHED or FULL. The uranium mill's thickener has an optional tails outlet. `process_water_pump` is the water pump on a 37 kW, 480 V motor. Scene `tailingsCell`. Tailings' scenes will take tails over a real pipe.
