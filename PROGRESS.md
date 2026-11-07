@@ -1538,9 +1538,8 @@ sized for a 40-pot line.
 - Phase 8a: without the turbine, steam is vented and the plant runs at a few percent on the aux feed. The feedwater is counted at
   227 C even from the aux feed. Starting the second 500 kW coolant pump direct on line on the same three-set island as the first drops the island. On
   4.16 kV drives two run on one three-set island (10a, the `drives` scene), but the reactor scene still feeds each pump its own
-  sets and unit substation. In the boron scene a single set on a busway never closed its breaker, even with a load on the bus;
-  the cause is not found yet (the scene uses two sets, as the fuel scene does). A lead from 10a: in AUTO a set closes onto a
-  dead bus only when its potential transformer reads the bus as not live, so that set must read the busway as live.
+  sets and unit substation. The boron scene's single set on a busway, which never closed its breaker, was the solver failure fixed in v0.4.1:
+  re-tested 2026-11-07, one set closes and runs the plant at 470 V (the scene still uses two).
 - Phase 7 is complete through 7g. Tim checks the fuel chain in a real session. The fuel test connects each part's 480 V after
   the sets are on line: closed onto the whole plant at once, the first set tripped.
 - Helium is taken from all pipeline gas at 0.4 %; real fields differ (most hold far less).
@@ -1597,6 +1596,11 @@ and cranes from it.
 Spec: docs/multiblocks/tailings-cell.md. Written ahead of a plan, then approved by Tim as built. `cell_liner` and `decant_tower` make a cell of any shape; the tower finds its basin, fills it with visible `settled_tails`, returns water on a water pipe, and reads BREACHED or FULL. The uranium mill's thickener has an optional tails outlet. `process_water_pump` is the water pump on a 37 kW, 480 V motor. Scene `tailingsCell`. Tailings' scenes will take tails over a real pipe.
 
 Phase 12 closed on 2026-11-06: the full client suite passed (BUILD SUCCESSFUL in 2h 47m) and it is released as v0.4.0. No phase is CURRENT until Tim picks the next.
+
+## Phase 13: PLCs (CURRENT)
+Spec: `docs/multiblocks/plc.md`, decided by Tim 2026-11-07: nine waves.
+
+**13a, the language core (2026-11-07):** IEC 61131-3 structured text, compiled to a bounded bytecode and run by a CPU in plain Java, with no game face yet. 31 unit tests run real programs: the scan's input image, every statement and type, timers and counters against the scan's clock, tasks at their intervals, a PID holding a level with anti-windup and bumpless transfer, forcing, retained values, the watchdog stopping a runaway program. Nothing a player can place yet: that is 13b.
 
 v0.4.1 (2026-11-06), two fixes found by Tailings' playthrough; the full client suite passed on them (2h 45m):
 - **The solver no longer gives up on a floating bus.** A busway's neutral on a dead bus has low resistance and no path to ground, so the small leak each node carries rounded away and the factorisation stopped with "Could not solve the circuit". The solve for that whole group was then dropped, so the generator's synchroniser never read the bus and its breaker never closed. The node now gets its leak back. Unit test `aFloatingBusStillSolves`. The warning came 241 times in the v0.4.0 suite's log, on a suite that passed, and 0 times in this one.
