@@ -345,6 +345,10 @@ Spec: `docs/multiblocks/plc.md`, nine waves, all approved in order: 13a language
   - fertilizer from phosphate and potash;
   - drilling mud from barite and bentonite.
 - Salt domes that trap oil on their flanks, as on the Gulf Coast.
+- Biogas as an engine fuel (proposed by Farmings, 2026-11-07): a gas genset that can burn biogas from a manure digester, mostly methane
+  with carbon dioxide, at a lower heating value than pipeline gas. Farmings' digester would give about 48 kWh of electricity per tonne
+  of dairy manure (Ontario OMAFA energy-yield table), so the flow is small. Needs: a biogas fuel type, a derate on the genset's
+  rating, and a way for another mod to supply it. No change until Tim approves. See Farmings `docs/waste.md`.
 - The purer yellowcake route: an ammonia plant on pipeline gas, ADU precipitation and a calciner at 750-800 C (94-98 % U3O8).
 - The acid plant's waste heat boiler steam to a steam turbine (about 2 kg/s of 40 bar steam).
 - Uranium from phosphoric acid (phosphate rock).
