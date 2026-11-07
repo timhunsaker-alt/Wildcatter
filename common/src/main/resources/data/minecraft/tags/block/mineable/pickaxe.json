@@ -345,6 +345,8 @@
     "wildcatter:lis_5kv",
     "wildcatter:lis_5kv_fused",
     "wildcatter:ats_480",
+    "wildcatter:decant_tower",
+    "wildcatter:process_water_pump",
     "wildcatter:control_cable",
     "wildcatter:junction_box",
     "wildcatter:control_supply",

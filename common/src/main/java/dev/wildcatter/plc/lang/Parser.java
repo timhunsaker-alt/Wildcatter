@@ -32,6 +32,21 @@ final class Parser {
 		}
 	}
 
+	/** One expression, as a graphical language's pin holds; null with an error if it is not one. */
+	static Expr parseExpression(String text, int line, List<CompileError> errors) {
+		try {
+			Parser parser = new Parser(Lexer.tokens(text, line), errors);
+			Expr out = parser.expr();
+			if (parser.peek().kind() != Kind.END) {
+				errors.add(new CompileError(line, 1, "unexpected " + parser.peek().text()));
+			}
+			return out;
+		} catch (CompileException e) {
+			errors.add(new CompileError(line, 1, e.getMessage()));
+			return null;
+		}
+	}
+
 	private Token peek() {
 		return tokens.get(at);
 	}

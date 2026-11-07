@@ -116,6 +116,10 @@ public final class Ast {
 	public record EnumType(int line, List<String> values) implements TypeSpec {
 	}
 
+	/** The type of what {@code of} computes: a graphical language's result, which has no written type. */
+	public record AutoType(int line, Expr of) implements TypeSpec {
+	}
+
 	public sealed interface Init {
 	}
 

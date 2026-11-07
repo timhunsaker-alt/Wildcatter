@@ -29,9 +29,50 @@ public final class PlcCompiler {
 		}
 	}
 
-	/** Compiles one source. */
+	/** Compiles one structured text source. */
 	public static Result compile(CpuSpec spec, String source) {
-		return new PlcCompiler(spec).run(List.of(source));
+		return compile(spec, Project.of(source));
+	}
+
+	/** Compiles a project of program units in any language. */
+	public static Result compile(CpuSpec spec, List<Project.Source> sources) {
+		return new PlcCompiler(spec).run(sources);
+	}
+
+	/** The function blocks and functions a project can place, for the screen: the standard's and its own. Errors in the sources are ignored here. */
+	public static Map<String, Ast.Pou> library(List<Project.Source> sources) {
+		Map<String, Ast.Pou> out = new HashMap<>();
+		STANDARD.pous().forEach(p -> out.put(p.name(), p));
+		List<CompileError> ignored = new ArrayList<>();
+		for (Project.Source source : sources) {
+			if (source.language() == Project.Language.ST) {
+				Parser.parse(source.text(), ignored).pous().forEach(p -> out.put(p.name(), p));
+			} else {
+				try {
+					Ast.Pou header = header(source, ignored);
+					if (header != null) {
+						out.put(header.name(), header);
+					}
+				} catch (IllegalArgumentException e) {
+					// a damaged diagram offers nothing
+				}
+			}
+		}
+		return out;
+	}
+
+	/** A graphical unit's name and variables, parsed as the structured text they are. */
+	private static Ast.Pou header(Project.Source source, List<CompileError> errors) {
+		String kind = source.language() == Project.Language.LD ? Ladder.parse(source.text()).kind : Fbd.parse(source.text()).kind;
+		String name = source.language() == Project.Language.LD ? Ladder.parse(source.text()).name : Fbd.parse(source.text()).name;
+		String declarations = source.language() == Project.Language.LD ? Ladder.parse(source.text()).declarations : Fbd.parse(source.text()).declarations;
+		String end = kind.equals("PROGRAM") ? "END_PROGRAM" : "END_FUNCTION_BLOCK";
+		List<CompileError> found = new ArrayList<>();
+		Ast.Unit unit = Parser.parse(kind + " " + name + "\n" + declarations + "\n" + end, found);
+		for (CompileError error : found) {
+			errors.add(new CompileError(source.name(), Math.max(1, error.line() - 1), error.column(), "in its variables: " + error.message()));
+		}
+		return unit.pous().isEmpty() ? null : unit.pous().getFirst();
 	}
 
 	private static final Ast.Unit STANDARD = parseStandard();
@@ -237,17 +278,55 @@ public final class PlcCompiler {
 	}
 
 	private void record(CompileException e) {
-		errors.add(new CompileError(e.line, e.column, e.getMessage()));
+		errors.add(new CompileError(cur == null ? pouless : pouSource.getOrDefault(cur.name, pouless), e.line, e.column, e.getMessage()));
 	}
 
 	// ---- the passes -------------------------------------------------------------------------------------------------------------------
 
-	private Result run(List<String> sources) {
+	private final Map<String, String> pouSource = new HashMap<>();
+	private String pouless = "";
+
+	private Result run(List<Project.Source> sources) {
 		List<Ast.Unit> units = new ArrayList<>();
 		units.add(STANDARD);
-		for (String source : sources) {
-			units.add(Parser.parse(source, errors));
+		Map<String, Ast.Pou> known = new HashMap<>();
+		STANDARD.pous().forEach(p -> known.put(p.name(), p));
+		boolean single = sources.size() == 1;
+		// structured text and the graphical headers first, so a diagram can place any block in the project
+		Map<Project.Source, Ast.Pou> headers = new java.util.LinkedHashMap<>();
+		for (Project.Source source : sources) {
+			String label = single ? "" : source.name();
+			if (source.language() == Project.Language.ST) {
+				List<CompileError> found = new ArrayList<>();
+				Ast.Unit unit = Parser.parse(source.text(), found);
+				found.forEach(e -> errors.add(new CompileError(label, e.line(), e.column(), e.message())));
+				unit.pous().forEach(p -> {
+					known.put(p.name(), p);
+					pouSource.put(p.name(), label);
+				});
+				units.add(unit);
+			} else {
+				try {
+					Ast.Pou header = header(source, errors);
+					if (header != null) {
+						headers.put(source, header);
+						known.put(header.name(), header);
+						pouSource.put(header.name(), label);
+					}
+				} catch (RuntimeException e) {
+					errors.add(new CompileError(label, 1, 1, "the saved diagram is damaged: " + e.getMessage()));
+				}
+			}
 		}
+		headers.forEach((source, header) -> {
+			String label = single ? "" : source.name();
+			try {
+				Ast.Pou pou = source.language() == Project.Language.LD ? Ladder.parse(source.text()).toPou(header, known, errors, label) : Fbd.parse(source.text()).toPou(header, known, errors, label);
+				units.add(new Ast.Unit(List.of(), List.of(), List.of(pou), List.of(), List.of()));
+			} catch (RuntimeException e) {
+				errors.add(new CompileError(label, 1, 1, "the saved diagram is damaged: " + e.getMessage()));
+			}
+		});
 		for (Ast.Unit unit : units) {
 			for (Ast.TypeDecl decl : unit.types()) {
 				if (typeDecls.putIfAbsent(decl.name(), decl) != null) {
@@ -267,18 +346,19 @@ public final class PlcCompiler {
 				globalDecls.put(decl.name(), decl);
 			}
 		}
+		int diagramErrors = errors.size();   // a diagram's own errors do not hide the rest
 		attempt(() -> {
 			for (Ast.TypeDecl decl : typeDecls.values()) {
 				attempt(() -> resolveNamed(decl.name(), decl.line()));
 			}
 		});
-		for (Pou pou : pous.values()) {
-			attempt(() -> layout(pou));
-		}
-		for (Ast.Unit unit : units) {
+		for (Ast.Unit unit : units) {   // before the POUs' own layouts, as a diagram's result can take a global's type
 			for (Ast.VarDecl decl : unit.globals()) {
 				attempt(() -> declareGlobal(decl));
 			}
+		}
+		for (Pou pou : pous.values()) {
+			attempt(() -> layout(pou));
 		}
 		for (Pou pou : pous.values()) {
 			if (pou.isFunction() && pou.laidOut) {
@@ -292,14 +372,14 @@ public final class PlcCompiler {
 		}
 		Map<String, Integer> instances = new LinkedHashMap<>();
 		List<PlcProgram.Task> tasks = tasks(units, instances);
-		if (errors.isEmpty()) {
+		if (errors.size() == diagramErrors) {
 			for (Pou pou : pous.values()) {
 				generate(pou);
 			}
 			checkRecursion();
 		}
 		if (!errors.isEmpty()) {
-			errors.sort((a, b) -> a.line() != b.line() ? a.line() - b.line() : a.column() - b.column());
+			errors.sort(java.util.Comparator.comparing(CompileError::source).thenComparingInt(CompileError::line).thenComparingInt(CompileError::column));
 			return new Result(null, List.copyOf(errors));
 		}
 		int[] entries = new int[pous.size()];
@@ -469,6 +549,13 @@ public final class PlcCompiler {
 					out.size += type.slots();
 				}
 				yield out;
+			}
+			case Ast.AutoType a -> {
+				Type type = settle(typeOf(a.of()), null);
+				if (type.slots() != 1) {
+					throw error(a.line(), "this block's result is a " + type.label() + ", which a wire cannot carry");
+				}
+				yield type;
 			}
 			case Ast.EnumType e -> {
 				EnumT out = new EnumT(named == null ? "ENUM" : named, List.copyOf(e.values()));

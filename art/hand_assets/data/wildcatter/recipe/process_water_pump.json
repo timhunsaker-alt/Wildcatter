@@ -1,0 +1,18 @@
+{
+ "type": "minecraft:crafting_shaped",
+ "category": "building",
+ "pattern": [
+  "III",
+  "CBC",
+  "ICI"
+ ],
+ "key": {
+  "I": "minecraft:iron_ingot",
+  "C": "minecraft:copper_ingot",
+  "B": "wildcatter:pump"
+ },
+ "result": {
+  "id": "wildcatter:process_water_pump",
+  "count": 1
+ }
+}

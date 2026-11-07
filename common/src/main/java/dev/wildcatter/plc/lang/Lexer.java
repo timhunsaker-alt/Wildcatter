@@ -26,7 +26,12 @@ final class Lexer {
 	}
 
 	static List<Token> tokens(String src) {
+		return tokens(src, 1);
+	}
+
+	static List<Token> tokens(String src, int firstLine) {
 		Lexer lexer = new Lexer(src);
+		lexer.line = firstLine;
 		List<Token> out = new ArrayList<>();
 		Token token;
 		do {

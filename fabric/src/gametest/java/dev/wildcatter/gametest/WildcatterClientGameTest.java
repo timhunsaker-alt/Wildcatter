@@ -45,6 +45,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		try (TestSingleplayerContext world = context.worldBuilder().create()) {
 			TestServerContext server = world.getServer();
 			context.waitTicks(40);
+			checkAssets(context);
 			y = server.computeOnServer(srv -> srv.overworld().getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, 10, 10));
 			up = y + 1;
 			server.runCommand("fill 6 " + y + " 6 24 " + (y + 4) + " 20 minecraft:air");
@@ -4483,7 +4484,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			context.waitTick();
 			context.getInput().pressMouse(1);
 			context.waitTicks(20);
-			check(server.computeOnServer(srv -> cabinet.apply(srv).source().equals(PLC_PROJECT)), "the download should reach the cabinet");
+			check(server.computeOnServer(srv -> cabinet.apply(srv).project().getFirst().text().equals(PLC_PROJECT)), "the download should reach the cabinet");
 			context.takeScreenshot("wildcatter-plc-editor");
 			context.runOnClient(client -> ((dev.wildcatter.client.PlcScreen) client.gui.screen()).showTabForTest("TERMINALS"));
 			context.waitTicks(15);
@@ -4573,6 +4574,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			server.runOnServer(srv -> ((dev.wildcatter.control.OperatorDeviceBlockEntity) srv.overworld().getBlockEntity(button)).operate());
 			context.waitTicks(60);
 			check(run.get().contains("RUNNING"), "the real project should run it again: " + run.get());
+			plcLadder(context, server, cabinet, status, run, button, estop, new BlockPos(14, up + 2, z + 5));
 			// a save and load keeps the project, the terminals and the latch
 			boolean kept = server.computeOnServer(srv -> {
 				dev.wildcatter.control.PlcCabinetBlockEntity box = cabinet.apply(srv);
@@ -4582,7 +4584,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 				copy.setLevel(srv.overworld());
 				copy.loadCustomOnly(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, registries, saved));
 				dev.wildcatter.control.PlcCabinetBlockEntity.tick(srv.overworld(), at, box.getBlockState(), copy);
-				return copy.source().equals(PLC_PROJECT) && copy.cpu() != null && Boolean.TRUE.equals(copy.cpu().read("MAIN.LATCH")) && copy.cpu().mode() == dev.wildcatter.plc.Cpu.Mode.RUN;
+				return copy.project().equals(box.project()) && copy.cpu() != null && Boolean.TRUE.equals(copy.cpu().read("POU2.COIL")) && copy.cpu().mode() == dev.wildcatter.plc.Cpu.Mode.RUN;
 			});
 			check(kept, "a save and load should keep the project and the latch");
 			put(server, 13, up, z + 5, "minecraft:air");
@@ -4599,6 +4601,169 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 				film.stop();
 			}
 		}
+	}
+
+	/** Every block and item of the mod has its files. The asset generator clears what it does not know about, so a hand-made file can vanish without an error anywhere else. */
+	private void checkAssets(ClientGameTestContext context) {
+		java.util.List<String> missing = context.computeOnClient(client -> {
+			java.util.List<String> out = new java.util.ArrayList<>();
+			var resources = client.getResourceManager();
+			for (var block : net.minecraft.core.registries.BuiltInRegistries.BLOCK) {
+				var id = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block);
+				if (id.getNamespace().equals("wildcatter") && resources.getResource(net.minecraft.resources.Identifier.fromNamespaceAndPath("wildcatter", "blockstates/" + id.getPath() + ".json")).isEmpty()) {
+					out.add("blockstate " + id.getPath());
+				}
+			}
+			for (var item : net.minecraft.core.registries.BuiltInRegistries.ITEM) {
+				var id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item);
+				if (id.getNamespace().equals("wildcatter") && resources.getResource(net.minecraft.resources.Identifier.fromNamespaceAndPath("wildcatter", "items/" + id.getPath() + ".json")).isEmpty()) {
+					out.add("item " + id.getPath());
+				}
+			}
+			return out;
+		});
+		check(missing.isEmpty(), "these have no assets: " + missing);
+	}
+
+	private dev.wildcatter.client.PlcScreen plcScreen(net.minecraft.client.Minecraft client) {
+		return (dev.wildcatter.client.PlcScreen) client.gui.screen();
+	}
+
+	/** Presses a labelled button in the PLC screen with the real mouse. */
+	private void plcClick(ClientGameTestContext context, String label) {
+		int[] at = context.computeOnClient(client -> plcScreen(client).buttonForTest(label));
+		check(at != null, "the " + label + " button should be there");
+		double toWindow = context.computeOnClient(client -> (double) client.getWindow().getScreenWidth() / client.getWindow().getGuiScaledWidth());
+		context.getInput().setCursorPos(at[0] * toWindow, at[1] * toWindow);
+		context.waitTick();
+		context.getInput().pressMouse(1);
+		context.waitTick();
+	}
+
+	private void plcField(ClientGameTestContext context, String label, String value) {
+		check(context.computeOnClient(client -> plcScreen(client).setFieldForTest(label, value)), "the " + label + " field should be there");
+	}
+
+	/** Phase 13c: the same motor from a ladder drawn with the real toolbar, a live view, forcing, an online change, and an FBD beside it. */
+	private void plcLadder(ClientGameTestContext context, TestServerContext server, java.util.function.Function<net.minecraft.server.MinecraftServer, dev.wildcatter.control.PlcCabinetBlockEntity> cabinet,
+			java.util.function.Supplier<String> status, java.util.function.Supplier<String> run, BlockPos button, BlockPos estop, BlockPos stack) {
+		context.waitTicks(1200);   // the overload relay cools from the last round of starts
+		server.runOnServer(srv -> cabinet.apply(srv).open(srv.getPlayerList().getPlayers().get(0)));
+		context.waitTicks(20);
+		// a project far past a vanilla client packet's 32 KB
+		context.runOnClient(client -> {
+			StringBuilder big = new StringBuilder("FUNCTION_BLOCK BIG\n(*");
+			for (int i = 0; i < 4000; i++) {
+				big.append("A long comment, to make a big project. ");
+			}
+			plcScreen(client).loadUnitForTest(dev.wildcatter.plc.lang.Project.Language.ST, "BIG", big + "*)\nEND_FUNCTION_BLOCK");
+		});
+		plcClick(context, "DOWNLOAD");
+		context.waitTicks(40);
+		check(server.computeOnServer(srv -> cabinet.apply(srv).project().size()) == 2, "a 150 KB project should reach the cabinet: " + server.computeOnServer(srv -> cabinet.apply(srv).project().size()));
+		plcClick(context, "DELETE UNIT");   // BIG is not first, so it selects MAIN and we delete below
+		// draw the ladder with the toolbar
+		plcClick(context, "+LD");
+		context.waitTicks(5);
+		context.runOnClient(client -> plcScreen(client).selectUnitForTest("MAIN"));
+		context.waitTicks(5);
+		plcClick(context, "DELETE UNIT");
+		context.waitTicks(5);
+		plcClick(context, "VARS");
+		context.runOnClient(client -> plcScreen(client).replaceForTest("""
+				VAR
+					start AT %IX0.0 : BOOL;
+					healthy AT %IX0.1 : BOOL;
+					running AT %IX0.2 : BOOL;
+					tripped AT %IX0.3 : BOOL;
+					coil AT %QX16.0 : BOOL;
+					lamp AT %QX16.1 : BOOL;
+				END_VAR"""));
+		plcClick(context, "DRAW");
+		plcClick(context, "RUNG");
+		plcClick(context, "NO");
+		plcField(context, "variable", "start");
+		plcClick(context, "BRANCH");
+		plcField(context, "variable", "coil");
+		context.runOnClient(client -> plcScreen(client).deselectForTest());
+		context.waitTick();
+		plcClick(context, "NO");
+		plcField(context, "variable", "healthy");
+		plcClick(context, "NC");
+		plcField(context, "variable", "tripped");
+		plcClick(context, "COIL");
+		plcField(context, "variable", "coil");
+		plcClick(context, "RUNG");
+		plcClick(context, "NO");
+		plcField(context, "variable", "running");
+		plcClick(context, "COIL");
+		plcField(context, "variable", "lamp");
+		context.waitTick();
+		context.runOnClient(client -> System.out.println("[wildcatter-test] plc ladder saved: " + plcScreen(client).savedForTest().replace("\n", " / ")));
+		plcClick(context, "DOWNLOAD");
+		context.waitTicks(20);
+		check(context.computeOnClient(client -> plcScreen(client).errorsForTest().isEmpty()), "the drawn ladder should compile: " + context.computeOnClient(client -> plcScreen(client).errorsForTest().toString()));
+		check(server.computeOnServer(srv -> cabinet.apply(srv).project().size() == 1 && cabinet.apply(srv).project().getFirst().language() == dev.wildcatter.plc.lang.Project.Language.LD), "the ladder should reach the cabinet");
+		check(status.get().contains("STOP"), "a download stops the CPU: " + status.get());
+		plcClick(context, "RUN");
+		context.waitTicks(30);
+		check(status.get().contains("RUN"), "RUN, from the screen: " + status.get());
+		check(context.computeOnClient(client -> plcScreen(client).liveForTest()), "the ladder should go live");
+		context.takeScreenshot("wildcatter-plc-ladder-idle");
+		server.runOnServer(srv -> ((dev.wildcatter.control.OperatorDeviceBlockEntity) srv.overworld().getBlockEntity(button)).operate());
+		context.waitTicks(120);
+		check(run.get().contains("RUNNING"), "the drawn ladder should start the motor: " + run.get());
+		context.takeScreenshot("wildcatter-plc-ladder-running");
+		// the power it draws is what the CPU computed: the seal branch has power, and the start branch does not, now the button is out
+		java.util.Map<String, String> shown = context.computeOnClient(client -> new java.util.HashMap<>(plcScreen(client).valuesForTest()));
+		check(shown.values().stream().filter("true"::equals).count() >= 3 && shown.containsValue("false"), "the live view should show power and no power: " + shown);
+		// an online change: a rung added with the motor running
+		plcClick(context, "RUNG");
+		plcClick(context, "NO");
+		plcField(context, "variable", "running");
+		plcClick(context, "ONLINE CHG");
+		context.waitTicks(20);
+		check(status.get().contains("RUN") && run.get().contains("RUNNING"), "an online change should not stop anything: " + status.get() + " | " + run.get());
+		// an FBD beside the ladder, in one project: run a green lamp a second after the motor starts
+		String fbd = """
+				PROGRAM GREEN
+				VAR
+					running AT %IX0.2 : BOOL;
+					green AT %QX16.2 : BOOL;
+				END_VAR
+				---
+				("B" "1" "IN_VAR" "running" "4" "8")
+				("B" "2" "TON" "SETTLE" "110" "8" ("IN" "@1.OUT") ("PT" "T#1s"))
+				("B" "3" "OUT_VAR" "green" "240" "8" ("IN" "@2.Q"))
+				""";
+		context.runOnClient(client -> plcScreen(client).loadUnitForTest(dev.wildcatter.plc.lang.Project.Language.FBD, "GREEN", fbd));
+		context.waitTick();
+		BlockPos stackAt = stack;
+		server.runOnServer(srv -> cabinet.apply(srv).land(stackAt, 2, "%QX16.2"));
+		plcClick(context, "ONLINE CHG");
+		context.waitTicks(60);
+		check(context.computeOnClient(client -> plcScreen(client).errorsForTest().isEmpty()), "the FBD should compile: " + context.computeOnClient(client -> plcScreen(client).errorsForTest().toString()));
+		check(server.computeOnServer(srv -> srv.overworld().getBlockState(stackAt).getValue(dev.wildcatter.control.OperatorDeviceBlock.LAMPS)) == 4, "the FBD's timer should light the stack's green lamp");
+		context.takeScreenshot("wildcatter-plc-fbd");
+		// the e-stop, then a force: the ONLINE tab starts the motor with nobody at the button
+		server.runOnServer(srv -> ((dev.wildcatter.control.OperatorDeviceBlockEntity) srv.overworld().getBlockEntity(estop)).operate());
+		context.waitTicks(20);
+		check(run.get().contains("STOPPED"), "the e-stop still stops it: " + run.get());
+		server.runOnServer(srv -> ((dev.wildcatter.control.OperatorDeviceBlockEntity) srv.overworld().getBlockEntity(estop)).operate());
+		context.waitTicks(10);
+		plcClick(context, "ONLINE");
+		plcField(context, "tag or address", "%IX0.0");
+		plcField(context, "value", "TRUE");
+		plcClick(context, "WATCH");
+		plcClick(context, "FORCE");
+		context.waitTicks(120);
+		check(status.get().contains("FORCING") && run.get().contains("RUNNING"), "a forced input should start it, with the light on: " + status.get() + " | " + run.get());
+		context.takeScreenshot("wildcatter-plc-online");
+		plcClick(context, "RELEASE");
+		context.waitTicks(10);
+		check(!status.get().contains("FORCING") && run.get().contains("RUNNING"), "released, the seal holds it: " + status.get() + " | " + run.get());
+		context.runOnClient(client -> client.gui.screen().onClose());
+		context.waitTicks(5);
 	}
 
 	private void motorStarter(ClientGameTestContext context, TestServerContext server) {

@@ -10,6 +10,7 @@ import dev.wildcatter.plc.Diagnostic;
 import dev.wildcatter.plc.IoAddress;
 import dev.wildcatter.plc.lang.CompileError;
 import dev.wildcatter.plc.lang.PlcCompiler;
+import dev.wildcatter.plc.lang.Project;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,7 +46,7 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 	/** Each module slot owns this many bytes of the input and of the output area. */
 	public static final int BYTES_PER_SLOT = 16;
 	private static final int WALK_TICKS = 10;
-	private static final int STATE_TICKS = 10;
+	private static final int STATE_TICKS = 5;
 
 	/** One signal landed on one channel. */
 	public record Landing(BlockPos pos, int point, int slot, int channel) {
@@ -53,7 +54,7 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 
 	private PlcModuleItem.@org.jspecify.annotations.Nullable Type cpuModule;
 	private final PlcModuleItem.Type[] modules = new PlcModuleItem.Type[MODULE_SLOTS];
-	private String source = "";
+	private List<Project.Source> project = new ArrayList<>();
 	private final List<Landing> landings = new ArrayList<>();
 	private final Map<BlockPos, String> tags = new HashMap<>();
 	private Cpu cpu;
@@ -65,6 +66,9 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 	private boolean loadedRunning;
 	private final Set<UUID> watchers = new HashSet<>();
 	private final Map<UUID, List<String>> watching = new HashMap<>();
+	private final Map<UUID, StringBuilder> downloads = new HashMap<>();
+	/** A project's limit, against a player filling a server's memory. */
+	private static final int MOST_PROJECT = 4_000_000;
 
 	public PlcCabinetBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.PLC_CABINET_ENTITY, pos, state);
@@ -82,8 +86,8 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		return net;
 	}
 
-	public String source() {
-		return source;
+	public List<Project.Source> project() {
+		return project;
 	}
 
 	// ---- the rail --------------------------------------------------------------------------------------------------------------------
@@ -143,7 +147,10 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		if (cpuModule == null) {
 			return;
 		}
-		PlcCompiler.Result result = PlcCompiler.compile(cpuModule.cpu, source);
+		if (project.isEmpty()) {
+			return;
+		}
+		PlcCompiler.Result result = PlcCompiler.compile(cpuModule.cpu, project);
 		if (result.ok()) {
 			cpu = new Cpu(cpuModule.cpu, result.program());
 		} else {
@@ -153,15 +160,24 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 
 	/** A new project: compiled here, and on success it replaces the old one, the CPU in STOP. The errors, or empty. */
 	public List<CompileError> download(String text) {
+		return download(Project.of(text), false);
+	}
+
+	/** {@code online} keeps the CPU running on the new code with its values, if a project is running; otherwise as a download. */
+	public List<CompileError> download(List<Project.Source> next, boolean online) {
 		CpuSpec spec = cpuModule == null ? CpuSpec.SMALL : cpuModule.cpu;
-		PlcCompiler.Result result = PlcCompiler.compile(spec, text);
+		PlcCompiler.Result result = PlcCompiler.compile(spec, next);
 		if (!result.ok()) {
 			return result.errors();
 		}
-		source = text;
+		project = new ArrayList<>(next);
 		compileText = "";
 		if (cpuModule != null) {
-			cpu = new Cpu(spec, result.program());
+			if (online && cpu != null) {
+				cpu.onlineChange(result.program());
+			} else {
+				cpu = new Cpu(spec, result.program());
+			}
 		}
 		setChanged();
 		return List.of();
@@ -287,8 +303,27 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		List<String> messages = new ArrayList<>();
 		switch (tag.getStringOr("action", "")) {
 			case "download" -> {
-				List<CompileError> errors = download(tag.getStringOr("source", ""));
-				messages.add(errors.isEmpty() ? "Downloaded. The CPU is in STOP." : "Download refused: " + errors.size() + " error(s)");
+				int part = tag.getIntOr("part", 0);
+				StringBuilder arriving = part == 0 ? new StringBuilder() : downloads.get(player.getUUID());
+				if (arriving == null || arriving.length() + tag.getStringOr("piece", "").length() > MOST_PROJECT) {
+					downloads.remove(player.getUUID());
+					messages.add("Download refused: the project is over " + MOST_PROJECT / 1_000_000 + " million characters");
+					break;
+				}
+				arriving.append(tag.getStringOr("piece", ""));
+				downloads.put(player.getUUID(), arriving);
+				if (part + 1 < tag.getIntOr("parts", 1)) {
+					return;
+				}
+				downloads.remove(player.getUUID());
+				List<Project.Source> next = Project.unpack(arriving.toString());
+				if (next == null) {
+					messages.add("Download refused: it arrived damaged");
+					break;
+				}
+				boolean online = tag.getBooleanOr("online", false);
+				List<CompileError> errors = download(next, online);
+				messages.add(errors.isEmpty() ? online ? "Online change made." : "Downloaded. The CPU is in STOP." : "Download refused: " + errors.size() + " error(s)");
 				errors.forEach(e -> messages.add(e.toString()));
 			}
 			case "key" -> {
@@ -374,13 +409,26 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		tag.putInt("z", worldPosition.getZ());
 		tag.putBoolean("open", open);
 		if (open) {
-			tag.putString("source", source);
+			ListTag units = new ListTag();
+			for (Project.Source unit : project) {
+				CompoundTag entry = new CompoundTag();
+				entry.putString("name", unit.name());
+				entry.putString("language", unit.language().name());
+				entry.putString("text", unit.text());
+				units.add(entry);
+			}
+			tag.put("project", units);
 			ListTag names = new ListTag();
 			if (cpu != null) {
-				new TreeSet<>(cpu.program().tags().keySet()).stream().filter(n -> !n.contains("[") && !isLibrary(n)).limit(1024).forEach(n -> names.add(StringTag.valueOf(n)));
+				new TreeSet<>(cpu.program().tags().keySet()).stream().filter(n -> !n.contains("[") && !n.contains("__") && !isLibrary(n)).limit(1024).forEach(n -> names.add(StringTag.valueOf(n)));
 			}
 			tag.put("names", names);
 		}
+		int hash = 0;
+		for (Project.Source unit : project) {
+			hash = hash * 31 + (unit.name() + unit.language() + unit.text()).hashCode();
+		}
+		tag.putInt("projectHash", hash);
 		tag.putString("status", statusText());
 		tag.putString("cpu", cpuModule == null ? "" : cpuModule.cpu.name());
 		tag.putString("rail", railText());
@@ -407,7 +455,7 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		ListTag values = new ListTag();
 		if (cpu != null) {
 			for (String name : watching.getOrDefault(player.getUUID(), List.of())) {
-				Object value = name.startsWith("%") ? null : cpu.read(name);
+				Object value = cpu.read(name);
 				values.add(StringTag.valueOf(name + "=" + (value == null ? "?" : value)));
 			}
 			cpu.forces().forEach((k, v) -> values.add(StringTag.valueOf(k + "=" + v + " (FORCED)")));
@@ -472,7 +520,7 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 			return "NO CPU: click a CPU module into the cabinet";
 		}
 		if (cpu == null) {
-			return source.isBlank() ? "NO PROJECT" : "The project does not compile: " + compileText;
+			return project.isEmpty() ? "NO PROJECT" : "The project does not compile: " + compileText;
 		}
 		return (cpu.faulted() ? "CPU FAULT" : cpu.mode() == Cpu.Mode.RUN ? "RUN" : "STOP") + (cpu.forcing() ? ", FORCING" : "");
 	}
@@ -513,7 +561,10 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		output.putBoolean("grown", grown);
 		output.putString("cpuModule", cpuModule == null ? "" : cpuModule.name());
 		output.store("modules", Codec.STRING.listOf(), java.util.Arrays.stream(modules).map(m -> m == null ? "" : m.name()).toList());
-		output.store("source", Codec.STRING.listOf(), List.of(source.split("\n", -1)));
+		output.store("units", Codec.STRING.listOf(), project.stream().map(u -> u.name() + "|" + u.language().name()).toList());
+		for (int i = 0; i < project.size(); i++) {
+			output.store("unit" + i, Codec.STRING.listOf(), List.of(project.get(i).text().split("\n", -1)));   // lines, as a save's strings are limited
+		}
 		int[] packed = new int[landings.size() * 6];
 		for (int i = 0; i < landings.size(); i++) {
 			Landing l = landings.get(i);
@@ -557,7 +608,13 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		for (int i = 0; i < modules.length && i < rail.size(); i++) {
 			modules[i] = rail.get(i).isEmpty() ? null : PlcModuleItem.Type.valueOf(rail.get(i));
 		}
-		source = String.join("\n", input.read("source", Codec.STRING.listOf()).orElse(List.of()));
+		project = new ArrayList<>();
+		List<String> units = input.read("units", Codec.STRING.listOf()).orElse(List.of());
+		for (int i = 0; i < units.size(); i++) {
+			String[] head = units.get(i).split("\\|");
+			project.add(new Project.Source(head[0], Project.Language.valueOf(head[1]), String.join("\n", input.read("unit" + i, Codec.STRING.listOf()).orElse(List.of()))));
+		}
+		input.read("source", Codec.STRING.listOf()).ifPresent(old -> project.add(new Project.Source("MAIN", Project.Language.ST, String.join("\n", old))));   // a 13b save
 		landings.clear();
 		int[] packed = input.getIntArray("landings").orElse(new int[0]);
 		for (int i = 0; i + 5 < packed.length; i += 6) {

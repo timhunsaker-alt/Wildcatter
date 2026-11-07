@@ -95,6 +95,27 @@ public final class Cpu {
 		log("project downloaded", null, 0);
 	}
 
+	/**
+	 * An online change: the new project takes over without a stop, each variable of the same name and type keeping its value, as an engineering
+	 * station's does. New variables start at their initial values. Outputs hold through it, as no scan is missed.
+	 */
+	public void onlineChange(PlcProgram next) {
+		long[] newMem = next.initMem().clone();
+		String[] newStr = next.initStr().clone();
+		for (Map.Entry<String, Tag> entry : next.tags().entrySet()) {
+			Tag was = program.tags().get(entry.getKey());
+			Tag now = entry.getValue();
+			if (was != null && was.type() == now.type() && was.area() == 0 && now.area() == 0) {
+				newMem[now.slot()] = mem[was.slot()];
+				newStr[now.slot()] = str[was.slot()];
+			}
+		}
+		program = next;
+		mem = newMem;
+		str = newStr;
+		log("online change", null, 0);
+	}
+
 	public CpuSpec spec() {
 		return spec;
 	}
@@ -301,6 +322,15 @@ public final class Cpu {
 
 	/** A variable's value by name, such as {@code MAIN.T1.ET}: a Boolean, Long, Double or String; null if there is no such tag. */
 	public Object read(String path) {
+		IoAddress direct = path.startsWith("%") ? IoAddress.parse(path) : null;
+		if (direct != null) {
+			int limit = direct.area() == 'I' ? spec.inputBytes() : direct.area() == 'Q' ? spec.outputBytes() : spec.markerBytes();
+			if (direct.byteAddress() + direct.bytes() > limit) {
+				return null;
+			}
+			long raw = readIo(areaOf(direct.area()), direct.size(), direct.byteAddress(), direct.bit());
+			return direct.size() == 'X' ? (Object) (raw != 0) : (Object) raw;
+		}
 		Tag tag = program.tags().get(path.toUpperCase(Locale.ROOT));
 		if (tag == null) {
 			return null;

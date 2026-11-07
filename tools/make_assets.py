@@ -2486,6 +2486,22 @@ lang[f"block.{ns}.branch_cable"] = "Branch Cable (armored, residential)"
 lang[f"block.{ns}.branch_cable_industrial"] = "Branch Cable (armored, industrial LV)"
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Assets made by hand, not by this script (Phase 12's lined cell and process water pump): kept in art/hand_assets, as this script clears the
+# folders it writes. Anything hand-made goes there, or the next run deletes it.
+for _dir, _, _files in os.walk("art/hand_assets"):
+	for _f in _files:
+		_to = os.path.join(ROOT, os.path.relpath(_dir, "art/hand_assets"), _f)
+		os.makedirs(os.path.dirname(_to), exist_ok=True)
+		shutil.copy(os.path.join(_dir, _f), _to)
+
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({"block.wildcatter.process_water_pump": "Process Water Pump", "block.wildcatter.cell_liner": "Cell Liner", "block.wildcatter.decant_tower": "Decant Tower", "block.wildcatter.settled_tails": "Settled Tails"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+for tag, names in {"mineable/pickaxe": ["wildcatter:decant_tower", "wildcatter:process_water_pump"], "needs_stone_tool": []}.items():
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
+	t["values"] += [n for n in names if n not in t["values"]]
+	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
+
 # ---- Phase 13: PLCs (docs/multiblocks/plc.md) --------------------------------------------------------------------------
 # Small wall devices, as plain JSON boxes in the mod's materials and vanilla's coloured blocks: no new textures.
 def _box(f, to, tex):

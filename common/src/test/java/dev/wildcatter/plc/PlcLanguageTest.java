@@ -469,6 +469,33 @@ class PlcLanguageTest {
 	}
 
 	@Test
+	void anOnlineChangeKeepsValuesAndRuns() {
+		Cpu cpu = cpu("PROGRAM MAIN VAR n : INT; t : TON; q AT %QX0.0 : BOOL; gone : INT := 5; END_VAR n := n + 1; q := TRUE; t(IN := TRUE, PT := T#10s); END_PROGRAM");
+		scans(cpu, 4);
+		assertTrue(cpu.outputBit(0, 0));
+		PlcCompiler.Result next = PlcCompiler.compile(CpuSpec.SMALL, "PROGRAM MAIN VAR n : INT; t : TON; q AT %QX0.0 : BOOL; added : INT := 9; END_VAR n := n + 10; q := TRUE; t(IN := TRUE, PT := T#10s); END_PROGRAM");
+		assertTrue(next.ok(), next.errors()::toString);
+		cpu.onlineChange(next.program());
+		assertEquals(Cpu.Mode.RUN, cpu.mode());
+		assertTrue(cpu.outputBit(0, 0), "outputs hold through it");
+		cpu.scan();
+		assertEquals(14L, cpu.read("MAIN.N"), "the value carried over, and the new code runs");
+		assertEquals(9L, cpu.read("MAIN.ADDED"));
+		assertEquals(200L, cpu.read("MAIN.T.ET"), "a timer runs on through it: five scans, from its first");
+	}
+
+	@Test
+	void aDirectAddressCanBeRead() {
+		Cpu cpu = cpu("PROGRAM MAIN VAR END_VAR %QX1.2 := TRUE; %MW4 := WORD#1234; END_PROGRAM");
+		cpu.setInputBit(0, 3, true);
+		cpu.scan();
+		assertEquals(true, cpu.read("%IX0.3"));
+		assertEquals(true, cpu.read("%QX1.2"));
+		assertEquals(1234L, cpu.read("%MW4"));
+		assertEquals(null, cpu.read("%IX99999.0"));
+	}
+
+	@Test
 	void compileErrorsNameTheLine() {
 		List<CompileError> found = errors("PROGRAM MAIN\nVAR a : INT; END_VAR\na := b;\na := TRUE;\nEND_PROGRAM");
 		assertEquals(2, found.size(), found::toString);

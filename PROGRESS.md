@@ -1441,6 +1441,7 @@ sized for a 40-pot line.
 
 ## Tools
 - `tools/process_art.py` and `tools/make_assets.py` generate textures, models, blockstates, lang, loot, tags and recipes. Run `process_art.py` first, then `make_assets.py`.
+- `tools/make_assets.py` clears the folders it writes. **Anything made by hand goes in `art/hand_assets`**, which it copies back, or the next run deletes it without a word. 13b's first commit lost Phase 12's lined cell and pump assets this way; they were restored in 13c, and the client suite now fails if any block or item has no assets.
 - `tools/recipe_sheet.py <dir>` renders every recipe as a crafting-grid picture.
 - `tools/process_materials.py` makes the model materials, and `tools/models/build.py [part]` builds the true-size part models and previews (make_assets runs it).
 - The client game test takes screenshots into `build/run/clientGameTest/screenshots/`.
@@ -1604,6 +1605,8 @@ Spec: `docs/multiblocks/plc.md`, decided by Tim 2026-11-07: nine waves.
 **13a, the language core (2026-11-07):** IEC 61131-3 structured text, compiled to a bounded bytecode and run by a CPU in plain Java, with no game face yet. 31 unit tests run real programs: the scan's input image, every statement and type, timers and counters against the scan's clock, tasks at their intervals, a PID holding a level with anti-windup and bumpless transfer, forcing, retained values, the watchdog stopping a runaway program. Nothing a player can place yet: that is 13b.
 
 **13b, the hardware and the editor (2026-11-07):** a PLC cabinet with CPU, 16-channel input and relay output modules; a 24 V control supply; multi-core control cable and junction boxes; pushbutton, selector, e-stop, pilot light, stack light, horn; a keyed HAND / OFF / AUTO selector on every starter (standalone, MCC bucket, soft starter, drive). The cabinet's screen is a real code editor, terminals, online tags and forcing, and a diagnostic buffer. Game scene `plc`, filmed. In HAND a starter is exactly as before.
+
+**13c, ladder and FBD (2026-11-07):** projects of program units in structured text, ladder and function block diagrams, calling each other; both graphical languages drawn with a toolbar and mouse; live power flow from the CPU's own values; forcing from the ONLINE tab; online change; large downloads in pieces. 18 more unit tests; the `plc` scene now draws a ladder, runs the motor from it, makes an online change, adds an FBD and forces an input.
 
 v0.4.1 (2026-11-06), two fixes found by Tailings' playthrough; the full client suite passed on them (2h 45m):
 - **The solver no longer gives up on a floating bus.** A busway's neutral on a dead bus has low resistance and no path to ground, so the small leak each node carries rounded away and the factorisation stopped with "Could not solve the circuit". The solve for that whole group was then dropped, so the generator's synchroniser never read the bus and its breaker never closed. The node now gets its leak back. Unit test `aFloatingBusStillSolves`. The warning came 241 times in the v0.4.0 suite's log, on a suite that passed, and 0 times in this one.

@@ -4,11 +4,21 @@ import dev.wildcatter.control.PlcNet;
 import dev.wildcatter.platform.Platform;
 import dev.wildcatter.plc.CpuSpec;
 import dev.wildcatter.plc.TextBuffer;
+import dev.wildcatter.plc.lang.Ast;
+import dev.wildcatter.plc.lang.BlockLibrary;
 import dev.wildcatter.plc.lang.CompileError;
+import dev.wildcatter.plc.lang.Fbd;
+import dev.wildcatter.plc.lang.Ladder;
 import dev.wildcatter.plc.lang.PlcCompiler;
+import dev.wildcatter.plc.lang.Project;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
@@ -48,7 +58,10 @@ public class PlcScreen extends Screen {
 	private static final int SELECT = 0xFF34507A;
 	private static final int ROW = 11;
 	private static final int TOP = 42;
-	private static final int ERROR_ROWS = 5;
+	private static final int ERROR_ROWS = 4;
+	private static final int PIECE = 8000;
+	private static final int LIST_W = 80;
+	private static final int SIDE_W = 104;
 	private static final Set<String> KEYWORDS = Set.of("PROGRAM", "END_PROGRAM", "FUNCTION", "END_FUNCTION", "FUNCTION_BLOCK", "END_FUNCTION_BLOCK", "VAR", "VAR_INPUT", "VAR_OUTPUT", "VAR_IN_OUT",
 			"VAR_TEMP", "VAR_GLOBAL", "VAR_EXTERNAL", "END_VAR", "CONSTANT", "RETAIN", "AT", "IF", "THEN", "ELSIF", "ELSE", "END_IF", "CASE", "OF", "END_CASE", "FOR", "TO", "BY", "DO", "END_FOR", "WHILE",
 			"END_WHILE", "REPEAT", "UNTIL", "END_REPEAT", "EXIT", "CONTINUE", "RETURN", "AND", "OR", "XOR", "NOT", "MOD", "TRUE", "FALSE", "TYPE", "END_TYPE", "STRUCT", "END_STRUCT", "ARRAY", "CONFIGURATION",
@@ -59,7 +72,12 @@ public class PlcScreen extends Screen {
 	private final int x;
 	private final int y;
 	private final int z;
-	private final TextBuffer code;
+	private final List<Unit> units = new ArrayList<>();
+	private Unit unit;
+	private final Map<String, String> values = new HashMap<>();
+	private Map<String, Ast.Pou> library = Map.of();
+	private String boxType = "TON";
+	private TextBuffer code = new TextBuffer("");
 	private final List<String> tagNames = new ArrayList<>();
 	private final List<String> watched = new ArrayList<>();
 	private Tab tab = Tab.CODE;
@@ -81,7 +99,16 @@ public class PlcScreen extends Screen {
 		x = tag.getIntOr("x", 0);
 		y = tag.getIntOr("y", 0);
 		z = tag.getIntOr("z", 0);
-		code = new TextBuffer(tag.getStringOr("source", ""));
+		ListTag saved = tag.getListOrEmpty("project");
+		for (int i = 0; i < saved.size(); i++) {
+			CompoundTag entry = saved.getCompoundOrEmpty(i);
+			units.add(new Unit(entry.getStringOr("name", "MAIN"), Project.Language.valueOf(entry.getStringOr("language", "ST")), entry.getStringOr("text", "")));
+		}
+		if (units.isEmpty()) {
+			units.add(new Unit("MAIN", Project.Language.ST, "PROGRAM MAIN\nVAR\nEND_VAR\n\nEND_PROGRAM"));
+		}
+		select(units.getFirst());
+		readValues(tag);
 		tag.getListOrEmpty("names").forEach(t -> t.asString().ifPresent(tagNames::add));
 		state = tag;
 	}
@@ -91,10 +118,150 @@ public class PlcScreen extends Screen {
 		Minecraft minecraft = Minecraft.getInstance();
 		if (minecraft.gui.screen() instanceof PlcScreen open && open.x == tag.getIntOr("x", 0) && open.y == tag.getIntOr("y", 0) && open.z == tag.getIntOr("z", 0)) {
 			open.state = tag;
+			open.readValues(tag);
 			tag.getListOrEmpty("messages").forEach(t -> t.asString().ifPresent(open.notes::add));
 		} else if (tag.getBooleanOr("open", false)) {
 			minecraft.gui.setScreen(new PlcScreen(tag));
 		}
+	}
+
+	/** One program unit, being edited. */
+	private final class Unit {
+		String name;
+		final Project.Language language;
+		TextBuffer text;
+		LadderPane ladder;
+		FbdPane fbd;
+		boolean showVars;
+		TextBuffer vars;
+		String monitor = "";
+		final Deque<String> undo = new ArrayDeque<>();
+
+		Unit(String name, Project.Language language, String saved) {
+			this.name = name;
+			this.language = language;
+			load(saved);
+		}
+
+		void load(String saved) {
+			switch (language) {
+				case ST -> text = new TextBuffer(saved);
+				case LD -> {
+					ladder = new LadderPane(Ladder.parse(saved), type -> {
+						BlockLibrary.Pins pins = BlockLibrary.pins(type, library);
+						if (pins == null) {
+							return List.of();
+						}
+						List<String> shown = new ArrayList<>(pins.inputs());
+						Ast.Pou pou = library.get(type);
+						if (pou != null) {
+							shown.remove(firstBoolInput(pou));   // the rung's power goes there
+						}
+						return shown;
+					});
+					vars = new TextBuffer(ladder.ladder.declarations);
+				}
+				case FBD -> {
+					fbd = new FbdPane(Fbd.parse(saved), type -> BlockLibrary.pins(type, library));
+					vars = new TextBuffer(fbd.fbd.declarations);
+				}
+			}
+		}
+
+		String saved() {
+			return switch (language) {
+				case ST -> text.text();
+				case LD -> {
+					ladder.ladder.declarations = vars.text();
+					yield ladder.ladder.write();
+				}
+				case FBD -> {
+					fbd.fbd.declarations = vars.text();
+					yield fbd.fbd.write();
+				}
+			};
+		}
+
+		String pouName() {
+			return language == Project.Language.LD ? ladder.ladder.name : language == Project.Language.FBD ? fbd.fbd.name : name;
+		}
+
+		String kind() {
+			return language == Project.Language.LD ? ladder.ladder.kind : language == Project.Language.FBD ? fbd.fbd.kind : "";
+		}
+
+		/** Where the CPU holds this unit's variables: a program's name, or the instance chosen for a function block. */
+		String prefix() {
+			return !monitor.isBlank() ? monitor.toUpperCase(Locale.ROOT) : kind().equals("PROGRAM") ? pouName() : "";
+		}
+
+		void touch() {
+			undo.push(saved());
+			while (undo.size() > 100) {
+				undo.removeLast();
+			}
+		}
+	}
+
+	private static String firstBoolInput(Ast.Pou pou) {
+		for (Ast.VarDecl decl : pou.vars()) {
+			if (decl.kind() == Ast.VarKind.INPUT && decl.type() instanceof Ast.NamedType named && named.name().equals("BOOL")) {
+				return decl.name();
+			}
+		}
+		return "";
+	}
+
+	private void select(Unit next) {
+		unit = next;
+		if (next.language == Project.Language.ST) {
+			code = next.text;
+		} else {
+			code = next.vars;
+		}
+		scrollLine = 0;
+		refreshLibrary();
+	}
+
+	private void refreshLibrary() {
+		library = PlcCompiler.library(sources());
+	}
+
+	private List<Project.Source> sources() {
+		List<Project.Source> out = new ArrayList<>();
+		for (Unit each : units) {
+			out.add(new Project.Source(each.name, each.language, each.saved()));
+		}
+		return out;
+	}
+
+	private void readValues(CompoundTag tag) {
+		values.clear();
+		ListTag list = tag.getListOrEmpty("values");
+		for (int i = 0; i < list.size(); i++) {
+			String row = list.getStringOr(i, "");
+			int cut = row.indexOf('=');
+			if (cut > 0) {
+				values.put(row.substring(0, cut), row.substring(cut + 1));
+			}
+		}
+	}
+
+	/** True while what is on screen is what the CPU is running. */
+	private boolean inSync() {
+		int hash = 0;
+		for (Project.Source source : sources()) {
+			hash = hash * 31 + (source.name() + source.language() + source.text()).hashCode();
+		}
+		return state.getIntOr("projectHash", 0) == hash;
+	}
+
+	private boolean live() {
+		return inSync() && state.getBooleanOr("running", false) && !state.getBooleanOr("faulted", false) && state.getBooleanOr("powered", false) && !unit.prefix().isEmpty();
+	}
+
+	private boolean graphic() {
+		return unit.language != Project.Language.ST && !unit.showVars;
 	}
 
 	private void ask(String action, Consumer<CompoundTag> fill) {
@@ -127,6 +294,7 @@ public class PlcScreen extends Screen {
 	protected void init() {
 		fieldOne = null;
 		fieldTwo = null;
+		refreshLibrary();
 		int bx = 8;
 		for (Tab each : Tab.values()) {
 			int w = font.width(each.name()) + 12;
@@ -134,6 +302,7 @@ public class PlcScreen extends Screen {
 				tab = each;
 				scrollList = 0;
 				rebuildWidgets();
+				sendWatch();
 			});
 			b.active = each != tab;
 			bx += w + 2;
@@ -144,8 +313,7 @@ public class PlcScreen extends Screen {
 		button(right - 88, 22, 42, "STOP", () -> ask("key", t -> t.putBoolean("run", false)));
 		button(right - 130, 22, 40, "RUN", () -> ask("key", t -> t.putBoolean("run", true)));
 		if (tab == Tab.CODE) {
-			button(right - 64, height - 26, 60, "DOWNLOAD", this::download);   // in the corner of the message pane: the top row is full at a small window
-			button(right - 108, height - 26, 42, "CHECK", this::check);
+			codeWidgets();
 		} else if (tab == Tab.TERMINALS) {
 			fieldOne = addRenderableWidget(new EditBox(font, width - 208, TOP + 14, 140, 16, Component.literal("address")));
 			fieldOne.setHint(Component.literal("%IX0.0"));
@@ -188,10 +356,259 @@ public class PlcScreen extends Screen {
 		}
 	}
 
+	private EditBox labelled(int bx, int by, int w, String label, String value, Consumer<String> change) {
+		EditBox box = addRenderableWidget(new EditBox(font, bx, by, w, 14, Component.literal(label)));
+		box.setMaxLength(256);
+		box.setValue(value == null ? "" : value);
+		box.setResponder(change);
+		return box;
+	}
+
+	private int canvasRight() {
+		return graphic() ? width - 8 - SIDE_W : width - 8;
+	}
+
+	/** The CODE tab: the list of units, the toolbar for this unit's language, and what is selected in it. */
+	private void codeWidgets() {
+		int right = width - 8;
+		button(right - 64, height - 26, 60, "DOWNLOAD", this::download);
+		button(right - 108, height - 26, 42, "CHECK", this::check);
+		button(right - 170, height - 26, 60, "ONLINE CHG", this::onlineChange);
+		int by = TOP + 14 + units.size() * ROW + 2;
+		for (Project.Language language : Project.Language.values()) {
+			int bx = 8 + language.ordinal() * 24;
+			button(bx, by, language == Project.Language.FBD ? 28 : 23, "+" + language.name(), () -> addUnit(language));
+		}
+		button(8, by + 18, 76, "DELETE UNIT", this::deleteUnit);
+		labelled(8, by + 36, 76, "name", unit.name, value -> {
+			unit.name = value;
+		});
+		if (unit.language != Project.Language.ST) {
+			button(LIST_W + 8 + 0, TOP, 30, unit.showVars ? "DRAW" : "VARS", () -> {
+				unit.showVars = !unit.showVars;
+				select(unit);
+				rebuildWidgets();
+				sendWatch();
+			});
+		}
+		if (!graphic()) {
+			return;
+		}
+		int tx = LIST_W + 8 + 32;
+		if (unit.language == Project.Language.LD) {
+			for (String[] tool : new String[][] {{"NO", "24"}, {"NC", "24"}, {"BOX", "28"}, {"BRANCH", "44"}, {"COIL", "32"}, {"/", "14"}, {"S", "14"}, {"R", "14"}, {"RUNG", "32"}, {"DEL", "26"}}) {
+				String name = tool[0];
+				int w = Integer.parseInt(tool[1]);
+				button(tx, TOP, w, name, () -> ladderTool(name));
+				tx += w + 1;
+			}
+			ladderSide();
+		} else {
+			for (String[] tool : new String[][] {{"IN", "24"}, {"OUT", "28"}, {"BLOCK", "40"}, {"DEL", "26"}}) {
+				String name = tool[0];
+				int w = Integer.parseInt(tool[1]);
+				button(tx, TOP, w, name, () -> fbdTool(name));
+				tx += w + 1;
+			}
+			fbdSide();
+		}
+	}
+
+	private void typeChooser(int sx, int sy, Runnable changed) {
+		button(sx, sy, 14, "<", () -> {
+			int at = BlockLibrary.COMMON.indexOf(boxType);
+			boxType = BlockLibrary.COMMON.get(Math.floorMod(at - 1, BlockLibrary.COMMON.size()));
+			changed.run();
+			rebuildWidgets();
+		});
+		button(sx + SIDE_W - 22, sy, 14, ">", () -> {
+			int at = BlockLibrary.COMMON.indexOf(boxType);
+			boxType = BlockLibrary.COMMON.get(Math.floorMod(at + 1, BlockLibrary.COMMON.size()));
+			changed.run();
+			rebuildWidgets();
+		});
+		labelled(sx + 15, sy + 1, SIDE_W - 38, "type", boxType, value -> {
+			String upper = value.toUpperCase(Locale.ROOT);
+			if (BlockLibrary.pins(upper, library) != null && !upper.equals(boxType)) {
+				boxType = upper;
+				changed.run();
+				rebuildWidgets();
+			}
+		});
+	}
+
+	private void ladderSide() {
+		int sx = width - 8 - SIDE_W + 4;
+		int w = SIDE_W - 8;
+		int sy = TOP + 18;
+		LadderPane pane = unit.ladder;
+		typeChooser(sx, sy + 9, () -> {
+			if (pane.selected instanceof Ladder.Box box) {
+				unit.touch();
+				box.type = boxType;
+				box.pins.clear();
+				box.instance = BlockLibrary.needsInstance(boxType, library) ? (box.instance.isEmpty() ? autoInstance(boxType) : box.instance) : "";
+			}
+		});
+		sy += 36;
+		switch (pane.selected) {
+			case Ladder.Contact c -> labelled(sx, sy + 9, w, "variable", c.var, value -> {
+				c.var = value;
+			});
+			case Ladder.Coil c -> labelled(sx, sy + 9, w, "variable", c.var, value -> {
+				c.var = value;
+			});
+			case Ladder.Box box -> {
+				if (BlockLibrary.needsInstance(box.type, library)) {
+					labelled(sx, sy + 9, w, "instance", box.instance, value -> {
+						box.instance = value;
+					});
+					sy += 26;
+				}
+				BlockLibrary.Pins pins = BlockLibrary.pins(box.type, library);
+				if (pins != null) {
+					Ast.Pou pou = library.get(box.type);
+					List<String> all = new ArrayList<>(pins.inputs());
+					all.addAll(pins.outputs());
+					for (String pin : all) {
+						if (pou != null && pin.equals(firstBoolInput(pou))) {
+							continue;
+						}
+						labelled(sx, sy + 9, w, pin, box.pins.getOrDefault(pin, ""), value -> {
+							box.pins.put(pin, value);
+						});
+						sy += 26;
+					}
+				}
+			}
+			case null, default -> {
+				if (pane.selectedRung != null) {
+					labelled(sx, sy + 9, w, "comment", pane.selectedRung.comment, value -> {
+						pane.selectedRung.comment = value;
+					});
+					sy += 26;
+				}
+				labelled(sx, sy + 9, w, "monitor", unit.monitor, value -> {
+					unit.monitor = value;
+					sendWatch();
+				});
+			}
+		}
+	}
+
+	private void fbdSide() {
+		int sx = width - 8 - SIDE_W + 4;
+		int w = SIDE_W - 8;
+		int sy = TOP + 18;
+		FbdPane pane = unit.fbd;
+		typeChooser(sx, sy + 9, () -> {
+		});
+		sy += 36;
+		Fbd.Block block = pane.selected;
+		if (block == null) {
+			labelled(sx, sy + 9, w, "monitor", unit.monitor, value -> {
+				unit.monitor = value;
+				sendWatch();
+			});
+			return;
+		}
+		boolean named = block.type.equals(Fbd.IN) || block.type.equals(Fbd.OUT) || BlockLibrary.needsInstance(block.type, library);
+		if (named) {
+			labelled(sx, sy + 9, w, block.type.equals(Fbd.IN) || block.type.equals(Fbd.OUT) ? "variable or value" : "instance", block.name, value -> {
+				block.name = value;
+			});
+			sy += 26;
+		}
+		BlockLibrary.Pins pins = BlockLibrary.pins(block.type, library);
+		if (pins != null && !block.type.equals(Fbd.IN) && !block.type.equals(Fbd.OUT)) {
+			for (String pin : pins.inputs()) {
+				String source = block.inputs.get(pin);
+				labelled(sx, sy + 9, w, pin, Fbd.isWire(source) ? "(wired)" : source, value -> {
+					if (!value.equals("(wired)")) {
+						block.inputs.put(pin, value);
+					}
+				});
+				sy += 26;
+			}
+		}
+	}
+
+	private String autoInstance(String type) {
+		int n = 1;
+		String all = String.join("\n", sources().stream().map(Project.Source::text).toList()).toUpperCase(Locale.ROOT);
+		while (all.contains("\"" + type + "_" + n + "\"")) {
+			n++;
+		}
+		return type + "_" + n;
+	}
+
+	private void ladderTool(String name) {
+		LadderPane pane = unit.ladder;
+		unit.touch();
+		switch (name) {
+			case "NO" -> pane.insertSeries(new Ladder.Contact("", false));
+			case "NC" -> pane.insertSeries(new Ladder.Contact("", true));
+			case "BOX" -> pane.insertSeries(new Ladder.Box(boxType, BlockLibrary.needsInstance(boxType, library) ? autoInstance(boxType) : ""));
+			case "BRANCH" -> pane.insertBranch(new Ladder.Contact("", false));
+			case "COIL" -> pane.addCoil(Ladder.CoilKind.COIL);
+			case "/" -> pane.addCoil(Ladder.CoilKind.NOT);
+			case "S" -> pane.addCoil(Ladder.CoilKind.SET);
+			case "R" -> pane.addCoil(Ladder.CoilKind.RESET);
+			case "RUNG" -> pane.addRung();
+			case "DEL" -> pane.deleteSelected();
+			default -> {
+			}
+		}
+		rebuildWidgets();
+		sendWatch();
+	}
+
+	private void fbdTool(String name) {
+		FbdPane pane = unit.fbd;
+		unit.touch();
+		switch (name) {
+			case "IN" -> pane.add(Fbd.IN, "");
+			case "OUT" -> pane.add(Fbd.OUT, "");
+			case "BLOCK" -> pane.add(boxType, BlockLibrary.needsInstance(boxType, library) ? autoInstance(boxType) : "");
+			case "DEL" -> pane.deleteSelected();
+			default -> {
+			}
+		}
+		rebuildWidgets();
+		sendWatch();
+	}
+
+	private void addUnit(Project.Language language) {
+		int n = units.size() + 1;
+		String name = "POU" + n;
+		String text = switch (language) {
+			case ST -> "FUNCTION_BLOCK " + name + "\nVAR_INPUT\nEND_VAR\nVAR_OUTPUT\nEND_VAR\n\nEND_FUNCTION_BLOCK";
+			case LD, FBD -> "PROGRAM " + name + "\nVAR\nEND_VAR\n---\n";
+		};
+		Unit added = new Unit(name, language, text);
+		units.add(added);
+		select(added);
+		rebuildWidgets();
+		sendWatch();
+	}
+
+	private void deleteUnit() {
+		if (units.size() > 1) {
+			units.remove(unit);
+			select(units.getFirst());
+			rebuildWidgets();
+			sendWatch();
+		}
+	}
+
 	private void sendWatch() {
 		ask("watch", t -> {
 			ListTag names = new ListTag();
 			watched.forEach(n -> names.add(StringTag.valueOf(n)));
+			if (tab == Tab.CODE && graphic() && !unit.prefix().isEmpty()) {
+				List<String> shown = unit.language == Project.Language.LD ? unit.ladder.watches(unit.prefix()) : unit.fbd.watches(unit.prefix());
+				shown.forEach(n -> names.add(StringTag.valueOf(n)));
+			}
 			t.put("names", names);
 		});
 	}
@@ -220,24 +637,94 @@ public class PlcScreen extends Screen {
 
 	/** Compiles here, touching nothing on the CPU. */
 	public void check() {
+		refreshLibrary();
 		CpuSpec spec = state.getStringOr("cpu", "").equals(CpuSpec.LARGE.name()) ? CpuSpec.LARGE : CpuSpec.SMALL;
-		errors = PlcCompiler.compile(spec, code.text()).errors();
+		errors = PlcCompiler.compile(spec, sources()).errors();
 		notes.clear();
 		notes.add(errors.isEmpty() ? "No errors." : errors.size() + " error(s).");
 	}
 
-	/** Sends the project to the cabinet, if it compiles here too. */
-	public void download() {
+	private void send(boolean online) {
 		check();
 		if (errors.isEmpty()) {
 			notes.clear();
-			ask("download", t -> t.putString("source", code.text()));
+			// in pieces, as a client's packet holds 32 KB: 8,000 characters are under that even at their widest
+			String packed = Project.pack(sources());
+			int total = Math.max(1, (packed.length() + PIECE - 1) / PIECE);
+			for (int i = 0; i < total; i++) {
+				int index = i;
+				String piece = packed.substring(i * PIECE, Math.min(packed.length(), (i + 1) * PIECE));
+				ask("download", t -> {
+					t.putBoolean("online", online);
+					t.putInt("part", index);
+					t.putInt("parts", total);
+					t.putString("piece", piece);
+				});
+			}
 		}
+	}
+
+	/** Sends the project to the cabinet, if it compiles here too. The CPU goes to STOP. */
+	public void download() {
+		send(false);
+	}
+
+	/** Sends the project and keeps the CPU running on it, with its values. */
+	public void onlineChange() {
+		send(true);
 	}
 
 	/** For the game test: what a paste does. */
 	public void replaceForTest(String text) {
 		code.setText(text);
+	}
+
+	/** For the game test: types into a labelled field, as a player does. */
+	public boolean setFieldForTest(String label, String value) {
+		for (var child : children()) {
+			if (child instanceof EditBox box && box.getMessage().getString().equals(label)) {
+				box.setValue(value);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void deselectForTest() {
+		if (unit.language == Project.Language.LD) {
+			unit.ladder.selected = null;
+		}
+		rebuildWidgets();
+	}
+
+	public void selectUnitForTest(String name) {
+		for (Unit each : units) {
+			if (each.name.equals(name)) {
+				select(each);
+				rebuildWidgets();
+				sendWatch();
+			}
+		}
+	}
+
+	public String savedForTest() {
+		return unit.saved();
+	}
+
+	/** For the game test: a unit laid out by a saved form, as a paste or an import does. */
+	public void loadUnitForTest(Project.Language language, String name, String text) {
+		units.removeIf(u -> u.name.equals(name));
+		units.add(new Unit(name, language, text));
+		selectUnitForTest(name);
+	}
+
+	/** For the game test: what the power flow is drawn from. */
+	public boolean liveForTest() {
+		return live();
+	}
+
+	public Map<String, String> valuesForTest() {
+		return values;
 	}
 
 	public List<CompileError> errorsForTest() {
@@ -262,6 +749,10 @@ public class PlcScreen extends Screen {
 		int colour = status.startsWith("RUN") ? GOOD : status.startsWith("STOP") ? 0xFFE0C060 : ERROR;
 		graphics.text(font, state.getStringOr("cpu", "No CPU"), 8, 8, TEXT, false);
 		graphics.text(font, status, 8 + font.width(state.getStringOr("cpu", "No CPU")) + 12, 8, colour, false);
+		if (tab == Tab.CODE) {
+			String sync = live() ? "ONLINE" : inSync() ? "offline" : "differs from CPU";
+			graphics.text(font, sync, 8 + font.width(state.getStringOr("cpu", "No CPU")) + 12 + font.width(status) + 10, 8, live() ? GOOD : MUTED, false);
+		}
 		if (state.getIntOr("budget", 0) > 0 && status.startsWith("RUN")) {
 			String load = String.format("scan %d / %d instructions", state.getIntOr("instructions", 0), state.getIntOr("budget", 0));
 			graphics.text(font, load, width - 8 - font.width(load), 8, MUTED, false);
@@ -298,21 +789,73 @@ public class PlcScreen extends Screen {
 	}
 
 	private int gutter() {
-		return 8 + font.width("0000") + 8;
+		return LIST_W + 8 + font.width("0000") + 8;
 	}
 
 	private void drawCode(GuiGraphicsExtractor graphics) {
+		drawUnits(graphics);
+		if (graphic()) {
+			drawGraphic(graphics);
+		} else {
+			drawText(graphics);
+		}
+		drawMessages(graphics);
+	}
+
+	private void drawUnits(GuiGraphicsExtractor graphics) {
+		graphics.fill(8, TOP, LIST_W + 4, codeBottom(), PANEL);
+		graphics.text(font, "Program units", 10, TOP + 2, MUTED, false);
+		for (int i = 0; i < units.size(); i++) {
+			Unit each = units.get(i);
+			int rowY = TOP + 14 + i * ROW;
+			if (each == unit) {
+				graphics.fill(8, rowY - 1, LIST_W + 4, rowY + ROW - 1, SELECT);
+			}
+			graphics.text(font, font.plainSubstrByWidth(each.name, LIST_W - 24), 10, rowY, TEXT, false);
+			graphics.text(font, each.language.name(), LIST_W + 2 - font.width(each.language.name()), rowY, each.language == Project.Language.ST ? TYPE : each.language == Project.Language.LD ? GOOD : NUMBER, false);
+		}
+	}
+
+	private void drawGraphic(GuiGraphicsExtractor graphics) {
+		int top = TOP + 18;
+		int left = LIST_W + 8;
+		int right = canvasRight();
 		int bottom = codeBottom();
-		graphics.fill(8, TOP, width - 8, bottom, PANEL);
-		graphics.enableScissor(8, TOP, width - 8, bottom);
+		graphics.fill(left, top, right, bottom, PANEL);
+		boolean live = live();
+		Set<String> forced = new HashSet<>();
+		values.forEach((k, v) -> {
+			if (v.contains("FORCED")) {
+				forced.add(k);
+			}
+		});
+		if (unit.language == Project.Language.LD) {
+			unit.ladder.draw(graphics, font, left, top, right, bottom, values, unit.prefix(), live, forced);
+		} else {
+			unit.fbd.draw(graphics, font, left, top, right, bottom, values, unit.prefix(), live);
+		}
+		int sx = right + 2;
+		graphics.fill(sx, TOP, width - 8, bottom, PANEL);
+		for (var child : children()) {
+			if (child instanceof EditBox box) {
+				graphics.text(font, box.getMessage().getString(), box.getX(), box.getY() - 9, MUTED, false);
+			}
+		}
+	}
+
+	private void drawText(GuiGraphicsExtractor graphics) {
+		int bottom = codeBottom();
+		int top = unit.language == Project.Language.ST ? TOP : TOP + 18;
+		graphics.fill(LIST_W + 8, top, width - 8, bottom, PANEL);
+		graphics.enableScissor(LIST_W + 8, top, width - 8, bottom);
 		int rows = codeRows();
 		int[] selection = code.selection();
 		for (int i = 0; i < rows && scrollLine + i < code.lineCount(); i++) {
 			int at = scrollLine + i;
-			int rowY = TOP + 2 + i * ROW;
+			int rowY = top + 2 + i * ROW;
 			String row = code.line(at);
-			boolean bad = errors.stream().anyMatch(e -> e.line() == at + 1);
-			graphics.text(font, Integer.toString(at + 1), 8 + 2, rowY, bad ? ERROR : COMMENT, false);
+			boolean bad = errors.stream().anyMatch(e -> e.line() == at + 1 && (e.source().isEmpty() || e.source().equals(unit.name)));
+			graphics.text(font, Integer.toString(at + 1), LIST_W + 10, rowY, bad ? ERROR : COMMENT, false);
 			if (selection != null && at >= selection[0] && at <= selection[2]) {
 				int from = at == selection[0] ? selection[1] : 0;
 				int to = at == selection[2] ? selection[3] : row.length();
@@ -327,6 +870,10 @@ public class PlcScreen extends Screen {
 			}
 		}
 		graphics.disableScissor();
+	}
+
+	private void drawMessages(GuiGraphicsExtractor graphics) {
+		int bottom = codeBottom();
 		int noteY = bottom + 4;
 		graphics.fill(8, bottom + 2, width - 8, height - 6, PANEL);
 		for (CompileError error : errors.stream().limit(ERROR_ROWS).toList()) {
@@ -446,7 +993,7 @@ public class PlcScreen extends Screen {
 	private void drawOnline(GuiGraphicsExtractor graphics) {
 		int split = width - 216;
 		graphics.fill(8, TOP, split, height - 8, PANEL);
-		graphics.text(font, "Watched tags: click a name on the right, then WATCH", 12, TOP + 3, MUTED, false);
+		graphics.text(font, "Watched tags", 12, TOP + 3, MUTED, false);
 		ListTag values = state.getListOrEmpty("values");
 		int rowY = TOP + 16;
 		for (int i = 0; i < values.size(); i++) {
@@ -496,7 +1043,7 @@ public class PlcScreen extends Screen {
 	}
 
 	private boolean editing() {
-		return tab == Tab.CODE;
+		return tab == Tab.CODE && !graphic() && !(getFocused() instanceof EditBox);
 	}
 
 	private void showCaret() {
@@ -511,6 +1058,33 @@ public class PlcScreen extends Screen {
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
+		if (tab == Tab.CODE && graphic() && !(getFocused() instanceof EditBox)) {
+			boolean command = (event.modifiers() & (2 | 8)) != 0;
+			if (event.key() == 261 || event.key() == 259) {
+				if (unit.language == Project.Language.LD) {
+					ladderTool("DEL");
+				} else {
+					fbdTool("DEL");
+				}
+				return true;
+			}
+			if (event.key() == 262 || event.key() == 263) {   // the arrow keys scroll a wide sheet
+				int by = event.key() == 262 ? 24 : -24;
+				if (unit.language == Project.Language.LD) {
+					unit.ladder.scrollX = Math.max(0, unit.ladder.scrollX + by);
+				} else {
+					unit.fbd.scrollX = Math.max(0, unit.fbd.scrollX + by);
+				}
+				return true;
+			}
+			if (command && event.key() == 90 && !unit.undo.isEmpty()) {
+				unit.load(unit.undo.pop());
+				select(unit);
+				rebuildWidgets();
+				sendWatch();
+				return true;
+			}
+		}
 		if (!editing() || event.key() == 256) {
 			return super.keyPressed(event);
 		}
@@ -604,16 +1178,53 @@ public class PlcScreen extends Screen {
 		double mouseX = event.x();
 		double mouseY = event.y();
 		if (tab == Tab.CODE) {
-			setFocused(null);
-			if (mouseY >= TOP && mouseY < codeBottom()) {
-				placeCaret(mouseX, mouseY, false);
-				dragging = true;
+			if (mouseX < LIST_W + 4 && mouseY >= TOP + 14) {
+				int row = (int) ((mouseY - TOP - 14) / ROW);
+				if (row >= 0 && row < units.size()) {
+					select(units.get(row));
+					rebuildWidgets();
+					sendWatch();
+					return true;
+				}
+			}
+			int errorRow = (int) ((mouseY - codeBottom() - 4) / ROW);
+			if (mouseY > codeBottom() && errorRow >= 0 && errorRow < errors.size() && errorRow < ERROR_ROWS) {
+				CompileError error = errors.get(errorRow);
+				for (Unit each : units) {
+					if (each.name.equals(error.source())) {
+						select(each);
+						rebuildWidgets();
+					}
+				}
+				if (!graphic()) {
+					code.moveTo(error.line() - 1, 0, false);   // an error in the list jumps to its line
+					showCaret();
+				} else if (unit.language == Project.Language.LD && error.line() - 1 < unit.ladder.ladder.rungs.size()) {
+					unit.ladder.selectedRung = unit.ladder.ladder.rungs.get(error.line() - 1);
+				}
 				return true;
 			}
-			int row = (int) ((mouseY - codeBottom() - 4) / ROW);
-			if (mouseY > codeBottom() && row >= 0 && row < errors.size() && row < ERROR_ROWS) {
-				code.moveTo(errors.get(row).line() - 1, 0, false);   // an error in the list jumps to its line
-				showCaret();
+			setFocused(null);
+			if (graphic() && mouseY >= TOP + 18 && mouseY < codeBottom() && mouseX >= LIST_W + 8 && mouseX < canvasRight()) {
+				if (unit.language == Project.Language.LD) {
+					Object before = unit.ladder.selected;
+					unit.ladder.click(mouseX, mouseY);
+					if (before != unit.ladder.selected) {
+						rebuildWidgets();
+					}
+				} else {
+					Fbd.Block before = unit.fbd.selected;
+					unit.touch();
+					unit.fbd.press(mouseX, mouseY, LIST_W + 8, TOP + 18);
+					if (before != unit.fbd.selected) {
+						rebuildWidgets();
+					}
+				}
+				return true;
+			}
+			if (!graphic() && mouseY >= TOP && mouseY < codeBottom() && mouseX >= LIST_W + 8) {
+				placeCaret(mouseX, mouseY, false);
+				dragging = true;
 				return true;
 			}
 		} else if (tab == Tab.TERMINALS && mouseX < width - 216) {
@@ -658,6 +1269,9 @@ public class PlcScreen extends Screen {
 
 	@Override
 	public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+		if (tab == Tab.CODE && graphic() && unit.language == Project.Language.FBD && unit.fbd.drag(event.x(), event.y(), LIST_W + 8, TOP + 18)) {
+			return true;
+		}
 		if (tab == Tab.CODE && dragging) {
 			placeCaret(event.x(), event.y(), true);
 			return true;
@@ -668,12 +1282,21 @@ public class PlcScreen extends Screen {
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
 		dragging = false;
+		if (unit.language == Project.Language.FBD) {
+			unit.fbd.release();
+		}
 		return super.mouseReleased(event);
 	}
 
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-		if (tab == Tab.CODE) {
+		if (tab == Tab.CODE && graphic()) {
+			if (unit.language == Project.Language.LD) {
+				unit.ladder.scroll = Math.max(0, unit.ladder.scroll - (int) Math.signum(scrollY) * 12);
+			} else {
+				unit.fbd.scrollY = Math.max(0, unit.fbd.scrollY - (int) Math.signum(scrollY) * 12);
+			}
+		} else if (tab == Tab.CODE) {
 			scrollLine = Math.max(0, Math.min(Math.max(0, code.lineCount() - 1), scrollLine - (int) Math.signum(scrollY) * 3));
 		} else {
 			scrollList = Math.max(0, scrollList - (int) Math.signum(scrollY) * 3);

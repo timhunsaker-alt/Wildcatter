@@ -205,6 +205,18 @@ Tailings compiles against a Wildcatter release, so it comes after 13h's release.
   - module and key icons borrow existing art, and the recipes are proposed;
   - the NeoForge jar compiles with its packet registered, but has not opened this screen in a world.
 
+## As built: 13c (2026-11-07)
+`plc.lang.Ladder`, `Fbd`, `BlockLibrary`, `Project`; `client/LadderPane`, `FbdPane`. A project is now program units in any language, calling each other.
+- **Ladder:** rungs of contacts and boxes in series and parallel, driving coils, negated coils, set and reset. Function blocks take the rung's power at their first BOOL input and give it out of their first BOOL output; comparison boxes pass power when true; other operators and functions run with power and pass it on.
+- **FBD:** blocks wired output to input, with variables, constants and expressions on pins. Execution follows the wiring whatever the layout, and a block's number shows its place. A loop reads last scan's value. A function's result takes its type from what it computes.
+- **Live view:** every ladder element and function result has its own variable, so what is drawn is what the CPU computed, not a second evaluation. It goes live only while the editor matches the CPU's project. A function block unit is watched by giving it an instance path in its `monitor` field.
+- **Online change:** the project is replaced with the CPU running; variables of the same name and type keep their values, and nothing misses a scan.
+- **Large projects:** a download goes in pieces, as a client's packet holds 32 KB, up to 4 million characters *(proposed)*. A 150 KB project is tested.
+- **Proved in the world:** the same motor from a ladder drawn with the real toolbar and mouse: running from the button, the live view showing the seal branch powered and the start branch not, an online change without a stop, an FBD beside it lighting the stack's green lamp after its timer, a force from the ONLINE tab starting the motor with its light on, and a release.
+- **Not yet:** ladder jumps and labels; a function or a ladder as a FUNCTION (a ladder or FBD is a PROGRAM or FUNCTION_BLOCK); a ladder's `Coil` on a located output of another unit; FBD wires routed around blocks, as they are drawn straight through.
+
+- **A regression, fixed:** running the asset generator for 13b deleted Phase 12's lined cell and process water pump assets, and 13b's commits carried that. No release had it. They are back, and `art/hand_assets` and a check at the start of the client suite keep it from recurring.
+
 ## Figures for 13a *(proposed)*
 | Figure | Small CPU | Large CPU | Basis |
 |---|---|---|---|

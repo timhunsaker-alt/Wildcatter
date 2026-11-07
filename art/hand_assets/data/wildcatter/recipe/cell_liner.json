@@ -1,0 +1,17 @@
+{
+ "type": "minecraft:crafting_shaped",
+ "category": "building",
+ "pattern": [
+  "PPP",
+  "PCP",
+  "PPP"
+ ],
+ "key": {
+  "P": "wildcatter:plastic_sheet",
+  "C": "minecraft:clay_ball"
+ },
+ "result": {
+  "id": "wildcatter:cell_liner",
+  "count": 8
+ }
+}
