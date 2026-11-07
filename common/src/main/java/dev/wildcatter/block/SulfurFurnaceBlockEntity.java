@@ -39,6 +39,9 @@ public class SulfurFurnaceBlockEntity extends PlantUnitBlockEntity {
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, SulfurFurnaceBlockEntity f) {
+		if (f.plcHold(level)) {
+			return;
+		}
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
 			return;
 		}

@@ -1448,6 +1448,8 @@ sized for a 40-pot line.
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- Phase 13g and 13h: see `docs/multiblocks/plc.md`, "As built". One process unit has run under a PLC in the world; the rig, crane and coolant pump signals are compiled only. Nothing stops two PLCs landing on one rack.
+- Phase 13f: see `docs/multiblocks/plc.md`, "As built: 13f, Not yet". Most power equipment's signals compile but have not been exercised in the world.
 - Phase 13e: see `docs/multiblocks/plc.md`, "As built: 13e, Not yet". New module items borrow existing decal art; the new blocks are boxes in the mod's materials and vanilla concrete, no new script-drawn textures.
 - Phase 13d: see `docs/multiblocks/plc.md`, "As built: 13d, Not yet". `memory_card` borrows vanilla paper's icon. PLCopen import has been tested on hand-written files, not on a real vendor's export.
 - Phase 13b: see `docs/multiblocks/plc.md`, "As built: 13b, Not yet". The modules seated are not drawn, cable core counts and the supply's 10 A are not enforced, and the NeoForge jar has not opened the screen in a world. No new script-drawn textures: the devices use the mod's materials and vanilla's coloured blocks.
@@ -1613,6 +1615,12 @@ Spec: `docs/multiblocks/plc.md`, decided by Tim 2026-11-07: nine waves.
 **13d, charts, device blocks, card and files (2026-11-07):** the fourth language, SFC, with parallel and choice branches, all eleven action qualifiers and named action bodies; `MOTOR_CTRL` and `VALVE_CTRL`; a memory card; a PROJECT tab exporting and importing PLCopen XML and structured text. 46 more unit tests. The new `plcSfc` scene draws a conveyor start-up with the real mouse and runs it on three real starters, stops it, faults it, carries it on a card, and exports and reimports it, running. See `docs/multiblocks/plc.md`, "As built: 13d".
 
 **13e, analog, drive speed, valves (2026-11-07):** 4-20 mA signals with AI8, AO4, RTD4 and HSC2 modules; transmitters and real numeric readings; a drive's speed reference, with flow following speed and power its cube; control, on-off and motor-operated valves on water and steel; instrument air; a water day tank. The new `plcAnalog` scene holds a tank's level with a PID on a real drive-fed pump, and fails a loop, the air and a valve's power. See `docs/multiblocks/plc.md`, "As built: 13e".
+
+**13f, power equipment and HMI (2026-11-07):** signals on the power equipment, a network cable and COMM module, and an HMI panel with a laid-out screen, ISA-18.2 alarms and trends. The new `plcPower` scene starts two real sets from an HMI, closes them in sync, loads them, sheds past a limit and shifts their shares. See `docs/multiblocks/plc.md`, "As built: 13f".
+
+**13g, process plants and the reactor (2026-11-07):** a run enable on every plant unit, and rods, boron and a manual trip on the reactor, its trips still beating them. The `reactor` and `toppingUnit` scenes now run under real programs.
+
+**13h, networks (2026-11-07):** remote I/O drops, PLC-to-PLC tag exchange, an HMI by station, and a marker as a register. The new `plcNetwork` scene runs a starter on a drop 60 blocks away and cuts the network.
 
 v0.4.1 (2026-11-06), two fixes found by Tailings' playthrough; the full client suite passed on them (2h 45m):
 - **The solver no longer gives up on a floating bus.** A busway's neutral on a dead bus has low resistance and no path to ground, so the small leak each node carries rounded away and the factorisation stopped with "Could not solve the circuit". The solve for that whole group was then dropped, so the generator's synchroniser never read the bus and its breaker never closed. The node now gets its leak back. Unit test `aFloatingBusStillSolves`. The warning came 241 times in the v0.4.0 suite's log, on a suite that passed, and 0 times in this one.

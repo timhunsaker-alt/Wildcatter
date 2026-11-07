@@ -36,7 +36,7 @@ public class OperatorDeviceBlockEntity extends BlockEntity implements ControlDev
 	public boolean operate() {
 		switch (kind()) {
 			case PUSHBUTTON -> pressed = PRESS_TICKS;
-			case SELECTOR, ESTOP -> latched = !latched;
+			case SELECTOR, ESTOP, PULL_CORD -> latched = !latched;
 			default -> {
 				return false;
 			}
@@ -50,7 +50,7 @@ public class OperatorDeviceBlockEntity extends BlockEntity implements ControlDev
 		return switch (kind()) {
 			case PUSHBUTTON -> pressed > 0;
 			case SELECTOR -> latched;
-			case ESTOP -> !latched;
+			case ESTOP, PULL_CORD -> !latched;
 			default -> false;
 		};
 	}
@@ -61,6 +61,7 @@ public class OperatorDeviceBlockEntity extends BlockEntity implements ControlDev
 			case PUSHBUTTON -> "Pushbutton";
 			case SELECTOR -> "Selector switch";
 			case ESTOP -> "E-stop";
+			case PULL_CORD -> "Pull cord switch";
 			case PILOT_LIGHT -> "Pilot light";
 			case STACK_LIGHT -> "Stack light";
 			case HORN -> "Horn";
@@ -72,7 +73,7 @@ public class OperatorDeviceBlockEntity extends BlockEntity implements ControlDev
 		return switch (kind()) {
 			case PUSHBUTTON -> List.of(new Point("PRESSED", false));
 			case SELECTOR -> List.of(new Point("ON", false));
-			case ESTOP -> List.of(new Point("HEALTHY (NC)", false));
+			case ESTOP, PULL_CORD -> List.of(new Point("HEALTHY (NC)", false));
 			case PILOT_LIGHT -> List.of(new Point("LAMP", true));
 			case STACK_LIGHT -> List.of(new Point("RED", true), new Point("AMBER", true), new Point("GREEN", true));
 			case HORN -> List.of(new Point("SOUND", true));
@@ -100,7 +101,7 @@ public class OperatorDeviceBlockEntity extends BlockEntity implements ControlDev
 		long now = level.getGameTime();
 		int lamps = switch (device.kind()) {
 			case PUSHBUTTON -> device.pressed > 0 ? 1 : 0;
-			case SELECTOR, ESTOP -> device.latched ? 1 : 0;
+			case SELECTOR, ESTOP, PULL_CORD -> device.latched ? 1 : 0;
 			case STACK_LIGHT -> (device.output(0, now) ? 1 : 0) | (device.output(1, now) ? 2 : 0) | (device.output(2, now) ? 4 : 0);
 			default -> device.output(0, now) ? 1 : 0;
 		};
@@ -121,6 +122,7 @@ public class OperatorDeviceBlockEntity extends BlockEntity implements ControlDev
 			case PUSHBUTTON -> pressed > 0 ? "pressed" : "released";
 			case SELECTOR -> latched ? "ON" : "OFF";
 			case ESTOP -> latched ? "PRESSED: click to release" : "healthy";
+			case PULL_CORD -> latched ? "PULLED: click to reset it" : "healthy";
 			default -> getBlockState().getValue(OperatorDeviceBlock.LAMPS) != 0 ? "on" : "off";
 		});
 	}

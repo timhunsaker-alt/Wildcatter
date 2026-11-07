@@ -275,6 +275,43 @@ Tailings compiles against a Wildcatter release, so it comes after 13h's release.
   - valves on steel pipe are built and share the code, but only water valves have run in the world;
   - a valve's air use per stroke is not modelled, only leakage.
 
+## As built: 13f (2026-11-07)
+`control/Remote`, `HmiPanelBlock`, `NetworkNet`, `client/HmiScreen`; signals on breakers, switchgear, the transfer switch, gensets, the steam plant's turbine generator, gas turbines, fireboxes, rectifiers, load banks and lamps and heaters; `network_cable`, `comm_module`; and the `plcPower` game scene.
+- **Proved in the world:** two real 500 kW diesel sets, a real program and a real HMI laid out through its editor. The HMI's button starts them; the first closes onto the dead bus, and the second is held by its permit until the first is closed, then closes in sync at 1 degree. The PLC closes feeders one by one; the third takes the load past its 100 kW limit, and after 3 s it opens that feeder and holds it off, at 89 kW. A trim moves 29 kW from one set to the other. The shed raises an ISA-18.2 alarm, acknowledged and shelved by real clicks, with its history and a trend. A tripped breaker refuses its close coil. The button stops both sets.
+- **Found:** control cables could not reach a true-size part that is not a `BigPartBlock` by class, such as the genset panel. Fixed in `ControlNet`.
+- **Figures, all proposed:** trims of 2 % (speed) and 5 % (voltage); kW read on 125 % of rating; a shelf of 10 minutes; 100 history rows; a sample a second kept 10 minutes; a firebox's burner modulating by time over 10 s.
+- **A stated shortcut:** a set's share of the load moves with its source voltage here, as its sag is a resistance standing in for droop. In a real set speed moves kW and voltage moves VARs. Both trims shift load in this model.
+- **Not yet:**
+  - only breakers, gensets and the HMI have run in the world under a PLC. The transfer switch, switchgear, steam and gas turbines, fireboxes, rectifiers, load banks and lamps have their signals compiled and not yet exercised;
+  - boiler pressure and three-element drum control: boilers report only their level, and the steam plant has no setpoint to take; the HRSG only follows its gas turbine;
+  - a gas turbine's load setpoint and a steam turbine's own valve: both still follow the grid;
+  - dampers, still, as nothing has a duct;
+  - CT and PT transducers are a transmitter on a cable, reading amps only; a cable has no voltage reading yet;
+  - relay flags (50/51, 87B) are read only as TRIPPED;
+  - the HMI's symbols use a device block's STATE; there are no piping graphics, and HMI screens are one page.
+
+## As built: 13g (2026-11-07)
+A selector and a run enable on every plant unit, in `PlantUnitBlockEntity`; rod demand, boron target, power setpoint and a manual trip on the reactor; the coolant pumps' start; the rig's drill enable and the crane's run enable.
+- **Proved in the world, in the `reactor` scene:** a real program, at 2 % power on a real reactor. Its demand starts where the rods are. Bank D went from 104 to 86 steps on the PLC's demand, power falling to 1.08 %, and the boron target to the PLC's 1,450 ppm. An RTD input read Tavg in tenths. **With the PLC demanding every rod out, a power excursion tripped it on LOW RCS FLOW and dropped them all,** its demand still standing; a manual trip from the PLC worked; only the console's reset cleared a trip; out of AUTO the reactor's own control took the rods back.
+- **Also, in the `toppingUnit` scene:** a real column enabled by a real program; off, it holds and says so and tells its PLC; on, it goes on; a cut cable holds it.
+- **The review of the 43 units:** 25 have a tick of their own and take the gate at its top. Motor-driven units take it in `UnitMotorBlockEntity.drive`, where 51 subclasses meet. **Left out on purpose:** the reactor vessel (its protection lives in its tick), the natural draft tower and the frequency converter (a heat sink and a grid tie, not a process run). The units with no tick are parts their controller runs, so they stop with it.
+- **Not yet:**
+  - only one process unit has run under a PLC in the world: the others take the same line of code;
+  - the rig, crane and coolant pump signals compile and have not been exercised;
+  - **a level is the fullest thing a unit holds;** a unit's own flows and temperatures have no reading yet;
+  - **feedwater** is not on a signal, nor a well's choke beyond a valve in its line: the valve is real, the scene has not run one;
+  - the crane has no lift-start signal, only a hold; its load and boom are not read.
+
+## As built: 13h (2026-11-07)
+`control/RemoteIoDropBlock`, tag exchange and a NET tab on the cabinet, stations on `NetworkNet`, and the `plcNetwork` game scene.
+- **Proved in the world:** a button and a starter on a drop 60 blocks from its PLC, across a real network cable; a second PLC taking two tags by rows entered in its real NET tab, lighting its own lamp from one; an HMI's network seeing both, reading by station, and writing a marker as a register; a cut network stopping the remote starter and showing the exchange as FAILED with its last values held; a save and load keeping the rows and name.
+- **Addressing:** rack 1's slot 0 is slot 12, so `%IX192.0`, and each rack takes 12 more *(proposed)*. A small CPU's 512 bytes reach rack 1 and part of rack 2; a large CPU's 4,096 reach all four.
+- **Not yet:**
+  - **nothing stops two PLCs landing signals on one rack,** where their outputs would fight. A real rack has one owner; here it is the player's to keep;
+  - no traffic, timing, or lost-packet model, as the spec says;
+  - the exchange copies each row every half second, one way; a row's types must match or it shows FAILED;
+  - a drop's modules are not drawn, as a cabinet's are not.
+
 ## The plan for 13e to 13i (surveyed 2026-11-07; Tim: "let's finish out the rest of 13")
 What the survey found that the waves above did not say, and how each is met. All figures *(proposed)*.
 - **13e:**

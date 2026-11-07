@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SSS",
+    "SCS",
+    "SIS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:comparator",
+    "I": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:remote_io_drop",
+    "count": 1
+  }
+}

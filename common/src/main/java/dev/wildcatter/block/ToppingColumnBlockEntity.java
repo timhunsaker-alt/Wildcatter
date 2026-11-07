@@ -39,6 +39,9 @@ public class ToppingColumnBlockEntity extends PlantUnitBlockEntity {
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, ToppingColumnBlockEntity col) {
+		if (col.plcHold(level)) {
+			return;
+		}
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
 			return;
 		}

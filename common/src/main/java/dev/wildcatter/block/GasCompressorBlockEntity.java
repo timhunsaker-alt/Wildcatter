@@ -146,6 +146,9 @@ public class GasCompressorBlockEntity extends PlantUnitBlockEntity implements Ci
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, GasCompressorBlockEntity c) {
+		if (c.plcHold(level)) {
+			return;
+		}
 		Motor motor = c.motor();
 		c.running.update(c, motor.output() > 0);
 		boolean turning = motor.state() == Motor.State.RUNNING && !motor.stalled();

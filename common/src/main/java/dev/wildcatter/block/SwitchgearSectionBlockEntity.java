@@ -34,7 +34,63 @@ import net.minecraft.world.level.storage.ValueOutput;
  * <li>50 trips it on the solve the fault appears in; 51 runs the IEEE moderately inverse curve after it.</li>
  * </ul>
  */
-public class SwitchgearSectionBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity {
+public class SwitchgearSectionBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity, dev.wildcatter.control.ControlDevice, dev.wildcatter.control.Measurable {
+	private final dev.wildcatter.control.Remote remote = new dev.wildcatter.control.Remote(2);
+
+	public boolean remote() {
+		return remote.auto();
+	}
+
+	@Override
+	public String deviceName() {
+		return "Switchgear section";
+	}
+
+	@Override
+	public java.util.List<Point> points() {
+		return java.util.List.of(new Point("CLOSE", true), new Point("TRIP COIL", true), new Point("CLOSED", false), new Point("TRIPPED", false), new Point("REMOTE", false), new Point("AMPS 4-20 mA, 150 %", false, Signal.MA));
+	}
+
+	@Override
+	public boolean readPoint(int point) {
+		return switch (point) {
+			case 2 -> closed();
+			case 3 -> tripped();
+			case 4 -> remote.auto();
+			default -> false;
+		};
+	}
+
+	/** A relay's trip stays until a hand resets it: a close coil will not clear it. */
+	@Override
+	public void commandPoint(int point, boolean on, long gameTime) {
+		if (point > 1 || !remote.command(point, on, gameTime)) {
+			return;
+		}
+		if ((point == 0 && !closed() && !tripped()) || (point == 1 && closed())) {
+			operate();
+			if (level != null) {
+				CircuitManager.markDirty(level);
+			}
+		}
+	}
+
+	@Override
+	public double readMa(int point) {
+		return 4 + 16 * Math.min(1.25, amps() / (frame() * 1.5));
+	}
+
+	@Override
+	public String cycleHoa(BlockPos cell) {
+		setChanged();
+		return remote.cycle().replace("HAND", "LOCAL").replace("AUTO", "REMOTE");
+	}
+
+	@Override
+	public double measure(Quantity quantity) {
+		return quantity == Quantity.AMPS ? amps() : Double.NaN;
+	}
+
 	public enum Rack { CONNECTED, TEST, DISCONNECTED }
 
 	private static final Conductor[] PHASES = {Conductor.A, Conductor.B, Conductor.C};
@@ -318,6 +374,7 @@ public class SwitchgearSectionBlockEntity extends BlockEntity implements Circuit
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
+		remote.save(output);
 		output.putBoolean("grown", grown);
 		output.putBoolean("closed", closed);
 		output.putBoolean("tripped", tripped);
@@ -330,6 +387,7 @@ public class SwitchgearSectionBlockEntity extends BlockEntity implements Circuit
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		remote.load(input);
 		grown = input.getBooleanOr("grown", false);
 		closed = input.getBooleanOr("closed", false);
 		tripped = input.getBooleanOr("tripped", false);

@@ -123,6 +123,9 @@ public class FumeTreatmentCentreBlockEntity extends PlantUnitBlockEntity impleme
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, FumeTreatmentCentreBlockEntity ftc) {
+		if (ftc.plcHold(level)) {
+			return;
+		}
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
 			return;
 		}

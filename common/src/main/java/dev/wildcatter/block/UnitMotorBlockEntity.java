@@ -160,6 +160,9 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 
 	/** The unit's controller asks it to run; returns how hard it is running now, 0 to 1. */
 	public double drive(Level level) {
+		if (plcHold(level)) {
+			return 0;   // not called, so its motor stops
+		}
 		called = level.getGameTime();
 		return motor().reversed() ? 0 : motor().output();
 	}

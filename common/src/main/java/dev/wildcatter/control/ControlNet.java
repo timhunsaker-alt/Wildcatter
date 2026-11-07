@@ -1,6 +1,5 @@
 package dev.wildcatter.control;
 
-import dev.wildcatter.block.BigPartBlock;
 import dev.wildcatter.multiblock.BigParts;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -31,13 +30,12 @@ public final class ControlNet {
 
 	/** The device at {@code pos}, looking through a big part's cell to its main cell. */
 	public static @Nullable ControlDevice deviceAt(BlockGetter level, BlockPos pos) {
-		BlockPos main = mainOf(level, pos);
-		return level.getBlockEntity(main) instanceof ControlDevice device ? device : null;
+		return BigParts.entity(level, pos) instanceof ControlDevice device && !device.points().isEmpty() ? device : null;   // one with no signals is no device: an MCC bucket, an unpowered part
 	}
 
 	public static BlockPos mainOf(BlockGetter level, BlockPos pos) {
-		BlockState state = level.getBlockState(pos);
-		return state.getBlock() instanceof BigPartBlock ? BigParts.main(pos, state) : pos;
+		var entity = BigParts.entity(level, pos);   // any kind of true-size part, as not all are a BigPartBlock
+		return entity != null ? entity.getBlockPos() : pos;
 	}
 
 	/** True if a control cable next to {@code pos} would join it. */

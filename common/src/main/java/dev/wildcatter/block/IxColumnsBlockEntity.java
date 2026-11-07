@@ -71,6 +71,9 @@ public class IxColumnsBlockEntity extends PlantUnitBlockEntity implements Hopper
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, IxColumnsBlockEntity x) {
+		if (x.plcHold(level)) {
+			return;
+		}
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
 			return;
 		}

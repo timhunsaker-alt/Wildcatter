@@ -83,12 +83,13 @@ public class TransmitterBlockEntity extends BlockEntity implements ControlDevice
 
 	@Override
 	public List<Point> points() {
-		return List.of(new Point("PV 4-20 mA", false, Signal.MA), new Point("PULSE", false, Signal.PULSE));
+		return List.of(new Point("PV 4-20 mA", false, Signal.MA), new Point("PULSE", false, Signal.PULSE), new Point("SWITCH, OVER MID-RANGE", false));
 	}
 
 	@Override
 	public boolean readPoint(int point) {
-		return false;
+		double value = reading();
+		return point == 2 && !Double.isNaN(value) && value > (low + high) / 2;   // a level, pressure, flow or zero-speed switch: a contact at the range's middle
 	}
 
 	@Override

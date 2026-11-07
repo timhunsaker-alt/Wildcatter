@@ -21,7 +21,69 @@ import org.jspecify.annotations.Nullable;
  * seconds of each at its outlet nozzles for whatever draws on them. Its nozzles are written in the part's own frame (drawn facing
  * north) and turned with it.
  */
-public abstract class PlantUnitBlockEntity extends BlockEntity implements Inspectable, BigPartEntity, FluidNode, Mixed {
+public abstract class PlantUnitBlockEntity extends BlockEntity implements Inspectable, BigPartEntity, FluidNode, Mixed, dev.wildcatter.control.ControlDevice, dev.wildcatter.control.Measurable {
+	/** Its HAND / OFF / AUTO: HAND runs as a unit always has, OFF holds it, and AUTO runs it while a PLC keeps enabling it (docs/multiblocks/plc.md). */
+	protected final dev.wildcatter.control.Remote unitRemote = new dev.wildcatter.control.Remote(1);
+
+	/** True while its selector and PLC hold it stopped; says so on its readout. It keeps what it holds. */
+	protected boolean plcHold(net.minecraft.world.level.Level level) {
+		if (unitRemote.hand() || unitRemote.on(0, level.getGameTime())) {
+			return false;
+		}
+		status = unitRemote.auto() ? "HELD: its PLC is not enabling it" : "HELD: selector in OFF";
+		return true;
+	}
+
+	@Override
+	public String deviceName() {
+		String id = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(getBlockState().getBlock()).getPath().replace('_', ' ');
+		return id.isEmpty() ? "Unit" : Character.toUpperCase(id.charAt(0)) + id.substring(1);
+	}
+
+	@Override
+	public List<Point> points() {
+		return List.of(new Point("RUN ENABLE", true), new Point("AUTO", false), new Point("HELD", false), new Point("LEVEL 4-20 mA", false, Signal.MA));
+	}
+
+	@Override
+	public boolean readPoint(int point) {
+		return point == 1 ? unitRemote.auto() : point == 2 && status.startsWith("HELD");
+	}
+
+	@Override
+	public void commandPoint(int point, boolean on, long gameTime) {
+		if (point == 0) {
+			unitRemote.command(0, on, gameTime);
+		}
+	}
+
+	@Override
+	public double readMa(int point) {
+		return 4 + 16 * Math.min(1.03, measure(Quantity.LEVEL) / 100);
+	}
+
+	@Override
+	public String cycleHoa(BlockPos cell) {
+		setChanged();
+		return unitRemote.cycle();
+	}
+
+	/** The fullest thing it holds, of what it can hold. */
+	@Override
+	public double measure(Quantity quantity) {
+		if (quantity != Quantity.LEVEL) {
+			return Double.NaN;
+		}
+		double most = 0;
+		for (var entry : held.entrySet()) {
+			double room = hold(entry.getKey());
+			if (room > 0) {
+				most = Math.max(most, entry.getValue() / room * 100);
+			}
+		}
+		return most;
+	}
+
 	protected final Map<Product, Double> held = new EnumMap<>(Product.class);
 	/**
 	 * What a held cracked gas is made of, by weight (docs/multiblocks/cracker.md): ethylene, fuel gas, LPG, pyrolysis gasoline,
@@ -155,6 +217,7 @@ public abstract class PlantUnitBlockEntity extends BlockEntity implements Inspec
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
+		unitRemote.save(output);
 		for (Map.Entry<Product, Double> e : held.entrySet()) {
 			output.putDouble("held_" + e.getKey().name(), e.getValue());
 		}
@@ -169,6 +232,7 @@ public abstract class PlantUnitBlockEntity extends BlockEntity implements Inspec
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		unitRemote.load(input);
 		for (Product p : Product.values()) {
 			double v = input.getDoubleOr("held_" + p.name(), 0);
 			if (v > 0) {

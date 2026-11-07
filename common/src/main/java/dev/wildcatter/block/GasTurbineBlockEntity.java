@@ -32,7 +32,47 @@ import org.jspecify.annotations.Nullable;
  * lights off, and it runs up to full speed; at speed its generator synchronizes. It burns pipeline gas, diesel or kerosene off its
  * fuel nozzle at its heat rate, and hands its exhaust heat to an HRSG.
  */
-public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity, dev.wildcatter.kinetic.Sounding {
+public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity, dev.wildcatter.kinetic.Sounding, dev.wildcatter.control.ControlDevice, dev.wildcatter.control.Measurable {
+	private final dev.wildcatter.control.Remote remote = new dev.wildcatter.control.Remote(1);
+
+	@Override
+	public String deviceName() {
+		return "Gas turbine";
+	}
+
+	@Override
+	public java.util.List<Point> points() {
+		return java.util.List.of(new Point("RUN", true), new Point("RUNNING", false), new Point("TRIPPED", false), new Point("AUTO", false));
+	}
+
+	@Override
+	public boolean readPoint(int point) {
+		return switch (point) {
+			case 1 -> phase == Phase.RUNNING;
+			case 2 -> !trip.isEmpty();
+			case 3 -> remote.auto();
+			default -> false;
+		};
+	}
+
+	@Override
+	public void commandPoint(int point, boolean on, long gameTime) {
+		if (point == 0) {
+			remote.command(point, on, gameTime);
+		}
+	}
+
+	@Override
+	public String cycleHoa(BlockPos cell) {
+		setChanged();
+		return remote.cycle();
+	}
+
+	@Override
+	public double measure(Quantity quantity) {
+		return quantity == Quantity.SPEED ? speed * 100 : Double.NaN;
+	}
+
 	public enum Phase {
 		STOPPED, PURGE, RUNUP, RUNNING
 	}
@@ -211,6 +251,9 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 
 	// ---- every tick ------------------------------------------------------------------------------------------------------------
 	public static void tick(Level level, BlockPos pos, BlockState state, GasTurbineBlockEntity gt) {
+		if (!gt.remote.hand()) {
+			gt.setWantRun(gt.remote.on(0, level.getGameTime()));   // a trip's reset stays a hand's: the panel's button
+		}
 		if (!(level instanceof ServerLevel server)) {
 			return;
 		}
@@ -401,6 +444,7 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
+		remote.save(output);
 		output.putBoolean("grown", grown);
 		output.putString("phase", phase.name());
 		output.putBoolean("wantRun", wantRun);
@@ -413,6 +457,7 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		remote.load(input);
 		running.load(input);
 		grown = input.getBooleanOr("grown", grown);
 		try {

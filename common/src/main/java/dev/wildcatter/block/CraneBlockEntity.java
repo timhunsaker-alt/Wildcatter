@@ -58,7 +58,37 @@ import org.jspecify.annotations.Nullable;
  * the industrial voltage at the west face of its switch cabinet; the crawler and ring cranes burn diesel from their own tanks, piped
  * to any cell of their base. The client draws it from the step it is in.
  */
-public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity {
+public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity, dev.wildcatter.control.ControlDevice {
+	private final dev.wildcatter.control.Remote remote = new dev.wildcatter.control.Remote(1);
+
+	@Override
+	public String deviceName() {
+		return "Crane";
+	}
+
+	@Override
+	public java.util.List<Point> points() {
+		return java.util.List.of(new Point("RUN ENABLE", true), new Point("CARRYING", false), new Point("AUTO", false));
+	}
+
+	@Override
+	public boolean readPoint(int point) {
+		return point == 1 ? carrying() : point == 2 && remote.auto();
+	}
+
+	@Override
+	public void commandPoint(int point, boolean on, long gameTime) {
+		if (point == 0) {
+			remote.command(0, on, gameTime);
+		}
+	}
+
+	@Override
+	public String cycleHoa(BlockPos cell) {
+		setChanged();
+		return remote.cycle();
+	}
+
 	/** The cranes the server has loaded, for a tandem partner. */
 	public static final Set<CraneBlockEntity> SERVER = ConcurrentHashMap.newKeySet();
 	/** How many open lifts a crane looks at for one it can make, each time it looks. */
@@ -591,6 +621,9 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 
 	// ---- each tick --------------------------------------------------------------------------------------------------------------------
 	public static void tick(Level level, BlockPos pos, BlockState state, CraneBlockEntity crane) {
+		if (!crane.remote.hand() && !crane.remote.on(0, level.getGameTime())) {
+			return;   // held where it is: a load stays on the hook
+		}
 		SERVER.add(crane);
 		crane.step(level);
 	}
@@ -971,6 +1004,7 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
+		remote.save(output);
 		output.putBoolean("grown", grown);
 		output.putInt("boom", boom);
 		output.putDouble("litres", litres);
@@ -988,6 +1022,7 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		remote.load(input);
 		grown = input.getBooleanOr("grown", false);
 		boom = Math.clamp(input.getIntOr("boom", kind().firstBoom()), 0, kind().booms() - 1);
 		litres = input.getDoubleOr("litres", 0);

@@ -103,6 +103,9 @@ public class ReductionReactorBlockEntity extends PlantUnitBlockEntity implements
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, ReductionReactorBlockEntity r) {
+		if (r.plcHold(level)) {
+			return;
+		}
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
 			return;
 		}

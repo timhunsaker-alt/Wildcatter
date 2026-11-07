@@ -49,8 +49,9 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<MccIncomingBlockEntity> MCC_INCOMING_ENTITY = entity(MccIncomingBlockEntity::new, MCC_INCOMING);
 	public static final BlockEntityType<dev.wildcatter.block.MccSectionBlockEntity> MCC_SECTION_ENTITY = entity(dev.wildcatter.block.MccSectionBlockEntity::new, MCC_SECTION);
 	public static final BlockEntityType<dev.wildcatter.control.ControlSupplyBlockEntity> CONTROL_SUPPLY_ENTITY = entity(dev.wildcatter.control.ControlSupplyBlockEntity::new, CONTROL_SUPPLY);
+	public static final BlockEntityType<dev.wildcatter.control.RemoteIoDropBlockEntity> REMOTE_IO_DROP_ENTITY = entity(dev.wildcatter.control.RemoteIoDropBlockEntity::new, REMOTE_IO_DROP);
 	public static final BlockEntityType<dev.wildcatter.control.PlcCabinetBlockEntity> PLC_CABINET_ENTITY = entity(dev.wildcatter.control.PlcCabinetBlockEntity::new, PLC_CABINET);
-	public static final BlockEntityType<dev.wildcatter.control.OperatorDeviceBlockEntity> OPERATOR_DEVICE_ENTITY = entity(dev.wildcatter.control.OperatorDeviceBlockEntity::new, PUSHBUTTON, SELECTOR_SWITCH, ESTOP, PILOT_LIGHT, STACK_LIGHT, HORN);
+	public static final BlockEntityType<dev.wildcatter.control.OperatorDeviceBlockEntity> OPERATOR_DEVICE_ENTITY = entity(dev.wildcatter.control.OperatorDeviceBlockEntity::new, PUSHBUTTON, SELECTOR_SWITCH, ESTOP, PULL_CORD, PILOT_LIGHT, STACK_LIGHT, HORN);
 	public static final BlockEntityType<dev.wildcatter.block.StarterCabinetBlockEntity> STARTER_CABINET_ENTITY = entity(dev.wildcatter.block.StarterCabinetBlockEntity::new,
 			SOFT_STARTER, DRIVE_CABINET, SOFT_STARTER_MV, DRIVE_MV_CONTROL);
 	public static final BlockEntityType<dev.wildcatter.block.DcBusBarBlockEntity> DC_BUS_ENTITY = entity(dev.wildcatter.block.DcBusBarBlockEntity::new, DC_BUS_4K, DC_BUS_16K, DC_BUS_180K, DC_BUS_180K_COPPER);
@@ -207,6 +208,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.control.AirCompressorBlockEntity> AIR_COMPRESSOR_ENTITY = entity(dev.wildcatter.control.AirCompressorBlockEntity::new, AIR_COMPRESSOR);
 	public static final BlockEntityType<dev.wildcatter.control.TransmitterBlockEntity> TRANSMITTER_ENTITY = entity(dev.wildcatter.control.TransmitterBlockEntity::new, TRANSMITTER);
 	public static final BlockEntityType<dev.wildcatter.block.DayTankBlockEntity> DAY_TANK_ENTITY = entity(dev.wildcatter.block.DayTankBlockEntity::new, DAY_TANK);
+	public static final BlockEntityType<dev.wildcatter.control.HmiPanelBlockEntity> HMI_PANEL_ENTITY = entity(dev.wildcatter.control.HmiPanelBlockEntity::new, HMI_PANEL);
 	public static final BlockEntityType<PumpBlockEntity> PUMP_ENTITY = entity(PumpBlockEntity::new, PUMP, PROCESS_WATER_PUMP);
 	public static final BlockEntityType<dev.wildcatter.block.DecantTowerBlockEntity> DECANT_TOWER_ENTITY = entity(dev.wildcatter.block.DecantTowerBlockEntity::new, DECANT_TOWER);
 
@@ -266,6 +268,8 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		add("on_off_valve_steel", ON_OFF_VALVE_STEEL);
 		add("motor_operated_valve_steel", MOTOR_OPERATED_VALVE_STEEL);
 		add("air_tubing", AIR_TUBING);
+		add("network_cable", NETWORK_CABLE);
+		add("hmi_panel", HMI_PANEL);
 		add("air_compressor", AIR_COMPRESSOR);
 		add("air_dryer", AIR_DRYER);
 		add("day_tank", DAY_TANK);
@@ -474,7 +478,9 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		add("junction_box", JUNCTION_BOX);
 		add("control_supply", CONTROL_SUPPLY);
 		add("plc_cabinet", PLC_CABINET);
+		add("remote_io_drop", REMOTE_IO_DROP);
 		add("pushbutton", PUSHBUTTON);
+		add("pull_cord", PULL_CORD);
 		add("selector_switch", SELECTOR_SWITCH);
 		add("estop", ESTOP);
 		add("pilot_light", PILOT_LIGHT);
@@ -519,8 +525,10 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("starter_cabinet"), STARTER_CABINET_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("control_supply"), CONTROL_SUPPLY_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("plc_cabinet"), PLC_CABINET_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("remote_io_drop"), REMOTE_IO_DROP_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("operator_device"), OPERATOR_DEVICE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("valve"), VALVE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("hmi_panel"), HMI_PANEL_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("air_compressor"), AIR_COMPRESSOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("transmitter"), TRANSMITTER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("day_tank"), DAY_TANK_ENTITY);

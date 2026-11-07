@@ -164,6 +164,15 @@ public class BreakerBlock extends BaseEntityBlock {
 			player.sendOverlayMessage(breaker.inspect());
 		} else {
 			boolean closing = state.getValue(POSITION) != Position.ON;
+			if (breaker.remote()) {
+				// in REMOTE a hand clears a trip and nothing else
+				if (state.getValue(POSITION) == Position.TRIPPED) {
+					breaker.setSwitch(false);
+					CircuitManager.markDirty(level);
+				}
+				player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("In REMOTE: the PLC operates it. A trip resets to open by hand."));
+				return InteractionResult.SUCCESS;
+			}
 			breaker.setSwitch(closing);
 			level.playSound(null, pos, WildcatterSounds.BREAKER_CLICK, SoundSource.BLOCKS, 0.8F, closing ? 1.0F : 0.85F);
 			player.sendOverlayMessage(breaker.inspect());

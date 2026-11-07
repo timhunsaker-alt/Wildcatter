@@ -25,7 +25,67 @@ import net.minecraft.world.level.storage.ValueOutput;
  * at once. A current only a little over the rating heats it slowly: it trips sooner the further over it is, and
  * never if the current stays at or under the rating.
  */
-public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Inspectable, dev.wildcatter.multiblock.BigPartEntity {
+public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Inspectable, dev.wildcatter.multiblock.BigPartEntity, dev.wildcatter.control.ControlDevice, dev.wildcatter.control.Measurable {
+	private final dev.wildcatter.control.Remote remote = new dev.wildcatter.control.Remote(2);
+
+	/** True while its selector gives it to the PLC: then a hand can only clear a trip. */
+	public boolean remote() {
+		return remote.auto();
+	}
+
+	@Override
+	public String deviceName() {
+		return "Breaker";
+	}
+
+	@Override
+	public java.util.List<Point> points() {
+		return java.util.List.of(new Point("CLOSE", true), new Point("OPEN", true), new Point("CLOSED", false), new Point("TRIPPED", false), new Point("REMOTE", false), new Point("AMPS 4-20 mA, 150 %", false, Signal.MA));
+	}
+
+	@Override
+	public boolean readPoint(int point) {
+		return switch (point) {
+			case 2 -> closed();
+			case 3 -> getBlockState().getValue(BreakerBlock.POSITION) == BreakerBlock.Position.TRIPPED;
+			case 4 -> remote.auto();
+			default -> false;
+		};
+	}
+
+	/** Each coil pulses on its command's rise. A tripped breaker takes no close: its reset is by hand, as the protection demands. */
+	@Override
+	public void commandPoint(int point, boolean on, long gameTime) {
+		if (point > 1 || !remote.command(point, on, gameTime)) {
+			return;
+		}
+		BreakerBlock.Position now = getBlockState().getValue(BreakerBlock.POSITION);
+		if (point == 0 && now == BreakerBlock.Position.OFF) {
+			setSwitch(true);
+		} else if (point == 1 && now == BreakerBlock.Position.ON) {
+			setSwitch(false);
+		}
+		if (level != null) {
+			CircuitManager.markDirty(level);
+		}
+	}
+
+	@Override
+	public double readMa(int point) {
+		return 4 + 16 * Math.min(1.25, amps / (rating() * 1.5));
+	}
+
+	@Override
+	public String cycleHoa(BlockPos cell) {
+		setChanged();
+		return remote.cycle().replace("HAND", "LOCAL").replace("AUTO", "REMOTE");
+	}
+
+	@Override
+	public double measure(Quantity quantity) {
+		return quantity == Quantity.AMPS ? amps : Double.NaN;
+	}
+
 	/** A true-size part has grown into its cells (see BigParts). */
 	private boolean grown;
 
@@ -287,6 +347,7 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
+		remote.save(output);
 		output.putBoolean("grown", grown);
 		output.putInt("rating", ratingIndex);
 		output.putDouble("heat", heat);
@@ -296,6 +357,7 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		remote.load(input);
 		grown = input.getBooleanOr("grown", false);
 		ratingIndex = Math.max(0, input.getIntOr("rating", 0));
 		heat = input.getDoubleOr("heat", 0);

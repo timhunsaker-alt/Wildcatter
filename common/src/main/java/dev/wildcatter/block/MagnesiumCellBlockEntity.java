@@ -71,6 +71,9 @@ public class MagnesiumCellBlockEntity extends PlantUnitBlockEntity implements de
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, MagnesiumCellBlockEntity c) {
+		if (c.plcHold(level)) {
+			return;
+		}
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
 			return;
 		}

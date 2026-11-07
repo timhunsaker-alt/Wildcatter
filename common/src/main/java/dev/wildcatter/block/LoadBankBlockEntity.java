@@ -22,7 +22,55 @@ import net.minecraft.world.level.storage.ValueOutput;
  * A resistive load bank at 13.8 kV (docs/multiblocks/gas-turbine.md): 0 to 10 MW in 1 MW steps, three resistor elements in delta.
  * Plants are commissioned against one. Its terminals are the north face of its front bottom cells.
  */
-public class LoadBankBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity {
+public class LoadBankBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity, dev.wildcatter.control.ControlDevice, dev.wildcatter.control.Measurable {
+	private final dev.wildcatter.control.Remote remote = new dev.wildcatter.control.Remote(1);
+
+	@Override
+	public String deviceName() {
+		return "Load bank";
+	}
+
+	@Override
+	public java.util.List<Point> points() {
+		return java.util.List.of(new Point("STEPS 4-20 mA", true, Signal.MA), new Point("AUTO", false), new Point("WATTS 4-20 mA", false, Signal.MA));
+	}
+
+	@Override
+	public boolean readPoint(int point) {
+		return point == 1 && remote.auto();
+	}
+
+	@Override
+	public void commandPoint(int point, boolean on, long gameTime) {
+	}
+
+	@Override
+	public void commandMa(int point, double milliamps, long gameTime) {
+		if (point == 0) {
+			remote.commandMa(0, milliamps, gameTime);
+			int wanted = (int) Math.round(remote.fraction(0, gameTime, 0) * Tuning.LOAD_BANK_STEPS);
+			if (remote.auto() && wanted != steps) {
+				setSteps(wanted);
+			}
+		}
+	}
+
+	@Override
+	public double readMa(int point) {
+		return 4 + 16 * Math.min(1.03, watts / (Tuning.LOAD_BANK_STEPS * 1e6));
+	}
+
+	@Override
+	public String cycleHoa(BlockPos cell) {
+		setChanged();
+		return remote.cycle();
+	}
+
+	@Override
+	public double measure(Quantity quantity) {
+		return quantity == Quantity.WATTS ? watts : Double.NaN;
+	}
+
 	private static final Conductor[] PHASES = {Conductor.A, Conductor.B, Conductor.C};
 	private final int[] hot = new int[3];
 	private final int[] element = {-1, -1, -1};
@@ -120,6 +168,7 @@ public class LoadBankBlockEntity extends BlockEntity implements CircuitPart, Ins
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
+		remote.save(output);
 		output.putBoolean("grown", grown);
 		output.putInt("steps", steps);
 	}
@@ -127,6 +176,7 @@ public class LoadBankBlockEntity extends BlockEntity implements CircuitPart, Ins
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		remote.load(input);
 		grown = input.getBooleanOr("grown", grown);
 		steps = input.getIntOr("steps", 0);
 	}

@@ -203,6 +203,12 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("plcAnalog")) {
 				plcAnalog(context, server);
 			}
+			if (only("plcPower")) {
+				plcPower(context, server);
+			}
+			if (only("plcNetwork")) {
+				plcNetwork(context, server);
+			}
 			if (only("boron")) {
 				boron(context, server);
 			}
@@ -5359,6 +5365,488 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		}
 	}
 
+	private static final String POWER_PROJECT = """
+			PROGRAM SITE
+			VAR
+				a_running AT %IX0.0 : BOOL;
+				a_closed AT %IX0.1 : BOOL;
+				a_tripped AT %IX0.2 : BOOL;
+				b_running AT %IX0.3 : BOOL;
+				b_closed AT %IX0.4 : BOOL;
+				f1_closed AT %IX0.5 : BOOL;
+				f2_closed AT %IX0.6 : BOOL;
+				f3_closed AT %IX0.7 : BOOL;
+				f3_tripped AT %IX1.0 : BOOL;
+				a_run AT %QX16.0 : BOOL;
+				a_permit AT %QX16.1 : BOOL;
+				b_run AT %QX16.2 : BOOL;
+				b_permit AT %QX16.3 : BOOL;
+				f1_close AT %QX16.4 : BOOL;
+				f2_close AT %QX16.5 : BOOL;
+				f3_close AT %QX16.6 : BOOL;
+				f3_open AT %QX16.7 : BOOL;
+				a_kw_raw AT %IW32 : WORD;
+				b_kw_raw AT %IW34 : WORD;
+				a_trim AT %QW48 : WORD;
+				go : BOOL;
+				a_kw, b_kw, total_kw : REAL;
+				shed_kw : REAL := 100.0;
+				trim_a : REAL := 50.0;
+				shed : BOOL;
+				over : TON;
+				clear : TON;
+				settle : TON;
+			END_VAR
+			a_kw := SCALE(INT_TO_REAL(WORD_TO_INT(a_kw_raw)), 0.0, 32000.0, 0.0, 625.0);
+			b_kw := SCALE(INT_TO_REAL(WORD_TO_INT(b_kw_raw)), 0.0, 32000.0, 0.0, 625.0);
+			total_kw := a_kw + b_kw;
+			a_run := go;
+			a_permit := go;
+			b_run := go AND a_closed;
+			b_permit := b_running AND a_closed;
+			a_trim := INT_TO_WORD(REAL_TO_INT(trim_a * 320.0));
+			settle(IN := a_closed AND b_closed, PT := T#2s);
+			f1_close := settle.Q;
+			f2_close := settle.Q AND f1_closed;
+			over(IN := total_kw > shed_kw, PT := T#3s);
+			clear(IN := total_kw < shed_kw - 20.0, PT := T#10s);
+			IF over.Q THEN
+				shed := TRUE;
+			ELSIF clear.Q THEN
+				shed := FALSE;
+			END_IF;
+			f3_close := settle.Q AND f2_closed AND NOT shed;
+			f3_open := shed;
+			END_PROGRAM""";
+
+	/** Phase 13f (docs/multiblocks/plc.md): a PLC starts two sets, closes them, loads them, sheds load past a limit and shifts their shares, all watched and worked from an HMI. */
+	private void plcPower(ClientGameTestContext context, TestServerContext server) {
+		int z = -3600;
+		int bay = z + 22;
+		server.runCommand("tp @p 19 " + (up + 2) + " " + (bay + 5) + " 180 10");
+		context.waitTicks(20);
+		server.runCommand("fill 2 " + (y - 1) + " " + (z - 14) + " 34 " + (y + 8) + " " + (bay + 10) + " minecraft:air");
+		server.runCommand("fill 2 " + (y - 1) + " " + (z - 14) + " 34 " + (y - 1) + " " + (bay + 10) + " minecraft:stone");
+		Filming film = null;
+		try {
+			BlockPos setA = new BlockPos(12, up, z);
+			BlockPos setB = new BlockPos(12, up, z + 16);
+			genset(server, setA, net.minecraft.core.Direction.NORTH, false);
+			genset(server, setB, net.minecraft.core.Direction.NORTH, false);
+			for (int zz = z; zz <= z + 16; zz++) {
+				put(server, 13, up, zz, "wildcatter:cable_industrial");
+			}
+			BlockPos[] feeders = {new BlockPos(14, up, z + 3), new BlockPos(14, up, z + 7), new BlockPos(14, up, z + 11)};
+			for (BlockPos feeder : feeders) {
+				put(server, 14, up, feeder.getZ(), "wildcatter:breaker_3p_industrial[facing=east,position=off]");
+				put(server, 15, up, feeder.getZ(), "wildcatter:cable_industrial");
+				put(server, 16, up, feeder.getZ(), "wildcatter:three_phase_heater");
+				put(server, 15, up, feeder.getZ() + 1, "wildcatter:cable_industrial");
+				put(server, 16, up, feeder.getZ() + 1, "wildcatter:three_phase_heater");
+				put(server, 15, up, feeder.getZ() - 1, "wildcatter:cable_industrial");
+				put(server, 16, up, feeder.getZ() - 1, "wildcatter:three_phase_heater");
+			}
+			server.runOnServer(srv -> {   // each feeder's dial set for its 54 A, as a player sets it
+				for (BlockPos feeder : feeders) {
+					var breaker = (dev.wildcatter.block.BreakerBlockEntity) srv.overworld().getBlockEntity(feeder);
+					while (breaker.rating() < 100) {
+						breaker.nextRating();
+					}
+				}
+			});
+			// the control trunk, boxes where anything touches
+			for (int zz = z + 1; zz < bay; zz++) {
+				boolean box = zz == z + 1 || zz == z + 3 || zz == z + 7 || zz == z + 11 || zz == z + 16;
+				put(server, 14, up + 1, zz, box ? "wildcatter:junction_box" : "wildcatter:control_cable");
+			}
+			// over each set's panel, which is two cells deep and two high, and down to the trunk
+			put(server, 14, up + 1, z, "wildcatter:control_cable");
+			for (int line : new int[] {z, z + 16}) {
+				put(server, 12, up + 2, line, "wildcatter:control_cable");
+				put(server, 13, up + 2, line, "wildcatter:control_cable");
+				put(server, 14, up + 2, line, "wildcatter:control_cable");
+			}
+			plant(server, bay);
+			put(server, 12, up, bay, "wildcatter:plastic_wire_hot");
+			put(server, 13, up, bay, "wildcatter:control_supply");
+			for (int x = 11; x <= 13; x++) {
+				put(server, x, up, bay + 1, "wildcatter:plastic_wire_neutral");
+			}
+			put(server, 14, up, bay, "wildcatter:junction_box");
+			put(server, 14, up + 1, bay, "wildcatter:junction_box");
+			BlockPos at = new BlockPos(15, up, bay);
+			put(server, 15, up, bay, "wildcatter:plc_cabinet[facing=south]");
+			server.runOnServer(srv -> dev.wildcatter.multiblock.BigParts.grow(srv.overworld(), at, srv.overworld().getBlockState(at)));
+			put(server, 16, up, bay, "wildcatter:network_cable");
+			put(server, 17, up, bay, "wildcatter:network_cable");
+			BlockPos hmiAt = new BlockPos(18, up, bay);
+			put(server, 18, up, bay, "wildcatter:hmi_panel[facing=south]");
+			// fuel the sets by hand, as a start needs: the PLC starts them, not a panel click
+			context.waitTicks(30);
+			server.computeOnServer(srv -> {
+				for (BlockPos set : new BlockPos[] {setA, setB}) {
+					BlockPos tank = dev.wildcatter.block.GensetSkid.base(set, net.minecraft.core.Direction.NORTH, false);
+					if (srv.overworld().getBlockEntity(tank) instanceof dev.wildcatter.block.GensetPartBlockEntity t) {
+						t.setFuel(1500);
+					}
+				}
+				return null;
+			});
+			java.util.function.Function<net.minecraft.server.MinecraftServer, dev.wildcatter.control.PlcCabinetBlockEntity> cabinet = srv -> (dev.wildcatter.control.PlcCabinetBlockEntity) srv.overworld().getBlockEntity(at);
+			java.util.function.Supplier<String> status = () -> read(server, 15, up, bay);
+			String wired = server.computeOnServer(srv -> {
+				dev.wildcatter.control.PlcCabinetBlockEntity box = cabinet.apply(srv);
+				for (var type : java.util.List.of(dev.wildcatter.control.PlcModuleItem.Type.CPU_SMALL, dev.wildcatter.control.PlcModuleItem.Type.DI16, dev.wildcatter.control.PlcModuleItem.Type.DO16, dev.wildcatter.control.PlcModuleItem.Type.AI8, dev.wildcatter.control.PlcModuleItem.Type.AO4,
+						dev.wildcatter.control.PlcModuleItem.Type.COMM)) {
+					box.seat(type);
+				}
+				box.setStation("PLC-1");
+				java.util.List<String> all = new java.util.ArrayList<>();
+				return String.join(";", all);
+			});
+			context.waitTicks(25);
+			check(wired.isEmpty(), "modules: " + wired);
+			String lands = server.computeOnServer(srv -> {
+				dev.wildcatter.control.PlcCabinetBlockEntity box = cabinet.apply(srv);
+				java.util.List<String> all = new java.util.ArrayList<>();
+				all.add(box.land(setA, 0, "%QX16.0"));
+				all.add(box.land(setA, 1, "%QX16.1"));
+				all.add(box.land(setA, 2, "%QW48"));
+				all.add(box.land(setA, 4, "%IX0.0"));
+				all.add(box.land(setA, 5, "%IX0.1"));
+				all.add(box.land(setA, 6, "%IX0.2"));
+				all.add(box.land(setA, 9, "%IW32"));
+				all.add(box.land(setB, 0, "%QX16.2"));
+				all.add(box.land(setB, 1, "%QX16.3"));
+				all.add(box.land(setB, 4, "%IX0.3"));
+				all.add(box.land(setB, 5, "%IX0.4"));
+				all.add(box.land(setB, 9, "%IW34"));
+				all.add(box.land(feeders[0], 0, "%QX16.4"));
+				all.add(box.land(feeders[1], 0, "%QX16.5"));
+				all.add(box.land(feeders[2], 0, "%QX16.6"));
+				all.add(box.land(feeders[2], 1, "%QX16.7"));
+				all.add(box.land(feeders[0], 2, "%IX0.5"));
+				all.add(box.land(feeders[1], 2, "%IX0.6"));
+				all.add(box.land(feeders[2], 2, "%IX0.7"));
+				all.add(box.land(feeders[2], 3, "%IX1.0"));
+				StringBuilder errors = new StringBuilder();
+				all.stream().filter(java.util.Objects::nonNull).forEach(e -> errors.append(e).append("; "));
+				for (BlockPos device : new BlockPos[] {setA, setB, feeders[0], feeders[1], feeders[2]}) {
+					var control = dev.wildcatter.control.ControlNet.deviceAt(srv.overworld(), device);
+					if (control == null) {
+						errors.append("no device at ").append(device.toShortString()).append(": ").append(srv.overworld().getBlockState(device)).append(" ").append(srv.overworld().getBlockEntity(device)).append("; ");
+						continue;
+					}
+					control.cycleHoa(device);
+					control.cycleHoa(device);
+				}
+				return errors.toString();
+			});
+			check(lands.isEmpty(), "every signal should land: " + lands);
+			context.waitTicks(25);
+			check(status.get().contains("devices reached") && !status.get().contains("NO 24 V") && !status.get().contains("BAD JOINT"), "the panel should be wired: " + status.get());
+			film = context.computeOnClient(client -> Filming.start(client, "plcPower"));
+			java.util.List<?> errors = server.computeOnServer(srv -> cabinet.apply(srv).download(POWER_PROJECT));
+			check(errors.isEmpty(), "the program should compile: " + errors);
+			server.runOnServer(srv -> cabinet.apply(srv).cpu().setMode(dev.wildcatter.plc.Cpu.Mode.RUN));
+			context.waitTicks(10);
+			java.util.function.Function<String, Object> tag = name -> server.computeOnServer(srv -> cabinet.apply(srv).cpu().read("SITE." + name));
+			// the operator's screen, laid out through its real editor
+			server.runOnServer(srv -> ((dev.wildcatter.control.HmiPanelBlockEntity) srv.overworld().getBlockEntity(hmiAt)).open(srv.getPlayerList().getPlayers().get(0)));
+			context.waitTicks(20);
+			check(context.computeOnClient(client -> client.gui.screen() instanceof dev.wildcatter.client.HmiScreen), "the HMI should open");
+			java.util.function.BiConsumer<String, String[]> add = (kind, v) -> {
+				context.runOnClient(client -> ((dev.wildcatter.client.HmiScreen) client.gui.screen()).kindForTest(kind));
+				context.waitTick();
+				hmiField(context, "label", v[0]);
+				hmiField(context, "tag", v[1]);
+				hmiField(context, "low", v[2]);
+				hmiField(context, "high", v[3]);
+				hmiClick(context, "ADD");
+				context.waitTick();
+			};
+			hmiClick(context, "EDIT");
+			context.waitTicks(2);
+			add.accept("BUTTON", new String[] {"SITE START", "SITE.GO", "0", "1"});
+			add.accept("VALUE", new String[] {"TOTAL KW", "SITE.TOTAL_KW", "0", "100"});
+			add.accept("LAMP", new String[] {"SHEDDING", "SITE.SHED", "0", "1"});
+			add.accept("BAR", new String[] {"SET A KW", "SITE.A_KW", "0", "100"});
+			add.accept("BAR", new String[] {"SET B KW", "SITE.B_KW", "0", "100"});
+			add.accept("LAMP", new String[] {"FEEDER 3", "SITE.F3_CLOSED", "0", "1"});
+			add.accept("TREND", new String[] {"TOTAL KW", "SITE.TOTAL_KW", "0", "150"});
+			check(context.computeOnClient(client -> ((dev.wildcatter.client.HmiScreen) client.gui.screen()).layoutSizeForTest()) == 7, "the screen should hold what was added");
+			hmiClick(context, "ALARMS");
+			context.waitTicks(2);
+			hmiField(context, "alarm tag", "SITE.SHED");
+			hmiField(context, "op", "=");
+			hmiField(context, "limit", "1");
+			hmiField(context, "pri", "1");
+			hmiField(context, "message", "Load shed: feeder 3 open");
+			hmiClick(context, "ADD ALARM");
+			context.waitTick();
+			hmiClick(context, "RUN");
+			context.waitTicks(5);
+			context.takeScreenshot("wildcatter-plc-hmi-stopped");
+			// the operator's start button, by the real mouse
+			plcMouseAt(context, context.computeOnClient(client -> ((dev.wildcatter.client.HmiScreen) client.gui.screen()).widgetForTest(0)));
+			context.waitTicks(40);
+			check(Boolean.TRUE.equals(tag.apply("GO")), "the HMI's button should write the tag");
+			String a = read(server, 12, up, z);
+			System.out.println("[wildcatter-test] plc power: after start: " + a);
+			context.waitTicks(1200);
+			String stateA = read(server, 12, up, z);
+			String stateB = read(server, 12, up, z + 16);
+			System.out.println("[wildcatter-test] plc power: A " + stateA + " | B " + stateB);
+			check(Boolean.TRUE.equals(tag.apply("A_CLOSED")) && Boolean.TRUE.equals(tag.apply("B_CLOSED")), "the PLC should have run and closed both sets: " + stateA + " | " + stateB);
+			check(Boolean.TRUE.equals(tag.apply("F1_CLOSED")) && Boolean.TRUE.equals(tag.apply("F2_CLOSED")), "and closed the feeders: " + read(server, 14, up, feeders[0].getZ()));
+			// feeder 3 took the load over the limit, so it was shed
+			context.waitTicks(200);
+			double total = ((Number) tag.apply("TOTAL_KW")).doubleValue();
+			System.out.println("[wildcatter-test] plc power: total " + total + " kW, shed " + tag.apply("SHED") + ", feeder 3 " + read(server, 14, up, feeders[2].getZ()));
+			check(Boolean.TRUE.equals(tag.apply("SHED")), "over its limit the PLC should have shed: " + total + " kW");
+			check(!Boolean.TRUE.equals(tag.apply("F3_CLOSED")), "feeder 3 should be open: " + read(server, 14, up, feeders[2].getZ()));
+			check(total > 80 && total < 100, "with feeder 3 off, two feeders of 45 kW each should be the load: " + total);
+			context.takeScreenshot("wildcatter-plc-hmi-running");
+			// a shift of share: A's speed trim up takes load from B
+			double aBefore = ((Number) tag.apply("A_KW")).doubleValue();
+			double bBefore = ((Number) tag.apply("B_KW")).doubleValue();
+			server.runOnServer(srv -> cabinet.apply(srv).cpu().write("SITE.TRIM_A", 65.0));
+			context.waitTicks(40);
+			double aAfter = ((Number) tag.apply("A_KW")).doubleValue();
+			double bAfter = ((Number) tag.apply("B_KW")).doubleValue();
+			System.out.println("[wildcatter-test] plc power: share A " + aBefore + " B " + bBefore + " kW, trimmed A " + aAfter + " B " + bAfter);
+			check(aAfter > aBefore && bAfter < bBefore, "a trim should shift the load between the sets: " + aBefore + "/" + bBefore + " to " + aAfter + "/" + bAfter);
+			server.runOnServer(srv -> cabinet.apply(srv).cpu().write("SITE.TRIM_A", 50.0));
+			// the alarm: active and unacknowledged, then acknowledged, by the real mouse
+			hmiClick(context, "ALARMS");
+			context.waitTicks(30);
+			var hmi = (java.util.function.Supplier<dev.wildcatter.control.HmiPanelBlockEntity.AlarmState>) () -> server.computeOnServer(srv -> ((dev.wildcatter.control.HmiPanelBlockEntity) srv.overworld().getBlockEntity(hmiAt)).alarmState(0));
+			check(hmi.get() == dev.wildcatter.control.HmiPanelBlockEntity.AlarmState.UNACKED, "the shed should raise an alarm: " + hmi.get());
+			context.takeScreenshot("wildcatter-plc-hmi-alarm");
+			hmiClick(context, "ACK");
+			context.waitTicks(15);
+			check(hmi.get() == dev.wildcatter.control.HmiPanelBlockEntity.AlarmState.ACKED, "ACK should acknowledge it: " + hmi.get());
+			check(server.computeOnServer(srv -> ((dev.wildcatter.control.HmiPanelBlockEntity) srv.overworld().getBlockEntity(hmiAt)).trendSamples("SITE.TOTAL_KW")) > 30, "the trend should have samples");
+			hmiClick(context, "SHELVE");
+			context.waitTicks(15);
+			check(hmi.get() == dev.wildcatter.control.HmiPanelBlockEntity.AlarmState.SHELVED, "SHELVE should shelve it: " + hmi.get());
+			hmiClick(context, "RUN");
+			context.waitTicks(5);
+			// a protective trip beats the PLC: feeder 1 tripped by hand of its protection stays out, its close coil does nothing, until a hand resets it
+			server.runOnServer(srv -> ((dev.wildcatter.block.BreakerBlockEntity) srv.overworld().getBlockEntity(feeders[0])).tripByRelay("test"));
+			context.waitTicks(40);
+			check(read(server, 14, up, feeders[0].getZ()).toUpperCase(java.util.Locale.ROOT).contains("TRIP"), "a trip should stand against the PLC's close: " + read(server, 14, up, feeders[0].getZ()));
+			// the operator stops it: sets stop and open
+			plcMouseAt(context, context.computeOnClient(client -> ((dev.wildcatter.client.HmiScreen) client.gui.screen()).widgetForTest(0)));
+			context.waitTicks(60);
+			check(!Boolean.TRUE.equals(tag.apply("A_RUNNING")) && !Boolean.TRUE.equals(tag.apply("B_RUNNING")), "the HMI's button should stop both sets");
+			context.runOnClient(client -> client.gui.screen().onClose());
+			context.waitTicks(5);
+			// a cable lost: the sets drop with the commands, as a dead PLC is a stopped plant
+			System.out.println("[wildcatter-test] plcPower ok: " + status.get());
+		} finally {
+			if (film != null) {
+				film.stop();
+			}
+		}
+	}
+
+	/** Phase 13h (docs/multiblocks/plc.md): a starter and a button on a remote drop 60 blocks from their PLC; a second PLC taking its tags; an HMI on either; a cut network. */
+	private void plcNetwork(ClientGameTestContext context, TestServerContext server) {
+		int z = -3800;
+		int mid = z + 30;
+		int far = z + 60;
+		server.runCommand("tp @p 18 " + (up + 2) + " " + (mid + 4) + " 180 10");
+		context.waitTicks(20);
+		for (int zz = z - 4; zz <= far + 6; zz += 20) {
+			server.runCommand("fill 8 " + (y - 1) + " " + zz + " 24 " + (y + 6) + " " + Math.min(zz + 19, far + 6) + " minecraft:air");
+			server.runCommand("fill 8 " + (y - 1) + " " + zz + " 24 " + (y - 1) + " " + Math.min(zz + 19, far + 6) + " minecraft:stone");
+		}
+		Filming film = null;
+		try {
+			film = context.computeOnClient(client -> Filming.start(client, "plcNetwork"));
+			BlockPos master = plcBench(context, server, z, dev.wildcatter.control.PlcModuleItem.Type.COMM);
+			BlockPos second = plcBench(context, server, mid, dev.wildcatter.control.PlcModuleItem.Type.COMM, dev.wildcatter.control.PlcModuleItem.Type.DO16);
+			// the drop: its own 24 V and control cables, no CPU, on the far end of the network
+			plant(server, far);
+			put(server, 12, up, far, "wildcatter:plastic_wire_hot");
+			put(server, 13, up, far, "wildcatter:control_supply");
+			for (int x = 11; x <= 13; x++) {
+				put(server, x, up, far + 1, "wildcatter:plastic_wire_neutral");
+			}
+			put(server, 14, up, far, "wildcatter:junction_box");
+			BlockPos dropAt = new BlockPos(15, up, far);
+			put(server, 15, up, far, "wildcatter:remote_io_drop[facing=south]");
+			server.runOnServer(srv -> dev.wildcatter.multiblock.BigParts.grow(srv.overworld(), dropAt, srv.overworld().getBlockState(dropAt)));
+			BlockPos starterAt = new BlockPos(14, up, far - 1);
+			BlockPos button = new BlockPos(14, up, far + 1);
+			put(server, 14, up, far - 1, "wildcatter:motor_starter[facing=east]");
+			put(server, 14, up, far + 1, "wildcatter:pushbutton[facing=south]");
+			BlockPos lamp = new BlockPos(14, up + 1, mid);
+			put(server, 14, up + 1, mid, "wildcatter:pilot_light[facing=south]");
+			// the network: each cabinet's east side out to a run down x 20; the HMI on it, by the second PLC
+			for (int line : new int[] {z, mid, far}) {
+				for (int x = 16; x <= 19; x++) {
+					put(server, x, up, line, "wildcatter:network_cable");
+				}
+			}
+			for (int zz = z; zz <= far; zz++) {
+				put(server, 20, up, zz, "wildcatter:network_cable");
+			}
+			BlockPos hmiAt = new BlockPos(21, up, mid);
+			put(server, 21, up, mid, "wildcatter:hmi_panel[facing=east]");
+			java.util.function.Function<net.minecraft.server.MinecraftServer, dev.wildcatter.control.PlcCabinetBlockEntity> plc1 = srv -> (dev.wildcatter.control.PlcCabinetBlockEntity) srv.overworld().getBlockEntity(master);
+			java.util.function.Function<net.minecraft.server.MinecraftServer, dev.wildcatter.control.PlcCabinetBlockEntity> plc2 = srv -> (dev.wildcatter.control.PlcCabinetBlockEntity) srv.overworld().getBlockEntity(second);
+			java.util.function.Function<net.minecraft.server.MinecraftServer, dev.wildcatter.control.RemoteIoDropBlockEntity> drop = srv -> (dev.wildcatter.control.RemoteIoDropBlockEntity) srv.overworld().getBlockEntity(dropAt);
+			server.runOnServer(srv -> {
+				drop.apply(srv).seat(dev.wildcatter.control.PlcModuleItem.Type.DI16);
+				drop.apply(srv).seat(dev.wildcatter.control.PlcModuleItem.Type.DO16);
+				String nope = drop.apply(srv).seat(dev.wildcatter.control.PlcModuleItem.Type.CPU_SMALL);
+				check(nope != null, "a drop takes no CPU");
+				plc1.apply(srv).setStation("PLC-1");
+				plc2.apply(srv).setStation("PLC-2");
+			});
+			context.waitTicks(30);
+			String landed = server.computeOnServer(srv -> {
+				var box = plc1.apply(srv);
+				String out = "";
+				for (String one : new String[] {box.land(button, 0, "%IX192.0"), box.land(starterAt, 1, "%IX192.1"), box.land(starterAt, 2, "%IX192.2"), box.land(starterAt, 0, "%QX208.0")}) {
+					if (one != null) {
+						out += one + "; ";
+					}
+				}
+				String lampOut = plc2.apply(srv).land(lamp, 0, "%QX16.0");
+				out += lampOut == null ? "" : lampOut;
+				dev.wildcatter.control.ControlNet.deviceAt(srv.overworld(), starterAt).cycleHoa(starterAt);
+				dev.wildcatter.control.ControlNet.deviceAt(srv.overworld(), starterAt).cycleHoa(starterAt);
+				box.download("PROGRAM MAIN\nVAR\n btn AT %IX192.0 : BOOL;\n fed AT %IX192.1 : BOOL;\n bad AT %IX192.2 : BOOL;\n coil AT %QX208.0 : BOOL;\n scans : DINT;\nEND_VAR\ncoil := (btn OR coil) AND NOT bad;\nscans := scans + 1;\nEND_PROGRAM");
+				box.cpu().setMode(dev.wildcatter.plc.Cpu.Mode.RUN);
+				plc2.apply(srv).download("PROGRAM LINK\nVAR\n seen : BOOL;\n light AT %QX16.0 : BOOL;\n count : DINT;\nEND_VAR\nlight := seen;\nEND_PROGRAM");
+				plc2.apply(srv).cpu().setMode(dev.wildcatter.plc.Cpu.Mode.RUN);
+				return out;
+			});
+			check(landed.isEmpty(), "the drop's signals should land on the PLC, by rack: " + landed + " | " + read(server, 15, up, z) + " | " + read(server, 15, up, far));
+			context.waitTicks(30);
+			check(read(server, 15, up, z).contains("rack") || server.computeOnServer(srv -> plc1.apply(srv).drops().size()) == 1, "the PLC should see its drop");
+			java.util.function.Supplier<Boolean> running = () -> server.computeOnServer(srv -> ((dev.wildcatter.block.MotorStarterBlockEntity) srv.overworld().getBlockEntity(starterAt)).readPoint(1));
+			// PLC-2's screen: its tag taken over the network, by real clicks
+			server.runOnServer(srv -> plc2.apply(srv).open(srv.getPlayerList().getPlayers().get(0)));
+			context.waitTicks(20);
+			plcClick(context, "NET");
+			context.waitTicks(5);
+			plcField(context, "exchange", "LINK.SEEN = PLC-1/MAIN.COIL");
+			plcClick(context, "ADD ROW");
+			context.waitTicks(5);
+			plcField(context, "exchange", "LINK.COUNT = PLC-1/MAIN.SCANS");
+			plcClick(context, "ADD ROW");
+			context.waitTicks(30);
+			check(server.computeOnServer(srv -> plc2.apply(srv).exchange().size()) == 2, "the rows should reach the cabinet");
+			check(server.computeOnServer(srv -> plc2.apply(srv).exchangeFailed().isEmpty()), "both should read: " + server.computeOnServer(srv -> plc2.apply(srv).exchangeFailed().toString()));
+			context.takeScreenshot("wildcatter-plc-network-tab");
+			context.runOnClient(client -> client.gui.screen().onClose());
+			context.waitTicks(5);
+			// the button on the drop, across the network, runs the starter on the drop
+			server.runOnServer(srv -> ((dev.wildcatter.control.OperatorDeviceBlockEntity) srv.overworld().getBlockEntity(button)).operate());
+			context.waitTicks(40);
+			check(running.get(), "a button on a remote drop should run a starter on it: " + read(server, 14, up, far - 1) + " | " + read(server, 15, up, z));
+			check(Boolean.TRUE.equals(server.computeOnServer(srv -> plc2.apply(srv).cpu().read("LINK.SEEN"))), "the second PLC should take its tag");
+			check(server.computeOnServer(srv -> srv.overworld().getBlockState(lamp).getValue(dev.wildcatter.control.OperatorDeviceBlock.LAMPS)) == 1, "and light its own lamp from it");
+			check(((Number) server.computeOnServer(srv -> plc2.apply(srv).cpu().read("LINK.COUNT"))).longValue() > 10, "and a number comes across too");
+			// an HMI reads and writes either PLC by station, and a marker as a register
+			java.util.function.Function<net.minecraft.server.MinecraftServer, java.util.List<dev.wildcatter.control.PlcCabinetBlockEntity>> netPlcs = srv -> dev.wildcatter.control.NetworkNet.plcs(srv.overworld(), java.util.List.of(hmiAt));
+			check(server.computeOnServer(srv -> netPlcs.apply(srv).size()) == 2, "an HMI should see both PLCs: " + read(server, 21, up, mid));
+			check(Boolean.TRUE.equals(server.computeOnServer(srv -> dev.wildcatter.control.NetworkNet.read(netPlcs.apply(srv), "PLC-1/MAIN.COIL"))), "by station");
+			check(server.computeOnServer(srv -> dev.wildcatter.control.NetworkNet.write(netPlcs.apply(srv), "PLC-2/%MW10", 1234L)), "a marker takes a register's write");
+			check(((Number) server.computeOnServer(srv -> dev.wildcatter.control.NetworkNet.read(netPlcs.apply(srv), "PLC-2/%MW10"))).longValue() == 1234, "and reads it back");
+			// the network cut between them: the drop's outputs stop arriving, so the starter falls back, and the exchange says FAILED
+			put(server, 20, up, mid + 10, "minecraft:air");
+			context.waitTicks(40);
+			check(!running.get(), "a cut network should stop a remote starter: " + read(server, 14, up, far - 1));
+			put(server, 20, up, mid - 10, "minecraft:air");
+			context.waitTicks(30);
+			check(server.computeOnServer(srv -> plc2.apply(srv).exchangeFailed().size()) == 2, "and a tag exchange should say it failed");
+			check(Boolean.TRUE.equals(server.computeOnServer(srv -> plc2.apply(srv).cpu().read("LINK.SEEN"))), "holding its last value");
+			put(server, 20, up, mid + 10, "wildcatter:network_cable");
+			put(server, 20, up, mid - 10, "wildcatter:network_cable");
+			context.waitTicks(40);
+			// a save and load keeps the rack and the exchange
+			boolean kept = server.computeOnServer(srv -> {
+				var registries = srv.registryAccess();
+				var box = plc2.apply(srv);
+				net.minecraft.nbt.CompoundTag saved = box.saveCustomOnly(registries);
+				var copy = new dev.wildcatter.control.PlcCabinetBlockEntity(second, box.getBlockState());
+				copy.setLevel(srv.overworld());
+				copy.loadCustomOnly(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, registries, saved));
+				return copy.exchange().size() == 2 && copy.station().equals("PLC-2");
+			});
+			check(kept, "a save and load should keep the exchange and the name");
+			System.out.println("[wildcatter-test] plcNetwork ok: " + read(server, 15, up, z) + " | " + read(server, 15, up, far));
+		} finally {
+			if (film != null) {
+				film.stop();
+			}
+		}
+	}
+
+	/** A control cable along these cells, refusing to overwrite anything: a true-size part it replaced would come apart. */
+	private void controlRun(TestServerContext server, String block, int[]... cells) {
+		for (int[] c : cells) {
+			boolean clear = server.computeOnServer(srv -> srv.overworld().getBlockState(new BlockPos(c[0], c[1], c[2])).isAir());
+			check(clear, "a control run should not overwrite " + server.computeOnServer(srv -> srv.overworld().getBlockState(new BlockPos(c[0], c[1], c[2])).toString()) + " at " + c[0] + " " + c[1] + " " + c[2]);
+			put(server, c[0], c[1], c[2], block);
+		}
+	}
+
+	private int[][] straight(int x0, int y0, int z0, int x1, int y1, int z1) {
+		java.util.List<int[]> out = new java.util.ArrayList<>();
+		int n = Math.max(Math.abs(x1 - x0), Math.max(Math.abs(y1 - y0), Math.abs(z1 - z0)));
+		for (int i = 0; i <= n; i++) {
+			out.add(new int[] {x0 + Integer.signum(x1 - x0) * i, y0 + Integer.signum(y1 - y0) * i, z0 + Integer.signum(z1 - z0) * i});
+		}
+		return out.toArray(new int[0][]);
+	}
+
+	/** A cabinet with a CPU and modules, its own 24 V from a small steam set at x 10-11, a box at x 14: the trunk starts on that box's top. */
+	private BlockPos plcBench(ClientGameTestContext context, TestServerContext server, int z, dev.wildcatter.control.PlcModuleItem.Type... modules) {
+		plant(server, z);
+		put(server, 12, up, z, "wildcatter:plastic_wire_hot");
+		put(server, 13, up, z, "wildcatter:control_supply");
+		for (int x = 11; x <= 13; x++) {
+			put(server, x, up, z + 1, "wildcatter:plastic_wire_neutral");
+		}
+		put(server, 14, up, z, "wildcatter:junction_box");
+		BlockPos at = new BlockPos(15, up, z);
+		put(server, 15, up, z, "wildcatter:plc_cabinet[facing=south]");
+		server.runOnServer(srv -> dev.wildcatter.multiblock.BigParts.grow(srv.overworld(), at, srv.overworld().getBlockState(at)));
+		context.waitTicks(25);
+		server.runOnServer(srv -> {
+			var box = (dev.wildcatter.control.PlcCabinetBlockEntity) srv.overworld().getBlockEntity(at);
+			box.seat(dev.wildcatter.control.PlcModuleItem.Type.CPU_SMALL);
+			for (var type : modules) {
+				box.seat(type);
+			}
+		});
+		return at;
+	}
+
+	private dev.wildcatter.client.HmiScreen hmiScreen(net.minecraft.client.Minecraft client) {
+		return (dev.wildcatter.client.HmiScreen) client.gui.screen();
+	}
+
+	private void hmiClick(ClientGameTestContext context, String label) {
+		int[] at = context.computeOnClient(client -> hmiScreen(client).buttonForTest(label));
+		check(at != null, "the HMI's " + label + " button should be there");
+		plcMouseAt(context, at);
+	}
+
+	private void hmiField(ClientGameTestContext context, String label, String value) {
+		check(context.computeOnClient(client -> hmiScreen(client).setFieldForTest(label, value)), "the HMI's " + label + " field should be there");
+	}
+
+	private void plcMouseAt(ClientGameTestContext context, int[] at) {
+		plcMouse(context, at);
+	}
+
 	/** Every block and item of the mod has its files. The asset generator clears what it does not know about, so a hand-made file can vanish without an error anywhere else. */
 	private void checkAssets(ClientGameTestContext context) {
 		java.util.List<String> missing = context.computeOnClient(client -> {
@@ -6510,6 +6998,43 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(3);
 		context.takeScreenshot("wildcatter-topping-unit");
 		System.out.println("[wildcatter-test] topping unit ok: " + unit + " | " + heater + all);
+		// 13g (docs/multiblocks/plc.md): the same column enabled by a real program; off, it holds; a cut cable holds it too
+		BlockPos bench = plcBench(context, server, z + 15, dev.wildcatter.control.PlcModuleItem.Type.DI16, dev.wildcatter.control.PlcModuleItem.Type.DO16, dev.wildcatter.control.PlcModuleItem.Type.AI8);
+		controlRun(server, "wildcatter:junction_box", new int[] {13, up + 1, z + 5});
+		controlRun(server, "wildcatter:junction_box", new int[] {12, up + 1, z + 5});   // the skid is beside it, and is a device too
+		controlRun(server, "wildcatter:control_cable", straight(11, up + 1, z + 5, 11, up + 7, z + 5));
+		controlRun(server, "wildcatter:control_cable", straight(11, up + 7, z + 6, 11, up + 7, z + 15));
+		controlRun(server, "wildcatter:control_cable", straight(12, up + 7, z + 15, 13, up + 7, z + 15));
+		controlRun(server, "wildcatter:control_cable", new int[] {14, up + 7, z + 15});
+		controlRun(server, "wildcatter:control_cable", straight(14, up + 6, z + 15, 14, up + 2, z + 15));
+		controlRun(server, "wildcatter:junction_box", new int[] {14, up + 1, z + 15});   // beside the cabinet's top, where a cable cell would touch three things
+		context.waitTicks(25);
+		java.util.function.Function<net.minecraft.server.MinecraftServer, dev.wildcatter.control.PlcCabinetBlockEntity> plc = srv -> (dev.wildcatter.control.PlcCabinetBlockEntity) srv.overworld().getBlockEntity(bench);
+		String landed = server.computeOnServer(srv -> {
+			var box = plc.apply(srv);
+			String out = String.valueOf(box.land(column, 0, "%QX16.0")) + box.land(column, 1, "%IX0.0") + box.land(column, 2, "%IX0.1") + box.land(column, 3, "%IW32");
+			dev.wildcatter.control.ControlNet.deviceAt(srv.overworld(), column).cycleHoa(column);
+			dev.wildcatter.control.ControlNet.deviceAt(srv.overworld(), column).cycleHoa(column);
+			box.download("PROGRAM UNIT\nVAR\n go : BOOL := TRUE;\n enable AT %QX16.0 : BOOL;\n auto AT %IX0.0 : BOOL;\n held AT %IX0.1 : BOOL;\n level AT %IW32 : WORD;\nEND_VAR\nenable := go;\nEND_PROGRAM");
+			box.cpu().setMode(dev.wildcatter.plc.Cpu.Mode.RUN);
+			return out;
+		});
+		check(landed.equals("nullnullnullnull"), "the column's signals should land: " + landed);
+		context.waitTicks(60);
+		String enabled = read(server, 14, up, z + 5);
+		check(enabled.contains("refining"), "enabled by its PLC it should refine: " + enabled + " | " + read(server, 15, up, z + 15));
+		server.runOnServer(srv -> plc.apply(srv).cpu().write("UNIT.GO", false));
+		context.waitTicks(30);
+		String heldBy = read(server, 14, up, z + 5);
+		check(heldBy.contains("HELD"), "with its enable off it should hold, and say so: " + heldBy);
+		check(Boolean.TRUE.equals(server.computeOnServer(srv -> plc.apply(srv).cpu().read("UNIT.HELD"))), "and tell its PLC");
+		server.runOnServer(srv -> plc.apply(srv).cpu().write("UNIT.GO", true));
+		context.waitTicks(30);
+		check(read(server, 14, up, z + 5).contains("refining"), "enabled again it should go on: " + read(server, 14, up, z + 5));
+		put(server, 11, up + 7, z + 10, "minecraft:air");
+		context.waitTicks(40);
+		check(read(server, 14, up, z + 5).contains("HELD"), "a cut cable should hold it: " + read(server, 14, up, z + 5));
+		System.out.println("[wildcatter-test] topping unit under a PLC ok: " + heldBy);
 	}
 
 	/**
@@ -9356,12 +9881,124 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(10);
 		context.takeScreenshot("wildcatter-reactor");
 		String running = read(server, 0, up, z);
+		// 13g (docs/multiblocks/plc.md): rods and boron from a real program, the temperature on an RTD input, and the trips beating it all
+		BlockPos bench = plcBench(context, server, z + 17, dev.wildcatter.control.PlcModuleItem.Type.DI16, dev.wildcatter.control.PlcModuleItem.Type.DO16, dev.wildcatter.control.PlcModuleItem.Type.AI8, dev.wildcatter.control.PlcModuleItem.Type.AO4,
+				dev.wildcatter.control.PlcModuleItem.Type.RTD4);
+		controlRun(server, "wildcatter:junction_box", new int[] {14, up + 1, z + 17});   // beside the cabinet's top, where a cable cell would touch three things
+		controlRun(server, "wildcatter:control_cable", straight(14, up + 2, z + 17, 14, up + 6, z + 17));
+		controlRun(server, "wildcatter:control_cable", straight(15, up + 6, z + 17, 16, up + 6, z + 17));
+		controlRun(server, "wildcatter:control_cable", straight(16, up + 6, z + 16, 16, up + 6, z + 2));
+		controlRun(server, "wildcatter:control_cable", straight(15, up + 6, z + 2, 3, up + 6, z + 2));
+		context.waitTicks(25);
+		java.util.function.Function<net.minecraft.server.MinecraftServer, dev.wildcatter.control.PlcCabinetBlockEntity> plc = srv -> (dev.wildcatter.control.PlcCabinetBlockEntity) srv.overworld().getBlockEntity(bench);
+		String signals = server.computeOnServer(srv -> {
+			var box = plc.apply(srv);
+			String out = "";
+			for (String one : new String[] {box.land(vessel, 0, "%QW48"), box.land(vessel, 1, "%QW50"), box.land(vessel, 4, "%IW32"), box.land(vessel, 7, "%IW34"), box.land(vessel, 8, "%IW36"), box.land(vessel, 5, "%IW64"), box.land(vessel, 11, "%IX0.0"), box.land(vessel, 3, "%QX16.0")}) {
+				if (one != null) {
+					out += one + "; ";
+				}
+			}
+			var control = dev.wildcatter.control.ControlNet.deviceAt(srv.overworld(), vessel);
+			control.cycleHoa(vessel);
+			control.cycleHoa(vessel);
+			java.util.List<?> errs = box.download("""
+					PROGRAM CORE
+					VAR
+						rod_out AT %QW48 : WORD;
+						boron_out AT %QW50 : WORD;
+						power_raw AT %IW32 : WORD;
+						ppm_raw AT %IW34 : WORD;
+						bank_raw AT %IW36 : WORD;
+						tavg_tenths AT %IW64 : WORD;
+						tripped AT %IX0.0 : BOOL;
+						trip AT %QX16.0 : BOOL;
+						ready : BOOL;
+						rods : REAL;
+						ppm : REAL;
+						want_trip : BOOL;
+						tavg : REAL;
+						bank : REAL;
+					END_VAR
+					bank := INT_TO_REAL(WORD_TO_INT(bank_raw)) / 320.0;
+					tavg := INT_TO_REAL(WORD_TO_INT(tavg_tenths)) / 10.0;
+					IF NOT ready THEN
+						rods := bank;
+						ppm := INT_TO_REAL(WORD_TO_INT(ppm_raw)) / 32000.0 * 2500.0;
+						ready := WORD_TO_INT(bank_raw) > 0;
+					END_IF;
+					rod_out := INT_TO_WORD(REAL_TO_INT(rods * 320.0));
+					boron_out := INT_TO_WORD(REAL_TO_INT(ppm / 2500.0 * 32000.0));
+					trip := want_trip;
+					END_PROGRAM""");
+			if (!errs.isEmpty()) {
+				out += errs.toString();
+			}
+			box.cpu().setMode(dev.wildcatter.plc.Cpu.Mode.RUN);
+			return out;
+		});
+		check(signals.isEmpty(), "the reactor's signals should land and its program compile: " + signals + " | " + read(server, 15, up, z + 17));
+		context.waitTicks(60);
+		check(server.computeOnServer(srv -> plc.apply(srv).net().devices().size()) >= 1, "the cabinet should reach the vessel: " + read(server, 15, up, z + 17));
+		double bank0 = server.computeOnServer(srv -> r[0].bankD());
+		double powerNow = server.computeOnServer(srv -> ((Number) plc.apply(srv).cpu().read("CORE.TAVG")).doubleValue());
+		check(Math.abs(powerNow - server.computeOnServer(srv -> r[0].tavg())) < 2, "an RTD input should read Tavg in tenths: " + powerNow + " against " + server.computeOnServer(srv -> r[0].tavg()));
+		check(server.computeOnServer(srv -> r[0].rodDemand()) >= 0, "the PLC should hold the rods' demand");
+		check(Math.abs(bank0 - server.computeOnServer(srv -> r[0].rodDemand())) < 8, "bumpless: its demand starts where the rods are: " + bank0 + " against " + server.computeOnServer(srv -> r[0].rodDemand()));
+		// rods in by the PLC's demand, and power falls; boron target by the PLC's
+		double downTo = bank0 / Tuning.ROD_STEPS * 100 - 10;
+		server.runOnServer(srv -> plc.apply(srv).cpu().write("CORE.RODS", downTo));
+		server.runOnServer(srv -> plc.apply(srv).cpu().write("CORE.PPM", 1450.0));
+		context.waitTicks(300);
+		double bank1 = server.computeOnServer(srv -> r[0].bankD());
+		System.out.println("[wildcatter-test] plc reactor: bank D " + bank0 + " to " + bank1 + ", target " + server.computeOnServer(srv -> r[0].targetPpm()) + " | " + read(server, 0, up, z));
+		check(Math.abs(bank1 / Tuning.ROD_STEPS * 100 - downTo) < 2.5, "bank D should go to the PLC's demand: " + bank1 + " for " + downTo + " %");
+		check(Math.abs(server.computeOnServer(srv -> r[0].targetPpm()) - 1450) < 3, "the boron target should be the PLC's: " + server.computeOnServer(srv -> r[0].targetPpm()));
+		context.takeScreenshot("wildcatter-plc-reactor");
+		// the trips beat it: the PLC demands every rod out, and high flux drops them all the same
+		server.runOnServer(srv -> plc.apply(srv).cpu().write("CORE.RODS", 100.0));
+		server.computeOnServer(srv -> {
+			r[0].holdPowerForTest(0.3);
+			return null;
+		});
+		context.waitTicks(200);
+		String beaten = read(server, 0, up, z);
+		System.out.println("[wildcatter-test] plc reactor: the PLC demanding all out, " + beaten);
+		check(r[0].tripped() && r[0].bankD() == 0 && r[0].shutdownBank() == 0, "a trip should drop the rods against the PLC's demand: " + beaten);
+		check(server.computeOnServer(srv -> r[0].rodDemand()) > 0, "with its demand still standing");
+		check(Boolean.TRUE.equals(server.computeOnServer(srv -> plc.apply(srv).cpu().read("CORE.TRIPPED"))), "and the PLC reads the trip");
+		// a hand's reset, as ever; a PLC's own manual trip works too
+		server.computeOnServer(srv -> {
+			r[0].setSetpoint(0);
+			return null;
+		});
+		context.waitTicks(160);
+		check(!r[0].tripped(), "the console's reset should clear it: " + read(server, 0, up, z));
+		server.runOnServer(srv -> plc.apply(srv).cpu().write("CORE.WANT_TRIP", true));
+		context.waitTicks(60);
+		check(r[0].tripped() && read(server, 0, up, z).contains("MANUAL TRIP"), "a PLC may always add a trip: " + read(server, 0, up, z));
+		server.runOnServer(srv -> plc.apply(srv).cpu().write("CORE.WANT_TRIP", false));
+		// its selector back to HAND, for what follows
+		server.runOnServer(srv -> {
+			var control = dev.wildcatter.control.ControlNet.deviceAt(srv.overworld(), vessel);
+			control.cycleHoa(vessel);
+		});
+		context.waitTicks(40);
+		check(server.computeOnServer(srv -> r[0].rodDemand()) < 0, "out of AUTO the reactor's own control has the rods back");
+		server.computeOnServer(srv -> {
+			r[0].setSetpoint(0);
+			return null;
+		});
+		context.waitTicks(100);
 		// a manual trip
 		server.computeOnServer(srv -> {
 			r[0].setSetpoint(-1);
 			return null;
 		});
 		context.waitTicks(400);
+		for (int i = 0; i < 40 && server.computeOnServer(srv -> r[0].power()) >= 0.001; i++) {
+			context.waitTicks(100);   // the excursion above left delayed neutrons to die away
+		}
 		String trip = read(server, 0, up, z);
 		check(r[0].tripped() && trip.contains("MANUAL TRIP") && r[0].power() < 0.001 && r[0].bankD() == 0 && r[0].shutdownBank() == 0,
 				"a manual trip should drop all rods and the power: " + trip);

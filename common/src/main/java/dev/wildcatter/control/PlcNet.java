@@ -32,8 +32,8 @@ public final class PlcNet {
 	/** A screen asks. The player must stand near the cabinet, and the rest of the checks are the cabinet's. */
 	public static void fromClient(ServerPlayer player, CompoundTag tag) {
 		BlockPos pos = new BlockPos(tag.getIntOr("x", 0), tag.getIntOr("y", 0), tag.getIntOr("z", 0));
-		if (player.blockPosition().distSqr(pos) <= 64 && player.level().getBlockEntity(pos) instanceof PlcCabinetBlockEntity cabinet) {
-			cabinet.request(player, tag);
+		if (player.blockPosition().distSqr(pos) <= 64 && player.level().getBlockEntity(pos) instanceof PlcRequests screen) {
+			screen.request(player, tag);
 		}
 	}
 }

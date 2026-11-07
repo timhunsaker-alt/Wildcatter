@@ -21,7 +21,64 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 /** A resistor between hot and neutral. Works if it gets enough voltage, and burns out if it gets far too much. */
-public class LoadBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable {
+public class LoadBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, dev.wildcatter.control.ControlDevice, dev.wildcatter.control.Measurable {
+	private final dev.wildcatter.control.Remote remote = new dev.wildcatter.control.Remote(1);
+	private boolean relayOn = true;
+
+	@Override
+	public String deviceName() {
+		return "Lamp or heater, on a relay";
+	}
+
+	@Override
+	public java.util.List<Point> points() {
+		return java.util.List.of(new Point("ON", true), new Point("AUTO", false));
+	}
+
+	@Override
+	public boolean readPoint(int point) {
+		return point == 1 && remote.auto();
+	}
+
+	@Override
+	public void commandPoint(int point, boolean on, long gameTime) {
+		if (point == 0) {
+			remote.command(0, on, gameTime);
+			sync(gameTime);
+		}
+	}
+
+	/** HAND is as a plain lamp always was; OFF is off; AUTO follows the PLC, and off if it stops. */
+	private void sync(long now) {
+		boolean next = remote.hand() || remote.on(0, now);
+		if (next != relayOn) {
+			relayOn = next;
+			if (level != null) {
+				CircuitManager.markDirty(level);
+			}
+		}
+	}
+
+	public static void tick(net.minecraft.world.level.Level level, BlockPos pos, net.minecraft.world.level.block.state.BlockState state, LoadBlockEntity load) {
+		load.sync(level.getGameTime());
+	}
+
+	@Override
+	public String cycleHoa(BlockPos cell) {
+		setChanged();
+		return remote.cycle();
+	}
+
+	@Override
+	public double measure(Quantity quantity) {
+		return switch (quantity) {
+			case WATTS -> volts * amps;
+			case VOLTS -> volts;
+			case AMPS -> amps;
+			default -> Double.NaN;
+		};
+	}
+
 	private int hot;
 	private int neutral;
 	private int resistor;
@@ -52,7 +109,7 @@ public class LoadBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		hot = circuit.node();
 		neutral = circuit.node();
 		double nominal = Voltage.LOW.nominal();
-		resistor = circuit.resistor(hot, neutral, nominal * nominal / watts()); // P = V^2 / R
+		resistor = circuit.resistor(hot, neutral, relayOn ? nominal * nominal / watts() : 1e9); // P = V^2 / R; an open relay is an open circuit
 		for (Direction face : Direction.values()) {
 			circuit.hotPort(worldPosition, face, Voltage.LOW, hot, Tuning.CONTACT_OHMS / 2, false);
 			circuit.port(worldPosition, face, Conductor.N, Voltage.LOW, neutral, Tuning.CONTACT_OHMS / 2, false);
@@ -96,5 +153,17 @@ public class LoadBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		}
 		return Component.literal(what + " (rated " + Math.round(watts()) + " W at " + Voltage.LOW.label() + "): " + String.format("%.0f V, %.2f A, %.0f W", volts, amps, volts * amps)
 				+ ", " + state + "; " + (level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you"));
+	}
+
+	@Override
+	protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput output) {
+		super.saveAdditional(output);
+		remote.save(output);
+	}
+
+	@Override
+	protected void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
+		super.loadAdditional(input);
+		remote.load(input);
 	}
 }

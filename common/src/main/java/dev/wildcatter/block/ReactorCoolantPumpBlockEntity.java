@@ -15,6 +15,45 @@ import net.minecraft.world.level.storage.ValueOutput;
  * power lost the flywheel carries it down, halving the flow in about 10 s. A sneak-click switches it to stop or to start.
  */
 public class ReactorCoolantPumpBlockEntity extends UnitMotorBlockEntity {
+	private final dev.wildcatter.control.Remote pumpRemote = new dev.wildcatter.control.Remote(1);
+
+	@Override
+	public java.util.List<Point> points() {
+		return java.util.List.of(new Point("START", true), new Point("RUNNING", false), new Point("AUTO", false), new Point("FLOW 4-20 mA", false, Signal.MA));
+	}
+
+	@Override
+	public boolean readPoint(int point) {
+		return point == 1 ? power > 0.3 : point == 2 && pumpRemote.auto();
+	}
+
+	/** In AUTO its switch follows the PLC. Its seal permit still rules: {@link #operate} holds it however it is told. */
+	@Override
+	public void commandPoint(int point, boolean on, long gameTime) {
+		if (point == 0) {
+			pumpRemote.command(0, on, gameTime);
+			if (pumpRemote.auto()) {
+				this.on = on;
+			}
+		}
+	}
+
+	@Override
+	public double readMa(int point) {
+		return 4 + 16 * flow;
+	}
+
+	@Override
+	public String cycleHoa(net.minecraft.core.BlockPos cell) {
+		setChanged();
+		return pumpRemote.cycle();
+	}
+
+	@Override
+	protected boolean plcHold(Level level) {
+		return false;   // a coolant pump is not a unit to be held: it runs from its switch and its permit
+	}
+
 	private boolean on = true;
 	private double flow;
 	private double power;
@@ -26,6 +65,9 @@ public class ReactorCoolantPumpBlockEntity extends UnitMotorBlockEntity {
 
 	/** The vessel's call each interval: runs it if switched on and {@code permit}; returns nothing, read {@link #flow()}. */
 	public void operate(Level level, boolean permit, String why, double dt) {
+		if (!pumpRemote.hand() && !pumpRemote.on(0, level.getGameTime())) {
+			on = false;   // OFF, or a PLC gone quiet: it stops, and the reactor's own low-flow trip does the rest
+		}
 		held = on && !permit ? why : "";
 		power = on && permit ? drive(level) : 0;
 		if (power > 0.3) {   // running, a voltage sag or not: only a stopped motor lets the flywheel carry it down

@@ -63,6 +63,9 @@ public class CrackingFurnaceBlockEntity extends PlantUnitBlockEntity implements 
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, CrackingFurnaceBlockEntity f) {
+		if (f.plcHold(level)) {
+			return;
+		}
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
 			return;
 		}

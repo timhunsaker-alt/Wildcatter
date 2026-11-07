@@ -38,7 +38,7 @@ public class PipeBlock extends Block {
 
 	/** Water pipes link boilers, turbines and pumps; gas lines link wells and fireboxes. The two never join. */
 	public enum Kind {
-		WATER, GAS, AIR
+		WATER, GAS, AIR, NETWORK
 	}
 
 	private final Kind kind;
@@ -80,7 +80,9 @@ public class PipeBlock extends Block {
 			return net.minecraft.world.InteractionResult.TRY_WITH_EMPTY_HAND;
 		}
 		if (!level.isClientSide()) {
-			if (kind == Kind.AIR) {
+			if (kind == Kind.NETWORK) {
+				player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Network cable: " + dev.wildcatter.control.NetworkNet.plcs(level, java.util.List.of(pos)).size() + " PLC(s) with a COMM module on it"));
+			} else if (kind == Kind.AIR) {
 				player.sendOverlayMessage(net.minecraft.network.chat.Component.literal(String.format(java.util.Locale.ROOT, "Instrument air tubing: %.1f bar", dev.wildcatter.control.AirCompressorBlockEntity.pressureAt(level, pos))));
 			} else if (kind == Kind.WATER) {
 				player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Water pipe (2 in): " + (Plumbing.network(level, java.util.List.of(pos)).size() + 1)
@@ -108,6 +110,9 @@ public class PipeBlock extends Block {
 		Block block = neighbour.getBlock();
 		if (block instanceof PipeBlock pipe) {
 			return pipe.kind == kind;
+		}
+		if (kind == Kind.NETWORK) {
+			return block instanceof dev.wildcatter.control.PlcCabinetBlock || block instanceof dev.wildcatter.control.HmiPanelBlock || block instanceof dev.wildcatter.control.RemoteIoDropBlock;
 		}
 		if (kind == Kind.AIR) {
 			return block instanceof dev.wildcatter.control.AirDryerBlock || block instanceof dev.wildcatter.control.ValveBlock v && v.type() != dev.wildcatter.control.ValveBlock.Type.MOTOR_OPERATED;

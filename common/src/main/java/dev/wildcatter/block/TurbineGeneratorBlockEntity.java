@@ -41,7 +41,47 @@ import net.minecraft.world.level.storage.ValueOutput;
  * (3.3 kV on IEC worlds) for the GSU. Without a cooling tower on the condenser's water the back pressure takes a third more steam,
  * so the plant makes at most three quarters of its rating. A low drum level trips it.
  */
-public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitPart, Generator, Inspectable, dev.wildcatter.multiblock.BigPartEntity {
+public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitPart, Generator, Inspectable, dev.wildcatter.multiblock.BigPartEntity, dev.wildcatter.control.ControlDevice, dev.wildcatter.control.Measurable {
+	private final dev.wildcatter.control.Remote remote = new dev.wildcatter.control.Remote(1);
+
+	@Override
+	public String deviceName() {
+		return "Steam plant turbine generator";
+	}
+
+	@Override
+	public java.util.List<Point> points() {
+		return java.util.List.of(new Point("RUN", true), new Point("RUNNING", false), new Point("TRIPPED", false), new Point("AUTO", false));
+	}
+
+	@Override
+	public boolean readPoint(int point) {
+		return switch (point) {
+			case 1 -> run == Run.RUNNING;
+			case 2 -> tripped;
+			case 3 -> remote.auto();
+			default -> false;
+		};
+	}
+
+	@Override
+	public void commandPoint(int point, boolean on, long gameTime) {
+		if (point == 0) {
+			remote.command(point, on, gameTime);
+		}
+	}
+
+	@Override
+	public String cycleHoa(BlockPos cell) {
+		setChanged();
+		return remote.cycle();
+	}
+
+	@Override
+	public double measure(Quantity quantity) {
+		return quantity == Quantity.LEVEL ? hotwellLevel() * 100 : quantity == Quantity.WATTS ? loadShare() * ratedWatts() : Double.NaN;
+	}
+
 	public enum Run {
 		COLD, FIRING, ROLLING, RUNNING
 	}
@@ -158,6 +198,9 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 
 	// ---- every tick -----------------------------------------------------------------------------------------------
 	public static void tick(Level level, BlockPos pos, BlockState state, TurbineGeneratorBlockEntity g) {
+		if (!g.remote.hand()) {
+			g.setWantRun(g.remote.on(0, level.getGameTime()));   // a trip's reset stays a hand's: the panel's button
+		}
 		if (!(level instanceof ServerLevel server)) {
 			return;
 		}
@@ -461,6 +504,7 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
+		remote.save(output);
 		output.putBoolean("formed", formed);
 		output.putBoolean("grown", grown);
 		output.putString("run", run.name());
@@ -477,6 +521,7 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		remote.load(input);
 		formed = input.getBooleanOr("formed", formed);
 		grown = input.getBooleanOr("grown", grown);
 		try {

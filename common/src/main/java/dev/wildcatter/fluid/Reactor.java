@@ -42,6 +42,7 @@ public final class Reactor {
 	// rods
 	double shutdownBank;
 	double bankD;
+	private double rodDemand = -1;
 	int setpoint;                        // index into SETPOINTS
 	boolean tripped = true;
 	String trip = "shut down";
@@ -390,6 +391,16 @@ public final class Reactor {
 		targetPpm = ppm;
 	}
 
+	/** A PLC's demand for bank D, in steps, or negative for the reactor's own control from its setpoint. Never saved: it must keep coming. It moves rods only as far as the trips allow. */
+	public void setRodDemand(double steps) {
+		rodDemand = steps;
+	}
+
+	public double rodDemand() {
+		return rodDemand;
+	}
+
+
 	public void setSetpoint(double fraction) {
 		for (int i = 0; i < SETPOINTS.length; i++) {
 			if (Math.abs(SETPOINTS[i] - fraction) < 1e-9) {
@@ -513,7 +524,16 @@ public final class Reactor {
 			double want = SETPOINTS[setpoint];
 			double p = power();
 			double rate = startupRate();
-			if (p > want * 1.02 || rate > Tuning.SUR_INSERT_DPM) {
+			if (rodDemand >= 0) {
+				// a PLC's demand, inside the same startup-rate limits: too fast and the rods insert whatever it asks
+				if (rate > Tuning.SUR_INSERT_DPM) {
+					bankD = Math.max(0, bankD - move);
+				} else if (bankD > rodDemand) {
+					bankD = Math.max(rodDemand, bankD - move);
+				} else if (bankD < rodDemand && rate < Tuning.SUR_WITHDRAW_DPM) {
+					bankD = Math.min(rodDemand, bankD + move);
+				}
+			} else if (p > want * 1.02 || rate > Tuning.SUR_INSERT_DPM) {
 				bankD = Math.max(0, bankD - move);
 			} else if (p < want * 0.98 && rate < Tuning.SUR_WITHDRAW_DPM) {
 				bankD = Math.min(Tuning.ROD_STEPS, bankD + move);

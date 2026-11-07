@@ -57,6 +57,9 @@ public class SulfurMelterBlockEntity extends PlantUnitBlockEntity implements Hop
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, SulfurMelterBlockEntity m) {
+		if (m.plcHold(level)) {
+			return;
+		}
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
 			return;
 		}

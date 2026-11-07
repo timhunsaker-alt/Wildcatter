@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "S",
+    "T"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "T": "minecraft:string"
+  },
+  "result": {
+    "id": "wildcatter:pull_cord",
+    "count": 1
+  }
+}

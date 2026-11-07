@@ -331,7 +331,7 @@ and the Field Manual has a page for each new system.
 Spec: `docs/multiblocks/tailings-cell.md`. For Tailings' Phase 4 and the uranium mill's underflow. Approved by Tim as built. The full client suite passed on 2026-11-06 (2h 47m), and it is released as v0.4.0.
 
 ## Phase 13 — PLCs — CURRENT (Tim, 2026-11-07: "every type of thing you would run off of them", programming "as close to real life as possible")
-Spec: `docs/multiblocks/plc.md`, nine waves, all approved in order: 13a language core; 13b hardware and text editor; 13c ladder and FBD; 13d SFC, device blocks, memory card, import and export (done); 13e transmitters and valves (done); 13f power equipment and HMI; 13g process plants and the reactor; 13h networks; 13i release and Tailings.
+Spec: `docs/multiblocks/plc.md`, nine waves, all approved in order: 13a language core; 13b hardware and text editor; 13c ladder and FBD; 13d SFC, device blocks, memory card, import and export (done); 13e transmitters and valves (done); 13f power equipment and HMI (done); 13g process plants and the reactor (done); 13h networks (done); 13i release and Tailings.
 
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released.

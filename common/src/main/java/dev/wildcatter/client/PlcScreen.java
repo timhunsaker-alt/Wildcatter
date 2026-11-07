@@ -46,7 +46,7 @@ import net.minecraft.network.chat.Component;
  */
 public class PlcScreen extends Screen {
 	private enum Tab {
-		CODE, TERMINALS, ONLINE, DIAGNOSTICS, PROJECT
+		CODE, TERMINALS, ONLINE, DIAGNOSTICS, PROJECT, NET
 	}
 
 	private static final int BACK = 0xF01B1E24;
@@ -98,6 +98,8 @@ public class PlcScreen extends Screen {
 	private int selectedDevice = -1;
 	private int selectedPoint = -1;
 	private int selectedTag = -1;
+	private int selectedRow = -1;
+	private int exchangeTop;
 	private boolean dragging;
 	private int blink;
 	private EditBox fieldOne;
@@ -366,13 +368,13 @@ public class PlcScreen extends Screen {
 			bx += w + 2;
 		}
 		int right = width - 8;
-		button(right - 44, 22, 44, "COLD", () -> ask("cold", t -> {
+		button(right - 34, 22, 34, "COLD", () -> ask("cold", t -> {
 		}));
-		button(right - 88, 22, 42, "STOP", () -> {
+		button(right - 69, 22, 34, "STOP", () -> {
 			notes.clear();
 			ask("key", t -> t.putBoolean("run", false));
 		});
-		button(right - 130, 22, 40, "RUN", () -> {
+		button(right - 100, 22, 30, "RUN", () -> {
 			notes.clear();
 			ask("key", t -> t.putBoolean("run", true));
 		});
@@ -428,6 +430,22 @@ public class PlcScreen extends Screen {
 			}));
 			button(width - 58, TOP + 70, 50, "RELEASE", () -> ask("release", t -> t.putString("tag", fieldOne.getValue())));
 			sendWatch();
+		} else if (tab == Tab.NET) {
+			fieldOne = addRenderableWidget(new EditBox(font, width - 208, TOP + 12, 140, 16, Component.literal("station")));
+			fieldOne.setValue(state.getStringOr("station", "PLC"));
+			fieldOne.setMaxLength(24);
+			button(width - 64, TOP + 12, 56, "SET NAME", () -> ask("station", t -> t.putString("station", fieldOne.getValue())));
+			fieldTwo = addRenderableWidget(new EditBox(font, width - 208, TOP + 44, 200, 16, Component.literal("exchange")));
+			fieldTwo.setHint(Component.literal("MAIN.FLOW = PLC-2/MAIN.FLOW"));
+			fieldTwo.setMaxLength(96);
+			button(width - 208, TOP + 62, 60, "ADD ROW", () -> ask("exchangeAdd", t -> t.putString("row", fieldTwo.getValue())));
+			button(width - 146, TOP + 62, 60, "DEL ROW", () -> {
+				if (selectedRow >= 0) {
+					int index = selectedRow;
+					ask("exchangeDel", t -> t.putInt("index", index));
+					selectedRow = -1;
+				}
+			});
 		} else if (tab == Tab.PROJECT) {
 			button(width - 208, TOP + 14, 60, "TO CARD", () -> ask("toCard", t -> {
 			}));
@@ -1188,6 +1206,7 @@ public class PlcScreen extends Screen {
 			case ONLINE -> drawOnline(graphics);
 			case DIAGNOSTICS -> drawDiagnostics(graphics);
 			case PROJECT -> drawProject(graphics);
+			case NET -> drawNetwork(graphics);
 		}
 		super.extractRenderState(graphics, mouseX, mouseY, partial);   // the widgets last, over the panels
 	}
@@ -1489,6 +1508,38 @@ public class PlcScreen extends Screen {
 		}
 	}
 
+	private void drawNetwork(GuiGraphicsExtractor graphics) {
+		int split = width - 216;
+		graphics.fill(8, TOP, split, height - 8, PANEL);
+		int rowY = TOP + 3;
+		if (!state.getBooleanOr("comm", false)) {
+			graphics.text(font, "No COMM module: this PLC is not on a network.", 12, rowY, ERROR, false);
+			rowY += ROW;
+		}
+		graphics.text(font, "On the network", 12, rowY, MUTED, false);
+		rowY += ROW;
+		for (var one : state.getListOrEmpty("network")) {
+			graphics.text(font, font.plainSubstrByWidth(one.asString().orElse(""), split - 20), 12, rowY, one.asString().orElse("").contains("NO 24 V") ? ERROR : TEXT, false);
+			rowY += ROW;
+		}
+		rowY += 4;
+		graphics.text(font, "Tags taken from other PLCs", 12, rowY, MUTED, false);
+		rowY += ROW;
+		exchangeTop = rowY;
+		ListTag rows = state.getListOrEmpty("exchange");
+		for (int i = 0; i < rows.size(); i++) {
+			String row = rows.getStringOr(i, "");
+			if (i == selectedRow) {
+				graphics.fill(10, rowY - 1, split - 2, rowY + ROW - 1, SELECT);
+			}
+			graphics.text(font, font.plainSubstrByWidth(row, split - 20), 12, rowY, row.startsWith("FAILED") ? ERROR : TEXT, false);
+			rowY += ROW;
+		}
+		graphics.text(font, "This PLC's name on the network:", width - 208, TOP + 3, TEXT, false);
+		graphics.text(font, "Take a tag: LOCAL = STATION/TAG", width - 208, TOP + 35, TEXT, false);
+		drawNotes(graphics, width - 208, TOP + 84);
+	}
+
 	private void drawProject(GuiGraphicsExtractor graphics) {
 		int split = width - 216;
 		graphics.fill(8, TOP, split, height - 8, PANEL);
@@ -1763,6 +1814,9 @@ public class PlcScreen extends Screen {
 				}
 				rowY += 3;
 			}
+		} else if (tab == Tab.NET && mouseX < width - 216 && mouseY >= exchangeTop) {
+			selectedRow = (int) ((mouseY - exchangeTop) / ROW);
+			return true;
 		} else if (tab == Tab.PROJECT && mouseX < width - 216 && mouseY >= TOP + 14) {
 			int row = scrollList + (int) ((mouseY - TOP - 16) / ROW);
 			if (row >= 0 && row < files.size()) {

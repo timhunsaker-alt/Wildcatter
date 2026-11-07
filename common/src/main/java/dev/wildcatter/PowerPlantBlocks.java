@@ -33,6 +33,8 @@ public interface PowerPlantBlocks {
 	Block CONTROL_VALVE_STEEL = block("control_valve_steel", props -> new dev.wildcatter.control.ValveBlock(props.mapColor(MapColor.COLOR_ORANGE).strength(1.5F, 4.0F).sound(SoundType.METAL).noOcclusion(), PipeBlock.Kind.GAS, dev.wildcatter.control.ValveBlock.Type.CONTROL));
 	Block ON_OFF_VALVE_STEEL = block("on_off_valve_steel", props -> new dev.wildcatter.control.ValveBlock(props.mapColor(MapColor.COLOR_ORANGE).strength(1.5F, 4.0F).sound(SoundType.METAL).noOcclusion(), PipeBlock.Kind.GAS, dev.wildcatter.control.ValveBlock.Type.ON_OFF));
 	Block MOTOR_OPERATED_VALVE_STEEL = block("motor_operated_valve_steel", props -> new dev.wildcatter.control.ValveBlock(props.mapColor(MapColor.COLOR_ORANGE).strength(1.5F, 4.0F).sound(SoundType.METAL).noOcclusion(), PipeBlock.Kind.GAS, dev.wildcatter.control.ValveBlock.Type.MOTOR_OPERATED));
+	Block NETWORK_CABLE = block("network_cable", props -> new PipeBlock(props.mapColor(MapColor.COLOR_BLUE).strength(0.5F).sound(SoundType.WOOL).noOcclusion(), PipeBlock.Kind.NETWORK));
+	Block HMI_PANEL = block("hmi_panel", props -> new dev.wildcatter.control.HmiPanelBlock(props.mapColor(MapColor.COLOR_GRAY).strength(0.5F).sound(SoundType.METAL).noOcclusion()));
 	Block AIR_TUBING = block("air_tubing", props -> new PipeBlock(props.mapColor(MapColor.METAL).strength(0.5F).sound(SoundType.METAL).noOcclusion(), PipeBlock.Kind.AIR));
 	Block AIR_COMPRESSOR = block("air_compressor", props -> new dev.wildcatter.control.AirCompressorBlock(props.mapColor(MapColor.COLOR_BLUE).strength(2.0F, 5.0F).sound(SoundType.METAL)));
 	Block AIR_DRYER = block("air_dryer", props -> new dev.wildcatter.control.AirDryerBlock(props.mapColor(MapColor.COLOR_GRAY).strength(2.0F, 5.0F).sound(SoundType.METAL)));

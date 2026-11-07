@@ -35,7 +35,57 @@ import org.jspecify.annotations.Nullable;
  * it gets allows: {@link Tuning#LAND_RIG_TICKS_PER_BLOCK} a block at full power, a 15 s connection after each 27 m stand. On a
  * strike it sets the wellhead in the hole cell under its floor and stops.
  */
-public class RigSubstructureBlockEntity extends BlockEntity implements Inspectable, BigPartEntity, Kinetic {
+public class RigSubstructureBlockEntity extends BlockEntity implements Inspectable, BigPartEntity, Kinetic, dev.wildcatter.control.ControlDevice {
+	private final dev.wildcatter.control.Remote remote = new dev.wildcatter.control.Remote(1);
+
+	@Override
+	public String deviceName() {
+		return "Drilling rig";
+	}
+
+	@Override
+	public java.util.List<Point> points() {
+		return java.util.List.of(new Point("DRILL ENABLE", true), new Point("DRILLING", false), new Point("MUD PUMPS", false), new Point("IN A CONNECTION", false), new Point("AUTO", false));
+	}
+
+	@Override
+	public boolean readPoint(int point) {
+		return switch (point) {
+			case 1 -> drilling();
+			case 2 -> pumping();
+			case 3 -> connecting();
+			case 4 -> remote.auto();
+			default -> false;
+		};
+	}
+
+	@Override
+	public void commandPoint(int point, boolean on, long gameTime) {
+		if (point == 0) {
+			remote.command(0, on, gameTime);
+		}
+	}
+
+	@Override
+	public String cycleHoa(BlockPos cell) {
+		setChanged();
+		return remote.cycle();
+	}
+
+	/** In AUTO it drills while enabled; a rig past idle or drilling, one finished, stays as it is. */
+	private void followPlc(long now) {
+		if (!remote.hand()) {
+			boolean want = remote.on(0, now);
+			if (want && phase == Phase.IDLE) {
+				phase = Phase.DRILLING;
+				setChanged();
+			} else if (!want && phase == Phase.DRILLING) {
+				phase = Phase.IDLE;
+				setChanged();
+			}
+		}
+	}
+
 	/** The top drive's quill at the top of a stand, above the hole (the floor's top is 6 m up). */
 	private static final float TOP_DRIVE_TOP = 6.0F + Tuning.LAND_RIG_STAND_BLOCKS + 3.0F;
 
@@ -118,6 +168,9 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 
 	/** The driller's console: start or stop drilling. */
 	public Component toggle() {
+		if (!remote.hand()) {
+			return Component.literal("The selector is not in HAND: the driller's console does nothing");
+		}
 		if (phase == Phase.IDLE) {
 			phase = Phase.DRILLING;
 		} else if (phase == Phase.DRILLING) {
@@ -148,6 +201,7 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, RigSubstructureBlockEntity rig) {
+		rig.followPlc(level.getGameTime());
 		if (!(level instanceof ServerLevel server)) {
 			return;
 		}
@@ -327,6 +381,7 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
+		remote.save(output);
 		output.putInt("phase", phase.ordinal());
 		output.putBoolean("topDrive", topDrive);
 		output.putInt("water", water);
@@ -341,6 +396,7 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		remote.load(input);
 		phase = Phase.values()[Math.max(0, Math.min(Phase.values().length - 1, input.getIntOr("phase", 0)))];
 		topDrive = input.getBooleanOr("topDrive", false);
 		water = input.getIntOr("water", 0);

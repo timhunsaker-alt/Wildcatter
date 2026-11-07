@@ -38,7 +38,48 @@ import org.jspecify.annotations.Nullable;
  * A fuel store and a fire under a starter boiler. The fire only burns down while the boiler above wants heat, so a full steam
  * tank costs no fuel. (The 1 MW steam plant has its own burner: docs/multiblocks/steam-plant.md.)
  */
-public class FireboxBlockEntity extends BaseContainerBlockEntity implements WorldlyContainer, Inspectable {
+public class FireboxBlockEntity extends BaseContainerBlockEntity implements WorldlyContainer, Inspectable, dev.wildcatter.control.ControlDevice {
+	private final dev.wildcatter.control.Remote remote = new dev.wildcatter.control.Remote(1);
+	/** A burner on a PLC modulates by time: on for its share of each period (proposed). */
+	private static final int FIRING_PERIOD_TICKS = 200;
+
+	@Override
+	public String deviceName() {
+		return "Firebox burner";
+	}
+
+	@Override
+	public java.util.List<Point> points() {
+		return java.util.List.of(new Point("FIRING RATE 4-20 mA", true, Signal.MA), new Point("BURNING", false), new Point("AUTO", false));
+	}
+
+	@Override
+	public boolean readPoint(int point) {
+		return point == 1 ? burnLeft > 0 : point == 2 && remote.auto();
+	}
+
+	@Override
+	public void commandPoint(int point, boolean on, long gameTime) {
+	}
+
+	@Override
+	public void commandMa(int point, double milliamps, long gameTime) {
+		if (point == 0) {
+			remote.commandMa(0, milliamps, gameTime);
+		}
+	}
+
+	@Override
+	public String cycleHoa(BlockPos cell) {
+		setChanged();
+		return remote.cycle();
+	}
+
+	/** In OFF nothing burns; in AUTO the rate's share of each period, and nothing if its signal stops. */
+	private boolean allowed(long now) {
+		return remote.hand() || remote.auto() && now % FIRING_PERIOD_TICKS < remote.fraction(0, now, 0) * FIRING_PERIOD_TICKS;
+	}
+
 	private static final int[] ALL_SLOTS = new int[Tuning.FIREBOX_SLOTS];
 
 	static {
@@ -180,7 +221,7 @@ public class FireboxBlockEntity extends BaseContainerBlockEntity implements Worl
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, FireboxBlockEntity firebox) {
-		boolean wants = firebox.wantsHeat(level);
+		boolean wants = firebox.wantsHeat(level) && firebox.allowed(level.getGameTime());
 		if (wants && (level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL == 0 && firebox.burnLeft < Tuning.FIREBOX_FEED_CAP) {
 			firebox.pipeFuel(level);
 		}
@@ -232,6 +273,7 @@ public class FireboxBlockEntity extends BaseContainerBlockEntity implements Worl
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
+		remote.save(output);
 		ContainerHelper.saveAllItems(output, items);
 		output.putDouble("burn_left", burnLeft);
 	}
@@ -239,6 +281,7 @@ public class FireboxBlockEntity extends BaseContainerBlockEntity implements Worl
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		remote.load(input);
 		items = NonNullList.withSize(Tuning.FIREBOX_SLOTS, ItemStack.EMPTY);
 		ContainerHelper.loadAllItems(input, items);
 		burnLeft = input.getDoubleOr("burn_left", 0);

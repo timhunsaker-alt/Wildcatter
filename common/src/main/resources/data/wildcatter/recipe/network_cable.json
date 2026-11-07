@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "WWW",
+    "CCC",
+    "WWW"
+  ],
+  "key": {
+    "W": "minecraft:blue_wool",
+    "C": "minecraft:copper_ingot"
+  },
+  "result": {
+    "id": "wildcatter:network_cable",
+    "count": 8
+  }
+}

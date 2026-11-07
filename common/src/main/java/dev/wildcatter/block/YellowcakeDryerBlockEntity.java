@@ -36,6 +36,9 @@ public class YellowcakeDryerBlockEntity extends PlantUnitBlockEntity {
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, YellowcakeDryerBlockEntity d) {
+		if (d.plcHold(level)) {
+			return;
+		}
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
 			return;
 		}

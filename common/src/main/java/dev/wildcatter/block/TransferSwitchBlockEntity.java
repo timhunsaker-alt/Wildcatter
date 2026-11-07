@@ -33,7 +33,50 @@ import net.minecraft.world.level.storage.ValueOutput;
  * </ul>
  * The neutral is solid and the ground runs through.
  */
-public class TransferSwitchBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity {
+public class TransferSwitchBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity, dev.wildcatter.control.ControlDevice {
+	private final dev.wildcatter.control.Remote remote = new dev.wildcatter.control.Remote(2);
+	private boolean plcTest;
+	private boolean inhibit;
+
+	@Override
+	public String deviceName() {
+		return "Automatic transfer switch";
+	}
+
+	@Override
+	public java.util.List<Point> points() {
+		return java.util.List.of(new Point("TEST", true), new Point("INHIBIT TRANSFER", true), new Point("ON NORMAL", false), new Point("ON EMERGENCY", false), new Point("NORMAL OK", false), new Point("EMERGENCY OK", false), new Point("ENGINE START", false), new Point("AUTO", false));
+	}
+
+	@Override
+	public boolean readPoint(int point) {
+		return switch (point) {
+			case 2 -> stage.normalClosed();
+			case 3 -> stage.emergencyClosed();
+			case 4 -> normalVolts >= Voltage.INDUSTRIAL.lineToLine() * Tuning.ATS_PICKUP;
+			case 5 -> emergencyVolts >= Voltage.INDUSTRIAL.lineToLine() * Tuning.ATS_PICKUP;
+			case 6 -> engineStart();
+			case 7 -> remote.auto();
+			default -> false;
+		};
+	}
+
+	@Override
+	public void commandPoint(int point, boolean on, long gameTime) {
+		if (point > 1) {
+			return;
+		}
+		remote.command(point, on, gameTime);
+		plcTest = remote.on(0, gameTime);
+		inhibit = remote.on(1, gameTime);
+	}
+
+	@Override
+	public String cycleHoa(BlockPos cell) {
+		setChanged();
+		return remote.cycle();
+	}
+
 	public enum Stage {
 		NORMAL, TDES, START, TDNE, TO_EMERGENCY, EMERGENCY, TDEN, TO_NORMAL, TDEC;
 
@@ -165,8 +208,9 @@ public class TransferSwitchBlockEntity extends BlockEntity implements CircuitPar
 		normalVolts = n * Voltage.INDUSTRIAL.lineToLine();
 		emergencyVolts = e * Voltage.INDUSTRIAL.lineToLine();
 		hertz = circuit.hertz();
-		boolean normalFailed = test || n < Tuning.ATS_DROPOUT;
-		boolean normalRestored = !test && n >= Tuning.ATS_PICKUP;
+		boolean testing = test || remote.auto() && plcTest;
+		boolean normalFailed = testing || n < Tuning.ATS_DROPOUT;
+		boolean normalRestored = !testing && n >= Tuning.ATS_PICKUP;
 		boolean emergencyOk = e >= Tuning.ATS_PICKUP && hertz >= Tuning.ATS_EMERGENCY_HERTZ * ElectricalStandard.active().hertz();
 		timer += ticks / 20.0;
 		Stage was = stage;
@@ -193,7 +237,7 @@ public class TransferSwitchBlockEntity extends BlockEntity implements CircuitPar
 			case TDNE -> {
 				if (!emergencyOk) {
 					go(Stage.START);
-				} else if (timer >= Tuning.ATS_TDNE_SECONDS) {
+				} else if (timer >= Tuning.ATS_TDNE_SECONDS && !(remote.auto() && inhibit)) {
 					go(Stage.TO_EMERGENCY);
 				}
 			}
@@ -284,6 +328,7 @@ public class TransferSwitchBlockEntity extends BlockEntity implements CircuitPar
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
+		remote.save(output);
 		output.putBoolean("grown", grown);
 		output.putString("stage", stage.name());
 		output.putDouble("timer", timer);
@@ -293,6 +338,7 @@ public class TransferSwitchBlockEntity extends BlockEntity implements CircuitPar
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		remote.load(input);
 		grown = input.getBooleanOr("grown", false);
 		stage = Stage.NORMAL;
 		for (Stage s : Stage.values()) {

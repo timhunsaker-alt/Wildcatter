@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "wildcatter:block/hmi_panel",
+      "y": 0
+    },
+    "facing=east": {
+      "model": "wildcatter:block/hmi_panel",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "wildcatter:block/hmi_panel",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "wildcatter:block/hmi_panel",
+      "y": 270
+    }
+  }
+}

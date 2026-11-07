@@ -39,7 +39,99 @@ import net.minecraft.world.level.storage.ValueOutput;
  * output breaker and the readout, burns the fuel, and makes 480Y/277 V three-phase (400Y/230 V on IEC worlds) at its terminals
  * (every face but the front). Right-click starts and stops the set: it cranks to rated speed in 10 s, then closes its breaker.
  */
-public class GensetControlPanelBlockEntity extends BlockEntity implements CircuitPart, Generator, Inspectable, dev.wildcatter.multiblock.BigPartEntity {
+public class GensetControlPanelBlockEntity extends BlockEntity implements CircuitPart, Generator, Inspectable, dev.wildcatter.multiblock.BigPartEntity, dev.wildcatter.control.ControlDevice, dev.wildcatter.control.Measurable {
+	private final dev.wildcatter.control.Remote remote = new dev.wildcatter.control.Remote(4);
+	private double appliedTrim = 1.0;
+
+	@Override
+	public String deviceName() {
+		return "Genset panel";
+	}
+
+	@Override
+	public java.util.List<Point> points() {
+		return java.util.List.of(new Point("RUN", true), new Point("CLOSE PERMIT", true), new Point("SPEED TRIM 4-20 mA", true, Signal.MA), new Point("VOLTAGE TRIM 4-20 mA", true, Signal.MA), new Point("RUNNING", false), new Point("BREAKER CLOSED", false),
+				new Point("TRIPPED", false), new Point("AUTO", false), new Point("HERTZ 4-20 mA, 50 to 70", false, Signal.MA), new Point("KW 4-20 mA, 125 %", false, Signal.MA), new Point("VOLTS 4-20 mA, 125 %", false, Signal.MA), new Point("FUEL 4-20 mA", false, Signal.MA),
+				new Point("SLIP 4-20 mA, -180 to 180", false, Signal.MA));
+	}
+
+	@Override
+	public boolean readPoint(int point) {
+		return switch (point) {
+			case 4 -> run == Run.RUNNING;
+			case 5 -> breakerClosed;
+			case 6 -> tripped;
+			case 7 -> remote.auto();
+			default -> false;
+		};
+	}
+
+	@Override
+	public void commandPoint(int point, boolean on, long gameTime) {
+		if (point <= 1) {
+			remote.command(point, on, gameTime);
+		}
+	}
+
+	@Override
+	public void commandMa(int point, double milliamps, long gameTime) {
+		if (point == 2 || point == 3) {
+			remote.commandMa(point, milliamps, gameTime);
+		}
+	}
+
+	private double fuelShare() {
+		if (level == null) {
+			return 0;
+		}
+		for (BlockPos at : parts) {
+			if (level.getBlockEntity(at) instanceof GensetPartBlockEntity part && part.liters() > 0) {
+				return part.liters() / Tuning.GENSET_TANK_LITERS;
+			}
+		}
+		return 0;
+	}
+
+	@Override
+	public double readMa(int point) {
+		double share = switch (point) {
+			case 8 -> (hertz - 50) / 20;
+			case 9 -> outWatts / (ratedWatts() * 1.25);
+			case 10 -> volts * Math.sqrt(3) / (Voltage.INDUSTRIAL.lineToLine() * 1.25);
+			case 11 -> fuelShare();
+			case 12 -> (sync.slipDegrees() + 180) / 360;
+			default -> 0;
+		};
+		return 4 + 16 * Math.max(-0.0125, Math.min(1.03, share));
+	}
+
+	@Override
+	public String cycleHoa(BlockPos cell) {
+		setChanged();
+		return remote.cycle();
+	}
+
+	@Override
+	public double measure(Quantity quantity) {
+		return switch (quantity) {
+			case WATTS -> outWatts;
+			case HERTZ -> hertz;
+			case VOLTS -> volts * Math.sqrt(3);
+			case AMPS -> amps;
+			case SPEED -> spin.rpm() / ratedRpm() * 100;
+			case LEVEL -> fuelShare() * 100;
+			default -> Double.NaN;
+		};
+	}
+
+	/**
+	 * The source's voltage, from the trims: 12 mA is none. In this model a set's share of the load follows its voltage (its resistive sag stands in
+	 * for a real set's droop), so both trims shift load: the speed trim by up to 2 % and the voltage trim by up to 5 %.
+	 */
+	private double trim(long now) {
+		return 1 + (remote.fraction(2, now, 0.5) - 0.5) * 2 * 0.02 + (remote.fraction(3, now, 0.5) - 0.5) * 2 * 0.05;
+	}
+
 	public enum Run {
 		STOPPED, CRANKING, RUNNING
 	}
@@ -126,7 +218,7 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 			tripped = false;
 			tripReason = "";
 			stator.reset();
-		} else {
+		} else if (remote.hand()) {
 			wantRun = !wantRun;
 		}
 		setChanged();
@@ -206,6 +298,15 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		}
 		if (phase % Tuning.STRUCTURE_CHECK_TICKS == 0) {
 			panel.checkStructure(server);
+		}
+		long now = level.getGameTime();
+		if (!panel.remote.hand()) {
+			panel.wantRun = panel.remote.on(0, now);
+		}
+		double trimNow = panel.trim(now);
+		if (Math.abs(trimNow - panel.appliedTrim) > 0.001) {
+			panel.appliedTrim = trimNow;
+			CircuitManager.markDirty(level);
 		}
 		if (phase % Tuning.WELL_INTERVAL == 0 && panel.formed && panel.gas) {
 			panel.drawGas(server);
@@ -369,7 +470,8 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 			case RUNNING -> {
 				if (!breakerClosed) {
 					String why = sync.step(ElectricalStandard.active().hertz(), Voltage.INDUSTRIAL);
-					if (why != null) {
+					// a PLC's permit, if one is landed, holds the close back; it cannot make a close the sync-check would refuse
+					if (why != null && (!remote.auto() || !remote.fresh(1, level.getGameTime()) || remote.on(1, level.getGameTime()))) {
 						close(level, why);
 					}
 				}
@@ -472,7 +574,7 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		double ratedAmps = ratedWatts() / Tuning.GENERATOR_RATED_PF / (3 * nominal);
 		double ohms = nominal * Tuning.ENGINE_SAG / ratedAmps;   // sags ENGINE_SAG at full current
 		phases.build(circuit, GensetControlPanelBlock.terminalCells(worldPosition, getBlockState()),
-				List.of(GensetControlPanelBlock.terminalFace(getBlockState())), Voltage.INDUSTRIAL, nominal, ohms);
+				List.of(GensetControlPanelBlock.terminalFace(getBlockState())), Voltage.INDUSTRIAL, nominal * appliedTrim, ohms);
 	}
 
 	@Override
@@ -570,6 +672,7 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
+		remote.save(output);
 		output.putBoolean("formed", formed);
 		output.putBoolean("grown", grown);
 		output.putBoolean("gas", gas);
@@ -588,6 +691,7 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		remote.load(input);
 		formed = input.getBooleanOr("formed", false);
 		grown = input.getBooleanOr("grown", false);
 		gas = input.getBooleanOr("gas", false);

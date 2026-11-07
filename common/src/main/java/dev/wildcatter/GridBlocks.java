@@ -155,6 +155,9 @@ public interface GridBlocks {
 	Block CONTROL_SUPPLY = block("control_supply", props -> new dev.wildcatter.control.ControlSupplyBlock(props.mapColor(MapColor.COLOR_GRAY).strength(1.5F, 3.0F).sound(SoundType.METAL)));
 	Block PLC_CABINET = block("plc_cabinet", props -> new dev.wildcatter.control.PlcCabinetBlock(props.mapColor(MapColor.COLOR_GRAY).strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(),
 			dev.wildcatter.multiblock.Footprint.box(1, 2, 1, 0, 0), "plc_cabinet"));
+	Block REMOTE_IO_DROP = block("remote_io_drop", props -> new dev.wildcatter.control.RemoteIoDropBlock(props.mapColor(MapColor.COLOR_GRAY).strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(),
+			dev.wildcatter.multiblock.Footprint.box(1, 2, 1, 0, 0), "remote_io_drop"));
+	Block PULL_CORD = block("pull_cord", props -> new dev.wildcatter.control.OperatorDeviceBlock(props.mapColor(MapColor.COLOR_RED).strength(0.5F).sound(SoundType.METAL), dev.wildcatter.control.OperatorDeviceBlock.Kind.PULL_CORD));
 	Block PUSHBUTTON = block("pushbutton", props -> new dev.wildcatter.control.OperatorDeviceBlock(props.mapColor(MapColor.COLOR_GRAY).strength(0.5F).sound(SoundType.METAL), dev.wildcatter.control.OperatorDeviceBlock.Kind.PUSHBUTTON));
 	Block SELECTOR_SWITCH = block("selector_switch", props -> new dev.wildcatter.control.OperatorDeviceBlock(props.mapColor(MapColor.COLOR_GRAY).strength(0.5F).sound(SoundType.METAL), dev.wildcatter.control.OperatorDeviceBlock.Kind.SELECTOR));
 	Block ESTOP = block("estop", props -> new dev.wildcatter.control.OperatorDeviceBlock(props.mapColor(MapColor.COLOR_RED).strength(0.5F).sound(SoundType.METAL), dev.wildcatter.control.OperatorDeviceBlock.Kind.ESTOP));

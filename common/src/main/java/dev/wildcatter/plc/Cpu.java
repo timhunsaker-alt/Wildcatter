@@ -358,6 +358,13 @@ public final class Cpu {
 
 	/** Writes a variable online, as an engineering station does. Located tags cannot be written here: force them. */
 	public boolean write(String path, Object value) {
+		IoAddress direct = path.startsWith("%") ? IoAddress.parse(path) : null;
+		if (direct != null && direct.area() == 'M' && direct.byteAddress() + direct.bytes() <= spec.markerBytes()) {
+			// a marker is a register a network can write, as Modbus's are; inputs and outputs are not
+			long raw = value instanceof Boolean b ? (b ? 1 : 0) : value instanceof Number n ? n.longValue() : 0;
+			writeIo(areaOf('M'), direct.size(), direct.byteAddress(), direct.bit(), raw);
+			return true;
+		}
 		Tag tag = program.tags().get(path.toUpperCase(Locale.ROOT));
 		if (tag == null || tag.area() != 0) {
 			return false;

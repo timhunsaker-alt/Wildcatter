@@ -276,6 +276,7 @@
     "wildcatter:ats_480",
     "wildcatter:junction_box",
     "wildcatter:control_supply",
-    "wildcatter:plc_cabinet"
+    "wildcatter:plc_cabinet",
+    "wildcatter:remote_io_drop"
   ]
 }

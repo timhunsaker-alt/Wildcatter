@@ -82,6 +82,6 @@ public class LoadBlock extends BaseEntityBlock {
 
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-		return null; // everything happens when its circuit is solved
+		return level.isClientSide() ? null : createTickerHelper(type, dev.wildcatter.WildcatterBlocks.LOAD_ENTITY, LoadBlockEntity::tick);   // only a relay's lag: the rest happens when its circuit is solved
 	}
 }

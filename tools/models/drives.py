@@ -160,6 +160,24 @@ def plc_cabinet():
 	return M
 
 
-EXTRA = [plc_cabinet(), lv_cabinet("drive_cabinet", True), soft_starter_mv(), drive_mv_transformer(), drive_mv_cells(), drive_mv_control()]
+def remote_io_drop():
+	"""A remote I/O drop: a PLC enclosure with no keyswitch, and a network adapter's blue tag on the door."""
+	X1, X2, Z1, Z2, TOP = 0.1, 0.9, 0.2, 0.8, 2.0
+	M = model("remote_io_drop", 1, 2, 1)
+	M.box((X1, 0.0, Z1 + 0.02), (X2, 0.1, Z2), "iron")
+	M.box((X1, 0.1, Z1 + 0.012), (X2, TOP, Z2), "grey")
+	M.box((X1 + 0.015, 0.14, Z1), (X2 - 0.015, TOP - 0.04, Z1 + 0.012), "grey")
+	M.box((X1 - 0.004, TOP, Z1), (X2 + 0.004, TOP + 0.025, Z2 + 0.004), "grey")
+	M.decal((0.28, 0.85, Z1 - 0.003), (0.72, 1.45, Z1), "controller", "north", "grey")
+	M.decal((0.33, 0.68, Z1 - 0.003), (0.67, 0.8, Z1), "nameplate", "north", "steel")
+	M.box((0.3, 1.62, Z1 - 0.012), (0.36, 1.68, Z1), "bulb")
+	M.box((0.42, 1.6, Z1 - 0.012), (0.7, 1.72, Z1), "dark")
+	latches(M, X2 - 0.05, Z1, (0.5, 1.0, 1.6))
+	M.cylinder("y", (0.5, 0.5), 0.03, 0.0, 0.1, "galv", 10)
+	M.collide((X1, 0.0, Z1), (X2, TOP, Z2))
+	return M
+
+
+EXTRA = [plc_cabinet(), remote_io_drop(), lv_cabinet("drive_cabinet", True), soft_starter_mv(), drive_mv_transformer(), drive_mv_cells(), drive_mv_control()]
 for extra in EXTRA:
 	extra.export_args = {"blockstate": True, "item": True}

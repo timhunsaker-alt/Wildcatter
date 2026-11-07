@@ -30,7 +30,13 @@ import net.minecraft.world.level.storage.ValueOutput;
  * when the cable burns. A grounding clamp set (docs/multiblocks/gen-bus-protection.md) puts A, B and C to that ground here: on a
  * dead cable it keeps it at earth, on a live one it is a bolted fault.
  */
-public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, Inspectable {
+public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, Inspectable, dev.wildcatter.control.Measurable {
+	/** A current transformer's reading: the largest phase. */
+	@Override
+	public double measure(Quantity quantity) {
+		return quantity == Quantity.AMPS ? Math.max(amps(Conductor.A), Math.max(amps(Conductor.B), amps(Conductor.C))) : Double.NaN;
+	}
+
 	private static final Conductor[] CONDUCTORS = Conductor.values();
 	private final int[] node = new int[CONDUCTORS.length];
 	private final double[] volts = new double[CONDUCTORS.length];

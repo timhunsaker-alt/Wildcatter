@@ -26,6 +26,108 @@ import org.jspecify.annotations.Nullable;
  * generators with their pumps, the pressurizer against it or a steam generator), runs them, and steps the plant with what they give.
  */
 public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
+	/**
+	 * A PLC's reach into the reactor: bank D, the boron target, the power setpoint and a manual trip. Not the trips: they run in {@link Reactor} after each
+	 * step, and beat all of these. Once tripped it ignores the setpoint too, so a PLC cannot reset a trip: that is the console's, by hand.
+	 */
+	private final dev.wildcatter.control.Remote reactorRemote = new dev.wildcatter.control.Remote(4);
+
+	@Override
+	public List<Point> points() {
+		return List.of(new Point("ROD DEMAND 4-20 mA", true, Signal.MA), new Point("BORON TARGET 4-20 mA, 2500 ppm", true, Signal.MA), new Point("POWER SETPOINT 4-20 mA", true, Signal.MA), new Point("MANUAL TRIP", true),
+				new Point("POWER 4-20 mA, 120 %", false, Signal.MA), new Point("TAVG 4-20 mA, 400 C", false, Signal.MA), new Point("PRESSURE 4-20 mA, 20 MPa", false, Signal.MA), new Point("BORON 4-20 mA, 2500 ppm", false, Signal.MA),
+				new Point("BANK D 4-20 mA", false, Signal.MA), new Point("SG A LEVEL 4-20 mA", false, Signal.MA), new Point("SG B LEVEL 4-20 mA", false, Signal.MA), new Point("TRIPPED", false), new Point("AUTO", false));
+	}
+
+	@Override
+	public boolean readPoint(int point) {
+		return point == 11 ? reactor != null && reactor.tripped() : point == 12 && reactorRemote.auto();
+	}
+
+	@Override
+	public void commandPoint(int point, boolean on, long gameTime) {
+		if (point == 3 && reactorRemote.command(3, on, gameTime) && reactor != null) {
+			reactor.setSetpoint(Reactor.SETPOINTS[0]);   // the manual trip: a PLC may always add a trip
+		}
+	}
+
+	@Override
+	public void commandMa(int point, double milliamps, long gameTime) {
+		if (point <= 2) {
+			reactorRemote.commandMa(point, milliamps, gameTime);
+		}
+	}
+
+	@Override
+	public double readMa(int point) {
+		if (reactor == null) {
+			return 0;
+		}
+		double share = switch (point) {
+			case 4 -> reactor.power() / 1.2;
+			case 5 -> reactor.tavg() / 400;
+			case 6 -> reactor.pressure() / 20;
+			case 7 -> reactor.ppm() / 2500;
+			case 8 -> reactor.bankD() / dev.wildcatter.Tuning.ROD_STEPS;
+			case 9 -> reactor.sgLevel(0);
+			case 10 -> reactor.sgLevel(1);
+			default -> 0;
+		};
+		return 4 + 16 * Math.max(0, Math.min(1.03, share));
+	}
+
+	@Override
+	public double readTenths(int point) {
+		return point == 5 && reactor != null ? reactor.tavg() * 10 : Double.NaN;
+	}
+
+	@Override
+	public String cycleHoa(BlockPos cell) {
+		setChanged();
+		return reactorRemote.cycle();
+	}
+
+	@Override
+	public double measure(Quantity quantity) {
+		if (reactor == null) {
+			return Double.NaN;
+		}
+		return switch (quantity) {
+			case TEMPERATURE -> reactor.tavg();
+			case PRESSURE -> reactor.pressure() * 10;
+			case LEVEL -> reactor.sgLevel(0) * 100;
+			default -> Double.NaN;
+		};
+	}
+
+	/** Applies what its PLC last sent; with a selector not in AUTO or a loop gone, the reactor's own control has it back. */
+	private void followPlc(long now) {
+		if (reactor == null) {
+			return;
+		}
+		double rods = reactorRemote.fraction(0, now, -1);
+		reactor.setRodDemand(rods < 0 ? -1 : rods * dev.wildcatter.Tuning.ROD_STEPS);
+		double boron = reactorRemote.fraction(1, now, -1);
+		if (boron >= 0) {
+			reactor.setTarget(boron * 2500);
+		}
+		double power = reactorRemote.fraction(2, now, -1);
+		if (power >= 0 && !reactor.tripped()) {
+			double best = Reactor.SETPOINTS[2];
+			for (int i = 2; i < Reactor.SETPOINTS.length; i++) {
+				if (Math.abs(Reactor.SETPOINTS[i] - power) < Math.abs(best - power)) {
+					best = Reactor.SETPOINTS[i];
+				}
+			}
+			reactor.setSetpoint(best);
+		}
+	}
+
+	@Override
+	protected boolean plcHold(Level level) {
+		return false;   // a reactor is not a unit to hold: its protection lives in its tick
+	}
+
 	private final Reactor reactor = new Reactor();
 	private final Reactor.Inputs in = new Reactor.Inputs();
 	private String parts = "NOT BUILT";
@@ -70,6 +172,7 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, ReactorVesselBlockEntity vessel) {
+		vessel.followPlc(level.getGameTime());
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL == 0) {
 			VESSELS.computeIfAbsent(level.dimension(), k -> new java.util.HashSet<>()).add(pos.immutable());
 			vessel.step(level);
@@ -247,6 +350,7 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
+		reactorRemote.save(output);
 		reactor.save(new Reactor.Store() {
 			@Override
 			public void put(String key, double value) {
@@ -263,6 +367,7 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		reactorRemote.load(input);
 		reactor.load(new Reactor.Store() {
 			@Override
 			public void put(String key, double value) {

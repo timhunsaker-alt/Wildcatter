@@ -2542,6 +2542,7 @@ _button = lambda z: [_box([6, 6, z], [10, 10, 12], "cap")]
 _device("pushbutton", [(_button(9), {"cap": _GRNLIT}), (_button(11), {"cap": _GRNLIT})])
 _device("selector_switch", [([_box([6, 7, 10], [10, 9, 12], "cap")], {"cap": "minecraft:block/black_concrete"}), ([_box([7, 6, 10], [9, 10, 12], "cap")], {"cap": "minecraft:block/black_concrete"})])
 _device("estop", [([_box([5, 5, 9], [11, 11, 12], "cap")], {"cap": _REDLIT}), ([_box([5, 5, 7], [11, 11, 12], "cap")], {"cap": _REDLIT})])
+_device("pull_cord", [([_box([5, 6, 8], [11, 10, 12], "cap"), _box([-8, 7.5, 9.5], [24, 8.5, 10.5], "cap")], {"cap": _REDLIT}), ([_box([5, 6, 8], [11, 10, 12], "cap"), _box([-8, 6.5, 9.5], [24, 7.5, 10.5], "cap")], {"cap": _RED})])
 _device("pilot_light", [(_button(10), {"cap": _RED}), (_button(10), {"cap": _REDLIT})])
 _device("horn", [([_box([5, 5, 7], [11, 11, 12], "cap")], {"cap": "minecraft:block/gray_concrete"})])
 _device("stack_light", [([_box([7, 2, 12], [9, 4, 16], "body"), _box([6, 11, 9], [10, 13, 13], "r"), _box([6, 8, 9], [10, 10, 13], "a"), _box([6, 5, 9], [10, 7, 13], "g")],
@@ -2566,10 +2567,12 @@ save_json(f"{ASSETS}/models/item/control_cable.json", {"parent": "minecraft:item
 save_json(f"{ASSETS}/items/control_cable.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/control_cable"}})
 big_part_loot_simple("control_cable")
 big_part_loot("plc_cabinet")
+big_part_loot("remote_io_drop")
 for name, icon in (("cpu_small", "decal_controller"), ("cpu_large", "decal_controller"), ("di16_module", "decal_relays"), ("do16_module", "decal_relays")):
 	_flat_item(name, f"{ns}:block/mat/{icon}")
 _flat_item("control_key", "minecraft:item/trial_key")
 _flat_item("memory_card", "minecraft:item/paper")
+_flat_item("comm_module", f"{ns}:block/mat/decal_controller")
 for name, icon in (("ai8_module", "decal_relays"), ("ao4_module", "decal_relays"), ("rtd4_module", "decal_relays"), ("hsc2_module", "decal_controller")):
 	_flat_item(name, f"{ns}:block/mat/{icon}")
 # 13e: valves are a body on the pipe's core and arms; an actuator on top says which kind
@@ -2609,8 +2612,21 @@ _model("transmitter", [_box([7, 7, 12], [9, 9, 16], "c"), _box([5, 4, 8], [11, 1
 save_json(f"{ASSETS}/blockstates/transmitter.json", {"variants": {f"facing={facing}": {"model": f"{ns}:block/transmitter", "y": rot} for facing, rot in _YROT.items()}})
 _item("transmitter", "transmitter")
 big_part_loot_simple("transmitter")
-_PLC_PARTS = ("control_valve", "on_off_valve", "motor_operated_valve", "control_valve_steel", "on_off_valve_steel", "motor_operated_valve_steel", "air_tubing", "air_compressor", "air_dryer", "day_tank", "transmitter", "control_cable", "junction_box", "control_supply", "plc_cabinet", "pushbutton", "selector_switch", "estop", "pilot_light", "stack_light", "horn")
-_PLC_STONE = ("junction_box", "control_supply", "plc_cabinet")
+# 13f: Ethernet cable on the pipe's arms, thinner; a touch panel on a door
+_BLUECAB = "minecraft:block/blue_wool"
+_model("network_cable_core", [_box([7, 7, 7], [9, 9, 9], "body")], {"body": _BLUECAB})
+_model("network_cable_arm", [_box([7.5, 7.5, 0], [8.5, 8.5, 7], "body")], {"body": _BLUECAB})
+save_json(f"{ASSETS}/blockstates/network_cable.json", {"multipart": [{"apply": {"model": f"{ns}:block/network_cable_core"}}] +
+	[{"when": {side: "true"}, "apply": {"model": f"{ns}:block/network_cable_arm", **rot}} for side, rot in _arm.items()]})
+save_json(f"{ASSETS}/models/item/network_cable.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/string"}})
+save_json(f"{ASSETS}/items/network_cable.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/network_cable"}})
+big_part_loot_simple("network_cable")
+_model("hmi_panel", [_box([1, 2, 13], [15, 14, 16], "body"), _box([2, 3, 12], [14, 13, 13], "s")], {"body": _GREY, "s": "minecraft:block/light_blue_terracotta"})
+save_json(f"{ASSETS}/blockstates/hmi_panel.json", {"variants": {f"facing={facing}": {"model": f"{ns}:block/hmi_panel", "y": rot} for facing, rot in _YROT.items()}})
+_item("hmi_panel", "hmi_panel")
+big_part_loot_simple("hmi_panel")
+_PLC_PARTS = ("pull_cord", "remote_io_drop", "network_cable", "hmi_panel", "control_valve", "on_off_valve", "motor_operated_valve", "control_valve_steel", "on_off_valve_steel", "motor_operated_valve_steel", "air_tubing", "air_compressor", "air_dryer", "day_tank", "transmitter", "control_cable", "junction_box", "control_supply", "plc_cabinet", "pushbutton", "selector_switch", "estop", "pilot_light", "stack_light", "horn")
+_PLC_STONE = ("junction_box", "control_supply", "plc_cabinet", "remote_io_drop")
 for tag, names in (("mineable/pickaxe", _PLC_PARTS), ("needs_stone_tool", _PLC_STONE)):
 	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
 	t["values"] += [f"{ns}:{n}" for n in names]
@@ -2640,6 +2656,11 @@ shaped("air_compressor", ["SPS", "SIS"], {"S": S_, "P": "minecraft:piston", "I":
 shaped("air_dryer", ["SSS", "SDS", "SSS"], {"S": S_, "D": "minecraft:sponge"}, "air_dryer")
 shaped("day_tank", ["III", "I I", "III"], {"I": "minecraft:iron_ingot"}, "day_tank")
 shaped("transmitter", ["G", "C", "S"], {"G": "minecraft:glass_pane", "C": "minecraft:comparator", "S": S_}, "transmitter")
+shaped("remote_io_drop", ["SSS", "SCS", "SIS"], {"S": S_, "C": "minecraft:comparator", "I": "minecraft:iron_block"}, "remote_io_drop")
+shaped("pull_cord", ["S", "T"], {"S": S_, "T": "minecraft:string"}, "pull_cord")
+shaped("comm_module", ["QRQ", "ECE", "QRQ"], {"Q": "minecraft:quartz", "R": "minecraft:redstone", "C": "minecraft:comparator", "E": "minecraft:ender_pearl"}, "comm_module")
+shaped("network_cable", ["WWW", "CCC", "WWW"], {"W": "minecraft:blue_wool", "C": "minecraft:copper_ingot"}, "network_cable", 8)
+shaped("hmi_panel", ["SGS", "SRS"], {"S": S_, "G": "minecraft:glass_pane", "R": "minecraft:comparator"}, "hmi_panel")
 shaped("memory_card", ["Q", "P", "R"], {"Q": "minecraft:quartz", "P": "minecraft:paper", "R": "minecraft:redstone"}, "memory_card")
 shaped("pushbutton", ["S", "B"], {"S": S_, "B": "minecraft:stone_button"}, "pushbutton")
 shaped("selector_switch", ["S", "L"], {"S": S_, "L": "minecraft:lever"}, "selector_switch")
@@ -2652,7 +2673,7 @@ lang.update({"block.wildcatter.control_cable": "Control Cable (multi-core)", "bl
 	"block.wildcatter.plc_cabinet": "PLC Cabinet", "block.wildcatter.pushbutton": "Pushbutton", "block.wildcatter.selector_switch": "Selector Switch", "block.wildcatter.estop": "E-Stop",
 	"block.wildcatter.pilot_light": "Pilot Light", "block.wildcatter.stack_light": "Stack Light", "block.wildcatter.horn": "Horn",
 	"item.wildcatter.cpu_small": "CPU Module (small)", "item.wildcatter.cpu_large": "CPU Module (large)", "item.wildcatter.di16_module": "Digital Input Module (16, 24 V DC)",
-	"item.wildcatter.do16_module": "Relay Output Module (16, 2 A)", "item.wildcatter.control_key": "Selector Key (HAND / OFF / AUTO)", "item.wildcatter.memory_card": "PLC Memory Card",
+	"item.wildcatter.do16_module": "Relay Output Module (16, 2 A)", "item.wildcatter.control_key": "Selector Key (HAND / OFF / AUTO)", "item.wildcatter.memory_card": "PLC Memory Card", "item.wildcatter.comm_module": "Communications Module", "block.wildcatter.network_cable": "Network Cable", "block.wildcatter.hmi_panel": "HMI Panel", "block.wildcatter.remote_io_drop": "Remote I/O Drop", "block.wildcatter.pull_cord": "Pull Cord Switch",
 	"item.wildcatter.ai8_module": "Analog Input Module (8, 4-20 mA)", "item.wildcatter.ao4_module": "Analog Output Module (4, 4-20 mA)", "item.wildcatter.rtd4_module": "RTD Input Module (4)", "item.wildcatter.hsc2_module": "High-Speed Counter Module (2)",
 	"block.wildcatter.control_valve": "Control Valve (air, 2 in water)", "block.wildcatter.on_off_valve": "On-Off Valve (air, 2 in water)", "block.wildcatter.motor_operated_valve": "Motor-Operated Valve (480 V, 2 in water)",
 	"block.wildcatter.control_valve_steel": "Control Valve (air, 4 in steel)", "block.wildcatter.on_off_valve_steel": "On-Off Valve (air, 4 in steel)", "block.wildcatter.motor_operated_valve_steel": "Motor-Operated Valve (480 V, 4 in steel)",

@@ -28,7 +28,7 @@ import org.jspecify.annotations.Nullable;
 /** A wall-mounted operator device on 24 V: a pushbutton, selector, e-stop, pilot light, stack light or horn (docs/multiblocks/plc.md). */
 public class OperatorDeviceBlock extends BaseEntityBlock {
 	public enum Kind {
-		PUSHBUTTON, SELECTOR, ESTOP, PILOT_LIGHT, STACK_LIGHT, HORN
+		PUSHBUTTON, SELECTOR, ESTOP, PULL_CORD, PILOT_LIGHT, STACK_LIGHT, HORN
 	}
 
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;

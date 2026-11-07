@@ -37,7 +37,13 @@ public final class WildcatterClient {
 	}
 
 	public static void renderers(RendererSink sink) {
-		dev.wildcatter.control.PlcNet.client = PlcScreen::fromServer;
+		dev.wildcatter.control.PlcNet.client = tag -> {
+			if (tag.contains("hmi")) {
+				HmiScreen.fromServer(tag);
+			} else {
+				PlcScreen.fromServer(tag);
+			}
+		};
 		sink.accept(dev.wildcatter.WildcatterBlocks.INSULATOR_ENTITY, context -> new SpanRenderer());
 		sink.accept(dev.wildcatter.WildcatterBlocks.NATURAL_DRAFT_TOWER_ENTITY, context -> new CoolingTowerRenderer());
 		sink.accept(dev.wildcatter.WildcatterBlocks.SPENT_FUEL_POOL_ENTITY, context -> new SpentFuelPoolRenderer());

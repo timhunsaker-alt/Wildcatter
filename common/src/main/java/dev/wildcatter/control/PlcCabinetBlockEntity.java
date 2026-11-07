@@ -40,7 +40,100 @@ import net.minecraft.world.level.storage.ValueOutput;
  * A PLC cabinet: the rail of modules, the project, the terminals, and the {@link Cpu} they run on. Each tick, with 24 V, it reads every landed
  * input, scans once and writes every landed output (docs/multiblocks/plc.md).
  */
-public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, BigPartEntity {
+public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, BigPartEntity, PlcRequests {
+	private String station = "PLC";
+	private List<RemoteIoDropBlockEntity> drops = List.of();
+	private List<PlcCabinetBlockEntity> peers = List.of();
+	/** Tag exchange: rows of {@code LOCAL = STATION/REMOTE}, as a real controller's produced and consumed data. */
+	private final List<String> exchange = new ArrayList<>();
+	private final Set<String> exchangeFailed = new HashSet<>();
+	private static final int EXCHANGE_TICKS = 10;
+
+	public void addExchange(String row) {
+		exchange.add(row);
+		setChanged();
+	}
+
+	public List<String> exchange() {
+		return exchange;
+	}
+
+	public Set<String> exchangeFailed() {
+		return exchangeFailed;
+	}
+
+	public List<RemoteIoDropBlockEntity> drops() {
+		return drops;
+	}
+
+	/** The module in a slot: its own for the first 12, then each rack's, 12 at a time; null if none, or if the rack is not on the network. */
+	private PlcModuleItem.@org.jspecify.annotations.Nullable Type moduleAt(int slot) {
+		if (slot < MODULE_SLOTS) {
+			return modules[slot];
+		}
+		int rack = (slot - MODULE_SLOTS) / MODULE_SLOTS + 1;
+		for (RemoteIoDropBlockEntity drop : drops) {
+			if (drop.rack() == rack) {
+				return drop.module((slot - MODULE_SLOTS) % MODULE_SLOTS);
+			}
+		}
+		return null;
+	}
+
+	private int slotsInUse() {
+		int most = MODULE_SLOTS;
+		for (RemoteIoDropBlockEntity drop : drops) {
+			most = Math.max(most, MODULE_SLOTS + drop.rack() * MODULE_SLOTS);
+		}
+		return most;
+	}
+
+	private Set<BlockPos> reachable() {
+		Set<BlockPos> out = new HashSet<>(net.devices());
+		for (RemoteIoDropBlockEntity drop : drops) {
+			if (drop.live()) {
+				out.addAll(drop.devices());
+			}
+		}
+		return out;
+	}
+
+	private void walkNetwork(Level level) {
+		List<BlockPos> cells = BigParts.cells(worldPosition, getBlockState());
+		drops = hasComm() ? NetworkNet.all(level, cells, RemoteIoDropBlockEntity.class) : List.of();
+		peers = hasComm() ? NetworkNet.plcs(level, cells).stream().filter(p -> p != this).toList() : List.of();
+	}
+
+	/** Copies each exchanged tag over, every half second, only while this CPU runs. A dead peer's tags hold their last value and are named as failed. */
+	private void runExchange() {
+		exchangeFailed.clear();
+		for (String row : exchange) {
+			int cut = row.indexOf('=');
+			if (cut <= 0) {
+				continue;
+			}
+			String local = row.substring(0, cut).trim().toUpperCase(java.util.Locale.ROOT);
+			Object value = NetworkNet.read(peers, row.substring(cut + 1).trim());
+			if (value == null || !cpu.write(local, value)) {
+				exchangeFailed.add(row);
+			}
+		}
+	}
+
+	public boolean hasComm() {
+		return java.util.Arrays.asList(modules).contains(PlcModuleItem.Type.COMM);
+	}
+
+	/** Its name on the network. */
+	public String station() {
+		return station;
+	}
+
+	public void setStation(String name) {
+		station = name;
+		setChanged();
+	}
+
 	/** The CPU's slot, then the module slots. */
 	public static final int MODULE_SLOTS = 12;
 	/** Each module slot owns this many bytes of the input and of the output area. */
@@ -262,7 +355,10 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		}
 		int slot = io.byteAddress() / BYTES_PER_SLOT;
 		int offset = io.byteAddress() % BYTES_PER_SLOT;
-		PlcModuleItem.Type module = slot >= MODULE_SLOTS ? null : modules[slot];
+		PlcModuleItem.Type module = moduleAt(slot);
+		if (cpu != null && io.byteAddress() + io.bytes() > (output ? cpu.spec().outputBytes() : cpu.spec().inputBytes())) {
+			return address + " is past this CPU's I/O: a large CPU reaches further racks";
+		}
 		int channel;
 		switch (wanted.signal()) {
 			case BOOL -> {
@@ -317,7 +413,7 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 
 	private String address(boolean output, int slot, int channel) {
 		int base = slot * BYTES_PER_SLOT;
-		PlcModuleItem.Type module = modules[slot];
+		PlcModuleItem.Type module = moduleAt(slot);
 		if (module == PlcModuleItem.Type.HSC2) {
 			return "%ID" + (base + channel * 4);
 		}
@@ -357,6 +453,7 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		}
 		if (now % WALK_TICKS == 0) {
 			net = ControlNet.walk(level, BigParts.cells(worldPosition, getBlockState()));
+			walkNetwork(level);
 		}
 		boolean wasPowered = powered;
 		powered = net.supplyLive();
@@ -384,10 +481,12 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 	}
 
 	private void scan(Level level, long now) {
-		Set<BlockPos> reachable = new HashSet<>(net.devices());
-		for (int slot = 0; slot < modules.length; slot++) {
-			if (modules[slot] == PlcModuleItem.Type.AI8 || modules[slot] == PlcModuleItem.Type.RTD4) {
-				for (int channel = 0; channel < (modules[slot] == PlcModuleItem.Type.AI8 ? 8 : 4); channel++) {
+		Set<BlockPos> reachable = reachable();
+		int slots = slotsInUse();
+		for (int slot = 0; slot < slots; slot++) {
+			PlcModuleItem.Type here = moduleAt(slot);
+			if ((here == PlcModuleItem.Type.AI8 || here == PlcModuleItem.Type.RTD4) && (slot + 1) * BYTES_PER_SLOT <= cpu.spec().inputBytes()) {
+				for (int channel = 0; channel < (here == PlcModuleItem.Type.AI8 ? 8 : 4); channel++) {
 					cpu.setInputWord(slot * BYTES_PER_SLOT + channel * 2, OPEN_LOOP);   // an empty channel, or a cut one, reads as an open loop
 				}
 			}
@@ -398,7 +497,7 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 				device = null;
 			}
 			int base = l.slot() * BYTES_PER_SLOT;
-			PlcModuleItem.Type module = modules[l.slot()];
+			PlcModuleItem.Type module = moduleAt(l.slot());
 			if (module == PlcModuleItem.Type.DI16) {
 				boolean on = device != null && !device.points().get(l.point()).output() && device.readPoint(l.point());
 				cpu.setInputBit(base + l.channel() / 8, l.channel() % 8, on);
@@ -412,6 +511,9 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 				cpu.setInputWord(base + l.channel() * 4 + 2, (int) (count >>> 16 & 0xFFFF));
 			}
 		}
+		if (now % EXCHANGE_TICKS == 0 && !exchange.isEmpty() && cpu.mode() == Cpu.Mode.RUN) {
+			runExchange();
+		}
 		cpu.scan();
 		// a stopped or faulted CPU writes no analog signal, so the loop is dead rather than a false 4 mA
 		boolean writesAnalog = cpu.mode() == Cpu.Mode.RUN && !cpu.faulted();
@@ -421,9 +523,10 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 				continue;
 			}
 			int base = l.slot() * BYTES_PER_SLOT;
-			if (modules[l.slot()] == PlcModuleItem.Type.DO16) {
+			PlcModuleItem.Type module = moduleAt(l.slot());
+			if (module == PlcModuleItem.Type.DO16) {
 				device.commandPoint(l.point(), cpu.outputBit(base + l.channel() / 8, l.channel() % 8), now);
-			} else if (modules[l.slot()] == PlcModuleItem.Type.AO4 && writesAnalog) {
+			} else if (module == PlcModuleItem.Type.AO4 && writesAnalog) {
 				device.commandMa(l.point(), milliampsOf(cpu.outputWord(base + l.channel() * 2)), now);
 			}
 		}
@@ -439,6 +542,7 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 	}
 
 	/** What a screen asks. {@code action} says which. */
+	@Override
 	public void request(ServerPlayer player, CompoundTag tag) {
 		List<String> messages = new ArrayList<>();
 		switch (tag.getStringOr("action", "")) {
@@ -510,6 +614,22 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 					messages.add(refused != null ? refused : "Range set: " + ends[0] + " to " + ends[1]);
 				} catch (NumberFormatException e) {
 					messages.add("A range is two numbers, such as 0 100");
+				}
+			}
+			case "station" -> setStation(tag.getStringOr("station", "PLC").trim());
+			case "exchangeAdd" -> {
+				String row = tag.getStringOr("row", "").trim();
+				if (row.indexOf('=') > 0 && exchange.size() < 64) {
+					addExchange(row);
+				} else {
+					messages.add("A row is LOCAL = STATION/TAG, such as MAIN.FLOW = PLC-2/MAIN.FLOW");
+				}
+			}
+			case "exchangeDel" -> {
+				int index = tag.getIntOr("index", -1);
+				if (index >= 0 && index < exchange.size()) {
+					exchange.remove(index);
+					setChanged();
 				}
 			}
 			case "tag" -> setTag(new BlockPos(tag.getIntOr("dx", 0), tag.getIntOr("dy", 0), tag.getIntOr("dz", 0)), tag.getStringOr("tag", ""));
@@ -595,6 +715,15 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		tag.putString("rail", railText());
 		tag.putString("compile", compileText);
 		tag.putString("card", card.isEmpty() ? "" : MemoryCardItem.describe(card));
+		tag.putString("station", station);
+		ListTag rows = new ListTag();
+		exchange.forEach(row -> rows.add(StringTag.valueOf((exchangeFailed.contains(row) ? "FAILED  " : "ok  ") + row)));
+		tag.put("exchange", rows);
+		ListTag others = new ListTag();
+		peers.forEach(p -> others.add(StringTag.valueOf(p.station() + ": " + (p.cpu() == null ? "no project" : p.cpu().mode().name()))));
+		drops.forEach(d -> others.add(StringTag.valueOf("Rack " + d.rack() + ": " + (d.live() ? "24 V OK, " : "NO 24 V, ") + d.devices().size() + " devices, slot " + (MODULE_SLOTS + (d.rack() - 1) * MODULE_SLOTS) + " up")));
+		tag.put("network", others);
+		tag.putBoolean("comm", hasComm());
 		tag.putBoolean("powered", powered);
 		if (cpu != null) {
 			tag.putBoolean("running", cpu.mode() == Cpu.Mode.RUN);
@@ -649,7 +778,11 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 
 	private ListTag devicesTag() {
 		ListTag list = new ListTag();
-		for (BlockPos pos : net.devices()) {
+		List<BlockPos> all = new ArrayList<>(net.devices());
+		for (RemoteIoDropBlockEntity drop : drops) {
+			all.addAll(drop.devices());
+		}
+		for (BlockPos pos : all) {
 			ControlDevice device = ControlNet.deviceAt(level, pos);
 			if (device == null) {
 				continue;
@@ -661,14 +794,14 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 			entry.putString("name", device.deviceName());
 			entry.putString("tag", tags.getOrDefault(pos, ""));
 			ListTag points = new ListTag();
-			List<ControlDevice.Point> all = device.points();
-			for (int i = 0; i < all.size(); i++) {
+			List<ControlDevice.Point> pointsHere = device.points();
+			for (int i = 0; i < pointsHere.size(); i++) {
 				int point = i;
 				CompoundTag row = new CompoundTag();
-				row.putString("name", all.get(i).name());
-				row.putBoolean("output", all.get(i).output());
+				row.putString("name", pointsHere.get(i).name());
+				row.putBoolean("output", pointsHere.get(i).output());
 				row.putString("address", landings.stream().filter(l -> l.pos().equals(pos) && l.point() == point).findFirst()
-						.map(l -> address(all.get(point).output(), l.slot(), l.channel())).orElse(""));
+						.map(l -> address(pointsHere.get(point).output(), l.slot(), l.channel())).orElse(""));
 				points.add(row);
 			}
 			entry.put("points", points);
@@ -686,6 +819,7 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 					case DO16 -> "%QX" + i * BYTES_PER_SLOT + ".0";
 					case AO4 -> "%QW" + i * BYTES_PER_SLOT;
 					case HSC2 -> "%ID" + i * BYTES_PER_SLOT;
+					case COMM -> "network";
 					default -> "%IW" + i * BYTES_PER_SLOT;
 				};
 				out.append(out.length() > 0 ? ", " : "").append(i).append(": ").append(modules[i]).append(" (").append(first).append(")");
@@ -744,6 +878,8 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
 		output.putBoolean("grown", grown);
+		output.putString("station", station);
+		output.store("exchange", Codec.STRING.listOf(), exchange);
 		if (!card.isEmpty()) {
 			output.store("card", ItemStack.CODEC, card);
 		}
@@ -790,6 +926,9 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
 		grown = input.getBooleanOr("grown", false);
+		station = input.getStringOr("station", "PLC");
+		exchange.clear();
+		exchange.addAll(input.read("exchange", Codec.STRING.listOf()).orElse(List.of()));
 		card = input.read("card", ItemStack.CODEC).orElse(ItemStack.EMPTY);
 		String name = input.getStringOr("cpuModule", "");
 		cpuModule = name.isEmpty() ? null : PlcModuleItem.Type.valueOf(name);

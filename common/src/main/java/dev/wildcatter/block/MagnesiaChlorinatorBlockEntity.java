@@ -86,6 +86,9 @@ public class MagnesiaChlorinatorBlockEntity extends PlantUnitBlockEntity impleme
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, MagnesiaChlorinatorBlockEntity m) {
+		if (m.plcHold(level)) {
+			return;
+		}
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
 			return;
 		}

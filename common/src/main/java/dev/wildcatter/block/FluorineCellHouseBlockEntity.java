@@ -56,6 +56,9 @@ public class FluorineCellHouseBlockEntity extends PlantUnitBlockEntity implement
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, FluorineCellHouseBlockEntity h) {
+		if (h.plcHold(level)) {
+			return;
+		}
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
 			return;
 		}
