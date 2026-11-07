@@ -221,4 +221,24 @@ class PhasorSolverTest {
 		System.out.println("1,000-node three-phase solve, best of 30: " + best / 1e6 + " ms");
 		assertTrue(best < 5_000_000L, "took " + best / 1e6 + " ms");
 	}
+
+	/** Floating pieces of circuit, such as a busway's neutral on a dead bus: the leak can round away, and they must still solve. */
+	@Test
+	void aFloatingBusStillSolves() {
+		for (int length = 2; length < 400; length++) {
+			for (double ohms : new double[] {1e-5, 3.3e-5, 1e-4, 2.5e-4, 1e-3, 7e-3}) {
+				PhasorSolver s = new PhasorSolver();
+				int first = s.node();
+				int at = first;
+				for (int i = 0; i < length; i++) {
+					int next = s.node();
+					s.resistor(at, next, ohms * (1 + i % 3));
+					s.resistor(next, first, ohms * 50);
+					at = next;
+				}
+				assertTrue(s.solve(), "a floating bus of " + length + " cells at " + ohms + " ohms");
+				assertEquals(0.0, s.voltage(at).abs(), 1.0);
+			}
+		}
+	}
 }

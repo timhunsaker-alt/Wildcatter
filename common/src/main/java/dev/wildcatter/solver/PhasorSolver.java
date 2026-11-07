@@ -324,7 +324,10 @@ public final class PhasorSolver {
 				double pi = im[kk];
 				double pm = pr * pr + pi * pi;
 				if (pm < 1e-60) {
-					return false;
+					// a floating piece of circuit (a busway's neutral on a dead bus): low resistances round the leak away, so it goes back
+					re[kk] = pr = LEAK;
+					im[kk] = pi = 0;
+					pm = pr * pr;
 				}
 				int last = Math.min(n - 1, k + band);
 				for (int i = k + 1; i <= last; i++) {

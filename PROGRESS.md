@@ -1597,3 +1597,7 @@ and cranes from it.
 Spec: docs/multiblocks/tailings-cell.md. Written ahead of a plan, then approved by Tim as built. `cell_liner` and `decant_tower` make a cell of any shape; the tower finds its basin, fills it with visible `settled_tails`, returns water on a water pipe, and reads BREACHED or FULL. The uranium mill's thickener has an optional tails outlet. `process_water_pump` is the water pump on a 37 kW, 480 V motor. Scene `tailingsCell`. Tailings' scenes will take tails over a real pipe.
 
 Phase 12 closed on 2026-11-06: the full client suite passed (BUILD SUCCESSFUL in 2h 47m) and it is released as v0.4.0. No phase is CURRENT until Tim picks the next.
+
+v0.4.1 (2026-11-06), two fixes found by Tailings' playthrough; the full client suite passed on them (2h 45m):
+- **The solver no longer gives up on a floating bus.** A busway's neutral on a dead bus has low resistance and no path to ground, so the small leak each node carries rounded away and the factorisation stopped with "Could not solve the circuit". The solve for that whole group was then dropped, so the generator's synchroniser never read the bus and its breaker never closed. The node now gets its leak back. Unit test `aFloatingBusStillSolves`. The warning came 241 times in the v0.4.0 suite's log, on a suite that passed, and 0 times in this one.
+- **A process water pump reads its own motor.** Its readout gave "750 W, 110 V" for every pump; it now gives the motor's watts and voltage.
