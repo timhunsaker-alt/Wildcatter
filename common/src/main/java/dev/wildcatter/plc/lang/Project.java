@@ -5,7 +5,7 @@ import java.util.List;
 /** A project: program units in any of the languages, each its own source (docs/multiblocks/plc.md). */
 public final class Project {
 	public enum Language {
-		ST, LD, FBD
+		ST, LD, FBD, SFC
 	}
 
 	public record Source(String name, Language language, String text) {

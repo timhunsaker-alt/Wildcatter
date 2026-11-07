@@ -17,6 +17,7 @@ final class Parser {
 	private final List<Token> tokens;
 	private final List<CompileError> errors;
 	private int at;
+	private final List<int[]> spans = new ArrayList<>();
 
 	private Parser(List<Token> tokens, List<CompileError> errors) {
 		this.tokens = tokens;
@@ -44,6 +45,37 @@ final class Parser {
 		} catch (CompileException e) {
 			errors.add(new CompileError(line, 1, e.getMessage()));
 			return null;
+		}
+	}
+
+	/** A unit, and where each of its POUs' bodies lies: first line, first column, end line, end column. */
+	record Spanned(Ast.Unit unit, List<int[]> bodies) {
+	}
+
+	/** For the export, which keeps a body's text as written. */
+	static Spanned parseSpanned(String source, List<CompileError> errors) {
+		try {
+			Parser parser = new Parser(Lexer.tokens(source), errors);
+			Ast.Unit unit = parser.unit();
+			return new Spanned(unit, parser.spans);
+		} catch (CompileException e) {
+			errors.add(new CompileError(e.line, e.column, e.getMessage()));
+			return new Spanned(new Ast.Unit(List.of(), List.of(), List.of(), List.of(), List.of()), List.of());
+		}
+	}
+
+	/** Statements, as an SFC action's body holds; what does not parse is reported, numbered from {@code line}. */
+	static List<Stmt> parseStatements(String text, int line, List<CompileError> errors) {
+		try {
+			Parser parser = new Parser(Lexer.tokens(text, line), errors);
+			List<Stmt> out = parser.statements();
+			if (parser.peek().kind() != Kind.END) {
+				errors.add(new CompileError(parser.peek().line(), parser.peek().column(), "unexpected " + parser.peek().text()));
+			}
+			return out;
+		} catch (CompileException e) {
+			errors.add(new CompileError(e.line, e.column, e.getMessage()));
+			return List.of();
 		}
 	}
 
@@ -288,8 +320,10 @@ final class Parser {
 		while (peek().text().startsWith("VAR") && peek().kind() == Kind.IDENT) {
 			vars.addAll(varBlock());
 		}
+		Token bodyStart = peek();
 		List<Stmt> body = statements();
-		expect(end);
+		Token bodyEnd = expect(end);
+		spans.add(new int[] {bodyStart.line(), bodyStart.column(), bodyEnd.line(), bodyEnd.column()});
 		return new Ast.Pou(line, kind, name, returns, vars, body);
 	}
 

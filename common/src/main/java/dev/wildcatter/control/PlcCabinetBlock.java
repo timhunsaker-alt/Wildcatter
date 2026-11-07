@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
-/** A floor-standing PLC cabinet. A module clicked on it seats; an empty hand opens its screen, and sneaking pulls the last module seated. */
+/** A floor-standing PLC cabinet. A module or memory card clicked on it seats; an empty hand opens its screen, and sneaking pulls the card, then the last module seated. */
 public class PlcCabinetBlock extends BigPartBlock {
 
 	public PlcCabinetBlock(Properties properties, Footprint footprint, String shapeName) {
@@ -49,6 +49,16 @@ public class PlcCabinetBlock extends BigPartBlock {
 					stack.consume(1, player);
 				}
 				player.sendOverlayMessage(Component.literal(refused != null ? refused : cabinet.inspect().getString()));
+			}
+			return InteractionResult.SUCCESS;
+		}
+		if (stack.getItem() instanceof MemoryCardItem) {
+			if (!level.isClientSide() && level.getBlockEntity(main(pos, state)) instanceof PlcCabinetBlockEntity cabinet) {
+				String refused = cabinet.seatCard(stack);
+				if (refused == null) {
+					stack.consume(1, player);
+				}
+				player.sendOverlayMessage(Component.literal(refused != null ? refused : "Memory card seated: " + MemoryCardItem.describe(cabinet.card())));
 			}
 			return InteractionResult.SUCCESS;
 		}

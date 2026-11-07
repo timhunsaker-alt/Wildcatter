@@ -2569,6 +2569,7 @@ big_part_loot("plc_cabinet")
 for name, icon in (("cpu_small", "decal_controller"), ("cpu_large", "decal_controller"), ("di16_module", "decal_relays"), ("do16_module", "decal_relays")):
 	_flat_item(name, f"{ns}:block/mat/{icon}")
 _flat_item("control_key", "minecraft:item/trial_key")
+_flat_item("memory_card", "minecraft:item/paper")
 _PLC_PARTS = ("control_cable", "junction_box", "control_supply", "plc_cabinet", "pushbutton", "selector_switch", "estop", "pilot_light", "stack_light", "horn")
 _PLC_STONE = ("junction_box", "control_supply", "plc_cabinet")
 for tag, names in (("mineable/pickaxe", _PLC_PARTS), ("needs_stone_tool", _PLC_STONE)):
@@ -2585,6 +2586,7 @@ shaped("cpu_large", ["DCD", "CPC", "DCD"], {"D": "minecraft:diamond", "C": "mine
 shaped("di16_module", ["QRQ", "RCR", "QRQ"], {"Q": "minecraft:quartz", "R": "minecraft:redstone", "C": "minecraft:comparator"}, "di16_module")
 shaped("do16_module", ["QRQ", "RCR", "QTQ"], {"Q": "minecraft:quartz", "R": "minecraft:redstone", "C": "minecraft:comparator", "T": "minecraft:repeater"}, "do16_module")
 shaped("control_key", [" I", "I "], {"I": "minecraft:iron_nugget"}, "control_key")
+shaped("memory_card", ["Q", "P", "R"], {"Q": "minecraft:quartz", "P": "minecraft:paper", "R": "minecraft:redstone"}, "memory_card")
 shaped("pushbutton", ["S", "B"], {"S": S_, "B": "minecraft:stone_button"}, "pushbutton")
 shaped("selector_switch", ["S", "L"], {"S": S_, "L": "minecraft:lever"}, "selector_switch")
 shaped("estop", ["R", "S", "B"], {"R": "minecraft:red_dye", "S": S_, "B": "minecraft:stone_button"}, "estop")
@@ -2596,7 +2598,7 @@ lang.update({"block.wildcatter.control_cable": "Control Cable (multi-core)", "bl
 	"block.wildcatter.plc_cabinet": "PLC Cabinet", "block.wildcatter.pushbutton": "Pushbutton", "block.wildcatter.selector_switch": "Selector Switch", "block.wildcatter.estop": "E-Stop",
 	"block.wildcatter.pilot_light": "Pilot Light", "block.wildcatter.stack_light": "Stack Light", "block.wildcatter.horn": "Horn",
 	"item.wildcatter.cpu_small": "CPU Module (small)", "item.wildcatter.cpu_large": "CPU Module (large)", "item.wildcatter.di16_module": "Digital Input Module (16, 24 V DC)",
-	"item.wildcatter.do16_module": "Relay Output Module (16, 2 A)", "item.wildcatter.control_key": "Selector Key (HAND / OFF / AUTO)"})
+	"item.wildcatter.do16_module": "Relay Output Module (16, 2 A)", "item.wildcatter.control_key": "Selector Key (HAND / OFF / AUTO)", "item.wildcatter.memory_card": "PLC Memory Card"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------

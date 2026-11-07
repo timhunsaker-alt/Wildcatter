@@ -234,5 +234,163 @@ final class StdLib {
 			END_IF;
 			LAST_PV := PV;
 			END_FUNCTION_BLOCK
+
+			TYPE
+				SFC_STEP : STRUCT
+					X : BOOL;
+					T : TIME;
+					START : TIME;
+				END_STRUCT;
+			END_TYPE
+
+			(* The standard's action control: a qualifier's rule for when an action is on. Q is on while it is; A is on while its body runs, which
+			   is Q and one scan more, so the body can tidy up. S0 is the standard's S, a word this block keeps for its set-reset. *)
+			FUNCTION_BLOCK ACTION_CONTROL
+			VAR_INPUT N, R, S0, L, D, P, P1, P0, SD, DS, SL : BOOL; T : TIME; END_VAR
+			VAR_OUTPUT Q, A : BOOL; END_VAR
+			VAR
+				__S_FF, __SD_FF, __DS_FF, __SL_FF : RS;
+				__L_T, __D_T, __SD_T, __DS_T, __SL_T : TON;
+				__P_E, __P1_E : R_TRIG;
+				__P0_E, __Q_E : F_TRIG;
+			END_VAR
+			__S_FF(S := S0, R1 := R);
+			__L_T(IN := L, PT := T);
+			__D_T(IN := D, PT := T);
+			__SD_FF(S := SD, R1 := R);
+			__SD_T(IN := __SD_FF.Q1, PT := T);
+			__DS_T(IN := DS, PT := T);
+			__DS_FF(S := __DS_T.Q, R1 := R);
+			__SL_T(IN := __SL_FF.Q1, PT := T);
+			__SL_FF(S := SL, R1 := R OR __SL_T.Q);
+			__P_E(CLK := P);
+			__P1_E(CLK := P1);
+			__P0_E(CLK := P0);
+			Q := NOT R AND (N OR (L AND NOT __L_T.Q) OR __D_T.Q OR __P_E.Q OR __S_FF.Q1 OR __SD_T.Q OR __DS_FF.Q1 OR __SL_FF.Q1);
+			__Q_E(CLK := Q);
+			A := Q OR __Q_E.Q OR __P1_E.Q OR __P0_E.Q;
+			END_FUNCTION_BLOCK
+
+			(* A motor, as a real vendor's device block: demand in, RUN out, a fault latched on what it sees. It cannot hold off a trip: the
+			   overload acts in the starter whatever this says. Outside AUTO the motor is not the program's, so it asks for nothing and raises nothing. *)
+			FUNCTION_BLOCK MOTOR_CTRL
+			VAR_INPUT
+				START : BOOL;
+				PERMIT : BOOL := TRUE;
+				RUNNING, TRIPPED : BOOL;
+				AUTO : BOOL := TRUE;
+				RESET : BOOL;
+				START_T : TIME := T#15s;
+				STOP_T : TIME := T#15s;
+			END_VAR
+			VAR_OUTPUT RUN, FAULT, FAIL_START, FAIL_STOP, FAIL_RUN : BOOL; STATE : INT; END_VAR
+			VAR __WAIT : TON; __UP : BOOL; END_VAR
+			IF RESET THEN
+				FAULT := FALSE;
+				FAIL_START := FALSE;
+				FAIL_STOP := FALSE;
+				FAIL_RUN := FALSE;
+			END_IF;
+			IF NOT AUTO THEN
+				RUN := FALSE;
+				__UP := FALSE;
+				__WAIT(IN := FALSE, PT := START_T);
+				STATE := 5;
+			ELSE
+				IF TRIPPED THEN
+					FAULT := TRUE;
+				END_IF;
+				RUN := START AND PERMIT AND NOT FAULT;
+				IF RUN AND RUNNING THEN
+					__UP := TRUE;
+				ELSIF RUN AND __UP THEN
+					FAIL_RUN := TRUE;
+					FAULT := TRUE;
+					RUN := FALSE;
+				END_IF;
+				IF NOT RUN THEN
+					__UP := FALSE;
+				END_IF;
+				__WAIT(IN := RUN <> RUNNING, PT := SEL(RUN, STOP_T, START_T));
+				IF __WAIT.Q THEN
+					IF RUN THEN
+						FAIL_START := TRUE;
+					ELSE
+						FAIL_STOP := TRUE;
+					END_IF;
+					FAULT := TRUE;
+					RUN := FALSE;
+				END_IF;
+				IF FAULT THEN
+					STATE := 4;
+				ELSIF RUN AND RUNNING THEN
+					STATE := 2;
+				ELSIF RUN THEN
+					STATE := 1;
+				ELSIF RUNNING THEN
+					STATE := 3;
+				ELSE
+					STATE := 0;
+				END_IF;
+			END_IF;
+			END_FUNCTION_BLOCK
+
+			(* A valve, for either kind (docs/multiblocks/plc.md): OUT held for a spring-return solenoid, CMD_OPEN and CMD_CLOSE driven to the limit for
+			   a motor-operated one. A fault drops them all, so an air valve goes to its fail position and a motor-operated one stays put. *)
+			FUNCTION_BLOCK VALVE_CTRL
+			VAR_INPUT
+				OPEN : BOOL;
+				PERMIT : BOOL := TRUE;
+				OPENED, CLOSED : BOOL;
+				AUTO : BOOL := TRUE;
+				RESET : BOOL;
+				TRAVEL_T : TIME := T#30s;
+			END_VAR
+			VAR_OUTPUT OUT, CMD_OPEN, CMD_CLOSE, FAULT, FAIL_OPEN, FAIL_CLOSE, BAD_LIMIT : BOOL; STATE : INT; END_VAR
+			VAR __WAIT : TON; __THERE : BOOL; END_VAR
+			IF RESET THEN
+				FAULT := FALSE;
+				FAIL_OPEN := FALSE;
+				FAIL_CLOSE := FALSE;
+				BAD_LIMIT := FALSE;
+			END_IF;
+			IF NOT AUTO THEN
+				OUT := FALSE;
+				CMD_OPEN := FALSE;
+				CMD_CLOSE := FALSE;
+				__WAIT(IN := FALSE, PT := TRAVEL_T);
+				STATE := 5;
+			ELSE
+				IF OPENED AND CLOSED THEN
+					BAD_LIMIT := TRUE;
+					FAULT := TRUE;
+				END_IF;
+				OUT := OPEN AND PERMIT AND NOT FAULT;
+				__THERE := (OUT AND OPENED) OR (NOT OUT AND CLOSED);
+				__WAIT(IN := NOT __THERE AND NOT FAULT, PT := TRAVEL_T);
+				IF __WAIT.Q THEN
+					IF OUT THEN
+						FAIL_OPEN := TRUE;
+					ELSE
+						FAIL_CLOSE := TRUE;
+					END_IF;
+					FAULT := TRUE;
+					OUT := FALSE;
+				END_IF;
+				CMD_OPEN := OUT AND NOT OPENED;
+				CMD_CLOSE := NOT OUT AND NOT CLOSED AND NOT FAULT;
+				IF FAULT THEN
+					STATE := 4;
+				ELSIF OUT AND __THERE THEN
+					STATE := 2;
+				ELSIF OUT THEN
+					STATE := 1;
+				ELSIF __THERE THEN
+					STATE := 0;
+				ELSE
+					STATE := 3;
+				END_IF;
+			END_IF;
+			END_FUNCTION_BLOCK
 			""";
 }

@@ -302,8 +302,12 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> CONTROL_KEY_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("control_key"));
 	public static final Item CONTROL_KEY = new dev.wildcatter.control.ControlKeyItem(new Item.Properties().stacksTo(1).setId(CONTROL_KEY_KEY));
 
+	public static final ResourceKey<Item> MEMORY_CARD_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("memory_card"));
+	public static final Item MEMORY_CARD = new dev.wildcatter.control.MemoryCardItem(new Item.Properties().stacksTo(1).setId(MEMORY_CARD_KEY));
+
 	public static void register() {
 		Registry.register(BuiltInRegistries.ITEM, POWER_METER_KEY, POWER_METER);
+		Registry.register(BuiltInRegistries.ITEM, MEMORY_CARD_KEY, MEMORY_CARD);
 		Registry.register(BuiltInRegistries.ITEM, CPU_SMALL_KEY, CPU_SMALL);
 		Registry.register(BuiltInRegistries.ITEM, CPU_LARGE_KEY, CPU_LARGE);
 		Registry.register(BuiltInRegistries.ITEM, DI16_MODULE_KEY, DI16_MODULE);

@@ -16,7 +16,7 @@ public final class BlockLibrary {
 	private static final Set<String> ONE = Set.of("NOT", "NEG", "ABS", "SQRT", "LN", "LOG", "EXP", "SIN", "COS", "TAN", "ASIN", "ACOS", "ATAN", "TRUNC", "MOVE");
 	private static final Map<String, String> SYMBOL = Map.of("GT", ">", "GE", ">=", "LT", "<", "LE", "<=", "EQ", "=", "NE", "<>", "ADD", "+", "SUB", "-", "MUL", "*", "DIV", "/");
 	/** What the screens offer first. */
-	public static final List<String> COMMON = List.of("TON", "TOF", "TP", "CTU", "CTD", "CTUD", "R_TRIG", "F_TRIG", "SR", "RS", "PID", "ALARM_HL", "TOTALIZER", "ADD", "SUB", "MUL", "DIV", "MOD", "AND", "OR", "XOR", "NOT", "GT", "GE", "LT", "LE", "EQ", "NE",
+	public static final List<String> COMMON = List.of("TON", "TOF", "TP", "CTU", "CTD", "CTUD", "R_TRIG", "F_TRIG", "SR", "RS", "PID", "ALARM_HL", "TOTALIZER", "MOTOR_CTRL", "VALVE_CTRL", "ADD", "SUB", "MUL", "DIV", "MOD", "AND", "OR", "XOR", "NOT", "GT", "GE", "LT", "LE", "EQ", "NE",
 			"MOVE", "SEL", "MUX", "MIN", "MAX", "LIMIT", "ABS", "SQRT", "SCALE");
 
 	private BlockLibrary() {

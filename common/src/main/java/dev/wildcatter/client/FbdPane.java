@@ -228,6 +228,14 @@ final class FbdPane {
 		panning = false;
 	}
 
+	/** For the game test: a pin's place on the screen, in GUI pixels. */
+	int[] pinAt(int id, String pin, boolean output, int left, int top) {
+		Fbd.Block block = fbd.block(id);
+		BlockLibrary.Pins p = pinsOf(block);
+		int index = (output ? p.outputs() : p.inputs()).indexOf(pin);
+		return new int[] {left + 4 - scrollX + block.x + (output ? BLOCK_W : 0), top + 4 - scrollY + inY(block, index)};
+	}
+
 	Fbd.Block add(String type, String name) {
 		int y = 8;
 		for (Fbd.Block block : fbd.blocks) {

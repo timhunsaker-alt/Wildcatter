@@ -69,6 +69,9 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 	private final Map<UUID, StringBuilder> downloads = new HashMap<>();
 	/** A project's limit, against a player filling a server's memory. */
 	private static final int MOST_PROJECT = 4_000_000;
+	/** A string in a packet holds 65,535 bytes, so a project opening in a screen goes in pieces of this many characters. */
+	private static final int OPEN_PIECE = 20_000;
+	private ItemStack card = ItemStack.EMPTY;
 
 	public PlcCabinetBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.PLC_CABINET_ENTITY, pos, state);
@@ -113,7 +116,50 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		return "The rail is full: " + MODULE_SLOTS + " modules";
 	}
 
+	/** A memory card into the door; why not, or null when it went in. */
+	public String seatCard(ItemStack stack) {
+		if (!card.isEmpty()) {
+			return "This cabinet already has a card in it";
+		}
+		card = stack.copyWithCount(1);
+		setChanged();
+		return null;
+	}
+
+	public ItemStack card() {
+		return card;
+	}
+
+	/** The project to the card; why not, or null. */
+	public String toCard() {
+		if (card.isEmpty()) {
+			return "There is no card in the door";
+		}
+		if (project.isEmpty()) {
+			return "The cabinet has no project to copy";
+		}
+		String refused = MemoryCardItem.write(card, project);
+		setChanged();
+		return refused;
+	}
+
+	/** Why the card cannot load, or null. */
+	public String cardProblem() {
+		return card.isEmpty() ? "There is no card in the door" : MemoryCardItem.read(card) == null ? "The card is blank" : null;
+	}
+
+	/** The card's project to the cabinet, as a download is: compiled first, and the CPU left in STOP. The errors, or empty. */
+	public List<String> fromCard() {
+		return download(MemoryCardItem.read(card), false).stream().map(CompileError::toString).toList();
+	}
+
 	public ItemStack unseatLast() {
+		if (!card.isEmpty()) {
+			ItemStack out = card;
+			card = ItemStack.EMPTY;
+			setChanged();
+			return out;
+		}
 		for (int i = modules.length - 1; i >= 0; i--) {
 			if (modules[i] != null) {
 				ItemStack out = item(modules[i]);
@@ -326,6 +372,25 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 				messages.add(errors.isEmpty() ? online ? "Online change made." : "Downloaded. The CPU is in STOP." : "Download refused: " + errors.size() + " error(s)");
 				errors.forEach(e -> messages.add(e.toString()));
 			}
+			case "toCard" -> {
+				String refused = toCard();
+				messages.add(refused != null ? refused : "Copied to the card: " + MemoryCardItem.describe(card));
+			}
+			case "fromCard" -> {
+				String problem = cardProblem();
+				if (problem != null) {
+					messages.add(problem);
+					break;
+				}
+				List<String> refused = fromCard();
+				if (refused.isEmpty()) {
+					messages.add("Loaded from the card. The CPU is in STOP.");
+					sendProject(player);
+				} else {
+					messages.add("Download refused: " + refused.size() + " error(s)");
+					messages.addAll(refused);
+				}
+			}
 			case "key" -> {
 				if (cpu != null) {
 					cpu.setMode(tag.getBooleanOr("run", false) ? Cpu.Mode.RUN : Cpu.Mode.STOP);
@@ -409,15 +474,7 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		tag.putInt("z", worldPosition.getZ());
 		tag.putBoolean("open", open);
 		if (open) {
-			ListTag units = new ListTag();
-			for (Project.Source unit : project) {
-				CompoundTag entry = new CompoundTag();
-				entry.putString("name", unit.name());
-				entry.putString("language", unit.language().name());
-				entry.putString("text", unit.text());
-				units.add(entry);
-			}
-			tag.put("project", units);
+			sendProject(player);
 			ListTag names = new ListTag();
 			if (cpu != null) {
 				new TreeSet<>(cpu.program().tags().keySet()).stream().filter(n -> !n.contains("[") && !n.contains("__") && !isLibrary(n)).limit(1024).forEach(n -> names.add(StringTag.valueOf(n)));
@@ -433,6 +490,7 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		tag.putString("cpu", cpuModule == null ? "" : cpuModule.cpu.name());
 		tag.putString("rail", railText());
 		tag.putString("compile", compileText);
+		tag.putString("card", card.isEmpty() ? "" : MemoryCardItem.describe(card));
 		tag.putBoolean("powered", powered);
 		if (cpu != null) {
 			tag.putBoolean("running", cpu.mode() == Cpu.Mode.RUN);
@@ -462,6 +520,22 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		}
 		tag.put("values", values);
 		dev.wildcatter.platform.Platform.INSTANCE.sendToPlayer(player, new PlcNet.Payload(tag));
+	}
+
+	/** The project to a player's screen, in pieces, ahead of the packet that opens it or reloads it. */
+	private void sendProject(ServerPlayer player) {
+		String packed = Project.pack(project);
+		int total = Math.max(1, (packed.length() + OPEN_PIECE - 1) / OPEN_PIECE);
+		for (int i = 0; i < total; i++) {
+			CompoundTag piece = new CompoundTag();
+			piece.putInt("x", worldPosition.getX());
+			piece.putInt("y", worldPosition.getY());
+			piece.putInt("z", worldPosition.getZ());
+			piece.putInt("part", i);
+			piece.putInt("parts", total);
+			piece.putString("projectPiece", packed.substring(i * OPEN_PIECE, Math.min(packed.length(), (i + 1) * OPEN_PIECE)));
+			dev.wildcatter.platform.Platform.INSTANCE.sendToPlayer(player, new PlcNet.Payload(piece));
+		}
 	}
 
 	/** The standard library's own variables would drown the list. */
@@ -559,6 +633,9 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
 		output.putBoolean("grown", grown);
+		if (!card.isEmpty()) {
+			output.store("card", ItemStack.CODEC, card);
+		}
 		output.putString("cpuModule", cpuModule == null ? "" : cpuModule.name());
 		output.store("modules", Codec.STRING.listOf(), java.util.Arrays.stream(modules).map(m -> m == null ? "" : m.name()).toList());
 		output.store("units", Codec.STRING.listOf(), project.stream().map(u -> u.name() + "|" + u.language().name()).toList());
@@ -602,6 +679,7 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
 		grown = input.getBooleanOr("grown", false);
+		card = input.read("card", ItemStack.CODEC).orElse(ItemStack.EMPTY);
 		String name = input.getStringOr("cpuModule", "");
 		cpuModule = name.isEmpty() ? null : PlcModuleItem.Type.valueOf(name);
 		List<String> rail = input.read("modules", Codec.STRING.listOf()).orElse(List.of());

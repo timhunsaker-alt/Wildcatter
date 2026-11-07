@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "Q",
+    "P",
+    "R"
+  ],
+  "key": {
+    "Q": "minecraft:quartz",
+    "P": "minecraft:paper",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "wildcatter:memory_card",
+    "count": 1
+  }
+}

@@ -1448,6 +1448,7 @@ sized for a 40-pot line.
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- Phase 13d: see `docs/multiblocks/plc.md`, "As built: 13d, Not yet". `memory_card` borrows vanilla paper's icon. PLCopen import has been tested on hand-written files, not on a real vendor's export.
 - Phase 13b: see `docs/multiblocks/plc.md`, "As built: 13b, Not yet". The modules seated are not drawn, cable core counts and the supply's 10 A are not enforced, and the NeoForge jar has not opened the screen in a world. No new script-drawn textures: the devices use the mod's materials and vanilla's coloured blocks.
 - Phase 12: `cell_liner_placeholder`, `settled_tails_placeholder` and `decant_tower_placeholder` are textures drawn by script, and the process water pump borrows the water pump's model, until the art comes from Ludo.
 - Phase 10b1:
@@ -1607,6 +1608,8 @@ Spec: `docs/multiblocks/plc.md`, decided by Tim 2026-11-07: nine waves.
 **13b, the hardware and the editor (2026-11-07):** a PLC cabinet with CPU, 16-channel input and relay output modules; a 24 V control supply; multi-core control cable and junction boxes; pushbutton, selector, e-stop, pilot light, stack light, horn; a keyed HAND / OFF / AUTO selector on every starter (standalone, MCC bucket, soft starter, drive). The cabinet's screen is a real code editor, terminals, online tags and forcing, and a diagnostic buffer. Game scene `plc`, filmed. In HAND a starter is exactly as before.
 
 **13c, ladder and FBD (2026-11-07):** projects of program units in structured text, ladder and function block diagrams, calling each other; both graphical languages drawn with a toolbar and mouse; live power flow from the CPU's own values; forcing from the ONLINE tab; online change; large downloads in pieces. 18 more unit tests; the `plc` scene now draws a ladder, runs the motor from it, makes an online change, adds an FBD and forces an input.
+
+**13d, charts, device blocks, card and files (2026-11-07):** the fourth language, SFC, with parallel and choice branches, all eleven action qualifiers and named action bodies; `MOTOR_CTRL` and `VALVE_CTRL`; a memory card; a PROJECT tab exporting and importing PLCopen XML and structured text. 46 more unit tests. The new `plcSfc` scene draws a conveyor start-up with the real mouse and runs it on three real starters, stops it, faults it, carries it on a card, and exports and reimports it, running. See `docs/multiblocks/plc.md`, "As built: 13d".
 
 v0.4.1 (2026-11-06), two fixes found by Tailings' playthrough; the full client suite passed on them (2h 45m):
 - **The solver no longer gives up on a floating bus.** A busway's neutral on a dead bus has low resistance and no path to ground, so the small leak each node carries rounded away and the factorisation stopped with "Could not solve the circuit". The solve for that whole group was then dropped, so the generator's synchroniser never read the bus and its breaker never closed. The node now gets its leak back. Unit test `aFloatingBusStillSolves`. The warning came 241 times in the v0.4.0 suite's log, on a suite that passed, and 0 times in this one.

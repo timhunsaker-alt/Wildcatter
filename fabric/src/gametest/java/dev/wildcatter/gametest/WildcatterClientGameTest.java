@@ -197,6 +197,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("plc")) {
 				plc(context, server);
 			}
+			if (only("plcSfc")) {
+				plcSfc(context, server);
+			}
 			if (only("boron")) {
 				boron(context, server);
 			}
@@ -4603,6 +4606,473 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		}
 	}
 
+	/** Clicks the sheet at a place in GUI pixels, with the real mouse. */
+	private void plcMouse(ClientGameTestContext context, int[] at) {
+		double toWindow = context.computeOnClient(client -> (double) client.getWindow().getScreenWidth() / client.getWindow().getGuiScaledWidth());
+		context.getInput().setCursorPos(at[0] * toWindow, at[1] * toWindow);
+		context.waitTick();
+		context.getInput().pressMouse(1);
+		context.waitTick();
+	}
+
+	private static final String BELT_VARS = """
+			VAR
+				start_pb AT %IX0.0 : BOOL;
+				stop_pb AT %IX0.1 : BOOL;
+				estop_ok AT %IX0.2 : BOOL;
+				run3 AT %IX0.3 : BOOL;
+				trip3 AT %IX0.4 : BOOL;
+				auto3 AT %IX0.5 : BOOL;
+				run2 AT %IX0.6 : BOOL;
+				trip2 AT %IX0.7 : BOOL;
+				auto2 AT %IX1.0 : BOOL;
+				run1 AT %IX1.1 : BOOL;
+				trip1 AT %IX1.2 : BOOL;
+				auto1 AT %IX1.3 : BOOL;
+				coil3 AT %QX16.0 : BOOL;
+				coil2 AT %QX16.1 : BOOL;
+				coil1 AT %QX16.2 : BOOL;
+				horn AT %QX16.3 : BOOL;
+				amber AT %QX16.4 : BOOL;
+				green AT %QX16.5 : BOOL;
+				red AT %QX16.6 : BOOL;
+				want3, want2, want1 : BOOL;
+				m3, m2, m1 : MOTOR_CTRL;
+			END_VAR""";
+
+	private static final String BELT_DRIVE = """
+			m3(START := want3, RUNNING := run3, TRIPPED := trip3, AUTO := auto3, RESET := start_pb, RUN => coil3);
+			m2(START := want2, RUNNING := run2, TRIPPED := trip2, AUTO := auto2, RESET := start_pb, RUN => coil2);
+			m1(START := want1, RUNNING := run1, TRIPPED := trip1, AUTO := auto1, RESET := start_pb, RUN => coil1);""";
+
+	private void sfcStep(ClientGameTestContext context, String name) {
+		plcClick(context, "STEP");
+		plcField(context, "step name", name);
+	}
+
+	private void sfcTrans(ClientGameTestContext context, String condition) {
+		plcClick(context, "TRANS");
+		plcField(context, "condition", condition);
+	}
+
+	private void sfcAction(ClientGameTestContext context, String qualifier, String action, String time) {
+		plcClick(context, "ACTION");
+		plcField(context, "qualifier", qualifier);
+		plcField(context, "action", action);
+		plcField(context, "time", time);
+	}
+
+	/** Waits for three starters' run state to reach {@code on}, noting the tick each did. */
+	private long[] plcBelts(ClientGameTestContext context, java.util.function.IntFunction<String> belt, boolean on, int ticks) {
+		long[] when = {-1, -1, -1};
+		for (int t = 0; t < ticks && (when[0] < 0 || when[1] < 0 || when[2] < 0); t++) {
+			for (int i = 0; i < 3; i++) {
+				if (when[i] < 0 && belt.apply(i).contains("RUNNING") == on) {
+					when[i] = t;
+				}
+			}
+			context.waitTick();
+		}
+		return when;
+	}
+
+	/** Phase 13d (docs/multiblocks/plc.md): a conveyor start-up, drawn as a chart with the real mouse, on three real starters and motors standing in for belts. */
+	private void plcSfc(ClientGameTestContext context, TestServerContext server) {
+		int z = -3200;
+		int bay = z + 14;
+		int px = 17;
+		server.runCommand("tp @p 15 " + (up + 2) + " " + (bay + 5) + " 180 15");
+		context.waitTicks(20);
+		server.runCommand("fill 2 " + (y - 1) + " " + (z - 8) + " 34 " + (y + 8) + " " + (bay + 12) + " minecraft:air");
+		server.runCommand("fill 2 " + (y - 1) + " " + (z - 8) + " 34 " + (y - 1) + " " + (bay + 12) + " minecraft:stone");
+		long seed = -1;
+		for (long s = 1; s < 4_000_000 && seed < 0; s++) {
+			boolean all = true;
+			for (int i = 0; i < 3 && all; i++) {
+				Reservoir oil = Reservoir.at(s, px + 6, z + i * 6);
+				all = oil != null && oil.kind() == Reservoir.Kind.OIL && oil.units() > 10_000;
+			}
+			if (all) {
+				seed = s;
+			}
+		}
+		check(seed >= 0, "no seed puts oil under all three pumpjacks");
+		ReservoirData.testSeed = seed;
+		Filming film = null;
+		try {
+			BlockPos set = new BlockPos(12, up, z);
+			genset(server, set, net.minecraft.core.Direction.NORTH, false);
+			for (int zz = z; zz <= z + 12; zz++) {
+				put(server, 13, up, zz, "wildcatter:cable_industrial");
+			}
+			BlockPos[] starters = new BlockPos[3];
+			for (int i = 0; i < 3; i++) {
+				int line = z + i * 6;
+				starters[i] = new BlockPos(14, up, line);
+				put(server, 14, up, line, "wildcatter:motor_starter[facing=east]");
+				put(server, 15, up, line, "wildcatter:cable_industrial");
+				put(server, 16, up, line, "wildcatter:cable_industrial");
+				pumpjack(server, new BlockPos(px, up, line), net.minecraft.core.Direction.EAST);
+				put(server, 14, up + 1, line, "wildcatter:junction_box");
+			}
+			for (int zz = z; zz <= bay; zz++) {
+				if ((zz - z) % 6 != 0 || zz > z + 12) {
+					put(server, 14, up + 1, zz, "wildcatter:control_cable");
+				}
+			}
+			plant(server, bay);
+			put(server, 12, up, bay, "wildcatter:plastic_wire_hot");
+			put(server, 13, up, bay, "wildcatter:control_supply");
+			for (int x = 11; x <= 13; x++) {
+				put(server, x, up, bay + 1, "wildcatter:plastic_wire_neutral");
+			}
+			put(server, 14, up, bay, "wildcatter:junction_box");
+			put(server, 14, up + 1, bay, "wildcatter:junction_box");
+			put(server, 14, up + 1, bay - 1, "wildcatter:junction_box");   // the stop button hangs under here, and a cable cell there would touch three things
+			put(server, 15, up, bay, "wildcatter:plc_cabinet[facing=south]");
+			server.runOnServer(srv -> dev.wildcatter.multiblock.BigParts.grow(srv.overworld(), new BlockPos(15, up, bay), srv.overworld().getBlockState(new BlockPos(15, up, bay))));
+			BlockPos startAt = new BlockPos(14, up, bay + 1);
+			BlockPos stopAt = new BlockPos(14, up, bay - 1);
+			BlockPos estop = new BlockPos(13, up + 1, bay);
+			BlockPos hornAt = new BlockPos(14, up + 1, bay + 1);
+			BlockPos stack = new BlockPos(14, up + 2, bay);
+			put(server, 14, up, bay + 1, "wildcatter:pushbutton[facing=south]");
+			put(server, 14, up, bay - 1, "wildcatter:pushbutton[facing=north]");
+			put(server, 13, up + 1, bay, "wildcatter:estop[facing=south]");
+			put(server, 14, up + 1, bay + 1, "wildcatter:horn[facing=south]");
+			put(server, 14, up + 2, bay, "wildcatter:stack_light[facing=south]");
+			startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 1000);
+			BlockPos at = new BlockPos(15, up, bay);
+			java.util.function.Function<net.minecraft.server.MinecraftServer, dev.wildcatter.control.PlcCabinetBlockEntity> cabinet = srv -> (dev.wildcatter.control.PlcCabinetBlockEntity) srv.overworld().getBlockEntity(at);
+			java.util.function.Supplier<String> status = () -> read(server, 15, up, bay);
+			java.util.function.IntFunction<String> belt = i -> read(server, 14, up, starters[i].getZ());
+			context.waitTicks(30);
+			String wired = server.computeOnServer(srv -> {
+				dev.wildcatter.control.PlcCabinetBlockEntity box = cabinet.apply(srv);
+				box.seat(dev.wildcatter.control.PlcModuleItem.Type.CPU_SMALL);
+				box.seat(dev.wildcatter.control.PlcModuleItem.Type.DI16);
+				box.seat(dev.wildcatter.control.PlcModuleItem.Type.DO16);
+				StringBuilder errors = new StringBuilder();
+				String[][] inputs = {{"%IX0.3", "%IX0.4", "%IX0.5"}, {"%IX0.6", "%IX0.7", "%IX1.0"}, {"%IX1.1", "%IX1.2", "%IX1.3"}};
+				java.util.List<String> all = new java.util.ArrayList<>();
+				all.add(box.land(startAt, 0, "%IX0.0"));
+				all.add(box.land(stopAt, 0, "%IX0.1"));
+				all.add(box.land(estop, 0, "%IX0.2"));
+				// belt 3 is the last in the line and starts first: starters[0] here
+				for (int i = 0; i < 3; i++) {
+					all.add(box.land(starters[i], 0, "%QX16." + i));
+					for (int point = 0; point < 3; point++) {
+						all.add(box.land(starters[i], point + 1, inputs[i][point]));
+					}
+				}
+				all.add(box.land(hornAt, 0, "%QX16.3"));
+				all.add(box.land(stack, 1, "%QX16.4"));
+				all.add(box.land(stack, 2, "%QX16.5"));
+				all.add(box.land(stack, 0, "%QX16.6"));
+				all.stream().filter(java.util.Objects::nonNull).forEach(e -> errors.append(e).append("; "));
+				return errors.toString();
+			});
+			check(wired.isEmpty(), "every signal should land: " + wired);
+			server.runOnServer(srv -> {
+				for (BlockPos starter : starters) {
+					starter(srv, starter.getX(), starter.getY(), starter.getZ()).cycleHoa(starter);
+					starter(srv, starter.getX(), starter.getY(), starter.getZ()).cycleHoa(starter);
+				}
+			});
+			context.waitTicks(30);
+			check(status.get().contains("devices reached") && !status.get().contains("NO 24 V") && !status.get().contains("BAD JOINT"), "the panel should be wired: " + status.get());
+			film = context.computeOnClient(client -> Filming.start(client, "plcSfc"));
+			server.runOnServer(srv -> cabinet.apply(srv).open(srv.getPlayerList().getPlayers().get(0)));
+			context.waitTicks(20);
+			// draw it: the toolbar chains a step and a transition, and the mouse wires what it does not
+			plcClick(context, "+SFC");
+			context.waitTicks(3);
+			plcField(context, "name", "BELTS");
+			context.runOnClient(client -> plcScreen(client).selectUnitForTest("MAIN"));
+			context.waitTick();
+			plcClick(context, "DELETE UNIT");
+			context.waitTicks(3);
+			plcClick(context, "VARS");
+			context.runOnClient(client -> plcScreen(client).replaceForTest(BELT_VARS));
+			plcClick(context, "DRAW");
+			sfcStep(context, "IDLE");
+			sfcTrans(context, "start_pb AND estop_ok");
+			sfcStep(context, "WARN1");
+			sfcAction(context, "N", "horn", "");
+			context.waitTick();
+			context.runOnClient(client -> plcScreen(client).sfcScrollForTest(0));
+			plcMouse(context, context.computeOnClient(client -> plcScreen(client).sfcTransitionPinForTest(0, true)));   // the transition's foot: the second branch comes out of the same one
+			sfcStep(context, "WARN2");
+			sfcAction(context, "N", "amber", "");
+			plcMouse(context, context.computeOnClient(client -> plcScreen(client).sfcStepPinForTest("WARN1", true)));
+			sfcTrans(context, "WARN1.T >= T#3s");
+			// the join: WARN2's foot to this transition's head, as the double bar
+			plcMouse(context, context.computeOnClient(client -> plcScreen(client).sfcStepPinForTest("WARN2", true)));
+			plcMouse(context, context.computeOnClient(client -> plcScreen(client).sfcTransitionPinForTest(1, false)));
+			sfcStep(context, "B3");
+			sfcAction(context, "S", "want3", "");
+			sfcTrans(context, "B3.T >= T#2s AND m3.STATE = 2");
+			sfcStep(context, "B2");
+			sfcAction(context, "S", "want2", "");
+			sfcTrans(context, "B2.T >= T#2s AND m2.STATE = 2");
+			sfcStep(context, "B1");
+			sfcAction(context, "S", "want1", "");
+			sfcTrans(context, "B1.T >= T#2s AND m1.STATE = 2");
+			sfcStep(context, "LINE_UP");
+			sfcAction(context, "N", "green", "");
+			sfcTrans(context, "stop_pb OR NOT estop_ok");
+			sfcStep(context, "STOP1");
+			sfcAction(context, "R", "want1", "");
+			sfcTrans(context, "NOT run1 AND STOP1.T >= T#1s");
+			sfcStep(context, "STOP2");
+			sfcAction(context, "R", "want2", "");
+			sfcTrans(context, "NOT run2 AND STOP2.T >= T#1s");
+			sfcStep(context, "STOP3");
+			sfcAction(context, "R", "want3", "");
+			sfcTrans(context, "NOT run3");
+			// the way back: the last transition's foot to IDLE's head, a jump round the side
+			context.waitTick();
+			int lastTransition = 8;
+			context.runOnClient(client -> plcScreen(client).sfcScrollForTest(300));
+			context.waitTick();
+			plcMouse(context, context.computeOnClient(client -> plcScreen(client).sfcTransitionPinForTest(lastTransition, true)));
+			context.runOnClient(client -> plcScreen(client).sfcScrollForTest(0));
+			context.waitTick();
+			plcMouse(context, context.computeOnClient(client -> plcScreen(client).sfcStepPinForTest("IDLE", false)));
+			// the second way out of LINE_UP: a fault stops everything and shows red
+			context.runOnClient(client -> plcScreen(client).sfcScrollForTest(150));
+			context.waitTick();
+			plcMouse(context, context.computeOnClient(client -> plcScreen(client).sfcStepPinForTest("LINE_UP", true)));
+			sfcTrans(context, "m3.FAULT OR m2.FAULT OR m1.FAULT");
+			sfcStep(context, "FAULTED");
+			sfcAction(context, "N", "red", "");
+			sfcAction(context, "R", "want1", "");
+			sfcAction(context, "R", "want2", "");
+			sfcAction(context, "R", "want3", "");
+			sfcTrans(context, "start_pb");
+			context.waitTick();
+			plcMouse(context, context.computeOnClient(client -> plcScreen(client).sfcTransitionPinForTest(10, true)));
+			context.runOnClient(client -> plcScreen(client).sfcScrollForTest(0));
+			context.waitTick();
+			plcMouse(context, context.computeOnClient(client -> plcScreen(client).sfcStepPinForTest("IDLE", false)));
+			// a second network, as the standard allows: one step always active, its action running the three device blocks
+			context.runOnClient(client -> plcScreen(client).deselectForTest());
+			context.waitTick();
+			sfcStep(context, "DEVICES");
+			plcClick(context, "INITIAL");
+			plcClick(context, "ACTION");
+			plcField(context, "action", "DRIVE");
+			plcClick(context, "BODY");
+			context.waitTick();
+			context.runOnClient(client -> plcScreen(client).replaceForTest(BELT_DRIVE));
+			plcClick(context, "DRAW");
+			context.waitTick();
+			context.runOnClient(client -> System.out.println("[wildcatter-test] plc chart saved: " + plcScreen(client).savedForTest().replace("\n", " / ")));
+			plcClick(context, "DOWNLOAD");
+			context.waitTicks(20);
+			check(context.computeOnClient(client -> plcScreen(client).errorsForTest().isEmpty()), "the drawn chart should compile: " + context.computeOnClient(client -> plcScreen(client).errorsForTest().toString()));
+			check(server.computeOnServer(srv -> cabinet.apply(srv).project().getFirst().language() == dev.wildcatter.plc.lang.Project.Language.SFC), "the chart should reach the cabinet");
+			plcClick(context, "RUN");
+			context.waitTicks(30);
+			check(status.get().contains("RUN"), "RUN, from the screen: " + status.get());
+			check(context.computeOnClient(client -> plcScreen(client).liveForTest()), "the chart should go live");
+			context.runOnClient(client -> plcScreen(client).sfcScrollForTest(0));
+			context.takeScreenshot("wildcatter-plc-sfc-idle");
+			java.util.function.Supplier<Integer> lamps = () -> server.computeOnServer(srv -> srv.overworld().getBlockState(stack).getValue(dev.wildcatter.control.OperatorDeviceBlock.LAMPS));
+			java.util.function.Consumer<BlockPos> press = device -> server.runOnServer(srv -> ((dev.wildcatter.control.OperatorDeviceBlockEntity) srv.overworld().getBlockEntity(device)).operate());
+			java.util.function.Function<String, Object> tag = name -> server.computeOnServer(srv -> cabinet.apply(srv).cpu().read("BELTS." + name));
+			// the start: horn and amber together, in the parallel branch, and nothing moving yet
+			press.accept(startAt);
+			context.waitTicks(20);
+			check(Boolean.TRUE.equals(tag.apply("WARN1.X")) && Boolean.TRUE.equals(tag.apply("WARN2.X")), "both branches should run: " + tag.apply("WARN1.X") + " " + tag.apply("WARN2.X"));
+			check(Boolean.TRUE.equals(tag.apply("HORN")) && (lamps.get() & 2) != 0, "the horn and amber light warn first: lamps " + lamps.get());
+			check(!belt.apply(0).contains("RUNNING"), "nothing moves during the warning: " + belt.apply(0));
+			context.takeScreenshot("wildcatter-plc-sfc-warning");
+			long[] up3 = plcBelts(context, belt, true, 600);
+			String order = up3[0] + ", " + up3[1] + ", " + up3[2];
+			check(up3[0] >= 0 && up3[1] > up3[0] + 30 && up3[2] > up3[1] + 30, "belt 3, then 2, then 1, at least 2 s apart: " + order);
+			context.waitTicks(60);
+			check(Boolean.TRUE.equals(tag.apply("LINE_UP.X")) && (lamps.get() & 4) != 0 && (lamps.get() & 2) == 0, "the line is up, green and no amber: lamps " + lamps.get());
+			check(read(server, px, up, starters[0].getZ()).contains("pumping"), "the real motor is doing real work: " + read(server, px, up, starters[0].getZ()));
+			context.runOnClient(client -> plcScreen(client).sfcScrollForTest(150));
+			context.waitTicks(10);
+			context.takeScreenshot("wildcatter-plc-sfc-running");
+			System.out.println("[wildcatter-test] plc belts started at ticks " + order);
+			// the stop: the reverse order
+			press.accept(stopAt);
+			long[] down = plcBelts(context, belt, false, 600);
+			String stopOrder = down[0] + ", " + down[1] + ", " + down[2];
+			check(down[2] >= 0 && down[1] > down[2] && down[0] > down[1], "belt 1 first, then 2, then 3: " + stopOrder);
+			context.waitTicks(30);
+			check(Boolean.TRUE.equals(tag.apply("IDLE.X")), "and back to IDLE, by the jump");
+			// a belt's feedback lost, as a contactor dropping out: the belts feeding it stop, and red
+			press.accept(startAt);
+			long[] again = plcBelts(context, belt, true, 600);
+			check(again[2] >= 0, "it should start again: " + again[2]);
+			context.waitTicks(60);
+			check(Boolean.TRUE.equals(tag.apply("LINE_UP.X")), "up again");
+			server.runOnServer(srv -> cabinet.apply(srv).cpu().force("%IX0.3", "FALSE"));
+			context.waitTicks(30);
+			check(Boolean.TRUE.equals(tag.apply("M3.FAIL_RUN")), "MOTOR_CTRL should see its feedback gone: " + tag.apply("M3.STATE"));
+			check(Boolean.TRUE.equals(tag.apply("FAULTED.X")) && (lamps.get() & 1) != 0, "the chart goes to its fault step, red: lamps " + lamps.get());
+			check(!belt.apply(1).contains("RUNNING") && !belt.apply(2).contains("RUNNING"), "the belts feeding it stop: " + belt.apply(1) + " | " + belt.apply(2));
+			context.runOnClient(client -> plcScreen(client).sfcScrollForTest(230));
+			context.waitTicks(5);
+			context.takeScreenshot("wildcatter-plc-sfc-fault");
+			context.runOnClient(client -> plcScreen(client).sfcScrollForTest(370));
+			context.waitTicks(5);
+			context.takeScreenshot("wildcatter-plc-sfc-jump");
+			server.runOnServer(srv -> cabinet.apply(srv).cpu().release("%IX0.3"));
+			context.waitTicks(40);
+			press.accept(startAt);
+			context.waitTicks(15);
+			check(Boolean.TRUE.equals(tag.apply("IDLE.X")) || Boolean.TRUE.equals(tag.apply("WARN1.X")), "start clears it, back through IDLE: " + tag.apply("FAULTED.X"));
+			check(!Boolean.TRUE.equals(tag.apply("M3.FAULT")), "and RESET cleared the block's latch");
+			// a selector out of AUTO is no failure: the block asks for nothing and raises nothing
+			server.runOnServer(srv -> starter(srv, 14, up, starters[1].getZ()).cycleHoa(starters[1]));
+			context.waitTicks(10);
+			check(((Number) tag.apply("M2.STATE")).intValue() == 5 && !Boolean.TRUE.equals(tag.apply("M2.FAULT")), "out of AUTO: state " + tag.apply("M2.STATE") + ", fault " + tag.apply("M2.FAULT"));
+			server.runOnServer(srv -> {
+				starter(srv, 14, up, starters[1].getZ()).cycleHoa(starters[1]);
+				starter(srv, 14, up, starters[1].getZ()).cycleHoa(starters[1]);
+			});
+			context.waitTicks(1200);   // the overload relays cool from these starts, and the warning finishes and belts come up
+			plcCardAndFiles(context, server, cabinet, status, belt, bay, press, startAt, stopAt);
+			System.out.println("[wildcatter-test] plcSfc ok: " + status.get());
+		} finally {
+			ReservoirData.testSeed = null;
+			if (film != null) {
+				film.stop();
+			}
+		}
+	}
+
+	/** The memory card to a second cabinet, then the project out to PLCopen XML and back in, running; then the mouse work 13c left untested. */
+	private void plcCardAndFiles(ClientGameTestContext context, TestServerContext server, java.util.function.Function<net.minecraft.server.MinecraftServer, dev.wildcatter.control.PlcCabinetBlockEntity> cabinet, java.util.function.Supplier<String> status,
+			java.util.function.IntFunction<String> belt, int bay, java.util.function.Consumer<BlockPos> press, BlockPos startAt, BlockPos stopAt) {
+		plcClick(context, "PROJECT");
+		context.waitTicks(3);
+		plcClick(context, "TO CARD");
+		context.waitTicks(10);
+		check(context.computeOnClient(client -> plcScreen(client).notesForTest().toString()).contains("no card"), "TO CARD with no card says so: " + context.computeOnClient(client -> plcScreen(client).notesForTest().toString()));
+		server.runOnServer(srv -> cabinet.apply(srv).seatCard(new net.minecraft.world.item.ItemStack(dev.wildcatter.WildcatterItems.MEMORY_CARD)));
+		context.waitTicks(10);
+		plcClick(context, "FROM CARD");
+		context.waitTicks(10);
+		check(context.computeOnClient(client -> plcScreen(client).notesForTest().toString()).contains("blank"), "a blank card says so");
+		plcClick(context, "TO CARD");
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-plc-project");
+		BlockPos second = new BlockPos(17, up, bay);
+		put(server, 17, up, bay, "wildcatter:plc_cabinet[facing=south]");
+		server.runOnServer(srv -> dev.wildcatter.multiblock.BigParts.grow(srv.overworld(), second, srv.overworld().getBlockState(second)));
+		boolean copied = server.computeOnServer(srv -> {
+			var box = (dev.wildcatter.control.PlcCabinetBlockEntity) srv.overworld().getBlockEntity(second);
+			box.seat(dev.wildcatter.control.PlcModuleItem.Type.CPU_SMALL);
+			net.minecraft.world.item.ItemStack card = cabinet.apply(srv).unseatLast();   // the card comes out before any module
+			if (!(card.getItem() instanceof dev.wildcatter.control.MemoryCardItem) || !dev.wildcatter.control.MemoryCardItem.describe(card).contains("BELTS")) {
+				return false;
+			}
+			box.seatCard(card);
+			var registries = srv.registryAccess();
+			net.minecraft.nbt.CompoundTag saved = box.saveCustomOnly(registries);
+			var copy = new dev.wildcatter.control.PlcCabinetBlockEntity(second, box.getBlockState());
+			copy.setLevel(srv.overworld());
+			copy.loadCustomOnly(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, registries, saved));
+			return dev.wildcatter.control.MemoryCardItem.describe(copy.card()).contains("BELTS") && box.fromCard().isEmpty() && box.project().equals(cabinet.apply(srv).project());
+		});
+		check(copied, "the card should carry the project to another cabinet, surviving a save");
+		// out to a real file and back
+		plcField(context, "file name", "../escape");
+		plcClick(context, "EXPORT XML");
+		context.waitTick();
+		check(context.computeOnClient(client -> plcScreen(client).notesForTest().toString()).contains("letters, numbers"), "a file name cannot leave the folder");
+		plcField(context, "file name", "belts");
+		plcClick(context, "EXPORT XML");
+		context.waitTicks(3);
+		plcClick(context, "EXPORT ST");
+		context.waitTicks(3);
+		check(context.computeOnClient(client -> plcScreen(client).filesForTest().contains("belts.xml")), "the file should be listed: " + context.computeOnClient(client -> plcScreen(client).filesForTest().toString()));
+		check(context.computeOnClient(client -> plcScreen(client).notesForTest().toString()).contains("no structured text"), "an all-chart project has no ST to export");
+		String savedBefore = context.computeOnClient(client -> plcScreen(client).sourcesForTest().getFirst().text());
+		plcClick(context, "CODE");
+		context.waitTicks(2);
+		plcClick(context, "+ST");
+		context.waitTicks(2);
+		context.runOnClient(client -> plcScreen(client).selectUnitForTest("BELTS"));
+		context.waitTick();
+		plcClick(context, "DELETE UNIT");
+		context.waitTicks(2);
+		check(context.computeOnClient(client -> !plcScreen(client).unitNamesForTest().contains("BELTS")), "the chart is gone from the editor");
+		plcClick(context, "PROJECT");
+		context.waitTicks(2);
+		context.runOnClient(client -> plcScreen(client).selectFileForTest("belts.xml"));
+		plcClick(context, "IMPORT");
+		context.waitTicks(3);
+		check(context.computeOnClient(client -> plcScreen(client).unitNamesForTest().contains("BELTS:SFC")), "the chart is back, as a chart: " + context.computeOnClient(client -> plcScreen(client).unitNamesForTest()));
+		String imported = context.computeOnClient(client -> plcScreen(client).sourcesForTest().stream().filter(u -> u.name().equals("BELTS")).findFirst().get().text());
+		check(imported.contains("\"WARN1.T >= T#3s\"") && imported.contains("\"DEVICES\"") && imported.contains("m3(START := want3"), "with its conditions and its action's body: " + imported);
+		System.out.println("[wildcatter-test] plc chart was " + savedBefore.length() + " characters, reimported " + imported.length());
+		plcClick(context, "CODE");
+		context.waitTicks(2);
+		context.runOnClient(client -> plcScreen(client).selectUnitForTest("BELTS"));
+		context.waitTick();
+		context.runOnClient(client -> plcScreen(client).sourcesForTest().forEach(u -> {
+			if (u.language() == dev.wildcatter.plc.lang.Project.Language.ST) {
+				plcScreen(client).deleteUnitForTest(u.name());
+			}
+		}));
+		context.waitTick();
+		plcClick(context, "DOWNLOAD");
+		context.waitTicks(15);
+		check(context.computeOnClient(client -> plcScreen(client).errorsForTest().isEmpty()), "the imported chart should compile: " + context.computeOnClient(client -> plcScreen(client).errorsForTest().toString()));
+		plcClick(context, "RUN");
+		context.waitTicks(20);
+		press.accept(startAt);
+		long[] up = plcBelts(context, belt, true, 600);
+		check(up[0] >= 0 && up[1] > up[0] + 30 && up[2] > up[1] + 30, "the imported chart runs the same sequence: " + up[0] + ", " + up[1] + ", " + up[2]);
+		context.waitTicks(40);
+		press.accept(stopAt);
+		long[] down = plcBelts(context, belt, false, 600);
+		check(down[2] >= 0 && down[0] > down[1] && down[1] > down[2], "and the same stop: " + down[0] + ", " + down[1] + ", " + down[2]);
+		// FBD by mouse: blocks, a wire from pin to pin, a drag and a pan, none of which 13c's scene touched
+		plcClick(context, "+FBD");
+		context.waitTicks(2);
+		plcClick(context, "IN");
+		plcField(context, "variable or value", "run3");
+		plcClick(context, "BLOCK");
+		context.waitTick();
+		plcClick(context, "OUT");
+		plcField(context, "variable or value", "other");
+		context.waitTick();
+		plcMouse(context, context.computeOnClient(client -> plcScreen(client).fbdPinForTest(1, "OUT", true)));
+		plcMouse(context, context.computeOnClient(client -> plcScreen(client).fbdPinForTest(2, "IN", false)));
+		plcMouse(context, context.computeOnClient(client -> plcScreen(client).fbdPinForTest(2, "Q", true)));
+		plcMouse(context, context.computeOnClient(client -> plcScreen(client).fbdPinForTest(3, "IN", false)));
+		context.waitTick();
+		String wiredFbd = context.computeOnClient(client -> plcScreen(client).savedForTest());
+		check(wiredFbd.contains("@1.OUT") && wiredFbd.contains("@2.Q"), "the mouse should have wired both: " + wiredFbd);
+		int[] body = context.computeOnClient(client -> plcScreen(client).fbdPinForTest(2, "IN", false));
+		double toWindow = context.computeOnClient(client -> (double) client.getWindow().getScreenWidth() / client.getWindow().getGuiScaledWidth());
+		int blockXBefore = context.computeOnClient(client -> plcScreen(client).fbdBlockXForTest(2));
+		context.getInput().setCursorPos((body[0] + 30) * toWindow, (body[1] - 18) * toWindow);
+		context.waitTick();
+		context.getInput().holdMouse(1);
+		context.waitTick();
+		context.getInput().setCursorPos((body[0] + 70) * toWindow, (body[1] - 18) * toWindow);
+		context.waitTicks(2);
+		context.getInput().releaseMouse(1);
+		context.waitTick();
+		int blockXAfter = context.computeOnClient(client -> plcScreen(client).fbdBlockXForTest(2));
+		check(blockXAfter == blockXBefore + 40, "a drag should move the block: " + blockXBefore + " to " + blockXAfter);
+		context.takeScreenshot("wildcatter-plc-fbd-mouse");
+		context.runOnClient(client -> plcScreen(client).undoForTest());
+		context.waitTick();
+		check(context.computeOnClient(client -> plcScreen(client).fbdBlockXForTest(2)) == blockXBefore, "undo should put it back");
+		context.runOnClient(client -> client.gui.screen().onClose());
+		context.waitTicks(5);
+	}
+
 	/** Every block and item of the mod has its files. The asset generator clears what it does not know about, so a hand-made file can vanish without an error anywhere else. */
 	private void checkAssets(ClientGameTestContext context) {
 		java.util.List<String> missing = context.computeOnClient(client -> {
@@ -4661,6 +5131,14 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		plcClick(context, "DOWNLOAD");
 		context.waitTicks(40);
 		check(server.computeOnServer(srv -> cabinet.apply(srv).project().size()) == 2, "a 150 KB project should reach the cabinet: " + server.computeOnServer(srv -> cabinet.apply(srv).project().size()));
+		// and it comes back: a packet's string holds 65,535 bytes, so a screen opening on this project has to take it in pieces
+		context.runOnClient(client -> client.gui.screen().onClose());
+		context.waitTicks(5);
+		server.runOnServer(srv -> cabinet.apply(srv).open(srv.getPlayerList().getPlayers().get(0)));
+		context.waitTicks(20);
+		check(context.computeOnClient(client -> client.gui.screen() instanceof dev.wildcatter.client.PlcScreen && plcScreen(client).unitCountForTest() == 2), "a screen should open on a 150 KB project and have both its units");
+		context.runOnClient(client -> plcScreen(client).selectUnitForTest("BIG"));
+		context.waitTick();
 		plcClick(context, "DELETE UNIT");   // BIG is not first, so it selects MAIN and we delete below
 		// draw the ladder with the toolbar
 		plcClick(context, "+LD");

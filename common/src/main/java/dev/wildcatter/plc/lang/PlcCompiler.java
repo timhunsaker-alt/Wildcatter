@@ -63,9 +63,29 @@ public final class PlcCompiler {
 
 	/** A graphical unit's name and variables, parsed as the structured text they are. */
 	private static Ast.Pou header(Project.Source source, List<CompileError> errors) {
-		String kind = source.language() == Project.Language.LD ? Ladder.parse(source.text()).kind : Fbd.parse(source.text()).kind;
-		String name = source.language() == Project.Language.LD ? Ladder.parse(source.text()).name : Fbd.parse(source.text()).name;
-		String declarations = source.language() == Project.Language.LD ? Ladder.parse(source.text()).declarations : Fbd.parse(source.text()).declarations;
+		String kind;
+		String name;
+		String declarations;
+		switch (source.language()) {
+			case LD -> {
+				Ladder parsed = Ladder.parse(source.text());
+				kind = parsed.kind;
+				name = parsed.name;
+				declarations = parsed.declarations;
+			}
+			case SFC -> {
+				Sfc parsed = Sfc.parse(source.text());
+				kind = parsed.kind;
+				name = parsed.name;
+				declarations = parsed.declarations;
+			}
+			default -> {
+				Fbd parsed = Fbd.parse(source.text());
+				kind = parsed.kind;
+				name = parsed.name;
+				declarations = parsed.declarations;
+			}
+		}
 		String end = kind.equals("PROGRAM") ? "END_PROGRAM" : "END_FUNCTION_BLOCK";
 		List<CompileError> found = new ArrayList<>();
 		Ast.Unit unit = Parser.parse(kind + " " + name + "\n" + declarations + "\n" + end, found);
@@ -321,7 +341,11 @@ public final class PlcCompiler {
 		headers.forEach((source, header) -> {
 			String label = single ? "" : source.name();
 			try {
-				Ast.Pou pou = source.language() == Project.Language.LD ? Ladder.parse(source.text()).toPou(header, known, errors, label) : Fbd.parse(source.text()).toPou(header, known, errors, label);
+				Ast.Pou pou = switch (source.language()) {
+					case LD -> Ladder.parse(source.text()).toPou(header, known, errors, label);
+					case SFC -> Sfc.parse(source.text()).toPou(header, errors, label);
+					default -> Fbd.parse(source.text()).toPou(header, known, errors, label);
+				};
 				units.add(new Ast.Unit(List.of(), List.of(), List.of(pou), List.of(), List.of()));
 			} catch (RuntimeException e) {
 				errors.add(new CompileError(label, 1, 1, "the saved diagram is damaged: " + e.getMessage()));

@@ -522,5 +522,6 @@
   "item.wildcatter.cpu_large": "CPU Module (large)",
   "item.wildcatter.di16_module": "Digital Input Module (16, 24 V DC)",
   "item.wildcatter.do16_module": "Relay Output Module (16, 2 A)",
-  "item.wildcatter.control_key": "Selector Key (HAND / OFF / AUTO)"
+  "item.wildcatter.control_key": "Selector Key (HAND / OFF / AUTO)",
+  "item.wildcatter.memory_card": "PLC Memory Card"
 }

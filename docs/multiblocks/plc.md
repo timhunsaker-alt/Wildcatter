@@ -217,6 +217,44 @@ Tailings compiles against a Wildcatter release, so it comes after 13h's release.
 
 - **A regression, fixed:** running the asset generator for 13b deleted Phase 12's lined cell and process water pump assets, and 13b's commits carried that. No release had it. They are back, and `art/hand_assets` and a check at the start of the client suite keep it from recurring.
 
+## How 13d plays *(proposed where marked)*
+- **Sequential function chart:** a fourth language beside the others, a PROGRAM or FUNCTION_BLOCK.
+  - **Steps and transitions** are drawn on a sheet and wired pin to pin. Several transitions leaving one step are a choice, taken left to right. A transition leaving or entering several steps is a parallel branch, drawn with the double bar.
+  - **The scan, as the standard asks:** all transitions are read against the steps active at the start, the ones that clear all fire together, then the actions run. A token moves one step a scan at most.
+  - **Each step has its flags,** `S1.X` (active) and `S1.T` (time active), readable anywhere in the unit.
+  - **Actions** take the standard's qualifiers: N, R, S, L, D, P, P1, P0, SD, DS, SL, through the standard's `ACTION_CONTROL` block. An action is a BOOL variable it drives, or a named body of structured text that runs while active and once more as it ends, so it can tidy up by reading its own `.Q`.
+  - **Refused:** no initial step, two in one chart, a transition with nothing before or after it or no condition, a timed qualifier with no time, one action given two times.
+- **Device blocks, beyond the standard as real vendors' are:**
+  - `MOTOR_CTRL`: START demand, PERMIT, RUNNING, TRIPPED and AUTO feedback, RESET; RUN out; FAIL_START, FAIL_STOP and FAIL_RUN latch FAULT until RESET. **15 s** to see RUNNING and to see it drop *(proposed, both set on pins)*. Outside AUTO it raises no alarm and asks for nothing.
+  - `VALVE_CTRL`: OPEN demand, PERMIT, OPENED and CLOSED limits, AUTO, RESET; OUT for a spring-return solenoid held open, CMD_OPEN and CMD_CLOSE for a motor-operated valve, driven to the limit; FAIL_OPEN, FAIL_CLOSE and BAD_LIMIT (both limits made at once). **30 s** of travel *(proposed, on a pin)*. A fault drops OUT, so an air valve goes to its fail position, and stops both drive commands, so a motor-operated valve stays put. 13e brings the valves themselves.
+  - These are process control only. Neither block can hold off a trip.
+- **Memory card:** the new `memory_card` item holds a project, up to **256,000 characters** *(proposed: real cards hold far more; this bound is what an item's data can carry to every player who sees it)*.
+  - Click a cabinet with a card to seat it in the door. Sneak with an empty hand pulls the card before any module.
+  - The new PROJECT tab has TO CARD and FROM CARD. FROM CARD is a download: it compiles first, and leaves the CPU in STOP.
+  - A card holds the project, not the terminals or the values, so it copies a program and not a site's wiring.
+- **Import and export, from the PROJECT tab, on the player's own machine:** files live in `<game folder>/wildcatter/plc/`.
+  - **EXPORT XML** writes the whole project as PLCopen XML (TC6 v2.01, the IEC 61131-10 form). **EXPORT ST** writes the structured text units as one `.st` source, and names any graphical unit it left out.
+  - **IMPORT** reads the file picked from the list into the editor. Units of the same name are replaced and others stay; nothing reaches the CPU until a download. A file it cannot represent is refused whole, with the reasons, rather than dropping part of a program.
+- **The proof:** a conveyor start-up sequence on three real starters, as a real plant starts belts: horn and amber light first, then the last belt in the line, each next belt once the one after it is running, and a stop in the reverse order. A starter that fails stops the belts feeding it. Three pumpjack motors stand in for belts here, as Wildcatter has none; Tailings' real belts come with 13i.
+
+## As built: 13d (2026-11-07)
+`plc.lang.Sfc`, `PlcOpen`; `client/SfcPane`; `control/MemoryCardItem`; the PROJECT tab; `ACTION_CONTROL`, `MOTOR_CTRL`, `VALVE_CTRL`; and the `plcSfc` game scene.
+- **Proved in the world, with a chart drawn with the real toolbar and mouse:** from the start button, horn and amber together in a parallel branch for 3 s with nothing moving; then three real 480 V starters and motors in order, last belt first, 2 s apart; green with the line up; a stop in reverse order; the jump back to the start; a belt's feedback forced off, so `MOTOR_CTRL` latches FAIL_RUN and the chart stops the rest and shows red; a selector out of AUTO raising no fault.
+- **Also in the world:** a memory card to a second cabinet through a save and load, blank and missing cards refused; a real `belts.xml` written, the chart deleted, imported back as a chart, downloaded, and the same sequence run from it; an unsafe file name refused. FBD wires, a drag and undo by real mouse, which 13c left untested.
+- **PLCopen:** every exported test project validates against PLCopen's own TC6 v2.01 schema, when `PLCOPEN_XSD` points to a copy, as that schema is PLCopen's and is not in this repository. CI skips that check. A file laid out as another tool might (shared rails, a named transition, an inline action) is tested, but this was hand-written: **no real vendor's export has been tried.**
+- **A second network in a chart** is allowed, as the standard does: the scene's device blocks run from an always-active step.
+- **Found and fixed:** a cabinet holding a unit over about 65 KB could not open its screen, as a string in a packet is limited, since 13c allowed such projects. A project now reaches a screen in pieces, and the `plc` scene reopens a 150 KB one.
+- **Not yet:**
+  - conditions and action bodies are structured text only, not ladder or FBD; a chart can call a ladder function block from a body;
+  - a chart's safety (a token stranded or doubled by odd wiring) is not checked, nor are macro steps;
+  - no SFC-wide reset or pause: a sequence stops through its own transitions;
+  - `VALVE_CTRL` has unit tests only, as the valves come with 13e; of the motor block's faults, only FAIL_RUN has run in the world;
+  - the card holds no retained values and does not load itself into a blank CPU;
+  - comments in variable blocks are lost through XML (a body's stay), and imported STRING lengths are ignored, as the CPU ignores them;
+  - import replaces a unit of the same name with no undo, so unsaved edits to that unit are lost;
+  - a jump's wire can only be removed by clicking its target's head pin, which takes all wires into that step;
+  - `memory_card` borrows vanilla paper's icon, and its recipe is proposed.
+
 ## Figures for 13a *(proposed)*
 | Figure | Small CPU | Large CPU | Basis |
 |---|---|---|---|

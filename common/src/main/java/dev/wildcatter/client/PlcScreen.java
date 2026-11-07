@@ -10,7 +10,13 @@ import dev.wildcatter.plc.lang.CompileError;
 import dev.wildcatter.plc.lang.Fbd;
 import dev.wildcatter.plc.lang.Ladder;
 import dev.wildcatter.plc.lang.PlcCompiler;
+import dev.wildcatter.plc.lang.PlcOpen;
 import dev.wildcatter.plc.lang.Project;
+import dev.wildcatter.plc.lang.Sfc;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -40,7 +46,7 @@ import net.minecraft.network.chat.Component;
  */
 public class PlcScreen extends Screen {
 	private enum Tab {
-		CODE, TERMINALS, ONLINE, DIAGNOSTICS
+		CODE, TERMINALS, ONLINE, DIAGNOSTICS, PROJECT
 	}
 
 	private static final int BACK = 0xF01B1E24;
@@ -67,7 +73,10 @@ public class PlcScreen extends Screen {
 			"END_WHILE", "REPEAT", "UNTIL", "END_REPEAT", "EXIT", "CONTINUE", "RETURN", "AND", "OR", "XOR", "NOT", "MOD", "TRUE", "FALSE", "TYPE", "END_TYPE", "STRUCT", "END_STRUCT", "ARRAY", "CONFIGURATION",
 			"END_CONFIGURATION", "RESOURCE", "END_RESOURCE", "ON", "TASK", "WITH");
 	private static final Set<String> TYPES = Set.of("BOOL", "SINT", "USINT", "INT", "UINT", "DINT", "UDINT", "LINT", "BYTE", "WORD", "DWORD", "LWORD", "REAL", "LREAL", "TIME", "STRING", "TON", "TOF", "TP",
-			"CTU", "CTD", "CTUD", "R_TRIG", "F_TRIG", "SR", "RS", "PID", "SCALE", "ALARM_HL", "TOTALIZER");
+			"CTU", "CTD", "CTUD", "R_TRIG", "F_TRIG", "SR", "RS", "PID", "SCALE", "ALARM_HL", "TOTALIZER", "ACTION_CONTROL", "MOTOR_CTRL", "VALVE_CTRL", "SFC_STEP");
+	/** A file's limit, as a project's on the server. */
+	private static final int MOST_FILE = 4_000_000;
+	private static final StringBuilder ARRIVING = new StringBuilder();
 
 	private final int x;
 	private final int y;
@@ -93,21 +102,16 @@ public class PlcScreen extends Screen {
 	private int blink;
 	private EditBox fieldOne;
 	private EditBox fieldTwo;
+	private final List<String> files = new ArrayList<>();
+	private String selectedFile = "";
+	private String fileName = "project";
 
-	private PlcScreen(CompoundTag tag) {
+	private PlcScreen(CompoundTag tag, List<Project.Source> project) {
 		super(Component.literal("PLC cabinet"));
 		x = tag.getIntOr("x", 0);
 		y = tag.getIntOr("y", 0);
 		z = tag.getIntOr("z", 0);
-		ListTag saved = tag.getListOrEmpty("project");
-		for (int i = 0; i < saved.size(); i++) {
-			CompoundTag entry = saved.getCompoundOrEmpty(i);
-			units.add(new Unit(entry.getStringOr("name", "MAIN"), Project.Language.valueOf(entry.getStringOr("language", "ST")), entry.getStringOr("text", "")));
-		}
-		if (units.isEmpty()) {
-			units.add(new Unit("MAIN", Project.Language.ST, "PROGRAM MAIN\nVAR\nEND_VAR\n\nEND_PROGRAM"));
-		}
-		select(units.getFirst());
+		loadProject(project);
 		readValues(tag);
 		tag.getListOrEmpty("names").forEach(t -> t.asString().ifPresent(tagNames::add));
 		state = tag;
@@ -116,13 +120,41 @@ public class PlcScreen extends Screen {
 	/** From the cabinet: opens the screen, or updates the one open on it. */
 	public static void fromServer(CompoundTag tag) {
 		Minecraft minecraft = Minecraft.getInstance();
+		if (tag.contains("projectPiece")) {
+			// a project arrives in pieces ahead of what opens the screen; if one is open on this cabinet, it is a card's load and replaces what is there
+			if (tag.getIntOr("part", 0) == 0) {
+				ARRIVING.setLength(0);
+			}
+			ARRIVING.append(tag.getStringOr("projectPiece", ""));
+			if (tag.getIntOr("part", 0) + 1 == tag.getIntOr("parts", 1) && minecraft.gui.screen() instanceof PlcScreen open && open.x == tag.getIntOr("x", 0) && open.y == tag.getIntOr("y", 0) && open.z == tag.getIntOr("z", 0)) {
+				List<Project.Source> project = Project.unpack(ARRIVING.toString());
+				if (project != null) {
+					open.loadProject(project);
+					open.rebuildWidgets();
+					open.sendWatch();
+				}
+			}
+			return;
+		}
 		if (minecraft.gui.screen() instanceof PlcScreen open && open.x == tag.getIntOr("x", 0) && open.y == tag.getIntOr("y", 0) && open.z == tag.getIntOr("z", 0)) {
 			open.state = tag;
 			open.readValues(tag);
 			tag.getListOrEmpty("messages").forEach(t -> t.asString().ifPresent(open.notes::add));
 		} else if (tag.getBooleanOr("open", false)) {
-			minecraft.gui.setScreen(new PlcScreen(tag));
+			List<Project.Source> project = Project.unpack(ARRIVING.toString());
+			minecraft.gui.setScreen(new PlcScreen(tag, project == null ? List.of() : project));
 		}
+	}
+
+	private void loadProject(List<Project.Source> project) {
+		units.clear();
+		for (Project.Source source : project) {
+			units.add(new Unit(source.name(), source.language(), source.text()));
+		}
+		if (units.isEmpty()) {
+			units.add(new Unit("MAIN", Project.Language.ST, "PROGRAM MAIN\nVAR\nEND_VAR\n\nEND_PROGRAM"));
+		}
+		select(units.getFirst());
 	}
 
 	/** One program unit, being edited. */
@@ -132,8 +164,12 @@ public class PlcScreen extends Screen {
 		TextBuffer text;
 		LadderPane ladder;
 		FbdPane fbd;
+		SfcPane sfc;
 		boolean showVars;
 		TextBuffer vars;
+		/** A chart's action open in the text editor, or null. */
+		String openAction;
+		TextBuffer actionText;
 		String monitor = "";
 		final Deque<String> undo = new ArrayDeque<>();
 
@@ -165,6 +201,11 @@ public class PlcScreen extends Screen {
 					fbd = new FbdPane(Fbd.parse(saved), type -> BlockLibrary.pins(type, library));
 					vars = new TextBuffer(fbd.fbd.declarations);
 				}
+				case SFC -> {
+					sfc = new SfcPane(Sfc.parse(saved));
+					vars = new TextBuffer(sfc.sfc.declarations);
+					openAction = null;
+				}
 			}
 		}
 
@@ -179,15 +220,32 @@ public class PlcScreen extends Screen {
 					fbd.fbd.declarations = vars.text();
 					yield fbd.fbd.write();
 				}
+				case SFC -> {
+					sfc.sfc.declarations = vars.text();
+					if (openAction != null) {
+						sfc.sfc.bodies.put(openAction, actionText.text());
+					}
+					yield sfc.sfc.write();
+				}
 			};
 		}
 
 		String pouName() {
-			return language == Project.Language.LD ? ladder.ladder.name : language == Project.Language.FBD ? fbd.fbd.name : name;
+			return switch (language) {
+				case LD -> ladder.ladder.name;
+				case FBD -> fbd.fbd.name;
+				case SFC -> sfc.sfc.name;
+				case ST -> name;
+			};
 		}
 
 		String kind() {
-			return language == Project.Language.LD ? ladder.ladder.kind : language == Project.Language.FBD ? fbd.fbd.kind : "";
+			return switch (language) {
+				case LD -> ladder.ladder.kind;
+				case FBD -> fbd.fbd.kind;
+				case SFC -> sfc.sfc.kind;
+				case ST -> "";
+			};
 		}
 
 		/** Where the CPU holds this unit's variables: a program's name, or the instance chosen for a function block. */
@@ -217,7 +275,7 @@ public class PlcScreen extends Screen {
 		if (next.language == Project.Language.ST) {
 			code = next.text;
 		} else {
-			code = next.vars;
+			code = next.openAction != null ? next.actionText : next.vars;
 		}
 		scrollLine = 0;
 		refreshLibrary();
@@ -261,7 +319,7 @@ public class PlcScreen extends Screen {
 	}
 
 	private boolean graphic() {
-		return unit.language != Project.Language.ST && !unit.showVars;
+		return unit.language != Project.Language.ST && !unit.showVars && unit.openAction == null;
 	}
 
 	private void ask(String action, Consumer<CompoundTag> fill) {
@@ -297,7 +355,7 @@ public class PlcScreen extends Screen {
 		refreshLibrary();
 		int bx = 8;
 		for (Tab each : Tab.values()) {
-			int w = font.width(each.name()) + 12;
+			int w = font.width(each.name()) + 8;
 			Button b = button(bx, 22, w, each.name(), () -> {
 				tab = each;
 				scrollList = 0;
@@ -310,8 +368,14 @@ public class PlcScreen extends Screen {
 		int right = width - 8;
 		button(right - 44, 22, 44, "COLD", () -> ask("cold", t -> {
 		}));
-		button(right - 88, 22, 42, "STOP", () -> ask("key", t -> t.putBoolean("run", false)));
-		button(right - 130, 22, 40, "RUN", () -> ask("key", t -> t.putBoolean("run", true)));
+		button(right - 88, 22, 42, "STOP", () -> {
+			notes.clear();
+			ask("key", t -> t.putBoolean("run", false));
+		});
+		button(right - 130, 22, 40, "RUN", () -> {
+			notes.clear();
+			ask("key", t -> t.putBoolean("run", true));
+		});
 		if (tab == Tab.CODE) {
 			codeWidgets();
 		} else if (tab == Tab.TERMINALS) {
@@ -353,6 +417,20 @@ public class PlcScreen extends Screen {
 			}));
 			button(width - 58, TOP + 70, 50, "RELEASE", () -> ask("release", t -> t.putString("tag", fieldOne.getValue())));
 			sendWatch();
+		} else if (tab == Tab.PROJECT) {
+			button(width - 208, TOP + 14, 60, "TO CARD", () -> ask("toCard", t -> {
+			}));
+			button(width - 146, TOP + 14, 60, "FROM CARD", () -> ask("fromCard", t -> {
+			}));
+			fieldOne = addRenderableWidget(new EditBox(font, width - 208, TOP + 50, 200, 16, Component.literal("file name")));
+			fieldOne.setValue(fileName);
+			fieldOne.setMaxLength(48);
+			fieldOne.setResponder(value -> fileName = value);
+			button(width - 208, TOP + 70, 66, "EXPORT XML", this::exportXml);
+			button(width - 140, TOP + 70, 60, "EXPORT ST", this::exportText);
+			button(width - 208, TOP + 88, 66, "IMPORT", this::importFile);
+			button(width - 140, TOP + 88, 60, "REFRESH", this::listFiles);
+			listFiles();
 		}
 	}
 
@@ -376,16 +454,31 @@ public class PlcScreen extends Screen {
 		button(right - 170, height - 26, 60, "ONLINE CHG", this::onlineChange);
 		int by = TOP + 14 + units.size() * ROW + 2;
 		for (Project.Language language : Project.Language.values()) {
-			int bx = 8 + language.ordinal() * 24;
-			button(bx, by, language == Project.Language.FBD ? 28 : 23, "+" + language.name(), () -> addUnit(language));
+			int bx = 8 + language.ordinal() % 2 * 38;
+			button(bx, by + language.ordinal() / 2 * 17, 37, "+" + language.name(), () -> addUnit(language));
 		}
+		by += 17;
 		button(8, by + 18, 76, "DELETE UNIT", this::deleteUnit);
 		labelled(8, by + 36, 76, "name", unit.name, value -> {
 			unit.name = value;
+			if (value.matches("[A-Za-z_][A-Za-z0-9_]*")) {   // a diagram's POU goes by its unit's name; structured text names its own
+				String pou = value.toUpperCase(Locale.ROOT);
+				switch (unit.language) {
+					case LD -> unit.ladder.ladder.name = pou;
+					case FBD -> unit.fbd.fbd.name = pou;
+					case SFC -> unit.sfc.sfc.name = pou;
+					case ST -> {
+					}
+				}
+			}
 		});
 		if (unit.language != Project.Language.ST) {
-			button(LIST_W + 8 + 0, TOP, 30, unit.showVars ? "DRAW" : "VARS", () -> {
-				unit.showVars = !unit.showVars;
+			button(LIST_W + 8 + 0, TOP, 30, unit.showVars || unit.openAction != null ? "DRAW" : "VARS", () -> {
+				if (unit.openAction != null) {
+					closeAction();
+				} else {
+					unit.showVars = !unit.showVars;
+				}
 				select(unit);
 				rebuildWidgets();
 				sendWatch();
@@ -403,6 +496,14 @@ public class PlcScreen extends Screen {
 				tx += w + 1;
 			}
 			ladderSide();
+		} else if (unit.language == Project.Language.SFC) {
+			for (String[] tool : new String[][] {{"STEP", "32"}, {"TRANS", "36"}, {"ACTION", "42"}, {"INITIAL", "44"}, {"DEL", "26"}}) {
+				String name = tool[0];
+				int w = Integer.parseInt(tool[1]);
+				button(tx, TOP, w, name, () -> sfcTool(name));
+				tx += w + 1;
+			}
+			sfcSide();
 		} else {
 			for (String[] tool : new String[][] {{"IN", "24"}, {"OUT", "28"}, {"BLOCK", "40"}, {"DEL", "26"}}) {
 				String name = tool[0];
@@ -533,6 +634,98 @@ public class PlcScreen extends Screen {
 		}
 	}
 
+	private void sfcSide() {
+		int sx = width - 8 - SIDE_W + 4;
+		int w = SIDE_W - 8;
+		int sy = TOP + 18;
+		SfcPane pane = unit.sfc;
+		if (pane.selectedAction != null) {
+			Sfc.Association action = pane.selectedAction;
+			labelled(sx, sy + 9, w, "qualifier", action.qualifier, value -> {
+				action.qualifier = value.toUpperCase(Locale.ROOT);
+			});
+			sy += 26;
+			labelled(sx, sy + 9, w, "action", action.action, value -> {
+				action.action = value;
+			});
+			sy += 26;
+			labelled(sx, sy + 9, w, "time", action.time, value -> {
+				action.time = value;
+			});
+			sy += 26;
+			button(sx, sy + 4, w, "BODY", () -> openAction(action.action));
+		} else if (pane.selectedStep != null) {
+			Sfc.Step step = pane.selectedStep;
+			labelled(sx, sy + 9, w, "step name", step.name, value -> {
+				step.name = value;
+			});
+			sy += 26;
+		} else if (pane.selectedTransition != null) {
+			Sfc.Transition t = pane.selectedTransition;
+			labelled(sx, sy + 9, w, "condition", t.condition, value -> {
+				t.condition = value;
+			});
+			sy += 26;
+		} else {
+			labelled(sx, sy + 9, w, "monitor", unit.monitor, value -> {
+				unit.monitor = value;
+				sendWatch();
+			});
+		}
+	}
+
+	/** A chart's action body in the text editor. A name with no body yet is given one, which makes it a named action, not a BOOL it drives. */
+	private void openAction(String action) {
+		String name = action.trim().toUpperCase(Locale.ROOT);
+		if (name.isEmpty() || !name.matches("[A-Z_][A-Z0-9_]*")) {
+			notes.clear();
+			notes.add("line: An action's body needs a plain name first");
+			return;
+		}
+		unit.touch();
+		unit.openAction = name;
+		unit.actionText = new TextBuffer(unit.sfc.sfc.bodies.getOrDefault(name, ""));
+		select(unit);
+		rebuildWidgets();
+	}
+
+	private void closeAction() {
+		String body = unit.actionText.text();
+		if (body.isBlank()) {
+			unit.sfc.sfc.bodies.remove(unit.openAction);   // no body: back to a BOOL it drives
+		} else {
+			unit.sfc.sfc.bodies.put(unit.openAction, body);
+		}
+		unit.openAction = null;
+		unit.actionText = null;
+	}
+
+	private void sfcTool(String name) {
+		SfcPane pane = unit.sfc;
+		unit.touch();
+		switch (name) {
+			case "STEP" -> pane.addStep();
+			case "TRANS" -> pane.addTransition();
+			case "ACTION" -> {
+				if (pane.selectedStep != null) {
+					Sfc.Association added = new Sfc.Association("N", "", "");
+					pane.selectedStep.actions.add(added);
+					pane.selectedAction = added;
+				}
+			}
+			case "INITIAL" -> {
+				if (pane.selectedStep != null) {
+					pane.selectedStep.initial = !pane.selectedStep.initial;
+				}
+			}
+			case "DEL" -> pane.deleteSelected();
+			default -> {
+			}
+		}
+		rebuildWidgets();
+		sendWatch();
+	}
+
 	private String autoInstance(String type) {
 		int n = 1;
 		String all = String.join("\n", sources().stream().map(Project.Source::text).toList()).toUpperCase(Locale.ROOT);
@@ -583,7 +776,7 @@ public class PlcScreen extends Screen {
 		String name = "POU" + n;
 		String text = switch (language) {
 			case ST -> "FUNCTION_BLOCK " + name + "\nVAR_INPUT\nEND_VAR\nVAR_OUTPUT\nEND_VAR\n\nEND_FUNCTION_BLOCK";
-			case LD, FBD -> "PROGRAM " + name + "\nVAR\nEND_VAR\n---\n";
+			case LD, FBD, SFC -> "PROGRAM " + name + "\nVAR\nEND_VAR\n---\n";
 		};
 		Unit added = new Unit(name, language, text);
 		units.add(added);
@@ -606,7 +799,11 @@ public class PlcScreen extends Screen {
 			ListTag names = new ListTag();
 			watched.forEach(n -> names.add(StringTag.valueOf(n)));
 			if (tab == Tab.CODE && graphic() && !unit.prefix().isEmpty()) {
-				List<String> shown = unit.language == Project.Language.LD ? unit.ladder.watches(unit.prefix()) : unit.fbd.watches(unit.prefix());
+				List<String> shown = switch (unit.language) {
+					case LD -> unit.ladder.watches(unit.prefix());
+					case SFC -> unit.sfc.watches(unit.prefix());
+					default -> unit.fbd.watches(unit.prefix());
+				};
 				shown.forEach(n -> names.add(StringTag.valueOf(n)));
 			}
 			t.put("names", names);
@@ -633,6 +830,137 @@ public class PlcScreen extends Screen {
 	private CompoundTag device(int index) {
 		ListTag devices = state.getListOrEmpty("devices");
 		return index >= 0 && index < devices.size() ? devices.getCompoundOrEmpty(index) : null;
+	}
+
+	// ---- the project tab: files on the player's own machine ---------------------------------------------------------------------------------
+
+	private Path folder() {
+		return minecraft.gameDirectory.toPath().resolve("wildcatter").resolve("plc");
+	}
+
+	private void listFiles() {
+		files.clear();
+		try (var entries = Files.list(folder())) {
+			entries.map(p -> p.getFileName().toString()).filter(n -> n.endsWith(".xml") || n.endsWith(".st")).sorted().forEach(files::add);
+		} catch (IOException e) {
+			// no folder yet: nothing has been exported
+		}
+		if (!files.contains(selectedFile)) {
+			selectedFile = "";
+		}
+	}
+
+	/** The file named, within the folder: a name is letters, numbers, - and _, so it cannot walk out of it. */
+	private Path exportPath(String extension) {
+		String name = fileName.trim();
+		if (!name.matches("[A-Za-z0-9_-]+")) {
+			say("A file name is letters, numbers, - and _");
+			return null;
+		}
+		return folder().resolve(name + extension);
+	}
+
+	private void say(String note) {
+		notes.add(note);
+		while (notes.size() > 8) {
+			notes.removeFirst();
+		}
+	}
+
+	private void writeFile(Path path, String text) {
+		try {
+			Files.createDirectories(path.getParent());
+			boolean existed = Files.exists(path);
+			Files.writeString(path, text, StandardCharsets.UTF_8);
+			say((existed ? "Replaced " : "Wrote ") + path.getFileName() + " in " + folder());
+			listFiles();
+		} catch (IOException e) {
+			say("Could not write it: " + e.getMessage());
+		}
+	}
+
+	/** Writes the editor's project as PLCopen XML. */
+	public void exportXml() {
+		Path path = exportPath(".xml");
+		if (path == null) {
+			return;
+		}
+		PlcOpen.Exported out = PlcOpen.write(sources());
+		if (out.xml() == null) {
+			say("Not exported: fix these first.");
+			out.problems().forEach(this::say);
+		} else {
+			writeFile(path, out.xml());
+		}
+	}
+
+	/** Writes the editor's structured text units as one source. */
+	public void exportText() {
+		Path path = exportPath(".st");
+		if (path == null) {
+			return;
+		}
+		List<String> leftOut = new ArrayList<>();
+		String text = PlcOpen.writeStructuredText(sources(), leftOut);
+		if (text.isEmpty()) {
+			say("This project has no structured text. EXPORT XML holds the diagrams.");
+			return;
+		}
+		writeFile(path, text);
+		if (!leftOut.isEmpty()) {
+			say("Left out, as they are diagrams: " + String.join(", ", leftOut) + ". EXPORT XML holds them.");
+		}
+	}
+
+	/** Reads the selected file into the editor: same names replaced, others kept, nothing sent to the CPU. */
+	public void importFile() {
+		if (selectedFile.isEmpty()) {
+			say("Pick a file from the list.");
+			return;
+		}
+		try {
+			Path path = folder().resolve(selectedFile);
+			if (Files.size(path) > MOST_FILE) {
+				say("That file is over " + MOST_FILE / 1_000_000 + " million bytes");
+				return;
+			}
+			String text = Files.readString(path, StandardCharsets.UTF_8);
+			List<Project.Source> read;
+			if (selectedFile.endsWith(".xml")) {
+				PlcOpen.Imported imported = PlcOpen.read(text);
+				if (!imported.problems().isEmpty()) {
+					say("Not imported: nothing was changed.");
+					imported.problems().forEach(this::say);
+					return;
+				}
+				read = imported.sources();
+			} else {
+				read = List.of(new Project.Source(selectedFile.substring(0, selectedFile.length() - 3).toUpperCase(Locale.ROOT), Project.Language.ST, text));
+			}
+			Unit first = null;
+			for (Project.Source source : read) {
+				Unit added = new Unit(source.name(), source.language(), source.text());
+				int at = -1;
+				for (int i = 0; i < units.size(); i++) {
+					if (units.get(i).name.equalsIgnoreCase(source.name())) {
+						at = i;
+					}
+				}
+				if (at >= 0) {
+					units.set(at, added);
+				} else {
+					units.add(added);
+				}
+				first = first == null ? added : first;
+			}
+			if (first != null) {
+				select(first);
+			}
+			say("Imported " + read.size() + " unit(s) from " + selectedFile + ". DOWNLOAD sends them.");
+			rebuildWidgets();
+		} catch (IOException | RuntimeException e) {
+			say("Could not read it: " + e.getMessage());
+		}
 	}
 
 	/** Compiles here, touching nothing on the CPU. */
@@ -691,10 +1019,83 @@ public class PlcScreen extends Screen {
 	}
 
 	public void deselectForTest() {
-		if (unit.language == Project.Language.LD) {
-			unit.ladder.selected = null;
+		switch (unit.language) {
+			case LD -> unit.ladder.selected = null;
+			case SFC -> {
+				unit.sfc.selectedStep = null;
+				unit.sfc.selectedTransition = null;
+				unit.sfc.selectedAction = null;
+			}
+			case FBD -> unit.fbd.selected = null;
+			case ST -> {
+			}
 		}
 		rebuildWidgets();
+	}
+
+	public void deleteUnitForTest(String name) {
+		units.removeIf(u -> u.name.equals(name) && units.size() > 1);
+		select(units.getFirst());
+		rebuildWidgets();
+	}
+
+	public void undoForTest() {
+		if (!unit.undo.isEmpty()) {
+			unit.load(unit.undo.pop());
+			select(unit);
+			rebuildWidgets();
+		}
+	}
+
+	public void sfcScrollForTest(int scroll) {
+		unit.sfc.scrollX = 0;
+		unit.sfc.scrollY = scroll;
+	}
+
+	public int fbdScrollForTest() {
+		return unit.fbd.scrollX;
+	}
+
+	public int fbdBlockXForTest(int block) {
+		return unit.fbd.fbd.block(block).x;
+	}
+
+	public String unitNamesForTest() {
+		return String.join(",", units.stream().map(u -> u.name + ":" + u.language).toList());
+	}
+
+	public int unitCountForTest() {
+		return units.size();
+	}
+
+	/** For the game test: a chart's pin on the sheet, in GUI pixels, as a player would click it. */
+	public int[] sfcStepPinForTest(String step, boolean bottom) {
+		return unit.sfc.stepPin(step, bottom, LIST_W + 8, TOP + 18);
+	}
+
+	public int[] sfcTransitionPinForTest(int index, boolean bottom) {
+		return unit.sfc.transitionPin(index, bottom, LIST_W + 8, TOP + 18);
+	}
+
+	/** For the game test: the middle of an FBD block's pin, in GUI pixels. */
+	public int[] fbdPinForTest(int block, String pin, boolean output) {
+		return unit.fbd.pinAt(block, pin, output, LIST_W + 8, TOP + 18);
+	}
+
+	public List<String> notesForTest() {
+		return notes;
+	}
+
+	public List<String> filesForTest() {
+		return files;
+	}
+
+	public void selectFileForTest(String name) {
+		selectedFile = name;
+	}
+
+	public List<Project.Source> sourcesForTest() {
+		return sources();
 	}
 
 	public void selectUnitForTest(String name) {
@@ -762,6 +1163,7 @@ public class PlcScreen extends Screen {
 			case TERMINALS -> drawTerminals(graphics);
 			case ONLINE -> drawOnline(graphics);
 			case DIAGNOSTICS -> drawDiagnostics(graphics);
+			case PROJECT -> drawProject(graphics);
 		}
 		super.extractRenderState(graphics, mouseX, mouseY, partial);   // the widgets last, over the panels
 	}
@@ -812,7 +1214,13 @@ public class PlcScreen extends Screen {
 				graphics.fill(8, rowY - 1, LIST_W + 4, rowY + ROW - 1, SELECT);
 			}
 			graphics.text(font, font.plainSubstrByWidth(each.name, LIST_W - 24), 10, rowY, TEXT, false);
-			graphics.text(font, each.language.name(), LIST_W + 2 - font.width(each.language.name()), rowY, each.language == Project.Language.ST ? TYPE : each.language == Project.Language.LD ? GOOD : NUMBER, false);
+			int shade = switch (each.language) {
+				case ST -> TYPE;
+				case LD -> GOOD;
+				case FBD -> NUMBER;
+				case SFC -> ADDRESS;
+			};
+			graphics.text(font, each.language.name(), LIST_W + 2 - font.width(each.language.name()), rowY, shade, false);
 		}
 	}
 
@@ -829,10 +1237,10 @@ public class PlcScreen extends Screen {
 				forced.add(k);
 			}
 		});
-		if (unit.language == Project.Language.LD) {
-			unit.ladder.draw(graphics, font, left, top, right, bottom, values, unit.prefix(), live, forced);
-		} else {
-			unit.fbd.draw(graphics, font, left, top, right, bottom, values, unit.prefix(), live);
+		switch (unit.language) {
+			case LD -> unit.ladder.draw(graphics, font, left, top, right, bottom, values, unit.prefix(), live, forced);
+			case SFC -> unit.sfc.draw(graphics, font, left, top, right, bottom, values, unit.prefix(), live);
+			default -> unit.fbd.draw(graphics, font, left, top, right, bottom, values, unit.prefix(), live);
 		}
 		int sx = right + 2;
 		graphics.fill(sx, TOP, width - 8, bottom, PANEL);
@@ -847,6 +1255,9 @@ public class PlcScreen extends Screen {
 		int bottom = codeBottom();
 		int top = unit.language == Project.Language.ST ? TOP : TOP + 18;
 		graphics.fill(LIST_W + 8, top, width - 8, bottom, PANEL);
+		if (unit.openAction != null) {
+			graphics.text(font, "Action " + unit.openAction + ": structured text, run while it is active and once more as it ends", LIST_W + 8 + 34, TOP + 4, MUTED, false);
+		}
 		graphics.enableScissor(LIST_W + 8, top, width - 8, bottom);
 		int rows = codeRows();
 		int[] selection = code.selection();
@@ -877,7 +1288,7 @@ public class PlcScreen extends Screen {
 		int noteY = bottom + 4;
 		graphics.fill(8, bottom + 2, width - 8, height - 6, PANEL);
 		for (CompileError error : errors.stream().limit(ERROR_ROWS).toList()) {
-			graphics.text(font, font.plainSubstrByWidth(error.toString(), width - 24), 12, noteY, ERROR, false);
+			graphics.text(font, font.plainSubstrByWidth(describe(error), width - 24), 12, noteY, ERROR, false);
 			noteY += ROW;
 		}
 		String compile = state.getStringOr("compile", "");
@@ -890,6 +1301,30 @@ public class PlcScreen extends Screen {
 		if (errors.isEmpty() && notes.isEmpty() && !compile.isEmpty()) {
 			graphics.text(font, compile.lines().findFirst().orElse(""), 12, noteY, ERROR, false);
 		}
+	}
+
+	/** An error as it reads: a chart's line is an element or a line of an action, so it says which. */
+	private String describe(CompileError error) {
+		Unit in = unitOf(error);
+		if (in != null && in.language == Project.Language.SFC) {
+			String where = in.sfc.sfc.where(error.line());
+			if (!where.isEmpty()) {
+				return in.name + " " + where + ": " + error.message();
+			}
+		}
+		return error.toString();
+	}
+
+	private Unit unitOf(CompileError error) {
+		if (error.source().isEmpty()) {
+			return units.size() == 1 ? units.getFirst() : null;
+		}
+		for (Unit each : units) {
+			if (each.name.equals(error.source())) {
+				return each;
+			}
+		}
+		return null;
 	}
 
 	/** One line of code, coloured by token. */
@@ -1024,6 +1459,34 @@ public class PlcScreen extends Screen {
 		}
 	}
 
+	private void drawProject(GuiGraphicsExtractor graphics) {
+		int split = width - 216;
+		graphics.fill(8, TOP, split, height - 8, PANEL);
+		graphics.text(font, "Files in the game folder, wildcatter/plc", 12, TOP + 3, MUTED, false);
+		graphics.enableScissor(8, TOP + 14, split, height - 8);
+		if (files.isEmpty()) {
+			int hintY = TOP + 16;
+			for (var hint : font.split(Component.literal("None yet. EXPORT writes here, and a file put here can be imported."), split - 20)) {
+				graphics.text(font, hint, 12, hintY, MUTED, false);
+				hintY += ROW;
+			}
+		}
+		for (int i = scrollList; i < files.size(); i++) {
+			int rowY = TOP + 16 + (i - scrollList) * ROW;
+			String name = files.get(i);
+			if (name.equals(selectedFile)) {
+				graphics.fill(10, rowY - 1, split - 2, rowY + ROW - 1, SELECT);
+			}
+			graphics.text(font, name, 12, rowY, TEXT, false);
+		}
+		graphics.disableScissor();
+		String card = state.getStringOr("card", "");
+		String shown = card.isEmpty() ? "Card: none in the door. Click a card on the cabinet." : "Card: " + card;
+		graphics.text(font, font.plainSubstrByWidth(shown, 200), width - 208, TOP + 3, TEXT, false);
+		graphics.text(font, "Export the editor's project as:", width - 208, TOP + 39, TEXT, false);
+		drawNotes(graphics, width - 208, TOP + 108);
+	}
+
 	private void drawDiagnostics(GuiGraphicsExtractor graphics) {
 		graphics.fill(8, TOP, width - 8, height - 8, PANEL);
 		ListTag lines = state.getListOrEmpty("diagnostics");
@@ -1061,19 +1524,19 @@ public class PlcScreen extends Screen {
 		if (tab == Tab.CODE && graphic() && !(getFocused() instanceof EditBox)) {
 			boolean command = (event.modifiers() & (2 | 8)) != 0;
 			if (event.key() == 261 || event.key() == 259) {
-				if (unit.language == Project.Language.LD) {
-					ladderTool("DEL");
-				} else {
-					fbdTool("DEL");
+				switch (unit.language) {
+					case LD -> ladderTool("DEL");
+					case SFC -> sfcTool("DEL");
+					default -> fbdTool("DEL");
 				}
 				return true;
 			}
 			if (event.key() == 262 || event.key() == 263) {   // the arrow keys scroll a wide sheet
 				int by = event.key() == 262 ? 24 : -24;
-				if (unit.language == Project.Language.LD) {
-					unit.ladder.scrollX = Math.max(0, unit.ladder.scrollX + by);
-				} else {
-					unit.fbd.scrollX = Math.max(0, unit.fbd.scrollX + by);
+				switch (unit.language) {
+					case LD -> unit.ladder.scrollX = Math.max(0, unit.ladder.scrollX + by);
+					case SFC -> unit.sfc.scrollX = Math.max(0, unit.sfc.scrollX + by);
+					default -> unit.fbd.scrollX = Math.max(0, unit.fbd.scrollX + by);
 				}
 				return true;
 			}
@@ -1201,6 +1664,20 @@ public class PlcScreen extends Screen {
 					showCaret();
 				} else if (unit.language == Project.Language.LD && error.line() - 1 < unit.ladder.ladder.rungs.size()) {
 					unit.ladder.selectedRung = unit.ladder.ladder.rungs.get(error.line() - 1);
+				} else if (unit.language == Project.Language.SFC) {
+					int action = Sfc.actionOfLine(error.line());
+					List<String> names = new ArrayList<>(unit.sfc.sfc.bodies.keySet());
+					if (action >= 0 && action < names.size()) {
+						openAction(names.get(action));
+						code.moveTo(error.line() % 1000 - 1, 0, false);
+						showCaret();
+					} else {
+						Sfc.Step step = unit.sfc.sfc.step(error.line());
+						unit.sfc.selectedStep = step;
+						unit.sfc.selectedAction = null;
+						unit.sfc.selectedTransition = unit.sfc.sfc.transitions.stream().filter(t -> t.id == error.line()).findFirst().orElse(null);
+						rebuildWidgets();
+					}
 				}
 				return true;
 			}
@@ -1210,6 +1687,13 @@ public class PlcScreen extends Screen {
 					Object before = unit.ladder.selected;
 					unit.ladder.click(mouseX, mouseY);
 					if (before != unit.ladder.selected) {
+						rebuildWidgets();
+					}
+				} else if (unit.language == Project.Language.SFC) {
+					Object[] before = {unit.sfc.selectedStep, unit.sfc.selectedTransition, unit.sfc.selectedAction};
+					unit.touch();
+					unit.sfc.press(mouseX, mouseY, LIST_W + 8, TOP + 18);
+					if (before[0] != unit.sfc.selectedStep || before[1] != unit.sfc.selectedTransition || before[2] != unit.sfc.selectedAction) {
 						rebuildWidgets();
 					}
 				} else {
@@ -1249,6 +1733,12 @@ public class PlcScreen extends Screen {
 				}
 				rowY += 3;
 			}
+		} else if (tab == Tab.PROJECT && mouseX < width - 216 && mouseY >= TOP + 14) {
+			int row = scrollList + (int) ((mouseY - TOP - 16) / ROW);
+			if (row >= 0 && row < files.size()) {
+				selectedFile = files.get(row);
+				return true;
+			}
 		} else if (tab == Tab.ONLINE && mouseX >= width - 208 && mouseY >= TOP + 92 && fieldOne != null) {
 			int want = scrollList + (int) ((mouseY - TOP - 92) / ROW);
 			String filter = fieldOne.getValue().toUpperCase(Locale.ROOT);
@@ -1272,6 +1762,9 @@ public class PlcScreen extends Screen {
 		if (tab == Tab.CODE && graphic() && unit.language == Project.Language.FBD && unit.fbd.drag(event.x(), event.y(), LIST_W + 8, TOP + 18)) {
 			return true;
 		}
+		if (tab == Tab.CODE && graphic() && unit.language == Project.Language.SFC && unit.sfc.drag(event.x(), event.y(), LIST_W + 8, TOP + 18)) {
+			return true;
+		}
 		if (tab == Tab.CODE && dragging) {
 			placeCaret(event.x(), event.y(), true);
 			return true;
@@ -1284,6 +1777,8 @@ public class PlcScreen extends Screen {
 		dragging = false;
 		if (unit.language == Project.Language.FBD) {
 			unit.fbd.release();
+		} else if (unit.language == Project.Language.SFC) {
+			unit.sfc.release();
 		}
 		return super.mouseReleased(event);
 	}
@@ -1291,10 +1786,11 @@ public class PlcScreen extends Screen {
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
 		if (tab == Tab.CODE && graphic()) {
-			if (unit.language == Project.Language.LD) {
-				unit.ladder.scroll = Math.max(0, unit.ladder.scroll - (int) Math.signum(scrollY) * 12);
-			} else {
-				unit.fbd.scrollY = Math.max(0, unit.fbd.scrollY - (int) Math.signum(scrollY) * 12);
+			int by = (int) Math.signum(scrollY) * 12;
+			switch (unit.language) {
+				case LD -> unit.ladder.scroll = Math.max(0, unit.ladder.scroll - by);
+				case SFC -> unit.sfc.scrollY = Math.max(0, unit.sfc.scrollY - by);
+				default -> unit.fbd.scrollY = Math.max(0, unit.fbd.scrollY - by);
 			}
 		} else if (tab == Tab.CODE) {
 			scrollLine = Math.max(0, Math.min(Math.max(0, code.lineCount() - 1), scrollLine - (int) Math.signum(scrollY) * 3));
