@@ -43,7 +43,11 @@ public final class Lines {
 	}
 
 	/** One joined run of steel pipe, the machines on it, and what it carries. */
-	public record Line(Set<BlockPos> pipes, List<Port> ports, Run run) {
+	public record Line(Set<BlockPos> pipes, List<Port> ports, Run run, double opening) {
+		public Line(Set<BlockPos> pipes, List<Port> ports, Run run) {
+			this(pipes, ports, run, 1.0);
+		}
+
 		/** True if a block of this kind touches the run (a disposal wellhead, which keeps no state). */
 		public boolean touches(Level level, Class<? extends Block> kind) {
 			for (BlockPos pipe : pipes) {
@@ -58,7 +62,7 @@ public final class Lines {
 	}
 
 	static boolean isSteelPipe(Level level, BlockPos pos) {
-		return level.getBlockState(pos).getBlock() instanceof PipeBlock pipe && pipe.kind() == PipeBlock.Kind.GAS;
+		return level.getBlockState(pos).getBlock() instanceof PipeBlock pipe && pipe.kind() == PipeBlock.Kind.GAS && PipeBlock.conducts(level, pos);
 	}
 
 	/** Every face of these cells that looks out of them (where a pipe could join). */
@@ -117,7 +121,7 @@ public final class Lines {
 				}
 			}
 		}
-		return new Line(pipes, ports, Run.of(offered));
+		return new Line(pipes, ports, Run.of(offered), Plumbing.throttle(level, pipes));
 	}
 
 	/** Each distinct run of steel pipe on these faces. */
@@ -172,7 +176,7 @@ public final class Lines {
 			Port p = sources.get(i);
 			available[i] = p.node().available(p.cell(), p.side(), product, pull);
 		}
-		double[] share = Flow.share(max, available);
+		double[] share = Flow.share(max * line.opening(), available);
 		double got = 0;
 		for (int i = 0; i < share.length; i++) {
 			if (share[i] > 0) {

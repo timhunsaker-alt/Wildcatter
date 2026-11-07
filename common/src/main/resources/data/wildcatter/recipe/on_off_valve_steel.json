@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "R",
+    "P"
+  ],
+  "key": {
+    "R": "minecraft:redstone",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:on_off_valve_steel",
+    "count": 1
+  }
+}

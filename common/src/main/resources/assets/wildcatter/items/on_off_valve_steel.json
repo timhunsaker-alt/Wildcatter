@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "wildcatter:block/on_off_valve_steel_core"
+  }
+}

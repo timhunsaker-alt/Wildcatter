@@ -211,6 +211,23 @@ public final class Circuit {
 		driveOutputs.add(node);
 	}
 
+	private final java.util.Map<Integer, Double> driveReferences = new java.util.HashMap<>();
+
+	/** The speed a drive's output is heading for, 0 to 1. */
+	public void markDriveReference(int node, double reference) {
+		driveReferences.put(node, reference);
+	}
+
+	/** After the solve: the speed the drive feeding {@code node} is heading for; 1 if none set one. */
+	public double driveReference(int node) {
+		for (var entry : driveReferences.entrySet()) {
+			if (network.reaches(node, java.util.Set.of(entry.getKey()))) {
+				return entry.getValue();
+			}
+		}
+		return 1.0;
+	}
+
 	/** After the solve: true if {@code node} is wired to a drive's output (through conductors, not ground or a transformer). */
 	public boolean driveFed(int node) {
 		return network.reaches(node, driveOutputs);

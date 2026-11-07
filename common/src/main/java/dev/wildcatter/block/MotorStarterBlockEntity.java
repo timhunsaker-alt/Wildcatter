@@ -23,7 +23,7 @@ import net.minecraft.world.level.storage.ValueOutput;
  * Its run state shows in the block state. (An older world's one-block MCC bucket shares this entity until it drops; it does
  * nothing in the meantime.)
  */
-public class MotorStarterBlockEntity extends BlockEntity implements CircuitPart, Inspectable, dev.wildcatter.control.ControlDevice {
+public class MotorStarterBlockEntity extends BlockEntity implements CircuitPart, Inspectable, dev.wildcatter.control.ControlDevice, dev.wildcatter.control.Measurable {
 	private final Starter starter = new Starter();
 	private final int[] line = new int[3];
 	private boolean loadedRun;
@@ -38,6 +38,11 @@ public class MotorStarterBlockEntity extends BlockEntity implements CircuitPart,
 
 	private Direction facing() {
 		return getBlockState().getValue(MotorStarterBlock.FACING);
+	}
+
+	@Override
+	public double measure(Quantity quantity) {
+		return starter.measure(quantity);
 	}
 
 	@Override

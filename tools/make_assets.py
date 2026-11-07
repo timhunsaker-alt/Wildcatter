@@ -2508,7 +2508,7 @@ def _box(f, to, tex):
 	return {"from": f, "to": to, "faces": {d: {"texture": "#" + tex} for d in ("north", "south", "east", "west", "up", "down")}}
 
 def _model(name, elements, textures):
-	save_json(f"{ASSETS}/models/block/{name}.json", {"parent": "minecraft:block/block", "textures": {"particle": textures["body"], **textures}, "elements": elements})
+	save_json(f"{ASSETS}/models/block/{name}.json", {"parent": "minecraft:block/block", "textures": {"particle": textures.get("body", next(iter(textures.values()))), **textures}, "elements": elements})
 
 def _item(name, model):
 	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{model}"}})
@@ -2570,7 +2570,46 @@ for name, icon in (("cpu_small", "decal_controller"), ("cpu_large", "decal_contr
 	_flat_item(name, f"{ns}:block/mat/{icon}")
 _flat_item("control_key", "minecraft:item/trial_key")
 _flat_item("memory_card", "minecraft:item/paper")
-_PLC_PARTS = ("control_cable", "junction_box", "control_supply", "plc_cabinet", "pushbutton", "selector_switch", "estop", "pilot_light", "stack_light", "horn")
+for name, icon in (("ai8_module", "decal_relays"), ("ao4_module", "decal_relays"), ("rtd4_module", "decal_relays"), ("hsc2_module", "decal_controller")):
+	_flat_item(name, f"{ns}:block/mat/{icon}")
+# 13e: valves are a body on the pipe's core and arms; an actuator on top says which kind
+_STEEL, _BLUE = f"{ns}:block/mat/mat_galvanized", "minecraft:block/blue_concrete"
+def _valve(name, pipe, actuator, atex):
+	_model(f"{name}_core", [_box([5, 5, 5], [11, 11, 11], "body")] + actuator, {"body": _STEEL, "a": atex})
+	save_json(f"{ASSETS}/blockstates/{name}.json", {"multipart": [{"apply": {"model": f"{ns}:block/{name}_core"}}] + [
+		{"when": {side: "true"}, "apply": {"model": f"{ns}:block/{pipe}_arm", **rot}} for side, rot in _arm.items()]})
+	_item(name, f"{name}_core")
+	big_part_loot_simple(name)
+_DIAPHRAGM = [_box([7, 11, 7], [9, 12, 9], "body"), _box([4, 12, 4], [12, 15, 12], "a")]   # a spring-and-diaphragm top
+_SOLENOID = [_box([6, 11, 6], [10, 15, 10], "a")]                                           # a small air cylinder
+_ACTUATOR = [_box([7, 11, 7], [9, 12, 9], "body"), _box([4, 12, 5], [12, 16, 11], "a")]     # a motor gearbox
+for suffix, pipe in (("", "pipe"), ("_steel", "gas_line")):
+	_valve(f"control_valve{suffix}", pipe, _DIAPHRAGM, _GREY)
+	_valve(f"on_off_valve{suffix}", pipe, _SOLENOID, "minecraft:block/yellow_concrete")
+	_valve(f"motor_operated_valve{suffix}", pipe, _ACTUATOR, _BLUE)
+_TUBE = "minecraft:block/copper_block"
+_model("air_tubing_core", [_box([7, 7, 7], [9, 9, 9], "body")], {"body": _TUBE})
+_model("air_tubing_arm", [_box([7.5, 7.5, 0], [8.5, 8.5, 7], "body")], {"body": _TUBE})
+save_json(f"{ASSETS}/blockstates/air_tubing.json", {"multipart": [{"apply": {"model": f"{ns}:block/air_tubing_core"}}] +
+	[{"when": {side: "true"}, "apply": {"model": f"{ns}:block/air_tubing_arm", **rot}} for side, rot in _arm.items()]})
+save_json(f"{ASSETS}/models/item/air_tubing.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/copper_ingot"}})
+save_json(f"{ASSETS}/items/air_tubing.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/air_tubing"}})
+big_part_loot_simple("air_tubing")
+def _plain(name, elements, textures):
+	_model(name, elements, textures)
+	save_json(f"{ASSETS}/blockstates/{name}.json", {"variants": {"": {"model": f"{ns}:block/{name}"}}})
+	_item(name, name)
+	big_part_loot_simple(name)
+# a receiver lying on a skid, the compressor on top; a twin-tower dryer; a caged tote tank
+_plain("air_compressor", [_box([0, 0, 1], [16, 2, 15], "s"), _box([1, 2, 3], [15, 9, 13], "r"), _box([4, 9, 4], [12, 15, 12], "c")], {"s": _STEEL, "r": _BLUE, "c": _GREY})
+_plain("air_dryer", [_box([1, 0, 1], [15, 2, 15], "s"), _box([2, 2, 4], [7, 15, 12], "t"), _box([9, 2, 4], [14, 15, 12], "t"), _box([7, 11, 7], [9, 13, 9], "s")], {"s": _STEEL, "t": _GREY})
+_plain("day_tank", [_box([0, 0, 0], [16, 2, 16], "s"), _box([1, 2, 1], [15, 15, 15], "t"), _box([6, 15, 6], [10, 16, 10], "s")], {"s": _STEEL, "t": "minecraft:block/white_concrete"})
+# the transmitter: a clamp behind, a round head with its display
+_model("transmitter", [_box([7, 7, 12], [9, 9, 16], "c"), _box([5, 4, 8], [11, 12, 12], "h"), _box([6, 5, 7], [10, 11, 8], "d")], {"c": _STEEL, "h": _GREY, "d": "minecraft:block/light_blue_concrete"})
+save_json(f"{ASSETS}/blockstates/transmitter.json", {"variants": {f"facing={facing}": {"model": f"{ns}:block/transmitter", "y": rot} for facing, rot in _YROT.items()}})
+_item("transmitter", "transmitter")
+big_part_loot_simple("transmitter")
+_PLC_PARTS = ("control_valve", "on_off_valve", "motor_operated_valve", "control_valve_steel", "on_off_valve_steel", "motor_operated_valve_steel", "air_tubing", "air_compressor", "air_dryer", "day_tank", "transmitter", "control_cable", "junction_box", "control_supply", "plc_cabinet", "pushbutton", "selector_switch", "estop", "pilot_light", "stack_light", "horn")
 _PLC_STONE = ("junction_box", "control_supply", "plc_cabinet")
 for tag, names in (("mineable/pickaxe", _PLC_PARTS), ("needs_stone_tool", _PLC_STONE)):
 	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
@@ -2586,6 +2625,21 @@ shaped("cpu_large", ["DCD", "CPC", "DCD"], {"D": "minecraft:diamond", "C": "mine
 shaped("di16_module", ["QRQ", "RCR", "QRQ"], {"Q": "minecraft:quartz", "R": "minecraft:redstone", "C": "minecraft:comparator"}, "di16_module")
 shaped("do16_module", ["QRQ", "RCR", "QTQ"], {"Q": "minecraft:quartz", "R": "minecraft:redstone", "C": "minecraft:comparator", "T": "minecraft:repeater"}, "do16_module")
 shaped("control_key", [" I", "I "], {"I": "minecraft:iron_nugget"}, "control_key")
+shaped("ai8_module", ["QRQ", "RCR", "QGQ"], {"Q": "minecraft:quartz", "R": "minecraft:redstone", "C": "minecraft:comparator", "G": "minecraft:gold_nugget"}, "ai8_module")
+shaped("ao4_module", ["QGQ", "RCR", "QRQ"], {"Q": "minecraft:quartz", "R": "minecraft:redstone", "C": "minecraft:comparator", "G": "minecraft:gold_nugget"}, "ao4_module")
+shaped("rtd4_module", ["QRQ", "GCG", "QRQ"], {"Q": "minecraft:quartz", "R": "minecraft:redstone", "C": "minecraft:comparator", "G": "minecraft:copper_ingot"}, "rtd4_module")
+shaped("hsc2_module", ["QTQ", "RCR", "QTQ"], {"Q": "minecraft:quartz", "R": "minecraft:redstone", "C": "minecraft:comparator", "T": "minecraft:repeater"}, "hsc2_module")
+shaped("control_valve", ["S", "P"], {"S": S_, "P": f"{ns}:pipe"}, "control_valve")
+shaped("on_off_valve", ["R", "P"], {"R": "minecraft:redstone", "P": f"{ns}:pipe"}, "on_off_valve")
+shaped("motor_operated_valve", ["C", "P"], {"C": "minecraft:comparator", "P": f"{ns}:pipe"}, "motor_operated_valve")
+shaped("control_valve_steel", ["S", "P"], {"S": S_, "P": f"{ns}:gas_line"}, "control_valve_steel")
+shaped("on_off_valve_steel", ["R", "P"], {"R": "minecraft:redstone", "P": f"{ns}:gas_line"}, "on_off_valve_steel")
+shaped("motor_operated_valve_steel", ["C", "P"], {"C": "minecraft:comparator", "P": f"{ns}:gas_line"}, "motor_operated_valve_steel")
+shaped("air_tubing", ["CCC"], {"C": "minecraft:copper_ingot"}, "air_tubing", 8)
+shaped("air_compressor", ["SPS", "SIS"], {"S": S_, "P": "minecraft:piston", "I": "minecraft:iron_block"}, "air_compressor")
+shaped("air_dryer", ["SSS", "SDS", "SSS"], {"S": S_, "D": "minecraft:sponge"}, "air_dryer")
+shaped("day_tank", ["III", "I I", "III"], {"I": "minecraft:iron_ingot"}, "day_tank")
+shaped("transmitter", ["G", "C", "S"], {"G": "minecraft:glass_pane", "C": "minecraft:comparator", "S": S_}, "transmitter")
 shaped("memory_card", ["Q", "P", "R"], {"Q": "minecraft:quartz", "P": "minecraft:paper", "R": "minecraft:redstone"}, "memory_card")
 shaped("pushbutton", ["S", "B"], {"S": S_, "B": "minecraft:stone_button"}, "pushbutton")
 shaped("selector_switch", ["S", "L"], {"S": S_, "L": "minecraft:lever"}, "selector_switch")
@@ -2598,7 +2652,11 @@ lang.update({"block.wildcatter.control_cable": "Control Cable (multi-core)", "bl
 	"block.wildcatter.plc_cabinet": "PLC Cabinet", "block.wildcatter.pushbutton": "Pushbutton", "block.wildcatter.selector_switch": "Selector Switch", "block.wildcatter.estop": "E-Stop",
 	"block.wildcatter.pilot_light": "Pilot Light", "block.wildcatter.stack_light": "Stack Light", "block.wildcatter.horn": "Horn",
 	"item.wildcatter.cpu_small": "CPU Module (small)", "item.wildcatter.cpu_large": "CPU Module (large)", "item.wildcatter.di16_module": "Digital Input Module (16, 24 V DC)",
-	"item.wildcatter.do16_module": "Relay Output Module (16, 2 A)", "item.wildcatter.control_key": "Selector Key (HAND / OFF / AUTO)", "item.wildcatter.memory_card": "PLC Memory Card"})
+	"item.wildcatter.do16_module": "Relay Output Module (16, 2 A)", "item.wildcatter.control_key": "Selector Key (HAND / OFF / AUTO)", "item.wildcatter.memory_card": "PLC Memory Card",
+	"item.wildcatter.ai8_module": "Analog Input Module (8, 4-20 mA)", "item.wildcatter.ao4_module": "Analog Output Module (4, 4-20 mA)", "item.wildcatter.rtd4_module": "RTD Input Module (4)", "item.wildcatter.hsc2_module": "High-Speed Counter Module (2)",
+	"block.wildcatter.control_valve": "Control Valve (air, 2 in water)", "block.wildcatter.on_off_valve": "On-Off Valve (air, 2 in water)", "block.wildcatter.motor_operated_valve": "Motor-Operated Valve (480 V, 2 in water)",
+	"block.wildcatter.control_valve_steel": "Control Valve (air, 4 in steel)", "block.wildcatter.on_off_valve_steel": "On-Off Valve (air, 4 in steel)", "block.wildcatter.motor_operated_valve_steel": "Motor-Operated Valve (480 V, 4 in steel)",
+	"block.wildcatter.air_tubing": "Instrument Air Tubing", "block.wildcatter.air_compressor": "Instrument Air Compressor", "block.wildcatter.air_dryer": "Air Dryer", "block.wildcatter.day_tank": "Water Day Tank (1 m3)", "block.wildcatter.transmitter": "Transmitter (4-20 mA)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------

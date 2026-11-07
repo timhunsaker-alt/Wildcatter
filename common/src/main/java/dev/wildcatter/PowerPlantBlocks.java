@@ -27,6 +27,17 @@ public interface PowerPlantBlocks {
 	/** Water pipe: carries the pump's water to the boilers, and the turbines' condensate back. */
 	Block PIPE = block("pipe", props -> new PipeBlock(props.mapColor(MapColor.METAL)
 			.strength(1.5F, 4.0F).sound(SoundType.METAL).noOcclusion(), PipeBlock.Kind.WATER));
+	Block CONTROL_VALVE = block("control_valve", props -> new dev.wildcatter.control.ValveBlock(props.mapColor(MapColor.METAL).strength(1.5F, 4.0F).sound(SoundType.METAL).noOcclusion(), PipeBlock.Kind.WATER, dev.wildcatter.control.ValveBlock.Type.CONTROL));
+	Block ON_OFF_VALVE = block("on_off_valve", props -> new dev.wildcatter.control.ValveBlock(props.mapColor(MapColor.METAL).strength(1.5F, 4.0F).sound(SoundType.METAL).noOcclusion(), PipeBlock.Kind.WATER, dev.wildcatter.control.ValveBlock.Type.ON_OFF));
+	Block MOTOR_OPERATED_VALVE = block("motor_operated_valve", props -> new dev.wildcatter.control.ValveBlock(props.mapColor(MapColor.METAL).strength(1.5F, 4.0F).sound(SoundType.METAL).noOcclusion(), PipeBlock.Kind.WATER, dev.wildcatter.control.ValveBlock.Type.MOTOR_OPERATED));
+	Block CONTROL_VALVE_STEEL = block("control_valve_steel", props -> new dev.wildcatter.control.ValveBlock(props.mapColor(MapColor.COLOR_ORANGE).strength(1.5F, 4.0F).sound(SoundType.METAL).noOcclusion(), PipeBlock.Kind.GAS, dev.wildcatter.control.ValveBlock.Type.CONTROL));
+	Block ON_OFF_VALVE_STEEL = block("on_off_valve_steel", props -> new dev.wildcatter.control.ValveBlock(props.mapColor(MapColor.COLOR_ORANGE).strength(1.5F, 4.0F).sound(SoundType.METAL).noOcclusion(), PipeBlock.Kind.GAS, dev.wildcatter.control.ValveBlock.Type.ON_OFF));
+	Block MOTOR_OPERATED_VALVE_STEEL = block("motor_operated_valve_steel", props -> new dev.wildcatter.control.ValveBlock(props.mapColor(MapColor.COLOR_ORANGE).strength(1.5F, 4.0F).sound(SoundType.METAL).noOcclusion(), PipeBlock.Kind.GAS, dev.wildcatter.control.ValveBlock.Type.MOTOR_OPERATED));
+	Block AIR_TUBING = block("air_tubing", props -> new PipeBlock(props.mapColor(MapColor.METAL).strength(0.5F).sound(SoundType.METAL).noOcclusion(), PipeBlock.Kind.AIR));
+	Block AIR_COMPRESSOR = block("air_compressor", props -> new dev.wildcatter.control.AirCompressorBlock(props.mapColor(MapColor.COLOR_BLUE).strength(2.0F, 5.0F).sound(SoundType.METAL)));
+	Block AIR_DRYER = block("air_dryer", props -> new dev.wildcatter.control.AirDryerBlock(props.mapColor(MapColor.COLOR_GRAY).strength(2.0F, 5.0F).sound(SoundType.METAL)));
+	Block DAY_TANK = block("day_tank", props -> new dev.wildcatter.block.DayTankBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 5.0F).sound(SoundType.METAL)));
+	Block TRANSMITTER = block("transmitter", props -> new dev.wildcatter.control.TransmitterBlock(props.mapColor(MapColor.COLOR_GRAY).strength(0.5F).sound(SoundType.METAL).noOcclusion()));
 	/** A 110 V electric pump that lifts water from the water touching it. */
 	Block PUMP = block("pump", props -> new PumpBlock(props.mapColor(MapColor.COLOR_BLUE)
 			.strength(2.0F, 5.0F).sound(SoundType.METAL)));

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "S",
+    "P"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:pipe"
+  },
+  "result": {
+    "id": "wildcatter:control_valve",
+    "count": 1
+  }
+}

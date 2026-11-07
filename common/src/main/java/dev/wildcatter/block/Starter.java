@@ -94,6 +94,15 @@ public final class Starter {
 	public static final java.util.List<dev.wildcatter.control.ControlDevice.Point> POINTS = java.util.List.of(
 			new dev.wildcatter.control.ControlDevice.Point("RUN", true), new dev.wildcatter.control.ControlDevice.Point("RUNNING", false),
 			new dev.wildcatter.control.ControlDevice.Point("TRIPPED", false), new dev.wildcatter.control.ControlDevice.Point("AUTO", false));
+	/** A drive's: the four above, and its speed reference and two readings. */
+	public static final java.util.List<dev.wildcatter.control.ControlDevice.Point> DRIVE_POINTS = java.util.List.of(POINTS.get(0), POINTS.get(1), POINTS.get(2), POINTS.get(3),
+			new dev.wildcatter.control.ControlDevice.Point("SPEED REF 4-20 mA", true, dev.wildcatter.control.ControlDevice.Signal.MA),
+			new dev.wildcatter.control.ControlDevice.Point("SPEED 4-20 mA", false, dev.wildcatter.control.ControlDevice.Signal.MA),
+			new dev.wildcatter.control.ControlDevice.Point("AMPS 4-20 mA, 150 %", false, dev.wildcatter.control.ControlDevice.Signal.MA));
+	private double referenceMa;
+	private long referenceTick = -COMMAND_STALE_TICKS - 1;
+	private long gameTime;
+	private double speedTarget = 1.0;
 
 	private dev.wildcatter.control.Hoa hoa = dev.wildcatter.control.Hoa.HAND;
 	private boolean commanded;
@@ -121,6 +130,50 @@ public final class Starter {
 			return false;
 		}
 		return setRun(commanded && now - commandTick <= COMMAND_STALE_TICKS ? MotorStarterBlock.Run.RUNNING : MotorStarterBlock.Run.STOPPED);
+	}
+
+	public java.util.List<dev.wildcatter.control.ControlDevice.Point> points() {
+		return kind == Kind.DRIVE ? DRIVE_POINTS : POINTS;
+	}
+
+	/** The speed reference, from the PLC's analog module, each scan; it counts only in AUTO. */
+	public void commandSpeed(double milliamps, long now) {
+		referenceMa = milliamps;
+		referenceTick = now;
+		gameTime = now;
+	}
+
+	/** Where the drive is heading, 0 to 1: its reference in AUTO if one is coming, otherwise full speed as ever. */
+	private double target() {
+		boolean fresh = hoa == dev.wildcatter.control.Hoa.AUTO && gameTime - referenceTick <= COMMAND_STALE_TICKS && referenceMa >= 3.6;
+		return fresh ? Math.max(Tuning.DRIVE_MIN_SPEED, Math.min(1.0, (referenceMa - 4) / 16)) : 1.0;
+	}
+
+	public void noteTime(long now) {
+		gameTime = now;
+	}
+
+	/** SPEED and AMPS, in milliamps. */
+	public double readMa(int point) {
+		return switch (point) {
+			case 5 -> 4 + 16 * ramp;
+			case 6 -> 4 + 16 * Math.min(1.25, outAmps / (overloadAmps() * 1.5));
+			default -> 0;
+		};
+	}
+
+	/** What a transmitter clamped on it reads. */
+	public double measure(dev.wildcatter.control.Measurable.Quantity quantity) {
+		double running = run == MotorStarterBlock.Run.RUNNING ? 1 : 0;
+		return switch (quantity) {
+			case SPEED -> (kind == Kind.DRIVE ? ramp : running) * 100;
+			case AMPS -> kind == Kind.DRIVE ? outAmps : amps;
+			case VOLTS -> lineVolts;
+			case WATTS -> kind == Kind.DRIVE ? lineWatts : Double.NaN;
+			case HERTZ -> (kind == Kind.DRIVE ? ramp : running) * dev.wildcatter.energy.ElectricalStandard.active().hertz();
+			case POWER_FACTOR -> kind == Kind.DRIVE ? linePowerFactor() : Double.NaN;
+			default -> Double.NaN;
+		};
 	}
 
 	/** RUNNING, TRIPPED and AUTO, as {@link #POINTS} numbers them. */
@@ -261,6 +314,7 @@ public final class Starter {
 					circuit.source(internal, outNeutral, voltage.nominal() * ramp, ThreePhaseSource.DEGREES[k]);
 					outBranch[k] = circuit.resistor(internal, load[k], Tuning.DRIVE_OUTPUT_OHMS);
 					circuit.markDriveOutput(load[k]);
+					circuit.markDriveReference(load[k], speedTarget);
 				}
 			}
 		}
@@ -374,7 +428,8 @@ public final class Starter {
 						}
 					} else {
 						overSeconds = Math.max(0, overSeconds - dt);
-						ramp = Math.min(1.0, ramp + dt / Tuning.DRIVE_RAMP_SECONDS);
+						speedTarget = target();
+						ramp = ramp < speedTarget ? Math.min(speedTarget, ramp + dt / Tuning.DRIVE_RAMP_SECONDS) : Math.max(speedTarget, ramp - dt / Tuning.DRIVE_RAMP_SECONDS);
 					}
 				} else {
 					ramp = 0;
@@ -420,7 +475,7 @@ public final class Starter {
 			case SOFT -> bypassed ? String.format("BYPASSED, running %.1f A", amps)
 					: String.format("RAMPING, limit %.1f x %.0f A = %.0f A, %.0f A", limitMultiple(), overloadAmps(), limitMultiple() * overloadAmps(), amps);
 			case DRIVE -> undervoltage ? String.format("UNDERVOLTAGE: stopped, %.0f V", lineVolts)
-					: String.format("%s %.1f Hz (%.0f %%), motor %.1f A, line %.1f A at %.2f PF, %.0f kW", ramp >= 1.0 ? "RUNNING" : "RAMPING",
+					: String.format("%s %.1f Hz (%.0f %%), motor %.1f A, line %.1f A at %.2f PF, %.0f kW", ramp >= speedTarget * 0.995 ? "RUNNING" : "RAMPING",
 							ramp * dev.wildcatter.energy.ElectricalStandard.active().hertz(), ramp * 100, outAmps, amps,
 							linePowerFactor(), lineWatts / 1000);
 		};

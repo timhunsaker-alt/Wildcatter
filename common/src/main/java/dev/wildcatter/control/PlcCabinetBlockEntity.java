@@ -72,6 +72,8 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 	/** A string in a packet holds 65,535 bytes, so a project opening in a screen goes in pieces of this many characters. */
 	private static final int OPEN_PIECE = 20_000;
 	private ItemStack card = ItemStack.EMPTY;
+	/** What an AI8 channel reads with no loop on it. */
+	public static final int OPEN_LOOP = 32767;
 
 	public PlcCabinetBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.PLC_CABINET_ENTITY, pos, state);
@@ -243,17 +245,60 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 			return null;
 		}
 		IoAddress io = IoAddress.parse(address);
-		boolean output = device.points().get(point).output();
-		if (io == null || io.size() != 'X' || io.area() != (output ? 'Q' : 'I')) {
-			return address + " is not " + (output ? "an output bit such as %QX16.0" : "an input bit such as %IX0.3") + ", which this signal needs";
+		ControlDevice.Point wanted = device.points().get(point);
+		boolean output = wanted.output();
+		char size = switch (wanted.signal()) {
+			case BOOL -> 'X';
+			case MA -> 'W';
+			case PULSE -> 'D';
+		};
+		if (io == null || io.size() != size || io.area() != (output ? 'Q' : 'I')) {
+			String example = switch (wanted.signal()) {
+				case BOOL -> output ? "an output bit such as %QX16.0" : "an input bit such as %IX0.3";
+				case MA -> output ? "an output word such as %QW48" : "an input word such as %IW32";
+				case PULSE -> "an input double word such as %ID64";
+			};
+			return address + " is not " + example + ", which this signal needs";
 		}
 		int slot = io.byteAddress() / BYTES_PER_SLOT;
-		int channel = (io.byteAddress() % BYTES_PER_SLOT) * 8 + io.bit();
-		if (slot >= MODULE_SLOTS || modules[slot] != (output ? PlcModuleItem.Type.DO16 : PlcModuleItem.Type.DI16)) {
-			return "Slot " + slot + " has no " + (output ? "DO16" : "DI16") + " module";
-		}
-		if (channel >= 16) {
-			return "A 16-channel module has channels 0 to 15; that is channel " + channel;
+		int offset = io.byteAddress() % BYTES_PER_SLOT;
+		PlcModuleItem.Type module = slot >= MODULE_SLOTS ? null : modules[slot];
+		int channel;
+		switch (wanted.signal()) {
+			case BOOL -> {
+				channel = offset * 8 + io.bit();
+				if (module != (output ? PlcModuleItem.Type.DO16 : PlcModuleItem.Type.DI16)) {
+					return "Slot " + slot + " has no " + (output ? "DO16" : "DI16") + " module";
+				}
+				if (channel >= 16) {
+					return "A 16-channel module has channels 0 to 15; that is channel " + channel;
+				}
+			}
+			case MA -> {
+				if (offset % 2 != 0) {
+					return "An analog channel is a whole word, on an even address";
+				}
+				channel = offset / 2;
+				boolean rtd = module == PlcModuleItem.Type.RTD4 && !Double.isNaN(device.readTenths(point));
+				if (output ? module != PlcModuleItem.Type.AO4 : module != PlcModuleItem.Type.AI8 && !rtd) {
+					return "Slot " + slot + " has no " + (output ? "AO4" : "AI8") + " module" + (module == PlcModuleItem.Type.RTD4 ? ", and this signal is not a temperature for an RTD4" : "");
+				}
+				if (channel >= (module == PlcModuleItem.Type.AI8 ? 8 : 4)) {
+					return "That module has channels 0 to " + ((module == PlcModuleItem.Type.AI8 ? 8 : 4) - 1) + "; that is channel " + channel;
+				}
+			}
+			default -> {
+				if (offset % 4 != 0) {
+					return "A counter is a double word, on an address divisible by 4";
+				}
+				channel = offset / 4;
+				if (module != PlcModuleItem.Type.HSC2) {
+					return "Slot " + slot + " has no HSC2 module";
+				}
+				if (channel >= 2) {
+					return "An HSC2 has counters 0 and 1; that is counter " + channel;
+				}
+			}
 		}
 		for (Landing other : landings) {
 			boolean otherOutput = ControlNet.deviceAt(level, other.pos()) instanceof ControlDevice d && other.point() < d.points().size() && d.points().get(other.point()).output();
@@ -270,8 +315,29 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		setChanged();
 	}
 
-	private static String address(boolean output, int slot, int channel) {
-		return (output ? "%QX" : "%IX") + (slot * BYTES_PER_SLOT + channel / 8) + "." + (channel % 8);
+	private String address(boolean output, int slot, int channel) {
+		int base = slot * BYTES_PER_SLOT;
+		PlcModuleItem.Type module = modules[slot];
+		if (module == PlcModuleItem.Type.HSC2) {
+			return "%ID" + (base + channel * 4);
+		}
+		if (module == PlcModuleItem.Type.AI8 || module == PlcModuleItem.Type.AO4 || module == PlcModuleItem.Type.RTD4) {
+			return (output ? "%QW" : "%IW") + (base + channel * 2);
+		}
+		return (output ? "%QX" : "%IX") + (base + channel / 8) + "." + (channel % 8);
+	}
+
+	/** A channel's raw value for {@code milliamps}: 4 mA is 0, 20 mA is 32000. Out of NE 43's bounds, an open or failed loop, is 32767. */
+	public static int rawOf(double milliamps) {
+		if (milliamps < 3.6 || milliamps > 21) {
+			return OPEN_LOOP;
+		}
+		return (int) Math.round((milliamps - 4) / 16 * 32000);
+	}
+
+	/** The loop current a raw output value gives. */
+	public static double milliampsOf(int raw) {
+		return Math.max(3.8, Math.min(20.5, 4 + (short) raw / 32000.0 * 16));
 	}
 
 	// ---- the scan --------------------------------------------------------------------------------------------------------------------
@@ -319,18 +385,46 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 
 	private void scan(Level level, long now) {
 		Set<BlockPos> reachable = new HashSet<>(net.devices());
+		for (int slot = 0; slot < modules.length; slot++) {
+			if (modules[slot] == PlcModuleItem.Type.AI8 || modules[slot] == PlcModuleItem.Type.RTD4) {
+				for (int channel = 0; channel < (modules[slot] == PlcModuleItem.Type.AI8 ? 8 : 4); channel++) {
+					cpu.setInputWord(slot * BYTES_PER_SLOT + channel * 2, OPEN_LOOP);   // an empty channel, or a cut one, reads as an open loop
+				}
+			}
+		}
 		for (Landing l : landings) {
 			ControlDevice device = reachable.contains(l.pos()) ? ControlNet.deviceAt(level, l.pos()) : null;
-			if (modules[l.slot()] == PlcModuleItem.Type.DI16) {
-				boolean on = device != null && l.point() < device.points().size() && !device.points().get(l.point()).output() && device.readPoint(l.point());
-				cpu.setInputBit(l.slot() * BYTES_PER_SLOT + l.channel() / 8, l.channel() % 8, on);
+			if (device != null && l.point() >= device.points().size()) {
+				device = null;
+			}
+			int base = l.slot() * BYTES_PER_SLOT;
+			PlcModuleItem.Type module = modules[l.slot()];
+			if (module == PlcModuleItem.Type.DI16) {
+				boolean on = device != null && !device.points().get(l.point()).output() && device.readPoint(l.point());
+				cpu.setInputBit(base + l.channel() / 8, l.channel() % 8, on);
+			} else if (module == PlcModuleItem.Type.AI8 && device != null) {
+				cpu.setInputWord(base + l.channel() * 2, rawOf(device.readMa(l.point())));
+			} else if (module == PlcModuleItem.Type.RTD4 && device != null && !Double.isNaN(device.readTenths(l.point()))) {
+				cpu.setInputWord(base + l.channel() * 2, (int) Math.round(device.readTenths(l.point())));
+			} else if (module == PlcModuleItem.Type.HSC2) {
+				long count = device == null ? 0 : device.readPulses(l.point());
+				cpu.setInputWord(base + l.channel() * 4, (int) (count & 0xFFFF));
+				cpu.setInputWord(base + l.channel() * 4 + 2, (int) (count >>> 16 & 0xFFFF));
 			}
 		}
 		cpu.scan();
+		// a stopped or faulted CPU writes no analog signal, so the loop is dead rather than a false 4 mA
+		boolean writesAnalog = cpu.mode() == Cpu.Mode.RUN && !cpu.faulted();
 		for (Landing l : landings) {
 			ControlDevice device = reachable.contains(l.pos()) ? ControlNet.deviceAt(level, l.pos()) : null;
-			if (device != null && modules[l.slot()] == PlcModuleItem.Type.DO16 && l.point() < device.points().size() && device.points().get(l.point()).output()) {
-				device.commandPoint(l.point(), cpu.outputBit(l.slot() * BYTES_PER_SLOT + l.channel() / 8, l.channel() % 8), now);
+			if (device == null || l.point() >= device.points().size() || !device.points().get(l.point()).output()) {
+				continue;
+			}
+			int base = l.slot() * BYTES_PER_SLOT;
+			if (modules[l.slot()] == PlcModuleItem.Type.DO16) {
+				device.commandPoint(l.point(), cpu.outputBit(base + l.channel() / 8, l.channel() % 8), now);
+			} else if (modules[l.slot()] == PlcModuleItem.Type.AO4 && writesAnalog) {
+				device.commandMa(l.point(), milliampsOf(cpu.outputWord(base + l.channel() * 2)), now);
 			}
 		}
 		setChanged();
@@ -406,6 +500,16 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 				String refused = land(at, tag.getIntOr("point", -1), tag.getStringOr("address", ""));
 				if (refused != null) {
 					messages.add(refused);
+				}
+			}
+			case "range" -> {
+				ControlDevice device = ControlNet.deviceAt(level, new BlockPos(tag.getIntOr("dx", 0), tag.getIntOr("dy", 0), tag.getIntOr("dz", 0)));
+				String[] ends = tag.getStringOr("range", "").trim().split("\\s+");
+				try {
+					String refused = device == null ? "That device is gone" : ends.length != 2 ? "A range is two numbers, such as 0 100" : device.setRange(Double.parseDouble(ends[0]), Double.parseDouble(ends[1]));
+					messages.add(refused != null ? refused : "Range set: " + ends[0] + " to " + ends[1]);
+				} catch (NumberFormatException e) {
+					messages.add("A range is two numbers, such as 0 100");
 				}
 			}
 			case "tag" -> setTag(new BlockPos(tag.getIntOr("dx", 0), tag.getIntOr("dy", 0), tag.getIntOr("dz", 0)), tag.getStringOr("tag", ""));
@@ -577,7 +681,14 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		StringBuilder out = new StringBuilder();
 		for (int i = 0; i < modules.length; i++) {
 			if (modules[i] != null) {
-				out.append(out.length() > 0 ? ", " : "").append(i).append(": ").append(modules[i]).append(" (%").append(modules[i] == PlcModuleItem.Type.DI16 ? "I" : "Q").append("X").append(i * BYTES_PER_SLOT).append(".0)");
+				String first = switch (modules[i]) {
+					case DI16 -> "%IX" + i * BYTES_PER_SLOT + ".0";
+					case DO16 -> "%QX" + i * BYTES_PER_SLOT + ".0";
+					case AO4 -> "%QW" + i * BYTES_PER_SLOT;
+					case HSC2 -> "%ID" + i * BYTES_PER_SLOT;
+					default -> "%IW" + i * BYTES_PER_SLOT;
+				};
+				out.append(out.length() > 0 ? ", " : "").append(i).append(": ").append(modules[i]).append(" (").append(first).append(")");
 			}
 		}
 		return out.length() == 0 ? "no modules" : out.toString();

@@ -23,6 +23,7 @@ import net.minecraft.core.Direction;
 public final class Motor {
 	public enum State { STOPPED, STARTING, RUNNING }
 
+	private double driveSpeed = 1.0;
 	private static final Conductor[] PHASES = {Conductor.A, Conductor.B, Conductor.C};
 
 	private final boolean threePhase;
@@ -85,6 +86,10 @@ public final class Motor {
 			double amps = fullLoadAmps() * (locked ? Tuning.MOTOR_LOCKED_ROTOR_MULTIPLE : 1.0);
 			double pf = locked ? Tuning.MOTOR_LOCKED_ROTOR_POWER_FACTOR : Tuning.MOTOR_POWER_FACTOR;
 			double z = voltage.nominal() / amps;
+			if (state == State.RUNNING && driveFed && !stalled) {
+				// below full speed a centrifugal load's power falls with the cube: with the voltage following speed, the current goes with its square
+				z /= Math.max(0.05, Math.min(1.0, driveSpeed));
+			}
 			if (state == State.STARTING && driveFed && !stalled) {
 				// accelerating on a drive: its rated current at whatever voltage the drive has reached
 				double lineToNeutral = threePhase ? volts / Math.sqrt(3) : volts;
@@ -148,6 +153,8 @@ public final class Motor {
 		double dt = ticks / 20.0;
 		driveFed = circuit.driveFed(hot[0]);
 		double nominal = threePhase ? voltage.lineToLine() : voltage.nominal();
+		driveSpeed = driveFed ? volts / nominal : 1.0;
+		double atSpeed = driveFed ? circuit.driveReference(hot[0]) * Tuning.DRIVE_AT_SPEED : 1.0;
 
 		if (!wanted) {
 			state = State.STOPPED;
@@ -165,7 +172,7 @@ public final class Motor {
 					startSeconds += dt * Math.min(1.0, Math.pow(volts / nominal, 2));
 					if (volts < 1.0) {
 						state = State.STOPPED;
-					} else if (driveFed ? volts >= nominal * Tuning.DRIVE_AT_SPEED : startSeconds >= Tuning.MOTOR_START_SECONDS) {
+					} else if (driveFed ? volts >= nominal * atSpeed : startSeconds >= Tuning.MOTOR_START_SECONDS) {
 						state = State.RUNNING;
 					}
 				}
@@ -183,13 +190,27 @@ public final class Motor {
 		}
 	}
 
-	/** How much of its rated work it does: 0 unless running the right way round on a full supply. */
+	/** How much of its rated work it does: 0 unless running the right way round on a full supply. On a drive, its speed. */
 	public double output() {
 		if (state != State.RUNNING || stalled || reversed) {
 			return 0;
 		}
 		double nominal = threePhase ? voltage.lineToLine() : voltage.nominal();
+		if (driveFed) {
+			return Math.min(1.0, volts / nominal);
+		}
 		return volts < nominal * Tuning.BRIGHT_ABOVE ? 0 : Math.min(1.0, Math.pow(volts / nominal, 2));
+	}
+
+	/** True while it runs from a drive's output. */
+	public boolean driveFed() {
+		return driveFed;
+	}
+
+	/** What a centrifugal pump on this motor delivers, 0 to 1: on a drive, nothing until its speed makes the static head. */
+	public double pumpOutput() {
+		double out = output();
+		return driveFed ? Math.max(0, (out - Tuning.PUMP_STATIC_HEAD_SPEED) / (1 - Tuning.PUMP_STATIC_HEAD_SPEED)) : out;
 	}
 
 	public boolean leadsSwapped() {

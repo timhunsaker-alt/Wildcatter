@@ -18,7 +18,12 @@ import net.minecraft.world.level.storage.ValueOutput;
  * The starter plant's boiler: it holds water and makes steam while a lit campfire or a burning firebox is under it. A turbine
  * next to it takes the steam. Big steam comes from the 1 MW steam plant's drum (docs/multiblocks/steam-plant.md).
  */
-public class BoilerBlockEntity extends BlockEntity implements Inspectable, dev.wildcatter.multiblock.BigPartEntity {
+public class BoilerBlockEntity extends BlockEntity implements Inspectable, dev.wildcatter.multiblock.BigPartEntity, dev.wildcatter.control.Measurable {
+	@Override
+	public double measure(Quantity quantity) {
+		return quantity == Quantity.LEVEL ? waterLevel() * 100 : Double.NaN;
+	}
+
 	private int water;
 	private boolean grown;
 	private int steam;

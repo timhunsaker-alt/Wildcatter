@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SSS",
+    "SDS",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "D": "minecraft:sponge"
+  },
+  "result": {
+    "id": "wildcatter:air_dryer",
+    "count": 1
+  }
+}

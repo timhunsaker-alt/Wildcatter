@@ -24,7 +24,18 @@ public final class Plumbing {
 	}
 
 	private static boolean isPipe(Level level, BlockPos pos, PipeBlock.Kind kind) {
-		return level.getBlockState(pos).getBlock() instanceof PipeBlock pipe && pipe.kind() == kind;
+		return level.getBlockState(pos).getBlock() instanceof PipeBlock pipe && pipe.kind() == kind && PipeBlock.conducts(level, pos);
+	}
+
+	/** The share of its flow a run passes: the most closed valve on it. Parallel branches are not told apart. */
+	public static double throttle(Level level, Collection<BlockPos> pipes) {
+		double least = 1;
+		for (BlockPos pipe : pipes) {
+			if (level.getBlockEntity(pipe) instanceof dev.wildcatter.control.ValveBlockEntity valve) {
+				least = Math.min(least, valve.position());
+			}
+		}
+		return least;
 	}
 
 	/** Every pipe of this kind joined to a pipe that touches one of {@code cells}. */

@@ -32,7 +32,7 @@ import org.jspecify.annotations.Nullable;
  * is complete it has no terminals.</li>
  * </ul>
  */
-public class StarterCabinetBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity, dev.wildcatter.control.ControlDevice {
+public class StarterCabinetBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity, dev.wildcatter.control.ControlDevice, dev.wildcatter.control.Measurable {
 	private final Starter starter;
 	private final int[] line = new int[3];
 	private boolean grown;
@@ -128,7 +128,28 @@ public class StarterCabinetBlockEntity extends BlockEntity implements CircuitPar
 
 	@Override
 	public java.util.List<Point> points() {
-		return Starter.POINTS;
+		return starter.points();
+	}
+
+	@Override
+	public double readMa(int point) {
+		return starter.readMa(point);
+	}
+
+	@Override
+	public void commandMa(int point, double milliamps, long gameTime) {
+		if (point == 4) {
+			starter.commandSpeed(milliamps, gameTime);
+		}
+	}
+
+	public Starter starterForTest() {
+		return starter;
+	}
+
+	@Override
+	public double measure(Quantity quantity) {
+		return starter.measure(quantity);
 	}
 
 	@Override
@@ -139,6 +160,7 @@ public class StarterCabinetBlockEntity extends BlockEntity implements CircuitPar
 	@Override
 	public void commandPoint(int point, boolean on, long gameTime) {
 		if (point == 0) {
+			starter.noteTime(gameTime);
 			starter.command(on, gameTime);
 			follow(gameTime);
 		}

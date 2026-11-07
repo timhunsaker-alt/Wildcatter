@@ -523,5 +523,20 @@
   "item.wildcatter.di16_module": "Digital Input Module (16, 24 V DC)",
   "item.wildcatter.do16_module": "Relay Output Module (16, 2 A)",
   "item.wildcatter.control_key": "Selector Key (HAND / OFF / AUTO)",
-  "item.wildcatter.memory_card": "PLC Memory Card"
+  "item.wildcatter.memory_card": "PLC Memory Card",
+  "item.wildcatter.ai8_module": "Analog Input Module (8, 4-20 mA)",
+  "item.wildcatter.ao4_module": "Analog Output Module (4, 4-20 mA)",
+  "item.wildcatter.rtd4_module": "RTD Input Module (4)",
+  "item.wildcatter.hsc2_module": "High-Speed Counter Module (2)",
+  "block.wildcatter.control_valve": "Control Valve (air, 2 in water)",
+  "block.wildcatter.on_off_valve": "On-Off Valve (air, 2 in water)",
+  "block.wildcatter.motor_operated_valve": "Motor-Operated Valve (480 V, 2 in water)",
+  "block.wildcatter.control_valve_steel": "Control Valve (air, 4 in steel)",
+  "block.wildcatter.on_off_valve_steel": "On-Off Valve (air, 4 in steel)",
+  "block.wildcatter.motor_operated_valve_steel": "Motor-Operated Valve (480 V, 4 in steel)",
+  "block.wildcatter.air_tubing": "Instrument Air Tubing",
+  "block.wildcatter.air_compressor": "Instrument Air Compressor",
+  "block.wildcatter.air_dryer": "Air Dryer",
+  "block.wildcatter.day_tank": "Water Day Tank (1 m3)",
+  "block.wildcatter.transmitter": "Transmitter (4-20 mA)"
 }

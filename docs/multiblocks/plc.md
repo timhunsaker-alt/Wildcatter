@@ -255,6 +255,38 @@ Tailings compiles against a Wildcatter release, so it comes after 13h's release.
   - a jump's wire can only be removed by clicking its target's head pin, which takes all wires into that step;
   - `memory_card` borrows vanilla paper's icon, and its recipe is proposed.
 
+## As built: 13e (2026-11-07)
+`control/ValveBlock`, `TransmitterBlock`, `AirCompressorBlock`, `AirDryerBlock`, `Measurable`; `block/DayTankBlock`; analog points on `ControlDevice`; `DRIVE_POINTS` on `Starter`; and the `plcAnalog` game scene.
+- **Proved in the world:** a PID in a real program, reading a real tank through a transmitter and an AI8, writing a real drive's speed reference through an AO4, on a 37 kW pump:
+  - at setpoint 50 % the tank held at 47.5 %, the drive at 32 % speed drawing 1.2 kW of a 37 kW motor, as the cube law gives;
+  - with a bigger draw it held 49.4 % by speeding up to 35 %;
+  - at setpoint 70 % it held 70.1 %.
+- **Also in the world:** a transmitter removed reads 32767 and the program stops the pump, and restarts it when it is back; air cut and a control valve fails shut and returns; power cut and a motor-operated valve stays put while `VALVE_CTRL` latches FAIL_CLOSE, then closes after a reset; a CPU in STOP stops the drive and shuts the air valve; flow totalled on an HSC2; a transmitter's range set through the real screen.
+- **Regression:** `drives`, `motorStarter`, `tailingsCell`, `lease`, `landRig` and `plcSfc` all pass against the changed motor.
+- **New figures, all proposed:** a drive's minimum speed 20 %; a pump's static head at 30 % speed; a valve's stroke of 5 s (control), 3 s (on-off), 30 s (motor-operated); a 370 W actuator; a 7.5 kW compressor cutting in at 6 bar and out at 8, 0.5 bar/s to charge and 0.01 bar/s of leakage; air fails under 3 bar; a 1,000 L day tank whose outlet passes 100 L/s full open and full.
+- **Not yet:**
+  - **dampers are not built:** nothing has a duct to put one on, so they wait for boiler firing in 13f;
+  - **vibration has no transmitter:** nothing in the mod models it, and a made-up number would be worse than none;
+  - **pressure** is read only on an air compressor so far: water and product pipes have no pressure model at all, so a pipe has no pressure to transmit;
+  - temperature, belt scale, density, pH and assay have their kinds but no machine gives them yet: 13g and 13i bring them, and `RTD4` is untested until then;
+  - transmitters read tanks, boilers, pumps, drives, starters, valves and the compressor. Cables, and the CT and PT transducers, are not done: 13f;
+  - a throttled valve caps the whole run it is on, as pipes have no flow model: parallel branches are not told apart;
+  - a soft starter or an MCC bucket's drive has no speed reference signals: only the drive cabinet and lineup control section has them, and the MCC's drive buckets wait for its point numbering to change;
+  - valves on steel pipe are built and share the code, but only water valves have run in the world;
+  - a valve's air use per stroke is not modelled, only leakage.
+
+## The plan for 13e to 13i (surveyed 2026-11-07; Tim: "let's finish out the rest of 13")
+What the survey found that the waves above did not say, and how each is met. All figures *(proposed)*.
+- **13e:**
+  - **Analog signals:** `ControlDevice` points are on/off only, so a point gains an analog kind carrying milliamps. AI8 and AO4 read and write words at the slot's address, 4 mA = 0, 20 mA = 32000; an open loop reads 32767, the channel fault. RTD4 reads tenths of a degree. HSC2 counts.
+  - **Readings:** most machines report only text, so a `Measurable` interface gives numbers, machine by machine.
+  - **Speed:** a drive's ramp always heads to 1.0, a motor on a drive under 98 % never counts as running, and `Motor.output()` is 0 at or below 50 % and goes as V squared above. A speed reference changes all three: the ramp heads to the reference, a drive at its reference is running, and a centrifugal load's flow follows speed and its power speed cubed, down to a minimum speed of 20 %.
+  - **Valves:** none exist, and pipes hold no state: the walkers in `Plumbing` and `Lines` learn to stop at a shut valve, and a pull path gains a cap for a throttled one. Instrument air is new: compressor, dryer, tubing.
+- **13f:** no voltage trim, rectifier setpoint setter, boiler firing rate or genset hertz getter exists, so each is added, behind a selector. A network cable arrives here for the HMI, and 13h extends it.
+- **13g:** `PlantUnitBlockEntity` has no tick and no gate, and 29 of its 43 direct subclasses tick themselves. The selector and points go in the base, and the gate wraps the unit's ticker, so a unit not enabled does not run and says so. Units on `UnitMotorBlockEntity` also pass through its `drive`. Rods have no direct demand, only the automatic bank from a setpoint, so a demand is added that the trips still beat. Wells have no choke: an inline control valve is one.
+- **13h:** as above.
+- **13i:** Tailings needs a Wildcatter release holding `ControlDevice`, so v0.5.0 is released first, after the full client suite. `PlantBlockEntity` is one hook for most of the plant, through `want()`. Exceptions: belts have no start or stop and no pull cord, the sorter is clicks only, and `mine_switch` cannot be thrown, while `TrainPath.broken` ignores a throw under a built path. The TBM moves, so its signals go through the fixed cable junction, with a new link back to the machine. Sorter routing and rates need word signals, as AO does, not bits.
+
 ## Figures for 13a *(proposed)*
 | Figure | Small CPU | Large CPU | Basis |
 |---|---|---|---|

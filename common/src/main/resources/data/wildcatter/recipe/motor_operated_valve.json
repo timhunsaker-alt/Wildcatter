@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "C",
+    "P"
+  ],
+  "key": {
+    "C": "minecraft:comparator",
+    "P": "wildcatter:pipe"
+  },
+  "result": {
+    "id": "wildcatter:motor_operated_valve",
+    "count": 1
+  }
+}

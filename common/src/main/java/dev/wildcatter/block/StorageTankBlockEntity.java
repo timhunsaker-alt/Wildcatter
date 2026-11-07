@@ -27,7 +27,12 @@ import org.jspecify.annotations.Nullable;
  * holds 58,000 L of LPG. Pipe joins the side faces of its bottom layer. It fills from the process outlets on those runs (never from
  * another tank) and gives to whatever draws on them after the outlets are drawn.
  */
-public class StorageTankBlockEntity extends BlockEntity implements Inspectable, BigPartEntity, FluidNode {
+public class StorageTankBlockEntity extends BlockEntity implements Inspectable, BigPartEntity, FluidNode, dev.wildcatter.control.Measurable {
+	@Override
+	public double measure(Quantity quantity) {
+		return quantity == Quantity.LEVEL ? amount() / Math.max(1, capacity()) * 100 : Double.NaN;
+	}
+
 	private @Nullable Product product;
 	private double amount;
 	private boolean grown;

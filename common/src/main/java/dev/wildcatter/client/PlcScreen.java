@@ -394,6 +394,17 @@ public class PlcScreen extends Screen {
 					});
 				}
 			});
+			EditBox range = addRenderableWidget(new EditBox(font, width - 208, TOP + 104, 140, 16, Component.literal("range")));
+			range.setHint(Component.literal("0 100"));
+			button(width - 64, TOP + 104, 56, "SET RANGE", () -> {
+				CompoundTag device = device(selectedDevice);
+				if (device != null) {
+					ask("range", t -> {
+						copyPos(device, t);
+						t.putString("range", range.getValue());
+					});
+				}
+			});
 		} else if (tab == Tab.ONLINE) {
 			fieldOne = addRenderableWidget(new EditBox(font, width - 208, TOP + 14, 200, 16, Component.literal("tag or address")));
 			fieldOne.setHint(Component.literal("MAIN.PUMP or %IX0.0"));
@@ -1047,6 +1058,19 @@ public class PlcScreen extends Screen {
 		}
 	}
 
+	/** For the game test: selects the first transmitter in the terminals; false if none. */
+	public boolean selectTransmitterForTest() {
+		ListTag devices = state.getListOrEmpty("devices");
+		for (int i = 0; i < devices.size(); i++) {
+			if (devices.getCompoundOrEmpty(i).getStringOr("name", "").contains("transmitter")) {
+				selectedDevice = i;
+				selectedPoint = 0;
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void sfcScrollForTest(int scroll) {
 		unit.sfc.scrollX = 0;
 		unit.sfc.scrollY = scroll;
@@ -1384,7 +1408,7 @@ public class PlcScreen extends Screen {
 	private void drawTerminals(GuiGraphicsExtractor graphics) {
 		int split = width - 216;
 		graphics.fill(8, TOP, split, height - 8, PANEL);
-		graphics.text(font, "Rail: " + state.getStringOr("rail", ""), 12, TOP + 3, MUTED, false);
+		graphics.text(font, "Signals, and where each is landed", 12, TOP + 3, MUTED, false);
 		graphics.enableScissor(8, TOP + 14, split, height - 8);
 		int rowY = TOP + 16 - scrollList * ROW;
 		ListTag devices = state.getListOrEmpty("devices");
@@ -1412,7 +1436,13 @@ public class PlcScreen extends Screen {
 		graphics.disableScissor();
 		graphics.text(font, "Land the selected signal on:", width - 208, TOP + 3, TEXT, false);
 		graphics.text(font, "The selected device's tag:", width - 208, TOP + 55, TEXT, false);
-		drawNotes(graphics, width - 208, TOP + 90);
+		graphics.text(font, "A transmitter's 4 and 20 mA values:", width - 208, TOP + 93, TEXT, false);
+		int railY = height - 8;
+		List<net.minecraft.util.FormattedCharSequence> rail = font.split(Component.literal("Rail: " + state.getStringOr("rail", "")), 200);
+		for (int i = 0; i < rail.size(); i++) {
+			graphics.text(font, rail.get(i), width - 208, railY - (rail.size() - i) * ROW, MUTED, false);   // at the foot, as long as it needs
+		}
+		drawNotes(graphics, width - 208, TOP + 124);
 	}
 
 	private void drawNotes(GuiGraphicsExtractor graphics, int nx, int ny) {

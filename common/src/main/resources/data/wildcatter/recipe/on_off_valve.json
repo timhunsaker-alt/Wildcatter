@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "R",
+    "P"
+  ],
+  "key": {
+    "R": "minecraft:redstone",
+    "P": "wildcatter:pipe"
+  },
+  "result": {
+    "id": "wildcatter:on_off_valve",
+    "count": 1
+  }
+}

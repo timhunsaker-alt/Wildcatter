@@ -203,6 +203,10 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 			PADMOUNT_208, PADMOUNT_480, UNIT_SUBSTATION, GSU_TRANSFORMER, GSU_25, GSU_60, SUBSTATION_TRANSFORMER_60, UNIT_AUX_TRANSFORMER, SUBSTATION_TRANSFORMER_10);
 
 	public static final BlockEntityType<FireboxBlockEntity> FIREBOX_ENTITY = entity(FireboxBlockEntity::new, FIREBOX);
+	public static final BlockEntityType<dev.wildcatter.control.ValveBlockEntity> VALVE_ENTITY = entity(dev.wildcatter.control.ValveBlockEntity::new, CONTROL_VALVE, ON_OFF_VALVE, MOTOR_OPERATED_VALVE, CONTROL_VALVE_STEEL, ON_OFF_VALVE_STEEL, MOTOR_OPERATED_VALVE_STEEL);
+	public static final BlockEntityType<dev.wildcatter.control.AirCompressorBlockEntity> AIR_COMPRESSOR_ENTITY = entity(dev.wildcatter.control.AirCompressorBlockEntity::new, AIR_COMPRESSOR);
+	public static final BlockEntityType<dev.wildcatter.control.TransmitterBlockEntity> TRANSMITTER_ENTITY = entity(dev.wildcatter.control.TransmitterBlockEntity::new, TRANSMITTER);
+	public static final BlockEntityType<dev.wildcatter.block.DayTankBlockEntity> DAY_TANK_ENTITY = entity(dev.wildcatter.block.DayTankBlockEntity::new, DAY_TANK);
 	public static final BlockEntityType<PumpBlockEntity> PUMP_ENTITY = entity(PumpBlockEntity::new, PUMP, PROCESS_WATER_PUMP);
 	public static final BlockEntityType<dev.wildcatter.block.DecantTowerBlockEntity> DECANT_TOWER_ENTITY = entity(dev.wildcatter.block.DecantTowerBlockEntity::new, DECANT_TOWER);
 
@@ -255,6 +259,17 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		add("pipe", PIPE);
 		add("pump", PUMP);
 		add("process_water_pump", PROCESS_WATER_PUMP);
+		add("control_valve", CONTROL_VALVE);
+		add("on_off_valve", ON_OFF_VALVE);
+		add("motor_operated_valve", MOTOR_OPERATED_VALVE);
+		add("control_valve_steel", CONTROL_VALVE_STEEL);
+		add("on_off_valve_steel", ON_OFF_VALVE_STEEL);
+		add("motor_operated_valve_steel", MOTOR_OPERATED_VALVE_STEEL);
+		add("air_tubing", AIR_TUBING);
+		add("air_compressor", AIR_COMPRESSOR);
+		add("air_dryer", AIR_DRYER);
+		add("day_tank", DAY_TANK);
+		add("transmitter", TRANSMITTER);
 		add("cell_liner", CELL_LINER);
 		add("settled_tails", SETTLED_TAILS);
 		add("decant_tower", DECANT_TOWER);
@@ -505,6 +520,10 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("control_supply"), CONTROL_SUPPLY_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("plc_cabinet"), PLC_CABINET_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("operator_device"), OPERATOR_DEVICE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("valve"), VALVE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("air_compressor"), AIR_COMPRESSOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("transmitter"), TRANSMITTER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("day_tank"), DAY_TANK_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("drive_section"), DRIVE_SECTION_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("dc_bus"), DC_BUS_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("genset_part"), GENSET_PART_ENTITY);

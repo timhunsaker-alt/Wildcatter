@@ -200,6 +200,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("plcSfc")) {
 				plcSfc(context, server);
 			}
+			if (only("plcAnalog")) {
+				plcAnalog(context, server);
+			}
 			if (only("boron")) {
 				boron(context, server);
 			}
@@ -5071,6 +5074,289 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(context.computeOnClient(client -> plcScreen(client).fbdBlockXForTest(2)) == blockXBefore, "undo should put it back");
 		context.runOnClient(client -> client.gui.screen().onClose());
 		context.waitTicks(5);
+	}
+
+	private static final String LEVEL_PROJECT = """
+			PROGRAM LEVEL
+			VAR
+				running AT %IX0.0 : BOOL;
+				tripped AT %IX0.1 : BOOL;
+				drive_auto AT %IX0.2 : BOOL;
+				mov_open AT %IX0.5 : BOOL;
+				mov_closed AT %IX0.6 : BOOL;
+				mov_auto AT %IX0.7 : BOOL;
+				coil AT %QX16.0 : BOOL;
+				mov_open_cmd AT %QX16.1 : BOOL;
+				mov_close_cmd AT %QX16.2 : BOOL;
+				lt_raw AT %IW34 : WORD;
+				zt_raw AT %IW36 : WORD;
+				speed_ref AT %QW48 : WORD;
+				fcv_signal AT %QW50 : WORD;
+				pulses AT %ID64 : DWORD;
+				sp : REAL := 50.0;
+				drain : REAL := 30.0;
+				inlet : BOOL := TRUE;
+				pv : REAL;
+				lt_fault : BOOL;
+				lt_counts : INT;
+				litres : DINT;
+				loop : PID;
+				pump : MOTOR_CTRL;
+				mov : VALVE_CTRL;
+			END_VAR
+			lt_counts := WORD_TO_INT(lt_raw);
+			lt_fault := lt_counts = 32767;
+			pv := SCALE(INT_TO_REAL(lt_counts), 0.0, 32000.0, 0.0, 100.0);
+			loop(AUTO := NOT lt_fault, PV := pv, SP := sp, MAN := 0.0, KP := 2.0, TI := T#30s);
+			speed_ref := INT_TO_WORD(REAL_TO_INT(loop.OUT * 320.0));
+			pump(START := NOT lt_fault, RUNNING := running, TRIPPED := tripped, AUTO := drive_auto, RUN => coil);
+			fcv_signal := INT_TO_WORD(REAL_TO_INT(drain * 320.0));
+			mov(OPEN := inlet, OPENED := mov_open, CLOSED := mov_closed, AUTO := mov_auto, TRAVEL_T := T#35s, CMD_OPEN => mov_open_cmd, CMD_CLOSE => mov_close_cmd);
+			litres := DWORD_TO_DINT(pulses);
+			END_PROGRAM""";
+
+	/** Phase 13e (docs/multiblocks/plc.md): a PID holding a real tank's level on a real drive-fed pump, through real 4-20 mA loops; air and motor-operated valves; a failed loop. */
+	private void plcAnalog(ClientGameTestContext context, TestServerContext server) {
+		int z = -3400;
+		int bay = z + 10;
+		server.runCommand("tp @p 18 " + (up + 3) + " " + (z + 9) + " 180 25");
+		context.waitTicks(20);
+		server.runCommand("fill 2 " + (y - 1) + " " + (z - 8) + " 34 " + (y + 8) + " " + (bay + 8) + " minecraft:air");
+		server.runCommand("fill 2 " + (y - 1) + " " + (z - 8) + " 34 " + (y - 1) + " " + (bay + 8) + " minecraft:stone");
+		Filming film = null;
+		try {
+			BlockPos set = new BlockPos(12, up, z);
+			genset(server, set, net.minecraft.core.Direction.NORTH, false);
+			// 480 V to the drive's top, along the top to the compressor and the valve's actuator
+			put(server, 13, up, z, "wildcatter:cable_industrial");
+			put(server, 14, up, z, "wildcatter:cable_industrial");
+			put(server, 14, up + 1, z, "wildcatter:cable_industrial");
+			put(server, 14, up + 2, z, "wildcatter:cable_industrial");
+			for (int x = 15; x <= 18; x++) {
+				put(server, x, up + 2, z, "wildcatter:cable_industrial");
+			}
+			for (int zz = z + 1; zz <= z + 3; zz++) {
+				put(server, 18, up + 2, zz, "wildcatter:cable_industrial");
+			}
+			put(server, 18, up + 1, z + 3, "wildcatter:cable_industrial");
+			BlockPos drive = new BlockPos(15, up, z);
+			placeBig(server, WildcatterBlocks.DRIVE_CABINET, drive, net.minecraft.core.Direction.NORTH);
+			put(server, 15, up, z + 1, "wildcatter:cable_industrial");
+			put(server, 15, up, z + 2, "wildcatter:cable_industrial");
+			server.runOnServer(srv -> {   // the dial set for a 37 kW motor's full-load amps, as a player sets it
+				var box = ((dev.wildcatter.block.StarterCabinetBlockEntity) srv.overworld().getBlockEntity(drive)).starterForTest();
+				while (box.overloadAmps() < 52) {
+					box.nextOverloadSetting();
+				}
+			});
+			// the pump, over its sump
+			server.runCommand("fill 13 " + y + " " + (z + 2) + " 17 " + y + " " + (z + 4) + " minecraft:stone");
+			put(server, 15, y, z + 3, "minecraft:water");
+			put(server, 15, up, z + 3, "wildcatter:process_water_pump[facing=north]");
+			put(server, 16, up, z + 3, "wildcatter:pipe");
+			put(server, 17, up, z + 3, "wildcatter:pipe");
+			BlockPos mov = new BlockPos(18, up, z + 3);
+			put(server, 18, up, z + 3, "wildcatter:motor_operated_valve");
+			put(server, 19, up, z + 3, "wildcatter:pipe");
+			BlockPos tank = new BlockPos(20, up, z + 3);
+			put(server, 20, up, z + 3, "wildcatter:day_tank");
+			BlockPos fcv = new BlockPos(21, up, z + 3);
+			put(server, 21, up, z + 3, "wildcatter:control_valve");
+			// instrument air: compressor, dryer, tubing down to the valve's top
+			put(server, 19, up + 2, z + 3, "wildcatter:air_compressor");
+			put(server, 20, up + 2, z + 3, "wildcatter:air_dryer");
+			BlockPos tubing = new BlockPos(21, up + 2, z + 3);
+			put(server, 21, up + 2, z + 3, "wildcatter:air_tubing");
+			put(server, 21, up + 1, z + 3, "wildcatter:air_tubing");
+			// the transmitters, clamped on
+			BlockPos lt = new BlockPos(20, up, z + 4);
+			BlockPos ft = new BlockPos(15, up, z + 4);
+			put(server, 20, up, z + 4, "wildcatter:transmitter[facing=south]");
+			put(server, 15, up, z + 4, "wildcatter:transmitter[facing=south]");
+			// the trunk: boxes where anything touches, cable between
+			for (int x = 14; x <= 21; x++) {
+				boolean box = x == 15 || x == 16 || x == 18 || x == 20 || x == 21;
+				put(server, x, up, z + 5, box ? "wildcatter:junction_box" : "wildcatter:control_cable");
+			}
+			put(server, 18, up, z + 4, "wildcatter:control_cable");
+			put(server, 21, up, z + 4, "wildcatter:junction_box");
+			for (int zz = z + 1; zz <= z + 5; zz++) {
+				put(server, 16, up + 1, zz, "wildcatter:control_cable");
+			}
+			put(server, 16, up + 1, z, "wildcatter:control_cable");
+			for (int zz = z + 6; zz < bay; zz++) {
+				put(server, 14, up, zz, "wildcatter:control_cable");
+			}
+			plant(server, bay);
+			put(server, 12, up, bay, "wildcatter:plastic_wire_hot");
+			put(server, 13, up, bay, "wildcatter:control_supply");
+			for (int x = 11; x <= 13; x++) {
+				put(server, x, up, bay + 1, "wildcatter:plastic_wire_neutral");
+			}
+			put(server, 14, up, bay, "wildcatter:junction_box");
+			BlockPos at = new BlockPos(15, up, bay);
+			put(server, 15, up, bay, "wildcatter:plc_cabinet[facing=south]");
+			server.runOnServer(srv -> dev.wildcatter.multiblock.BigParts.grow(srv.overworld(), at, srv.overworld().getBlockState(at)));
+			// the new blocks in a row, for the contact sheet
+			String[] row = {"control_valve", "on_off_valve", "motor_operated_valve", "control_valve_steel", "on_off_valve_steel", "motor_operated_valve_steel", "air_compressor", "air_dryer", "day_tank"};
+			for (int i = 0; i < row.length; i++) {
+				put(server, 24 + i, up, z + 7, "wildcatter:" + row[i]);
+			}
+			put(server, 24, up + 2, z + 7, "wildcatter:air_tubing");
+			put(server, 25, up + 2, z + 7, "wildcatter:air_tubing");
+			put(server, 26, up + 2, z + 7, "wildcatter:transmitter[facing=south]");
+			put(server, 26, up + 1, z + 7, "wildcatter:day_tank");
+			startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 2000);
+			java.util.function.Function<net.minecraft.server.MinecraftServer, dev.wildcatter.control.PlcCabinetBlockEntity> cabinet = srv -> (dev.wildcatter.control.PlcCabinetBlockEntity) srv.overworld().getBlockEntity(at);
+			java.util.function.Supplier<String> status = () -> read(server, 15, up, bay);
+			context.waitTicks(30);
+			String refused = server.computeOnServer(srv -> cabinet.apply(srv).land(lt, 0, "%IW32"));
+			check(refused != null && refused.contains("no AI8"), "an analog signal needs an analog module: " + refused);
+			String wired = server.computeOnServer(srv -> {
+				dev.wildcatter.control.PlcCabinetBlockEntity box = cabinet.apply(srv);
+				for (var type : java.util.List.of(dev.wildcatter.control.PlcModuleItem.Type.CPU_SMALL, dev.wildcatter.control.PlcModuleItem.Type.DI16, dev.wildcatter.control.PlcModuleItem.Type.DO16, dev.wildcatter.control.PlcModuleItem.Type.AI8, dev.wildcatter.control.PlcModuleItem.Type.AO4,
+						dev.wildcatter.control.PlcModuleItem.Type.HSC2)) {
+					box.seat(type);
+				}
+				java.util.List<String> all = new java.util.ArrayList<>();
+				all.add(box.land(drive, 0, "%QX16.0"));
+				all.add(box.land(drive, 1, "%IX0.0"));
+				all.add(box.land(drive, 2, "%IX0.1"));
+				all.add(box.land(drive, 3, "%IX0.2"));
+				all.add(box.land(drive, 4, "%QW48"));
+				all.add(box.land(drive, 5, "%IW32"));
+				all.add(box.land(lt, 0, "%IW34"));
+				all.add(box.land(ft, 1, "%ID64"));
+				all.add(box.land(fcv, 0, "%QW50"));
+				all.add(box.land(fcv, 1, "%IW36"));
+				all.add(box.land(mov, 0, "%QX16.1"));
+				all.add(box.land(mov, 1, "%QX16.2"));
+				all.add(box.land(mov, 2, "%IX0.5"));
+				all.add(box.land(mov, 3, "%IX0.6"));
+				all.add(box.land(mov, 4, "%IX0.7"));
+				box.setTag(lt, "LT-101");
+				box.setTag(ft, "FT-101");
+				box.setTag(fcv, "FV-101");
+				box.setTag(mov, "XV-101");
+				StringBuilder errors = new StringBuilder();
+				all.stream().filter(java.util.Objects::nonNull).forEach(e -> errors.append(e).append("; "));
+				return errors.toString();
+			});
+			check(wired.isEmpty(), "every signal should land: " + wired);
+			String badWord = server.computeOnServer(srv -> cabinet.apply(srv).land(lt, 0, "%IX0.3"));
+			check(badWord != null && badWord.contains("input word"), "a loop cannot land on a bit: " + badWord);
+			server.runOnServer(srv -> {
+				cabinet.apply(srv).land(lt, 0, "%IW34");
+				var flow = (dev.wildcatter.control.TransmitterBlockEntity) srv.overworld().getBlockEntity(ft);
+				flow.setQuantity(dev.wildcatter.control.Measurable.Quantity.FLOW);
+				flow.setRange(0, 800);
+				for (BlockPos device : new BlockPos[] {drive, fcv, mov}) {
+					var control = dev.wildcatter.control.ControlNet.deviceAt(srv.overworld(), device);
+					control.cycleHoa(device);
+					control.cycleHoa(device);
+				}
+			});
+			context.waitTicks(30);
+			check(status.get().contains("devices reached") && !status.get().contains("NO 24 V") && !status.get().contains("BAD JOINT"), "the panel should be wired: " + status.get());
+			film = context.computeOnClient(client -> Filming.start(client, "plcAnalog"));
+			context.takeScreenshot("wildcatter-plc-analog-site");
+			java.util.List<?> errors = server.computeOnServer(srv -> cabinet.apply(srv).download(LEVEL_PROJECT));
+			check(errors.isEmpty(), "the program should compile: " + errors);
+			server.runOnServer(srv -> cabinet.apply(srv).cpu().setMode(dev.wildcatter.plc.Cpu.Mode.RUN));
+			java.util.function.Supplier<Double> level = () -> server.computeOnServer(srv -> ((dev.wildcatter.block.DayTankBlockEntity) srv.overworld().getBlockEntity(tank)).waterLevel() * 100);
+			java.util.function.Supplier<dev.wildcatter.control.ValveBlockEntity> none = null;
+			java.util.function.Function<BlockPos, Double> valveAt = pos -> server.computeOnServer(srv -> ((dev.wildcatter.control.ValveBlockEntity) srv.overworld().getBlockEntity(pos)).position());
+			java.util.function.Function<String, Object> tag = name -> server.computeOnServer(srv -> cabinet.apply(srv).cpu().read("LEVEL." + name));
+			java.util.function.Supplier<String> driveText = () -> read(server, 15, up, z);
+			// the inlet valve opens on its 480 V actuator; air charges; the drain valve goes to 30 %; the pump fills it to the setpoint and holds it
+			context.waitTicks(400);
+			check(valveAt.apply(mov) > 0.5, "the motor-operated valve should be opening under power: " + valveAt.apply(mov) + " | " + read(server, 18, up, z + 3));
+			check(Math.abs(valveAt.apply(fcv) - 0.3) < 0.02, "the control valve should follow its 4-20 mA to 30 %: " + valveAt.apply(fcv) + " | " + read(server, 21, up, z + 3));
+			context.waitTicks(1400);
+			double first = level.get();
+			System.out.println("[wildcatter-test] plc analog: level " + first + " % at setpoint 50 | " + driveText.get() + " | " + read(server, 15, up, z + 3));
+			check(Math.abs(first - 50) < 4, "the PID should hold the level near 50 %: " + first + " | " + driveText.get());
+			check(Math.abs(((Number) tag.apply("PV")).doubleValue() - first) < 1.5, "what the CPU reads should be the tank: " + tag.apply("PV") + " against " + first);
+			double speed = server.computeOnServer(srv -> ((dev.wildcatter.block.StarterCabinetBlockEntity) srv.overworld().getBlockEntity(drive)).measure(dev.wildcatter.control.Measurable.Quantity.SPEED));
+			double watts = server.computeOnServer(srv -> ((dev.wildcatter.block.StarterCabinetBlockEntity) srv.overworld().getBlockEntity(drive)).measure(dev.wildcatter.control.Measurable.Quantity.WATTS));
+			System.out.println("[wildcatter-test] plc analog: drive at " + speed + " %, " + watts + " W, of a 37,000 W motor");
+			check(speed > 22 && speed < 60, "holding a small draw, the drive should run well below full speed: " + speed);
+			check(watts < 37_000 * 0.25, "power should fall with the cube of speed: " + watts + " W at " + speed + " %");
+			check(((Number) tag.apply("PUMP.STATE")).intValue() == 2, "the device block should read the drive running: " + tag.apply("PUMP.STATE") + " | " + driveText.get());
+			check(((Number) tag.apply("LITRES")).longValue() > 100, "the counter should total the flow: " + tag.apply("LITRES"));
+			context.takeScreenshot("wildcatter-plc-analog-holding");
+			// a bigger draw: it holds the level, by speeding up
+			server.runOnServer(srv -> cabinet.apply(srv).cpu().write("LEVEL.DRAIN", 80.0));
+			context.waitTicks(800);
+			double second = level.get();
+			double faster = server.computeOnServer(srv -> ((dev.wildcatter.block.StarterCabinetBlockEntity) srv.overworld().getBlockEntity(drive)).measure(dev.wildcatter.control.Measurable.Quantity.SPEED));
+			System.out.println("[wildcatter-test] plc analog: drain 80 %: level " + second + " %, drive " + faster + " %");
+			check(Math.abs(second - 50) < 4, "the level should hold through a bigger draw: " + second);
+			check(faster > speed, "by running faster: " + faster + " against " + speed);
+			// a new setpoint
+			server.runOnServer(srv -> cabinet.apply(srv).cpu().write("LEVEL.SP", 70.0));
+			context.waitTicks(800);
+			double third = level.get();
+			System.out.println("[wildcatter-test] plc analog: setpoint 70: level " + third + " %");
+			check(Math.abs(third - 70) < 4, "the level should follow a new setpoint: " + third);
+			// a failed loop: the transmitter gone reads as an open loop, so the program stops the pump rather than filling blind
+			put(server, 20, up, z + 4, "minecraft:air");
+			context.waitTicks(40);
+			check(Boolean.TRUE.equals(tag.apply("LT_FAULT")) && ((Number) tag.apply("LT_COUNTS")).intValue() == 32767, "an open loop should read 32767: " + tag.apply("LT_COUNTS"));
+			check(driveText.get().contains("STOPPED"), "and the program stops the pump: " + driveText.get());
+			put(server, 20, up, z + 4, "wildcatter:transmitter[facing=south]");
+			context.waitTicks(400);
+			check(!Boolean.TRUE.equals(tag.apply("LT_FAULT")) && driveText.get().contains("RUN"), "back, it runs again: " + driveText.get());
+			// air lost: the spring takes the control valve shut, whatever its signal says
+			put(server, 21, up + 2, z + 3, "minecraft:air");
+			context.waitTicks(160);
+			check(valveAt.apply(fcv) < 0.02, "with no air it should fail shut: " + valveAt.apply(fcv) + " | " + read(server, 21, up, z + 3));
+			put(server, 21, up + 2, z + 3, "wildcatter:air_tubing");
+			context.waitTicks(200);
+			check(valveAt.apply(fcv) > 0.5, "air back, it goes back to its signal: " + valveAt.apply(fcv));
+			// power lost to the motor-operated valve: told to close, it stays put, and VALVE_CTRL says so
+			put(server, 18, up + 1, z + 3, "minecraft:air");
+			context.waitTicks(20);
+			server.runOnServer(srv -> cabinet.apply(srv).cpu().write("LEVEL.INLET", false));
+			context.waitTicks(780);
+			check(valveAt.apply(mov) > 0.95, "with no power it should stay put: " + valveAt.apply(mov));
+			check(Boolean.TRUE.equals(tag.apply("MOV.FAIL_CLOSE")), "and VALVE_CTRL should report it would not close: state " + tag.apply("MOV.STATE"));
+			put(server, 18, up + 1, z + 3, "wildcatter:cable_industrial");
+			server.runOnServer(srv -> cabinet.apply(srv).cpu().write("LEVEL.MOV.RESET", true));
+			context.waitTicks(10);
+			server.runOnServer(srv -> cabinet.apply(srv).cpu().write("LEVEL.MOV.RESET", false));
+			context.waitTicks(700);
+			check(valveAt.apply(mov) < 0.05 && !Boolean.TRUE.equals(tag.apply("MOV.FAULT")), "power back and reset, it closes: " + valveAt.apply(mov));
+			// a CPU in STOP writes no signal: the drive stops, and the air valve goes to its fail position
+			server.runOnServer(srv -> cabinet.apply(srv).cpu().setMode(dev.wildcatter.plc.Cpu.Mode.STOP));
+			context.waitTicks(160);
+			check(driveText.get().contains("STOPPED"), "STOP stops the drive: " + driveText.get());
+			check(valveAt.apply(fcv) < 0.02, "and shuts the air valve: " + valveAt.apply(fcv));
+			// the terminal screen's range, by the real mouse
+			server.runOnServer(srv -> cabinet.apply(srv).open(srv.getPlayerList().getPlayers().get(0)));
+			context.waitTicks(20);
+			plcClick(context, "TERMINALS");
+			context.waitTicks(5);
+			check(context.computeOnClient(client -> plcScreen(client).selectTransmitterForTest()), "the transmitters should be listed");
+			plcField(context, "range", "0 500");
+			plcClick(context, "SET RANGE");
+			context.waitTicks(10);
+			check(context.computeOnClient(client -> plcScreen(client).notesForTest().toString()).contains("Range set"), "the range should set: " + context.computeOnClient(client -> plcScreen(client).notesForTest().toString()));
+			context.takeScreenshot("wildcatter-plc-analog-terminals");
+			context.runOnClient(client -> client.gui.screen().onClose());
+			context.waitTicks(5);
+			server.runCommand("tp @p 26 " + (up + 1) + " " + (z + 10) + " 180 12");
+			context.waitTicks(30);
+			context.takeScreenshot("wildcatter-plc-analog-contact-valves");
+			server.runCommand("tp @p 31 " + (up + 1) + " " + (z + 10) + " 180 12");
+			context.waitTicks(30);
+			context.takeScreenshot("wildcatter-plc-analog-contact-air");
+			System.out.println("[wildcatter-test] plcAnalog ok: " + status.get());
+		} finally {
+			if (film != null) {
+				film.stop();
+			}
+		}
 	}
 
 	/** Every block and item of the mod has its files. The asset generator clears what it does not know about, so a hand-made file can vanish without an error anywhere else. */

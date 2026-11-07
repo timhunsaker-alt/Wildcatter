@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "QRQ",
+    "RCR",
+    "QGQ"
+  ],
+  "key": {
+    "Q": "minecraft:quartz",
+    "R": "minecraft:redstone",
+    "C": "minecraft:comparator",
+    "G": "minecraft:gold_nugget"
+  },
+  "result": {
+    "id": "wildcatter:ai8_module",
+    "count": 1
+  }
+}

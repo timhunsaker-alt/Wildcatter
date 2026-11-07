@@ -38,7 +38,7 @@ public class PipeBlock extends Block {
 
 	/** Water pipes link boilers, turbines and pumps; gas lines link wells and fireboxes. The two never join. */
 	public enum Kind {
-		WATER, GAS
+		WATER, GAS, AIR
 	}
 
 	private final Kind kind;
@@ -80,7 +80,9 @@ public class PipeBlock extends Block {
 			return net.minecraft.world.InteractionResult.TRY_WITH_EMPTY_HAND;
 		}
 		if (!level.isClientSide()) {
-			if (kind == Kind.WATER) {
+			if (kind == Kind.AIR) {
+				player.sendOverlayMessage(net.minecraft.network.chat.Component.literal(String.format(java.util.Locale.ROOT, "Instrument air tubing: %.1f bar", dev.wildcatter.control.AirCompressorBlockEntity.pressureAt(level, pos))));
+			} else if (kind == Kind.WATER) {
 				player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Water pipe (2 in): " + (Plumbing.network(level, java.util.List.of(pos)).size() + 1)
 						+ " lengths joined, carrying fresh water from a pump"));
 			} else {
@@ -97,13 +99,21 @@ public class PipeBlock extends Block {
 		return kind;
 	}
 
+	/** False at a shut valve, where a run of pipe stops. */
+	public static boolean conducts(net.minecraft.world.level.Level level, BlockPos pos) {
+		return !(level.getBlockEntity(pos) instanceof dev.wildcatter.control.ValveBlockEntity valve) || valve.position() > 0.001;
+	}
+
 	private boolean joins(BlockState neighbour) {
 		Block block = neighbour.getBlock();
 		if (block instanceof PipeBlock pipe) {
 			return pipe.kind == kind;
 		}
+		if (kind == Kind.AIR) {
+			return block instanceof dev.wildcatter.control.AirDryerBlock || block instanceof dev.wildcatter.control.ValveBlock v && v.type() != dev.wildcatter.control.ValveBlock.Type.MOTOR_OPERATED;
+		}
 		return kind == Kind.WATER
-				? block instanceof BoilerBlock || block instanceof SteamTurbineBlock || block instanceof PumpBlock || block instanceof TowerBasinBlock
+				? block instanceof DayTankBlock || block instanceof BoilerBlock || block instanceof SteamTurbineBlock || block instanceof PumpBlock || block instanceof TowerBasinBlock
 						|| block instanceof RigPartBlock rig && rig.part() == RigPartBlock.Part.MUD_TANKS
 						|| block instanceof SteamPlantPartBlock plant && plant.part() == SteamPlantPartBlock.Part.CONDENSER
 						|| block instanceof PetrochemPartBlock furnace && furnace.part() == PetrochemPartBlock.Part.CRACKING_FURNACE

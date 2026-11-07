@@ -26,7 +26,20 @@ import net.minecraft.world.level.block.state.BlockState;
  * A level switch runs its motor only while the boilers need water: it starts below 80 % and stops when they are full.
  * Water pressure follows the motor: it needs most of its voltage, and delivers with the square of it, like a real pump.
  */
-public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, dev.wildcatter.kinetic.Sounding, dev.wildcatter.kinetic.Kinetic {
+public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, dev.wildcatter.kinetic.Sounding, dev.wildcatter.kinetic.Kinetic, dev.wildcatter.control.Measurable {
+	private double flow;
+
+	@Override
+	public double measure(Quantity quantity) {
+		return switch (quantity) {
+			case FLOW -> flow;
+			case SPEED -> motor.output() * 100;
+			case AMPS -> amps;
+			case VOLTS -> volts;
+			default -> Double.NaN;
+		};
+	}
+
 	private final dev.wildcatter.kinetic.Spin spin = new dev.wildcatter.kinetic.Spin();
 	/** Its induction motor (single-phase); it turns only while there is work. */
 	private final dev.wildcatter.circuit.Motor motor;
@@ -83,6 +96,7 @@ public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.PLUMBING_INTERVAL != 0) {
 			return;
 		}
+		pump.flow = 0;
 		if (!pump.touchesWater(level)) {
 			pump.wanted = false;
 			pump.status = "DRY: put it against water";
@@ -112,12 +126,12 @@ public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspect
 				Math.min(rigs.stream().mapToDouble(RigSubstructureBlockEntity::waterLevel).min().orElse(1.0),
 						furnaces.stream().mapToDouble(WaterUser::waterLevel).min().orElse(1.0)));
 		pump.wanted = pump.wanted ? lowest < 1.0 : lowest < Tuning.PUMP_START_LEVEL;
-		double strength = pump.motor.output();
+		double strength = pump.motor.pumpOutput();
 		if (strength == 0) {
 			pump.status = pump.wanted ? pump.motor.describe() : "boilers full, " + pump.motor.describe();
 			return;
 		}
-		int budget = (int) Math.round(Tuning.PUMP_WATER_PER_TICK * Tuning.PLUMBING_INTERVAL * strength);
+		int budget = (int) Math.round(Tuning.PUMP_WATER_PER_TICK * Tuning.PLUMBING_INTERVAL * strength * Plumbing.throttle(level, pipes));
 		int moved = Plumbing.deliver(boilers, budget);
 		for (TurbineGeneratorBlockEntity plant : plants) {
 			moved += (int) Math.round(plant.addMakeup((budget - moved) / (double) plants.size()));
@@ -128,6 +142,7 @@ public class PumpBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		for (WaterUser furnace : furnaces) {
 			moved += furnace.addWater(budget - moved);
 		}
+		pump.flow = moved * 20.0 / Tuning.PLUMBING_INTERVAL;
 		pump.status = (moved > 0 ? "pumping " + Math.round(moved * 20.0 / Tuning.PLUMBING_INTERVAL) + " water/s to " + boilers.size() + " boiler(s), " + plants.size() + " plant(s)"
 				+ (rigs.isEmpty() ? "" : " and " + rigs.size() + " rig's mud tanks")
 				: "boilers are full") + ", " + pump.motor.describe();

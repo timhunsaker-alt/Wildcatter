@@ -299,6 +299,14 @@ public final class WildcatterItems {
 	public static final Item DI16_MODULE = new dev.wildcatter.control.PlcModuleItem(new Item.Properties().stacksTo(16).setId(DI16_MODULE_KEY), dev.wildcatter.control.PlcModuleItem.Type.DI16);
 	public static final ResourceKey<Item> DO16_MODULE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("do16_module"));
 	public static final Item DO16_MODULE = new dev.wildcatter.control.PlcModuleItem(new Item.Properties().stacksTo(16).setId(DO16_MODULE_KEY), dev.wildcatter.control.PlcModuleItem.Type.DO16);
+	public static final ResourceKey<Item> AI8_MODULE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("ai8_module"));
+	public static final Item AI8_MODULE = new dev.wildcatter.control.PlcModuleItem(new Item.Properties().stacksTo(16).setId(AI8_MODULE_KEY), dev.wildcatter.control.PlcModuleItem.Type.AI8);
+	public static final ResourceKey<Item> AO4_MODULE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("ao4_module"));
+	public static final Item AO4_MODULE = new dev.wildcatter.control.PlcModuleItem(new Item.Properties().stacksTo(16).setId(AO4_MODULE_KEY), dev.wildcatter.control.PlcModuleItem.Type.AO4);
+	public static final ResourceKey<Item> RTD4_MODULE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("rtd4_module"));
+	public static final Item RTD4_MODULE = new dev.wildcatter.control.PlcModuleItem(new Item.Properties().stacksTo(16).setId(RTD4_MODULE_KEY), dev.wildcatter.control.PlcModuleItem.Type.RTD4);
+	public static final ResourceKey<Item> HSC2_MODULE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("hsc2_module"));
+	public static final Item HSC2_MODULE = new dev.wildcatter.control.PlcModuleItem(new Item.Properties().stacksTo(16).setId(HSC2_MODULE_KEY), dev.wildcatter.control.PlcModuleItem.Type.HSC2);
 	public static final ResourceKey<Item> CONTROL_KEY_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("control_key"));
 	public static final Item CONTROL_KEY = new dev.wildcatter.control.ControlKeyItem(new Item.Properties().stacksTo(1).setId(CONTROL_KEY_KEY));
 
@@ -313,6 +321,10 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, DI16_MODULE_KEY, DI16_MODULE);
 		Registry.register(BuiltInRegistries.ITEM, DO16_MODULE_KEY, DO16_MODULE);
 		Registry.register(BuiltInRegistries.ITEM, CONTROL_KEY_KEY, CONTROL_KEY);
+		Registry.register(BuiltInRegistries.ITEM, AI8_MODULE_KEY, AI8_MODULE);
+		Registry.register(BuiltInRegistries.ITEM, AO4_MODULE_KEY, AO4_MODULE);
+		Registry.register(BuiltInRegistries.ITEM, RTD4_MODULE_KEY, RTD4_MODULE);
+		Registry.register(BuiltInRegistries.ITEM, HSC2_MODULE_KEY, HSC2_MODULE);
 		Registry.register(BuiltInRegistries.ITEM, FIELD_MANUAL_KEY, FIELD_MANUAL);
 		Registry.register(BuiltInRegistries.ITEM, SEISMOGRAPH_KEY, SEISMOGRAPH);
 		Registry.register(BuiltInRegistries.ITEM, SCINTILLOMETER_KEY, SCINTILLOMETER);

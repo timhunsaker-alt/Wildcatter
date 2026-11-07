@@ -923,6 +923,21 @@ public final class Tuning {
 	public static final double DRIVE_RAMP_SECONDS = 10.0;          // 0 to full frequency and voltage, volts per hertz held
 	public static final double DRIVE_CURRENT_LIMIT = 1.5;          // x full-load amps, heavy duty...
 	public static final double DRIVE_LIMIT_SECONDS = 60.0;         // ...for this long, then it trips on overcurrent
+	// ---- PLCs: analog, valves, air (docs/multiblocks/plc.md, all proposed) ----
+	public static final double DRIVE_MIN_SPEED = 0.2;              // a drive under a speed reference runs no slower than this share of full speed
+	public static final double PUMP_STATIC_HEAD_SPEED = 0.3;       // a centrifugal pump against head delivers nothing below this speed
+	public static final double VALVE_ACTUATOR_WATTS = 370.0;       // a small multi-turn actuator
+	public static final double CONTROL_VALVE_STROKE_SECONDS = 5.0;
+	public static final double ON_OFF_VALVE_STROKE_SECONDS = 3.0;
+	public static final double MOV_STROKE_SECONDS = 30.0;
+	public static final double AIR_COMPRESSOR_WATTS = 7_500.0;
+	public static final double AIR_CUT_IN_BAR = 6.0;
+	public static final double AIR_CUT_OUT_BAR = 8.0;
+	public static final double AIR_MIN_BAR = 3.0;                  // under this an actuator's spring wins
+	public static final double AIR_CHARGE_BAR_PER_SECOND = 0.5;
+	public static final double AIR_LEAK_BAR_PER_SECOND = 0.01;
+	public static final double DAY_TANK_LITRES = 1000.0;
+	public static final double DAY_TANK_OUTLET_LITRES_PER_SECOND = 100.0;   // full open, full tank
 	public static final double DRIVE_AT_SPEED = 0.98;              // a drive-fed motor runs once the drive is at this share of full voltage
 	public static final double DRIVE_OUTPUT_OHMS = 0.001;          // the inverter's output impedance: stiff
 	public static final int MCC_MAX_BUCKETS = 6;                 // the water pump starts below this full, and stops when the boilers are full
