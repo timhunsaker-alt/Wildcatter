@@ -4475,7 +4475,13 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			check(context.computeOnClient(client -> !((dev.wildcatter.client.PlcScreen) client.gui.screen()).errorsForTest().isEmpty()), "CHECK should list the error");
 			context.takeScreenshot("wildcatter-plc-error");
 			context.runOnClient(client -> ((dev.wildcatter.client.PlcScreen) client.gui.screen()).replaceForTest(PLC_PROJECT));
-			context.runOnClient(client -> ((dev.wildcatter.client.PlcScreen) client.gui.screen()).download());
+			// the real button with the real mouse, down the game's whole input path (the left button is number 1 in this version). A click finds a button whether or not it can be seen, so the screenshots are what show one is not hidden
+			int[] downloadAt = context.computeOnClient(client -> ((dev.wildcatter.client.PlcScreen) client.gui.screen()).buttonForTest("DOWNLOAD"));
+			check(downloadAt != null, "the DOWNLOAD button should be there");
+			double toWindow = context.computeOnClient(client -> (double) client.getWindow().getScreenWidth() / client.getWindow().getGuiScaledWidth());
+			context.getInput().setCursorPos(downloadAt[0] * toWindow, downloadAt[1] * toWindow);
+			context.waitTick();
+			context.getInput().pressMouse(1);
 			context.waitTicks(20);
 			check(server.computeOnServer(srv -> cabinet.apply(srv).source().equals(PLC_PROJECT)), "the download should reach the cabinet");
 			context.takeScreenshot("wildcatter-plc-editor");

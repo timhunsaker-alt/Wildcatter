@@ -258,7 +258,6 @@ public class PlcScreen extends Screen {
 
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partial) {
-		super.extractRenderState(graphics, mouseX, mouseY, partial);
 		String status = state.getStringOr("status", "");
 		int colour = status.startsWith("RUN") ? GOOD : status.startsWith("STOP") ? 0xFFE0C060 : ERROR;
 		graphics.text(font, state.getStringOr("cpu", "No CPU"), 8, 8, TEXT, false);
@@ -273,6 +272,17 @@ public class PlcScreen extends Screen {
 			case ONLINE -> drawOnline(graphics);
 			case DIAGNOSTICS -> drawDiagnostics(graphics);
 		}
+		super.extractRenderState(graphics, mouseX, mouseY, partial);   // the widgets last, over the panels
+	}
+
+	/** For the game test: the middle of a labelled button, in GUI pixels, or null if none is there to click. */
+	public int[] buttonForTest(String label) {
+		for (var child : children()) {
+			if (child instanceof Button b && b.getMessage().getString().equals(label) && b.visible && b.active) {
+				return new int[] {b.getX() + b.getWidth() / 2, b.getY() + b.getHeight() / 2};
+			}
+		}
+		return null;
 	}
 
 	private int codeBottom() {
@@ -320,13 +330,13 @@ public class PlcScreen extends Screen {
 		int noteY = bottom + 4;
 		graphics.fill(8, bottom + 2, width - 8, height - 6, PANEL);
 		for (CompileError error : errors.stream().limit(ERROR_ROWS).toList()) {
-			graphics.text(font, error.toString(), 12, noteY, ERROR, false);
+			graphics.text(font, font.plainSubstrByWidth(error.toString(), width - 24), 12, noteY, ERROR, false);
 			noteY += ROW;
 		}
 		String compile = state.getStringOr("compile", "");
 		for (String note : notes) {
 			if (noteY < height - 8) {
-				graphics.text(font, note, 12, noteY, note.startsWith("Download refused") || note.startsWith("line") ? ERROR : GOOD, false);
+				graphics.text(font, font.plainSubstrByWidth(note, width - 24), 12, noteY, note.startsWith("Download refused") || note.startsWith("line") ? ERROR : GOOD, false);
 				noteY += ROW;
 			}
 		}
