@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "on=false": {
+      "model": "wildcatter:block/control_supply_false"
+    },
+    "on=true": {
+      "model": "wildcatter:block/control_supply_true"
+    }
+  }
+}

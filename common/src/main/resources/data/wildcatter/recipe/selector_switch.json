@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "S",
+    "L"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "L": "minecraft:lever"
+  },
+  "result": {
+    "id": "wildcatter:selector_switch",
+    "count": 1
+  }
+}

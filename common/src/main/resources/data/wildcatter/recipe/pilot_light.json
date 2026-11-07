@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "G",
+    "S"
+  ],
+  "key": {
+    "G": "minecraft:glowstone_dust",
+    "S": "wildcatter:steel_ingot"
+  },
+  "result": {
+    "id": "wildcatter:pilot_light",
+    "count": 1
+  }
+}

@@ -291,8 +291,24 @@ public final class WildcatterItems {
 	private WildcatterItems() {
 	}
 
+	public static final ResourceKey<Item> CPU_SMALL_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("cpu_small"));
+	public static final Item CPU_SMALL = new dev.wildcatter.control.PlcModuleItem(new Item.Properties().stacksTo(16).setId(CPU_SMALL_KEY), dev.wildcatter.control.PlcModuleItem.Type.CPU_SMALL);
+	public static final ResourceKey<Item> CPU_LARGE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("cpu_large"));
+	public static final Item CPU_LARGE = new dev.wildcatter.control.PlcModuleItem(new Item.Properties().stacksTo(16).setId(CPU_LARGE_KEY), dev.wildcatter.control.PlcModuleItem.Type.CPU_LARGE);
+	public static final ResourceKey<Item> DI16_MODULE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("di16_module"));
+	public static final Item DI16_MODULE = new dev.wildcatter.control.PlcModuleItem(new Item.Properties().stacksTo(16).setId(DI16_MODULE_KEY), dev.wildcatter.control.PlcModuleItem.Type.DI16);
+	public static final ResourceKey<Item> DO16_MODULE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("do16_module"));
+	public static final Item DO16_MODULE = new dev.wildcatter.control.PlcModuleItem(new Item.Properties().stacksTo(16).setId(DO16_MODULE_KEY), dev.wildcatter.control.PlcModuleItem.Type.DO16);
+	public static final ResourceKey<Item> CONTROL_KEY_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("control_key"));
+	public static final Item CONTROL_KEY = new dev.wildcatter.control.ControlKeyItem(new Item.Properties().stacksTo(1).setId(CONTROL_KEY_KEY));
+
 	public static void register() {
 		Registry.register(BuiltInRegistries.ITEM, POWER_METER_KEY, POWER_METER);
+		Registry.register(BuiltInRegistries.ITEM, CPU_SMALL_KEY, CPU_SMALL);
+		Registry.register(BuiltInRegistries.ITEM, CPU_LARGE_KEY, CPU_LARGE);
+		Registry.register(BuiltInRegistries.ITEM, DI16_MODULE_KEY, DI16_MODULE);
+		Registry.register(BuiltInRegistries.ITEM, DO16_MODULE_KEY, DO16_MODULE);
+		Registry.register(BuiltInRegistries.ITEM, CONTROL_KEY_KEY, CONTROL_KEY);
 		Registry.register(BuiltInRegistries.ITEM, FIELD_MANUAL_KEY, FIELD_MANUAL);
 		Registry.register(BuiltInRegistries.ITEM, SEISMOGRAPH_KEY, SEISMOGRAPH);
 		Registry.register(BuiltInRegistries.ITEM, SCINTILLOMETER_KEY, SCINTILLOMETER);

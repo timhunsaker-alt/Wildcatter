@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "QCQ",
+    "RGR",
+    "QCQ"
+  ],
+  "key": {
+    "Q": "minecraft:quartz",
+    "C": "minecraft:comparator",
+    "R": "minecraft:redstone",
+    "G": "minecraft:gold_ingot"
+  },
+  "result": {
+    "id": "wildcatter:cpu_small",
+    "count": 1
+  }
+}

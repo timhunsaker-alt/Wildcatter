@@ -193,6 +193,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("fuel")) {
 				fuel(context, server);
 			}
+			if (only("plc")) {
+				plc(context, server);
+			}
 			if (only("boron")) {
 				boron(context, server);
 			}
@@ -4357,6 +4360,241 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	 * and a redstone signal start and stop it, an overload dial set far below the motor's current trips it, and a tripped
 	 * starter ignores redstone until it is reset by hand.
 	 */
+	private static final String PLC_PROJECT = """
+			(* Start and stop a motor from a panel, with a latched e-stop. *)
+			PROGRAM MAIN
+			VAR
+				start AT %IX0.0 : BOOL;     (* PB-101 *)
+				healthy AT %IX0.1 : BOOL;   (* ES-101, normally closed *)
+				running AT %IX0.2 : BOOL;   (* the starter's feedback *)
+				tripped AT %IX0.3 : BOOL;
+				coil AT %QX16.0 : BOOL;     (* the starter's RUN *)
+				lamp AT %QX16.1 : BOOL;     (* the pilot light *)
+				latch : BOOL;
+			END_VAR
+			IF start AND healthy THEN
+				latch := TRUE;
+			END_IF;
+			IF NOT healthy OR tripped THEN
+				latch := FALSE;
+			END_IF;
+			coil := latch;
+			lamp := running;
+			END_PROGRAM
+			""";
+
+	/** Phase 13b (docs/multiblocks/plc.md): a real pushbutton, through a real structured text program and real wiring, starts a real motor. */
+	private void plc(ClientGameTestContext context, TestServerContext server) {
+		int z = -3000;
+		int px = 17;
+		server.runCommand("tp @p 15 " + (up + 2) + " " + (z + 11) + " 180 15");
+		context.waitTicks(20);
+		server.runCommand("fill 2 " + (y - 1) + " " + (z - 6) + " 34 " + (y + 6) + " " + (z + 12) + " minecraft:air");
+		server.runCommand("fill 2 " + (y - 1) + " " + (z - 6) + " 34 " + (y - 1) + " " + (z + 12) + " minecraft:stone");
+		long seed = -1;
+		for (long s = 1; s < 2_000_000 && seed < 0; s++) {
+			Reservoir oil = Reservoir.at(s, px + 6, z);
+			if (oil != null && oil.kind() == Reservoir.Kind.OIL && oil.units() > 10_000) {
+				seed = s;
+			}
+		}
+		check(seed >= 0, "no seed puts an oil field under the PLC scene's pumpjack");
+		ReservoirData.testSeed = seed;
+		Filming film = null;
+		try {
+			// the 480 V line: as the starter's own scene
+			BlockPos set = new BlockPos(12, up, z);
+			genset(server, set, net.minecraft.core.Direction.NORTH, false);
+			put(server, 13, up, z, "wildcatter:cable_industrial");
+			put(server, 14, up, z, "wildcatter:motor_starter[facing=east]");
+			put(server, 15, up, z, "wildcatter:cable_industrial");
+			put(server, 16, up, z, "wildcatter:cable_industrial");
+			pumpjack(server, new BlockPos(px, up, z), net.minecraft.core.Direction.EAST);
+			// 120 V for the control supply, from a small steam set
+			plant(server, z + 5);
+			put(server, 12, up, z + 5, "wildcatter:plastic_wire_hot");
+			put(server, 13, up, z + 5, "wildcatter:control_supply");
+			for (int x = 11; x <= 13; x++) {
+				put(server, x, up, z + 6, "wildcatter:plastic_wire_neutral");
+			}
+			// the panel: a box beside the supply and cabinet with the operator devices on it, and a run north to the starter
+			put(server, 14, up, z + 5, "wildcatter:junction_box");
+			put(server, 14, up + 1, z + 5, "wildcatter:junction_box");
+			put(server, 15, up, z + 5, "wildcatter:plc_cabinet[facing=south]");
+			server.runOnServer(srv -> dev.wildcatter.multiblock.BigParts.grow(srv.overworld(), new BlockPos(15, up, z + 5), srv.overworld().getBlockState(new BlockPos(15, up, z + 5))));
+			for (int zz = z + 1; zz <= z + 4; zz++) {
+				put(server, 14, up, zz, "wildcatter:control_cable");
+			}
+			put(server, 14, up, z + 6, "wildcatter:pushbutton[facing=south]");
+			put(server, 13, up + 1, z + 5, "wildcatter:estop[facing=south]");
+			put(server, 14, up + 1, z + 6, "wildcatter:pilot_light[facing=south]");
+			put(server, 14, up + 2, z + 5, "wildcatter:stack_light[facing=south]");
+			startGenset(context, server, set, net.minecraft.core.Direction.NORTH, 1000);
+			context.waitTicks(40);
+			BlockPos at = new BlockPos(15, up, z + 5);
+			BlockPos button = new BlockPos(14, up, z + 6);
+			BlockPos estop = new BlockPos(13, up + 1, z + 5);
+			BlockPos starterAt = new BlockPos(14, up, z);
+			BlockPos lamp = new BlockPos(14, up + 1, z + 6);
+			java.util.function.Function<net.minecraft.server.MinecraftServer, dev.wildcatter.control.PlcCabinetBlockEntity> cabinet = srv -> (dev.wildcatter.control.PlcCabinetBlockEntity) srv.overworld().getBlockEntity(at);
+			java.util.function.Supplier<String> status = () -> read(server, 15, up, z + 5);
+			check(status.get().contains("NO CPU"), "a new cabinet has no CPU: " + status.get());
+			String refused = server.computeOnServer(srv -> cabinet.apply(srv).land(button, 0, "%IX0.0"));
+			check(refused != null && refused.contains("no DI16"), "a signal should not land on a module that is not there: " + refused);
+			String wired = server.computeOnServer(srv -> {
+				dev.wildcatter.control.PlcCabinetBlockEntity box = cabinet.apply(srv);
+				box.seat(dev.wildcatter.control.PlcModuleItem.Type.CPU_SMALL);
+				box.seat(dev.wildcatter.control.PlcModuleItem.Type.DI16);
+				box.seat(dev.wildcatter.control.PlcModuleItem.Type.DO16);
+				StringBuilder errors = new StringBuilder();
+				for (String err : new String[] {box.land(button, 0, "%IX0.0"), box.land(estop, 0, "%IX0.1"), box.land(starterAt, 1, "%IX0.2"), box.land(starterAt, 2, "%IX0.3"), box.land(starterAt, 0, "%QX16.0"), box.land(lamp, 0, "%QX16.1")}) {
+					if (err != null) {
+						errors.append(err).append("; ");
+					}
+				}
+				box.setTag(button, "PB-101");
+				return errors.toString();
+			});
+			check(wired.isEmpty(), "every signal should land: " + wired);
+			String wrong = server.computeOnServer(srv -> cabinet.apply(srv).land(button, 0, "%QX16.5"));
+			check(wrong != null && wrong.contains("input bit"), "an input cannot land on an output: " + wrong);
+			server.runOnServer(srv -> cabinet.apply(srv).land(button, 0, "%IX0.0"));
+			context.waitTicks(30);
+			check(status.get().contains("devices reached") && !status.get().contains("NO 24 V"), "the supply should reach the cabinet: " + status.get());
+			film = context.computeOnClient(client -> Filming.start(client, "plc"));
+			context.takeScreenshot("wildcatter-plc-panel");
+			// the engineering station: typed into the real editor and downloaded over the real packet
+			server.runOnServer(srv -> cabinet.apply(srv).open(srv.getPlayerList().getPlayers().get(0)));
+			context.waitTicks(20);
+			check(context.computeOnClient(client -> client.gui.screen() instanceof dev.wildcatter.client.PlcScreen), "the cabinet's screen should open");
+			context.getInput().typeChars(PLC_PROJECT.substring(0, 60).replace("\n", " "));
+			context.waitTicks(10);
+			context.runOnClient(client -> ((dev.wildcatter.client.PlcScreen) client.gui.screen()).replaceForTest(PLC_PROJECT + "\nthis is not structured text"));
+			context.runOnClient(client -> ((dev.wildcatter.client.PlcScreen) client.gui.screen()).check());
+			context.waitTicks(10);
+			check(context.computeOnClient(client -> !((dev.wildcatter.client.PlcScreen) client.gui.screen()).errorsForTest().isEmpty()), "CHECK should list the error");
+			context.takeScreenshot("wildcatter-plc-error");
+			context.runOnClient(client -> ((dev.wildcatter.client.PlcScreen) client.gui.screen()).replaceForTest(PLC_PROJECT));
+			context.runOnClient(client -> ((dev.wildcatter.client.PlcScreen) client.gui.screen()).download());
+			context.waitTicks(20);
+			check(server.computeOnServer(srv -> cabinet.apply(srv).source().equals(PLC_PROJECT)), "the download should reach the cabinet");
+			context.takeScreenshot("wildcatter-plc-editor");
+			context.runOnClient(client -> ((dev.wildcatter.client.PlcScreen) client.gui.screen()).showTabForTest("TERMINALS"));
+			context.waitTicks(15);
+			context.takeScreenshot("wildcatter-plc-terminals");
+			context.runOnClient(client -> client.gui.screen().onClose());
+			context.waitTicks(10);
+			check(status.get().contains("STOP"), "a download leaves the CPU in STOP: " + status.get());
+			// AUTO: the selector; RUN: the key
+			java.util.function.Supplier<String> run = () -> read(server, 14, up, z);
+			server.runOnServer(srv -> {
+				starter(srv, 14, up, z).pushButton();
+			});
+			context.waitTicks(20);
+			check(run.get().contains("RUNNING"), "in HAND the starter's own button still works: " + run.get());
+			server.runOnServer(srv -> {
+				starter(srv, 14, up, z).cycleHoa(starterAt);
+			});
+			context.waitTicks(10);
+			check(run.get().contains("[OFF]") && run.get().contains("STOPPED"), "OFF stops it: " + run.get());
+			server.runOnServer(srv -> {
+				starter(srv, 14, up, z).cycleHoa(starterAt);
+			});
+			server.runOnServer(srv -> cabinet.apply(srv).cpu().setMode(dev.wildcatter.plc.Cpu.Mode.RUN));
+			context.waitTicks(20);
+			check(run.get().contains("[AUTO]") && run.get().contains("STOPPED"), "AUTO with nothing commanded stands still: " + run.get());
+			server.runOnServer(srv -> {
+				starter(srv, 14, up, z).pushButton();
+			});
+			context.waitTicks(10);
+			check(run.get().contains("STOPPED"), "in AUTO the starter's own button does nothing: " + run.get());
+			// the operator's button
+			server.runOnServer(srv -> ((dev.wildcatter.control.OperatorDeviceBlockEntity) srv.overworld().getBlockEntity(button)).operate());
+			context.waitTicks(160);
+			check(run.get().contains("RUNNING") && read(server, px, up, z).contains("pumping"), "the pushbutton should start the motor through the program: " + run.get() + " | " + read(server, px, up, z));
+			check(server.computeOnServer(srv -> srv.overworld().getBlockState(lamp).getValue(dev.wildcatter.control.OperatorDeviceBlock.LAMPS)) == 1, "the pilot light should show it running");
+			context.takeScreenshot("wildcatter-plc-running");
+			// the e-stop drops it and holds it down
+			server.runOnServer(srv -> ((dev.wildcatter.control.OperatorDeviceBlockEntity) srv.overworld().getBlockEntity(estop)).operate());
+			context.waitTicks(30);
+			check(run.get().contains("STOPPED"), "the e-stop should stop it: " + run.get());
+			server.runOnServer(srv -> ((dev.wildcatter.control.OperatorDeviceBlockEntity) srv.overworld().getBlockEntity(button)).operate());
+			context.waitTicks(30);
+			check(run.get().contains("STOPPED"), "a start should do nothing with the e-stop in: " + run.get());
+			server.runOnServer(srv -> ((dev.wildcatter.control.OperatorDeviceBlockEntity) srv.overworld().getBlockEntity(estop)).operate());
+			context.waitTicks(10);
+			server.runOnServer(srv -> ((dev.wildcatter.control.OperatorDeviceBlockEntity) srv.overworld().getBlockEntity(button)).operate());
+			context.waitTicks(60);
+			check(run.get().contains("RUNNING"), "released, a start should work again: " + run.get());
+			// a cut cable to the starter: it stops at once, as it has heard no command, and the latch is still set, so mending the cable starts it again
+			put(server, 14, up, z + 3, "minecraft:air");
+			context.waitTicks(40);
+			check(run.get().contains("STOPPED"), "a cut cable should stop the motor: " + run.get());
+			context.takeScreenshot("wildcatter-plc-cut");
+			put(server, 14, up, z + 3, "wildcatter:control_cable");
+			context.waitTicks(40);
+			check(run.get().contains("RUNNING"), "the panel's cable was not the one cut, so its latch still commands the motor: " + run.get());
+			// a T in a cable is a bad joint, named at the cabinet
+			put(server, 13, up, z + 3, "wildcatter:control_cable");
+			context.waitTicks(40);
+			check(status.get().contains("BAD JOINT") && run.get().contains("STOPPED"), "a T in a cable should be a bad joint: " + status.get() + " | " + run.get());
+			put(server, 13, up, z + 3, "minecraft:air");
+			context.waitTicks(40);
+			// a CPU fault drops everything, and names the line
+			server.runOnServer(srv -> {
+				dev.wildcatter.control.PlcCabinetBlockEntity box = cabinet.apply(srv);
+				box.download("PROGRAM MAIN\nVAR coil AT %QX16.0 : BOOL; i : DINT; END_VAR\ncoil := TRUE;\nWHILE TRUE DO i := i + 1; END_WHILE;\nEND_PROGRAM");
+				box.cpu().setMode(dev.wildcatter.plc.Cpu.Mode.RUN);
+			});
+			context.waitTicks(30);
+			check(status.get().contains("CPU FAULT") && run.get().contains("STOPPED"), "a runaway program should fault and drop the starter: " + status.get() + " | " + run.get());
+			check(server.computeOnServer(srv -> cabinet.apply(srv).cpu().diagnostics().getLast().toString()).contains("watchdog"), "the buffer should say why");
+			// so many direct-on-line starts heat the overload relay for real: let it cool, and reset it by hand if it tripped, which even AUTO allows
+			context.waitTicks(1200);
+			if (run.get().contains("TRIPPED")) {
+				server.runOnServer(srv -> {
+					starter(srv, 14, up, z).pushButton();
+				});
+				check(run.get().contains("[AUTO]") && !run.get().contains("TRIPPED"), "a trip's hand reset should work in AUTO: " + run.get());
+			}
+			// back on the real project, then lose the supply
+			server.runOnServer(srv -> {
+				dev.wildcatter.control.PlcCabinetBlockEntity box = cabinet.apply(srv);
+				box.download(PLC_PROJECT);
+				box.cpu().setMode(dev.wildcatter.plc.Cpu.Mode.RUN);
+			});
+			context.waitTicks(10);
+			server.runOnServer(srv -> ((dev.wildcatter.control.OperatorDeviceBlockEntity) srv.overworld().getBlockEntity(button)).operate());
+			context.waitTicks(60);
+			check(run.get().contains("RUNNING"), "the real project should run it again: " + run.get());
+			// a save and load keeps the project, the terminals and the latch
+			boolean kept = server.computeOnServer(srv -> {
+				dev.wildcatter.control.PlcCabinetBlockEntity box = cabinet.apply(srv);
+				var registries = srv.registryAccess();
+				net.minecraft.nbt.CompoundTag saved = box.saveCustomOnly(registries);
+				dev.wildcatter.control.PlcCabinetBlockEntity copy = new dev.wildcatter.control.PlcCabinetBlockEntity(at, box.getBlockState());
+				copy.setLevel(srv.overworld());
+				copy.loadCustomOnly(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, registries, saved));
+				dev.wildcatter.control.PlcCabinetBlockEntity.tick(srv.overworld(), at, box.getBlockState(), copy);
+				return copy.source().equals(PLC_PROJECT) && copy.cpu() != null && Boolean.TRUE.equals(copy.cpu().read("MAIN.LATCH")) && copy.cpu().mode() == dev.wildcatter.plc.Cpu.Mode.RUN;
+			});
+			check(kept, "a save and load should keep the project and the latch");
+			put(server, 13, up, z + 5, "minecraft:air");
+			context.waitTicks(40);
+			check(status.get().contains("NO 24 V") && run.get().contains("STOPPED"), "no 24 V should stop the motor: " + status.get() + " | " + run.get());
+			put(server, 13, up, z + 5, "wildcatter:control_supply");
+			context.waitTicks(60);
+			check(status.get().contains("RUN"), "the supply back, the CPU restarts: " + status.get());
+			check(run.get().contains("STOPPED"), "and the latch was not RETAIN, so the motor stays stopped until an operator starts it: " + run.get());
+			System.out.println("[wildcatter-test] plc ok: " + status.get());
+		} finally {
+			ReservoirData.testSeed = null;
+			if (film != null) {
+				film.stop();
+			}
+		}
+	}
+
 	private void motorStarter(ClientGameTestContext context, TestServerContext server) {
 		int z = -385;
 		int px = 17;

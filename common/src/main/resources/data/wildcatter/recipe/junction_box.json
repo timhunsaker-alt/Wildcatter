@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SSS",
+    "SRS",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "R": "minecraft:repeater"
+  },
+  "result": {
+    "id": "wildcatter:junction_box",
+    "count": 1
+  }
+}

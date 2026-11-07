@@ -15,4 +15,8 @@ public interface Platform {
 	Path configDir();
 
 	boolean isModLoaded(String modId);
+
+	void sendToPlayer(net.minecraft.server.level.ServerPlayer player, net.minecraft.network.protocol.common.custom.CustomPacketPayload payload);
+
+	void sendToServer(net.minecraft.network.protocol.common.custom.CustomPacketPayload payload);
 }

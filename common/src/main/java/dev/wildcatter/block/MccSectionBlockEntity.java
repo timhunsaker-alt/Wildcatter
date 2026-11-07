@@ -29,7 +29,7 @@ import org.jspecify.annotations.Nullable;
  * {@link Starter} in each bucket space that has one. The bus joins its neighbours through the side faces of its bottom cell, but only
  * while the section stands in a lineup to the right of an incoming section; each bucket's motor leads are on the back of its cell.
  */
-public class MccSectionBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity {
+public class MccSectionBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity, dev.wildcatter.control.ControlDevice {
 	public static final int SPACES = 3;
 	private static final Conductor[] PHASES = {Conductor.A, Conductor.B, Conductor.C};
 
@@ -93,6 +93,64 @@ public class MccSectionBlockEntity extends BlockEntity implements CircuitPart, I
 		if (buckets[space] != null && buckets[space].pushButton()) {
 			show(space);
 		}
+	}
+
+	@Override
+	public String deviceName() {
+		return "MCC starter section";
+	}
+
+	/** Each space's four signals, for what is installed; the numbers hold still as buckets come and go. */
+	@Override
+	public java.util.List<Point> points() {
+		java.util.List<Point> out = new java.util.ArrayList<>();
+		for (int space = 0; space < SPACES; space++) {
+			for (Point point : Starter.POINTS) {
+				out.add(new Point("Bucket " + (space + 1) + " " + point.name(), point.output()));
+			}
+		}
+		return out;
+	}
+
+	@Override
+	public boolean readPoint(int point) {
+		Starter bucket = buckets[point / Starter.POINTS.size()];
+		return bucket != null && bucket.readPoint(point % Starter.POINTS.size());
+	}
+
+	@Override
+	public void commandPoint(int point, boolean on, long gameTime) {
+		int space = point / Starter.POINTS.size();
+		if (buckets[space] != null && point % Starter.POINTS.size() == 0) {
+			buckets[space].command(on, gameTime);
+			follow(space, gameTime);
+		}
+	}
+
+	private void follow(int space, long now) {
+		if (buckets[space] != null && buckets[space].followCommand(now)) {
+			show(space);
+			if (level instanceof ServerLevel server) {
+				CircuitManager.markDirty(server);
+			}
+		}
+	}
+
+	@Override
+	public String cycleHoa(BlockPos cell) {
+		int space = Math.max(0, Math.min(SPACES - 1, cell.getY() - worldPosition.getY()));
+		Starter bucket = buckets[space];
+		if (bucket == null) {
+			return "bucket " + (space + 1) + " is empty";
+		}
+		if (bucket.cycleHoa()) {
+			show(space);
+			if (level instanceof ServerLevel server) {
+				CircuitManager.markDirty(server);
+			}
+		}
+		setChanged();
+		return "bucket " + (space + 1) + " " + bucket.hoa();
 	}
 
 	public void nextOverloadSetting(int space) {
@@ -198,6 +256,9 @@ public class MccSectionBlockEntity extends BlockEntity implements CircuitPart, I
 		for (int space = 0; space < SPACES; space++) {
 			if (buckets[space] != null && buckets[space].apply(circuit, ticks)) {
 				tripped(space);
+			}
+			if (level != null) {
+				follow(space, level.getGameTime());
 			}
 		}
 	}

@@ -2486,6 +2486,103 @@ lang[f"block.{ns}.branch_cable"] = "Branch Cable (armored, residential)"
 lang[f"block.{ns}.branch_cable_industrial"] = "Branch Cable (armored, industrial LV)"
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 13: PLCs (docs/multiblocks/plc.md) --------------------------------------------------------------------------
+# Small wall devices, as plain JSON boxes in the mod's materials and vanilla's coloured blocks: no new textures.
+def _box(f, to, tex):
+	return {"from": f, "to": to, "faces": {d: {"texture": "#" + tex} for d in ("north", "south", "east", "west", "up", "down")}}
+
+def _model(name, elements, textures):
+	save_json(f"{ASSETS}/models/block/{name}.json", {"parent": "minecraft:block/block", "textures": {"particle": textures["body"], **textures}, "elements": elements})
+
+def _item(name, model):
+	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{model}"}})
+
+def _flat_item(name, layer):
+	save_json(f"{ASSETS}/models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": layer}})
+	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{name}"}})
+
+_GREY = f"{ns}:block/mat/mat_polymer_grey"
+_BODY = [_box([4, 4, 12], [12, 12, 16], "body")]                      # the enclosure, on the wall behind it, drawn facing north
+_YROT = {"north": 0, "east": 90, "south": 180, "west": 270}
+
+def _device(name, variants):
+	"""variants: the lamps value's model elements and textures; the highest given holds for the rest."""
+	for lamps, (elements, textures) in enumerate(variants):
+		_model(f"{name}_{lamps}", _BODY + elements, {"body": _GREY, **textures})
+	save_json(f"{ASSETS}/blockstates/{name}.json", {"variants": {
+		f"facing={facing},lamps={lamps}": {"model": f"{ns}:block/{name}_{min(lamps, len(variants) - 1)}", "y": rot}
+		for facing, rot in _YROT.items() for lamps in range(8)}})
+	_item(name, f"{name}_0")
+	big_part_loot_simple(name)
+
+def big_part_loot_simple(name):
+	save_json(f"{ROOT}/data/{ns}/loot_table/blocks/{name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],
+		"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+
+_RED, _REDLIT = "minecraft:block/red_terracotta", "minecraft:block/red_concrete"
+_AMB, _AMBLIT = "minecraft:block/yellow_terracotta", "minecraft:block/yellow_concrete"
+_GRN, _GRNLIT = "minecraft:block/green_terracotta", "minecraft:block/lime_concrete"
+_button = lambda z: [_box([6, 6, z], [10, 10, 12], "cap")]
+_device("pushbutton", [(_button(9), {"cap": _GRNLIT}), (_button(11), {"cap": _GRNLIT})])
+_device("selector_switch", [([_box([6, 7, 10], [10, 9, 12], "cap")], {"cap": "minecraft:block/black_concrete"}), ([_box([7, 6, 10], [9, 10, 12], "cap")], {"cap": "minecraft:block/black_concrete"})])
+_device("estop", [([_box([5, 5, 9], [11, 11, 12], "cap")], {"cap": _REDLIT}), ([_box([5, 5, 7], [11, 11, 12], "cap")], {"cap": _REDLIT})])
+_device("pilot_light", [(_button(10), {"cap": _RED}), (_button(10), {"cap": _REDLIT})])
+_device("horn", [([_box([5, 5, 7], [11, 11, 12], "cap")], {"cap": "minecraft:block/gray_concrete"})])
+_device("stack_light", [([_box([7, 2, 12], [9, 4, 16], "body"), _box([6, 11, 9], [10, 13, 13], "r"), _box([6, 8, 9], [10, 10, 13], "a"), _box([6, 5, 9], [10, 7, 13], "g")],
+	{"r": _REDLIT if lamps & 1 else _RED, "a": _AMBLIT if lamps & 2 else _AMB, "g": _GRNLIT if lamps & 4 else _GRN}) for lamps in range(8)])
+
+_model("junction_box", [_box([3, 3, 3], [13, 13, 13], "body")], {"body": f"{ns}:block/mat/mat_galvanized"})
+save_json(f"{ASSETS}/blockstates/junction_box.json", {"variants": {"": {"model": f"{ns}:block/junction_box"}}})
+_item("junction_box", "junction_box")
+big_part_loot_simple("junction_box")
+for on, lamp in (("false", "minecraft:block/green_terracotta"), ("true", "minecraft:block/lime_concrete")):
+	_model(f"control_supply_{on}", [_box([3, 0, 4], [13, 12, 12], "body"), _box([10, 9, 3], [12, 11, 4], "lamp")], {"body": _GREY, "lamp": lamp})
+save_json(f"{ASSETS}/blockstates/control_supply.json", {"variants": {"on=false": {"model": f"{ns}:block/control_supply_false"}, "on=true": {"model": f"{ns}:block/control_supply_true"}}})
+_item("control_supply", "control_supply_true")
+big_part_loot_simple("control_supply")
+_RUBBER = f"{ns}:block/mat/mat_rubber"
+_model("control_cable_core", [_box([7, 7, 7], [9, 9, 9], "body")], {"body": _RUBBER})
+_model("control_cable_arm", [_box([7, 7, 0], [9, 9, 7], "body")], {"body": _RUBBER})
+_arm = {"north": {}, "east": {"y": 90}, "south": {"y": 180}, "west": {"y": 270}, "up": {"x": 270}, "down": {"x": 90}}
+save_json(f"{ASSETS}/blockstates/control_cable.json", {"multipart": [{"apply": {"model": f"{ns}:block/control_cable_core"}}] +
+	[{"when": {side: "true"}, "apply": {"model": f"{ns}:block/control_cable_arm", **rot}} for side, rot in _arm.items()]})
+save_json(f"{ASSETS}/models/item/control_cable.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/string"}})
+save_json(f"{ASSETS}/items/control_cable.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/control_cable"}})
+big_part_loot_simple("control_cable")
+big_part_loot("plc_cabinet")
+for name, icon in (("cpu_small", "decal_controller"), ("cpu_large", "decal_controller"), ("di16_module", "decal_relays"), ("do16_module", "decal_relays")):
+	_flat_item(name, f"{ns}:block/mat/{icon}")
+_flat_item("control_key", "minecraft:item/trial_key")
+_PLC_PARTS = ("control_cable", "junction_box", "control_supply", "plc_cabinet", "pushbutton", "selector_switch", "estop", "pilot_light", "stack_light", "horn")
+_PLC_STONE = ("junction_box", "control_supply", "plc_cabinet")
+for tag, names in (("mineable/pickaxe", _PLC_PARTS), ("needs_stone_tool", _PLC_STONE)):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
+	t["values"] += [f"{ns}:{n}" for n in names]
+	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
+# proposed recipes (plc.md): real parts where the mod has them
+shaped("control_cable", ["WWW", "RRR", "WWW"], {"W": "minecraft:black_wool", "R": "minecraft:redstone"}, "control_cable", 8)
+shaped("junction_box", ["SSS", "SRS", "SSS"], {"S": S_, "R": "minecraft:repeater"}, "junction_box")
+shaped("control_supply", ["SQS", "RCR", "SSS"], {"S": S_, "Q": "minecraft:quartz", "R": "minecraft:redstone", "C": "minecraft:comparator"}, "control_supply")
+shaped("plc_cabinet", ["SSS", "SRS", "SIS"], {"S": S_, "R": "minecraft:repeater", "I": "minecraft:iron_block"}, "plc_cabinet")
+shaped("cpu_small", ["QCQ", "RGR", "QCQ"], {"Q": "minecraft:quartz", "C": "minecraft:comparator", "R": "minecraft:redstone", "G": "minecraft:gold_ingot"}, "cpu_small")
+shaped("cpu_large", ["DCD", "CPC", "DCD"], {"D": "minecraft:diamond", "C": "minecraft:comparator", "P": f"{ns}:cpu_small"}, "cpu_large")
+shaped("di16_module", ["QRQ", "RCR", "QRQ"], {"Q": "minecraft:quartz", "R": "minecraft:redstone", "C": "minecraft:comparator"}, "di16_module")
+shaped("do16_module", ["QRQ", "RCR", "QTQ"], {"Q": "minecraft:quartz", "R": "minecraft:redstone", "C": "minecraft:comparator", "T": "minecraft:repeater"}, "do16_module")
+shaped("control_key", [" I", "I "], {"I": "minecraft:iron_nugget"}, "control_key")
+shaped("pushbutton", ["S", "B"], {"S": S_, "B": "minecraft:stone_button"}, "pushbutton")
+shaped("selector_switch", ["S", "L"], {"S": S_, "L": "minecraft:lever"}, "selector_switch")
+shaped("estop", ["R", "S", "B"], {"R": "minecraft:red_dye", "S": S_, "B": "minecraft:stone_button"}, "estop")
+shaped("pilot_light", ["G", "S"], {"G": "minecraft:glowstone_dust", "S": S_}, "pilot_light")
+shaped("stack_light", ["R", "G", "S"], {"R": "minecraft:redstone_lamp", "G": "minecraft:glass_pane", "S": S_}, "stack_light")
+shaped("horn", ["N", "S"], {"N": "minecraft:note_block", "S": S_}, "horn")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({"block.wildcatter.control_cable": "Control Cable (multi-core)", "block.wildcatter.junction_box": "Field Junction Box", "block.wildcatter.control_supply": "Control Power Supply (24 V DC)",
+	"block.wildcatter.plc_cabinet": "PLC Cabinet", "block.wildcatter.pushbutton": "Pushbutton", "block.wildcatter.selector_switch": "Selector Switch", "block.wildcatter.estop": "E-Stop",
+	"block.wildcatter.pilot_light": "Pilot Light", "block.wildcatter.stack_light": "Stack Light", "block.wildcatter.horn": "Horn",
+	"item.wildcatter.cpu_small": "CPU Module (small)", "item.wildcatter.cpu_large": "CPU Module (large)", "item.wildcatter.di16_module": "Digital Input Module (16, 24 V DC)",
+	"item.wildcatter.do16_module": "Relay Output Module (16, 2 A)", "item.wildcatter.control_key": "Selector Key (HAND / OFF / AUTO)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

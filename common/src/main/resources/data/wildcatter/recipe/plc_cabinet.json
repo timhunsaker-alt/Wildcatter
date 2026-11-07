@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SSS",
+    "SRS",
+    "SIS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "R": "minecraft:repeater",
+    "I": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:plc_cabinet",
+    "count": 1
+  }
+}

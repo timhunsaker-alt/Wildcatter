@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "S",
+    "B"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "B": "minecraft:stone_button"
+  },
+  "result": {
+    "id": "wildcatter:pushbutton",
+    "count": 1
+  }
+}

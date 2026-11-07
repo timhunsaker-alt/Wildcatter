@@ -23,7 +23,7 @@ import net.minecraft.world.level.storage.ValueOutput;
  * Its run state shows in the block state. (An older world's one-block MCC bucket shares this entity until it drops; it does
  * nothing in the meantime.)
  */
-public class MotorStarterBlockEntity extends BlockEntity implements CircuitPart, Inspectable {
+public class MotorStarterBlockEntity extends BlockEntity implements CircuitPart, Inspectable, dev.wildcatter.control.ControlDevice {
 	private final Starter starter = new Starter();
 	private final int[] line = new int[3];
 	private boolean loadedRun;
@@ -38,6 +38,53 @@ public class MotorStarterBlockEntity extends BlockEntity implements CircuitPart,
 
 	private Direction facing() {
 		return getBlockState().getValue(MotorStarterBlock.FACING);
+	}
+
+	@Override
+	public String deviceName() {
+		return "Motor starter";
+	}
+
+	@Override
+	public java.util.List<Point> points() {
+		return block().bucket() ? java.util.List.of() : Starter.POINTS;
+	}
+
+	@Override
+	public boolean readPoint(int point) {
+		return starter.readPoint(point);
+	}
+
+	@Override
+	public void commandPoint(int point, boolean on, long gameTime) {
+		if (point == 0) {
+			starter.command(on, gameTime);
+			follow(gameTime);
+		}
+	}
+
+	private void follow(long now) {
+		if (starter.followCommand(now)) {
+			show();
+			if (level instanceof ServerLevel server) {
+				CircuitManager.markDirty(server);
+			}
+		}
+	}
+
+	@Override
+	public String cycleHoa(BlockPos cell) {
+		if (block().bucket()) {
+			return null;
+		}
+		if (starter.cycleHoa()) {
+			show();
+			if (level instanceof ServerLevel server) {
+				CircuitManager.markDirty(server);
+			}
+		}
+		setChanged();
+		return starter.hoa().name();
 	}
 
 	public MotorStarterBlock.Run run() {
@@ -115,6 +162,9 @@ public class MotorStarterBlockEntity extends BlockEntity implements CircuitPart,
 	public void apply(Circuit circuit, int ticks) {
 		if (!block().bucket() && starter.apply(circuit, ticks)) {
 			tripped();
+		}
+		if (!block().bucket() && level != null) {
+			follow(level.getGameTime());
 		}
 	}
 

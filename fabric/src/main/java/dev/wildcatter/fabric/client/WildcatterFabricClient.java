@@ -14,6 +14,8 @@ public class WildcatterFabricClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		WildcatterClient.init();
 		WildcatterClient.renderers(BlockEntityRenderers::register);
+		net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.registerGlobalReceiver(dev.wildcatter.control.PlcNet.Payload.TYPE,
+				(payload, context) -> context.client().execute(() -> dev.wildcatter.control.PlcNet.client.accept(payload.tag())));
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> WildcatterClient.disconnected());
 		LevelRenderEvents.BEFORE_GIZMOS.register(context -> WildcatterClient.drawGizmos());
 		ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {

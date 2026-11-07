@@ -180,6 +180,31 @@ Tailings compiles against a Wildcatter release, so it comes after 13h's release.
 - **Left out:** date types (DATE, TOD, DT), ULINT, the 2013 edition's object-oriented methods and interfaces, and passing variables to a program instance in the configuration. A function block in an array cannot use `=>`: read its output after the call, as `fbs[i].Q`.
 - **Errors carry a line, not yet a file:** a project is compiled from one source for now; 13b's editor brings POUs in their own files.
 
+## How 13b plays *(proposed where marked)*
+- **Slots and addresses, by position, as a real rack's:** the cabinet's CPU sits in its own slot, and 12 module slots follow. Slot *n* (from 0) owns 16 bytes from `n x 16` *(proposed)*, so channel 3 of a DI16 in slot 1 is `%IX16.3`. An input and an output module each read and write their own area.
+- **Seating a module:** click the cabinet holding it. Sneak with an empty hand pulls the last one seated.
+- **Wiring:** `control_cable` joins the cabinet, junction boxes, the supply and devices. A cable makes one run, so **a cable cell touching more than two things is a bad joint**: the signal stops there and the cabinet names the block. Runs fan out at a junction box, which takes any number.
+- **Terminals:** click the cabinet with an empty hand, and the screen's TERMINALS tab lists every device its cables reach, each with its signals. Choosing a channel lands a signal. A device's tag, such as `PB-101`, is set there too.
+- **The HAND / OFF / AUTO selector:** the new `control_key` item, clicked on a device, steps its selector. A keyed selector is a real fitting, and the key does not take over any click a device already has. In OFF or AUTO a device's buttons and redstone do nothing, except a trip's hand reset. Every device starts in HAND.
+- **Losing the PLC:** a device in AUTO stops if it has heard no command for half a second *(proposed)*. A cut cable, a dead supply, STOP, a CPU fault and an unloaded cabinet all look the same to it.
+- **Starters:** every direct, soft and drive starter, in its own box, an MCC bucket or a cabinet, has four signals: RUN (output), RUNNING, TRIPPED, AUTO (inputs).
+- **Operator devices, wall-mounted, 24 V:** pushbutton (momentary, on for half a second a click), selector (maintained), e-stop (latched, **normally closed**, so a cut wire reads as a press), pilot light, stack light (red, amber, green), horn.
+- **The supply** draws **100 W** *(proposed)* from a 120 V circuit (or the world's standard). Below 85 % voltage *(proposed)* it gives no 24 V. Its 10 A rating is not enforced yet.
+- **The editor:** line numbers, syntax colours, selection, copy and paste, undo, and a compile that lists errors by line and jumps to them. CHECK compiles without touching the CPU. DOWNLOAD compiles on the server and replaces the project, leaving the CPU in STOP, as a real download does. A DIAGNOSTICS tab shows the fault buffer, and an ONLINE tab reads and writes tags and forces I/O.
+
+## As built: 13b (2026-11-07)
+`dev.wildcatter.control`, `client/PlcScreen`, and the `plc` game scene, on the Fabric client.
+- **Proved in the world:** a pushbutton starts a pumpjack's real 480 V motor through a real program. In AUTO the starter's own button does nothing, the e-stop drops it and refuses a start, a cut cable stops it, a T in a cable is named as a bad joint, a runaway program faults and drops it, a save and load keeps the project and the latch, and losing 24 V stops it. The repeated direct-on-line starts tripped the starter's real overload at 67.5 A inrush on the way, and the hand reset worked in AUTO.
+- **Not yet:**
+  - the modules seated are not drawn in the cabinet's window, as the spec wants: the door shows a fixed picture;
+  - a cable's core count: any number of signals may share a run;
+  - the supply's 10 A rating is not enforced;
+  - `control_key` steps a selector with no drawn switch position on the device: its readout shows it;
+  - a project is one source, so errors carry a line and no POU;
+  - the horn borrows a vanilla note block sound;
+  - module and key icons borrow existing art, and the recipes are proposed;
+  - the NeoForge jar compiles with its packet registered, but has not opened this screen in a world.
+
 ## Figures for 13a *(proposed)*
 | Figure | Small CPU | Large CPU | Basis |
 |---|---|---|---|

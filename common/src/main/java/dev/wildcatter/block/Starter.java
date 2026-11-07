@@ -87,6 +87,52 @@ public final class Starter {
 		return kind;
 	}
 
+	// ---- HAND / OFF / AUTO, and the PLC's coil (docs/multiblocks/plc.md) --------------------------------------------------------
+
+	/** A device in AUTO stops when it has heard no command for this long: a cut cable, a dead PLC and STOP all look the same. */
+	public static final int COMMAND_STALE_TICKS = 10;
+	public static final java.util.List<dev.wildcatter.control.ControlDevice.Point> POINTS = java.util.List.of(
+			new dev.wildcatter.control.ControlDevice.Point("RUN", true), new dev.wildcatter.control.ControlDevice.Point("RUNNING", false),
+			new dev.wildcatter.control.ControlDevice.Point("TRIPPED", false), new dev.wildcatter.control.ControlDevice.Point("AUTO", false));
+
+	private dev.wildcatter.control.Hoa hoa = dev.wildcatter.control.Hoa.HAND;
+	private boolean commanded;
+	private long commandTick = -COMMAND_STALE_TICKS - 1;
+
+	public dev.wildcatter.control.Hoa hoa() {
+		return hoa;
+	}
+
+	/** Steps the selector; true if the run state changed. Only HAND keeps it running: leaving it stops the motor until AUTO's command comes. */
+	public boolean cycleHoa() {
+		hoa = hoa.next();
+		return run != MotorStarterBlock.Run.TRIPPED && hoa != dev.wildcatter.control.Hoa.HAND && setRun(MotorStarterBlock.Run.STOPPED);
+	}
+
+	/** The PLC's output, each scan; it counts only in AUTO. */
+	public void command(boolean on, long now) {
+		commanded = on;
+		commandTick = now;
+	}
+
+	/** Follows the PLC, in AUTO. True if the run state changed. A trip stays until its hand reset. */
+	public boolean followCommand(long now) {
+		if (hoa != dev.wildcatter.control.Hoa.AUTO || run == MotorStarterBlock.Run.TRIPPED) {
+			return false;
+		}
+		return setRun(commanded && now - commandTick <= COMMAND_STALE_TICKS ? MotorStarterBlock.Run.RUNNING : MotorStarterBlock.Run.STOPPED);
+	}
+
+	/** RUNNING, TRIPPED and AUTO, as {@link #POINTS} numbers them. */
+	public boolean readPoint(int point) {
+		return switch (point) {
+			case 1 -> run == MotorStarterBlock.Run.RUNNING;
+			case 2 -> run == MotorStarterBlock.Run.TRIPPED;
+			case 3 -> hoa == dev.wildcatter.control.Hoa.AUTO;
+			default -> false;
+		};
+	}
+
 	public MotorStarterBlock.Run run() {
 		return run;
 	}
@@ -144,6 +190,9 @@ public final class Starter {
 
 	/** The start/stop button: start when stopped, stop when running, reset (to stopped) after a trip. True if the run state changed. */
 	public boolean pushButton() {
+		if (hoa != dev.wildcatter.control.Hoa.HAND && run != MotorStarterBlock.Run.TRIPPED) {
+			return false;
+		}
 		return setRun(run == MotorStarterBlock.Run.STOPPED ? MotorStarterBlock.Run.RUNNING : MotorStarterBlock.Run.STOPPED);
 	}
 
@@ -153,7 +202,7 @@ public final class Starter {
 			return false;
 		}
 		powered = signal;
-		return run != MotorStarterBlock.Run.TRIPPED && setRun(signal ? MotorStarterBlock.Run.RUNNING : MotorStarterBlock.Run.STOPPED);
+		return hoa == dev.wildcatter.control.Hoa.HAND && run != MotorStarterBlock.Run.TRIPPED && setRun(signal ? MotorStarterBlock.Run.RUNNING : MotorStarterBlock.Run.STOPPED);
 	}
 
 	/** Its poles from {@code line} (one node per phase) to its motor side, closed while it runs and {@code fed}. */
@@ -405,11 +454,13 @@ public final class Starter {
 		String dials = kind == Kind.SOFT
 				? String.format(", full-load amps set to %.1f A, limit %.1f x; sneak and right-click steps the amps, with the Power Meter the limit", overloadAmps(), limitMultiple())
 				: String.format(", %s set to %.1f A; sneak and right-click steps the dial", kind == Kind.DRIVE ? "motor full-load amps" : "overload", overloadAmps());
+		state = (hoa == dev.wildcatter.control.Hoa.HAND ? "" : "[" + hoa + "] ") + state;
 		return state + (heat > 0.05 ? ", overload relay heating " + Math.round(heat * 100) + "%" : "") + dials;
 	}
 
 	public void save(ValueOutput output, String prefix) {
 		output.putString(prefix + "run", run.getSerializedName());
+		output.putString(prefix + "hoa", hoa.name());
 		output.putInt(prefix + "setting", setting);
 		output.putDouble(prefix + "heat", heat);
 		output.putString(prefix + "lastTrip", lastTrip);
@@ -426,6 +477,7 @@ public final class Starter {
 				run = r;
 			}
 		}
+		hoa = dev.wildcatter.control.Hoa.valueOf(input.getStringOr(prefix + "hoa", "HAND"));
 		setting = input.getIntOr(prefix + "setting", setting);
 		heat = input.getDoubleOr(prefix + "heat", 0);
 		lastTrip = input.getStringOr(prefix + "lastTrip", "");

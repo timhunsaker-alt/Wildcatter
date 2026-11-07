@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SQS",
+    "RCR",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "Q": "minecraft:quartz",
+    "R": "minecraft:redstone",
+    "C": "minecraft:comparator"
+  },
+  "result": {
+    "id": "wildcatter:control_supply",
+    "count": 1
+  }
+}

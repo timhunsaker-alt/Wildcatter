@@ -1,0 +1,132 @@
+{
+  "variants": {
+    "facing=north,lamps=0": {
+      "model": "wildcatter:block/selector_switch_0",
+      "y": 0
+    },
+    "facing=north,lamps=1": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 0
+    },
+    "facing=north,lamps=2": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 0
+    },
+    "facing=north,lamps=3": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 0
+    },
+    "facing=north,lamps=4": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 0
+    },
+    "facing=north,lamps=5": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 0
+    },
+    "facing=north,lamps=6": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 0
+    },
+    "facing=north,lamps=7": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 0
+    },
+    "facing=east,lamps=0": {
+      "model": "wildcatter:block/selector_switch_0",
+      "y": 90
+    },
+    "facing=east,lamps=1": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 90
+    },
+    "facing=east,lamps=2": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 90
+    },
+    "facing=east,lamps=3": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 90
+    },
+    "facing=east,lamps=4": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 90
+    },
+    "facing=east,lamps=5": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 90
+    },
+    "facing=east,lamps=6": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 90
+    },
+    "facing=east,lamps=7": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 90
+    },
+    "facing=south,lamps=0": {
+      "model": "wildcatter:block/selector_switch_0",
+      "y": 180
+    },
+    "facing=south,lamps=1": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 180
+    },
+    "facing=south,lamps=2": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 180
+    },
+    "facing=south,lamps=3": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 180
+    },
+    "facing=south,lamps=4": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 180
+    },
+    "facing=south,lamps=5": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 180
+    },
+    "facing=south,lamps=6": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 180
+    },
+    "facing=south,lamps=7": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 180
+    },
+    "facing=west,lamps=0": {
+      "model": "wildcatter:block/selector_switch_0",
+      "y": 270
+    },
+    "facing=west,lamps=1": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 270
+    },
+    "facing=west,lamps=2": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 270
+    },
+    "facing=west,lamps=3": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 270
+    },
+    "facing=west,lamps=4": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 270
+    },
+    "facing=west,lamps=5": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 270
+    },
+    "facing=west,lamps=6": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 270
+    },
+    "facing=west,lamps=7": {
+      "model": "wildcatter:block/selector_switch_1",
+      "y": 270
+    }
+  }
+}

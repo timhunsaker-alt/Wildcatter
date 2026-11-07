@@ -32,7 +32,7 @@ import org.jspecify.annotations.Nullable;
  * is complete it has no terminals.</li>
  * </ul>
  */
-public class StarterCabinetBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity {
+public class StarterCabinetBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity, dev.wildcatter.control.ControlDevice {
 	private final Starter starter;
 	private final int[] line = new int[3];
 	private boolean grown;
@@ -121,6 +121,47 @@ public class StarterCabinetBlockEntity extends BlockEntity implements CircuitPar
 		return false;
 	}
 
+	@Override
+	public String deviceName() {
+		return starter.kind() == Starter.Kind.DRIVE ? "Variable-frequency drive" : "Soft starter";
+	}
+
+	@Override
+	public java.util.List<Point> points() {
+		return Starter.POINTS;
+	}
+
+	@Override
+	public boolean readPoint(int point) {
+		return starter.readPoint(point);
+	}
+
+	@Override
+	public void commandPoint(int point, boolean on, long gameTime) {
+		if (point == 0) {
+			starter.command(on, gameTime);
+			follow(gameTime);
+		}
+	}
+
+	private void follow(long now) {
+		if (starter.followCommand(now)) {
+			setChanged();
+			if (level instanceof ServerLevel server) {
+				CircuitManager.markDirty(server);
+			}
+		}
+	}
+
+	@Override
+	public String cycleHoa(BlockPos cell) {
+		if (starter.cycleHoa() && level instanceof ServerLevel server) {
+			CircuitManager.markDirty(server);
+		}
+		setChanged();
+		return starter.hoa().name();
+	}
+
 	public void pushButton() {
 		if (starter.pushButton()) {
 			setChanged();
@@ -187,6 +228,9 @@ public class StarterCabinetBlockEntity extends BlockEntity implements CircuitPar
 	public void apply(Circuit circuit, int ticks) {
 		if (starter.apply(circuit, ticks)) {
 			tripped();
+		}
+		if (level != null) {
+			follow(level.getGameTime());
 		}
 		setChanged();
 	}

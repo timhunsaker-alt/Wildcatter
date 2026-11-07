@@ -40,6 +40,14 @@ public class WildcatterNeoForge {
 						.build());
 			}
 		});
+		modBus.addListener(net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent.class, event -> event.registrar("1").playBidirectional(
+				dev.wildcatter.control.PlcNet.Payload.TYPE, dev.wildcatter.control.PlcNet.Payload.CODEC, (payload, context) -> context.enqueueWork(() -> {
+					if (context.flow().isServerbound()) {
+						dev.wildcatter.control.PlcNet.fromClient((net.minecraft.server.level.ServerPlayer) context.player(), payload.tag());
+					} else {
+						dev.wildcatter.control.PlcNet.client.accept(payload.tag());
+					}
+				})));
 		NeoForge.EVENT_BUS.addListener(ServerStartedEvent.class, event -> Wildcatter.serverStarted(event.getServer()));
 		NeoForge.EVENT_BUS.addListener(ServerStoppedEvent.class, event -> Wildcatter.serverStopped(event.getServer()));
 		NeoForge.EVENT_BUS.addListener(ServerTickEvent.Post.class, event -> Wildcatter.serverTick(event.getServer()));

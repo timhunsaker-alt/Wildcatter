@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "N",
+    "S"
+  ],
+  "key": {
+    "N": "minecraft:note_block",
+    "S": "wildcatter:steel_ingot"
+  },
+  "result": {
+    "id": "wildcatter:horn",
+    "count": 1
+  }
+}

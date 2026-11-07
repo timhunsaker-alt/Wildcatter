@@ -18,6 +18,10 @@ public class WildcatterFabric implements ModInitializer {
 	public void onInitialize() {
 		Wildcatter.register();
 		OreGenFabric.register();
+		net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry.serverboundPlay().register(dev.wildcatter.control.PlcNet.Payload.TYPE, dev.wildcatter.control.PlcNet.Payload.CODEC);
+		net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry.clientboundPlay().register(dev.wildcatter.control.PlcNet.Payload.TYPE, dev.wildcatter.control.PlcNet.Payload.CODEC);
+		net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.registerGlobalReceiver(dev.wildcatter.control.PlcNet.Payload.TYPE,
+				(payload, context) -> context.server().execute(() -> dev.wildcatter.control.PlcNet.fromClient(context.player(), payload.tag())));
 		// plugs hand power to Team Reborn Energy machines (bundled, so always loaded on Fabric)
 		if (FabricLoader.getInstance().isModLoaded("team_reborn_energy")) {
 			dev.wildcatter.energy.TeamRebornEnergy.register();

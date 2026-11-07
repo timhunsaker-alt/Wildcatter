@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "WWW",
+    "RRR",
+    "WWW"
+  ],
+  "key": {
+    "W": "minecraft:black_wool",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "wildcatter:control_cable",
+    "count": 8
+  }
+}

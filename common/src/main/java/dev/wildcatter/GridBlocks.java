@@ -149,6 +149,18 @@ public interface GridBlocks {
 	Block SOFT_STARTER = block("soft_starter", props -> new dev.wildcatter.block.StarterCabinetBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), dev.wildcatter.multiblock.Footprint.box(1, 2, 1, 0, 0), "soft_starter",
 			dev.wildcatter.block.Starter.Kind.SOFT, Voltage.INDUSTRIAL, Tuning.CABINET_SETTINGS_LV, false));
+	/** Phase 13: PLCs (docs/multiblocks/plc.md). */
+	Block CONTROL_CABLE = block("control_cable", props -> new dev.wildcatter.control.ControlCableBlock(props.mapColor(MapColor.COLOR_BLACK).strength(0.5F).sound(SoundType.WOOL)));
+	Block JUNCTION_BOX = block("junction_box", props -> new dev.wildcatter.control.JunctionBoxBlock(props.mapColor(MapColor.COLOR_GRAY).strength(1.5F, 3.0F).sound(SoundType.METAL)));
+	Block CONTROL_SUPPLY = block("control_supply", props -> new dev.wildcatter.control.ControlSupplyBlock(props.mapColor(MapColor.COLOR_GRAY).strength(1.5F, 3.0F).sound(SoundType.METAL)));
+	Block PLC_CABINET = block("plc_cabinet", props -> new dev.wildcatter.control.PlcCabinetBlock(props.mapColor(MapColor.COLOR_GRAY).strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(),
+			dev.wildcatter.multiblock.Footprint.box(1, 2, 1, 0, 0), "plc_cabinet"));
+	Block PUSHBUTTON = block("pushbutton", props -> new dev.wildcatter.control.OperatorDeviceBlock(props.mapColor(MapColor.COLOR_GRAY).strength(0.5F).sound(SoundType.METAL), dev.wildcatter.control.OperatorDeviceBlock.Kind.PUSHBUTTON));
+	Block SELECTOR_SWITCH = block("selector_switch", props -> new dev.wildcatter.control.OperatorDeviceBlock(props.mapColor(MapColor.COLOR_GRAY).strength(0.5F).sound(SoundType.METAL), dev.wildcatter.control.OperatorDeviceBlock.Kind.SELECTOR));
+	Block ESTOP = block("estop", props -> new dev.wildcatter.control.OperatorDeviceBlock(props.mapColor(MapColor.COLOR_RED).strength(0.5F).sound(SoundType.METAL), dev.wildcatter.control.OperatorDeviceBlock.Kind.ESTOP));
+	Block PILOT_LIGHT = block("pilot_light", props -> new dev.wildcatter.control.OperatorDeviceBlock(props.mapColor(MapColor.COLOR_GRAY).strength(0.5F).sound(SoundType.METAL).lightLevel(s -> s.getValue(dev.wildcatter.control.OperatorDeviceBlock.LAMPS) != 0 ? 7 : 0), dev.wildcatter.control.OperatorDeviceBlock.Kind.PILOT_LIGHT));
+	Block STACK_LIGHT = block("stack_light", props -> new dev.wildcatter.control.OperatorDeviceBlock(props.mapColor(MapColor.COLOR_GRAY).strength(0.5F).sound(SoundType.METAL).lightLevel(s -> s.getValue(dev.wildcatter.control.OperatorDeviceBlock.LAMPS) != 0 ? 7 : 0), dev.wildcatter.control.OperatorDeviceBlock.Kind.STACK_LIGHT));
+	Block HORN = block("horn", props -> new dev.wildcatter.control.OperatorDeviceBlock(props.mapColor(MapColor.COLOR_GRAY).strength(0.5F).sound(SoundType.METAL), dev.wildcatter.control.OperatorDeviceBlock.Kind.HORN));
 	Block DRIVE_CABINET = block("drive_cabinet", props -> new dev.wildcatter.block.StarterCabinetBlock(props.mapColor(MapColor.COLOR_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), dev.wildcatter.multiblock.Footprint.box(1, 2, 1, 0, 0), "drive_cabinet",
 			dev.wildcatter.block.Starter.Kind.DRIVE, Voltage.INDUSTRIAL, Tuning.CABINET_SETTINGS_LV, false));
