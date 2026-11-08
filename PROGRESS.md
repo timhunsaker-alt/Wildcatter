@@ -1448,6 +1448,7 @@ sized for a 40-pot line.
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- Phase 13i: Tailings' sorter routing and its TBM's course are not on a signal (Tailings' Known gaps).
 - Phase 13g and 13h: see `docs/multiblocks/plc.md`, "As built". One process unit has run under a PLC in the world; the rig, crane and coolant pump signals are compiled only. Nothing stops two PLCs landing on one rack.
 - Phase 13f: see `docs/multiblocks/plc.md`, "As built: 13f, Not yet". Most power equipment's signals compile but have not been exercised in the world.
 - Phase 13e: see `docs/multiblocks/plc.md`, "As built: 13e, Not yet". New module items borrow existing decal art; the new blocks are boxes in the mod's materials and vanilla concrete, no new script-drawn textures.
@@ -1603,7 +1604,7 @@ Spec: docs/multiblocks/tailings-cell.md. Written ahead of a plan, then approved 
 
 Phase 12 closed on 2026-11-06: the full client suite passed (BUILD SUCCESSFUL in 2h 47m) and it is released as v0.4.0. No phase is CURRENT until Tim picks the next.
 
-## Phase 13: PLCs (CURRENT)
+## Phase 13: PLCs (2026-11-07)
 Spec: `docs/multiblocks/plc.md`, decided by Tim 2026-11-07: nine waves.
 
 **13a, the language core (2026-11-07):** IEC 61131-3 structured text, compiled to a bounded bytecode and run by a CPU in plain Java, with no game face yet. 31 unit tests run real programs: the scan's input image, every statement and type, timers and counters against the scan's clock, tasks at their intervals, a PID holding a level with anti-windup and bumpless transfer, forcing, retained values, the watchdog stopping a runaway program. Nothing a player can place yet: that is 13b.
@@ -1621,6 +1622,10 @@ Spec: `docs/multiblocks/plc.md`, decided by Tim 2026-11-07: nine waves.
 **13g, process plants and the reactor (2026-11-07):** a run enable on every plant unit, and rods, boron and a manual trip on the reactor, its trips still beating them. The `reactor` and `toppingUnit` scenes now run under real programs.
 
 **13h, networks (2026-11-07):** remote I/O drops, PLC-to-PLC tag exchange, an HMI by station, and a marker as a register. The new `plcNetwork` scene runs a starter on a drop 60 blocks away and cuts the network.
+
+**13i, the release and Tailings (2026-11-07):** the full client suite passed (BUILD SUCCESSFUL in 2h 53m, 0 unsolved circuits) and Phase 13 is released as v0.5.0. The suite found that a world could not be saved with a program unit over 64 KB in a cabinet, broken since 13c; units are now saved in pieces, and the `plc` scene writes a 150 KB unit as a save does. Tailings' plant motors, sorter gates, mine switches, block signals and TBM cable junction take PLC signals on v0.5.0 (Tailings' `DESIGN.md`, "PLC signals").
+
+Phase 13 closed on 2026-11-07. No phase is CURRENT until Tim picks the next.
 
 v0.4.1 (2026-11-06), two fixes found by Tailings' playthrough; the full client suite passed on them (2h 45m):
 - **The solver no longer gives up on a floating bus.** A busway's neutral on a dead bus has low resistance and no path to ground, so the small leak each node carries rounded away and the factorisation stopped with "Could not solve the circuit". The solve for that whole group was then dropped, so the generator's synchroniser never read the bus and its breaker never closed. The node now gets its leak back. Unit test `aFloatingBusStillSolves`. The warning came 241 times in the v0.4.0 suite's log, on a suite that passed, and 0 times in this one.

@@ -5913,6 +5913,17 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(context.computeOnClient(client -> client.gui.screen() instanceof dev.wildcatter.client.PlcScreen && plcScreen(client).unitCountForTest() == 2), "a screen should open on a 150 KB project and have both its units");
 		context.runOnClient(client -> plcScreen(client).selectUnitForTest("BIG"));
 		context.waitTick();
+		// and it saves: a saved string holds 65,535 bytes, and this unit is one line of 156,000
+		String saved = server.computeOnServer(srv -> {
+			try {
+				var out = new java.io.ByteArrayOutputStream();
+				net.minecraft.nbt.NbtIo.write(cabinet.apply(srv).saveCustomOnly(srv.registryAccess()), new java.io.DataOutputStream(out));
+				return "ok " + out.size();
+			} catch (java.io.IOException | RuntimeException e) {
+				return e.toString();
+			}
+		});
+		check(saved.startsWith("ok"), "a cabinet holding a 150 KB unit should write to disk: " + saved);
 		plcClick(context, "DELETE UNIT");   // BIG is not first, so it selects MAIN and we delete below
 		// draw the ladder with the toolbar
 		plcClick(context, "+LD");

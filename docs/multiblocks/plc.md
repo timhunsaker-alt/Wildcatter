@@ -312,6 +312,11 @@ A selector and a run enable on every plant unit, in `PlantUnitBlockEntity`; rod 
   - the exchange copies each row every half second, one way; a row's types must match or it shows FAILED;
   - a drop's modules are not drawn, as a cabinet's are not.
 
+## As built: 13i (2026-11-07)
+Wildcatter v0.5.0, holding everything above, and Tailings on it.
+- **Found by the full suite:** since 13c, a world could not be saved with a program unit over 64 KB in a cabinet: the unit went to disk as one string, and a save writes no string past 65,535 bytes. Units are now saved in pieces of 20,000 characters, as they already went to the screen; a world saved before loads them the old way. The `plc` scene now writes a cabinet holding a 150 KB unit to bytes, as a save does.
+- **Tailings:** its plant machines, mine switches, signals and the TBM's cable junction are devices on Wildcatter's control cable. See Tailings' `DESIGN.md` and its `plc_*` scenes.
+
 ## The plan for 13e to 13i (surveyed 2026-11-07; Tim: "let's finish out the rest of 13")
 What the survey found that the waves above did not say, and how each is met. All figures *(proposed)*.
 - **13e:**

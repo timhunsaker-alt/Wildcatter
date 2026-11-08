@@ -330,8 +330,8 @@ and the Field Manual has a page for each new system.
 ## Phase 12 — The lined tailings cell and the process water pump — DONE (2026-11-06; Tim: "do whatever is needed for wildcatter")
 Spec: `docs/multiblocks/tailings-cell.md`. For Tailings' Phase 4 and the uranium mill's underflow. Approved by Tim as built. The full client suite passed on 2026-11-06 (2h 47m), and it is released as v0.4.0.
 
-## Phase 13 — PLCs — CURRENT (Tim, 2026-11-07: "every type of thing you would run off of them", programming "as close to real life as possible")
-Spec: `docs/multiblocks/plc.md`, nine waves, all approved in order: 13a language core; 13b hardware and text editor; 13c ladder and FBD; 13d SFC, device blocks, memory card, import and export (done); 13e transmitters and valves (done); 13f power equipment and HMI (done); 13g process plants and the reactor (done); 13h networks (done); 13i release and Tailings.
+## Phase 13 — PLCs — done (Tim, 2026-11-07: "every type of thing you would run off of them", programming "as close to real life as possible")
+Spec: `docs/multiblocks/plc.md`, nine waves, all approved in order: 13a language core; 13b hardware and text editor; 13c ladder and FBD; 13d SFC, device blocks, memory card, import and export (done); 13e transmitters and valves (done); 13f power equipment and HMI (done); 13g process plants and the reactor (done); 13h networks (done); 13i release and Tailings (done). The full client suite passed on 2026-11-07 (2h 53m), and it is released as v0.5.0.
 
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released.

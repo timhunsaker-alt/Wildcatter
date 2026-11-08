@@ -887,7 +887,13 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		output.store("modules", Codec.STRING.listOf(), java.util.Arrays.stream(modules).map(m -> m == null ? "" : m.name()).toList());
 		output.store("units", Codec.STRING.listOf(), project.stream().map(u -> u.name() + "|" + u.language().name()).toList());
 		for (int i = 0; i < project.size(); i++) {
-			output.store("unit" + i, Codec.STRING.listOf(), List.of(project.get(i).text().split("\n", -1)));   // lines, as a save's strings are limited
+			// in pieces: a saved string holds 65,535 bytes, and one line of a unit can be longer than that
+			String text = project.get(i).text();
+			List<String> pieces = new ArrayList<>();
+			for (int at = 0; at < text.length(); at += 20_000) {
+				pieces.add(text.substring(at, Math.min(text.length(), at + 20_000)));
+			}
+			output.store("unitPieces" + i, Codec.STRING.listOf(), pieces);
 		}
 		int[] packed = new int[landings.size() * 6];
 		for (int i = 0; i < landings.size(); i++) {
@@ -940,7 +946,10 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		List<String> units = input.read("units", Codec.STRING.listOf()).orElse(List.of());
 		for (int i = 0; i < units.size(); i++) {
 			String[] head = units.get(i).split("\\|");
-			project.add(new Project.Source(head[0], Project.Language.valueOf(head[1]), String.join("\n", input.read("unit" + i, Codec.STRING.listOf()).orElse(List.of()))));
+			int unit = i;
+			String text = input.read("unitPieces" + i, Codec.STRING.listOf()).map(pieces -> String.join("", pieces))
+					.orElseGet(() -> String.join("\n", input.read("unit" + unit, Codec.STRING.listOf()).orElse(List.of())));   // a 13c to 13h save, by lines
+			project.add(new Project.Source(head[0], Project.Language.valueOf(head[1]), text));
 		}
 		input.read("source", Codec.STRING.listOf()).ifPresent(old -> project.add(new Project.Source("MAIN", Project.Language.ST, String.join("\n", old))));   // a 13b save
 		landings.clear();
