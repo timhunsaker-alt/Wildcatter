@@ -5780,6 +5780,46 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 				return copy.exchange().size() == 2 && copy.station().equals("PLC-2");
 			});
 			check(kept, "a save and load should keep the exchange and the name");
+			// a long trunk: about 2,400 cells of control cable, rows two apart in four layers, with a lamp at its far end
+			int trunk = server.computeOnServer(srv -> {
+				var level = srv.overworld();
+				var cable = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(net.minecraft.resources.Identifier.parse("wildcatter:control_cable")).defaultBlockState();
+				java.util.List<BlockPos> laid = new java.util.ArrayList<>();
+				int z0 = z - 2;
+				int z1 = far + 4;
+				BlockPos at = null;
+				int row = 0;
+				for (int layer = 0; layer < 4; layer++) {
+					int yb = up + 8 + 2 * layer;
+					for (int r = 0; r < 9; r++, row++) {
+						int x = 8 + 2 * (layer % 2 == 0 ? r : 8 - r);
+						BlockPos from = new BlockPos(x, yb, row % 2 == 0 ? z0 : z1);
+						BlockPos to = new BlockPos(x, yb, row % 2 == 0 ? z1 : z0);
+						for (BlockPos step : java.util.List.of(from, to)) {
+							while (at != null && !at.equals(step)) {
+								at = at.offset(Integer.signum(step.getX() - at.getX()), Integer.signum(step.getY() - at.getY()), Integer.signum(step.getZ() - at.getZ()));
+								level.setBlock(at, cable, 2);
+								laid.add(at);
+							}
+							if (at == null) {
+								at = step;
+								level.setBlock(at, cable, 2);
+								laid.add(at);
+							}
+						}
+					}
+				}
+				BlockPos end = at.relative(row % 2 == 0 ? net.minecraft.core.Direction.NORTH : net.minecraft.core.Direction.SOUTH);
+				level.setBlock(end, net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(net.minecraft.resources.Identifier.parse("wildcatter:pilot_light")).defaultBlockState(), 2);
+				var found = dev.wildcatter.control.ControlNet.walk(level, java.util.List.of(laid.get(0).north()));
+				boolean reached = found.devices().contains(end) && found.badJoint() == null;
+				for (BlockPos one : laid) {
+					level.setBlock(one, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 2);
+				}
+				level.setBlock(end, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 2);
+				return reached ? laid.size() : -laid.size();
+			});
+			check(trunk > 2000, "a cabinet should reach a device at the end of a long trunk (" + Math.abs(trunk) + " cells)");
 			System.out.println("[wildcatter-test] plcNetwork ok: " + read(server, 15, up, z) + " | " + read(server, 15, up, far));
 		} finally {
 			if (film != null) {

@@ -19,6 +19,7 @@ import org.jspecify.annotations.Nullable;
  * only, walked over loaded blocks (docs/multiblocks/plc.md).
  */
 public final class ControlNet {
+	/** The most cable and box cells one walk follows: about 8 km of cable. */
 	private static final int MOST_CELLS = 8192;
 
 	private ControlNet() {
@@ -62,7 +63,8 @@ public final class ControlNet {
 		Set<BlockPos> devices = new java.util.LinkedHashSet<>();
 		boolean live = false;
 		BlockPos bad = null;
-		while (!queue.isEmpty() && seen.size() < MOST_CELLS) {
+		int cells = 0;   // cable and boxes followed: the blocks looked at beside them do not count, or a long trunk stops a fifth of the way
+		while (!queue.isEmpty() && cells < MOST_CELLS) {
 			BlockPos at = queue.poll();
 			for (Direction side : Direction.values()) {
 				BlockPos next = at.relative(side);
@@ -75,9 +77,11 @@ public final class ControlNet {
 						bad = bad == null ? next : bad;
 					} else {
 						queue.add(next);
+						cells++;
 					}
 				} else if (state.getBlock() instanceof JunctionBoxBlock) {
 					queue.add(next);
+					cells++;
 				} else if (level.getBlockEntity(next) instanceof ControlSupplyBlockEntity supply) {
 					live |= supply.live();
 				} else if (!(state.getBlock() instanceof PlcCabinetBlock) && deviceAt(level, next) != null) {

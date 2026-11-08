@@ -1627,6 +1627,10 @@ Spec: `docs/multiblocks/plc.md`, decided by Tim 2026-11-07: nine waves.
 
 Phase 13 closed on 2026-11-07. No phase is CURRENT until Tim picks the next.
 
+v0.5.1 (2026-11-07), one fix found by Tailings' playthrough:
+- **A control cable reaches as far as it says.** A cabinet's walk along its cables stopped after 8,192 blocks looked at, and the blocks beside each cable counted, so a trunk was cut off after about 1,600 cables: Tailings' site, 2,076 cables to 37 devices, reached 26. Now only cable and junction boxes count. The `plcNetwork` scene lays a 2,447-cell trunk and lights a lamp at its end; on 0.5.0 it fails.
+- The full client suite passed on 0.5.1 (2 h 53 min).
+
 v0.4.1 (2026-11-06), two fixes found by Tailings' playthrough; the full client suite passed on them (2h 45m):
 - **The solver no longer gives up on a floating bus.** A busway's neutral on a dead bus has low resistance and no path to ground, so the small leak each node carries rounded away and the factorisation stopped with "Could not solve the circuit". The solve for that whole group was then dropped, so the generator's synchroniser never read the bus and its breaker never closed. The node now gets its leak back. Unit test `aFloatingBusStillSolves`. The warning came 241 times in the v0.4.0 suite's log, on a suite that passed, and 0 times in this one.
 - **A process water pump reads its own motor.** Its readout gave "750 W, 110 V" for every pump; it now gives the motor's watts and voltage.
