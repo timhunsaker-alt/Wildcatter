@@ -1,7 +1,7 @@
 {
   "textures": {
     "stake": "wildcatter:block/mat/mat_wood_fir",
-    "flag": "wildcatter:block/site_marker_placeholder",
+    "flag": "wildcatter:block/ore/site_marker",
     "particle": "wildcatter:block/mat/mat_wood_fir"
   },
   "elements": [

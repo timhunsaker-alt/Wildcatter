@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "wildcatter:item/tapping_crucible_placeholder"
+    "layer0": "wildcatter:item/ore/tapping_crucible"
   }
 }

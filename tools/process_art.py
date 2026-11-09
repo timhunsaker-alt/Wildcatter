@@ -294,6 +294,10 @@ if os.path.exists(f"{SRC}/fuse_cartridge.webp"):
 	save("fuse_cap", part((0, int(h * 0.2), int(w * 0.09), int(h * 0.8))))   # a brass end cap
 if os.path.exists(f"{SRC}/cable_sheath.webp"):
 	save("cable_mv", tint(load("cable_sheath"), (40, 46, 60), 0.25))   # the 4.16 kV cable, between the LV and the distribution jacket
+# art wave (2026-11-09): the turning parts' paint (tower fan, disconnect blades): Ludo's dark steel, with the painted yellow
+# stripe the placeholder had across its middle, so the turning shows
+if os.path.exists(f"{SRC}/rotor.webp"):
+	save("rotor", banded(load("rotor"), (230, 190, 40), (15, 16)))
 
 print("art processed:", len(os.listdir(OUT)), "textures")
 
@@ -322,11 +326,13 @@ GENSET_PART_ICONS = ("engine_block_casting", "piston", "crankshaft", "cylinder_h
 for name in GENSET_PART_ICONS:
 	if os.path.exists(f"{SRC}/{name}.webp"):
 		icon(name).save(f"{OUT}/{name}.png")
-# 7a: mineral, ingot and scintillometer icons (art/source/ore/<name>.webp, not the *_ore block pictures)
+# 7a: mineral, ingot and scintillometer icons (art/source/ore/<name>.webp, not the *_ore block pictures, nor the other blocks
+# there, which tools/process_materials.py makes into tiles)
+ORE_BLOCKS = ("red_mud", "aluminium_block", "site_marker")
 if os.path.isdir(f"{SRC}/ore"):
 	os.makedirs(f"{OUT}/ore", exist_ok=True)
 	for f in sorted(os.listdir(f"{SRC}/ore")):
 		name, ext = os.path.splitext(f)
-		if ext == ".webp" and not name.endswith("_ore"):
+		if ext == ".webp" and not name.endswith("_ore") and name not in ORE_BLOCKS:
 			icon(name, f"{SRC}/ore").save(f"{OUT}/ore/{name}.png")
 print("icons done")

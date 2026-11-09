@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "wildcatter:item/anode_rod_placeholder"
+    "layer0": "wildcatter:item/ore/anode_rod"
   }
 }

@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "wildcatter:item/green_anode_placeholder"
+    "layer0": "wildcatter:item/ore/green_anode"
   }
 }

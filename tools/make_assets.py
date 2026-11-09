@@ -255,7 +255,9 @@ def wood(base, grain):
 	return draw
 
 
-tex("pole", wood((110, 78, 48), (80, 55, 34)))
+# the pole and crossarm are creosoted wood, the Ludo material (art wave); the old script grain is still drawn, unsaved, so the noise
+# sequence of the textures after it stays put
+_scratch = Image.new("RGBA", (16, 16)); wood((110, 78, 48), (80, 55, 34))(_scratch, ImageDraw.Draw(_scratch))
 tex("insulator", plain((200, 200, 210)))
 tex("breaker_lever_on", lever((60, 190, 90)))
 tex("breaker_lever_off", lever((120, 120, 126)))
@@ -416,11 +418,11 @@ for prefix in ("",):
 
 # the pole: a thin post. The crossarm: a beam with two insulators.
 save_json(f"{ASSETS}/blockstates/pole.json", {"variants": {"": {"model": f"{ns}:block/pole"}}})
-save_json(f"{ASSETS}/models/block/pole.json", {"textures": {"wood": f"{ns}:block/pole", "particle": f"{ns}:block/pole"},
+save_json(f"{ASSETS}/models/block/pole.json", {"textures": {"wood": f"{ns}:block/mat/mat_wood_creosote", "particle": f"{ns}:block/mat/mat_wood_creosote"},
 	"elements": [cuboid([5, 0, 5], [11, 16, 11], "#wood")]})
 for axis, (lo, hi) in {"x": ([0, 12, 6], [16, 16, 10]), "z": ([6, 12, 0], [10, 16, 16])}.items():
 	save_json(f"{ASSETS}/models/block/crossarm_{axis}.json", {
-		"textures": {"wood": f"{ns}:block/pole", "particle": f"{ns}:block/pole"},
+		"textures": {"wood": f"{ns}:block/mat/mat_wood_creosote", "particle": f"{ns}:block/mat/mat_wood_creosote"},
 		"elements": [cuboid([5, 0, 5], [11, 12, 11], "#wood"), cuboid(lo, hi, "#wood")]})   # a short post under the beam joins it to the pole
 save_json(f"{ASSETS}/blockstates/crossarm.json", {"variants": {"axis=x": {"model": f"{ns}:block/crossarm_x"}, "axis=z": {"model": f"{ns}:block/crossarm_z"}}})
 
@@ -2151,7 +2153,7 @@ save_json(f"{ASSETS}/lang/en_us.json", lang)
 # ---- Phase 10c2: the tower and crawler cranes (docs/multiblocks/tower-crane.md, crawler-crane.md) --------------------------------
 # blockstates, models, shapes and items come from tools/models/cranes.py (run after this, it reads the paint); here the paint, loot,
 # names, tags and recipes. The superstructure is drawn by client/CraneRenderer in the same paint.
-tex("mat/mat_paint_crane_yellow_placeholder", lambda img, d: noise(img, (238, 178, 18), 7))
+# the crane paint is Ludo art since the art wave (art/source/mat_paint_crane_yellow.webp, tools/process_materials.py)
 CRANE_PARTS = ("tower_crane", "crawler_crane")
 for name in CRANE_PARTS:
 	big_part_loot(name)
@@ -2571,7 +2573,11 @@ big_part_loot("remote_io_drop")
 for name, icon in (("cpu_small", "decal_controller"), ("cpu_large", "decal_controller"), ("di16_module", "decal_relays"), ("do16_module", "decal_relays")):
 	_flat_item(name, f"{ns}:block/mat/{icon}")
 _flat_item("control_key", "minecraft:item/trial_key")
-_flat_item("memory_card", "minecraft:item/paper")
+if os.path.exists(f"{ORE_ART}/memory_card.png"):   # the art wave's Ludo icon; vanilla paper's before it
+	shutil.copy(f"{ORE_ART}/memory_card.png", f"{ASSETS}/textures/item/ore/memory_card.png")
+	_flat_item("memory_card", f"{ns}:item/ore/memory_card")
+else:
+	_flat_item("memory_card", "minecraft:item/paper")
 _flat_item("comm_module", f"{ns}:block/mat/decal_controller")
 for name, icon in (("ai8_module", "decal_relays"), ("ao4_module", "decal_relays"), ("rtd4_module", "decal_relays"), ("hsc2_module", "decal_controller")):
 	_flat_item(name, f"{ns}:block/mat/{icon}")
@@ -2683,3 +2689,18 @@ save_json(f"{ASSETS}/lang/en_us.json", lang)
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)
+
+# ---- Placeholders the Ludo art has replaced stay out of the jar --------------------------------------------------------
+# A placeholder is drawn before this script knows whether its art exists (and some are drawn only to keep the noise sequence);
+# any *_placeholder texture no model, blockstate or Java class names is deleted here.
+import glob, re
+_named = set()
+for _f in glob.glob(f"{ASSETS}/**/*.json", recursive=True) + glob.glob("common/src/main/java/**/*.java", recursive=True):
+	_named.update(re.findall(r"[a-z0-9_/]+_placeholder", open(_f).read()))
+_gone = 0
+for _png in glob.glob(f"{ASSETS}/textures/**/*_placeholder.png", recursive=True):
+	_name = os.path.relpath(_png, f"{ASSETS}/textures")[:-4]   # e.g. block/rotor_placeholder
+	if not any(n.endswith(_name) or n == os.path.basename(_name) for n in _named):
+		os.remove(_png)
+		_gone += 1
+print(f"{_gone} replaced placeholders left out")

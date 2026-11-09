@@ -1448,13 +1448,17 @@ sized for a 40-pot line.
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- Art (2026-11-09 art wave): no `*_placeholder` texture is left in the jar. Every placeholder named here before now has Ludo art
+  (`art/source/PROMPTS.md`, "Art wave"), and `tools/make_assets.py` leaves out any placeholder nothing names. `memory_card` has its own icon.
+  Still drawn by script without the `*_placeholder` name: the breaker levers and the insulator caps, glaze and pins (flat colour
+  markers; `docs/questions/art-wave.md`, 7).
 - Phase 13i: Tailings' sorter routing and its TBM's course are not on a signal (Tailings' Known gaps).
 - Phase 13g and 13h: see `docs/multiblocks/plc.md`, "As built". One process unit has run under a PLC in the world; the rig, crane and coolant pump signals are compiled only. Nothing stops two PLCs landing on one rack.
 - Phase 13f: see `docs/multiblocks/plc.md`, "As built: 13f, Not yet". Most power equipment's signals compile but have not been exercised in the world.
 - Phase 13e: see `docs/multiblocks/plc.md`, "As built: 13e, Not yet". New module items borrow existing decal art; the new blocks are boxes in the mod's materials and vanilla concrete, no new script-drawn textures.
-- Phase 13d: see `docs/multiblocks/plc.md`, "As built: 13d, Not yet". `memory_card` borrows vanilla paper's icon. PLCopen import has been tested on hand-written files, not on a real vendor's export.
+- Phase 13d: see `docs/multiblocks/plc.md`, "As built: 13d, Not yet". PLCopen import has been tested on hand-written files, not on a real vendor's export.
 - Phase 13b: see `docs/multiblocks/plc.md`, "As built: 13b, Not yet". The modules seated are not drawn, cable core counts and the supply's 10 A are not enforced, and the NeoForge jar has not opened the screen in a world. No new script-drawn textures: the devices use the mod's materials and vanilla's coloured blocks.
-- Phase 12: `cell_liner_placeholder`, `settled_tails_placeholder` and `decant_tower_placeholder` are textures drawn by script, and the process water pump borrows the water pump's model, until the art comes from Ludo.
+- Phase 12: the process water pump borrows the water pump's model.
 - Phase 10b1:
   - the bus bars' standoffs stand on the floor of their own cell, so a run carried up in the air shows them hanging (no
     supports or structure yet);
@@ -1483,14 +1487,12 @@ sized for a 40-pot line.
   - it carries no heavy-duty jib, and no hook arrangement for its 5,000 t: its chart is capped at the 3,200 t main hook;
   - no wind (its 14 m/s limit) and no ground bearing on its mats;
   - a tandem lift's hooks keep to the line between the two cranes; the part does not turn as two real hooks would turn it;
-  - its paint is the same `mat_paint_crane_yellow_placeholder`.
 - Phase 10c2:
   - the cranes are placed whole: no erection, climbing or boom assembly;
   - wind is left out, and so are the crawler's travel and ground bearing;
   - a crawler has only its main boom and the 104 t counterweight chart: no derrick, superlift or luffing jib;
   - the mast, jib and boom have no collision, and nothing stops a jib passing through a building or another crane;
   - a world saved mid-lift puts the load back in the chest, and the lift is made again;
-  - the cranes' paint is a `*_placeholder` texture (`mat_paint_crane_yellow_placeholder`).
 - Phase 10c1:
   - a blueprint does not record what blocks hold or how machines are set, nor entities; it cannot be edited, only surveyed again;
   - the site marker stands at the origin corner, so a blueprint with a block in that corner cannot be finished until the marker
@@ -1498,7 +1500,6 @@ sized for a 40-pot line.
   - the ghost draws blocks as coloured cubes, not their models;
   - a site's ghost shows only while its marker's chunk is loaded on the client, so a big plant seen from far beyond its marker
     (past the server's view distance) shows none;
-  - the survey tool, the blueprint and the site marker's flag have `*_placeholder` textures.
 - Phase 10b3b:
   - pot auxiliaries (beam jacks, point feeders, crust breakers) draw no power;
   - the pots change their own anodes, standing in for the pot tending machine until 10c's cranes; the tapping crucible item stands
@@ -1507,8 +1508,6 @@ sized for a 40-pot line.
     not modelled; C2F6 is not counted;
   - spent pot lining has no treatment and no use; a frozen pot is broken and bused around, not shorted out live;
   - the pot's 6 x 6 x 12 cell box stands in for the potroom building, which is not drawn;
-  - the new items and the aluminium block have `*_placeholder` textures (`aluminium_ingot`, `reacted_alumina_bag`,
-    `spent_pot_lining`, `tapping_crucible`, `aluminium_block`).
 - Phase 10b3a:
   - residence times are not modelled: the 18 h coking, the drums' 12-24 h fill and the furnace's two-week firing run as steady
     flow (the drums switch at a tonne);
@@ -1516,13 +1515,11 @@ sized for a 40-pot line.
     plant's gas burners, not engines or turbines;
   - no ammonia, light oil or gas desulfurizing at the by-product plant; no vacuum unit ahead of the coker;
   - the rodded anodes are used by 10b3b's pots;
-  - the new items have `*_placeholder` textures.
 - Phase 10b2:
   - the Bayer liquor's first fill is waived: the evaporator starts with 10 minutes of strong liquor;
   - each stream carries its alumina in a fixed share. Silica, soda in the mud and liquor strength are not tracked, and the soda
     loss is one make-up figure;
   - residence times (36 h precipitation, 1 h digestion) are not modelled: the plant runs as a steady flow with 5 s holds;
-  - the new items, the limestone ore and the red mud block have `*_placeholder` textures;
   - the alumina and AlF3 now go to 10b3b's pots; the ton containers and the chlorine still have no buyer.
 - Phase 9c: Mekanism has not been tried: it is not yet released for 26.3. Plugs were checked against a real NeoForge energy
   handler on a stand-in block.
@@ -1583,7 +1580,6 @@ sized for a 40-pot line.
 - A hopper feeds the burner only through its main cell.
 - The frame-rate check runs at the client's 120 fps cap, so it shows no drop but not how much headroom is left.
 - The alternator is drawn 1 m long for both sets; a real 1 MW frame is about 1.6 m.
-- The old genset `*_placeholder` textures are still generated (the rotor texture is still used by the tower fan and disconnect blades).
 - The brass swatch keeps a faint tile line.
 - The test skips the steam plant's five-minute warm-up with a hook (it checks the drum starts rising, then jumps to pressure).
 - A small genset cannot drive enough fault current through the 20 MVA substation to reach real relay settings; the test scales the relays down. In play, such a source's own protection clears a feeder fault first.

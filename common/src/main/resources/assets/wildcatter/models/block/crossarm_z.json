@@ -1,7 +1,7 @@
 {
   "textures": {
-    "wood": "wildcatter:block/pole",
-    "particle": "wildcatter:block/pole"
+    "wood": "wildcatter:block/mat/mat_wood_creosote",
+    "particle": "wildcatter:block/mat/mat_wood_creosote"
   },
   "elements": [
     {

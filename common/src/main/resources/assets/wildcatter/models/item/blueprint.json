@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "wildcatter:item/blueprint_placeholder"
+    "layer0": "wildcatter:item/ore/blueprint"
   }
 }

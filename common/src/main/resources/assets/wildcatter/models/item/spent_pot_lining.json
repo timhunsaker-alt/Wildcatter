@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "wildcatter:item/spent_pot_lining_placeholder"
+    "layer0": "wildcatter:item/ore/spent_pot_lining"
   }
 }

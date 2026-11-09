@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "wildcatter:item/hydrate_bag_placeholder"
+    "layer0": "wildcatter:item/ore/hydrate_bag"
   }
 }

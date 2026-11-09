@@ -1,6 +1,6 @@
 {
  "parent": "minecraft:block/cube_all",
  "textures": {
-  "all": "wildcatter:block/cell_liner_placeholder"
+  "all": "wildcatter:block/cell_liner"
  }
 }

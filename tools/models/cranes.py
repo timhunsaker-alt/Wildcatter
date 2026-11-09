@@ -13,7 +13,7 @@ import mlib
 import plantlib as g
 
 TEX = dict(g.TEX)
-TEX["yellow"] = "block/mat/mat_paint_crane_yellow_placeholder"
+TEX["yellow"] = "block/mat/mat_paint_crane_yellow"
 
 
 def model(name, w, h, d, particle="yellow"):

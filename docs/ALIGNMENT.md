@@ -53,7 +53,7 @@ Diesel engines and gas turbines are 110 V alone and 4.16 kV in a cube. The model
 
 ### 9. Wording and process
 - `PROGRESS.md` and some Field Manual pages describe the mod as a teaching tool. The vision says it is not. Needs a wording pass.
-- Two textures are script-drawn without the `*_placeholder` name or a Known-gaps entry: the pole and crossarm woodgrain, and the fuse, switch and breaker bodies.
+- (Closed: the fuse, switch and breaker bodies are Ludo art since Phase 10d4, and the pole and crossarm are drawn in the Ludo creosoted wood since the 2026-11-09 art wave.)
 - Features were added tonight (cooling tower, fuse, switch, pole blocks) before these documents existed. The fuse, cooling tower and breakers are on the Keep list. The switch is under Ideas in the roadmap.
 
 ## What each rework touches
