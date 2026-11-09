@@ -54,15 +54,33 @@ public class SpoolItem extends Item {
 
 	@Override
 	public InteractionResult useOn(UseOnContext context) {
-		if (!(context.getLevel() instanceof ServerLevel level) || !(context.getPlayer() instanceof ServerPlayer player)
-				|| !(level.getBlockEntity(context.getClickedPos()) instanceof InsulatorBlockEntity here)) {
+		if (!(context.getLevel() instanceof ServerLevel level) || !(context.getPlayer() instanceof ServerPlayer player)) {
 			return InteractionResult.PASS;
 		}
 		BlockPos pos = context.getClickedPos();
+		boolean insulator = level.getBlockEntity(pos) instanceof InsulatorBlockEntity;
+		boolean lead = level.getBlockEntity(pos) instanceof dev.wildcatter.block.LeadEnd end && end.leadVoltage() != null;
+		if (!insulator && !lead) {
+			return InteractionResult.PASS;
+		}
 		Pending first = PENDING.get(player.getUUID());
-		if (first == null || first.dimension != level.dimension() || !(level.getBlockEntity(first.pos) instanceof InsulatorBlockEntity there)) {
+		boolean firstOk = first != null && first.dimension == level.dimension() && first.pos != null
+				&& (level.getBlockEntity(first.pos) instanceof InsulatorBlockEntity || level.getBlockEntity(first.pos) instanceof dev.wildcatter.block.LeadEnd);
+		if (!firstOk) {
 			PENDING.put(player.getUUID(), new Pending(level.dimension(), pos.immutable()));
-			player.sendOverlayMessage(Component.literal("First insulator chosen (" + here.conductor().label() + "). Right-click the second one."));
+			player.sendOverlayMessage(Component.literal(insulator ? "First insulator chosen (" + ((InsulatorBlockEntity) level.getBlockEntity(pos)).conductor().label() + "). Right-click the second one, or a cutout or pole transformer for a lead."
+					: "Lead end chosen. Right-click the line insulator it comes down from."));
+			return InteractionResult.SUCCESS;
+		}
+		if (!first.pos.equals(pos) && !(insulator && level.getBlockEntity(first.pos) instanceof InsulatorBlockEntity)) {
+			int left = context.getItemInHand().getMaxDamage() - context.getItemInHand().getDamageValue();
+			Result result = insulator ? connectLead(level, pos, first.pos, tier, covered, left, size(context.getItemInHand()))
+					: connectLead(level, first.pos, pos, tier, covered, left, size(context.getItemInHand()));
+			player.sendOverlayMessage(Component.literal(result.message()));
+			if (result.ok()) {
+				context.getItemInHand().hurtAndBreak(result.length(), player, context.getHand());
+				PENDING.remove(player.getUUID());
+			}
 			return InteractionResult.SUCCESS;
 		}
 		if (first.pos.equals(pos)) {
@@ -105,6 +123,43 @@ public class SpoolItem extends Item {
 		here.addSpan(new InsulatorBlockEntity.Span(a.immutable(), tier.ordinal(), covered, length, size));
 		there.addSpan(new InsulatorBlockEntity.Span(b.immutable(), tier.ordinal(), covered, length, size));
 		return new Result(true, "Span of " + length + " blocks (" + Math.round(length * Tuning.SPAN_METERS_PER_BLOCK) + " m), " + tier.label() + ", " + size.label() + (covered ? ", covered" : ", bare") + ".", length);
+	}
+
+	/**
+	 * Strings a lead (a jumper) from a line insulator down to a fused cutout's line contact or a pole transformer's H1 bushing
+	 * (docs/multiblocks/poles.md, "Leads"). It carries the insulator's conductor to the part.
+	 */
+	public static Result connectLead(ServerLevel level, BlockPos insulatorPos, BlockPos partPos, Voltage tier, boolean covered, int spoolLeft, ConductorSize size) {
+		if (!(level.getBlockEntity(insulatorPos) instanceof InsulatorBlockEntity insulator)) {
+			return new Result(false, "A lead comes down from a line insulator.", 0);
+		}
+		if (!(level.getBlockEntity(partPos) instanceof dev.wildcatter.block.LeadEnd end) || end.leadVoltage() == null) {
+			return new Result(false, "A lead goes to a fused cutout or a pole transformer.", 0);
+		}
+		if (end.leadVoltage() != tier) {
+			return new Result(false, "That part is for a " + end.leadVoltage().label() + " line; this spool is " + tier.label() + ".", 0);
+		}
+		if ((!insulator.spans().isEmpty() || !insulator.leads().isEmpty()) && insulator.lineTier() != tier) {
+			return new Result(false, "That insulator holds a " + insulator.lineTier().label() + " line: one kind of line per insulator.", 0);
+		}
+		if (insulator.hasLeadTo(partPos) || !end.takesLead()) {
+			return new Result(false, "That part already has its lead.", 0);
+		}
+		if (insulator.leads().size() >= 2) {
+			return new Result(false, "An insulator holds at most two leads.", 0);
+		}
+		int length = length(insulatorPos, partPos);
+		if (length > Tuning.LEAD_MAX_BLOCKS) {
+			return new Result(false, "Too far for a lead: " + length + " blocks. A lead reaches at most " + Tuning.LEAD_MAX_BLOCKS + " (" + Math.round(Tuning.LEAD_MAX_BLOCKS * Tuning.SPAN_METERS_PER_BLOCK) + " m).", length);
+		}
+		if (spoolLeft < length) {
+			return new Result(false, "This spool has " + spoolLeft + " blocks left; this lead needs " + length + ".", length);
+		}
+		insulator.addLead(new InsulatorBlockEntity.Lead(partPos.immutable(), tier.ordinal(), covered, length, size));
+		end.leadsIn().add(insulatorPos.immutable());
+		((net.minecraft.world.level.block.entity.BlockEntity) end).setChanged();
+		dev.wildcatter.circuit.CircuitManager.markDirty(level);
+		return new Result(true, "Lead of " + length + " blocks (" + Math.round(length * Tuning.SPAN_METERS_PER_BLOCK) + " m), " + tier.label() + ", " + size.label() + (covered ? ", covered" : ", bare") + ".", length);
 	}
 
 	/** The longest span of this conductor: heavier conductors sag more, so the same poles must stand closer. */

@@ -148,6 +148,16 @@ public class TransformerBlock extends BaseEntityBlock {
 		return false;
 	}
 
+	/** A pole unit hung on a pole comes down with it, and drops. */
+	@Override
+	protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock,
+			net.minecraft.world.level.redstone.@org.jspecify.annotations.Nullable Orientation orientation, boolean movedByPiston) {
+		super.neighborChanged(state, level, pos, neighborBlock, orientation, movedByPiston);
+		if (poleMount() && !level.isClientSide() && level.getBlockEntity(pos) instanceof TransformerBlockEntity unit && unit.hung() && !WoodPoleBlock.poleBeside(level, pos)) {
+			level.destroyBlock(pos, true);
+		}
+	}
+
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(FACING);

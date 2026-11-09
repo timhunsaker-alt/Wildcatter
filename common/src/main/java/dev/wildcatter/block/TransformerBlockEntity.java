@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * The windings have a little resistance, which is where the heat and the few percent of loss come from.
  * The neutral on each side is tied to ground, as it is at a real service entrance.
  */
-public class TransformerBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, dev.wildcatter.multiblock.BigPartEntity {
+public class TransformerBlockEntity extends BlockEntity implements CircuitPart, Inspectable, LeadEnd, Bondable, dev.wildcatter.multiblock.BigPartEntity {
 	/** A true-size unit (the GSU) has grown into its cells: see BigParts. */
 	private boolean grown;
 
@@ -116,8 +116,19 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 		return split || block().poleMount();
 	}
 
+	/** Latched once it has hung on a pole: it then falls when its pole goes (a cutout or transformer set down elsewhere never does). */
+	private boolean hung;
+
+	public boolean hung() {
+		return hung;
+	}
+
 	@Override
 	public void build(Circuit circuit) {
+		if (!hung && level != null && block().poleMount() && WoodPoleBlock.poleBeside(level, worldPosition)) {
+			hung = true;
+			setChanged();
+		}
 		TransformerBlock block = block();
 		double ratio = block.high().nominal() / block.low().nominal();
 		// North American service: the low side is centre-tapped. Winding two runs the other way round, so leg B is 180 degrees from leg A.
@@ -158,6 +169,10 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 		}
 		circuit.ground(lowNeutral);
 		circuit.ground(highNeutral);
+		if (block.poleMount()) {
+			pruneLeads();
+			circuit.publish(worldPosition, highPort[0]);   // a lead from a line insulator lands on H1
+		}
 
 		Conductor[] names = {Conductor.A, Conductor.B, Conductor.C};
 		for (TransformerBlock.Terminal t : terminals()) {
@@ -295,12 +310,61 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 	@Override
 	protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput output) {
 		super.saveAdditional(output);
+		output.putBoolean("hung", hung);
+		saveLeads(output);
 		output.putBoolean("grown", grown);
 	}
 
 	@Override
 	protected void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
 		super.loadAdditional(input);
+		hung = input.getBooleanOr("hung", false);
+		loadLeads(input);
 		grown = input.getBooleanOr("grown", false);
+	}
+
+	// ---- leads from a line insulator (LeadEnd) ----
+	private final java.util.Set<BlockPos> leadsIn = new java.util.HashSet<>();
+
+	@Override
+	public java.util.Set<BlockPos> leadsIn() {
+		return leadsIn;
+	}
+
+	@Override
+	public java.util.Collection<BlockPos> links() {
+		return leadsIn;
+	}
+
+	/** Forgets a lead whose insulator is gone or no longer holds it. */
+	private void pruneLeads() {
+		if (level != null && leadsIn.removeIf(at -> level.isLoaded(at) && !(level.getBlockEntity(at) instanceof InsulatorBlockEntity i && i.hasLeadTo(worldPosition)))) {
+			setChanged();
+		}
+	}
+
+	private void saveLeads(net.minecraft.world.level.storage.ValueOutput output) {
+		output.putInt("leadsIn", leadsIn.size());
+		int k = 0;
+		for (BlockPos at : leadsIn) {
+			output.putLong("leadIn" + k++, at.asLong());
+		}
+	}
+
+	private void loadLeads(net.minecraft.world.level.storage.ValueInput input) {
+		leadsIn.clear();
+		for (int k = 0; k < input.getIntOr("leadsIn", 0); k++) {
+			leadsIn.add(BlockPos.of(input.getLongOr("leadIn" + k, 0)));
+		}
+	}
+
+	@Override
+	public dev.wildcatter.energy.Voltage leadVoltage() {
+		return block().poleMount() ? block().high() : null;
+	}
+
+	@Override
+	public double leadY() {
+		return 0.95;
 	}
 }

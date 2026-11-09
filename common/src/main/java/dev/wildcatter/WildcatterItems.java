@@ -214,9 +214,11 @@ public final class WildcatterItems {
 
 	/** Conductor spools: a span of a tier, bare or plastic covered. A spool holds {@link Tuning#SPOOL_SPAN_BLOCKS} blocks of span. */
 	public static final Item SPOOL_LV = spool("conductor_spool_lv", Voltage.LOW, false);
+	public static final Item SPOOL_MV = spool("conductor_spool_mv", Voltage.MEDIUM, false);
 	public static final Item SPOOL_DIST = spool("conductor_spool_dist", Voltage.DISTRIBUTION, false);
 	public static final Item SPOOL_HV = spool("conductor_spool_hv", Voltage.HIGH, false);
 	public static final Item COVERED_SPOOL_LV = spool("covered_conductor_spool_lv", Voltage.LOW, true);
+	public static final Item COVERED_SPOOL_MV = spool("covered_conductor_spool_mv", Voltage.MEDIUM, true);
 	public static final Item COVERED_SPOOL_DIST = spool("covered_conductor_spool_dist", Voltage.DISTRIBUTION, true);
 	public static final Item COVERED_SPOOL_HV = spool("covered_conductor_spool_hv", Voltage.HIGH, true);
 
@@ -393,9 +395,11 @@ public final class WildcatterItems {
 		BRANCH_BREAKERS.forEach((name, item) -> Registry.register(BuiltInRegistries.ITEM, ResourceKey.create(Registries.ITEM, Wildcatter.id(name)), item));
 		CARTRIDGE_FUSES.forEach((name, item) -> Registry.register(BuiltInRegistries.ITEM, ResourceKey.create(Registries.ITEM, Wildcatter.id(name)), item));
 		registerSpool("conductor_spool_lv", SPOOL_LV);
+		registerSpool("conductor_spool_mv", SPOOL_MV);
 		registerSpool("conductor_spool_dist", SPOOL_DIST);
 		registerSpool("conductor_spool_hv", SPOOL_HV);
 		registerSpool("covered_conductor_spool_lv", COVERED_SPOOL_LV);
+		registerSpool("covered_conductor_spool_mv", COVERED_SPOOL_MV);
 		registerSpool("covered_conductor_spool_dist", COVERED_SPOOL_DIST);
 		registerSpool("covered_conductor_spool_hv", COVERED_SPOOL_HV);
 	}

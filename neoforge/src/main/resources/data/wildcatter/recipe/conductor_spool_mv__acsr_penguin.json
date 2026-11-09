@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "WWW",
+    "WSW",
+    "WWW"
+  ],
+  "key": {
+    "W": {
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "wildcatter:mv_wire_hot",
+      "components": {
+        "wildcatter:conductor_size": "acsr_penguin"
+      },
+      "strict": false
+    },
+    "S": "minecraft:stick"
+  },
+  "result": {
+    "id": "wildcatter:conductor_spool_mv",
+    "count": 1,
+    "components": {
+      "wildcatter:conductor_size": "acsr_penguin"
+    }
+  }
+}

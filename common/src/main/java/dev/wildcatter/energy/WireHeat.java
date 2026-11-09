@@ -18,6 +18,12 @@ public final class WireHeat {
 		return target + (rise - target) * Math.exp(-seconds / Tuning.WIRE_HEAT_SECONDS);
 	}
 
+	/** As {@link #step(double, double, double)}, with a conductor's own time constant (an overhead span's, in minutes). */
+	public static double step(double rise, double ratio, double seconds, double timeConstant) {
+		double target = ratio * ratio;
+		return target + (rise - target) * Math.exp(-seconds / timeConstant);
+	}
+
 	public static boolean burnt(double rise) {
 		return rise >= Tuning.WIRE_BURN_RISE;
 	}
