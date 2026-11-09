@@ -253,7 +253,7 @@ Tailings compiles against a Wildcatter release, so it comes after 13h's release.
   - comments in variable blocks are lost through XML (a body's stay), and imported STRING lengths are ignored, as the CPU ignores them;
   - import replaces a unit of the same name with no undo, so unsaved edits to that unit are lost;
   - a jump's wire can only be removed by clicking its target's head pin, which takes all wires into that step;
-  - `memory_card` borrows vanilla paper's icon, and its recipe is proposed.
+  - `memory_card`'s recipe is proposed (its icon is Ludo art since the 2026-11-09 art wave).
 
 ## As built: 13e (2026-11-07)
 `control/ValveBlock`, `TransmitterBlock`, `AirCompressorBlock`, `AirDryerBlock`, `Measurable`; `block/DayTankBlock`; analog points on `ControlDevice`; `DRIVE_POINTS` on `Starter`; and the `plcAnalog` game scene.

@@ -38,8 +38,8 @@
   "concrete": "wildcatter:block/mat/mat_concrete",
   "polymer": "wildcatter:block/mat/mat_polymer_grey",
   "padgreen": "wildcatter:block/mat/mat_paint_pad_green",
-  "yellow": "wildcatter:block/mat/mat_paint_crane_yellow_placeholder",
-  "particle": "wildcatter:block/mat/mat_paint_crane_yellow_placeholder"
+  "yellow": "wildcatter:block/mat/mat_paint_crane_yellow",
+  "particle": "wildcatter:block/mat/mat_paint_crane_yellow"
  },
  "elements": []
 }

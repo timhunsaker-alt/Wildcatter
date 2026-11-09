@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "wildcatter:item/calcined_coke_bag_placeholder"
+    "layer0": "wildcatter:item/ore/calcined_coke_bag"
   }
 }

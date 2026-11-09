@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "wildcatter:block/aluminium_block_placeholder"
+    "all": "wildcatter:block/ore/aluminium_block"
   }
 }

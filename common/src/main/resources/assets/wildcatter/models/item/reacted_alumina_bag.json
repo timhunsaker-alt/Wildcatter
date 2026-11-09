@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "wildcatter:item/reacted_alumina_bag_placeholder"
+    "layer0": "wildcatter:item/ore/reacted_alumina_bag"
   }
 }

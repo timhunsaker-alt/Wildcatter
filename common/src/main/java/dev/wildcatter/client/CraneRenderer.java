@@ -161,7 +161,7 @@ public class CraneRenderer implements BlockEntityRenderer<CraneBlockEntity, Cran
 
 	@Override
 	public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-		TextureAtlasSprite yellow = sprite("mat_paint_crane_yellow_placeholder");
+		TextureAtlasSprite yellow = sprite("mat_paint_crane_yellow");
 		TextureAtlasSprite concrete = sprite("mat_concrete");
 		TextureAtlasSprite dark = sprite("mat_oil_dark");
 		TextureAtlasSprite rope = sprite("mat_galvanized");

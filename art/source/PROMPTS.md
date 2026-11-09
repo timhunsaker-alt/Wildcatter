@@ -219,3 +219,58 @@ Sounds (`art/sound_source/`): Ludo `createSoundEffect`, one take each; `tools/pr
 | zap.mp3 | no | 0.8 s | a short electric shock, a sharp crackling buzz of electricity arcing for a moment |
 | structure_formed.mp3 | no | 1.5 s | heavy steel machine parts seating into place, a solid metallic clunk followed by a short settling rattle and a low resonant ring |
 
+
+## Art wave (2026-11-09): the last placeholders (art/source/ore/ and art/source/)
+Tim, 2026-11-09: "close all known gaps". Ludo `createImage`, model klimt, art_style `Photorealistic 3D`, 2 variations each, the better
+kept (the letter after each name). Icons are `item-icon` (Ludo returns them on transparency) and go through `tools/process_art.py`'s
+`icon()` to 32 px; blocks are `texture` and go through `tools/process_materials.py` (whole picture to a 32 px tile).
+
+Bulk bags (`<item>_bag`, all a): "A single full white woven polypropylene FIBC bulk bag (one tonne super sack) with four lifting loops
+and a broad <colour> printed band, top spout open showing <contents>, standing upright, game item icon, plain dark grey background, no
+text". The band tells the bags apart in the inventory:
+
+| Item | Band | Contents |
+|---|---|---|
+| alumina_bag | blue | fine bright white alumina powder |
+| hydrate_bag | green | damp cream-coloured aluminium hydroxide powder |
+| alf3_bag | purple | fine pale grey aluminium fluoride powder |
+| quicklime_bag | yellow | chalky white quicklime pebbles |
+| reacted_alumina_bag | brown | light grey-tan reacted alumina powder |
+| calcined_coke_bag | black | granular black calcined petroleum coke (plain white background) |
+
+The other items, "..., game item icon, plain white background, no text" unless a dark ground is noted:
+
+| File | Prompt |
+|---|---|
+| empty_bulk_bag (a) | A single empty white woven polypropylene FIBC bulk bag (one tonne super sack) folded flat, four lifting loops at the corners, lying diagonally (dark grey background) |
+| empty_ton_container (b) | A single empty one-ton chlorine ton container seen from the side: a long horizontal steel cylinder with concave dished ends and rolling hoops, painted plain silver grey, a domed valve protection hood at one end, no markings |
+| chlorine_ton_container (a) | the same, full, "painted yellow-green ... a green and white diamond gas placard" |
+| green_petroleum_coke (a) | A small heap of lumpy dull black green petroleum coke, porous sponge coke chunks |
+| metallurgical_coke (a) | A single fist-sized lump of silver-grey metallurgical coke, hard, porous and cellular with a slight metallic sheen |
+| green_anode (b) | A single rectangular unbaked green carbon anode block for aluminium smelting, matte black pitch and coke, three round stub holes in its top face, seen from above at an angle |
+| baked_anode (a) | A single rectangular baked carbon anode block for aluminium smelting, hard dark charcoal grey with a dusty surface and a little packing coke stuck on, three round stub holes in its top face, seen from above at an angle |
+| rodded_anode (a) | A rodded anode for an aluminium smelting pot: a dark grey baked carbon block with a tall square aluminium rod standing on it, joined by a three-stub steel yoke cast into the top of the block |
+| spent_anode (b) | A spent anode from an aluminium smelting pot: a thin worn eroded butt of dark grey carbon crusted with white frozen bath, still held by its three-stub steel yoke under a tall square aluminium rod |
+| crushed_butts (a) | A small heap of crushed carbon anode butts, angular dark grey-black carbon pieces with a few flecks of white bath crust |
+| anode_rod (a) | A single anode rod assembly for aluminium smelting, lying diagonally: a long square-section aluminium rod ending in a steel yoke with three short round steel stubs |
+| aluminium_ingot (a) | A single cast primary aluminium ingot, a trapezoid bar with sloped sides, bright satin silver with a slightly rippled cast top surface (dark grey background) |
+| spent_pot_lining (a) | A small heap of broken spent pot lining from an aluminium smelter: black carbon cathode block fragments mixed with pale grey refractory brick pieces and white fluoride crust |
+| tapping_crucible (a) | A single aluminium smelter tapping crucible: a squat round steel ladle painted dark grey with a bolted lid, a long angled siphon tube spout on the lid and two lifting trunnions on its sides |
+| blueprint (a) | A single engineering blueprint sheet, half unrolled from a roll, deep blue paper with crisp white line drawings of an industrial plant layout and a title block, no readable text |
+| survey_tool (a) | A single construction surveyor's total station instrument without its tripod: a yellow body with a dark telescope on a rotating yoke, a small screen and keypad, generic, no brand names |
+| limestone (a) | A single lump of pale grey fine-grained limestone with a few tiny fossil shell fragments, mineral specimen (dark grey background) |
+| memory_card (a) | A single industrial PLC memory card: a small black plastic card with gold edge contacts and a blank white label, lying diagonally, generic, no brand names |
+
+Blocks, `texture`, each "Seamless flat texture, <straight-on / top-down> orthographic view, even lighting: ..., no text":
+
+| File | Prompt |
+|---|---|
+| ore/red_mud (a) | pressed red mud filter cake from bauxite refining, brick-red to rust-orange fine clay, slightly damp, faint cloth marks and fine drying cracks |
+| ore/aluminium_block (a) | face of a solid block of cast aluminium, satin bright silver metal with faint cast grain and a few machining marks, plain, no seams |
+| ore/site_marker (a) | fluorescent orange surveyor's marking flag cloth, fine woven nylon fabric with soft creases |
+| ore/limestone_ore (b) | rough mined rock face of pale grey bedded limestone, faint horizontal bedding, scattered small fossil shell fragments, natural rock |
+| cell_liner (a) | black textured HDPE geomembrane liner of a mine tailings cell, slightly glossy pebbled surface, one straight welded seam, a little dust |
+| settled_tails (b) | settled mine tailings beach, fine light grey silt and sand, damp, with shallow drying cracks and faint ripple marks |
+| decant_tower (b) | wall of a tailings dam decant tower, weathered grey precast concrete riser with a vertical steel channel slot holding stacked dark timber stop-logs, water stains |
+| mat_paint_crane_yellow (b) | steel plate painted bright crane yellow, slightly weathered gloss enamel with a few small scratches and faint dirt, plain, no seams |
+| rotor (b) | dark grey painted machined steel of a fan hub and shaft, slightly worn paint with faint circular machining marks, plain (`tools/process_art.py` paints the yellow stripe across it, as the placeholder had, so the turning shows) |

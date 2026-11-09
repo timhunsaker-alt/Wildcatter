@@ -108,9 +108,17 @@ if os.path.isdir(ORE_SRC):
 	os.makedirs(ORE_OUT, exist_ok=True)
 	for f in sorted(os.listdir(ORE_SRC)):
 		name, ext = os.path.splitext(f)
-		if ext != ".webp" or not name.endswith("_ore"):
+		if ext != ".webp" or not (name.endswith("_ore") or name in ("red_mud", "aluminium_block", "site_marker")):
 			continue
 		img = Image.open(f"{ORE_SRC}/{f}").convert("RGB").resize((SIZE, SIZE), Image.BOX)
 		img = tileable(ImageEnhance.Contrast(img).enhance(1.1))
 		img.convert("RGBA").save(f"{ORE_OUT}/{name}.png")
 		print(name, "(ore)")
+
+# art wave (2026-11-09): Phase 12's lined cell blocks (art/source/<name>.webp), whole-block tiles like the ores; make_assets.py
+# copies art/final into the mod and art/hand_assets' models name them
+for name in ("cell_liner", "settled_tails", "decant_tower"):
+	if os.path.exists(f"{SRC}/{name}.webp"):
+		img = Image.open(f"{SRC}/{name}.webp").convert("RGB").resize((SIZE, SIZE), Image.BOX)
+		tileable(ImageEnhance.Contrast(img).enhance(1.1)).convert("RGBA").save(f"art/final/{name}.png")
+		print(name, "(tile)")

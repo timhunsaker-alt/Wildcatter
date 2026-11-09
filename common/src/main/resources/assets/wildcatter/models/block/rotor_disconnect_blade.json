@@ -1,7 +1,7 @@
 {
   "textures": {
-    "rotor": "wildcatter:block/rotor_placeholder",
-    "particle": "wildcatter:block/rotor_placeholder"
+    "rotor": "wildcatter:block/rotor",
+    "particle": "wildcatter:block/rotor"
   },
   "elements": [
     {
