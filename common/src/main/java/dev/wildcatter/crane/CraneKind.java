@@ -55,6 +55,44 @@ public enum CraneKind {
 	/** Rigging a load at the pick or at its place, and landing and unhooking it, s (proposed). */
 	public static final double RIG_SECONDS = 30;
 
+	// ---- wind and ground (docs/questions/plant-crane-gaps.md, 1 and 2) -------------------------------------------------------------
+	/** The tower crane stops above about 72 km/h at its jib (tower-crane.md). */
+	public static final double TOWER_WIND_LIMIT = 20.0;
+	/** The LR 1300's main boom charts hold to 9 m/s at the boom head (EN 13000's reference wind; proposed). */
+	public static final double CRAWLER_WIND_LIMIT = 9.0;
+	/** The SGC-250's 14 m/s (ring-crane.md). */
+	public static final double RING_WIND_LIMIT = 14.0;
+	/** The LR 1300 on its mats: 1.45 kg/cm2 (crawler-crane.md). */
+	public static final double CRAWLER_GROUND_T_M2 = 14.5;
+	/** The SGC-250's ring mats: 30 t/m2 (ring-crane.md). */
+	public static final double RING_GROUND_T_M2 = 30.0;
+
+	/** The most wind it works in, at its jib or boom head, m/s. */
+	public double windLimit() {
+		return switch (this) {
+			case TOWER -> TOWER_WIND_LIMIT;
+			case CRAWLER -> CRAWLER_WIND_LIMIT;
+			case RING -> RING_WIND_LIMIT;
+		};
+	}
+
+	/** What the ground under its crawlers or ring must bear, t/m2; 0 for the tower crane, whose cross base is on its own ballast slabs. */
+	public double groundTonnesPerM2() {
+		return switch (this) {
+			case TOWER -> 0;
+			case CRAWLER -> CRAWLER_GROUND_T_M2;
+			case RING -> RING_GROUND_T_M2;
+		};
+	}
+
+	/** Height of its jib's top or its boom head above its base with the hook at {@code radius}, m: where its wind is read. */
+	public double headHeight(int boom, double radius) {
+		if (this == TOWER) {
+			return TOWER_HOOK_HEIGHT + Siting.TOWER_JIB_OVER_HOOK + Siting.TOWER_JIB_DEPTH;
+		}
+		return footUp() + boomLength(boom) * Math.sin(Math.toRadians(boomAngle(boom, radius)));
+	}
+
 	public LoadChart chart(int boom) {
 		return switch (this) {
 			case TOWER -> LoadChart.tower();

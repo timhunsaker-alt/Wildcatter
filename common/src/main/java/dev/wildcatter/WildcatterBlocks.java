@@ -441,6 +441,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		add("tower_crane", TOWER_CRANE);
 		add("crawler_crane", CRAWLER_CRANE);
 		add("ring_crane", RING_CRANE);
+		add("crane_rail", CRANE_RAIL);
 		add("gen_feeder_breaker", GEN_FEEDER_BREAKER);
 		add("bus_relay_panel", BUS_RELAY_PANEL);
 		add("mv_switchgear_main", MV_SWITCHGEAR_MAIN);

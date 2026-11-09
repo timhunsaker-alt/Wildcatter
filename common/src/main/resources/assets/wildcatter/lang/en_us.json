@@ -551,5 +551,6 @@
   "block.wildcatter.air_compressor": "Instrument Air Compressor",
   "block.wildcatter.air_dryer": "Air Dryer",
   "block.wildcatter.day_tank": "Water Day Tank (1 m3)",
-  "block.wildcatter.transmitter": "Transmitter (4-20 mA)"
+  "block.wildcatter.transmitter": "Transmitter (4-20 mA)",
+  "block.wildcatter.crane_rail": "Crane Rail"
 }

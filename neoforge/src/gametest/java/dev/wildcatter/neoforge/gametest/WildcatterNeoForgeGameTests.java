@@ -44,7 +44,7 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 public class WildcatterNeoForgeGameTests {
 	private static final String[] SCENES = {"registers", "lamp", "plug", "ores"};
 	/** The ammonia plant's scenes (AmmoniaPlantScenes): big, so each gets room round it, and long, for the gensets to start. */
-	private static final String[] PLANT_SCENES = {"ammonia_loop", "nitric_acid", "an_emulsion"};
+	private static final String[] PLANT_SCENES = {"ammonia_loop", "nitric_acid", "an_emulsion", "crane_siting", "ring_travel"};
 
 	public WildcatterNeoForgeGameTests(IEventBus modBus) {
 		modBus.addListener(RegisterEvent.class, event -> event.register(Registries.TEST_FUNCTION, helper -> {
@@ -55,6 +55,8 @@ public class WildcatterNeoForgeGameTests {
 			helper.register(id("ammonia_loop"), (Consumer<GameTestHelper>) AmmoniaPlantScenes::ammoniaLoop);
 			helper.register(id("nitric_acid"), (Consumer<GameTestHelper>) AmmoniaPlantScenes::nitricAcid);
 			helper.register(id("an_emulsion"), (Consumer<GameTestHelper>) AmmoniaPlantScenes::anEmulsion);
+			helper.register(id("crane_siting"), (Consumer<GameTestHelper>) CraneScenes::craneSiting);
+			helper.register(id("ring_travel"), (Consumer<GameTestHelper>) CraneScenes::ringTravel);
 		}));
 		modBus.addListener(RegisterCapabilitiesEvent.class, event -> event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, entity, side) -> STORAGE, Blocks.GOLD_BLOCK));
 		modBus.addListener(RegisterGameTestsEvent.class, event -> {

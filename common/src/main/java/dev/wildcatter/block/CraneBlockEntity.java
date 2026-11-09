@@ -13,6 +13,7 @@ import dev.wildcatter.circuit.DriveLoad;
 import dev.wildcatter.crane.CraneKind;
 import dev.wildcatter.crane.LiftCycle;
 import dev.wildcatter.crane.LoadChart;
+import dev.wildcatter.crane.Siting;
 import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.energy.Voltage;
 import dev.wildcatter.fluid.Product;
@@ -124,6 +125,21 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 	/** The ring crane's laydown chest, and when to look for one again. */
 	private @Nullable BlockPos laydown;
 	private long nextScan;
+	/** After a lift is found blocked by its jib or boom, it looks again from this game time. */
+	private long blockedUntil;
+	/** The ring crane's travel on its rails: metres still to go (signed along x or z), and how far into the next metre it is. */
+	private int travelLeft;
+	private boolean travelAlongX;
+	private double travelled;
+	private String travelTo = "";
+	/** For the game test: its travel sped up this many times. */
+	private double speedup = 1;
+	/** Set while it moves itself a metre along its rails, so its old cells going leave the site and the chest alone. */
+	private boolean moving;
+	/** For the game test: the wind 10 m up, m/s, in place of the world's weather; negative to read the weather. */
+	private double testWind = -1;
+	/** True while it holds a lift for the wind. */
+	private boolean windHeld;
 
 	public CraneBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.CRANE_ENTITY, pos, state);
@@ -363,10 +379,22 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 	 * the first it can make. With none, it reads the first one it could not make and why.
 	 */
 	private void findWork() {
+		if (level.getGameTime() < blockedUntil) {
+			return;   // its jib or boom was found blocked: it looks again shortly
+		}
+		String stop = windStop();
+		if (stop == null) {
+			stop = softGround();
+		}
+		if (stop != null) {
+			status = stop;
+			return;
+		}
 		SiteMarkerBlockEntity m = findSite();
 		site = m == null ? null : m.getBlockPos();
 		if (m == null) {
 			status = String.format("NO SITE within %.0f m", chart().maxRadius());
+			planTravel();
 			return;
 		}
 		Blueprint b = m.blueprint();
@@ -393,12 +421,20 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 			if (why == null) {
 				return;
 			}
+			if (why.startsWith("BLOCKED")) {
+				status = why;   // its slew is blocked for every lift alike: it looks again in 5 s
+				blockedUntil = level.getGameTime() + 100;
+				return;
+			}
 			if (first == null) {
 				first = why;
 			}
 		}
 		if (first != null) {
 			status = first;
+			if (first.startsWith("OUT OF REACH")) {
+				planTravel();
+			}
 		} else if (left) {
 			status = down ? "WAITING: the lifts left to take down carry lifts still on other cranes' hooks"
 					: "WAITING: the lifts left rest on lifts on other cranes' hooks";
@@ -489,11 +525,15 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 			String why = tryTandem(m, index, l, chestAt, sx, setY, sz, siteTop, loadHeight, tonnes, down, box);
 			return why == null ? null : heavy + (kind() == CraneKind.CRAWLER ? ": a shorter boom lifts more" : "") + "; " + why;
 		}
+		List<LiftCycle.Step> plan = LiftCycle.plan(kind(), boom, here(), down ? w.set() : w.pick(), down ? w.pick() : w.set(), w.clearance(), hooked);
+		String struck = struck(plan);
+		if (struck != null) {
+			return struck;
+		}
 		if (!m.claim(index, worldPosition)) {
 			return "WAITING: another crane took it";
 		}
-		start(m, index, down, LiftCycle.plan(kind(), boom, here(), down ? w.set() : w.pick(), down ? w.pick() : w.set(), w.clearance(), hooked),
-				hooked, 0, w.radius(), null, false);
+		start(m, index, down, plan, hooked, 0, w.radius(), null, false);
 		return null;
 	}
 
@@ -567,6 +607,14 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 			List<LiftCycle.Step> mineSteps = LiftCycle.plan(kind(), boom, here(), down ? a.set() : a.pick(), down ? a.pick() : a.set(), over - worldPosition.getY(), shareA);
 			List<LiftCycle.Step> theirSteps = LiftCycle.plan(p.kind(), p.boom, p.here(), down ? bw.set() : bw.pick(), down ? bw.pick() : bw.set(),
 					over - p.worldPosition.getY(), shareB);
+			String struck = struck(mineSteps);
+			if (struck == null) {
+				struck = p.struck(theirSteps);
+			}
+			if (struck != null) {
+				m.release(index, worldPosition);
+				return struck;
+			}
 			LiftCycle.Tandem t = LiftCycle.together(mineSteps, theirSteps);
 			start(m, index, down, t.lead(), shareA, tonnes, a.radius(), p.worldPosition, true);
 			p.start(m, index, down, t.follower(), shareB, tonnes, bw.radius(), worldPosition, false);
@@ -652,6 +700,10 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 		if (!held.isEmpty() && steps == null) {
 			returnHeld();   // a load left on the hook (the world was saved mid-lift) goes back to the chest
 		}
+		if (steps == null && travelLeft != 0) {
+			travel(level);
+			return;
+		}
 		if (steps == null) {
 			load.setDemand(site != null ? CraneKind.TOWER_STANDBY_WATTS : 0);
 			if ((level.getGameTime() + worldPosition.hashCode()) % 20 == 0) {
@@ -673,6 +725,23 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 			status = who + "; holding " + (carried ? "its load on its brakes" : "where it is");
 			load.setDemand(CraneKind.TOWER_STANDBY_WATTS);
 			return;
+		}
+		String gale = level.getGameTime() % 20 == 0 ? windStop() : null;
+		if (gale == null && other != null && level.getGameTime() % 20 == 0) {
+			gale = other.windStop();
+		}
+		if (gale != null || (windHeld && level.getGameTime() % 20 != 0)) {
+			if (gale != null) {
+				status = gale + "; holding " + (carried ? "its load on its brakes" : "where it is");
+				windHeld = true;
+			}
+			load.setDemand(CraneKind.TOWER_STANDBY_WATTS);
+			stepStart++;   // the step it is in waits, for the client's drawing too
+			return;
+		}
+		if (windHeld) {
+			windHeld = false;
+			sync();
 		}
 		LiftCycle.Step st = steps.get(step);
 		burn(st);
@@ -909,6 +978,313 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 		sync();
 	}
 
+	// ---- wind, ground and collision (docs/questions/plant-crane-gaps.md, 1 to 3) -----------------------------------------------------
+	/** The wind at its jib or boom head now, m/s: the world's weather 10 m up, rising with height. */
+	public double wind() {
+		if (level == null) {
+			return 0;
+		}
+		double at10 = testWind >= 0 ? testWind : Siting.windAt10(level.getRainLevel(1.0F), level.getThunderLevel(1.0F));
+		return Siting.windAt(at10, kind().headHeight(boom, Math.max(hookRadius, chart().minRadius())));
+	}
+
+	/** Why the wind stops it, or null. */
+	private @Nullable String windStop() {
+		double w = wind();
+		if (w <= kind().windLimit() + 1e-9) {
+			return null;
+		}
+		return String.format("WIND: %.1f m/s at its %s, over its %.0f m/s limit", w, kind() == CraneKind.TOWER ? "jib" : "boom head", kind().windLimit());
+	}
+
+	/** Why the ground under its crawlers or ring will not bear it, or null. */
+	public @Nullable String softGround() {
+		double need = kind().groundTonnesPerM2();
+		if (need <= 0 || level == null) {
+			return null;
+		}
+		List<BlockPos> cells = BigParts.cells(worldPosition, getBlockState());
+		int bottom = Integer.MAX_VALUE;
+		for (BlockPos cell : cells) {
+			bottom = Math.min(bottom, cell.getY());
+		}
+		int soft = 0, total = 0;
+		Siting.Ground worst = Siting.Ground.ROCK;
+		for (BlockPos cell : cells) {
+			if (cell.getY() != bottom) {
+				continue;
+			}
+			total++;
+			Siting.Ground g = CraneGround.at(level, cell.below());
+			if (!g.bears(need)) {
+				soft++;
+				if (g.tonnesPerM2 < worst.tonnesPerM2) {
+					worst = g;
+				}
+			}
+		}
+		if (soft == 0) {
+			return null;
+		}
+		return String.format("SOFT GROUND: %d of %d m2 under its %s bear less than its %.1f t/m2 (%s, %.1f t/m2): set it on %s", soft, total,
+				kind() == CraneKind.RING ? "ring" : "crawlers", need, worst.label, worst.tonnesPerM2,
+				kind() == CraneKind.RING ? "rock, concrete or crane rail" : "gravel, rock or concrete");
+	}
+
+	/** What its jib or boom would strike on {@code plan}'s slews, as a BLOCKED readout, or null if its way is clear. */
+	private @Nullable String struck(List<LiftCycle.Step> plan) {
+		double reach = kind() == CraneKind.TOWER ? Siting.TOWER_JIB : kind().boomFoot()[0] + kind().boomLength(boom);
+		Set<BlockPos> mine = new HashSet<>(BigParts.cells(worldPosition, getBlockState()));
+		List<double[]> masts = new ArrayList<>();
+		double[] c = centre();
+		for (CraneBlockEntity other : SERVER) {
+			if (other != this && !other.isRemoved() && other.level == level && other.kind() == CraneKind.TOWER) {
+				double[] oc = other.centre();
+				if (Math.hypot(oc[0] - c[0], oc[1] - c[1]) <= reach + Siting.TOWER_COUNTER_JIB + 5) {
+					masts.add(new double[] {oc[0], oc[1], other.worldPosition.getY() + CraneKind.TOWER_HOOK_HEIGHT + Siting.TOWER_JIB_OVER_HOOK + Siting.TOWER_JIB_DEPTH});
+				}
+			}
+		}
+		for (LiftCycle.Step st : plan) {
+			if (st.phase() != LiftCycle.Phase.TO_PICK && st.phase() != LiftCycle.Phase.SLEW) {
+				continue;
+			}
+			for (double[] at : Siting.sweep(st.from(), st.to(), reach)) {
+				String hit = strikes(at[0], at[1], mine, masts, c);
+				if (hit != null) {
+					return String.format("BLOCKED: its %s would strike %s %s", kind() == CraneKind.TOWER ? "jib" : "boom", hit,
+							st.phase() == LiftCycle.Phase.TO_PICK ? "on its way to the pick" : "as it slews the load");
+				}
+			}
+		}
+		return null;
+	}
+
+	/** What the jib or boom strikes with the hook at {@code degrees}, {@code radius}: a block or another tower crane's mast, or null. */
+	private @Nullable String strikes(double degrees, double radius, Set<BlockPos> mine, List<double[]> masts, double[] c) {
+		double a = Math.toRadians(degrees);
+		double sx = Math.sin(a), sz = -Math.cos(a);
+		BlockPos.MutableBlockPos at = new BlockPos.MutableBlockPos();
+		int base = worldPosition.getY();
+		if (kind() == CraneKind.TOWER) {
+			double y0 = base + CraneKind.TOWER_HOOK_HEIGHT + Siting.TOWER_JIB_OVER_HOOK, y1 = y0 + Siting.TOWER_JIB_DEPTH;
+			for (double d = -Siting.TOWER_COUNTER_JIB; d <= Siting.TOWER_JIB; d += 0.5) {
+				if (Math.abs(d) < Siting.TOWER_MAST_HALF + Siting.CLEARANCE) {
+					continue;   // its own slewing platform
+				}
+				double x = c[0] + sx * d, z = c[1] + sz * d;
+				for (int y = (int) Math.floor(y0); y <= (int) Math.floor(y1); y++) {
+					String hit = hit(at.set(Math.floor(x), y, Math.floor(z)), mine, masts, x, y, z);
+					if (hit != null) {
+						return hit;
+					}
+				}
+			}
+			return null;
+		}
+		double[] foot = kind().boomFoot();
+		double angle = Math.toRadians(kind().boomAngle(boom, Math.max(radius, chart().minRadius())));
+		for (double s = 2; s <= kind().boomLength(boom); s += 0.5) {
+			double out = foot[0] + s * Math.cos(angle);
+			double y = base + foot[1] + s * Math.sin(angle);
+			double x = c[0] + sx * out, z = c[1] + sz * out;
+			String hit = hit(at.set(Math.floor(x), Math.floor(y), Math.floor(z)), mine, masts, x, y, z);
+			if (hit != null) {
+				return hit;
+			}
+		}
+		return null;
+	}
+
+	private @Nullable String hit(BlockPos at, Set<BlockPos> mine, List<double[]> masts, double x, double y, double z) {
+		for (double[] mast : masts) {
+			if (y <= mast[2] && Math.abs(x - mast[0]) <= Siting.TOWER_MAST_HALF + Siting.CLEARANCE && Math.abs(z - mast[1]) <= Siting.TOWER_MAST_HALF + Siting.CLEARANCE) {
+				return String.format("the tower crane's mast at %.0f, %.0f", mast[0], mast[1]);
+			}
+		}
+		if (mine.contains(at) || !level.isLoaded(at)) {
+			return null;
+		}
+		BlockState state = level.getBlockState(at);
+		if (state.isAir() || state.getCollisionShape(level, at).isEmpty()) {
+			return null;
+		}
+		return String.format("%s at %d, %d, %d", BuiltInRegistries.BLOCK.getKey(state.getBlock()), at.getX(), at.getY(), at.getZ());
+	}
+
+	// ---- the ring crane's travel on its rails (docs/questions/plant-crane-gaps.md, 4) -------------------------------------------------
+	/** The rail cell under its slewing centre, a metre below its ring. */
+	private BlockPos centreRail() {
+		double[] c = centre();
+		return BlockPos.containing(c[0], worldPosition.getY() - 1, c[1]);
+	}
+
+	/**
+	 * With nothing it can make (no site in reach, or the lifts out of reach), a ring crane standing on crane rail looks along them for
+	 * the stop that brings the nearest site with work left closest in, and travels there.
+	 */
+	private void planTravel() {
+		if (kind() != CraneKind.RING || level == null) {
+			return;
+		}
+		BlockPos rail = centreRail();
+		BlockState under = level.getBlockState(rail);
+		if (!under.is(WildcatterBlocks.CRANE_RAIL)) {
+			return;
+		}
+		boolean alongX = under.getValue(CraneRailBlock.AXIS) == Direction.Axis.X;
+		Direction ahead = alongX ? Direction.EAST : Direction.SOUTH;
+		int fwd = run(rail, ahead), back = run(rail, ahead.getOpposite());
+		if (fwd == 0 && back == 0) {
+			return;
+		}
+		double[] c = centre();
+		int[] dir = {ahead.getStepX(), ahead.getStepZ()};
+		double aim = chart().minRadius() + Siting.RING_TRAVEL_MARGIN;
+		SiteMarkerBlockEntity target = null;
+		int bestK = 0;
+		double bestScore = Double.MAX_VALUE;
+		for (SiteMarkerBlockEntity m : SiteMarkerBlockEntity.SERVER) {
+			if (m.isRemoved() || m.getLevel() != level || m.blueprint() == null || (m.dismantle() ? m.done() == 0 : m.complete())) {
+				continue;
+			}
+			double[] at = {m.getBlockPos().getX() + 0.5, m.getBlockPos().getZ() + 0.5};
+			int k = Siting.bestStop(c, dir, back, fwd, at, aim, chart().maxRadius());
+			if (k == 0) {
+				continue;
+			}
+			double score = Math.abs(Math.hypot(at[0] - c[0] - dir[0] * k, at[1] - c[1] - dir[1] * k) - aim);
+			if (score < bestScore) {
+				bestScore = score;
+				bestK = k;
+				target = m;
+			}
+		}
+		if (target == null) {
+			return;
+		}
+		travelLeft = bestK;
+		travelAlongX = alongX;
+		travelled = 0;
+		travelTo = siteName(target);
+		status = travelStatus();
+		setChanged();
+	}
+
+	/** How many metres of rail run on from {@code from} toward {@code d}, up to 512. */
+	private int run(BlockPos from, Direction d) {
+		int n = 0;
+		BlockPos at = from;
+		while (n < 512) {
+			at = at.relative(d);
+			if (!level.isLoaded(at) || !level.getBlockState(at).is(WildcatterBlocks.CRANE_RAIL)) {
+				break;
+			}
+			n++;
+		}
+		return n;
+	}
+
+	private String travelStatus() {
+		return String.format("TRAVELLING on its rails to bring %s within reach: %d m to go at %.0f m/h", travelTo, Math.abs(travelLeft), Siting.RING_TRAVEL_M_H);
+	}
+
+	private void travel(Level level) {
+		if (!powered()) {
+			status = noPower() + "; stopped on its rails";
+			return;
+		}
+		double watts = Siting.RING_TRAVEL_WATTS;
+		litres = Math.max(0, litres - kind().dieselPerSecond(watts) / 20.0);
+		travelled += speedup * Siting.RING_TRAVEL_M_H / 3600 / 20;
+		if (travelled < 1) {
+			if (level.getGameTime() % 20 == 0) {
+				status = travelStatus();
+				setChanged();
+			}
+			return;
+		}
+		String why = moveOne();
+		if (why != null) {
+			status = why;
+			travelled = 1;   // it tries the metre again
+			if (why.startsWith("END")) {
+				travelLeft = 0;
+			}
+			setChanged();
+		}
+	}
+
+	/** Moves the whole crane a metre along its rails; null once moved (this block entity is then gone), or why it cannot. */
+	private @Nullable String moveOne() {
+		Direction d = travelAlongX ? (travelLeft > 0 ? Direction.EAST : Direction.WEST) : (travelLeft > 0 ? Direction.SOUTH : Direction.NORTH);
+		if (!level.getBlockState(centreRail().relative(d)).is(WildcatterBlocks.CRANE_RAIL)) {
+			return "END OF ITS RAILS: it stopped short of " + travelTo;
+		}
+		BlockState state = getBlockState();
+		BlockPos to = worldPosition.relative(d);
+		List<BlockPos> from = BigParts.cells(worldPosition, state);
+		Set<BlockPos> old = new HashSet<>(from);
+		for (BlockPos cell : BigParts.cells(to, state)) {
+			if (old.contains(cell)) {
+				continue;
+			}
+			if (!level.isLoaded(cell)) {
+				return "TRAVEL HELD: the ground ahead is not loaded";
+			}
+			BlockState there = level.getBlockState(cell);
+			if (!there.canBeReplaced()) {
+				return String.format("TRAVEL BLOCKED: %s at %d, %d, %d in its path", BuiltInRegistries.BLOCK.getKey(there.getBlock()), cell.getX(), cell.getY(), cell.getZ());
+			}
+		}
+		travelLeft -= Integer.signum(travelLeft);
+		travelled -= 1;
+		if (travelLeft == 0) {
+			laydown = null;
+			nextScan = 0;
+		}
+		status = travelLeft == 0 ? "arrived: looking for its next lift" : travelStatus();
+		CompoundTag data = saveCustomOnly(level.registryAccess());
+		Level here = level;
+		moving = true;
+		int quiet = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_SUPPRESS_DROPS;
+		for (BlockPos cell : from) {
+			if (!cell.equals(worldPosition)) {
+				here.setBlock(cell, Blocks.AIR.defaultBlockState(), quiet);
+			}
+		}
+		here.setBlock(worldPosition, Blocks.AIR.defaultBlockState(), quiet);
+		here.setBlock(to, state, Block.UPDATE_ALL);
+		if (here.getBlockEntity(to) instanceof CraneBlockEntity moved) {
+			moved.loadCustomOnly(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, here.registryAccess(), data));
+			moved.setChanged();
+		}
+		BigParts.grow(here, to, state);
+		return null;
+	}
+
+	/** True while it travels on its rails. */
+	public boolean travelling() {
+		return travelLeft != 0;
+	}
+
+	/** For the game test: diesel in its tank, as if piped. */
+	public void testFuel(double add) {
+		litres = Math.min(kind().tankLitres(), litres + add);
+		setChanged();
+	}
+
+	/** For the game test: the wind 10 m up, m/s, whatever the world's weather; negative to read the weather again. */
+	public void testWind(double metresPerSecond) {
+		testWind = metresPerSecond;
+	}
+
+	/** For the game test: its travel this many times faster than real. */
+	public void testSpeedup(double times) {
+		speedup = times;
+		setChanged();
+	}
+
 	// ---- power: the tower crane's switch cabinet ------------------------------------------------------------------------------------
 	private Direction terminalFace() {
 		return getBlockState().getValue(BigPartBlock.FACING).getCounterClockWise();   // west when facing north
@@ -1008,6 +1384,11 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 		output.putBoolean("grown", grown);
 		output.putInt("boom", boom);
 		output.putDouble("litres", litres);
+		output.putInt("travelLeft", travelLeft);
+		output.putBoolean("travelAlongX", travelAlongX);
+		output.putDouble("travelled", travelled);
+		output.putString("travelTo", travelTo);
+		output.putDouble("speedup", speedup);
 		output.putDouble("hookDeg", hookDeg);
 		output.putDouble("hookRadius", hookRadius);
 		output.putDouble("hookHeight", hookHeight);
@@ -1026,6 +1407,11 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 		grown = input.getBooleanOr("grown", false);
 		boom = Math.clamp(input.getIntOr("boom", kind().firstBoom()), 0, kind().booms() - 1);
 		litres = input.getDoubleOr("litres", 0);
+		travelLeft = input.getIntOr("travelLeft", 0);
+		travelAlongX = input.getBooleanOr("travelAlongX", false);
+		travelled = input.getDoubleOr("travelled", 0);
+		travelTo = input.getStringOr("travelTo", "");
+		speedup = input.getDoubleOr("speedup", 1);
 		hookDeg = input.getDoubleOr("hookDeg", 0);
 		hookRadius = input.getDoubleOr("hookRadius", 0);
 		hookHeight = input.getDoubleOr("hookHeight", 0);
@@ -1101,6 +1487,9 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 	@Override
 	public void preRemoveSideEffects(BlockPos pos, BlockState state) {
 		super.preRemoveSideEffects(pos, state);
+		if (moving) {
+			return;   // it travels on: it has no lift on and nothing on its hook
+		}
 		SiteMarkerBlockEntity m = marker();
 		if (m != null && lift >= 0 && leading()) {
 			m.release(lift, worldPosition);

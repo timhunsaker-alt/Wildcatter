@@ -1,0 +1,16 @@
+{
+ "type": "minecraft:crafting_shaped",
+ "category": "building",
+ "pattern": [
+  "SSS",
+  "PPP"
+ ],
+ "key": {
+  "S": "wildcatter:steel_ingot",
+  "P": "#minecraft:planks"
+ },
+ "result": {
+  "id": "wildcatter:crane_rail",
+  "count": 6
+ }
+}
