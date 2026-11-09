@@ -116,3 +116,60 @@ close all known gaps". This wave closes the Known gaps of Phase 10d1, 10d2, 10d3
 - **Why:** the set's cable is 2/0, which is F855 grade 3; the adiabatic melting limit of 2/0 copper is about 3.7 x 10^8 A²s, close to it.
   A 40 kA bus fault cleared by 87B leaves the set whole; 10 kA that nothing clears burns it in about 3 s.
 - **Alternatives:** the withstand rating (27 kA for 15 cycles, 1.8 x 10^8) as the burn point; the item consumed on a burn.
+
+### 15. How hot can an overhead span run before it fails?
+- **Chosen:** a span (and a lead) heats on its conductor's ampacity (75 C conductor in 25 C air, a 50 K rise) with a 600 s time constant,
+  and parts and falls at 3 x its rated rise (about 175 C): twice the rating lasts about 11 minutes, five times about 50 s.
+- **Why:** bare 4/0 ACSR in still air has a thermal time constant of about 10 minutes (IEEE 738); ACSR's emergency limit is 100-150 C,
+  and above it the aluminium anneals and the span sags and parts. Building wire's 2-minute constant would burn spans far too fast.
+- **Alternatives:** the building-wire model (120 s, 1.8 x); annealing as a permanent loss of strength.
+
+### 16. What shatters an under-rated insulator?
+- **Chosen:** the charge of the power-follow arc, read before any relay acts: the arc current over the solve interval, or over 5 cycles
+  at the island's frequency if a relay cleared it at once; it shatters at 50 A·s. The old 3 s above 1 A rule stays.
+- **Why:** a flashover arc at fault currents cracks porcelain within cycles; before this a fault cleared at once never shattered
+  anything, so the path could not happen.
+- **Alternatives:** shatter on any flashover at once; the arc's I²t.
+
+### 17. How is the house's neutral earthed?
+- **Chosen:** a load centre or panelboard with a ground rod (touching it, or by ground wire) is the service: its main bonding jumper ties
+  N to G, and the rod earths it at 25 ohm. A panel with no rod is a sub-panel, N and G kept apart. The readout gives the bonding jumper's
+  current, or "neutral not earthed here".
+- **Why:** NEC 250.24 bonds N to G only at the service disconnect, with a grounding electrode there; NEC 250.53(A)(2) allows 25 ohm for
+  a single rod. The rod is how a player marks "this is the service".
+- **Alternatives:** a meter-base block that does the bonding (closer to real, one more part); bonding every load centre (wrong for
+  sub-panels).
+
+### 18. Leads (jumpers) from the line down to a cutout or pole transformer
+- **Chosen:** strung with the line's own conductor spool from an insulator to a cutout's line contact or a pole unit's H1: at most 6 m,
+  two per insulator and one per part, voltage matching. A real circuit link, drawn slack. Wire blocks to the faces still work.
+- **Why:** a real primary lead is a short piece of line conductor clamped from the line to the cutout or bushing, so no new item; 6 m
+  reaches from the arm to a unit hung a few metres below.
+- **Alternatives:** a separate lead-wire item; leads between any two parts (cutout to transformer), which needs a renderer on the cutout.
+
+### 19. What comes down when a pole is broken?
+- **Chosen:** a pole transformer or fused cutout that has hung beside a pole (latched the first time it is solved there) drops as an
+  item when no pole is left beside it, on top of the arms and insulators that already fell.
+- **Why:** pole equipment is bolted to its pole. The latch keeps unit substations, yard cutouts and older builds safe.
+- **Alternatives:** an "on pole" block-state flag set at placement (misses units placed by command and older worlds).
+
+### 20. Guy wires (PLANNED, not built: question for Tim)
+- **Chosen:** not built in this wave. The plan: a `guy_anchor` block and a guy strung from the pole top with a `guy_strand` item (3/8 in
+  EHS, 15,400 lbf breaking, NESC strength factor 0.9). Each pole sums its spans' horizontal pull at about 25 % of rated breaking strength
+  (Sparrow 2,850 lbf, Raven 4,380, Penguin 8,350, Linnet 14,100, Drake 31,200) against its ANSI O5.1 class load at the top (30 ft class 5:
+  1,900 lbf; 40 ft class 4: 2,400; 75 ft class 2: 3,700) plus its guys' horizontal share. The readout warns "UNGUYED: N lbf of line pull
+  on a class 4 pole rated 2,400 lbf". Ludo art for the anchor.
+- **Why not built:** a new block, item, block entity, renderer, art and loading model, and the effect is a design call: a pole that
+  fails would bring down every existing world's unguyed line ends and several client scenes.
+- **Question:** should an overloaded, unguyed pole only warn, lean, or break after some minutes?
+- **Alternatives:** guys as decoration only; a guy required before a dead-end span can be strung.
+
+### 21. A pole transformer placed by command (PLANNED: question for Tim)
+- **Chosen:** not changed yet. The fix is a rule in `TransformerBlock.onPlace`: a pole unit with a pole beside it, but not behind it,
+  turns its back to that pole (player placement already does this).
+- **Why not done:** the facing decides the terminals (front and top high side, back and bottom leg A, sides leg B), so turning a unit
+  rewires it. Seven client scenes set units by command wired to their current facing (`transformerChain`, `poleTransformer`,
+  `serviceDrop`, `panels`, `feederRelay`, the scene near line 6337 of the client test, the cutout in `lineParts`); they must be re-laid
+  and run on the client, one at a time, by the lead.
+- **Alternatives:** re-lay those scenes (pole behind each unit, leg-A loads to the bottom face) in a wave where the client suite runs; a
+  drawing-only bracket property (drawn bushings would then not match the terminals).
