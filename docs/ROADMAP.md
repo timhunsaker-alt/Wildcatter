@@ -342,6 +342,21 @@ Spec: `docs/multiblocks/ammonia-plant.md` (approved 2026-11-09; "As built" lists
   product in kg for Tailings' emulsion truck). Boosters and detonators stay in Tailings (vanilla TNT, Tim's decision).
 - NeoForge scenes `ammonia_loop`, `nitric_acid`, `an_emulsion`; unit test `AmmoniaPlantTest`. Client scene `ammoniaPlant` (filmed, passes).
 
+## The protection gap wave — DONE 2026-11-09 (the Known gaps of 10d1, 10d2, 10d3 and Phase 2's distribution; built while Tim was away: "close all known gaps")
+Decisions for Tim: `docs/questions/protection-gaps.md` (28 entries). Specs updated: `gen-bus-protection.md`, `mv-switchgear.md`,
+`breaker-relay-cabinet.md`, `power-transformer-10.md`, `panelboards.md`, `ats.md`, `poles.md`, `docs/phase2-distribution.md`.
+- **Relays:** pickup, curve (IEEE MI, VI, EI), time dial and 50 settable on every feeder relay with the Power Meter; 79 reclosing on
+  the breaker relay cabinet; 50BF on the switchgear and the 13.8 kV feeders; 87B on the 4.16 kV lineup.
+- **Switchgear:** racking time (15 s a position) and remote racking from a PLC.
+- **Differentials:** 87T on the GSUs and the 10 MVA unit, 87G on the big generators; 86B transfer-trips a GSU's 138 kV breakers.
+- **Grounding clamps:** an I²t rating (ASTM F855 grade 3); they burn off past it.
+- **Panels and switches:** a shock trips a GFCI (a 1,000 ohm body path); ATS factory timers with open, in-phase and closed transition;
+  current-limiting fuse let-through; a protection race and a coordination readout; the panel main's handle drawn by state.
+- **Distribution:** span ampacity, 4.16 kV spans, leads from insulators to cutouts and pole units, earthing at the service, the
+  flashover shattering path, pole hardware falling with its pole.
+- **Planned, not built (questions for Tim):** guy wires (20), the command-placed pole transformer's facing (21). Left out: AFCI (22).
+- NeoForge server scenes for each; the Fabric client scenes `switchgear`, `busProtection`, `ats` changed and wait for a client run.
+
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released.
 - A sales gas pipeline and meter station, so a gas plant's residue gas has a buyer besides engines and the flare.

@@ -123,7 +123,11 @@ of pickup 1,293 A; feeder 1 (2,000 A) 520 A; feeder 2 (1,200 A) 340 A".
 - **A feeder breaker:** breaking it drops it and opens the feeder. Either drops its item, as other true-size parts do.
 
 ## Left out (Known gaps)
-- The relay settings are fixed. Only the feeder breaker's rating is set (the protection gap wave makes the feeder relays settable).
+- 87B's slope and the 51V's dial stay fixed. (Closed in the gap wave: each feeder's relay is settable, and a feeder that fails to
+  open is backed up by 50BF.)
+- 87T and 87G see faults made with the grounding set only; internal winding faults are not modelled.
+- A 13.8 kV bus fed only through a GSU's delta, with no generator breaker closed on it, has no ground reference: its cells read
+  meaningless voltages to earth (line to line is right).
 
 ## As built: the protection gap wave (2026-11-09; decisions in docs/questions/protection-gaps.md)
 - **87T, transformer differential (SEL-787 class),** on every true-size, three-phase transformer of 10 MVA and up: the 25 and 60 MVA
@@ -153,6 +157,13 @@ of pickup 1,293 A; feeder 1 (2,000 A) 520 A; feeder 2 (1,200 A) 340 A".
   - Past the rating the clamps burn off: a flash, molten copper, and the cell reads "UNGROUNDED: the grounding clamps BURNED OFF".
     The set item itself is not used up (it never was). While on, the cell shows the share of the rating used.
   - So a 40 kA bus fault cleared by 87B leaves the set whole, and 10 kA that nothing clears burns it in about 3 s.
+
+- **The feeder relays are settable (group A):** each 15 kV feeder breaker's upper cells are its relay and control compartment. With the
+  Power Meter, right-click moves the cursor (pickup, curve, dial, 50), sneak and right-click steps the selected setting. Until set, a
+  feeder's relay follows its rating as in 10d1. Pickup steps go up to 3,000 A.
+- **50BF on the feeders:** a feeder breaker that fails to open (asked to interrupt more than 50 kA, or a stuck mechanism, a test hook)
+  and still carries more than 2 A 0.15 s later makes the panel trip the whole bus as 87B does, with the lockout ("50BF BREAKER
+  FAILURE"). A hand opens the stuck breaker. The client scene's last step checks it.
 
 ## Game test (`busProtection`)
 1. **The plant:** a gas turbine (20.6 MVA), its generator breaker, a bus duct to two feeder breakers, each feeding a 13.8 kV load

@@ -173,3 +173,63 @@ close all known gaps". This wave closes the Known gaps of Phase 10d1, 10d2, 10d3
   and run on the client, one at a time, by the lead.
 - **Alternatives:** re-lay those scenes (pole behind each unit, leg-A loads to the bottom face) in a wave where the client suite runs; a
   drawing-only bracket property (drawn bushings would then not match the terminals).
+
+### 22. Arc-fault (AFCI) breakers?
+- **Chosen:** none built; documented as a limit.
+- **Why:** a UL 1699 AFCI trips on an arc's high-frequency signature (kHz noise, shoulders at each zero crossing). The solver is a
+  50/60 Hz phasor solve, where an arc is only a resistance like any other fault, so an AFCI could only be a breaker tripping on a made-up
+  rule.
+- **Alternatives:** treat worn-wool hot-to-neutral contact as an "arcing" contact an AFCI trips on (not backed by the physics, and it
+  would change how shorts behave in existing scenes).
+
+### 23. How a shock trips a GFCI
+- **Chosen:** for one second after a shock, the part that shocked puts 1,000 ohm from its live conductor to earth (IEC 60479-1
+  hand-to-feet, 50th percentile, dry). A GFCI upstream sees about 120 mA and trips (UL 943 Class A at 5 mA; an RCD at 30 mA). The first
+  shock still lands: a GFCI limits how long a shock lasts. Bare wires and ungrounded lamps and heaters add the path.
+- **Why:** this is how a real GFCI sees a person: current to ground.
+- **Alternatives:** body impedance by voltage, wetness and contact area (IEC 60479 tables); the path on every part that shocks,
+  including MV (where no GFCI exists).
+
+### 24. ATS timers
+- **Chosen:** a new ATS runs the factory defaults (TDES 3 s, TDNE 0 s, TDEN 30 min, TDEC 5 min); sneak and right-click the bottom cell
+  with the Power Meter switches to the 10d3 SHORT set (3 s, 1 s, 30 s, 30 s). A switch saved before this wave keeps SHORT.
+- **Why:** the UL 1008 controllers' factory defaults; old worlds keep their behaviour.
+- **Alternatives:** each timer settable on its own (a PLC or HMI menu); the short set as the default.
+
+### 25. Closed transition and the in-phase monitor on a one-frequency solver
+- **Chosen:** between two live sources the ATS does OPEN (1 s neutral position), IN_PHASE (transfers within 15 degrees and under 2 Hz,
+  0.1 s contact travel) or CLOSED (make before break for one solve, at most 100 ms, only within 5 degrees, 0.2 Hz and 5 % voltage);
+  with no sync after 30 s it falls back to open. Leaving a dead source is always open. The angle is emergency phase A against normal
+  phase A, from the solve. Set with the Power Meter (sneak-click the top cell).
+- **Why:** usual closed-transition passive-sync settings; UL 1008 limits the overlap to 100 ms.
+- **Limit:** the solver gives a connected group one frequency, and the ATS joins both sources into one group, so in play they never
+  slip: the angle is only the load-angle difference and both modes find their window at once. Scenes inject slip with a test hook.
+- **Alternatives:** solve each side of an open ATS as its own island (a change to how CircuitManager groups circuits and frequency
+  islands; a later plan).
+
+### 26. Current-limiting let-through, the protection race, the coordination study
+- **Chosen:** class J fuses limit above 15 x their rating, E-rated above 20 x; they clear in 0.5 cycle x (threshold / I)^(1/3), with a
+  peak let-through of sqrt(2) x threshold x (I / threshold)^(1/3) (within about 10 % of UL 248-8's maximum peaks at 200 kA for 30-600 A,
+  unit-tested) and the I²t of that triangle. On a fault solve only the fastest timed devices act (breaker magnetic and non-limiting fuse
+  melt 1 cycle, GFCI on a heavy ground fault 1.5 cycles, current-limiting fuse under half a cycle), with anything within a quarter cycle
+  of the fastest, and any device whose instantaneous pickup is under the winning fuse's let-through. Relays are untimed in the race and
+  act as before. Interrupting ratings for the study: load centre 10 kA, panelboard 14 kA, one-block breaker 10 kA (proposed, UL 489
+  floor), class J 200 kA, E-rated 50 kA (proposed), plug fuse and K link 10 kA (proposed). Series ratings left out.
+- **Why:** the cube-root law is the shape of every maker's let-through chart and reproduces the UL limits. Two molded-case breakers both
+  in their magnetic range tie and both trip, as real ones do. A series rating is a tested listing, not derivable from curves.
+- **Alternatives:** a magnetic clearing time falling with the fault multiple (would make molded-case breakers look selective); vendor
+  let-through tables per size; the available fault current from a second solve.
+
+### 27. The coordination readout: where and how
+- **Chosen:** appended to the Power Meter readout of each branch breaker, panel main, one-block LV or 480 V breaker or fuse, safety
+  switch and fused load-interrupter: "coordination: under the ..., selective only up to N A". The device upstream is the panel main for a
+  gutter's breaker; otherwise the first breaker, fuse or relay (switchgear section, relay cabinet) found walking the line side through
+  conductors; the walk stops at a transformer or source.
+- **Why:** no new tool to craft, and a real study's answer is "selective up to X kA".
+- **Alternatives:** a separate coordination tool item; comparing across transformers (needs the turns ratio and the primary protection).
+
+### 28. The panel main's handle
+- **Chosen:** a `main` block-state (on, off, tripped) on the load centre and the 480 V panelboard; the handle shows through a window in
+  the dead front, up for ON, down for OFF, centred with its flag out for TRIPPED, drawn from existing materials.
+- **Why:** it matches the gutters, and real main-breaker panels show the main's handle.
+- **Alternatives:** draw it only with the door open.

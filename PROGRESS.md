@@ -101,14 +101,14 @@ The 110 V devices go in the hot wire: in at the back, out at the front. Sneak an
 ## Phase 2b: insulators and overhead spans
 - **Insulators** (LV 1 kV, DIST 15 kV pin, HV 138 kV suspension) sit on top of a pole or crossarm (they pop off otherwise) and hold one conductor, chosen by right-click. **Conductor spools** (bare and covered, per tier) string a span between two insulators: right-click one, then the other. A spool pays out one block of its 256 per block of span.
 - A span is a link stored on both insulators, solved with the circuit (the two ends are one island even far apart), with the tier's wire resistance per block, and drawn by a client renderer as a sagging line (`client/SpanRenderer`). Limits: 8 blocks at LV, 10 at DIST, 64 at HV (1 block = 4 m); both ends the same conductor; one kind of line per insulator; four spans at most. A span whose other end is gone is dropped. Bare spans shock like bare wire.
-- A line above an insulator's rating gets a ground arc ("flashing over"); under load for 3 s the insulator shatters. Tested: the flag. The shattering depends on enough fault current, which a small generator cannot supply (it trips on frequency first), so that path is not exercised by the game test.
+- A line above an insulator's rating gets a ground arc ("flashing over"); under load for 3 s the insulator shatters. Tested: the flag. The shattering depends on enough fault current, which a small generator cannot supply (it trips on frequency first), so that path was not exercised by the game test (it is since the protection gap wave: scene `mv_span_flashover`).
 - Game test: a 9 block distribution span carries 7,200 V, a 16 block span is refused ("Too far"), insulators on different conductors are refused, and an under-rated insulator is flagged.
-- Not done: span conductor ampacity (spans never burn), spans for the 4.16 kV tier (no MV spool), conductor sizes (one per tier).
+- Not done then: span ampacity, 4.16 kV spans and conductor sizes (sizes came in Phase 4.1, the rest in the protection gap wave).
 
 ## Phase 2c and 2d: pole transformer, fused cutout, service drop
-- **Pole-Mount Transformer** (25 kVA, 12.47 kV (7.2 kV to neutral) to 120/240 V split-phase, or 230 V on IEC): hangs on a pole (one must stand beside it), feeder to its top (high side), leg A and neutral on the back and bottom, leg B on the sides. Loaded beyond 25 kVA it heats and at 150 % burns out in 10 s. Not done: the 2.5 % impedance (it uses the common winding model).
+- **Pole-Mount Transformer** (25 kVA, 12.47 kV (7.2 kV to neutral) to 120/240 V split-phase, or 230 V on IEC): hangs on a pole (one must stand beside it), feeder to its top (high side), leg A and neutral on the back and bottom, leg B on the sides. Loaded beyond 25 kVA it heats and at 150 % burns out in 10 s. (The 2.5 % impedance came in Phase 3a; the short-time rule became C57.109 in 10d1.)
 - **Fused Cutout** (DIST): an in-line fuse for the feeder with K-link ratings 6/10/15/25/40/65/100 A; it blows, its tube drops open, and a copper ingot fits a new link.
-- **Service drop**: a low voltage span pair (hot and neutral) from the pole transformer to the house. Not done: tying the neutral to earth at the house (the transformer neutral is tied at the pole).
+- **Service drop**: a low voltage span pair (hot and neutral) from the pole transformer to the house. (The house's neutral is earthed at its service since the protection gap wave: a panel with a ground rod.)
 - Game test: feeder, cutout, pole transformer, a 7 block service drop and a house lamp that lights; the cutout blows (test shrinks its rating) and the house goes dark; a new link restores it.
 
 ## Phase 2e and 2f: receptacles, plug adapters, feeder relays
@@ -118,7 +118,7 @@ The 110 V devices go in the hot wire: in at the back, out at the front. Sneak an
 - Game test: a plug hands 923 FE/t (92k FE in 100 ticks) to a stand-in machine; a CEE 7 plug is refused beside a NEMA receptacle and delivers nothing on 120 V; a plug above its rating burns with its receptacle; the feeder relay sheds a pole transformer's overload at 59.0 Hz and the turbine stays on.
 
 ## Phase 2 summary
-Distribution tier, insulators and spans, pole transformer, fused cutout, service drop, receptacles and plugs, feeder relays are all built and covered by the game test. Known gaps: span ampacity, 4.16 kV spans, conductor sizes, transformer impedance, neutral earthing at the house, flashover shattering path untested.
+Distribution tier, insulators and spans, pole transformer, fused cutout, service drop, receptacles and plugs, feeder relays are all built and covered by the game test. Its known gaps were closed in the protection gap wave (2026-11-09): span ampacity, 4.16 kV spans and the service's neutral earthing were built, the flashover shattering path is tested, and conductor sizes (Phase 4.1) and transformer impedance (Phase 3a/3c) had been done already.
 
 ## Phase 3a: phasor solver in the blocks (no commit yet; held until after Tim's workday)
 - Every block now solves on the complex phasor solver (`solver/Network` builds a `PhasorSolver`; the old real-valued `Solver` is gone). The whole Phase 0 to 2 game test passes unchanged on it.
@@ -1469,25 +1469,20 @@ sized for a 40-pot line.
   - the bus bars' standoffs stand on the floor of their own cell, so a run carried up in the air shows them hanging (no
     supports or structure yet);
   - the chlor-alkali caustic soda is still only counted (fixed in 10b2: it is a pipe product).
-- Phase 10d3:
-  - no arc-fault (AFCI) breakers: arcing isn't modelled;
-  - a shock to a player isn't current in the circuit, so it doesn't trip a GFCI;
-  - the ATS timers are scaled down from the real defaults; no closed transition or in-phase monitor; the solver gives one
-    frequency to a connected group, so the ATS checks frequency only for emergency;
-  - no breaker or fuse coordination study, no let-through (I²t) of current-limiting fuses, no series ratings;
-  - only the gutters show on, off and tripped; the panel's main handle is not drawn by state.
-- Phase 10d2:
-  - racking is instant: no racking time and no remote racking;
-  - no breaker failure protection (50BF): a breaker always opens when its relay trips it;
-  - no bus differential on the 4.16 kV switchgear bus, and no 87T on the 10 MVA unit;
-  - the new relays' curve and dial are fixed; only the pickup (and the switchgear's frame) are set;
-  - the breaker relay cabinet does not reclose by itself (no recloser shots).
-- Phase 10d1:
-  - the grounding clamps never burn, however long a fault lasts;
-  - there is no transformer (87T) or generator (87G) differential: a fault inside a GSU or a generator is cleared by 51V or the
-    stator trip;
-  - the relay settings are fixed, except each feeder breaker's rating;
-  - a 138 kV source back-feeding the GSU onto a bus fault is not opened by 87B: it has no breaker on the bus side;
+- The protection gap wave (2026-11-09; what is left of the Phase 10d1-10d3 gaps; decisions in `docs/questions/protection-gaps.md`):
+  - no arc-fault (AFCI) breakers: an arc's signature is not on a phasor solver (decision 22);
+  - no series ratings; a molded-case breaker past its interrupting rating still opens (only the switchgear and the 15 kV feeders
+    fail to open past theirs);
+  - the ATS's two sources share one frequency in the solver, so its in-phase monitor and sync check see no slip in play (a test hook
+    gives slip); no load shed before transfer;
+  - relays are untimed in the protection race (they act as before), relays carry no coordination readout of their own, and the
+    coordination check stops at transformers;
+  - nothing in play sticks a breaker's mechanism (a test hook does); the switchgear main and the relay cabinet have no 50BF above them;
+  - 87T and 87G see faults made with the grounding set only; internal winding faults are not modelled;
+  - a 13.8 kV bus fed only through a GSU's delta, with no generator breaker closed on it, has no ground reference (its voltages to
+    earth read wrong; line to line is right);
+  - the 87B slope and the 51V dial are fixed; the relay settings use the IEEE curves only (no IEC curves);
+  - the new settings have been exercised in NeoForge server scenes, and the Fabric client scenes that changed have not been run.
 - Phase 10c3:
   - the ring crane stands where it is placed: no relocation on rails, as a real one moves between lifting positions;
   - it carries no heavy-duty jib, and no hook arrangement for its 5,000 t: its chart is capped at the 3,200 t main hook;
@@ -1578,10 +1573,10 @@ sized for a 40-pot line.
 - Wall-mounted gear sits 0.55 m up its cell; a player wanting it higher places it a block up.
 - Pumpjack and rig collision is the still frame: the moving beam, crank and pipe do not push anything.
 - The pumpjack's linkage and the rig's head have been checked in test screenshots, not watched in a real play session.
-- The pole transformer and cutout are wired as before (wire blocks to their faces); there are no jumper or riser leads drawn from an insulator down to them.
-- A pole transformer placed by command keeps its old facing rule, so in some test scenes its brackets face away from the pole.
-- Breaking a pole does not take down a pole transformer hung on it (it stays, as before).
-- There are no guy wires.
+- A lead runs only from an insulator to a cutout or a pole unit; the cutout-to-transformer link is still by touching faces.
+- A pole transformer placed by command keeps its old facing rule, so in some test scenes its brackets face away from the pole (planned: protection-gaps 21).
+- There are no guy wires (planned: protection-gaps 20; Tim to choose what an unguyed pole does).
+- The MV spool icons are script-drawn like the other spool icons (no spool has Ludo art).
 - The steam plant's main steam line and feedwater line are drawn only within each part: they meet at the parts' edges, and the feedwater line stops at the boiler.
 - A hopper feeds the burner only through its main cell.
 - The frame-rate check runs at the client's 120 fps cap, so it shows no drop but not how much headroom is left.
@@ -1664,3 +1659,34 @@ the decisions taken are in `docs/questions/ammonia-plant.md` for him to go throu
   46.1 kg/h of matrix into a stock tank; NO DIESEL, NO ACID). All 8 NeoForge scenes pass (5 before).
 - **Client scene `ammoniaPlant`** (filmed): the whole chain on one diesel set, each readout in a screenshot, the matrix tank, then the
   hydrogen pipe cut (NO HYDROGEN, then NO SYNGAS). Passed on its first run (2026-11-09): reformer 30 Nm³/h, nitrogen 9.7 Nm³/h, acid 43.8 kg/h of 60 %, matrix in the tank, then NO HYDROGEN and NO SYNGAS.
+
+## The protection gap wave (2026-11-09; built while Tim was away; decisions: `docs/questions/protection-gaps.md`)
+Closes the Known gaps of Phase 10d1, 10d2, 10d3 and Phase 2's distribution, except guy wires and the command-placed pole transformer's
+facing (planned, questions 20 and 21) and AFCI (left out: question 22).
+- **Relay settings (10d1, 10d2):** every feeder relay (switchgear section, breaker relay cabinet, 15 kV feeder breaker) has a settable
+  pickup (5 to 3,000 A), curve (IEEE C37.112 MI, VI, EI), time dial (0.5 to 15) and 50 (off, 4 to 20 x), set from its front panel with
+  the Power Meter: right-click the relay to move the cursor, sneak and right-click to step the selected setting (`circuit/RelaySettings`).
+- **Switchgear (10d2):** racking takes 15 s a position and can be done from a PLC (RACK IN, RACK OUT); 50BF opens the rest of the
+  lineup when a breaker fails to open (beyond 41 kA, or a stuck mechanism) and 86BF holds it; the main carries the lineup's 87B, and the
+  grounding set goes on any section's bus.
+- **Breaker relay cabinet (10d2):** 79 recloses after a 50/51 trip (2, 15, 30 s; 3 shots on 12.47 kV, 1 on 138 kV; lockout after the
+  last; reset after 60 s closed).
+- **Generator bus (10d1):** each feeder's relay is settable; a feeder that fails to open trips the whole bus (50BF). 86B transfer-trips
+  the 138 kV breakers of a GSU straight off the bus, so the line cannot back-feed a bus fault.
+- **87T and 87G (10d1, 10d2):** the 25 and 60 MVA GSUs and the 10 MVA 4.16/138 kV unit have 87T (0.3 pu, 25 % slope; zone to the
+  breakers on each side; 86T, reset at the transformer); the big generators have 87G (0.1 pu, 10 % slope), faulted with the grounding set
+  on the generator.
+- **Grounding clamps (10d1):** ASTM F855 grade 3, 35 kA for 15 cycles; past their I²t they burn off and the conductor reads UNGROUNDED.
+- **Panels and switches (10d3):** a shock puts a 1,000 ohm body path to earth, so a GFCI or RCD trips on it; the ATS runs factory timers
+  (or the short set) with open, in-phase or closed transition; class J and E-rated fuses are current-limiting with a let-through peak and
+  I²t; on a fault only the fastest breakers and fuses act (the protection race); breakers and fuses read the device upstream and how far
+  they are selective; the load centre's and panelboard's main handle is drawn ON, OFF or TRIPPED.
+- **Distribution (Phase 2):** spans and leads heat on their conductor's rating (10 min time constant) and burn down at 3 x the rated
+  rise; 4.16 kV spans on MV conductor spools; leads strung from a line insulator to a cutout or pole transformer; a load centre or
+  panelboard with a ground rod is the service (N bonded to G, rod 25 ohm); an under-rated insulator shatters at 50 A·s of arc, even when
+  a relay clears the fault at once; a pole transformer or cutout hung on a pole comes down with it.
+- **Tests:** unit tests `RelaySettingsTest`, `DifferentialTest`, `TimeCurrentTest`, a span-heat test in `WireHeatTest` (316 in all). NeoForge
+  server scenes `switchgear_settings`, `switchgear_bf_87b`, `cabinet_reclose`, `unit_differentials`, `gsu_backfeed`, `clamp_burn`,
+  `panel_gfci_shock`, `fuse_let_through`, `ats_timers`, `ats_closed_in_phase`, `span_burns`, `mv_span_flashover`, `house_earth` (21 scenes
+  pass). Client scenes changed but not yet run: `switchgear` (racking hook), `busProtection` (a 50BF step), `ats` (short timers).
+
