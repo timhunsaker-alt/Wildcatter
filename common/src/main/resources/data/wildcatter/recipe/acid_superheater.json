@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SBS",
+    "PCP",
+    "SBS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "B": "minecraft:bricks",
+    "P": "wildcatter:gas_line",
+    "C": "minecraft:copper_block"
+  },
+  "result": {
+    "id": "wildcatter:acid_superheater",
+    "count": 1
+  }
+}

@@ -34,6 +34,8 @@ frequency, protection) is in `docs/ELECTRICAL_MODEL.md`. What is built, phase by
 - **Ammonia and blasting emulsion:** a small ammonia plant on the steam reformer's hydrogen and PSA nitrogen, a nitric acid unit on
   a platinum-rhodium gauze, an ammonium nitrate neutraliser and an emulsion blender making bulk emulsion matrix for open-pit blasting
   (Phase 14).
+- **Gas and power quick wins:** a sales gas line with receipt and delivery meter stations, the acid plant's steam to a turbine, and
+  biogas from another mod as a derated gas set fuel (Phase 14b-14d).
 - **Blueprints:** survey any plant onto a blueprint, or pick one of 26 from the library; its ghost and site marker show what to build
   and the lifts it takes (10c1).
 - **Cranes:** a 16 t tower crane on 480 V, a 300 t crawler crane and a 5,000 t ring crane on their own diesel, on their real load

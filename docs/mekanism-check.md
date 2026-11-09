@@ -1,6 +1,6 @@
 # Checking the plugs against real Mekanism machines
 
-> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Proposed wave **14d**, to run **when
+> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Proposed wave **14e** (was 14d; Phase 14 was already the ammonia plant, 14a), to run **when
 > Mekanism for 26.3 is released**. Decisions are in `docs/questions/specs-wildcatter.md` (items 12-13).
 
 Phase 9c made plugs feed NeoForge's energy capability, checked against a stand-in `SimpleEnergyHandler` because Mekanism for 26.3 was

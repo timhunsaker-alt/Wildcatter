@@ -210,6 +210,7 @@ public class FireboxBlockEntity extends BaseContainerBlockEntity implements Worl
 	private static double fuelTicks(Product product) {
 		return switch (product) {
 			case WET_GAS, GAS, COMPRESSED_GAS, DRIED_GAS, PIPELINE_GAS -> Tuning.GAS_FUEL_TICKS_PER_UNIT;
+			case BIOGAS -> dev.wildcatter.fluid.Biogas.fireboxTicksPerM3();   // any gas, by its heating value (docs/biogas.md)
 			case CRUDE -> Tuning.OIL_FUEL_TICKS_PER_UNIT;
 			case DIESEL -> Tuning.DIESEL_FUEL_TICKS_PER_UNIT;
 			case GASOLINE, NATURAL_GASOLINE -> Tuning.GASOLINE_FUEL_TICKS_PER_UNIT;

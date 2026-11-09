@@ -283,6 +283,12 @@
     "wildcatter:junction_box",
     "wildcatter:control_supply",
     "wildcatter:plc_cabinet",
-    "wildcatter:remote_io_drop"
+    "wildcatter:remote_io_drop",
+    "wildcatter:meter_building",
+    "wildcatter:filter_separator",
+    "wildcatter:ultrasonic_meter_run",
+    "wildcatter:regulator_skid",
+    "wildcatter:pipeline_tap",
+    "wildcatter:acid_superheater"
   ]
 }

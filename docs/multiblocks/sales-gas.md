@@ -1,6 +1,7 @@
 # The sales line: receipt and delivery meter stations
 
-> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Proposed phase **14a**. Decisions are in
+> **BUILT as wave 14b (2026-11-09), decided on recommendation while Tim was away; not approved.** See "As built" at the end and
+> `docs/questions/phase14-gas-power.md`. Renumbered 14b-14e on 2026-11-09: Phase 14 was already the ammonia plant (14a). Decisions are in
 > `docs/questions/specs-wildcatter.md` (items 1-4).
 
 The gas plant's residue gas has a buyer besides engines and the flare: a **transmission line** that belongs to someone else, as an
@@ -130,4 +131,22 @@ The grid is a sketch; the game test is the layout of record.
 - **Screenshot:** the receipt station.
 
 ## Proposed wave
-**14a**, alone: a small wave of five parts and one world counter. It needs nothing new from the solver.
+**14b** (was 14a), alone: a small wave of five parts and one world counter. It needs nothing new from the solver.
+
+## As built (14b, 2026-11-09)
+Decisions taken while building are in `docs/questions/phase14-gas-power.md` (items 2-8, 17, 18).
+- **Layout of record** (facing north, the building's main cell at 0,0,0): building x 0-2 z 0-3; meter run x 3 z 0-7 along its east side;
+  filter separator (receipt) or regulator skid (delivery) x 4-5 from z 0; tap x 4 z 7, at the run's south end. The filter separator's
+  inlet is the **north** face of its front bottom cells (the meter run is on its west). The regulator skid's outlet: the south face of its
+  back cells, as specified. The building's residential box: the west face of its main cell (hot and neutral).
+- **Numbers as specified:** 5 m3/s a station; 2 % retention booked on each receipt; 0.2 % to the line heater on each delivery; 8 game
+  hours of RTU battery (8,000 ticks), recharged while powered; 2 kW single-phase at the low tier. Added: the regulator skid holds one
+  interval at rating (1 m3); the filter separator's sump catches 1 L a 100,000 m3 *(proposed)*.
+- **The account:** `SalesGasLine`, the dimension's saved data (received, retained and debited GJ; m3 received and delivered).
+- **Readouts:** RECEIPT / DELIVERY with flow and MW; OFF SPEC: RICH, WATER, CO2; NOT GAS; NOT BUILT: NO METER RUN, NO TAP, NO FILTER,
+  NO REGULATOR; METER FAILED; NO POWER (on the battery, hours left); NO GAS ON THE LINE; SHUT IN (PLC). The run ticket: today's and the
+  lifetime m3, GJ and MMBtu, the heating value and the account. The tap reads its block valve OPEN or CLOSED.
+- **PLC points:** RUN (in), RUNNING, SHUT IN, AUTO, FLOW 4-20 mA (0-5 m3/s), HEATING VALUE 4-20 mA (30-45 MJ/m3).
+- **Tests:** unit tests in `GasPowerTest`; NeoForge scene `sales_gas` (the spec's list, with a stand-in source for the gas plant and a
+  heater on the gas set in place of a load bank); client scene `salesGas` (written, filmed by the lead).
+- **Not built:** pressure, line pack, odorizing, H2S and CO2 limits beyond the refusals, money (as "Left out").
