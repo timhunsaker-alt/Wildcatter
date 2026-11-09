@@ -185,6 +185,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("conversion")) {
 				conversion(context, server);
 			}
+			if (only("ammoniaPlant")) {
+				ammoniaPlant(context, server);
+			}
 			if (only("cascade")) {
 				cascade(context, server);
 			}
@@ -8949,6 +8952,177 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		}
 	}
 
+
+	/**
+	 * The ammonia plant (Phase 14, docs/multiblocks/ammonia-plant.md), the whole chain at true size, every part facing north. North
+	 * end: a steam reformer on LPG from a bullet and a nitrogen generator feed the syngas compressor, with the ammonia converter against
+	 * its south end; the converter's liquid ammonia runs into a pressure bullet. Off that bullet's west side: the nitric acid unit (its
+	 * gauze packs in a hopper on top) and the AN neutraliser, the acid running from the one to the other; the neutraliser's solution to
+	 * the emulsion blender (diesel from a stock tank, emulsifier pails in a hopper on top) and the matrix into its own stock tank. One
+	 * 500 kW diesel set on the industrial cable to every part's west box. The ammonia bullet starts with 2,000 L, as if the loop had
+	 * been running a few days (the loop's 25 L/h would take an hour to show), and the diesel tank with 5,000 L. Each stage must run at
+	 * the spec's rate; then the hydrogen pipe is cut and the compressor reads NO HYDROGEN, and once its gas is used the converter
+	 * NO SYNGAS. Screenshots of each readout and of the plant.
+	 */
+	private void ammoniaPlant(ClientGameTestContext context, TestServerContext server) {
+		int z = -8000;
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 8 " + (up + 30) + " " + (z + 50) + " 180 40");
+		context.waitTicks(20);
+		for (int zz = z - 16; zz <= z + 42; zz += 20) {   // /fill takes at most 32,768 blocks
+			server.runCommand("fill -16 " + (y - 1) + " " + zz + " 34 " + (y + 15) + " " + Math.min(zz + 19, z + 42) + " minecraft:air");
+		}
+		server.runCommand("fill -16 " + (y - 1) + " " + (z - 16) + " 34 " + (y - 1) + " " + (z + 42) + " minecraft:stone");
+		Filming film = null;
+		try {
+			film = context.computeOnClient(client -> Filming.start(client, "ammoniaPlant"));
+			// the ammonia loop
+			placeBig(server, WildcatterBlocks.STEAM_REFORMER, new BlockPos(13, up, z), north);           // x 13-15, z..z+3
+			BlockPos lpg = new BlockPos(17, up, z - 10);
+			placeBig(server, WildcatterBlocks.LPG_BULLET, lpg, north);                                   // x 17-19, z-10..z+1
+			placeBig(server, WildcatterBlocks.NITROGEN_GENERATOR, new BlockPos(13, up, z + 7), north);   // x 13-14, z+7..z+9
+			placeBig(server, WildcatterBlocks.SYNGAS_COMPRESSOR, new BlockPos(8, up, z + 6), north);     // x 8-10, z+6..z+10
+			placeBig(server, WildcatterBlocks.AMMONIA_CONVERTER, new BlockPos(8, up, z + 11), north);    // x 8-10, z+11..z+13, against it
+			BlockPos nh3 = new BlockPos(8, up, z + 15);
+			placeBig(server, WildcatterBlocks.LPG_BULLET, nh3, north);                                   // x 8-10, z+15..z+26: the ammonia
+			// acid, AN and matrix
+			placeBig(server, WildcatterBlocks.NITRIC_ACID_UNIT, new BlockPos(3, up, z + 16), north);     // x 3-6, z+16..z+19
+			placeBig(server, WildcatterBlocks.AN_NEUTRALISER, new BlockPos(0, up, z + 22), north);       // x 0-2, z+22..z+24
+			placeBig(server, WildcatterBlocks.EMULSION_BLENDER, new BlockPos(-6, up, z + 28), north);    // x -6..-4, z+28..z+31
+			BlockPos diesel = new BlockPos(-2, up, z + 31);
+			placeBig(server, WildcatterBlocks.STOCK_TANK, diesel, north);                                // x -2..1, z+31..z+34
+			BlockPos matrixTank = new BlockPos(-7, up, z + 34);
+			placeBig(server, WildcatterBlocks.STOCK_TANK, matrixTank, north);                            // x -7..-4, z+34..z+37
+			// steel pipe
+			pipes(server, z, new int[][] {{16, 0, 0}});                                                  // LPG to the reformer's east side
+			pipes(server, z, new int[][] {{14, 0, 4}, {14, 0, 5}, {13, 0, 5}, {12, 0, 5}, {11, 0, 5}, {11, 0, 6}});   // hydrogen
+			pipes(server, z, new int[][] {{13, 0, 10}, {12, 0, 10}, {11, 0, 10}});                        // nitrogen
+			pipes(server, z, new int[][] {{9, 0, 14}});                                                  // liquid ammonia to its bullet
+			pipes(server, z, new int[][] {{7, 0, 16}});                                                  // ammonia to the acid unit's east side
+			pipes(server, z, new int[][] {{7, 0, 24}, {6, 0, 24}, {5, 0, 24}, {4, 0, 24}, {3, 0, 24}});  // ammonia to the neutraliser
+			pipes(server, z, new int[][] {{4, 0, 20}, {4, 0, 21}, {4, 0, 22}, {3, 0, 22}});              // 60 % acid to the neutraliser
+			pipes(server, z, new int[][] {{1, 0, 25}, {1, 0, 26}, {1, 0, 27}, {0, 0, 27}, {-1, 0, 27}, {-2, 0, 27}, {-3, 0, 27}, {-3, 0, 28}});   // AN solution
+			pipes(server, z, new int[][] {{-3, 0, 31}});                                                 // diesel
+			pipes(server, z, new int[][] {{-5, 0, 32}, {-5, 0, 33}});                                    // matrix to its tank
+			// hoppers: gauze packs on the acid unit, emulsifier pails on the blender
+			put(server, 4, up + 12, z + 17, "minecraft:hopper");
+			server.runCommand("item replace block 4 " + (up + 12) + " " + (z + 17) + " container.0 with wildcatter:gauze_pack 2");
+			put(server, -5, up + 3, z + 29, "minecraft:hopper");
+			server.runCommand("item replace block -5 " + (up + 3) + " " + (z + 29) + " container.0 with wildcatter:emulsifier_pail 4");
+			// the industrial cable: a diesel set east, north round the LPG bullet, a spine down x 7 past the compressor's and
+			// converter's boxes, a branch over the hydrogen pipe to the nitrogen generator, and one west and south to the acid unit and the blender
+			BlockPos set = new BlockPos(30, up, z - 3);
+			genset(server, set, north, false);                                                           // x 25-30, z-3..z-2
+			java.util.List<int[]> cable = new java.util.ArrayList<>();
+			for (int zz = -12; zz <= -3; zz++) {
+				cable.add(new int[] {31, 0, zz});
+			}
+			for (int x = 7; x <= 30; x++) {
+				cable.add(new int[] {x, 0, -12});
+			}
+			for (int zz = -11; zz <= 11; zz++) {
+				cable.add(new int[] {7, 0, zz});
+			}
+			for (int x = 8; x <= 12; x++) {
+				cable.add(new int[] {x, 0, -1});
+			}
+			for (int zz = 0; zz <= 4; zz++) {
+				cable.add(new int[] {12, 0, zz});
+			}
+			for (int[] c : new int[][] {{12, 1, 4}, {12, 1, 5}, {12, 1, 6}, {12, 0, 6}, {12, 0, 7}}) {    // over the hydrogen pipe
+				cable.add(c);
+			}
+			for (int x = 2; x <= 6; x++) {
+				cable.add(new int[] {x, 0, 11});
+			}
+			for (int zz = 12; zz <= 16; zz++) {
+				cable.add(new int[] {2, 0, zz});                                                         // the acid unit's box
+			}
+			for (int x = -7; x <= 1; x++) {
+				cable.add(new int[] {x, 0, 12});
+			}
+			for (int zz = 13; zz <= 28; zz++) {
+				cable.add(new int[] {-7, 0, zz});                                                        // the blender's box
+			}
+			for (int[] c : cable) {
+				put(server, c[0], up + c[1], z + c[2], "wildcatter:cable_industrial");
+			}
+			fillTank(server, lpg, dev.wildcatter.fluid.Product.LPG, 20_000);
+			fillTank(server, nh3, dev.wildcatter.fluid.Product.AMMONIA, 2_000);
+			fillTank(server, diesel, dev.wildcatter.fluid.Product.DIESEL, 5_000);
+			BlockPos reformer = new BlockPos(13, up, z);
+			BlockPos acidUnit = new BlockPos(3, up, z + 16);
+			BlockPos blender = new BlockPos(-6, up, z + 28);
+			water(server, reformer, acidUnit, blender);
+			startGenset(context, server, set, north, 2000);
+			for (int i = 0; i < 24; i++) {   // 60 s: every stage up to its rate, and matrix in its tank
+				context.waitTicks(50);
+				water(server, reformer, acidUnit, blender);
+			}
+			String chain = " | reformer " + read(server, 13, up, z) + " | n2 " + read(server, 13, up, z + 7) + " | compressor " + read(server, 8, up, z + 6)
+					+ " | converter " + read(server, 8, up, z + 11) + " | bullet " + read(server, 8, up, z + 15) + " | acid unit " + read(server, 3, up, z + 16)
+					+ " | neutraliser " + read(server, 0, up, z + 22) + " | blender " + read(server, -6, up, z + 28) + " | matrix " + read(server, -7, up, z + 34)
+					+ " | set " + read(server, 30, up, z - 3);
+			double[] rates = server.computeOnServer(srv -> new double[] {
+					((dev.wildcatter.block.AmmoniaConverterBlockEntity) srv.overworld().getBlockEntity(new BlockPos(8, up, z + 11))).making(),
+					((dev.wildcatter.block.NitricAcidUnitBlockEntity) srv.overworld().getBlockEntity(acidUnit)).making(),
+					((dev.wildcatter.block.AnNeutraliserBlockEntity) srv.overworld().getBlockEntity(new BlockPos(0, up, z + 22))).making(),
+					((dev.wildcatter.block.EmulsionBlenderBlockEntity) srv.overworld().getBlockEntity(blender)).making(),
+					((dev.wildcatter.block.StorageTankBlockEntity) srv.overworld().getBlockEntity(matrixTank)).amount()});
+			check(read(server, 13, up, z).contains("reforming"), "the reformer should make hydrogen: " + chain);
+			check(Math.abs(rates[0] - dev.wildcatter.fluid.AmmoniaPlant.ammoniaKgh()) < 1.5, "the converter should make about 15.2 kg/h of ammonia: " + rates[0] + chain);
+			check(Math.abs(rates[1] - dev.wildcatter.fluid.AmmoniaPlant.hno3Kgh()) < 2.7, "the acid unit should make about 27 kg/h of HNO3: " + rates[1] + chain);
+			check(Math.abs(rates[2] - dev.wildcatter.fluid.AmmoniaPlant.anKgh()) < 5, "the neutraliser should make about 34.6 kg/h of AN: " + rates[2] + chain);
+			check(Math.abs(rates[3] - dev.wildcatter.fluid.AmmoniaPlant.matrixKgh()) < 7, "the blender should make about 46 kg/h of matrix: " + rates[3] + chain);
+			check(rates[4] > 0.05, "emulsion matrix should be in its tank: " + rates[4] + chain);
+			System.out.println("[wildcatter-test] ammoniaPlant running" + chain);
+			server.runCommand("tp @p 22 " + (up + 22) + " " + (z + 46) + " 155 35");
+			context.waitTicks(5);
+			context.takeScreenshot("wildcatter-ammonia-plant");
+			showReadout(context, server, new BlockPos(8, up, z + 11), "tp @p 4 " + (up + 3) + " " + (z + 12) + " -90 10", "wildcatter-ammonia-converter");
+			showReadout(context, server, acidUnit, "tp @p 0 " + (up + 3) + " " + (z + 13) + " -135 10", "wildcatter-ammonia-acid-unit");
+			showReadout(context, server, new BlockPos(0, up, z + 22), "tp @p -3 " + (up + 3) + " " + (z + 20) + " -120 15", "wildcatter-ammonia-neutraliser");
+			showReadout(context, server, blender, "tp @p -10 " + (up + 3) + " " + (z + 26) + " -135 15", "wildcatter-ammonia-blender");
+			showReadout(context, server, matrixTank, "tp @p -10 " + (up + 3) + " " + (z + 40) + " -135 15", "wildcatter-ammonia-matrix-tank");
+			// the hydrogen pipe cut: the compressor stops at once, the converter when its gas is used up
+			put(server, 14, up, z + 4, "minecraft:air");
+			context.waitTicks(40);
+			String noH2 = read(server, 8, up, z + 6);
+			check(noH2.contains("NO HYDROGEN"), "without hydrogen the compressor should stop: " + noH2);
+			showReadout(context, server, new BlockPos(8, up, z + 6), "tp @p 4 " + (up + 3) + " " + (z + 4) + " -120 15", "wildcatter-ammonia-no-hydrogen");
+			String starved = "";
+			for (int i = 0; i < 16 && !starved.contains("NO SYNGAS"); i++) {   // the compressor holds 20 s of gas
+				context.waitTicks(50);
+				water(server, reformer, acidUnit, blender);
+				starved = read(server, 8, up, z + 11);
+			}
+			check(starved.contains("NO SYNGAS"), "once the compressor's gas is used the converter should stop: " + starved);
+			showReadout(context, server, new BlockPos(8, up, z + 11), "tp @p 4 " + (up + 3) + " " + (z + 12) + " -90 10", "wildcatter-ammonia-no-syngas");
+			System.out.println("[wildcatter-test] ammoniaPlant ok: " + noH2 + " | " + starved);
+		} finally {
+			if (film != null) {
+				film.stop();
+			}
+		}
+	}
+
+	/** Puts a part's readout in the player's action bar, as clicking it would, from where {@code tp} stands; then a screenshot. */
+	private void showReadout(ClientGameTestContext context, TestServerContext server, BlockPos part, String tp, String shot) {
+		server.runCommand(tp);
+		context.waitTicks(3);
+		server.computeOnServer(srv -> {
+			if (dev.wildcatter.multiblock.BigParts.entity(srv.overworld(), part) instanceof Inspectable i) {
+				for (ServerPlayer player : srv.getPlayerList().getPlayers()) {
+					player.sendOverlayMessage(i.inspect());
+				}
+			}
+			return null;
+		});
+		context.waitTicks(10);
+		context.takeScreenshot(shot);
+		context.waitTicks(30);   // a moment to read it on film
+	}
 
 	/**
 	 * Conversion to UF6 (7d, docs/multiblocks/conversion.md). The main line runs south in a column, every part facing north and

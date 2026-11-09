@@ -92,6 +92,6 @@ Spec: `docs/multiblocks/ammonia-plant.md` (approved 2026-11-09; its "As built" s
 - **Chosen:** three scenes as the spec names them (`ammonia_loop`, `nitric_acid`, `an_emulsion`), each with its own diesel set, stand-in
   tanks filled by the test, and checks at the spec's rates within 5-10 %, then stopping without feed or power. Each scene force-loads its
   chunks (the framework forces only the one-block test structure's).
-- **Why:** each stage proved on its own, in under a minute of game time each. The whole plant chained in one place is for the filmed
-  client scene.
+- **Why:** each stage proved on its own, in under a minute of game time each. The whole plant chained in one place is the filmed
+  client scene `ammoniaPlant` (its ammonia bullet starts with 2,000 L, as if the loop had run a few days).
 - **Alternatives:** one scene of the whole plant (slower to reach steady state, harder to read a failure).
