@@ -155,7 +155,7 @@ voltage transformers (wye-grounded, 1 MΩ a phase) give the 13.8 kV bus its grou
 - Transfer (10d3, docs/multiblocks/ats.md): a 480 V open-transition ATS starts a standby genset by redstone and moves the load
   over; the two sources are never paralleled through it.
 - The relays' 51 pickup is settable, as a real relay's CT ratio and tap set it: 5 to 1,200 A, up to the breaker's frame, with 50 at
-  8 x the pickup and the IEEE moderately inverse curve at time dial 1.
+  8 x the pickup and the IEEE moderately inverse curve at time dial 1 (the defaults; curve, dial and 50 settable since the gap wave).
 - Protective grounds: a grounding clamp set puts three phases to ground on a cable, busway or bus duct. On a dead conductor it keeps
   it safe to work on; on a live one it is a bolted fault.
 - The protection gap wave (2026-11-09, docs/questions/protection-gaps.md):
