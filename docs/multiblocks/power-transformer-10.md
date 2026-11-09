@@ -44,6 +44,11 @@ R T M T R                   . . . . .
 The rated transformer's readout: its two voltages, each side's current, its loading against 10 MVA, and its C57.109 heating ("within
 its rating", or "OVERLOADED at 140 %, heating 12 %, fails in 7 min at this load").
 
+## Protection (the protection gap wave, 2026-11-09)
+It carries 87T, transformer differential, as every true-size transformer of 10 MVA and up does (gen-bus-protection.md, "As built:
+the protection gap wave"): the zone is its 4.16 kV cable up to the switchgear section and its 138 kV leads up to the yard breaker;
+grounds on either trip both, and 86T is reset by hand at the transformer once it is dead.
+
 ## Breaking
 Breaking it drops it, as other true-size parts do. Both sides go dead.
 

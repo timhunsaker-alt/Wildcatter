@@ -123,11 +123,36 @@ of pickup 1,293 A; feeder 1 (2,000 A) 520 A; feeder 2 (1,200 A) 340 A".
 - **A feeder breaker:** breaking it drops it and opens the feeder. Either drops its item, as other true-size parts do.
 
 ## Left out (Known gaps)
-- The clamps never burn, however long a fault lasts (real clusters are rated, say, 43 kA for 15 cycles).
-- There is no transformer differential (87T) and no generator differential (87G). A fault inside a GSU or a generator is cleared by
-  51V or the generator's own stator trip.
-- The relay settings are fixed. Only the feeder breaker's rating is set.
-- A 138 kV source back-feeding the GSU onto a bus fault is not opened by 87B. It has no breaker on the bus side.
+- The relay settings are fixed. Only the feeder breaker's rating is set (the protection gap wave makes the feeder relays settable).
+
+## As built: the protection gap wave (2026-11-09; decisions in docs/questions/protection-gaps.md)
+- **87T, transformer differential (SEL-787 class),** on every true-size, three-phase transformer of 10 MVA and up: the 25 and 60 MVA
+  GSUs and the 10 MVA 4.16/138 kV unit (the 20 MVA substation transformer keeps its yard relay panel).
+  - **The zone:** the transformer and its leads on each side (cable, busway, bus duct, a station bus and its disconnects) up to the
+    breakers whose CTs bound it: a 138 kV or 12.47 kV yard breaker, a 15 kV feeder breaker, a switchgear section, a generator breaker.
+    It is found again each time the circuit is built. A GSU straight off a generator bus has the bus inside its zone.
+  - **It operates** when the current into grounds on its leads, in per unit of the transformer's rated current on that side, is over
+    `max(0.3, 0.25 x the through current in per unit)` (O87P 0.3, SLP1 25 %).
+  - **It trips** every breaker bounding the zone at once (a generator breaker by a unit trip) and 86T locks them out: a breaker closed
+    again while it is locked out opens at once. Right-click the transformer with an empty hand, once it is dead, to reset 86T; it
+    closes what it opened and resets the generator to resynchronize.
+  - **Readout:** "87T ready (0.00 per unit difference), zone bounded by 2 breakers", or "87T TRANSFORMER DIFFERENTIAL TRIP: 9.0 per
+    unit in the zone (pickup 2.25), LOCKED OUT (86T)".
+- **87G, generator differential (SEL-700G class),** on the big generators (gas turbine, steam turbine, aeroderivative, 60 MVA
+  turbine generator). The grounding set goes on the generator itself (any of its cells): grounds on its terminals, between its
+  neutral CTs and its breaker's. It operates over `max(0.1, 0.1 x the through current)` per unit of its full-load current and trips
+  the unit at once (86G); the prime mover's reset releases it.
+- **The GSU's line behind a bus fault:** the bus relay panel's zone now notes a GSU straight off the bus. 86B transfer-trips the
+  breakers bounding the GSU's 138 kV side, so a 138 kV line can no longer back-feed a bus fault through it; the panel's reset closes
+  them again. Its readout adds "1 line-side breaker behind a GSU (transfer trip)". Such a fault also lies inside the GSU's 87T zone,
+  so 86T may lock out too, and both are reset.
+- **The clamps burn:** a set is ASTM F855 grade 3 (2/0 copper), whose ultimate rating is 35 kA for 15 cycles, I²t 3.06 x 10^8 A²s.
+  - Each solve the most loaded clamp's current is counted: a fault cleared on the solve it appeared in still flows for 5 cycles
+    (the relay and a vacuum breaker); one left on flows for as long as it lasts. Below 300 A (the cable's continuous rating) it cools
+    back over 5 minutes.
+  - Past the rating the clamps burn off: a flash, molten copper, and the cell reads "UNGROUNDED: the grounding clamps BURNED OFF".
+    The set item itself is not used up (it never was). While on, the cell shows the share of the rating used.
+  - So a 40 kA bus fault cleared by 87B leaves the set whole, and 10 kA that nothing clears burns it in about 3 s.
 
 ## Game test (`busProtection`)
 1. **The plant:** a gas turbine (20.6 MVA), its generator breaker, a bus duct to two feeder breakers, each feeding a 13.8 kV load

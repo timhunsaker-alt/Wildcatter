@@ -43,6 +43,11 @@ public final class ThreePhaseSource {
 		}
 	}
 
+	/** The terminal node of phase {@code k} (0 A, 1 B, 2 C), from the last build. */
+	public int hot(int k) {
+		return hot[k];
+	}
+
 	/** Real power out of the terminals on all three phases (what the machine delivers, not counting its own losses). */
 	public double watts(Circuit circuit) {
 		double sum = 0;

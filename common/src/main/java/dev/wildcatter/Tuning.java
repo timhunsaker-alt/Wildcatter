@@ -1117,6 +1117,15 @@ public final class Tuning {
 	public static final int RECLOSE_SHOTS_HIGH = 1;                // a 138 kV line: one shot
 
 	// ---- protection gap wave, group B: differentials, back-feed, grounding clamps ----
+	public static final double XFMR_87_MIN_VA = 10_000_000;       // 87T on a transformer of 10 MVA and up (IEEE C37.91 practice)
+	public static final double XFMR_87_MIN_PU = 0.3;               // 87T minimum pickup, per unit of rated current (SEL-787 class O87P)
+	public static final double XFMR_87_SLOPE = 0.25;               // 87T restraint slope (SLP1 25 %)
+	public static final double GEN_87_MIN_PU = 0.1;                // 87G minimum pickup, per unit of rated current (SEL-700G class)
+	public static final double GEN_87_SLOPE = 0.1;                 // 87G restraint slope (10 %): a generator has no magnetizing inrush or taps
+	public static final double CLAMP_ULTIMATE_I2T = 35_000.0 * 35_000.0 * 0.25;   // ASTM F855 grade 3 (2/0 Cu): 35 kA for 15 cycles, ultimate
+	public static final double CLAMP_CONTINUOUS_AMPS = 300;        // 2/0 copper in free air: what it carries without heating toward failure
+	public static final double CLAMP_COOL_SECONDS = 300;           // a fully heated cluster cools back over 5 minutes
+	public static final double FAULT_CLEARING_CYCLES = 5;          // relay (1-2 cycles) plus a vacuum breaker's 3-cycle interrupting time
 
 	// ---- protection gap wave, group C: panels, GFCI, ATS, fuses, coordination ----
 

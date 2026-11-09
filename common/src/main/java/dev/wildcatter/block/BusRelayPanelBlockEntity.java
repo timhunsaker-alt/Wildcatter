@@ -42,6 +42,7 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 	private final List<BlockPos> ducts = new ArrayList<>();
 	private final List<BlockPos> generators = new ArrayList<>();   // generator breakers' main cells
 	private final List<BlockPos> feeders = new ArrayList<>();      // feeder breakers' main cells
+	private final List<BlockPos> highSide = new ArrayList<>();     // breakers on the line side of a GSU straight off the bus: transfer-tripped by 86B
 	private final Map<BlockPos, BusProtection.TimeElement> elements = new HashMap<>();
 	private final Set<BlockPos> openedByUs = new HashSet<>();
 	private boolean lockedOut;
@@ -76,6 +77,7 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 		ducts.clear();
 		generators.clear();
 		feeders.clear();
+		highSide.clear();
 		if (level == null) {
 			return;
 		}
@@ -104,6 +106,13 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 				} else if (BigParts.entity(level, n) instanceof BreakerBlockEntity b && b.getBlockState().is(WildcatterBlocks.GEN_FEEDER_BREAKER)
 						&& !feeders.contains(b.getBlockPos())) {
 					feeders.add(b.getBlockPos());
+				} else if (BigParts.entity(level, n) instanceof TransformerBlockEntity t && t.bottomVoltage() == Voltage.GENERATOR) {
+					// a GSU straight off the bus: a line behind it back-feeds a bus fault, so 86B transfer-trips its line-side breakers
+					for (BlockPos hv : t.highSideBreakers()) {
+						if (!highSide.contains(hv)) {
+							highSide.add(hv);
+						}
+					}
 				}
 			}
 		}
@@ -279,6 +288,11 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 				openedByUs.add(at);
 			}
 		}
+		for (BlockPos at : highSide) {
+			if (ProtectionZone.open(level, at, "transfer trip from the generator bus's 87B (86B lockout)")) {
+				openedByUs.add(at);
+			}
+		}
 		lockedOut = true;
 		lastTrip = why;
 		setChanged();
@@ -315,7 +329,8 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 			return Component.literal("Bus relay panel: NO BUS: set it against the " + Voltage.GENERATOR.label() + " bus duct");
 		}
 		String zone = String.format("Bus relay panel: %s bus, %d generator breaker%s, %d feeder%s", Voltage.GENERATOR.label(), generators.size(),
-				generators.size() == 1 ? "" : "s", feeders.size(), feeders.size() == 1 ? "" : "s");
+				generators.size() == 1 ? "" : "s", feeders.size(), feeders.size() == 1 ? "" : "s")
+				+ (highSide.isEmpty() ? "" : String.format(", %d line-side breaker%s behind a GSU (transfer trip)", highSide.size(), highSide.size() == 1 ? "" : "s"));
 		if (lockedOut) {
 			return Component.literal(zone + "; " + lastTrip + ", LOCKED OUT (86B); right-click to reset once the fault is cleared");
 		}
