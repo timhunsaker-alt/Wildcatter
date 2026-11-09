@@ -1108,6 +1108,32 @@ public final class Tuning {
 	// ---- protection gap wave, group B: differentials, back-feed, grounding clamps ----
 
 	// ---- protection gap wave, group C: panels, GFCI, ATS, fuses, coordination ----
+	public static final double BODY_OHMS = 1000.0;                 // IEC 60479-1: hand to feet at 120-230 V, about 1 kohm (the 50 % value, dry, large contact)
+	public static final int BODY_CONTACT_TICKS = 20;               // a body stays across the conductor this long after a shock
+	// the ATS's factory timers (UL 1008 controllers' defaults); the SHORT set is the scaled 10d3 one (ATS_*_SECONDS above)
+	public static final double ATS_FACTORY_TDES = 3.0;             // engine start delay
+	public static final double ATS_FACTORY_TDNE = 0.0;             // transfer to emergency
+	public static final double ATS_FACTORY_TDEN = 1800.0;          // retransfer to normal: 30 min
+	public static final double ATS_FACTORY_TDEC = 300.0;           // engine cooldown: 5 min
+	public static final double ATS_IN_PHASE_DEGREES = 15.0;        // in-phase monitor: transfer between live sources within 15 degrees
+	public static final double ATS_IN_PHASE_MAX_HZ = 2.0;          // ... and under 2 Hz apart
+	public static final double ATS_FAST_NEUTRAL_SECONDS = 0.1;     // an in-phase transfer's own contact travel (about 6 cycles), no programmed delay
+	public static final double ATS_CLOSED_DEGREES = 5.0;           // closed transition sync check: within 5 degrees,
+	public static final double ATS_CLOSED_HZ = 0.2;                // 0.2 Hz
+	public static final double ATS_CLOSED_VOLTS = 0.05;            // and 5 % voltage
+	public static final double ATS_OVERLAP_SECONDS = 0.1;          // closed transition: both closed at most 100 ms
+	public static final double ATS_SYNC_WAIT_SECONDS = 30.0;       // closed transition that finds no sync in this long falls back to open
+	// the protection race and the coordination study (circuit/TimeCurrent)
+	public static final double MAGNETIC_CLEAR_CYCLES = 1.0;        // a molded-case breaker's magnetic trip, or a fuse's instant melt: about a cycle
+	public static final double CL_CLEAR_CYCLES = 0.5;              // a current-limiting fuse above its threshold: inside the first half cycle
+	public static final double COORDINATION_MARGIN_CYCLES = 0.25;  // a device a quarter cycle slower than the one that cleared the fault holds
+	public static final double GFCI_CLEAR_CYCLES = 1.5;            // UL 943: a GFCI on a heavy ground fault opens in about 25 ms
+	public static final double INTERRUPT_LOAD_CENTRE = 10_000;     // a load centre and its plug-on breakers: 10 kA (panelboards.md)
+	public static final double INTERRUPT_PANELBOARD = 14_000;      // a 480Y/277 V panelboard and its bolt-on breakers: 14 kA
+	public static final double INTERRUPT_MCCB = 10_000;            // the one-block breakers: 10 kA, the UL 489 floor (proposed)
+	public static final double INTERRUPT_CLASS_J = 200_000;        // class J fuses: 200 kA (UL 248-8)
+	public static final double INTERRUPT_E_RATED = 50_000;         // 5 kV E-rated current-limiting fuses: 50 kA symmetrical (proposed, ANSI C37.46 class)
+	public static final double INTERRUPT_FUSE = 10_000;            // a plug fuse or an expulsion K link: 10 kA (proposed)
 
 	// ---- protection gap wave, group D: distribution, spans, poles ----
 }

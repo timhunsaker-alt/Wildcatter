@@ -1,33 +1,93 @@
 {
  "variants": {
-  "facing=north,piece=0": {
+  "facing=north,main=on,piece=0": {
    "model": "wildcatter:block/load_centre/p0"
   },
-  "facing=north,piece=1": {
+  "facing=north,main=off,piece=0": {
+   "model": "wildcatter:block/load_centre_off/p0"
+  },
+  "facing=north,main=tripped,piece=0": {
+   "model": "wildcatter:block/load_centre_tripped/p0"
+  },
+  "facing=north,main=on,piece=1": {
    "model": "wildcatter:block/load_centre/p0"
   },
-  "facing=east,piece=0": {
+  "facing=north,main=off,piece=1": {
+   "model": "wildcatter:block/load_centre_off/p0"
+  },
+  "facing=north,main=tripped,piece=1": {
+   "model": "wildcatter:block/load_centre_tripped/p0"
+  },
+  "facing=east,main=on,piece=0": {
    "model": "wildcatter:block/load_centre/p0",
    "y": 90
   },
-  "facing=east,piece=1": {
+  "facing=east,main=off,piece=0": {
+   "model": "wildcatter:block/load_centre_off/p0",
+   "y": 90
+  },
+  "facing=east,main=tripped,piece=0": {
+   "model": "wildcatter:block/load_centre_tripped/p0",
+   "y": 90
+  },
+  "facing=east,main=on,piece=1": {
    "model": "wildcatter:block/load_centre/p0",
    "y": 90
   },
-  "facing=south,piece=0": {
+  "facing=east,main=off,piece=1": {
+   "model": "wildcatter:block/load_centre_off/p0",
+   "y": 90
+  },
+  "facing=east,main=tripped,piece=1": {
+   "model": "wildcatter:block/load_centre_tripped/p0",
+   "y": 90
+  },
+  "facing=south,main=on,piece=0": {
    "model": "wildcatter:block/load_centre/p0",
    "y": 180
   },
-  "facing=south,piece=1": {
+  "facing=south,main=off,piece=0": {
+   "model": "wildcatter:block/load_centre_off/p0",
+   "y": 180
+  },
+  "facing=south,main=tripped,piece=0": {
+   "model": "wildcatter:block/load_centre_tripped/p0",
+   "y": 180
+  },
+  "facing=south,main=on,piece=1": {
    "model": "wildcatter:block/load_centre/p0",
    "y": 180
   },
-  "facing=west,piece=0": {
+  "facing=south,main=off,piece=1": {
+   "model": "wildcatter:block/load_centre_off/p0",
+   "y": 180
+  },
+  "facing=south,main=tripped,piece=1": {
+   "model": "wildcatter:block/load_centre_tripped/p0",
+   "y": 180
+  },
+  "facing=west,main=on,piece=0": {
    "model": "wildcatter:block/load_centre/p0",
    "y": 270
   },
-  "facing=west,piece=1": {
+  "facing=west,main=off,piece=0": {
+   "model": "wildcatter:block/load_centre_off/p0",
+   "y": 270
+  },
+  "facing=west,main=tripped,piece=0": {
+   "model": "wildcatter:block/load_centre_tripped/p0",
+   "y": 270
+  },
+  "facing=west,main=on,piece=1": {
    "model": "wildcatter:block/load_centre/p0",
+   "y": 270
+  },
+  "facing=west,main=off,piece=1": {
+   "model": "wildcatter:block/load_centre_off/p0",
+   "y": 270
+  },
+  "facing=west,main=tripped,piece=1": {
+   "model": "wildcatter:block/load_centre_tripped/p0",
    "y": 270
   }
  }

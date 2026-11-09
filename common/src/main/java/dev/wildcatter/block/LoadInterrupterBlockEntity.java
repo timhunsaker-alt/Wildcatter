@@ -36,7 +36,7 @@ import org.jspecify.annotations.Nullable;
  * one, an E-rated fuse in each phase. N and G run through. It opens load but not a fault: opened over its load-break rating, it is
  * wrecked.
  */
-public class LoadInterrupterBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity {
+public class LoadInterrupterBlockEntity extends BlockEntity implements CircuitPart, Protective, Inspectable, BigPartEntity {
 	private static final Conductor[] PHASES = {Conductor.A, Conductor.B, Conductor.C};
 
 	/** The game test lowers the load-break rating to this so a small load can wreck it. Null in play. */
@@ -206,6 +206,47 @@ public class LoadInterrupterBlockEntity extends BlockEntity implements CircuitPa
 		}
 	}
 
+	// ---- the protection race and the coordination study: current-limiting fuses (protection gap wave) -------------------------------
+	@Override
+	public double clearingSeconds(Circuit circuit) {
+		return fused() ? fuses.clearingSeconds(circuit) : Double.NaN;
+	}
+
+	@Override
+	public double letThroughPeak(Circuit circuit) {
+		return fuses.letThroughPeak(circuit);
+	}
+
+	@Override
+	public String curveName() {
+		return fuses.curve(dev.wildcatter.energy.ElectricalStandard.active().hertz()).curveName();
+	}
+
+	@Override
+	public double clearingSeconds(double amps) {
+		return fuses.largest() == 0 ? Double.POSITIVE_INFINITY : fuses.curve(dev.wildcatter.energy.ElectricalStandard.active().hertz()).clearingSeconds(amps);
+	}
+
+	@Override
+	public double ratingAmps() {
+		return fuses.largest();
+	}
+
+	@Override
+	public dev.wildcatter.circuit.TripCurve studyCurve() {
+		return fuses.curve(dev.wildcatter.energy.ElectricalStandard.active().hertz());
+	}
+
+	@Override
+	public double interruptingAmps() {
+		return Tuning.INTERRUPT_E_RATED;
+	}
+
+	@Override
+	public List<Terminal> lineSide() {
+		return fused() ? List.of(new Terminal(lineCell(), Direction.UP)) : List.of();
+	}
+
 	@Override
 	public boolean protect(Circuit circuit, int ticks) {
 		if (fuses.protect(circuit)) {
@@ -252,6 +293,12 @@ public class LoadInterrupterBlockEntity extends BlockEntity implements CircuitPa
 			String blown = fuses.blownPhases();
 			if (!blown.isEmpty()) {
 				text.append("; phase ").append(blown).append(" open: fix the fault, then open the switch and fit a new fuse");
+			}
+			if (!fuses.letThrough().isEmpty()) {
+				text.append("; ").append(fuses.letThrough());
+			}
+			if (fuses.largest() > 0) {
+				text.append(Coordination.readout(level, this));
 			}
 		}
 		return Component.literal(text.toString());

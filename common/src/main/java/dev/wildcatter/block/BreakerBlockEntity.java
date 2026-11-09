@@ -25,7 +25,7 @@ import net.minecraft.world.level.storage.ValueOutput;
  * at once. A current only a little over the rating heats it slowly: it trips sooner the further over it is, and
  * never if the current stays at or under the rating.
  */
-public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Inspectable, dev.wildcatter.multiblock.BigPartEntity, dev.wildcatter.control.ControlDevice, dev.wildcatter.control.Measurable {
+public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Protective, Inspectable, dev.wildcatter.multiblock.BigPartEntity, dev.wildcatter.control.ControlDevice, dev.wildcatter.control.Measurable {
 	private final dev.wildcatter.control.Remote remote = new dev.wildcatter.control.Remote(2);
 
 	/** True while its selector gives it to the PLC: then a hand can only clear a trip. */
@@ -264,6 +264,52 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 		return false;
 	}
 
+	// ---- the protection race and the coordination study (protection gap wave) ----------------------------------------------------
+	/** Only the low-voltage and 480 V breakers that trip on their own current are timed; relay-operated and plain switches are not. */
+	private boolean timed() {
+		return !plainSwitch() && (voltage() == Voltage.LOW || voltage() == Voltage.INDUSTRIAL);
+	}
+
+	@Override
+	public double clearingSeconds(Circuit circuit) {
+		if (!timed()) {
+			return Double.NaN;
+		}
+		return links.length > 0 && mostAmps(circuit) > rating() * Tuning.BREAKER_MAGNETIC_MULTIPLE
+				? Tuning.MAGNETIC_CLEAR_CYCLES / circuit.hertz() : Double.POSITIVE_INFINITY;
+	}
+
+	@Override
+	public double instantPickupAmps() {
+		return timed() ? rating() * Tuning.BREAKER_MAGNETIC_MULTIPLE : Double.POSITIVE_INFINITY;
+	}
+
+	@Override
+	public String curveName() {
+		return String.format("%d A %sbreaker", rating(), poles() == 3 ? "three-pole " : "");
+	}
+
+	@Override
+	public double clearingSeconds(double amps) {
+		return plainSwitch() ? Double.POSITIVE_INFINITY : dev.wildcatter.circuit.TimeCurrent.thermalMagnetic(curveName(), rating(), Tuning.BREAKER_TRIP_SECONDS_AT_2X,
+				Tuning.BREAKER_MAGNETIC_MULTIPLE, dev.wildcatter.energy.ElectricalStandard.active().hertz()).clearingSeconds(amps);
+	}
+
+	@Override
+	public double ratingAmps() {
+		return rating();
+	}
+
+	@Override
+	public double interruptingAmps() {
+		return voltage() == Voltage.INDUSTRIAL ? Tuning.INTERRUPT_PANELBOARD : Tuning.INTERRUPT_MCCB;
+	}
+
+	@Override
+	public java.util.List<Terminal> lineSide() {
+		return timed() ? java.util.List.of(new Terminal(at(facing().getOpposite()), facing().getOpposite())) : java.util.List.of();
+	}
+
 	/** The thermal trip: a moderate overload heats it up until it opens. */
 	@Override
 	public void apply(Circuit circuit, int ticks) {
@@ -341,7 +387,7 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 					+ "; right-click to flip it. A switch has NO protection: it never trips, so put a breaker or fuse before it");
 		}
 		return Component.literal((poles() == 3 ? "Three-pole breaker " : "Breaker ") + rating() + " A (" + voltage().label() + "): " + status + "; sneak and right-click changes the rating"
-				+ (heat > 0.05 && closed() ? ", getting warm " + Math.round(heat * 100) + "%" : ""));
+				+ (heat > 0.05 && closed() ? ", getting warm " + Math.round(heat * 100) + "%" : "") + Coordination.readout(level, this));
 	}
 
 	@Override

@@ -62,11 +62,29 @@ A figure marked *(proposed)* is a setting or estimate, not a published rating.
 ## Breaking
 Drops itself. The redstone signal goes with it.
 
+## As built: the protection gap wave (2026-11-09; docs/questions/protection-gaps.md, C-entries)
+- **Timers:** a new ATS runs the factory defaults, TDES 3 s, TDNE 0 s, TDEN 30 min, TDEC 5 min. Sneak and right-click the bottom cell
+  with the Power Meter switches to the SHORT set built in 10d3 (3 s, 1 s, 30 s, 30 s) and back. A switch saved before this wave
+  keeps the short set.
+- **Transition** (sneak and right-click the top cell with the Power Meter), between two live sources (a test, a retransfer):
+  - OPEN: as before, break, the 1 s neutral position, make.
+  - IN-PHASE (an in-phase monitor): open, but only once the sources are within 15 degrees (and under 2 Hz apart), with no
+    programmed neutral delay: just the contacts' travel, 0.1 s.
+  - CLOSED: make before break, both sets closed for one solve (at most 100 ms, UL 1008's limit for closed transition), only when the
+    sync check passes: within 5 degrees, 0.2 Hz and 5 % voltage.
+  - With no sync or window in 30 s, it falls back to open. Leaving a dead source is always open transition.
+- **The angle** is read from the solve: phase A of emergency against phase A of normal.
+- **The limit:** the solver gives a connected group one frequency, and the ATS joins its two sources into one group. So the two
+  never slip apart by themselves: the angle the monitor sees is only the difference of the two sources' load angles, a few
+  degrees, and the in-phase and closed transitions find their window at once. A real pair of independent sources drifts through
+  phase at their frequency difference. The ATS can be given that slip for a test (`setSlipForTest`), which the scenes use; in play
+  it is zero.
+- **Readout:** "Transfer switch 480 V, 400 A, closed transition, factory timers: on EMERGENCY, 41 A; ... 3 degrees apart; last transfer
+  to emergency, closed transition (3 degrees apart)".
+
 ## Left out (Known gaps)
-- No closed transition, no in-phase monitor, no load shed before transfer.
-- The solver gives one frequency to a connected group, so with both sources wired in the ATS sees the same frequency on both; it
-  checks the frequency only for emergency acceptance.
-- The timers are scaled down from the real defaults.
+- No load shed before transfer.
+- The two sources share one frequency in the solver (above), so the in-phase monitor and sync check see no slip in play.
 
 ## Game test (`ats`)
 1. Genset 1, through a breaker, is the normal source; genset 2 is the emergency source, its control panel next to the ATS's

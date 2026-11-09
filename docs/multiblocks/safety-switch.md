@@ -39,8 +39,18 @@ Wall-mounted. `safety_switch_100` is 1 x 1 x 1; `safety_switch_200` is 1 x 2 x 1
 ## Breaking
 Drops itself and its fitted fuses (good ones as items).
 
+## As built: the protection gap wave (2026-11-09; docs/questions/protection-gaps.md, C-entries)
+- **Current limiting.** Above 15 x its rating a class J fuse melts in the first half cycle (0.5 cycle at its threshold, sooner the
+  heavier the fault, as the cube root) and lets through a peak of √2 x threshold x (prospective / threshold)^(1/3). For 30 A to
+  600 A this lands within a tenth of UL 248-8's maximum peak let-through at 200 kA (6, 8, 12, 16, 25, 35 kA). Its I²t is the
+  triangle under that peak. The readout names the last fault: "the last fault it cleared, 5,200 A prospective, was limited to
+  1,470 A peak and 1,900 A²s".
+- **The race.** A limiting fuse clears before any breaker's magnetic trip, so a breaker upstream holds, unless the let-through
+  peak's rms equivalent (peak / √2) is over its instant pickup: then it unlatches and opens too.
+- **Coordination readout:** the device upstream and how far they are selective (panelboards.md).
+
 ## Left out (Known gaps)
-- No fuse-and-breaker coordination study; no let-through (I²t) modelling of current limiting.
+- No series ratings.
 
 ## Game test (in `panels`)
 1. A unit substation feeds a `safety_switch_100` with three 30 A fuses, then a 15 kW heater: it carries the load.

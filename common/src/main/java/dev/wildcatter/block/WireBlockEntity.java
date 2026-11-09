@@ -105,6 +105,8 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		Conductor conductor = getBlockState().getValue(CableBlock.CONDUCTOR);
 		if (conductor == Conductor.G) {
 			circuit.ground(node);   // the ground conductor is the earth: tied to it at every piece
+		} else if (level != null && dev.wildcatter.safety.BodyContact.on(level, worldPosition)) {
+			circuit.toEarth(node, Tuning.BODY_OHMS);   // someone across it and the ground: current to earth, which a GFCI sees
 		}
 		for (Direction face : Direction.values()) {
 			circuit.port(worldPosition, face, conductor, block.voltage(), node, ohms() / 2.0, exposed());

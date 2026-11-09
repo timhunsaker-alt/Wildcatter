@@ -78,14 +78,19 @@ public class TransferSwitchBlockEntity extends BlockEntity implements CircuitPar
 	}
 
 	public enum Stage {
-		NORMAL, TDES, START, TDNE, TO_EMERGENCY, EMERGENCY, TDEN, TO_NORMAL, TDEC;
+		NORMAL, TDES, START, TDNE, TO_EMERGENCY, CLOSED_TO_EMERGENCY, EMERGENCY, TDEN, TO_NORMAL, CLOSED_TO_NORMAL, TDEC;
 
 		boolean normalClosed() {
-			return this == NORMAL || this == TDES || this == START || this == TDNE || this == TDEC;
+			return this == NORMAL || this == TDES || this == START || this == TDNE || this == TDEC || overlap();
 		}
 
 		boolean emergencyClosed() {
-			return this == EMERGENCY || this == TDEN;
+			return this == EMERGENCY || this == TDEN || overlap();
+		}
+
+		/** A closed transition's make-before-break: both sets of contacts closed for a moment. */
+		boolean overlap() {
+			return this == CLOSED_TO_EMERGENCY || this == CLOSED_TO_NORMAL;
 		}
 
 		boolean engineStart() {
@@ -93,8 +98,56 @@ public class TransferSwitchBlockEntity extends BlockEntity implements CircuitPar
 		}
 	}
 
+	/**
+	 * How it moves the load between two live sources (a test, a retransfer). OPEN: break, a programmed neutral position, make. IN_PHASE:
+	 * open, but only once the in-phase monitor sees the two sources within its window, with no programmed delay. CLOSED: make before
+	 * break, both closed at most 100 ms, only when the sync check passes. Leaving a dead source is always an open transition.
+	 */
+	public enum Transition {
+		OPEN("open transition"), IN_PHASE("open transition, in-phase monitor"), CLOSED("closed transition");
+
+		public final String label;
+
+		Transition(String label) {
+			this.label = label;
+		}
+	}
+
+	/** The controller's timers: FACTORY, the real defaults (TDEN 30 min, TDEC 5 min); SHORT, the scaled set built in 10d3. */
+	public enum Timers {
+		FACTORY, SHORT;
+
+		double tdes() {
+			return this == FACTORY ? Tuning.ATS_FACTORY_TDES : Tuning.ATS_TDES_SECONDS;
+		}
+
+		double tdne() {
+			return this == FACTORY ? Tuning.ATS_FACTORY_TDNE : Tuning.ATS_TDNE_SECONDS;
+		}
+
+		double tden() {
+			return this == FACTORY ? Tuning.ATS_FACTORY_TDEN : Tuning.ATS_TDEN_SECONDS;
+		}
+
+		double tdec() {
+			return this == FACTORY ? Tuning.ATS_FACTORY_TDEC : Tuning.ATS_TDEC_SECONDS;
+		}
+	}
+
 	private static final Conductor[] PHASES = {Conductor.A, Conductor.B, Conductor.C};
 
+	private Transition transition = Transition.OPEN;
+	private Timers timers = Timers.FACTORY;
+	/** The neutral position's length for the transfer under way. */
+	private double neutralSeconds = Tuning.ATS_NEUTRAL_SECONDS;
+	/** Normal to emergency, in degrees (phase A to phase A), as the in-phase monitor and sync check see it. */
+	private double angle;
+	/** A slip between the two sources the solver cannot make (it gives a connected group one frequency): a test hook. */
+	private double slipHz;
+	private double slipDegrees;
+	/** The longest make-before-break overlap so far, in seconds. */
+	private double longestOverlap;
+	private String lastTransfer = "";
 	private boolean grown;
 	private Stage stage = Stage.NORMAL;
 	private double timer;
@@ -134,8 +187,53 @@ public class TransferSwitchBlockEntity extends BlockEntity implements CircuitPar
 		setChanged();
 	}
 
+	/** True if the two sets of contacts were ever closed together outside a closed transition: never, by construction. */
 	public boolean paralleled() {
 		return paralleled;
+	}
+
+	public Transition transition() {
+		return transition;
+	}
+
+	public void setTransition(Transition value) {
+		transition = value;
+		setChanged();
+	}
+
+	public void nextTransition() {
+		setTransition(Transition.values()[(transition.ordinal() + 1) % Transition.values().length]);
+	}
+
+	public Timers timers() {
+		return timers;
+	}
+
+	public void setTimers(Timers value) {
+		timers = value;
+		setChanged();
+	}
+
+	public void nextTimers() {
+		setTimers(timers == Timers.FACTORY ? Timers.SHORT : Timers.FACTORY);
+	}
+
+	/** Test hook: the two sources drift apart at {@code hz}, as two separate machines would; the solver gives them one frequency. */
+	public void setSlipForTest(double hz) {
+		slipHz = hz;
+		slipDegrees = 0;
+	}
+
+	public double angle() {
+		return angle;
+	}
+
+	public double longestOverlap() {
+		return longestOverlap;
+	}
+
+	public String lastTransfer() {
+		return lastTransfer;
 	}
 
 	public double amps() {
@@ -161,7 +259,7 @@ public class TransferSwitchBlockEntity extends BlockEntity implements CircuitPar
 	public void build(Circuit circuit) {
 		boolean n = stage.normalClosed();
 		boolean e = stage.emergencyClosed();
-		paralleled |= n && e;
+		paralleled |= n && e && !stage.overlap();
 		links = new int[(n ? 3 : 0) + (e ? 3 : 0)];
 		int used = 0;
 		for (int k = 0; k < 3; k++) {
@@ -212,7 +310,12 @@ public class TransferSwitchBlockEntity extends BlockEntity implements CircuitPar
 		boolean normalFailed = testing || n < Tuning.ATS_DROPOUT;
 		boolean normalRestored = !testing && n >= Tuning.ATS_PICKUP;
 		boolean emergencyOk = e >= Tuning.ATS_PICKUP && hertz >= Tuning.ATS_EMERGENCY_HERTZ * ElectricalStandard.active().hertz();
-		timer += ticks / 20.0;
+		boolean normalLive = n >= Tuning.ATS_PICKUP;   // live, whether or not a test treats it as failed
+		double dt = ticks / 20.0;
+		slipDegrees = wrap(slipDegrees + 360.0 * slipHz * dt);
+		angle = wrap(circuit.voltagePhasor(emergency[0]).degrees() - circuit.voltagePhasor(normal[0]).degrees() + slipDegrees);
+		boolean bothLive = normalLive && emergencyOk;
+		timer += dt;
 		Stage was = stage;
 		switch (stage) {
 			case NORMAL -> {
@@ -223,7 +326,7 @@ public class TransferSwitchBlockEntity extends BlockEntity implements CircuitPar
 			case TDES -> {
 				if (!normalFailed) {
 					go(Stage.NORMAL);
-				} else if (timer >= Tuning.ATS_TDES_SECONDS) {
+				} else if (timer >= timers.tdes()) {
 					go(Stage.START);
 				}
 			}
@@ -237,40 +340,51 @@ public class TransferSwitchBlockEntity extends BlockEntity implements CircuitPar
 			case TDNE -> {
 				if (!emergencyOk) {
 					go(Stage.START);
-				} else if (timer >= Tuning.ATS_TDNE_SECONDS && !(remote.auto() && inhibit)) {
-					go(Stage.TO_EMERGENCY);
+				} else if (timer >= timers.tdne() && !(remote.auto() && inhibit)) {
+					transfer(bothLive, timer - timers.tdne(), Stage.TO_EMERGENCY, Stage.CLOSED_TO_EMERGENCY, "to emergency");
 				}
 			}
 			case TO_EMERGENCY -> {
-				if (timer >= Tuning.ATS_NEUTRAL_SECONDS) {
+				if (timer >= neutralSeconds) {
 					go(Stage.EMERGENCY);
 				}
 			}
+			case CLOSED_TO_EMERGENCY -> {
+				// the overlap was the solve just made with both closed: open normal now
+				longestOverlap = Math.max(longestOverlap, dt);
+				go(Stage.EMERGENCY);
+			}
 			case EMERGENCY -> {
 				if (!emergencyOk && normalRestored) {
-					go(Stage.TO_NORMAL);   // the genset failed and normal is there: back at once
+					neutralSeconds = Tuning.ATS_NEUTRAL_SECONDS;
+				go(Stage.TO_NORMAL);   // the genset failed and normal is there: back at once
 				} else if (normalRestored) {
 					go(Stage.TDEN);
 				}
 			}
 			case TDEN -> {
 				if (!emergencyOk) {
+					neutralSeconds = Tuning.ATS_NEUTRAL_SECONDS;
 					go(Stage.TO_NORMAL);
 				} else if (!normalRestored) {
 					go(Stage.EMERGENCY);
-				} else if (timer >= Tuning.ATS_TDEN_SECONDS) {
-					go(Stage.TO_NORMAL);
+				} else if (timer >= timers.tden()) {
+					transfer(true, timer - timers.tden(), Stage.TO_NORMAL, Stage.CLOSED_TO_NORMAL, "to normal");
 				}
 			}
 			case TO_NORMAL -> {
-				if (timer >= Tuning.ATS_NEUTRAL_SECONDS) {
+				if (timer >= neutralSeconds) {
 					go(Stage.TDEC);
 				}
+			}
+			case CLOSED_TO_NORMAL -> {
+				longestOverlap = Math.max(longestOverlap, dt);
+				go(Stage.TDEC);
 			}
 			case TDEC -> {
 				if (normalFailed) {
 					go(Stage.START);   // normal failed again while the engine ran on: it is still running
-				} else if (timer >= Tuning.ATS_TDEC_SECONDS) {
+				} else if (timer >= timers.tdec()) {
 					go(Stage.NORMAL);
 				}
 			}
@@ -288,6 +402,31 @@ public class TransferSwitchBlockEntity extends BlockEntity implements CircuitPar
 		}
 	}
 
+	/**
+	 * Starts a transfer once its delay has run: between two live sources by the set transition (waiting for the in-phase window or the
+	 * sync check, and falling back to open after {@link Tuning#ATS_SYNC_WAIT_SECONDS}); away from a dead source always open.
+	 */
+	private void transfer(boolean bothLive, double waited, Stage open, Stage closed, String where) {
+		boolean timedOut = waited >= Tuning.ATS_SYNC_WAIT_SECONDS;
+		if (!bothLive || transition == Transition.OPEN || timedOut) {
+			neutralSeconds = Tuning.ATS_NEUTRAL_SECONDS;
+			lastTransfer = where + ", open transition" + (bothLive && transition != Transition.OPEN ? " (no sync in " + Math.round(Tuning.ATS_SYNC_WAIT_SECONDS) + " s)" : "");
+			go(open);
+		} else if (transition == Transition.IN_PHASE && Math.abs(angle) <= Tuning.ATS_IN_PHASE_DEGREES && Math.abs(slipHz) <= Tuning.ATS_IN_PHASE_MAX_HZ) {
+			neutralSeconds = Tuning.ATS_FAST_NEUTRAL_SECONDS;
+			lastTransfer = String.format("%s, in phase (%.0f degrees apart)", where, angle);
+			go(open);
+		} else if (transition == Transition.CLOSED && Math.abs(angle) <= Tuning.ATS_CLOSED_DEGREES && Math.abs(slipHz) <= Tuning.ATS_CLOSED_HZ
+				&& Math.abs(normalVolts - emergencyVolts) <= Tuning.ATS_CLOSED_VOLTS * Voltage.INDUSTRIAL.lineToLine()) {
+			lastTransfer = String.format("%s, closed transition (%.0f degrees apart)", where, angle);
+			go(closed);
+		}
+	}
+
+	private static double wrap(double degrees) {
+		return ((degrees + 180.0) % 360.0 + 360.0) % 360.0 - 180.0;
+	}
+
 	private void go(Stage next) {
 		stage = next;
 		timer = 0;
@@ -300,18 +439,31 @@ public class TransferSwitchBlockEntity extends BlockEntity implements CircuitPar
 			case NORMAL, TDES, START, TDNE, TDEC -> String.format("on NORMAL, %,.0f A", amps);
 			case EMERGENCY, TDEN -> String.format("on EMERGENCY, %,.0f A", amps);
 			case TO_EMERGENCY, TO_NORMAL -> "in the NEUTRAL position (open transition)";
+			case CLOSED_TO_EMERGENCY, CLOSED_TO_NORMAL -> "on BOTH (closed transition, make before break)";
 		};
 		String timing = switch (stage) {
 			case TDES -> String.format("; normal failed: engine start in %.0f s", Math.max(0, Tuning.ATS_TDES_SECONDS - timer));
 			case START -> "; waiting for emergency to be acceptable";
-			case TDNE -> String.format("; transfer to emergency in %.0f s", Math.max(0, Tuning.ATS_TDNE_SECONDS - timer));
-			case TDEN -> String.format("; normal restored: retransfer in %.0f s", Math.max(0, Tuning.ATS_TDEN_SECONDS - timer));
-			case TDEC -> String.format("; engine cooldown, %.0f s left", Math.max(0, Tuning.ATS_TDEC_SECONDS - timer));
+			case TDNE -> timer >= timers.tdne() ? waitingFor() : String.format("; transfer to emergency in %s", clock(timers.tdne() - timer));
+			case TDEN -> timer >= timers.tden() ? waitingFor() : String.format("; normal restored: retransfer in %s", clock(timers.tden() - timer));
+			case TDEC -> String.format("; engine cooldown, %s left", clock(timers.tdec() - timer));
 			default -> "";
 		};
-		return Component.literal(String.format("Transfer switch %s, %d A, open transition: %s%s; normal %,.0f V, emergency %,.0f V, %.1f Hz; engine start %s%s",
-				Voltage.INDUSTRIAL.label(), Tuning.ATS_AMPS, on, timing, normalVolts, emergencyVolts, hertz, engineStart() ? "ON" : "off",
+		return Component.literal(String.format("Transfer switch %s, %d A, %s, %s timers: %s%s; normal %,.0f V, emergency %,.0f V, %.1f Hz%s; engine start %s%s%s",
+				Voltage.INDUSTRIAL.label(), Tuning.ATS_AMPS, transition.label, timers.name().toLowerCase(java.util.Locale.ROOT), on, timing, normalVolts, emergencyVolts, hertz,
+				normalVolts > 0.5 * Voltage.INDUSTRIAL.lineToLine() && emergencyVolts > 0.5 * Voltage.INDUSTRIAL.lineToLine() ? String.format(", %.0f degrees apart", angle) : "", engineStart() ? "ON" : "off", lastTransfer.isEmpty() ? "" : "; last transfer " + lastTransfer,
 				test ? "; TEST: normal treated as failed (sneak and right-click to end it)" : ""));
+	}
+
+	private String waitingFor() {
+		return transition == Transition.CLOSED ? String.format("; waiting for sync (within %.0f degrees, %.0f%% voltage)", Tuning.ATS_CLOSED_DEGREES, Tuning.ATS_CLOSED_VOLTS * 100)
+				: transition == Transition.IN_PHASE ? String.format("; in-phase monitor: waiting for the sources within %.0f degrees", Tuning.ATS_IN_PHASE_DEGREES) : "";
+	}
+
+	/** "22 s", "4 min 10 s". */
+	private static String clock(double seconds) {
+		long s = Math.max(0, Math.round(seconds));
+		return s >= 60 ? String.format("%d min %d s", s / 60, s % 60) : s + " s";
 	}
 
 	@Override
@@ -333,6 +485,10 @@ public class TransferSwitchBlockEntity extends BlockEntity implements CircuitPar
 		output.putString("stage", stage.name());
 		output.putDouble("timer", timer);
 		output.putBoolean("test", test);
+		output.putString("transition", transition.name());
+		output.putString("timers", timers.name());
+		output.putDouble("neutral", neutralSeconds);
+		output.putString("lastTransfer", lastTransfer);
 	}
 
 	@Override
@@ -348,5 +504,15 @@ public class TransferSwitchBlockEntity extends BlockEntity implements CircuitPar
 		}
 		timer = input.getDoubleOr("timer", 0);
 		test = input.getBooleanOr("test", false);
+		transition = Transition.OPEN;
+		for (Transition t : Transition.values()) {
+			if (t.name().equals(input.getStringOr("transition", ""))) {
+				transition = t;
+			}
+		}
+		// a switch saved before the timer sets keeps the scaled timers it was built with
+		timers = "FACTORY".equals(input.getStringOr("timers", "SHORT")) ? Timers.FACTORY : Timers.SHORT;
+		neutralSeconds = input.getDoubleOr("neutral", Tuning.ATS_NEUTRAL_SECONDS);
+		lastTransfer = input.getStringOr("lastTransfer", "");
 	}
 }

@@ -23,7 +23,7 @@ import net.minecraft.world.level.storage.ValueOutput;
  * The element melts: a current over the rating heats it, faster the more it is over, and a short circuit melts it
  * at once. Unlike a breaker it cannot be reset, and it is a 110 V part.
  */
-public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspectable {
+public class FuseBlockEntity extends BlockEntity implements CircuitPart, Protective, Inspectable {
 	private int ratingIndex;
 	private double heat;
 	private int back;
@@ -113,6 +113,44 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		return false;
 	}
 
+	// ---- the protection race and the coordination study (neither a plug fuse nor an expulsion link limits current) ------------------
+	@Override
+	public double clearingSeconds(Circuit circuit) {
+		return link >= 0 && Math.abs(circuit.current(link)) > effectiveRating() * Tuning.FUSE_INSTANT_MULTIPLE
+				? Tuning.MAGNETIC_CLEAR_CYCLES / circuit.hertz() : Double.POSITIVE_INFINITY;
+	}
+
+	@Override
+	public double instantPickupAmps() {
+		return effectiveRating() * Tuning.FUSE_INSTANT_MULTIPLE;
+	}
+
+	@Override
+	public String curveName() {
+		return cutout() ? rating() + " A K link" : rating() + " A fuse";
+	}
+
+	@Override
+	public double clearingSeconds(double amps) {
+		return dev.wildcatter.circuit.TimeCurrent.thermalMagnetic(curveName(), effectiveRating(), Tuning.FUSE_SECONDS_AT_2X, Tuning.FUSE_INSTANT_MULTIPLE,
+				dev.wildcatter.energy.ElectricalStandard.active().hertz()).clearingSeconds(amps);
+	}
+
+	@Override
+	public double ratingAmps() {
+		return effectiveRating();
+	}
+
+	@Override
+	public double interruptingAmps() {
+		return Tuning.INTERRUPT_FUSE;
+	}
+
+	@Override
+	public java.util.List<Terminal> lineSide() {
+		return java.util.List.of(new Terminal(worldPosition, facing().getOpposite()));
+	}
+
 	/** True if either end is live: a blown cutout's top contact is still on the line. */
 	public boolean isLive() {
 		return volts > Tuning.SHOCK_MIN_VOLTS;
@@ -153,7 +191,7 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 	public Component inspect() {
 		String status = blown() ? "BLOWN: fix the fault, then right-click with a copper ingot to fit a new element" : String.format("good, carrying %.1f A", amps)
 				+ (heat > 0.05 ? ", getting hot " + Math.round(heat * 100) + "%" : "");
-		return Component.literal((cutout() ? "Fused cutout, " + rating() + " A K link (" : "Fuse " + rating() + " A (") + voltage().label() + "): " + status + (cutout() ? "; the link drops out when it blows: fit a new one" + (isLive() ? ". LIVE: its contacts are bare, open the line before you touch it" : "") : "; a fuse can't be reset, a breaker can"));
+		return Component.literal((cutout() ? "Fused cutout, " + rating() + " A K link (" : "Fuse " + rating() + " A (") + voltage().label() + "): " + status + (cutout() ? "; the link drops out when it blows: fit a new one" + (isLive() ? ". LIVE: its contacts are bare, open the line before you touch it" : "") : "; a fuse can't be reset, a breaker can") + Coordination.readout(level, this));
 	}
 
 	@Override

@@ -110,6 +110,9 @@ public class LoadBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		neutral = circuit.node();
 		double nominal = Voltage.LOW.nominal();
 		resistor = circuit.resistor(hot, neutral, relayOn ? nominal * nominal / watts() : 1e9); // P = V^2 / R; an open relay is an open circuit
+		if (level != null && dev.wildcatter.safety.BodyContact.on(level, worldPosition)) {
+			circuit.toEarth(hot, Tuning.BODY_OHMS);   // its ungrounded frame is live: the hand on it carries current to earth
+		}
 		for (Direction face : Direction.values()) {
 			circuit.hotPort(worldPosition, face, Voltage.LOW, hot, Tuning.CONTACT_OHMS / 2, false);
 			circuit.port(worldPosition, face, Conductor.N, Voltage.LOW, neutral, Tuning.CONTACT_OHMS / 2, false);

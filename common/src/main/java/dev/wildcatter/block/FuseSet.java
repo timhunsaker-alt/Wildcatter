@@ -99,11 +99,76 @@ final class FuseSet {
 				: amps[k] > 100 ? Tuning.E_FUSE_SECONDS_AT_2X_LARGE : Tuning.E_FUSE_SECONDS_AT_2X;
 	}
 
+	/** Phase {@code k}'s fuse as a current-limiting curve: class J or E-rated, its rating, its melt and its let-through. */
+	dev.wildcatter.circuit.TimeCurrent.CurrentLimiting curve(int k, double hertz) {
+		return new dev.wildcatter.circuit.TimeCurrent.CurrentLimiting(CartridgeFuseItem.label(kind, amps[k]) + " fuse", rating(k), secondsAt2x(k), instantMultiple(), hertz);
+	}
+
+	/** The fuses' curve for the coordination study: the largest fitted, or a nominal one if the clips are empty. */
+	dev.wildcatter.circuit.TimeCurrent.CurrentLimiting curve(double hertz) {
+		int best = 0;
+		for (int k = 1; k < 3; k++) {
+			if (amps[k] > amps[best]) {
+				best = k;
+			}
+		}
+		return curve(best, hertz);
+	}
+
+	/** The race: how soon a fuse limiting a fault clears it on this solve; infinite if none is in its limiting range. */
+	double clearingSeconds(Circuit circuit) {
+		double t = Double.POSITIVE_INFINITY;
+		for (int k = 0; k < 3; k++) {
+			if (links[k] >= 0 && good(k)) {
+				double amps = circuit.current(links[k]);
+				if (amps > rating(k) * instantMultiple()) {
+					t = Math.min(t, curve(k, circuit.hertz()).clearingSeconds(amps));
+				}
+			}
+		}
+		return t;
+	}
+
+	/** The largest let-through peak of a fuse limiting a fault on this solve; 0 if none. */
+	double letThroughPeak(Circuit circuit) {
+		double peak = 0;
+		for (int k = 0; k < 3; k++) {
+			if (links[k] >= 0 && good(k)) {
+				double amps = circuit.current(links[k]);
+				if (amps > rating(k) * instantMultiple()) {
+					peak = Math.max(peak, curve(k, circuit.hertz()).letThroughPeak(amps));
+				}
+			}
+		}
+		return peak;
+	}
+
+	/** The last fault a fuse limited: its prospective current, the peak it let through and the I²t (A²s); zeros if none yet. */
+	private double lastProspective;
+	private double lastPeak;
+	private double lastI2t;
+
+	/** "it limited 18,000 A to 6,350 A peak, 21,000 A²s" or "". */
+	String letThrough() {
+		return lastProspective <= 0 ? "" : String.format("the last fault it cleared, %,.0f A prospective, was limited to %,.0f A peak and %,.0f A²s", lastProspective, lastPeak, lastI2t);
+	}
+
+	double lastPeak() {
+		return lastPeak;
+	}
+
 	/** The instant melt: true if a fuse blew in this solve. */
 	boolean protect(Circuit circuit) {
 		boolean any = false;
 		for (int k = 0; k < 3; k++) {
-			if (links[k] >= 0 && circuit.current(links[k]) > rating(k) * instantMultiple()) {
+			double amps = links[k] >= 0 ? circuit.current(links[k]) : 0;
+			if (links[k] >= 0 && amps > rating(k) * instantMultiple()) {
+				dev.wildcatter.circuit.TimeCurrent.CurrentLimiting cl = curve(k, circuit.hertz());
+				if (amps > lastProspective || !any) {
+					lastProspective = amps;
+					lastPeak = cl.letThroughPeak(amps);
+					lastI2t = cl.letThroughI2t(amps);
+				}
 				blow(k);
 				any = true;
 			}
@@ -180,6 +245,9 @@ final class FuseSet {
 	}
 
 	void save(ValueOutput output) {
+		output.putDouble("ltProspective", lastProspective);
+		output.putDouble("ltPeak", lastPeak);
+		output.putDouble("ltI2t", lastI2t);
 		for (int k = 0; k < 3; k++) {
 			output.putInt("fuse" + k, amps[k]);
 			output.putBoolean("blown" + k, blown[k]);
@@ -188,6 +256,9 @@ final class FuseSet {
 	}
 
 	void load(ValueInput input) {
+		lastProspective = input.getDoubleOr("ltProspective", 0);
+		lastPeak = input.getDoubleOr("ltPeak", 0);
+		lastI2t = input.getDoubleOr("ltI2t", 0);
 		for (int k = 0; k < 3; k++) {
 			amps[k] = Math.max(0, input.getIntOr("fuse" + k, 0));
 			blown[k] = input.getBooleanOr("blown" + k, false);

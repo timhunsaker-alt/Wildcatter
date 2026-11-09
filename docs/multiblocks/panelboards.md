@@ -83,11 +83,32 @@ facings. The panelboard is 1 x 2 x 1 (its main cell is the bottom one).
 - A panel drops itself. Its gutters go dead (no panel) but keep their breakers.
 - A gutter drops itself and its breaker. The gutters beyond it, if no longer reached, go dead.
 
+## As built: the protection gap wave (2026-11-09; docs/questions/protection-gaps.md, C-entries)
+- **A shock is current to earth.** A person or animal shocked by a bare live wire, or by an ungrounded lamp or heater, puts IEC
+  60479-1's hand-to-feet body impedance, 1,000 ohm, from that conductor to earth for the next second of solves. Upstream it is real
+  imbalance: 120 mA on a 120 V branch, far over a GFCI's 5 mA (an RCD's 30 mA), so the GFCI trips "ground fault". The shock still
+  lands: a GFCI limits how long it lasts, not the first bite.
+- **The main's handle is drawn by state** (`main` = on, off, tripped on `load_centre` and `panelboard_480`): up ON, down OFF,
+  centred with its trip flag TRIPPED, through a window in the dead front.
+- **The protection race.** On a solve with a fault, only the fastest breakers and fuses act, and the circuit is solved again
+  without the fault. A molded-case breaker's magnetic trip clears in about a cycle, a GFCI on a heavy ground fault in 1.5, a
+  current-limiting fuse in under half. Two breakers both in their magnetic range tie and both open, as real molded-case breakers
+  do: a branch fault over the main's magnetic pickup (8 x 200 A) still opens the main. Untimed devices (relays, motor starters)
+  act as before.
+- **The coordination readout.** The Power Meter on a branch breaker, a panel main, a one-block breaker or fuse, a safety switch or a
+  fused LIS names the device upstream (a gutter's is its panel's main; otherwise the first breaker, fuse or relay up the
+  conductors from its line side, stopping at a transformer or source) and says up to what fault current the pair is selective:
+  "coordination: under the 200 A main, selective only up to 1,603 A: above that the 200 A main clears as fast". The study runs from
+  the downstream's rating to its interrupting rating (10 kA load centre, 14 kA panelboard).
+- **AFCI: not built.** An arc fault breaker (UL 1699) trips on an arc's signature: broadband noise and the current's shoulders at
+  each zero crossing, at kHz. The solver is a 50/60 Hz phasor solve: an arc in it is only a resistance, the same as any other
+  fault, so an AFCI could only be a breaker that trips on a made-up rule. Left out on purpose.
+- **Series ratings:** left out. A series-rated combination (a fuse or breaker protecting a breaker below its interrupting rating) is
+  a tested listing of pairs, not something to derive from curves.
+
 ## Left out (Known gaps)
-- No arc-fault (AFCI) breakers: arcing isn't modelled.
-- A shock to a player isn't current in the circuit, so it doesn't trip a GFCI.
-- No breaker coordination study: a branch fault large enough can trip the main too.
-- No series ratings or interrupting-rating checks.
+- No arc-fault (AFCI) breakers (above: not credible on a phasor solver).
+- No series ratings, and no interrupting-rating failure: a breaker past its rating still opens.
 
 ## Game test (`panels`)
 1. A `pole_transformer` feeds a load centre with four gutters: 1-pole 20 A to a heater, GFCI 20 A to a lamp, 2-pole 30 A, and
