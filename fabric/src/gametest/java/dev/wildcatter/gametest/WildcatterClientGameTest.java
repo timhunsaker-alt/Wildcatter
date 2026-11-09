@@ -3261,7 +3261,30 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(40);
 		String reclosed = read(server, 29, up, z + 9);
 		check(reclosed.contains("CLOSED") && read(server, 35, up, z + 10).matches(".*taking [1-9].*"), "the panel's reset should close feeder 1 again: " + reclosed);
-		System.out.println("[wildcatter-test] busProtection ok: " + busTrip + " | " + feederTrip + " | " + reclosed);
+		// ---- gap wave: feeder 1's relay set from its relay compartment (curve VI), then a stuck mechanism: 50BF opens the whole bus
+		String relaySet = server.computeOnServer(srv -> {
+			dev.wildcatter.block.BreakerBlockEntity f = (dev.wildcatter.block.BreakerBlockEntity) srv.overworld().getBlockEntity(new BlockPos(29, up, z + 9));
+			f.nextFeederSetting();   // the cursor to the curve
+			f.stepFeederRelay();     // MI -> VI
+			f.stickMechanism(true);
+			return f.inspect().getString();
+		});
+		check(relaySet.contains("[VI]"), "the feeder relay's curve should step to VI: " + relaySet);
+		grounds.accept(pastFeeder);
+		context.waitTicks(40);
+		String bf = read(server, 27, up, z + 10);
+		String stuckFeeder = read(server, 29, up, z + 9);
+		System.out.println("[wildcatter-test] busProtection: 50BF | " + bf + " | " + stuckFeeder + " | " + read(server, 24, up, z + 1));
+		check(bf.contains("50BF BREAKER FAILURE") && bf.contains("LOCKED OUT"), "a feeder that fails to open should trip the bus by 50BF: " + bf);
+		check(read(server, 24, up, z + 1).contains("TRIPPED") && read(server, 29, up, z + 12).contains("TRIPPED"), "50BF should open the generator and feeder 2");
+		grounds.accept(pastFeeder);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.BreakerBlockEntity) srv.overworld().getBlockEntity(new BlockPos(29, up, z + 9))).setSwitch(false);   // opened by hand
+			((dev.wildcatter.block.BusRelayPanelBlockEntity) srv.overworld().getBlockEntity(new BlockPos(27, up, z + 10))).reset();
+			return null;
+		});
+		context.waitTicks(40);
+		System.out.println("[wildcatter-test] busProtection ok: " + busTrip + " | " + feederTrip + " | " + reclosed + " | " + bf);
 	}
 
 	/**
@@ -3365,8 +3388,10 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		// ---- racking: feeder 3 racked out to DISCONNECTED cannot close
 		boolean refused = server.computeOnServer(srv -> {
 			dev.wildcatter.block.SwitchgearSectionBlockEntity s = (dev.wildcatter.block.SwitchgearSectionBlockEntity) srv.overworld().getBlockEntity(feeder3);
+			s.rack();             // racking takes 15 s a position (gap wave): the test finishes each move at once
+			s.finishRacking();
 			s.rack();
-			s.rack();
+			s.finishRacking();
 			return !s.operate();
 		});
 		String racked = read(server, 21, up, z - 3);

@@ -110,6 +110,15 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 		Set<BlockPos> watched = new HashSet<>(generators);
 		watched.addAll(feeders);
 		elements.keySet().retainAll(watched);
+		feederElements.keySet().retainAll(watched);
+	}
+
+	private final Map<BlockPos, dev.wildcatter.circuit.RelaySettings.Element> feederElements = new HashMap<>();
+	/** 50BF: how long each feeder that failed to open has been carrying since. */
+	private final Map<BlockPos, Double> failedFor = new HashMap<>();
+
+	private dev.wildcatter.circuit.RelaySettings.Element feederElement(BlockPos at) {
+		return feederElements.computeIfAbsent(at, k -> new dev.wildcatter.circuit.RelaySettings.Element());
 	}
 
 	private BusProtection.TimeElement element(BlockPos at, boolean veryInverse) {
@@ -177,11 +186,22 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 			BreakerBlockEntity b = feeder(at);
 			if (b != null && b.closed()) {
 				double amps = b.mostAmps(circuit);
-				if (amps > Tuning.FEEDER_50_MULTIPLE * b.rating()) {
+				if (b.failedToOpen()) {
+					// 50BF: the feeder breaker was told to open and is still carrying after the failure timer: the whole bus opens (86BF)
+					if (amps > Tuning.BF_DETECTOR_AMPS && failedFor.getOrDefault(at, 0.0) >= Tuning.BF_SECONDS) {
+						tripBus(String.format("50BF BREAKER FAILURE: the feeder at %s failed to open on %,.0f A", at.toShortString(), amps));
+						failedFor.remove(at);
+						return true;
+					}
+					continue;
+				}
+				var relay = b.feederRelay();
+				if (relay.instantaneous() > 0 && amps > relay.instantaneous() * b.feederPickup()) {
+					b.seeFault(amps);
 					b.tripByRelay(String.format("50 instantaneous, %,.0f A", amps));
 					openedByUs.add(at);
 					lastTrip = String.format("feeder at %d, %d, %d: 50 instantaneous, %,.0f A", at.getX(), at.getY(), at.getZ(), amps);
-					tripped = true;
+					tripped |= !b.closed();
 				}
 			}
 		}
@@ -217,17 +237,25 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 		for (BlockPos at : feeders) {
 			BreakerBlockEntity b = feeder(at);
 			if (b == null || !b.closed()) {
-				element(at, false).reset();
+				feederElement(at).reset();
+				failedFor.remove(at);
 				continue;
 			}
 			double amps = b.amps();
 			reading.put(at, amps);
-			double pickup = Tuning.FEEDER_51_PICKUP * b.rating();
-			if (element(at, false).step(amps, pickup, Tuning.RELAY_TIME_DIAL, dt)) {
-				b.tripByRelay(String.format("51 time overcurrent, %,.0f A on %,d A", amps, b.rating()));
+			if (b.failedToOpen()) {
+				failedFor.merge(at, dt, Double::sum);
+				if (amps <= Tuning.BF_DETECTOR_AMPS) {
+					failedFor.put(at, 0.0);
+				}
+				continue;
+			}
+			var relay = b.feederRelay();
+			if (feederElement(at).step(amps, b.feederPickup(), relay.curve(), relay.dial(), dt)) {
+				b.tripByRelay(String.format("51 time overcurrent, %,.0f A on a %,d A pickup", amps, b.feederPickup()));
 				openedByUs.add(at);
 				lastTrip = "51 on the feeder at " + at.toShortString();
-				element(at, false).reset();
+				feederElement(at).reset();
 				CircuitManager.markDirty(level);
 				setChanged();
 			}
@@ -271,6 +299,8 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 		}
 		openedByUs.clear();
 		elements.values().forEach(BusProtection.TimeElement::reset);
+		feederElements.values().forEach(dev.wildcatter.circuit.RelaySettings.Element::reset);
+		failedFor.clear();
 		CircuitManager.markDirty(level);
 		setChanged();
 	}
@@ -301,7 +331,8 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 		for (BlockPos at : feeders) {
 			BreakerBlockEntity b = feeder(at);
 			if (b != null) {
-				text.append(String.format("; feeder %d (%,d A) %s", n++, b.rating(), b.closed() ? String.format("%,.0f A", b.amps()) : "OPEN"));
+				text.append(String.format("; feeder %d (%,d A, %s) %s", n++, b.rating(), b.feederRelay().describe(b.rating(), false),
+						b.failedToOpen() ? "FAILED TO OPEN" : b.closed() ? String.format("%,.0f A", b.amps()) : "OPEN"));
 			}
 		}
 		if (!lastTrip.isEmpty()) {

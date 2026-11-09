@@ -484,16 +484,15 @@ public class SwitchgearSectionBlockEntity extends BlockEntity implements Circuit
 		}
 		double fault = 0;
 		double boundary = 0;
-		double largest = 0;
 		for (SwitchgearSectionBlockEntity section : lineup) {
 			fault = Math.max(fault, section.groundAmps(circuit));
 			boundary += section.mostAmps(circuit);
-			largest = Math.max(largest, section.frame());
 		}
-		if (!BusProtection.differentialOperates(fault, boundary, largest)) {
+		double pickup = busPickup(boundary);
+		if (fault <= pickup) {
 			return false;
 		}
-		String why = String.format("87B BUS DIFFERENTIAL TRIP: %,.0f A in the bus (pickup %,.0f A)", fault, BusProtection.differentialPickup(boundary, largest));
+		String why = String.format("87B BUS DIFFERENTIAL TRIP: %,.0f A in the bus (pickup %,.0f A)", fault, pickup);
 		for (SwitchgearSectionBlockEntity section : lineup) {
 			if (section.closed) {
 				section.trip("87B bus differential, 86B lockout");
@@ -503,6 +502,11 @@ public class SwitchgearSectionBlockEntity extends BlockEntity implements Circuit
 		lockout = why;
 		setChanged();
 		return true;
+	}
+
+	/** 87B's restrained pickup: half the main's 51 pickup, or a share of the current through the lineup's breakers if more. */
+	private double busPickup(double boundary) {
+		return Math.max(Tuning.SWITCHGEAR_87_OF_MAIN_PICKUP * pickup(), Tuning.BUS_87_SLOPE * boundary);
 	}
 
 	/** 50BF: this breaker failed to open; every other breaker on the bus opens and 86BF holds them. */
@@ -520,7 +524,7 @@ public class SwitchgearSectionBlockEntity extends BlockEntity implements Circuit
 			main.setChanged();
 		}
 		failedFor = 0;
-		lastTrip = lastTrip + "; FAILED TO OPEN, cleared by 50BF";
+		lastTrip = lastTrip + "; cleared by 50BF";
 		setChanged();
 		return true;
 	}
@@ -608,14 +612,14 @@ public class SwitchgearSectionBlockEntity extends BlockEntity implements Circuit
 			state = (mains == 0 ? "NO MAIN: a lineup needs one main section" : "TWO MAINS: a lineup takes only one main section") + "; the breaker carries nothing";
 		} else if (failed && closed) {
 			state = "FAILED TO OPEN (" + lastTrip + "); right-click to open it by hand";
+		} else if (rackTarget != null) {
+			state = String.format("OPEN%s, RACKING from %s to %s, %.0f s", tripped ? " (tripped: " + lastTrip + ")" : "", rack.name(), rackTarget.name(), Math.max(0, rackLeft));
 		} else if (tripped) {
 			boolean held = main != null && main.lockedOut;
 			state = "TRIPPED (" + lastTrip + ")" + (rack == Rack.CONNECTED ? (held && !isMain() ? "; LOCKED OUT: reset the main first" : "; right-click to reset and close")
 					: rack == Rack.DISCONNECTED ? ", DISCONNECTED (racked out: it cannot close)" : ", TEST (the primaries are parted: it carries nothing)");
 		} else if (closed && rack == Rack.CONNECTED && rackTarget == null) {
 			state = String.format("CLOSED, CONNECTED, %,.0f A", amps);
-		} else if (rackTarget != null) {
-			state = String.format("OPEN, RACKING from %s to %s, %.0f s", rack.name(), rackTarget.name(), Math.max(0, rackLeft));
 		} else if (rack == Rack.DISCONNECTED) {
 			state = "OPEN, DISCONNECTED (racked out: it cannot close)";
 		} else {
