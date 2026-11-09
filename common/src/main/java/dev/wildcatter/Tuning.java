@@ -994,9 +994,14 @@ public final class Tuning {
 	public static final double GROUNDING_SET_OHMS = 0.001;         // a grounding cluster: each phase to earth through 2/0 copper (ASTM F855)
 	// 10d2: the 4.16 kV switchgear and the breaker relay cabinet (docs/multiblocks/mv-switchgear.md, breaker-relay-cabinet.md)
 	public static final int[] SWITCHGEAR_FRAME_AMPS = {1200, 2000, 3000};   // 5 kV metal-clad vacuum breakers (VCP-W 5 class)
-	public static final int[] RELAY_PICKUP_STEPS = {5, 10, 25, 50, 100, 200, 400, 600, 1200};   // 51 pickup in amps (proposed: 50:5 CT, 0.5 A tap at the bottom)
+	public static final int[] RELAY_PICKUP_STEPS = {5, 10, 25, 50, 100, 200, 400, 600, 1200, 2000, 3000};   // 51 pickup in amps (proposed: 50:5 CT, 0.5 A tap at the bottom; 2,000 and 3,000 A for the 15 kV feeders, gap wave)
 	public static final int RELAY_PICKUP_START = 4;                // a new relay starts at 100 A
 	public static final double RELAY_50_OF_PICKUP = 8.0;           // 50 at 8 x the 51 pickup
+	// the protection gap wave (docs/questions/protection-gaps.md): settable curve, dial and 50 on every feeder relay
+	public static final double[] RELAY_DIAL_STEPS = {0.5, 1, 2, 3, 4, 5, 7, 10, 15};   // IEEE C37.112 time dial, 0.5 to 15
+	public static final int RELAY_DIAL_START = 1;                  // time dial 1, as before
+	public static final double[] RELAY_50_STEPS = {0, 4, 6, 8, 10, 12, 16, 20};       // 50 as a multiple of the pickup; 0 = off
+	public static final int RELAY_50_START = 3;                    // 8 x, as before
 	// the 10 MVA 4.16/138 kV power transformer (docs/multiblocks/power-transformer-10.md)
 	public static final double STEP_UP_10_VA = 10_000_000.0;       // 4.16 kV delta / 138 kV grounded wye, ONAN
 	public static final double STEP_UP_10_PERCENT_Z = 7.5;
@@ -1098,4 +1103,11 @@ public final class Tuning {
 			case HIGH -> SPAN_MAX_HIGH;
 		};
 	}
+	// ---- protection gap wave, group A: relays, switchgear, breaker failure, reclosing ----
+
+	// ---- protection gap wave, group B: differentials, back-feed, grounding clamps ----
+
+	// ---- protection gap wave, group C: panels, GFCI, ATS, fuses, coordination ----
+
+	// ---- protection gap wave, group D: distribution, spans, poles ----
 }

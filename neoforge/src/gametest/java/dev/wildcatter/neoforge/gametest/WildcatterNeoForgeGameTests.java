@@ -46,6 +46,16 @@ public class WildcatterNeoForgeGameTests {
 	/** The ammonia plant's scenes (AmmoniaPlantScenes): big, so each gets room round it, and long, for the gensets to start. */
 	private static final String[] PLANT_SCENES = {"ammonia_loop", "nitric_acid", "an_emulsion"};
 
+	/** The protection gap wave's grid scenes (docs/questions/protection-gaps.md), each group in its own class, all run as plant scenes. */
+	private static final java.util.Map<String, Consumer<GameTestHelper>> GRID_SCENES = new java.util.LinkedHashMap<>();
+
+	static {
+		GRID_SCENES.putAll(RelayScenes.scenes());
+		GRID_SCENES.putAll(DifferentialScenes.scenes());
+		GRID_SCENES.putAll(PanelScenes.scenes());
+		GRID_SCENES.putAll(DistributionScenes.scenes());
+	}
+
 	public WildcatterNeoForgeGameTests(IEventBus modBus) {
 		modBus.addListener(RegisterEvent.class, event -> event.register(Registries.TEST_FUNCTION, helper -> {
 			helper.register(id("registers"), (Consumer<GameTestHelper>) WildcatterNeoForgeGameTests::registers);
@@ -55,6 +65,7 @@ public class WildcatterNeoForgeGameTests {
 			helper.register(id("ammonia_loop"), (Consumer<GameTestHelper>) AmmoniaPlantScenes::ammoniaLoop);
 			helper.register(id("nitric_acid"), (Consumer<GameTestHelper>) AmmoniaPlantScenes::nitricAcid);
 			helper.register(id("an_emulsion"), (Consumer<GameTestHelper>) AmmoniaPlantScenes::anEmulsion);
+			GRID_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 		}));
 		modBus.addListener(RegisterCapabilitiesEvent.class, event -> event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, entity, side) -> STORAGE, Blocks.GOLD_BLOCK));
 		modBus.addListener(RegisterGameTestsEvent.class, event -> {
@@ -63,7 +74,7 @@ public class WildcatterNeoForgeGameTests {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
 						new TestData<>(plain, Identifier.withDefaultNamespace("empty"), 400, 1, true)));
 			}
-			for (String scene : PLANT_SCENES) {
+			for (String scene : java.util.stream.Stream.concat(java.util.Arrays.stream(PLANT_SCENES), GRID_SCENES.keySet().stream()).toList()) {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
 						new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 3000, 1, true,
 								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 40)));
