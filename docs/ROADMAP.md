@@ -340,7 +340,7 @@ Spec: `docs/multiblocks/ammonia-plant.md` (approved 2026-11-09; "As built" lists
 - A nitric acid unit on a platinum-rhodium gauze: 45.4 kg/h of 60 % acid; the gauze loses platinum and is changed when worn.
 - An AN neutraliser (34.6 kg/h of ammonium nitrate as 85 % solution) and an emulsion blender (46.1 kg/h of emulsion matrix, a pipe
   product in kg for Tailings' emulsion truck). Boosters and detonators stay in Tailings (vanilla TNT, Tim's decision).
-- NeoForge scenes `ammonia_loop`, `nitric_acid`, `an_emulsion`; unit test `AmmoniaPlantTest`. Client scene `ammoniaPlant` (filmed), written and compiled, run by the lead.
+- NeoForge scenes `ammonia_loop`, `nitric_acid`, `an_emulsion`; unit test `AmmoniaPlantTest`. Client scene `ammoniaPlant` (filmed, passes).
 
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released.

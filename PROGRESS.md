@@ -1451,7 +1451,7 @@ sized for a 40-pot line.
 - Phase 14 (the ammonia plant): `gauze_pack_placeholder` and `emulsifier_pail_placeholder` are item textures drawn by script, until
   the art comes from Ludo. The six parts use the mod's materials. Not built: the ammonia leak hazard, AN solution setting in a cold
   pipe, an IBC for matrix, a PGM refinery (a gauze pack is crafted straight from platinum reef ore and a worn pack is not recovered),
-  the purge gas, nitrous oxide abatement. The client scene `ammoniaPlant` is written but has not been run yet. See
+  the purge gas, nitrous oxide abatement. The client scene `ammoniaPlant` passes (filmed 2026-11-09). See
   `docs/questions/ammonia-plant.md`.
 - Phase 13i: Tailings' sorter routing and its TBM's course are not on a signal (Tailings' Known gaps).
 - Phase 13g and 13h: see `docs/multiblocks/plc.md`, "As built". One process unit has run under a PLC in the world; the rig, crane and coolant pump signals are compiled only. Nothing stops two PLCs landing on one rack.
@@ -1666,4 +1666,4 @@ the decisions taken are in `docs/questions/ammonia-plant.md` for him to go throu
   `nitric_acid` (27 kg/h of HNO3 into a stock tank, the gauze losing platinum; NO AIR, NO GAUZE) and `an_emulsion` (34.6 kg/h of AN,
   46.1 kg/h of matrix into a stock tank; NO DIESEL, NO ACID). All 8 NeoForge scenes pass (5 before).
 - **Client scene `ammoniaPlant`** (filmed): the whole chain on one diesel set, each readout in a screenshot, the matrix tank, then the
-  hydrogen pipe cut (NO HYDROGEN, then NO SYNGAS). Written and compiled; not yet run.
+  hydrogen pipe cut (NO HYDROGEN, then NO SYNGAS). Passed on its first run (2026-11-09): reformer 30 Nm³/h, nitrogen 9.7 Nm³/h, acid 43.8 kg/h of 60 %, matrix in the tank, then NO HYDROGEN and NO SYNGAS.
