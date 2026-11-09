@@ -49,6 +49,29 @@ not a go-ahead to build: that waits for the roadmap phase (ROADMAP.md). Nothing 
 | [ats.md](ats.md) | 10d3 | new: 480 V open-transition automatic transfer switch; the genset's redstone remote start |
 | [aeroderivative.md](aeroderivative.md) | 6b | new: 45 MW aeroderivative peaker, 3,000 A generator breaker, 60 MVA GSU and 60 MVA substation transformer |
 
+**DRAFT specs for the Ideas (2026-11-09, decided while Tim was away; not approved).** Plan: `docs/ideas-plan.md`; decisions:
+`docs/questions/specs-wildcatter.md`. System specs outside this folder: `docs/biogas.md`, `docs/salt-dome-oil.md`, `docs/mekanism-check.md`.
+
+| Spec | Proposed wave | Adds |
+|---|---|---|
+| [sales-gas.md](sales-gas.md) | 14a (DRAFT) | new: meter building, filter separator, ultrasonic meter run, regulator skid, pipeline tap |
+| [acid-plant-steam.md](acid-plant-steam.md) | 14b (DRAFT) | new: acid superheater; reuses the 5 MW turbine, its generator, condenser and feed pump, the unit auxiliary transformer |
+| [drilling-mud.md](drilling-mud.md) | 15b (DRAFT) | new: barite mill, bentonite dryer, mud hopper, BOP stack, BOP accumulator |
+| [adu-yellowcake.md](adu-yellowcake.md) | 16a (DRAFT) | new: uranium calciner; ammonia into the precipitation tank |
+| [conversion-extensions.md](conversion-extensions.md) | 16b (DRAFT) | new: cathode gas scrubber, KOH scrubber, rectifier_mv and a large main line (16b2) |
+| [enrichment-operations.md](enrichment-operations.md) | 16c (DRAFT) | new: cascade cooling skid, sampling autoclave |
+| [isr-operations.md](isr-operations.md) | 16d (DRAFT) | new: CO2 liquefier, CO2 storage tank, monitor wellhead, RO unit |
+| [ferroalloys.md](ferroalloys.md) | 17a (DRAFT) | new: furnace transformer, submerged arc furnace, capacitor bank, moly roaster, aluminothermic vessel |
+| [nickel-smelter.md](nickel-smelter.md) | 17b (DRAFT) | new: fluid-bed roaster, nickel electric furnace, Peirce-Smith converter, chlorine leach reactor, Ni purification, nickel tankhouse, induction furnace, AOD converter, ingot caster |
+| [zirconium-extensions.md](zirconium-extensions.md) | 17c (DRAFT) | new: fumed silica burner, Pidgeon furnace, chromate kiln |
+| [fertilizer.md](fertilizer.md) | 18a (DRAFT) | new: phosphate mill, phosphoric reactor, tilting pan filter, acid evaporator, granulation plant, potash dissolver, vacuum crystallizer, potash dryer |
+| [uranium-from-phosphate.md](uranium-from-phosphate.md) | 18b (DRAFT) | new: acid pretreatment, DEPA-TOPO circuit |
+| [reactor-extensions.md](reactor-extensions.md) | 19a, 19b, 19d (DRAFT) | new: containment concrete, equipment hatch, personnel airlock, hydrogen recombiner, hydrogen igniter, containment monitor, pressurizer relief tank, cask loading station, storage module, personnel monitor, new-fuel inspection stand |
+| [fuel-fabrication-extensions.md](fuel-fabrication-extensions.md) | 19c (DRAFT) | new: HF recovery condenser, pellet inspection, rod inspection, IFBA coater, scrap oxidizer |
+| [chlor-alkali-plant.md](chlor-alkali-plant.md) | 20a (DRAFT) | new: brine saturator, brine treatment, membrane cell room, rectifier_mv, chlorine train, caustic evaporator, HCl synthesis unit, brine wellhead |
+| [titanium-pigment.md](titanium-pigment.md) | 20b (DRAFT) | new: Ti chlorinator, TiCl4 purification, TiCl4 oxidiser, VPSA oxygen, pigment finishing |
+| [lithium.md](lithium.md) | 20c (DRAFT) | new: decrepitation kiln, acid roast kiln, lithium leach, LiOH crystallizer, lithium carbonator |
+
 ## Shared rules
 - One **controller** block validates the structure and holds all state. Parts have no logic of their own beyond
   exposing a face to the controller, so the four copies of formation code collapse into one shared `MultiblockSpec` helper.
