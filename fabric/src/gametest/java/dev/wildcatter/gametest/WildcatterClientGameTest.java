@@ -3763,7 +3763,13 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		put(server, 11, up + 1, ze + 1, "minecraft:redstone_wire");
 		java.util.function.Supplier<dev.wildcatter.block.TransferSwitchBlockEntity> atsBe = () -> server.computeOnServer(srv ->
 				(dev.wildcatter.block.TransferSwitchBlockEntity) srv.overworld().getBlockEntity(ats));
-		context.waitTicks(100);
+		context.waitTicks(5);
+		// a new ATS runs the factory timers (TDEN 30 min, TDEC 5 min); this scene runs the short set (protection gap wave)
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.TransferSwitchBlockEntity) srv.overworld().getBlockEntity(ats)).setTimers(dev.wildcatter.block.TransferSwitchBlockEntity.Timers.SHORT);
+			return null;
+		});
+		context.waitTicks(95);
 		String onNormal = read(server, ats.getX(), ats.getY(), ats.getZ());
 		System.out.println("[wildcatter-test] ats: " + onNormal + " | " + read(server, standby.getX(), up, standby.getZ()));
 		check(onNormal.contains("on NORMAL") && onNormal.contains("engine start off") && onNormal.matches(".*NORMAL, [2-4]\\d A.*"), "the ATS should feed its load from normal: " + onNormal);

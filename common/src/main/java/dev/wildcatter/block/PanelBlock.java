@@ -16,6 +16,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
@@ -26,6 +28,10 @@ import org.jspecify.annotations.Nullable;
  * The service lands on its top face or its back face. Right-click works the main.
  */
 public class PanelBlock extends BigPartBlock {
+	/** What the main's handle shows through the dead front: ON (up), OFF (down) or TRIPPED (centre, its flag out). EMPTY is unused. */
+	public static final EnumProperty<PanelGutterBlock.Slot> MAIN = EnumProperty.create("main", PanelGutterBlock.Slot.class,
+			PanelGutterBlock.Slot.ON, PanelGutterBlock.Slot.OFF, PanelGutterBlock.Slot.TRIPPED);
+
 	private final Voltage voltage;
 	private final int mainAmps;
 	private final int spaces;
@@ -35,6 +41,13 @@ public class PanelBlock extends BigPartBlock {
 		this.voltage = voltage;
 		this.mainAmps = mainAmps;
 		this.spaces = spaces;
+		registerDefaultState(defaultBlockState().setValue(MAIN, PanelGutterBlock.Slot.ON));
+	}
+
+	@Override
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+		super.createBlockStateDefinition(builder);
+		builder.add(MAIN);
 	}
 
 	/** {@link Voltage#LOW} for a load centre, {@link Voltage#INDUSTRIAL} for a panelboard. */

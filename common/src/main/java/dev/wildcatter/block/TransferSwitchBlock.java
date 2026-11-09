@@ -48,6 +48,18 @@ public class TransferSwitchBlock extends BigPartBlock {
 
 	@Override
 	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+		TransferSwitchBlockEntity ats = entity(level, pos, state);
+		if (stack.getItem() instanceof PowerMeterItem && player.isShiftKeyDown() && ats != null) {
+			if (!level.isClientSide()) {
+				if (pos.equals(BigParts.main(pos, state))) {
+					ats.nextTimers();       // the bottom cell: the controller's timer set
+				} else {
+					ats.nextTransition();   // the top cell: open, in-phase or closed transition
+				}
+				player.sendOverlayMessage(ats.inspect());
+			}
+			return InteractionResult.SUCCESS;
+		}
 		InteractionResult read = PowerMeterItem.readIfMeter(stack, level, BigParts.main(pos, state), player);
 		return read != null ? read : InteractionResult.TRY_WITH_EMPTY_HAND;
 	}

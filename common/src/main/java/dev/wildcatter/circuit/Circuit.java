@@ -69,6 +69,11 @@ public final class Circuit {
 		return network.resistor(node, dev.wildcatter.solver.PhasorSolver.GROUND, ohms);
 	}
 
+	/** A path of {@code ohms} from {@code node} to the earth (a person's body across a live part and the ground). */
+	public int toEarth(int node, double ohms) {
+		return earth(node, ohms);
+	}
+
 	/** Bonds a node to the ground (0 V). Neutral conductors are tied to ground where the power comes in. */
 	public void ground(int node) {
 		network.ground(node);

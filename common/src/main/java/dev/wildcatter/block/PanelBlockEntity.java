@@ -27,7 +27,7 @@ import net.minecraft.world.level.storage.ValueOutput;
  * thermal-magnetic main breaker, and the bus behind it, which leaves the panel's faces in the wall's plane on the panel bus key for
  * its gutters. The neutral and ground run through the main unswitched.
  */
-public class PanelBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity {
+public class PanelBlockEntity extends BlockEntity implements CircuitPart, Protective, Inspectable, BigPartEntity {
 	static final Conductor[] PHASES = {Conductor.A, Conductor.B, Conductor.C};
 
 	private boolean grown;
@@ -85,7 +85,27 @@ public class PanelBlockEntity extends BlockEntity implements CircuitPart, Inspec
 			tripped = false;
 			heat = 0;
 		}
+		show();
+	}
+
+	/** Draws the main's handle by its state on every cell: up ON, down OFF, centre TRIPPED (as the gutters' breakers). */
+	private void show() {
 		setChanged();
+		if (level == null || !(getBlockState().getBlock() instanceof PanelBlock)) {
+			return;
+		}
+		PanelGutterBlock.Slot want = tripped ? PanelGutterBlock.Slot.TRIPPED : closed ? PanelGutterBlock.Slot.ON : PanelGutterBlock.Slot.OFF;
+		for (BlockPos cell : cells()) {
+			BlockState state = level.getBlockState(cell);
+			if (state.getBlock() instanceof PanelBlock && state.getValue(PanelBlock.MAIN) != want) {
+				level.setBlock(cell, state.setValue(PanelBlock.MAIN, want), 3);
+			}
+		}
+	}
+
+	/** The main handle's drawn state: ON, OFF or TRIPPED. */
+	public PanelGutterBlock.Slot handle() {
+		return getBlockState().getValue(PanelBlock.MAIN);
 	}
 
 	/** The phases its bus stabs alternate over: A and B on a split-phase load centre, L alone under IEC, A, B and C on a panelboard. */
@@ -195,6 +215,43 @@ public class PanelBlockEntity extends BlockEntity implements CircuitPart, Inspec
 		return false;
 	}
 
+	// ---- the protection race and the coordination study ----------------------------------------------------------------------------
+	@Override
+	public double clearingSeconds(Circuit circuit) {
+		return links.length > 0 && mostAmps(circuit) > mainAmps() * Tuning.BREAKER_MAGNETIC_MULTIPLE ? Tuning.MAGNETIC_CLEAR_CYCLES / circuit.hertz() : Double.POSITIVE_INFINITY;
+	}
+
+	@Override
+	public double instantPickupAmps() {
+		return mainAmps() * Tuning.BREAKER_MAGNETIC_MULTIPLE;
+	}
+
+	@Override
+	public String curveName() {
+		return String.format("%d A main", mainAmps());
+	}
+
+	@Override
+	public double clearingSeconds(double amps) {
+		return dev.wildcatter.circuit.TimeCurrent.thermalMagnetic(curveName(), mainAmps(), Tuning.BREAKER_TRIP_SECONDS_AT_2X, Tuning.BREAKER_MAGNETIC_MULTIPLE,
+				dev.wildcatter.energy.ElectricalStandard.active().hertz()).clearingSeconds(amps);
+	}
+
+	@Override
+	public double ratingAmps() {
+		return mainAmps();
+	}
+
+	@Override
+	public double interruptingAmps() {
+		return voltage() == Voltage.LOW ? Tuning.INTERRUPT_LOAD_CENTRE : Tuning.INTERRUPT_PANELBOARD;
+	}
+
+	@Override
+	public List<Terminal> lineSide() {
+		return List.of(new Terminal(topCell(), Direction.UP), new Terminal(worldPosition, facing().getOpposite()));
+	}
+
 	/** The thermal trip. */
 	@Override
 	public void apply(Circuit circuit, int ticks) {
@@ -211,13 +268,18 @@ public class PanelBlockEntity extends BlockEntity implements CircuitPart, Inspec
 		}
 	}
 
+	/** Test hook: the main trips as on a fault. */
+	public void tripForTest() {
+		trip(amps, "test trip");
+	}
+
 	private void trip(double tripAmps, String reason) {
 		closed = false;
 		tripped = true;
 		heat = 0;
 		amps = 0;
 		lastTrip = String.format("%s: %,.0f A on the %d A main", reason, tripAmps, mainAmps());
-		setChanged();
+		show();
 		if (level instanceof ServerLevel server) {
 			server.playSound(null, worldPosition, WildcatterSounds.BREAKER_TRIP, SoundSource.BLOCKS, 1.0F, 0.8F);
 			CircuitManager.markDirty(server);
@@ -249,7 +311,7 @@ public class PanelBlockEntity extends BlockEntity implements CircuitPart, Inspec
 				: closed ? String.format("ON, %,.0f A", amps) + (heat > 0.05 ? ", getting warm " + Math.round(heat * 100) + "%" : "") : "OFF";
 		int[] used = used();
 		return Component.literal(String.format("%s %s, main %d A: %s; %d space%s of %d used (%d breaker%s)", name(), voltageLabel(), mainAmps(), state,
-				used[0], used[0] == 1 ? "" : "s", spaces(), used[1], used[1] == 1 ? "" : "s") + grounding());
+				used[0], used[0] == 1 ? "" : "s", spaces(), used[1], used[1] == 1 ? "" : "s") + grounding() + Coordination.readout(level, this));
 	}
 
 	/** The service's grounding: bonded to a rod, or not. */

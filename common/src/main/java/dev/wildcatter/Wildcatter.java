@@ -64,6 +64,7 @@ public final class Wildcatter {
 		dev.wildcatter.block.ReactorVesselBlockEntity.clearAll();
 		dev.wildcatter.radiation.RadiationTicker.clearAll();
 		SpoolItem.clearAll();
+		dev.wildcatter.safety.BodyContact.clearAll();
 	}
 
 	public static void serverTick(MinecraftServer server) {

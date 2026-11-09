@@ -77,6 +77,7 @@ public final class Shock {
 		if (victim instanceof Player player && (player.isCreative() || player.isSpectator())) {
 			return;
 		}
+		BodyContact.touched(level, source);   // the body is a path to earth: a GFCI upstream sees it
 		float amount = damage(voltage) * fraction * (victim.isInWaterOrRain() ? Tuning.WET_SHOCK_MULTIPLIER : 1.0F);
 		victim.hurtServer(level, level.damageSources().lightningBolt(), amount);
 		Vec3 at = Vec3.atCenterOf(source);

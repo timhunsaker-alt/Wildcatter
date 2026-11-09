@@ -42,18 +42,41 @@ def handle(M, x, y, z, up, length=0.12, width=0.03):
 
 
 # ---- the load centre and the panelboard -----------------------------------------------------------------------------------------------
-L = mlib.Model("load_centre", mlib.footprint_box(1, 1, 1, 0, 0), dict(g.TEX), g.TEX["grey"])
-z = wall_box(L, 0.32, 0.68, 0.0, 0.98, 0.1)
-L.decal((0.36, 0.78, z - 0.002), (0.64, 0.9, z), "nameplate", "north", "grey")
-L.decal((0.36, 0.08, z - 0.002), (0.64, 0.22, z), "danger", "north", "grey")
-L.box((0.6, 0.45, z - 0.012), (0.63, 0.55, z), "galv")                                   # the door latch
-conduit(L, 0.5, 0.95, 0.98, 1.0)
-P = mlib.Model("panelboard_480", mlib.footprint_box(1, 2, 1, 0, 0), dict(g.TEX), g.TEX["grey"])
-z = wall_box(P, 0.25, 0.75, 0.1, 1.9, 0.15)
-P.decal((0.3, 1.55, z - 0.002), (0.7, 1.75, z), "nameplate", "north", "grey")
-P.decal((0.3, 0.2, z - 0.002), (0.7, 0.4, z), "danger", "north", "grey")
-P.box((0.68, 0.9, z - 0.012), (0.72, 1.1, z), "galv")
-conduit(P, 0.5, 0.92, 1.9, 2.0)
+def main_handle(M, x, y, z, slot):
+	"""The main breaker's handle through a window in the dead front: up ON, down OFF, centred with its flag out TRIPPED."""
+	M.box((x - 0.07, y - 0.09, z - 0.004), (x + 0.07, y + 0.09, z), "dark")                 # the window onto the main
+	tilt = {"on": 0.035, "off": -0.035, "tripped": 0.0}[slot]
+	M.box((x - 0.04, y - 0.02 + tilt, z - 0.03), (x + 0.04, y + 0.02 + tilt, z - 0.004), "rubber")
+	if slot == "tripped":
+		M.box((x - 0.05, y + 0.055, z - 0.007), (x + 0.05, y + 0.08, z - 0.004), "danger")   # the trip flag
+
+
+def load_centre(slot):
+	L = mlib.Model(f"load_centre{'' if slot == 'on' else '_' + slot}", mlib.footprint_box(1, 1, 1, 0, 0), dict(g.TEX), g.TEX["grey"])
+	z = wall_box(L, 0.32, 0.68, 0.0, 0.98, 0.1)
+	L.decal((0.36, 0.78, z - 0.002), (0.64, 0.9, z), "nameplate", "north", "grey")
+	L.decal((0.36, 0.08, z - 0.002), (0.64, 0.22, z), "danger", "north", "grey")
+	L.box((0.6, 0.45, z - 0.012), (0.63, 0.55, z), "galv")                                   # the door latch
+	main_handle(L, 0.47, 0.62, z, slot)
+	conduit(L, 0.5, 0.95, 0.98, 1.0)
+	return L
+
+
+def panelboard(slot):
+	P = mlib.Model(f"panelboard_480{'' if slot == 'on' else '_' + slot}", mlib.footprint_box(1, 2, 1, 0, 0), dict(g.TEX), g.TEX["grey"])
+	z = wall_box(P, 0.25, 0.75, 0.1, 1.9, 0.15)
+	P.decal((0.3, 1.55, z - 0.002), (0.7, 1.75, z), "nameplate", "north", "grey")
+	P.decal((0.3, 0.2, z - 0.002), (0.7, 0.4, z), "danger", "north", "grey")
+	P.box((0.68, 0.9, z - 0.012), (0.72, 1.1, z), "galv")
+	main_handle(P, 0.5, 1.32, z, slot)
+	conduit(P, 0.5, 0.92, 1.9, 2.0)
+	return P
+
+
+LOAD_CENTRES = [load_centre(s) for s in ("on", "off", "tripped")]
+PANELBOARDS = [panelboard(s) for s in ("on", "off", "tripped")]
+L = LOAD_CENTRES[0]
+P = PANELBOARDS[0]
 
 
 # ---- the gutter -----------------------------------------------------------------------------------------------------------------------
@@ -154,10 +177,10 @@ conduit(A, 0.5, 0.75, 1.95, 2.0)                                                
 conduit(A, 0.5, 0.75, 0.0, 0.05)                                                           # LOAD out of the bottom
 
 M = L
-EXTRA = [P, A] + GUTTERS + S1 + S2 + LIS + LISF
-for extra in (P, A):
+EXTRA = LOAD_CENTRES[1:] + PANELBOARDS + [A] + GUTTERS + S1 + S2 + LIS + LISF
+for extra in (A,):
 	extra.export_args = {"blockstate": True, "item": True}
-for group in (GUTTERS, S1, S2, LIS, LISF):
+for group in (LOAD_CENTRES, PANELBOARDS, GUTTERS, S1, S2, LIS, LISF):
 	group[0].export_args = {"blockstate": True, "item": True}   # its shapes and item; its blockstate is rewritten in after()
 	for other in group[1:]:
 		other.export_args = {"blockstate": False, "item": False}
@@ -165,8 +188,10 @@ for group in (GUTTERS, S1, S2, LIS, LISF):
 
 def after():
 	# a one-cell part's piece property still runs 0 to 1 (BigParts.pieceProperty): both show the one cell
-	g.save_blockstate("load_centre", {f"facing={facing},piece={piece}": {"model": "wildcatter:block/load_centre/p0", **({"y": y} if y else {})}
-		for facing, y in g.ROT.items() for piece in range(2)})
+	g.save_blockstate("load_centre", {f"facing={facing},main={slot},piece={piece}": {"model": f"wildcatter:block/load_centre{'' if slot == 'on' else '_' + slot}/p0", **({"y": y} if y else {})}
+		for facing, y in g.ROT.items() for piece in range(2) for slot in ("on", "off", "tripped")})
+	g.save_blockstate("panelboard_480", {f"facing={facing},main={slot},piece={piece}": {"model": f"wildcatter:block/panelboard_480{'' if slot == 'on' else '_' + slot}/p{piece}", **({"y": y} if y else {})}
+		for facing, y in g.ROT.items() for piece in range(2) for slot in ("on", "off", "tripped")})
 	g.save_blockstate("panel_gutter", {f"facing={facing},piece={piece},slot={slot}": {"model": f"wildcatter:block/panel_gutter{'' if slot == 'empty' else '_' + slot}/p0", **({"y": y} if y else {})}
 		for facing, y in g.ROT.items() for piece in range(2) for slot in ("empty", "on", "off", "tripped")})
 	for name, height in (("safety_switch_100", 1), ("safety_switch_200", 2)):

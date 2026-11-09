@@ -31,7 +31,7 @@ import org.jspecify.annotations.Nullable;
  * the load terminals on the bottom face of its main cell, and between them the handle's blades and a class J fuse in each phase. N and
  * G run through.
  */
-public class SafetySwitchBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity {
+public class SafetySwitchBlockEntity extends BlockEntity implements CircuitPart, Protective, Inspectable, BigPartEntity {
 	private static final Conductor[] PHASES = {Conductor.A, Conductor.B, Conductor.C};
 
 	private boolean grown;
@@ -135,6 +135,47 @@ public class SafetySwitchBlockEntity extends BlockEntity implements CircuitPart,
 		}
 	}
 
+	// ---- the protection race and the coordination study: current-limiting fuses (protection gap wave) -------------------------------
+	@Override
+	public double clearingSeconds(Circuit circuit) {
+		return fuses.clearingSeconds(circuit);
+	}
+
+	@Override
+	public double letThroughPeak(Circuit circuit) {
+		return fuses.letThroughPeak(circuit);
+	}
+
+	@Override
+	public String curveName() {
+		return fuses.curve(dev.wildcatter.energy.ElectricalStandard.active().hertz()).curveName();
+	}
+
+	@Override
+	public double clearingSeconds(double amps) {
+		return fuses.largest() == 0 ? Double.POSITIVE_INFINITY : fuses.curve(dev.wildcatter.energy.ElectricalStandard.active().hertz()).clearingSeconds(amps);
+	}
+
+	@Override
+	public double ratingAmps() {
+		return fuses.largest();
+	}
+
+	@Override
+	public dev.wildcatter.circuit.TripCurve studyCurve() {
+		return fuses.curve(dev.wildcatter.energy.ElectricalStandard.active().hertz());
+	}
+
+	@Override
+	public double interruptingAmps() {
+		return Tuning.INTERRUPT_CLASS_J;
+	}
+
+	@Override
+	public List<Terminal> lineSide() {
+		return List.of(new Terminal(topCell(), Direction.UP));
+	}
+
 	@Override
 	public boolean protect(Circuit circuit, int ticks) {
 		if (fuses.protect(circuit)) {
@@ -165,7 +206,8 @@ public class SafetySwitchBlockEntity extends BlockEntity implements CircuitPart,
 		String blown = fuses.blownPhases();
 		return Component.literal(String.format("Safety switch %s, %d A frame: %s; %s", Voltage.INDUSTRIAL.label(), frame(), state, fuses.describe())
 				+ (blown.isEmpty() ? "" : "; phase " + blown + " open: fix the fault, then handle OFF and fit a new fuse")
-				+ (fuses.empty() ? "; handle OFF, then right-click with class J fuses to fit them" : ""));
+				+ (fuses.empty() ? "; handle OFF, then right-click with class J fuses to fit them" : "")
+				+ (fuses.letThrough().isEmpty() ? "" : "; " + fuses.letThrough()) + (fuses.empty() ? "" : Coordination.readout(level, this)));
 	}
 
 	/** Breaking it drops its good fuses. */
