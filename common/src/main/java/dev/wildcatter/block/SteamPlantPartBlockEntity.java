@@ -41,7 +41,7 @@ import org.jspecify.annotations.Nullable;
  * A steam plant part. It remembers its turbine generator (sent to the client for the turning parts and sounds). The burner holds
  * its fuel (one stack, fed by hand or hopper, plus the heat already taken from it); the feed pump is a 480 V three-phase motor.
  */
-public class SteamPlantPartBlockEntity extends BlockEntity implements CircuitPart, Kinetic, Sounding, Inspectable, Container, dev.wildcatter.multiblock.BigPartEntity {
+public class SteamPlantPartBlockEntity extends BlockEntity implements CircuitPart, Kinetic, Sounding, Inspectable, net.minecraft.world.WorldlyContainer, dev.wildcatter.multiblock.BigPartEntity {
 	private static final Spin STILL = new Spin();
 
 	private @Nullable BlockPos controller;
@@ -326,6 +326,22 @@ public class SteamPlantPartBlockEntity extends BlockEntity implements CircuitPar
 	@Override
 	public boolean canPlaceItem(int slot, ItemStack stack) {
 		return part() == SteamPlantPartBlock.Part.BURNER && joulesOf(stack) > 0;
+	}
+
+	// a hopper against any cell of the burner feeds it (SteamPlantPartBlock.getContainer)
+	@Override
+	public int[] getSlotsForFace(net.minecraft.core.Direction side) {
+		return part() == SteamPlantPartBlock.Part.BURNER ? new int[] {0} : new int[0];
+	}
+
+	@Override
+	public boolean canPlaceItemThroughFace(int slot, ItemStack stack, net.minecraft.core.@org.jspecify.annotations.Nullable Direction side) {
+		return canPlaceItem(slot, stack);
+	}
+
+	@Override
+	public boolean canTakeItemThroughFace(int slot, ItemStack stack, net.minecraft.core.Direction side) {
+		return false;
 	}
 
 	@Override

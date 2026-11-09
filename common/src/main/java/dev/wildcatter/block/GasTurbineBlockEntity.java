@@ -225,6 +225,8 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 	private static double joules(Product p) {
 		return switch (p) {
 			case PIPELINE_GAS -> Tuning.GAS_JOULES_PER_M3;
+			case COKE_OVEN_GAS -> Tuning.COKE_OVEN_GAS_JOULES_PER_M3;   // steel-mill gases, as heavy-duty frames burn them
+			case COKER_GAS -> Tuning.COKER_GAS_JOULES_PER_M3;
 			case DIESEL, KEROSENE -> Tuning.LIQUID_FUEL_JOULES_PER_L;
 			default -> 0;
 		};
@@ -244,7 +246,7 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 				return;
 			}
 			if (p != null && p.gas()) {
-				fuel = "WRONG GAS: " + p.label() + " - it needs pipeline gas (process it in a gas plant)";
+				fuel = "WRONG GAS: " + p.label() + " - it needs pipeline gas (process it in a gas plant), coke oven gas or coker gas";
 			}
 		}
 	}

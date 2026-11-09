@@ -30,6 +30,11 @@ public final class GasPlant {
 		return litres * Tuning.STABILIZER_LPG;
 	}
 
+	/** Fuel (joules) a stabilizer's fired reboiler burns for {@code litres} of Y-grade in. */
+	public static double reboilerFuel(double litres) {
+		return litres * Tuning.STABILIZER_REBOILER_J_PER_L / Tuning.REBOILER_EFFICIENCY;
+	}
+
 	/** Natural gasoline (litres) out of a stabilizer for {@code litres} of Y-grade in. */
 	public static double gasoline(double litres) {
 		return litres - lpg(litres);

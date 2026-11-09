@@ -2578,6 +2578,20 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		for (int x = 42; x <= 44; x++) {
 			put(server, x, up, z + 20, "wildcatter:cable_industrial");
 		}
+		// the pots' auxiliaries (pot controllers, feeders, crust breakers, beam jacks): a diesel set's 480 V along the front of each row,
+		// past each pot's main cell; north of row 1 along z-14, east along x 91 and back along z+14 in front of row 2
+		BlockPos auxSet = new BlockPos(75, up, z - 20);
+		genset(server, auxSet, north, false);                                                    // x 70-75, z-20..z-19
+		for (int zz = z - 20; zz <= z - 14; zz++) {
+			put(server, 76, up, zz, "wildcatter:cable_industrial");
+		}
+		for (int x = 60; x <= 91; x++) {
+			put(server, x, up, z - 14, "wildcatter:cable_industrial");
+			put(server, x, up, z + 14, "wildcatter:cable_industrial");
+		}
+		for (int zz = z - 13; zz <= z + 13; zz++) {
+			put(server, 91, up, zz, "wildcatter:cable_industrial");
+		}
 		// pot row 1's middle pot: rodded anodes on top, a hopper under it for the spent ones
 		BlockPos changer = row1[2];
 		put(server, changer.getX() + 1, up + 6, changer.getZ() + 2, "minecraft:hopper");
@@ -2607,6 +2621,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		});
 		press(server, fanStarter);
 		startGenset(context, server, lvSet, north, 2000);
+		startGenset(context, server, auxSet, north, 2000);
 		server.runCommand("item replace block 62 " + (up + 12) + " " + (z - 38) + " container.0 with wildcatter:alumina_bag 4");
 		java.util.function.ToDoubleFunction<BlockPos> potAmps = pos -> server.computeOnServer(srv ->
 				((dev.wildcatter.block.PotBlockEntity) srv.overworld().getBlockEntity(pos)).amps());
@@ -2706,6 +2721,16 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			cleared = !server.computeOnServer(srv -> ((dev.wildcatter.block.PotBlockEntity) srv.overworld().getBlockEntity(row1[1])).effect());
 		}
 		check(cleared, "alumina back, the anode effect should clear: " + read(server, row1[1].getX(), up, row1[1].getZ()));
+		check(!read(server, row1[1].getX(), up, row1[1].getZ()).contains("NO AUX POWER") && !read(server, row2[2].getX(), up, row2[2].getZ()).contains("NO AUX POWER"),
+				"the pots' auxiliaries should have their 480 V: " + read(server, row1[1].getX(), up, row1[1].getZ()) + " | " + read(server, row2[2].getX(), up, row2[2].getZ()));
+		// a pot cut out live: its shorting bars carry the line past it, and the line holds
+		String cut = server.computeOnServer(srv -> ((dev.wildcatter.block.PotBlockEntity) srv.overworld().getBlockEntity(row1[3])).toggleCutOut().getString());
+		context.waitTicks(100);
+		amps = potAmps.applyAsDouble(row1[0]);
+		String cutRead = read(server, row1[3].getX(), up, row1[3].getZ());
+		System.out.println("[wildcatter-test] potline: cut out " + cut + " | " + cutRead + " | line " + Math.round(amps) + " A");
+		check(cutRead.contains("CUT OUT") && Math.abs(amps - 180_000) < 5_000, "a pot cut out live should leave the line at 180 kA: " + amps + " | " + cutRead);
+		server.computeOnServer(srv -> ((dev.wildcatter.block.PotBlockEntity) srv.overworld().getBlockEntity(row1[3])).toggleCutOut().getString());
 		// a freeze: the lone pot past four hours without current, then broken
 		server.computeOnServer(srv -> {
 			((dev.wildcatter.block.PotBlockEntity) srv.overworld().getBlockEntity(lone)).addCold(Tuning.POT_FREEZE_SECONDS - 5);
@@ -2866,6 +2891,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		final int z = -6800;
 		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
 		server.runCommand("effect give @p minecraft:slow_falling 600 0 true");
+		server.runCommand("weather clear");   // rain is over the crawler's 9 m/s at its boom head
 		server.runCommand("tp @p 40 " + (up + 30) + " " + (z + 45) + " 180 30");
 		context.waitTicks(20);
 		for (int zz = z - 20; zz <= z + 40; zz += 20) {
@@ -2999,6 +3025,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		final int z = -7200;
 		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
 		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("weather clear");   // rain is over the crawler's 9 m/s at its boom head
 		server.runCommand("tp @p 100 " + (up + 40) + " " + (z + 5) + " 180 30");   // between both areas, so all their chunks load
 		context.waitTicks(60);
 		for (int zz = z - 50; zz <= z + 60; zz += 20) {

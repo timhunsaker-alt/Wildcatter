@@ -44,7 +44,7 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 public class WildcatterNeoForgeGameTests {
 	private static final String[] SCENES = {"registers", "lamp", "plug", "ores"};
 	/** The ammonia plant's scenes (AmmoniaPlantScenes): big, so each gets room round it, and long, for the gensets to start. */
-	private static final String[] PLANT_SCENES = {"ammonia_loop", "nitric_acid", "an_emulsion", "crane_siting", "ring_travel"};
+	private static final String[] PLANT_SCENES = {"ammonia_loop", "nitric_acid", "an_emulsion", "crane_siting", "ring_travel", "quench_sump", "stabilizer_fuel", "cog_engine", "pot_aux", "burner_hopper"};
 
 	public WildcatterNeoForgeGameTests(IEventBus modBus) {
 		modBus.addListener(RegisterEvent.class, event -> event.register(Registries.TEST_FUNCTION, helper -> {
@@ -57,6 +57,11 @@ public class WildcatterNeoForgeGameTests {
 			helper.register(id("an_emulsion"), (Consumer<GameTestHelper>) AmmoniaPlantScenes::anEmulsion);
 			helper.register(id("crane_siting"), (Consumer<GameTestHelper>) CraneScenes::craneSiting);
 			helper.register(id("ring_travel"), (Consumer<GameTestHelper>) CraneScenes::ringTravel);
+			helper.register(id("quench_sump"), (Consumer<GameTestHelper>) PlantGapScenes::quenchSump);
+			helper.register(id("stabilizer_fuel"), (Consumer<GameTestHelper>) PlantGapScenes::stabilizerFuel);
+			helper.register(id("cog_engine"), (Consumer<GameTestHelper>) PlantGapScenes::cogEngine);
+			helper.register(id("pot_aux"), (Consumer<GameTestHelper>) PlantGapScenes::potAux);
+			helper.register(id("burner_hopper"), (Consumer<GameTestHelper>) PlantGapScenes::burnerHopper);
 		}));
 		modBus.addListener(RegisterCapabilitiesEvent.class, event -> event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, entity, side) -> STORAGE, Blocks.GOLD_BLOCK));
 		modBus.addListener(RegisterGameTestsEvent.class, event -> {

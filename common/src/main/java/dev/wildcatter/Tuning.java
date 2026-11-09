@@ -169,6 +169,8 @@ public final class Tuning {
 	public static final double REFRIGERATION_WATTS = 112_000.0;    // a 150 hp propane screw compressor, 480 V
 	public static final double STABILIZER_LPS = 0.5;               // litres of Y-grade a second
 	public static final double STABILIZER_LPG = 0.80;              // of the Y-grade: propane and butane overhead, the rest C5+
+	public static final double STABILIZER_REBOILER_J_PER_L = 450.0e3;   // reboiler duty a litre of Y-grade: the overhead boiled up at 1.5 reflux (proposed)
+	public static final double REBOILER_EFFICIENCY = 0.80;          // a fired reboiler, fuel to process heat
 	public static final double LPG_BULLET_LITERS = 58_000.0;       // an 18,000 gallon (68 m3) bullet at its 85 % fill
 	public static final double PLANT_HOLD_SECONDS = 5.0;           // each process part holds this much of its output
 
@@ -202,6 +204,7 @@ public final class Tuning {
 	public static final double COLD_BOX_KGS = 0.6;                 // kg of cracked gas a second, through the compressor and the cold box
 	public static final int CRACKED_GAS_COMPRESSOR_POLES = 4;      // 1,780 rpm at 60 Hz
 	public static final double QUENCH_KGS = 1.0;                   // kg of hot cracked gas a second
+	public static final double QUENCH_BOTTOMS_L = 2_000.0;         // its sump: 0.5 m of liquid in the 2 x 2 m tower, each of pyrolysis gasoline and fuel oil
 	public static final double RESIDUE_KG_PER_L = 0.95;            // fuel oil
 	public static final double PE_REACTOR_KGS = 0.25;              // kg of ethylene a second: sized for the cracker
 	public static final double PE_REACTOR_WATTS = 75_000.0;        // its cycle gas compressor, 480 V
@@ -452,6 +455,9 @@ public final class Tuning {
 	public static final double POT_METAL_HOLD_KG = 2_726.0;        // 2 days of metal over its pad
 	public static final double POT_ALUMINA_BIN_KG = 2_000.0;
 	public static final double POT_ALF3_BIN_KG = 1_000.0;
+	public static final double POT_AUX_WATTS = 3_000.0;            // its pot controller, beam jacks and its share of the potroom's compressed air (proposed)
+	public static final double POT_BATH_ALUMINA_KG = 60.0;         // alumina dissolved in its bath above the anode-effect level: about half an hour (proposed)
+	public static final double POT_SHORTING_OHMS = 1.0e-6;         // its shorting bars when it is cut out: 0.18 V at 180 kA (proposed)
 	public static final double POT_GAS_M3H = 5_000.0;              // Nm3/h a pot to the duct
 	public static final double POT_GAS_HOLD_S = 10.0;              // seconds of a row's gas its end pot holds
 	public static final double RECTIFORMER_AMPS = 60_000.0;

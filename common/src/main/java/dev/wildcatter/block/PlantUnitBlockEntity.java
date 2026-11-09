@@ -121,6 +121,11 @@ public abstract class PlantUnitBlockEntity extends BlockEntity implements Inspec
 		setChanged();
 	}
 
+	/** For the game test: {@code amount} of {@code product} in its hold, as if made, up to what it holds. */
+	public void testAdd(Product product, double amount) {
+		add(product, amount);
+	}
+
 	/** The make-up of a held cracked gas: ethylene, fuel gas, LPG, pyrolysis gasoline, residue. */
 	@Override
 	public double[] mixOf(Product product) {

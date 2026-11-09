@@ -380,12 +380,24 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		double got = Lines.pull(level, faces, Product.GAS, want, FluidNode.Pull.MACHINE, null);
 		double piped = Lines.pull(level, faces, Product.PIPELINE_GAS, want - got, FluidNode.Pull.MACHINE, null);   // a gas plant's gas does as well
 		got += piped;
+		// a carbon plant's gases, counted as the natural gas of the same heat (docs/questions/plant-crane-gaps.md)
+		String lean = null;
+		for (Product p : new Product[] {Product.COKE_OVEN_GAS, Product.COKER_GAS}) {
+			double per = p == Product.COKE_OVEN_GAS ? Tuning.COKE_OVEN_GAS_JOULES_PER_M3 : Tuning.COKER_GAS_JOULES_PER_M3;
+			if (want - got > 1e-9) {
+				double m3 = Lines.pull(level, faces, p, (want - got) * Tuning.GAS_JOULES_PER_M3 / per, FluidNode.Pull.MACHINE, null);
+				if (m3 > 0) {
+					got += m3 * per / Tuning.GAS_JOULES_PER_M3;
+					lean = p.label();
+				}
+			}
+		}
 		gasBuffer += got;
 		dev.wildcatter.fluid.Run wrong = got > 0 ? null : Lines.wrong(level, faces, Product.GAS);
-		if (wrong != null && wrong.carries(Product.PIPELINE_GAS)) {
+		if (wrong != null && (wrong.carries(Product.PIPELINE_GAS) || wrong.carries(Product.COKE_OVEN_GAS) || wrong.carries(Product.COKER_GAS))) {
 			wrong = null;
 		}
-		supply = piped > 0 ? "pipeline gas" : got > 0 || gasBuffer > 0 ? "gas from a separator"
+		supply = lean != null ? lean : piped > 0 ? "pipeline gas" : got > 0 || gasBuffer > 0 ? "gas from a separator"
 				: wrong != null && wrong.carries(Product.WET_GAS) ? "WET GAS: put a separator between the well and the engine"
 				: wrong != null ? "NO GAS: its gas line is " + wrong.describe()
 				: "NO GAS: run a gas line from a separator's gas side to the engine";

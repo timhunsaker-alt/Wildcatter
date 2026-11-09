@@ -57,6 +57,9 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 	private double cold;             // seconds below the freezing current
 	private boolean frozen;
 	private boolean treated = true;  // its gas went to the duct last interval
+	private double bath = Tuning.POT_BATH_ALUMINA_KG;   // alumina dissolved in its bath, kg: what it runs on while its feeders are stopped
+	private boolean cutOut;          // shorted out of the line by its shorting bars
+	private final dev.wildcatter.circuit.DriveLoad aux = new dev.wildcatter.circuit.DriveLoad(Voltage.INDUSTRIAL, Tuning.MOTOR_POWER_FACTOR, 0);
 	private int changed;
 	private double made;             // kg/s, for the readout
 
@@ -196,17 +199,37 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 	}
 
 	// ---- the circuit --------------------------------------------------------------------------------------------------------
+	/** Its auxiliaries' 480 V: the pot control cabinet on its front face, at its main cell. */
+	private Direction auxFace() {
+		return LeasePartBlock.world(getBlockState(), Direction.NORTH);
+	}
+
 	@Override
 	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
-		return false;
+		return face == auxFace() && voltage == Voltage.INDUSTRIAL && role != Conductor.N;
+	}
+
+	@Override
+	public boolean hasPortAt(BlockPos cell, Direction face, Conductor role, Voltage voltage) {
+		return cell.equals(worldPosition) && hasPort(face, role, voltage);
+	}
+
+	/** True while its auxiliaries have their 480 V. */
+	public boolean auxPowered() {
+		return !aux.undervoltage() && aux.volts() >= Voltage.INDUSTRIAL.lineToLine() * Tuning.LAND_RIG_UNDERVOLTAGE;
 	}
 
 	@Override
 	public void build(Circuit circuit) {
+		aux.setDemand(Tuning.POT_AUX_WATTS);
+		aux.build(circuit, worldPosition, List.of(auxFace()));
 		plus = circuit.node();
 		minus = circuit.node();
 		cell.setBackEmf(effect ? Potline.anodeEffectBackEmf() : Tuning.POT_BACK_EMF);
-		cell.build(circuit, plus, minus, !frozen);   // a pot in series is never opened, but a frozen bath is solid
+		cell.build(circuit, plus, minus, !frozen && !cutOut);   // a pot in series is never opened, but a frozen bath is solid
+		if (cutOut) {
+			circuit.resistor(plus, minus, Tuning.POT_SHORTING_OHMS);   // its shorting bars carry the line past it
+		}
 		BlockState state = getBlockState();
 		circuit.dcPort(LeasePartBlock.at(worldPosition, state, 0, 1, 5), LeasePartBlock.world(state, Direction.WEST), plus, Tuning.POT_RISER_OHMS / 2, false);
 		circuit.dcPort(LeasePartBlock.at(worldPosition, state, 5, 1, 5), LeasePartBlock.world(state, Direction.EAST), minus, Tuning.POT_RISER_OHMS / 2, false);
@@ -214,6 +237,7 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 
 	@Override
 	public void apply(Circuit circuit, int ticks) {
+		aux.apply(circuit, ticks);
 		cell.apply(circuit, plus, minus);
 	}
 
@@ -239,10 +263,15 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 
 	private void work(Level level) {
 		double s = seconds();
-		double amps = frozen ? 0 : cell.amps();
+		double amps = frozen || cutOut ? 0 : cell.amps();
 		made = 0;
+		if (cutOut) {
+			status = frozen ? "CUT OUT, FROZEN: its shorting bars carry the line past it; break it for its spent pot lining"
+					: "CUT OUT: its shorting bars carry the line past it; sneak and right-click to cut it back in";
+			return;
+		}
 		if (frozen) {
-			status = "FROZEN: its bath is solid and its circuit open; break it (it leaves spent pot lining) and bus around it";
+			status = "FROZEN: its bath is solid and its circuit open; sneak and right-click to short it out of the line, or break it (it leaves spent pot lining) and bus around it";
 			return;
 		}
 		// the freeze clock
@@ -251,7 +280,7 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 			if (cold >= Tuning.POT_FREEZE_SECONDS) {
 				frozen = true;
 				CircuitManager.markDirty(level);
-				status = "FROZEN: its bath is solid and its circuit open; break it (it leaves spent pot lining) and bus around it";
+				status = "FROZEN: its bath is solid and its circuit open; sneak and right-click to short it out of the line, or break it (it leaves spent pot lining) and bus around it";
 				return;
 			}
 		} else {
@@ -268,9 +297,16 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 			slots.get(2).shrink(1);
 			alf3 += Tuning.BULK_BAG_KG;
 		}
+		// its point feeders keep its bath's alumina up while its auxiliaries have power; without, it runs on what is dissolved
+		boolean fed = auxPowered();
+		if (fed) {
+			double top = Math.min(alumina, Tuning.POT_BATH_ALUMINA_KG - bath);
+			bath += top;
+			alumina -= top;
+		}
 		// the anode effect: its alumina gone, back two minutes after it returns
 		boolean was = effect;
-		if (alumina <= 1e-6) {
+		if (bath <= 1e-6) {
 			effect = true;
 			clearing = 0;
 		} else if (effect) {
@@ -308,8 +344,16 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 		boolean noAlf3 = alf3 <= 1e-6;
 		double ce = Potline.currentEfficiency(overdue, noAlf3);
 		double al = Potline.aluminiumKgs(amps, ce) * s;
-		al = Math.min(al, Math.min(alumina / Tuning.POT_ALUMINA_PER_AL, Tuning.POT_METAL_HOLD_KG - metal));
-		alumina = Math.max(0, alumina - al * Tuning.POT_ALUMINA_PER_AL);
+		al = Math.min(al, Math.min((bath + (fed ? alumina : 0)) / Tuning.POT_ALUMINA_PER_AL, Tuning.POT_METAL_HOLD_KG - metal));
+		double use = al * Tuning.POT_ALUMINA_PER_AL;
+		double fromBath = fed ? Math.min(bath, use) : use;
+		bath = Math.max(0, bath - fromBath);
+		if (fed) {
+			alumina = Math.max(0, alumina - (use - fromBath));
+			double top = Math.min(alumina, Tuning.POT_BATH_ALUMINA_KG - bath);   // the feeders top the bath back up
+			bath += top;
+			alumina -= top;
+		}
 		if (!noAlf3) {
 			alf3 = Math.max(0, alf3 - al * Potline.alf3PerAl(treated));
 		}
@@ -334,6 +378,10 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 		}
 		if (!treated) {
 			notes.append("; VENTING (no duct): pipe its row's duct end to a fume treatment centre");
+		}
+		if (!fed) {
+			notes.append(String.format("; NO AUX POWER (%s at the front of its main cell): its point feeders and crust breakers are stopped, %.0f kg of alumina left in its bath",
+					Voltage.INDUSTRIAL.label(), bath));
 		}
 		status = String.format("%.2f V, %.0f kA, %.0f %%: %.1f kg/h of aluminium%s", cell.volts(), amps / 1000, ce * 100, made * 3600, notes);
 	}
@@ -370,6 +418,30 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 		return frozen;
 	}
 
+	public boolean cutOut() {
+		return cutOut;
+	}
+
+	/**
+	 * Sneak-right-click: its shorting bars in or out. Cut out, the line's current goes past it through the bars, live, as a frozen or
+	 * relined pot is taken out of a running line; a frozen pot cannot be cut back in.
+	 */
+	public Component toggleCutOut() {
+		if (cutOut && frozen) {
+			return Component.literal("Pot: FROZEN: it stays cut out; break it for its spent pot lining");
+		}
+		cutOut = !cutOut;
+		setChanged();
+		if (level != null) {
+			CircuitManager.markDirty(level);
+		}
+		return Component.literal(cutOut ? "Pot: CUT OUT: its shorting bars carry the line past it" : "Pot: CUT IN: its shorting bars are out, the line runs through it");
+	}
+
+	public double bath() {
+		return bath;
+	}
+
 	public boolean effect() {
 		return effect;
 	}
@@ -393,6 +465,7 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 	/** For the game test: its alumina taken out, as if its feeders had run the bin dry. */
 	public void emptyAlumina() {
 		alumina = 0;
+		bath = 0;
 		slots.get(0).setCount(0);
 		slots.get(1).setCount(0);
 		setChanged();
@@ -412,9 +485,9 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 
 	@Override
 	public Component inspect() {
-		return Component.literal(String.format("Pot (180 kA prebake): %s; metal %,.0f of %,.0f kg; alumina %,.0f kg and %d bags, AlF3 %,.0f kg and %d bags; %d anodes, next change in %.0f h, %d rodded anodes waiting, %d changed",
+		return Component.literal(String.format("Pot (180 kA prebake): %s; metal %,.0f of %,.0f kg; alumina %,.0f kg and %d bags, AlF3 %,.0f kg and %d bags; %d anodes, next change in %.0f h, %d rodded anodes waiting, %d changed; auxiliaries %s",
 				status, metal, Tuning.POT_METAL_HOLD_KG, alumina, slots.get(0).getCount() + slots.get(1).getCount(), alf3, slots.get(2).getCount(), Tuning.POT_ANODES,
-				anodeHours(), slots.get(3).getCount(), changed));
+				anodeHours(), slots.get(3).getCount(), changed, aux.describe()));
 	}
 
 	@Override
@@ -431,6 +504,8 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 		output.putDouble("cf4", cf4);
 		output.putDouble("cold", cold);
 		output.putBoolean("frozen", frozen);
+		output.putDouble("bath", bath);
+		output.putBoolean("cutOut", cutOut);
 		output.putInt("changed", changed);
 	}
 
@@ -449,6 +524,8 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 		cf4 = input.getDoubleOr("cf4", 0);
 		cold = input.getDoubleOr("cold", 0);
 		frozen = input.getBooleanOr("frozen", false);
+		bath = input.getDoubleOr("bath", Tuning.POT_BATH_ALUMINA_KG);
+		cutOut = input.getBooleanOr("cutOut", false);
 		changed = input.getIntOr("changed", 0);
 	}
 }

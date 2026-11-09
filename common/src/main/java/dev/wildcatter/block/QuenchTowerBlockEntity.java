@@ -34,7 +34,7 @@ public class QuenchTowerBlockEntity extends PlantUnitBlockEntity {
 
 	@Override
 	protected double hold(Product product) {
-		return product == Product.CRACKED_GAS ? Tuning.QUENCH_KGS * Tuning.PLANT_HOLD_SECONDS : 20;
+		return product == Product.CRACKED_GAS ? Tuning.QUENCH_KGS * Tuning.PLANT_HOLD_SECONDS : Tuning.QUENCH_BOTTOMS_L;
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, QuenchTowerBlockEntity q) {
@@ -42,6 +42,11 @@ public class QuenchTowerBlockEntity extends PlantUnitBlockEntity {
 			return;
 		}
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
+			return;
+		}
+		if (q.room(Product.GASOLINE) < 1 || q.room(Product.RESIDUE) < 1) {
+			q.status = String.format("FULL: its sump is full; pipe its pyrolysis gasoline (east face) and fuel oil (west face) away");
+			q.setChanged();
 			return;
 		}
 		double max = Math.min(Tuning.QUENCH_KGS * seconds(), q.room(Product.CRACKED_GAS));
@@ -61,6 +66,17 @@ public class QuenchTowerBlockEntity extends PlantUnitBlockEntity {
 
 	@Override
 	public Component inspect() {
-		return Component.literal("Quench tower: " + status + String.format("; pyrolysis gasoline %.1f L, fuel oil %.1f L held", held(Product.GASOLINE), held(Product.RESIDUE)));
+		return Component.literal("Quench tower: " + status + String.format("; pyrolysis gasoline %.1f L, fuel oil %.1f L in its sump of %,.0f L each", held(Product.GASOLINE),
+				held(Product.RESIDUE), Tuning.QUENCH_BOTTOMS_L));
+	}
+
+	/** For the game test: its sump filled, as if it had run hours with nothing piped away. */
+	public void testFillSump() {
+		add(Product.GASOLINE, Tuning.QUENCH_BOTTOMS_L);
+		add(Product.RESIDUE, Tuning.QUENCH_BOTTOMS_L);
+	}
+
+	public double sump(Product product) {
+		return held(product);
 	}
 }

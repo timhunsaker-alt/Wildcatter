@@ -130,6 +130,10 @@ public class PotlinePartBlock extends BigPartBlock implements net.minecraft.worl
 			ftc.giveAll(player);
 			return InteractionResult.SUCCESS;
 		}
+		if (entity instanceof PotBlockEntity pot && player.isShiftKeyDown()) {
+			player.sendOverlayMessage(pot.toggleCutOut());
+			return InteractionResult.SUCCESS;
+		}
 		if (entity instanceof PotBlockEntity pot && pot.outCount() > 0) {
 			pot.giveAll(player);
 			return InteractionResult.SUCCESS;

@@ -26,6 +26,11 @@ public class StabilizerBlockEntity extends PlantUnitBlockEntity {
 		return faces(at -> at[1] == 0, Direction.NORTH);
 	}
 
+	/** Its reboiler's fuel: gas or LPG piped to the west face of its base. */
+	private List<Lines.Face> fuel() {
+		return faces(at -> at[1] == 0, Direction.WEST);
+	}
+
 	@Override
 	protected @Nullable Product nozzle(int[] at, Direction side) {
 		if (at[1] != 0) {
@@ -48,13 +53,29 @@ public class StabilizerBlockEntity extends PlantUnitBlockEntity {
 		}
 		double want = Math.min(Tuning.STABILIZER_LPS * seconds(), Math.min(st.room(Product.LPG) / Tuning.STABILIZER_LPG,
 				st.room(Product.NATURAL_GASOLINE) / (1 - Tuning.STABILIZER_LPG)));
-		double got = want > 0.001 ? Lines.pull(level, st.inlet(), Product.Y_GRADE, want, Pull.MACHINE, st) : 0;
-		st.add(Product.LPG, GasPlant.lpg(got));
+		double fed = Math.min(want, st.testFeed);
+		st.testFeed -= fed;
+		double got = fed + (want - fed > 0.001 ? Lines.pull(level, st.inlet(), Product.Y_GRADE, want - fed, Pull.MACHINE, st) : 0);
+		// its fired reboiler: fuel piped to its west face, or its own LPG off the reflux drum
+		double need = GasPlant.reboilerFuel(got);
+		double piped = need > 0 ? GasFiring.fire(level, st.fuel(), need, st) : 0;
+		double own = Math.min(GasPlant.lpg(got), (need - piped) / Tuning.LPG_JOULES_PER_L);
+		st.add(Product.LPG, GasPlant.lpg(got) - own);
 		st.add(Product.NATURAL_GASOLINE, GasPlant.gasoline(got));
-		st.status = got > 0 ? String.format("splitting %.2f L/s of raw NGL: %.2f L/s LPG, %.2f L/s natural gasoline", got / seconds(), GasPlant.lpg(got) / seconds(), GasPlant.gasoline(got) / seconds())
+		String fired = got <= 0 ? "" : own > 1e-9 ? String.format("; its reboiler burns %.1f kW of its own LPG (pipe fuel gas to its west face to save it)", own * Tuning.LPG_JOULES_PER_L / seconds() / 1000)
+				: String.format("; its reboiler burns %.1f kW of piped fuel", piped / seconds() / 1000);
+		st.status = got > 0 ? String.format("splitting %.2f L/s of raw NGL: %.2f L/s LPG, %.2f L/s natural gasoline%s", got / seconds(), (GasPlant.lpg(got) - own) / seconds(),
+				GasPlant.gasoline(got) / seconds(), fired)
 				: want <= 0.001 ? "idle: its products have nowhere to go (LPG to a bullet, east; gasoline to a stock tank, south)"
 				: "idle: no raw NGL at its base (north face)";
 		st.setChanged();
+	}
+
+	/** For the game test: raw NGL as if from a chiller, litres. */
+	private double testFeed;
+
+	public void testFeed(double litres) {
+		testFeed += litres;
 	}
 
 	@Override

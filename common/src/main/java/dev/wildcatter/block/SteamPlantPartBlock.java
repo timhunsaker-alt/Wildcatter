@@ -21,7 +21,7 @@ import net.minecraft.world.phys.BlockHitResult;
  * coal, charcoal or coal blocks (by hand on any of its cells, or a hopper into its main cell) or pipeline gas on any cell; the
  * feed pump is a 480 V three-phase motor, its terminal box on the motor's south side, that needs power before the plant can run.
  */
-public class SteamPlantPartBlock extends BigPartBlock {
+public class SteamPlantPartBlock extends BigPartBlock implements net.minecraft.world.WorldlyContainerHolder {
 	public enum Part {
 		// sizes along the plant's x, high, along z; every main cell is the part's north-west bottom corner
 		BURNER("boiler_burner", Footprint.box(1, 3, 3, 0, 0)),
@@ -96,5 +96,11 @@ public class SteamPlantPartBlock extends BigPartBlock {
 			player.sendOverlayMessage(p.inspect());
 		}
 		return InteractionResult.SUCCESS;
+	}
+
+	/** A hopper against any cell of the burner feeds its fuel, not only one at its main cell. */
+	@Override
+	public net.minecraft.world.WorldlyContainer getContainer(BlockState state, net.minecraft.world.level.LevelAccessor level, BlockPos pos) {
+		return level instanceof Level l && l.getBlockEntity(main(pos, state)) instanceof SteamPlantPartBlockEntity part && part.part() == Part.BURNER ? part : null;
 	}
 }
