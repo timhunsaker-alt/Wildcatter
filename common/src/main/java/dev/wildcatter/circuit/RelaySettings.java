@@ -34,16 +34,35 @@ public final class RelaySettings {
 	}
 
 	/** Which setting the front-panel cursor is on. */
-	public enum Field { PICKUP, CURVE, DIAL, INSTANTANEOUS }
+	public enum Field { PICKUP, CURVE, DIAL, INSTANTANEOUS, RECLOSE }
 
 	private int pickupIndex;
 	private Curve curve;
 	private int dialIndex;
 	private int instIndex;
 	private Field cursor = Field.PICKUP;
+	/** True on a relay with a 79 reclosing element (the breaker relay cabinet): its shots are one more setting. */
+	private boolean reclosing;
+	private int shots;
 
 	public RelaySettings() {
 		this(Tuning.RELAY_PICKUP_START, Curve.MI, Tuning.RELAY_DIAL_START);
+	}
+
+	/** Gives the relay a 79 element with {@code shots} reclosing shots (0 = off, at most {@link Tuning#RECLOSE_INTERVALS}' length). */
+	public RelaySettings withReclosing(int shots) {
+		this.reclosing = true;
+		this.shots = Math.clamp(shots, 0, Tuning.RECLOSE_INTERVALS.length);
+		return this;
+	}
+
+	/** 79's shots: how many times it recloses after a trip before it locks out; 0 without a 79. */
+	public int shots() {
+		return reclosing ? shots : 0;
+	}
+
+	public void setShots(int shots) {
+		this.shots = Math.clamp(shots, 0, Tuning.RECLOSE_INTERVALS.length);
 	}
 
 	public RelaySettings(int pickupIndex, Curve curve, int dialIndex) {
@@ -79,6 +98,9 @@ public final class RelaySettings {
 	/** Moves the front-panel cursor to the next setting. */
 	public Field nextField() {
 		cursor = Field.values()[(cursor.ordinal() + 1) % Field.values().length];
+		if (cursor == Field.RECLOSE && !reclosing) {
+			cursor = Field.PICKUP;
+		}
 		return cursor;
 	}
 
@@ -94,6 +116,7 @@ public final class RelaySettings {
 			case CURVE -> curve = Curve.values()[(curve.ordinal() + 1) % Curve.values().length];
 			case DIAL -> dialIndex = (dialIndex + 1) % Tuning.RELAY_DIAL_STEPS.length;
 			case INSTANTANEOUS -> instIndex = (instIndex + 1) % Tuning.RELAY_50_STEPS.length;
+			case RECLOSE -> shots = (shots + 1) % (Tuning.RECLOSE_INTERVALS.length + 1);
 		}
 	}
 
@@ -143,9 +166,15 @@ public final class RelaySettings {
 				case CURVE -> c = "[" + c + "]";
 				case DIAL -> d = "[" + d + "]";
 				case INSTANTANEOUS -> i = "[" + i + "]";
+				default -> { }
 			}
 		}
-		return p + " (" + c + ", " + d + "), " + i;
+		String text = p + " (" + c + ", " + d + "), " + i;
+		if (reclosing) {
+			String r = shots == 0 ? "79 off" : String.format("79 %d shot%s", shots, shots == 1 ? "" : "s");
+			text += ", " + (showCursor && cursor == Field.RECLOSE ? "[" + r + "]" : r);
+		}
+		return text;
 	}
 
 	private static String trim(double v) {
@@ -154,7 +183,20 @@ public final class RelaySettings {
 
 	// ---- saving, as plain integers ---------------------------------------------------------------------------------------------------
 	public int[] save() {
-		return new int[] {pickupIndex, curve.ordinal(), dialIndex, instIndex, cursor.ordinal()};
+		return new int[] {pickupIndex, curve.ordinal(), dialIndex, instIndex, cursor.ordinal(), shots};
+	}
+
+	/** Loads what {@link #save} gave; a missing entry keeps its default. */
+	public void load(int[] saved) {
+		if (saved.length >= 5) {
+			load(saved[0], saved[1], saved[2], saved[3], saved[4]);
+		}
+		if (saved.length >= 6) {
+			setShots(saved[5]);
+		}
+		if (cursor == Field.RECLOSE && !reclosing) {
+			cursor = Field.PICKUP;
+		}
 	}
 
 	public void load(int pickup, int curveOrdinal, int dial, int inst, int field) {

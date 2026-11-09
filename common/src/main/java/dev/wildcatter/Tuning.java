@@ -1104,6 +1104,16 @@ public final class Tuning {
 		};
 	}
 	// ---- protection gap wave, group A: relays, switchgear, breaker failure, reclosing ----
+	public static final double RACK_SECONDS = 15.0;                // a draw-out truck cranked one position (about 20 turns of the racking handle)
+	public static final double BF_SECONDS = 0.15;                  // 62BF: the breaker failure timer, about 9 cycles
+	public static final double BF_DETECTOR_AMPS = 5.0;             // 50BF's current detector: still carrying after the timer means it failed
+	public static final double SWITCHGEAR_INTERRUPTING_AMPS = 41_000;   // 5 kV, 350 MVA class vacuum breaker (IEEE C37.06): 41 kA
+	public static final double GEN_FEEDER_INTERRUPTING_AMPS = 50_000;   // 15 kV generator-bus feeder breakers, 50 kA class
+	public static final double BREAKER_INTERRUPT_SECONDS = 0.05;   // a vacuum breaker's interrupting time: 3 cycles
+	public static final double[] RECLOSE_INTERVALS = {2, 15, 30};  // 79: the open intervals before shots 1, 2 and 3, in seconds
+	public static final double RECLOSE_RESET_SECONDS = 60;         // 79: held closed this long after a shot, the sequence resets
+	public static final int RECLOSE_SHOTS_DISTRIBUTION = 3;        // a 12.47 kV feeder: three shots, four trips to lockout
+	public static final int RECLOSE_SHOTS_HIGH = 1;                // a 138 kV line: one shot
 
 	// ---- protection gap wave, group B: differentials, back-feed, grounding clamps ----
 
