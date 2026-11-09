@@ -142,8 +142,8 @@ As the tower crane.
 - **Travel:** the crane stands where it is placed (the real one crawls at 1.3 km/h).
 - **Rigging the crane:** derrick and superlift (the LR 1300 SX), the luffing jib, the 124 t counterweight chart, and boom assembly
   time.
-- **Wind and ground bearing:** wind limits are left out, and so is ground bearing (1.45 kg/cm2 with mats).
-- **No collision:** the boom has no collision.
+- **Wind, ground bearing and collision:** added in the plant-crane-gaps wave: 9 m/s at the boom head (*proposed*), 14.5 t/m2 under
+  every cell of its crawlers, and its boom's slews checked against blocks and tower crane masts (`docs/questions/plant-crane-gaps.md`).
 
 ## Game test (`cranes`)
 1. The crawler is filled with diesel from a stock tank.

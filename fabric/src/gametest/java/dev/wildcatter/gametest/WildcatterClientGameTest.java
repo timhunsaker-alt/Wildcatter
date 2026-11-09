@@ -278,8 +278,59 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("ats")) {
 				ats(context, server);
 			}
+			if (only("ringTravel")) {
+				ringTravel(context, server);
+			}
 			fieldManual(server);
 		}
+	}
+
+	/**
+	 * The ring crane's rails (docs/questions/plant-crane-gaps.md, 4): a ring crane on a row of crane rail under its slewing centre, its
+	 * site 150 m down the rails and out of its 120 m reach, travels along them (sped up) until the site is 50 m out, and stops there.
+	 */
+	private void ringTravel(ClientGameTestContext context, TestServerContext server) {
+		final int z = -8200;
+		server.runCommand("weather clear");
+		server.runCommand("effect give @p minecraft:slow_falling 600 0 true");
+		server.runCommand("tp @p 100 " + (up + 70) + " " + (z + 90) + " 90 35");
+		context.waitTicks(60);
+		for (int zz = z - 2; zz <= z + 200; zz += 40) {
+			int z2 = Math.min(zz + 39, z + 200);
+			server.runCommand("fill 34 " + y + " " + zz + " 86 " + (y + 12) + " " + z2 + " minecraft:air");
+			server.runCommand("fill 34 " + (y - 1) + " " + zz + " 86 " + (y - 1) + " " + z2 + " minecraft:stone");
+		}
+		for (int zz = z + 20; zz <= z + 190; zz++) {
+			put(server, 60, y - 1, zz, "wildcatter:crane_rail[axis=z]");
+		}
+		BlockPos ring = new BlockPos(60, y, z);
+		placeBig(server, WildcatterBlocks.RING_CRANE, ring, net.minecraft.core.Direction.NORTH);   // x 36-84, z..z+48, its centre 60.5, z+24.5
+		BlockPos origin = new BlockPos(70, y, z + 174);
+		for (int x = 71; x <= 72; x++) {
+			put(server, x, y, z + 175, "minecraft:stone_bricks");
+		}
+		String data = server.computeOnServer(srv -> dev.wildcatter.item.SurveyToolItem.record(srv.overworld(), origin, origin.offset(3, 1, 2)).compressed());
+		server.runCommand("fill 70 " + y + " " + (z + 174) + " 73 " + (y + 1) + " " + (z + 176) + " minecraft:air");
+		server.computeOnServer(srv -> {
+			srv.overworld().setBlock(origin, WildcatterBlocks.SITE_MARKER.defaultBlockState(), 3);
+			((dev.wildcatter.block.SiteMarkerBlockEntity) srv.overworld().getBlockEntity(origin)).set(data, 0);
+			dev.wildcatter.block.CraneBlockEntity c = (dev.wildcatter.block.CraneBlockEntity) srv.overworld().getBlockEntity(ring);
+			c.testFuel(6_000);
+			c.testSpeedup(720);   // 2 m/s: a metre every 10 ticks
+			return null;
+		});
+		context.waitTicks(400);
+		String moving = read(server, 60, y, z + 30) + read(server, 60, y, z + 40);
+		System.out.println("[wildcatter-test] ringTravel: on its way | " + moving);
+		context.takeScreenshot("wildcatter-ring-crane-rails");
+		BlockPos stop = new BlockPos(60, y, z + 101);
+		String arrived = waitFor(context, server, () -> server.computeOnServer(srv -> srv.overworld().getBlockEntity(stop) instanceof dev.wildcatter.block.CraneBlockEntity c
+				&& !c.travelling()), 2400);
+		String there = read(server, 60, y, z + 101);
+		System.out.println("[wildcatter-test] ringTravel: arrived " + arrived + " | " + there);
+		check(arrived.startsWith("yes") && !there.contains("NO SITE") && !there.contains("TRAVEL"), "the ring crane should travel 101 m along its rails and find its site in reach: " + there);
+		context.takeScreenshot("wildcatter-ring-crane-arrived");
+		System.out.println("[wildcatter-test] ringTravel ok: " + there);
 	}
 
 	/** WILDCATTER_ONLY=sceneA,sceneB runs just those scenes while working on them; unset, every scene runs. */

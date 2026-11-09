@@ -129,8 +129,9 @@ chest is full.
 
 ## Left out (Known gaps)
 - **Erection and climbing:** the crane is placed whole at its free-standing height.
-- **Wind:** the real crane stops above about 72 km/h and weathervanes.
-- **The superstructure:** it has no collision, and nothing stops a jib passing through a building or another crane's jib.
+- **Wind:** added in the plant-crane-gaps wave: it stops above 20 m/s (72 km/h) at its jib. It does not weathervane.
+- **The superstructure:** it is drawn, not blocks. Since the plant-crane-gaps wave a lift's slews are checked against blocks and other
+  tower cranes' masts; two jibs are not checked against each other.
 - **The rest:** the 3.4 t power-plus tip load, rail travel and swing-sway damping.
 
 ## Game test (`cranes`)

@@ -30,7 +30,9 @@ separator gas -> COMPRESSOR -> TEG DEHYDRATOR -> NGL CHILLER (+ REFRIGERATION CO
   in layer 1; Y-grade out on the south face of the back cells in layer 0.
 - Refrigeration compressor: the 480 V terminal box on the west face of its main cell. It cools a chiller any of whose cells is
   next to one of its own.
-- Stabilizer: Y-grade in on the north face of its bottom cells; LPG out on their east face; gasoline out on their south face.
+- Stabilizer: Y-grade in on the north face of its bottom cells; LPG out on their east face; gasoline out on their south face. Its
+  fired reboiler (since the plant-crane-gaps wave) burns 450 kJ a litre of Y-grade at 80 % (*proposed*): gas, LPG, coker gas or coke
+  oven gas on the west face of its bottom cells, or else its own LPG.
 - LPG bullet: LPG in and out on the side faces of its bottom layer.
 
 ## Products

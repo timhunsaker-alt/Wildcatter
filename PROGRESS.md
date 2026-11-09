@@ -1488,16 +1488,16 @@ sized for a 40-pot line.
     stator trip;
   - the relay settings are fixed, except each feeder breaker's rating;
   - a 138 kV source back-feeding the GSU onto a bus fault is not opened by 87B: it has no breaker on the bus side;
-- Phase 10c3:
-  - the ring crane stands where it is placed: no relocation on rails, as a real one moves between lifting positions;
+- Phase 10c3 (wind, ground bearing and relocation on crane rail done in the plant-crane-gaps wave):
   - it carries no heavy-duty jib, and no hook arrangement for its 5,000 t: its chart is capped at the 3,200 t main hook;
-  - no wind (its 14 m/s limit) and no ground bearing on its mats;
   - a tandem lift's hooks keep to the line between the two cranes; the part does not turn as two real hooks would turn it;
-- Phase 10c2:
-  - the cranes are placed whole: no erection, climbing or boom assembly;
-  - wind is left out, and so are the crawler's travel and ground bearing;
+  - it travels only along one straight row of crane rail; no turning, no switches;
+- Phase 10c2 (wind, ground bearing and boom and jib collision done in the plant-crane-gaps wave):
+  - the cranes are placed whole: no erection, climbing or boom assembly (planned: `docs/questions/plant-crane-gaps.md`, 12);
+  - the crawler does not travel;
   - a crawler has only its main boom and the 104 t counterweight chart: no derrick, superlift or luffing jib;
-  - the mast, jib and boom have no collision, and nothing stops a jib passing through a building or another crane;
+  - the mast, jib and boom are drawn, not blocks: a slew is checked against blocks and tower crane masts before a lift, but two
+    tower cranes' jibs are not checked against each other, and nothing stops a player walking through them;
   - a world saved mid-lift puts the load back in the chest, and the lift is made again;
 - Phase 10c1:
   - a blueprint does not record what blocks hold or how machines are set, nor entities; it cannot be edited, only surveyed again;
@@ -1506,26 +1506,26 @@ sized for a 40-pot line.
   - the ghost draws blocks as coloured cubes, not their models;
   - a site's ghost shows only while its marker's chunk is loaded on the client, so a big plant seen from far beyond its marker
     (past the server's view distance) shows none;
-- Phase 10b3b:
-  - pot auxiliaries (beam jacks, point feeders, crust breakers) draw no power;
+- Phase 10b3b (auxiliary power and live cut-out done in the plant-crane-gaps wave):
   - the pots change their own anodes, standing in for the pot tending machine until 10c's cranes; the tapping crucible item stands
     in for the crucible and its transport vehicle, and the metal does not cool in it;
   - a new pot starts hot and full (no bake-in or start-up), and potroom magnetics, heat balance, bath chemistry and cathode life are
     not modelled; C2F6 is not counted;
-  - spent pot lining has no treatment and no use; a frozen pot is broken and bused around, not shorted out live;
+  - spent pot lining has no treatment and no use (planned: `docs/questions/plant-crane-gaps.md`, 13);
   - the pot's 6 x 6 x 12 cell box stands in for the potroom building, which is not drawn;
 - Phase 10b3a:
   - residence times are not modelled: the 18 h coking, the drums' 12-24 h fill and the furnace's two-week firing run as steady
-    flow (the drums switch at a tonne);
-  - most of the metallurgical coke has no user in the mod beyond carbon and burner fuel; coke oven gas and coker gas fire only the
-    plant's gas burners, not engines or turbines;
+    flow (the drums switch at a tonne); left for Tim, with a plan: `docs/questions/plant-crane-gaps.md`, 11;
+  - most of the metallurgical coke has no user in the mod beyond carbon and burner fuel (coke oven gas and coker gas now also run
+    gas engines and gas turbines);
   - no ammonia, light oil or gas desulfurizing at the by-product plant; no vacuum unit ahead of the coker;
   - the rodded anodes are used by 10b3b's pots;
 - Phase 10b2:
   - the Bayer liquor's first fill is waived: the evaporator starts with 10 minutes of strong liquor;
   - each stream carries its alumina in a fixed share. Silica, soda in the mud and liquor strength are not tracked, and the soda
     loss is one make-up figure;
-  - residence times (36 h precipitation, 1 h digestion) are not modelled: the plant runs as a steady flow with 5 s holds;
+  - residence times (36 h precipitation, 1 h digestion) are not modelled: the plant runs as a steady flow with 5 s holds (left for
+    Tim, with a plan: `docs/questions/plant-crane-gaps.md`, 11);
   - the alumina and AlF3 now go to 10b3b's pots; the ton containers and the chlorine still have no buyer.
 - Phase 9c: Mekanism has not been tried: it is not yet released for 26.3. Plugs were checked against a real NeoForge energy
   handler on a stand-in block.
@@ -1562,31 +1562,28 @@ sized for a 40-pot line.
 - Phase 5 is complete with 5c and 5d (the lease, the gas plant, the crude units, the cracker). Tim checks each in a real session.
 - Gasoline and kerosene have no engine of their own yet: kerosene and diesel are for the Phase 6 gas turbine.
 - The cracker test tops up the furnace's water with a hook; the pump feeding a furnace is wired but not exercised in a test.
-- The cracker's pyrolysis gasoline and fuel oil are held at the quench tower (20 L) and need a pipe away in a long run.
 - Phase 10a: the 250 hp charge pump does start direct on line on one 500 kW set (172 A peak at 4.16 kV); the older gap saying it
   needed two sets no longer holds (the crude unit scene still uses two). The soft starter and drive look the same in every state
   (no run lights on their models), and the MCC's soft-starter and drive buckets show the combination starter's door. The drive's
   motor side is solved at the island's frequency; only its readout and the motor's ramp follow the drive's own.
 - Gas has no sales pipeline yet: a gas plant's residue gas goes to engines, burners or a flare.
-- The gas plant's reboiler and stabilizer heat are not drawn from any fuel but the dehydrator's 0.5 %.
 - Pipe arms join every face of a lease part, though only its nozzles connect; the Power Meter on a pipe says what a run carries.
 - The land rig's power limit works on frequency, so on a small set it holds back well below the set's rating until the
   frequency control catches up (30 s); a real rig's power management also reads the gensets' kW.
 - The land rig's motors are inside the drive house's load: there are no cables drawn from the drive house to the pumps and
-  drawworks.
-- There is no blowout preventer stack in the cellar yet.
+  drawworks (a drawing-only gap; planned: `docs/questions/plant-crane-gaps.md`, 15).
+- There is no blowout preventer stack in the cellar yet: it comes with well control, Phase 15b2 of `docs/multiblocks/drilling-mud.md`.
 - Wall-mounted gear sits 0.55 m up its cell; a player wanting it higher places it a block up.
-- Pumpjack and rig collision is the still frame: the moving beam, crank and pipe do not push anything.
+- Pumpjack and rig collision is the still frame: the moving beam, crank and pipe do not push anything (drawing-only; questions 15).
 - The pumpjack's linkage and the rig's head have been checked in test screenshots, not watched in a real play session.
 - The pole transformer and cutout are wired as before (wire blocks to their faces); there are no jumper or riser leads drawn from an insulator down to them.
 - A pole transformer placed by command keeps its old facing rule, so in some test scenes its brackets face away from the pole.
 - Breaking a pole does not take down a pole transformer hung on it (it stays, as before).
 - There are no guy wires.
-- The steam plant's main steam line and feedwater line are drawn only within each part: they meet at the parts' edges, and the feedwater line stops at the boiler.
-- A hopper feeds the burner only through its main cell.
+- The steam plant's main steam line and feedwater line are drawn only within each part: they meet at the parts' edges, and the feedwater line stops at the boiler (drawing-only; questions 15).
 - The frame-rate check runs at the client's 120 fps cap, so it shows no drop but not how much headroom is left.
-- The alternator is drawn 1 m long for both sets; a real 1 MW frame is about 1.6 m.
-- The brass swatch keeps a faint tile line.
+- The alternator is drawn 1 m long for both sets; a real 1 MW frame is about 1.6 m (model; questions 15).
+- The brass swatch keeps a faint tile line (art; questions 15).
 - The test skips the steam plant's five-minute warm-up with a hook (it checks the drum starts rising, then jumps to pressure).
 - A small genset cannot drive enough fault current through the 20 MVA substation to reach real relay settings; the test scales the relays down. In play, such a source's own protection clears a feeder fault first.
 - The 1/0 and 4/0 MV cable ampacities are from the NEC 310.60 table family but not checked line by line (500 kcmil, 450 A, is).
@@ -1595,6 +1592,11 @@ sized for a 40-pot line.
 - The starter 120 V turbine can carry its full rating on one phase (decided: it stands in for a single-phase set).
 - Gas fields are large, so a gas well lasts hours.
 - Only the fused cutout shocks on touch; enclosed gear is dead-front by design.
+
+- Plant and crane gaps wave (2026-11-09): the coke oven gas engine is not derated on lean gas; the aeroderivative takes coke oven gas
+  and coker gas as the heavy-duty turbines do. The quench sump's FULL, the stabilizer's own-LPG reboiler and the pots' bath alumina
+  without auxiliaries have run only in NeoForge server scenes. A pot without auxiliary power going to an anode effect has not been
+  run in a test (it needs line current; the client `potline` scene runs the powered case).
 
 ## Ideas not started
 Ideas live in one list: `docs/ROADMAP.md`, "Ideas (not scheduled)". Phase 10 took switches and panels, the art, drives, the DC tier
@@ -1664,3 +1666,39 @@ the decisions taken are in `docs/questions/ammonia-plant.md` for him to go throu
   46.1 kg/h of matrix into a stock tank; NO DIESEL, NO ACID). All 8 NeoForge scenes pass (5 before).
 - **Client scene `ammoniaPlant`** (filmed): the whole chain on one diesel set, each readout in a screenshot, the matrix tank, then the
   hydrogen pipe cut (NO HYDROGEN, then NO SYNGAS). Passed on its first run (2026-11-09): reformer 30 Nm³/h, nitrogen 9.7 Nm³/h, acid 43.8 kg/h of 60 %, matrix in the tank, then NO HYDROGEN and NO SYNGAS.
+
+## Plant and crane gaps (2026-11-09)
+Built while Tim was away, on the best recommendation; the decisions are in `docs/questions/plant-crane-gaps.md` for him to go
+through. Branch `plant-crane-gaps`.
+- **Wind** (`crane/Siting`, `CraneKind.windLimit`): the weather's wind 10 m up (4 m/s fair, 8 in rain, 18 in a thunderstorm), risen
+  by the 1/7 power law to the jib or boom head, against each crane's limit: tower 20 m/s, crawler 9, ring 14. Over it a crane starts
+  no lift and holds one under way: `WIND: 21.5 m/s at its boom head, over its 9 m/s limit`.
+- **Ground bearing** (`block/CraneGround`): the blocks under a crawler's tracks or the ring's mats read as soils with IBC Table
+  1806.2's bearing (rock and concrete 58.6 t/m2, fill 19.5, gravel 14.6, sand 9.8, dirt and clay 7.3); the crawler needs 14.5, the
+  ring 30. `SOFT GROUND: ...: set it on gravel, rock or concrete`.
+- **Collision:** a lift's slews are swept for the jib (61-63 m up, counter-jib to tip) or the boom (foot to head) against blocks and
+  other tower cranes' masts; `BLOCKED: its boom would strike minecraft:obsidian at x, y, z as it slews the load`, looked at again
+  every 5 s.
+- **The ring crane travels** on a new block, **Crane Rail** (`crane_rail`), laid in a row under its slewing centre: with no lift in
+  reach it skids along the rails at 10 m/h to the stop that brings the nearest unfinished site 10 m beyond its least radius, one
+  metre at a time, and stops on a block in its path or the rails' end.
+- **The quench tower's sump** holds 2,000 L each of pyrolysis gasoline (east face) and fuel oil (west face); full, it reads FULL and
+  stops, where before it lost them past 20 L.
+- **The stabilizer's reboiler** burns 450 kJ a litre of Y-grade at 80 %: gas, LPG, coker gas or coke oven gas on the west face of its
+  base, or else its own LPG (about 2.8 %).
+- **Coke oven gas and coker gas** run gas engine sets (counted by heat against natural gas) and gas turbines.
+- **The pots' auxiliaries** take 3 kW at the industrial voltage on the front face of each pot's main cell. Without it the feeders stop:
+  the pot runs on its bath's 60 kg of alumina, then goes to an anode effect (`NO AUX POWER`).
+- **A pot is cut out live** with a sneak-right-click: its shorting bars (1 µΩ) carry the line past it. A frozen pot stays cut out.
+- **The steam plant's burner** takes coal from a hopper against any of its cells.
+- **Field Manual:** CRANES and HEAVY LIFTS (wind, ground, blocked slews, the rails), THE POTLINE (auxiliaries, cut-out), GAS PLANT
+  (the stabilizer's fuel), STEAM CRACKER (the sump), and the gas engine on carbon gases.
+- **Tests:** unit tests `SitingTest` (5) and one more in `GasPlantTest`. NeoForge server scenes `crane_siting` (SOFT GROUND on dirt,
+  NO SITE on stone, WIND in an 18 m/s gale, BLOCKED by a pillar, BUILDING once it is gone), `ring_travel` (101 m along its rails to
+  its site), `quench_sump`, `stabilizer_fuel`, `cog_engine`, `pot_aux`, `burner_hopper`. All 15 NeoForge scenes pass (8 before).
+- **Client scenes for the lead to run** (compiled, not run here): `cranes` and `heavyLift` (now set clear weather: rain is over the
+  crawler's 9 m/s); `potline` (a diesel set's 480 V along both rows' fronts for the auxiliaries; a pot cut out live with the line
+  holding 180 kA); the new `ringTravel` (screenshots of the ring crane on its rails); `gasPlant` and `cracker` (readouts changed;
+  checks unchanged).
+- **Planned, not built:** residence holds, crane erection and assembly, the crawler's jibs and travel, spent pot lining's treatment,
+  the BOP stack (with Phase 15b2), and the drawing-only gaps (`docs/questions/plant-crane-gaps.md`, 11-16).

@@ -342,6 +342,17 @@ Spec: `docs/multiblocks/ammonia-plant.md` (approved 2026-11-09; "As built" lists
   product in kg for Tailings' emulsion truck). Boosters and detonators stay in Tailings (vanilla TNT, Tim's decision).
 - NeoForge scenes `ammonia_loop`, `nitric_acid`, `an_emulsion`; unit test `AmmoniaPlantTest`. Client scene `ammoniaPlant` (filmed, passes).
 
+## Plant and crane gaps — 2026-11-09 (Known gaps wave; built while Tim was away)
+Decisions for Tim: `docs/questions/plant-crane-gaps.md`. Branch `plant-crane-gaps`.
+- Cranes: wind limits from the weather (tower 20, crawler 9, ring 14 m/s at the head), ground bearing under crawlers and ring (IBC
+  presumptive values), slews checked against blocks and tower crane masts, the ring crane travelling on crane rail.
+- Plants: the quench tower's 2,000 L sump; the stabilizer's fired reboiler; coke oven and coker gas in gas engines and turbines; the
+  pots' auxiliaries on 480 V and live cut-out with shorting bars; a burner fed by a hopper at any cell.
+- Planned, for Tim: residence holds, crane erection and the crawler's jibs, spent pot lining treatment, the BOP stack (with 15b2),
+  drawing-only gaps.
+- NeoForge scenes `crane_siting`, `ring_travel`, `quench_sump`, `stabilizer_fuel`, `cog_engine`, `pot_aux`, `burner_hopper`; client
+  scene `ringTravel` (new) and `cranes`, `heavyLift`, `potline` changed, for the lead to run.
+
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released.
 - A sales gas pipeline and meter station, so a gas plant's residue gas has a buyer besides engines and the flare.

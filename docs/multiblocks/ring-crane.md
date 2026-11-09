@@ -137,11 +137,16 @@ laydown chest it reads `NO CHEST: set a chest within its reach, 40 to 120 m out`
 ## Breaking
 As the tower crane. A load on its hook goes back to its laydown chest, or drops there.
 
+## Added in the plant-crane-gaps wave (2026-11-09; `docs/questions/plant-crane-gaps.md`, 1-4)
+- **Relocation:** a row of `crane_rail` under its slewing centre, a metre below its ring; with no lift in reach it skids along it at
+  10 m/h (*proposed*) to the stop that puts the nearest unfinished site 10 m beyond its least radius.
+- **Wind:** 14 m/s at the boom head, the weather's wind risen by the 1/7 power law.
+- **Ground bearing:** 30 t/m² under every cell of its ring (rock, concrete or crane rail).
+- **Collision:** its boom's slews are checked against blocks and tower crane masts before each lift.
+
 ## Left out (Known gaps)
-- **Relocation:** a real one moves between lifting positions on rails; this one stands where it is placed.
 - **Configurations:** the heavy-duty jib, and the hook arrangement for its 5,000 t.
-- **Wind and ground bearing:** the 14 m/s wind limit and the 30 t/m² mats are left out.
-- **No collision:** the boom has no collision.
+- **Travel:** only along one straight row of rail.
 - **Assembly:** it is placed whole, with its counterweight.
 
 ## Game test (`heavyLift`)

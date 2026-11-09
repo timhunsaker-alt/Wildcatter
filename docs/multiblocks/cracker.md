@@ -40,7 +40,8 @@ The fuel gas roughly covers the furnace's own fuel, as in a real cracker: pipe i
 ## Added while building (5d)
 - The furnace also fires on LPG (25 MJ/L) until its own fuel gas comes round: a cracker needs fuel before it makes any. In the test
   the bullet's LPG feeds it and fires it at first.
-- The quench tower's fuel oil (residue) leaves its west face.
+- The quench tower's fuel oil (residue) leaves its west face. Its sump holds 2,000 L of each (since the plant-crane-gaps wave); full,
+  it stops and reads FULL.
 - The test tops the furnace's water up with a hook instead of a pump: 200 L is over twenty minutes on LPG.
 
 ## Game test

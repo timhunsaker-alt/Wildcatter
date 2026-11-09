@@ -211,15 +211,19 @@ Legend:
 - Breaking a pot opens the line there. Breaking a rectiformer leaves the yard with one unit fewer.
 - The pot's metal, bins and anodes are lost when it is broken.
 
+## Added in the plant-crane-gaps wave (2026-11-09; `docs/questions/plant-crane-gaps.md`, 8 and 9)
+- **Pot auxiliaries:** 3 kW (*proposed*) at the world's industrial voltage on the front face of each pot's main cell (the pot control
+  cabinet). Without it the point feeders stop: the pot runs on the 60 kg (*proposed*) of alumina dissolved in its bath, then has an
+  anode effect. Readout: `NO AUX POWER`.
+- **Cutting a pot out live:** sneak-right-click puts its shorting bars in (1 µΩ, *proposed*); the line's current goes past it. A
+  frozen pot can be cut out, and stays so; breaking it still leaves spent pot lining.
+
 ## Left out (Known gaps)
 - Potroom magnetics, heat balance, bath chemistry (ratio, superheat), and cathode life (a pot is relined after 5-7 years).
-- **Pot auxiliaries:** the beam jacks, point feeders and crust breakers draw little and intermittently, so no 480 V feed is
-  needed.
 - **The pot tending machine:** the pot changes its own anodes until 10c's cranes.
 - **The crucible transport vehicle:** the tapping crucible item stands in for it. Cooling in the crucible is not modelled.
 - **Spent pot lining** has no treatment yet.
 - **C2F6** is not counted, only CF4.
-- **Shorting a pot out live** with shorting bars is not modelled. A frozen pot is broken and bused around.
 
 ## Game test
 `potline` (z near −6300):
