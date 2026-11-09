@@ -76,11 +76,53 @@ The pole transformer hangs on any pole cell, old or new, its bracket toward the 
   (H1). The low side is the back, with leg A and the neutral, and the two sides carry leg B.
 - **It runs backward too.** A 120 V source on its low side gives 2.4 kV to neutral on its high side (the `transformerChain` scene).
 
+## The protection gap wave (2026-11-09, built while Tim was away; decisions in `docs/questions/protection-gaps.md`)
+### Leads (jumpers)
+- **Counterpart:** the primary lead (a jumper of line conductor) from the line's insulator down to a cutout's top contact or a pole
+  transformer's H1 bushing, as a lineman ties it in with a hot-line clamp.
+- **How:** the same conductor spool: right-click the insulator, then the cutout or the pole transformer (either order). A lead is at
+  most 6 m (`Tuning.LEAD_MAX_BLOCKS`). An insulator holds two leads; a cutout or a pole unit takes one.
+- **What it joins:** the insulator's conductor to the cutout's line contact (the back) or the unit's H1 (its high-side node). The
+  insulator owns the lead (saved on it, drawn by the span renderer, slack); the part remembers which insulator feeds it, so the two
+  solve as one circuit. A lead is the spool's tier and must match the part (a 4.16 kV unit takes a 4.16 kV lead).
+- **Heating:** a lead heats on its conductor's rating as a span does.
+- Wire blocks to the parts' faces still work, as before.
+- **Not drawn:** a lead from the cutout's bottom to the transformer (they still join by touching), and arresters' leads.
+
+### Pole hardware falls with its pole
+A pole transformer or a fused cutout that has hung beside a pole (latched the first time it is solved there) comes down, dropping as
+an item, when no pole stands beside it any more. One set down away from a pole is not touched.
+
+### Span ampacity
+A span (and a lead) heats on its conductor's rating (the size's amps: the ACSR table at 75 C conductor, 25 C air), its temperature
+rise following the square of its loading with a 10-minute time constant (bare 4/0 ACSR in still air, IEEE 738). It parts and falls
+when the rise reaches 3 x the rated rise, about 175 C, past ACSR's 100-150 C emergency limit, where the aluminium anneals. Twice the
+rating lasts about 11 minutes, five times about 50 seconds. The insulator's readout gives the most loaded span's amps and heating.
+
+### 4.16 kV spans
+`conductor_spool_mv` and `covered_conductor_spool_mv`, wound from MV wire in the ACSR sizes, string 4.16 kV (3.3 kV IEC) spans, as
+long as distribution spans, on DIST (15 kV) insulators.
+
+### The flashover's arc
+An under-rated insulator flashes over to earth. Its power-follow arc is counted in amp-seconds, on the solve the fault appears in
+(before any relay clears it): a fault a relay clears at once still arced for 5 cycles at the island's frequency. At 50 A·s the
+porcelain shatters (a few kA for a few cycles), as does the old 3 s of arc above 1 A.
+
+### Guy wires (planned, not built)
+See `docs/questions/protection-gaps.md`, entry D6: a down guy (3/8 in EHS strand, 15,400 lbf) from the pole top to a screw anchor,
+and a pole loading check against the ANSI O5.1 class strength. Planned, with the reasons.
+
+### A pole transformer placed by command (planned)
+See entry D7: the rule (it turns its back to the pole) would rewire the seven client scenes that set one by command beside a pole.
+
 ## Older worlds
 - The one-block `pole` and `crossarm` stay and keep working with their spans; they are no longer crafted or in the creative tab.
 - Insulators still stand on them (as they did); placed on the new hardware they take the new mounting.
 
 ## Game test
+- NeoForge server scenes (protection gap wave): `span_burns` (a 12.47 kV span and a lead to a pole unit carry two heaters; the span
+  heats and burns down at a shrunk ampacity; breaking the pole drops the unit and the insulator), `mv_span_flashover` (a 4.16 kV span
+  and lead light a 4.16 kV pole unit's lamp; a span to a 1 kV insulator flashes over and shatters it).
 - `spans`, `conductorSizes`, `serviceDrop`, `overheadThreePhase` and `refining` are strung on the new poles.
 - `lineParts`: a pole placed by a click, an arm clicked on it snaps to the top, insulators on the arm, breaking the pole drops
   the pole, arm and insulators; an old stacked pole's span still carries current; an H-frame with its strings forms.

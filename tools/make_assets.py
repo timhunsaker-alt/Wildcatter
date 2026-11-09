@@ -488,7 +488,7 @@ def spool_icon(metal, covered):
 	return draw
 
 
-for tier, metal in (("lv", COPPER), ("dist", (178, 164, 150)), ("hv", STEEL_WIRE)):
+for tier, metal in (("lv", COPPER), ("mv", (186, 150, 120)), ("dist", (178, 164, 150)), ("hv", STEEL_WIRE)):
 	tex(f"conductor_spool_{tier}", spool_icon(metal, False), kind="item")
 	tex(f"covered_conductor_spool_{tier}", spool_icon(metal, True), kind="item")
 
@@ -615,11 +615,11 @@ ITEM_MODELS = {"firebox": "block/firebox", "pump": "block/pump", "pipe": "block/
 	"gas_wellhead": "block/gas_wellhead", "casing": "block/casing", "boiler": "block/boiler", "steam_turbine": "block/steam_turbine", "electric_lamp": "block/electric_lamp",
 	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "fuse": "block/fuse_good", "fused_cutout": "block/fused_cutout/item", "pole_transformer": "block/pole_transformer/item", "switch": "block/switch_on", "ufls_relay": "block/relay_on", "pole": "block/pole", "crossarm": "block/crossarm_x", "pole_transformer_mv": "block/pole_transformer_mv/item",
 	"ground_rod": "block/ground_rod",
-	"power_meter": "item/power_meter", "field_manual": "item/field_manual", "seismograph": "item/seismograph", "crude_oil_bucket": "item/crude_oil_bucket", "plastic_sheet": "item/plastic_sheet", "diesel_bucket": "item/diesel_bucket", "steel_ingot": "item/steel_ingot", "conductor_spool_lv": "item/conductor_spool_lv", "conductor_spool_dist": "item/conductor_spool_dist", "conductor_spool_hv": "item/conductor_spool_hv", "covered_conductor_spool_lv": "item/covered_conductor_spool_lv", "covered_conductor_spool_dist": "item/covered_conductor_spool_dist", "covered_conductor_spool_hv": "item/covered_conductor_spool_hv", "insulator_lv": "block/insulator_lv_a", **{f"receptacle_{p}": f"block/receptacle_{p}" for p in PLUG_COLORS}, **{f"plug_{p}": f"block/plug_{p}" for p in PLUG_COLORS}, "insulator_dist": "block/insulator_dist_a", "insulator_hv": "block/insulator_hv_a"}
+	"power_meter": "item/power_meter", "field_manual": "item/field_manual", "seismograph": "item/seismograph", "crude_oil_bucket": "item/crude_oil_bucket", "plastic_sheet": "item/plastic_sheet", "diesel_bucket": "item/diesel_bucket", "steel_ingot": "item/steel_ingot", "conductor_spool_lv": "item/conductor_spool_lv", "conductor_spool_mv": "item/conductor_spool_mv", "covered_conductor_spool_mv": "item/covered_conductor_spool_mv", "conductor_spool_dist": "item/conductor_spool_dist", "conductor_spool_hv": "item/conductor_spool_hv", "covered_conductor_spool_lv": "item/covered_conductor_spool_lv", "covered_conductor_spool_dist": "item/covered_conductor_spool_dist", "covered_conductor_spool_hv": "item/covered_conductor_spool_hv", "insulator_lv": "block/insulator_lv_a", **{f"receptacle_{p}": f"block/receptacle_{p}" for p in PLUG_COLORS}, **{f"plug_{p}": f"block/plug_{p}" for p in PLUG_COLORS}, "insulator_dist": "block/insulator_dist_a", "insulator_hv": "block/insulator_hv_a"}
 ITEM_MODELS.update({w: f"block/{w}_inventory" for w in WIRES})
 for name, model in ITEM_MODELS.items():
 	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:{model}"}})
-for item in ("power_meter", "field_manual", "seismograph", "crude_oil_bucket", "plastic_sheet", "diesel_bucket", "steel_ingot", "conductor_spool_lv", "conductor_spool_dist", "conductor_spool_hv", "covered_conductor_spool_lv", "covered_conductor_spool_dist", "covered_conductor_spool_hv"):
+for item in ("power_meter", "field_manual", "seismograph", "crude_oil_bucket", "plastic_sheet", "diesel_bucket", "steel_ingot", "conductor_spool_lv", "conductor_spool_mv", "covered_conductor_spool_mv", "conductor_spool_dist", "conductor_spool_hv", "covered_conductor_spool_lv", "covered_conductor_spool_dist", "covered_conductor_spool_hv"):
 	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}"}})
 
 # ---- names --------------------------------------------------------------------------------------------
@@ -666,6 +666,8 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 	"block.wildcatter.insulator_dist": "Pin Insulator (DIST, 15 kV)",
 	"block.wildcatter.insulator_hv": "Suspension Insulator (HV, 138 kV)",
 	"item.wildcatter.conductor_spool_lv": "Conductor Spool (LV)",
+	"item.wildcatter.conductor_spool_mv": "Conductor Spool (MV)",
+	"item.wildcatter.covered_conductor_spool_mv": "Covered Conductor Spool (MV)",
 	"item.wildcatter.conductor_spool_dist": "Conductor Spool (DIST)",
 	"item.wildcatter.conductor_spool_hv": "Conductor Spool (HV)",
 	"item.wildcatter.covered_conductor_spool_lv": "Covered Conductor Spool (LV)",
@@ -744,7 +746,7 @@ shaped("fuse", ["GGG", "ICI", "GGG"], {"G": "minecraft:glass_pane", "I": "minecr
 shaped("ufls_relay", ["ICI", "RBR", "III"], {"I": "minecraft:iron_ingot", "C": "minecraft:comparator", "R": "minecraft:redstone", "B": f"{ns}:breaker"}, "ufls_relay")
 shaped("switch", ["I I", "ICI", "III"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot"}, "switch")
 shaped("breaker", ["ICI", "IRI", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, "breaker")
-for tier, wire, sheets in (("lv", "wire_hot", 1), ("dist", "dist_wire_hot", 2), ("hv", "hv_wire_hot", 3)):
+for tier, wire, sheets in (("lv", "wire_hot", 1), ("mv", "mv_wire_hot", 2), ("dist", "dist_wire_hot", 2), ("hv", "hv_wire_hot", 3)):
 	shaped(f"conductor_spool_{tier}", ["WWW", "WSW", "WWW"], {"W": f"{ns}:{wire}", "S": "minecraft:stick"}, f"conductor_spool_{tier}")
 	shapeless(f"covered_conductor_spool_{tier}", [f"{ns}:conductor_spool_{tier}"] + [f"{ns}:plastic_sheet"] * sheets, f"covered_conductor_spool_{tier}")
 shaped("insulator_lv", ["B", "N"], {"B": "minecraft:brick", "N": "minecraft:iron_nugget"}, "insulator_lv", 2)
@@ -1302,7 +1304,7 @@ for role in ("hot", "neutral"):
 	for prefix in ("mv_", "mv_plastic_", "dist_", "dist_plastic_", "hv_", "hv_plastic_"):
 		FAMILY[f"{prefix}wire_{role}"] = ACSR
 FAMILY.update({"cable_lv": BUILDING, "cable_industrial": BUILDING, "cable_mv": MV_CABLE, "cable_dist": MV_CABLE, "cable_hv": MV_CABLE})
-for tier, fam in (("lv", BUILDING), ("dist", ACSR), ("hv", ACSR)):
+for tier, fam in (("lv", BUILDING), ("mv", ACSR), ("dist", ACSR), ("hv", ACSR)):
 	FAMILY[f"conductor_spool_{tier}"] = fam
 	FAMILY[f"covered_conductor_spool_{tier}"] = fam
 SIZE_KEY = f"{ns}:conductor_size"

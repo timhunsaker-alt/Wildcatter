@@ -64,6 +64,11 @@ public final class Circuit {
 		return network.transformer(aPlus, aMinus, bPlus, bMinus, ratio, new Complex(ohms, reactance));
 	}
 
+	/** Ties a node to earth through {@code ohms}: a grounding electrode's resistance to remote earth. Returns the branch. */
+	public int earth(int node, double ohms) {
+		return network.resistor(node, dev.wildcatter.solver.PhasorSolver.GROUND, ohms);
+	}
+
 	/** Bonds a node to the ground (0 V). Neutral conductors are tied to ground where the power comes in. */
 	public void ground(int node) {
 		network.ground(node);
@@ -136,26 +141,51 @@ public final class Circuit {
 		network.portAnyOf(cell(pos), face.ordinal(), ANY_PHASE, voltage.ordinal(), node, halfOhms, exposed);
 	}
 
-	private final java.util.Map<BlockPos, Integer> endpoints = new java.util.HashMap<>();
+	/** An end a span or lead can attach to: a part's position and which of its terminals (0 for an insulator, 1 and 2 for a cutout's two). */
+	private record End(BlockPos pos, int slot) {
+	}
+
+	private final java.util.Map<End, Integer> endpoints = new java.util.HashMap<>();
 	private final java.util.List<Object[]> spans = new java.util.ArrayList<>();
+	private final java.util.Map<java.util.List<End>, Integer> spanIds = new java.util.HashMap<>();
 
 	/** A part says which node an overhead span attaches to. */
 	public void publish(BlockPos pos, int node) {
-		endpoints.put(pos.immutable(), node);
+		publish(pos, 0, node);
+	}
+
+	/** A part with more than one place to attach a lead (a fused cutout's line and load terminals) says each by its slot. */
+	public void publish(BlockPos pos, int slot, int node) {
+		endpoints.put(new End(pos.immutable(), slot), node);
 	}
 
 	/** An overhead span between two published endpoints, with the resistance of its length. */
 	public void span(BlockPos a, BlockPos b, double ohms) {
-		spans.add(new Object[] {a.immutable(), b.immutable(), ohms});
+		span(a, 0, b, 0, ohms);
+	}
+
+	/** A span or a lead between two published terminals. */
+	public void span(BlockPos a, int slotA, BlockPos b, int slotB, double ohms) {
+		spans.add(new Object[] {new End(a.immutable(), slotA), new End(b.immutable(), slotB), ohms});
+	}
+
+	/** After the solve: the amps through the span between two terminals, as it was declared; 0 if it was not joined. */
+	public double spanCurrent(BlockPos a, int slotA, BlockPos b, int slotB) {
+		Integer id = spanIds.get(java.util.List.of(new End(a, slotA), new End(b, slotB)));
+		return id == null ? 0 : network.current(id);
+	}
+
+	public double spanCurrent(BlockPos a, BlockPos b) {
+		return spanCurrent(a, 0, b, 0);
 	}
 
 	/** Joins the terminals of neighbouring parts and the ends of spans, then solves. */
 	public boolean solve() {
 		for (Object[] span : spans) {
-			Integer a = endpoints.get((BlockPos) span[0]);
-			Integer b = endpoints.get((BlockPos) span[1]);
+			Integer a = endpoints.get((End) span[0]);
+			Integer b = endpoints.get((End) span[1]);
 			if (a != null && b != null) {
-				network.resistor(a, b, (Double) span[2]);
+				spanIds.put(java.util.List.of((End) span[0], (End) span[1]), network.resistor(a, b, (Double) span[2]));
 			}
 		}
 		return network.solve();

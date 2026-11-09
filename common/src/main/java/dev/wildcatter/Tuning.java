@@ -1130,4 +1130,22 @@ public final class Tuning {
 	// ---- protection gap wave, group C: panels, GFCI, ATS, fuses, coordination ----
 
 	// ---- protection gap wave, group D: distribution, spans, poles ----
+	/**
+	 * An overhead span heats on its conductor's rating (the ACSR table's 75 C in 25 C air, a 50 K rise) with a bare conductor's longer
+	 * time constant, about 10 minutes for 4/0 ACSR in still air (IEEE 738); it parts when its rise reaches 3 x the rated rise, about
+	 * 175 C, well past ACSR's 100-150 C emergency limit, where the aluminium strands anneal and the span drops.
+	 */
+	public static final double SPAN_HEAT_SECONDS = 600.0;
+	public static final double SPAN_BURN_RISE = 3.0;
+	/**
+	 * The power-follow arc over a flashed-over insulator shatters its porcelain once it has passed this many amp-seconds (a few kA for
+	 * a few cycles; proposed). A fault the relays clear in the same solve still arced for about 5 cycles (a feeder relay's 50 and a
+	 * vacuum breaker: 1 to 1.5 cycles of relay and 3 of breaker).
+	 */
+	public static final double INSULATOR_SHATTER_AMP_SECONDS = 50.0;
+	public static final double ARC_CLEARING_CYCLES = 5.0;
+	/** A grounding electrode at a service: a single driven rod is taken at NEC 250.53(A)(2)'s 25 ohm limit. */
+	public static final double GROUND_ELECTRODE_OHMS = 25.0;
+	/** A lead (jumper) from a line insulator down to a cutout or a pole transformer's H1 bushing is a few metres at most. */
+	public static final int LEAD_MAX_BLOCKS = 6;
 }

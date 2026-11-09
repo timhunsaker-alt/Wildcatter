@@ -130,6 +130,10 @@ public class FuseBlock extends BaseEntityBlock {
 	protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock,
 			net.minecraft.world.level.redstone.@org.jspecify.annotations.Nullable Orientation orientation, boolean movedByPiston) {
 		CircuitManager.markDirty(level);
+		// a cutout hung on a pole comes down with it
+		if (!level.isClientSide() && level.getBlockEntity(pos) instanceof FuseBlockEntity fuse && fuse.hung() && !WoodPoleBlock.poleBeside(level, pos)) {
+			level.destroyBlock(pos, true);
+		}
 	}
 
 	@Override

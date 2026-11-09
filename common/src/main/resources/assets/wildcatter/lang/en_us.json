@@ -41,6 +41,8 @@
   "block.wildcatter.insulator_dist": "Pin Insulator (DIST, 15 kV)",
   "block.wildcatter.insulator_hv": "Suspension Insulator String (HV, 138 kV)",
   "item.wildcatter.conductor_spool_lv": "Conductor Spool (LV)",
+  "item.wildcatter.conductor_spool_mv": "Conductor Spool (MV)",
+  "item.wildcatter.covered_conductor_spool_mv": "Covered Conductor Spool (MV)",
   "item.wildcatter.conductor_spool_dist": "Conductor Spool (DIST)",
   "item.wildcatter.conductor_spool_hv": "Conductor Spool (HV)",
   "item.wildcatter.covered_conductor_spool_lv": "Covered Conductor Spool (LV)",

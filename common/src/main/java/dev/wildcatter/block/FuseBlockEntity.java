@@ -23,7 +23,7 @@ import net.minecraft.world.level.storage.ValueOutput;
  * The element melts: a current over the rating heats it, faster the more it is over, and a short circuit melts it
  * at once. Unlike a breaker it cannot be reset, and it is a 110 V part.
  */
-public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspectable {
+public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspectable, LeadEnd {
 	private int ratingIndex;
 	private double heat;
 	private int back;
@@ -91,12 +91,27 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		return (role == Conductor.A || role == Conductor.B || role == Conductor.C) && voltage == voltage() && (face == facing() || face == facing().getOpposite());
 	}
 
+	/** Latched once it has hung on a pole: it then falls when its pole goes (a cutout or transformer set down elsewhere never does). */
+	private boolean hung;
+
+	public boolean hung() {
+		return hung;
+	}
+
 	@Override
 	public void build(Circuit circuit) {
+		if (!hung && level != null && cutout() && WoodPoleBlock.poleBeside(level, worldPosition)) {
+			hung = true;
+			setChanged();
+		}
 		back = circuit.node();
 		front = circuit.node();
 		link = blown() ? -1 : circuit.resistor(back, front, Tuning.BREAKER_CLOSED_OHMS);
 		circuit.hotPort(worldPosition, facing().getOpposite(), voltage(), back, Tuning.CONTACT_OHMS / 2, false);
+		if (cutout()) {
+			pruneLeads();
+			circuit.publish(worldPosition, back);   // a lead from a line insulator lands on the line (top) contact
+		}
 		circuit.hotPort(worldPosition, facing(), voltage(), front, Tuning.CONTACT_OHMS / 2, false);
 	}
 
@@ -159,6 +174,8 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
+		output.putBoolean("hung", hung);
+		saveLeads(output);
 		output.putInt("rating", ratingIndex);
 		output.putDouble("heat", heat);
 	}
@@ -166,7 +183,54 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Inspect
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		hung = input.getBooleanOr("hung", false);
+		loadLeads(input);
 		ratingIndex = Math.max(0, Math.min(Tuning.CUTOUT_K_LINKS.length - 1, input.getIntOr("rating", 0)));
 		heat = input.getDoubleOr("heat", 0);
+	}
+
+	// ---- leads from a line insulator (LeadEnd) ----
+	private final java.util.Set<BlockPos> leadsIn = new java.util.HashSet<>();
+
+	@Override
+	public java.util.Set<BlockPos> leadsIn() {
+		return leadsIn;
+	}
+
+	@Override
+	public java.util.Collection<BlockPos> links() {
+		return leadsIn;
+	}
+
+	/** Forgets a lead whose insulator is gone or no longer holds it. */
+	private void pruneLeads() {
+		if (level != null && leadsIn.removeIf(at -> level.isLoaded(at) && !(level.getBlockEntity(at) instanceof InsulatorBlockEntity i && i.hasLeadTo(worldPosition)))) {
+			setChanged();
+		}
+	}
+
+	private void saveLeads(ValueOutput output) {
+		output.putInt("leadsIn", leadsIn.size());
+		int k = 0;
+		for (BlockPos at : leadsIn) {
+			output.putLong("leadIn" + k++, at.asLong());
+		}
+	}
+
+	private void loadLeads(ValueInput input) {
+		leadsIn.clear();
+		for (int k = 0; k < input.getIntOr("leadsIn", 0); k++) {
+			leadsIn.add(BlockPos.of(input.getLongOr("leadIn" + k, 0)));
+		}
+	}
+
+	@Override
+	public dev.wildcatter.energy.Voltage leadVoltage() {
+		return cutout() ? voltage() : null;
+	}
+
+	@Override
+	public double leadY() {
+		return 0.85;
 	}
 }

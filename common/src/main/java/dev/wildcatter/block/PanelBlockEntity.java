@@ -120,11 +120,28 @@ public class PanelBlockEntity extends BlockEntity implements CircuitPart, Inspec
 		return voltage == voltage() && feedFace(cell, face) && (role != Conductor.C || voltage() == Voltage.INDUSTRIAL);
 	}
 
+	/** True while a ground rod (the grounding electrode) touches the panel or is wired to it: it is then the service, bonded (NEC 250.24). */
+	private boolean service;
+	private int electrode = -1;
+	private double electrodeAmps;
+
+	public boolean service() {
+		return service;
+	}
+
 	@Override
 	public void build(Circuit circuit) {
 		links = closed ? new int[3] : new int[0];
 		int neutral = circuit.node();
 		int ground = circuit.node();
+		// the service: a grounding electrode at the panel makes it the service disconnect; its main bonding jumper ties the neutral bar
+		// to the ground bar, and the grounding electrode conductor ties both to the rod. A panel with no rod is a sub-panel: N and G apart.
+		service = level != null && cells().stream().anyMatch(cell -> dev.wildcatter.safety.Grounding.isGrounded(level, cell));
+		electrode = -1;
+		if (service) {
+			electrode = circuit.resistor(neutral, ground, Tuning.CONTACT_OHMS);   // read: the bonding jumper's current
+			circuit.earth(neutral, Tuning.GROUND_ELECTRODE_OHMS);
+		}
 		int[] bus = new int[3];
 		for (int k = 0; k < 3; k++) {
 			int feed = circuit.node();
@@ -181,6 +198,7 @@ public class PanelBlockEntity extends BlockEntity implements CircuitPart, Inspec
 	/** The thermal trip. */
 	@Override
 	public void apply(Circuit circuit, int ticks) {
+		electrodeAmps = electrode >= 0 ? circuit.current(electrode) : 0;
 		amps = mostAmps(circuit);
 		double ratio = amps / mainAmps();
 		if (ratio > 1.0) {
@@ -231,7 +249,18 @@ public class PanelBlockEntity extends BlockEntity implements CircuitPart, Inspec
 				: closed ? String.format("ON, %,.0f A", amps) + (heat > 0.05 ? ", getting warm " + Math.round(heat * 100) + "%" : "") : "OFF";
 		int[] used = used();
 		return Component.literal(String.format("%s %s, main %d A: %s; %d space%s of %d used (%d breaker%s)", name(), voltageLabel(), mainAmps(), state,
-				used[0], used[0] == 1 ? "" : "s", spaces(), used[1], used[1] == 1 ? "" : "s"));
+				used[0], used[0] == 1 ? "" : "s", spaces(), used[1], used[1] == 1 ? "" : "s") + grounding());
+	}
+
+	/** The service's grounding: bonded to a rod, or not. */
+	public String grounding() {
+		return service ? String.format("; SERVICE: neutral bonded to ground and earthed by its ground rod (%.0f ohm), %.2f A on the bonding jumper", Tuning.GROUND_ELECTRODE_OHMS, electrodeAmps)
+				: "; neutral not earthed here (no ground rod: a sub-panel, or an unearthed service)";
+	}
+
+	/** Amps through the main bonding jumper, neutral to ground: what comes home by the earth (the game test). */
+	public double electrodeAmps() {
+		return electrodeAmps;
 	}
 
 	/** "120/240 V" split-phase, "230 V" under IEC, "480Y/277 V" or "400Y/230 V". */

@@ -27,6 +27,16 @@ Every number and mechanic below that is not in ELECTRICAL_MODEL is a proposal wi
 | Plug starting set (single and split phase) | NEMA 5-15 (120 V, 15 A), 5-20 (120 V, 20 A), 14-50 (120/240 V, 50 A), CEE 7 (230 V, 16 A), IEC 60309 blue (230 V, 32 A) | ELECTRICAL_MODEL plug table; three-phase plugs wait for Phase 3 |
 | Watts to FE | 1 W = 1 FE/t, configurable | ELECTRICAL_MODEL decision |
 
+## Status of the Phase 2 gaps (protection gap wave, 2026-11-09)
+- **Span ampacity:** built: spans and leads heat and burn down (docs/multiblocks/poles.md, "Span ampacity").
+- **4.16 kV spans:** built: the MV spools.
+- **Conductor sizes:** done in Phase 4.1 (sizes per conductor, ACSR #2 to 795 kcmil on spans; longer spans for lighter conductors).
+- **Transformer impedance:** done in Phase 3a/3c (every rated unit takes its series impedance from its nameplate %Z, X/R 5; the pole
+  unit's 2.5 %).
+- **Neutral earthing at the house:** built: a load centre or panelboard with a ground rod is the service; its main bonding jumper ties
+  N to G, and the rod (25 ohm, NEC 250.53) ties it to earth (NEC 250.24). Its readout says SERVICE.
+- **The flashover's shattering:** built and tested (`mv_span_flashover`): the arc is counted in amp-seconds.
+
 ## Notes
 - Under-rated insulators flash over: a span whose tier is above its insulator's rating shorts to ground and trips protection; the insulator then shatters.
 - Team Reborn Energy: the newest Maven release (5.0.0, Jan 2026) is not confirmed for Minecraft 26.3. Plugs go through a plain-Java `HostEnergy` interface; the Team Reborn adapter is added only if it builds against 26.3.
