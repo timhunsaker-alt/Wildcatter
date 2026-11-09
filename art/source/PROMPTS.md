@@ -274,3 +274,10 @@ Blocks, `texture`, each "Seamless flat texture, <straight-on / top-down> orthogr
 | decant_tower (b) | wall of a tailings dam decant tower, weathered grey precast concrete riser with a vertical steel channel slot holding stacked dark timber stop-logs, water stains |
 | mat_paint_crane_yellow (b) | steel plate painted bright crane yellow, slightly weathered gloss enamel with a few small scratches and faint dirt, plain, no seams |
 | rotor (b) | dark grey painted machined steel of a fan hub and shaft, slightly worn paint with faint circular machining marks, plain (`tools/process_art.py` paints the yellow stripe across it, as the placeholder had, so the turning shows) |
+
+## Art wave, Phase 14's items (2026-11-09, art/source/ore/)
+`item-icon`, `Photorealistic 3D`, 2 variations each, "..., generic, no brand, game item icon, plain dark grey background, no text":
+- `gauze_pack` (b): "A small stack of round woven fine platinum-rhodium wire gauze pads, catalyst gauze for nitric acid, shiny silver metal
+  mesh discs, slightly fanned".
+- `emulsifier_pail` (a): "A single 20 kg white plastic pail with a tight lid and a wire handle, holding emulsifier for explosives, a plain amber
+  band label with no writing".

@@ -2250,8 +2250,13 @@ recipe = {"type": "minecraft:crafting_shapeless", "category": "misc", "ingredien
 save_json(f"{DATA}/recipe/emulsifier_pail.json", recipe)
 lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
 for item, (name, colour) in {"gauze_pack": ("Platinum-Rhodium Gauze Pack", (200, 200, 196)), "emulsifier_pail": ("Emulsifier Pail (20 kg)", (180, 150, 60))}.items():
-	tex(f"{item}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
-	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}_placeholder"}})
+	if os.path.exists(f"{ORE_ART}/{item}.png"):   # the Ludo icon (art/source/ore/), as the other plant items
+		shutil.copy(f"{ORE_ART}/{item}.png", f"{ASSETS}/textures/item/ore/{item}.png")
+		item_tex = f"{ns}:item/ore/{item}"
+	else:
+		tex(f"{item}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+		item_tex = f"{ns}:item/{item}_placeholder"
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": item_tex}})
 	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
 	lang[f"item.{ns}.{item}"] = name
 lang.update({f"block.{ns}.nitrogen_generator": "Nitrogen Generator (PSA, 10 Nm3/h)", f"block.{ns}.syngas_compressor": "Syngas Compressor (150 bar)",

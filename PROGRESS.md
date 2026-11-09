@@ -1448,8 +1448,8 @@ sized for a 40-pot line.
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
-- Phase 14 (the ammonia plant): `gauze_pack_placeholder` and `emulsifier_pail_placeholder` are item textures drawn by script, until
-  the art comes from Ludo. The six parts use the mod's materials. Not built: the ammonia leak hazard, AN solution setting in a cold
+- Phase 14 (the ammonia plant): the `gauze_pack` and `emulsifier_pail` icons are Ludo art since the art wave (2026-11-09); no
+  placeholder is left. The six parts use the mod's materials. Not built: the ammonia leak hazard, AN solution setting in a cold
   pipe, an IBC for matrix, a PGM refinery (a gauze pack is crafted straight from platinum reef ore and a worn pack is not recovered),
   the purge gas, nitrous oxide abatement. The client scene `ammoniaPlant` passes (filmed 2026-11-09). See
   `docs/questions/ammonia-plant.md`.
