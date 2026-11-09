@@ -335,6 +335,7 @@ Spec: `docs/multiblocks/plc.md`, nine waves, all approved in order: 13a language
 
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released.
+- An ammonia plant (proposed for Tailings' open pits, 2026-11-09): ammonia from the existing steam reformer's hydrogen and PSA nitrogen, nitric acid, ammonium nitrate and emulsion matrix for blasting; also the ADU yellowcake route's ammonia. Spec approved 2026-11-09: docs/multiblocks/ammonia-plant.md; built as Tailings' wave P3 needs it.
 - A sales gas pipeline and meter station, so a gas plant's residue gas has a buyer besides engines and the flare.
 - Plants for the 7a ores that the fuel chain doesn't use:
   - chlor-alkali from rock salt;
