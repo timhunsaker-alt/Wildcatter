@@ -17,6 +17,8 @@ public interface FuelCycleBlocks {
 	Block CONVERTER = acidPart(dev.wildcatter.block.AcidPlantPartBlock.Part.CONVERTER);
 	Block INTERPASS_ABSORBER = acidPart(dev.wildcatter.block.AcidPlantPartBlock.Part.INTERPASS_ABSORBER);
 	Block FINAL_ABSORBER = acidPart(dev.wildcatter.block.AcidPlantPartBlock.Part.FINAL_ABSORBER);
+	// 14c: the acid plant's steam to the 5 MW turbine (docs/multiblocks/acid-plant-steam.md)
+	Block ACID_SUPERHEATER = acidPart(dev.wildcatter.block.AcidPlantPartBlock.Part.ACID_SUPERHEATER);
 	Block JAW_CRUSHER = millPart(dev.wildcatter.block.MillPartBlock.Part.JAW_CRUSHER);
 	Block SAG_MILL = millPart(dev.wildcatter.block.MillPartBlock.Part.SAG_MILL);
 	Block LEACH_TANK = millPart(dev.wildcatter.block.MillPartBlock.Part.LEACH_TANK);

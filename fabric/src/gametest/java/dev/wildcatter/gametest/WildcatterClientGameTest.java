@@ -188,6 +188,15 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("ammoniaPlant")) {
 				ammoniaPlant(context, server);
 			}
+			if (only("salesGas")) {
+				new GasPowerClientScenes(context, server, y, up, -8200).salesGas();
+			}
+			if (only("acidSteam")) {
+				new GasPowerClientScenes(context, server, y, up, -8400).acidSteam();
+			}
+			if (only("biogas")) {
+				new GasPowerClientScenes(context, server, y, up, -8600).biogas();
+			}
 			if (only("cascade")) {
 				cascade(context, server);
 			}

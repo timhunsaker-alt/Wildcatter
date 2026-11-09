@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "SWS",
+    "SBS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "W": "minecraft:white_wool",
+    "B": "minecraft:bucket"
+  },
+  "result": {
+    "id": "wildcatter:filter_separator",
+    "count": 1
+  }
+}

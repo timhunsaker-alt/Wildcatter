@@ -30,7 +30,9 @@ public class AcidPlantPartBlock extends BigPartBlock implements net.minecraft.wo
 		WASTE_HEAT_BOILER("waste_heat_boiler", Footprint.box(3, 4, 8, 0, 0)),
 		CONVERTER("converter", Footprint.box(5, 15, 5, 0, 0)),
 		INTERPASS_ABSORBER("interpass_absorber", Footprint.box(3, 12, 3, 0, 0)),
-		FINAL_ABSORBER("final_absorber", Footprint.box(3, 20, 3, 0, 0));
+		FINAL_ABSORBER("final_absorber", Footprint.box(3, 20, 3, 0, 0)),
+		/** The steam superheater between the converter's beds (docs/multiblocks/acid-plant-steam.md). */
+		ACID_SUPERHEATER("acid_superheater", Footprint.box(3, 6, 3, 0, 0));
 
 		private final String id;
 		private final Footprint footprint;
@@ -66,6 +68,7 @@ public class AcidPlantPartBlock extends BigPartBlock implements net.minecraft.wo
 			case WASTE_HEAT_BOILER -> new WasteHeatBoilerBlockEntity(pos, state);
 			case CONVERTER -> new ConverterBlockEntity(pos, state);
 			case FINAL_ABSORBER -> new FinalAbsorberBlockEntity(pos, state);
+			case ACID_SUPERHEATER -> new AcidSuperheaterBlockEntity(pos, state);
 		};
 	}
 
@@ -80,6 +83,7 @@ public class AcidPlantPartBlock extends BigPartBlock implements net.minecraft.wo
 			case MAIN_BLOWER -> createTickerHelper(type, WildcatterBlocks.UNIT_MOTOR_ENTITY, UnitMotorBlockEntity::tick);
 			case SULFUR_FURNACE -> createTickerHelper(type, WildcatterBlocks.SULFUR_FURNACE_ENTITY, SulfurFurnaceBlockEntity::tick);
 			case CONVERTER -> createTickerHelper(type, WildcatterBlocks.CONVERTER_ENTITY, ConverterBlockEntity::tick);
+			case ACID_SUPERHEATER -> createTickerHelper(type, WildcatterBlocks.ACID_SUPERHEATER_ENTITY, AcidSuperheaterBlockEntity::tick);
 		};
 	}
 

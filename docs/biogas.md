@@ -1,6 +1,7 @@
 # Biogas as an engine fuel
 
-> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Proposed phase **14c**. Decisions are in
+> **BUILT as wave 14d (2026-11-09), decided on recommendation while Tim was away; not approved.** See "As built" at the end and
+> `docs/questions/phase14-gas-power.md`. Renumbered 14b-14e on 2026-11-09: Phase 14 was already the ammonia plant (14a). Decisions are in
 > `docs/questions/specs-wildcatter.md` (items 8-11). No Wildcatter change until Tim approves (ROADMAP Ideas, 2026-11-07).
 
 Farmings (the sister mod) proposes a manure **methane digester** whose biogas runs a Wildcatter gas genset (Farmings
@@ -69,4 +70,18 @@ Sources:
 - No screenshot: nothing new is drawn.
 
 ## Proposed wave
-**14c**: one product, one engine rule, one test stand-in. Small; it can ride with 14a.
+**14d** (was 14c): one product, one engine rule, one test stand-in. Built with 14b.
+
+## As built (14d, 2026-11-09)
+Decisions taken while building are in `docs/questions/phase14-gas-power.md` (items 13-16).
+- **`Product.BIOGAS`** ("biogas, 60 % CH4"), a gas in m3, added at the end of the list. The Power Meter on its pipe reads "carrying biogas,
+  60 % CH4". It ships in **0.7.0** (not 0.6.0, which is out).
+- **The gas set:** draws separator gas, then pipeline gas, then biogas; on biogas its island rating is 850 kW and its governor's hold lowers
+  its voltage until the load takes no more than that; 407 m3/h at 850 kW, 61 m3/h idle (`Biogas`). Readout: "biogas, 60 % CH4, burning
+  N m3/h; BIOGAS: 850 kW MAX".
+- **The firebox** burns it at 23/38 of a natural gas m3. **The steam plant burner** on a biogas run reads NEEDS PIPELINE GAS; gas turbines,
+  the reformer, dryers and the sales line (OFF SPEC: CO2) refuse it.
+- **For another mod:** a block entity implementing `dev.wildcatter.block.FluidNode` that offers `Product.BIOGAS` on a face; Wildcatter's
+  steel pipe does the rest. The NeoForge test mod's stand-in source (`TestGasSource`) is exactly such a block, in another mod's namespace.
+- **Measured** (NeoForge scene `biogas`): against a 1 MW load bank (through a backward unit substation and the unit auxiliary transformer
+  to 13.8 kV) the set holds 846 kW at 447 V and burns 405 m3/h.

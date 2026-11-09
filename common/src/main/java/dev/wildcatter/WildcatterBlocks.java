@@ -91,6 +91,9 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.WasteHeatBoilerBlockEntity> WASTE_HEAT_BOILER_ENTITY = entity(dev.wildcatter.block.WasteHeatBoilerBlockEntity::new, WASTE_HEAT_BOILER);
 	public static final BlockEntityType<dev.wildcatter.block.ConverterBlockEntity> CONVERTER_ENTITY = entity(dev.wildcatter.block.ConverterBlockEntity::new, CONVERTER);
 	public static final BlockEntityType<dev.wildcatter.block.FinalAbsorberBlockEntity> FINAL_ABSORBER_ENTITY = entity(dev.wildcatter.block.FinalAbsorberBlockEntity::new, FINAL_ABSORBER);
+	public static final BlockEntityType<dev.wildcatter.block.MeterBuildingBlockEntity> METER_BUILDING_ENTITY = entity(dev.wildcatter.block.MeterBuildingBlockEntity::new, METER_BUILDING);
+	public static final BlockEntityType<dev.wildcatter.block.SalesGasUnitBlockEntity> SALES_GAS_UNIT_ENTITY = entity(dev.wildcatter.block.SalesGasUnitBlockEntity::new, FILTER_SEPARATOR, ULTRASONIC_METER_RUN, REGULATOR_SKID, PIPELINE_TAP);
+	public static final BlockEntityType<dev.wildcatter.block.AcidSuperheaterBlockEntity> ACID_SUPERHEATER_ENTITY = entity(dev.wildcatter.block.AcidSuperheaterBlockEntity::new, ACID_SUPERHEATER);
 	public static final BlockEntityType<dev.wildcatter.block.JawCrusherBlockEntity> JAW_CRUSHER_ENTITY = entity(dev.wildcatter.block.JawCrusherBlockEntity::new, JAW_CRUSHER);
 	public static final BlockEntityType<dev.wildcatter.block.SagMillBlockEntity> SAG_MILL_ENTITY = entity(dev.wildcatter.block.SagMillBlockEntity::new, SAG_MILL);
 	public static final BlockEntityType<dev.wildcatter.block.LeachTankBlockEntity> LEACH_TANK_ENTITY = entity(dev.wildcatter.block.LeachTankBlockEntity::new, LEACH_TANK);
@@ -404,7 +407,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		for (Block part : new Block[] {CRACKING_FURNACE, QUENCH_TOWER, CRACKED_GAS_COMPRESSOR, COLD_BOX, POLYETHYLENE_REACTOR, PELLETIZER}) {
 			add(((dev.wildcatter.block.PetrochemPartBlock) part).part().id(), part);
 		}
-		for (Block part : new Block[] {SULFUR_MELTER, DRYING_TOWER, MAIN_BLOWER, SULFUR_FURNACE, WASTE_HEAT_BOILER, CONVERTER, INTERPASS_ABSORBER, FINAL_ABSORBER}) {
+		for (Block part : new Block[] {SULFUR_MELTER, DRYING_TOWER, MAIN_BLOWER, SULFUR_FURNACE, WASTE_HEAT_BOILER, CONVERTER, INTERPASS_ABSORBER, FINAL_ABSORBER, ACID_SUPERHEATER}) {
 			add(((dev.wildcatter.block.AcidPlantPartBlock) part).part().id(), part);
 		}
 		for (Block part : new Block[] {JAW_CRUSHER, SAG_MILL, LEACH_TANK, CCD_THICKENER, SX_CIRCUIT, PRECIPITATION_TANK, YELLOWCAKE_DRYER, DRUM_FILLER}) {
@@ -429,6 +432,9 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		add("red_mud", RED_MUD);
 		for (Block part : new Block[] {COKER_FRACTIONATOR, COKER_HEATER, COKE_DRUM, COKE_PIT, COKE_KILN, COKE_COOLER, COAL_TOWER, COKE_OVEN_BATTERY, PUSHER_MACHINE, COKE_QUENCH_TOWER, BYPRODUCT_PLANT, TAR_STILL, PASTE_PLANT, FORMING_PRESS, BAKING_FURNACE, RODDING_SHOP}) {
 			add(((dev.wildcatter.block.CarbonPartBlock) part).part().id(), part);
+		}
+		for (Block part : new Block[] {METER_BUILDING, FILTER_SEPARATOR, ULTRASONIC_METER_RUN, REGULATOR_SKID, PIPELINE_TAP}) {
+			add(((dev.wildcatter.block.SalesGasPartBlock) part).part().id(), part);
 		}
 		for (Block part : new Block[] {NITROGEN_GENERATOR, SYNGAS_COMPRESSOR, AMMONIA_CONVERTER, NITRIC_ACID_UNIT, AN_NEUTRALISER, EMULSION_BLENDER}) {
 			add(((dev.wildcatter.block.AmmoniaPartBlock) part).part().id(), part);
@@ -580,6 +586,9 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("acid_passive"), ACID_PASSIVE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("sulfur_furnace"), SULFUR_FURNACE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("waste_heat_boiler"), WASTE_HEAT_BOILER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("acid_superheater"), ACID_SUPERHEATER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("meter_building"), METER_BUILDING_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("sales_gas_unit"), SALES_GAS_UNIT_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("converter"), CONVERTER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("final_absorber"), FINAL_ABSORBER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("jaw_crusher"), JAW_CRUSHER_ENTITY);

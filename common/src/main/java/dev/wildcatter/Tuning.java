@@ -527,6 +527,31 @@ public final class Tuning {
 	public static final double BLAST_POWDER_FACTOR_KG_PER_T = 0.37; // Tailings' open pit: kg of explosive a tonne of rock
 	public static final double CYLINDER_FILLER_WATTS = 5_000.0;    // 480 V (unverified)
 
+	// ---- Phase 14b: the sales line and its meter stations (docs/multiblocks/sales-gas.md) ----------------------------------------
+	public static final double SALES_STATION_M3S = 5.0;            // a station's rating (proposed): about 15 million scf a day
+	public static final double SALES_FUEL_RETENTION = 0.02;        // the line keeps 2 % of receipts as compressor fuel (proposed; real 1-3 %)
+	public static final double SALES_LINE_HEATER_SHARE = 0.002;    // a delivery station's line heater burns 0.2 % of what it passes (proposed)
+	public static final double SALES_BTU_SCF_MAX = 1_150.0;        // a typical tariff's heating value limits, Btu/scf (unverified)
+	public static final double SALES_BTU_SCF_MIN = 950.0;
+	public static final double METER_BUILDING_WATTS = 2_000.0;     // heaters, the chromatograph's oven, lights and the RTU charger (proposed), residential
+	public static final double METER_BATTERY_TICKS = 8_000.0;      // the RTU's battery: 8 game hours (proposed)
+	public static final double FILTER_CATCH_L_PER_M3 = 1.0e-5;     // what a filter separator's sump catches: 1 L a 100,000 m3 (proposed)
+	public static final double JOULES_PER_BTU = 1_055.06;
+	public static final double M3_PER_SCF = 0.0283168;
+
+	// ---- Phase 14c: the acid plant's steam to the 5 MW turbine (docs/multiblocks/acid-plant-steam.md) -----------------------------
+	public static final double ST_DESIGN_STEAM_KGS = 6.0;          // the 5 MW turbine's design flow (combined-cycle.md): 5.2 MW from 6 kg/s at 40 bar, 400 C
+	public static final double ST_DESIGN_WATTS = 5_200_000.0;
+	public static final double ST_THROTTLE_LOSS = 0.15;            // part-load loss with no flow, falling to none at design: a tenth at a third (proposed)
+	public static final double MELTER_STEAM_KGS = 0.06;            // the melter's coils: about 100 kW at 1.7 MJ/kg of condensing steam (derived)
+	public static final double ACID_CONDENSATE_RETURN = 0.90;      // the feed pump returns 90 % to the boiler: make-up 10 % (proposed, as the steam plant's)
+	public static final double SUPERHEAT_J_PER_KG = 413_000.0;     // 40 bar saturated (2,801 kJ/kg) to 400 C (3,214 kJ/kg), IAPWS-IF97
+
+	// ---- Phase 14d: biogas as an engine fuel (docs/biogas.md) --------------------------------------------------------------------
+	public static final double BIOGAS_JOULES_PER_M3 = 23.0e6;      // 60 % CH4, 40 % CO2, on the pipeline gas basis (38 MJ/m3): 60 % of it (derived)
+	public static final double GENSET_BIOGAS_WATTS = 850_000.0;    // the CG260-12's biogas rating is 84 % of its natural gas rating
+	public static final double BIOGAS_HEAT_RATE_MJ_KWH = 11.0;     // lean biogas at full load (proposed): 23 m3 make 48 kWh, Farmings' OMAFA figure
+
 	// ---- The centrifuge cascade (docs/multiblocks/enrichment.md, approved 2026-11-01) ------------------------------------------
 	public static final double ASSAY_FEED = 0.00711;               // natural U-235
 	public static final double ASSAY_PRODUCT = 0.0495;             // LEU for the 17x17 fuel

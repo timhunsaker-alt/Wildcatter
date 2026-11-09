@@ -29,6 +29,15 @@ public final class Synchronizer {
 	private double busHertz;
 	private final int[] pt = new int[3];
 	private boolean ptBuilt;
+	private int earth;
+	/** Phase A's angle on the bus, as the potential transformers read it, degrees. */
+	private double busAngle;
+	/**
+	 * The machine's phase frame once closed: the bus's angle to the nearest 30 degrees. A delta-wye transformer between two machines
+	 * shifts the bus 30 degrees; a real machine pulls into step with the bus it closes onto, so it takes that shift as its own. The small
+	 * load angle is left out, so machines with no such transformer between them stay at 0 and share load as before.
+	 */
+	private double angle;
 	private boolean busRead;
 	private String lastClose = "";
 
@@ -97,7 +106,7 @@ public final class Synchronizer {
 
 	/** The same, on {@code faces} of each of {@code cells} (a big part's terminal box). */
 	public void buildTransformers(Circuit circuit, java.util.List<BlockPos> cells, java.util.List<Direction> faces, Voltage tier) {
-		int earth = circuit.node();
+		earth = circuit.node();
 		circuit.ground(earth);
 		for (int k = 0; k < 3; k++) {
 			pt[k] = circuit.node();
@@ -115,6 +124,7 @@ public final class Synchronizer {
 	public void read(Circuit circuit) {
 		if (ptBuilt) {
 			busVolts = Math.max(circuit.voltage(pt[0]), Math.max(circuit.voltage(pt[1]), circuit.voltage(pt[2])));
+			busAngle = circuit.acrossPhasor(pt[0], earth).degrees();
 			busHertz = circuit.hertz();
 			busRead = true;
 		} else {
@@ -157,6 +167,7 @@ public final class Synchronizer {
 	}
 
 	public void closed(String how) {
+		angle = busRead && busVolts > 1 ? 30.0 * Math.round(busAngle / 30.0) : 0;
 		lastClose = how;
 		busRead = false;
 		slipDegrees = 0;
@@ -169,7 +180,13 @@ public final class Synchronizer {
 				+ (mode == Mode.MANUAL ? String.format(" (speed trim %+.1f Hz): right-click to close", Tuning.SYNC_TRIM_HZ[trim]) : "");
 	}
 
+	/** The machine's phase frame, degrees (0 unless it closed onto a bus shifted by a delta-wye transformer). */
+	public double angle() {
+		return angle;
+	}
+
 	public void save(ValueOutput output) {
+		output.putDouble("syncAngle", angle);
 		output.putString("sync", mode.name());
 		output.putInt("trim", trim);
 		output.putString("lastClose", lastClose);
@@ -179,5 +196,6 @@ public final class Synchronizer {
 		mode = "MANUAL".equals(input.getStringOr("sync", "AUTO")) ? Mode.MANUAL : Mode.AUTO;
 		trim = Math.max(0, Math.min(Tuning.SYNC_TRIM_HZ.length - 1, input.getIntOr("trim", 2)));
 		lastClose = input.getStringOr("lastClose", "");
+		angle = input.getDoubleOr("syncAngle", 0);
 	}
 }

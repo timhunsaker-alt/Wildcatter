@@ -186,7 +186,7 @@ public class GeneratorPartBlockEntity extends BlockEntity implements CircuitPart
 		}
 		double nominal = Voltage.GENERATOR.nominal();
 		double ratedAmps = rated / Tuning.GENERATOR_RATED_PF / (3 * nominal);
-		phases.build(circuit, terminalCells(), List.of(terminalFace()), Voltage.GENERATOR, nominal, nominal * Tuning.ENGINE_SAG / ratedAmps);
+		phases.build(circuit, terminalCells(), List.of(terminalFace()), Voltage.GENERATOR, nominal, nominal * Tuning.ENGINE_SAG / ratedAmps, sync.angle());
 	}
 
 	@Override
