@@ -2225,6 +2225,39 @@ lang[f"block.{ns}.bus_relay_panel"] = "Generator Bus Relay Panel (87B, 51V, 50/5
 lang[f"item.{ns}.grounding_set"] = "Grounding Clamp Set"
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- The ammonia plant (docs/multiblocks/ammonia-plant.md) ------------------------------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/ammonia.py; here loot, names, tags, recipes and the two items.
+AMMONIA_PARTS = ("nitrogen_generator", "syngas_compressor", "ammonia_converter", "nitric_acid_unit", "an_neutraliser", "emulsion_blender")
+for name in AMMONIA_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in AMMONIA_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("nitrogen_generator", ["SPS", "GXG", "SSS"], {"S": S_, "P": P_, "G": "minecraft:charcoal", "X": "minecraft:piston"}, "nitrogen_generator")
+shaped("syngas_compressor", ["SPS", "XIX", "SSS"], {"S": S_, "P": P_, "X": "minecraft:piston", "I": "minecraft:iron_block"}, "syngas_compressor")
+shaped("ammonia_converter", ["SPS", "IFI", "SIS"], {"S": S_, "P": P_, "I": "minecraft:iron_block", "F": "minecraft:blast_furnace"}, "ammonia_converter")
+shaped("nitric_acid_unit", ["SPS", "SFS", "SXS"], {"S": S_, "P": P_, "F": "minecraft:blast_furnace", "X": "minecraft:piston"}, "nitric_acid_unit")
+shaped("an_neutraliser", ["SPS", "S S", "SPS"], {"S": S_, "P": P_}, "an_neutraliser")
+shaped("emulsion_blender", ["SHS", "PXP", "SSS"], {"S": S_, "H": "minecraft:hopper", "P": P_, "X": "minecraft:piston"}, "emulsion_blender")
+recipe = {"type": "minecraft:crafting_shapeless", "category": "misc", "ingredients": [f"{ns}:platinum"], "result": {"id": f"{ns}:gauze_pack", "count": 1}}
+save_json(f"{DATA}/recipe/gauze_pack.json", recipe)
+recipe = {"type": "minecraft:crafting_shapeless", "category": "misc", "ingredients": [f"{ns}:plastic_sheet", f"{ns}:diesel_bucket", "minecraft:iron_ingot"],
+	"result": {"id": f"{ns}:emulsifier_pail", "count": 4}}
+save_json(f"{DATA}/recipe/emulsifier_pail.json", recipe)
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in {"gauze_pack": ("Platinum-Rhodium Gauze Pack", (200, 200, 196)), "emulsifier_pail": ("Emulsifier Pail (20 kg)", (180, 150, 60))}.items():
+	tex(f"{item}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}_placeholder"}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.nitrogen_generator": "Nitrogen Generator (PSA, 10 Nm3/h)", f"block.{ns}.syngas_compressor": "Syngas Compressor (150 bar)",
+	f"block.{ns}.ammonia_converter": "Ammonia Converter (with its loop)", f"block.{ns}.nitric_acid_unit": "Nitric Acid Unit (Pt-Rh gauze, 60 % acid)",
+	f"block.{ns}.an_neutraliser": "Ammonium Nitrate Neutraliser", f"block.{ns}.emulsion_blender": "Emulsion Blender",
+	f"block.{ns}.lpg_bullet": "Pressure Bullet (18,000 gal; LPG or ammonia)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 7g: the fuel plant (docs/multiblocks/fuel.md) -------------------------------------------------------------------
 # blockstates, models, shapes and items come from tools/models/fuel.py; here loot, names, tags, recipes and the items.
 FUEL_PARTS = ("uf6_autoclave", "idr_kiln", "granulator", "pellet_press", "sintering_furnace", "pellet_grinder", "rod_loader", "rod_welder",

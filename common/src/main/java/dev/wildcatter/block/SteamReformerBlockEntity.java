@@ -65,7 +65,7 @@ public class SteamReformerBlockEntity extends PlantUnitBlockEntity implements Wa
 		if (r.water < 0.001) {
 			r.status = "NO WATER: pump water to it for its steam";
 		} else if (m3 <= 1e-7) {
-			r.status = "idle: its hydrogen has nowhere to go (pipe its back end to a reduction reactor)";
+			r.status = "idle: its hydrogen has nowhere to go (pipe its back end to a reduction reactor or a syngas compressor)";
 		} else {
 			double need = m3 * Conversion.reformerJoulesPerM3();
 			double got = GasFiring.fire(level, r.fuel(), need, r);

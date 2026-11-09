@@ -148,6 +148,11 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "rodding_shop" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.RODDING_WATTS);
 				case "ftc_fan" -> new Motor(true, Voltage.MEDIUM, Tuning.FTC_FAN_WATTS);
 				case "casting_machine" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CASTER_WATTS);
+				case "nitrogen_generator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.N2_GENERATOR_WATTS);
+				case "syngas_compressor" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.SYNGAS_COMPRESSOR_WATTS);
+				case "ammonia_converter" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.AMMONIA_CONVERTER_WATTS);
+				case "nitric_acid_unit" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.NITRIC_UNIT_WATTS);
+				case "emulsion_blender" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.EMULSION_BLENDER_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -255,6 +260,11 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "rodding_shop" -> "induction furnace";
 			case "ftc_fan" -> "main fan";
 			case "casting_machine" -> "mould chain";
+			case "nitrogen_generator" -> "air compressor";
+			case "syngas_compressor" -> "compressor";
+			case "ammonia_converter" -> "circulator and chiller";
+			case "nitric_acid_unit" -> "air blower";
+			case "emulsion_blender" -> "mixer";
 			default -> kind();
 		};
 	}

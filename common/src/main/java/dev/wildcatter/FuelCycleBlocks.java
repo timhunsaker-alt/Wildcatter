@@ -112,6 +112,13 @@ public interface FuelCycleBlocks {
 	Block FUME_TREATMENT_CENTRE = potlinePart(dev.wildcatter.block.PotlinePartBlock.Part.FUME_TREATMENT_CENTRE);
 	Block FTC_FAN = potlinePart(dev.wildcatter.block.PotlinePartBlock.Part.FTC_FAN);
 	Block CASTING_MACHINE = potlinePart(dev.wildcatter.block.PotlinePartBlock.Part.CASTING_MACHINE);
+	// The ammonia plant (docs/multiblocks/ammonia-plant.md)
+	Block NITROGEN_GENERATOR = ammoniaPart(dev.wildcatter.block.AmmoniaPartBlock.Part.NITROGEN_GENERATOR);
+	Block SYNGAS_COMPRESSOR = ammoniaPart(dev.wildcatter.block.AmmoniaPartBlock.Part.SYNGAS_COMPRESSOR);
+	Block AMMONIA_CONVERTER = ammoniaPart(dev.wildcatter.block.AmmoniaPartBlock.Part.AMMONIA_CONVERTER);
+	Block NITRIC_ACID_UNIT = ammoniaPart(dev.wildcatter.block.AmmoniaPartBlock.Part.NITRIC_ACID_UNIT);
+	Block AN_NEUTRALISER = ammoniaPart(dev.wildcatter.block.AmmoniaPartBlock.Part.AN_NEUTRALISER);
+	Block EMULSION_BLENDER = ammoniaPart(dev.wildcatter.block.AmmoniaPartBlock.Part.EMULSION_BLENDER);
 	// 10c2: the cranes (docs/multiblocks/tower-crane.md, crawler-crane.md)
 	Block TOWER_CRANE = cranePart(dev.wildcatter.block.CranePartBlock.Part.TOWER_CRANE);
 	Block CRAWLER_CRANE = cranePart(dev.wildcatter.block.CranePartBlock.Part.CRAWLER_CRANE);

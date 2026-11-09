@@ -498,6 +498,33 @@ public final class Tuning {
 	public static final double HF_KILN_WATTS = 15_000.0;           // its drive, 480 V
 	public static final double COLD_TRAP_WATTS = 30_000.0;         // refrigeration, 480 V (unverified)
 	public static final double REBOILER_WATTS = 20_000.0;          // electric, 480 V (unverified)
+
+	// The ammonia plant (docs/multiblocks/ammonia-plant.md): one steam reformer's hydrogen to ammonia, nitric acid, ammonium nitrate
+	// and emulsion matrix for blasting. Every rate follows from SMR_M3H through fluid/AmmoniaPlant.
+	public static final double N2_GENERATOR_NM3H = 10.0;           // the PSA nitrogen generator, 99.9 % N2: the loop's 1:3
+	public static final double N2_GENERATOR_WATTS = 3_000.0;       // about 0.3 kWh/Nm3 (unverified), 480 V
+	public static final double SYNGAS_COMPRESSOR_WATTS = 40_000.0; // reciprocating, to 150 bar (proposed), 480 V
+	public static final double SYNGAS_LOOP_BAR = 150.0;            // the synthesis loop (proposed; real loops 100-250 bar)
+	public static final double AMMONIA_CONVERTER_WATTS = 10_000.0; // its recycle circulator and ammonia chiller (proposed), 480 V
+	public static final double AMMONIA_PER_PASS = 0.15;            // converted a pass through the iron catalyst (unverified)
+	public static final double AMMONIA_KG_PER_L = 0.61;            // liquid ammonia at about 20 C under its own pressure (8.6 bar)
+	public static final double NITRIC_CONVERSION = 0.94;           // of the ammonia burned on the gauze, to acid (BREF 93-98 %)
+	public static final double NITRIC_STRENGTH = 0.60;             // the absorption tower's acid (BREF 50-68 %)
+	public static final double NITRIC_KG_PER_L = 1.37;             // 60 % nitric acid at 20 C
+	public static final double NITRIC_UNIT_WATTS = 15_000.0;       // its air blower (proposed), 480 V
+	public static final double GAUZE_PT_G = 20.0;                  // platinum-rhodium in one gauze pack (proposed)
+	public static final double GAUZE_LOSS_G_PER_T = 0.15;          // g of it lost a tonne of HNO3 (BREF 0.05-0.3)
+	public static final double GAUZE_WORN_SHARE = 0.25;            // a pack is changed when it has lost this share (proposed)
+	public static final double AN_STRENGTH = 0.85;                 // the neutraliser's AN solution (BREF)
+	public static final double MATRIX_AN = 0.75;                   // the emulsion matrix, by weight (proposed; real 70-80 % AN)
+	public static final double MATRIX_WATER = 0.18;
+	public static final double MATRIX_DIESEL = 0.06;
+	public static final double MATRIX_EMULSIFIER = 0.01;
+	public static final double EMULSION_BLENDER_WATTS = 5_500.0;   // its high-shear mixer and pumps (proposed), 480 V
+	public static final double EMULSIFIER_PAIL_KG = 20.0;          // one pail of emulsifier (proposed)
+	public static final double DIESEL_KG_PER_L = 0.84;
+	public static final double AMMONIA_PLANT_WATER_HOLD = 200.0;   // litres a nitric acid unit or blender holds off its pump
+	public static final double BLAST_POWDER_FACTOR_KG_PER_T = 0.37; // Tailings' open pit: kg of explosive a tonne of rock
 	public static final double CYLINDER_FILLER_WATTS = 5_000.0;    // 480 V (unverified)
 
 	// ---- The centrifuge cascade (docs/multiblocks/enrichment.md, approved 2026-11-01) ------------------------------------------

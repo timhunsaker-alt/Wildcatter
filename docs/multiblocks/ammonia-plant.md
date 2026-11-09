@@ -72,3 +72,72 @@ and the nitric acid unit: RUN, RUNNING, a 4-20 mA rate each.
 - `ammonia_loop`: hydrogen and nitrogen in, ammonia into a tank at about 15 kg/h.
 - `nitric_acid`: ammonia and air to 60 % acid; the gauze slowly loses platinum.
 - `an_emulsion`: acid and ammonia to AN solution, then emulsion matrix into an IBC.
+
+## As built (2026-11-09; decided while Tim was away, see docs/questions/ammonia-plant.md)
+Every rate follows from the reformer's 30 Nm3/h through `fluid/AmmoniaPlant` (unit test `AmmoniaPlantTest`): 15.2 kg/h of ammonia,
+27.3 kg/h of HNO3 (45.4 kg/h of 60 % acid), 34.6 kg/h of AN, 46.1 kg/h of matrix, about 3,000 t of rock a day. The split is exact:
+51.5 % of the ammonia to the acid unit (1 / 1.94), the rest to the neutraliser.
+
+### Numbers added *(proposed)*
+| What | Value | Real-world basis |
+|---|---|---|
+| Ammonia converter's load | **10 kW** at the industrial voltage *(proposed)* | Its recycle circulator and the ammonia chiller: condensing 15 kg/h takes about 6 kW of refrigeration (1.37 MJ/kg) |
+| Nitric acid unit's load | **15 kW** *(proposed)* | Its air blower: about 120 Nm3/h of air to a few bar, 0.1 kWh/Nm3 |
+| Emulsion blender's load | **5.5 kW** (7.5 hp) *(proposed)* | Its high-shear mixer and matrix pump at 46 kg/h |
+| AN neutraliser's load | none *(proposed)* | It runs on its own heat of reaction; its pumps are left out |
+| Liquid ammonia | **0.61 kg/L**, counted in litres | At about 20 C under its own pressure (8.6 bar) |
+| 60 % nitric acid | **1.37 kg/L**, counted in litres | At 20 C |
+| AN solution, matrix | counted in **kg** *(proposed)* | Blends whose density moves with temperature; charges are reckoned in kg |
+| Process water to the absorption tower | **0.35 kg a kg of HNO3** (derived) | The 60 % acid's water less what the burning makes |
+| Water boiled off in the neutraliser | **0.44 kg a kg of HNO3** (derived) | The acid's water less the 85 % solution's |
+| Make-up water in the blender | **0.048 L a kg of matrix** (derived; 2.2 L/h) | 18 % water less what the solution brings |
+| Gauze pack | **20 g** of 90/10 Pt-Rh *(proposed)*, losing **0.15 g a tonne of HNO3** (BREF 0.05-0.3), changed at **25 %** lost *(proposed)*: about 1,200 h | Small plants run gauze campaigns of months |
+| Emulsifier pail | **20 kg** *(proposed)*: about 43 h at the plant's rate | A pail of PIBSA-type emulsifier |
+| Diesel | **0.84 kg/L** | Road diesel 0.82-0.85 |
+| Water held | 200 L in the acid unit and the blender, off a pump | As the reformer |
+
+### Nozzles (each part drawn facing north; x east, z south; its main cell at the north-west bottom corner)
+- **480 V boxes:** on the west face of the main cell of the nitrogen generator, syngas compressor, ammonia converter, nitric acid unit
+  and emulsion blender.
+- **Nitrogen generator:** nitrogen out of the south face of its back cells (z 2, bottom).
+- **Syngas compressor:** hydrogen and nitrogen in on the east face of its bottom cells, on two separate runs. The converter takes its
+  gas by touching it (no syngas pipe).
+- **Ammonia converter:** liquid ammonia out of the south face of its bottom cells (z 2).
+- **Nitric acid unit:** ammonia in on the east face of its bottom cells; 60 % acid out of the south face of its back cells (z 3, bottom).
+  Gauze packs by a hopper on any top cell, or clicked in. Water from a pump.
+- **AN neutraliser:** ammonia and acid in on the east face of its bottom cells; AN solution out of the south face of its bottom cells (z 2).
+- **Emulsion blender:** AN solution and diesel in on the east face of its bottom cells; matrix out of the south face of its back cells
+  (z 3, bottom). Emulsifier pails by a hopper on top, or clicked in. Water from a pump.
+- **Ammonia storage:** the 18,000 gal pressure bullet (the LPG bullet) holds ammonia; a stock tank refuses it. Acid, AN solution and
+  matrix go in stock tanks.
+
+### Layout (the `ammonia_loop` scene's, plan view of the bottom layer)
+```
+            . . . . . . . B B B          B LPG bullet (x 17-19)  R steam reformer (x 13-15)
+  C . . . . . . R R R p B B B          N nitrogen generator     K syngas compressor
+  C . . . . . . R R R   B B B          A ammonia converter      T the ammonia bullet (x 8-10, z 15-26)
+  C . . K K K . . h      ...           C the 480 V cable spine   p LPG pipe   h hydrogen   n nitrogen
+  C . . K K K h N N
+  C . . K K K n n N N
+  C . . A A A
+  C . . A A A
+          a                            a ammonia pipe to the bullet
+        T T T
+```
+The game scenes (NeoForge, `AmmoniaPlantScenes`) are the layouts of record.
+
+### How it forms and runs
+- Each part reads its status: NO HYDROGEN, NO NITROGEN, NO SYNGAS, COLD (the converter's circulator and chiller are off), NO AIR (the
+  nitrogen generator's compressor or the acid unit's blower is off), NO AMMONIA, NO ACID, NO WATER, NO GAUZE, NO AN SOLUTION, NO DIESEL,
+  NO EMULSIFIER, FULL.
+- PLC points on the converter, the acid unit and the neutraliser: RUN, RUNNING, AUTO, RATE 4-20 mA (0 to its rating). Every part also
+  has the plant units' HAND / OFF / AUTO.
+- Removing a part stops what needs it; nothing is lost but what each part holds.
+
+### Not built (Known gaps)
+- The ammonia leak hazard: a broken bullet or pipe does not yet release a gas cloud.
+- AN solution does not set in a cold pipe; tanks are not heated.
+- No IBC: matrix goes to a stock tank on pipe, for Tailings' bulk truck to load.
+- The purge gas back to the reformer's burner is not counted (pure PSA hydrogen and 99.9 % nitrogen make next to none).
+- Spent gauze packs are not returned for refining; there is no PGM refinery, so a pack is crafted straight from platinum reef ore.
+- Nitrous oxide abatement on the tail gas (as the spec says).

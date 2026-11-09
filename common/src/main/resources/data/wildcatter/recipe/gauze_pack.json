@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "wildcatter:platinum"
+  ],
+  "result": {
+    "id": "wildcatter:gauze_pack",
+    "count": 1
+  }
+}

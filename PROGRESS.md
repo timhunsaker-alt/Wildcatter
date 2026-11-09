@@ -1448,6 +1448,11 @@ sized for a 40-pot line.
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- Phase 14 (the ammonia plant): `gauze_pack_placeholder` and `emulsifier_pail_placeholder` are item textures drawn by script, until
+  the art comes from Ludo. The six parts use the mod's materials. Not built: the ammonia leak hazard, AN solution setting in a cold
+  pipe, an IBC for matrix, a PGM refinery (a gauze pack is crafted straight from platinum reef ore and a worn pack is not recovered),
+  the purge gas, nitrous oxide abatement. Proved by NeoForge server scenes only; no filmed client scene yet. See
+  `docs/questions/ammonia-plant.md`.
 - Phase 13i: Tailings' sorter routing and its TBM's course are not on a signal (Tailings' Known gaps).
 - Phase 13g and 13h: see `docs/multiblocks/plc.md`, "As built". One process unit has run under a PLC in the world; the rig, crane and coolant pump signals are compiled only. Nothing stops two PLCs landing on one rack.
 - Phase 13f: see `docs/multiblocks/plc.md`, "As built: 13f, Not yet". Most power equipment's signals compile but have not been exercised in the world.
@@ -1634,3 +1639,30 @@ v0.5.1 (2026-11-07), one fix found by Tailings' playthrough:
 v0.4.1 (2026-11-06), two fixes found by Tailings' playthrough; the full client suite passed on them (2h 45m):
 - **The solver no longer gives up on a floating bus.** A busway's neutral on a dead bus has low resistance and no path to ground, so the small leak each node carries rounded away and the factorisation stopped with "Could not solve the circuit". The solve for that whole group was then dropped, so the generator's synchroniser never read the bus and its breaker never closed. The node now gets its leak back. Unit test `aFloatingBusStillSolves`. The warning came 241 times in the v0.4.0 suite's log, on a suite that passed, and 0 times in this one.
 - **A process water pump reads its own motor.** Its readout gave "750 W, 110 V" for every pump; it now gives the motor's watts and voltage.
+
+## Phase 14: the ammonia plant (2026-11-09)
+Spec: `docs/multiblocks/ammonia-plant.md` (approved by Tim 2026-11-09; "As built" lists the numbers added). Built while Tim was away;
+the decisions taken are in `docs/questions/ammonia-plant.md` for him to go through. For Tailings' open-pit blasting (its wave P3).
+- **Six true-size parts**, all on the world's industrial voltage except the neutraliser:
+  - NITROGEN GENERATOR (PSA, 2 x 3 x 3): 10 Nm3/h of 99.9 % nitrogen, 3 kW;
+  - SYNGAS COMPRESSOR (3 x 3 x 5): the reformer's hydrogen and the nitrogen, 3:1, to 150 bar, 40 kW;
+  - AMMONIA CONVERTER (3 x 10 x 3), against the compressor: iron catalyst at 400-450 C, its circulator and chiller 10 kW; 15.2 kg/h of
+    liquid ammonia (24.9 L/h);
+  - NITRIC ACID UNIT (4 x 12 x 4): burns 51.5 % of the ammonia on a platinum-rhodium gauze at 94 % conversion, 45.4 kg/h of 60 % acid with
+    process water off a pump; its blower 15 kW; the gauze loses 0.15 g a tonne of HNO3;
+  - AN NEUTRALISER (3 x 5 x 3): the rest of the ammonia and the acid to 34.6 kg/h of AN as 85 % solution, on its own heat;
+  - EMULSION BLENDER (3 x 3 x 4): AN solution, diesel, emulsifier and a little water to 46.1 kg/h of emulsion matrix (75/18/6/1), 5.5 kW.
+- **New pipe products:** nitrogen (Nm3), ammonia (L, only the pressure bullet holds it), nitric acid 60 % (L), ammonium nitrate
+  solution (kg) and emulsion matrix (kg). The matrix is the hand-over to Tailings' emulsion truck; boosters and detonators stay in
+  Tailings.
+- **New items:** Platinum-Rhodium Gauze Pack (20 g, from platinum reef ore) and Emulsifier Pail (20 kg, four from a plastic sheet, a
+  diesel bucket and an iron ingot). Both go in by a hopper on top or by hand.
+- **The bullet** now holds LPG or ammonia ("Pressure Bullet"; it reads "Ammonia bullet" when it holds ammonia).
+- **Readouts:** NO HYDROGEN, NO NITROGEN, NO SYNGAS, COLD, NO AIR, NO AMMONIA, NO ACID, NO WATER, NO GAUZE, NO AN SOLUTION, NO DIESEL,
+  NO EMULSIFIER, FULL. PLC points RUN, RUNNING, AUTO and RATE 4-20 mA on the converter, the acid unit and the neutraliser.
+- **Field Manual:** two pages, AMMONIA PLANT and AMMONIUM NITRATE AND EMULSION.
+- **Tests:** unit test `AmmoniaPlantTest` (5 tests: the spec's rates, the split, the water balances, the gauze and the pail). NeoForge
+  server scenes `ammonia_loop` (14.8 kg/h of ammonia into a bullet; NO HYDROGEN without the hydrogen pipe, COLD without power),
+  `nitric_acid` (27 kg/h of HNO3 into a stock tank, the gauze losing platinum; NO AIR, NO GAUZE) and `an_emulsion` (34.6 kg/h of AN,
+  46.1 kg/h of matrix into a stock tank; NO DIESEL, NO ACID). All 8 NeoForge scenes pass (5 before).
+- **Not yet:** a filmed client scene of the whole plant, for the lead to run.

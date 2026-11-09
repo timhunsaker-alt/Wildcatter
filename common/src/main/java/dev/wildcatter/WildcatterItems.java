@@ -166,6 +166,13 @@ public final class WildcatterItems {
 			"Spent pot lining: a frozen pot's carbon cathode and refractory, with its fluoride", "no use yet");
 	public static final ResourceKey<Item> TAPPING_CRUCIBLE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("tapping_crucible"));
 	public static final Item TAPPING_CRUCIBLE = new dev.wildcatter.item.TappingCrucibleItem(new Item.Properties().stacksTo(1).setId(TAPPING_CRUCIBLE_KEY));
+	// The ammonia plant (docs/multiblocks/ammonia-plant.md)
+	public static final ResourceKey<Item> GAUZE_PACK_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("gauze_pack"));
+	public static final Item GAUZE_PACK = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(GAUZE_PACK_KEY),
+			String.format("Platinum-rhodium gauze pack: %.0f g of 90/10 Pt-Rh woven gauze", Tuning.GAUZE_PT_G), "for the nitric acid unit's burner");
+	public static final ResourceKey<Item> EMULSIFIER_PAIL_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("emulsifier_pail"));
+	public static final Item EMULSIFIER_PAIL = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(EMULSIFIER_PAIL_KEY),
+			String.format("A %.0f kg pail of emulsifier (a polyisobutylene succinic anhydride in oil)", Tuning.EMULSIFIER_PAIL_KG), "for the emulsion blender");
 	// 10c1: blueprints (docs/blueprints.md)
 	public static final ResourceKey<Item> BLUEPRINT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("blueprint"));
 	public static final Item BLUEPRINT = new dev.wildcatter.item.BlueprintItem(new Item.Properties().stacksTo(1).setId(BLUEPRINT_KEY));
@@ -369,6 +376,8 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, REACTED_ALUMINA_BAG_KEY, REACTED_ALUMINA_BAG);
 		Registry.register(BuiltInRegistries.ITEM, SPENT_POT_LINING_KEY, SPENT_POT_LINING);
 		Registry.register(BuiltInRegistries.ITEM, TAPPING_CRUCIBLE_KEY, TAPPING_CRUCIBLE);
+		Registry.register(BuiltInRegistries.ITEM, GAUZE_PACK_KEY, GAUZE_PACK);
+		Registry.register(BuiltInRegistries.ITEM, EMULSIFIER_PAIL_KEY, EMULSIFIER_PAIL);
 		Registry.register(BuiltInRegistries.ITEM, BLUEPRINT_KEY, BLUEPRINT);
 		Registry.register(BuiltInRegistries.ITEM, SURVEY_TOOL_KEY, SURVEY_TOOL);
 		Registry.register(BuiltInRegistries.ITEM, GROUNDING_SET_KEY, GROUNDING_SET);

@@ -110,7 +110,20 @@ public enum Product {
 	CONDITIONED_SLURRY("conditioned slurry", false),
 	CONCENTRATE_SLURRY("concentrate slurry", false),
 	THICKENED_CONCENTRATE("thickened concentrate", false),
-	TAILS_SLURRY("tails slurry", false);
+	TAILS_SLURRY("tails slurry", false),
+	/** From a PSA nitrogen generator (docs/multiblocks/ammonia-plant.md), 99.9 % N2, for the syngas compressor. */
+	NITROGEN("nitrogen", true),
+	/** Liquid ammonia off the converter's chiller, counted in litres of liquid; only a pressure vessel (the bullet) holds it. */
+	AMMONIA("ammonia", false),
+	/** 60 % nitric acid from the nitric acid unit. */
+	NITRIC_ACID("nitric acid (60 %)", false),
+	/** The neutraliser's 85 % ammonium nitrate solution, kept hot. Counted in kg. */
+	AN_SOLUTION("ammonium nitrate solution (85 %)", false),
+	/**
+	 * The emulsion matrix for blasting: AN solution, diesel and emulsifier. An oxidiser, not an explosive until it is gassed in the
+	 * hole; Tailings' emulsion truck loads it. Counted in kg.
+	 */
+	EMULSION_MATRIX("emulsion matrix", false);
 
 	private final String label;
 	private final boolean gas;
@@ -133,7 +146,7 @@ public enum Product {
 		return switch (this) {
 			case HOT_CRACKED_GAS, CRACKED_GAS, COMPRESSED_CRACKED_GAS, BURNER_GAS, ORE_SLURRY, LEACH_SLURRY, FLUORINE, UF6, CHLORINE, STEAM, FEEDWATER, COOLING_WATER,
 					CAUSTIC_SODA, PROCESS_STEAM, BAUXITE_SLURRY, DIGESTED_SLURRY, GREEN_LIQUOR, MUD_SLURRY, POLISHED_LIQUOR, HYDRATE_SLURRY, SPENT_LIQUOR, STRONG_LIQUOR, COAL_TAR, PITCH,
-					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY -> "kg";
+					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY, AN_SOLUTION, EMULSION_MATRIX -> "kg";
 			default -> gas ? "m3" : "L";
 		};
 	}

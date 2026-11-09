@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "wildcatter:plastic_sheet",
+    "wildcatter:diesel_bucket",
+    "minecraft:iron_ingot"
+  ],
+  "result": {
+    "id": "wildcatter:emulsifier_pail",
+    "count": 4
+  }
+}

@@ -142,6 +142,12 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.CokeOvenBatteryBlockEntity> COKE_OVEN_BATTERY_ENTITY = entity(dev.wildcatter.block.CokeOvenBatteryBlockEntity::new, COKE_OVEN_BATTERY);
 	public static final BlockEntityType<dev.wildcatter.block.CokeQuenchTowerBlockEntity> COKE_QUENCH_TOWER_ENTITY = entity(dev.wildcatter.block.CokeQuenchTowerBlockEntity::new, COKE_QUENCH_TOWER);
 	public static final BlockEntityType<dev.wildcatter.block.ByproductPlantBlockEntity> BYPRODUCT_PLANT_ENTITY = entity(dev.wildcatter.block.ByproductPlantBlockEntity::new, BYPRODUCT_PLANT);
+	public static final BlockEntityType<dev.wildcatter.block.NitrogenGeneratorBlockEntity> NITROGEN_GENERATOR_ENTITY = entity(dev.wildcatter.block.NitrogenGeneratorBlockEntity::new, NITROGEN_GENERATOR);
+	public static final BlockEntityType<dev.wildcatter.block.SyngasCompressorBlockEntity> SYNGAS_COMPRESSOR_ENTITY = entity(dev.wildcatter.block.SyngasCompressorBlockEntity::new, SYNGAS_COMPRESSOR);
+	public static final BlockEntityType<dev.wildcatter.block.AmmoniaConverterBlockEntity> AMMONIA_CONVERTER_ENTITY = entity(dev.wildcatter.block.AmmoniaConverterBlockEntity::new, AMMONIA_CONVERTER);
+	public static final BlockEntityType<dev.wildcatter.block.NitricAcidUnitBlockEntity> NITRIC_ACID_UNIT_ENTITY = entity(dev.wildcatter.block.NitricAcidUnitBlockEntity::new, NITRIC_ACID_UNIT);
+	public static final BlockEntityType<dev.wildcatter.block.AnNeutraliserBlockEntity> AN_NEUTRALISER_ENTITY = entity(dev.wildcatter.block.AnNeutraliserBlockEntity::new, AN_NEUTRALISER);
+	public static final BlockEntityType<dev.wildcatter.block.EmulsionBlenderBlockEntity> EMULSION_BLENDER_ENTITY = entity(dev.wildcatter.block.EmulsionBlenderBlockEntity::new, EMULSION_BLENDER);
 	public static final BlockEntityType<dev.wildcatter.block.TarStillBlockEntity> TAR_STILL_ENTITY = entity(dev.wildcatter.block.TarStillBlockEntity::new, TAR_STILL);
 	public static final BlockEntityType<dev.wildcatter.block.PastePlantBlockEntity> PASTE_PLANT_ENTITY = entity(dev.wildcatter.block.PastePlantBlockEntity::new, PASTE_PLANT);
 	public static final BlockEntityType<dev.wildcatter.block.FormingPressBlockEntity> FORMING_PRESS_ENTITY = entity(dev.wildcatter.block.FormingPressBlockEntity::new, FORMING_PRESS);
@@ -424,6 +430,9 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		for (Block part : new Block[] {COKER_FRACTIONATOR, COKER_HEATER, COKE_DRUM, COKE_PIT, COKE_KILN, COKE_COOLER, COAL_TOWER, COKE_OVEN_BATTERY, PUSHER_MACHINE, COKE_QUENCH_TOWER, BYPRODUCT_PLANT, TAR_STILL, PASTE_PLANT, FORMING_PRESS, BAKING_FURNACE, RODDING_SHOP}) {
 			add(((dev.wildcatter.block.CarbonPartBlock) part).part().id(), part);
 		}
+		for (Block part : new Block[] {NITROGEN_GENERATOR, SYNGAS_COMPRESSOR, AMMONIA_CONVERTER, NITRIC_ACID_UNIT, AN_NEUTRALISER, EMULSION_BLENDER}) {
+			add(((dev.wildcatter.block.AmmoniaPartBlock) part).part().id(), part);
+		}
 		for (Block part : new Block[] {RECTIFORMER, POT, FUME_TREATMENT_CENTRE, FTC_FAN, CASTING_MACHINE}) {
 			add(((dev.wildcatter.block.PotlinePartBlock) part).part().id(), part);
 		}
@@ -625,6 +634,12 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("coke_quench_tower"), COKE_QUENCH_TOWER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("byproduct_plant"), BYPRODUCT_PLANT_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("tar_still"), TAR_STILL_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("nitrogen_generator"), NITROGEN_GENERATOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("syngas_compressor"), SYNGAS_COMPRESSOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("ammonia_converter"), AMMONIA_CONVERTER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("nitric_acid_unit"), NITRIC_ACID_UNIT_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("an_neutraliser"), AN_NEUTRALISER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("emulsion_blender"), EMULSION_BLENDER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("paste_plant"), PASTE_PLANT_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("forming_press"), FORMING_PRESS_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("baking_furnace"), BAKING_FURNACE_ENTITY);

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "IFI",
+    "SIS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "I": "minecraft:iron_block",
+    "F": "minecraft:blast_furnace"
+  },
+  "result": {
+    "id": "wildcatter:ammonia_converter",
+    "count": 1
+  }
+}

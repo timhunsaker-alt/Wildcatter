@@ -43,6 +43,8 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 @Mod("wildcatter_gametest")
 public class WildcatterNeoForgeGameTests {
 	private static final String[] SCENES = {"registers", "lamp", "plug", "ores"};
+	/** The ammonia plant's scenes (AmmoniaPlantScenes): big, so each gets room round it, and long, for the gensets to start. */
+	private static final String[] PLANT_SCENES = {"ammonia_loop", "nitric_acid", "an_emulsion"};
 
 	public WildcatterNeoForgeGameTests(IEventBus modBus) {
 		modBus.addListener(RegisterEvent.class, event -> event.register(Registries.TEST_FUNCTION, helper -> {
@@ -50,6 +52,9 @@ public class WildcatterNeoForgeGameTests {
 			helper.register(id("lamp"), (Consumer<GameTestHelper>) WildcatterNeoForgeGameTests::lamp);
 			helper.register(id("plug"), (Consumer<GameTestHelper>) WildcatterNeoForgeGameTests::plug);
 			helper.register(id("ores"), (Consumer<GameTestHelper>) WildcatterNeoForgeGameTests::ores);
+			helper.register(id("ammonia_loop"), (Consumer<GameTestHelper>) AmmoniaPlantScenes::ammoniaLoop);
+			helper.register(id("nitric_acid"), (Consumer<GameTestHelper>) AmmoniaPlantScenes::nitricAcid);
+			helper.register(id("an_emulsion"), (Consumer<GameTestHelper>) AmmoniaPlantScenes::anEmulsion);
 		}));
 		modBus.addListener(RegisterCapabilitiesEvent.class, event -> event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, entity, side) -> STORAGE, Blocks.GOLD_BLOCK));
 		modBus.addListener(RegisterGameTestsEvent.class, event -> {
@@ -57,6 +62,11 @@ public class WildcatterNeoForgeGameTests {
 			for (String scene : SCENES) {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
 						new TestData<>(plain, Identifier.withDefaultNamespace("empty"), 400, 1, true)));
+			}
+			for (String scene : PLANT_SCENES) {
+				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
+						new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 3000, 1, true,
+								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 40)));
 			}
 		});
 	}

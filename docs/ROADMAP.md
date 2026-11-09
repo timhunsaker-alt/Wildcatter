@@ -333,9 +333,17 @@ Spec: `docs/multiblocks/tailings-cell.md`. For Tailings' Phase 4 and the uranium
 ## Phase 13 — PLCs — done (Tim, 2026-11-07: "every type of thing you would run off of them", programming "as close to real life as possible")
 Spec: `docs/multiblocks/plc.md`, nine waves, all approved in order: 13a language core; 13b hardware and text editor; 13c ladder and FBD; 13d SFC, device blocks, memory card, import and export (done); 13e transmitters and valves (done); 13f power equipment and HMI (done); 13g process plants and the reactor (done); 13h networks (done); 13i release and Tailings (done). The full client suite passed on 2026-11-07 (2h 53m), and it is released as v0.5.0.
 
+## Phase 14 — The ammonia plant — DONE 2026-11-09 (for Tailings' open-pit blasting, its wave P3; built while Tim was away: "make decisions best recommendation and complete the rest of these two mods leaving questions for when I get back")
+Spec: `docs/multiblocks/ammonia-plant.md` (approved 2026-11-09; "As built" lists the numbers added). Decisions for Tim: `docs/questions/ammonia-plant.md`.
+- One steam reformer's 30 Nm3/h of hydrogen and a PSA nitrogen generator's 10 Nm3/h, through a syngas compressor (150 bar) and the
+  ammonia converter against it: 15.2 kg/h of liquid ammonia into a pressure bullet.
+- A nitric acid unit on a platinum-rhodium gauze: 45.4 kg/h of 60 % acid; the gauze loses platinum and is changed when worn.
+- An AN neutraliser (34.6 kg/h of ammonium nitrate as 85 % solution) and an emulsion blender (46.1 kg/h of emulsion matrix, a pipe
+  product in kg for Tailings' emulsion truck). Boosters and detonators stay in Tailings (vanilla TNT, Tim's decision).
+- NeoForge scenes `ammonia_loop`, `nitric_acid`, `an_emulsion`; unit test `AmmoniaPlantTest`. The filmed client scene is left for the lead.
+
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released.
-- An ammonia plant (proposed for Tailings' open pits, 2026-11-09): ammonia from the existing steam reformer's hydrogen and PSA nitrogen, nitric acid, ammonium nitrate and emulsion matrix for blasting; also the ADU yellowcake route's ammonia. Spec approved 2026-11-09: docs/multiblocks/ammonia-plant.md; built as Tailings' wave P3 needs it.
 - A sales gas pipeline and meter station, so a gas plant's residue gas has a buyer besides engines and the flare.
 - Plants for the 7a ores that the fuel chain doesn't use:
   - chlor-alkali from rock salt;
@@ -350,9 +358,11 @@ Spec: `docs/multiblocks/plc.md`, nine waves, all approved in order: 13a language
   with carbon dioxide, at a lower heating value than pipeline gas. Farmings' digester would give about 48 kWh of electricity per tonne
   of dairy manure (Ontario OMAFA energy-yield table), so the flow is small. Needs: a biogas fuel type, a derate on the genset's
   rating, and a way for another mod to supply it. No change until Tim approves. See Farmings `docs/waste.md`.
-- The purer yellowcake route: an ammonia plant on pipeline gas, ADU precipitation and a calciner at 750-800 C (94-98 % U3O8).
+- The purer yellowcake route: ADU precipitation on the Phase 14 ammonia and a calciner at 750-800 C (94-98 % U3O8).
 - The acid plant's waste heat boiler steam to a steam turbine (about 2 kg/s of 40 bar steam).
 - Uranium from phosphoric acid (phosphate rock).
+- Ammonia plant (Phase 14 gaps): the ammonia leak hazard; AN solution setting in a cold pipe; an IBC for matrix; a PGM refinery so
+  gauze packs are made from refined platinum and worn packs recovered; nitrous oxide abatement on the acid unit's tail gas; prill and ANFO.
 - Conversion: the fluorine cells' cathode hydrogen to the reducer; retiring the fluorinator's ash bed; regenerating the KOH
   scrubbers; a full-size plant.
 - ISR: bottled CO2 for the lixiviant, monitor-well rings and excursions, groundwater restoration (sweep, reverse osmosis,

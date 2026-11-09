@@ -51,8 +51,8 @@ public class StorageTankBlockEntity extends BlockEntity implements Inspectable, 
 
 	/** What it may hold. */
 	public boolean accepts(Product p) {
-		return water() ? p == Product.PRODUCED_WATER : bullet() ? p == Product.LPG
-				: p.tanked() && p != Product.PRODUCED_WATER && p != Product.LPG && p != Product.WELL_FLUID && p != Product.Y_GRADE;
+		return water() ? p == Product.PRODUCED_WATER : bullet() ? p == Product.LPG || p == Product.AMMONIA   // ammonia is stored in the same pressure vessels as propane
+				: p.tanked() && p != Product.PRODUCED_WATER && p != Product.LPG && p != Product.AMMONIA && p != Product.WELL_FLUID && p != Product.Y_GRADE;
 	}
 
 	public double capacity() {
@@ -178,7 +178,7 @@ public class StorageTankBlockEntity extends BlockEntity implements Inspectable, 
 
 	@Override
 	public Component inspect() {
-		String kind = water() ? "Water tank (400 bbl fiberglass, 64,000 L)" : bullet() ? "LPG bullet (18,000 gal, 250 psi, 58,000 L)" : "Stock tank (400 bbl API 12F, 64,000 L)";
+		String kind = water() ? "Water tank (400 bbl fiberglass, 64,000 L)" : bullet() ? (product == Product.AMMONIA ? "Ammonia bullet" : "LPG bullet") + " (18,000 gal, 250 psi, 58,000 L)" : "Stock tank (400 bbl API 12F, 64,000 L)";
 		String holds = amount < 0.5 ? "empty" : String.format("%s %,.0f %s (%.0f%%)", product == null ? "?" : product.label(), amount, product == null ? "L" : product.unit(), amount / capacity() * 100);
 		return Component.literal(kind + ": " + holds + (amount >= capacity() ? ", FULL" : ""));
 	}
