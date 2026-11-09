@@ -76,3 +76,43 @@ close all known gaps". This wave closes the Known gaps of Phase 10d1, 10d2, 10d3
 - **Why:** each feeder has its own relay; setting it at the breaker is where a technician would find it, and the panel stays the
   place for the bus-wide elements.
 - **Alternatives:** settings at the bus relay panel, one page per feeder; a settable 51V dial.
+
+### 10. Which transformers carry 87T, and where does the relay live?
+- **Chosen:** every true-size, three-phase rated transformer of 10 MVA and up except the substation yard's 20 MVA unit: the 25 and
+  60 MVA GSUs and the 10 MVA 4.16/138 kV unit. The relay is built into the transformer; its readout and its 86T reset are there.
+- **Why:** IEEE C37.91 practice puts differential protection on power transformers from about 10 MVA; pad-mounts and unit
+  substations are protected by fuses or overcurrent relays. The yard unit already has its relay panel. No new block to place.
+- **Alternatives:** a separate transformer relay panel block (truer to a station, one more part); 87T on the yard transformer too,
+  inside its relay panel.
+
+### 11. The 87T zone and its settings
+- **Chosen:** an overall differential on the breakers' CTs: the transformer plus its cable, busway, bus duct, station bus and
+  disconnects up to the first breaker on each side (yard breaker, 15 kV feeder breaker, switchgear section, generator breaker). Minimum
+  pickup 0.3 per unit of rated current, slope 25 %; the difference is the current into grounds in the zone, as 87B measures it. It opens
+  every bounding breaker (a generator breaker means a unit trip); 86T holds them, and a breaker closed while locked out opens again.
+- **Why:** typical SEL-787 class settings (O87P 0.3, SLP1 25 %). Breaker CTs put the transformer's leads inside the zone, as in a station.
+- **Alternatives:** bushing CTs (faults on the leads left to the bus or line relays); a second slope, an unrestrained 87U and harmonic
+  restraint (the model has no inrush harmonics, so they would do nothing).
+
+### 12. 87G settings, and how a fault inside a generator is made
+- **Chosen:** the grounding set goes on the big generator itself (grounds on its terminals, between its neutral CTs and its breaker's);
+  minimum pickup 0.1 per unit of full-load current, slope 10 %; a unit trip with 86G, released by the prime mover's reset.
+- **Why:** the generator touches its breaker directly, so there is no lead to clamp. Generator differentials are set more sensitively
+  than transformer ones (no inrush, no tap changer; SEL-700G class).
+- **Alternatives:** internal winding faults from stator overheating (a new failure mode that changes existing scenes); 87G on the
+  gensets too.
+
+### 13. A 138 kV line back-feeding a GSU onto a generator-bus fault
+- **Chosen:** when a GSU stands straight off the bus, 86B also opens the breakers bounding the GSU's 138 kV side (transfer trip), and
+  the panel's reset closes them. The bus is also inside that GSU's 87T zone, so 86T may lock out as well; then both are reset.
+- **Why:** this is how a unit-connected station does it: the bus lockout trips the GSU's high-side breaker.
+- **Alternatives:** requiring a 15 kV feeder breaker between the bus and the GSU.
+
+### 14. When do the grounding clamps burn?
+- **Chosen:** ASTM F855 grade 3 (2/0 copper), ultimate rating 35 kA for 15 cycles: I²t 3.06 x 10^8 A²s. A fault cleared on the solve it
+  appeared in still counts 5 cycles (relay plus a 3-cycle vacuum breaker); a fault left on counts as long as it lasts, only the current
+  above 300 A (the cable's continuous rating). A heated set cools back over 5 minutes. Past the rating the clamps burn off: a flash, the
+  cell reads UNGROUNDED, and the item is not used up.
+- **Why:** the set's cable is 2/0, which is F855 grade 3; the adiabatic melting limit of 2/0 copper is about 3.7 x 10^8 A²s, close to it.
+  A 40 kA bus fault cleared by 87B leaves the set whole; 10 kA that nothing clears burns it in about 3 s.
+- **Alternatives:** the withstand rating (27 kA for 15 cycles, 1.8 x 10^8) as the burn point; the item consumed on a burn.
