@@ -168,6 +168,11 @@ final class CraneScenes {
 		BlockPos stop = abs(helper, 0, 1, 101);   // where the marker is 50 m out: 49 m along, 10 m across
 		helper.runAfterDelay(400, () -> {
 			ServerLevel level = helper.getLevel();
+			for (int z = 0; z <= 150; z++) {
+				if (level.getBlockEntity(abs(helper, 0, 1, z)) instanceof CraneBlockEntity c) {
+					log("ring_travel", "the crane at z " + z + " | " + c.inspect().getString());
+				}
+			}
 			String there = level.getBlockEntity(stop) instanceof CraneBlockEntity c ? c.inspect().getString() : "(no crane at its stop)";
 			log("ring_travel", "at its stop | " + there + " | start " + level.getBlockState(start).getBlock());
 			check(helper, level.getBlockEntity(stop) instanceof CraneBlockEntity c && !c.travelling(), "the ring crane should have travelled 101 m and stopped: " + there);

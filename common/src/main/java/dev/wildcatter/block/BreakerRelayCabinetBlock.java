@@ -17,7 +17,8 @@ import net.minecraft.world.phys.BlockHitResult;
 /**
  * A standalone breaker's relay cabinet at true size, 1 x 2 x 1 (docs/multiblocks/breaker-relay-cabinet.md): 50/51 on the 12.47 kV or
  * 138 kV yard breaker it touches, and 81U on a 12.47 kV one. Right-click reads it, and after a trip resets it and recloses the
- * breaker; sneak and right-click with the Power Meter steps the 51 pickup.
+ * breaker; sneak and right-click with the Power Meter steps the relay's selected setting, and right-click with it on the upper cell
+ * moves the relay's cursor to the next setting (pickup, curve, dial, 50, 79 shots).
  */
 public class BreakerRelayCabinetBlock extends BigPartBlock {
 	public static final Footprint FOOTPRINT = Footprint.box(1, 2, 1, 0, 0);
@@ -36,6 +37,13 @@ public class BreakerRelayCabinetBlock extends BigPartBlock {
 		if (stack.getItem() instanceof PowerMeterItem && player.isShiftKeyDown() && level.getBlockEntity(main(pos, state)) instanceof BreakerRelayCabinetBlockEntity cabinet) {
 			if (!level.isClientSide()) {
 				cabinet.nextPickup();
+				player.sendOverlayMessage(cabinet.inspect());
+			}
+			return InteractionResult.SUCCESS;
+		}
+		if (stack.getItem() instanceof PowerMeterItem && pos.getY() > main(pos, state).getY() && level.getBlockEntity(main(pos, state)) instanceof BreakerRelayCabinetBlockEntity cabinet) {
+			if (!level.isClientSide()) {
+				cabinet.nextSetting();   // the relay in the upper cell: its front-panel cursor
 				player.sendOverlayMessage(cabinet.inspect());
 			}
 			return InteractionResult.SUCCESS;

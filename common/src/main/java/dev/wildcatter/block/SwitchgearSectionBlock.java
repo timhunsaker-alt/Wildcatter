@@ -25,7 +25,8 @@ import org.jspecify.annotations.Nullable;
  * <ul>
  * <li>Right-click opens or closes the breaker; on a trip it resets the relay and closes.</li>
  * <li>Sneak and right-click with an empty hand racks the breaker: CONNECTED, TEST, DISCONNECTED.</li>
- * <li>Sneak and right-click with the Power Meter steps the frame on the top cell, the 51 pickup on the others.</li>
+ * <li>Sneak and right-click with the Power Meter steps the frame on the top cell, the relay's selected setting on the others.</li>
+ * <li>Right-click with the Power Meter on the middle cells (the relay door) moves the relay's cursor to its next setting.</li>
  * </ul>
  */
 public class SwitchgearSectionBlock extends BigPartBlock {
@@ -61,8 +62,15 @@ public class SwitchgearSectionBlock extends BigPartBlock {
 				if (pos.getY() - BigParts.main(pos, state).getY() == 2) {
 					section.nextFrame();   // the top cell: the breaker's frame
 				} else {
-					section.nextPickup();  // the relay's 51 pickup
+					section.nextPickup();  // the relay's selected setting (the pickup on a new relay)
 				}
+				player.sendOverlayMessage(section.inspect());
+			}
+			return InteractionResult.SUCCESS;
+		}
+		if (stack.getItem() instanceof PowerMeterItem && section != null && pos.getY() - BigParts.main(pos, state).getY() == 1) {
+			if (!level.isClientSide()) {
+				section.nextSetting();   // the relay door: the front-panel cursor
 				player.sendOverlayMessage(section.inspect());
 			}
 			return InteractionResult.SUCCESS;
@@ -79,7 +87,7 @@ public class SwitchgearSectionBlock extends BigPartBlock {
 		}
 		if (player.isShiftKeyDown()) {
 			if (section.rack()) {
-				level.playSound(null, pos, WildcatterSounds.BREAKER_CLICK, SoundSource.BLOCKS, 1.0F, 0.6F);
+				level.playSound(null, pos, WildcatterSounds.BREAKER_CLICK, SoundSource.BLOCKS, 1.0F, 0.6F);   // the racking crank goes on
 			}
 		} else if (section.operate()) {
 			level.playSound(null, pos, WildcatterSounds.BREAKER_CLICK, SoundSource.BLOCKS, 1.0F, 0.9F);

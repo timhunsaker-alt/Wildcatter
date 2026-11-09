@@ -17,10 +17,10 @@ what each needs first.
 ## The specs
 | # | Spec | Idea it covers | New parts | Size | Value | Proposed wave |
 |---|---|---|---|---|---|---|
-| 1 | [multiblocks/sales-gas.md](multiblocks/sales-gas.md) | sales gas pipeline and meter station | 5 | S-M | 5: residue gas gets a buyer; gas moves between sites; closes a known gap | **14a** |
-| 2 | [multiblocks/acid-plant-steam.md](multiblocks/acid-plant-steam.md) | acid plant waste-heat steam to a turbine | 1 | S | 4: the acid plant exports about 1.3 MW and can island itself | **14b** |
-| 3 | [biogas.md](biogas.md) | biogas as an engine fuel | 0 | S | 3: Farmings' digester joins the grid | **14c** |
-| 4 | [mekanism-check.md](mekanism-check.md) | check plugs against real Mekanism | 0 | S | 4 when possible: the "power base" claim; **blocked** (Mekanism for 26.3 not released, checked 2026-11-09) | **14d** (when released) |
+| 1 | [multiblocks/sales-gas.md](multiblocks/sales-gas.md) | sales gas pipeline and meter station | 5 | S-M | 5: residue gas gets a buyer; gas moves between sites; closes a known gap | **14b** (built) |
+| 2 | [multiblocks/acid-plant-steam.md](multiblocks/acid-plant-steam.md) | acid plant waste-heat steam to a turbine | 1 | S | 4: the acid plant exports about 1.3 MW and can island itself | **14c** (built) |
+| 3 | [biogas.md](biogas.md) | biogas as an engine fuel | 0 | S | 3: Farmings' digester joins the grid | **14d** (built) |
+| 4 | [mekanism-check.md](mekanism-check.md) | check plugs against real Mekanism | 0 | S | 4 when possible: the "power base" claim; **blocked** (Mekanism for 26.3 not released, checked 2026-11-09) | **14e** (when released) |
 | 5 | [salt-dome-oil.md](salt-dome-oil.md) | salt domes trap oil on their flanks | worldgen | M | 4: richer early oil, a reason to survey domes | **15a** |
 | 6 | [multiblocks/drilling-mud.md](multiblocks/drilling-mud.md) | drilling mud from barite and bentonite | 5 | M (15b1), M (15b2) | 4: two dead ores get a use; kicks, the BOP and blowouts; closes a known gap | **15b1, 15b2** |
 | 7 | [multiblocks/adu-yellowcake.md](multiblocks/adu-yellowcake.md) | the purer yellowcake route | 1 | S | 3: cleaner conversion, uses the ammonia plant | **16a** |
@@ -40,7 +40,7 @@ what each needs first.
 
 ## Proposed phases
 ### Phase 14: gas and power quick wins
-Small, high value, few dependencies. Waves: **14a** sales line; **14b** acid plant turbine; **14c** biogas (can ride with 14a); **14d**
+Small, high value, few dependencies. Phase 14 is already the ammonia plant (**14a**, built), so these are renumbered: **14b** sales line; **14c** acid plant turbine; **14d** biogas (built with 14b); **14e**
 the Mekanism check, whenever Mekanism for 26.3 ships (it can drop into any phase).
 
 ### Phase 15: the oilfield
@@ -81,7 +81,7 @@ ammonia plant (approved, Tailings P3) --> 16a ADU --> 18b uranium from phosphate
                      \--> 20b Ti slag
 17c1 hafnium --> 19d hafnium rods
 19c1 inspection (leaking rods) --> 19b contamination (coolant activity)       (either order works; 19b reads leaks if present)
-14a sales line <-- biogas refused there (14c)                                 (independent)
+14b sales line <-- biogas refused there (14d)                                 (independent)
 15a salt domes --> 15b1 salt washout; 20a brine wells
 16d1 CO2 liquefier --> 18b ammonium carbonate; 20a brine carbonate
 20a chlor-alkali (chlorine, caustic, rectifier_mv) --> 20b titanium, 20c lithium, 16b1 first KOH (or the small 7f cell), 16b2 rectifier_mv
@@ -91,9 +91,9 @@ Tailings concentrate (assayed slurry) --> 17a molybdenum and tungsten; optional 
 ## What each phase adds to the electrical grid
 | Wave | New loads or sources | Voltage tier (from the world's standard) |
 |---|---|---|
-| 14a | 2 kW a meter station | residential |
-| 14b | **+1.6 MW** generation | generator terminals, through the 13.8/4.16 kV unit auxiliary transformer |
-| 14c | gas sets derated to 850 kW | industrial LV |
+| 14b | 2 kW a meter station | residential |
+| 14c | **+1.6 MW** generation | generator terminals, through the 13.8/4.16 kV unit auxiliary transformer |
+| 14d | gas sets derated to 850 kW | industrial LV |
 | 15b | mills 150 kW and 75 kW, mixing hopper 37 kW, accumulator 15 kW | industrial LV |
 | 17a | **SAF 8 MW at PF 0.80**; a **3 Mvar** capacitor bank | distribution |
 | 17b | furnace 1 MW; converter blower 250 kW; **0.78 MW DC** tankhouse; induction furnace 1.5 MW | distribution, industrial MV, DC |

@@ -198,7 +198,7 @@ public final class CircuitManager {
 				return;
 			}
 			boolean tripped = false;
-			for (CircuitPart part : parts) {
+			for (CircuitPart part : ProtectionRace.acting(parts, circuit)) {
 				tripped |= part.protect(circuit, ticks);
 			}
 			if (!tripped) {

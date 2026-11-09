@@ -1,6 +1,7 @@
 # The acid plant's steam to a turbine
 
-> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Proposed phase **14b**. Decisions are in
+> **BUILT as wave 14c (2026-11-09), decided on recommendation while Tim was away; not approved.** See "As built" at the end and
+> `docs/questions/phase14-gas-power.md`. Renumbered 14b-14e on 2026-11-09: Phase 14 was already the ammonia plant (14a). Decisions are in
 > `docs/questions/specs-wildcatter.md` (items 5-7).
 
 The sulfuric acid plant (acid-plant.md) burns sulfur, and its waste heat boiler raises about **2.1 kg/s of 40 bar steam**. Today the
@@ -103,4 +104,23 @@ The grid is a sketch; the game test is the layout of record.
 - **Screenshot:** the acid plant with its turbine.
 
 ## Proposed wave
-**14b**: one new part, the boiler's two new nozzles, and the turbine's second steam source.
+**14c** (was 14b): one new part, the boiler's two new nozzles, and the turbine's second steam source.
+
+## As built (14c, 2026-11-09)
+Decisions taken while building are in `docs/questions/phase14-gas-power.md` (items 9-12).
+- **The superheater** (`acid_superheater`, 3 x 6 x 3, part of the acid plant's block family) stands against the converter, takes the
+  boiler's steam on a steam pipe at the **west face of its bottom cells**, and passes it to the 5 MW turbine **by touching** (as the HRSG
+  does). It is hot while the converter touching it has converted in the last 2 s.
+- **The waste heat boiler:** STEAM out of its top face (held 5 s; what nobody takes goes up the silencer); the melter touching it takes
+  0.06 kg/s first; a feed pump touching it returns 90 % of the turbine's steam as condensate (`AcidSteam.makeUpKgs`).
+- **The turbine:** 0.87 MW a kg/s less a throttle loss of 15 % x (1 - flow/design), a tenth at a third of design (`AcidSteam.turbineWatts`):
+  about 1.6 MW at 2.0 kg/s; times its condenser fans' and feed pump's running share, as in combined cycle. It trips its generator on
+  LOW STEAM TEMPERATURE and resets once stopped with superheat back. All four condenser fans run (the spec's two at part load is not built).
+- **The layout of record** (NeoForge scene `acid_steam`): the acid plant facing west as in the client scene `acidPlant`; the superheater
+  (facing north) at x 27-29 z 1-3 against the converter's south face; the turbine x 30-32 z 1-6; generator x 33-35 z 1-4; generator breaker
+  x 33-34 z 5-6; condenser x 27-32 z 7-12; feed pump x 22-23 z 1-4 against the boiler; the unit auxiliary transformer x 35-38 z 7-10, its
+  4.16 kV onto the plant's bus with the blower and a backward unit substation from two diesel sets.
+- **A solver change it needed:** a machine closing onto a bus takes the bus's angle to the nearest 30 degrees (the unit auxiliary
+  transformer is delta-wye); without it the turbine and the diesel sets drove about 2 MW round between them.
+- **Measured:** steam for 1.44-1.52 MW at 1.9-2.0 kg/s (its 480 V motors at about 95 % voltage on two diesel sets); on its own, it carries
+  the plant (about 0.43 MW) at 59.7 Hz.

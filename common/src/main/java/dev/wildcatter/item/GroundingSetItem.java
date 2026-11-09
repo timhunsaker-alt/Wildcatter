@@ -1,6 +1,6 @@
 package dev.wildcatter.item;
 
-import dev.wildcatter.block.MultiCableBlockEntity;
+import dev.wildcatter.safety.Groundable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
@@ -24,14 +24,14 @@ public class GroundingSetItem extends Item {
 		Player player = context.getPlayer();
 		Level level = context.getLevel();
 		BlockPos clicked = context.getClickedPos();
-		if (!(level.getBlockEntity(clicked) instanceof MultiCableBlockEntity cable)) {
+		if (!(dev.wildcatter.multiblock.BigParts.entity(level, clicked) instanceof Groundable cable)) {
 			return InteractionResult.PASS;
 		}
 		if (level.isClientSide()) {
 			return InteractionResult.SUCCESS;
 		}
 		cable.setGrounded(!cable.grounded());
-		message(player, cable.grounded() ? "Grounding set: grounds applied, A, B and C to ground" : "Grounding set: grounds removed");
+		message(player, cable.grounded() ? cable.groundedMessage() : "Grounding set: grounds removed");
 		return InteractionResult.SUCCESS;
 	}
 

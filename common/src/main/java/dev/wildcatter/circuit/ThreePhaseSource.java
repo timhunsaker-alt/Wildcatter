@@ -25,11 +25,16 @@ public final class ThreePhaseSource {
 
 	/** The same source with its terminals only on {@code faces} of {@code cells} (a big part's terminal box). */
 	public void build(Circuit circuit, java.util.List<BlockPos> cells, java.util.List<Direction> faces, Voltage voltage, double volts, double ohms) {
+		build(circuit, cells, faces, voltage, volts, ohms, 0);
+	}
+
+	/** The same, its phases turned {@code angle} degrees: a machine in step with a bus a delta-wye transformer has shifted (Synchronizer). */
+	public void build(Circuit circuit, java.util.List<BlockPos> cells, java.util.List<Direction> faces, Voltage voltage, double volts, double ohms, double angle) {
 		neutral = circuit.node();
 		for (int k = 0; k < 3; k++) {
 			hot[k] = circuit.node();
 			int internal = circuit.node();
-			source[k] = circuit.source(internal, neutral, volts, DEGREES[k]);
+			source[k] = circuit.source(internal, neutral, volts, DEGREES[k] + angle);
 			circuit.resistor(internal, hot[k], ohms);
 		}
 		circuit.ground(neutral);
@@ -41,6 +46,11 @@ public final class ThreePhaseSource {
 				circuit.port(pos, face, Conductor.N, voltage, neutral, Tuning.CONTACT_OHMS / 2, false);
 			}
 		}
+	}
+
+	/** The terminal node of phase {@code k} (0 A, 1 B, 2 C), from the last build. */
+	public int hot(int k) {
+		return hot[k];
 	}
 
 	/** Real power out of the terminals on all three phases (what the machine delivers, not counting its own losses). */

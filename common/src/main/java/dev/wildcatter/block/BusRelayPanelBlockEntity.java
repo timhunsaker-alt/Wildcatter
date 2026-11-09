@@ -42,6 +42,7 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 	private final List<BlockPos> ducts = new ArrayList<>();
 	private final List<BlockPos> generators = new ArrayList<>();   // generator breakers' main cells
 	private final List<BlockPos> feeders = new ArrayList<>();      // feeder breakers' main cells
+	private final List<BlockPos> highSide = new ArrayList<>();     // breakers on the line side of a GSU straight off the bus: transfer-tripped by 86B
 	private final Map<BlockPos, BusProtection.TimeElement> elements = new HashMap<>();
 	private final Set<BlockPos> openedByUs = new HashSet<>();
 	private boolean lockedOut;
@@ -76,6 +77,7 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 		ducts.clear();
 		generators.clear();
 		feeders.clear();
+		highSide.clear();
 		if (level == null) {
 			return;
 		}
@@ -104,12 +106,28 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 				} else if (BigParts.entity(level, n) instanceof BreakerBlockEntity b && b.getBlockState().is(WildcatterBlocks.GEN_FEEDER_BREAKER)
 						&& !feeders.contains(b.getBlockPos())) {
 					feeders.add(b.getBlockPos());
+				} else if (BigParts.entity(level, n) instanceof TransformerBlockEntity t && t.bottomVoltage() == Voltage.GENERATOR) {
+					// a GSU straight off the bus: a line behind it back-feeds a bus fault, so 86B transfer-trips its line-side breakers
+					for (BlockPos hv : t.highSideBreakers()) {
+						if (!highSide.contains(hv)) {
+							highSide.add(hv);
+						}
+					}
 				}
 			}
 		}
 		Set<BlockPos> watched = new HashSet<>(generators);
 		watched.addAll(feeders);
 		elements.keySet().retainAll(watched);
+		feederElements.keySet().retainAll(watched);
+	}
+
+	private final Map<BlockPos, dev.wildcatter.circuit.RelaySettings.Element> feederElements = new HashMap<>();
+	/** 50BF: how long each feeder that failed to open has been carrying since. */
+	private final Map<BlockPos, Double> failedFor = new HashMap<>();
+
+	private dev.wildcatter.circuit.RelaySettings.Element feederElement(BlockPos at) {
+		return feederElements.computeIfAbsent(at, k -> new dev.wildcatter.circuit.RelaySettings.Element());
 	}
 
 	private BusProtection.TimeElement element(BlockPos at, boolean veryInverse) {
@@ -177,11 +195,22 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 			BreakerBlockEntity b = feeder(at);
 			if (b != null && b.closed()) {
 				double amps = b.mostAmps(circuit);
-				if (amps > Tuning.FEEDER_50_MULTIPLE * b.rating()) {
+				if (b.failedToOpen()) {
+					// 50BF: the feeder breaker was told to open and is still carrying after the failure timer: the whole bus opens (86BF)
+					if (amps > Tuning.BF_DETECTOR_AMPS && failedFor.getOrDefault(at, 0.0) >= Tuning.BF_SECONDS) {
+						tripBus(String.format("50BF BREAKER FAILURE: the feeder at %s failed to open on %,.0f A", at.toShortString(), amps));
+						failedFor.remove(at);
+						return true;
+					}
+					continue;
+				}
+				var relay = b.feederRelay();
+				if (relay.instantaneous() > 0 && amps > relay.instantaneous() * b.feederPickup()) {
+					b.seeFault(amps);
 					b.tripByRelay(String.format("50 instantaneous, %,.0f A", amps));
 					openedByUs.add(at);
 					lastTrip = String.format("feeder at %d, %d, %d: 50 instantaneous, %,.0f A", at.getX(), at.getY(), at.getZ(), amps);
-					tripped = true;
+					tripped |= !b.closed();
 				}
 			}
 		}
@@ -217,17 +246,25 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 		for (BlockPos at : feeders) {
 			BreakerBlockEntity b = feeder(at);
 			if (b == null || !b.closed()) {
-				element(at, false).reset();
+				feederElement(at).reset();
+				failedFor.remove(at);
 				continue;
 			}
 			double amps = b.amps();
 			reading.put(at, amps);
-			double pickup = Tuning.FEEDER_51_PICKUP * b.rating();
-			if (element(at, false).step(amps, pickup, Tuning.RELAY_TIME_DIAL, dt)) {
-				b.tripByRelay(String.format("51 time overcurrent, %,.0f A on %,d A", amps, b.rating()));
+			if (b.failedToOpen()) {
+				failedFor.merge(at, dt, Double::sum);
+				if (amps <= Tuning.BF_DETECTOR_AMPS) {
+					failedFor.put(at, 0.0);
+				}
+				continue;
+			}
+			var relay = b.feederRelay();
+			if (feederElement(at).step(amps, b.feederPickup(), relay.curve(), relay.dial(), dt)) {
+				b.tripByRelay(String.format("51 time overcurrent, %,.0f A on a %,d A pickup", amps, b.feederPickup()));
 				openedByUs.add(at);
 				lastTrip = "51 on the feeder at " + at.toShortString();
-				element(at, false).reset();
+				feederElement(at).reset();
 				CircuitManager.markDirty(level);
 				setChanged();
 			}
@@ -251,6 +288,11 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 				openedByUs.add(at);
 			}
 		}
+		for (BlockPos at : highSide) {
+			if (ProtectionZone.open(level, at, "transfer trip from the generator bus's 87B (86B lockout)")) {
+				openedByUs.add(at);
+			}
+		}
 		lockedOut = true;
 		lastTrip = why;
 		setChanged();
@@ -271,6 +313,8 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 		}
 		openedByUs.clear();
 		elements.values().forEach(BusProtection.TimeElement::reset);
+		feederElements.values().forEach(dev.wildcatter.circuit.RelaySettings.Element::reset);
+		failedFor.clear();
 		CircuitManager.markDirty(level);
 		setChanged();
 	}
@@ -285,7 +329,8 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 			return Component.literal("Bus relay panel: NO BUS: set it against the " + Voltage.GENERATOR.label() + " bus duct");
 		}
 		String zone = String.format("Bus relay panel: %s bus, %d generator breaker%s, %d feeder%s", Voltage.GENERATOR.label(), generators.size(),
-				generators.size() == 1 ? "" : "s", feeders.size(), feeders.size() == 1 ? "" : "s");
+				generators.size() == 1 ? "" : "s", feeders.size(), feeders.size() == 1 ? "" : "s")
+				+ (highSide.isEmpty() ? "" : String.format(", %d line-side breaker%s behind a GSU (transfer trip)", highSide.size(), highSide.size() == 1 ? "" : "s"));
 		if (lockedOut) {
 			return Component.literal(zone + "; " + lastTrip + ", LOCKED OUT (86B); right-click to reset once the fault is cleared");
 		}
@@ -301,7 +346,8 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 		for (BlockPos at : feeders) {
 			BreakerBlockEntity b = feeder(at);
 			if (b != null) {
-				text.append(String.format("; feeder %d (%,d A) %s", n++, b.rating(), b.closed() ? String.format("%,.0f A", b.amps()) : "OPEN"));
+				text.append(String.format("; feeder %d (%,d A, %s) %s", n++, b.rating(), b.feederRelay().describe(b.rating(), false),
+						b.failedToOpen() ? "FAILED TO OPEN" : b.closed() ? String.format("%,.0f A", b.amps()) : "OPEN"));
 			}
 		}
 		if (!lastTrip.isEmpty()) {

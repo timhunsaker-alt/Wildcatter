@@ -533,6 +533,31 @@ public final class Tuning {
 	public static final double BLAST_POWDER_FACTOR_KG_PER_T = 0.37; // Tailings' open pit: kg of explosive a tonne of rock
 	public static final double CYLINDER_FILLER_WATTS = 5_000.0;    // 480 V (unverified)
 
+	// ---- Phase 14b: the sales line and its meter stations (docs/multiblocks/sales-gas.md) ----------------------------------------
+	public static final double SALES_STATION_M3S = 5.0;            // a station's rating (proposed): about 15 million scf a day
+	public static final double SALES_FUEL_RETENTION = 0.02;        // the line keeps 2 % of receipts as compressor fuel (proposed; real 1-3 %)
+	public static final double SALES_LINE_HEATER_SHARE = 0.002;    // a delivery station's line heater burns 0.2 % of what it passes (proposed)
+	public static final double SALES_BTU_SCF_MAX = 1_150.0;        // a typical tariff's heating value limits, Btu/scf (unverified)
+	public static final double SALES_BTU_SCF_MIN = 950.0;
+	public static final double METER_BUILDING_WATTS = 2_000.0;     // heaters, the chromatograph's oven, lights and the RTU charger (proposed), residential
+	public static final double METER_BATTERY_TICKS = 8_000.0;      // the RTU's battery: 8 game hours (proposed)
+	public static final double FILTER_CATCH_L_PER_M3 = 1.0e-5;     // what a filter separator's sump catches: 1 L a 100,000 m3 (proposed)
+	public static final double JOULES_PER_BTU = 1_055.06;
+	public static final double M3_PER_SCF = 0.0283168;
+
+	// ---- Phase 14c: the acid plant's steam to the 5 MW turbine (docs/multiblocks/acid-plant-steam.md) -----------------------------
+	public static final double ST_DESIGN_STEAM_KGS = 6.0;          // the 5 MW turbine's design flow (combined-cycle.md): 5.2 MW from 6 kg/s at 40 bar, 400 C
+	public static final double ST_DESIGN_WATTS = 5_200_000.0;
+	public static final double ST_THROTTLE_LOSS = 0.15;            // part-load loss with no flow, falling to none at design: a tenth at a third (proposed)
+	public static final double MELTER_STEAM_KGS = 0.06;            // the melter's coils: about 100 kW at 1.7 MJ/kg of condensing steam (derived)
+	public static final double ACID_CONDENSATE_RETURN = 0.90;      // the feed pump returns 90 % to the boiler: make-up 10 % (proposed, as the steam plant's)
+	public static final double SUPERHEAT_J_PER_KG = 413_000.0;     // 40 bar saturated (2,801 kJ/kg) to 400 C (3,214 kJ/kg), IAPWS-IF97
+
+	// ---- Phase 14d: biogas as an engine fuel (docs/biogas.md) --------------------------------------------------------------------
+	public static final double BIOGAS_JOULES_PER_M3 = 23.0e6;      // 60 % CH4, 40 % CO2, on the pipeline gas basis (38 MJ/m3): 60 % of it (derived)
+	public static final double GENSET_BIOGAS_WATTS = 850_000.0;    // the CG260-12's biogas rating is 84 % of its natural gas rating
+	public static final double BIOGAS_HEAT_RATE_MJ_KWH = 11.0;     // lean biogas at full load (proposed): 23 m3 make 48 kWh, Farmings' OMAFA figure
+
 	// ---- The centrifuge cascade (docs/multiblocks/enrichment.md, approved 2026-11-01) ------------------------------------------
 	public static final double ASSAY_FEED = 0.00711;               // natural U-235
 	public static final double ASSAY_PRODUCT = 0.0495;             // LEU for the 17x17 fuel
@@ -1000,9 +1025,14 @@ public final class Tuning {
 	public static final double GROUNDING_SET_OHMS = 0.001;         // a grounding cluster: each phase to earth through 2/0 copper (ASTM F855)
 	// 10d2: the 4.16 kV switchgear and the breaker relay cabinet (docs/multiblocks/mv-switchgear.md, breaker-relay-cabinet.md)
 	public static final int[] SWITCHGEAR_FRAME_AMPS = {1200, 2000, 3000};   // 5 kV metal-clad vacuum breakers (VCP-W 5 class)
-	public static final int[] RELAY_PICKUP_STEPS = {5, 10, 25, 50, 100, 200, 400, 600, 1200};   // 51 pickup in amps (proposed: 50:5 CT, 0.5 A tap at the bottom)
+	public static final int[] RELAY_PICKUP_STEPS = {5, 10, 25, 50, 100, 200, 400, 600, 1200, 2000, 3000};   // 51 pickup in amps (proposed: 50:5 CT, 0.5 A tap at the bottom; 2,000 and 3,000 A for the 15 kV feeders, gap wave)
 	public static final int RELAY_PICKUP_START = 4;                // a new relay starts at 100 A
 	public static final double RELAY_50_OF_PICKUP = 8.0;           // 50 at 8 x the 51 pickup
+	// the protection gap wave (docs/questions/protection-gaps.md): settable curve, dial and 50 on every feeder relay
+	public static final double[] RELAY_DIAL_STEPS = {0.5, 1, 2, 3, 4, 5, 7, 10, 15};   // IEEE C37.112 time dial, 0.5 to 15
+	public static final int RELAY_DIAL_START = 1;                  // time dial 1, as before
+	public static final double[] RELAY_50_STEPS = {0, 4, 6, 8, 10, 12, 16, 20};       // 50 as a multiple of the pickup; 0 = off
+	public static final int RELAY_50_START = 3;                    // 8 x, as before
 	// the 10 MVA 4.16/138 kV power transformer (docs/multiblocks/power-transformer-10.md)
 	public static final double STEP_UP_10_VA = 10_000_000.0;       // 4.16 kV delta / 138 kV grounded wye, ONAN
 	public static final double STEP_UP_10_PERCENT_Z = 7.5;
@@ -1104,4 +1134,75 @@ public final class Tuning {
 			case HIGH -> SPAN_MAX_HIGH;
 		};
 	}
+	// ---- protection gap wave, group A: relays, switchgear, breaker failure, reclosing ----
+	public static final double RACK_SECONDS = 15.0;                // a draw-out truck cranked one position (about 20 turns of the racking handle)
+	public static final double BF_SECONDS = 0.15;                  // 62BF: the breaker failure timer, about 9 cycles
+	public static final double BF_DETECTOR_AMPS = 2.0;             // 50BF's current detector: still carrying after the timer means it failed
+	public static final double SWITCHGEAR_INTERRUPTING_AMPS = 41_000;   // 5 kV, 350 MVA class vacuum breaker (IEEE C37.06): 41 kA
+	public static final double GEN_FEEDER_INTERRUPTING_AMPS = 50_000;   // 15 kV generator-bus feeder breakers, 50 kA class
+	public static final double SWITCHGEAR_87_OF_MAIN_PICKUP = 0.5;   // the lineup's 87B minimum pickup: half the main's 51 pickup
+	public static final double BREAKER_INTERRUPT_SECONDS = 0.05;   // a vacuum breaker's interrupting time: 3 cycles
+	public static final double[] RECLOSE_INTERVALS = {2, 15, 30};  // 79: the open intervals before shots 1, 2 and 3, in seconds
+	public static final double RECLOSE_RESET_SECONDS = 60;         // 79: held closed this long after a shot, the sequence resets
+	public static final int RECLOSE_SHOTS_DISTRIBUTION = 3;        // a 12.47 kV feeder: three shots, four trips to lockout
+	public static final int RECLOSE_SHOTS_HIGH = 1;                // a 138 kV line: one shot
+
+	// ---- protection gap wave, group B: differentials, back-feed, grounding clamps ----
+	public static final double XFMR_87_MIN_VA = 10_000_000;       // 87T on a transformer of 10 MVA and up (IEEE C37.91 practice)
+	public static final double XFMR_87_MIN_PU = 0.3;               // 87T minimum pickup, per unit of rated current (SEL-787 class O87P)
+	public static final double XFMR_87_SLOPE = 0.25;               // 87T restraint slope (SLP1 25 %)
+	public static final double GEN_87_MIN_PU = 0.1;                // 87G minimum pickup, per unit of rated current (SEL-700G class)
+	public static final double GEN_87_SLOPE = 0.1;                 // 87G restraint slope (10 %): a generator has no magnetizing inrush or taps
+	public static final double CLAMP_ULTIMATE_I2T = 35_000.0 * 35_000.0 * 0.25;   // ASTM F855 grade 3 (2/0 Cu): 35 kA for 15 cycles, ultimate
+	public static final double CLAMP_CONTINUOUS_AMPS = 300;        // 2/0 copper in free air: what it carries without heating toward failure
+	public static final double CLAMP_COOL_SECONDS = 300;           // a fully heated cluster cools back over 5 minutes
+	public static final double FAULT_CLEARING_CYCLES = 5;          // relay (1-2 cycles) plus a vacuum breaker's 3-cycle interrupting time
+
+	// ---- protection gap wave, group C: panels, GFCI, ATS, fuses, coordination ----
+	public static final double BODY_OHMS = 1000.0;                 // IEC 60479-1: hand to feet at 120-230 V, about 1 kohm (the 50 % value, dry, large contact)
+	public static final int BODY_CONTACT_TICKS = 20;               // a body stays across the conductor this long after a shock
+	// the ATS's factory timers (UL 1008 controllers' defaults); the SHORT set is the scaled 10d3 one (ATS_*_SECONDS above)
+	public static final double ATS_FACTORY_TDES = 3.0;             // engine start delay
+	public static final double ATS_FACTORY_TDNE = 0.0;             // transfer to emergency
+	public static final double ATS_FACTORY_TDEN = 1800.0;          // retransfer to normal: 30 min
+	public static final double ATS_FACTORY_TDEC = 300.0;           // engine cooldown: 5 min
+	public static final double ATS_IN_PHASE_DEGREES = 15.0;        // in-phase monitor: transfer between live sources within 15 degrees
+	public static final double ATS_IN_PHASE_MAX_HZ = 2.0;          // ... and under 2 Hz apart
+	public static final double ATS_FAST_NEUTRAL_SECONDS = 0.1;     // an in-phase transfer's own contact travel (about 6 cycles), no programmed delay
+	public static final double ATS_CLOSED_DEGREES = 5.0;           // closed transition sync check: within 5 degrees,
+	public static final double ATS_CLOSED_HZ = 0.2;                // 0.2 Hz
+	public static final double ATS_CLOSED_VOLTS = 0.05;            // and 5 % voltage
+	public static final double ATS_OVERLAP_SECONDS = 0.1;          // closed transition: both closed at most 100 ms
+	public static final double ATS_SYNC_WAIT_SECONDS = 30.0;       // closed transition that finds no sync in this long falls back to open
+	// the protection race and the coordination study (circuit/TimeCurrent)
+	public static final double MAGNETIC_CLEAR_CYCLES = 1.0;        // a molded-case breaker's magnetic trip, or a fuse's instant melt: about a cycle
+	public static final double CL_CLEAR_CYCLES = 0.5;              // a current-limiting fuse above its threshold: inside the first half cycle
+	public static final double COORDINATION_MARGIN_CYCLES = 0.25;  // a device a quarter cycle slower than the one that cleared the fault holds
+	public static final double GFCI_CLEAR_CYCLES = 1.5;            // UL 943: a GFCI on a heavy ground fault opens in about 25 ms
+	public static final double INTERRUPT_LOAD_CENTRE = 10_000;     // a load centre and its plug-on breakers: 10 kA (panelboards.md)
+	public static final double INTERRUPT_PANELBOARD = 14_000;      // a 480Y/277 V panelboard and its bolt-on breakers: 14 kA
+	public static final double INTERRUPT_MCCB = 10_000;            // the one-block breakers: 10 kA, the UL 489 floor (proposed)
+	public static final double INTERRUPT_CLASS_J = 200_000;        // class J fuses: 200 kA (UL 248-8)
+	public static final double INTERRUPT_E_RATED = 50_000;         // 5 kV E-rated current-limiting fuses: 50 kA symmetrical (proposed, ANSI C37.46 class)
+	public static final double INTERRUPT_FUSE = 10_000;            // a plug fuse or an expulsion K link: 10 kA (proposed)
+
+	// ---- protection gap wave, group D: distribution, spans, poles ----
+	/**
+	 * An overhead span heats on its conductor's rating (the ACSR table's 75 C in 25 C air, a 50 K rise) with a bare conductor's longer
+	 * time constant, about 10 minutes for 4/0 ACSR in still air (IEEE 738); it parts when its rise reaches 3 x the rated rise, about
+	 * 175 C, well past ACSR's 100-150 C emergency limit, where the aluminium strands anneal and the span drops.
+	 */
+	public static final double SPAN_HEAT_SECONDS = 600.0;
+	public static final double SPAN_BURN_RISE = 3.0;
+	/**
+	 * The power-follow arc over a flashed-over insulator shatters its porcelain once it has passed this many amp-seconds (a few kA for
+	 * a few cycles; proposed). A fault the relays clear in the same solve still arced for about 5 cycles (a feeder relay's 50 and a
+	 * vacuum breaker: 1 to 1.5 cycles of relay and 3 of breaker).
+	 */
+	public static final double INSULATOR_SHATTER_AMP_SECONDS = 50.0;
+	public static final double ARC_CLEARING_CYCLES = 5.0;
+	/** A grounding electrode at a service: a single driven rod is taken at NEC 250.53(A)(2)'s 25 ohm limit. */
+	public static final double GROUND_ELECTRODE_OHMS = 25.0;
+	/** A lead (jumper) from a line insulator down to a cutout or a pole transformer's H1 bushing is a few metres at most. */
+	public static final int LEAD_MAX_BLOCKS = 6;
 }

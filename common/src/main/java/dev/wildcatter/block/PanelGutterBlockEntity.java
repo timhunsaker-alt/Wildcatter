@@ -37,7 +37,7 @@ import org.jspecify.annotations.Nullable;
  * <li>Thermal-magnetic, as the one-block breaker; a GFCI also trips on the difference between its hot and neutral currents.</li>
  * </ul>
  */
-public class PanelGutterBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity {
+public class PanelGutterBlockEntity extends BlockEntity implements CircuitPart, Protective, Inspectable, BigPartEntity {
 	private static final Conductor[] ROLES = {Conductor.A, Conductor.B, Conductor.C};
 
 	private boolean grown;
@@ -311,6 +311,55 @@ public class PanelGutterBlockEntity extends BlockEntity implements CircuitPart, 
 		return false;
 	}
 
+	// ---- the protection race and the coordination study ----------------------------------------------------------------------------
+	/** A GFCI on a ground fault opens in about 1.5 cycles; the magnetic trip in about one. */
+	@Override
+	public double clearingSeconds(Circuit circuit) {
+		if (links.length == 0 || breaker == null) {
+			return Double.POSITIVE_INFINITY;
+		}
+		double t = Double.POSITIVE_INFINITY;
+		if (breaker.gfci() && imbalance(circuit) > ElectricalStandard.active().groundFaultTripAmps()) {
+			t = Tuning.GFCI_CLEAR_CYCLES / circuit.hertz();
+		}
+		if (mostAmps(circuit) > breaker.amps() * Tuning.BREAKER_MAGNETIC_MULTIPLE) {
+			t = Math.min(t, Tuning.MAGNETIC_CLEAR_CYCLES / circuit.hertz());
+		}
+		return t;
+	}
+
+	@Override
+	public double instantPickupAmps() {
+		return breaker == null ? Double.POSITIVE_INFINITY : breaker.amps() * Tuning.BREAKER_MAGNETIC_MULTIPLE;
+	}
+
+	@Override
+	public String curveName() {
+		return breaker == null ? "empty space" : String.format("%d A branch breaker", breaker.amps());
+	}
+
+	@Override
+	public double clearingSeconds(double amps) {
+		return breaker == null ? Double.POSITIVE_INFINITY : dev.wildcatter.circuit.TimeCurrent.thermalMagnetic(curveName(), breaker.amps(), Tuning.BREAKER_TRIP_SECONDS_AT_2X,
+				Tuning.BREAKER_MAGNETIC_MULTIPLE, ElectricalStandard.active().hertz()).clearingSeconds(amps);
+	}
+
+	@Override
+	public double ratingAmps() {
+		return breaker == null ? 0 : breaker.amps();
+	}
+
+	@Override
+	public double interruptingAmps() {
+		return breaker != null && breaker.tier() == Voltage.INDUSTRIAL ? Tuning.INTERRUPT_PANELBOARD : Tuning.INTERRUPT_LOAD_CENTRE;
+	}
+
+	/** On the panel's bus: its upstream is the panel's main ({@link Coordination#upstream}). */
+	@Override
+	public List<Terminal> lineSide() {
+		return List.of();
+	}
+
 	/** The thermal trip. */
 	@Override
 	public void apply(Circuit circuit, int ticks) {
@@ -376,7 +425,7 @@ public class PanelGutterBlockEntity extends BlockEntity implements CircuitPart, 
 		} else {
 			state = "OFF; sneak and right-click to pull it out";
 		}
-		return Component.literal(where + ", " + kind + ": " + state);
+		return Component.literal(where + ", " + kind + ": " + state + (place.inSpaces() ? Coordination.readout(level, this) : ""));
 	}
 
 	private String stabs(Place place) {

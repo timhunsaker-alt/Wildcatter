@@ -123,7 +123,13 @@ public enum Product {
 	 * The emulsion matrix for blasting: AN solution, diesel and emulsifier. An oxidiser, not an explosive until it is gassed in the
 	 * hole; Tailings' emulsion truck loads it. Counted in kg.
 	 */
-	EMULSION_MATRIX("emulsion matrix", false);
+	EMULSION_MATRIX("emulsion matrix", false),
+	/**
+	 * Biogas (docs/biogas.md): 60 % methane and 40 % CO2, dried and stripped of H2S by whoever makes it, about 23 MJ/m3. Another mod
+	 * puts it on steel pipe by a block entity that implements {@code block.FluidNode} and offers this product. Gas sets (derated to
+	 * 850 kW) and fireboxes burn it; big burners, turbines and the sales line refuse it.
+	 */
+	BIOGAS("biogas, 60 % CH4", true);
 
 	private final String label;
 	private final boolean gas;

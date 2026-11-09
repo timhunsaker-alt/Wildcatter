@@ -25,7 +25,7 @@ import net.minecraft.world.level.storage.ValueOutput;
  * at once. A current only a little over the rating heats it slowly: it trips sooner the further over it is, and
  * never if the current stays at or under the rating.
  */
-public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Inspectable, dev.wildcatter.multiblock.BigPartEntity, dev.wildcatter.control.ControlDevice, dev.wildcatter.control.Measurable {
+public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Protective, Inspectable, dev.wildcatter.multiblock.BigPartEntity, dev.wildcatter.control.ControlDevice, dev.wildcatter.control.Measurable {
 	private final dev.wildcatter.control.Remote remote = new dev.wildcatter.control.Remote(2);
 
 	/** True while its selector gives it to the PLC: then a hand can only clear a trip. */
@@ -144,11 +144,71 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 		return ratings()[Math.min(ratingIndex, ratings().length - 1)];
 	}
 
-	/** The relay panel opens it: a protective trip. */
+	/**
+	 * The relay settings of a 15 kV feeder breaker's relay (in the bus relay panel, read on this breaker's CTs): null until a player
+	 * sets one, and until then the pickup follows the breaker's rating, MI, time dial 1, 50 at 8 x, as built in 10d1.
+	 */
+	private dev.wildcatter.circuit.RelaySettings feederRelay;
+	/** 50BF: the mechanism is stuck (a test hook), or the last relay trip failed to open it. */
+	private boolean stuck;
+	private boolean failedToOpen;
+
+	public dev.wildcatter.circuit.RelaySettings feederRelay() {
+		if (feederRelay != null) {
+			return feederRelay;
+		}
+		dev.wildcatter.circuit.RelaySettings fresh = new dev.wildcatter.circuit.RelaySettings();
+		fresh.setPickup(rating());
+		return fresh;
+	}
+
+	/** The pickup of the feeder relay, capped at the rating. */
+	public int feederPickup() {
+		return feederRelay().pickup(rating());
+	}
+
+	/** Sneak and right-click with the Power Meter on the relay compartment: steps the feeder relay's selected setting. */
+	public void stepFeederRelay() {
+		feederRelay = feederRelay();
+		feederRelay.step(rating());
+		setChanged();
+	}
+
+	/** Right-click with the Power Meter on the relay compartment: the cursor moves to the next setting. */
+	public void nextFeederSetting() {
+		feederRelay = feederRelay();
+		feederRelay.nextField();
+		setChanged();
+	}
+
+	/** A test hook: the mechanism sticks, so the next relay trip fails to open it (breaker failure). */
+	public void stickMechanism(boolean on) {
+		stuck = on;
+		setChanged();
+	}
+
+	/** True after a relay trip that failed to open it: 50BF is timing. */
+	public boolean failedToOpen() {
+		return failedToOpen && closed();
+	}
+
+	/** The relay panel opens it: a protective trip. A stuck mechanism, or a generator-bus feeder breaker asked to break more than its interrupting rating, fails to open. */
 	public void tripByRelay(String reason) {
 		if (closed()) {
+			boolean beyond = voltage() == Voltage.GENERATOR && amps > Tuning.GEN_FEEDER_INTERRUPTING_AMPS;
+			if (stuck || beyond) {
+				failedToOpen = true;
+				lastTrip = reason + (stuck ? "; FAILED TO OPEN (the mechanism stuck)" : String.format("; FAILED TO OPEN (beyond its %,.0f A interrupting rating)", Tuning.GEN_FEEDER_INTERRUPTING_AMPS));
+				setChanged();
+				return;
+			}
 			trip(amps, reason);
 		}
+	}
+
+	/** The amps it would be asked to interrupt, set before a relay trip on the solve the fault appears in. */
+	public void seeFault(double amps) {
+		this.amps = amps;
 	}
 
 	/** The relay panel closes it after a reset. */
@@ -190,6 +250,10 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 	/** Flips the switch by hand. Closing it onto a fault will just trip it again. */
 	public void setSwitch(boolean on) {
 		heat = 0;
+		if (!on) {
+			failedToOpen = false;   // opened by hand: the manual trip on a stuck mechanism
+			stuck = false;
+		}
 		setPosition(on ? BreakerBlock.Position.ON : BreakerBlock.Position.OFF);
 	}
 
@@ -264,6 +328,52 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 		return false;
 	}
 
+	// ---- the protection race and the coordination study (protection gap wave) ----------------------------------------------------
+	/** Only the low-voltage and 480 V breakers that trip on their own current are timed; relay-operated and plain switches are not. */
+	private boolean timed() {
+		return !plainSwitch() && (voltage() == Voltage.LOW || voltage() == Voltage.INDUSTRIAL);
+	}
+
+	@Override
+	public double clearingSeconds(Circuit circuit) {
+		if (!timed()) {
+			return Double.NaN;
+		}
+		return links.length > 0 && mostAmps(circuit) > rating() * Tuning.BREAKER_MAGNETIC_MULTIPLE
+				? Tuning.MAGNETIC_CLEAR_CYCLES / circuit.hertz() : Double.POSITIVE_INFINITY;
+	}
+
+	@Override
+	public double instantPickupAmps() {
+		return timed() ? rating() * Tuning.BREAKER_MAGNETIC_MULTIPLE : Double.POSITIVE_INFINITY;
+	}
+
+	@Override
+	public String curveName() {
+		return String.format("%d A %sbreaker", rating(), poles() == 3 ? "three-pole " : "");
+	}
+
+	@Override
+	public double clearingSeconds(double amps) {
+		return plainSwitch() ? Double.POSITIVE_INFINITY : dev.wildcatter.circuit.TimeCurrent.thermalMagnetic(curveName(), rating(), Tuning.BREAKER_TRIP_SECONDS_AT_2X,
+				Tuning.BREAKER_MAGNETIC_MULTIPLE, dev.wildcatter.energy.ElectricalStandard.active().hertz()).clearingSeconds(amps);
+	}
+
+	@Override
+	public double ratingAmps() {
+		return rating();
+	}
+
+	@Override
+	public double interruptingAmps() {
+		return voltage() == Voltage.INDUSTRIAL ? Tuning.INTERRUPT_PANELBOARD : Tuning.INTERRUPT_MCCB;
+	}
+
+	@Override
+	public java.util.List<Terminal> lineSide() {
+		return timed() ? java.util.List.of(new Terminal(at(facing().getOpposite()), facing().getOpposite())) : java.util.List.of();
+	}
+
 	/** The thermal trip: a moderate overload heats it up until it opens. */
 	@Override
 	public void apply(Circuit circuit, int ticks) {
@@ -331,8 +441,11 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 				case TRIPPED -> "TRIPPED by the relay panel (" + lastTrip + "); reset it at the relay panel";
 			};
 			if (voltage() == Voltage.GENERATOR) {   // 10d1: a feeder off the generator bus (docs/multiblocks/gen-bus-protection.md)
-				return Component.literal(String.format("Feeder breaker (%s metal-clad, vacuum, %,d A, opened by the bus relay panel): %s; sneak and right-click changes the rating",
-						voltage().label(), rating(), state));
+				if (failedToOpen()) {
+					state = "FAILED TO OPEN (" + lastTrip + "); right-click to open it by hand";
+				}
+				return Component.literal(String.format("Feeder breaker (%s metal-clad, vacuum, %,d A, opened by the bus relay panel): %s; relay %s; sneak and right-click changes the rating",
+						voltage().label(), rating(), state, feederRelay().describe(rating(), feederRelay != null)));
 			}
 			return Component.literal("Substation breaker (" + voltage().label() + ", three-pole, relay operated): " + state);
 		}
@@ -341,7 +454,7 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 					+ "; right-click to flip it. A switch has NO protection: it never trips, so put a breaker or fuse before it");
 		}
 		return Component.literal((poles() == 3 ? "Three-pole breaker " : "Breaker ") + rating() + " A (" + voltage().label() + "): " + status + "; sneak and right-click changes the rating"
-				+ (heat > 0.05 && closed() ? ", getting warm " + Math.round(heat * 100) + "%" : ""));
+				+ (heat > 0.05 && closed() ? ", getting warm " + Math.round(heat * 100) + "%" : "") + Coordination.readout(level, this));
 	}
 
 	@Override
@@ -352,6 +465,13 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 		output.putInt("rating", ratingIndex);
 		output.putDouble("heat", heat);
 		output.putString("lastTrip", lastTrip);
+		if (feederRelay != null) {
+			int[] relay = feederRelay.save();
+			for (int k = 0; k < relay.length; k++) {
+				output.putInt("relay" + k, relay[k]);
+			}
+		}
+		output.putBoolean("failedToOpen", failedToOpen);
 	}
 
 	@Override
@@ -362,5 +482,16 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Insp
 		ratingIndex = Math.max(0, input.getIntOr("rating", 0));
 		heat = input.getDoubleOr("heat", 0);
 		lastTrip = input.getStringOr("lastTrip", "");
+		feederRelay = null;
+		if (input.getIntOr("relay0", -1) >= 0) {
+			int[] relay = new int[6];
+			int[] defaults = new dev.wildcatter.circuit.RelaySettings().save();
+			for (int k = 0; k < relay.length; k++) {
+				relay[k] = input.getIntOr("relay" + k, defaults[k]);
+			}
+			feederRelay = new dev.wildcatter.circuit.RelaySettings();
+			feederRelay.load(relay);
+		}
+		failedToOpen = input.getBooleanOr("failedToOpen", false);
 	}
 }

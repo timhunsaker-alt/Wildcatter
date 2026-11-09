@@ -20,6 +20,7 @@ import org.jspecify.annotations.Nullable;
 public class ConverterBlockEntity extends PlantUnitBlockEntity {
 	private double stackSo2;   // kg/h
 	private boolean interpass;
+	private long converted = -1000;
 
 	public ConverterBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.CONVERTER_ENTITY, pos, state);
@@ -48,6 +49,11 @@ public class ConverterBlockEntity extends PlantUnitBlockEntity {
 		return interpass;
 	}
 
+	/** True while its beds are converting: their heat is what an acid superheater against it takes (docs/multiblocks/acid-plant-steam.md). */
+	public boolean converting(Level level) {
+		return level.getGameTime() - converted < 40;
+	}
+
 	public static void tick(Level level, BlockPos pos, BlockState state, ConverterBlockEntity c) {
 		if (c.plcHold(level)) {
 			return;
@@ -71,6 +77,9 @@ public class ConverterBlockEntity extends PlantUnitBlockEntity {
 			double max = Math.min(AcidPlant.ratedSulfurKgs() * AcidPlant.gasPerSulfur() * seconds() * 1.2, absorber.canMake() / productPerGas);
 			double gas = max > 0.001 ? Lines.pull(level, c.inlet(), Product.BURNER_GAS, Math.min(max, waiting), Pull.MACHINE, c) : 0;
 			absorber.absorb(gas * productPerGas);
+			if (gas > 0) {
+				c.converted = level.getGameTime();
+			}
 			c.stackSo2 = gas * AcidPlant.so2InGas() * (1 - conversion) / seconds() * 3600;
 			double acid = gas * productPerGas / seconds();
 			c.status = gas > 0 ? String.format("%s: %.1f %% converted, %.2f kg/s of acid (%.0f t/day), %.1f kg/h of SO2 up the stack",

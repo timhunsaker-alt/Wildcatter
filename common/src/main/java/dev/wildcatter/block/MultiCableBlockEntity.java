@@ -30,7 +30,7 @@ import net.minecraft.world.level.storage.ValueOutput;
  * when the cable burns. A grounding clamp set (docs/multiblocks/gen-bus-protection.md) puts A, B and C to that ground here: on a
  * dead cable it keeps it at earth, on a live one it is a bolted fault.
  */
-public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, Inspectable, dev.wildcatter.control.Measurable {
+public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, Inspectable, dev.wildcatter.control.Measurable, dev.wildcatter.safety.Groundable {
 	/** A current transformer's reading: the largest phase. */
 	@Override
 	public double measure(Quantity quantity) {
@@ -50,6 +50,10 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 	/** Protective grounds applied here, and their branches in the last build. */
 	private boolean grounded;
 	private int[] clamps = new int[0];
+	/** The clamps' I²t against their rating (ASTM F855 grade 3), when they went on, and whether the last set burned off. */
+	private final dev.wildcatter.circuit.ClampHeating clampHeat = new dev.wildcatter.circuit.ClampHeating();
+	private long groundedAt;
+	private boolean burnedOff;
 
 	public MultiCableBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.MULTI_CABLE_ENTITY, pos, state);
@@ -106,15 +110,22 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 		}
 	}
 
+	@Override
 	public boolean grounded() {
 		return grounded;
 	}
 
 	/** Puts the grounding clamps on or takes them off; on a live cable putting them on is a bolted fault, and it flashes. */
+	@Override
 	public void setGrounded(boolean on) {
 		if (on && !grounded && level instanceof ServerLevel server && Math.abs(lineVolts) > 50) {
 			server.playSound(null, worldPosition, dev.wildcatter.WildcatterSounds.FLASHOVER, SoundSource.BLOCKS, 1.5F, 1.0F);
 			server.sendParticles(ParticleTypes.ELECTRIC_SPARK, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5, 40, 0.4, 0.4, 0.4, 0.3);
+		}
+		if (on && !grounded) {
+			clampHeat.reset();
+			burnedOff = false;
+			groundedAt = level == null ? 0 : level.getGameTime();
 		}
 		grounded = on;
 		setChanged();
@@ -132,9 +143,34 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 		return most;
 	}
 
+	/** Each solve, faulted or not, the clamps see the fault current, so a fault cleared before the final solve still heats them. */
+	@Override
+	public boolean protect(Circuit circuit, int ticks) {
+		if (clamps.length > 0) {
+			clampHeat.seen(groundAmps(circuit));
+		}
+		return false;
+	}
+
+	/** True if the last set of clamps on it burned off (their I²t past the cluster's rating). */
+	public boolean burnedOff() {
+		return burnedOff;
+	}
+
+	/** 0 to 1 and over: how much of the clamps' I²t rating the fault has used. */
+	public double clampHeating() {
+		return clampHeat.share();
+	}
+
 	@Override
 	public void apply(Circuit circuit, int ticks) {
 		hertz = circuit.hertz();
+		if (clamps.length > 0 && level != null) {
+			double seconds = Math.min(ticks, Math.max(0, level.getGameTime() - groundedAt)) / 20.0;
+			if (clampHeat.step(groundAmps(circuit), seconds, Tuning.FAULT_CLEARING_CYCLES / hertz)) {
+				burnOff();
+			}
+		}
 		double worst = 0;
 		for (int k = 0; k < CONDUCTORS.length; k++) {
 			volts[k] = circuit.voltage(node[k]);
@@ -152,6 +188,20 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 		}
 	}
 
+	/** The clamps have carried more I²t than their rating: the cables melt open at the ferrules and the grounds are gone. */
+	private void burnOff() {
+		grounded = false;
+		burnedOff = true;
+		clamps = new int[0];
+		if (level instanceof ServerLevel server) {
+			server.playSound(null, worldPosition, dev.wildcatter.WildcatterSounds.FLASHOVER, SoundSource.BLOCKS, 1.5F, 0.7F);
+			server.sendParticles(ParticleTypes.LAVA, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5, 12, 0.3, 0.3, 0.3, 0.1);
+			server.sendParticles(ParticleTypes.LARGE_SMOKE, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5, 10, 0.2, 0.2, 0.2, 0.02);
+			CircuitManager.markDirty(server);
+		}
+		setChanged();
+	}
+
 	/** Current on one conductor, for the game test and the meter. */
 	public double amps(Conductor conductor) {
 		return amps[conductor.ordinal()];
@@ -160,7 +210,9 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 	@Override
 	public Component inspect() {
 		StringBuilder text = new StringBuilder((block().busway() ? "Busway (" : "Three-phase cable (") + voltage().label() + ", " + size().label() + ", insulated): "
-				+ (grounded ? "GROUNDED (protective grounds applied), " : ""));
+				+ (grounded ? (clampHeat.share() > 0.01 ? String.format("GROUNDED (protective grounds applied, %.0f%% of their I²t used), ", clampHeat.share() * 100)
+						: "GROUNDED (protective grounds applied), ") : "")
+				+ (burnedOff ? "UNGROUNDED: the grounding clamps BURNED OFF (the fault outlasted their rating), " : ""));
 		for (Conductor conductor : new Conductor[] {Conductor.A, Conductor.B, Conductor.C}) {
 			int k = conductor.ordinal();
 			text.append(String.format("%s %.0f V %.1f A, ", conductor.name(), volts[k], amps[k]));
@@ -175,6 +227,7 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 		super.saveAdditional(output);
 		output.putDouble("heat", heat);
 		output.putBoolean("grounded", grounded);
+		output.putBoolean("burnedOff", burnedOff);
 		if (size != null) {
 			output.putString("size", size.getSerializedName());
 		}
@@ -185,6 +238,7 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 		super.loadAdditional(input);
 		heat = input.getDoubleOr("heat", 0);
 		grounded = input.getBooleanOr("grounded", false);
+		burnedOff = input.getBooleanOr("burnedOff", false);
 		size = ConductorSize.byId(input.getStringOr("size", ""));
 	}
 

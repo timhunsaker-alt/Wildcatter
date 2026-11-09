@@ -60,9 +60,19 @@ layer 0   layer 1
 - Breaking the cabinet drops it. The breaker is left as it stands: closed, it stays closed, but nothing will trip it.
 
 ## Left out (Known gaps)
-- No automatic reclosing: a recloser's shots are not modelled.
-- No 81U restoration: it is reset by hand.
-- The curve and dial are fixed.
+- No 81U restoration: it is reset by hand (decided with Tim).
+- No 50BF on a cabinet: it knows only the breaker it touches, not the one above it.
+- (Closed in the protection gap wave, 2026-11-09: reclosing shots and the settable curve and dial; see below.)
+
+## As built: the protection gap wave (2026-11-09; decisions in `docs/questions/protection-gaps.md`)
+- **Settings:** pickup, curve (MI, VI, EI), time dial, 50 and the 79's shots, set from the relay (the upper cell) with the Power Meter:
+  right-click moves the cursor, sneak and right-click steps the selected setting.
+- **79, reclosing:** after a 50 or 51 trip the cabinet recloses the breaker after open intervals of 2, 15 and 30 s, for as many
+  shots as are set (0 to 3). A trip with no shot left LOCKS OUT; a right-click resets it and closes. Held closed for 60 s, the
+  sequence resets. A 12.47 kV cabinet starts with 3 shots (four trips to lockout, as an overhead distribution feeder), a 138 kV one
+  with 1. An 81U trip is never reclosed.
+- Readout while timing: "TRIPPED: 50 instantaneous, 224 A; 79 recloses in 2 s (shot 1 of 3)".
+- NeoForge scene `cabinet_reclose`.
 
 ## Game tests
 - **`spans`:** the 12.47 kV line's breaker is a `dist_breaker_3p` with a cabinet. The line carries 7.2 kV through it.

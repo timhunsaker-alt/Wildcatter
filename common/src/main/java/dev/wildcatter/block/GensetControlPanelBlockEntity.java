@@ -153,6 +153,14 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 	private String missing = "";
 	private String supply = "";
 	private double gasBuffer;
+	/** Biogas in the engine's line, m3 (docs/biogas.md): drawn only when there is no natural gas. */
+	private double biogasBuffer;
+	/** Burning biogas this tick: the set is derated to 850 kW and its governor holds it there. */
+	private boolean biogas;
+	/** The derate's hold on the set's voltage, so a resistive load takes no more than the biogas rating (1 when not held). */
+	private double limitTrim = 1.0;
+	/** m3 of biogas burned since it was placed, for the readout's rate and the game test. */
+	private double biogasBurned;
 	private double volts;
 	private double amps;
 	private double outWatts;
@@ -370,17 +378,21 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		return worldPosition;
 	}
 
-	/** Separated gas: the engine draws from the gas run on any of its cells into a few seconds' buffer. Wet gas would wreck it. */
+	/**
+	 * Separated gas: the engine draws from the gas run on any of its cells into a few seconds' buffer. Wet gas would wreck it. It takes
+	 * separator gas, then pipeline gas, then biogas (docs/biogas.md); a run carries one product, so a set on biogas has only biogas.
+	 */
 	private void drawGas(ServerLevel level) {
 		double want = Tuning.GAS_FULL_LOAD_M3H / 3600.0 * 10 - gasBuffer;   // ten seconds at full load
-		if (want <= 0) {
+		double wantBio = dev.wildcatter.fluid.Biogas.fullLoadM3h() / 3600.0 * 10 - biogasBuffer;
+		if (want <= 0 && wantBio <= 0) {
 			return;
 		}
 		List<Lines.Face> faces = Lines.faces(dev.wildcatter.multiblock.BigParts.cellsAt(level, engine()));   // a gas line to any cell of the engine
-		double got = Lines.pull(level, faces, Product.GAS, want, FluidNode.Pull.MACHINE, null);
-		double piped = Lines.pull(level, faces, Product.PIPELINE_GAS, want - got, FluidNode.Pull.MACHINE, null);   // a gas plant's gas does as well
+		double got = want > 0 ? Lines.pull(level, faces, Product.GAS, want, FluidNode.Pull.MACHINE, null) : 0;
+		double piped = want - got > 0 ? Lines.pull(level, faces, Product.PIPELINE_GAS, want - got, FluidNode.Pull.MACHINE, null) : 0;   // a gas plant's gas does as well
 		got += piped;
-		// a carbon plant's gases, counted as the natural gas of the same heat (docs/questions/plant-crane-gaps.md)
+		// a carbon plant's gases, counted as the natural gas of the same heat (docs/questions/plant-crane-gaps.md, 7)
 		String lean = null;
 		for (Product p : new Product[] {Product.COKE_OVEN_GAS, Product.COKER_GAS}) {
 			double per = p == Product.COKE_OVEN_GAS ? Tuning.COKE_OVEN_GAS_JOULES_PER_M3 : Tuning.COKER_GAS_JOULES_PER_M3;
@@ -393,11 +405,16 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 			}
 		}
 		gasBuffer += got;
-		dev.wildcatter.fluid.Run wrong = got > 0 ? null : Lines.wrong(level, faces, Product.GAS);
-		if (wrong != null && (wrong.carries(Product.PIPELINE_GAS) || wrong.carries(Product.COKE_OVEN_GAS) || wrong.carries(Product.COKER_GAS))) {
+		double bio = gasBuffer < fuelPerTick() && wantBio > 0 ? Lines.pull(level, faces, Product.BIOGAS, wantBio, FluidNode.Pull.MACHINE, null) : 0;
+		biogasBuffer += bio;
+		dev.wildcatter.fluid.Run wrong = got > 0 || bio > 0 ? null : Lines.wrong(level, faces, Product.GAS);
+		if (wrong != null && (wrong.carries(Product.PIPELINE_GAS) || wrong.carries(Product.BIOGAS) || wrong.carries(Product.COKE_OVEN_GAS)
+				|| wrong.carries(Product.COKER_GAS))) {
 			wrong = null;
 		}
-		supply = lean != null ? lean : piped > 0 ? "pipeline gas" : got > 0 || gasBuffer > 0 ? "gas from a separator"
+		supply = lean != null ? lean : piped > 0 ? "pipeline gas" : got > 0 || gasBuffer >= fuelPerTick() && gasBuffer > 0 ? "gas from a separator"
+				: bio > 0 || biogasBuffer > 0 ? String.format("%s, burning %.0f m3/h; BIOGAS: %d kW MAX", Product.BIOGAS.label(),
+						dev.wildcatter.fluid.Biogas.fuelM3h(outWatts / Tuning.GENSET_BIOGAS_WATTS), Math.round(Tuning.GENSET_BIOGAS_WATTS / 1000))
 				: wrong != null && wrong.carries(Product.WET_GAS) ? "WET GAS: put a separator between the well and the engine"
 				: wrong != null ? "NO GAS: its gas line is " + wrong.describe()
 				: "NO GAS: run a gas line from a separator's gas side to the engine";
@@ -417,6 +434,21 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 	private double fuelPerTick() {
 		double fullPerSecond = (gas ? Tuning.GAS_FULL_LOAD_M3H : Tuning.DIESEL_FULL_LOAD_LPH) / 3600.0;
 		return fullPerSecond * (Tuning.GENSET_NO_LOAD_FUEL + (1 - Tuning.GENSET_NO_LOAD_FUEL) * loadShare()) / 20.0;
+	}
+
+	/** Biogas for one tick at the present load, on the derated rating (docs/biogas.md). */
+	private double biogasPerTick() {
+		return dev.wildcatter.fluid.Biogas.fuelM3h(outWatts / Tuning.GENSET_BIOGAS_WATTS) / 3600.0 / 20.0;
+	}
+
+	/** True while it burns biogas: derated to 850 kW. */
+	public boolean onBiogas() {
+		return biogas;
+	}
+
+	/** m3 of biogas it has burned, for the game test. */
+	public double biogasBurned() {
+		return biogasBurned;
 	}
 
 	private void step(ServerLevel level) {
@@ -440,16 +472,31 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 			wantRun = wantRun && formed;
 			run = Run.STOPPED;
 		}
+		if (run == Run.STOPPED) {
+			biogas = false;
+		}
 		// fuel
 		if (run != Run.STOPPED) {
 			double need = fuelPerTick();
 			double got;
 			if (gas) {
-				if (gasBuffer < need) {
-					drawGas(level);
+				if (gasBuffer < need && biogasBuffer < biogasPerTick() * 2) {
+					drawGas(level);   // on biogas its buffer is topped up each interval, as natural gas's is
 				}
-				got = Math.min(gasBuffer, need);
-				gasBuffer -= got;
+				if (gasBuffer >= need * 0.999 || biogasBuffer <= 0) {
+					got = Math.min(gasBuffer, need);
+					gasBuffer -= got;
+					biogas = false;
+				} else {
+					// on biogas: its own fuel line at its own rate; "got" is counted against the natural gas need
+					double bioNeed = biogasPerTick();
+					double bio = Math.min(biogasBuffer, bioNeed);
+					biogasBuffer -= bio;
+					biogasBurned += bio;
+					biogas = true;
+					gasBuffer = 0;   // the last of the natural gas in the line is gone
+					got = bioNeed > 0 ? need * bio / bioNeed : need;
+				}
 			} else {
 				GensetPartBlockEntity tank = tank(level);
 				got = tank == null ? 0 : tank.take(need);
@@ -586,7 +633,7 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		double ratedAmps = ratedWatts() / Tuning.GENERATOR_RATED_PF / (3 * nominal);
 		double ohms = nominal * Tuning.ENGINE_SAG / ratedAmps;   // sags ENGINE_SAG at full current
 		phases.build(circuit, GensetControlPanelBlock.terminalCells(worldPosition, getBlockState()),
-				List.of(GensetControlPanelBlock.terminalFace(getBlockState())), Voltage.INDUSTRIAL, nominal * appliedTrim, ohms);
+				List.of(GensetControlPanelBlock.terminalFace(getBlockState())), Voltage.INDUSTRIAL, nominal * appliedTrim * (biogas ? limitTrim : 1.0), ohms, sync.angle());
 	}
 
 	@Override
@@ -600,8 +647,27 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		amps = phases.amps(circuit);
 		outWatts = phases.watts(circuit);
 		hertz = circuit.hertz();
+		holdBiogasLimit();
 		if (stator.step(phases.phaseAmps(circuit), StatorHeating.ratedPhaseAmps(ratedWatts(), Voltage.INDUSTRIAL.nominal()), ticks / 20.0)) {
 			trip(String.format("on stator overcurrent (phase %s at %.1fx its rating)", "ABC".charAt(stator.hottestPhase()), stator.worstRatio()));
+		}
+	}
+
+	/**
+	 * On biogas the governor holds the set to its derated 850 kW: asked for more, it droops, as a set at its limit does. In this model a
+	 * set's load follows its voltage, so the hold lowers the voltage until the load takes no more than the rating (a load's power goes
+	 * with the square of its voltage), and lets it back up as the load falls.
+	 */
+	private void holdBiogasLimit() {
+		double limit = Tuning.GENSET_BIOGAS_WATTS * 0.995;
+		double before = limitTrim;
+		if (!biogas) {
+			limitTrim = 1.0;
+		} else if (outWatts > limit || limitTrim < 1.0) {
+			limitTrim = outWatts > 1 ? Math.max(0.5, Math.min(1.0, limitTrim * Math.sqrt(limit / outWatts))) : 1.0;
+		}
+		if (Math.abs(limitTrim - before) > 0.002 && level != null) {
+			CircuitManager.markDirty(level);
 		}
 	}
 
@@ -620,7 +686,7 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 	// ---- Generator: the island's frequency ----------------------------------------------------------------------------
 	@Override
 	public double ratedWatts() {
-		return gas ? Tuning.GENSET_GAS_WATTS : Tuning.GENSET_DIESEL_WATTS;
+		return gas ? (biogas ? Tuning.GENSET_BIOGAS_WATTS : Tuning.GENSET_GAS_WATTS) : Tuning.GENSET_DIESEL_WATTS;
 	}
 
 	@Override
@@ -695,6 +761,8 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		output.putBoolean("tripped", tripped);
 		output.putString("tripReason", tripReason);
 		output.putDouble("gasBuffer", gasBuffer);
+		output.putDouble("biogasBuffer", biogasBuffer);
+		output.putDouble("biogasBurned", biogasBurned);
 		output.putFloat("rpm", spin.rpm());
 		output.putDouble("watts", outWatts);
 		sync.save(output);
@@ -718,6 +786,8 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		tripped = input.getBooleanOr("tripped", false);
 		tripReason = input.getStringOr("tripReason", "");
 		gasBuffer = input.getDoubleOr("gasBuffer", 0);
+		biogasBuffer = input.getDoubleOr("biogasBuffer", 0);
+		biogasBurned = input.getDoubleOr("biogasBurned", 0);
 		spin.setRpm(input.getFloatOr("rpm", 0));
 		outWatts = input.getDoubleOr("watts", 0);
 		sync.load(input);

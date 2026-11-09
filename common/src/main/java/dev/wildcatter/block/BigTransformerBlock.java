@@ -167,6 +167,11 @@ public abstract class BigTransformerBlock extends TransformerBlock implements Bi
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 		BlockPos main = BigParts.main(pos, state);
 		if (!level.isClientSide() && level.getBlockEntity(main) instanceof TransformerBlockEntity transformer) {
+			if (transformer.lockedOut() && !transformer.isLive()) {
+				transformer.resetLockout();   // 86T, reset by hand
+				player.sendOverlayMessage(transformer.inspect());
+				return InteractionResult.SUCCESS;
+			}
 			if (!Shock.touch((ServerLevel) level, main, player, transformer.topVoltage(), transformer.isLive())) {
 				player.sendOverlayMessage(transformer.inspect());
 			}

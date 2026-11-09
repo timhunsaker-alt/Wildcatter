@@ -342,6 +342,37 @@ Spec: `docs/multiblocks/ammonia-plant.md` (approved 2026-11-09; "As built" lists
   product in kg for Tailings' emulsion truck). Boosters and detonators stay in Tailings (vanilla TNT, Tim's decision).
 - NeoForge scenes `ammonia_loop`, `nitric_acid`, `an_emulsion`; unit test `AmmoniaPlantTest`. Client scene `ammoniaPlant` (filmed, passes).
 
+### Phase 14b-14e — Gas and power quick wins — 14b-14d BUILT 2026-11-09 (while Tim was away, on the DRAFT specs decided on recommendation; not approved)
+The ammonia plant above is **14a**. The plan (`docs/ideas-plan.md`) called these 14a-14d; they are renumbered 14b-14e because Phase 14
+was already the ammonia plant. Decisions for Tim: `docs/questions/specs-wildcatter.md` items 1-13 and `docs/questions/phase14-gas-power.md`.
+- **14b, the sales line** (`docs/multiblocks/sales-gas.md`, BUILT): an off-map transmission line per dimension with a saved account; receipt
+  and delivery meter stations of five true-size parts (meter building on 2 kW residential, filter separator, ultrasonic meter run, regulator
+  skid, pipeline tap); 5 m3/s a station, 2 % kept as fuel, off-spec gas refused, 8 hours of RTU battery, PLC points. Closes the gap "Gas has
+  no sales pipeline yet". NeoForge scene `sales_gas`; client scene `salesGas` (written, to be filmed).
+- **14c, the acid plant's steam** (`docs/multiblocks/acid-plant-steam.md`, BUILT): an acid superheater against the converter; the waste heat
+  boiler's steam to the existing 5 MW turbine at part load (about 1.6 MW); condensate back by the feed pump; LOW STEAM TEMPERATURE; the
+  plant can carry itself. A machine closing onto a bus now takes its 30-degree delta-wye shift (decision 12, for Tim to check). NeoForge
+  scene `acid_steam`; client scene `acidSteam` (written, to be filmed).
+- **14d, biogas** (`docs/biogas.md`, BUILT): `Product.BIOGAS` for another mod to offer on steel pipe through `FluidNode`; the gas set derated
+  to 850 kW at 11.0 MJ/kWh; fireboxes burn it; big burners and the sales line refuse it. Ships in 0.7.0. NeoForge scene `biogas`; client
+  scene `biogas` (written, to be filmed).
+- **14e, the Mekanism check** (`docs/mekanism-check.md`): a plan, blocked until Mekanism for 26.3 is released.
+
+## The protection gap wave — DONE 2026-11-09 (the Known gaps of 10d1, 10d2, 10d3 and Phase 2's distribution; built while Tim was away: "close all known gaps")
+Decisions for Tim: `docs/questions/protection-gaps.md` (28 entries). Specs updated: `gen-bus-protection.md`, `mv-switchgear.md`,
+`breaker-relay-cabinet.md`, `power-transformer-10.md`, `panelboards.md`, `ats.md`, `poles.md`, `docs/phase2-distribution.md`.
+- **Relays:** pickup, curve (IEEE MI, VI, EI), time dial and 50 settable on every feeder relay with the Power Meter; 79 reclosing on
+  the breaker relay cabinet; 50BF on the switchgear and the 13.8 kV feeders; 87B on the 4.16 kV lineup.
+- **Switchgear:** racking time (15 s a position) and remote racking from a PLC.
+- **Differentials:** 87T on the GSUs and the 10 MVA unit, 87G on the big generators; 86B transfer-trips a GSU's 138 kV breakers.
+- **Grounding clamps:** an I²t rating (ASTM F855 grade 3); they burn off past it.
+- **Panels and switches:** a shock trips a GFCI (a 1,000 ohm body path); ATS factory timers with open, in-phase and closed transition;
+  current-limiting fuse let-through; a protection race and a coordination readout; the panel main's handle drawn by state.
+- **Distribution:** span ampacity, 4.16 kV spans, leads from insulators to cutouts and pole units, earthing at the service, the
+  flashover shattering path, pole hardware falling with its pole.
+- **Planned, not built (questions for Tim):** guy wires (20), the command-placed pole transformer's facing (21). Left out: AFCI (22).
+- NeoForge server scenes for each; the Fabric client scenes `switchgear`, `busProtection`, `ats` changed and wait for a client run.
+
 ## Plant and crane gaps — 2026-11-09 (Known gaps wave; built while Tim was away)
 Decisions for Tim: `docs/questions/plant-crane-gaps.md`. Branch `plant-crane-gaps`.
 - Cranes: wind limits from the weather (tower 20, crawler 9, ring 14 m/s at the head), ground bearing under crawlers and ring (IBC
@@ -354,8 +385,7 @@ Decisions for Tim: `docs/questions/plant-crane-gaps.md`. Branch `plant-crane-gap
   scene `ringTravel` (new) and `cranes`, `heavyLift`, `potline` changed, for the lead to run.
 
 ## Ideas (not scheduled)
-- Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released.
-- A sales gas pipeline and meter station, so a gas plant's residue gas has a buyer besides engines and the flare.
+- Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released (planned as 14e, `docs/mekanism-check.md`).
 - Plants for the 7a ores that the fuel chain doesn't use:
   - chlor-alkali from rock salt;
   - a titanium pigment plant from ilmenite and rutile (the separator's);
@@ -365,12 +395,9 @@ Decisions for Tim: `docs/questions/plant-crane-gaps.md`. Branch `plant-crane-gap
   - fertilizer from phosphate and potash;
   - drilling mud from barite and bentonite.
 - Salt domes that trap oil on their flanks, as on the Gulf Coast.
-- Biogas as an engine fuel (proposed by Farmings, 2026-11-07): a gas genset that can burn biogas from a manure digester, mostly methane
-  with carbon dioxide, at a lower heating value than pipeline gas. Farmings' digester would give about 48 kWh of electricity per tonne
-  of dairy manure (Ontario OMAFA energy-yield table), so the flow is small. Needs: a biogas fuel type, a derate on the genset's
-  rating, and a way for another mod to supply it. No change until Tim approves. See Farmings `docs/waste.md`.
 - The purer yellowcake route: ADU precipitation on the Phase 14 ammonia and a calciner at 750-800 C (94-98 % U3O8).
-- The acid plant's waste heat boiler steam to a steam turbine (about 2 kg/s of 40 bar steam).
+- Phase 14b-14d follow-ons: a small (100-250 kW) biogas set for farm digesters; biomethane upgrading so biogas can go on the sales line;
+  line pack and pressure on the sales line; a delivery station fed from the set it supplies; the condenser's fans staged at part load.
 - Uranium from phosphoric acid (phosphate rock).
 - Ammonia plant (Phase 14 gaps): the ammonia leak hazard; AN solution setting in a cold pipe; an IBC for matrix; a PGM refinery so
   gauze packs are made from refined platinum and worn packs recovered; nitrous oxide abatement on the acid unit's tail gas; prill and ANFO.

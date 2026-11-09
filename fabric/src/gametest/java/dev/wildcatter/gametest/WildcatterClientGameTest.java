@@ -188,6 +188,15 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("ammoniaPlant")) {
 				ammoniaPlant(context, server);
 			}
+			if (only("salesGas")) {
+				new GasPowerClientScenes(context, server, y, up, -8200).salesGas();
+			}
+			if (only("acidSteam")) {
+				new GasPowerClientScenes(context, server, y, up, -8400).acidSteam();
+			}
+			if (only("biogas")) {
+				new GasPowerClientScenes(context, server, y, up, -8600).biogas();
+			}
 			if (only("cascade")) {
 				cascade(context, server);
 			}
@@ -290,7 +299,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	 * site 150 m down the rails and out of its 120 m reach, travels along them (sped up) until the site is 50 m out, and stops there.
 	 */
 	private void ringTravel(ClientGameTestContext context, TestServerContext server) {
-		final int z = -8200;
+		final int z = -9000;   // clear of salesGas (-8200), acidSteam (-8400) and biogas (-8600)
 		server.runCommand("weather clear");
 		server.runCommand("effect give @p minecraft:slow_falling 600 0 true");
 		server.runCommand("tp @p 100 " + (up + 70) + " " + (z + 90) + " 90 35");
@@ -3339,7 +3348,30 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitTicks(40);
 		String reclosed = read(server, 29, up, z + 9);
 		check(reclosed.contains("CLOSED") && read(server, 35, up, z + 10).matches(".*taking [1-9].*"), "the panel's reset should close feeder 1 again: " + reclosed);
-		System.out.println("[wildcatter-test] busProtection ok: " + busTrip + " | " + feederTrip + " | " + reclosed);
+		// ---- gap wave: feeder 1's relay set from its relay compartment (curve VI), then a stuck mechanism: 50BF opens the whole bus
+		String relaySet = server.computeOnServer(srv -> {
+			dev.wildcatter.block.BreakerBlockEntity f = (dev.wildcatter.block.BreakerBlockEntity) srv.overworld().getBlockEntity(new BlockPos(29, up, z + 9));
+			f.nextFeederSetting();   // the cursor to the curve
+			f.stepFeederRelay();     // MI -> VI
+			f.stickMechanism(true);
+			return f.inspect().getString();
+		});
+		check(relaySet.contains("[VI]"), "the feeder relay's curve should step to VI: " + relaySet);
+		grounds.accept(pastFeeder);
+		context.waitTicks(40);
+		String bf = read(server, 27, up, z + 10);
+		String stuckFeeder = read(server, 29, up, z + 9);
+		System.out.println("[wildcatter-test] busProtection: 50BF | " + bf + " | " + stuckFeeder + " | " + read(server, 24, up, z + 1));
+		check(bf.contains("50BF BREAKER FAILURE") && bf.contains("LOCKED OUT"), "a feeder that fails to open should trip the bus by 50BF: " + bf);
+		check(read(server, 24, up, z + 1).contains("TRIPPED") && read(server, 29, up, z + 12).contains("TRIPPED"), "50BF should open the generator and feeder 2");
+		grounds.accept(pastFeeder);
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.BreakerBlockEntity) srv.overworld().getBlockEntity(new BlockPos(29, up, z + 9))).setSwitch(false);   // opened by hand
+			((dev.wildcatter.block.BusRelayPanelBlockEntity) srv.overworld().getBlockEntity(new BlockPos(27, up, z + 10))).reset();
+			return null;
+		});
+		context.waitTicks(40);
+		System.out.println("[wildcatter-test] busProtection ok: " + busTrip + " | " + feederTrip + " | " + reclosed + " | " + bf);
 	}
 
 	/**
@@ -3443,8 +3475,10 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		// ---- racking: feeder 3 racked out to DISCONNECTED cannot close
 		boolean refused = server.computeOnServer(srv -> {
 			dev.wildcatter.block.SwitchgearSectionBlockEntity s = (dev.wildcatter.block.SwitchgearSectionBlockEntity) srv.overworld().getBlockEntity(feeder3);
+			s.rack();             // racking takes 15 s a position (gap wave): the test finishes each move at once
+			s.finishRacking();
 			s.rack();
-			s.rack();
+			s.finishRacking();
 			return !s.operate();
 		});
 		String racked = read(server, 21, up, z - 3);
@@ -3816,7 +3850,13 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		put(server, 11, up + 1, ze + 1, "minecraft:redstone_wire");
 		java.util.function.Supplier<dev.wildcatter.block.TransferSwitchBlockEntity> atsBe = () -> server.computeOnServer(srv ->
 				(dev.wildcatter.block.TransferSwitchBlockEntity) srv.overworld().getBlockEntity(ats));
-		context.waitTicks(100);
+		context.waitTicks(5);
+		// a new ATS runs the factory timers (TDEN 30 min, TDEC 5 min); this scene runs the short set (protection gap wave)
+		server.computeOnServer(srv -> {
+			((dev.wildcatter.block.TransferSwitchBlockEntity) srv.overworld().getBlockEntity(ats)).setTimers(dev.wildcatter.block.TransferSwitchBlockEntity.Timers.SHORT);
+			return null;
+		});
+		context.waitTicks(95);
 		String onNormal = read(server, ats.getX(), ats.getY(), ats.getZ());
 		System.out.println("[wildcatter-test] ats: " + onNormal + " | " + read(server, standby.getX(), up, standby.getZ()));
 		check(onNormal.contains("on NORMAL") && onNormal.contains("engine start off") && onNormal.matches(".*NORMAL, [2-4]\\d A.*"), "the ATS should feed its load from normal: " + onNormal);

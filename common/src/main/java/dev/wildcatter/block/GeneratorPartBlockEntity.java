@@ -34,7 +34,7 @@ import net.minecraft.world.level.storage.ValueOutput;
  * generator breaker (the {@code gen_breaker} against its terminal end), onto a dead bus at once or onto a live one in step, and it
  * trips on stator overcurrent or frequency. Its terminals are the south face of its back bottom cells.
  */
-public class GeneratorPartBlockEntity extends BlockEntity implements CircuitPart, Generator, Inspectable, BigPartEntity {
+public class GeneratorPartBlockEntity extends BlockEntity implements CircuitPart, Generator, Inspectable, BigPartEntity, dev.wildcatter.safety.Groundable {
 	private final ThreePhaseSource phases = new ThreePhaseSource();
 	private final StatorHeating stator = new StatorHeating();
 	private final Synchronizer sync = new Synchronizer();
@@ -49,6 +49,13 @@ public class GeneratorPartBlockEntity extends BlockEntity implements CircuitPart
 	private double amps;
 	private double outWatts;
 	private double hertz = ElectricalStandard.active().hertz();
+	/** Protective grounds on its terminals (inside the 87G zone, between its neutral CTs and its breaker's), and their branches. */
+	private boolean grounded;
+	private int[] clamps = new int[0];
+	private final dev.wildcatter.circuit.ClampHeating clampHeat = new dev.wildcatter.circuit.ClampHeating();
+	private long groundedAt;
+	private boolean burnedOff;
+	private double differencePu;
 
 	public GeneratorPartBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.GENERATOR_PART_ENTITY, pos, state);
@@ -178,6 +185,7 @@ public class GeneratorPartBlockEntity extends BlockEntity implements CircuitPart
 	@Override
 	public void build(Circuit circuit) {
 		sync.beginBuild();
+		clamps = new int[0];
 		if (!live()) {
 			if (ready && !breakerClosed && !tripped) {
 				sync.buildTransformers(circuit, terminalCells(), List.of(terminalFace()), Voltage.GENERATOR);
@@ -186,11 +194,91 @@ public class GeneratorPartBlockEntity extends BlockEntity implements CircuitPart
 		}
 		double nominal = Voltage.GENERATOR.nominal();
 		double ratedAmps = rated / Tuning.GENERATOR_RATED_PF / (3 * nominal);
-		phases.build(circuit, terminalCells(), List.of(terminalFace()), Voltage.GENERATOR, nominal, nominal * Tuning.ENGINE_SAG / ratedAmps);
+		phases.build(circuit, terminalCells(), List.of(terminalFace()), Voltage.GENERATOR, nominal, nominal * Tuning.ENGINE_SAG / ratedAmps, sync.angle());
+		clamps = new int[0];
+		if (grounded) {
+			int earth = circuit.node();
+			circuit.ground(earth);
+			clamps = new int[] {circuit.resistor(phases.hot(0), earth, Tuning.GROUNDING_SET_OHMS), circuit.resistor(phases.hot(1), earth, Tuning.GROUNDING_SET_OHMS),
+					circuit.resistor(phases.hot(2), earth, Tuning.GROUNDING_SET_OHMS)};
+		}
+	}
+
+	private double clampAmps(Circuit circuit) {
+		double most = 0;
+		for (int clamp : clamps) {
+			most = Math.max(most, circuit.current(clamp));
+		}
+		return most;
+	}
+
+	/**
+	 * 87G, the generator differential: the current into grounds on its terminals is current its neutral-side CTs see and its breaker's
+	 * do not. Over its percentage-restrained pickup it trips the unit at once (86G); the prime mover's reset releases it.
+	 */
+	@Override
+	public boolean protect(Circuit circuit, int ticks) {
+		if (clamps.length == 0 || !live()) {
+			return false;
+		}
+		double fault = clampAmps(circuit);
+		clampHeat.seen(fault);
+		double fla = fullLoadAmps();
+		differencePu = fault / fla;
+		double through = phases.amps(circuit) / fla;
+		if (dev.wildcatter.circuit.Differential.generator(differencePu, through)) {
+			trip(String.format("by 87G generator differential (%.1f per unit in the zone, 86G lockout)", differencePu));
+			return true;
+		}
+		return false;
+	}
+
+	// ---- Groundable: a grounding set on its terminals ----
+	@Override
+	public boolean grounded() {
+		return grounded;
+	}
+
+	@Override
+	public void setGrounded(boolean on) {
+		if (on && !grounded) {
+			clampHeat.reset();
+			burnedOff = false;
+			groundedAt = level == null ? 0 : level.getGameTime();
+			if (level instanceof ServerLevel server && live()) {
+				server.playSound(null, worldPosition, WildcatterSounds.FLASHOVER, SoundSource.BLOCKS, 1.5F, 1.0F);
+			}
+		}
+		grounded = on;
+		setChanged();
+		if (level != null) {
+			CircuitManager.markDirty(level);
+		}
+	}
+
+	@Override
+	public String groundedMessage() {
+		return "Grounding set: grounds applied to the generator's terminals, A, B and C to ground";
+	}
+
+	public boolean burnedOff() {
+		return burnedOff;
 	}
 
 	@Override
 	public void apply(Circuit circuit, int ticks) {
+		if (clamps.length > 0 && level != null) {
+			double seconds = Math.min(ticks, Math.max(0, level.getGameTime() - groundedAt)) / 20.0;
+			if (clampHeat.step(live() ? clampAmps(circuit) : 0, seconds, Tuning.FAULT_CLEARING_CYCLES / circuit.hertz())) {
+				grounded = false;
+				burnedOff = true;
+				if (level instanceof ServerLevel server) {
+					server.playSound(null, worldPosition, WildcatterSounds.FLASHOVER, SoundSource.BLOCKS, 1.5F, 0.7F);
+					CircuitManager.markDirty(server);
+				}
+				setChanged();
+			}
+		}
 		if (!live()) {
 			volts = amps = outWatts = 0;
 			sync.read(circuit);
@@ -269,7 +357,9 @@ public class GeneratorPartBlockEntity extends BlockEntity implements CircuitPart
 			case "tg_generator_60" -> "Turbine generator (60 MVA, hydrogen-cooled, ";
 			default -> "Gas turbine generator (20.6 MVA, ";
 		};
-		return Component.literal(name + Voltage.GENERATOR.label() + "): " + status());
+		String grounds = grounded ? "; GROUNDED (protective grounds on its terminals)" : burnedOff ? "; the grounding clamps on its terminals BURNED OFF" : "";
+		String diff = tripped && tripReason.contains("87G") ? "" : String.format("; 87G ready (%.2f per unit difference)", live() ? differencePu : 0);
+		return Component.literal(name + Voltage.GENERATOR.label() + "): " + status() + diff + grounds);
 	}
 
 	@Override
@@ -287,6 +377,8 @@ public class GeneratorPartBlockEntity extends BlockEntity implements CircuitPart
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
 		output.putBoolean("grown", grown);
+		output.putBoolean("grounded", grounded);
+		output.putBoolean("burnedOff", burnedOff);
 		output.putBoolean("tripped", tripped);
 		output.putString("tripReason", tripReason);
 		sync.save(output);
@@ -296,6 +388,8 @@ public class GeneratorPartBlockEntity extends BlockEntity implements CircuitPart
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
 		grown = input.getBooleanOr("grown", grown);
+		grounded = input.getBooleanOr("grounded", false);
+		burnedOff = input.getBooleanOr("burnedOff", false);
 		tripped = input.getBooleanOr("tripped", false);
 		tripReason = input.getStringOr("tripReason", "");
 		sync.load(input);

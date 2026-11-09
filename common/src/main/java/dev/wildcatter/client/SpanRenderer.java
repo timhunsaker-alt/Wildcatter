@@ -47,6 +47,12 @@ public class SpanRenderer implements BlockEntityRenderer<InsulatorBlockEntity, S
 						span.other().getZ() - entity.getBlockPos().getZ(), span.covered() ? 1 : 0, span.length(), here, there});
 			}
 		}
+		// leads down to a cutout or a pole transformer: drawn from the insulator, slack
+		for (InsulatorBlockEntity.Lead lead : entity.leads()) {
+			double there = entity.getLevel() != null && entity.getLevel().getBlockEntity(lead.to()) instanceof dev.wildcatter.block.LeadEnd end ? end.leadY() : 0.9;
+			state.spans.add(new double[] {lead.to().getX() - entity.getBlockPos().getX(), lead.to().getY() - entity.getBlockPos().getY(),
+					lead.to().getZ() - entity.getBlockPos().getZ(), lead.covered() ? 1 : 0, Math.max(4, lead.length() * 2), here, there});
+		}
 	}
 
 	@Override

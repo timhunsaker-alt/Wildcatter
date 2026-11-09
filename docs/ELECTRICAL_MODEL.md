@@ -155,13 +155,27 @@ voltage transformers (wye-grounded, 1 MΩ a phase) give the 13.8 kV bus its grou
 - Transfer (10d3, docs/multiblocks/ats.md): a 480 V open-transition ATS starts a standby genset by redstone and moves the load
   over; the two sources are never paralleled through it.
 - The relays' 51 pickup is settable, as a real relay's CT ratio and tap set it: 5 to 1,200 A, up to the breaker's frame, with 50 at
-  8 x the pickup and the IEEE moderately inverse curve at time dial 1.
+  8 x the pickup and the IEEE moderately inverse curve at time dial 1 (the defaults; curve, dial and 50 settable since the gap wave).
 - Protective grounds: a grounding clamp set puts three phases to ground on a cable, busway or bus duct. On a dead conductor it keeps
   it safe to work on; on a live one it is a bolted fault.
+- The protection gap wave (2026-11-09, docs/questions/protection-gaps.md):
+  - Feeder relays: pickup, IEEE C37.112 curve (MI, VI, EI), time dial (0.5-15) and 50 (off, 4-20 x) are settable; the breaker relay
+    cabinet adds 79 (2, 15, 30 s; 3 shots on 12.47 kV, 1 on 138 kV). 50BF (2 A, 0.15 s) on the switchgear and the 13.8 kV feeders;
+    the 4.16 kV lineup has 87B in its main.
+  - 87T on every true-size transformer of 10 MVA and up but the yard's (0.3 pu, 25 % slope, zone to the bounding breakers, 86T);
+    87G on the big generators (0.1 pu, 10 % slope). 86B transfer-trips the 138 kV breakers of a GSU straight off a generator bus.
+  - The grounding clamp set is ASTM F855 grade 3 (35 kA for 15 cycles, I²t 3.06 x 10^8 A²s) and burns off past it.
+  - GFCI/RCD: a shock puts a 1,000 ohm body path (IEC 60479-1) from the touched conductor to earth.
+  - Current-limiting fuses (class J, E-rated) clear inside half a cycle above 15 x or 20 x their rating; peak let-through
+    sqrt(2) x Ith x (I/Ith)^(1/3). On a fault only the fastest timed devices act (magnetic 1 cycle, GFCI 1.5, current-limiting fuse under
+    0.5); relays act as before. Breaker and fuse readouts give the selectivity limit against the device upstream.
+  - ATS: factory timers; open, in-phase (15 degrees) or closed (5 degrees, 0.2 Hz, 5 % V, at most 100 ms) transition, limited by one
+    frequency per connected group.
 - Frequency relays for load shedding and generator protection (see above).
 - Coordination: the device closest to a fault should trip first. The Power Meter or a relay screen
   shows which device tripped and why.
-- Grounding: neutral bonded to ground only at the transformer and at the service entrance.
+- Grounding: neutral bonded to ground only at the transformer and at the service entrance. The service (gap wave): a load centre or
+  panelboard with a ground rod, its main bonding jumper N to G and its electrode 25 ohm (NEC 250.24, 250.53).
   Ground faults return through the ground path. GFCI / RCD: the panel's GFCI breaker (10d3).
 
 ## Poles and overhead lines
@@ -170,3 +184,5 @@ voltage transformers (wye-grounded, 1 MΩ a phase) give the 13.8 kV bus its grou
 - Insulators are rated per voltage; using an under-rated insulator causes flashover.
 - Poles carry transformers, fused cutouts and reclosers.
 - Cable blocks stay for LV and indoor runs.
+- Gap wave: a span heats on its conductor's ampacity (10 min time constant) and parts at 3 x its rated rise. Leads run from a line
+  insulator to a cutout or a pole transformer's H1. An under-rated insulator's arc shatters it at 50 A·s.

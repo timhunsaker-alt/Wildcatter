@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * The windings have a little resistance, which is where the heat and the few percent of loss come from.
  * The neutral on each side is tied to ground, as it is at a real service entrance.
  */
-public class TransformerBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, dev.wildcatter.multiblock.BigPartEntity {
+public class TransformerBlockEntity extends BlockEntity implements CircuitPart, Inspectable, LeadEnd, Bondable, dev.wildcatter.multiblock.BigPartEntity {
 	/** A true-size unit (the GSU) has grown into its cells: see BigParts. */
 	private boolean grown;
 
@@ -60,6 +60,13 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 	/** 0 to 1: how close an overloaded pole transformer is to failing. */
 	private final dev.wildcatter.circuit.TransformerHeating heating = new dev.wildcatter.circuit.TransformerHeating();
 	private boolean failed;
+	// ---- 87T, the transformer differential (a transformer of 10 MVA and up that is a true-size part) ----
+	private ProtectionZone lowZone;
+	private ProtectionZone highZone;
+	private boolean lockedOut;
+	private String lastTrip = "";
+	private double differencePu;
+	private final java.util.Set<BlockPos> openedByUs = new java.util.LinkedHashSet<>();
 	/** The game test sets this to give a pole transformer a small rating. Null in play. */
 	public static volatile Double testRatedVa;
 
@@ -91,6 +98,10 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 		return block().high();
 	}
 
+	public Voltage bottomVoltage() {
+		return block().low();
+	}
+
 	/** The terminals (TransformerBlock#terminals): on a one-block unit the front and top are high, the other four faces low. */
 	private java.util.List<TransformerBlock.Terminal> terminals() {
 		return block().terminals(worldPosition, getBlockState());
@@ -116,8 +127,19 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 		return split || block().poleMount();
 	}
 
+	/** Latched once it has hung on a pole: it then falls when its pole goes (a cutout or transformer set down elsewhere never does). */
+	private boolean hung;
+
+	public boolean hung() {
+		return hung;
+	}
+
 	@Override
 	public void build(Circuit circuit) {
+		if (!hung && level != null && block().poleMount() && WoodPoleBlock.poleBeside(level, worldPosition)) {
+			hung = true;
+			setChanged();
+		}
 		TransformerBlock block = block();
 		double ratio = block.high().nominal() / block.low().nominal();
 		// North American service: the low side is centre-tapped. Winding two runs the other way round, so leg B is 180 degrees from leg A.
@@ -158,6 +180,11 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 		}
 		circuit.ground(lowNeutral);
 		circuit.ground(highNeutral);
+		findZones();
+		if (block.poleMount()) {
+			pruneLeads();
+			circuit.publish(worldPosition, highPort[0]);   // a lead from a line insulator lands on H1
+		}
 
 		Conductor[] names = {Conductor.A, Conductor.B, Conductor.C};
 		for (TransformerBlock.Terminal t : terminals()) {
@@ -195,6 +222,135 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 				}
 			}
 		}
+	}
+
+	/** True if it carries 87T: a true-size, three-phase, rated unit of 10 MVA and up, not a substation yard's (its relay panel guards it). */
+	public boolean differential() {
+		TransformerBlock block = block();
+		return block instanceof dev.wildcatter.multiblock.BigPart && block.threePhase() && block.ratedVa() >= Tuning.XFMR_87_MIN_VA
+				&& !(this instanceof PowerTransformerBlockEntity);
+	}
+
+	/** The terminals on one side, as faces to walk the zone from. */
+	private java.util.List<Lines.Face> sideFaces(boolean high) {
+		java.util.List<Lines.Face> out = new java.util.ArrayList<>();
+		for (TransformerBlock.Terminal t : terminals()) {
+			if (t.high() == high) {
+				out.add(new Lines.Face(t.cell(), t.face()));
+			}
+		}
+		return out;
+	}
+
+	private void findZones() {
+		if (level == null || !differential()) {
+			lowZone = highZone = null;
+			return;
+		}
+		lowZone = ProtectionZone.walk(level, sideFaces(false));
+		highZone = ProtectionZone.walk(level, sideFaces(true));
+	}
+
+	/** The breakers bounding its high side (for the generator bus's 87B to transfer-trip a GSU's line side); empty if none. */
+	public java.util.List<BlockPos> highSideBreakers() {
+		if (level == null) {
+			return java.util.List.of();
+		}
+		return ProtectionZone.walk(level, sideFaces(true)).breakers;
+	}
+
+	/** Rated line current on one side: its VA over three phases at that side's voltage to neutral. */
+	private double ratedAmps(boolean high) {
+		return block().ratedVa() / (3 * (high ? block().high() : block().low()).nominal());
+	}
+
+	private java.util.List<BlockPos> boundary() {
+		java.util.List<BlockPos> all = new java.util.ArrayList<>();
+		if (lowZone != null) {
+			all.addAll(lowZone.breakers);
+		}
+		if (highZone != null) {
+			all.addAll(highZone.breakers);
+		}
+		return all;
+	}
+
+	/** 87T: grounds in the zone draw current that does not come out at the other side's breakers; it opens all of them, and 86T holds them. */
+	@Override
+	public boolean protect(Circuit circuit, int ticks) {
+		if (level == null || lowZone == null || highZone == null) {
+			return false;
+		}
+		if (lockedOut) {
+			boolean any = false;
+			for (BlockPos at : boundary()) {
+				any |= ProtectionZone.open(level, at, "87T transformer differential (86T lockout)");
+			}
+			return any;
+		}
+		double through = 0;
+		for (int k = 0; k < phases; k++) {
+			double winding = Math.abs(circuit.transformerCurrent(highWinding[k]));
+			through = Math.max(through, winding * (block().deltaHigh() ? Math.sqrt(3) : 1) / ratedAmps(true));
+		}
+		differencePu = lowZone.faultAmps(level, circuit) / ratedAmps(false) + highZone.faultAmps(level, circuit) / ratedAmps(true);
+		if (!dev.wildcatter.circuit.Differential.transformer(differencePu, through)) {
+			return false;
+		}
+		lockedOut = true;
+		lastTrip = String.format("87T TRANSFORMER DIFFERENTIAL TRIP: %.1f per unit in the zone (pickup %.2f)", differencePu,
+				dev.wildcatter.circuit.Differential.pickup(through, Tuning.XFMR_87_MIN_PU, Tuning.XFMR_87_SLOPE));
+		for (BlockPos at : boundary()) {
+			if (ProtectionZone.open(level, at, "87T transformer differential (86T lockout)")) {
+				openedByUs.add(at);
+			}
+		}
+		if (level instanceof net.minecraft.server.level.ServerLevel server) {
+			server.playSound(null, worldPosition, dev.wildcatter.WildcatterSounds.HV_BREAKER, net.minecraft.sounds.SoundSource.BLOCKS, 1.2F, 0.9F);
+		}
+		setChanged();
+		return true;
+	}
+
+	public boolean lockedOut() {
+		return lockedOut;
+	}
+
+	public String lastTrip() {
+		return lastTrip;
+	}
+
+	/** 86T reset by hand: the breakers it opened close again (a generator is reset to start and synchronize). */
+	public void resetLockout() {
+		if (level == null) {
+			return;
+		}
+		lockedOut = false;
+		for (BlockPos at : openedByUs) {
+			ProtectionZone.close(level, at);
+		}
+		openedByUs.clear();
+		dev.wildcatter.circuit.CircuitManager.markDirty(level);
+		setChanged();
+	}
+
+	/** "87T ready (0.00 per unit), zone bounded by 2 breakers", or the trip. */
+	private String differentialText() {
+		if (!differential()) {
+			return "";
+		}
+		if (lockedOut) {
+			return lastTrip + ", LOCKED OUT (86T); right-click with an empty hand to reset once the fault is cleared; ";
+		}
+		if (level != null && !level.isClientSide()) {
+			findZones();
+		}
+		int n = boundary().size();
+		String text = String.format("87T ready (%.2f per unit difference), zone bounded by %d breaker%s", differencePu, n, n == 1 ? "" : "s");
+		if (!lastTrip.isEmpty()) {
+			text += "; last trip: " + lastTrip;
+		}
+		return text + "; ";
 	}
 
 	@Override
@@ -286,7 +442,7 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 		String kind = block().deltaLow() ? String.format("Delta-wye generator step-up (line side %+.0f degrees) ", shiftDegrees)
 				: block().deltaHigh() ? String.format("Delta-wye power transformer (high side %+.0f degrees) ", shiftDegrees)
 				: phases == 3 ? "Three-phase transformer " : "Transformer ";
-		return Component.literal(kind + block().low().label() + (block().deltaLow() ? " (line to line)" : "") + " / " + block().high().label() + ": " + rating + legB + bc
+		return Component.literal(kind + block().low().label() + (block().deltaLow() ? " (line to line)" : "") + " / " + block().high().label() + ": " + differentialText() + rating + legB + bc
 				+ String.format("%s%.0f V %.1f A on the %s side, %.0f V %.2f A on the %s side, losing %.0f W as heat; ",
 						phases == 3 ? "A " : "", lowVolts[0], lowAmps[0], block().low().label(), highVolts[0], highAmps[0], block().high().label(), lossWatts)
 				+ (level != null && Grounding.isGrounded(level, worldPosition) ? "grounded" : "UNGROUNDED, touching it can shock you"));
@@ -295,12 +451,74 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 	@Override
 	protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput output) {
 		super.saveAdditional(output);
+		output.putBoolean("hung", hung);
+		saveLeads(output);
 		output.putBoolean("grown", grown);
+		output.putBoolean("lockedOut", lockedOut);
+		output.putString("lastTrip", lastTrip);
+		output.putInt("opened", openedByUs.size());
+		int i = 0;
+		for (BlockPos at : openedByUs) {
+			output.putLong("opened" + i++, at.asLong());
+		}
 	}
 
 	@Override
 	protected void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
 		super.loadAdditional(input);
+		hung = input.getBooleanOr("hung", false);
+		loadLeads(input);
 		grown = input.getBooleanOr("grown", false);
+		lockedOut = input.getBooleanOr("lockedOut", false);
+		lastTrip = input.getStringOr("lastTrip", "");
+		openedByUs.clear();
+		for (int i = 0; i < input.getIntOr("opened", 0); i++) {
+			openedByUs.add(BlockPos.of(input.getLongOr("opened" + i, 0)));
+		}
+	}
+
+	// ---- leads from a line insulator (LeadEnd) ----
+	private final java.util.Set<BlockPos> leadsIn = new java.util.HashSet<>();
+
+	@Override
+	public java.util.Set<BlockPos> leadsIn() {
+		return leadsIn;
+	}
+
+	@Override
+	public java.util.Collection<BlockPos> links() {
+		return leadsIn;
+	}
+
+	/** Forgets a lead whose insulator is gone or no longer holds it. */
+	private void pruneLeads() {
+		if (level != null && leadsIn.removeIf(at -> level.isLoaded(at) && !(level.getBlockEntity(at) instanceof InsulatorBlockEntity i && i.hasLeadTo(worldPosition)))) {
+			setChanged();
+		}
+	}
+
+	private void saveLeads(net.minecraft.world.level.storage.ValueOutput output) {
+		output.putInt("leadsIn", leadsIn.size());
+		int k = 0;
+		for (BlockPos at : leadsIn) {
+			output.putLong("leadIn" + k++, at.asLong());
+		}
+	}
+
+	private void loadLeads(net.minecraft.world.level.storage.ValueInput input) {
+		leadsIn.clear();
+		for (int k = 0; k < input.getIntOr("leadsIn", 0); k++) {
+			leadsIn.add(BlockPos.of(input.getLongOr("leadIn" + k, 0)));
+		}
+	}
+
+	@Override
+	public dev.wildcatter.energy.Voltage leadVoltage() {
+		return block().poleMount() ? block().high() : null;
+	}
+
+	@Override
+	public double leadY() {
+		return 0.95;
 	}
 }

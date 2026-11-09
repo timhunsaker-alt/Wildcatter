@@ -41,6 +41,8 @@
   "block.wildcatter.insulator_dist": "Pin Insulator (DIST, 15 kV)",
   "block.wildcatter.insulator_hv": "Suspension Insulator String (HV, 138 kV)",
   "item.wildcatter.conductor_spool_lv": "Conductor Spool (LV)",
+  "item.wildcatter.conductor_spool_mv": "Conductor Spool (MV)",
+  "item.wildcatter.covered_conductor_spool_mv": "Covered Conductor Spool (MV)",
   "item.wildcatter.conductor_spool_dist": "Conductor Spool (DIST)",
   "item.wildcatter.conductor_spool_hv": "Conductor Spool (HV)",
   "item.wildcatter.covered_conductor_spool_lv": "Covered Conductor Spool (LV)",
@@ -552,5 +554,11 @@
   "block.wildcatter.air_dryer": "Air Dryer",
   "block.wildcatter.day_tank": "Water Day Tank (1 m3)",
   "block.wildcatter.transmitter": "Transmitter (4-20 mA)",
+  "block.wildcatter.meter_building": "Meter Building (flow computer, chromatograph, RTU)",
+  "block.wildcatter.filter_separator": "Filter Separator",
+  "block.wildcatter.ultrasonic_meter_run": "Ultrasonic Meter Run (4 in, 4-path)",
+  "block.wildcatter.regulator_skid": "Regulator Skid (with line heater)",
+  "block.wildcatter.pipeline_tap": "Pipeline Tap (hot tap and block valve)",
+  "block.wildcatter.acid_superheater": "Acid Plant Steam Superheater",
   "block.wildcatter.crane_rail": "Crane Rail"
 }

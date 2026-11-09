@@ -17,12 +17,18 @@ import org.jspecify.annotations.Nullable;
  * The combined cycle's 5 MW condensing steam turbine and the steam side's controller (docs/multiblocks/combined-cycle.md). It takes
  * the steam of the HRSG it touches, exhausts into the air-cooled condenser touching it (whose fans it runs) and needs the HRSG's feed
  * pump running. It rolls up once there is steam and its generator synchronizes; its power is what the steam gives.
+ *
+ * <p>Its second steam source (docs/multiblocks/acid-plant-steam.md): an acid plant's superheater touching it, its feed pump touching
+ * the acid plant's waste heat boiler (to which it returns the condensate). It makes 0.87 MW a kg/s less its throttle's part-load loss,
+ * and trips on LOW STEAM TEMPERATURE if the superheater passes saturated steam.
  */
 public class SteamCycleBlockEntity extends BlockEntity implements Inspectable, BigPartEntity, dev.wildcatter.kinetic.Sounding {
 	private final dev.wildcatter.kinetic.RunningSound running = new dev.wildcatter.kinetic.RunningSound();
 	private double speed;
 	private String status = "starting";
 	private boolean grown;
+	/** Tripped on low steam temperature: it coasts down, and resets once stopped with superheat back. */
+	private boolean lowTemperature;
 
 	public SteamCycleBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.STEAM_CYCLE_ENTITY, pos, state);
@@ -35,17 +41,36 @@ public class SteamCycleBlockEntity extends BlockEntity implements Inspectable, B
 	public static void tick(Level level, BlockPos pos, BlockState state, SteamCycleBlockEntity st) {
 		double dt = 1.0 / 20.0;
 		HrsgBlockEntity hrsg = Touching.find(level, pos, HrsgBlockEntity.class, h -> true);
+		AcidSuperheaterBlockEntity sh = hrsg != null ? null : Touching.find(level, pos, AcidSuperheaterBlockEntity.class, h -> true);
+		WasteHeatBoilerBlockEntity boiler = sh == null ? null : sh.boiler(level);
 		GeneratorPartBlockEntity gen = st.generator(level);
 		UnitMotorBlockEntity acc = Touching.find(level, pos, UnitMotorBlockEntity.class, m -> m.kind().equals("air_cooled_condenser"));
-		UnitMotorBlockEntity pump = hrsg == null ? null : Touching.find(level, hrsg.getBlockPos(), UnitMotorBlockEntity.class, m -> m.kind().equals("hrsg_feed_pump"));
-		double steam = hrsg == null ? 0 : hrsg.steamWatts();
+		BlockPos feedFrom = hrsg != null ? hrsg.getBlockPos() : boiler != null ? boiler.getBlockPos() : null;
+		UnitMotorBlockEntity pump = feedFrom == null ? null : Touching.find(level, feedFrom, UnitMotorBlockEntity.class, m -> m.kind().equals("hrsg_feed_pump"));
+		double steam = hrsg != null ? hrsg.steamWatts() : sh != null ? dev.wildcatter.fluid.AcidSteam.turbineWatts(sh.steamKgs()) : 0;
 		double available = 0;
-		if (hrsg == null || gen == null || acc == null || pump == null) {
-			st.status = "NOT BUILT: needs " + (hrsg == null ? "an HRSG against it, " : "") + (gen == null ? "its GENERATOR against it, " : "")
-					+ (acc == null ? "an AIR-COOLED CONDENSER against it, " : "") + (pump == null ? "a FEED PUMP against the HRSG, " : "");
+		if (st.lowTemperature && st.speed <= 0 && (sh == null || sh.superheated() || sh.steamKgs() <= 0)) {
+			st.lowTemperature = false;   // stopped, and the steam is hot again (or gone): it may roll up again
+		}
+		if (hrsg == null && sh == null) {
+			st.status = "NO STEAM: needs an HRSG or an ACID SUPERHEATER against it";
+		} else if (sh != null && sh.steamKgs() <= 0) {
+			st.status = "NO STEAM: the acid superheater has none (" + sh.inspect().getString().replace("Acid plant superheater: ", "") + ")";
+		} else if (gen == null || acc == null || pump == null) {
+			st.status = "NOT BUILT: needs " + (gen == null ? "its GENERATOR against it, " : "") + (acc == null ? "an AIR-COOLED CONDENSER against it, " : "")
+					+ (pump == null ? (sh != null ? "a FEED PUMP against the waste heat boiler, " : "a FEED PUMP against the HRSG, ") : "");
 			st.status = st.status.substring(0, st.status.length() - 2);
+		} else if (st.lowTemperature) {
+			st.status = "TRIPPED on LOW STEAM TEMPERATURE: the superheater passed saturated steam (is the converter running?); it resets once stopped";
+		} else if (sh != null && sh.steamKgs() > 0 && !sh.superheated()) {
+			st.lowTemperature = true;   // wet steam would erode the last stages' blades
+			if (gen.live()) {
+				gen.trip("on LOW STEAM TEMPERATURE");
+			}
+			st.status = "TRIPPED on LOW STEAM TEMPERATURE: the superheater passed saturated steam (is the converter running?)";
 		} else if (steam < Tuning.ST_WATTS * 0.05) {
-			st.status = String.format("waiting for steam (the HRSG makes %.2f MW worth)", steam / 1e6);
+			st.status = hrsg != null ? String.format("waiting for steam (the HRSG makes %.2f MW worth)", steam / 1e6)
+					: String.format("NO STEAM: the superheater passes %.2f kg/s", sh.steamKgs());
 		} else {
 			double fans = acc.drive(level), feed = pump.drive(level);
 			if (fans <= 0) {
@@ -54,7 +79,11 @@ public class SteamCycleBlockEntity extends BlockEntity implements Inspectable, B
 				st.status = "NO FEEDWATER: the feed pump is not running (" + pump.describe() + ")";
 			} else {
 				available = Math.min(steam, Tuning.ST_WATTS) * Math.min(fans, feed);
-				st.status = String.format("steam for %.2f MW", available / 1e6);
+				st.status = sh == null ? String.format("steam for %.2f MW", available / 1e6)
+						: String.format("steam for %.2f MW (%.2f kg/s from the acid plant)", available / 1e6, sh.steamKgs());
+				if (boiler != null && feed > 0) {
+					boiler.returnCondensate(level, sh.steamKgs() * dt * Tuning.ACID_CONDENSATE_RETURN, dt);
+				}
 			}
 		}
 		// it rolls up over a minute on steam, and coasts down without it
@@ -64,6 +93,12 @@ public class SteamCycleBlockEntity extends BlockEntity implements Inspectable, B
 		}
 		st.running.update(st, st.speed > 0.05);
 		st.setChanged();
+	}
+
+	/** Game test hook: at speed at once (a minute in play). */
+	public void skipRunupForTest() {
+		speed = 1;
+		setChanged();
 	}
 
 	@Override
@@ -103,6 +138,7 @@ public class SteamCycleBlockEntity extends BlockEntity implements Inspectable, B
 		super.saveAdditional(output);
 		output.putBoolean("grown", grown);
 		output.putDouble("speed", speed);
+		output.putBoolean("lowTemperature", lowTemperature);
 	}
 
 	@Override
@@ -111,6 +147,7 @@ public class SteamCycleBlockEntity extends BlockEntity implements Inspectable, B
 		running.load(input);
 		grown = input.getBooleanOr("grown", grown);
 		speed = input.getDoubleOr("speed", 0);
+		lowTemperature = input.getBooleanOr("lowTemperature", false);
 	}
 
 	@Override

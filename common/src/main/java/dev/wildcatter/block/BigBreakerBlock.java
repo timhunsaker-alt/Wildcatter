@@ -163,7 +163,21 @@ public class BigBreakerBlock extends BreakerBlock implements BigPart {
 	// a click on any piece is a click on the breaker
 	@Override
 	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-		InteractionResult read = PowerMeterItem.readIfMeter(stack, level, BigParts.main(pos, state), player);
+		BlockPos main = BigParts.main(pos, state);
+		// a 15 kV feeder breaker's relay and control compartment (its upper cells): the Power Meter sets its feeder relay
+		if (stack.getItem() instanceof PowerMeterItem && voltage() == dev.wildcatter.energy.Voltage.GENERATOR && pos.getY() > main.getY()
+				&& level.getBlockEntity(main) instanceof BreakerBlockEntity breaker) {
+			if (!level.isClientSide()) {
+				if (player.isShiftKeyDown()) {
+					breaker.stepFeederRelay();
+				} else {
+					breaker.nextFeederSetting();
+				}
+				player.sendOverlayMessage(breaker.inspect());
+			}
+			return InteractionResult.SUCCESS;
+		}
+		InteractionResult read = PowerMeterItem.readIfMeter(stack, level, main, player);
 		return read != null ? read : InteractionResult.TRY_WITH_EMPTY_HAND;
 	}
 

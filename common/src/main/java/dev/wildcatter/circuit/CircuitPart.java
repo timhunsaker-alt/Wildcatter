@@ -35,6 +35,26 @@ public interface CircuitPart {
 		return false;
 	}
 
+	/**
+	 * The protection race (protection gap wave): how soon this part's {@link #protect} would open on this solve, in seconds, or
+	 * infinity if it would not. Only the fastest parts act on a solve, and the circuit is solved again without the fault, so a
+	 * current-limiting fuse clears a fault before a breaker's magnetic trip sees it. NaN (the default): untimed, it always acts, as
+	 * before.
+	 */
+	default double clearingSeconds(Circuit circuit) {
+		return Double.NaN;
+	}
+
+	/** The peak current a current-limiting fuse lets through on this solve, when it wins the race in its limiting range; 0 if none. */
+	default double letThroughPeak(Circuit circuit) {
+		return 0;
+	}
+
+	/** The rms current at which this part trips at once (its magnetic pickup); a let-through peak over √2 times it still trips it. */
+	default double instantPickupAmps() {
+		return Double.POSITIVE_INFINITY;
+	}
+
 	/** Other parts this one is linked to without touching them (an overhead span): they are solved together as one circuit. */
 	default java.util.Collection<net.minecraft.core.BlockPos> links() {
 		return java.util.List.of();

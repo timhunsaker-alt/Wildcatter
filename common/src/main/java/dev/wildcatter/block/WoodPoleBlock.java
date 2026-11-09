@@ -49,4 +49,14 @@ public class WoodPoleBlock extends BigPartBlock {
 	public static BlockPos top(BlockPos pos, BlockState state) {
 		return state.getBlock() instanceof WoodPoleBlock pole ? BigParts.main(pos, state).above(pole.height - 1) : pos;
 	}
+
+	/** True if a pole cell stands beside {@code pos} (north, south, east or west): what pole hardware hangs on. */
+	public static boolean poleBeside(net.minecraft.world.level.BlockGetter level, net.minecraft.core.BlockPos pos) {
+		for (net.minecraft.core.Direction side : net.minecraft.core.Direction.Plane.HORIZONTAL) {
+			if (isPole(level.getBlockState(pos.relative(side)))) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

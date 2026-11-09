@@ -27,7 +27,7 @@ import net.minecraft.world.level.storage.ValueOutput;
  * thermal-magnetic main breaker, and the bus behind it, which leaves the panel's faces in the wall's plane on the panel bus key for
  * its gutters. The neutral and ground run through the main unswitched.
  */
-public class PanelBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity {
+public class PanelBlockEntity extends BlockEntity implements CircuitPart, Protective, Inspectable, BigPartEntity {
 	static final Conductor[] PHASES = {Conductor.A, Conductor.B, Conductor.C};
 
 	private boolean grown;
@@ -85,7 +85,27 @@ public class PanelBlockEntity extends BlockEntity implements CircuitPart, Inspec
 			tripped = false;
 			heat = 0;
 		}
+		show();
+	}
+
+	/** Draws the main's handle by its state on every cell: up ON, down OFF, centre TRIPPED (as the gutters' breakers). */
+	private void show() {
 		setChanged();
+		if (level == null || !(getBlockState().getBlock() instanceof PanelBlock)) {
+			return;
+		}
+		PanelGutterBlock.Slot want = tripped ? PanelGutterBlock.Slot.TRIPPED : closed ? PanelGutterBlock.Slot.ON : PanelGutterBlock.Slot.OFF;
+		for (BlockPos cell : cells()) {
+			BlockState state = level.getBlockState(cell);
+			if (state.getBlock() instanceof PanelBlock && state.getValue(PanelBlock.MAIN) != want) {
+				level.setBlock(cell, state.setValue(PanelBlock.MAIN, want), 3);
+			}
+		}
+	}
+
+	/** The main handle's drawn state: ON, OFF or TRIPPED. */
+	public PanelGutterBlock.Slot handle() {
+		return getBlockState().getValue(PanelBlock.MAIN);
 	}
 
 	/** The phases its bus stabs alternate over: A and B on a split-phase load centre, L alone under IEC, A, B and C on a panelboard. */
@@ -120,11 +140,28 @@ public class PanelBlockEntity extends BlockEntity implements CircuitPart, Inspec
 		return voltage == voltage() && feedFace(cell, face) && (role != Conductor.C || voltage() == Voltage.INDUSTRIAL);
 	}
 
+	/** True while a ground rod (the grounding electrode) touches the panel or is wired to it: it is then the service, bonded (NEC 250.24). */
+	private boolean service;
+	private int electrode = -1;
+	private double electrodeAmps;
+
+	public boolean service() {
+		return service;
+	}
+
 	@Override
 	public void build(Circuit circuit) {
 		links = closed ? new int[3] : new int[0];
 		int neutral = circuit.node();
 		int ground = circuit.node();
+		// the service: a grounding electrode at the panel makes it the service disconnect; its main bonding jumper ties the neutral bar
+		// to the ground bar, and the grounding electrode conductor ties both to the rod. A panel with no rod is a sub-panel: N and G apart.
+		service = level != null && cells().stream().anyMatch(cell -> dev.wildcatter.safety.Grounding.isGrounded(level, cell));
+		electrode = -1;
+		if (service) {
+			electrode = circuit.resistor(neutral, ground, Tuning.CONTACT_OHMS);   // read: the bonding jumper's current
+			circuit.earth(neutral, Tuning.GROUND_ELECTRODE_OHMS);
+		}
 		int[] bus = new int[3];
 		for (int k = 0; k < 3; k++) {
 			int feed = circuit.node();
@@ -178,9 +215,47 @@ public class PanelBlockEntity extends BlockEntity implements CircuitPart, Inspec
 		return false;
 	}
 
+	// ---- the protection race and the coordination study ----------------------------------------------------------------------------
+	@Override
+	public double clearingSeconds(Circuit circuit) {
+		return links.length > 0 && mostAmps(circuit) > mainAmps() * Tuning.BREAKER_MAGNETIC_MULTIPLE ? Tuning.MAGNETIC_CLEAR_CYCLES / circuit.hertz() : Double.POSITIVE_INFINITY;
+	}
+
+	@Override
+	public double instantPickupAmps() {
+		return mainAmps() * Tuning.BREAKER_MAGNETIC_MULTIPLE;
+	}
+
+	@Override
+	public String curveName() {
+		return String.format("%d A main", mainAmps());
+	}
+
+	@Override
+	public double clearingSeconds(double amps) {
+		return dev.wildcatter.circuit.TimeCurrent.thermalMagnetic(curveName(), mainAmps(), Tuning.BREAKER_TRIP_SECONDS_AT_2X, Tuning.BREAKER_MAGNETIC_MULTIPLE,
+				dev.wildcatter.energy.ElectricalStandard.active().hertz()).clearingSeconds(amps);
+	}
+
+	@Override
+	public double ratingAmps() {
+		return mainAmps();
+	}
+
+	@Override
+	public double interruptingAmps() {
+		return voltage() == Voltage.LOW ? Tuning.INTERRUPT_LOAD_CENTRE : Tuning.INTERRUPT_PANELBOARD;
+	}
+
+	@Override
+	public List<Terminal> lineSide() {
+		return List.of(new Terminal(topCell(), Direction.UP), new Terminal(worldPosition, facing().getOpposite()));
+	}
+
 	/** The thermal trip. */
 	@Override
 	public void apply(Circuit circuit, int ticks) {
+		electrodeAmps = electrode >= 0 ? circuit.current(electrode) : 0;
 		amps = mostAmps(circuit);
 		double ratio = amps / mainAmps();
 		if (ratio > 1.0) {
@@ -193,13 +268,18 @@ public class PanelBlockEntity extends BlockEntity implements CircuitPart, Inspec
 		}
 	}
 
+	/** Test hook: the main trips as on a fault. */
+	public void tripForTest() {
+		trip(amps, "test trip");
+	}
+
 	private void trip(double tripAmps, String reason) {
 		closed = false;
 		tripped = true;
 		heat = 0;
 		amps = 0;
 		lastTrip = String.format("%s: %,.0f A on the %d A main", reason, tripAmps, mainAmps());
-		setChanged();
+		show();
 		if (level instanceof ServerLevel server) {
 			server.playSound(null, worldPosition, WildcatterSounds.BREAKER_TRIP, SoundSource.BLOCKS, 1.0F, 0.8F);
 			CircuitManager.markDirty(server);
@@ -231,7 +311,18 @@ public class PanelBlockEntity extends BlockEntity implements CircuitPart, Inspec
 				: closed ? String.format("ON, %,.0f A", amps) + (heat > 0.05 ? ", getting warm " + Math.round(heat * 100) + "%" : "") : "OFF";
 		int[] used = used();
 		return Component.literal(String.format("%s %s, main %d A: %s; %d space%s of %d used (%d breaker%s)", name(), voltageLabel(), mainAmps(), state,
-				used[0], used[0] == 1 ? "" : "s", spaces(), used[1], used[1] == 1 ? "" : "s"));
+				used[0], used[0] == 1 ? "" : "s", spaces(), used[1], used[1] == 1 ? "" : "s") + grounding() + Coordination.readout(level, this));
+	}
+
+	/** The service's grounding: bonded to a rod, or not. */
+	public String grounding() {
+		return service ? String.format("; SERVICE: neutral bonded to ground and earthed by its ground rod (%.0f ohm), %.2f A on the bonding jumper", Tuning.GROUND_ELECTRODE_OHMS, electrodeAmps)
+				: "; neutral not earthed here (no ground rod: a sub-panel, or an unearthed service)";
+	}
+
+	/** Amps through the main bonding jumper, neutral to ground: what comes home by the earth (the game test). */
+	public double electrodeAmps() {
+		return electrodeAmps;
 	}
 
 	/** "120/240 V" split-phase, "230 V" under IEC, "480Y/277 V" or "400Y/230 V". */

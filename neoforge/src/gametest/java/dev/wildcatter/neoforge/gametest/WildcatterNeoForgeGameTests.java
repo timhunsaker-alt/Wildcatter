@@ -44,9 +44,31 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 public class WildcatterNeoForgeGameTests {
 	private static final String[] SCENES = {"registers", "lamp", "plug", "ores"};
 	/** The ammonia plant's scenes (AmmoniaPlantScenes): big, so each gets room round it, and long, for the gensets to start. */
-	private static final String[] PLANT_SCENES = {"ammonia_loop", "nitric_acid", "an_emulsion", "crane_siting", "ring_travel", "quench_sump", "stabilizer_fuel", "cog_engine", "pot_aux", "burner_hopper"};
+	private static final String[] PLANT_SCENES = {"ammonia_loop", "nitric_acid", "an_emulsion", "crane_siting", "quench_sump", "stabilizer_fuel", "cog_engine", "pot_aux", "burner_hopper"};
+	/** Phase 14b-14d's scenes (GasPowerScenes): longer still, for the acid plant to raise steam and the turbine to take the plant. */
+	private static final String[] GAS_POWER_SCENES = {"sales_gas", "acid_steam", "biogas"};
+
+	/** The protection gap wave's grid scenes (docs/questions/protection-gaps.md), each group in its own class, all run as plant scenes. */
+	private static final java.util.Map<String, Consumer<GameTestHelper>> GRID_SCENES = new java.util.LinkedHashMap<>();
+
+	static {
+		GRID_SCENES.putAll(RelayScenes.scenes());
+		GRID_SCENES.putAll(DifferentialScenes.scenes());
+		GRID_SCENES.putAll(PanelScenes.scenes());
+		GRID_SCENES.putAll(DistributionScenes.scenes());
+	}
 
 	public WildcatterNeoForgeGameTests(IEventBus modBus) {
+		modBus.addListener(RegisterEvent.class, event -> {
+			// the stand-in gas source: a block of this mod offering a product on Wildcatter's steel pipe, as another mod would (docs/biogas.md)
+			event.register(Registries.BLOCK, helper -> helper.register(id("gas_source"), new TestGasSource.SourceBlock(
+					net.minecraft.world.level.block.state.BlockBehaviour.Properties.of().setId(ResourceKey.create(Registries.BLOCK, id("gas_source"))))));
+			event.register(Registries.BLOCK_ENTITY_TYPE, helper -> {
+				TestGasSource.TYPE = new net.minecraft.world.level.block.entity.BlockEntityType<>(TestGasSource.SourceEntity::new,
+						java.util.Set.of(BuiltInRegistries.BLOCK.getValue(id("gas_source"))));
+				helper.register(id("gas_source"), TestGasSource.TYPE);
+			});
+		});
 		modBus.addListener(RegisterEvent.class, event -> event.register(Registries.TEST_FUNCTION, helper -> {
 			helper.register(id("registers"), (Consumer<GameTestHelper>) WildcatterNeoForgeGameTests::registers);
 			helper.register(id("lamp"), (Consumer<GameTestHelper>) WildcatterNeoForgeGameTests::lamp);
@@ -62,6 +84,10 @@ public class WildcatterNeoForgeGameTests {
 			helper.register(id("cog_engine"), (Consumer<GameTestHelper>) PlantGapScenes::cogEngine);
 			helper.register(id("pot_aux"), (Consumer<GameTestHelper>) PlantGapScenes::potAux);
 			helper.register(id("burner_hopper"), (Consumer<GameTestHelper>) PlantGapScenes::burnerHopper);
+			helper.register(id("sales_gas"), (Consumer<GameTestHelper>) GasPowerScenes::salesGas);
+			helper.register(id("acid_steam"), (Consumer<GameTestHelper>) GasPowerScenes::acidSteam);
+			helper.register(id("biogas"), (Consumer<GameTestHelper>) GasPowerScenes::biogas);
+			GRID_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 		}));
 		modBus.addListener(RegisterCapabilitiesEvent.class, event -> event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, entity, side) -> STORAGE, Blocks.GOLD_BLOCK));
 		modBus.addListener(RegisterGameTestsEvent.class, event -> {
@@ -70,15 +96,24 @@ public class WildcatterNeoForgeGameTests {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
 						new TestData<>(plain, Identifier.withDefaultNamespace("empty"), 400, 1, true)));
 			}
-			for (String scene : PLANT_SCENES) {
+			for (String scene : java.util.stream.Stream.concat(java.util.Arrays.stream(PLANT_SCENES), GRID_SCENES.keySet().stream()).toList()) {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
 						new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 3000, 1, true,
 								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 40)));
 			}
+			// the ring crane's travel runs 200 m down its rails: room round it, as the sales scene has
+			event.registerTest(id("ring_travel"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id("ring_travel")),
+					new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 3000, 1, true,
+							net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 240)));
+			for (String scene : GAS_POWER_SCENES) {
+				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
+						new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 12000, 1, true,
+								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 240)));   // padding: the sales scene's delivery station is 200 blocks off
+			}
 		});
 	}
 
-	private static Identifier id(String path) {
+	static Identifier id(String path) {
 		return Identifier.fromNamespaceAndPath("wildcatter_gametest", path);
 	}
 

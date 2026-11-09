@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " L ",
+    "SPS",
+    " P "
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "L": "minecraft:lever"
+  },
+  "result": {
+    "id": "wildcatter:pipeline_tap",
+    "count": 1
+  }
+}

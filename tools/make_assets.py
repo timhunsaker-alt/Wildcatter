@@ -488,7 +488,7 @@ def spool_icon(metal, covered):
 	return draw
 
 
-for tier, metal in (("lv", COPPER), ("dist", (178, 164, 150)), ("hv", STEEL_WIRE)):
+for tier, metal in (("lv", COPPER), ("mv", (186, 150, 120)), ("dist", (178, 164, 150)), ("hv", STEEL_WIRE)):
 	tex(f"conductor_spool_{tier}", spool_icon(metal, False), kind="item")
 	tex(f"covered_conductor_spool_{tier}", spool_icon(metal, True), kind="item")
 
@@ -615,11 +615,11 @@ ITEM_MODELS = {"firebox": "block/firebox", "pump": "block/pump", "pipe": "block/
 	"gas_wellhead": "block/gas_wellhead", "casing": "block/casing", "boiler": "block/boiler", "steam_turbine": "block/steam_turbine", "electric_lamp": "block/electric_lamp",
 	"electric_heater": "block/electric_heater", "breaker": "block/breaker_on", "fuse": "block/fuse_good", "fused_cutout": "block/fused_cutout/item", "pole_transformer": "block/pole_transformer/item", "switch": "block/switch_on", "ufls_relay": "block/relay_on", "pole": "block/pole", "crossarm": "block/crossarm_x", "pole_transformer_mv": "block/pole_transformer_mv/item",
 	"ground_rod": "block/ground_rod",
-	"power_meter": "item/power_meter", "field_manual": "item/field_manual", "seismograph": "item/seismograph", "crude_oil_bucket": "item/crude_oil_bucket", "plastic_sheet": "item/plastic_sheet", "diesel_bucket": "item/diesel_bucket", "steel_ingot": "item/steel_ingot", "conductor_spool_lv": "item/conductor_spool_lv", "conductor_spool_dist": "item/conductor_spool_dist", "conductor_spool_hv": "item/conductor_spool_hv", "covered_conductor_spool_lv": "item/covered_conductor_spool_lv", "covered_conductor_spool_dist": "item/covered_conductor_spool_dist", "covered_conductor_spool_hv": "item/covered_conductor_spool_hv", "insulator_lv": "block/insulator_lv_a", **{f"receptacle_{p}": f"block/receptacle_{p}" for p in PLUG_COLORS}, **{f"plug_{p}": f"block/plug_{p}" for p in PLUG_COLORS}, "insulator_dist": "block/insulator_dist_a", "insulator_hv": "block/insulator_hv_a"}
+	"power_meter": "item/power_meter", "field_manual": "item/field_manual", "seismograph": "item/seismograph", "crude_oil_bucket": "item/crude_oil_bucket", "plastic_sheet": "item/plastic_sheet", "diesel_bucket": "item/diesel_bucket", "steel_ingot": "item/steel_ingot", "conductor_spool_lv": "item/conductor_spool_lv", "conductor_spool_mv": "item/conductor_spool_mv", "covered_conductor_spool_mv": "item/covered_conductor_spool_mv", "conductor_spool_dist": "item/conductor_spool_dist", "conductor_spool_hv": "item/conductor_spool_hv", "covered_conductor_spool_lv": "item/covered_conductor_spool_lv", "covered_conductor_spool_dist": "item/covered_conductor_spool_dist", "covered_conductor_spool_hv": "item/covered_conductor_spool_hv", "insulator_lv": "block/insulator_lv_a", **{f"receptacle_{p}": f"block/receptacle_{p}" for p in PLUG_COLORS}, **{f"plug_{p}": f"block/plug_{p}" for p in PLUG_COLORS}, "insulator_dist": "block/insulator_dist_a", "insulator_hv": "block/insulator_hv_a"}
 ITEM_MODELS.update({w: f"block/{w}_inventory" for w in WIRES})
 for name, model in ITEM_MODELS.items():
 	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:{model}"}})
-for item in ("power_meter", "field_manual", "seismograph", "crude_oil_bucket", "plastic_sheet", "diesel_bucket", "steel_ingot", "conductor_spool_lv", "conductor_spool_dist", "conductor_spool_hv", "covered_conductor_spool_lv", "covered_conductor_spool_dist", "covered_conductor_spool_hv"):
+for item in ("power_meter", "field_manual", "seismograph", "crude_oil_bucket", "plastic_sheet", "diesel_bucket", "steel_ingot", "conductor_spool_lv", "conductor_spool_mv", "covered_conductor_spool_mv", "conductor_spool_dist", "conductor_spool_hv", "covered_conductor_spool_lv", "covered_conductor_spool_dist", "covered_conductor_spool_hv"):
 	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}"}})
 
 # ---- names --------------------------------------------------------------------------------------------
@@ -666,6 +666,8 @@ save_json(f"{ASSETS}/lang/en_us.json", {
 	"block.wildcatter.insulator_dist": "Pin Insulator (DIST, 15 kV)",
 	"block.wildcatter.insulator_hv": "Suspension Insulator (HV, 138 kV)",
 	"item.wildcatter.conductor_spool_lv": "Conductor Spool (LV)",
+	"item.wildcatter.conductor_spool_mv": "Conductor Spool (MV)",
+	"item.wildcatter.covered_conductor_spool_mv": "Covered Conductor Spool (MV)",
 	"item.wildcatter.conductor_spool_dist": "Conductor Spool (DIST)",
 	"item.wildcatter.conductor_spool_hv": "Conductor Spool (HV)",
 	"item.wildcatter.covered_conductor_spool_lv": "Covered Conductor Spool (LV)",
@@ -744,7 +746,7 @@ shaped("fuse", ["GGG", "ICI", "GGG"], {"G": "minecraft:glass_pane", "I": "minecr
 shaped("ufls_relay", ["ICI", "RBR", "III"], {"I": "minecraft:iron_ingot", "C": "minecraft:comparator", "R": "minecraft:redstone", "B": f"{ns}:breaker"}, "ufls_relay")
 shaped("switch", ["I I", "ICI", "III"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot"}, "switch")
 shaped("breaker", ["ICI", "IRI", "ICI"], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, "breaker")
-for tier, wire, sheets in (("lv", "wire_hot", 1), ("dist", "dist_wire_hot", 2), ("hv", "hv_wire_hot", 3)):
+for tier, wire, sheets in (("lv", "wire_hot", 1), ("mv", "mv_wire_hot", 2), ("dist", "dist_wire_hot", 2), ("hv", "hv_wire_hot", 3)):
 	shaped(f"conductor_spool_{tier}", ["WWW", "WSW", "WWW"], {"W": f"{ns}:{wire}", "S": "minecraft:stick"}, f"conductor_spool_{tier}")
 	shapeless(f"covered_conductor_spool_{tier}", [f"{ns}:conductor_spool_{tier}"] + [f"{ns}:plastic_sheet"] * sheets, f"covered_conductor_spool_{tier}")
 shaped("insulator_lv", ["B", "N"], {"B": "minecraft:brick", "N": "minecraft:iron_nugget"}, "insulator_lv", 2)
@@ -1302,7 +1304,7 @@ for role in ("hot", "neutral"):
 	for prefix in ("mv_", "mv_plastic_", "dist_", "dist_plastic_", "hv_", "hv_plastic_"):
 		FAMILY[f"{prefix}wire_{role}"] = ACSR
 FAMILY.update({"cable_lv": BUILDING, "cable_industrial": BUILDING, "cable_mv": MV_CABLE, "cable_dist": MV_CABLE, "cable_hv": MV_CABLE})
-for tier, fam in (("lv", BUILDING), ("dist", ACSR), ("hv", ACSR)):
+for tier, fam in (("lv", BUILDING), ("mv", ACSR), ("dist", ACSR), ("hv", ACSR)):
 	FAMILY[f"conductor_spool_{tier}"] = fam
 	FAMILY[f"covered_conductor_spool_{tier}"] = fam
 SIZE_KEY = f"{ns}:conductor_size"
@@ -2263,6 +2265,29 @@ lang.update({f"block.{ns}.nitrogen_generator": "Nitrogen Generator (PSA, 10 Nm3/
 	f"block.{ns}.ammonia_converter": "Ammonia Converter (with its loop)", f"block.{ns}.nitric_acid_unit": "Nitric Acid Unit (Pt-Rh gauze, 60 % acid)",
 	f"block.{ns}.an_neutraliser": "Ammonium Nitrate Neutraliser", f"block.{ns}.emulsion_blender": "Emulsion Blender",
 	f"block.{ns}.lpg_bullet": "Pressure Bullet (18,000 gal; LPG or ammonia)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+# ---- Phase 14b and 14c: the sales line's meter stations and the acid plant's superheater -----------------------------------------
+# (docs/multiblocks/sales-gas.md, acid-plant-steam.md) blockstates, models, shapes and items come from tools/models/gas_power.py; here
+# loot, names, tags and recipes.
+GAS_POWER_PARTS = ("meter_building", "filter_separator", "ultrasonic_meter_run", "regulator_skid", "pipeline_tap", "acid_superheater")
+for name in GAS_POWER_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in GAS_POWER_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("meter_building", ["SGS", "CRC", "SSS"], {"S": S_, "G": "minecraft:glass_pane", "C": "minecraft:comparator", "R": "minecraft:repeater"}, "meter_building")
+shaped("filter_separator", ["SPS", "SWS", "SBS"], {"S": S_, "P": P_, "W": "minecraft:white_wool", "B": "minecraft:bucket"}, "filter_separator")
+shaped("ultrasonic_meter_run", ["PPP", "SCS", "PPP"], {"S": S_, "P": P_, "C": "minecraft:comparator"}, "ultrasonic_meter_run")
+shaped("regulator_skid", ["SPS", "LFL", "SPS"], {"S": S_, "P": P_, "L": "minecraft:lever", "F": "minecraft:furnace"}, "regulator_skid")
+shaped("pipeline_tap", [" L ", "SPS", " P "], {"S": S_, "P": P_, "L": "minecraft:lever"}, "pipeline_tap")
+shaped("acid_superheater", ["SBS", "PCP", "SBS"], {"S": S_, "B": "minecraft:bricks", "P": P_, "C": "minecraft:copper_block"}, "acid_superheater")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({f"block.{ns}.meter_building": "Meter Building (flow computer, chromatograph, RTU)", f"block.{ns}.filter_separator": "Filter Separator",
+	f"block.{ns}.ultrasonic_meter_run": "Ultrasonic Meter Run (4 in, 4-path)", f"block.{ns}.regulator_skid": "Regulator Skid (with line heater)",
+	f"block.{ns}.pipeline_tap": "Pipeline Tap (hot tap and block valve)", f"block.{ns}.acid_superheater": "Acid Plant Steam Superheater"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
 # ---- Phase 7g: the fuel plant (docs/multiblocks/fuel.md) -------------------------------------------------------------------

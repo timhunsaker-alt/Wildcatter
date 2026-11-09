@@ -47,7 +47,13 @@ layer 0   layer 1   layer 2
 Drops itself and its good fuses.
 
 ## Left out (Known gaps)
-- No fuse let-through or melting-curve shape beyond I²t; no ground switch; no key interlock with a downstream breaker.
+- No ground switch; no key interlock with a downstream breaker.
+- The E-rated fuses' melting curve is I²t-shaped (no published curve shape beyond it).
+
+## As built: the protection gap wave (2026-11-09)
+- The E-rated fuses are current-limiting above 20 x their rating, on the class J's law (safety-switch.md), with a 50 kA interrupting
+  rating *(proposed, ANSI C37.46 class)*; the readout names the last fault's prospective current, peak let-through and I²t, and the
+  coordination with the device upstream (a switchgear feeder relay, through its TripCurve).
 
 ## Game test (in `panels`)
 1. A switchgear feeder feeds a `lis_5kv_fused` with 25E fuses, then a unit substation and its heaters: it carries the load.
