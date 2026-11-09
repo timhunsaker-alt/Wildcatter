@@ -1450,6 +1450,15 @@ sized for a 40-pot line.
 ## Known gaps
 - Phase 14 (the ammonia plant): the `gauze_pack` and `emulsifier_pail` icons are Ludo art since the art wave (2026-11-09); no
   placeholder is left. The six parts use the mod's materials. Not built: the ammonia leak hazard, AN solution setting in a cold
+
+- Phase 14b-14d (gas and power quick wins): no new script-drawn textures (the six parts use the mod's materials). Not built: line pack
+  and pressure on the sales line, a delivery station fed from the set it supplies (the scenes run it on its battery), the condenser's fans
+  staged at part load, biomethane upgrading, a small biogas set. The acid turbine reads 1.44-1.52 MW in the scene, the low end of the
+  spec's 1.4-1.8 MW, because its 480 V fan and pump motors run at about 95 % voltage on two diesel sets. An unloaded 13.8 kV delta behind
+  a backward transformer can solve to nonsense currents (the `biogas` scene sets its load bank before the set starts). The client scenes
+  `salesGas`, `acidSteam` and `biogas` are written and compiled, not yet run or filmed. See `docs/questions/phase14-gas-power.md`.
+- Phase 14 (the ammonia plant): `gauze_pack_placeholder` and `emulsifier_pail_placeholder` are item textures drawn by script, until
+  the art comes from Ludo. The six parts use the mod's materials. Not built: the ammonia leak hazard, AN solution setting in a cold
   pipe, an IBC for matrix, a PGM refinery (a gauze pack is crafted straight from platinum reef ore and a worn pack is not recovered),
   the purge gas, nitrous oxide abatement. The client scene `ammoniaPlant` passes (filmed 2026-11-09). See
   `docs/questions/ammonia-plant.md`.
@@ -1567,7 +1576,6 @@ sized for a 40-pot line.
   needed two sets no longer holds (the crude unit scene still uses two). The soft starter and drive look the same in every state
   (no run lights on their models), and the MCC's soft-starter and drive buckets show the combination starter's door. The drive's
   motor side is solved at the island's frequency; only its readout and the motor's ramp follow the drive's own.
-- Gas has no sales pipeline yet: a gas plant's residue gas goes to engines, burners or a flare.
 - The gas plant's reboiler and stabilizer heat are not drawn from any fuel but the dehydrator's 0.5 %.
 - Pipe arms join every face of a lease part, though only its nozzles connect; the Power Meter on a pipe says what a run carries.
 - The land rig's power limit works on frequency, so on a small set it holds back well below the set's rating until the
@@ -1664,3 +1672,31 @@ the decisions taken are in `docs/questions/ammonia-plant.md` for him to go throu
   46.1 kg/h of matrix into a stock tank; NO DIESEL, NO ACID). All 8 NeoForge scenes pass (5 before).
 - **Client scene `ammoniaPlant`** (filmed): the whole chain on one diesel set, each readout in a screenshot, the matrix tank, then the
   hydrogen pipe cut (NO HYDROGEN, then NO SYNGAS). Passed on its first run (2026-11-09): reformer 30 Nm³/h, nitrogen 9.7 Nm³/h, acid 43.8 kg/h of 60 %, matrix in the tank, then NO HYDROGEN and NO SYNGAS.
+
+## Phase 14b-14d: gas and power quick wins (2026-11-09)
+Specs (DRAFT, decided on recommendation, built while Tim was away; not approved): `docs/multiblocks/sales-gas.md`,
+`docs/multiblocks/acid-plant-steam.md`, `docs/biogas.md`, each with an "As built" section. Phase 14 was already the ammonia plant
+(now called 14a), so the plan's 14a-14d are renumbered 14b-14e. Decisions: `docs/questions/phase14-gas-power.md`.
+- **14b, the sales line:** five true-size parts: METER BUILDING (controller; flow computer, chromatograph, RTU; 2 kW single-phase at the
+  low tier), FILTER SEPARATOR, ULTRASONIC METER RUN, REGULATOR SKID, PIPELINE TAP. Sneak-click sets RECEIPT or DELIVERY. An off-map line
+  per dimension (`SalesGasLine`, saved): receipts book m3 and GJ less 2 % fuel; deliveries put pipeline gas out of the regulator skid
+  while the account holds energy (0.2 % to the line heater). 5 m3/s a station. Readouts: OFF SPEC: RICH, WATER, CO2; NOT BUILT: NO
+  METER RUN / NO TAP / NO FILTER / NO REGULATOR; NO POWER on the RTU battery; METER FAILED after 8 hours; NO GAS ON THE LINE; the run
+  ticket in m3, GJ and MMBtu. PLC points RUN, RUNNING, SHUT IN, AUTO, FLOW and HEATING VALUE 4-20 mA. Closes the gap "Gas has no sales
+  pipeline yet".
+- **14c, the acid plant's steam:** an ACID SUPERHEATER (3 x 6 x 3) against the converter takes the waste heat boiler's steam (a new STEAM
+  nozzle on its top) and the 5 MW turbine against it makes about 1.6 MW at part load; the melter's coils take their share first; the
+  feed pump touching the boiler returns 90 % as condensate; LOW STEAM TEMPERATURE trip when the converter stops; through the generator
+  breaker and the unit auxiliary transformer onto the plant's 4.16 kV bus, it carries the plant with the diesel sets stopped.
+- **Solver:** a generator or genset closing onto a live bus takes the bus's angle to the nearest 30 degrees (`Synchronizer.angle`), so a
+  machine behind a delta-wye transformer parallels with the others; without it the acid turbine and the diesel sets drove about 2 MW
+  round between them. Machines with no such transformer between them stay at 0 and share load as before.
+- **14d, biogas:** `Product.BIOGAS` ("biogas, 60 % CH4", 23 MJ/m3). Another mod offers it through `FluidNode` on steel pipe. A gas set
+  burns it after separator and pipeline gas, derated to 850 kW (its governor holds it there) at 407 m3/h; fireboxes burn it by heating
+  value; the steam plant burner reads NEEDS PIPELINE GAS; the sales line refuses it. Ships in 0.7.0.
+- **Field Manual:** three pages, SALES LINE, ACID PLANT STEAM, BIOGAS.
+- **Tests:** unit test `GasPowerTest` (7 tests). NeoForge server scenes `sales_gas`, `acid_steam`, `biogas` with a stand-in gas source
+  block in the test mod (another mod's `FluidNode`). Client scenes `salesGas`, `acidSteam`, `biogas` written for filming
+  (`WILDCATTER_ONLY=...`), not yet run.
+- **14e, the Mekanism check,** stays a plan: Mekanism for 26.3 is not released.
+

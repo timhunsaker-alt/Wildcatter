@@ -153,6 +153,7 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "ammonia_converter" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.AMMONIA_CONVERTER_WATTS);
 				case "nitric_acid_unit" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.NITRIC_UNIT_WATTS);
 				case "emulsion_blender" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.EMULSION_BLENDER_WATTS);
+				case "meter_building" -> new Motor(false, Voltage.LOW, Tuning.METER_BUILDING_WATTS);   // residential, single-phase
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -168,6 +169,12 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 		if (plcHold(level)) {
 			return 0;   // not called, so its motor stops
 		}
+		called = level.getGameTime();
+		return motor().reversed() ? 0 : motor().output();
+	}
+
+	/** Runs its load with no unit to hold it: a supply that is always on (a meter building's heaters and analysers); 0 to 1. */
+	protected double power(Level level) {
 		called = level.getGameTime();
 		return motor().reversed() ? 0 : motor().output();
 	}
@@ -265,6 +272,7 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "ammonia_converter" -> "circulator and chiller";
 			case "nitric_acid_unit" -> "air blower";
 			case "emulsion_blender" -> "mixer";
+			case "meter_building" -> "heaters, chromatograph and RTU charger";
 			default -> kind();
 		};
 	}

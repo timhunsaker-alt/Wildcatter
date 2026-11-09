@@ -2265,6 +2265,29 @@ lang.update({f"block.{ns}.nitrogen_generator": "Nitrogen Generator (PSA, 10 Nm3/
 	f"block.{ns}.lpg_bullet": "Pressure Bullet (18,000 gal; LPG or ammonia)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 14b and 14c: the sales line's meter stations and the acid plant's superheater -----------------------------------------
+# (docs/multiblocks/sales-gas.md, acid-plant-steam.md) blockstates, models, shapes and items come from tools/models/gas_power.py; here
+# loot, names, tags and recipes.
+GAS_POWER_PARTS = ("meter_building", "filter_separator", "ultrasonic_meter_run", "regulator_skid", "pipeline_tap", "acid_superheater")
+for name in GAS_POWER_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in GAS_POWER_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("meter_building", ["SGS", "CRC", "SSS"], {"S": S_, "G": "minecraft:glass_pane", "C": "minecraft:comparator", "R": "minecraft:repeater"}, "meter_building")
+shaped("filter_separator", ["SPS", "SWS", "SBS"], {"S": S_, "P": P_, "W": "minecraft:white_wool", "B": "minecraft:bucket"}, "filter_separator")
+shaped("ultrasonic_meter_run", ["PPP", "SCS", "PPP"], {"S": S_, "P": P_, "C": "minecraft:comparator"}, "ultrasonic_meter_run")
+shaped("regulator_skid", ["SPS", "LFL", "SPS"], {"S": S_, "P": P_, "L": "minecraft:lever", "F": "minecraft:furnace"}, "regulator_skid")
+shaped("pipeline_tap", [" L ", "SPS", " P "], {"S": S_, "P": P_, "L": "minecraft:lever"}, "pipeline_tap")
+shaped("acid_superheater", ["SBS", "PCP", "SBS"], {"S": S_, "B": "minecraft:bricks", "P": P_, "C": "minecraft:copper_block"}, "acid_superheater")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({f"block.{ns}.meter_building": "Meter Building (flow computer, chromatograph, RTU)", f"block.{ns}.filter_separator": "Filter Separator",
+	f"block.{ns}.ultrasonic_meter_run": "Ultrasonic Meter Run (4 in, 4-path)", f"block.{ns}.regulator_skid": "Regulator Skid (with line heater)",
+	f"block.{ns}.pipeline_tap": "Pipeline Tap (hot tap and block valve)", f"block.{ns}.acid_superheater": "Acid Plant Steam Superheater"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 7g: the fuel plant (docs/multiblocks/fuel.md) -------------------------------------------------------------------
 # blockstates, models, shapes and items come from tools/models/fuel.py; here loot, names, tags, recipes and the items.
 FUEL_PARTS = ("uf6_autoclave", "idr_kiln", "granulator", "pellet_press", "sintering_furnace", "pellet_grinder", "rod_loader", "rod_welder",

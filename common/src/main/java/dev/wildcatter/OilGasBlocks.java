@@ -44,6 +44,12 @@ public interface OilGasBlocks {
 	Block GAS_COMPRESSOR = gasPlantPart(dev.wildcatter.block.GasPlantPartBlock.Part.GAS_COMPRESSOR);
 	Block TEG_DEHYDRATOR = gasPlantPart(dev.wildcatter.block.GasPlantPartBlock.Part.TEG_DEHYDRATOR);
 	Block NGL_CHILLER = gasPlantPart(dev.wildcatter.block.GasPlantPartBlock.Part.NGL_CHILLER);
+	// 14b: the sales line's meter stations (docs/multiblocks/sales-gas.md)
+	Block METER_BUILDING = salesGasPart(dev.wildcatter.block.SalesGasPartBlock.Part.METER_BUILDING);
+	Block FILTER_SEPARATOR = salesGasPart(dev.wildcatter.block.SalesGasPartBlock.Part.FILTER_SEPARATOR);
+	Block ULTRASONIC_METER_RUN = salesGasPart(dev.wildcatter.block.SalesGasPartBlock.Part.ULTRASONIC_METER_RUN);
+	Block REGULATOR_SKID = salesGasPart(dev.wildcatter.block.SalesGasPartBlock.Part.REGULATOR_SKID);
+	Block PIPELINE_TAP = salesGasPart(dev.wildcatter.block.SalesGasPartBlock.Part.PIPELINE_TAP);
 	Block REFRIGERATION_COMPRESSOR = gasPlantPart(dev.wildcatter.block.GasPlantPartBlock.Part.REFRIGERATION_COMPRESSOR);
 	Block STABILIZER = gasPlantPart(dev.wildcatter.block.GasPlantPartBlock.Part.STABILIZER);
 	Block LPG_BULLET = gasPlantPart(dev.wildcatter.block.GasPlantPartBlock.Part.LPG_BULLET);

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "LFL",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "L": "minecraft:lever",
+    "F": "minecraft:furnace"
+  },
+  "result": {
+    "id": "wildcatter:regulator_skid",
+    "count": 1
+  }
+}

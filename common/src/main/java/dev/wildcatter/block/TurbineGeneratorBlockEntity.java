@@ -296,7 +296,8 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 			}
 		}
 		firing = got / (FULL_FIRE_WATTS * dt);
-		fuelNote = burner == null ? "" : firing < fireWanted * 0.99 && fireWanted > 0 ? (wrongGas(level, burner) ? "OUT OF FUEL: its gas line carries unprocessed gas; the burner needs pipeline gas: process it in a gas plant"
+		fuelNote = burner == null ? "" : firing < fireWanted * 0.99 && fireWanted > 0 ? (wrongGas(level, burner) ? (onBiogas(level, burner)
+				? "NEEDS PIPELINE GAS: its gas line carries biogas (40 % CO2); the burner takes only pipeline gas" : "OUT OF FUEL: its gas line carries unprocessed gas; the burner needs pipeline gas: process it in a gas plant")
 				: "OUT OF FUEL: put coal in the burner or pipe pipeline gas or residue to it") : "";
 		// drum pressure: the fire raises it, the steam drawn and the losses lower it
 		heat += (firing - steamShare - 0.02) * dt / Tuning.PLANT_HEATUP_SECONDS;
@@ -370,6 +371,12 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 		// or residue, as fuel oil (docs/multiblocks/crude-units.md)
 		return got + Lines.pull(level, Lines.faces(cells), Product.RESIDUE, (joules - got) / Tuning.FUEL_OIL_JOULES_PER_L, FluidNode.Pull.MACHINE, null)
 				* Tuning.FUEL_OIL_JOULES_PER_L;
+	}
+
+	/** True if the burner's gas line carries biogas (docs/biogas.md): the steam plant's burner needs pipeline gas. */
+	private boolean onBiogas(ServerLevel level, SteamPlantPartBlockEntity burner) {
+		dev.wildcatter.fluid.Run wrong = Lines.wrong(level, Lines.faces(dev.wildcatter.multiblock.BigParts.cellsAt(level, burner.getBlockPos())), Product.PIPELINE_GAS);
+		return wrong != null && wrong.carries(Product.BIOGAS);
 	}
 
 	/** True if the burner's gas line carries a gas it will not burn. */

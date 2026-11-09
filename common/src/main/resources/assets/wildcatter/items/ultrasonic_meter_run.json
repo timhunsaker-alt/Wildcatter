@@ -1,0 +1,6 @@
+{
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/ultrasonic_meter_run/item"
+ }
+}

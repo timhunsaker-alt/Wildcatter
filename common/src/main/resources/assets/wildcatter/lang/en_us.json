@@ -551,5 +551,11 @@
   "block.wildcatter.air_compressor": "Instrument Air Compressor",
   "block.wildcatter.air_dryer": "Air Dryer",
   "block.wildcatter.day_tank": "Water Day Tank (1 m3)",
-  "block.wildcatter.transmitter": "Transmitter (4-20 mA)"
+  "block.wildcatter.transmitter": "Transmitter (4-20 mA)",
+  "block.wildcatter.meter_building": "Meter Building (flow computer, chromatograph, RTU)",
+  "block.wildcatter.filter_separator": "Filter Separator",
+  "block.wildcatter.ultrasonic_meter_run": "Ultrasonic Meter Run (4 in, 4-path)",
+  "block.wildcatter.regulator_skid": "Regulator Skid (with line heater)",
+  "block.wildcatter.pipeline_tap": "Pipeline Tap (hot tap and block valve)",
+  "block.wildcatter.acid_superheater": "Acid Plant Steam Superheater"
 }
