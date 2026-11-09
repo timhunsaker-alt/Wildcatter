@@ -80,10 +80,30 @@ layer 0   layer 1   layer 2
 - The lineup splits there: the sections on either side form their own lineups, and the rule above applies to each.
 
 ## Left out (Known gaps)
-- Racking is instant: there is no racking time, and no remote racking.
-- No breaker failure protection (50BF): a breaker always opens when its relay trips it.
-- No bus differential on the 4.16 kV bus. A fault on the bus itself is cleared by the main's 51, or by the source's protection.
-- The relay's curve and dial are fixed. Only the pickup and the frame are set.
+- (Closed in the protection gap wave, 2026-11-09: racking time and remote racking, 50BF, 87B on the lineup bus, settable curve and
+  dial. See "As built: the protection gap wave" below.)
+- The main's 50BF has no breaker above it in the lineup to open: a main that fails to open is left to the source's protection (no
+  transfer trip to the transformer's primary breaker).
+
+## As built: the protection gap wave (2026-11-09; decisions in `docs/questions/protection-gaps.md`)
+- **Settings:** pickup (5 to 3,000 A, up to the frame), curve (IEEE C37.112 MI, VI, EI), time dial (0.5 to 15) and 50 (off, 4 to 20 x
+  the pickup), from the relay door (the middle cell) with the Power Meter: right-click moves the cursor, sneak and right-click steps
+  the selected setting. A new relay starts at 100 A, MI, TD 1, 50 at 8 x, as before.
+- **Racking time:** 15 s a position (about 20 turns of a racking handle); the breaker cannot close while the truck moves, and the
+  readout counts down ("OPEN, RACKING from CONNECTED to TEST, 9 s").
+- **Remote racking:** PLC points RACK IN (6) and RACK OUT (7) drive the remote racking motor one position toward CONNECTED or
+  DISCONNECTED, with the selector on REMOTE; CONNECTED (8) and RACKING (9) read back. Real counterpart: a remote racking device, which
+  keeps the operator out of the arc-flash boundary.
+- **50BF:** a breaker told to open that is still carrying more than 2 A after 0.15 s (62BF, about 9 cycles) has failed: every other
+  breaker in the lineup opens and the main's 86BF holds them until the main is reset. A breaker fails to open when it is asked to
+  interrupt more than 41 kA (a 5 kV, 350 MVA class vacuum breaker, IEEE C37.06) or its mechanism has stuck (a test hook). A hand opens
+  a stuck breaker.
+- **87B:** the main section carries the lineup's bus differential. The grounding clamp set goes on any section's bus compartment
+  (right-click a section with it). Current into grounds on the bus above `max(0.5 x the main's 51 pickup, 0.3 x the current through the
+  lineup's breakers)` opens every breaker in the lineup at once; 86B holds them, and a feeder refuses to close, until the main is
+  right-clicked.
+- **For the coordination check:** each section gives its time-current curve (its 50/51 plus 3 cycles of interrupting time).
+- NeoForge scenes `switchgear_settings` and `switchgear_bf_87b`.
 
 ## Game test (`switchgear`)
 1. **The supply:** a diesel genset and a unit substation run backward give 4.16 kV to a MAIN section. Two FEEDER sections stand to
