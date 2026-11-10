@@ -1448,6 +1448,9 @@ sized for a 40-pot line.
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- Phase 16 (uranium routes and plant operations, 2026-11-10; `docs/questions/phase16-uranium.md`): script-drawn icon
+  `u3o8_drum_placeholder` (16a). Not built in 16a: uranyl peroxide precipitation, ammonia recovery, ASTM C967 impurity penalties.
+  16b2, 16c2 and 16d2 are planned in ROADMAP, not built.
 - Phase 14 (the ammonia plant): the `gauze_pack` and `emulsifier_pail` icons are Ludo art since the art wave (2026-11-09); no
   placeholder is left. The six parts use the mod's materials. Not built: the ammonia leak hazard, AN solution setting in a cold
   pipe, an IBC for matrix, a PGM refinery (a gauze pack is crafted straight from platinum reef ore and a worn pack is not recovered),
@@ -1838,3 +1841,19 @@ Branch `misc-gaps`.
 - **Field Manual:** GENSETS (the derate on coke oven gas), PEAKER (no coke oven gas, the Wobbe index).
 - **Tests:** unit test `LeanGasTest` (3). NeoForge server scenes `cog_derate` (860 kW held against a 1 MW bank), `aero_lean_gas`,
   `cracker_pump` (a furnace filled 0 to 200 L by a process water pump on a diesel set), `alternator_frames`, `drawn_runs`.
+
+## Phase 16: uranium routes and plant operations (2026-11-10; built while Tim was away; decisions: `docs/questions/phase16-uranium.md`)
+Plan: `docs/ideas-plan.md`. Branch `phase16`. Nothing changes what an existing world already does.
+- **16a, ADU yellowcake** (`docs/multiblocks/adu-yellowcake.md`, "As built"):
+  - URANIUM CALCINER (3 x 8 x 3, a mill part): a six-hearth calciner against the precipitation tank and the drum filler, in the dryer's
+    place. Burners 0.6 MW on gas or LPG (east face, bottom); rabble drive and off-gas fan 15 kW on the industrial supply, its box on the
+    north face of its main cell. FIRING UP for 5 minutes from cold, then up to 0.45 kg of U3O8 a second.
+  - The precipitation tank takes liquid ammonia on the east face of its bottom cells: ADU at pH 7.5, 0.2 kg of NH3 a kg of U3O8, held
+    apart from the magnesia precipitate. NO AMMONIA, NO CALCINER. Without ammonia the tank runs on magnesia as before.
+  - New item U3O8 DRUM (96 %): 384 kg of U3O8, 326 kg of U. The drum filler holds the two concentrates apart.
+  - Conversion: the reducer takes both drums; the share from U3O8 drums follows the uranium down the line: 5.65 g of hydrogen a kg of
+    U, HF 0.43 kg (no MgF2), ash 0.049 kg.
+  - Field Manual page ADU AND THE CALCINER.
+  - Tests: NeoForge scene `adu_yellowcake` passes; unit test `UraniumOperationsTest` (16a: H2 derivation, the drums' uranium, one
+    ammonia plant feeds 76 kg/h of U3O8).
+

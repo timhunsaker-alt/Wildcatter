@@ -290,6 +290,7 @@
     "wildcatter:junction_box",
     "wildcatter:control_supply",
     "wildcatter:plc_cabinet",
-    "wildcatter:remote_io_drop"
+    "wildcatter:remote_io_drop",
+    "wildcatter:uranium_calciner"
   ]
 }

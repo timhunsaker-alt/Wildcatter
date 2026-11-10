@@ -21,6 +21,7 @@ import org.jspecify.annotations.Nullable;
 public class ConversionStageBlockEntity extends PlantUnitBlockEntity implements UraniumStage {
 	private double uranium;
 	private double counted;   // kg: the scrubbed off-gas, or the fluorinator's ash
+	private double aduShare;  // of the uranium held, the share from 96 % U3O8 drums (16a)
 
 	public ConversionStageBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
@@ -50,6 +51,11 @@ public class ConversionStageBlockEntity extends PlantUnitBlockEntity implements 
 	}
 
 	@Override
+	public double aduShare() {
+		return aduShare;
+	}
+
+	@Override
 	public double takeUranium(double kg) {
 		double got = Math.min(kg, uranium);
 		uranium -= got;
@@ -68,7 +74,9 @@ public class ConversionStageBlockEntity extends PlantUnitBlockEntity implements 
 		Class<? extends UraniumStage> before = f ? ConversionStageBlockEntity.class : ReductionReactorBlockEntity.class;
 		UraniumStage up = Touching.find(level, pos, before, u -> !f || u instanceof ConversionStageBlockEntity c && !c.fluorinator());
 		Product reagent = f ? Product.FLUORINE : Product.ANHYDROUS_HF;
-		double perU = f ? Tuning.CONV_F2_PER_U : Tuning.CONV_HF_PER_U / Tuning.AHF_KG_PER_L;   // kg of F2, or litres of HF, a kg of U
+		double share = up == null ? 0 : up.aduShare();
+		// kg of F2, or litres of HF, a kg of U: U3O8 drums bring no magnesia to take HF as MgF2 (16a)
+		double perU = f ? Tuning.CONV_F2_PER_U : hfPerU(share) / Tuning.AHF_KG_PER_L;
 		String name = f ? "Fluorinator" : "Hydrofluorinator";
 		if (up == null) {
 			s.status = "NOT BUILT: set it against the " + (f ? "HYDROFLUORINATOR" : "REDUCTION REACTOR");
@@ -84,9 +92,13 @@ public class ConversionStageBlockEntity extends PlantUnitBlockEntity implements 
 				s.status = "idle: the stage after it is full";
 			} else {
 				Lines.pull(level, s.reagentFaces(), reagent, kg * perU, Pull.MACHINE, s);
-				s.uranium += up.takeUranium(kg);
+				double got = up.takeUranium(kg);
+				s.aduShare = UraniumStage.blend(s.uranium, s.aduShare, got, share);
+				s.uranium += got;
+				s.taken += kg * perU;
+				s.through += kg;
 				// the fluorinator keeps the feed's impurities as ash; the hydrofluorinator scrubs its water and excess HF
-				s.counted += f ? kg * ashPerU() : kg * (Tuning.CONV_HF_PER_U - 0.336 + 0.151);
+				s.counted += f ? kg * ashPerU(share) : kg * (hfPerU(share) - 0.336 + 0.151);
 				s.status = String.format("%s %.3f kg/s of U with %.3f %s/s", f ? "fluorinating" : "hydrofluorinating", kg / seconds(), kg * perU / seconds(), reagent.unit());
 			}
 		}
@@ -100,6 +112,33 @@ public class ConversionStageBlockEntity extends PlantUnitBlockEntity implements 
 		return Tuning.DRUM_NET_KG * (1 - Tuning.YELLOWCAKE_U3O8) / u;
 	}
 
+	/** The same for 96 % U3O8 drums: the 4 % that is not U3O8 (16a, proposed). */
+	static double aduAshPerU() {
+		double u = Tuning.DRUM_NET_KG * Tuning.ADU_U3O8 * dev.wildcatter.ore.Ore.U_IN_U3O8;
+		return Tuning.DRUM_NET_KG * (1 - Tuning.ADU_U3O8) / u;
+	}
+
+	/** Ash a kg of U for a feed with this share from U3O8 drums. */
+	public static double ashPerU(double adu) {
+		return ashPerU() * (1 - adu) + aduAshPerU() * adu;
+	}
+
+	/** kg of HF a kg of U the hydrofluorinator takes for a feed with this share from U3O8 drums. */
+	public static double hfPerU(double adu) {
+		return Tuning.CONV_HF_PER_U - Tuning.CONV_HF_MGF2_PER_U * adu;
+	}
+
+	private double taken;     // the reagent taken, in its unit, and the kg of U through, since placed (the game test reads them)
+	private double through;
+
+	public double reagentTaken() {
+		return taken;
+	}
+
+	public double uraniumThrough() {
+		return through;
+	}
+
 	@Override
 	public Component inspect() {
 		return Component.literal(status + String.format("; %.1f kg of U held; %,.0f kg %s", uranium, counted, fluorinator() ? "of ash in its bed" : "of water and HF to its scrubber"));
@@ -110,6 +149,9 @@ public class ConversionStageBlockEntity extends PlantUnitBlockEntity implements 
 		super.saveAdditional(output);
 		output.putDouble("uranium", uranium);
 		output.putDouble("counted", counted);
+		output.putDouble("aduShare", aduShare);
+		output.putDouble("taken", taken);
+		output.putDouble("through", through);
 	}
 
 	@Override
@@ -117,5 +159,8 @@ public class ConversionStageBlockEntity extends PlantUnitBlockEntity implements 
 		super.loadAdditional(input);
 		uranium = input.getDoubleOr("uranium", 0);
 		counted = input.getDoubleOr("counted", 0);
+		aduShare = input.getDoubleOr("aduShare", 0);
+		taken = input.getDoubleOr("taken", 0);
+		through = input.getDoubleOr("through", 0);
 	}
 }

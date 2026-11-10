@@ -415,6 +415,22 @@ Decisions for Tim: `docs/questions/plc-gaps.md` (12 entries). Spec updated: `doc
   - process models (pipe pressure, drum pressure, a turbine's load setpoint, dampers, vibration, CT and PT voltage);
   - the crane's lift start.
 
+## Phase 16 — Uranium routes and plant operations — 16a BUILT 2026-11-10 (built while Tim was away, on the DRAFT specs decided on recommendation; not approved)
+Plan: `docs/ideas-plan.md`, Phase 16. Branch `phase16`. Decisions for Tim: `docs/questions/phase16-uranium.md` (numbered across the waves).
+Rule: nothing changes or slows what an existing world already does; anything that would alter a plant already built is behind a
+default-off setting or waits until the player adds the new part.
+- **16a, ADU yellowcake** (`docs/multiblocks/adu-yellowcake.md`, BUILT): liquid ammonia to the precipitation tank's east side makes
+  ammonium diuranate; a new 3 x 8 x 3 URANIUM CALCINER (0.6 MW of burners, 15 kW drive) against the tank and the drum filler calcines it to
+  U3O8 at 96 %, a new U3O8 DRUM of 326 kg of U. Conversion takes 5.65 g of hydrogen a kg of U for it, no HF for magnesia and a sixth of the
+  ash. Without ammonia the old route is unchanged. NeoForge scene `adu_yellowcake`; unit test `UraniumOperationsTest`.
+- **16b1** (conversion's cathode hydrogen, ash bed and KOH), **16c1** (product assay, spin-up and cooling), **16d1** (ISR CO2, bleed and
+  satellites): next.
+- **Planned, not built (can wait):** **16b2** the full-size conversion plant (four cell houses in series on a 12.47 kV `rectifier_mv`,
+  a second, larger main line); **16c2** machine crashes, the sampling autoclave and blending, cylinder heels; **16d2** monitor-well rings,
+  excursions and groundwater restoration (RO unit). Each is written in its spec.
+- **Known gaps:** the `u3o8_drum_placeholder` icon is drawn by script. The calciner uses the mod's materials. Not built: uranyl peroxide
+  precipitation, ammonia recovery from the off-gas and barren liquor, ASTM C967 impurity penalties.
+
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released (planned as 14e, `docs/mekanism-check.md`).
 - Plants for the 7a ores that the fuel chain doesn't use:

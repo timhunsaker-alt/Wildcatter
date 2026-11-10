@@ -19,7 +19,8 @@ import net.minecraft.world.phys.BlockHitResult;
 
 /**
  * One part of the uranium mill at true size (docs/multiblocks/uranium-mill.md): the jaw crusher and SAG mill, the leach tank, the
- * CCD thickener and the SX circuit on steel pipe; the precipitation tank, yellowcake dryer and drum filler, a unit by touching.
+ * CCD thickener and the SX circuit on steel pipe; the precipitation tank, yellowcake dryer and drum filler, a unit by touching. 16a
+ * adds the uranium calciner, the ADU route's finisher in the dryer's place (docs/multiblocks/adu-yellowcake.md).
  */
 public class MillPartBlock extends BigPartBlock implements net.minecraft.world.WorldlyContainerHolder {
 	public enum Part {
@@ -30,7 +31,8 @@ public class MillPartBlock extends BigPartBlock implements net.minecraft.world.W
 		SX_CIRCUIT("sx_circuit", Footprint.box(6, 3, 16, 0, 0)),
 		PRECIPITATION_TANK("precipitation_tank", Footprint.box(4, 5, 4, 0, 0)),
 		YELLOWCAKE_DRYER("yellowcake_dryer", Footprint.box(3, 8, 3, 0, 0)),
-		DRUM_FILLER("drum_filler", Footprint.box(2, 4, 2, 0, 0));
+		DRUM_FILLER("drum_filler", Footprint.box(2, 4, 2, 0, 0)),
+		URANIUM_CALCINER("uranium_calciner", Footprint.box(3, 8, 3, 0, 0));
 
 		private final String id;
 		private final Footprint footprint;
@@ -67,6 +69,7 @@ public class MillPartBlock extends BigPartBlock implements net.minecraft.world.W
 			case PRECIPITATION_TANK -> new PrecipitationTankBlockEntity(pos, state);
 			case YELLOWCAKE_DRYER -> new YellowcakeDryerBlockEntity(pos, state);
 			case DRUM_FILLER -> new DrumFillerBlockEntity(pos, state);
+			case URANIUM_CALCINER -> new UraniumCalcinerBlockEntity(pos, state);
 		};
 	}
 
@@ -81,6 +84,7 @@ public class MillPartBlock extends BigPartBlock implements net.minecraft.world.W
 				case SX_CIRCUIT -> createTickerHelper(type, WildcatterBlocks.SX_CIRCUIT_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
 				case PRECIPITATION_TANK -> createTickerHelper(type, WildcatterBlocks.PRECIPITATION_TANK_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
 				case DRUM_FILLER -> createTickerHelper(type, WildcatterBlocks.DRUM_FILLER_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
+				case URANIUM_CALCINER -> createTickerHelper(type, WildcatterBlocks.URANIUM_CALCINER_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
 				case YELLOWCAKE_DRYER -> null;
 			};
 		}
@@ -93,6 +97,7 @@ public class MillPartBlock extends BigPartBlock implements net.minecraft.world.W
 			case PRECIPITATION_TANK -> createTickerHelper(type, WildcatterBlocks.PRECIPITATION_TANK_ENTITY, UnitMotorBlockEntity::tick);
 			case YELLOWCAKE_DRYER -> createTickerHelper(type, WildcatterBlocks.YELLOWCAKE_DRYER_ENTITY, YellowcakeDryerBlockEntity::tick);
 			case DRUM_FILLER -> createTickerHelper(type, WildcatterBlocks.DRUM_FILLER_ENTITY, UnitMotorBlockEntity::tick);
+			case URANIUM_CALCINER -> createTickerHelper(type, WildcatterBlocks.URANIUM_CALCINER_ENTITY, UnitMotorBlockEntity::tick);
 		};
 	}
 

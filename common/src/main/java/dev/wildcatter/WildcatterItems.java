@@ -43,6 +43,11 @@ public final class WildcatterItems {
 			String.format("%,.0f kg of uranium ore concentrate (magnesium diuranate)", Tuning.DRUM_NET_KG),
 			String.format("%.0f %% U3O8: %,.0f kg of U3O8, %,.0f kg of uranium", Tuning.YELLOWCAKE_U3O8 * 100, Tuning.DRUM_NET_KG * Tuning.YELLOWCAKE_U3O8,
 					Tuning.DRUM_NET_KG * Tuning.YELLOWCAKE_U3O8 * dev.wildcatter.ore.Ore.U_IN_U3O8));
+	/** 16a: the ADU route's drum (docs/multiblocks/adu-yellowcake.md): calcined U3O8 at 96 %. */
+	public static final ResourceKey<Item> U3O8_DRUM_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("u3o8_drum"));
+	public static final Item U3O8_DRUM = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(1).setId(U3O8_DRUM_KEY),
+			String.format("U3O8, %.0f %%: %.0f kg net, %.0f kg of U3O8, %.0f kg of uranium", Tuning.ADU_U3O8 * 100, Tuning.DRUM_NET_KG, Tuning.DRUM_NET_KG * Tuning.ADU_U3O8,
+					Tuning.DRUM_NET_KG * Tuning.ADU_U3O8 * dev.wildcatter.ore.Ore.U_IN_U3O8), "calcined ammonium diuranate, for conversion");
 
 	/** 7c: a 4 in submersible pump (7.5 hp, 480 V): clicked into an ISR well, it makes the well a producer. */
 	public static final ResourceKey<Item> SUBMERSIBLE_PUMP_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("submersible_pump"));
@@ -343,6 +348,7 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, MAGNESIA_KEY, MAGNESIA);
 		Registry.register(BuiltInRegistries.ITEM, EMPTY_DRUM_KEY, EMPTY_DRUM);
 		Registry.register(BuiltInRegistries.ITEM, YELLOWCAKE_DRUM_KEY, YELLOWCAKE_DRUM);
+		Registry.register(BuiltInRegistries.ITEM, U3O8_DRUM_KEY, U3O8_DRUM);
 		Registry.register(BuiltInRegistries.ITEM, SUBMERSIBLE_PUMP_KEY, SUBMERSIBLE_PUMP);
 		Registry.register(BuiltInRegistries.ITEM, EMPTY_48Y_CYLINDER_KEY, EMPTY_48Y_CYLINDER);
 		Registry.register(BuiltInRegistries.ITEM, UF6_CYLINDER_48Y_KEY, UF6_CYLINDER_48Y);

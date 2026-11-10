@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SFS",
+    "BXB",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "F": "minecraft:blast_furnace",
+    "B": "minecraft:bricks",
+    "X": "minecraft:piston",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:uranium_calciner",
+    "count": 1
+  }
+}

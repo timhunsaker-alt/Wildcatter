@@ -384,6 +384,7 @@
     "wildcatter:estop",
     "wildcatter:pilot_light",
     "wildcatter:stack_light",
-    "wildcatter:horn"
+    "wildcatter:horn",
+    "wildcatter:uranium_calciner"
   ]
 }

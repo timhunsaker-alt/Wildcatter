@@ -1220,4 +1220,15 @@ public final class Tuning {
 	public static final double GROUND_ELECTRODE_OHMS = 25.0;
 	/** A lead (jumper) from a line insulator down to a cutout or a pole transformer's H1 bushing is a few metres at most. */
 	public static final int LEAD_MAX_BLOCKS = 6;
+
+	// ---- Phase 16a: ADU yellowcake (docs/multiblocks/adu-yellowcake.md) --------------------------------------------------------
+	public static final double ADU_NH3_PER_U3O8 = 0.2;             // kg of NH3 a kg of U3O8: 0.072 the ADU, the rest the liquor's free acid (proposed)
+	public static final double ADU_U3O8 = 0.96;                    // calcined U3O8 (uranium-mill.md: ADU and a calciner give 94-98 %)
+	public static final double CALCINER_FIRING_WATTS = 600_000.0;  // the multiple-hearth calciner's burners at 750-800 C (proposed)
+	public static final double CALCINER_WATTS = 15_000.0;          // its rabble drive and off-gas fan (unverified), the industrial supply
+	public static final double CALCINER_U3O8_KGS = 0.45;           // the calciner's most: the mill's full rate
+	public static final double CALCINER_WARMUP_SECONDS = 300.0;    // from cold to 750 C (proposed)
+	public static final double CONV_H2_PER_U_ADU = 5.65e-3;        // kg of H2 a kg of U: U3O8 + 2 H2 -> 3 UO2 (derived)
+	public static final double CONV_HF_MGF2_PER_U = 0.084;         // the magnesia drum's extra HF, part of CONV_HF_PER_U
+	public static final double ADU_BYPRODUCT_PER_NH3 = 3.1;        // kg of ammonium salt in the barren liquor a kg of NH3 (NH4Cl 53.5/17; counted)
 }

@@ -102,6 +102,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.PrecipitationTankBlockEntity> PRECIPITATION_TANK_ENTITY = entity(dev.wildcatter.block.PrecipitationTankBlockEntity::new, PRECIPITATION_TANK);
 	public static final BlockEntityType<dev.wildcatter.block.YellowcakeDryerBlockEntity> YELLOWCAKE_DRYER_ENTITY = entity(dev.wildcatter.block.YellowcakeDryerBlockEntity::new, YELLOWCAKE_DRYER);
 	public static final BlockEntityType<dev.wildcatter.block.DrumFillerBlockEntity> DRUM_FILLER_ENTITY = entity(dev.wildcatter.block.DrumFillerBlockEntity::new, DRUM_FILLER);
+	public static final BlockEntityType<dev.wildcatter.block.UraniumCalcinerBlockEntity> URANIUM_CALCINER_ENTITY = entity(dev.wildcatter.block.UraniumCalcinerBlockEntity::new, URANIUM_CALCINER);
 	public static final BlockEntityType<dev.wildcatter.block.HeaderHouseBlockEntity> HEADER_HOUSE_ENTITY = entity(dev.wildcatter.block.HeaderHouseBlockEntity::new, HEADER_HOUSE);
 	public static final BlockEntityType<dev.wildcatter.block.OxygenGeneratorBlockEntity> OXYGEN_GENERATOR_ENTITY = entity(dev.wildcatter.block.OxygenGeneratorBlockEntity::new, OXYGEN_GENERATOR);
 	public static final BlockEntityType<dev.wildcatter.block.IxColumnsBlockEntity> IX_COLUMNS_ENTITY = entity(dev.wildcatter.block.IxColumnsBlockEntity::new, IX_COLUMNS);
@@ -410,7 +411,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		for (Block part : new Block[] {SULFUR_MELTER, DRYING_TOWER, MAIN_BLOWER, SULFUR_FURNACE, WASTE_HEAT_BOILER, CONVERTER, INTERPASS_ABSORBER, FINAL_ABSORBER, ACID_SUPERHEATER}) {
 			add(((dev.wildcatter.block.AcidPlantPartBlock) part).part().id(), part);
 		}
-		for (Block part : new Block[] {JAW_CRUSHER, SAG_MILL, LEACH_TANK, CCD_THICKENER, SX_CIRCUIT, PRECIPITATION_TANK, YELLOWCAKE_DRYER, DRUM_FILLER}) {
+		for (Block part : new Block[] {JAW_CRUSHER, SAG_MILL, LEACH_TANK, CCD_THICKENER, SX_CIRCUIT, PRECIPITATION_TANK, YELLOWCAKE_DRYER, DRUM_FILLER, URANIUM_CALCINER}) {
 			add(((dev.wildcatter.block.MillPartBlock) part).part().id(), part);
 		}
 		for (Block part : new Block[] {HEADER_HOUSE, OXYGEN_GENERATOR, IX_COLUMNS}) {
@@ -600,6 +601,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("precipitation_tank"), PRECIPITATION_TANK_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("yellowcake_dryer"), YELLOWCAKE_DRYER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("drum_filler"), DRUM_FILLER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("uranium_calciner"), URANIUM_CALCINER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("header_house"), HEADER_HOUSE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("oxygen_generator"), OXYGEN_GENERATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("ix_columns"), IX_COLUMNS_ENTITY);

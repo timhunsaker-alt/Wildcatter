@@ -2756,6 +2756,41 @@ lang.update({"block.wildcatter.control_cable": "Control Cable (multi-core)", "bl
 	"block.wildcatter.air_tubing": "Instrument Air Tubing", "block.wildcatter.air_compressor": "Instrument Air Compressor", "block.wildcatter.air_dryer": "Air Dryer", "block.wildcatter.day_tank": "Water Day Tank (1 m3)", "block.wildcatter.transmitter": "Transmitter (4-20 mA)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 16: uranium routes and plant operations (docs/ideas-plan.md) --------------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/; here loot, names, tags, recipes and the items' placeholders.
+def phase16_parts(parts):
+	for name in parts:
+		big_part_loot(name)
+	for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+		t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+		wanted = [f"{ns}:{n}" for n in parts]
+		t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+		save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+
+
+def phase16_items(items):
+	lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+	for item, (name, colour) in items.items():
+		tex(f"{item}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+		save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}_placeholder"}})
+		save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+		lang[f"item.{ns}.{item}"] = name
+	save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+
+def phase16_names(names):
+	lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+	lang.update({f"block.{ns}.{k}": v for k, v in names.items()})
+	save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+
+S_, P_ = f"{ns}:steel_ingot", f"{ns}:gas_line"
+# 16a: ADU yellowcake (docs/multiblocks/adu-yellowcake.md)
+phase16_parts(("uranium_calciner",))
+shaped("uranium_calciner", ["SFS", "BXB", "SPS"], {"S": S_, "F": "minecraft:blast_furnace", "B": "minecraft:bricks", "X": "minecraft:piston", "P": P_}, "uranium_calciner")
+phase16_items({"u3o8_drum": ("U3O8 Drum (96 %)", (60, 56, 50))})
+phase16_names({"uranium_calciner": "Uranium Calciner (six hearths, 0.6 MW)"})
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

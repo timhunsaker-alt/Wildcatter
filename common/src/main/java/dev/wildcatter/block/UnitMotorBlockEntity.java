@@ -74,6 +74,7 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "sx_circuit" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.SX_MIXER_WATTS);
 				case "precipitation_tank" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PRECIP_AGITATOR_WATTS);
 				case "drum_filler" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.DRUM_FILLER_WATTS);
+				case "uranium_calciner" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CALCINER_WATTS);
 				case "oxygen_generator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.O2_GENERATOR_WATTS);
 				case "cold_traps" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.COLD_TRAP_WATTS);
 				case "distillation_columns" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.REBOILER_WATTS);
@@ -271,6 +272,7 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "syngas_compressor" -> "compressor";
 			case "ammonia_converter" -> "circulator and chiller";
 			case "nitric_acid_unit" -> "air blower";
+			case "uranium_calciner" -> "rabble drive and off-gas fan";
 			case "emulsion_blender" -> "mixer";
 			case "meter_building" -> "heaters, chromatograph and RTU charger";
 			default -> kind();
@@ -312,7 +314,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 	}
 
 	// ---- the motor ---------------------------------------------------------------------------------------------------------------
-	private List<Direction> boxFaces() {
+	/** The faces of its main cell its motor's box takes cable on: the west, unless a part's box stands elsewhere. */
+	protected List<Direction> boxFaces() {
 		return List.of(LeasePartBlock.world(getBlockState(), Direction.WEST));
 	}
 

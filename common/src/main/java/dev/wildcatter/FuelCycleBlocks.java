@@ -27,6 +27,8 @@ public interface FuelCycleBlocks {
 	Block PRECIPITATION_TANK = millPart(dev.wildcatter.block.MillPartBlock.Part.PRECIPITATION_TANK);
 	Block YELLOWCAKE_DRYER = millPart(dev.wildcatter.block.MillPartBlock.Part.YELLOWCAKE_DRYER);
 	Block DRUM_FILLER = millPart(dev.wildcatter.block.MillPartBlock.Part.DRUM_FILLER);
+	// 16a: the ADU route's calciner (docs/multiblocks/adu-yellowcake.md)
+	Block URANIUM_CALCINER = millPart(dev.wildcatter.block.MillPartBlock.Part.URANIUM_CALCINER);
 	// 7c: the ISR wellfield (docs/multiblocks/isr-wellfield.md)
 	Block HEADER_HOUSE = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.HEADER_HOUSE);
 	Block OXYGEN_GENERATOR = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.OXYGEN_GENERATOR);
