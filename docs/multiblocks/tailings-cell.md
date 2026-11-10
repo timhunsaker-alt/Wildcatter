@@ -32,6 +32,14 @@ There is no controller but the tower, and any rotation works. It forms when the 
   - BREACHED: a floor block is missing, or a wall was broken below what the cell holds. It stops taking tails, and seeps where the breach is, shown as dripping. No ground is contaminated (Tim, 2026-11-06). Put the liner back and it goes on.
 - **Breaking settled tails** gives nothing. Its mass is held by the tower.
 
+## The tower's rate (Tim, 2026-11-10: "a decant tower rate that scales with its size")
+A pond settles at a set overflow rate, so a bigger cell takes more: the tower takes 20 kg of slurry a tick (400 kg/s, 1,440 t/h) on up to
+256 m2 of floor *(proposed)*, and in proportion above (a 32 x 32 cell: 80 kg a tick). A tower from an older save keeps 20 kg a tick.
+
+## The 600 mm slurry pipe and air header (2026-11-10)
+`slurry_pipe`: rubber-lined steel, 600 mm, rated 1 m3/s (slurries at 1.5 t/m3: 75 kg a tick); its own run, no gas. `air_header`: 600 mm
+blower air for flotation cells, its own network. Decisions: `docs/questions/answers-grid.md` 4-6.
+
 ## The uranium mill
 `ccd_thickener` gets a tails outlet: the west face of its third row, bottom layer. With a pipe on it, the washed solids leave as tails slurry at 50 % solids, and a full pipe stops the thickener. With no pipe it counts them as before, so built mills go on working.
 

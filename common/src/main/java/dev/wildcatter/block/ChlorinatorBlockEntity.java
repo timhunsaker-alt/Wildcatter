@@ -18,13 +18,16 @@ import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 /**
- * The fluid-bed carbochlorinator (docs/multiblocks/zirconium.md): zircon from the mineral separator it touches, carbon from coal or
- * charcoal by a hopper on top, chlorine off the pipe at the east face of its bottom cells. ZrSiO4 + 4C + 4Cl2 -> ZrCl4 + SiCl4 + 4CO
+ * The fluid-bed carbochlorinator (docs/multiblocks/zirconium.md): zircon from the mineral separator it touches, or zircon concentrate
+ * ({@code #wildcatter:zircon_feed} with its kg file, see {@link ZirconFeed}: Tailings' zircon concentrate) by a hopper on top; carbon from coal or charcoal by a
+ * hopper on top, chlorine off the pipe at the east face of its bottom cells. ZrSiO4 + 4C + 4Cl2 -> ZrCl4 + SiCl4 + 4CO
  * at about 1,200 C, the reaction keeping it hot; its fluidizing blower is 15 kW at 480 V. SiCl4 and CO are counted.
  */
 public class ChlorinatorBlockEntity extends UnitMotorBlockEntity implements ZrStage, HopperFed {
-	private final NonNullList<ItemStack> slots = NonNullList.withSize(1, ItemStack.EMPTY);
+	/** Slot 0 carbon, slot 1 zircon feed. */
+	private final NonNullList<ItemStack> slots = NonNullList.withSize(2, ItemStack.EMPTY);
 	private double metal;    // ZrCl4, as kg of metal
+	private double zircon;   // kg of ZrSiO4 from zircon feed, not yet chlorinated
 	private double carbon;   // kg
 	private double siCl4, co;
 	private String unit = "starting";
@@ -66,20 +69,61 @@ public class ChlorinatorBlockEntity extends UnitMotorBlockEntity implements ZrSt
 		return SolidCarbon.is(stack);
 	}
 
+	/** True for zircon feed: anything in {@code #wildcatter:zircon_feed} (block/ZirconFeed), as Tailings' zircon concentrate. */
+	public static boolean zirconFeed(ItemStack stack) {
+		return ZirconFeed.is(stack);
+	}
+
+	private double itemKg(ItemStack stack) {
+		return ZirconFeed.kg(level == null ? null : level.getServer(), stack);
+	}
+
+	@Override
+	public int[] getSlotsForFace(Direction side) {
+		return side == Direction.UP ? new int[] {0, 1} : new int[0];
+	}
+
+	@Override
+	public boolean canPlaceItem(int slot, ItemStack stack) {
+		return slot == 0 ? takes(stack) : slot == 1 && zirconFeed(stack);
+	}
+
+	@Override
+	public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
+		return side == Direction.UP && canPlaceItem(slot, stack);
+	}
+
+	/** kg of ZrSiO4 from zircon feed it holds, burning or in its hopper slot. */
+	public double zirconFeedKg() {
+		return zircon + slots.get(1).getCount() * itemKg(slots.get(1));
+	}
+
+	/** Zircon feed as kg of zirconium: what is left of the last item, topped up from the slot. */
+	private double feedZirconium(double wanted) {
+		while (zircon * Tuning.ZR_IN_ZIRCON < wanted && zirconFeed(slots.get(1))) {
+			zircon += itemKg(slots.get(1));
+			slots.get(1).shrink(1);
+			setChanged();
+		}
+		return zircon * Tuning.ZR_IN_ZIRCON;
+	}
+
 	@Override
 	protected void work(Level level) {
-		ZrStage up = Touching.find(level, worldPosition, ZrLineBlockEntity.class, z -> z.kind().equals("mineral_separator"));
-		if (up == null) {
-			unit = "NOT BUILT: set it against the MINERAL SEPARATOR";
+		ZrStage separator = Touching.find(level, worldPosition, ZrLineBlockEntity.class, z -> z.kind().equals("mineral_separator"));
+		boolean fed = zirconFeedKg() > 1e-9;
+		if (separator == null && !fed) {
+			unit = "NOT BUILT: set it against the MINERAL SEPARATOR, or feed it zircon concentrate by a hopper on top";
 			return;
 		}
 		double rate = Tuning.ZR_LINE_KGS * 1.2 * seconds();
+		ZrStage up = fed ? feedStage() : separator;   // zircon concentrate in its hopper first, then the separator's
 		if (carbon < rate * Zirconium.carbonPerZr() && fed() > 0) {
 			carbon += SolidCarbon.carbonKg(useOne());
 		}
 		double cl2 = Lines.available(level, chlorine(), Product.CHLORINE, Pull.MACHINE, this);
 		if (up.zirconium() < 1e-9) {
-			unit = "waiting for zircon from the mineral separator";
+			unit = separator != null ? "waiting for zircon from the mineral separator" : "waiting for zircon concentrate in its hopper";
 			return;
 		}
 		if (carbon <= 1e-9) {
@@ -111,6 +155,28 @@ public class ChlorinatorBlockEntity extends UnitMotorBlockEntity implements ZrSt
 				zr * Zirconium.chlorinePerZr() / seconds() * 3600, carbon);
 	}
 
+	/** The zircon feed as a stage the chlorination draws on: kg of zirconium in it, taken as ZrSiO4. */
+	private ZrStage feedStage() {
+		return new ZrStage() {
+			@Override
+			public double zirconium() {
+				return feedZirconium(Tuning.ZR_LINE_KGS * 1.2 * seconds());
+			}
+
+			@Override
+			public double takeZirconium(double kg) {
+				double got = Math.max(0, Math.min(kg, feedZirconium(kg)));
+				zircon = Math.max(0, zircon - got / Tuning.ZR_IN_ZIRCON);
+				setChanged();
+				return got;
+			}
+
+			@Override
+			public void addZirconium(double kg) {
+			}
+		};
+	}
+
 	@Override
 	public Component inspect() {
 		return Component.literal(String.format("Chlorinator (fluid bed): %s; ZrCl4 %.2f kg of metal held; SiCl4 %.0f kg, CO %.0f kg to the scrubber; %s", unit, metal,
@@ -125,6 +191,9 @@ public class ChlorinatorBlockEntity extends UnitMotorBlockEntity implements ZrSt
 		output.putDouble("carbon", carbon);
 		output.putDouble("sicl4", siCl4);
 		output.putDouble("co", co);
+		if (zircon > 0) {
+			output.putDouble("zircon", zircon);
+		}
 	}
 
 	@Override
@@ -136,5 +205,6 @@ public class ChlorinatorBlockEntity extends UnitMotorBlockEntity implements ZrSt
 		carbon = input.getDoubleOr("carbon", 0);
 		siCl4 = input.getDoubleOr("sicl4", 0);
 		co = input.getDoubleOr("co", 0);
+		zircon = input.getDoubleOr("zircon", 0);
 	}
 }

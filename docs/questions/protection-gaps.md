@@ -153,7 +153,7 @@ close all known gaps". This wave closes the Known gaps of Phase 10d1, 10d2, 10d3
 - **Why:** pole equipment is bolted to its pole. The latch keeps unit substations, yard cutouts and older builds safe.
 - **Alternatives:** an "on pole" block-state flag set at placement (misses units placed by command and older worlds).
 
-### 20. Guy wires (PLANNED, not built: question for Tim)
+### 20. Guy wires (BUILT 2026-11-10 on Tim's answer)
 - **Chosen:** not built in this wave. The plan: a `guy_anchor` block and a guy strung from the pole top with a `guy_strand` item (3/8 in
   EHS, 15,400 lbf breaking, NESC strength factor 0.9). Each pole sums its spans' horizontal pull at about 25 % of rated breaking strength
   (Sparrow 2,850 lbf, Raven 4,380, Penguin 8,350, Linnet 14,100, Drake 31,200) against its ANSI O5.1 class load at the top (30 ft class 5:
@@ -163,8 +163,10 @@ close all known gaps". This wave closes the Known gaps of Phase 10d1, 10d2, 10d3
   fails would bring down every existing world's unguyed line ends and several client scenes.
 - **Question:** should an overloaded, unguyed pole only warn, lean, or break after some minutes?
 - **Alternatives:** guys as decoration only; a guy required before a dead-end span can be strung.
+- **Tim (2026-11-10):** "an overloaded pole with no guy reads UNGUYED, then leans after a while. It never breaks on its own." Built on
+  branch `w-grid` (`guy_anchor`, `guy_strand`, block/PoleLoad): see `docs/questions/answers-grid.md` 2.
 
-### 21. A pole transformer placed by command (PLANNED: question for Tim)
+### 21. A pole transformer placed by command (BUILT 2026-11-10 on Tim's answer)
 - **Chosen:** not changed yet. The fix is a rule in `TransformerBlock.onPlace`: a pole unit with a pole beside it, but not behind it,
   turns its back to that pole (player placement already does this).
 - **Why not done:** the facing decides the terminals (front and top high side, back and bottom leg A, sides leg B), so turning a unit
@@ -173,6 +175,8 @@ close all known gaps". This wave closes the Known gaps of Phase 10d1, 10d2, 10d3
   and run on the client, one at a time, by the lead.
 - **Alternatives:** re-lay those scenes (pole behind each unit, leg-A loads to the bottom face) in a wave where the client suite runs; a
   drawing-only bracket property (drawn bushings would then not match the terminals).
+- **Tim (2026-11-10):** "face the pole for new placements only." Built on `w-grid`: a new unit in the default facing turns its back to its
+  pole; a named facing and a unit from an older save are kept (a `faced` marker). No scene is rewired: `answers-grid.md` 3.
 
 ### 22. Arc-fault (AFCI) breakers?
 - **Chosen:** none built; documented as a limit.

@@ -1448,6 +1448,9 @@ sized for a 40-pot line.
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- `guy_strand_placeholder` (the guy strand's icon) is drawn by script (2026-11-10, `w-grid`); the guy anchor has no Ludo art yet (it is
+  drawn in the mod's galvanized material). A guy is drawn as a straight line.
+- The lean of an overloaded pole is drawn on the pole only (turned about its top cell); guys and spans are not redrawn for it.
 - Phase 18 (phosphate): the `tsp_bag`, `dap_bag`, `mop_bag` and `extractant_drum` icons are script-drawn `*_placeholder`. The ten parts
   use the mod's materials. The DEPA-TOPO second cycle is built (2026-11-10, branch `w-rules`; see "Tim's answers" below). Not built:
   the filter acid's uranium is not carried as an assay; fluorosilicic acid recovery; the hemihydrate process; potash by flotation;
@@ -1628,7 +1631,6 @@ sized for a 40-pot line.
 - The pumpjack's linkage and the rig's head have been checked in test screenshots, not watched in a real play session.
 - A lead runs only from an insulator to a cutout or a pole unit; the cutout-to-transformer link is still by touching faces.
 - A pole transformer placed by command keeps its old facing rule, so in some test scenes its brackets face away from the pole (planned: protection-gaps 21).
-- There are no guy wires (planned: protection-gaps 20; Tim to choose what an unguyed pole does).
 - The frame-rate check runs at the client's 120 fps cap, so it shows no drop but not how much headroom is left.
 - The test skips the steam plant's five-minute warm-up with a hook (it checks the drum starts rising, then jumps to pressure).
 - A small genset cannot drive enough fault current through the 20 MVA substation to reach real relay settings; the test scales the relays down. In play, such a source's own protection clears a feeder fault first.
@@ -2039,3 +2041,25 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
   5 oilfield scenes, the 5 new and `always_pass`); unit tests 395, none failed (2 skipped).
 - **Known gaps:** no new placeholders. The coker drums' 12-24 h fill and the furnace's firing are still not holds. A cask record saved
   before counts its cooling from now. The salt dome film is of a dome placed by command on a built stone column in the flat test world.
+
+
+
+## Tim's answers, grid and pit line (2026-11-10; branch `w-grid`; decisions: `docs/questions/answers-grid.md`)
+- **Firebox (answer 17):** one heat rate, 0.36 MW, in every world (`Tuning.FIREBOX_HEAT_WATTS`, `fluid/FireboxFuel`): natural gas 2,111
+  ticks a m3, biogas 1,278, liquids by their MJ a litre; buckets by the same rule. A firebox now stays lit on a digester's biogas or a
+  pipeline. The `biogas` scenes (server and client) check it.
+- **Guy wires (answer 16):** `guy_anchor` (block and entity, its guy drawn by `GuyRenderer`) and `guy_strand` (60 m coil). `PoleLoad`
+  weighs each wood pole's span pulls (25 % of the conductor's breaking strength, `ConductorSize.breakingLbf`) against its class load,
+  less its guys (3/8 in EHS, 0.9); the Power Meter on a pole reads it. Overloaded: UNGUYED, and a pole placed from 0.7.0 on (its
+  block entity's `leans` marker) leans 1.5, 3 and 5 degrees, a step every 10 minutes (`WoodPoleBlock.LEAN`; lean models
+  `p<k>_l<n>` written by `tools/models/linelib.lean_after`). A guy that holds stands it plumb. Scene `guy_wire`; client `guyWire`.
+- **Pole transformer by command (answer 18):** `TransformerBlockEntity.faced`; a new default-facing unit turns its back to its pole.
+  Scene `pole_unit_facing`.
+- **Slurry pipe (answer 12):** `slurry_pipe` (`PipeBlock.Kind.SLURRY`), a rated run in `Lines` (`capacityPerTick`, shared within a
+  tick), 75 kg a tick of slurry. `PipeBlock.Joins` lets another mod's block draw arms. Scene `slurry_pipe`.
+- **Decant tower (answer 12):** `DecantTowerBlockEntity.ratePerTick`: 20 kg a tick on up to 256 m2 of floor, in proportion above; a
+  tower from an older save keeps 20. Scene `decant_rate`.
+- **Air header (answer 12):** `air_header` (`PipeBlock.Kind.AIR_HEADER`), its own network. Scene `air_header`.
+- **Zircon feed (answer 9):** `block/ZirconFeed`: `#wildcatter:zircon_feed` and kg files `data/<ns>/wildcatter/zircon_feed/*.json`;
+  the chlorinator's hopper takes them in a second slot and needs no separator. Scene `zircon_feed`.
+- Field Manual: POLES AND ARMS (guys), TAILINGS CELL (rate, slurry pipe, air header), ZIRCONIUM (zircon concentrate).

@@ -616,5 +616,9 @@
   "block.wildcatter.bop_stack": "BOP Stack (13-5/8 in, 5,000 psi)",
   "block.wildcatter.bop_accumulator": "BOP Accumulator Unit",
   "item.wildcatter.barite_bag": "Bulk Bag of Barite (API 13A 4.1)",
-  "item.wildcatter.bentonite_bag": "Bulk Bag of Bentonite (API 13A)"
+  "item.wildcatter.bentonite_bag": "Bulk Bag of Bentonite (API 13A)",
+  "block.wildcatter.slurry_pipe": "Slurry Pipe (600 mm)",
+  "block.wildcatter.air_header": "Air Header (600 mm)",
+  "block.wildcatter.guy_anchor": "Guy Anchor",
+  "item.wildcatter.guy_strand": "Guy Strand (3/8 in EHS)"
 }

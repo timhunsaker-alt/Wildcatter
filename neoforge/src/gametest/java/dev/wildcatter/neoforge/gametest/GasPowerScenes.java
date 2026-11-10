@@ -558,7 +558,9 @@ final class GasPowerScenes {
 					check(helper, p.onBiogas() && held.contains("BIOGAS: 850 kW MAX"), "the set should be on biogas, derated: " + held);
 					check(helper, p.watts() > 800_000 && p.watts() < 860_000, "the set should hold about 850 kW against the 1 MW bank: " + p.watts() + " | " + held + " | bank " + read(helper, 20, 2));
 					check(helper, near(m3h, Biogas.fullLoadM3h(), 0.05), "it should burn about 407 m3/h: " + m3h);
-					check(helper, lit[0] && fireGas.taken > 1, "the firebox should burn the biogas (until its boiler is full): " + fireGas.taken + " m3 taken, lit " + lit[0]);
+					// one real heat rate (Tim, 2026-11-10): 0.36 MW is 1/64 m3 of biogas a second, so it stays lit on the digester and burns
+					// only a fraction of a m3 until its boiler is full (it took over 1 m3 when a m3 was 8 ticks of fire)
+					check(helper, lit[0] && fireGas.taken > 0.05 && fireGas.taken < 2, "the firebox should burn the biogas at 0.36 MW (until its boiler is full): " + fireGas.taken + " m3 taken, lit " + lit[0]);
 					String burner = read(helper, 40, 0);
 					check(helper, burner.contains("NEEDS PIPELINE GAS"), "the steam plant's burner should refuse biogas: " + burner);
 					log("biogas", String.format("ok: %.0f m3/h | %s | bank %s | %s", m3h, held, read(helper, 20, 2), burner));

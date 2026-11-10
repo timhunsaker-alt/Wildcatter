@@ -78,9 +78,23 @@ class GasPowerTest {
 		assertEquals(Biogas.fullLoadM3h(), Biogas.fuelM3h(1), 1e-9);
 		assertEquals(0.85, Biogas.derate(), 1e-9);
 		assertEquals(48, 23 * Biogas.kwhPerM3(), 0.1, "23 m3 of biogas makes Farmings' 48 kWh");
-		assertEquals(Tuning.GAS_FUEL_TICKS_PER_UNIT * 23.0 / 38.0, Biogas.fireboxTicksPerM3(), 1e-9);
+		assertEquals(23e6 / 0.36e6 * 20, Biogas.fireboxTicksPerM3(), 1e-6, "a m3 of biogas burns 64 s in a firebox at its 0.36 MW");
 		assertTrue(Product.BIOGAS.gas() && !Product.BIOGAS.tanked());
 		assertEquals("m3", Product.BIOGAS.unit());
 		assertEquals("biogas, 60 % CH4", Product.BIOGAS.label());
+	}
+
+	// ---- the firebox's one heat rate (Tim, 2026-11-10; phase14-gas-power 20) -------------------------------------------------------
+	@Test
+	void aFireboxBurnsEveryFuelByHeatingValueAtItsCoalFiresRate() {
+		assertEquals(2111.1, FireboxFuel.ticksPerUnit(Product.PIPELINE_GAS), 0.1, "a m3 of natural gas: 38 MJ at 0.36 MW, about 105 s");
+		assertEquals(FireboxFuel.ticksPerUnit(Product.PIPELINE_GAS), FireboxFuel.ticksPerUnit(Product.WET_GAS), 1e-9, "well gas is in m3 too");
+		assertEquals(1277.8, FireboxFuel.ticksPerUnit(Product.BIOGAS), 0.1);
+		// a digester's 1 m3/s of biogas keeps one lit with gas to spare: a firebox burns 1/64 m3 a second
+		assertTrue(20.0 / FireboxFuel.ticksPerUnit(Product.BIOGAS) < 0.02);
+		assertEquals(2000.0, FireboxFuel.ticksPerUnit(Product.DIESEL), 1e-6);
+		assertEquals(0, FireboxFuel.ticksPerUnit(Product.TAILS_SLURRY), 1e-9);
+		// the vanilla coal's 1,600 ticks are 28.8 MJ at this rate
+		assertEquals(1600, FireboxFuel.ticks(28.8e6), 1e-6);
 	}
 }

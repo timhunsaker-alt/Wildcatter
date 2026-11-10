@@ -384,8 +384,13 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> MEMORY_CARD_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("memory_card"));
 	public static final Item MEMORY_CARD = new dev.wildcatter.control.MemoryCardItem(new Item.Properties().stacksTo(1).setId(MEMORY_CARD_KEY));
 
+	/** A coil of 3/8 in EHS guy strand (protection-gaps 20): its durability is its metres. */
+	public static final ResourceKey<Item> GUY_STRAND_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("guy_strand"));
+	public static final Item GUY_STRAND = new dev.wildcatter.item.GuyStrandItem(new Item.Properties().durability(Tuning.GUY_STRAND_METERS).setId(GUY_STRAND_KEY));
+
 	public static void register() {
 		Registry.register(BuiltInRegistries.ITEM, POWER_METER_KEY, POWER_METER);
+		Registry.register(BuiltInRegistries.ITEM, GUY_STRAND_KEY, GUY_STRAND);
 		Registry.register(BuiltInRegistries.ITEM, MEMORY_CARD_KEY, MEMORY_CARD);
 		Registry.register(BuiltInRegistries.ITEM, CPU_SMALL_KEY, CPU_SMALL);
 		Registry.register(BuiltInRegistries.ITEM, CPU_LARGE_KEY, CPU_LARGE);

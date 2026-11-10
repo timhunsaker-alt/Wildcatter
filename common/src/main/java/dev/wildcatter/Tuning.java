@@ -37,8 +37,36 @@ public final class Tuning {
 	public static final double MILL_TAILS_SOLIDS = 0.50;       // the thickener's underflow (proposed)
 	public static final double CELL_KG_PER_BLOCK = 2_200.0;    // settled tails, dry (proposed)
 	public static final double CELL_SLURRY_SOLIDS = 0.40;      // what the tower takes tails as (proposed)
+	// ---- Guy wires (protection-gaps 20; Tim, 2026-11-10: answer 16) -----------------------------------------------------------------
+	/** A span pulls on its insulators at this share of its conductor's rated breaking strength (initial tension, proposed). */
+	public static final double SPAN_TENSION_SHARE = 0.25;
+	/** 3/8 in extra-high-strength (EHS) guy strand: 15,400 lbf rated breaking strength (ASTM A475). */
+	public static final double GUY_STRAND_LBF = 15_400.0;
+	/** NESC strength factor for guys (grade B). */
+	public static final double GUY_STRENGTH_FACTOR = 0.9;
+	/** A guy strand coil, metres. */
+	public static final int GUY_STRAND_METERS = 60;
+	/** Each step of an overloaded, unguyed pole's lean comes after this long overloaded (proposed: soil creep is days, scaled). */
+	public static final double POLE_LEAN_SECONDS = 600.0;
+	/** The lean, degrees, at each step (proposed: a pole past about 5 degrees is a pole to replace). */
+	public static final double[] POLE_LEAN_DEGREES = {0, 1.5, 3.0, 5.0};
 	public static final double CELL_RECLAIM = 0.75;            // of the slurry's water, back on the water pipe (proposed)
+	/**
+	 * The large-bore slurry pipe (Tim, 2026-11-10, Tailings p7 #27): 600 mm (24 in) rubber-lined steel, rated about 1 m3/s, a 0.28 m2 bore
+	 * at 3.5 m/s, above the settling velocity of coarse tails. Slurries (counted in kg) are rated at 1.5 t/m3, about 50 % solids by mass.
+	 */
+	public static final double SLURRY_PIPE_M3_S = 1.0;
+	public static final double SLURRY_PIPE_KG_M3 = 1_500.0;
+	/** The 600 mm (24 in) flotation air header: about 5.7 m3/s of low-pressure blower air at 20 m/s (proposed), for another mod's cells. */
+	public static final double AIR_HEADER_M3_S = 5.7;
 	public static final int CELL_MAX_AREA = 4096;              // cells of open floor one tower can serve (proposed)
+	/** A decant tower takes 20 kg of slurry a tick (400 kg/s, 1,440 t/h) on a cell of up to this much floor (proposed). */
+	public static final double CELL_SLURRY_KG_PER_TICK = 20.0;
+	/**
+	 * m2 of floor a cell needs for each 20 kg a tick (Tim, 2026-11-10, Tailings p7 #40: "a decant tower rate that scales with its size"): a
+	 * pond's surface clarifies its water at a set overflow rate, so a bigger pond takes more. A 16 x 16 cell keeps today's rate (proposed).
+	 */
+	public static final double CELL_FLOOR_PER_RATE = 256.0;
 	public static final int PUMP_WATER_PER_TICK = 40;         // at full voltage
 	public static final int PLUMBING_INTERVAL = 4;            // ticks between pump / drain transfers
 	public static final int PIPE_NETWORK_LIMIT = 512;
@@ -91,9 +119,15 @@ public final class Tuning {
 	public static final int OIL_MAX_UNITS = 200_000;
 	public static final int GAS_MIN_UNITS = 150_000;
 	public static final int GAS_MAX_UNITS = 400_000;
-	/** Fire in a firebox per unit: crude is 20 ticks a unit (a bucket burns 20000 ticks, like lava); gas is 8. */
-	public static final double OIL_FUEL_TICKS_PER_UNIT = 20.0;
-	public static final double GAS_FUEL_TICKS_PER_UNIT = 8.0;
+	/**
+	 * A firebox's one heat rate (Tim, 2026-11-10, phase14-gas-power 20): its coal fire's, a coal burning 80 s at about 29 MJ. Every fuel
+	 * burns by its heating value at this rate, in every world: natural gas about 2,100 ticks a m3, biogas about 1,280 (fluid.FireboxFuel).
+	 */
+	public static final double FIREBOX_HEAT_WATTS = 0.36e6;
+	/** Crude burned as fuel: about 45 MJ/kg at 0.85 kg/L (proposed, as the residue's fuel oil). */
+	public static final double CRUDE_JOULES_PER_L = 38.0e6;
+	/** Gasoline, natural gasoline and condensate: about 32 MJ/L (proposed; motor gasoline is 32-34). */
+	public static final double GASOLINE_JOULES_PER_L = 32.0e6;
 	public static final int CRUDE_BUCKET_UNITS = 1000;
 	public static final double RIG_WATTS = 30_000.0;          // a 40 hp, 480 V three-phase drive: about 45 A (docs/phase3-three-phase.md)
 	public static final int DRILL_TICKS_PER_BLOCK = 20;       // at full voltage
@@ -243,10 +277,6 @@ public final class Tuning {
 	public static final double CONDENSER_FAN_WATTS = 75_000.0;     // four 25 hp fans, 480 V
 	public static final double FUEL_OIL_JOULES_PER_L = 38.0e6;     // residue burned as fuel oil
 	public static final double LPG_JOULES_PER_L = 25.0e6;
-	public static final double GASOLINE_FUEL_TICKS_PER_UNIT = 15.0;   // a litre in a firebox, beside crude's 20 and diesel's 16
-	public static final double KEROSENE_FUEL_TICKS_PER_UNIT = 16.0;
-	public static final double RESIDUE_FUEL_TICKS_PER_UNIT = 20.0;
-	public static final double CONDENSATE_FUEL_TICKS_PER_UNIT = 16.0;
 
 	// ---- The cracker and polyethylene (docs/multiblocks/cracker.md, approved 2026-10-31) ----------------------------------
 	public static final double CRACKER_FEED_LPS = 1.0;             // litres of LPG or gasoline a second at full rate
@@ -718,6 +748,11 @@ public final class Tuning {
 	public static final double HM_RUTILE = 0.05;
 	public static final double HM_MONAZITE = 0.03;
 	public static final double ZR_IN_ZIRCON = 91.22 / 183.31;      // ZrSiO4
+	/**
+	 * An item of {@code #wildcatter:zircon_feed} with no kg file (block/ZirconFeed) counts as this much ZrSiO4: Tailings' zircon
+	 * concentrate's 56.25 kg, a quarter of its 225 kg heavy-mineral block share (its l6-dry-mill 14).
+	 */
+	public static final double ZIRCON_FEED_ITEM_KG = 56.25;
 	public static final double ZR_HF_FRACTION = 0.02;              // of the metal in zircon (1-3 %, unverified)
 	public static final double ZR_CARBON_EXCESS = 1.10;
 	public static final double KROLL_MG_EXCESS = 1.25;             // Mg charged over the 2 Mg a Zr (proposed)
@@ -1100,7 +1135,6 @@ public final class Tuning {
 
 	// ---- Refining and engines ----------------------------------------------------------------------------------------
 	public static final int DIESEL_BUCKET_UNITS = 1000;
-	public static final double DIESEL_FUEL_TICKS_PER_UNIT = 16.0;   // burning it in a firebox
 	/** Electrical energy in one unit of fuel, after the engine's losses: 100 kW of diesel uses 2.5 units a second. */
 	/**
 	 * A single engine is a 110 V set. A 2x2x2 cube of eight joins into one 4.16 kV generator, like the steam turbines do:

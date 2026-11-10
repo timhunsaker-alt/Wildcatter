@@ -29,8 +29,6 @@ import org.jspecify.annotations.Nullable;
  */
 public class DecantTowerBlockEntity extends BlockEntity implements Inspectable {
 	private static final int SCAN_TICKS = 40;
-	/** Slurry drawn a tick at most: well over a plant's 40 kg/s. */
-	private static final double MAX_PER_TICK = 20;
 
 	private double settledKg;
 	private double reclaimed;
@@ -41,6 +39,11 @@ public class DecantTowerBlockEntity extends BlockEntity implements Inspectable {
 	private int rim;
 	private @Nullable BlockPos breach;
 	private String status = "finding its basin";
+	/**
+	 * Set on a tower placed from 0.7.0 on: its rate scales with its cell's floor ({@link #ratePerTick}). A tower from an older save keeps
+	 * the old 20 kg a tick whatever its cell (protection of built worlds).
+	 */
+	private boolean scales = true;
 
 	public DecantTowerBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.DECANT_TOWER_ENTITY, pos, state);
@@ -52,6 +55,20 @@ public class DecantTowerBlockEntity extends BlockEntity implements Inspectable {
 
 	public double capacityKg() {
 		return (floor.size() * rim - 1) * Tuning.CELL_KG_PER_BLOCK;
+	}
+
+	/**
+	 * kg of slurry it takes a tick at most: 20 kg (400 kg/s) on a cell of up to 256 m2 of floor, and that much again for each 256 m2 more
+	 * (Tuning.CELL_FLOOR_PER_RATE), so a 4,096-cell basin takes 16 times as much. A tower from an older save takes 20 kg.
+	 */
+	public double ratePerTick() {
+		double rate = Tuning.CELL_SLURRY_KG_PER_TICK;
+		return scales ? rate * Math.max(1.0, floor.size() / Tuning.CELL_FLOOR_PER_RATE) : rate;
+	}
+
+	/** Test hook: the tower as loaded from a save made before its rate scaled. */
+	public void asOlderSaveForTest() {
+		scales = false;
 	}
 
 	public @Nullable BlockPos breach() {
@@ -166,7 +183,7 @@ public class DecantTowerBlockEntity extends BlockEntity implements Inspectable {
 			tower.status = String.format("FULL: %.0f t of tails", tower.settledKg / 1000);
 			return;
 		}
-		Slurry.Taken got = Slurry.take(level, Lines.faces(List.of(pos)), Product.TAILS_SLURRY, Math.min(MAX_PER_TICK, room / Tuning.CELL_SLURRY_SOLIDS), tower);
+		Slurry.Taken got = Slurry.take(level, Lines.faces(List.of(pos)), Product.TAILS_SLURRY, Math.min(tower.ratePerTick(), room / Tuning.CELL_SLURRY_SOLIDS), tower);
 		if (got.kg() > 0) {
 			tower.settledKg += got.kg() * Tuning.CELL_SLURRY_SOLIDS;
 			tower.gypsumKg += got.assay().kg(PanFilterBlockEntity.GYPSUM, got.kg());
@@ -177,7 +194,8 @@ public class DecantTowerBlockEntity extends BlockEntity implements Inspectable {
 		if (now % Tuning.PLUMBING_INTERVAL == 0) {
 			tower.decant(level);
 		}
-		tower.status = String.format("%.1f of %.0f t of tails (%d x %d cells)", tower.settledKg / 1000, tower.capacityKg() / 1000, tower.floor.size(), tower.rim) + tower.stack();
+		tower.status = String.format("%.1f of %.0f t of tails (%d x %d cells); takes up to %,.0f t/h of slurry", tower.settledKg / 1000, tower.capacityKg() / 1000,
+				tower.floor.size(), tower.rim, tower.ratePerTick() * 20 * 3.6) + tower.stack();
 	}
 
 	/** What the stack is made of, when a fertilizer plant sent it: "", or "; of which 12.0 t phosphogypsum". */
@@ -205,6 +223,7 @@ public class DecantTowerBlockEntity extends BlockEntity implements Inspectable {
 		output.putDouble("settled", settledKg);
 		output.putDouble("reclaimed", reclaimed);
 		output.putInt("placed", placed);
+		output.putBoolean("scales", scales);
 		if (gypsumKg > 0) {
 			output.putDouble("gypsum", gypsumKg);
 		}
@@ -219,6 +238,7 @@ public class DecantTowerBlockEntity extends BlockEntity implements Inspectable {
 		settledKg = input.getDoubleOr("settled", 0);
 		reclaimed = input.getDoubleOr("reclaimed", 0);
 		placed = input.getIntOr("placed", 0);
+		scales = input.getBooleanOr("scales", false);   // an older save keeps 20 kg a tick
 		gypsumKg = input.getDoubleOr("gypsum", 0);
 		saltKg = input.getDoubleOr("salt", 0);
 	}

@@ -2,6 +2,17 @@
 
 ## Unreleased (0.7.0, branch `w-next`): Phases 15-19, built 2026-11-10 while Tim was away
 
+### Tim's answers, grid and pit line (2026-11-10, branch `w-grid`)
+- **Firebox:** one real heat rate, 0.36 MW, in every world: piped gas, biogas and liquid fuels last their heating value. A firebox on
+  biogas or pipeline gas stays lit; one on a gas well burns far less gas for the same steam.
+- **Guy wires:** a Guy Anchor and Guy Strand. A pole whose line pulls it past its class load reads UNGUYED on the Power Meter and, if
+  placed in this version, leans over time; a guy that holds the pull stands it plumb. Poles never break on their own; built poles never lean.
+- **Pole transformer set by command:** in its default facing it turns its back to its pole. Built units keep their terminals.
+- **Slurry Pipe (600 mm):** a rated large-bore slurry line, about 1 m3/s. **Air Header (600 mm):** blower air for flotation cells.
+- **Decant tower:** a larger cell takes more slurry (20 kg a tick per 256 m2 of floor); built towers keep their rate.
+- **Chlorinator:** takes zircon concentrate tagged `#wildcatter:zircon_feed` by hopper, at the kg its data file gives.
+- Decisions: `docs/questions/answers-grid.md`.
+
 ### phosphate (Phase 18, built 2026-11-10 while Tim was away; not approved)
 - **Fertilizer (18a):** a phosphate mill, a dihydrate phosphoric reactor with its tilting pan filter, an acid evaporator and a granulation
   plant: 20 t of P2O5 a day from phosphate rock and sulfuric acid, its phosphogypsum to a lined tailings cell, merchant acid, and TSP or

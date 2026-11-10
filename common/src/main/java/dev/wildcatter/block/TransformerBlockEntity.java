@@ -129,6 +129,39 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 
 	/** Latched once it has hung on a pole: it then falls when its pole goes (a cutout or transformer set down elsewhere never does). */
 	private boolean hung;
+	/**
+	 * Set once a new pole unit has looked for its pole (protection-gaps 21; Tim, 2026-11-10: "face the pole for new placements only").
+	 * A unit from a save without this marker counts as set, so a built unit keeps its facing and its terminals.
+	 */
+	private boolean faced;
+
+	/**
+	 * A pole unit placed by command (the default facing, north) with a pole beside it but not behind it turns its back to that pole, as
+	 * a player's click hangs it. A facing named in the command is kept, and a unit already hung right is left alone.
+	 */
+	private void faceItsPole(net.minecraft.world.level.Level level, BlockPos pos, BlockState state) {
+		Direction facing = state.getValue(TransformerBlock.FACING);
+		if (!block().poleMount() || facing != Direction.NORTH || WoodPoleBlock.isPole(level.getBlockState(pos.relative(facing.getOpposite())))) {
+			return;
+		}
+		for (Direction side : Direction.Plane.HORIZONTAL) {
+			if (WoodPoleBlock.isPole(level.getBlockState(pos.relative(side)))) {
+				level.setBlock(pos, state.setValue(TransformerBlock.FACING, side.getOpposite()), 3);
+				dev.wildcatter.circuit.CircuitManager.markDirty(level);
+				return;
+			}
+		}
+	}
+
+	/** Test hook: the unit as loaded from a save made before units faced their poles. */
+	public void asOlderSaveForTest() {
+		faced = true;
+	}
+
+	/** True once it has looked for its pole (or it came from an older save). */
+	public boolean faced() {
+		return faced;
+	}
 
 	public boolean hung() {
 		return hung;
@@ -403,6 +436,11 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 
 	/** A pole transformer that has overheated burns out. */
 	public static void tick(net.minecraft.world.level.Level level, BlockPos pos, BlockState state, TransformerBlockEntity transformer) {
+		if (!transformer.faced) {
+			transformer.faced = true;
+			transformer.setChanged();
+			transformer.faceItsPole(level, pos, state);
+		}
 		if (transformer.failed && level instanceof net.minecraft.server.level.ServerLevel server) {
 			server.sendParticles(net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE, pos.getX() + 0.5, pos.getY() + 0.7, pos.getZ() + 0.5, 20, 0.3, 0.3, 0.3, 0.05);
 			server.playSound(null, pos, net.minecraft.sounds.SoundEvents.GENERIC_EXPLODE.value(), net.minecraft.sounds.SoundSource.BLOCKS, 0.8F, 1.3F);
@@ -452,6 +490,7 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 	protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput output) {
 		super.saveAdditional(output);
 		output.putBoolean("hung", hung);
+		output.putBoolean("faced", faced);
 		saveLeads(output);
 		output.putBoolean("grown", grown);
 		output.putBoolean("lockedOut", lockedOut);
@@ -467,6 +506,7 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 	protected void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
 		super.loadAdditional(input);
 		hung = input.getBooleanOr("hung", false);
+		faced = input.getBooleanOr("faced", true);   // an older save: built units keep their terminals
 		loadLeads(input);
 		grown = input.getBooleanOr("grown", false);
 		lockedOut = input.getBooleanOr("lockedOut", false);

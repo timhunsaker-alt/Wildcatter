@@ -5,7 +5,7 @@ Every part is drawn facing north in its own frame (x east, y up, z south), its m
 in the middle of its cell; its top is 0.3 m into the cell above its top cell, so a crossarm in the top cell's row sits 0.3 m
 below the pole top with its top flush with the cell above's floor.
 """
-import math
+import json, math, os
 import mlib
 import plantlib as p
 
@@ -68,3 +68,49 @@ def strut(M, a, b, width, depth, tex, axis="z", pieces=None):
 			M.box((c[0] - h, c[1] - width / 2, c[2] - depth / 2), (c[0] + h, c[1] + width / 2, c[2] + depth / 2), tex, rot=("z", deg, tuple(c)))
 		else:
 			M.box((c[0] - depth / 2, c[1] - width / 2, c[2] - h), (c[0] + depth / 2, c[1] + width / 2, c[2] + h), tex, rot=("x", -deg, tuple(c)))
+
+
+# ---- a pole's lean (protection-gaps 20; Tim, 2026-11-10: an overloaded, unguyed pole leans) -----------------------------------------
+LEAN_DEGREES = (1.5, 3.0, 5.0)   # Tuning.POLE_LEAN_DEGREES, steps 1 to 3
+
+
+def lean_after(name, cells):
+	"""After a wood pole's export: each piece again for each lean step, turned about the pole's top cell (so the arm, the insulators and
+	the spans stay where they are and the foot kicks out), leaning west as drawn facing north; and the blockstate with its lean."""
+	def after():
+		out = os.path.join(mlib.ASSETS, "models/block", name)
+		for k in range(cells):
+			base = json.load(open(os.path.join(out, f"p{k}.json")))
+			pivot = [8.0, (cells - 0.5 - k) * 16, 8.0]
+			for step, deg in enumerate(LEAN_DEGREES, 1):
+				elements = []
+				for e in base["elements"]:
+					e = json.loads(json.dumps(e))
+					rot = e.get("rotation")
+					yaw = 0.0
+					if rot:
+						if rot.get("axis") != "y":
+							raise mlib.ModelError(f"{name}: a lean can only follow a turn about y")
+						yaw = rot["angle"]
+						o = rot["origin"]
+						# the turn about y moves to the pivot: shift the box by Ry^-1(o - p) - (o - p), zero on the pole's axis
+						d = [o[0] - pivot[0], o[1] - pivot[1], o[2] - pivot[2]]
+						a = math.radians(-yaw)
+						c, sn = math.cos(a), math.sin(a)
+						back = [d[0] * c + d[2] * sn, d[1], -d[0] * sn + d[2] * c]
+						t = [back[i] - d[i] for i in range(3)]
+						e["from"] = [round(e["from"][i] + t[i], 4) for i in range(3)]
+						e["to"] = [round(e["to"][i] + t[i], 4) for i in range(3)]
+					e["rotation"] = {"origin": [round(v, 4) for v in pivot], "x": 0, "y": yaw, "z": deg}
+					elements.append(e)
+				mlib._save(os.path.join(out, f"p{k}_l{step}.json"), {"textures": base["textures"], "elements": elements})
+		variants = {}
+		for facing, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270)):
+			for k in range(cells):
+				for step in range(len(LEAN_DEGREES) + 1):
+					v = {"model": f"{mlib.NS}:block/{name}/p{k}" + (f"_l{step}" if step else "")}
+					if y:
+						v["y"] = y
+					variants[f"facing={facing},lean={step},piece={k}"] = v
+		mlib._save(os.path.join(mlib.ASSETS, "blockstates", f"{name}.json"), {"variants": variants})
+	return after

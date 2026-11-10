@@ -42,7 +42,7 @@ public final class Slurry {
 			Lines.Port p = sources.get(i);
 			available[i] = p.node().available(p.cell(), p.side(), product, FluidNode.Pull.MACHINE);
 		}
-		double[] share = Flow.share(maxKg, available);
+		double[] share = Flow.share(Math.min(maxKg, Lines.room(line, product)), available);
 		Taken got = Taken.NONE;
 		for (int i = 0; i < share.length; i++) {
 			if (share[i] > 0) {
@@ -52,6 +52,7 @@ public final class Slurry {
 				got = add(got, new Taken(kg, assay));
 			}
 		}
+		Lines.use(line, got.kg());
 		return got;
 	}
 

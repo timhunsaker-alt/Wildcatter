@@ -10,26 +10,26 @@ import net.minecraft.util.StringRepresentable;
  * duct tables. A wire block is 1 m of conductor; a span block is {@code SPAN_METERS_PER_BLOCK} metres.
  */
 public enum ConductorSize implements StringRepresentable {
-	AWG_12("awg_12", "12 AWG", Family.BUILDING, 20, 6.50e-3, 1.0),
-	AWG_10("awg_10", "10 AWG", Family.BUILDING, 30, 4.07e-3, 1.0),
-	AWG_6("awg_6", "6 AWG", Family.BUILDING, 65, 1.61e-3, 1.0),
-	AWG_2("awg_2", "2 AWG", Family.BUILDING, 115, 0.636e-3, 1.0),
-	AWG_4_0("awg_4_0", "4/0 AWG", Family.BUILDING, 230, 0.199e-3, 1.0),
-	KCMIL_500("kcmil_500", "500 kcmil", Family.BUILDING, 380, 0.0846e-3, 1.0),
-	BUSWAY_800("busway_800", "800 A busway", Family.BUSWAY, 800, 0.02e-3, 1.0),
-	ACSR_SPARROW("acsr_sparrow", "#2 ACSR (Sparrow)", Family.ACSR, 180, 1.05e-3, 1.0),
-	ACSR_RAVEN("acsr_raven", "1/0 ACSR (Raven)", Family.ACSR, 240, 0.66e-3, 1.0),
-	ACSR_PENGUIN("acsr_penguin", "4/0 ACSR (Penguin)", Family.ACSR, 340, 0.36e-3, 0.9),
-	ACSR_LINNET("acsr_linnet", "336.4 kcmil ACSR (Linnet)", Family.ACSR, 530, 0.205e-3, 0.8),
-	ACSR_DRAKE("acsr_drake", "795 kcmil ACSR (Drake)", Family.ACSR, 900, 0.087e-3, 0.7),
-	MV_1_0("mv_1_0", "1/0 MV cable", Family.MV_CABLE, 195, 0.40e-3, 1.0),
-	MV_4_0("mv_4_0", "4/0 MV cable", Family.MV_CABLE, 290, 0.199e-3, 1.0),
-	MV_500("mv_500", "500 kcmil MV cable", Family.MV_CABLE, 450, 0.0846e-3, 1.0),
-	STATION_BUS_2000("station_bus_2000", "2000 A station bus", Family.STATION_BUS, 2000, 0.015e-3, 1.0),
+	AWG_12("awg_12", "12 AWG", Family.BUILDING, 20, 6.50e-3, 1.0, 185),
+	AWG_10("awg_10", "10 AWG", Family.BUILDING, 30, 4.07e-3, 1.0, 293),
+	AWG_6("awg_6", "6 AWG", Family.BUILDING, 65, 1.61e-3, 1.0, 742),
+	AWG_2("awg_2", "2 AWG", Family.BUILDING, 115, 0.636e-3, 1.0, 1880),
+	AWG_4_0("awg_4_0", "4/0 AWG", Family.BUILDING, 230, 0.199e-3, 1.0, 5980),
+	KCMIL_500("kcmil_500", "500 kcmil", Family.BUILDING, 380, 0.0846e-3, 1.0, 14140),
+	BUSWAY_800("busway_800", "800 A busway", Family.BUSWAY, 800, 0.02e-3, 1.0, 0),
+	ACSR_SPARROW("acsr_sparrow", "#2 ACSR (Sparrow)", Family.ACSR, 180, 1.05e-3, 1.0, 2850),
+	ACSR_RAVEN("acsr_raven", "1/0 ACSR (Raven)", Family.ACSR, 240, 0.66e-3, 1.0, 4380),
+	ACSR_PENGUIN("acsr_penguin", "4/0 ACSR (Penguin)", Family.ACSR, 340, 0.36e-3, 0.9, 8350),
+	ACSR_LINNET("acsr_linnet", "336.4 kcmil ACSR (Linnet)", Family.ACSR, 530, 0.205e-3, 0.8, 14100),
+	ACSR_DRAKE("acsr_drake", "795 kcmil ACSR (Drake)", Family.ACSR, 900, 0.087e-3, 0.7, 31200),
+	MV_1_0("mv_1_0", "1/0 MV cable", Family.MV_CABLE, 195, 0.40e-3, 1.0, 0),
+	MV_4_0("mv_4_0", "4/0 MV cable", Family.MV_CABLE, 290, 0.199e-3, 1.0, 0),
+	MV_500("mv_500", "500 kcmil MV cable", Family.MV_CABLE, 450, 0.0846e-3, 1.0, 0),
+	STATION_BUS_2000("station_bus_2000", "2000 A station bus", Family.STATION_BUS, 2000, 0.015e-3, 1.0, 0),
 	/** 15 kV non-segregated phase bus duct from a generator (docs/multiblocks/gas-turbine.md). */
-	BUS_DUCT_1200("bus_duct_1200", "1,200 A generator bus duct", Family.STATION_BUS, 1200, 0.025e-3, 1.0),
+	BUS_DUCT_1200("bus_duct_1200", "1,200 A generator bus duct", Family.STATION_BUS, 1200, 0.025e-3, 1.0, 0),
 	/** The 45 MW peaker's generator bus (docs/multiblocks/aeroderivative.md). */
-	BUS_DUCT_3000("bus_duct_3000", "3,000 A generator bus duct", Family.STATION_BUS, 3000, 0.010e-3, 1.0);
+	BUS_DUCT_3000("bus_duct_3000", "3,000 A generator bus duct", Family.STATION_BUS, 3000, 0.010e-3, 1.0, 0);
 
 	/** Which set of sizes a conductor comes in. */
 	public enum Family {
@@ -49,14 +49,24 @@ public enum ConductorSize implements StringRepresentable {
 	private final double amps;
 	private final double ohmsPerMeter;
 	private final double spanFactor;
+	private final double breakingLbf;
 
-	ConductorSize(String id, String label, Family family, double amps, double ohmsPerMeter, double spanFactor) {
+	ConductorSize(String id, String label, Family family, double amps, double ohmsPerMeter, double spanFactor, double breakingLbf) {
 		this.id = id;
 		this.label = label;
 		this.family = family;
 		this.amps = amps;
 		this.ohmsPerMeter = ohmsPerMeter;
 		this.spanFactor = spanFactor;
+		this.breakingLbf = breakingLbf;
+	}
+
+	/**
+	 * Rated breaking strength, lbf, of a conductor strung as a span (protection-gaps 20): ACSR from its tables (Sparrow 2,850 to Drake
+	 * 31,200); building wire as soft-drawn copper at about 36 ksi (proposed). 0 for what is never strung overhead.
+	 */
+	public double breakingLbf() {
+		return breakingLbf;
 	}
 
 	@Override

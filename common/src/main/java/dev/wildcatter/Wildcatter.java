@@ -78,6 +78,7 @@ public final class Wildcatter {
 		dev.wildcatter.block.StorageModuleBlockEntity.clearAll();
 		dev.wildcatter.radiation.RadiationTicker.clearAll();
 		SpoolItem.clearAll();
+		dev.wildcatter.item.GuyStrandItem.clearAll();
 		dev.wildcatter.safety.BodyContact.clearAll();
 	}
 

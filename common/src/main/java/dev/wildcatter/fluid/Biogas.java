@@ -31,8 +31,8 @@ public final class Biogas {
 		return Tuning.GENSET_BIOGAS_WATTS / Tuning.GENSET_GAS_WATTS;
 	}
 
-	/** A firebox's ticks of fire in a m3 of biogas: a natural gas m3's, by heating value. */
+	/** A firebox's ticks of fire in a m3 of biogas: its heating value at the firebox's one heat rate. */
 	public static double fireboxTicksPerM3() {
-		return Tuning.GAS_FUEL_TICKS_PER_UNIT * Tuning.BIOGAS_JOULES_PER_M3 / Tuning.GAS_JOULES_PER_M3;
+		return FireboxFuel.ticksPerUnit(Product.BIOGAS);
 	}
 }

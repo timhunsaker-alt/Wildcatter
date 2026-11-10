@@ -108,12 +108,21 @@ An under-rated insulator flashes over to earth. Its power-follow arc is counted 
 (before any relay clears it): a fault a relay clears at once still arced for 5 cycles at the island's frequency. At 50 A·s the
 porcelain shatters (a few kA for a few cycles), as does the old 3 s of arc above 1 A.
 
-### Guy wires (planned, not built)
-See `docs/questions/protection-gaps.md`, entry D6: a down guy (3/8 in EHS strand, 15,400 lbf) from the pole top to a screw anchor,
-and a pole loading check against the ANSI O5.1 class strength. Planned, with the reasons.
+### Guy wires (built 2026-11-10 on Tim's answer; `docs/questions/answers-grid.md` 2)
+- **Counterpart:** a down guy of 3/8 in EHS strand (15,400 lbf, NESC strength factor 0.9) from near the pole top to an 8 in screw anchor.
+- **Parts:** `guy_anchor`, one block, its rod eye above grade; `guy_strand`, a 60 m coil: click the pole where the guy is clamped, then
+  the anchor. The anchor goes at least 2 m out and below the clamp; one guy an anchor, four a pole.
+- **The pull:** each span pulls its insulator toward its far end at 25 % of its conductor's rated breaking strength. A pole adds the
+  pulls of the insulators within 2 m of it (an H-frame's middle insulator is shared by its two poles), each scaled by its height to the
+  class load's point 0.6 m below the top. A guy takes what pulls away from its anchor, up to its strength times its lead over its length.
+- **Against:** the class load at the top: 30 ft class 5 1,900 lbf, 40 ft class 4 2,400, 75 ft class 2 3,700 (ANSI O5.1).
+- **Overloaded:** the Power Meter reads UNGUYED (or UNDER-GUYED). A pole placed from 0.7.0 on leans a step every 10 minutes: 1.5, 3 and
+  5 degrees, drawn turned about its top cell so its hardware stays put. It never breaks. A guy that holds the pull stands it plumb.
+- **Older worlds:** a built pole reads UNGUYED but never leans; one-block `pole` sections take no guys.
 
-### A pole transformer placed by command (planned)
-See entry D7: the rule (it turns its back to the pole) would rewire the seven client scenes that set one by command beside a pole.
+### A pole transformer placed by command (built 2026-11-10; `answers-grid.md` 3)
+A new pole unit in the default facing (north) with a pole beside it but not behind it turns its back to that pole on its first tick. A
+facing named in the command is kept; a unit from an older save keeps its facing and terminals.
 
 ## Older worlds
 - The one-block `pole` and `crossarm` stay and keep working with their spans; they are no longer crafted or in the creative tab.

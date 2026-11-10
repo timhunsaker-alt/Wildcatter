@@ -239,6 +239,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 			RECEPTACLE_NEMA_L21_30, RECEPTACLE_NEMA_L22_30, RECEPTACLE_IEC_60309_RED_32, RECEPTACLE_IEC_60309_RED_63);
 	public static final BlockEntityType<PlugAdapterBlockEntity> PLUG_ADAPTER_ENTITY = entity(PlugAdapterBlockEntity::new, PLUG_NEMA_5_15, PLUG_NEMA_5_20, PLUG_NEMA_14_50, PLUG_CEE_7, PLUG_IEC_60309_BLUE,
 			PLUG_NEMA_L21_30, PLUG_NEMA_L22_30, PLUG_IEC_60309_RED_32, PLUG_IEC_60309_RED_63);
+	public static final BlockEntityType<dev.wildcatter.block.GuyAnchorBlockEntity> GUY_ANCHOR_ENTITY = entity(dev.wildcatter.block.GuyAnchorBlockEntity::new, GUY_ANCHOR);
 	public static final BlockEntityType<InsulatorBlockEntity> INSULATOR_ENTITY = entity(InsulatorBlockEntity::new, INSULATOR_LV, INSULATOR_DIST, INSULATOR_HV);
 	public static final BlockEntityType<dev.wildcatter.block.PowerTransformerBlockEntity> POWER_TRANSFORMER_ENTITY = entity(dev.wildcatter.block.PowerTransformerBlockEntity::new, POWER_TRANSFORMER);
 	public static final BlockEntityType<dev.wildcatter.block.DisconnectSwitchBlockEntity> DISCONNECT_ENTITY = entity(dev.wildcatter.block.DisconnectSwitchBlockEntity::new, DISCONNECT_HV, DISCONNECT_DIST);
@@ -310,6 +311,8 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		add("on_off_valve_steel", ON_OFF_VALVE_STEEL);
 		add("motor_operated_valve_steel", MOTOR_OPERATED_VALVE_STEEL);
 		add("air_tubing", AIR_TUBING);
+		add("air_header", AIR_HEADER);
+		add("slurry_pipe", SLURRY_PIPE);
 		add("network_cable", NETWORK_CABLE);
 		add("hmi_panel", HMI_PANEL);
 		add("air_compressor", AIR_COMPRESSOR);
@@ -348,6 +351,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		add("hv_wire_hot", HV_WIRE_HOT);
 		add("hv_wire_neutral", HV_WIRE_NEUTRAL);
 		add("ground_rod", GROUND_ROD);
+		add("guy_anchor", GUY_ANCHOR);
 		add("ground_wire", GROUND_WIRE);
 		add("pole", POLE);
 		add("crossarm", CROSSARM);
@@ -583,6 +587,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("receptacle"), RECEPTACLE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("plug_adapter"), PLUG_ADAPTER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("insulator"), INSULATOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("guy_anchor"), GUY_ANCHOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("transformer"), TRANSFORMER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("multi_cable"), MULTI_CABLE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("three_phase_heater"), THREE_PHASE_HEATER_ENTITY);

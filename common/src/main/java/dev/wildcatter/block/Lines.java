@@ -42,10 +42,17 @@ public final class Lines {
 		}
 	}
 
-	/** One joined run of steel pipe, the machines on it, and what it carries. */
-	public record Line(Set<BlockPos> pipes, List<Port> ports, Run run, double opening) {
+	/**
+	 * One joined run of steel pipe (or of 600 mm slurry pipe), the machines on it, and what it carries. A slurry run is rated
+	 * ({@link #capacityPerTick}): {@code key} and {@code tick} let the pulls of one game tick share its rating.
+	 */
+	public record Line(Set<BlockPos> pipes, List<Port> ports, Run run, double opening, boolean slurry, long key, long tick) {
 		public Line(Set<BlockPos> pipes, List<Port> ports, Run run) {
 			this(pipes, ports, run, 1.0);
+		}
+
+		public Line(Set<BlockPos> pipes, List<Port> ports, Run run, double opening) {
+			this(pipes, ports, run, opening, false, 0, 0);
 		}
 
 		/** True if a block of this kind touches the run (a disposal wellhead, which keeps no state). */
@@ -62,7 +69,61 @@ public final class Lines {
 	}
 
 	static boolean isSteelPipe(Level level, BlockPos pos) {
-		return level.getBlockState(pos).getBlock() instanceof PipeBlock pipe && pipe.kind() == PipeBlock.Kind.GAS && PipeBlock.conducts(level, pos);
+		return isRun(level, pos, PipeBlock.Kind.GAS);
+	}
+
+	/** A conducting pipe of this kind at {@code pos}. */
+	static boolean isRun(Level level, BlockPos pos, PipeBlock.Kind kind) {
+		return level.getBlockState(pos).getBlock() instanceof PipeBlock pipe && pipe.kind() == kind && PipeBlock.conducts(level, pos);
+	}
+
+	/** The kind of process run at {@code pos}: steel pipe (GAS) or slurry pipe, or null for neither. */
+	static PipeBlock.@Nullable Kind runKind(Level level, BlockPos pos) {
+		return isRun(level, pos, PipeBlock.Kind.GAS) ? PipeBlock.Kind.GAS : isRun(level, pos, PipeBlock.Kind.SLURRY) ? PipeBlock.Kind.SLURRY : null;
+	}
+
+	// ---- the slurry pipe's rating (Tim, 2026-11-10, Tailings p7 #27) ------------------------------------------------------------------
+	/** Per rated run: the game tick and what has gone through it in that tick. */
+	private static final java.util.Map<Long, double[]> USED = new java.util.HashMap<>();
+
+	/**
+	 * What a run passes in a tick of {@code product}, in its own unit: steel pipe is unrated; the 600 mm slurry pipe passes
+	 * {@link Tuning#SLURRY_PIPE_M3_S} m3/s, counted for slurries at {@link Tuning#SLURRY_PIPE_KG_M3}, and no gas.
+	 */
+	public static double capacityPerTick(Line line, Product product) {
+		if (!line.slurry()) {
+			return Double.POSITIVE_INFINITY;
+		}
+		if (product.gas()) {
+			return 0;
+		}
+		return Tuning.SLURRY_PIPE_M3_S * ("kg".equals(product.unit()) ? Tuning.SLURRY_PIPE_KG_M3 : 1000.0) / 20.0;
+	}
+
+	/** What is left of a run's rating in this tick. */
+	public static double room(Line line, Product product) {
+		double cap = capacityPerTick(line, product);
+		if (Double.isInfinite(cap)) {
+			return cap;
+		}
+		double[] used = USED.get(line.key());
+		return Math.max(0, cap - (used != null && used[0] == line.tick() ? used[1] : 0));
+	}
+
+	/** Counts {@code amount} through a rated run in this tick. */
+	static void use(Line line, double amount) {
+		if (!line.slurry() || amount <= 0) {
+			return;
+		}
+		if (USED.size() > 4096) {
+			USED.values().removeIf(u -> u[0] < line.tick());
+		}
+		double[] used = USED.computeIfAbsent(line.key(), k -> new double[] {line.tick(), 0});
+		if (used[0] != line.tick()) {
+			used[0] = line.tick();
+			used[1] = 0;
+		}
+		used[1] += amount;
 	}
 
 	/** Every face of these cells that looks out of them (where a pipe could join). */
@@ -90,17 +151,23 @@ public final class Lines {
 		return entity instanceof FluidNode node ? node : null;
 	}
 
-	/** The run through the steel pipe at {@code start}. */
+	/** The run through the steel pipe (or the slurry pipe) at {@code start}. */
 	public static Line line(Level level, BlockPos start) {
+		PipeBlock.Kind kind = runKind(level, start);
+		if (kind == null) {
+			kind = PipeBlock.Kind.GAS;
+		}
 		Set<BlockPos> pipes = new LinkedHashSet<>();
 		ArrayDeque<BlockPos> queue = new ArrayDeque<>();
 		pipes.add(start);
 		queue.add(start);
+		long key = start.asLong();
 		while (!queue.isEmpty() && pipes.size() < Tuning.PIPE_NETWORK_LIMIT) {
 			BlockPos at = queue.poll();
+			key = Math.min(key, at.asLong());
 			for (Direction side : Direction.values()) {
 				BlockPos next = at.relative(side);
-				if (isSteelPipe(level, next) && pipes.add(next)) {
+				if (isRun(level, next, kind) && pipes.add(next)) {
 					queue.add(next);
 				}
 			}
@@ -121,7 +188,8 @@ public final class Lines {
 				}
 			}
 		}
-		return new Line(pipes, ports, Run.of(offered), Plumbing.throttle(level, pipes));
+		boolean slurry = kind == PipeBlock.Kind.SLURRY;
+		return new Line(pipes, ports, Run.of(offered), Plumbing.throttle(level, pipes), slurry, slurry ? key ^ level.dimension().hashCode() : 0, level.getGameTime());
 	}
 
 	/** Each distinct run of steel pipe on these faces. */
@@ -130,7 +198,7 @@ public final class Lines {
 		Set<BlockPos> seen = new HashSet<>();
 		for (Face face : faces) {
 			BlockPos pipe = face.pipe();
-			if (!seen.contains(pipe) && isSteelPipe(level, pipe)) {
+			if (!seen.contains(pipe) && runKind(level, pipe) != null) {
 				Line line = line(level, pipe);
 				seen.addAll(line.pipes());
 				out.add(line);
@@ -142,7 +210,7 @@ public final class Lines {
 	/** The sources of {@code product} on a run that {@code pull} may draw from, process outlets before tanks, never {@code self}. */
 	static List<Port> sources(Line line, Product product, FluidNode.Pull pull, @Nullable Object self) {
 		List<Port> outlets = new ArrayList<>(), tanks = new ArrayList<>();
-		if (!line.run().carries(product)) {
+		if (!line.run().carries(product) || line.slurry() && product.gas()) {
 			return outlets;
 		}
 		for (Port port : line.ports()) {
@@ -176,7 +244,7 @@ public final class Lines {
 			Port p = sources.get(i);
 			available[i] = p.node().available(p.cell(), p.side(), product, pull);
 		}
-		double[] share = Flow.share(max * line.opening(), available);
+		double[] share = Flow.share(Math.min(max * line.opening(), room(line, product)), available);
 		double got = 0;
 		for (int i = 0; i < share.length; i++) {
 			if (share[i] > 0) {
@@ -184,6 +252,7 @@ public final class Lines {
 				got += p.node().take(p.cell(), p.side(), product, share[i], pull);
 			}
 		}
+		use(line, got);
 		return got;
 	}
 
@@ -191,9 +260,11 @@ public final class Lines {
 	public static double available(Level level, Collection<Face> faces, Product product, FluidNode.Pull pull, @Nullable Object self) {
 		double sum = 0;
 		for (Line line : lines(level, faces)) {
+			double here = 0;
 			for (Port p : sources(line, product, pull, self)) {
-				sum += p.node().available(p.cell(), p.side(), product, pull);
+				here += p.node().available(p.cell(), p.side(), product, pull);
 			}
+			sum += Math.min(here, room(line, product));
 		}
 		return sum;
 	}

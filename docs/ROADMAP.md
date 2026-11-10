@@ -383,7 +383,7 @@ Decisions for Tim: `docs/questions/protection-gaps.md` (28 entries). Specs updat
   current-limiting fuse let-through; a protection race and a coordination readout; the panel main's handle drawn by state.
 - **Distribution:** span ampacity, 4.16 kV spans, leads from insulators to cutouts and pole units, earthing at the service, the
   flashover shattering path, pole hardware falling with its pole.
-- **Planned, not built (questions for Tim):** guy wires (20), the command-placed pole transformer's facing (21). Left out: AFCI (22).
+- **Planned, then built on Tim's answers (2026-11-10, branch `w-grid`):** guy wires (20), the command-placed pole transformer's facing (21). Left out: AFCI (22).
 - NeoForge server scenes for each; the Fabric client scenes `switchgear`, `busProtection`, `ats` changed and wait for a client run.
 
 ## Misc gaps — 2026-11-09 (Known gaps wave; built while Tim was away)
@@ -535,6 +535,16 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
 - Tests: unit `HoldupTest`, `CaskCoolingTest` (and `ReactorLimitsTest`'s rules test); NeoForge scenes `world_rules`, `cask_cooling`,
   `assembly_assay`, `phosphate_auc`, `residence_holds`; client scene `saltDomeFilm` (filmed). Full server suite 74 of 74; unit tests 395
   (2 skipped), none failed.
+
+
+## Tim's answers, grid and pit line — BUILT 2026-11-10 on branch `w-grid` (answers 9, 12, 16, 17, 18 of Tailings' `answers-2026-11-10.md`)
+Decisions taken while building: `docs/questions/answers-grid.md`. NeoForge scenes in `GridAnswerScenes`; client scene `guyWire` (filmed).
+- **The firebox's one heat rate (17):** 0.36 MW in every world; every piped fuel lasts its heating value (`fluid/FireboxFuel`).
+- **Guy wires (16):** `guy_anchor` and `guy_strand`; a pole weighs its spans' pull against its class load, reads UNGUYED past it and,
+  if placed from 0.7.0 on, leans in three steps; a guy that holds the pull stands it plumb. It never breaks.
+- **Pole transformer by command (18):** a new unit in the default facing turns its back to its pole; built units keep their terminals.
+- **Pit line (12):** the 600 mm `slurry_pipe` (rated 1 m3/s), the decant tower's rate scaling with its cell's floor, the 600 mm `air_header`.
+- **Zircon concentrate (9):** `#wildcatter:zircon_feed` and a kg data file; the chlorinator's hopper takes it.
 
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released (planned as 14e, `docs/mekanism-check.md`).

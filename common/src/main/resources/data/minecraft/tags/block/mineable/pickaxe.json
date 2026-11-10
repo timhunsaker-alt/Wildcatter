@@ -422,6 +422,9 @@
     "wildcatter:bentonite_dryer",
     "wildcatter:mud_hopper",
     "wildcatter:bop_stack",
-    "wildcatter:bop_accumulator"
+    "wildcatter:bop_accumulator",
+    "wildcatter:slurry_pipe",
+    "wildcatter:air_header",
+    "wildcatter:guy_anchor"
   ]
 }

@@ -32,11 +32,11 @@ public interface GridBlocks {
 			.strength(1.5F, 3.0F).sound(SoundType.WOOD).noOcclusion()));
 	/** True-size wood poles and their hardware (docs/multiblocks/poles.md): 30, 40 and 75 ft, standing 8, 10 and 20 m. */
 	Block WOOD_POLE_30 = block("wood_pole_30", props -> new dev.wildcatter.block.WoodPoleBlock(props.mapColor(MapColor.WOOD)
-			.strength(2.0F, 3.0F).sound(SoundType.WOOD), 8, "wood_pole_30"));
+			.strength(2.0F, 3.0F).sound(SoundType.WOOD), 8, "wood_pole_30", "30 ft class 5", 5, 1_900));
 	Block WOOD_POLE_40 = block("wood_pole_40", props -> new dev.wildcatter.block.WoodPoleBlock(props.mapColor(MapColor.WOOD)
-			.strength(2.0F, 3.0F).sound(SoundType.WOOD), 10, "wood_pole_40"));
+			.strength(2.0F, 3.0F).sound(SoundType.WOOD), 10, "wood_pole_40", "40 ft class 4", 4, 2_400));
 	Block WOOD_POLE_75 = block("wood_pole_75", props -> new dev.wildcatter.block.WoodPoleBlock(props.mapColor(MapColor.WOOD)
-			.strength(2.5F, 4.0F).sound(SoundType.WOOD), 20, "wood_pole_75"));
+			.strength(2.5F, 4.0F).sound(SoundType.WOOD), 20, "wood_pole_75", "75 ft class 2", 2, 3_700));
 	Block CROSSARM_DIST = block("crossarm_dist", props -> new dev.wildcatter.block.CrossarmPartBlock(props.mapColor(MapColor.WOOD)
 			.strength(1.5F, 3.0F).sound(SoundType.WOOD)));
 	Block CROSSBEAM_138 = block("crossbeam_138", props -> new dev.wildcatter.block.CrossbeamBlock(props.mapColor(MapColor.WOOD)
@@ -84,6 +84,9 @@ public interface GridBlocks {
 	Block BUSWAY_LV = busway("busway_lv", Voltage.LOW);
 	Block BUSWAY_INDUSTRIAL = busway("busway_industrial", Voltage.INDUSTRIAL);
 
+	/** A guy anchor (protection-gaps 20): a screw anchor and its rod eye, for a guy from a wood pole. */
+	Block GUY_ANCHOR = block("guy_anchor", props -> new dev.wildcatter.block.GuyAnchorBlock(props.mapColor(MapColor.METAL)
+			.strength(2.0F, 4.0F).sound(SoundType.METAL).noOcclusion()));
 	/** A copper rod in the earth, for grounding machines. */
 	Block GROUND_ROD = block("ground_rod", props -> new GroundRodBlock(props.mapColor(MapColor.COLOR_ORANGE)
 			.strength(1.0F).sound(SoundType.COPPER).noOcclusion()));
