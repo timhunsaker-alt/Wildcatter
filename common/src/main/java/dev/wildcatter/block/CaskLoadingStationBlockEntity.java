@@ -104,10 +104,11 @@ public class CaskLoadingStationBlockEntity extends UnitMotorBlockEntity implemen
 		return level.getBlockEntity(link) instanceof StorageModuleBlockEntity m ? m : null;
 	}
 
+	/** The canister's heat as its limits count it: each assembly's cooling counted 100x (answer 20; {@link SpentFuel.Assembly#eligibilityWatts}). */
 	private double canisterWatts() {
 		double w = 0;
 		for (SpentFuel.Assembly a : canister) {
-			w += a.watts();
+			w += a.eligibilityWatts();
 		}
 		return w;
 	}
@@ -117,8 +118,8 @@ public class CaskLoadingStationBlockEntity extends UnitMotorBlockEntity implemen
 		double total = canisterWatts();
 		SpentFuel.Assembly best = null;
 		for (SpentFuel.Assembly a : pool.racks()) {
-			double w = a.watts();
-			if (w <= Tuning.CANISTER_MAX_W_EACH && total + w <= Tuning.CANISTER_MAX_W && (best == null || w < best.watts())) {
+			double w = a.eligibilityWatts();
+			if (w <= Tuning.CANISTER_MAX_W_EACH && total + w <= Tuning.CANISTER_MAX_W && (best == null || w < best.eligibilityWatts())) {
 				best = a;
 			}
 		}
@@ -177,7 +178,7 @@ public class CaskLoadingStationBlockEntity extends UnitMotorBlockEntity implemen
 				if (canister.size() >= Tuning.CANISTER_ASSEMBLIES || next == null && !canister.isEmpty()) {
 					stage = "DRYING";
 				} else if (next == null) {
-					double coolest = pool.racks().stream().mapToDouble(SpentFuel.Assembly::watts).min().orElse(0);
+					double coolest = pool.racks().stream().mapToDouble(SpentFuel.Assembly::eligibilityWatts).min().orElse(0);
 					unit = pool.racks().isEmpty() ? "HELD: the pool is empty" : String.format("HELD: no assembly cool enough for a canister (the coolest %.1f kW; the limit %.1f kW)",
 							coolest / 1000, Tuning.CANISTER_MAX_W_EACH / 1000);
 				}

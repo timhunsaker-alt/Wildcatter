@@ -251,6 +251,7 @@ public class SpentFuelPoolBlockEntity extends UnitMotorBlockEntity implements Wa
 			SpentFuel.Assembly a = records.get(i);
 			output.putDouble(prefix + i + "b", a.burnup);
 			output.putBoolean(prefix + i + "x", a.damaged);
+			output.putDouble(prefix + i + "c", a.cooled);
 			for (int g = 0; g < a.decay.length; g++) {
 				output.putDouble(prefix + i + "d" + g, a.decay[g]);
 			}
@@ -265,7 +266,7 @@ public class SpentFuelPoolBlockEntity extends UnitMotorBlockEntity implements Wa
 			for (int g = 0; g < d.length; g++) {
 				d[g] = input.getDoubleOr(prefix + i + "d" + g, 0);
 			}
-			records.add(new SpentFuel.Assembly(input.getDoubleOr(prefix + i + "b", 0), d, input.getBooleanOr(prefix + i + "x", false)));
+			records.add(new SpentFuel.Assembly(input.getDoubleOr(prefix + i + "b", 0), d, input.getBooleanOr(prefix + i + "x", false), input.getDoubleOr(prefix + i + "c", 0)));
 		}
 	}
 

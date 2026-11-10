@@ -43,6 +43,7 @@ final class ReactorExtensionScenes {
 		out.put("containment", ReactorExtensionScenes::containment);
 		out.put("reactor_limits", ReactorExtensionScenes::reactorLimits);
 		out.put("casks", ReactorExtensionScenes::casks);
+		out.put("cask_cooling", ReactorExtensionScenes::caskCooling);
 		out.put("contamination", ReactorExtensionScenes::contamination);
 		out.put("fuel_inspection", ReactorExtensionScenes::fuelInspection);
 		return out;
@@ -317,6 +318,48 @@ final class ReactorExtensionScenes {
 				float progress = helper.getLevel().getBlockState(wall).getDestroyProgress(miner, helper.getLevel(), wall);
 				GridSceneKit.check(helper, progress == 0, "a loaded module cannot be broken: " + progress);
 				log("casks", "ok: " + moved + " | beside " + dev.wildcatter.fluid.Radiation.rateText(rate));
+				helper.succeed();
+			}));
+		});
+	}
+
+	/**
+	 * Cask cooling counted 100x for eligibility only (Tim's answer 20): two assemblies of the same real 3 kW (over the canister's 1.5 kW
+	 * an assembly), one discharged a while ago (its cooling time, counted 100x, brings it under the limit) and one just discharged. On
+	 * LOAD CASK the station takes the cooled one and sends it alone to the module; the new one stays; the heat carried is the real 3 kW.
+	 */
+	static void caskCooling(GameTestHelper helper) {
+		floor(helper, -6, -8, 22, 20);
+		place(helper, WildcatterBlocks.SPENT_FUEL_POOL, 4, 1, 4, Direction.NORTH);
+		place(helper, WildcatterBlocks.CASK_LOADING_STATION, 4, 1, 8, Direction.NORTH);
+		place(helper, WildcatterBlocks.STORAGE_MODULE, 12, 1, 10, Direction.NORTH);
+		GridSceneKit.genset(helper, 1, 1, 8);
+		put(helper, "cable_industrial", 2, 1, 8);
+		put(helper, "cable_industrial", 3, 1, 8);
+		dev.wildcatter.block.SpentFuelPoolBlockEntity pool = entity(helper, 4, 1, 4, dev.wildcatter.block.SpentFuelPoolBlockEntity.class);
+		dev.wildcatter.block.CaskLoadingStationBlockEntity station = entity(helper, 4, 1, 8, dev.wildcatter.block.CaskLoadingStationBlockEntity.class);
+		dev.wildcatter.block.StorageModuleBlockEntity module = entity(helper, 12, 1, 10, dev.wildcatter.block.StorageModuleBlockEntity.class);
+		double lambda = Tuning.DECAY_LAMBDA[Tuning.DECAY_LAMBDA.length - 1];
+		dev.wildcatter.fluid.SpentFuel.Assembly cooled = old(3000);
+		cooled.cooled = Math.log(3) / ((Tuning.BURNUP_SPEEDUP - 1) * lambda);   // about 10 h of world time: counted 100x, it reads 1 kW
+		dev.wildcatter.fluid.SpentFuel.Assembly fresh = old(3000);
+		GridSceneKit.check(helper, cooled.watts() > Tuning.CANISTER_MAX_W_EACH && cooled.eligibilityWatts() < Tuning.CANISTER_MAX_W_EACH
+				&& fresh.eligibilityWatts() > Tuning.CANISTER_MAX_W_EACH, String.format("the cooled assembly should count %.0f W (real %.0f W), the fresh one %.0f W",
+						cooled.eligibilityWatts(), cooled.watts(), fresh.eligibilityWatts()));
+		pool.store(helper.getLevel(), cooled);
+		pool.store(helper.getLevel(), fresh);
+		station.setTimesForTest(0.4, 1, 1, 1);
+		station.setItem(0, new net.minecraft.world.item.ItemStack(dev.wildcatter.WildcatterItems.DRY_STORAGE_CANISTER));
+		helper.runAfterDelay(20, () -> {
+			String linked = station.link(helper.getLevel());
+			GridSceneKit.check(helper, linked.contains("linked"), "the station should link the module: " + linked);
+			pool.toggleCaskMode();
+			GridSceneKit.start(helper, 1, 1, 8, () -> await(helper, 1200, () -> !module.records().isEmpty(), () -> {
+				String moved = read(helper, 12, 1, 10) + " | " + read(helper, 4, 1, 8);
+				GridSceneKit.check(helper, module.records().size() == 1 && pool.racks().size() == 1, "the station should send the cooled assembly alone: " + moved);
+				double carried = module.records().getFirst().watts();
+				GridSceneKit.check(helper, carried > 2900, "the module should carry its real heat, about 3 kW: " + carried);
+				log("cask_cooling", "ok: " + moved + String.format(" | carried %.0f W", carried));
 				helper.succeed();
 			}));
 		});
