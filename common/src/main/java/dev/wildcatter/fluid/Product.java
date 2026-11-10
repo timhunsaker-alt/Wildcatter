@@ -129,7 +129,9 @@ public enum Product {
 	 * puts it on steel pipe by a block entity that implements {@code block.FluidNode} and offers this product. Gas sets (derated to
 	 * 850 kW) and fireboxes burn it; big burners, turbines and the sales line refuse it.
 	 */
-	BIOGAS("biogas, 60 % CH4", true);
+	BIOGAS("biogas, 60 % CH4", true),
+	/** 16b1: 32 % potassium hydroxide from a chlor-alkali cell run on potash, the KOH scrubber's first charge. Counted in kg. */
+	CAUSTIC_POTASH("caustic potash (32 %)", false);
 
 	private final String label;
 	private final boolean gas;
@@ -152,7 +154,7 @@ public enum Product {
 		return switch (this) {
 			case HOT_CRACKED_GAS, CRACKED_GAS, COMPRESSED_CRACKED_GAS, BURNER_GAS, ORE_SLURRY, LEACH_SLURRY, FLUORINE, UF6, CHLORINE, STEAM, FEEDWATER, COOLING_WATER,
 					CAUSTIC_SODA, PROCESS_STEAM, BAUXITE_SLURRY, DIGESTED_SLURRY, GREEN_LIQUOR, MUD_SLURRY, POLISHED_LIQUOR, HYDRATE_SLURRY, SPENT_LIQUOR, STRONG_LIQUOR, COAL_TAR, PITCH,
-					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY, AN_SOLUTION, EMULSION_MATRIX -> "kg";
+					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY, AN_SOLUTION, EMULSION_MATRIX, CAUSTIC_POTASH -> "kg";
 			default -> gas ? "m3" : "L";
 		};
 	}

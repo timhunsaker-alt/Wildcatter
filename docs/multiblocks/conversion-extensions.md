@@ -1,7 +1,8 @@
 # Conversion extensions: cathode hydrogen, the ash bed, KOH regeneration, a full-size plant
 
-> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Proposed phase **16b** (16b1 the first three
-> items; 16b2 the full-size plant). Decisions are in `docs/questions/specs-wildcatter.md` (items 27-30).
+> **16b1 BUILT (2026-11-10), decided on recommendation while Tim was away; not approved.** See "As built (16b1)" at the end and
+> `docs/questions/phase16-uranium.md` (items 8-16). **16b2 (the full-size plant) is a written plan, not built.** Drafted as proposed phase
+> **16b** (16b1 the first three items; 16b2 the full-size plant). Decisions are in `docs/questions/specs-wildcatter.md` (items 27-30).
 
 Four items the conversion spec (conversion.md, approved 2026-11-01) left in ROADMAP Ideas. Each has its real basis and a proposed
 scope. Numbers derive from conversion.md's own: 12 cells at 6 kA, 48.5 kg of F2 an hour, 0.075 kg of U a second.
@@ -110,3 +111,29 @@ touching the part they serve; any rotation. Removing one returns that part to to
 ## Proposed waves
 - **16b1:** cathode hydrogen, the ash bed, the KOH scrubber (three new parts, two new items: ash drum, caustic potash).
 - **16b2:** the full-size plant.
+
+## As built (16b1, 2026-11-10; decisions in `docs/questions/phase16-uranium.md`, items 8-16)
+- **Cathode gas scrubber** (`wildcatter:cathode_gas_scrubber`, 2 x 4 x 2, 10 kW on the industrial supply, box on the north face of its main
+  cell): touching the fluorine cell house anywhere, it takes the cells' hydrogen (0.590 Nm3 a kg of F2, **28.6 Nm3/h** at full current)
+  and puts it on the pipe at the south face of its back cells; what the pipe cannot take is vented. Without a scrubber the cell house
+  vents it, as before.
+- **The ash bed:** a sneak-click on the fluorinator, or a PLC's **RETIRE BED** point, retires its bed: 10 minutes RETIRING THE BED, then its
+  ash into **Fluorinator Ash Drums** (400 kg each; empty drums from a hopper on top, six out slots under it), then a new bed of 500 kg of
+  fluorspar (fluorspar blocks or synthetic fluorspar bags by the same hopper). NO DRUMS, FULL, NO FLUORSPAR. PLC points also BED FULL and
+  RETIRING. **BED FULL** at 2 t stops the fluorinator **only with `fluorinatorAshBed=true`** in `config/wildcatter.properties` (default
+  off: fluorinators already built keep running as before).
+- **Ash drums in the mill:** the leach tank takes them by its hopper (a second slot) and, while it leaches ore, adds their uranium (3 %,
+  14.2 kg of U3O8 a drum) to its slurry at up to 0.05 kg/s; the drum is used up.
+- **KOH scrubber** (`wildcatter:koh_scrubber`, 3 x 8 x 3, 15 kW, box on the west): against the hydrofluorinator. Its first charge, 2,000 kg
+  of KOH, comes as **caustic potash** (32 %, kg) on the pipe at the north face of its front cells. It takes the hydrofluorinator's excess
+  HF (0.094 kg a kg of U, 2.8 kg of KOH a kg of HF); quicklime bags by a hopper on top regenerate the liquor (1.40 kg of CaO a kg of HF, up
+  to 1 kg of KOH a second); the CaF2 (1.95 kg a kg of HF) goes out under it in 1 t bags of **Synthetic Fluorspar**, which the HF kiln and a
+  fluorinator's new bed take. **SPENT** stops the hydrofluorinator (KOH SCRUBBER SPENT), as does a scrubber whose pumps are not running. A
+  hydrofluorinator with no KOH scrubber runs and counts its HF as before.
+- **Caustic potash:** a chlor-alkali cell given potash (sylvite) instead of rock salt makes 32 % caustic potash out of its caustic nozzle,
+  1.58 kg of KOH and 2.1 kg of KCl a kg of Cl2. New pipe product `caustic potash (32 %)`.
+- **Tests:** NeoForge scene `conversion_extensions` (the cells at full current by hook: 28.6 Nm3/h through the scrubber runs the reducer
+  with no reformer; BED FULL with the rule on; a retirement fills five ash drums and renews the bed; an ash drum leached; CaF2 bagged;
+  SPENT stops the hydrofluorinator). Unit test `UraniumOperationsTest` (the hydrogen, lime, CaF2 and 28-hour balances). The chlor-alkali
+  cell on potash has no scene yet (it needs DC).
+

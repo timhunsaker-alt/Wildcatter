@@ -26,4 +26,32 @@ class UraniumOperationsTest {
 	void oneAmmoniaPlantFeedsAbout76KgOfU3o8AnHour() {
 		assertEquals(76, AmmoniaPlant.ammoniaKgh() / Tuning.ADU_NH3_PER_U3O8, 2);
 	}
+
+	// ---- 16b1: cathode hydrogen, the ash bed, KOH (docs/multiblocks/conversion-extensions.md) ---------------------------------------
+	private static double cathodeNm3h() {
+		return Conversion.fluorineKgs() * Conversion.cathodeM3PerF2() * 3600;
+	}
+
+	@Test
+	void theCellsHydrogenCoversTheReducer() {
+		assertEquals(28.6, cathodeNm3h(), 0.3);
+		double magnesia = Conversion.uraniumKgs() * Conversion.hydrogenM3PerU() * 3600;
+		double adu = Conversion.uraniumKgs() * Tuning.CONV_H2_PER_U_ADU / Tuning.H2_KG_PER_M3 * 3600;
+		assertEquals(25.4, magnesia, 0.3);
+		assertEquals(17.0, adu, 0.3);
+	}
+
+	@Test
+	void theKohScrubbersBalance() {
+		double hfKgh = Conversion.uraniumKgs() * Tuning.HF_EXCESS_PER_U * 3600;
+		assertEquals(25.4, hfKgh, 0.3);
+		assertEquals(35.6, hfKgh * Tuning.LIME_PER_HF, 0.5);
+		assertEquals(49.5, hfKgh * Tuning.CAF2_PER_HF, 0.5);
+		assertEquals(28, Tuning.KOH_CHARGE_KG / (hfKgh * Tuning.KOH_PER_HF), 1);   // hours without lime
+	}
+
+	@Test
+	void anAshDrumHolds12KgOfU() {
+		assertEquals(12, Tuning.ASH_DRUM_KG * Tuning.ASH_U_SHARE, 0.01);
+	}
 }

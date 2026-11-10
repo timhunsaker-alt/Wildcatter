@@ -1231,4 +1231,23 @@ public final class Tuning {
 	public static final double CONV_H2_PER_U_ADU = 5.65e-3;        // kg of H2 a kg of U: U3O8 + 2 H2 -> 3 UO2 (derived)
 	public static final double CONV_HF_MGF2_PER_U = 0.084;         // the magnesia drum's extra HF, part of CONV_HF_PER_U
 	public static final double ADU_BYPRODUCT_PER_NH3 = 3.1;        // kg of ammonium salt in the barren liquor a kg of NH3 (NH4Cl 53.5/17; counted)
+
+	// ---- Phase 16b1: conversion's cathode hydrogen, the ash bed, KOH (docs/multiblocks/conversion-extensions.md) ----------------
+	public static final double CATHODE_H2_KG_PER_F2 = 2.016 / 38.0;  // one H2 at the cathode for each F2 at the anode
+	public static final double CATHODE_SCRUBBER_WATTS = 10_000.0;  // its NaF beds' heaters and KOH polishing pump (proposed), industrial supply
+	public static final double ASH_BED_KG = 2_000.0;               // the fluorinator's bed is full at this much ash (proposed)
+	public static final double ASH_U_SHARE = 0.03;                 // uranium in the fluorinator ash (proposed)
+	public static final double ASH_DRUM_KG = 400.0;                // ash a drum
+	public static final double BED_RETIRE_SECONDS = 600.0;         // the fluorinator stopped to dump its bed (proposed)
+	public static final double BED_FLUORSPAR_KG = 500.0;           // a new bed of CaF2 (proposed)
+	public static final double ASH_LEACH_U3O8_KGS = 0.05;          // ash uranium the leach tank takes into its slurry while it leaches ore (proposed)
+	public static final double KOH_SCRUBBER_WATTS = 15_000.0;      // its recirculation pumps and lime reactor agitator (proposed), industrial supply
+	public static final double KOH_CHARGE_KG = 2_000.0;            // the first charge of KOH (proposed)
+	public static final double HF_EXCESS_PER_U = 0.43 - 0.336;    // kg of HF a kg of U the hydrofluorinator sends to its scrubber
+	public static final double KOH_PER_HF = 56.1 / 20.0;           // KOH + HF -> KF + H2O
+	public static final double LIME_PER_HF = 1.40;                 // kg of CaO a kg of HF scrubbed: 2 KF + Ca(OH)2 -> CaF2 + 2 KOH
+	public static final double CAF2_PER_HF = 1.95;                 // kg of CaF2 a kg of HF scrubbed
+	public static final double KOH_REGEN_KGS = 1.0;                // KOH the lime reactor regenerates at most a second (proposed: a batch reactor)
+	public static final double KOH_PER_CL2 = 1.58;                // kg of KOH a kg of Cl2, a membrane cell on potash (derived)
+	public static final double KCL_PER_CL2 = 2.1;                 // kg of KCl a kg of Cl2 (derived)
 }

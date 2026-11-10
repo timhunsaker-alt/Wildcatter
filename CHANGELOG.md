@@ -4,6 +4,11 @@
 - **ADU yellowcake (16a):** pipe liquid ammonia to the precipitation tank and set the new URANIUM CALCINER against it and the drum filler:
   U3O8 at 96 % in a new U3O8 Drum, 326 kg of uranium against the magnesia drum's 271. Conversion needs a third less hydrogen for it, no
   HF for magnesia and far less ash. Without ammonia the magnesia route is unchanged. Spec: `docs/multiblocks/adu-yellowcake.md`.
+- **Conversion's by-products (16b1):** a CATHODE GAS SCRUBBER sends the fluorine cells' hydrogen to the reducer; the fluorinator's bed
+  can be retired into Fluorinator Ash Drums whose uranium the mill's leach tank recovers (BED FULL stops a fluorinator only with
+  `fluorinatorAshBed=true` in `config/wildcatter.properties`); a KOH SCRUBBER cleans the hydrofluorinator's off-gas, charged with caustic
+  potash from a chlor-alkali cell run on potash and regenerated with quicklime into Synthetic Fluorspar. Spec:
+  `docs/multiblocks/conversion-extensions.md`.
 - Decisions for review: `docs/questions/phase16-uranium.md`.
 
 ## Unreleased (0.7.0): gas and power quick wins (Phase 14b-14d) and the protection gap wave (built 2026-11-09 while Tim was away; not approved)

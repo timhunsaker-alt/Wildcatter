@@ -1448,8 +1448,9 @@ sized for a 40-pot line.
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
-- Phase 16 (uranium routes and plant operations, 2026-11-10; `docs/questions/phase16-uranium.md`): script-drawn icon
-  `u3o8_drum_placeholder` (16a). Not built in 16a: uranyl peroxide precipitation, ammonia recovery, ASTM C967 impurity penalties.
+- Phase 16 (uranium routes and plant operations, 2026-11-10; `docs/questions/phase16-uranium.md`): script-drawn icons
+  `u3o8_drum_placeholder` (16a), `fluorinator_ash_drum_placeholder`, `synthetic_fluorspar_placeholder` (16b1). The chlor-alkali cell on
+  potash has no scene (16b1). Not built in 16a: uranyl peroxide precipitation, ammonia recovery, ASTM C967 impurity penalties.
   16b2, 16c2 and 16d2 are planned in ROADMAP, not built.
 - Phase 14 (the ammonia plant): the `gauze_pack` and `emulsifier_pail` icons are Ludo art since the art wave (2026-11-09); no
   placeholder is left. The six parts use the mod's materials. Not built: the ammonia leak hazard, AN solution setting in a cold
@@ -1856,4 +1857,16 @@ Plan: `docs/ideas-plan.md`. Branch `phase16`. Nothing changes what an existing w
   - Field Manual page ADU AND THE CALCINER.
   - Tests: NeoForge scene `adu_yellowcake` passes; unit test `UraniumOperationsTest` (16a: H2 derivation, the drums' uranium, one
     ammonia plant feeds 76 kg/h of U3O8).
+- **16b1, conversion's by-products** (`docs/multiblocks/conversion-extensions.md`, "As built (16b1)"):
+  - CATHODE GAS SCRUBBER (2 x 4 x 2, 10 kW, box north): against the fluorine cell house, its 28.6 Nm3/h of cathode hydrogen to a pipe
+    for the reducer; what the pipe cannot take is vented, as is all of it with no scrubber.
+  - The fluorinator's bed: RETIRE BED (sneak-click, or a PLC point; also BED FULL and RETIRING): ten minutes, the ash into Fluorinator Ash
+    Drums (400 kg, 3 % U), a new bed of 500 kg of fluorspar. BED FULL at 2 t stops it only with `fluorinatorAshBed=true` in
+    `config/wildcatter.properties` (new class `Rules`; default off). The leach tank takes ash drums by hopper and leaches their uranium
+    with the ore.
+  - KOH SCRUBBER (3 x 8 x 3, 15 kW): against the hydrofluorinator; first charge of 2,000 kg of KOH as caustic potash (new pipe product,
+    32 %) from a chlor-alkali cell given potash; quicklime regenerates it; CaF2 out in 1 t bags of Synthetic Fluorspar (the HF kiln and a
+    new bed take them); SPENT stops the hydrofluorinator.
+  - Field Manual pages CONVERSION'S BY-PRODUCTS and KOH SCRUBBER.
+  - Tests: NeoForge scene `conversion_extensions` passes; `UraniumOperationsTest` adds the hydrogen, KOH and ash balances.
 

@@ -40,7 +40,7 @@ public class HfKilnBlockEntity extends UnitMotorBlockEntity implements HopperFed
 
 	@Override
 	public boolean takes(ItemStack stack) {
-		return stack.is(OreBlocks.MINERALS.get(Ore.FLUORITE));
+		return stack.is(OreBlocks.MINERALS.get(Ore.FLUORITE)) || stack.is(dev.wildcatter.WildcatterItems.SYNTHETIC_FLUORSPAR);
 	}
 
 	private List<Lines.Face> east() {
@@ -58,8 +58,7 @@ public class HfKilnBlockEntity extends UnitMotorBlockEntity implements HopperFed
 	protected void work(Level level) {
 		double max = Math.min(Tuning.HF_KILN_KGS * seconds(), Tuning.HF_KILN_KGS * Tuning.PLANT_HOLD_SECONDS - hf);
 		if (fluorspar < max * Tuning.HF_FLUORSPAR_PER_HF && fed() > 0) {
-			useOne();
-			fluorspar += Ore.FLUORITE.kgPerBlock();
+			fluorspar += ConversionStageBlockEntity.spar(useOne());   // a fluorspar block, or a bag of synthetic fluorspar (16b1)
 		}
 		double acidPerHf = Tuning.HF_ACID_PER_HF / Tuning.ACID_STRENGTH / Tuning.ACID_KG_PER_L;   // litres of 98.5 % acid a kg of HF
 		double acid = Lines.available(level, east(), Product.SULFURIC_ACID, Pull.MACHINE, this);

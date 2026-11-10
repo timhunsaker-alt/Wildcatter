@@ -43,6 +43,15 @@ public final class WildcatterItems {
 			String.format("%,.0f kg of uranium ore concentrate (magnesium diuranate)", Tuning.DRUM_NET_KG),
 			String.format("%.0f %% U3O8: %,.0f kg of U3O8, %,.0f kg of uranium", Tuning.YELLOWCAKE_U3O8 * 100, Tuning.DRUM_NET_KG * Tuning.YELLOWCAKE_U3O8,
 					Tuning.DRUM_NET_KG * Tuning.YELLOWCAKE_U3O8 * dev.wildcatter.ore.Ore.U_IN_U3O8));
+	/** 16b1: the fluorinator's retired bed, drummed (docs/multiblocks/conversion-extensions.md), and the KOH scrubber's CaF2. */
+	public static final ResourceKey<Item> FLUORINATOR_ASH_DRUM_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("fluorinator_ash_drum"));
+	public static final Item FLUORINATOR_ASH_DRUM = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(1).setId(FLUORINATOR_ASH_DRUM_KEY),
+			String.format("Up to %.0f kg of fluorinator ash: the bed's CaF2 and the fluorides of what was not uranium", Tuning.ASH_DRUM_KG),
+			String.format("about %.0f %% uranium: a uranium mill's leach tank recovers it", Tuning.ASH_U_SHARE * 100));
+	public static final ResourceKey<Item> SYNTHETIC_FLUORSPAR_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("synthetic_fluorspar"));
+	public static final Item SYNTHETIC_FLUORSPAR = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(SYNTHETIC_FLUORSPAR_KEY),
+			String.format("%,.0f kg of synthetic fluorspar (CaF2) from a KOH scrubber's lime reactor", Tuning.BULK_BAG_KG), "the HF kiln takes it as fluorspar");
+
 	/** 16a: the ADU route's drum (docs/multiblocks/adu-yellowcake.md): calcined U3O8 at 96 %. */
 	public static final ResourceKey<Item> U3O8_DRUM_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("u3o8_drum"));
 	public static final Item U3O8_DRUM = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(1).setId(U3O8_DRUM_KEY),
@@ -349,6 +358,8 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, EMPTY_DRUM_KEY, EMPTY_DRUM);
 		Registry.register(BuiltInRegistries.ITEM, YELLOWCAKE_DRUM_KEY, YELLOWCAKE_DRUM);
 		Registry.register(BuiltInRegistries.ITEM, U3O8_DRUM_KEY, U3O8_DRUM);
+		Registry.register(BuiltInRegistries.ITEM, FLUORINATOR_ASH_DRUM_KEY, FLUORINATOR_ASH_DRUM);
+		Registry.register(BuiltInRegistries.ITEM, SYNTHETIC_FLUORSPAR_KEY, SYNTHETIC_FLUORSPAR);
 		Registry.register(BuiltInRegistries.ITEM, SUBMERSIBLE_PUMP_KEY, SUBMERSIBLE_PUMP);
 		Registry.register(BuiltInRegistries.ITEM, EMPTY_48Y_CYLINDER_KEY, EMPTY_48Y_CYLINDER);
 		Registry.register(BuiltInRegistries.ITEM, UF6_CYLINDER_48Y_KEY, UF6_CYLINDER_48Y);

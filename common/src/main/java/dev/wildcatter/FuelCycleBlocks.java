@@ -45,6 +45,9 @@ public interface FuelCycleBlocks {
 	Block HF_COLUMN = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.HF_COLUMN);
 	Block RECTIFIER = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.RECTIFIER);
 	Block FLUORINE_CELL_HOUSE = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.FLUORINE_CELL_HOUSE);
+	// 16b1 (docs/multiblocks/conversion-extensions.md)
+	Block CATHODE_GAS_SCRUBBER = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.CATHODE_GAS_SCRUBBER);
+	Block KOH_SCRUBBER = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.KOH_SCRUBBER);
 	// 7e: the centrifuge cascade (docs/multiblocks/enrichment.md)
 	Block CENTRIFUGE = enrichmentPart(dev.wildcatter.block.EnrichmentPartBlock.Part.CENTRIFUGE);
 	Block FREQUENCY_CONVERTER = enrichmentPart(dev.wildcatter.block.EnrichmentPartBlock.Part.FREQUENCY_CONVERTER);

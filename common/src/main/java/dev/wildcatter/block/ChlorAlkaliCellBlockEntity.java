@@ -29,6 +29,8 @@ public class ChlorAlkaliCellBlockEntity extends PlantUnitBlockEntity implements 
 	private static final double WATER_HOLD = 400.0;
 	private final NonNullList<ItemStack> slots = NonNullList.withSize(1, ItemStack.EMPTY);
 	private double salt, water, naoh;   // naoh: kg of NaOH sent out
+	private double potash, koh;         // 16b1: kg of KCl tipped in, kg of KOH sent out
+	private boolean onPotash;           // its brine is potash: caustic potash out of its caustic nozzle
 	private double share;
 
 	public ChlorAlkaliCellBlockEntity(BlockPos pos, BlockState state) {
@@ -41,14 +43,14 @@ public class ChlorAlkaliCellBlockEntity extends PlantUnitBlockEntity implements 
 			return null;
 		}
 		if (at[2] == 5 && at[0] == 0 && side == Direction.WEST) {
-			return Product.CAUSTIC_SODA;
+			return onPotash ? Product.CAUSTIC_POTASH : Product.CAUSTIC_SODA;
 		}
 		return at[2] == 5 && side == Direction.SOUTH ? Product.CHLORINE : at[2] == 0 && side == Direction.NORTH ? Product.HYDROGEN : null;
 	}
 
 	@Override
 	protected double hold(Product product) {
-		return product == Product.CHLORINE ? 20 : product == Product.CAUSTIC_SODA ? Tuning.CAUSTIC_HOLD_KG : 10;
+		return product == Product.CHLORINE ? 20 : product == Product.CAUSTIC_SODA || product == Product.CAUSTIC_POTASH ? Tuning.CAUSTIC_HOLD_KG : 10;
 	}
 
 	@Override
@@ -58,7 +60,7 @@ public class ChlorAlkaliCellBlockEntity extends PlantUnitBlockEntity implements 
 
 	@Override
 	public boolean takes(ItemStack stack) {
-		return stack.is(OreBlocks.MINERALS.get(Ore.HALITE));
+		return stack.is(OreBlocks.MINERALS.get(Ore.HALITE)) || stack.is(OreBlocks.MINERALS.get(Ore.SYLVITE));
 	}
 
 	@Override
@@ -81,32 +83,47 @@ public class ChlorAlkaliCellBlockEntity extends PlantUnitBlockEntity implements 
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
 			return;
 		}
-		if (c.salt <= 1e-6 && !c.useOne().isEmpty()) {
-			c.salt += Ore.HALITE.kgPerBlock();
+		if (c.salt <= 1e-6 && c.potash <= 1e-6 && c.fed() > 0) {
+			ItemStack one = c.useOne();   // 16b1: potash (sylvite) runs it on KCl brine, for caustic potash
+			if (one.is(OreBlocks.MINERALS.get(Ore.SYLVITE))) {
+				c.potash += Ore.SYLVITE.kgPerBlock();
+			} else {
+				c.salt += Ore.HALITE.kgPerBlock();
+			}
 		}
-		boolean work = c.salt > 1e-6 && c.water > 0.01 && c.room(Product.CHLORINE) > 1e-6 && c.room(Product.CAUSTIC_SODA) > 1e-6;
+		c.onPotash = c.salt <= 1e-6 && c.potash > 1e-6;
+		Product caustic = c.onPotash ? Product.CAUSTIC_POTASH : Product.CAUSTIC_SODA;
+		double brine = c.onPotash ? c.potash : c.salt;
+		double causticPerCl2 = c.onPotash ? Tuning.KOH_PER_CL2 / Tuning.CAUSTIC_STRENGTH : dev.wildcatter.fluid.Bayer.causticPerCl2();
+		double brinePerCl2 = c.onPotash ? Tuning.KCL_PER_CL2 : Tuning.CA_SALT_PER_CL2;
+		boolean work = brine > 1e-6 && c.water > 0.01 && c.room(Product.CHLORINE) > 1e-6 && c.room(caustic) > 1e-6;
 		c.dc.setDrawing(level, work);
 		c.share = c.dc.share();
-		if (c.salt <= 1e-6) {
-			c.status = "NO SALT: put rock salt in its hopper";
+		if (brine <= 1e-6) {
+			c.status = "NO SALT: put rock salt (or potash, for caustic potash) in its hopper";
 		} else if (c.water <= 0.01) {
 			c.status = "NO WATER: pump water to it";
-		} else if (c.room(Product.CAUSTIC_SODA) <= 1e-6) {
-			c.status = "idle: its caustic soda has nowhere to go (pipe its west side at the back to a tank or the refinery)";
+		} else if (c.room(caustic) <= 1e-6) {
+			c.status = "idle: its " + caustic.label() + " has nowhere to go (pipe its west side at the back to a tank or the refinery)";
 		} else if (!work) {
 			c.status = "idle: its chlorine has nowhere to go (pipe its back end to a chlorinator or a chlorine filler)";
 		} else if (c.dc.amps() < 1) {
 			c.status = "NO DC: set a RECTIFIER against it, or run DC bus bars to its terminals (east face)";
 		} else {
 			double cl2 = Math.min(Math.min(Math.min(Zirconium.chlorAlkaliKgs() * seconds() * c.share, c.room(Product.CHLORINE)),
-					c.room(Product.CAUSTIC_SODA) / dev.wildcatter.fluid.Bayer.causticPerCl2()),
-					Math.min(c.salt / Tuning.CA_SALT_PER_CL2, c.water / Tuning.CA_WATER_PER_CL2));
-			c.salt -= cl2 * Tuning.CA_SALT_PER_CL2;
+					c.room(caustic) / causticPerCl2),
+					Math.min(brine / brinePerCl2, c.water / Tuning.CA_WATER_PER_CL2));
+			if (c.onPotash) {
+				c.potash -= cl2 * brinePerCl2;
+				c.koh += cl2 * Tuning.KOH_PER_CL2;
+			} else {
+				c.salt -= cl2 * Tuning.CA_SALT_PER_CL2;
+				c.naoh += cl2 * Tuning.NAOH_PER_CL2;
+			}
 			c.water = Math.max(0, c.water - cl2 * Tuning.CA_WATER_PER_CL2);
 			c.add(Product.CHLORINE, cl2);
 			c.add(Product.HYDROGEN, cl2 * Zirconium.hydrogenM3PerCl2());   // what has nowhere to go is vented
-			c.add(Product.CAUSTIC_SODA, cl2 * dev.wildcatter.fluid.Bayer.causticPerCl2());
-			c.naoh += cl2 * Tuning.NAOH_PER_CL2;
+			c.add(caustic, cl2 * causticPerCl2);
 			c.status = cl2 > 1e-9 ? String.format("%d cells at %.1f V and %.2f kA: %.1f kg/h of chlorine, %.1f m3/h of hydrogen", Tuning.CA_CELLS, c.dc.volts() / Tuning.CA_CELLS,
 					c.dc.amps() / 1000, cl2 / seconds() * 3600, cl2 * Zirconium.hydrogenM3PerCl2() / seconds() * 3600) : "starting: waiting for DC from the rectifier";
 		}
@@ -135,8 +152,9 @@ public class ChlorAlkaliCellBlockEntity extends PlantUnitBlockEntity implements 
 
 	@Override
 	public Component inspect() {
+		String k = potash > 0 || koh > 0 ? String.format("; on potash: KCl %,.0f kg, %.0f kg of KOH made, %.0f kg of 32 %% caustic potash held", potash, koh, held(Product.CAUSTIC_POTASH)) : "";
 		return Component.literal(String.format("Chlor-alkali cell (membrane): %s; salt %,.0f kg, water %.0f/%.0f L; caustic soda %.0f kg of NaOH made, %.0f kg of 32 %% held", status, salt, water,
-				WATER_HOLD, naoh, held(Product.CAUSTIC_SODA)));
+				WATER_HOLD, naoh, held(Product.CAUSTIC_SODA)) + k);
 	}
 
 	@Override
@@ -146,6 +164,8 @@ public class ChlorAlkaliCellBlockEntity extends PlantUnitBlockEntity implements 
 		output.putDouble("salt", salt);
 		output.putDouble("water", water);
 		output.putDouble("naoh", naoh);
+		output.putDouble("potash", potash);
+		output.putDouble("koh", koh);
 		output.putBoolean("caustic_piped", true);
 	}
 
@@ -157,6 +177,8 @@ public class ChlorAlkaliCellBlockEntity extends PlantUnitBlockEntity implements 
 		salt = input.getDoubleOr("salt", 0);
 		water = input.getDoubleOr("water", 0);
 		naoh = input.getDoubleOr("naoh", 0);
+		potash = input.getDoubleOr("potash", 0);
+		koh = input.getDoubleOr("koh", 0);
 		if (!input.getBooleanOr("caustic_piped", false) && naoh > 0) {   // a cell from before 10b2 counted its caustic: it comes into the hold
 			add(Product.CAUSTIC_SODA, naoh / Tuning.CAUSTIC_STRENGTH);
 		}

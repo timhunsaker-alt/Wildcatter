@@ -116,6 +116,8 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.HfColumnBlockEntity> HF_COLUMN_ENTITY = entity(dev.wildcatter.block.HfColumnBlockEntity::new, HF_COLUMN);
 	public static final BlockEntityType<dev.wildcatter.block.RectifierBlockEntity> RECTIFIER_ENTITY = entity(dev.wildcatter.block.RectifierBlockEntity::new, RECTIFIER);
 	public static final BlockEntityType<dev.wildcatter.block.FluorineCellHouseBlockEntity> FLUORINE_CELL_HOUSE_ENTITY = entity(dev.wildcatter.block.FluorineCellHouseBlockEntity::new, FLUORINE_CELL_HOUSE);
+	public static final BlockEntityType<dev.wildcatter.block.CathodeGasScrubberBlockEntity> CATHODE_GAS_SCRUBBER_ENTITY = entity(dev.wildcatter.block.CathodeGasScrubberBlockEntity::new, CATHODE_GAS_SCRUBBER);
+	public static final BlockEntityType<dev.wildcatter.block.KohScrubberBlockEntity> KOH_SCRUBBER_ENTITY = entity(dev.wildcatter.block.KohScrubberBlockEntity::new, KOH_SCRUBBER);
 	public static final BlockEntityType<dev.wildcatter.block.CentrifugeBlockEntity> CENTRIFUGE_ENTITY = entity(dev.wildcatter.block.CentrifugeBlockEntity::new, CENTRIFUGE);
 	public static final BlockEntityType<dev.wildcatter.block.FrequencyConverterBlockEntity> FREQUENCY_CONVERTER_ENTITY = entity(dev.wildcatter.block.FrequencyConverterBlockEntity::new, FREQUENCY_CONVERTER);
 	public static final BlockEntityType<dev.wildcatter.block.FeedStationBlockEntity> FEED_STATION_ENTITY = entity(dev.wildcatter.block.FeedStationBlockEntity::new, FEED_STATION);
@@ -418,7 +420,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 			add(((dev.wildcatter.block.WellfieldPartBlock) part).part().id(), part);
 		}
 		add("isr_wellhead", ISR_WELLHEAD);
-		for (Block part : new Block[] {REDUCTION_REACTOR, HYDROFLUORINATOR, FLUORINATOR, COLD_TRAPS, DISTILLATION_COLUMNS, CYLINDER_FILLER, STEAM_REFORMER, HF_KILN, HF_COLUMN, RECTIFIER, FLUORINE_CELL_HOUSE}) {
+		for (Block part : new Block[] {REDUCTION_REACTOR, HYDROFLUORINATOR, FLUORINATOR, COLD_TRAPS, DISTILLATION_COLUMNS, CYLINDER_FILLER, STEAM_REFORMER, HF_KILN, HF_COLUMN, RECTIFIER, FLUORINE_CELL_HOUSE, CATHODE_GAS_SCRUBBER, KOH_SCRUBBER}) {
 			add(((dev.wildcatter.block.ConversionPartBlock) part).part().id(), part);
 		}
 		for (Block part : new Block[] {CENTRIFUGE, FREQUENCY_CONVERTER, FEED_STATION, PRODUCT_TAKEOFF, TAILS_TAKEOFF}) {
@@ -615,6 +617,8 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("hf_column"), HF_COLUMN_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rectifier"), RECTIFIER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("fluorine_cell_house"), FLUORINE_CELL_HOUSE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("cathode_gas_scrubber"), CATHODE_GAS_SCRUBBER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("koh_scrubber"), KOH_SCRUBBER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("centrifuge"), CENTRIFUGE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("frequency_converter"), FREQUENCY_CONVERTER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("feed_station"), FEED_STATION_ENTITY);

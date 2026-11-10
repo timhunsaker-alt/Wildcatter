@@ -562,5 +562,9 @@
   "block.wildcatter.day_tank": "Water Day Tank (1 m3)",
   "block.wildcatter.transmitter": "Transmitter (4-20 mA)",
   "item.wildcatter.u3o8_drum": "U3O8 Drum (96 %)",
-  "block.wildcatter.uranium_calciner": "Uranium Calciner (six hearths, 0.6 MW)"
+  "block.wildcatter.uranium_calciner": "Uranium Calciner (six hearths, 0.6 MW)",
+  "item.wildcatter.fluorinator_ash_drum": "Fluorinator Ash Drum",
+  "item.wildcatter.synthetic_fluorspar": "Synthetic Fluorspar (1 t bag)",
+  "block.wildcatter.cathode_gas_scrubber": "Cathode Gas Scrubber (NaF beds, 10 kW)",
+  "block.wildcatter.koh_scrubber": "KOH Scrubber (with lime regeneration, 15 kW)"
 }

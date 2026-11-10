@@ -291,6 +291,8 @@
     "wildcatter:control_supply",
     "wildcatter:plc_cabinet",
     "wildcatter:remote_io_drop",
-    "wildcatter:uranium_calciner"
+    "wildcatter:uranium_calciner",
+    "wildcatter:cathode_gas_scrubber",
+    "wildcatter:koh_scrubber"
   ]
 }

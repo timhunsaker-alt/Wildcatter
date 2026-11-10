@@ -19,4 +19,7 @@ Format of an entry:
 
 ## Start here
 
+- **Phase 16 opt-in rules** (`phase16-uranium.md` #8): `fluorinatorAshBed` and `cascadeSpinUp` in `config/wildcatter.properties` are
+  off by default so no existing world changes. Should they be on for new worlds?
+
 The index of both mods' questions, and the short list of what waits on you, is in Tailings: `tailings/docs/questions/README.md`.

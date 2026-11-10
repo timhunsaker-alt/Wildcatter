@@ -20,7 +20,8 @@ import net.minecraft.world.phys.BlockHitResult;
 /**
  * One part of the conversion plant at true size (docs/multiblocks/conversion.md): the reduction reactor, hydrofluorinator,
  * fluorinator, cold traps, distillation columns and cylinder filler in a line by touching; the steam reformer, the HF kiln and its
- * column, and the rectifier against the fluorine cell house, on steel pipe.
+ * column, and the rectifier against the fluorine cell house, on steel pipe. 16b1 (docs/multiblocks/conversion-extensions.md) adds the
+ * cathode gas scrubber against the cell house and the KOH scrubber against the hydrofluorinator.
  */
 public class ConversionPartBlock extends BigPartBlock implements net.minecraft.world.WorldlyContainerHolder {
 	public enum Part {
@@ -34,7 +35,9 @@ public class ConversionPartBlock extends BigPartBlock implements net.minecraft.w
 		HF_KILN("hf_kiln", Footprint.box(3, 4, 10, 0, 0)),
 		HF_COLUMN("hf_column", Footprint.box(2, 10, 2, 0, 0)),
 		RECTIFIER("rectifier", Footprint.box(3, 4, 4, 0, 0)),
-		FLUORINE_CELL_HOUSE("fluorine_cell_house", Footprint.box(6, 4, 12, 0, 0));
+		FLUORINE_CELL_HOUSE("fluorine_cell_house", Footprint.box(6, 4, 12, 0, 0)),
+		CATHODE_GAS_SCRUBBER("cathode_gas_scrubber", Footprint.box(2, 4, 2, 0, 0)),
+		KOH_SCRUBBER("koh_scrubber", Footprint.box(3, 8, 3, 0, 0));
 
 		private final String id;
 		private final Footprint footprint;
@@ -72,6 +75,8 @@ public class ConversionPartBlock extends BigPartBlock implements net.minecraft.w
 			case HF_COLUMN -> new HfColumnBlockEntity(pos, state);
 			case RECTIFIER -> new RectifierBlockEntity(pos, state);
 			case FLUORINE_CELL_HOUSE -> new FluorineCellHouseBlockEntity(pos, state);
+			case CATHODE_GAS_SCRUBBER -> new CathodeGasScrubberBlockEntity(pos, state);
+			case KOH_SCRUBBER -> new KohScrubberBlockEntity(pos, state);
 		};
 	}
 
@@ -82,6 +87,8 @@ public class ConversionPartBlock extends BigPartBlock implements net.minecraft.w
 				case COLD_TRAPS, DISTILLATION_COLUMNS -> createTickerHelper(type, WildcatterBlocks.UF6_STAGE_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
 				case CYLINDER_FILLER -> createTickerHelper(type, WildcatterBlocks.CYLINDER_FILLER_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
 				case HF_KILN -> createTickerHelper(type, WildcatterBlocks.HF_KILN_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
+				case CATHODE_GAS_SCRUBBER -> createTickerHelper(type, WildcatterBlocks.CATHODE_GAS_SCRUBBER_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
+				case KOH_SCRUBBER -> createTickerHelper(type, WildcatterBlocks.KOH_SCRUBBER_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
 				default -> null;
 			};
 		}
@@ -95,6 +102,8 @@ public class ConversionPartBlock extends BigPartBlock implements net.minecraft.w
 			case HF_COLUMN -> createTickerHelper(type, WildcatterBlocks.HF_COLUMN_ENTITY, HfColumnBlockEntity::tick);
 			case RECTIFIER -> null;
 			case FLUORINE_CELL_HOUSE -> createTickerHelper(type, WildcatterBlocks.FLUORINE_CELL_HOUSE_ENTITY, FluorineCellHouseBlockEntity::tick);
+			case CATHODE_GAS_SCRUBBER -> createTickerHelper(type, WildcatterBlocks.CATHODE_GAS_SCRUBBER_ENTITY, UnitMotorBlockEntity::tick);
+			case KOH_SCRUBBER -> createTickerHelper(type, WildcatterBlocks.KOH_SCRUBBER_ENTITY, UnitMotorBlockEntity::tick);
 		};
 	}
 
@@ -117,6 +126,10 @@ public class ConversionPartBlock extends BigPartBlock implements net.minecraft.w
 			} else {
 				rectifier.reset();
 			}
+		}
+		if (entity instanceof ConversionStageBlockEntity stage && player.isShiftKeyDown() && stage.retireBed()) {   // 16b1: retire the fluorinator's bed
+			player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Fluorinator: retiring its bed (ten minutes stopped); empty drums and fluorspar in a hopper on top"));
+			return InteractionResult.SUCCESS;
 		}
 		if (entity instanceof CylinderFillerBlockEntity filler && filler.full() > 0) {
 			filler.giveAll(player);

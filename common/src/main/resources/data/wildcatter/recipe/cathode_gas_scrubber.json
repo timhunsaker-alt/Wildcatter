@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "GCG",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "G": "minecraft:glass",
+    "C": "minecraft:copper_ingot"
+  },
+  "result": {
+    "id": "wildcatter:cathode_gas_scrubber",
+    "count": 1
+  }
+}

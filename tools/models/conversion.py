@@ -10,7 +10,9 @@ footprints match ConversionPartBlock's):
 - hf_kiln, 3 x 4 x 10: the pre-reactor and the brick-lined rotary kiln on its tyres and rollers, its drive (480 V box west);
 - hf_column, 2 x 10 x 2: the scrubbing and purification column with its condenser;
 - rectifier, 3 x 4 x 4: the rectifier transformer and the diode cubicle, bus bars on its east (4.16 kV box west);
-- fluorine_cell_house, 6 x 4 x 12: the cell house, its roof vents, the HF line in front and the fluorine line out the back."""
+- fluorine_cell_house, 6 x 4 x 12: the cell house, its roof vents, the HF line in front and the fluorine line out the back;
+- cathode_gas_scrubber, 2 x 4 x 2 (16b1): twin NaF beds and a KOH polishing column on a skid, hydrogen out the back (480 V box north);
+- koh_scrubber, 3 x 8 x 3 (16b1): the packed scrubber, its recirculation tank and the lime reactor with its filter (480 V box west)."""
 import mlib
 import plantlib as g
 
@@ -146,8 +148,35 @@ CH.pipe([(3.0, 0.5, 0.0), (3.0, 0.5, 0.2)], 2, "steel")                     # an
 CH.pipe([(3.0, 0.5, 11.8), (3.0, 0.5, 12.0)], 2, "steel")                   # fluorine out, the back
 CH.collide((0.2, 0.0, 0.2), (5.8, 3.55, 11.8))
 
+# ---- 16b1: the cathode gas scrubber ---------------------------------------------------------------------------------------------
+CG = model("cathode_gas_scrubber", 2, 4, 2, "steel")
+CG.box((0.0, 0.0, 0.0), (2.0, 0.2, 2.0), "iron")                            # its skid
+vessel(CG, 0.5, 0.55, 0.35, 0.2, 2.9)                                       # the two NaF beds
+vessel(CG, 0.5, 1.45, 0.35, 0.2, 2.9)
+CG.cylinder("y", (1.5, 1.0), 0.22, 0.2, 3.6, "steel", 12)                   # the KOH polishing column
+CG.box((1.1, 0.2, 0.05), (1.9, 0.9, 0.5), "grey")                           # the bed heaters' panel
+CG.box((1.2, 0.4, 0.0), (1.7, 1.0, 0.05), "grey")                           # its 480 V box, the north face
+CG.decal((1.25, 0.5, -0.01), (1.65, 0.9, 0.0), "danger", "north", "grey")
+CG.pipe([(0.5, 3.2, 0.55), (0.5, 3.4, 0.55), (0.5, 3.4, 1.0), (1.5, 3.4, 1.0)], 1, "steel")  # the beds' outlet to the column
+CG.pipe([(0.5, 0.5, 1.8), (0.5, 0.5, 2.0)], 2, "steel")                     # hydrogen out, the back
+CG.collide((0.1, 0.0, 0.1), (1.9, 3.6, 1.9))
+
+# ---- 16b1: the KOH scrubber -----------------------------------------------------------------------------------------------------
+KS = model("koh_scrubber", 3, 8, 3, "padgreen")
+KS.box((0.0, 0.0, 0.0), (3.0, 0.25, 3.0), "concrete")
+KS.cylinder("y", (0.9, 0.9), 0.65, 0.25, 7.6, "padgreen", 16)              # the packed scrubber
+KS.cylinder("y", (0.9, 0.9), 0.3, 7.6, 7.95, "padgreen", 10)               # its vent
+KS.cylinder("y", (2.2, 0.8), 0.6, 0.25, 2.0, "polymer", 14)                # the KOH recirculation tank
+KS.cylinder("y", (2.0, 2.2), 0.65, 0.25, 3.2, "steel", 14)                 # the lime reactor
+KS.box((1.75, 3.2, 1.95), (2.25, 3.7, 2.45), "blue")                        # its agitator drive
+KS.box((0.3, 0.25, 1.8), (1.3, 1.4, 2.8), "grey")                           # the filter, the CaF2 cake out under it
+KS.box((1.6, 3.7, 1.6), (2.6, 4.3, 2.6), "galv")                            # the lime hopper
+KS.pipe([(0.9, 0.5, 0.0), (0.9, 0.5, 0.25)], 2, "steel")                    # caustic potash in, the front
+box480(KS, 0.4, 0.3)
+KS.collide((0.2, 0.0, 0.2), (2.8, 7.6, 2.8))
+
 
 M = RR
-EXTRA = [HF, FL, CT, DC, CF, SR, HK, HC, RC, CH]
+EXTRA = [HF, FL, CT, DC, CF, SR, HK, HC, RC, CH, CG, KS]
 for extra in EXTRA:
 	extra.export_args = {"blockstate": True, "item": True}

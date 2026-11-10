@@ -2790,6 +2790,12 @@ phase16_parts(("uranium_calciner",))
 shaped("uranium_calciner", ["SFS", "BXB", "SPS"], {"S": S_, "F": "minecraft:blast_furnace", "B": "minecraft:bricks", "X": "minecraft:piston", "P": P_}, "uranium_calciner")
 phase16_items({"u3o8_drum": ("U3O8 Drum (96 %)", (60, 56, 50))})
 phase16_names({"uranium_calciner": "Uranium Calciner (six hearths, 0.6 MW)"})
+# 16b1: cathode hydrogen, the ash bed, KOH (docs/multiblocks/conversion-extensions.md)
+phase16_parts(("cathode_gas_scrubber", "koh_scrubber"))
+shaped("cathode_gas_scrubber", ["SPS", "GCG", "SSS"], {"S": S_, "P": P_, "G": "minecraft:glass", "C": "minecraft:copper_ingot"}, "cathode_gas_scrubber")
+shaped("koh_scrubber", ["SPS", "SCS", "SXS"], {"S": S_, "P": P_, "C": "minecraft:cauldron", "X": "minecraft:piston"}, "koh_scrubber")
+phase16_items({"fluorinator_ash_drum": ("Fluorinator Ash Drum", (120, 110, 100)), "synthetic_fluorspar": ("Synthetic Fluorspar (1 t bag)", (200, 190, 220))})
+phase16_names({"cathode_gas_scrubber": "Cathode Gas Scrubber (NaF beds, 10 kW)", "koh_scrubber": "KOH Scrubber (with lime regeneration, 15 kW)"})
 
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys

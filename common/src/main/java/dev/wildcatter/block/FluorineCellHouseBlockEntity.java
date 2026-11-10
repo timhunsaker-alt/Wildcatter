@@ -17,12 +17,37 @@ import org.jspecify.annotations.Nullable;
 /**
  * The fluorine cell house (docs/multiblocks/conversion.md, dc-bus.md): 12 KF·2HF cells in series, 9 V and 6 kA each, a DC load
  * on its terminals (west face, z 6) or on the rectifier touching it. Anhydrous HF in on the north face of its front cells; fluorine out of the south face of its back cells, 95 % of
- * Faraday's 0.709 kg a kAh. Its cooling tower's make-up water comes off a pump; the cathode hydrogen goes up its vent.
+ * Faraday's 0.709 kg a kAh. Its cooling tower's make-up water comes off a pump; the cathode hydrogen goes up its vent, unless a cathode
+ * gas scrubber touches it (16b1, docs/multiblocks/conversion-extensions.md): then the scrubber takes it.
  */
 public class FluorineCellHouseBlockEntity extends PlantUnitBlockEntity implements WaterUser, dev.wildcatter.circuit.CircuitPart, Electrolysis.Part {
 	private final Electrolysis dc = new Electrolysis(new dev.wildcatter.circuit.DcCell(Tuning.F2_CELLS, Tuning.F2_CELL_BACK_EMF, Tuning.F2_CELL_VOLTS, Tuning.F2_CELL_KA * 1000), 0, 6, Direction.WEST);
 	private double water;
 	private double share;
+	private double cathode;          // m3 of cathode hydrogen waiting for a cathode gas scrubber touching it (16b1); the rest is vented
+	private double testCathodeM3s;   // the game test's stand-in for the cells at full current (not saved)
+
+	/** m3 of hydrogen a kg of fluorine: one H2 at the cathode for each F2 (docs/multiblocks/conversion-extensions.md). */
+	public static double cathodeM3PerF2() {
+		return Conversion.cathodeM3PerF2();
+	}
+
+	/** The cathode gas scrubber takes up to {@code m3} of hydrogen; returns what it got. */
+	public double takeCathodeGas(double m3) {
+		double got = Math.min(m3, cathode);
+		cathode -= got;
+		return got;
+	}
+
+	/** For the game test: cathode gas as if the cells made fluorine at this many kg a second. */
+	public void testCells(double f2Kgs) {
+		testCathodeM3s = f2Kgs * cathodeM3PerF2();
+	}
+
+	private void cathode(double f2) {
+		double hold = Conversion.fluorineKgs() * cathodeM3PerF2() * Tuning.PLANT_HOLD_SECONDS;
+		cathode = Math.min(hold, cathode + f2 * cathodeM3PerF2());   // what no scrubber takes goes up its vent
+	}
 
 	public FluorineCellHouseBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.FLUORINE_CELL_HOUSE_ENTITY, pos, state);
@@ -62,6 +87,9 @@ public class FluorineCellHouseBlockEntity extends PlantUnitBlockEntity implement
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
 			return;
 		}
+		if (h.testCathodeM3s > 0) {
+			h.cathode(h.testCathodeM3s / cathodeM3PerF2() * seconds());
+		}
 		double waiting = Lines.available(level, h.hf(), Product.ANHYDROUS_HF, Pull.MACHINE, h) * Tuning.AHF_KG_PER_L;
 		boolean work = waiting > 1e-6 && h.water > 0.01 && h.room(Product.FLUORINE) > 1e-6;
 		h.dc.setDrawing(level, work);
@@ -79,6 +107,7 @@ public class FluorineCellHouseBlockEntity extends PlantUnitBlockEntity implement
 			Lines.pull(level, h.hf(), Product.ANHYDROUS_HF, f2 * Tuning.F2_HF_PER_F2 / Tuning.AHF_KG_PER_L, Pull.MACHINE, h);
 			h.water = Math.max(0, h.water - Tuning.F2_COOLING_LPS * seconds() * h.share);
 			h.add(Product.FLUORINE, f2);
+			h.cathode(f2);
 			h.status = f2 > 1e-7 ? String.format("%d cells at %.1f V and %.2f kA: %.1f kg/h of fluorine", Tuning.F2_CELLS, h.dc.volts() / Tuning.F2_CELLS,
 					h.dc.amps() / 1000, f2 / seconds() * 3600) : "starting: waiting for DC from the rectifier";
 		}

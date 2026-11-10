@@ -55,4 +55,66 @@ is behind a default-off setting, or happens only once the player adds the new pa
 - **Why:** the dryer and the calciner stand in the same place against the tank; the scene would have to break and rebuild a part.
 - **Alternatives:** a second scene with a dryer.
 
+## 16b1: conversion's cathode hydrogen, the ash bed, KOH
+
+### 8. How are rules that would change an existing plant made opt-in? **(needs Tim)**
+- **Chosen:** a key in `config/wildcatter.properties`, the file that already holds `standard` and `wattsPerFe`, read when a server starts
+  (`dev.wildcatter.Rules`). Each is **off** unless set: `fluorinatorAshBed=true` (16b1) and `cascadeSpinUp=true` (16c1). Off, those
+  plants run exactly as before Phase 16.
+- **Why:** Tim's rule for this phase is that nothing may change or slow what an existing world already does. The config file is how the
+  mod already takes settings, and a missing key is off, so no world changes on update.
+- **Alternatives:** on for new worlds and off for worlds made before (a saved flag, as the electrical standard is saved); a game rule;
+  per-plant switches. **Tim:** should these rules stay off by default, or be on for new worlds?
+
+### 9. What the ash bed changes when the rule is off
+- **Chosen:** retiring works always (a sneak-click or RETIRE BED), so ash drums and their uranium are there for anyone; only the BED FULL
+  stop waits on `fluorinatorAshBed`. The bed counts its ash from what it held before (a fluorinator saved with 5 t of ash reads BED FULL at
+  once if the rule is turned on).
+- **Why:** retiring is something the player chooses; stopping is what would change a running plant.
+- **Alternatives:** start counting from zero when the rule is turned on.
+
+### 10. The ash drums
+- **Chosen:** 400 kg a drum, the last part-full; six out slots under the fluorinator (a 2 t bed is five drums); 3 % uranium (14.2 kg of
+  U3O8). The leach tank uses up a drum (no empty drum back) and leaches its uranium at up to 0.05 kg/s of U3O8 while it leaches ore.
+- **Why:** the spec gives 400 kg and 3 %; a drum of ash is not returned in practice (it goes with the ore). The rate keeps the ash a
+  small share of the ore's uranium.
+- **Alternatives:** give the empty drum back to a hopper under the leach tank; leach the ash on its own.
+
+### 11. Where the cathode gas scrubber touches and where its box is
+- **Chosen:** it takes the hydrogen touching the cell house anywhere, not only at the west face of the back cells; its 480 V box is on the
+  north face of its main cell.
+- **Why:** the rectifier's DC terminals and the cooling water already crowd the cell house's west side; the box on the west would face
+  the cell house when the scrubber stands against its east side.
+- **Alternatives:** a fixed cathode gas nozzle on the cell house, as the spec draws it.
+
+### 12. The scene runs the cells by hook
+- **Chosen:** `conversion_extensions` sets the cell house's cells to full current by a test hook (`testCells`), not by a rectifier.
+- **Why:** the cells at full current take about 0.7 MW of DC, which one 500 kW diesel set cannot carry (the Field Manual says so); the
+  client `conversion` scene runs them for real. The hook feeds the same path the cells' own fluorine does.
+- **Alternatives:** two synchronized sets and a 4.16 kV unit substation in the server scene.
+
+### 13. The KOH scrubber's first charge
+- **Chosen:** on the pipe at the north face of its front cells, as caustic potash at 32 % counted in kg of solution (as caustic soda is);
+  6,250 kg of solution make the 2,000 kg charge.
+- **Why:** the spec draws it against the hydrofluorinator's east face, so its east face is taken; 32 % is the membrane cell's caustic.
+- **Alternatives:** potash bags by hand; KOH counted dry.
+
+### 14. The KOH scrubber's pumps and its regeneration rate
+- **Chosen:** the scrubber scrubs only while its pumps run; the lime reactor regenerates up to 1 kg of KOH a second (*proposed*, a batch
+  reactor on the recirculation tank).
+- **Why:** no circulation, no scrubbing; a fast batch keeps the liquor near full strength whenever lime is there (the plant's HF needs only
+  71 kg/h).
+- **Alternatives:** scrub unpowered; regenerate at the plant's rate.
+
+### 15. Synthetic fluorspar
+- **Chosen:** 1 t bags (the mod's bulk bag), which the HF kiln and a fluorinator's new bed take as fluorspar.
+- **Why:** the spec's "the HF kiln takes it as fluorspar"; the quicklime it uses also comes in 1 t bags.
+- **Alternatives:** a synthetic fluorspar block.
+
+### 16. Caustic potash from the small chlor-alkali cell
+- **Chosen:** the zirconium plant's chlor-alkali cell takes potash (sylvite blocks) in the same hopper as rock salt; on potash its caustic
+  nozzle gives caustic potash. It is not covered by a scene (the cell needs DC); its rates are the spec's.
+- **Why:** the chlor-alkali plant (20a) is not built; the spec names the small 7f cell as the first source.
+- **Alternatives:** a scene with a rectifier for the cell; caustic potash only from 20a.
+
 There is no `docs/DESIGN.md` in Wildcatter (that file is Tailings'). The design record for each wave is its spec's "As built" section.
