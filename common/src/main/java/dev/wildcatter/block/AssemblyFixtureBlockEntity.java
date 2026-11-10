@@ -23,7 +23,10 @@ import org.jspecify.annotations.Nullable;
  */
 public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements HopperFed {
 	private static final int OUT = 3;
-	private final NonNullList<ItemStack> slots = NonNullList.withSize(OUT + 1, ItemStack.EMPTY);
+	private static final int REPAIR = 4;   // 19b: a bent assembly to straighten, by a hopper on top
+	private final NonNullList<ItemStack> slots = NonNullList.withSize(REPAIR + 1, ItemStack.EMPTY);
+	private double repair;
+	private double repairSeconds = Tuning.GRID_REPAIR_SECONDS;
 	private boolean skeleton;
 	private double steel;
 	private int rods;
@@ -41,16 +44,17 @@ public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements 
 
 	@Override
 	public boolean takes(ItemStack stack) {
-		return takes(0, stack) || takes(1, stack) || takes(2, stack);
+		return takes(0, stack) || takes(1, stack) || takes(2, stack) || takes(REPAIR, stack);
 	}
 
 	private boolean takes(int slot, ItemStack stack) {
-		return slot == 0 && stack.is(WildcatterItems.GUIDE_THIMBLE) || slot == 1 && stack.is(WildcatterItems.SPACER_GRID) || slot == 2 && stack.is(WildcatterItems.STEEL_INGOT);
+		return slot == 0 && stack.is(WildcatterItems.GUIDE_THIMBLE) || slot == 1 && stack.is(WildcatterItems.SPACER_GRID) || slot == 2 && stack.is(WildcatterItems.STEEL_INGOT)
+				|| slot == REPAIR && stack.is(WildcatterBlocks.FUEL_ASSEMBLY.asItem()) && dev.wildcatter.item.FuelAssemblyTags.bent(stack);
 	}
 
 	@Override
 	public int[] getSlotsForFace(Direction side) {
-		return side == Direction.UP ? new int[] {0, 1, 2} : side == Direction.DOWN ? new int[] {OUT} : new int[0];
+		return side == Direction.UP ? new int[] {0, 1, 2, REPAIR} : side == Direction.DOWN ? new int[] {OUT} : new int[0];
 	}
 
 	@Override
@@ -90,8 +94,35 @@ public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements 
 		setChanged();
 	}
 
+	/** For the game test: a grid straightened in {@code s} seconds. */
+	public void setRepairSecondsForTest(double s) {
+		repairSeconds = s;
+	}
+
 	@Override
 	protected void work(Level level) {
+		// 19b: a bent assembly in its repair bin comes first: the grid straightened, out to be inspected again
+		if (!slots.get(REPAIR).isEmpty()) {
+			if (!slots.get(OUT).isEmpty()) {
+				unit = "FULL: take the finished assembly (empty hand, or a hopper under it)";
+				return;
+			}
+			double strength = drive(level);
+			if (strength <= 0) {
+				unit = "starting: " + describe();
+				return;
+			}
+			repair += seconds() * strength;
+			unit = String.format("straightening a bent grid: %.0f %%", repair / repairSeconds * 100);
+			if (repair >= repairSeconds) {
+				ItemStack fixed = slots.get(REPAIR).split(1);
+				dev.wildcatter.item.FuelAssemblyTags.repaired(fixed);
+				slots.set(OUT, fixed);
+				repair = 0;
+				unit = "bent grid straightened: inspect the assembly again";
+			}
+			return;
+		}
 		RodWelderBlockEntity welder = Touching.find(level, worldPosition, RodWelderBlockEntity.class, w -> true);
 		if (welder == null) {
 			unit = "NOT BUILT: set it against the ROD WELDER";
@@ -152,6 +183,7 @@ public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements 
 		output.putDouble("steel", steel);
 		output.putInt("rods", rods);
 		output.putInt("built", built);
+		output.putDouble("repair", repair);
 	}
 
 	@Override
@@ -163,5 +195,6 @@ public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements 
 		steel = input.getDoubleOr("steel", 0);
 		rods = input.getIntOr("rods", 0);
 		built = input.getIntOr("built", 0);
+		repair = input.getDoubleOr("repair", 0);
 	}
 }

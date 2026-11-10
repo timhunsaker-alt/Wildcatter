@@ -391,6 +391,10 @@
     "wildcatter:containment_monitor",
     "wildcatter:pressurizer_relief_tank",
     "wildcatter:containment_concrete",
-    "wildcatter:hydrogen_igniter"
+    "wildcatter:hydrogen_igniter",
+    "wildcatter:cask_loading_station",
+    "wildcatter:storage_module",
+    "wildcatter:new_fuel_inspection_stand",
+    "wildcatter:personnel_monitor"
   ]
 }

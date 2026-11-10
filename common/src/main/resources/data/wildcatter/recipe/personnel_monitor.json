@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SGS",
+    "SRS",
+    "SBS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "G": "minecraft:glass_pane",
+    "R": "minecraft:comparator",
+    "B": "minecraft:bucket"
+  },
+  "result": {
+    "id": "wildcatter:personnel_monitor",
+    "count": 1
+  }
+}

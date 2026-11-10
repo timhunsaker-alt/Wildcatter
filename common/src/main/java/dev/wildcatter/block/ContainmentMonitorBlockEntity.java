@@ -334,9 +334,11 @@ public class ContainmentMonitorBlockEntity extends PlantUnitBlockEntity {
 		// the steam condenses on the liner; its pressure
 		steamKg *= Math.exp(-dt / Tuning.CONTAINMENT_CONDENSE_S);
 		if (pressure() > Tuning.CONTAINMENT_DESIGN_MPA * Tuning.CONTAINMENT_FAIL_FACTOR) {
+			boolean damaged = vessels.stream().anyMatch(v -> level.getBlockEntity(v) instanceof ReactorVesselBlockEntity rv && rv.reactor().coreDamaged());
 			for (BlockPos h : hatches) {
 				if (level.getBlockEntity(h) instanceof ContainmentDoorBlockEntity door) {
 					door.fail();
+					dev.wildcatter.radiation.Contamination.splash(level, h, 32, damaged ? 1.0 : 0.2);   // 19b, with its rule
 				}
 			}
 			event = String.format("THE EQUIPMENT HATCH FAILED at %.2f MPa", pressure());

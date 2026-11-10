@@ -20,5 +20,9 @@ public class FuelAssemblyItem extends BigPartItem {
 		super.appendHoverText(stack, context, display, tooltip, flag);
 		tooltip.accept(Component.literal(FuelAssemblyBlock.describe()).withStyle(ChatFormatting.GRAY));
 		tooltip.accept(Component.literal("214 mm square, 4.06 m tall: 24 guide thimbles, 1 instrument tube, 8 grids").withStyle(ChatFormatting.GRAY));
+		if (FuelAssemblyTags.inspected(stack)) {
+			tooltip.accept(Component.literal(FuelAssemblyTags.bent(stack) ? "INSPECTED: BENT GRID: straighten it at the assembly fixture" : "INSPECTED: grids and nozzles good")
+					.withStyle(FuelAssemblyTags.bent(stack) ? ChatFormatting.RED : ChatFormatting.GREEN));
+		}
 	}
 }

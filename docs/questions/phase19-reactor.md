@@ -9,6 +9,9 @@ The rule for existing worlds: nothing may change or slow what an existing reacto
 that only add (the containment and its parts, the relief tank, casks, the inspection stand, the personnel monitor, the washer) need no
 key: a reactor without them runs as before.
 
+**Waiting on Tim:** 1-4, 6, 7 (each rule: default on for new worlds?); 5 (the OP-delta-T constants, unverified); 8 (keys per server or
+per world); 15 (the contamination numbers); 18 (dry casks against real decay heat: count cooling time 100x for eligibility?).
+
 ## The gated rules (each: default on for new worlds?)
 
 ### 1. Default on for new worlds? `reactorLtop` (the P-T curve, LTOP and the vessel's failure) — **Needs Tim**
@@ -118,7 +121,68 @@ key: a reactor without them runs as before.
 
 ## 19b: dry casks, contamination, fresh-fuel inspection
 
-(Entries 14-20 are added with 19b.)
+### 14. Coolant activity
+- **Chosen:** with `reactorContamination`, the coolant carries an activity in µCi/g dose-equivalent I-131, the tech spec's unit (limit 1.0,
+  NUREG-1431 LCO 3.4.16; COOLANT ACTIVITY alarms over it). Sources: activated corrosion products, about 0.02 µCi/g at full power, and each
+  leaking assembly, about 0.2 µCi/g at full power, with half a leaker's source as an iodine spike while decay heat is high after a trip.
+  Removal: I-131's decay and the CVCS's letdown through its resin (0.5 kg/s of 30 t, a decontamination factor of 10), worked out exactly
+  over a step. The CVCS reads it with the count of leakers.
+- **Why:** the spec's "rises with leaking rods and falls with the demineralizer's resin", in the unit a real plant uses. All values
+  *(proposed)*; leakers come from bent grids now and would come from 19c1's rod defects later.
+- **Alternatives:** separate iodine, noble gas and corrosion product nuclides; leakers raising the activity in proportion to their burnup.
+
+### 15. Where contamination gets out, and how much — **Needs Tim** (the numbers)
+- **Chosen:** each release contaminates the top surface of every column within a radius (falling to half at the edge), as a share of
+  "fully contaminated" (1 mSv/h at 1 m): a primary part (vessel, steam generator, coolant pump, pressurizer, CVCS) broken by a player with
+  water in the RCS, 8 m at the coolant's strength (its activity over the limit, at least 5 %); the relief tank's disc, 6 m at that
+  strength; core damage, 32 m at full strength (16 m inside a closed containment); the hatch failing, 32 m (full with a damaged core,
+  20 % without); a spent fuel pool drained below its fuel, 8 m at 50 %. Stored sparsely by block, decaying with a 30-day half-life in
+  game time. Dose: the contaminated blocks within 16 m, inverse square, no shielding counted (they are surfaces).
+- **Why:** the spec's ranges (3 to 32 blocks by what failed); surface-only keeps a release to a few thousand entries.
+- **Alternatives:** contaminating blocks through a volume, spreading by water flow, or line of sight in the dose.
+
+### 16. On a player; the monitor and the washer
+- **Chosen:** each second a player stands on a contaminated block they pick up 2 % of it (the block loses it), and carry it as a dose
+  of up to 2 mSv/h until washed; it decays like the blocks'. The personnel monitor is a 1 x 3 x 1 booth on the residential tier
+  (single-phase, 1.5 kW): a click reads the player and washes them clean, while powered (a player cannot step into a solid true-size
+  part). The washer is an item: it works within 4 m of a live receptacle and with a water bucket in the inventory; it cleans 90 % a click.
+- **Why:** the spec's behaviour with the simplest interaction. **Not modelled:** the washer's 2 kW is not drawn from the receptacle
+  (an item is not on the circuit) and its water is not used up.
+- **Alternatives:** the washer as a placed skid with a hose (a real circuit load); a walk-through portal monitor block.
+
+### 17. Bent grids and the inspection stand
+- **Chosen:** with `fuelHandlingDamage`, an assembly gets one roll, 1 %, at its first move by hopper into the inspection stand or by the
+  refuelling machine's crane into the core; the result rides on the item (`handled`, `bentGrid`, `inspected` in its custom data, shown in
+  its tooltip once inspected). The stand (2 x 6 x 2, 5 kW at 480 V, hopper in on top and out below, 60 s an assembly) marks it INSPECTED and
+  finds a bent grid. The refuelling machine and the vessel refuse an inspected bent assembly; the assembly fixture straightens one put in
+  its hopper (a new repair bin; 10 minutes; no sneak-click needed), and it goes out uninspected. Loaded unseen, a bent grid becomes a
+  leaking rod once the assembly has burned a third of a cycle. An assembly loaded by hand gets no roll.
+- **Why:** one roll per assembly keeps inspection meaningful (an inspected assembly cannot be bent again on the way in).
+- **Alternatives:** a roll on every move (the spec's wording), so a crane move after inspection could still bend it; a sneak-click on
+  the fixture to start the repair, as the spec says.
+
+### 18. The dry cask limits against the model's decay heat — **Needs Tim**
+- **Chosen:** the spec's limits, 1.5 kW an assembly and 12 kW a canister, against the model's real (uncompressed) decay heat. With 8d's
+  decay fit, an assembly from a full-power run falls to 1.5 kW about 160 days of world time after discharge; a pool of 36 fills after
+  about 53 days at full power (3 assemblies a 107-hour cycle). So in play a full pool cannot yet empty into casks.
+- **Why:** the limit is the canister's real thermal design (cladding under 400 C); burnup is compressed 100x but decay heat is not.
+- **Alternatives (for Tim):** count cooling time 100x for cask eligibility, as burnup is; raise the per-assembly limit (about 40 kW
+  would take fuel about a month old); or a bigger pool. Recommended: count cooling time 100x for eligibility only.
+
+### 19. Linking a module; one canister each
+- **Chosen:** a sneak-click on the station with the Power Meter links the nearest empty storage module within 64 m. A module holds one
+  canister; after a transfer the link clears and the next canister needs another module. The transfer cask is abstract (10 minutes).
+  The pool's controller takes a sneak-click for LOAD CASK (it had none before; a click still reads it). The module is unbreakable while
+  loaded (no destroy progress) and has blast resistance 1,200.
+- **Why:** the spec's link and limits; the nearest-empty rule needs no second click on the module.
+- **Alternatives:** a click on the module then the station; a crawler transporter vehicle.
+
+### 20. Additive only
+- **Chosen:** the casks, the module's dose, the inspection stand, the personnel monitor and the washer need no rule: with none built,
+  nothing changes. Contamination and its dose, the coolant activity and bent grids are behind rules 6 and 7. The CVCS's readout adds the
+  activity only with the rule on.
+- **Why:** the rule for existing worlds.
+- **Alternatives:** none needed.
 
 ## Testing
 

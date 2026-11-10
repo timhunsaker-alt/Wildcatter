@@ -1,6 +1,6 @@
 # Reactor extensions: containment, protection, casks, contamination, rods
 
-> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Proposed phase **19** in three waves here:
+> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved. 19a and 19b BUILT 2026-11-10 (see "As built").** Proposed phase **19** in three waves here:
 > **19a** containment and protection; **19b** dry casks, contamination and fresh-fuel inspection; **19d** rod materials and the sodium
 > sulfate. (19c is fuel-fabrication-extensions.md.) Decisions are in `docs/questions/specs-wildcatter.md` (items 85-96).
 
@@ -272,3 +272,27 @@ The grid is a sketch; the game test is the layout of record.
 - **Tests:** unit `ReactorLimitsTest` (8); NeoForge scenes `containment` and `reactor_limits` (its own batch); Fabric client scene
   `reactorContainment` (filmed: inside the closed building, the relief tank's disc bursting, the igniter's burn and the blast; the film
   is assembled from the scene's own frames, `film-reactor-NNNN`, because the screen recorder caught only the desktop).
+
+### 19b (2026-11-10, branch `phase19`; decisions in `docs/questions/phase19-reactor.md`, 14-20)
+- **Rules:** `reactorContamination` (coolant activity, contamination and its dose and pick-up) and `fuelHandlingDamage` (bent grids),
+  off unless `true`.
+- **Dry casks** (`FuelStoragePartBlock`, `CaskLoadingStationBlockEntity`, `StorageModuleBlockEntity`): `cask_loading_station` 3 x 4 x 4,
+  50 kW at 480 V, against the pool's controller, empty `dry_storage_canister`s (crafted from steel) by a hopper on top;
+  `storage_module` 4 x 6 x 6, linked by a sneak-click on the station with the Power Meter (the nearest empty module within 64 m). The pool's
+  controller takes a sneak-click for LOAD CASK. The station takes the coolest racks that fit (1.5 kW each, 12 kW in all, 12 a canister),
+  a move a minute; dries and backfills (20 minutes), welds (10) and transfers (10). The module keeps the records, decays them, radiates
+  through its 1 m walls (a thousandth), cannot be broken while loaded. The racks are freed.
+- **Contamination** (`radiation/Contamination`, `ContaminationData`; with its rule): coolant activity in µCi/g DEI (`ReactorActivity`;
+  CVCS readout; COOLANT ACTIVITY over 1.0); releases at a broken primary part (8 m), the relief tank's disc (6 m), core damage (32 m,
+  16 m contained), a failed hatch (32 m) and a drained pool (8 m); top surfaces only, 30-day half-life; dose from the blocks within 16 m;
+  2 % a second picked up by a player standing on one. `personnel_monitor` 1 x 3 x 1 (1.5 kW, residential, single-phase): a click reads
+  and washes. `decon_washer` (item): within 4 m of a live receptacle, with a water bucket, cleans 90 %. The Power Meter reads a block.
+- **Fresh-fuel inspection** (`InspectionStandBlockEntity`, `item/FuelAssemblyTags`): `new_fuel_inspection_stand` 2 x 6 x 2, 5 kW at 480 V,
+  hopper in on top, out below, 60 s an assembly. With its rule, one 1 % roll per assembly (at the stand or the refuelling machine's move);
+  INSPECTED and BENT GRID ride on the item. The refuelling machine and the vessel refuse an inspected bent assembly; the assembly fixture
+  straightens one fed to its new repair bin (10 minutes). Loaded unseen, it leaks after a third of a cycle.
+- **Field Manual:** DRY CASKS; CONTAMINATION AND NEW FUEL.
+- **Tests:** unit `ReactorActivityTest` (3); NeoForge scenes `casks`, `contamination` and `fuel_inspection` (each rule scene in its own
+  batch).
+- **Placeholders:** `dry_storage_canister_placeholder`, `decon_washer_placeholder` (item icons drawn by script).
+

@@ -44,6 +44,8 @@ public class SpentFuelPoolBlockEntity extends UnitMotorBlockEntity implements Wa
 	private double makeup;
 	private double cooling;
 	private String unit = "starting";
+	private boolean caskMode;
+	private boolean bare;
 
 	public SpentFuelPoolBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.SPENT_FUEL_POOL_ENTITY, pos, state);
@@ -77,6 +79,24 @@ public class SpentFuelPoolBlockEntity extends UnitMotorBlockEntity implements Wa
 
 	public int layers() {
 		return layers;
+	}
+
+	/** 19b: LOAD CASK, the cask loading station's moves out of the racks; a sneak-click on the controller. */
+	public boolean caskMode() {
+		return caskMode;
+	}
+
+	public String toggleCaskMode() {
+		caskMode = !caskMode;
+		setChanged();
+		return "Spent fuel pool: " + (caskMode ? "LOAD CASK (the cask loading station takes the coolest assemblies, a move a minute)" : "NORMAL");
+	}
+
+	/** The cask loading station takes an assembly out of the racks. */
+	public void takeRack(Level level, SpentFuel.Assembly a) {
+		racks.remove(a);
+		setChanged();
+		level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
 	}
 
 	/** The refuelling machine's delivery. */
@@ -189,13 +209,19 @@ public class SpentFuelPoolBlockEntity extends UnitMotorBlockEntity implements Wa
 		kg += fill;
 		level(level);
 		double over = layers - Tuning.POOL_FUEL_TOP_M;
+		// 19b, with the contamination rule: a pool drained below its fuel's top contaminates its edge
+		boolean nowBare = over < 0 && !racks.isEmpty();
+		if (nowBare && !bare && level instanceof net.minecraft.server.level.ServerLevel sl) {
+			dev.wildcatter.radiation.Contamination.splash(sl, cell(2, 2, 0).above(), 8, 0.5);
+		}
+		bare = nowBare;
 		unit = String.format("%d of %d racks; decay heat %.0f kW, cooling %.0f kW; %.1f C%s; water %.1f m (%.1f m over the fuel)", racks.size(), Tuning.POOL_RACKS,
 				heat / 1000, cooling / 1000, tempC, tempC >= 100 ? " BOILING: pump make-up water to it" : "", (double) layers, over);
 	}
 
 	@Override
 	public Component inspect() {
-		return Component.literal("Spent fuel pool (6 x 6 m, 12 m deep): " + unit + "; " + describe());
+		return Component.literal("Spent fuel pool (6 x 6 m, 12 m deep): " + unit + (caskMode ? "; LOAD CASK" : "") + "; " + describe());
 	}
 
 	@Override
@@ -214,14 +240,32 @@ public class SpentFuelPoolBlockEntity extends UnitMotorBlockEntity implements Wa
 		output.putDouble("kg", kg);
 		output.putInt("layers", layers);
 		output.putDouble("makeup", makeup);
-		output.putInt("racks", racks.size());
-		for (int i = 0; i < racks.size(); i++) {
-			SpentFuel.Assembly a = racks.get(i);
-			output.putDouble("r" + i + "b", a.burnup);
-			output.putBoolean("r" + i + "x", a.damaged);
+		output.putBoolean("caskMode", caskMode);
+		saveRecords(output, "r", racks);
+	}
+
+	/** Irradiated assembly records under {@code prefix} (the pool's keys are "racks", "r0b", "r0x", "r0d0"...). */
+	static void saveRecords(ValueOutput output, String prefix, List<SpentFuel.Assembly> records) {
+		output.putInt(prefix.equals("r") ? "racks" : prefix + "count", records.size());
+		for (int i = 0; i < records.size(); i++) {
+			SpentFuel.Assembly a = records.get(i);
+			output.putDouble(prefix + i + "b", a.burnup);
+			output.putBoolean(prefix + i + "x", a.damaged);
 			for (int g = 0; g < a.decay.length; g++) {
-				output.putDouble("r" + i + "d" + g, a.decay[g]);
+				output.putDouble(prefix + i + "d" + g, a.decay[g]);
 			}
+		}
+	}
+
+	static void loadRecords(ValueInput input, String prefix, List<SpentFuel.Assembly> records) {
+		records.clear();
+		int n = input.getIntOr(prefix.equals("r") ? "racks" : prefix + "count", 0);
+		for (int i = 0; i < n; i++) {
+			double[] d = new double[Tuning.DECAY_LAMBDA.length];
+			for (int g = 0; g < d.length; g++) {
+				d[g] = input.getDoubleOr(prefix + i + "d" + g, 0);
+			}
+			records.add(new SpentFuel.Assembly(input.getDoubleOr(prefix + i + "b", 0), d, input.getBooleanOr(prefix + i + "x", false)));
 		}
 	}
 
@@ -233,15 +277,8 @@ public class SpentFuelPoolBlockEntity extends UnitMotorBlockEntity implements Wa
 		kg = input.getDoubleOr("kg", Tuning.POOL_WATER_KG);
 		layers = input.getIntOr("layers", Tuning.POOL_DEPTH);
 		makeup = input.getDoubleOr("makeup", 0);
-		racks.clear();
-		int n = input.getIntOr("racks", 0);
-		for (int i = 0; i < n; i++) {
-			double[] d = new double[Tuning.DECAY_LAMBDA.length];
-			for (int g = 0; g < d.length; g++) {
-				d[g] = input.getDoubleOr("r" + i + "d" + g, 0);
-			}
-			racks.add(new SpentFuel.Assembly(input.getDoubleOr("r" + i + "b", 0), d, input.getBooleanOr("r" + i + "x", false)));
-		}
+		caskMode = input.getBooleanOr("caskMode", false);
+		loadRecords(input, "r", racks);
 	}
 
 	@Override

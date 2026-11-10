@@ -1627,6 +1627,10 @@ sized for a 40-pot line.
   (no coolant pumps there); the full critical startup with the rule on runs only in the unit test. The four rules are server-wide
   keys, not stored per world (question 8). The macOS screen recorder (`Filming`) caught only the desktop wallpaper on this run (the
   Phase 17 film shows the same); the `reactorContainment` scene therefore also saves a frame every 4 ticks, and the film is made from them.
+- Phase 19b (2026-11-10): two item icons drawn by script: `dry_storage_canister_placeholder` and `decon_washer_placeholder`; the
+  four parts use the mod's materials. With real decay heat a cask takes fuel about 160 days of world time out of the core (question 18,
+  for Tim). The washer's 2 kW is not drawn from its receptacle and its water bucket is not used up. Not built: a transfer cask vehicle,
+  contamination spreading by water, nuclide-by-nuclide activity. No client scene for 19b (the phase's one film is 19a's).
 - Misc gaps wave (2026-11-09): the steam plant's feedwater line, the land rig's cables, the 1 MW alternator and the new spool icons
   have been checked in model previews and NeoForge server scenes, not yet in the client (no client scene was run in the wave).
   Coker gas keeps a gas set's full rating (its heavier hydrocarbons' knock is not modelled). No new script-drawn textures.
@@ -1865,4 +1869,20 @@ Spec: `docs/multiblocks/reactor-extensions.md` ("As built"). Branch `phase19`.
 - **Field Manual:** CONTAINMENT; THE RELIEF TANK AND THE REACTOR RULES.
 - **Tests:** unit `ReactorLimitsTest` (8 tests); NeoForge server scenes `containment` and `reactor_limits`; Fabric client scene
   `reactorContainment` (filmed).
+
+## Phase 19b: dry casks, contamination, fresh-fuel inspection (2026-11-10; built while Tim was away; decisions: `docs/questions/phase19-reactor.md`, 14-20)
+Spec: `docs/multiblocks/reactor-extensions.md` ("As built", 19b). Branch `phase19`.
+- **Existing worlds unchanged:** two more keys, off unless `true`: `reactorContamination`, `fuelHandlingDamage`. The new parts only add.
+- **Dry casks:** the cask loading station (50 kW at 480 V) against the spent fuel pool's controller, empty canisters by hopper; LOAD
+  CASK on the pool's controller (sneak-click); the coolest assemblies that fit a canister's limits, a move a minute; drying, welding
+  and the transfer to a horizontal storage module linked with the Power Meter (within 64 m). The module keeps and decays the records,
+  shields them with its 1 m walls and cannot be broken while loaded.
+- **Contamination** (rule): coolant activity (µCi/g DEI) from corrosion products and leaking rods, taken out by the CVCS's resin and read
+  on the CVCS; contamination round a broken primary part, a burst relief disc, a damaged core, a failed hatch or a drained pool; its dose;
+  pick-up by players; the personnel monitor (residential tier) washes them; the decontamination washer cleans blocks; the Power Meter
+  reads them.
+- **Fresh-fuel inspection:** the inspection stand (5 kW at 480 V) marks assemblies INSPECTED; with the rule, a bent grid (1 %) is found
+  there, refused by the refuelling machine and the vessel, and straightened at the assembly fixture; loaded unseen, it leaks.
+- **Field Manual:** DRY CASKS; CONTAMINATION AND NEW FUEL.
+- **Tests:** unit `ReactorActivityTest` (3 tests); NeoForge server scenes `casks`, `contamination`, `fuel_inspection`.
 

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SHS",
+    "BWB",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "B": "minecraft:iron_block",
+    "W": "minecraft:anvil"
+  },
+  "result": {
+    "id": "wildcatter:cask_loading_station",
+    "count": 1
+  }
+}

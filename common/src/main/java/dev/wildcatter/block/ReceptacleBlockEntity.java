@@ -69,6 +69,11 @@ public class ReceptacleBlockEntity extends BlockEntity implements CircuitPart, I
 		volts = type().threePhase() ? circuit.across(hotA, hotB) : circuit.across(hotA, neutral);
 	}
 
+	/** The volts on its line (between phases A and B for a three-phase one), from the last solve. */
+	public double volts() {
+		return Math.abs(volts);
+	}
+
 	@Override
 	public Component inspect() {
 		return Component.literal(type().label() + " receptacle (" + Math.round(type().volts()) + " V, " + Math.round(type().amps()) + " A): "

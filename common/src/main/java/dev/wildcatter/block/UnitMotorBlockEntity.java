@@ -154,6 +154,9 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "nitric_acid_unit" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.NITRIC_UNIT_WATTS);
 				case "emulsion_blender" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.EMULSION_BLENDER_WATTS);
 				case "meter_building" -> new Motor(false, Voltage.LOW, Tuning.METER_BUILDING_WATTS);   // residential, single-phase
+				case "personnel_monitor" -> new Motor(false, Voltage.LOW, Tuning.PERSONNEL_MONITOR_WATTS);   // residential, single-phase (19b)
+				case "cask_loading_station" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CASK_STATION_WATTS);
+				case "new_fuel_inspection_stand" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.INSPECTION_STAND_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -273,6 +276,9 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "nitric_acid_unit" -> "air blower";
 			case "emulsion_blender" -> "mixer";
 			case "meter_building" -> "heaters, chromatograph and RTU charger";
+			case "personnel_monitor" -> "detectors and shower heater";
+			case "cask_loading_station" -> "welder, vacuum pump and helium skid";
+			case "new_fuel_inspection_stand" -> "lights and camera";
 			default -> kind();
 		};
 	}

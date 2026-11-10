@@ -415,7 +415,7 @@ Decisions for Tim: `docs/questions/plc-gaps.md` (12 entries). Spec updated: `doc
   - process models (pipe pressure, drum pressure, a turbine's load setpoint, dampers, vibration, CT and PT voltage);
   - the crane's lift start.
 
-## Phase 19 — Reactor and fuel extensions — 19a BUILT 2026-11-10 (while Tim was away, on the DRAFT spec decided on recommendation; not approved)
+## Phase 19 — Reactor and fuel extensions — 19a and 19b BUILT 2026-11-10 (while Tim was away, on the DRAFT spec decided on recommendation; not approved)
 Spec: `docs/multiblocks/reactor-extensions.md` ("As built"); plan: `docs/ideas-plan.md`, Phase 19. Decisions for Tim:
 `docs/questions/phase19-reactor.md`. Branch `phase19`. **The rule for existing worlds:** every rule that changes what a reactor already
 does is a key in `config/wildcatter.properties`, off by default (questions 1-8: default on for new worlds?).
@@ -424,7 +424,21 @@ does is a key in `config/wildcatter.properties`, off by default (questions 1-8: 
   disc. Behind keys: LTOP and the P-T curve (`reactorLtop`), the 55 C/h heat-up alarm (`reactorHeatupLimit`), the real heat-up
   (`reactorRealHeatup`), the OT and OP delta-T trips (`reactorDeltaTTrips`). Unit test `ReactorLimitsTest`; NeoForge scenes
   `containment`, `reactor_limits`; client scene `reactorContainment` (filmed).
-- **19b, dry casks, contamination, fresh-fuel inspection** (planned next in this branch).
+- **19b, dry casks, contamination, fresh-fuel inspection** (BUILT): the cask loading station, dry storage canisters and the horizontal
+  storage module; the new-fuel inspection stand and the assembly fixture's repair bin; the personnel monitor and the decontamination
+  washer. Behind keys: coolant activity and contamination (`reactorContamination`), bent grids (`fuelHandlingDamage`). Unit test
+  `ReactorActivityTest`; NeoForge scenes `casks`, `contamination`, `fuel_inspection`. Question 18 needs Tim: with real decay heat, fuel
+  takes about 160 days of world time to be cool enough for a cask.
+- **Known gaps (19a, 19b; also in PROGRESS.md, Known gaps):**
+  - placeholders drawn by script: `dry_storage_canister_placeholder`, `decon_washer_placeholder` (item icons); every part uses the
+    mod's materials;
+  - the OP-delta-T constants K4, K5, K6 are unverified and the H. B. Robinson 2 accession number is not recorded (question 5);
+  - with real decay heat, fuel is cool enough for a cask about 160 days of world time after discharge (question 18);
+  - the washer's 2 kW is not drawn from its receptacle, and its water bucket is not used up;
+  - not built: containment spray and fan coolers, the relief tank's cover gas and drain tank, a transfer cask vehicle, contamination
+    spreading with water;
+  - the rules are server-wide config keys, not stored per world (question 8);
+  - the screen recorder caught only the desktop, so the `reactorContainment` film is made from the scene's own frames.
 - **19c, fuel fabrication extensions** (planned, not built): `docs/multiblocks/fuel-fabrication-extensions.md`. 19c1 pellet inspection,
   rod X-ray and helium leak tests, scrap and the zinc stearate lubricant; 19c2 HF recovery to the conversion plant, IFBA and gadolinia
   burnable absorbers, real Inconel and stainless hardware (after 17b's nickel smelter). 19c1's leaking rods would feed 19b's coolant
@@ -460,4 +474,4 @@ does is a key in `config/wildcatter.properties`, off by default (questions 1-8: 
   dolomite; the aluminothermic chromium step; scrap recycle and yields; Kroll and VAR batch timing.
 - Fuel: the kiln's HF back to the conversion plant; zinc stearate lubricant and pore formers; a nickel smelter for real Inconel and
   stainless hardware; pellet inspection, rod X-ray and helium leak tests; IFBA and gadolinia burnable absorbers; rejects and scrap.
-- Reactor (the rest of Phase 19, planned above): silver-indium-cadmium and hafnium rods; helium in the B4C rodlets; a buyer for the borax plant's sodium sulfate. Raised by 19a: containment spray and fan coolers; a relief tank's cover gas and drain tank; the reactor rules stored per world, so they can be on for new worlds only.
+- Reactor (the rest of Phase 19, planned above): silver-indium-cadmium and hafnium rods; helium in the B4C rodlets; a buyer for the borax plant's sodium sulfate. Raised by 19a: containment spray and fan coolers; a relief tank's cover gas and drain tank; the reactor rules stored per world, so they can be on for new worlds only. Raised by 19b: a crawler transporter for the transfer cask; the washer as a placed skid on the circuit; contamination spreading with water; nuclide-by-nuclide coolant activity.

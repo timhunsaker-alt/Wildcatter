@@ -34,6 +34,7 @@ public final class Reactor {
 		public double rhrWaterKgs;                    // circulating water through its exchanger
 		public double rhrWaterC = Tuning.LAKE_C;
 		public boolean contained;                     // a closed containment takes the hydrogen (19a): no blast of the reactor's own
+		public boolean demineralizer;                 // the CVCS's letdown runs through its resin (19b)
 	}
 
 	// fuel
@@ -95,6 +96,10 @@ public final class Reactor {
 	double reliefKg;
 	double reliefJ;
 	double locaKg;
+	// 19b: bent grids and leaking rods by assembly; the coolant's activity, µCi/g dose-equivalent I-131
+	final boolean[] bent = new boolean[Tuning.CORE_ASSEMBLIES];
+	final boolean[] leaking = new boolean[Tuning.CORE_ASSEMBLIES];
+	double activity;
 
 	// ---- numbers (ReactorDesign) -----------------------------------------------------------------------------------------------
 	public static double assemblyWatts() {
@@ -380,6 +385,28 @@ public final class Reactor {
 		exploded = true;
 	}
 
+	// ---- 19b: leaking rods and the coolant's activity ----------------------------------------------------------------------------
+	/** The coolant's activity, µCi/g dose-equivalent I-131. */
+	public double activity() {
+		return activity;
+	}
+
+	public int leakers() {
+		int n = 0;
+		for (int i = 0; i < assemblies; i++) {
+			n += leaking[i] ? 1 : 0;
+		}
+		return n;
+	}
+
+	public boolean bent(int i) {
+		return bent[i];
+	}
+
+	public boolean leaking(int i) {
+		return leaking[i];
+	}
+
 	/** The alarms on the console, each with its rule on; empty when none. */
 	public String alarms() {
 		StringBuilder out = new StringBuilder();
@@ -394,6 +421,9 @@ public final class Reactor {
 		}
 		if (ltopNotArmed()) {
 			out.append(out.isEmpty() ? "" : ", ").append("LTOP NOT ARMED");
+		}
+		if (ReactorRules.contamination && activity > Tuning.ACTIVITY_LIMIT) {
+			out.append(out.isEmpty() ? "" : ", ").append("COOLANT ACTIVITY");
 		}
 		return out.toString();
 	}
@@ -425,9 +455,16 @@ public final class Reactor {
 
 	/** Loads a fresh assembly; false when the core is full. */
 	public boolean loadAssembly(double gwd) {
+		return loadAssembly(gwd, false);
+	}
+
+	/** Loads a fresh assembly, with a bent grid nobody found (19b); false when the core is full. */
+	public boolean loadAssembly(double gwd, boolean bentGrid) {
 		if (assemblies >= Tuning.CORE_ASSEMBLIES) {
 			return false;
 		}
+		bent[assemblies] = bentGrid;
+		leaking[assemblies] = false;
 		burnup[assemblies++] = gwd;
 		return true;
 	}
@@ -438,7 +475,13 @@ public final class Reactor {
 			return false;
 		}
 		assemblies--;
+		bent[assemblies] = false;
 		return true;
+	}
+
+	/** Whether the last assembly (the one {@link #unloadFreshAssembly} would take) has a bent grid. */
+	public boolean lastBent() {
+		return assemblies > 0 && bent[assemblies - 1];
 	}
 
 	/** The index of the assembly with the most burnup (the next to go to the pool). */
@@ -460,9 +503,13 @@ public final class Reactor {
 		SpentFuel.Assembly out = new SpentFuel.Assembly(burnup[i], decay, coreDamaged);
 		for (int k = i; k < assemblies - 1; k++) {
 			burnup[k] = burnup[k + 1];
+			bent[k] = bent[k + 1];
+			leaking[k] = leaking[k + 1];
 		}
 		assemblies--;
 		burnup[assemblies] = 0;
+		bent[assemblies] = false;
+		leaking[assemblies] = false;
 		for (int g = 0; g < decay.length; g++) {
 			decay[g] *= assemblies / (assemblies + 1.0);
 		}
@@ -629,6 +676,16 @@ public final class Reactor {
 		pinnedForTest = power;
 	}
 
+	/** For the game test: assembly {@code i} with a leaking rod. */
+	public void setLeakingForTest(int i) {
+		leaking[i] = true;
+	}
+
+	/** For the game test: the coolant's activity, µCi/g. */
+	public void setActivityForTest(double uciPerG) {
+		activity = uciPerG;
+	}
+
 	/** For the game test: the core steady at {@code power}. */
 	public void holdPowerForTest(double power) {
 		kinetics.hold(power);
@@ -702,6 +759,7 @@ public final class Reactor {
 		ReactorNeutronics.burn(this, p, dt);
 
 		ReactorLimits.step(this, in, dt, before);
+		ReactorActivity.step(this, in, p, dt);
 
 		ReactorProtection.trips(this, in, p, dt);
 	}

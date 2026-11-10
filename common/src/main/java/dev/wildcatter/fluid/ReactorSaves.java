@@ -46,6 +46,12 @@ final class ReactorSaves {
 		out.put("ltopArmed", r.ltopArmed ? 1 : 0);
 		out.put("ptViolations", r.ptViolations);
 		out.put("vesselFailed", r.vesselFailed ? 1 : 0);
+		// 19b
+		for (int i = 0; i < r.bent.length; i++) {
+			out.put("bent" + i, r.bent[i] ? 1 : 0);
+			out.put("leaking" + i, r.leaking[i] ? 1 : 0);
+		}
+		out.put("activity", r.activity);
 	}
 
 	/** Reads the state back, with the defaults for older saves. */
@@ -88,6 +94,11 @@ final class ReactorSaves {
 		r.ltopArmed = in.get("ltopArmed", 0) > 0.5;
 		r.ptViolations = (int) in.get("ptViolations", 0);
 		r.vesselFailed = in.get("vesselFailed", 0) > 0.5;
+		for (int i = 0; i < r.bent.length; i++) {
+			r.bent[i] = in.get("bent" + i, 0) > 0.5;
+			r.leaking[i] = in.get("leaking" + i, 0) > 0.5;
+		}
+		r.activity = in.get("activity", 0);
 		if (r.coreDamaged) {
 			r.trip = "CORE DAMAGE";
 		} else if (r.vesselFailed) {

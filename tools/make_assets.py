@@ -2792,6 +2792,32 @@ lang.update({f"block.{ns}.containment_concrete": "Containment Concrete (1 m, ste
 	f"block.{ns}.containment_monitor": "Containment Monitor", f"block.{ns}.pressurizer_relief_tank": "Pressurizer Relief Tank (30 m3)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 19b: dry casks, contamination, fresh-fuel inspection (docs/multiblocks/reactor-extensions.md) --------------------------
+P19B_PARTS = ("cask_loading_station", "storage_module", "new_fuel_inspection_stand", "personnel_monitor")
+for name in P19B_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in P19B_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("cask_loading_station", ["SHS", "BWB", "SSS"], {"S": f"{ns}:steel_ingot", "H": "minecraft:hopper", "B": "minecraft:iron_block", "W": "minecraft:anvil"}, "cask_loading_station")
+shaped("storage_module", ["CCC", "C C", "CCC"], {"C": f"{ns}:containment_concrete"}, "storage_module")
+shaped("new_fuel_inspection_stand", ["SGS", "S S", "SLS"], {"S": f"{ns}:steel_ingot", "G": "minecraft:glass_pane", "L": "minecraft:redstone_lamp"}, "new_fuel_inspection_stand")
+shaped("personnel_monitor", ["SGS", "SRS", "SBS"], {"S": f"{ns}:steel_ingot", "G": "minecraft:glass_pane", "R": "minecraft:comparator", "B": "minecraft:bucket"}, "personnel_monitor")
+shaped("dry_storage_canister", ["SSS", "S S", "SSS"], {"S": f"{ns}:steel_ingot"}, "dry_storage_canister")
+shaped("decon_washer", [" P ", "SXS", " B "], {"P": f"{ns}:pipe", "S": f"{ns}:steel_ingot", "X": "minecraft:piston", "B": "minecraft:bucket"}, "decon_washer")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in {"dry_storage_canister": ("Dry Storage Canister (empty, 12 assemblies)", (150, 156, 162)),
+		"decon_washer": ("Decontamination Washer (2 kW)", (210, 180, 40))}.items():
+	tex(f"{item}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}_placeholder"}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.cask_loading_station": "Cask Loading Station", f"block.{ns}.storage_module": "Dry Cask Storage Module (horizontal)",
+	f"block.{ns}.new_fuel_inspection_stand": "New-Fuel Inspection Stand", f"block.{ns}.personnel_monitor": "Personnel Contamination Monitor"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

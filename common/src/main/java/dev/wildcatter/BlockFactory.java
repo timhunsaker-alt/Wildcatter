@@ -92,6 +92,13 @@ final class BlockFactory {
 				.strength(5.0F, blast).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
 	}
 
+	static Block fuelStoragePart(dev.wildcatter.block.FuelStoragePartBlock.Part part) {
+		// the storage module is 1 m of reinforced concrete: it stands through a blast
+		float blast = part == dev.wildcatter.block.FuelStoragePartBlock.Part.STORAGE_MODULE ? 1200.0F : 8.0F;
+		return block(part.id(), props -> new dev.wildcatter.block.FuelStoragePartBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
+				.strength(5.0F, blast).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
+	}
+
 	static Block boronPart(dev.wildcatter.block.BoronPartBlock.Part part) {
 		return block(part.id(), props -> new dev.wildcatter.block.BoronPartBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
 				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));

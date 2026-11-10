@@ -36,6 +36,11 @@ public interface NuclearBlocks {
 	Block HYDROGEN_RECOMBINER = containmentPart(dev.wildcatter.block.ContainmentPartBlock.Part.HYDROGEN_RECOMBINER);
 	Block CONTAINMENT_MONITOR = containmentPart(dev.wildcatter.block.ContainmentPartBlock.Part.CONTAINMENT_MONITOR);
 	Block PRESSURIZER_RELIEF_TANK = containmentPart(dev.wildcatter.block.ContainmentPartBlock.Part.PRESSURIZER_RELIEF_TANK);
+	// 19b: dry casks, contamination, fresh-fuel inspection
+	Block CASK_LOADING_STATION = fuelStoragePart(dev.wildcatter.block.FuelStoragePartBlock.Part.CASK_LOADING_STATION);
+	Block STORAGE_MODULE = fuelStoragePart(dev.wildcatter.block.FuelStoragePartBlock.Part.STORAGE_MODULE);
+	Block NEW_FUEL_INSPECTION_STAND = fuelStoragePart(dev.wildcatter.block.FuelStoragePartBlock.Part.NEW_FUEL_INSPECTION_STAND);
+	Block PERSONNEL_MONITOR = fuelStoragePart(dev.wildcatter.block.FuelStoragePartBlock.Part.PERSONNEL_MONITOR);
 	Block FUEL_ASSEMBLY = block("fuel_assembly", props -> new dev.wildcatter.block.FuelAssemblyBlock(props.mapColor(MapColor.METAL)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).noOcclusion()));
 }

@@ -43,11 +43,14 @@ final class ReactorExtensionScenes {
 		java.util.Map<String, Consumer<GameTestHelper>> out = new java.util.LinkedHashMap<>();
 		out.put("containment", ReactorExtensionScenes::containment);
 		out.put("reactor_limits", ReactorExtensionScenes::reactorLimits);
+		out.put("casks", ReactorExtensionScenes::casks);
+		out.put("contamination", ReactorExtensionScenes::contamination);
+		out.put("fuel_inspection", ReactorExtensionScenes::fuelInspection);
 		return out;
 	}
 
 	/** The scenes that switch a rule on: each in a batch of its own. */
-	static final java.util.Set<String> RULE_SCENES = java.util.Set.of("reactor_limits");
+	static final java.util.Set<String> RULE_SCENES = java.util.Set.of("reactor_limits", "contamination", "fuel_inspection");
 
 	/** A check that hands the rules back before it fails. */
 	private static void check(GameTestHelper helper, boolean ok, String message, boolean[] rules) {
@@ -260,6 +263,210 @@ final class ReactorExtensionScenes {
 					ReactorRules.restore(rules);
 					check(helper, r.tripped() && r.trip().startsWith("OT-DELTA-T"), "with the rule it should trip on OT-DELTA-T: " + trip, rules);
 					log("reactor_limits", "ok: " + trip);
+					helper.succeed();
+				});
+			});
+		}));
+	}
+
+	// ---- 19b: casks -----------------------------------------------------------------------------------------------------------------
+	/** An irradiated assembly's record making {@code watts} of decay heat (its long-lived group only, as old fuel's is). */
+	private static dev.wildcatter.fluid.SpentFuel.Assembly old(double watts) {
+		double[] d = new double[Tuning.DECAY_LAMBDA.length];
+		d[d.length - 1] = watts / Reactor.assemblyWatts();
+		return new dev.wildcatter.fluid.SpentFuel.Assembly(45, d, false);
+	}
+
+	/**
+	 * Dry casks: the pool's controller with a station against it on 480 V and a storage module on the pad. The pool holds 12 old
+	 * assemblies (about 0.9 kW each) and 2 hotter ones (5 kW); on LOAD CASK, with the moves sped up, the station loads the 12 cool ones,
+	 * dries, welds and sends the canister to the module; the hot ones stay. The dose beside the module is low; it cannot be broken.
+	 */
+	static void casks(GameTestHelper helper) {
+		floor(helper, -6, -8, 22, 20);
+		place(helper, WildcatterBlocks.SPENT_FUEL_POOL, 4, 1, 4, Direction.NORTH);            // x 4-7, z 4-7; the pool north of it
+		place(helper, WildcatterBlocks.CASK_LOADING_STATION, 4, 1, 8, Direction.NORTH);       // x 4-6, z 8-11, against the controller
+		place(helper, WildcatterBlocks.STORAGE_MODULE, 12, 1, 10, Direction.NORTH);           // x 12-15, z 10-15, y 1-6
+		GridSceneKit.genset(helper, 1, 1, 8);                                                 // its terminal at (2, 1, 8)
+		put(helper, "cable_industrial", 2, 1, 8);
+		put(helper, "cable_industrial", 3, 1, 8);
+		dev.wildcatter.block.SpentFuelPoolBlockEntity pool = entity(helper, 4, 1, 4, dev.wildcatter.block.SpentFuelPoolBlockEntity.class);
+		dev.wildcatter.block.CaskLoadingStationBlockEntity station = entity(helper, 4, 1, 8, dev.wildcatter.block.CaskLoadingStationBlockEntity.class);
+		dev.wildcatter.block.StorageModuleBlockEntity module = entity(helper, 12, 1, 10, dev.wildcatter.block.StorageModuleBlockEntity.class);
+		for (int i = 0; i < 12; i++) {
+			pool.store(helper.getLevel(), old(850 + 10 * i));
+		}
+		pool.store(helper.getLevel(), old(5000));
+		pool.store(helper.getLevel(), old(5200));
+		station.setTimesForTest(0.4, 1, 1, 1);
+		station.setItem(0, new net.minecraft.world.item.ItemStack(dev.wildcatter.WildcatterItems.DRY_STORAGE_CANISTER));
+		helper.runAfterDelay(20, () -> {
+			String linked = station.link(helper.getLevel());
+			GridSceneKit.check(helper, linked.contains("linked"), "the station should link the module: " + linked);
+			pool.toggleCaskMode();
+			GridSceneKit.start(helper, 1, 1, 8, () -> await(helper, 1200, () -> !module.records().isEmpty(), () -> {
+				String moved = read(helper, 12, 1, 10) + " | " + read(helper, 4, 1, 8) + " | " + read(helper, 4, 1, 4);
+				GridSceneKit.check(helper, module.records().size() == 12 && pool.racks().size() == 2, "the station should load the 12 cool assemblies into the module: " + moved);
+				GridSceneKit.check(helper, pool.racks().stream().allMatch(a -> a.watts() > 4000), "the hot ones should stay in the pool: " + moved);
+				net.minecraft.world.phys.Vec3 beside = net.minecraft.world.phys.Vec3.atCenterOf(abs(helper, 18, 2, 12));
+				double rate = dev.wildcatter.radiation.RadiationTicker.rateAt(helper.getLevel(), beside, null);
+				double bare = module.records().stream().mapToDouble(a -> dev.wildcatter.fluid.Radiation.assemblyAt1m(a.watts())).sum() / module.centre().distanceToSqr(beside);
+				GridSceneKit.check(helper, rate > 0 && rate < bare / 500, "beside the module the dose should be low: " + dev.wildcatter.fluid.Radiation.rateText(rate)
+						+ " (bare " + dev.wildcatter.fluid.Radiation.rateText(bare) + ")");
+				net.minecraft.world.entity.player.Player miner = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+				BlockPos wall = abs(helper, 13, 3, 10);
+				float progress = helper.getLevel().getBlockState(wall).getDestroyProgress(miner, helper.getLevel(), wall);
+				GridSceneKit.check(helper, progress == 0, "a loaded module cannot be broken: " + progress);
+				log("casks", "ok: " + moved + " | beside " + dev.wildcatter.fluid.Radiation.rateText(rate));
+				helper.succeed();
+			}));
+		});
+	}
+
+	// ---- 19b: contamination -----------------------------------------------------------------------------------------------------------
+	/**
+	 * Contamination, with its rule switched on and handed back: a vessel full of coolant at the limit's activity; a player breaks its
+	 * pressurizer and the floor round it is contaminated; a player standing there picks some up; the personnel monitor (on a 120/240 V
+	 * service: a diesel set, a pad-mount run backward, a pole unit) washes them; the washer, plugged into a live receptacle on a starter
+	 * plant, cleans a block by 90 %.
+	 */
+	static void contamination(GameTestHelper helper) {
+		boolean[] rules = ReactorRules.snapshot();
+		floor(helper, -24, -4, 18, 18);
+		place(helper, WildcatterBlocks.REACTOR_VESSEL, 6, 1, 4, Direction.NORTH);             // x 6-8, z 4-6
+		place(helper, WildcatterBlocks.PRESSURIZER, 6, 1, 7, Direction.NORTH);                // x 6-7, z 7-8
+		place(helper, WildcatterBlocks.PERSONNEL_MONITOR, 0, 1, 0, Direction.NORTH);          // its box on the west face, at (-1, 1, 0)
+		// the monitor's residential service, as the sales gas scene's meter building
+		GridSceneKit.genset(helper, -18, 1, 0);                                               // its 480 V terminal at (-17, 1, 0)
+		place(helper, WildcatterBlocks.PADMOUNT_480, -17, 1, 0, Direction.NORTH);             // run backward: 12.47 kV out at x -15
+		BlockPos hv = new BlockPos(-15, 1, 0);
+		for (int x = hv.getX(); x <= hv.getX() + 2; x++) {
+			put(helper, "dist_wire_hot", x, 1, 0);
+		}
+		int px = hv.getX() + 3;
+		put(helper, "pole", px, 1, -1);
+		helper.getLevel().setBlock(abs(helper, px, 1, 0), WildcatterBlocks.POLE_TRANSFORMER.defaultBlockState()
+				.setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING, Direction.WEST), 3);
+		for (int x = px + 1; x <= -1; x++) {
+			put(helper, "cable_lv", x, 1, 0);
+		}
+		// the washer's receptacle on a 120 V starter plant
+		helper.setBlock(12, 1, 14, Blocks.CAMPFIRE.defaultBlockState().setValue(CampfireBlock.LIT, true));
+		helper.setBlock(12, 2, 14, WildcatterBlocks.BOILER);
+		helper.setBlock(13, 2, 14, WildcatterBlocks.STEAM_TURBINE);
+		helper.getBlockEntity(new BlockPos(12, 2, 14), BoilerBlockEntity.class).addWater(4000);
+		put(helper, "wool_wire_hot", 14, 2, 14);
+		put(helper, "receptacle_nema_5_15", 15, 2, 14);
+		for (int x = 13; x <= 15; x++) {
+			put(helper, "wool_wire_neutral", x, 2, 15);
+		}
+		ReactorVesselBlockEntity vessel = entity(helper, 6, 1, 4, ReactorVesselBlockEntity.class);
+		vessel.setHotStandbyForTest(1500);
+		vessel.reactor().setActivityForTest(Tuning.ACTIVITY_LIMIT);
+		ReactorRules.contamination = true;
+		dev.wildcatter.radiation.ContaminationData data = dev.wildcatter.radiation.ContaminationData.get(helper.getLevel());
+		GridSceneKit.start(helper, -18, 1, 0, () -> {
+			net.minecraft.server.level.ServerPlayer player = helper.makeMockServerPlayerInLevel();
+			player.getInventory().add(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.WATER_BUCKET));
+			// a player breaks the pressurizer with the RCS full
+			player.gameMode.destroyBlock(abs(helper, 6, 1, 7));
+			BlockPos floorCell = abs(helper, 9, 0, 9);
+			long now = helper.getLevel().getGameTime();
+			double on = data.at(floorCell, now);
+			check(helper, on > 0.3, "breaking a primary part with water in it should contaminate the floor round it: " + on + " (" + data.size() + " blocks)", rules);
+			double rate = dev.wildcatter.radiation.Contamination.rate(helper.getLevel(), net.minecraft.world.phys.Vec3.atCenterOf(floorCell.above(2)));
+			check(helper, rate > 1e-4, "the contaminated floor should be a dose source: " + dev.wildcatter.fluid.Radiation.rateText(rate), rules);
+			// standing on it the player picks some up
+			player.teleportTo(floorCell.getX() + 0.5, floorCell.getY() + 1, floorCell.getZ() + 0.5);
+			for (int i = 0; i < 5; i++) {
+				dev.wildcatter.radiation.Contamination.pickUp(helper.getLevel(), player);
+			}
+			double skin = dev.wildcatter.radiation.Contamination.skinRate(helper.getLevel(), player);
+			check(helper, skin > 0, "standing on it the player should carry contamination", rules);
+			// the personnel monitor washes them
+			dev.wildcatter.block.PersonnelMonitorBlockEntity monitor = entity(helper, 0, 1, 0, dev.wildcatter.block.PersonnelMonitorBlockEntity.class);
+			String washed = monitor.wash(player);
+			check(helper, washed.contains("CONTAMINATED") && dev.wildcatter.radiation.Contamination.skinRate(helper.getLevel(), player) == 0,
+					"the powered monitor should read and wash the player: " + washed + " | " + read(helper, 0, 1, 0), rules);
+			// the washer cleans a block by 90 %
+			double before = data.at(floorCell, helper.getLevel().getGameTime());
+			BlockPos near = abs(helper, 14, 1, 13);
+			data.set(near, 0.8, helper.getLevel().getGameTime());
+			String wash = dev.wildcatter.item.DeconWasherItem.wash(helper.getLevel(), near, player);
+			double after = data.at(near, helper.getLevel().getGameTime());
+			check(helper, Math.abs(after - 0.08) < 0.01, "the washer should clean the block by 90 %: " + wash + " | receptacle " + read(helper, 15, 2, 14), rules);
+			ReactorRules.restore(rules);
+			log("contamination", "ok: floor " + before + ", dose " + dev.wildcatter.fluid.Radiation.rateText(rate) + ", skin " + dev.wildcatter.fluid.Radiation.rateText(skin)
+					+ " | " + washed + " | " + wash);
+			helper.succeed();
+		});
+	}
+
+	// ---- 19b: fresh-fuel inspection ---------------------------------------------------------------------------------------------------
+	/**
+	 * Fresh-fuel inspection, with the fuel handling damage rule switched on (and a bent grid made certain) and handed back: the stand on
+	 * 480 V finds the bent grid; the assembly fixture straightens it; the vessel refuses an inspected bent assembly and takes an
+	 * uninspected one, which leaks after a third of its cycle.
+	 */
+	static void fuelInspection(GameTestHelper helper) {
+		boolean[] rules = ReactorRules.snapshot();
+		floor(helper, -6, -2, 14, 18);
+		GridSceneKit.genset(helper, 0, 1, 0);                                                 // its terminal at (1, 1, 0)
+		for (int x = 1; x <= 3; x++) {
+			put(helper, "cable_industrial", x, 1, 0);
+		}
+		for (int z = 1; z <= 6; z++) {
+			put(helper, "cable_industrial", 3, 1, z);
+		}
+		place(helper, WildcatterBlocks.NEW_FUEL_INSPECTION_STAND, 4, 1, 2, Direction.NORTH);  // x 4-5, z 2-3; its box at (3, 1, 2)
+		place(helper, WildcatterBlocks.ASSEMBLY_FIXTURE, 4, 1, 6, Direction.NORTH);           // x 4-6, z 6-15; its box at (3, 1, 6)
+		place(helper, WildcatterBlocks.REACTOR_VESSEL, 10, 1, 2, Direction.NORTH);
+		dev.wildcatter.block.InspectionStandBlockEntity stand = entity(helper, 4, 1, 2, dev.wildcatter.block.InspectionStandBlockEntity.class);
+		dev.wildcatter.block.AssemblyFixtureBlockEntity fixture = entity(helper, 4, 1, 6, dev.wildcatter.block.AssemblyFixtureBlockEntity.class);
+		ReactorVesselBlockEntity vessel = entity(helper, 10, 1, 2, ReactorVesselBlockEntity.class);
+		ReactorRules.fuelHandlingDamage = true;
+		dev.wildcatter.item.FuelAssemblyTags.setBentChanceForTest(1.0);
+		Runnable handBack = () -> {
+			ReactorRules.restore(rules);
+			dev.wildcatter.item.FuelAssemblyTags.setBentChanceForTest(-1);
+		};
+		stand.setSecondsForTest(1);
+		fixture.setRepairSecondsForTest(2);
+		stand.setItem(0, new net.minecraft.world.item.ItemStack(WildcatterBlocks.FUEL_ASSEMBLY));
+		GridSceneKit.start(helper, 0, 1, 0, () -> await(helper, 400, () -> !stand.getItem(1).isEmpty(), () -> {
+			net.minecraft.world.item.ItemStack found = stand.getItem(1).copy();
+			if (!(dev.wildcatter.item.FuelAssemblyTags.inspected(found) && dev.wildcatter.item.FuelAssemblyTags.bent(found))) {
+				handBack.run();
+			}
+			check(helper, dev.wildcatter.item.FuelAssemblyTags.inspected(found) && dev.wildcatter.item.FuelAssemblyTags.bent(found),
+					"the stand should find the bent grid: " + read(helper, 4, 1, 2), rules);
+			// the vessel, cold, refuses it
+			String refused = vessel.load(found.copy());
+			if (!refused.contains("bent grid")) {
+				handBack.run();
+			}
+			check(helper, refused.contains("bent grid"), "the vessel should refuse an inspected bent assembly: " + refused, rules);
+			// the fixture straightens it
+			stand.setItem(1, net.minecraft.world.item.ItemStack.EMPTY);
+			fixture.setItem(4, found);
+			await(helper, 400, () -> !fixture.getItem(3).isEmpty(), () -> {
+				net.minecraft.world.item.ItemStack fixed = fixture.getItem(3);
+				boolean ok = !fixed.isEmpty() && !dev.wildcatter.item.FuelAssemblyTags.bent(fixed) && !dev.wildcatter.item.FuelAssemblyTags.inspected(fixed);
+				if (!ok) {
+					handBack.run();
+				}
+				check(helper, ok, "the fixture should straighten the grid: " + read(helper, 4, 1, 6), rules);
+				// an uninspected bent assembly loads, and leaks after a third of its cycle
+				net.minecraft.world.item.ItemStack hidden = new net.minecraft.world.item.ItemStack(WildcatterBlocks.FUEL_ASSEMBLY);
+				dev.wildcatter.item.FuelAssemblyTags.markBent(hidden);
+				String loaded = vessel.load(hidden);
+				Reactor r = vessel.reactor();
+				r.setBurnupsForTest(dev.wildcatter.fluid.Reactor.burnupPerSecond() * Reactor.cycleHours() * 3600 / 3 + 0.5);
+				helper.runAfterDelay(20, () -> {
+					handBack.run();
+					check(helper, loaded.contains("loaded") && r.bent(0) && r.leaking(0), "the bent assembly should load and leak after a third of its cycle: " + loaded
+							+ " | bent " + r.bent(0) + ", leaking " + r.leaking(0), rules);
+					log("fuel_inspection", "ok: " + read(helper, 4, 1, 2) + " | " + refused + " | fixture: " + read(helper, 4, 1, 6) + " | " + loaded);
 					helper.succeed();
 				});
 			});

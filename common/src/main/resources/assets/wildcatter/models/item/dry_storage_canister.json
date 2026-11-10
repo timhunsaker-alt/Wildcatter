@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "wildcatter:item/dry_storage_canister_placeholder"
+  }
+}

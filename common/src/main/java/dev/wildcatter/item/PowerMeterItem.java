@@ -38,6 +38,11 @@ public class PowerMeterItem extends Item {
 			}
 			return InteractionResult.SUCCESS;
 		}
+		// 19b, with the contamination rule: a plain block reads its contamination
+		if (dev.wildcatter.fluid.ReactorRules.contamination && context.getLevel() instanceof net.minecraft.server.level.ServerLevel level && context.getPlayer() != null) {
+			context.getPlayer().sendOverlayMessage(net.minecraft.network.chat.Component.literal(dev.wildcatter.radiation.Contamination.reading(level, context.getClickedPos())));
+			return InteractionResult.SUCCESS;
+		}
 		return InteractionResult.PASS;
 	}
 }

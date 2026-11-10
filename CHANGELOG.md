@@ -9,6 +9,13 @@
   - **New rules, all off unless `config/wildcatter.properties` turns them on** (existing reactors are unchanged): `reactorLtop` (the P-T
     curve, LTOP, the vessel failing over twice the curve), `reactorHeatupLimit` (HEAT-UP RATE over 55 C/h), `reactorRealHeatup` (no 80x
     heat-up), `reactorDeltaTTrips` (the full OT and OP delta-T trips).
+- **Reactor extensions 19b** (same; decisions 14-20):
+  - **Dry casks:** a cask loading station against the spent fuel pool moves its coolest fuel into welded canisters and sends them to
+    horizontal concrete storage modules on a pad, freeing the pool's racks.
+  - **Fresh-fuel inspection:** a new-fuel inspection stand marks assemblies INSPECTED; the assembly fixture straightens a bent grid.
+  - **Contamination:** a personnel monitor and a decontamination washer.
+  - **New rules, off unless turned on:** `reactorContamination` (coolant activity; contamination where primary water gets out, its dose,
+    and its pick-up by players), `fuelHandlingDamage` (a 1 % chance of a bent grid on a move, a leaking rod if loaded unseen).
 - **The sales line (14b):** a gas plant's pipeline gas goes on an off-map transmission line at a receipt meter station and comes off
   anywhere in the dimension at a delivery station, less 2 % kept as compressor fuel. Five true-size parts: meter building (2 kW,
   residential), filter separator, ultrasonic meter run, regulator skid, pipeline tap. Off-spec gas refused (rich, wet, biogas); 8 hours on

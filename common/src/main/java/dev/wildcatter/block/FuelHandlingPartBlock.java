@@ -93,6 +93,10 @@ public class FuelHandlingPartBlock extends BigPartBlock implements net.minecraft
 			player.sendOverlayMessage(Component.literal(machine.nextMode(level)));
 			return InteractionResult.SUCCESS;
 		}
+		if (entity instanceof SpentFuelPoolBlockEntity pool && player.isShiftKeyDown()) {
+			player.sendOverlayMessage(Component.literal(pool.toggleCaskMode()));
+			return InteractionResult.SUCCESS;
+		}
 		if (entity instanceof dev.wildcatter.energy.Inspectable machine) {
 			boolean shocked = entity instanceof UnitMotorBlockEntity motor && Shock.touch((ServerLevel) level, pos, player, motor.motor().voltage(), motor.isLive());
 			if (!shocked) {

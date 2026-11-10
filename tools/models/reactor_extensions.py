@@ -4,7 +4,11 @@ cell (the footprints match ContainmentPartBlock's):
 - personnel_airlock, 2 x 3 x 3: the steel barrel with its inner and outer doors;
 - hydrogen_recombiner, 1 x 2 x 1: a passive autocatalytic recombiner, a louvred box of catalyst plates;
 - containment_monitor, 1 x 2 x 1: the panel that reads the building;
-- pressurizer_relief_tank, 2 x 2 x 6: the horizontal tank on its saddles, its rupture disc on top."""
+- pressurizer_relief_tank, 2 x 2 x 6: the horizontal tank on its saddles, its rupture disc on top;
+- cask_loading_station, 3 x 4 x 4: the cask pit with a canister in it, the welding machine on its gantry, the drying skid (19b);
+- storage_module, 4 x 6 x 6: a horizontal concrete storage module, 1 m walls, its door and air vents (19b);
+- new_fuel_inspection_stand, 2 x 6 x 2: the stand's columns, its lights and camera (19b);
+- personnel_monitor, 1 x 3 x 1: the whole-body contamination monitor and shower booth (19b)."""
 import mlib
 import plantlib as g
 
@@ -67,7 +71,64 @@ RT.cylinder("y", (1.0, 4.5), 0.18, 1.85, 2.0, "blue", 10)                     # 
 RT.pipe([(1.0, 1.9, 1.5), (1.0, 2.0, 1.5)], 6, "steel")                       # the PORVs' discharge line in
 RT.collide((0.1, 0.0, 0.05), (1.9, 1.95, 5.95))
 
+# ---- 19b: the cask loading station ----------------------------------------------------------------------------------------------------
+CS = model("cask_loading_station", 3, 4, 4, "concrete")
+for x in range(3):
+	for z in range(4):
+		CS.box((x, 0.0, z), (x + 1, 0.3, z + 1), "concrete")                 # its slab
+for x, z in ((0, 0), (1, 0), (0, 1), (1, 1)):
+	CS.box((x, 0.3, z), (x + 1, 1.2, z + 1), "concrete")                     # the cask pit's walls
+CS.cylinder("y", (1.0, 1.0), 0.7, 0.3, 3.2, "steel", 16)                      # the canister in its transfer cask
+CS.cylinder("y", (1.0, 1.0), 0.75, 3.2, 3.4, "iron", 16)                      # its lid, being welded
+for x in (0.1, 1.8):
+	CS.box((x, 0.3, 0.2), (x + 0.15, 3.9, 0.35), "iron")                     # the gantry's legs
+	CS.box((x, 0.3, 1.65), (x + 0.15, 3.9, 1.8), "iron")
+CS.box((0.1, 3.75, 0.2), (1.95, 3.9, 1.8), "iron")                            # its beam
+CS.box((0.75, 3.4, 0.75), (1.25, 3.75, 1.25), "blue")                         # the welding head
+CS.box((2.1, 0.3, 0.2), (2.9, 1.6, 3.8), "blue")                              # the vacuum drying and helium skid
+CS.cylinder("y", (2.5, 2.9), 0.3, 1.6, 2.6, "galv", 10)                       # its helium bottles
+CS.box((0.2, 0.3, 2.3), (1.8, 1.4, 3.8), "grey")                              # the welder's power cabinet
+CS.collide((0.0, 0.0, 0.0), (3.0, 3.9, 4.0))
+
+# ---- 19b: the horizontal storage module ---------------------------------------------------------------------------------------------
+SM = model("storage_module", 4, 6, 6, "concrete")
+for x in range(4):
+	for y in range(6):
+		for z in range(6):
+			if x in (0, 3) or y in (0, 5) or z in (0, 5):
+				SM.box((x, y, z), (x + 1, y + 1, z + 1), "concrete")              # the 1 m walls, roof and floor
+SM.cylinder("z", (2.0, 2.6), 0.85, 1.0, 5.0, "steel", 16)                     # the canister on its rails, inside
+for z in (0.0, 5.99):
+	SM.box((1.0, 1.0, z), (3.0, 4.0, z + 0.01), "iron")                      # the door and the back plate
+for x in (0.3, 3.3):
+	SM.box((x, 5.0, 2.0), (x + 0.4, 5.25, 4.0), "grating")                   # the roof's air outlets
+SM.collide((0.0, 0.0, 0.0), (4.0, 6.0, 6.0))
+
+# ---- 19b: the new-fuel inspection stand ---------------------------------------------------------------------------------------------
+IS = model("new_fuel_inspection_stand", 2, 6, 2, "galv")
+for x, z in ((0.1, 0.1), (1.75, 0.1), (0.1, 1.75), (1.75, 1.75)):
+	for y in range(6):
+		IS.box((x, y, z), (x + 0.15, y + 1, z + 0.15), "galv")              # the columns
+for y in (0.0, 5.85):
+	for x in range(2):
+		IS.box((x, y, 0.1), (x + 1, y + 0.15, 1.9), "grating")              # the base and the top frame
+IS.box((0.85, 0.15, 0.85), (1.15, 4.2, 1.15), "steel")                        # the assembly standing in it
+for y in (1.0, 2.5, 4.0):
+	IS.box((0.25, y, 0.2), (0.45, y + 0.2, 0.4), "blue")                     # the cameras
+	IS.box((1.55, y, 1.6), (1.75, y + 0.2, 1.8), "grey")                     # the lights
+IS.collide((0.1, 0.0, 0.1), (1.9, 6.0, 1.9))
+
+# ---- 19b: the personnel monitor -------------------------------------------------------------------------------------------------------
+PM = model("personnel_monitor", 1, 3, 1, "grey")
+for y in range(3):
+	PM.box((0.05, y, 0.05), (0.95, y + (0.9 if y == 2 else 1), 0.25), "grey")   # the detector wall
+	PM.box((0.05, y, 0.25), (0.15, y + (0.9 if y == 2 else 1), 0.95), "grey")   # its side panels
+	PM.box((0.85, y, 0.25), (0.95, y + (0.9 if y == 2 else 1), 0.95), "grey")
+PM.box((0.15, 2.7, 0.25), (0.85, 2.9, 0.95), "grey")                          # the roof and its shower head
+PM.decal((0.25, 1.3, 0.26), (0.75, 1.8, 0.27), "controller", "south", "grey")  # the readout
+PM.collide((0.05, 0.0, 0.05), (0.95, 2.9, 0.95))
+
 M = EH
-EXTRA = [PA, PR, CM, RT]
+EXTRA = [PA, PR, CM, RT, CS, SM, IS, PM]
 for extra in EXTRA:
 	extra.export_args = {"blockstate": True, "item": True}

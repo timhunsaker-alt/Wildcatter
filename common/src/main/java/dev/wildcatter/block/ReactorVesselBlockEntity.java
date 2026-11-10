@@ -132,6 +132,7 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 	private final Reactor.Inputs in = new Reactor.Inputs();
 	private String parts = "NOT BUILT";
 	private double lastH2 = Double.NaN;
+	private boolean wasDamaged = true;   // a core damaged before this was loaded has already put its contamination down
 	private boolean pumpsStopped = true;
 
 	public ReactorVesselBlockEntity(BlockPos pos, BlockState state) {
@@ -229,6 +230,7 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 		in.cvcs = cvcs != null;
 		in.charging = cvcs != null ? cvcs.drive(level) : 0;
 		in.boricAcid = cvcs != null ? cvcs.boricAcid() : 0;
+		in.demineralizer = cvcs != null && in.charging > 0;   // the letdown through the resin (19b)
 		in.water = cvcs != null ? cvcs.water() : 0;
 		boolean permit = reactor.full() && reactor.pressure() >= Tuning.RCP_SEAL_MPA;
 		String why = !reactor.full() ? "the RCS is not full" : String.format("its seals need %.1f MPa", Tuning.RCP_SEAL_MPA);
@@ -265,6 +267,16 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 		}
 		reactor.step(in, dt);
 		double onward = tank != null ? tank.relieve(level, reactor.reliefKg(), reactor.reliefJ(), cvcs, dt) : reactor.reliefKg();
+		// 19b, with the contamination rule: the relief tank's disc and a damaged core put contamination round them
+		if (level instanceof net.minecraft.server.level.ServerLevel sl) {
+			if (tank != null && tank.takeBurst()) {
+				dev.wildcatter.radiation.Contamination.splash(sl, tank.getBlockPos(), 6, dev.wildcatter.radiation.Contamination.strength(reactor));
+			}
+			if (reactor.coreDamaged() && !wasDamaged) {
+				dev.wildcatter.radiation.Contamination.splash(sl, worldPosition, containment != null ? 16 : 32, 1.0);
+			}
+		}
+		wasDamaged = reactor.coreDamaged();
 		if (containment != null) {
 			containment.addSteam(onward + reactor.locaKg());
 			containment.addHydrogen(Double.isNaN(lastH2) ? 0 : reactor.h2() - lastH2);
@@ -305,7 +317,10 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 					reactor.tavg(), reactor.pressure());
 		}
 		boolean rcca = stack.is(WildcatterItems.RCCA);
-		boolean ok = rcca ? reactor.loadRcca() : reactor.loadAssembly(0);
+		if (!rcca && dev.wildcatter.item.FuelAssemblyTags.inspected(stack) && dev.wildcatter.item.FuelAssemblyTags.bent(stack)) {
+			return "Reactor vessel: its inspection found a bent grid: straighten it at the assembly fixture first";
+		}
+		boolean ok = rcca ? reactor.loadRcca() : reactor.loadAssembly(0, dev.wildcatter.item.FuelAssemblyTags.bent(stack));
 		if (!ok) {
 			return rcca ? "Reactor vessel: all 5 RCCAs are in" : "Reactor vessel: the core is full (9 assemblies)";
 		}
@@ -320,10 +335,14 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 			return "Reactor vessel: it opens only cold, depressurized and with its pumps stopped";
 		}
 		ItemStack out;
+		boolean bentGrid = reactor.lastBent();
 		if (reactor.unloadRcca()) {
 			out = new ItemStack(WildcatterItems.RCCA);
 		} else if (reactor.unloadFreshAssembly()) {
 			out = new ItemStack(WildcatterBlocks.FUEL_ASSEMBLY);
+			if (bentGrid) {
+				dev.wildcatter.item.FuelAssemblyTags.markBent(out);
+			}
 		} else {
 			return reactor.assemblies() > 0 ? "Reactor vessel: irradiated fuel waits for the refuelling machine (8c)" : "Reactor vessel: empty";
 		}

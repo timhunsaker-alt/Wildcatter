@@ -875,6 +875,35 @@ public final class Tuning {
 	public static final double OT_TPRIME_C = TAVG_FULL_LOAD;       // T' and T'', the full-power Tavg
 	public static final double OT_PPRIME_MPA = 15.51;              // P'
 
+	// ---- Reactor extensions 19b: casks, contamination, inspection (docs/multiblocks/reactor-extensions.md, decided 2026-11-10) -----
+	public static final double ACTIVITY_LIMIT = 1.0;               // µCi/g dose-equivalent I-131 (NUREG-1431 LCO 3.4.16)
+	public static final double CORROSION_UCI_G_S = 3e-7;           // at full power: about 0.02 µCi/g with the demineralizer (proposed)
+	public static final double LEAKER_UCI_G_S = 3e-6;              // a leaking rod at full power: about 0.2 µCi/g each (proposed)
+	public static final double LEAKER_SPIKE = 0.5;                 // the iodine spike after a trip, of a leaker's full-power source (proposed)
+	public static final double IODINE_131_LAMBDA = Math.log(2) / (8.02 * 86400);
+	public static final double DEMIN_EFFICIENCY = 0.9;             // a decontamination factor of 10 across the resin (unverified)
+	public static final double CONTAMINATION_SV_H_AT_1M = 1e-3;    // a fully contaminated block, at 1 m (proposed)
+	public static final double CONTAMINATION_HALF_LIFE_TICKS = 30 * 24000.0;   // 30 game days (proposed; Co-60 is 5.3 years)
+	public static final double CONTAMINATION_PICKUP = 0.02;        // of a block's contamination a player picks up a second on it (proposed)
+	public static final double SKIN_SV_H = 2e-3;                   // a fully contaminated player, on their skin and clothes (proposed)
+	public static final double WASHER_CLEANS = 0.90;               // a washer's pass (proposed)
+	public static final double WASHER_WATTS = 2_000.0;
+	public static final double WASHER_REACH = 4.0;                 // m of hose to a live receptacle (proposed)
+	public static final double PERSONNEL_MONITOR_WATTS = 1_500.0;  // the monitor and its shower's heater (proposed)
+	public static final int CANISTER_ASSEMBLIES = 12;              // (proposed; real 24-37 PWR)
+	public static final double CANISTER_MAX_W = 12_000.0;          // (proposed)
+	public static final double CANISTER_MAX_W_EACH = 1_500.0;      // (proposed)
+	public static final double CASK_DRY_SECONDS = 20 * 60.0;       // drain, vacuum dry, backfill with helium (proposed)
+	public static final double CASK_WELD_SECONDS = 10 * 60.0;
+	public static final double CASK_TRANSFER_SECONDS = 10 * 60.0;
+	public static final double CASK_LINK_BLOCKS = 64.0;
+	public static final double CASK_STATION_WATTS = 50_000.0;
+	public static final double MODULE_WALL_BLOCKS = 1.0;           // the module's 1 m of concrete, counted as one solid block
+	public static final double INSPECTION_STAND_WATTS = 5_000.0;
+	public static final double INSPECTION_SECONDS = 60.0;          // a visual and camera pass (proposed)
+	public static final double BENT_GRID_CHANCE = 0.01;            // a move by hopper or crane (proposed)
+	public static final double GRID_REPAIR_SECONDS = 10 * 60.0;
+
 	// ---- The natural-draft cooling tower (docs/multiblocks/natural-draft-tower.md, approved 2026-11-01) --------------------------
 	public static final double TOWER_SHELL_BASE_Y = 8.0;           // over the basin floor; the raker columns below
 	public static final double TOWER_THROAT_Y = 62.0;
