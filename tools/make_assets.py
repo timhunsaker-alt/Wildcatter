@@ -2891,6 +2891,68 @@ save_json(f"{ASSETS}/lang/en_us.json", lang)
 # the convention tag another mod's crops can read; Wildcatter itself gives the bags no use on crops (fertilizer.md)
 save_json(f"{ROOT}/data/c/tags/item/fertilizers.json", {"replace": False, "values": [f"{ns}:tsp_bag", f"{ns}:dap_bag", f"{ns}:mop_bag"]})
 
+# ---- Phase 19a: containment and protection (docs/multiblocks/reactor-extensions.md) --------------------------------------
+# The big parts' blockstates, models and shapes come from tools/models/reactor_extensions.py; the concrete and the igniter are drawn
+# in the materials already in art/final/mat (no new textures).
+P19A_PARTS = ("equipment_hatch", "personnel_airlock", "hydrogen_recombiner", "containment_monitor", "pressurizer_relief_tank")
+for name in P19A_PARTS:
+	big_part_loot(name)
+for name in ("containment_concrete", "hydrogen_igniter"):
+	big_part_loot_simple(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in P19A_PARTS + ("containment_concrete", "hydrogen_igniter")]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+block_model("containment_concrete", "minecraft:block/cube_all", {"all": f"{ns}:block/mat/mat_concrete"})
+save_json(f"{ASSETS}/blockstates/containment_concrete.json", {"variants": {"": {"model": f"{ns}:block/containment_concrete"}}})
+save_json(f"{ASSETS}/items/containment_concrete.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/containment_concrete"}})
+for lit, glow in (("", f"{ns}:block/mat/mat_galvanized"), ("_lit", "minecraft:block/orange_concrete")):
+	save_json(f"{ASSETS}/models/block/hydrogen_igniter{lit}.json", {"parent": "minecraft:block/block", "textures": {"body": f"{ns}:block/mat/mat_galvanized", "tip": glow,
+		"particle": f"{ns}:block/mat/mat_galvanized"}, "elements": [
+		{"from": [5, 5, 5], "to": [11, 11, 11], "faces": {f: {"texture": "#body"} for f in ("north", "south", "east", "west", "up", "down")}},
+		{"from": [7, 7, 11], "to": [9, 9, 14], "faces": {f: {"texture": "#tip"} for f in ("north", "south", "east", "west", "up", "down")}}]})
+save_json(f"{ASSETS}/blockstates/hydrogen_igniter.json", {"variants": {"lit=false": {"model": f"{ns}:block/hydrogen_igniter"}, "lit=true": {"model": f"{ns}:block/hydrogen_igniter_lit"}}})
+save_json(f"{ASSETS}/items/hydrogen_igniter.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/hydrogen_igniter"}})
+shaped("containment_concrete", ["CCC", "CSC", "CCC"], {"C": "minecraft:gray_concrete", "S": f"{ns}:steel_ingot"}, "containment_concrete", 8)
+shaped("hydrogen_igniter", [" R ", "SCS"], {"R": "minecraft:redstone", "S": f"{ns}:steel_ingot", "C": "minecraft:copper_ingot"}, "hydrogen_igniter", 2)
+shaped("equipment_hatch", ["SSS", "SIS", "SSS"], {"S": f"{ns}:steel_ingot", "I": "minecraft:iron_block"}, "equipment_hatch")
+shaped("personnel_airlock", ["SDS", "S S", "SDS"], {"S": f"{ns}:steel_ingot", "D": "minecraft:iron_door"}, "personnel_airlock")
+shaped("hydrogen_recombiner", ["SBS", "SGS", "SBS"], {"S": f"{ns}:steel_ingot", "B": "minecraft:iron_bars", "G": "minecraft:gold_ingot"}, "hydrogen_recombiner")
+shaped("containment_monitor", ["GCG", "SRS", "SSS"], {"G": "minecraft:glass_pane", "C": "minecraft:comparator", "R": "minecraft:redstone", "S": f"{ns}:steel_ingot"}, "containment_monitor")
+shaped("pressurizer_relief_tank", ["SPS", "SBS", "SPS"], {"S": f"{ns}:steel_ingot", "P": f"{ns}:gas_line", "B": "minecraft:bucket"}, "pressurizer_relief_tank")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({f"block.{ns}.containment_concrete": "Containment Concrete (1 m, steel-lined)", f"block.{ns}.hydrogen_igniter": "Hydrogen Igniter (glow plug)",
+	f"block.{ns}.equipment_hatch": "Equipment Hatch", f"block.{ns}.personnel_airlock": "Personnel Airlock", f"block.{ns}.hydrogen_recombiner": "Hydrogen Recombiner (passive)",
+	f"block.{ns}.containment_monitor": "Containment Monitor", f"block.{ns}.pressurizer_relief_tank": "Pressurizer Relief Tank (30 m3)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+# ---- Phase 19b: dry casks, contamination, fresh-fuel inspection (docs/multiblocks/reactor-extensions.md) --------------------------
+P19B_PARTS = ("cask_loading_station", "storage_module", "new_fuel_inspection_stand", "personnel_monitor")
+for name in P19B_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in P19B_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("cask_loading_station", ["SHS", "BWB", "SSS"], {"S": f"{ns}:steel_ingot", "H": "minecraft:hopper", "B": "minecraft:iron_block", "W": "minecraft:anvil"}, "cask_loading_station")
+shaped("storage_module", ["CCC", "C C", "CCC"], {"C": f"{ns}:containment_concrete"}, "storage_module")
+shaped("new_fuel_inspection_stand", ["SGS", "S S", "SLS"], {"S": f"{ns}:steel_ingot", "G": "minecraft:glass_pane", "L": "minecraft:redstone_lamp"}, "new_fuel_inspection_stand")
+shaped("personnel_monitor", ["SGS", "SRS", "SBS"], {"S": f"{ns}:steel_ingot", "G": "minecraft:glass_pane", "R": "minecraft:comparator", "B": "minecraft:bucket"}, "personnel_monitor")
+shaped("dry_storage_canister", ["SSS", "S S", "SSS"], {"S": f"{ns}:steel_ingot"}, "dry_storage_canister")
+shaped("decon_washer", [" P ", "SXS", " B "], {"P": f"{ns}:pipe", "S": f"{ns}:steel_ingot", "X": "minecraft:piston", "B": "minecraft:bucket"}, "decon_washer")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in {"dry_storage_canister": ("Dry Storage Canister (empty, 12 assemblies)", (150, 156, 162)),
+		"decon_washer": ("Decontamination Washer (2 kW)", (210, 180, 40))}.items():
+	tex(f"{item}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}_placeholder"}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.cask_loading_station": "Cask Loading Station", f"block.{ns}.storage_module": "Dry Cask Storage Module (horizontal)",
+	f"block.{ns}.new_fuel_inspection_stand": "New-Fuel Inspection Stand", f"block.{ns}.personnel_monitor": "Personnel Contamination Monitor"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

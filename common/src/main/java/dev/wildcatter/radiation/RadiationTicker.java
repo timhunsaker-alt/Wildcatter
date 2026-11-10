@@ -60,7 +60,8 @@ public final class RadiationTicker {
 				continue;
 			}
 			ServerLevel level = player.level();
-			double rate = rateAt(level, player.getEyePosition(), server.getTickCount() % 200 == 0 ? player : null);
+			Contamination.pickUp(level, player);   // 19b, with its rule
+			double rate = rateAt(level, player.getEyePosition(), server.getTickCount() % 200 == 0 ? player : null) + Contamination.skinRate(level, player);
 			RATES.put(player.getUUID(), rate);
 			DoseData data = DoseData.get(level);
 			double[] dose = data.of(player.getStringUUID());
@@ -104,6 +105,18 @@ public final class RadiationTicker {
 				rate += through(level, new Vec3(c[0], c[1], c[2]), at, Radiation.assemblyAt1m(a.watts()), Set.of());
 			}
 		}
+		// 19b: dry cask storage modules, through their 1 m concrete walls, and contamination (with its rule)
+		for (BlockPos p : Set.copyOf(dev.wildcatter.block.StorageModuleBlockEntity.modules(level))) {
+			if (!(level.getBlockEntity(p) instanceof dev.wildcatter.block.StorageModuleBlockEntity module) || module.records().isEmpty()) {
+				continue;
+			}
+			double at1m = 0;
+			for (SpentFuel.Assembly a : module.records()) {
+				at1m += Radiation.assemblyAt1m(a.watts());
+			}
+			rate += through(level, module.centre(), at, at1m * Math.pow(Tuning.SOLID_BLOCK_SHIELD, Tuning.MODULE_WALL_BLOCKS), Set.copyOf(BigParts.cellsAt(level, p)));
+		}
+		rate += Contamination.rate(level, at);
 		if (player != null) {
 			double cps = dev.wildcatter.item.ScintillometerItem.read(level, at.x, at.y, at.z).cps();
 			ORE.put(player.getUUID(), cps * Tuning.ORE_USV_H_PER_CPS * 1e-6);

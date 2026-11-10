@@ -125,6 +125,7 @@ public class ReactorPartBlock extends BigPartBlock implements net.minecraft.worl
 		if (player.isShiftKeyDown()) {
 			String said = switch (entity) {
 				case ReactorVesselBlockEntity vessel -> vessel.unload(player);
+				case ReactorConsoleBlockEntity console when dev.wildcatter.fluid.ReactorRules.ltop && lowerFace(pos, state, hit) -> console.toggleLtop(level);
 				case ReactorConsoleBlockEntity console -> console.nextSetpoint(level);
 				case CvcsBlockEntity cvcs -> cvcs.nextTarget(level);
 				case ReactorCoolantPumpBlockEntity pump -> pump.toggle();
@@ -142,6 +143,40 @@ public class ReactorPartBlock extends BigPartBlock implements net.minecraft.worl
 			}
 		}
 		return InteractionResult.SUCCESS;
+	}
+
+	/**
+	 * 19b, with the contamination rule: a primary part broken with water in the RCS puts the coolant's contamination round it (the vessel's
+	 * own, or the nearest vessel's within 16 m).
+	 */
+	@Override
+	public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+		if (dev.wildcatter.fluid.ReactorRules.contamination && level instanceof ServerLevel sl && switch (part) {
+			case REACTOR_VESSEL, STEAM_GENERATOR, REACTOR_COOLANT_PUMP, PRESSURIZER, CVCS_SKID -> true;
+			default -> false;
+		}) {
+			BlockPos main = main(pos, state);
+			ReactorVesselBlockEntity vessel = null;
+			double best = 16 * 16;
+			for (BlockPos v : java.util.Set.copyOf(ReactorVesselBlockEntity.vessels(level))) {
+				if (v.distSqr(main) <= best && level.getBlockEntity(v) instanceof ReactorVesselBlockEntity rv) {
+					vessel = rv;
+					best = v.distSqr(main);
+				}
+			}
+			if (level.getBlockEntity(main) instanceof ReactorVesselBlockEntity self) {
+				vessel = self;
+			}
+			if (vessel != null && vessel.reactor().waterKg() > 1) {
+				dev.wildcatter.radiation.Contamination.splash(sl, main, 8, dev.wildcatter.radiation.Contamination.strength(vessel.reactor()));
+			}
+		}
+		return super.playerWillDestroy(level, pos, state, player);
+	}
+
+	/** The lower half of the console's bottom row: its LTOP ARMED switch (19a). */
+	private static boolean lowerFace(BlockPos pos, BlockState state, BlockHitResult hit) {
+		return pos.getY() == main(pos, state).getY() && hit.getLocation().y - pos.getY() < 0.5;
 	}
 
 	/** A hopper on top of the CVCS works its boric acid bin. */

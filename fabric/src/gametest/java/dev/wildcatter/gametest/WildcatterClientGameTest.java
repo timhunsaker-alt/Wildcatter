@@ -299,6 +299,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("ringTravel")) {
 				ringTravel(context, server);
 			}
+			if (only("reactorContainment")) {
+				new ReactorClientScenes(context, server, y, -9600).containment();
+			}
 			fieldManual(server);
 		}
 	}

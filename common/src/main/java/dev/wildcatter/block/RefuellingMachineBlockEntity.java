@@ -154,6 +154,10 @@ public class RefuellingMachineBlockEntity extends UnitMotorBlockEntity implement
 			unit = "HELD: NO NEW FUEL: put fuel assemblies in its hopper";
 			return;
 		}
+		if (move == FRESH && dev.wildcatter.item.FuelAssemblyTags.inspected(slots.get(0)) && dev.wildcatter.item.FuelAssemblyTags.bent(slots.get(0))) {
+			unit = "HELD: BENT GRID: the inspection found one; straighten it at the assembly fixture";
+			return;
+		}
 		double strength = drive(level);
 		if (strength <= 0) {
 			unit = "starting: " + describe();
@@ -169,8 +173,11 @@ public class RefuellingMachineBlockEntity extends UnitMotorBlockEntity implement
 				case TO_POOL -> pool.store(level, r.removeAssembly(r.mostBurned()));
 				case FRESH -> {
 					double a = dev.wildcatter.WildcatterComponents.assay(slots.get(0));
+					// 19b, with the fuel handling damage rule: the crane's move is its one chance of a bent grid, unseen unless inspected
+					dev.wildcatter.item.FuelAssemblyTags.handle(slots.get(0), level.getRandom());
+					boolean bentGrid = dev.wildcatter.item.FuelAssemblyTags.bent(slots.get(0));
 					slots.get(0).shrink(1);
-					r.loadAssembly(0, a);
+					r.loadAssembly(0, a, bentGrid);
 				}
 				default -> {
 				}

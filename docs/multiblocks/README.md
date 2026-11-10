@@ -66,7 +66,7 @@ not a go-ahead to build: that waits for the roadmap phase (ROADMAP.md). Nothing 
 | [zirconium-extensions.md](zirconium-extensions.md) | 17c (DRAFT) | new: fumed silica burner, Pidgeon furnace, chromate kiln |
 | [fertilizer.md](fertilizer.md) | 18a (DRAFT) | new: phosphate mill, phosphoric reactor, tilting pan filter, acid evaporator, granulation plant, potash dissolver, vacuum crystallizer, potash dryer |
 | [uranium-from-phosphate.md](uranium-from-phosphate.md) | 18b (DRAFT) | new: acid pretreatment, DEPA-TOPO circuit |
-| [reactor-extensions.md](reactor-extensions.md) | 19a, 19b, 19d (DRAFT) | new: containment concrete, equipment hatch, personnel airlock, hydrogen recombiner, hydrogen igniter, containment monitor, pressurizer relief tank, cask loading station, storage module, personnel monitor, new-fuel inspection stand |
+| [reactor-extensions.md](reactor-extensions.md) | 19a, 19b BUILT (2026-11-10, not approved); 19d DRAFT | new: containment concrete, equipment hatch, personnel airlock, hydrogen recombiner, hydrogen igniter, containment monitor, pressurizer relief tank, cask loading station, storage module, personnel monitor, new-fuel inspection stand |
 | [fuel-fabrication-extensions.md](fuel-fabrication-extensions.md) | 19c (DRAFT) | new: HF recovery condenser, pellet inspection, rod inspection, IFBA coater, scrap oxidizer |
 | [chlor-alkali-plant.md](chlor-alkali-plant.md) | 20a (DRAFT) | new: brine saturator, brine treatment, membrane cell room, rectifier_mv, chlorine train, caustic evaporator, HCl synthesis unit, brine wellhead |
 | [titanium-pigment.md](titanium-pigment.md) | 20b (DRAFT) | new: Ti chlorinator, TiCl4 purification, TiCl4 oxidiser, VPSA oxygen, pigment finishing |

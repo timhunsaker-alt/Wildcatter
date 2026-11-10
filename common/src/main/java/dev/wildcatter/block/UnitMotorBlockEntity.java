@@ -171,6 +171,9 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "acid_pretreatment" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ACID_PRETREATMENT_WATTS);
 				case "depa_topo_circuit" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.DEPA_TOPO_WATTS);
 				case "meter_building" -> new Motor(false, Voltage.LOW, Tuning.METER_BUILDING_WATTS);   // residential, single-phase
+				case "personnel_monitor" -> new Motor(false, Voltage.LOW, Tuning.PERSONNEL_MONITOR_WATTS);   // residential, single-phase (19b)
+				case "cask_loading_station" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CASK_STATION_WATTS);
+				case "new_fuel_inspection_stand" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.INSPECTION_STAND_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -307,6 +310,9 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "acid_pretreatment" -> "clarifier and blower";
 			case "depa_topo_circuit" -> "mixers";
 			case "meter_building" -> "heaters, chromatograph and RTU charger";
+			case "personnel_monitor" -> "detectors and shower heater";
+			case "cask_loading_station" -> "welder, vacuum pump and helium skid";
+			case "new_fuel_inspection_stand" -> "lights and camera";
 			default -> kind();
 		};
 	}

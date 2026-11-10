@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SGS",
+    "S S",
+    "SLS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "G": "minecraft:glass_pane",
+    "L": "minecraft:redstone_lamp"
+  },
+  "result": {
+    "id": "wildcatter:new_fuel_inspection_stand",
+    "count": 1
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " P ",
+    "SXS",
+    " B "
+  ],
+  "key": {
+    "P": "wildcatter:pipe",
+    "S": "wildcatter:steel_ingot",
+    "X": "minecraft:piston",
+    "B": "minecraft:bucket"
+  },
+  "result": {
+    "id": "wildcatter:decon_washer",
+    "count": 1
+  }
+}

@@ -131,6 +131,8 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 	private final Reactor reactor = new Reactor();
 	private final Reactor.Inputs in = new Reactor.Inputs();
 	private String parts = "NOT BUILT";
+	private double lastH2 = Double.NaN;
+	private boolean wasDamaged = true;   // a core damaged before this was loaded has already put its contamination down
 	private boolean pumpsStopped = true;
 
 	public ReactorVesselBlockEntity(BlockPos pos, BlockState state) {
@@ -228,6 +230,7 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 		in.cvcs = cvcs != null;
 		in.charging = cvcs != null ? cvcs.drive(level) : 0;
 		in.boricAcid = cvcs != null ? cvcs.boricAcid() : 0;
+		in.demineralizer = cvcs != null && in.charging > 0;   // the letdown through the resin (19b)
 		in.water = cvcs != null ? cvcs.water() : 0;
 		boolean permit = reactor.full() && reactor.pressure() >= Tuning.RCP_SEAL_MPA;
 		String why = !reactor.full() ? "the RCS is not full" : String.format("its seals need %.1f MPa", Tuning.RCP_SEAL_MPA);
@@ -255,7 +258,30 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 		for (SteamGeneratorBlockEntity sg : sgs) {
 			in.turbineTripped |= sg.turbineTripped(level.getGameTime());
 		}
+		// 19a: a closed containment round it takes its hydrogen and steam; a relief tank against it or the pressurizer, the PORVs'
+		ContainmentMonitorBlockEntity containment = ContainmentMonitorBlockEntity.round(level, worldPosition);
+		in.contained = containment != null;
+		ReliefTankBlockEntity tank = Touching.find(level, worldPosition, ReliefTankBlockEntity.class, t -> true);
+		if (tank == null && pzr != null) {
+			tank = Touching.find(level, pzr.getBlockPos(), ReliefTankBlockEntity.class, t -> true);
+		}
 		reactor.step(in, dt);
+		double onward = tank != null ? tank.relieve(level, reactor.reliefKg(), reactor.reliefJ(), cvcs, dt) : reactor.reliefKg();
+		// 19b, with the contamination rule: the relief tank's disc and a damaged core put contamination round them
+		if (level instanceof net.minecraft.server.level.ServerLevel sl) {
+			if (tank != null && tank.takeBurst()) {
+				dev.wildcatter.radiation.Contamination.splash(sl, tank.getBlockPos(), 6, dev.wildcatter.radiation.Contamination.strength(reactor));
+			}
+			if (reactor.coreDamaged() && !wasDamaged) {
+				dev.wildcatter.radiation.Contamination.splash(sl, worldPosition, containment != null ? 16 : 32, 1.0);
+			}
+		}
+		wasDamaged = reactor.coreDamaged();
+		if (containment != null) {
+			containment.addSteam(onward + reactor.locaKg());
+			containment.addHydrogen(Double.isNaN(lastH2) ? 0 : reactor.h2() - lastH2);
+		}
+		lastH2 = reactor.h2();
 
 		if (cvcs != null) {
 			cvcs.use(reactor.boricAcidUsed(), reactor.waterUsed());
@@ -291,7 +317,10 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 					reactor.tavg(), reactor.pressure());
 		}
 		boolean rcca = stack.is(WildcatterItems.RCCA);
-		boolean ok = rcca ? reactor.loadRcca() : reactor.loadAssembly(0, dev.wildcatter.WildcatterComponents.assay(stack));
+		if (!rcca && dev.wildcatter.item.FuelAssemblyTags.inspected(stack) && dev.wildcatter.item.FuelAssemblyTags.bent(stack)) {
+			return "Reactor vessel: its inspection found a bent grid: straighten it at the assembly fixture first";
+		}
+		boolean ok = rcca ? reactor.loadRcca() : reactor.loadAssembly(0, dev.wildcatter.WildcatterComponents.assay(stack), dev.wildcatter.item.FuelAssemblyTags.bent(stack));
 		if (!ok) {
 			return rcca ? "Reactor vessel: all 5 RCCAs are in" : "Reactor vessel: the core is full (9 assemblies)";
 		}
@@ -306,12 +335,16 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 			return "Reactor vessel: it opens only cold, depressurized and with its pumps stopped";
 		}
 		ItemStack out;
+		boolean bentGrid = reactor.lastBent();
 		if (reactor.unloadRcca()) {
 			out = new ItemStack(WildcatterItems.RCCA);
 		} else if (reactor.assemblies() > 0 && reactor.burnup(reactor.assemblies() - 1) <= 0) {
 			double a = reactor.lastAssay();
 			reactor.unloadFreshAssembly();
 			out = dev.wildcatter.WildcatterComponents.withAssay(new ItemStack(WildcatterBlocks.FUEL_ASSEMBLY), a);
+			if (bentGrid) {
+				dev.wildcatter.item.FuelAssemblyTags.markBent(out);
+			}
 		} else {
 			return reactor.assemblies() > 0 ? "Reactor vessel: irradiated fuel waits for the refuelling machine (8c)" : "Reactor vessel: empty";
 		}
@@ -335,7 +368,7 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 	@Override
 	public Component inspect() {
 		Reactor r = reactor;
-		String state = r.exploded() ? "HYDROGEN EXPLOSION; CORE DAMAGE" : r.coreDamaged() ? "CORE DAMAGE" : !parts.isEmpty() ? parts
+		String state = r.exploded() ? "HYDROGEN EXPLOSION; CORE DAMAGE" : r.coreDamaged() ? "CORE DAMAGE" : r.vesselFailed() ? "VESSEL FAILED" : !parts.isEmpty() ? parts
 				: r.tripped() ? "TRIPPED: " + r.trip() : r.power() < 1e-4 ? "SUBCRITICAL" : "CRITICAL";
 		String power = r.power() < 1e-4 ? String.format("source range %.0f cps", r.power() * 1e10) : String.format("power %.2f %% (%.1f MW)", r.power() * 100,
 				r.power() * Reactor.ratedWatts() / 1e6);
@@ -346,7 +379,38 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 				state, power, r.startupRate(), setpoint, r.held().isEmpty() ? "" : ", HELD: " + r.held(), r.shutdownBank(), r.bankD(), Tuning.ROD_STEPS, r.ppm(),
 				r.xenonPcm(), r.decayHeat() * 100, r.decayHeat() * Reactor.ratedWatts() / 1e6, r.tavg(), r.thot(), r.tcold(), r.fuelC(), r.pressure(), r.waterKg() / 1000,
 				r.rhrHeat() / 1e6, r.h2(), r.assemblies(), Tuning.CORE_ASSEMBLIES, r.rccas(), Tuning.RCCAS,
-				r.assemblies() > 0 ? r.burnup(0) : 0));
+				r.assemblies() > 0 ? r.burnup(0) : 0) + limits());
+	}
+
+	/** 19a's readout, with its rules on (empty otherwise, so a reactor's readout is as before Phase 19). */
+	private String limits() {
+		Reactor r = reactor;
+		StringBuilder out = new StringBuilder();
+		String alarms = r.alarms();
+		if (!alarms.isEmpty()) {
+			out.append("; ALARMS: ").append(alarms);
+		}
+		if (dev.wildcatter.fluid.ReactorRules.heatupLimit) {
+			out.append(String.format("; heat-up %.0f C/h (plant time, limit %.0f), fatigue count %d", r.heatupRate(), Tuning.HEATUP_LIMIT_C_PER_H, r.fatigue()));
+		}
+		if (dev.wildcatter.fluid.ReactorRules.ltop) {
+			out.append(String.format("; LTOP %s; P-T limit %s at %.0f C, %d violations", r.ltopArmed() ? "ARMED" : "not armed",
+					Double.isInfinite(Reactor.ptLimit(r.tcold())) ? "none" : String.format("%.1f MPa", Reactor.ptLimit(r.tcold())), r.tcold(), r.ptViolations()));
+		}
+		if (dev.wildcatter.fluid.ReactorRules.deltaTTrips && !Double.isNaN(r.otSetpoint())) {
+			out.append(String.format("; delta-T %.1f C (OT setpoint %.1f, OP %.1f)", r.deltaT(), r.otSetpoint(), r.opSetpoint()));
+		}
+		return out.toString();
+	}
+
+	/** The console's LTOP ARMED switch (19a, with its rule); null without the rule. */
+	public String toggleLtop() {
+		if (!dev.wildcatter.fluid.ReactorRules.ltop) {
+			return null;
+		}
+		boolean armed = reactor.toggleLtop();
+		setChanged();
+		return String.format("Reactor console: LTOP %s (below %.0f C the PORVs lift at %.1f MPa)", armed ? "ARMED" : "NOT ARMED", Tuning.LTOP_ENABLE_C, Tuning.LTOP_MPA);
 	}
 
 	@Override

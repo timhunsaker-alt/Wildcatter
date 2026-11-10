@@ -115,6 +115,11 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> B4C_PELLETS_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("b4c_pellets"));
 	public static final Item B4C_PELLETS = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(64).setId(B4C_PELLETS_KEY),
 			"1 kg tray of boron carbide pellets, 70 % dense", "9 trays to an RCCA's 24 rodlets");
+	public static final ResourceKey<Item> DRY_STORAGE_CANISTER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("dry_storage_canister"));
+	public static final Item DRY_STORAGE_CANISTER = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(1).setId(DRY_STORAGE_CANISTER_KEY),
+			"An empty welded steel canister for dry storage: 12 assemblies, at most 12 kW", "for the cask loading station's hopper");
+	public static final ResourceKey<Item> DECON_WASHER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("decon_washer"));
+	public static final Item DECON_WASHER = new dev.wildcatter.item.DeconWasherItem(new Item.Properties().stacksTo(1).setId(DECON_WASHER_KEY));
 	public static final ResourceKey<Item> RCCA_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("rcca"));
 	public static final Item RCCA = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(1).setId(RCCA_KEY),
 			"Rod cluster control assembly: 24 B4C rodlets on a spider", "5 to the reactor's core; load it by right-click on the cold vessel");
@@ -409,6 +414,8 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, B4C_PELLETS_KEY, B4C_PELLETS);
 		Registry.register(BuiltInRegistries.ITEM, RCCA_KEY, RCCA);
 		Registry.register(BuiltInRegistries.ITEM, DOSIMETER_KEY, DOSIMETER);
+		Registry.register(BuiltInRegistries.ITEM, DRY_STORAGE_CANISTER_KEY, DRY_STORAGE_CANISTER);
+		Registry.register(BuiltInRegistries.ITEM, DECON_WASHER_KEY, DECON_WASHER);
 		Registry.register(BuiltInRegistries.ITEM, EMPTY_BULK_BAG_KEY, EMPTY_BULK_BAG);
 		Registry.register(BuiltInRegistries.ITEM, ALUMINA_BAG_KEY, ALUMINA_BAG);
 		Registry.register(BuiltInRegistries.ITEM, HYDRATE_BAG_KEY, HYDRATE_BAG);

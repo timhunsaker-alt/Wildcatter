@@ -881,6 +881,77 @@ public final class Tuning {
 	public static final double ALARM_RATE_SV_H = 1e-3;
 	public static final double ALARM_DOSE_SV = 0.020;              // the occupational year (ICRP)
 
+	// ---- Reactor extensions 19a: containment and protection (docs/multiblocks/reactor-extensions.md, decided 2026-11-10) ----------
+	public static final double CONTAINMENT_MAX_M3 = 60_000.0;      // the largest free volume the monitor fills (proposed)
+	public static final int CONTAINMENT_MAX_CELLS = 150_000;       // cells it may pass through, air and parts, before it calls the building open
+	public static final double CONTAINMENT_LOWER_M3 = 5_000.0;     // the lower compartment, 8d's notional building air
+	public static final double CONTAINMENT_MIX_S = 3_600.0;        // the lower compartment mixes into the dome over an hour (proposed)
+	public static final double CONTAINMENT_DESIGN_MPA = 0.40;      // gauge, a large dry containment (textbook, unverified)
+	public static final double CONTAINMENT_FAIL_FACTOR = 2.5;      // the hatch fails at 2.5 times design (proposed)
+	public static final double CONTAINMENT_CONDENSE_S = 1_800.0;   // steam condensing on the liner and structures (proposed)
+	public static final int CONTAINMENT_FILL_TICKS = 200;          // the monitor fills the building every 10 s
+	public static final double H2_FLAMMABLE = 0.04;                // the 4 % lower flammability limit
+	public static final double PAR_START = 0.01;                   // a PAR starts itself above 1 % (proposed, unverified)
+	public static final double PAR_KG_H = 1.5;                     // at 4 % (proposed, unverified)
+	public static final double IGNITER_WATTS = 160.0;              // a glow plug on the vital service (unverified)
+	public static final double IGNITER_BURN_TO = 0.005;            // what a deliberate lean burn leaves (proposed)
+	public static final double PT_LOW_MPA = 3.4;                   // the P-T curve, simplified (proposed): 3.4 MPa up to 100 C...
+	public static final double PT_LOW_C = 100.0;
+	public static final double PT_HIGH_MPA = 15.5;                 // ...rising in a straight line to 15.5 MPa at 290 C
+	public static final double PT_HIGH_C = 290.0;
+	public static final double PT_FAIL_FACTOR = 2.0;               // over twice the curve the vessel fails (proposed)
+	public static final double LTOP_ENABLE_C = 150.0;              // (proposed; NUREG-1431 LCO 3.4.12, unverified)
+	public static final double LTOP_MPA = 3.2;
+	public static final double LTOP_HEATER_SHARE = 0.9;            // with the rule on, the heaters hold the pressure to 90 % of the curve
+	public static final double PORV_KGS = 26.0;                    // a PORV's capacity, about 210,000 lb/h (unverified)
+	public static final double LOCA_KGS = 10 * PORV_KGS;           // a failed vessel empties at the PORVs' rate times ten (proposed)
+	public static final double HEATUP_LIMIT_C_PER_H = 55.0;        // 100 F an hour (NUREG-1431, unverified)
+	public static final double HEATUP_FILTER_S = 30.0;             // the console averages the rate over half a minute
+	public static final double RELIEF_TANK_KG = 30_000.0;          // 30 m3 of water (proposed)
+	public static final double RELIEF_DISC_MPA = 0.70;             // (unverified)
+	public static final double RELIEF_SPRAY_KGS = 10.0;            // the spray off the CVCS's makeup water (proposed)
+	public static final double OT_DT0 = 33.0;                      // the full-power core delta-T, C
+	public static final double OT_K1 = 1.1265;                     // H. B. Robinson 2, Table 3.3.1-1 Note 1 (NRC amendment, accession number not recorded)
+	public static final double OT_K2_PER_C = 0.0221;               // 0.01228 /F
+	public static final double OT_K3_PER_MPA = 0.129;              // 0.00089 /psig
+	public static final double OT_TAU1_S = 30.0;                   // the lead (unverified)
+	public static final double OT_TAU2_S = 4.0;                    // the lag (unverified)
+	public static final double OP_K4 = 1.0864;                     // the OP delta-T constants: from memory of the same note, unverified
+	public static final double OP_K5_PER_C = 0.036;                // 0.02 /F, for increasing Tavg only (unverified)
+	public static final double OP_K6_PER_C = 0.0050;               // 0.00277 /F, for Tavg over T'' (unverified)
+	public static final double OP_TAU3_S = 10.0;                   // the rate term's time constant (unverified)
+	public static final double OT_TPRIME_C = TAVG_FULL_LOAD;       // T' and T'', the full-power Tavg
+	public static final double OT_PPRIME_MPA = 15.51;              // P'
+
+	// ---- Reactor extensions 19b: casks, contamination, inspection (docs/multiblocks/reactor-extensions.md, decided 2026-11-10) -----
+	public static final double ACTIVITY_LIMIT = 1.0;               // µCi/g dose-equivalent I-131 (NUREG-1431 LCO 3.4.16)
+	public static final double CORROSION_UCI_G_S = 3e-7;           // at full power: about 0.02 µCi/g with the demineralizer (proposed)
+	public static final double LEAKER_UCI_G_S = 3e-6;              // a leaking rod at full power: about 0.2 µCi/g each (proposed)
+	public static final double LEAKER_SPIKE = 0.5;                 // the iodine spike after a trip, of a leaker's full-power source (proposed)
+	public static final double IODINE_131_LAMBDA = Math.log(2) / (8.02 * 86400);
+	public static final double DEMIN_EFFICIENCY = 0.9;             // a decontamination factor of 10 across the resin (unverified)
+	public static final double CONTAMINATION_SV_H_AT_1M = 1e-3;    // a fully contaminated block, at 1 m (proposed)
+	public static final double CONTAMINATION_HALF_LIFE_TICKS = 30 * 24000.0;   // 30 game days (proposed; Co-60 is 5.3 years)
+	public static final double CONTAMINATION_PICKUP = 0.02;        // of a block's contamination a player picks up a second on it (proposed)
+	public static final double SKIN_SV_H = 2e-3;                   // a fully contaminated player, on their skin and clothes (proposed)
+	public static final double WASHER_CLEANS = 0.90;               // a washer's pass (proposed)
+	public static final double WASHER_WATTS = 2_000.0;
+	public static final double WASHER_REACH = 4.0;                 // m of hose to a live receptacle (proposed)
+	public static final double PERSONNEL_MONITOR_WATTS = 1_500.0;  // the monitor and its shower's heater (proposed)
+	public static final int CANISTER_ASSEMBLIES = 12;              // (proposed; real 24-37 PWR)
+	public static final double CANISTER_MAX_W = 12_000.0;          // (proposed)
+	public static final double CANISTER_MAX_W_EACH = 1_500.0;      // (proposed)
+	public static final double CASK_DRY_SECONDS = 20 * 60.0;       // drain, vacuum dry, backfill with helium (proposed)
+	public static final double CASK_WELD_SECONDS = 10 * 60.0;
+	public static final double CASK_TRANSFER_SECONDS = 10 * 60.0;
+	public static final double CASK_LINK_BLOCKS = 64.0;
+	public static final double CASK_STATION_WATTS = 50_000.0;
+	public static final double MODULE_WALL_BLOCKS = 1.0;           // the module's 1 m of concrete, counted as one solid block
+	public static final double INSPECTION_STAND_WATTS = 5_000.0;
+	public static final double INSPECTION_SECONDS = 60.0;          // a visual and camera pass (proposed)
+	public static final double BENT_GRID_CHANCE = 0.01;            // a move by hopper or crane (proposed)
+	public static final double GRID_REPAIR_SECONDS = 10 * 60.0;
+
 	// ---- The natural-draft cooling tower (docs/multiblocks/natural-draft-tower.md, approved 2026-11-01) --------------------------
 	public static final double TOWER_SHELL_BASE_Y = 8.0;           // over the basin floor; the raker columns below
 	public static final double TOWER_THROAT_Y = 62.0;

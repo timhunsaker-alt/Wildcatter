@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "wildcatter:block/hydrogen_igniter"
+    },
+    "lit=true": {
+      "model": "wildcatter:block/hydrogen_igniter_lit"
+    }
+  }
+}

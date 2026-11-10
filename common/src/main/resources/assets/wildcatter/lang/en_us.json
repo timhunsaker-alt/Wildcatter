@@ -596,5 +596,18 @@
   "block.wildcatter.vacuum_crystallizer": "Vacuum Crystallizer",
   "block.wildcatter.potash_dryer": "Potash Dryer and Compactor",
   "block.wildcatter.acid_pretreatment": "Acid Pretreatment (uranium)",
-  "block.wildcatter.depa_topo_circuit": "DEPA-TOPO Circuit"
+  "block.wildcatter.depa_topo_circuit": "DEPA-TOPO Circuit",
+  "block.wildcatter.containment_concrete": "Containment Concrete (1 m, steel-lined)",
+  "block.wildcatter.hydrogen_igniter": "Hydrogen Igniter (glow plug)",
+  "block.wildcatter.equipment_hatch": "Equipment Hatch",
+  "block.wildcatter.personnel_airlock": "Personnel Airlock",
+  "block.wildcatter.hydrogen_recombiner": "Hydrogen Recombiner (passive)",
+  "block.wildcatter.containment_monitor": "Containment Monitor",
+  "block.wildcatter.pressurizer_relief_tank": "Pressurizer Relief Tank (30 m3)",
+  "item.wildcatter.dry_storage_canister": "Dry Storage Canister (empty, 12 assemblies)",
+  "item.wildcatter.decon_washer": "Decontamination Washer (2 kW)",
+  "block.wildcatter.cask_loading_station": "Cask Loading Station",
+  "block.wildcatter.storage_module": "Dry Cask Storage Module (horizontal)",
+  "block.wildcatter.new_fuel_inspection_stand": "New-Fuel Inspection Stand",
+  "block.wildcatter.personnel_monitor": "Personnel Contamination Monitor"
 }

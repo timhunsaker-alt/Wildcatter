@@ -206,6 +206,13 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.NaturalDraftTowerBlockEntity> NATURAL_DRAFT_TOWER_ENTITY = entity(dev.wildcatter.block.NaturalDraftTowerBlockEntity::new, NATURAL_DRAFT_TOWER);
 	public static final BlockEntityType<dev.wildcatter.block.RefuellingMachineBlockEntity> REFUELLING_MACHINE_ENTITY = entity(dev.wildcatter.block.RefuellingMachineBlockEntity::new, REFUELLING_MACHINE);
 	public static final BlockEntityType<dev.wildcatter.block.SpentFuelPoolBlockEntity> SPENT_FUEL_POOL_ENTITY = entity(dev.wildcatter.block.SpentFuelPoolBlockEntity::new, SPENT_FUEL_POOL);
+	public static final BlockEntityType<dev.wildcatter.block.ContainmentDoorBlockEntity> CONTAINMENT_DOOR_ENTITY = entity(dev.wildcatter.block.ContainmentDoorBlockEntity::new, EQUIPMENT_HATCH, PERSONNEL_AIRLOCK, HYDROGEN_RECOMBINER);
+	public static final BlockEntityType<dev.wildcatter.block.ContainmentMonitorBlockEntity> CONTAINMENT_MONITOR_ENTITY = entity(dev.wildcatter.block.ContainmentMonitorBlockEntity::new, CONTAINMENT_MONITOR);
+	public static final BlockEntityType<dev.wildcatter.block.ReliefTankBlockEntity> RELIEF_TANK_ENTITY = entity(dev.wildcatter.block.ReliefTankBlockEntity::new, PRESSURIZER_RELIEF_TANK);
+	public static final BlockEntityType<dev.wildcatter.block.CaskLoadingStationBlockEntity> CASK_STATION_ENTITY = entity(dev.wildcatter.block.CaskLoadingStationBlockEntity::new, CASK_LOADING_STATION);
+	public static final BlockEntityType<dev.wildcatter.block.StorageModuleBlockEntity> STORAGE_MODULE_ENTITY = entity(dev.wildcatter.block.StorageModuleBlockEntity::new, STORAGE_MODULE);
+	public static final BlockEntityType<dev.wildcatter.block.InspectionStandBlockEntity> INSPECTION_STAND_ENTITY = entity(dev.wildcatter.block.InspectionStandBlockEntity::new, NEW_FUEL_INSPECTION_STAND);
+	public static final BlockEntityType<dev.wildcatter.block.PersonnelMonitorBlockEntity> PERSONNEL_MONITOR_ENTITY = entity(dev.wildcatter.block.PersonnelMonitorBlockEntity::new, PERSONNEL_MONITOR);
 	public static final BlockEntityType<dev.wildcatter.block.RhrHeatExchangerBlockEntity> RHR_HX_ENTITY = entity(dev.wildcatter.block.RhrHeatExchangerBlockEntity::new, RHR_HEAT_EXCHANGER);
 	public static final BlockEntityType<dev.wildcatter.block.HpTurbineBlockEntity> HP_TURBINE_ENTITY = entity(dev.wildcatter.block.HpTurbineBlockEntity::new, HP_TURBINE);
 	public static final BlockEntityType<dev.wildcatter.block.CondenserBlockEntity> CONDENSER_ENTITY = entity(dev.wildcatter.block.CondenserBlockEntity::new, MAIN_CONDENSER);
@@ -220,7 +227,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.TurbineGeneratorBlockEntity> TURBINE_GENERATOR_ENTITY = entity(dev.wildcatter.block.TurbineGeneratorBlockEntity::new, TURBINE_GENERATOR);
 	public static final BlockEntityType<dev.wildcatter.block.GensetControlPanelBlockEntity> GENSET_CONTROL_PANEL_ENTITY = entity(dev.wildcatter.block.GensetControlPanelBlockEntity::new, GENSET_CONTROL_PANEL);
 	public static final BlockEntityType<ThreePhaseHeaterBlockEntity> THREE_PHASE_HEATER_ENTITY = entity(ThreePhaseHeaterBlockEntity::new, THREE_PHASE_HEATER);
-	public static final BlockEntityType<LoadBlockEntity> LOAD_ENTITY = entity(LoadBlockEntity::new, ELECTRIC_LAMP, ELECTRIC_HEATER);
+	public static final BlockEntityType<LoadBlockEntity> LOAD_ENTITY = entity(LoadBlockEntity::new, ELECTRIC_LAMP, ELECTRIC_HEATER, HYDROGEN_IGNITER);
 	public static final BlockEntityType<BreakerBlockEntity> BREAKER_ENTITY = entity(BreakerBlockEntity::new, BREAKER, SWITCH, UFLS_RELAY,
 			BREAKER_3P_LV, BREAKER_3P_INDUSTRIAL, HV_BREAKER_3P, DIST_BREAKER_3P, GEN_FEEDER_BREAKER);
 	public static final BlockEntityType<FuseBlockEntity> FUSE_ENTITY = entity(FuseBlockEntity::new, FUSE, FUSED_CUTOUT);
@@ -509,6 +516,14 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		for (Block part : new Block[] {REFUELLING_MACHINE, FUEL_TRANSFER_SYSTEM, SPENT_FUEL_POOL}) {
 			add(((dev.wildcatter.block.FuelHandlingPartBlock) part).part().id(), part);
 		}
+		add("containment_concrete", CONTAINMENT_CONCRETE);
+		add("hydrogen_igniter", HYDROGEN_IGNITER);
+		for (Block part : new Block[] {EQUIPMENT_HATCH, PERSONNEL_AIRLOCK, HYDROGEN_RECOMBINER, CONTAINMENT_MONITOR, PRESSURIZER_RELIEF_TANK}) {
+			add(((dev.wildcatter.block.ContainmentPartBlock) part).part().id(), part);
+		}
+		for (Block part : new Block[] {CASK_LOADING_STATION, STORAGE_MODULE, NEW_FUEL_INSPECTION_STAND, PERSONNEL_MONITOR}) {
+			add(((dev.wildcatter.block.FuelStoragePartBlock) part).part().id(), part);
+		}
 		Registry.register(BuiltInRegistries.BLOCK, Wildcatter.id("tower_shell"), TOWER_SHELL);   // no item: the tower places it
 		add("unit_auxiliary_transformer", UNIT_AUX_TRANSFORMER);
 		for (Block part : new Block[] {BORAX_DISSOLVER, BORIC_ACID_CRYSTALLIZER, B4C_FURNACE, RCCA_BENCH}) {
@@ -734,6 +749,13 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rhr_heat_exchanger"), RHR_HX_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("refuelling_machine"), REFUELLING_MACHINE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("spent_fuel_pool"), SPENT_FUEL_POOL_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("containment_door"), CONTAINMENT_DOOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("containment_monitor"), CONTAINMENT_MONITOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("pressurizer_relief_tank"), RELIEF_TANK_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("cask_loading_station"), CASK_STATION_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("storage_module"), STORAGE_MODULE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("new_fuel_inspection_stand"), INSPECTION_STAND_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("personnel_monitor"), PERSONNEL_MONITOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("natural_draft_tower"), NATURAL_DRAFT_TOWER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("main_condenser"), CONDENSER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("deaerator"), DEAERATOR_ENTITY);
