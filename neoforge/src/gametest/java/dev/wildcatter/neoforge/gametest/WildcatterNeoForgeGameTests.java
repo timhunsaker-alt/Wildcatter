@@ -66,7 +66,11 @@ public class WildcatterNeoForgeGameTests {
 		GRID_SCENES.putAll(PlcPowerScenes.scenes());
 		GRID_SCENES.putAll(PlcPlantScenes.scenes());
 		GRID_SCENES.putAll(UraniumScenes.scenes());
+		GRID_SCENES.putAll(GridAnswerScenes.scenes());
 	}
+
+	/** A stand-in for Tailings' zircon concentrate: in #wildcatter:zircon_feed at 50 kg by this mod's data (GridAnswerScenes.zirconFeed). */
+	static net.minecraft.world.item.Item ZIRCON_CONCENTRATE;
 
 	/** Phase 19's reactor scenes (ReactorExtensionScenes): a scene that switches a reactor rule on runs in a batch of its own. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> REACTOR_SCENES = ReactorExtensionScenes.scenes();
@@ -82,6 +86,11 @@ public class WildcatterNeoForgeGameTests {
 			// the stand-in gas source: a block of this mod offering a product on Wildcatter's steel pipe, as another mod would (docs/biogas.md)
 			event.register(Registries.BLOCK, helper -> helper.register(id("gas_source"), new TestGasSource.SourceBlock(
 					net.minecraft.world.level.block.state.BlockBehaviour.Properties.of().setId(ResourceKey.create(Registries.BLOCK, id("gas_source"))))));
+			event.register(Registries.ITEM, helper -> {
+				ResourceKey<net.minecraft.world.item.Item> key = ResourceKey.create(Registries.ITEM, id("zircon_concentrate"));
+				ZIRCON_CONCENTRATE = new net.minecraft.world.item.Item(new net.minecraft.world.item.Item.Properties().setId(key));
+				helper.register(id("zircon_concentrate"), ZIRCON_CONCENTRATE);
+			});
 			event.register(Registries.BLOCK_ENTITY_TYPE, helper -> {
 				TestGasSource.TYPE = new net.minecraft.world.level.block.entity.BlockEntityType<>(TestGasSource.SourceEntity::new,
 						java.util.Set.of(BuiltInRegistries.BLOCK.getValue(id("gas_source"))));

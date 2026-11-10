@@ -2953,6 +2953,49 @@ lang.update({f"block.{ns}.cask_loading_station": "Cask Loading Station", f"block
 	f"block.{ns}.new_fuel_inspection_stand": "New-Fuel Inspection Stand", f"block.{ns}.personnel_monitor": "Personnel Contamination Monitor"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Tim's answers of 2026-11-10 (branch w-grid; docs/questions/answers-grid.md) ------------------------------------------------
+# The 600 mm slurry pipe (Tailings p7 #27) and flotation air header (p7 #36): the pipe's core and arms at 0.61 m OD with a 0.75 m flange,
+# in the mod's materials. Rubber-lined steel slurry pipe painted black; the air header galvanized.
+_GALV = f"{ns}:block/mat/mat_galvanized"
+for _name, _tex in (("slurry_pipe", _RUBBER), ("air_header", _GALV)):
+	_pt = {"pipe": _tex, "particle": _tex}
+	_core, _armel = pipe_shapes(0.61, 0.75)
+	save_json(f"{ASSETS}/models/block/{_name}_core.json", {"textures": _pt, "elements": _core})
+	save_json(f"{ASSETS}/models/block/{_name}_arm.json", {"textures": _pt, "elements": _armel})
+	save_json(f"{ASSETS}/models/block/{_name}_inventory.json", {"parent": "minecraft:block/block",
+		"display": {"gui": {"rotation": [30, 225, 0], "scale": [0.625, 0.625, 0.625]}, "ground": {"scale": [0.5, 0.5, 0.5]},
+			"firstperson_righthand": {"rotation": [0, 45, 0], "scale": [0.5, 0.5, 0.5]}, "thirdperson_righthand": {"scale": [0.5, 0.5, 0.5]}},
+		"textures": _pt, "elements": [cuboid([0, 3, 3], [16, 13, 13], "#pipe"), cuboid([2, 2, 2], [14, 14, 14], "#pipe")]})
+	save_json(f"{ASSETS}/blockstates/{_name}.json", {"multipart": [{"apply": {"model": f"{ns}:block/{_name}_core"}}] +
+		[{"when": {side: "true"}, "apply": {"model": f"{ns}:block/{_name}_arm", **rot}} for side, rot in _arm.items()]})
+	_item(_name, f"{_name}_inventory")
+	big_part_loot_simple(_name)
+shaped("slurry_pipe", ["SSS", "K K", "SSS"], {"S": S_, "K": "minecraft:dried_kelp_block"}, "slurry_pipe", 4)   # the lining
+shaped("air_header", ["S S", "S S", "S S"], {"S": S_}, "air_header", 4)
+# the guy anchor (protection-gaps 20): a screw anchor's rod and eye standing out of the ground, a bolt plate under it
+_model("guy_anchor", [_box([5, 0, 5], [11, 1, 11], "body"), _box([7.4, 0, 7.4], [8.6, 4, 8.6], "body"), _box([7, 4, 6.5], [9, 6, 9.5], "body")], {"body": _GALV})
+save_json(f"{ASSETS}/blockstates/guy_anchor.json", {"variants": {"": {"model": f"{ns}:block/guy_anchor"}}})
+_item("guy_anchor", "guy_anchor")
+big_part_loot_simple("guy_anchor")
+shaped("guy_anchor", [" I ", " S ", "SSS"], {"I": "minecraft:iron_ingot", "S": S_}, "guy_anchor", 2)
+# the guy strand: a coil of galvanized 7-wire strand (placeholder icon, drawn here)
+def _coil(img, d):
+	for r, c in ((6, (150, 156, 162)), (5, (110, 116, 122)), (4, (170, 176, 182))):
+		d.ellipse([8 - r, 8 - r, 7 + r, 7 + r], outline=c + (255,))
+tex("guy_strand_placeholder", _coil, "item")
+_flat_item("guy_strand", f"{ns}:item/guy_strand_placeholder")
+shaped("guy_strand", ["NSN", "S S", "NSN"], {"N": "minecraft:iron_nugget", "S": S_}, "guy_strand")
+# the chlorinator's zircon feed (answer 9): empty here; Tailings (or a data pack) adds its zircon concentrate and a kg file (block/ZirconFeed)
+save_json(f"{DATA}/tags/item/zircon_feed.json", {"values": []})
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({"block.wildcatter.slurry_pipe": "Slurry Pipe (600 mm)", "block.wildcatter.air_header": "Air Header (600 mm)",
+	"block.wildcatter.guy_anchor": "Guy Anchor", "item.wildcatter.guy_strand": "Guy Strand (3/8 in EHS)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+for tag in ("mineable/pickaxe",):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
+	t["values"] += [f"{ns}:{n}" for n in ("slurry_pipe", "air_header", "guy_anchor") if f"{ns}:{n}" not in t["values"]]
+	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

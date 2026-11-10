@@ -25,20 +25,34 @@ import org.jspecify.annotations.Nullable;
 public class PipeBlock extends Block {
 	/** Drawn at its real diameter (docs/multiblocks/well-site.md), but clicked and walked into as 0.25 m so it can be hit. */
 	private static final VoxelShape CORE = Block.box(6, 6, 6, 10, 10, 10);
-	private static final Map<Direction, VoxelShape> ARM_SHAPES = new EnumMap<>(Direction.class);
+	private static final Map<Direction, VoxelShape> ARM_SHAPES = arms(6, 10);
+	/** The 600 mm slurry pipe and air header: clicked and walked into at their size. */
+	private static final VoxelShape BIG_CORE = Block.box(3, 3, 3, 13, 13, 13);
+	private static final Map<Direction, VoxelShape> BIG_ARM_SHAPES = arms(3, 13);
 
-	static {
-		ARM_SHAPES.put(Direction.NORTH, Block.box(6, 6, 0, 10, 10, 6));
-		ARM_SHAPES.put(Direction.SOUTH, Block.box(6, 6, 10, 10, 10, 16));
-		ARM_SHAPES.put(Direction.WEST, Block.box(0, 6, 6, 6, 10, 10));
-		ARM_SHAPES.put(Direction.EAST, Block.box(10, 6, 6, 16, 10, 10));
-		ARM_SHAPES.put(Direction.DOWN, Block.box(6, 0, 6, 10, 6, 10));
-		ARM_SHAPES.put(Direction.UP, Block.box(6, 10, 6, 10, 16, 10));
+	private static Map<Direction, VoxelShape> arms(int a, int b) {
+		Map<Direction, VoxelShape> out = new EnumMap<>(Direction.class);
+		out.put(Direction.NORTH, Block.box(a, a, 0, b, b, a));
+		out.put(Direction.SOUTH, Block.box(a, a, b, b, b, 16));
+		out.put(Direction.WEST, Block.box(0, a, a, a, b, b));
+		out.put(Direction.EAST, Block.box(b, a, a, 16, b, b));
+		out.put(Direction.DOWN, Block.box(a, 0, a, b, a, b));
+		out.put(Direction.UP, Block.box(a, b, a, b, 16, b));
+		return out;
 	}
 
-	/** Water pipes link boilers, turbines and pumps; gas lines link wells and fireboxes. The two never join. */
+	/**
+	 * Water pipes link boilers, turbines and pumps; gas lines link wells and fireboxes. The two never join. SLURRY is the 600 mm
+	 * large-bore slurry pipe: a run of its own, as steel pipe's, rated about 1 m3/s ({@link Lines#capacityPerTick}). AIR_HEADER is the
+	 * 600 mm flotation air header: blower air for another mod's cells, a network of its own ({@link Plumbing#network}).
+	 */
 	public enum Kind {
-		WATER, GAS, AIR, NETWORK
+		WATER, GAS, AIR, NETWORK, SLURRY, AIR_HEADER
+	}
+
+	/** Another mod's block that draws an arm toward a pipe of these kinds (a slurry pump's nozzle, a blower's outlet). */
+	public interface Joins {
+		boolean joinsPipe(BlockState state, Kind kind);
 	}
 
 	private final Kind kind;
@@ -84,6 +98,14 @@ public class PipeBlock extends Block {
 				player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Network cable: " + dev.wildcatter.control.NetworkNet.plcs(level, java.util.List.of(pos)).size() + " PLC(s) with a COMM module on it"));
 			} else if (kind == Kind.AIR) {
 				player.sendOverlayMessage(net.minecraft.network.chat.Component.literal(String.format(java.util.Locale.ROOT, "Instrument air tubing: %.1f bar", dev.wildcatter.control.AirCompressorBlockEntity.pressureAt(level, pos))));
+			} else if (kind == Kind.AIR_HEADER) {
+				player.sendOverlayMessage(net.minecraft.network.chat.Component.literal(String.format(java.util.Locale.ROOT, "Air header (600 mm, about %.1f m3/s of blower air): %d lengths joined",
+						dev.wildcatter.Tuning.AIR_HEADER_M3_S, Plumbing.network(level, java.util.List.of(pos), Kind.AIR_HEADER).size() + 1)));
+			} else if (kind == Kind.SLURRY) {
+				Lines.Line line = Lines.line(level, pos);
+				String assay = Slurry.describe(line);
+				player.sendOverlayMessage(net.minecraft.network.chat.Component.literal(String.format(java.util.Locale.ROOT, "Slurry pipe (600 mm, rated %.0f m3/s): ", dev.wildcatter.Tuning.SLURRY_PIPE_M3_S)
+						+ line.pipes().size() + " lengths joined, " + line.run().describe() + (assay == null ? "" : " (" + assay + ")")));
 			} else if (kind == Kind.WATER) {
 				player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Water pipe (2 in): " + (Plumbing.network(level, java.util.List.of(pos)).size() + 1)
 						+ " lengths joined, carrying fresh water from a pump"));
@@ -110,6 +132,15 @@ public class PipeBlock extends Block {
 		Block block = neighbour.getBlock();
 		if (block instanceof PipeBlock pipe) {
 			return pipe.kind == kind;
+		}
+		if (block instanceof Joins other && other.joinsPipe(neighbour, kind)) {
+			return true;
+		}
+		if (kind == Kind.AIR_HEADER) {
+			return false;
+		}
+		if (kind == Kind.SLURRY && block instanceof DecantTowerBlock) {
+			return true;
 		}
 		if (kind == Kind.NETWORK) {
 			return block instanceof dev.wildcatter.control.PlcCabinetBlock || block instanceof dev.wildcatter.control.HmiPanelBlock || block instanceof dev.wildcatter.control.RemoteIoDropBlock;
@@ -141,10 +172,11 @@ public class PipeBlock extends Block {
 
 	@Override
 	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-		VoxelShape shape = CORE;
+		boolean big = kind == Kind.SLURRY || kind == Kind.AIR_HEADER;
+		VoxelShape shape = big ? BIG_CORE : CORE;
 		for (Direction side : Direction.values()) {
 			if (state.getValue(WireShape.ARMS.get(side))) {
-				shape = Shapes.or(shape, ARM_SHAPES.get(side));
+				shape = Shapes.or(shape, (big ? BIG_ARM_SHAPES : ARM_SHAPES).get(side));
 			}
 		}
 		return shape;

@@ -45,6 +45,7 @@ public final class WildcatterClient {
 			}
 		};
 		sink.accept(dev.wildcatter.WildcatterBlocks.INSULATOR_ENTITY, context -> new SpanRenderer());
+		sink.accept(dev.wildcatter.WildcatterBlocks.GUY_ANCHOR_ENTITY, context -> new GuyRenderer());
 		sink.accept(dev.wildcatter.WildcatterBlocks.NATURAL_DRAFT_TOWER_ENTITY, context -> new CoolingTowerRenderer());
 		sink.accept(dev.wildcatter.WildcatterBlocks.SPENT_FUEL_POOL_ENTITY, context -> new SpentFuelPoolRenderer());
 		sink.accept(dev.wildcatter.WildcatterBlocks.CRANE_ENTITY, CraneRenderer::new);

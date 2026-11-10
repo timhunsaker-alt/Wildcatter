@@ -4,3 +4,4 @@ import linelib as l
 
 M = l.model("wood_pole_40", l.mlib.footprint_box(1, 10, 1, 0, 0))
 l.wood_pole(M, 0.5, 0.5, 10, 0.17, 0.27)
+after = l.lean_after("wood_pole_40", 10)

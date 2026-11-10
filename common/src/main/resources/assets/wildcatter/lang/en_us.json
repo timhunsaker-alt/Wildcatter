@@ -609,5 +609,9 @@
   "block.wildcatter.cask_loading_station": "Cask Loading Station",
   "block.wildcatter.storage_module": "Dry Cask Storage Module (horizontal)",
   "block.wildcatter.new_fuel_inspection_stand": "New-Fuel Inspection Stand",
-  "block.wildcatter.personnel_monitor": "Personnel Contamination Monitor"
+  "block.wildcatter.personnel_monitor": "Personnel Contamination Monitor",
+  "block.wildcatter.slurry_pipe": "Slurry Pipe (600 mm)",
+  "block.wildcatter.air_header": "Air Header (600 mm)",
+  "block.wildcatter.guy_anchor": "Guy Anchor",
+  "item.wildcatter.guy_strand": "Guy Strand (3/8 in EHS)"
 }

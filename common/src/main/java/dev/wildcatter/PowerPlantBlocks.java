@@ -36,6 +36,10 @@ public interface PowerPlantBlocks {
 	Block NETWORK_CABLE = block("network_cable", props -> new PipeBlock(props.mapColor(MapColor.COLOR_BLUE).strength(0.5F).sound(SoundType.WOOL).noOcclusion(), PipeBlock.Kind.NETWORK));
 	Block HMI_PANEL = block("hmi_panel", props -> new dev.wildcatter.control.HmiPanelBlock(props.mapColor(MapColor.COLOR_GRAY).strength(0.5F).sound(SoundType.METAL).noOcclusion()));
 	Block AIR_TUBING = block("air_tubing", props -> new PipeBlock(props.mapColor(MapColor.METAL).strength(0.5F).sound(SoundType.METAL).noOcclusion(), PipeBlock.Kind.AIR));
+	/** The 600 mm flotation air header (Tim, 2026-11-10, Tailings p7 #36): low-pressure blower air for another mod's tank cells. */
+	Block AIR_HEADER = block("air_header", props -> new PipeBlock(props.mapColor(MapColor.METAL).strength(1.5F, 4.0F).sound(SoundType.METAL).noOcclusion(), PipeBlock.Kind.AIR_HEADER));
+	/** The 600 mm large-bore slurry pipe (Tim, 2026-11-10, Tailings p7 #27): rubber-lined steel, rated about 1 m3/s. */
+	Block SLURRY_PIPE = block("slurry_pipe", props -> new PipeBlock(props.mapColor(MapColor.COLOR_BLACK).strength(1.5F, 4.0F).sound(SoundType.METAL).noOcclusion(), PipeBlock.Kind.SLURRY));
 	Block AIR_COMPRESSOR = block("air_compressor", props -> new dev.wildcatter.control.AirCompressorBlock(props.mapColor(MapColor.COLOR_BLUE).strength(2.0F, 5.0F).sound(SoundType.METAL)));
 	Block AIR_DRYER = block("air_dryer", props -> new dev.wildcatter.control.AirDryerBlock(props.mapColor(MapColor.COLOR_GRAY).strength(2.0F, 5.0F).sound(SoundType.METAL)));
 	Block DAY_TANK = block("day_tank", props -> new dev.wildcatter.block.DayTankBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 5.0F).sound(SoundType.METAL)));

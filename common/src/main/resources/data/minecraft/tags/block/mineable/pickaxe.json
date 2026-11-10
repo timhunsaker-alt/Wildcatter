@@ -417,6 +417,9 @@
     "wildcatter:cask_loading_station",
     "wildcatter:storage_module",
     "wildcatter:new_fuel_inspection_stand",
-    "wildcatter:personnel_monitor"
+    "wildcatter:personnel_monitor",
+    "wildcatter:slurry_pipe",
+    "wildcatter:air_header",
+    "wildcatter:guy_anchor"
   ]
 }

@@ -206,6 +206,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("ferroalloys")) {
 				new FerroalloyClientScenes(context, server, y, up, -9400).ferroalloys();
 			}
+			if (only("guyWire")) {
+				new GridClientScenes(context, server, y, up, -10400).guyWire();
+			}
 			if (only("cascade")) {
 				cascade(context, server);
 			}

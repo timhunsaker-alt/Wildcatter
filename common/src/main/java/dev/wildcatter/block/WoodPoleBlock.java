@@ -13,15 +13,73 @@ import net.minecraft.world.level.block.state.BlockState;
  * clicked onto it. Climbable, like the one-block sections it replaces.
  */
 public class WoodPoleBlock extends BigPartBlock {
-	private final int height;
+	/** Steps of lean (protection-gaps 20): 0 plumb; see {@link dev.wildcatter.Tuning#POLE_LEAN_DEGREES}. */
+	public static final int MAX_LEAN = 3;
+	public static final net.minecraft.world.level.block.state.properties.IntegerProperty LEAN =
+			net.minecraft.world.level.block.state.properties.IntegerProperty.create("lean", 0, MAX_LEAN);
 
-	public WoodPoleBlock(Properties properties, int height, String shapeName) {
+	private final int height;
+	private final String label;
+	private final int poleClass;
+	private final double classLoadLbf;
+
+	/**
+	 * {@code label} the pole's length ("40 ft class 4"); {@code classLoadLbf} its ANSI O5.1 class's horizontal load 2 ft below the top
+	 * (class 5: 1,900 lbf; class 4: 2,400; class 2: 3,700).
+	 */
+	public WoodPoleBlock(Properties properties, int height, String shapeName, String label, int poleClass, double classLoadLbf) {
 		super(properties, Footprint.box(1, height, 1, 0, 0), shapeName);
 		this.height = height;
+		this.label = label;
+		this.poleClass = poleClass;
+		this.classLoadLbf = classLoadLbf;
 	}
 
 	public int height() {
 		return height;
+	}
+
+	public String label() {
+		return label;
+	}
+
+	public int poleClass() {
+		return poleClass;
+	}
+
+	public double classLoadLbf() {
+		return classLoadLbf;
+	}
+
+	@Override
+	protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
+		super.createBlockStateDefinition(builder);
+		builder.add(LEAN);
+	}
+
+	/** Its main cell weighs up its line pull and its guys (block/PoleLoad). */
+	@Override
+	@SuppressWarnings("unchecked")
+	protected <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> mainTicker(net.minecraft.world.level.Level level, BlockState state,
+			net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
+		if (level.isClientSide() || type != WildcatterBlocks.BIG_PART_ENTITY) {
+			return null;
+		}
+		return (l, p, s, entity) -> PoleLoad.tick(l, p, s, (BigPartBlockEntity) entity);
+	}
+
+	/** The Power Meter on any of its cells reads its line pull, its guys and its lean. */
+	@Override
+	protected net.minecraft.world.InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, net.minecraft.world.level.Level level, BlockPos pos,
+			net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+		if (!stack.is(dev.wildcatter.WildcatterItems.POWER_METER)) {
+			return super.useItemOn(stack, state, level, pos, player, hand, hit);
+		}
+		BlockPos foot = BigParts.main(pos, state);
+		if (!level.isClientSide() && level.getBlockEntity(foot) instanceof BigPartBlockEntity entity) {
+			player.sendOverlayMessage(net.minecraft.network.chat.Component.literal(PoleLoad.describe(level, foot, level.getBlockState(foot), this, entity)));
+		}
+		return net.minecraft.world.InteractionResult.SUCCESS;
 	}
 
 	@Override

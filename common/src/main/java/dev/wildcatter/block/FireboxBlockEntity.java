@@ -4,6 +4,7 @@ import dev.wildcatter.Tuning;
 import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.WildcatterSounds;
 import dev.wildcatter.energy.Inspectable;
+import dev.wildcatter.fluid.FireboxFuel;
 import dev.wildcatter.fluid.Product;
 import dev.wildcatter.fluid.Stream;
 import java.util.Optional;
@@ -35,7 +36,8 @@ import net.minecraft.world.level.storage.loot.providers.number.ints.ResolvableIn
 import org.jspecify.annotations.Nullable;
 
 /**
- * A fuel store and a fire under a starter boiler. The fire only burns down while the boiler above wants heat, so a full steam
+ * A fuel store and a fire under a starter boiler. It burns at one heat rate, its coal fire's (0.36 MW); piped fuels last their heating
+ * value at that rate ({@link FireboxFuel}). The fire only burns down while the boiler above wants heat, so a full steam
  * tank costs no fuel. (The 1 MW steam plant has its own burner: docs/multiblocks/steam-plant.md.)
  */
 public class FireboxBlockEntity extends BaseContainerBlockEntity implements WorldlyContainer, Inspectable, dev.wildcatter.control.ControlDevice {
@@ -157,10 +159,10 @@ public class FireboxBlockEntity extends BaseContainerBlockEntity implements Worl
 	/** How many ticks a piece of fuel burns, or 0 if it is not fuel. */
 	private static int burnTicks(ServerLevel level, ItemStack stack) {
 		if (stack.is(dev.wildcatter.WildcatterItems.CRUDE_OIL_BUCKET)) {
-			return (int) (Tuning.CRUDE_BUCKET_UNITS * Tuning.OIL_FUEL_TICKS_PER_UNIT);
+			return (int) (Tuning.CRUDE_BUCKET_UNITS * FireboxFuel.ticksPerUnit(Product.CRUDE));
 		}
 		if (stack.is(dev.wildcatter.WildcatterItems.DIESEL_BUCKET)) {
-			return (int) (Tuning.DIESEL_BUCKET_UNITS * Tuning.DIESEL_FUEL_TICKS_PER_UNIT);
+			return (int) (Tuning.DIESEL_BUCKET_UNITS * FireboxFuel.ticksPerUnit(Product.DIESEL));
 		}
 		if (stack.isEmpty() || stack.get(DataComponents.COOKING_FUEL) == null) {
 			return 0;
@@ -190,14 +192,14 @@ public class FireboxBlockEntity extends BaseContainerBlockEntity implements Worl
 					double sum = 0;
 					for (Lines.Port port : Lines.sources(line, product, FluidNode.Pull.MACHINE, this)) {
 						if (port.node() instanceof WellSource well && sum < need) {
-							Stream.Split got = well.drain((need - sum) / Tuning.OIL_FUEL_TICKS_PER_UNIT);
-							sum += got.oil() * Tuning.OIL_FUEL_TICKS_PER_UNIT + got.gas() * Tuning.GAS_FUEL_TICKS_PER_UNIT;
+							Stream.Split got = well.drain((need - sum) / FireboxFuel.ticksPerUnit(Product.CRUDE));
+							sum += got.oil() * FireboxFuel.ticksPerUnit(Product.CRUDE) + got.gas() * FireboxFuel.ticksPerUnit(Product.GAS);
 						}
 					}
 					yield sum;
 				}
 				default -> {
-					double perUnit = fuelTicks(product);
+					double perUnit = FireboxFuel.ticksPerUnit(product);
 					yield perUnit > 0 ? Lines.pull(line, product, need / perUnit, FluidNode.Pull.MACHINE, this) * perUnit : 0;
 				}
 			};
@@ -206,21 +208,6 @@ public class FireboxBlockEntity extends BaseContainerBlockEntity implements Worl
 				setChanged();
 			}
 		}
-	}
-
-	/** Ticks of fire in a unit (litre or m3) of what a line carries, or 0 if a firebox does not burn it. */
-	private static double fuelTicks(Product product) {
-		return switch (product) {
-			case WET_GAS, GAS, COMPRESSED_GAS, DRIED_GAS, PIPELINE_GAS -> Tuning.GAS_FUEL_TICKS_PER_UNIT;
-			case BIOGAS -> dev.wildcatter.fluid.Biogas.fireboxTicksPerM3();   // any gas, by its heating value (docs/biogas.md)
-			case CRUDE -> Tuning.OIL_FUEL_TICKS_PER_UNIT;
-			case DIESEL -> Tuning.DIESEL_FUEL_TICKS_PER_UNIT;
-			case GASOLINE, NATURAL_GASOLINE -> Tuning.GASOLINE_FUEL_TICKS_PER_UNIT;
-			case KEROSENE -> Tuning.KEROSENE_FUEL_TICKS_PER_UNIT;
-			case RESIDUE -> Tuning.RESIDUE_FUEL_TICKS_PER_UNIT;
-			case CONDENSATE -> Tuning.CONDENSATE_FUEL_TICKS_PER_UNIT;
-			default -> 0;
-		};
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, FireboxBlockEntity firebox) {

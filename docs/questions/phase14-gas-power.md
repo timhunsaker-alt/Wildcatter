@@ -128,3 +128,5 @@ lets get all ideas done or planned out". Specs: `docs/multiblocks/sales-gas.md` 
   gas wells under a firebox would run about 260 times longer per unit.
 - **Alternatives:** leave it (gas fireboxes stay an early-game shortcut); or fix only m3 products (pipeline gas, biogas) and leave
   well units alone.
+- **Tim (2026-11-10):** "fix it with one real heat rate, in every world." Built on `w-grid`: 0.36 MW, every fuel by its heating value
+  (`fluid/FireboxFuel`); the `biogas` scenes now check the firebox stays lit. See `docs/questions/answers-grid.md` 1.
