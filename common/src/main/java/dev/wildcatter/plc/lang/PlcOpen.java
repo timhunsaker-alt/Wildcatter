@@ -328,16 +328,22 @@ public final class PlcOpen {
 		return pous.child("pou").attr("name", name).attr("pouType", POU_TYPE.getOrDefault(kind, "program"));
 	}
 
-	private static X graphicalFace(String kind, String name, String declarations, X element, List<String> problems, String unit) {
+	private static X graphicalFace(String kind, String name, String returns, String declarations, X element, List<String> problems, String unit) {
 		List<CompileError> errors = new ArrayList<>();
-		String end = kind.equals("PROGRAM") ? "END_PROGRAM" : "END_FUNCTION_BLOCK";
-		Ast.Unit parsed = Parser.parse(kind + " " + name + "\n" + declarations + "\n" + end, errors);
+		if (kind.equals("FUNCTION") && (returns == null || returns.isBlank())) {
+			problems.add(unit + " is a function with no result type");
+		}
+		Ast.Unit parsed = Parser.parse(PlcCompiler.headerText(kind, name, returns, declarations), errors);
 		for (CompileError error : errors) {
 			problems.add(unit + "'s variables, line " + Math.max(1, error.line() - 1) + ": " + error.message());
 		}
 		X face = element.child("interface");
 		if (!parsed.pous().isEmpty()) {
-			varBlocks(parsed.pous().getFirst().vars(), face);
+			Ast.Pou pou = parsed.pous().getFirst();
+			if (pou.returns() != null) {
+				face.child("returnType").add(typeXml(pou.returns()));
+			}
+			varBlocks(pou.vars(), face);
 		}
 		return face;
 	}
@@ -366,7 +372,7 @@ public final class PlcOpen {
 
 	private static void ladder(Ladder ladder, Map<String, Ast.Pou> library, X pous, List<String> problems, String unit) {
 		X element = pou(ladder.name, ladder.kind, pous);
-		graphicalFace(ladder.kind, ladder.name, ladder.declarations, element, problems, unit);
+		graphicalFace(ladder.kind, ladder.name, ladder.returns, ladder.declarations, element, problems, unit);
 		LdOut out = new LdOut(library);
 		int row = 0;
 		for (Ladder.Rung rung : ladder.rungs) {
@@ -377,6 +383,10 @@ public final class PlcOpen {
 				comment.add(position(40, Math.max(0, out.y - 14)));
 				comment.child("content").child("xhtml:p").text = rung.comment;
 			}
+			if (rung.label != null && !rung.label.isBlank()) {
+				// a label stands before its rung, as the standard draws it
+				out.body.child("label").attr("localId", out.id()).attr("label", rung.label.trim().toUpperCase(Locale.ROOT)).add(position(0, Math.max(0, out.y - 10)));
+			}
 			int rail = out.id();
 			X left = out.body.child("leftPowerRail").attr("localId", rail).add(position(10, out.y));
 			left.child("connectionPointOut").attr("formalParameter", "");
@@ -384,6 +394,16 @@ public final class PlcOpen {
 			List<Feed> ends = new ArrayList<>();
 			for (Ladder.Coil coil : rung.coils) {
 				int id = out.id();
+				if (coil.kind.flow()) {
+					// a jump or return ends its rung: it has no output, and the right rail does not take it
+					X flow = out.body.child(coil.kind == Ladder.CoilKind.JUMP ? "jump" : "return").attr("localId", id);
+					if (coil.kind == Ladder.CoilKind.JUMP) {
+						flow.attr("label", coil.var.trim().toUpperCase(Locale.ROOT));
+					}
+					flow.add(position(out.x + 40, out.y));
+					connect(flow.child("connectionPointIn"), power);
+					continue;
+				}
 				X element2 = out.body.child("coil").attr("localId", id).attr("negated", coil.kind == Ladder.CoilKind.NOT ? "true" : "false");
 				if (coil.kind == Ladder.CoilKind.SET) {
 					element2.attr("storage", "set");
@@ -396,11 +416,15 @@ public final class PlcOpen {
 				element2.child("variable").text = coil.var;
 				ends.add(new Feed(id, ""));
 			}
-			if (ends.isEmpty()) {
+			if (ends.isEmpty() && rung.coils.stream().noneMatch(c -> c.kind.flow())) {
 				ends = power;
 			}
 			X right = out.body.child("rightPowerRail").attr("localId", out.id()).add(position(out.x + 90, out.y));
-			connect(right.child("connectionPointIn"), ends);
+			if (ends.isEmpty()) {
+				right.child("connectionPointIn");
+			} else {
+				connect(right.child("connectionPointIn"), ends);
+			}
 			row++;
 		}
 		element.child("body").add(out.body);
@@ -518,7 +542,7 @@ public final class PlcOpen {
 
 	private static void fbd(Fbd fbd, Map<String, Ast.Pou> library, X pous, List<String> problems, String unit) {
 		X element = pou(fbd.name, fbd.kind, pous);
-		graphicalFace(fbd.kind, fbd.name, fbd.declarations, element, problems, unit);
+		graphicalFace(fbd.kind, fbd.name, fbd.returns, fbd.declarations, element, problems, unit);
 		X body = new X("FBD");
 		int[] next = {fbd.nextId()};
 		List<Fbd.Block> order = fbd.order();
@@ -572,7 +596,7 @@ public final class PlcOpen {
 
 	private static void sfc(Sfc sfc, X pous, List<String> problems, String unit) {
 		X element = pou(sfc.name, sfc.kind, pous);
-		graphicalFace(sfc.kind, sfc.name, sfc.declarations, element, problems, unit);
+		graphicalFace(sfc.kind, sfc.name, "", sfc.declarations, element, problems, unit);
 		if (!sfc.bodies.isEmpty()) {
 			X actions = element.child("actions");
 			sfc.bodies.forEach((name, text) -> {
@@ -977,15 +1001,16 @@ public final class PlcOpen {
 		if (!tag.equals("SFC") && (child(pou, "actions") != null && !children(child(pou, "actions")).isEmpty() || child(pou, "transitions") != null && !children(child(pou, "transitions")).isEmpty())) {
 			problems.add(where + " has actions or transitions outside a chart, which are not built");
 		}
-		if (!tag.equals("ST") && kind.equals("FUNCTION")) {
-			problems.add(where + " is a function in " + tag + "; a diagram here is a PROGRAM or FUNCTION_BLOCK");
+		if (tag.equals("SFC") && kind.equals("FUNCTION")) {
+			problems.add(where + " is a function in SFC; a chart here is a PROGRAM or FUNCTION_BLOCK");
 			return null;
 		}
+		String returns = kind.equals("FUNCTION") ? typeText(child(face, "returnType"), problems, where + "'s result") : "";
 		switch (tag) {
 			case "ST" -> {
 				String head = kind + " " + name;
 				if (kind.equals("FUNCTION")) {
-					head += " : " + typeText(child(face, "returnType"), problems, where + "'s result");
+					head += " : " + returns;
 				}
 				return new Source(name, Language.ST, head + "\n" + vars + "\n" + code(language) + "\nEND_" + kind);
 			}
@@ -993,6 +1018,7 @@ public final class PlcOpen {
 				Ladder ladder = readLadder(language, problems, where);
 				ladder.kind = kind;
 				ladder.name = name;
+				ladder.returns = returns;
 				ladder.declarations = vars;
 				return new Source(name, Language.LD, ladder.write());
 			}
@@ -1000,6 +1026,7 @@ public final class PlcOpen {
 				Fbd fbd = readFbd(language, problems, where);
 				fbd.kind = kind;
 				fbd.name = name;
+				fbd.returns = returns;
 				fbd.declarations = vars;
 				return new Source(name, Language.FBD, fbd.write());
 			}
@@ -1303,7 +1330,7 @@ public final class PlcOpen {
 				index.put(id, counter);
 			}
 			switch (local(element)) {
-				case "leftPowerRail", "rightPowerRail", "contact", "coil", "block", "inVariable", "outVariable", "comment" -> {
+				case "leftPowerRail", "rightPowerRail", "contact", "coil", "block", "inVariable", "outVariable", "comment", "jump", "return", "label" -> {
 				}
 				default -> problems.add(where + ": " + local(element) + " is not built in a ladder here");
 			}
@@ -1320,7 +1347,7 @@ public final class PlcOpen {
 			Element element = entry.getValue();
 			int id = entry.getKey();
 			switch (local(element)) {
-				case "contact", "coil" -> {
+				case "contact", "coil", "jump", "return" -> {
 					if (local(element).equals("contact") && !element.getAttribute("edge").isEmpty()) {
 						problems.add(where + ": contact " + id + " is edge-triggered, which is not built; use an R_TRIG box");
 					}
@@ -1404,6 +1431,11 @@ public final class PlcOpen {
 				String net = nets.find(in(entry.getKey()));
 				coils.computeIfAbsent(net, k -> new ArrayList<>()).add(new Ladder.Coil(kind, code(child(element, "variable"))));
 				coilIndex.merge(net, index.get(entry.getKey()), Math::min);
+			} else if (local(element).equals("jump") || local(element).equals("return")) {
+				boolean jump = local(element).equals("jump");
+				String net = nets.find(in(entry.getKey()));
+				coils.computeIfAbsent(net, k -> new ArrayList<>()).add(new Ladder.Coil(jump ? Ladder.CoilKind.JUMP : Ladder.CoilKind.RETURN, jump ? element.getAttribute("label").toUpperCase(Locale.ROOT) : ""));
+				coilIndex.merge(net, index.get(entry.getKey()), Math::min);
 			}
 		}
 		// the elements with power through them are edges between nets
@@ -1464,6 +1496,24 @@ public final class PlcOpen {
 						rung.rung.comment = code(child(entry.getValue(), "content"));
 						break;
 					}
+				}
+			}
+		}
+		// a label stands before the rung it names
+		for (var entry : elements.entrySet()) {
+			if (local(entry.getValue()).equals("label")) {
+				int where2 = index.get(entry.getKey());
+				Rung2 named = null;
+				for (Rung2 rung : built) {
+					if (rung.first > where2 && rung.rung.label.isEmpty()) {
+						named = rung;
+						break;
+					}
+				}
+				if (named == null) {
+					problems.add(where + ": label " + entry.getValue().getAttribute("label") + " has no rung after it");
+				} else {
+					named.rung.label = entry.getValue().getAttribute("label").toUpperCase(Locale.ROOT);
 				}
 			}
 		}

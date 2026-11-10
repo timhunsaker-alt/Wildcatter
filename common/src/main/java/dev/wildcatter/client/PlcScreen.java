@@ -241,6 +241,14 @@ public class PlcScreen extends Screen {
 			};
 		}
 
+		String returns() {
+			return switch (language) {
+				case LD -> ladder.ladder.returns;
+				case FBD -> fbd.fbd.returns;
+				default -> "";
+			};
+		}
+
 		String kind() {
 			return switch (language) {
 				case LD -> ladder.ladder.kind;
@@ -518,7 +526,7 @@ public class PlcScreen extends Screen {
 		}
 		int tx = LIST_W + 8 + 32;
 		if (unit.language == Project.Language.LD) {
-			for (String[] tool : new String[][] {{"NO", "24"}, {"NC", "24"}, {"BOX", "28"}, {"BRANCH", "44"}, {"COIL", "32"}, {"/", "14"}, {"S", "14"}, {"R", "14"}, {"RUNG", "32"}, {"DEL", "26"}}) {
+			for (String[] tool : new String[][] {{"NO", "24"}, {"NC", "24"}, {"BOX", "28"}, {"BRANCH", "44"}, {"COIL", "32"}, {"/", "14"}, {"S", "14"}, {"R", "14"}, {">>", "18"}, {"RET", "24"}, {"RUNG", "32"}, {"DEL", "26"}}) {
 				String name = tool[0];
 				int w = Integer.parseInt(tool[1]);
 				button(tx, TOP, w, name, () -> ladderTool(name));
@@ -585,9 +593,17 @@ public class PlcScreen extends Screen {
 			case Ladder.Contact c -> labelled(sx, sy + 9, w, "variable", c.var, value -> {
 				c.var = value;
 			});
-			case Ladder.Coil c -> labelled(sx, sy + 9, w, "variable", c.var, value -> {
-				c.var = value;
-			});
+			case Ladder.Coil c -> {
+				if (c.kind == Ladder.CoilKind.JUMP) {
+					labelled(sx, sy + 9, w, "jump to", c.var, value -> {
+						c.var = value;
+					});
+				} else if (c.kind != Ladder.CoilKind.RETURN) {
+					labelled(sx, sy + 9, w, "variable", c.var, value -> {
+						c.var = value;
+					});
+				}
+			}
 			case Ladder.Box box -> {
 				if (BlockLibrary.needsInstance(box.type, library)) {
 					labelled(sx, sy + 9, w, "instance", box.instance, value -> {
@@ -617,13 +633,58 @@ public class PlcScreen extends Screen {
 						pane.selectedRung.comment = value;
 					});
 					sy += 26;
+					Ladder.Rung named = pane.selectedRung;
+					labelled(sx, sy + 9, w, "label", named.label, value -> {
+						named.label = value.trim().toUpperCase(Locale.ROOT);
+					});
+					sy += 26;
 				}
+				sy = unitKind(sx, sy, w);
 				labelled(sx, sy + 9, w, "monitor", unit.monitor, value -> {
 					unit.monitor = value;
 					sendWatch();
 				});
 			}
 		}
+	}
+
+	private static final List<String> UNIT_KINDS = List.of("PROGRAM", "FUNCTION_BLOCK", "FUNCTION");
+
+	/** A diagram's kind, cycled by its button, and a function's result type; returns where the next field goes. */
+	private int unitKind(int sx, int sy, int w) {
+		button(sx, sy + 8, w, unit.kind(), () -> setUnitKind(UNIT_KINDS.get((UNIT_KINDS.indexOf(unit.kind()) + 1) % UNIT_KINDS.size()), null));
+		sy += 22;
+		if (unit.kind().equals("FUNCTION")) {
+			labelled(sx, sy + 9, w, "result type", unit.returns(), value -> {
+				String type = value.trim().toUpperCase(Locale.ROOT);
+				if (unit.language == Project.Language.LD) {
+					unit.ladder.ladder.returns = type;
+				} else {
+					unit.fbd.fbd.returns = type;
+				}
+			});
+			sy += 26;
+		}
+		return sy;
+	}
+
+	/** Makes the open diagram a PROGRAM, FUNCTION_BLOCK or FUNCTION; a function starts with a BOOL result, which its field changes. */
+	private void setUnitKind(String kind, String returns) {
+		if (unit.language != Project.Language.LD && unit.language != Project.Language.FBD) {
+			return;
+		}
+		unit.touch();
+		String type = returns != null ? returns.toUpperCase(Locale.ROOT) : unit.returns().isBlank() ? "BOOL" : unit.returns();
+		if (unit.language == Project.Language.LD) {
+			unit.ladder.ladder.kind = kind;
+			unit.ladder.ladder.returns = kind.equals("FUNCTION") ? type : "";
+		} else {
+			unit.fbd.fbd.kind = kind;
+			unit.fbd.fbd.returns = kind.equals("FUNCTION") ? type : "";
+		}
+		refreshLibrary();
+		rebuildWidgets();
+		sendWatch();
 	}
 
 	private void fbdSide() {
@@ -636,6 +697,7 @@ public class PlcScreen extends Screen {
 		sy += 36;
 		Fbd.Block block = pane.selected;
 		if (block == null) {
+			sy = unitKind(sx, sy, w);
 			labelled(sx, sy + 9, w, "monitor", unit.monitor, value -> {
 				unit.monitor = value;
 				sendWatch();
@@ -776,6 +838,8 @@ public class PlcScreen extends Screen {
 			case "/" -> pane.addCoil(Ladder.CoilKind.NOT);
 			case "S" -> pane.addCoil(Ladder.CoilKind.SET);
 			case "R" -> pane.addCoil(Ladder.CoilKind.RESET);
+			case ">>" -> pane.addCoil(Ladder.CoilKind.JUMP);
+			case "RET" -> pane.addCoil(Ladder.CoilKind.RETURN);
 			case "RUNG" -> pane.addRung();
 			case "DEL" -> pane.deleteSelected();
 			default -> {
@@ -1045,6 +1109,20 @@ public class PlcScreen extends Screen {
 			}
 		}
 		return false;
+	}
+
+	/** Makes the open ladder or FBD a PROGRAM, FUNCTION_BLOCK, or FUNCTION with {@code returns} as its result type. */
+	public void unitKindForTest(String kind, String returns) {
+		setUnitKind(kind, returns);
+	}
+
+	/** The power the live view shows at the end of the open ladder's rung {@code rung} (from 1), as the CPU reported it. */
+	public String rungPowerForTest(int rung) {
+		if (unit.language != Project.Language.LD || rung < 1 || rung > unit.ladder.ladder.rungs.size()) {
+			return null;
+		}
+		unit.ladder.ladder.number();
+		return values.get(unit.prefix() + "." + Ladder.powerVar(unit.ladder.ladder.rungs.get(rung - 1).body.id()));
 	}
 
 	public void deselectForTest() {

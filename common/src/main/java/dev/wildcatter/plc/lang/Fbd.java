@@ -45,6 +45,8 @@ public final class Fbd {
 
 	public String kind = "PROGRAM";
 	public String name = "MAIN";
+	/** A FUNCTION's result type, as written; empty for a program or function block. */
+	public String returns = "";
 	public String declarations = "VAR\nEND_VAR";
 	public final List<Block> blocks = new ArrayList<>();
 
@@ -87,7 +89,7 @@ public final class Fbd {
 
 	public String write() {
 		StringBuilder out = new StringBuilder();
-		out.append(kind).append(' ').append(name).append('\n').append(declarations).append("\n---\n");
+		out.append(Ladder.headLine(kind, name, returns)).append('\n').append(declarations).append("\n---\n");
 		for (Block block : blocks) {
 			List<Object> parts = new ArrayList<>(List.of("B", Integer.toString(block.id), block.type, block.name == null ? "" : block.name, Integer.toString(block.x), Integer.toString(block.y)));
 			block.inputs.forEach((pin, source) -> parts.add(Sexpr.list(pin, source)));
@@ -101,9 +103,10 @@ public final class Fbd {
 		int cut = text.indexOf("\n---\n");
 		String head = cut < 0 ? text : text.substring(0, cut);
 		int newline = head.indexOf('\n');
-		String[] first = (newline < 0 ? head : head.substring(0, newline)).trim().split(" ");
-		out.kind = first[0].isEmpty() ? "PROGRAM" : first[0].toUpperCase(Locale.ROOT);
-		out.name = first.length > 1 ? first[1].toUpperCase(Locale.ROOT) : "MAIN";
+		String[] first = Ladder.readHead(newline < 0 ? head : head.substring(0, newline));
+		out.kind = first[0];
+		out.name = first[1];
+		out.returns = first[2];
 		out.declarations = newline < 0 ? "VAR\nEND_VAR" : head.substring(newline + 1);
 		if (cut >= 0) {
 			for (String line : text.substring(cut + 5).split("\n")) {
@@ -206,6 +209,10 @@ public final class Fbd {
 				continue;
 			}
 			if (BlockLibrary.needsInstance(block.type, pous)) {
+				if (header.kind() == Ast.PouKind.FUNCTION) {
+					errors.add(new CompileError(sourceName, line, 1, Ladder.functionHoldsBlock(header.name(), block.type)));
+					continue;
+				}
 				if (block.name == null || block.name.isBlank()) {
 					errors.add(new CompileError(sourceName, line, 1, "a " + block.type + " block needs an instance name"));
 					continue;
