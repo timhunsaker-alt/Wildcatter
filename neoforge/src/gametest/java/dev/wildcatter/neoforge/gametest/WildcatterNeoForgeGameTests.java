@@ -58,6 +58,7 @@ public class WildcatterNeoForgeGameTests {
 		GRID_SCENES.putAll(DistributionScenes.scenes());
 		GRID_SCENES.putAll(PlcLimitScenes.scenes());
 		GRID_SCENES.putAll(PlcPowerScenes.scenes());
+		GRID_SCENES.putAll(PlcPlantScenes.scenes());
 	}
 
 	/** WILDCATTER_ONLY=a,b registers just those scenes while working on them; unset, every scene runs (as the Fabric client test). */
