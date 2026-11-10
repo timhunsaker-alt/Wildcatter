@@ -89,7 +89,7 @@ public class PlcRackRenderer<T extends BlockEntity> implements BlockEntityRender
 
 	@Override
 	public void submit(State state, PoseStack pose, SubmitNodeCollector collector, CameraRenderState camera) {
-		TextureAtlasSprite polymer = sprite("mat_polymer_grey");
+		TextureAtlasSprite polymer = sprite("mat_paint_ansi61");
 		TextureAtlasSprite galv = sprite("mat_galvanized");
 		TextureAtlasSprite dark = sprite("mat_oil_dark");
 		TextureAtlasSprite bulb = sprite("mat_bulb_lit");
@@ -145,7 +145,10 @@ public class PlcRackRenderer<T extends BlockEntity> implements BlockEntityRender
 		pose.popPose();
 	}
 
-	private static void box(PoseStack.Pose pose, VertexConsumer v, TextureAtlasSprite s, float x0, float y0, float z0, float x1, float y1, float z1, int color, int light) {
+	/** Laid out left to right as a person at the door sees it, which is the model's x from high to low. */
+	private static void box(PoseStack.Pose pose, VertexConsumer v, TextureAtlasSprite s, float left, float y0, float z0, float right, float y1, float z1, int color, int light) {
+		float x0 = X0 + X1 - right;
+		float x1 = X0 + X1 - left;
 		float[][] faces = {
 				{x0, y0, z0, x1, y0, z0, x1, y1, z0, x0, y1, z0, 0, 0, -1},
 				{x1, y0, z1, x0, y0, z1, x0, y1, z1, x1, y1, z1, 0, 0, 1},
