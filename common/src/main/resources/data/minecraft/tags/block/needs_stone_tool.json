@@ -293,6 +293,7 @@
     "wildcatter:remote_io_drop",
     "wildcatter:uranium_calciner",
     "wildcatter:cathode_gas_scrubber",
-    "wildcatter:koh_scrubber"
+    "wildcatter:koh_scrubber",
+    "wildcatter:cascade_cooling_skid"
   ]
 }

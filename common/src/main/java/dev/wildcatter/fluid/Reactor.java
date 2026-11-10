@@ -37,6 +37,13 @@ public final class Reactor {
 
 	// fuel
 	final double[] burnup = new double[Tuning.CORE_ASSEMBLIES];   // GWd/t
+	final double[] assay = filled(Tuning.ASSAY_PRODUCT);          // 16c1: each assembly's U-235, from its 30B
+
+	private static double[] filled(double v) {
+		double[] a = new double[Tuning.CORE_ASSEMBLIES];
+		java.util.Arrays.fill(a, v);
+		return a;
+	}
 	int assemblies;
 	int rccas;
 	// rods
@@ -299,11 +306,26 @@ public final class Reactor {
 
 	/** Loads a fresh assembly; false when the core is full. */
 	public boolean loadAssembly(double gwd) {
+		return loadAssembly(gwd, Tuning.ASSAY_PRODUCT);
+	}
+
+	/** 16c1: loads a fresh assembly of this assay; its starting reactivity follows it (Enrichment.freshRho). */
+	public boolean loadAssembly(double gwd, double u235) {
 		if (assemblies >= Tuning.CORE_ASSEMBLIES) {
 			return false;
 		}
+		assay[assemblies] = u235;
 		burnup[assemblies++] = gwd;
 		return true;
+	}
+
+	/** The assay of the last assembly loaded (what a fresh one taken back out carries). */
+	public double lastAssay() {
+		return assemblies == 0 ? Tuning.ASSAY_PRODUCT : assay[assemblies - 1];
+	}
+
+	public double assay(int i) {
+		return assay[i];
 	}
 
 	/** Takes the last assembly back out if it is fresh; returns false otherwise. */
@@ -334,9 +356,11 @@ public final class Reactor {
 		SpentFuel.Assembly out = new SpentFuel.Assembly(burnup[i], decay, coreDamaged);
 		for (int k = i; k < assemblies - 1; k++) {
 			burnup[k] = burnup[k + 1];
+			assay[k] = assay[k + 1];
 		}
 		assemblies--;
 		burnup[assemblies] = 0;
+		assay[assemblies] = Tuning.ASSAY_PRODUCT;
 		for (int g = 0; g < decay.length; g++) {
 			decay[g] *= assemblies / (assemblies + 1.0);
 		}

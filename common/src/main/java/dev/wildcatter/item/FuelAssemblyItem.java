@@ -18,7 +18,7 @@ public class FuelAssemblyItem extends BigPartItem {
 	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
 		super.appendHoverText(stack, context, display, tooltip, flag);
-		tooltip.accept(Component.literal(FuelAssemblyBlock.describe()).withStyle(ChatFormatting.GRAY));
+		tooltip.accept(Component.literal(FuelAssemblyBlock.describe(dev.wildcatter.WildcatterComponents.assay(stack))).withStyle(ChatFormatting.GRAY));
 		tooltip.accept(Component.literal("214 mm square, 4.06 m tall: 24 guide thimbles, 1 instrument tube, 8 grids").withStyle(ChatFormatting.GRAY));
 	}
 }

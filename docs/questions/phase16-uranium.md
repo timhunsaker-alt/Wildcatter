@@ -117,4 +117,53 @@ is behind a default-off setting, or happens only once the player adds the new pa
 - **Why:** the chlor-alkali plant (20a) is not built; the spec names the small 7f cell as the first source.
 - **Alternatives:** a scene with a rectifier for the cell; caustic potash only from 20a.
 
+## 16c1: product assay, spin-up and cooling
+
+### 17. How the assays are set
+- **Chosen:** a sneak-click on the feed station steps one setting round fifteen: the five product assays, then the next tails assay.
+  The readout shows the stages, feed and SWU a kg at the setting.
+- **Why:** one click is how other parts take a setting (the rectifier's setpoint); fifteen steps is short enough to go round.
+- **Alternatives:** product on a sneak-click and tails with the Power Meter; a PLC analog setpoint.
+
+### 18. What a 30B carries
+- **Chosen:** an item component, `wildcatter:assay`, stamped only when it is not 4.95 %. The 30B's tooltip reads it. Tails 48Ys are not
+  stamped (only their take-off's readout shows their assay).
+- **Why:** every 30B in a world now has no component and reads 4.95 %, exactly as before. A component (not five items) because there are
+  five product assays.
+- **Alternatives:** a separate item for each assay; stamp the tails too.
+
+### 19. How the fuel plant carries the assay
+- **Chosen:** each stage keeps the assay of what it holds, blended by kg of U as it takes more (the loader by its rods, the welder and
+  fixture by rods); the assembly comes out stamped. **Known gap:** an assembly stood up as a block keeps no assay, so a low-assay
+  assembly placed and broken again reads 4.95 %.
+- **Why:** the line passes uranium by mass between touching parts; a blend is what a real line would make if two assays met in it.
+- **Alternatives:** refuse a 30B of another assay while the line holds uranium; keep the assay on the placed block (a block entity).
+
+### 20. The reactor's fresh reactivity at lower assays
+- **Chosen:** the spec's proposed +16,000 pcm at 4.95 %, 4,000 pcm less for each percent below (3 %: +8,200 pcm). Each core position
+  keeps its assembly's assay; cores saved before read 4.95 %.
+- **Why:** gives 3 % fuel about half the cycle, the spec's intent; linear is close enough over 3-5 %.
+- **Alternatives:** a k-infinity curve from the assay (more accurate, harder to read).
+
+### 21. Spin-up and coast-down are opt-in **(needs Tim, with item 8)**
+- **Chosen:** behind `cascadeSpinUp=true` (default off). Off, a machine is at its converter's speed at once and stops at once, as before.
+- **Why:** Tim's example of what must not change on a running cascade; on, a power cut no longer stops a cascade at once, and a new one
+  takes 10 minutes to start.
+- **Alternatives:** on for cascades built after this wave (a saved flag on each machine).
+
+### 22. Cooling is opt-in by placing a skid
+- **Chosen:** a feed station remembers that a skid has served its header; from then on it needs one cooling (water and power), or after 5
+  minutes CASING HOT holds its feed. The skid is found touching any header pipe. Warm water nothing takes back is discharged (counted).
+  No crash yet (16c2).
+- **Why:** the spec's "cascades built before this wave run without a skid until one is placed on their header": no config needed, since
+  only a player who adds the skid takes on the rule.
+- **Alternatives:** require cooling of every cascade under a config key.
+
+### 23. The scene drives the machines by hook
+- **Chosen:** `cascade_operations` drives the centrifuges directly every second (as the frequency converter does), with a diesel set for
+  the 480 V stations and the skid.
+- **Why:** a frequency converter takes 12.47 kV and about 6 MW for ten machines (the client `cascade` scene has that chain); the server
+  scene tests the feed station, take-offs, skid and machines.
+- **Alternatives:** the full power chain in a server scene.
+
 There is no `docs/DESIGN.md` in Wildcatter (that file is Tailings'). The design record for each wave is its spec's "As built" section.

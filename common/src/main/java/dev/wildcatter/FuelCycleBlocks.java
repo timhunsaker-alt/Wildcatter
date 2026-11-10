@@ -54,6 +54,8 @@ public interface FuelCycleBlocks {
 	Block FEED_STATION = enrichmentPart(dev.wildcatter.block.EnrichmentPartBlock.Part.FEED_STATION);
 	Block PRODUCT_TAKEOFF = enrichmentPart(dev.wildcatter.block.EnrichmentPartBlock.Part.PRODUCT_TAKEOFF);
 	Block TAILS_TAKEOFF = enrichmentPart(dev.wildcatter.block.EnrichmentPartBlock.Part.TAILS_TAKEOFF);
+	// 16c1 (docs/multiblocks/enrichment-operations.md)
+	Block CASCADE_COOLING_SKID = enrichmentPart(dev.wildcatter.block.EnrichmentPartBlock.Part.CASCADE_COOLING_SKID);
 	// 7f: the zirconium plant (docs/multiblocks/zirconium.md)
 	Block MINERAL_SEPARATOR = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.MINERAL_SEPARATOR);
 	Block CHLORINATOR = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.CHLORINATOR);

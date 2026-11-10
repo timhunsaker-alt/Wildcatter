@@ -4,7 +4,9 @@ footprints match EnrichmentPartBlock's):
 - frequency_converter, 3 x 3 x 6: the input transformer and the rectifier and inverter cubicles (12.47 kV box west);
 - feed_station, 3 x 3 x 5: the heated cabinet around a 48Y, its header valve out the back (480 V box west);
 - product_takeoff, 3 x 3 x 4: a 30B on its scale under the chilled desublimers (480 V box west);
-- tails_takeoff, 3 x 3 x 5: a 48Y on its scale under the desublimers (480 V box west)."""
+- tails_takeoff, 3 x 3 x 5: a 48Y on its scale under the desublimers (480 V box west);
+- cascade_cooling_skid, 3 x 3 x 6 (16c1): two plate exchangers and two pumps on a skid, circulating water in at the front and out
+  at the back (480 V box west)."""
 import mlib
 import plantlib as g
 
@@ -74,8 +76,23 @@ def takeoff(name, length, r):
 PT = takeoff("product_takeoff", 4, 0.38)   # a 30B: 30 in across, 2.07 m long
 TT = takeoff("tails_takeoff", 5, 0.61)     # a 48Y: 48 in across, 3.8 m long
 
+# ---- 16c1: the cascade cooling skid --------------------------------------------------------------------------------------------
+CK = model("cascade_cooling_skid", 3, 3, 6, "blue")
+CK.box((0.0, 0.0, 0.0), (3.0, 0.2, 6.0), "iron")                            # its skid
+for z in (0.6, 3.2):
+	CK.box((0.9, 0.2, z), (2.1, 2.4, z + 0.5), "grey")                      # a plate exchanger's frame plates
+	CK.box((1.0, 0.4, z + 0.5), (2.0, 2.2, z + 1.8), "steel")               # its plate pack
+	CK.box((0.9, 0.2, z + 1.8), (2.1, 2.4, z + 2.1), "grey")
+for z in (1.2, 3.8):
+	CK.cylinder("x", (0.55, z), 0.25, 0.2, 0.85, "blue", 12)                # a pump and its motor
+CK.pipe([(1.5, 0.5, 0.0), (1.5, 0.5, 0.6)], 8, "steel")                     # circulating water in, the front
+CK.pipe([(1.5, 0.5, 5.4), (1.5, 0.5, 6.0)], 8, "steel")                     # and out, the back
+CK.pipe([(2.6, 2.6, 0.3), (2.6, 2.6, 5.7)], 4, "steel")                     # the closed loop's header along the top
+box480(CK, 0.4, 2.5)
+CK.collide((0.1, 0.0, 0.1), (2.9, 2.6, 5.9))
+
 
 M = CE
-EXTRA = [FC, FS, PT, TT]
+EXTRA = [FC, FS, PT, TT, CK]
 for extra in EXTRA:
 	extra.export_args = {"blockstate": True, "item": True}

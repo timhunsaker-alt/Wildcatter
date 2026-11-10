@@ -14,7 +14,7 @@ public final class Enrichment {
 
 	/** kg of feed U a kg of product U. */
 	public static double feedPerProduct() {
-		return (Tuning.ASSAY_PRODUCT - Tuning.ASSAY_TAILS) / (Tuning.ASSAY_FEED - Tuning.ASSAY_TAILS);
+		return feedPerProduct(Tuning.ASSAY_PRODUCT, Tuning.ASSAY_TAILS);
 	}
 
 	/** kg of tails U a kg of product U. */
@@ -24,7 +24,36 @@ public final class Enrichment {
 
 	/** SWU a kg of product U. */
 	public static double swuPerProduct() {
-		return value(Tuning.ASSAY_PRODUCT) + tailsPerProduct() * value(Tuning.ASSAY_TAILS) - feedPerProduct() * value(Tuning.ASSAY_FEED);
+		return swuPerProduct(Tuning.ASSAY_PRODUCT, Tuning.ASSAY_TAILS);
+	}
+
+	// ---- 16c1: any product and tails assay (docs/multiblocks/enrichment-operations.md) ----------------------------------------------
+	/** The product assays a feed station may be set to, and the tails assays. */
+	public static final double[] PRODUCT_ASSAYS = {0.030, 0.035, 0.040, 0.045, 0.0495};
+	public static final double[] TAILS_ASSAYS = {0.0020, 0.0025, 0.0030};
+
+	public static double feedPerProduct(double product, double tails) {
+		return (product - tails) / (Tuning.ASSAY_FEED - tails);
+	}
+
+	public static double tailsPerProduct(double product, double tails) {
+		return feedPerProduct(product, tails) - 1;
+	}
+
+	public static double swuPerProduct(double product, double tails) {
+		return value(product) + tailsPerProduct(product, tails) * value(tails) - feedPerProduct(product, tails) * value(Tuning.ASSAY_FEED);
+	}
+
+	public static int stages(double product, double tails) {
+		double beta = Math.log(Math.sqrt(Tuning.CENTRIFUGE_SEPARATION_FACTOR));
+		double enriching = Math.log(ratio(product) / ratio(Tuning.ASSAY_FEED)) / beta;
+		double stripping = Math.log(ratio(Tuning.ASSAY_FEED) / ratio(tails)) / beta;
+		return (int) Math.ceil(enriching + stripping);
+	}
+
+	/** A fresh assembly's starting reactivity at this assay: +16,000 pcm at 4.95 %, 4,000 less for each percent below (proposed). */
+	public static double freshRho(double assay) {
+		return Tuning.ASSEMBLY_RHO_FRESH - Tuning.RHO_PER_ASSAY * (Tuning.ASSAY_PRODUCT - assay);
 	}
 
 	private static double ratio(double x) {

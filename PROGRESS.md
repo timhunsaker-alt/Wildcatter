@@ -1450,7 +1450,7 @@ sized for a 40-pot line.
 ## Known gaps
 - Phase 16 (uranium routes and plant operations, 2026-11-10; `docs/questions/phase16-uranium.md`): script-drawn icons
   `u3o8_drum_placeholder` (16a), `fluorinator_ash_drum_placeholder`, `synthetic_fluorspar_placeholder` (16b1). The chlor-alkali cell on
-  potash has no scene (16b1). Not built in 16a: uranyl peroxide precipitation, ammonia recovery, ASTM C967 impurity penalties.
+  potash has no scene (16b1). A fuel assembly stood up as a block keeps no assay and reads 4.95 % when broken (16c1). Not built in 16a: uranyl peroxide precipitation, ammonia recovery, ASTM C967 impurity penalties.
   16b2, 16c2 and 16d2 are planned in ROADMAP, not built.
 - Phase 14 (the ammonia plant): the `gauze_pack` and `emulsifier_pail` icons are Ludo art since the art wave (2026-11-09); no
   placeholder is left. The six parts use the mod's materials. Not built: the ammonia leak hazard, AN solution setting in a cold
@@ -1869,4 +1869,13 @@ Plan: `docs/ideas-plan.md`. Branch `phase16`. Nothing changes what an existing w
     new bed take them); SPENT stops the hydrofluorinator.
   - Field Manual pages CONVERSION'S BY-PRODUCTS and KOH SCRUBBER.
   - Tests: NeoForge scene `conversion_extensions` passes; `UraniumOperationsTest` adds the hydrogen, KOH and ash balances.
+- **16c1, enrichment operations** (`docs/multiblocks/enrichment-operations.md`, "As built (16c1)"):
+  - The feed station's sneak-click steps its assays (product 3.0-4.95 %, tails 0.20-0.30 %); `fluid/Enrichment` works from any pair.
+  - New item component `wildcatter:assay` on 30Bs and fuel assemblies (none means 4.95 %); the fuel plant, rod welder and assembly fixture
+    carry it; the reactor keeps each assembly's (fresh reactivity 4,000 pcm less a percent below 4.95 %).
+  - CASCADE COOLING SKID (3 x 3 x 6, 55 kW): against the header, circulating water in front, warm water out the back; a cascade that has
+    had one reads CASING HOT after 5 minutes without cooling and holds its feed.
+  - Spin-up and coast-down with `cascadeSpinUp=true` (default off): COASTING machines keep separating as they slow.
+  - Field Manual page CASCADE OPERATIONS.
+  - Tests: NeoForge scene `cascade_operations` passes; `UraniumOperationsTest` adds the spec's assay table, fresh reactivity, cooling water.
 

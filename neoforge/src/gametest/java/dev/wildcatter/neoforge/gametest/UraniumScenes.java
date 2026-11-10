@@ -39,6 +39,10 @@ import net.minecraft.world.level.block.Block;
  * caustic potash scrubs the hydrofluorinator's HF, bags its CaF2 as synthetic fluorspar, and without lime reads SPENT and stops the
  * hydrofluorinator; a fluorinator with a full bed (the rule on) reads BED FULL, and retired fills five ash drums and takes fluorspar for a
  * new bed; an ash drum in a leach tank adds its uranium to the slurry.</li>
+ * <li>{@code cascade_operations} (16c1, enrichment-operations.md): eleven centrifuges driven by hook (a frequency converter needs
+ * 12.47 kV and several MW); set to 3.00 / 0.25 %, ten machines are enough and the 30B the product take-off fills reads 3.00 %; with the
+ * spin-up rule on and the drive gone, the machines coast and the cascade still feeds; with the cooling skid's water cut and five
+ * minutes passed by hook, CASING HOT holds the feed.</li>
  * </ul>
  */
 final class UraniumScenes {
@@ -49,6 +53,7 @@ final class UraniumScenes {
 		Map<String, Consumer<GameTestHelper>> scenes = new LinkedHashMap<>();
 		scenes.put("adu_yellowcake", UraniumScenes::aduYellowcake);
 		scenes.put("conversion_extensions", UraniumScenes::conversionExtensions);
+		scenes.put("cascade_operations", UraniumScenes::cascadeOperations);
 		return scenes;
 	}
 
@@ -262,4 +267,108 @@ final class UraniumScenes {
 			});
 		}));
 	}
+
+	// ---- cascade_operations (16c1) -------------------------------------------------------------------------------------------------
+	/** Drives the centrifuges at (x1..x2, U, z) at full speed every second while {@code on[0]}, as a frequency converter would. */
+	static void driveLoop(GameTestHelper helper, int x1, int x2, int z, boolean[] on) {
+		if (!on[0]) {
+			return;
+		}
+		long now = helper.getLevel().getGameTime();
+		net.minecraft.core.BlockPos fake = abs(helper, -50, U, -50);
+		for (int x = x1; x <= x2; x++) {
+			entity(helper, x, z, dev.wildcatter.block.CentrifugeBlockEntity.class).drive(fake, 1.0, now);
+		}
+		helper.runAfterDelay(20, () -> driveLoop(helper, x1, x2, z, on));
+	}
+
+	static void cascadeOperations(GameTestHelper helper) {
+		String scene = "cascade_operations";
+		floor(helper, -10, -6, 28, 16);
+		place(helper, WildcatterBlocks.FEED_STATION, 0, 0);            // x 0-2, z 0-4; the header at z 5
+		place(helper, WildcatterBlocks.PRODUCT_TAKEOFF, 2, 6);         // x 2-4, z 6-9
+		place(helper, WildcatterBlocks.TAILS_TAKEOFF, 6, 6);           // x 6-8, z 6-10
+		place(helper, WildcatterBlocks.CASCADE_COOLING_SKID, 10, 8);   // x 10-12, z 8-13, its east side on the header's branch
+		for (int x = 0; x <= 15; x++) {
+			pipe(helper, new int[] {x, 0, 5});
+		}
+		for (int z = 6; z <= 10; z++) {
+			pipe(helper, new int[] {13, 0, z});                                                          // the header's branch past the skid
+		}
+		for (int y = 1; y <= 6; y++) {
+			pipe(helper, new int[] {15, y, 5});
+		}
+		for (int x = 16; x <= 26; x++) {
+			place(helper, WildcatterBlocks.CENTRIFUGE, x, 5);
+			pipe(helper, new int[] {x, 6, 5});                                                           // the header over the machines
+		}
+		pipe(helper, new int[] {11, 0, 7});
+		helper.getLevel().setBlock(abs(helper, 11, U + 1, 7), BuiltInRegistries.BLOCK.getValue(WildcatterNeoForgeGameTests.id("gas_source")).defaultBlockState(), 3);
+		TestGasSource.SourceEntity cw = (TestGasSource.SourceEntity) helper.getLevel().getBlockEntity(abs(helper, 11, U + 1, 7));
+		cw.product = Product.COOLING_WATER;
+		cw.rate = 300.0;
+		genset(helper, -4, -4);
+		cableRun(helper, -3, -4, -1, 14);                                                                // the feed station's box at (-1, 0), on to z 14
+		cableRun(helper, -1, 14, 9, 14);
+		for (int z = 6; z <= 13; z++) {
+			cable(helper, 1, z);                                                                         // the product take-off's box
+			cable(helper, 5, z);                                                                         // the tails take-off's box
+		}
+		for (int z = 8; z <= 13; z++) {
+			cable(helper, 9, z);                                                                         // the skid's box
+		}
+		dev.wildcatter.block.FeedStationBlockEntity feed = entity(helper, 0, 0, dev.wildcatter.block.FeedStationBlockEntity.class);
+		feed.slots().set(0, new ItemStack(WildcatterItems.UF6_CYLINDER_48Y, 1));
+		feed.setAssaysForTest(0, 1);                                                                     // 3.00 / 0.25 %
+		dev.wildcatter.block.TakeoffBlockEntity product = entity(helper, 2, 6, dev.wildcatter.block.TakeoffBlockEntity.class);
+		product.slots().set(0, new ItemStack(WildcatterItems.EMPTY_30B_CYLINDER, 2));
+		dev.wildcatter.block.TakeoffBlockEntity tails = entity(helper, 6, 6, dev.wildcatter.block.TakeoffBlockEntity.class);
+		tails.slots().set(0, new ItemStack(WildcatterItems.EMPTY_48Y_CYLINDER, 2));
+		boolean[] on = {true};
+		check(helper, dev.wildcatter.fluid.Enrichment.stages(0.03, 0.0025) == 10, "3.00 / 0.25 % should need ten stages: " + dev.wildcatter.fluid.Enrichment.stages(0.03, 0.0025));
+		start(helper, -4, -4, () -> {
+			driveLoop(helper, 16, 25, 5, on);                                                            // ten machines
+			helper.runAfterDelay(100, () -> {
+				String running = read(helper, 0, 0);
+				check(helper, running.contains("feeding") && running.contains("3.00 %"), "ten machines should run a 3.00 / 0.25 % cascade: " + running + " | skid " + read(helper, 10, 8));
+				check(helper, read(helper, 10, 8).contains("cooling 10 machines"), "the skid should cool the ten machines: " + read(helper, 10, 8));
+				product.addUf6(Math.max(0, product.capacity() - 0.01), 0.03);                                // a hook brings the 30B near full
+				log(scene, "running: " + running);
+				helper.runAfterDelay(60, () -> {
+					ItemStack cylinder = product.slots().get(1);
+					double assay = dev.wildcatter.WildcatterComponents.assay(cylinder);
+					check(helper, cylinder.is(WildcatterItems.LEU_CYLINDER_30B) && Math.abs(assay - 0.03) < 0.0002, "the product 30B should read 3.00 %: " + cylinder + " " + assay
+							+ " | " + read(helper, 2, 6));
+					// the drive gone with the spin-up rule on: the machines coast and the cascade keeps feeding
+					dev.wildcatter.Rules.setCascadeSpinUp(true);
+					for (int x = 16; x <= 25; x++) {
+						entity(helper, x, 5, dev.wildcatter.block.CentrifugeBlockEntity.class).setSpinForTest(1.0);
+					}
+					on[0] = false;
+					helper.runAfterDelay(100, () -> {
+						dev.wildcatter.block.CentrifugeBlockEntity c = entity(helper, 16, 5, dev.wildcatter.block.CentrifugeBlockEntity.class);
+						double s = c.speed();
+						String coast = read(helper, 16, 5);
+						String still = read(helper, 0, 0);
+						check(helper, s < 1 && s > 0.99 && coast.contains("COASTING"), "with no drive a machine should coast: " + s + " | " + coast);
+						check(helper, still.contains("feeding"), "the coasting cascade should keep feeding: " + still);
+						dev.wildcatter.Rules.setCascadeSpinUp(false);
+						on[0] = true;
+						driveLoop(helper, 16, 25, 5, on);
+						// the cooling water cut, five minutes passed by hook
+						helper.getLevel().setBlock(abs(helper, 11, U + 1, 7), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+						helper.runAfterDelay(80, () -> feed.setHotForTest(Tuning.CASING_HOT_SECONDS - 2));   // once the skid has run dry
+						helper.runAfterDelay(160, () -> {
+							String hot = read(helper, 0, 0);
+							check(helper, hot.startsWith("Feed station: CASING HOT"), "without cooling water the cascade should read CASING HOT: " + hot + " | skid " + read(helper, 10, 8));
+							on[0] = false;
+							log(scene, "ok: " + coast + " | " + hot);
+							helper.succeed();
+						});
+					});
+				});
+			});
+		});
+	}
 }
+

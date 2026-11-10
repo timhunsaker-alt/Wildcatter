@@ -27,6 +27,7 @@ public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements 
 	private boolean skeleton;
 	private double steel;
 	private int rods;
+	private double assay = Tuning.ASSAY_PRODUCT;   // 16c1: of the rods in the skeleton
 	private int built;
 	private String unit = "starting";
 
@@ -125,11 +126,13 @@ public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements 
 			steel -= Tuning.ASSEMBLY_STEEL_KG;
 			skeleton = true;
 		}
+		double a = welder.rodAssay();
 		if (rods < Tuning.ASSEMBLY_RODS && welder.takeRod()) {
+			assay = FuelStage.blend(rods, assay, 1, a);   // 16c1
 			rods++;
 		}
 		if (rods >= Tuning.ASSEMBLY_RODS) {
-			slots.set(OUT, new ItemStack(WildcatterBlocks.FUEL_ASSEMBLY));
+			slots.set(OUT, dev.wildcatter.WildcatterComponents.withAssay(new ItemStack(WildcatterBlocks.FUEL_ASSEMBLY), assay));
 			skeleton = false;
 			rods = 0;
 			built++;
@@ -147,6 +150,7 @@ public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements 
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
+		output.putDouble("assay", assay);
 		ContainerHelper.saveAllItems(output, slots);
 		output.putBoolean("skeleton", skeleton);
 		output.putDouble("steel", steel);
@@ -157,6 +161,7 @@ public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements 
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		assay = input.getDoubleOr("assay", Tuning.ASSAY_PRODUCT);
 		slots.clear();
 		ContainerHelper.loadAllItems(input, slots);
 		skeleton = input.getBooleanOr("skeleton", false);

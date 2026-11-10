@@ -565,6 +565,7 @@
   "block.wildcatter.uranium_calciner": "Uranium Calciner (six hearths, 0.6 MW)",
   "item.wildcatter.fluorinator_ash_drum": "Fluorinator Ash Drum",
   "item.wildcatter.synthetic_fluorspar": "Synthetic Fluorspar (1 t bag)",
+  "block.wildcatter.cascade_cooling_skid": "Cascade Cooling Skid (55 kW)",
   "block.wildcatter.cathode_gas_scrubber": "Cathode Gas Scrubber (NaF beds, 10 kW)",
   "block.wildcatter.koh_scrubber": "KOH Scrubber (with lime regeneration, 15 kW)"
 }

@@ -77,6 +77,7 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "uranium_calciner" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CALCINER_WATTS);
 				case "cathode_gas_scrubber" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CATHODE_SCRUBBER_WATTS);
 				case "koh_scrubber" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.KOH_SCRUBBER_WATTS);
+				case "cascade_cooling_skid" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CASCADE_SKID_WATTS);
 				case "oxygen_generator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.O2_GENERATOR_WATTS);
 				case "cold_traps" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.COLD_TRAP_WATTS);
 				case "distillation_columns" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.REBOILER_WATTS);
@@ -277,6 +278,7 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "uranium_calciner" -> "rabble drive and off-gas fan";
 			case "cathode_gas_scrubber" -> "bed heaters and pump";
 			case "koh_scrubber" -> "recirculation pumps";
+			case "cascade_cooling_skid" -> "cooling water pumps";
 			case "emulsion_blender" -> "mixer";
 			case "meter_building" -> "heaters, chromatograph and RTU charger";
 			default -> kind();

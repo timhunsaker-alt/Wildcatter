@@ -30,8 +30,12 @@ public class FuelAssemblyBlock extends BigPartBlock {
 
 	/** Its tooltip and readout. */
 	public static String describe() {
+		return describe(Tuning.ASSAY_PRODUCT);
+	}
+
+	public static String describe(double assay) {
 		return String.format("17x17 fuel assembly: %d rods, %,.1f kg of uranium at %.2f %% U-235, about %,.0f kg", Tuning.ASSEMBLY_RODS, Fuel.assemblyU(),
-				Tuning.ASSAY_PRODUCT * 100, Fuel.assemblyKg());
+				assay * 100, Fuel.assemblyKg());
 	}
 
 	@Override

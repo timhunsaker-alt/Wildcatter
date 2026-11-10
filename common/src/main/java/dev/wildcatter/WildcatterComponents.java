@@ -35,6 +35,26 @@ public final class WildcatterComponents {
 			.networkSynchronized(net.minecraft.core.BlockPos.STREAM_CODEC)
 			.build();
 
+	/** 16c1: the U-235 assay (a fraction) of a 30B of LEU or a fuel assembly made from it; none reads as the standard 4.95 %. */
+	public static final DataComponentType<Double> ASSAY = DataComponentType.<Double>builder()
+			.persistent(com.mojang.serialization.Codec.DOUBLE)
+			.networkSynchronized(ByteBufCodecs.DOUBLE)
+			.build();
+
+	/** The assay a stack carries: its component, or the standard product assay. */
+	public static double assay(net.minecraft.world.item.ItemStack stack) {
+		Double a = stack.get(ASSAY);
+		return a == null ? Tuning.ASSAY_PRODUCT : a;
+	}
+
+	/** Stamps a stack with an assay; the standard one is left unstamped, so it stacks and reads as every 30B before. */
+	public static net.minecraft.world.item.ItemStack withAssay(net.minecraft.world.item.ItemStack stack, double assay) {
+		if (Math.abs(assay - Tuning.ASSAY_PRODUCT) > 1e-5) {
+			stack.set(ASSAY, Math.round(assay * 1e5) / 1e5);
+		}
+		return stack;
+	}
+
 	private WildcatterComponents() {
 	}
 
@@ -44,5 +64,6 @@ public final class WildcatterComponents {
 		Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wildcatter.id("blueprint"), BLUEPRINT);
 		Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wildcatter.id("survey_a"), SURVEY_A);
 		Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wildcatter.id("survey_b"), SURVEY_B);
+		Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wildcatter.id("assay"), ASSAY);
 	}
 }

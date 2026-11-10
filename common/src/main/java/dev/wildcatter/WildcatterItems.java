@@ -77,9 +77,8 @@ public final class WildcatterItems {
 	public static final Item EMPTY_30B_CYLINDER = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(4).setId(EMPTY_30B_CYLINDER_KEY),
 			String.format("30 in steel UF6 cylinder (ANSI N14.1), %,.0f kg tare", Tuning.CYLINDER_30B_TARE));
 	public static final ResourceKey<Item> LEU_CYLINDER_30B_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("leu_cylinder_30b"));
-	public static final Item LEU_CYLINDER_30B = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(1).setId(LEU_CYLINDER_30B_KEY),
-			String.format("%,.0f kg of enriched UF6, %,.0f kg of uranium", Tuning.CYLINDER_30B_KG, Tuning.CYLINDER_30B_KG / Tuning.UF6_PER_U),
-			String.format("%.2f %% U-235: low-enriched, for fuel", Tuning.ASSAY_PRODUCT * 100));
+	public static final Item LEU_CYLINDER_30B = new dev.wildcatter.item.AssayedItem(new Item.Properties().stacksTo(1).setId(LEU_CYLINDER_30B_KEY),
+			String.format("%,.0f kg of enriched UF6, %,.0f kg of uranium", Tuning.CYLINDER_30B_KG, Tuning.CYLINDER_30B_KG / Tuning.UF6_PER_U));
 	public static final ResourceKey<Item> TAILS_CYLINDER_48Y_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("tails_cylinder_48y"));
 	public static final Item TAILS_CYLINDER_48Y = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(1).setId(TAILS_CYLINDER_48Y_KEY),
 			String.format("%,.0f kg of depleted UF6, %,.0f kg of uranium", Tuning.CYLINDER_48Y_KG, Tuning.CYLINDER_48Y_KG / Tuning.UF6_PER_U),

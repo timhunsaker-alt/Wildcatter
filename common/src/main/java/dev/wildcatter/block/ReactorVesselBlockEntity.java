@@ -291,7 +291,7 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 					reactor.tavg(), reactor.pressure());
 		}
 		boolean rcca = stack.is(WildcatterItems.RCCA);
-		boolean ok = rcca ? reactor.loadRcca() : reactor.loadAssembly(0);
+		boolean ok = rcca ? reactor.loadRcca() : reactor.loadAssembly(0, dev.wildcatter.WildcatterComponents.assay(stack));
 		if (!ok) {
 			return rcca ? "Reactor vessel: all 5 RCCAs are in" : "Reactor vessel: the core is full (9 assemblies)";
 		}
@@ -308,8 +308,10 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 		ItemStack out;
 		if (reactor.unloadRcca()) {
 			out = new ItemStack(WildcatterItems.RCCA);
-		} else if (reactor.unloadFreshAssembly()) {
-			out = new ItemStack(WildcatterBlocks.FUEL_ASSEMBLY);
+		} else if (reactor.assemblies() > 0 && reactor.burnup(reactor.assemblies() - 1) <= 0) {
+			double a = reactor.lastAssay();
+			reactor.unloadFreshAssembly();
+			out = dev.wildcatter.WildcatterComponents.withAssay(new ItemStack(WildcatterBlocks.FUEL_ASSEMBLY), a);
 		} else {
 			return reactor.assemblies() > 0 ? "Reactor vessel: irradiated fuel waits for the refuelling machine (8c)" : "Reactor vessel: empty";
 		}

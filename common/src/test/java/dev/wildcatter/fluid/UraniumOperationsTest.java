@@ -54,4 +54,28 @@ class UraniumOperationsTest {
 	void anAshDrumHolds12KgOfU() {
 		assertEquals(12, Tuning.ASH_DRUM_KG * Tuning.ASH_U_SHARE, 0.01);
 	}
+
+	// ---- 16c1: product assay, spin-up and cooling (docs/multiblocks/enrichment-operations.md) ---------------------------------------
+	@Test
+	void theSpecsAssayTable() {
+		double[][] rows = {{0.0495, 0.0025, 10.20, 7.81, 11}, {0.040, 0.0025, 8.13, 5.83, 11}, {0.030, 0.0025, 5.97, 3.81, 10}, {0.0495, 0.0020, 9.30, 8.73, 12}};
+		for (double[] r : rows) {
+			assertEquals(r[2], Enrichment.feedPerProduct(r[0], r[1]), 0.01);
+			assertEquals(r[3], Enrichment.swuPerProduct(r[0], r[1]), 0.02);
+			assertEquals((int) r[4], Enrichment.stages(r[0], r[1]));
+		}
+		assertEquals(Enrichment.swuPerProduct(), Enrichment.swuPerProduct(Tuning.ASSAY_PRODUCT, Tuning.ASSAY_TAILS), 1e-12);
+		assertEquals(Enrichment.stages(), Enrichment.stages(Tuning.ASSAY_PRODUCT, Tuning.ASSAY_TAILS));
+	}
+
+	@Test
+	void lowerAssayFuelStartsLower() {
+		assertEquals(Tuning.ASSEMBLY_RHO_FRESH, Enrichment.freshRho(Tuning.ASSAY_PRODUCT), 1e-12);   // 4.95 % fuel as before
+		assertEquals(0.082, Enrichment.freshRho(0.030), 1e-9);                                       // 3 %: about half the cycle
+	}
+
+	@Test
+	void aMachineTakes13Point6KgOfWaterASecond() {
+		assertEquals(13.6, Enrichment.machineWatts() / (Tuning.WATER_SPECIFIC_HEAT * Tuning.CASING_RISE_C), 0.2);
+	}
 }

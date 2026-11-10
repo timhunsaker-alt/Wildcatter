@@ -1250,4 +1250,13 @@ public final class Tuning {
 	public static final double KOH_REGEN_KGS = 1.0;                // KOH the lime reactor regenerates at most a second (proposed: a batch reactor)
 	public static final double KOH_PER_CL2 = 1.58;                // kg of KOH a kg of Cl2, a membrane cell on potash (derived)
 	public static final double KCL_PER_CL2 = 2.1;                 // kg of KCl a kg of Cl2 (derived)
+
+	// ---- Phase 16c1: product assay, spin-up and cooling (docs/multiblocks/enrichment-operations.md) -----------------------------
+	public static final double RHO_PER_ASSAY = 4.0;                // 4,000 pcm a percent of U-235 below 4.95 % (proposed)
+	public static final double SPIN_UP_SECONDS = 600.0;            // rest to full speed on the converter's ramp (proposed)
+	public static final double COAST_DOWN_SECONDS = 3_600.0;       // full speed to rest in the casing's vacuum, no drive (proposed)
+	public static final double CASCADE_SKID_WATTS = 55_000.0;      // the cooling skid's pumps (proposed), industrial supply
+	public static final double CASING_RISE_C = 10.0;
+	public static final double WATER_SPECIFIC_HEAT = 4_186.0;      // J/kg K               // the cooling water's rise through the casings
+	public static final double CASING_HOT_SECONDS = 300.0;         // without cooling, CASING HOT after this (proposed)
 }

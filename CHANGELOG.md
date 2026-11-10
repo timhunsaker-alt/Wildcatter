@@ -9,6 +9,10 @@
   `fluorinatorAshBed=true` in `config/wildcatter.properties`); a KOH SCRUBBER cleans the hydrofluorinator's off-gas, charged with caustic
   potash from a chlor-alkali cell run on potash and regenerated with quicklime into Synthetic Fluorspar. Spec:
   `docs/multiblocks/conversion-extensions.md`.
+- **Enrichment operations (16c1):** sneak-click the feed station to choose the product (3.0-4.95 %) and tails (0.20-0.30 %) assays; the
+  30B, the fuel assembly and the reactor carry the assay (lower assay, shorter cycle). A CASCADE COOLING SKID cools the casings; a cascade
+  that has had one reads CASING HOT without it. Spin-up and coast-down are opt-in (`cascadeSpinUp=true`). Spec:
+  `docs/multiblocks/enrichment-operations.md`.
 - Decisions for review: `docs/questions/phase16-uranium.md`.
 
 ## Unreleased (0.7.0): gas and power quick wins (Phase 14b-14d) and the protection gap wave (built 2026-11-09 while Tim was away; not approved)

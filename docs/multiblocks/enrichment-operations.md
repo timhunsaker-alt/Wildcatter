@@ -1,7 +1,8 @@
 # Enrichment operations: spin-up, crashes, cooling, sampling, heels, product assay
 
-> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Proposed phase **16c** (16c1 assay choice,
-> spin-up and cooling; 16c2 crashes, sampling and heels). Decisions are in `docs/questions/specs-wildcatter.md` (items 36-40).
+> **16c1 BUILT (2026-11-10), decided on recommendation while Tim was away; not approved.** See "As built (16c1)" at the end and
+> `docs/questions/phase16-uranium.md` (items 17-23). **16c2 (crashes, sampling and blending, heels) is a written plan, not built.**
+> Drafted as proposed phase **16c** (16c1 assay choice, spin-up and cooling; 16c2 crashes, sampling and heels). Decisions are in `docs/questions/specs-wildcatter.md` (items 36-40).
 
 Six items the cascade spec (enrichment.md, approved 2026-11-01) left in ROADMAP Ideas. Each has its real basis and a proposed scope.
 Numbers use enrichment.md's: Glaser's separation factor 1.74, a stage factor of its square root, 11.4 SWU an hour and 571 kW a machine
@@ -128,3 +129,23 @@ The grid is a sketch; the game test is the layout of record.
 ## Proposed waves
 - **16c1:** product assay, spin-up and coast-down, cooling.
 - **16c2:** crashes, sampling and blending, heels.
+
+## As built (16c1, 2026-11-10; decisions in `docs/questions/phase16-uranium.md`, items 17-23)
+- **Assays:** a sneak-click on the feed station steps its setting round all fifteen: product 3.0, 3.5, 4.0, 4.5, 4.95 %, then tails 0.20,
+  0.25, 0.30 %. Until set, 4.95 / 0.25 % (every cascade already built). `fluid/Enrichment` takes any product and tails assay; the spec's
+  table is in `UraniumOperationsTest` (3.00 / 0.25 %: 5.97 kg of feed, 3.81 SWU, 10 stages).
+- **Downstream:** the product take-off stamps each 30B with the assay of what went into it (a new item component, `wildcatter:assay`;
+  4.95 % is left unstamped, so it stacks and reads as every 30B before). The fuel plant carries it by mass through every stage, the rod
+  welder and the assembly fixture by rods, onto the assembly; the reactor keeps each assembly's assay: starting reactivity
+  +16,000 pcm at 4.95 %, 4,000 pcm less a percent below. Tooltips read it.
+- **Spin-up and coast-down** (`cascadeSpinUp=true` in `config/wildcatter.properties`, **default off**): 10 minutes from rest to full speed,
+  an hour from full speed to rest with no drive, separating at its speed share; a coasting machine reads COASTING. Critical speeds and
+  crashes are 16c2.
+- **Cascade cooling skid** (`wildcatter:cascade_cooling_skid`, 3 x 3 x 6, 55 kW, box west): its side against the header; circulating water
+  in on the north face of its front cells, 13.6 kg/s a machine (571 kW at a 10 C rise), back warm on the south face of its back cells,
+  what nothing takes discharged. **A cascade that has had a skid on its header needs one cooling:** 5 minutes without (no skid, no water,
+  no power), CASING HOT, feed held. A cascade that never had one runs as before.
+- **Tests:** NeoForge scene `cascade_operations` (machines driven by hook: ten run 3.00 / 0.25 %, the 30B reads 3.00 %; with the rule on,
+  the machines coast and the cascade feeds; water cut, CASING HOT). Unit test `UraniumOperationsTest` (the table, fresh reactivity,
+  cooling water).
+
