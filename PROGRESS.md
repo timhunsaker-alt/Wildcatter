@@ -1448,6 +1448,11 @@ sized for a 40-pot line.
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- Phase 18 (phosphate): the `tsp_bag`, `dap_bag`, `mop_bag` and `extractant_drum` icons are script-drawn `*_placeholder`. The ten parts
+  use the mod's materials. Not built: the DEPA-TOPO second cycle (ammonium carbonate strip, AUC to the uranium calciner; it needs Phase
+  16a and 16d1, on the `phase16` branch, planned in `docs/multiblocks/uranium-from-phosphate.md`), so the uranium stays in the strip;
+  the filter acid's uranium is not carried as an assay; fluorosilicic acid recovery; the hemihydrate process; potash by flotation;
+  Farmings reading `c:fertilizers` (Farmings' side). See `docs/questions/phase18-phosphate.md`.
 - Phase 14 (the ammonia plant): the `gauze_pack` and `emulsifier_pail` icons are Ludo art since the art wave (2026-11-09); no
   placeholder is left. The six parts use the mod's materials. Not built: the ammonia leak hazard, AN solution setting in a cold
   pipe, an IBC for matrix, a PGM refinery (a gauze pack is crafted straight from platinum reef ore and a worn pack is not recovered),
@@ -1838,3 +1843,22 @@ Branch `misc-gaps`.
 - **Field Manual:** GENSETS (the derate on coke oven gas), PEAKER (no coke oven gas, the Wobbe index).
 - **Tests:** unit test `LeanGasTest` (3). NeoForge server scenes `cog_derate` (860 kW held against a 1 MW bank), `aero_lean_gas`,
   `cracker_pump` (a furnace filled 0 to 200 L by a process water pump on a diesel set), `alternator_frames`, `drawn_runs`.
+
+## Phase 18: phosphate (2026-11-10; built while Tim was away; decisions: `docs/questions/phase18-phosphate.md`)
+- **18a, fertilizer** (`docs/multiblocks/fertilizer.md`): **phosphate mill** (wet ball mill, 200 kW at 4.16 kV; rock by hopper, water,
+  rock slurry out), **phosphoric reactor** (dihydrate attack, 150 kW; rock slurry north, sulfuric acid south) with the **tilting pan
+  filter** against it (250 kW at 4.16 kV; filter acid south, gypsum tails west to a lined cell, NO GYPSUM STACK), **acid evaporator**
+  (75 kW; 28 % to 54 % P2O5 on process steam, fluorine counted), **granulation plant** (150 kW, 0.8 MW dryer; TSP or DAP by sneak-click,
+  1 t bags at a bagging station); **potash dissolver**, **vacuum crystallizer** and **potash dryer** (55, 110 and 75 kW; 5 t/h of MOP, salt
+  tails to a cell). 20 t of P2O5 a day. New pipe products rock slurry, filter acid, merchant acid; TSP, DAP and MOP bags tagged
+  `c:fertilizers`. The decant tower names phosphogypsum and salt. Phosphate rock and potash ore now have uses.
+- **18b, uranium from phosphoric acid** (`docs/multiblocks/uranium-from-phosphate.md`): **acid pretreatment** (45 kW) and the
+  **DEPA-TOPO circuit** against it (60 kW): first charge of kerosene and extractant drums (FILLING), then 2.7 kg/h of uranium into the
+  strip on iron ingots; treated acid (a new pipe product) on to the evaporator; the acid bypasses the circuit when it cannot take it.
+  The second cycle waits on Phase 16. New item: the extractant drum.
+- **Field Manual:** PHOSPHORIC ACID, FERTILIZER, URANIUM FROM PHOSPHATE.
+- **Tests:** `PhosphateTest` (5); NeoForge `phosphoric`, `potash`, `phosphate_uranium`; client `phosphatePlant` (filmed).
+  At the end of the phase (2026-11-10): the full NeoForge server suite, 53 of 53 passed (49 earlier Wildcatter scenes, `always_pass`
+  and the three new); unit tests 354, none failed (2 skipped).
+- **Existing worlds:** unchanged (question 1); text only: the two ore tooltips, the bagging station's NOT BUILT line, the tower's readout
+  when it holds gypsum or salt.

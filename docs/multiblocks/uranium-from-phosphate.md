@@ -2,7 +2,8 @@
 
 > **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Proposed phase **18b**. Decisions are in
 > `docs/questions/specs-wildcatter.md` (items 57-59). Depends on the fertilizer plant (fertilizer.md, 18a) and the ADU calciner
-> (adu-yellowcake.md, 16a).
+> (adu-yellowcake.md, 16a). **The first cycle is built as 18b on branch `phase18` (2026-11-10), without Phase 16; the second cycle
+> is a plan: see "As built" below and `docs/questions/phase18-phosphate.md`.**
 
 Phosphate rock carries uranium (ores.md: 70-200 ppm real, **1,300 ppm** in the game, which the scintillometer hears). Most of it
 dissolves into the wet-process phosphoric acid. From the late 1970s to the 1990s, Florida and Louisiana plants recovered it by
@@ -86,3 +87,41 @@ The grid is a sketch; the game test is the layout of record.
 
 ## Proposed wave
 **18b**, after 18a and 16a.
+
+## As built (2026-11-10; decided while Tim was away, see docs/questions/phase18-phosphate.md items 17-22)
+Built without Phase 16, which is on the `phase16` branch: the pretreatment and the circuit's **first cycle** (DEPA-TOPO extraction and the
+reductive strip on iron). The rates follow from fertilizer.md's through `fluid/Phosphate` (`PhosphateTest`): **1.35 g of U a litre** of
+filter acid, **2.7 kg of U an hour** recovered at the full 0.64 L/s, a drum's 326 kg in about 5 days.
+
+### Numbers added *(proposed)*
+| What | Value | Real-world basis |
+|---|---|---|
+| The organic | **0.2 kg** of DEPA and TOPO a litre (derived from 0.5 M and 0.125 M) | Molar masses 322 and 386 |
+| Extractant drum | **200 kg** of DEPA and TOPO, counted at a litre a kg | A 55 gal drum |
+| First charge | **4,000 L of kerosene** by pipe and **5 drums** | The spec's 5,000 L |
+| Make-up | 0.05 L of organic a m3 of acid, four-fifths kerosene, one-fifth extractant: a drum lasts about 8,000 h | The spec's loss |
+| Iron | **100 kg** an ingot (the mod's figure), 0.5 kg a kg of U: an ingot lasts about 72 h | The spec's figure |
+| Strip hold | **326 kg of U** (an ADU drum's) | Until the second cycle is built |
+| Pretreatment's bypass | the filter acid straight out of its own south face, no power needed | The spec: the fertilizer plant runs on |
+
+### Nozzles
+- **Acid pretreatment:** filter acid in on the north face of its front cells; the bypass out of the south face of its back cells (z 5);
+  480 V box on the west face of its main cell. It runs the circuit against its east side.
+- **DEPA-TOPO circuit** (16 x 3 x 6, running east): kerosene in on the north face of its front cells; extractant drums and iron ingots by a
+  hopper on top (one bin, a slot for each) or clicked in; **treated acid** (a new pipe product, L) out of the south face of its back cells
+  (z 5); 480 V box on the **north** face of its main cell (the pretreatment covers its west).
+- **Evaporator:** takes treated acid as it takes filter acid.
+- **Readouts:** U in (g/L), recovery, kg/h into the strip and what the strip holds; FILLING (first charge), NO IRON, NO EXTRACTANT, FULL;
+  the pretreatment says when the acid is passing round the circuit.
+- **Extractant drum recipe** (stand-in): an empty drum, phosphate rock, a diesel bucket and an iron ingot (question 19). Icon
+  `extractant_drum_placeholder`.
+
+### Plan: the second cycle, once Phase 16 is merged
+1. A **uranium carbonate** hand-off: on the circuit's east face, ammonia (the ammonia plant's bullet, L) and liquid CO2 (16d1's liquefier,
+   `Product.CO2`, kg) at 0.4 kg of NH3 and 0.5 kg of CO2 a kg of U make the ammonium carbonate strip. NO AMMONIA and NO CO2 readouts.
+2. The strip's uranium (held now, so none is lost) re-extracted and stripped as **AUC**, handed by touching to 16a's `uranium_calciner`
+   against the circuit's east end; the calciner treats AUC as it treats ADU (U3O8 at 96 %), and the drum filler against it fills **U3O8
+   Drums**.
+3. FULL then means the calciner is backed up, not that the second cycle is missing; the strip hold stays as a buffer.
+4. Tests: `phosphate_uranium` gains the calciner and filler, a drum brought near full by hook, and NO AMMONIA with the ammonia cut, as the
+   spec's game test asks; the client screenshot of the circuit beside the plant.

@@ -188,6 +188,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("ammoniaPlant")) {
 				ammoniaPlant(context, server);
 			}
+			if (only("phosphatePlant")) {
+				phosphatePlant(context, server);
+			}
 			if (only("salesGas")) {
 				new GasPowerClientScenes(context, server, y, up, -8200).salesGas();
 			}
@@ -9247,6 +9250,227 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			check(starved.contains("NO SYNGAS"), "once the compressor's gas is used the converter should stop: " + starved);
 			showReadout(context, server, new BlockPos(8, up, z + 11), "tp @p 4 " + (up + 3) + " " + (z + 12) + " -90 10", "wildcatter-ammonia-no-syngas");
 			System.out.println("[wildcatter-test] ammoniaPlant ok: " + noH2 + " | " + starved);
+		} finally {
+			if (film != null) {
+				film.stop();
+			}
+		}
+	}
+
+	/**
+	 * The phosphoric acid and fertilizer plant (Phase 18a, docs/multiblocks/fertilizer.md), filmed, every part facing north. A hopper of
+	 * phosphate rock on the phosphate mill (4.16 kV), its rock slurry to the phosphoric reactor; sulfuric acid from a stock tank; the
+	 * tilting pan filter against the reactor's east side (4.16 kV) sends its gypsum over the wall of a lined tailings cell and its filter
+	 * acid to the evaporator, on process steam from a package boiler fired on LPG. The merchant acid and ammonia from a bullet go to the
+	 * granulation plant on DAP, its dryer on LPG, a bagging station against its south end. Five diesel sets: two on 480 V for the
+	 * plant, one for the boiler, two through backward unit substations for the mill and filter; the big motors started one at a time.
+	 * The reactor must run near its rating, gypsum must reach the cell, merchant acid the granulator, and a DAP bag (brought near full by
+	 * hook) must drop. Screenshots of the plant and each readout.
+	 */
+	private void phosphatePlant(ClientGameTestContext context, TestServerContext server) {
+		int z = -10000;
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 6 " + (up + 34) + " " + (z + 48) + " 180 45");
+		context.waitTicks(20);
+		for (int zz = z - 26; zz <= z + 44; zz += 12) {   // /fill takes at most 32,768 blocks
+			server.runCommand("fill -27 " + (y - 1) + " " + zz + " 37 " + (y + 14) + " " + Math.min(zz + 11, z + 44) + " minecraft:air");
+		}
+		server.runCommand("fill -27 " + (y - 1) + " " + (z - 26) + " 37 " + (y - 1) + " " + (z + 44) + " minecraft:stone");
+		Filming film = null;
+		try {
+			BlockPos mill = new BlockPos(-6, up, z - 8);
+			BlockPos reactor = new BlockPos(0, up, z);
+			BlockPos filter = new BlockPos(8, up, z);
+			BlockPos acidTank = new BlockPos(2, up, z + 9);
+			BlockPos evaporator = new BlockPos(9, up, z + 11);
+			BlockPos boiler = new BlockPos(15, up, z + 1);
+			BlockPos lpg = new BlockPos(20, up, z + 1);
+			BlockPos granulator = new BlockPos(9, up, z + 16);
+			BlockPos bagger = new BlockPos(10, up, z + 28);
+			BlockPos nh3 = new BlockPos(15, up, z + 18);
+			BlockPos lpg2 = new BlockPos(15, up, z + 30);
+			placeBig(server, WildcatterBlocks.PHOSPHATE_MILL, mill, north);              // x -6..-4, z-8..z-3
+			placeBig(server, WildcatterBlocks.PHOSPHORIC_REACTOR, reactor, north);        // x 0-7, z..z+7
+			placeBig(server, WildcatterBlocks.TILTING_PAN_FILTER, filter, north);         // x 8-13, z..z+9, against its east side
+			placeBig(server, WildcatterBlocks.STOCK_TANK, acidTank, north);               // x 2-5, z+9..z+12
+			placeBig(server, WildcatterBlocks.ACID_EVAPORATOR, evaporator, north);        // x 9-11, z+11..z+13
+			placeBig(server, WildcatterBlocks.PACKAGE_BOILER, boiler, north);             // x 15-18, z+1..z+9
+			placeBig(server, WildcatterBlocks.LPG_BULLET, lpg, north);                    // x 20-22, z+1..z+12
+			placeBig(server, WildcatterBlocks.GRANULATION_PLANT, granulator, north);      // x 9-12, z+16..z+27
+			placeBig(server, WildcatterBlocks.BAGGING_STATION, bagger, north);            // x 10-11, z+28..z+29
+			placeBig(server, WildcatterBlocks.LPG_BULLET, nh3, north);                    // x 15-17, z+18..z+29: the ammonia
+			placeBig(server, WildcatterBlocks.LPG_BULLET, lpg2, north);                   // x 15-17, z+30..z+41: the dryer's LPG
+			// the lined tailings cell, x 0-6, z+16..z+22, its tower inside the north wall
+			for (int x = 0; x <= 6; x++) {
+				for (int zz = 16; zz <= 22; zz++) {
+					put(server, x, up - 1, z + zz, "wildcatter:cell_liner");
+					if (x == 0 || x == 6 || zz == 16 || zz == 22) {
+						for (int yy = up; yy <= up + 2; yy++) {
+							put(server, x, yy, z + zz, "wildcatter:cell_liner");
+						}
+					}
+				}
+			}
+			put(server, 3, up, z + 17, "wildcatter:decant_tower");
+			// steel pipe
+			pipes(server, z, new int[][] {{-5, 0, -2}, {-4, 0, -2}, {-3, 0, -2}, {-2, 0, -2}, {-1, 0, -2}, {0, 0, -2}, {1, 0, -2}, {2, 0, -2}, {2, 0, -1}});   // rock slurry
+			pipes(server, z, new int[][] {{4, 0, 8}});                                                                     // sulfuric acid
+			pipes(server, z, new int[][] {{7, 0, 9}, {7, 0, 10}, {7, 0, 11}, {7, 0, 12}, {7, 0, 13}, {7, 0, 14}, {7, 0, 15}, {6, 0, 15}, {5, 0, 15}, {4, 0, 15},
+					{3, 0, 15}, {3, 1, 15}, {3, 2, 15}, {3, 3, 15}, {3, 3, 16}, {3, 3, 17}, {3, 2, 17}, {3, 1, 17}});         // gypsum over the wall to the tower
+			pipes(server, z, new int[][] {{10, 0, 10}});                                                                    // filter acid
+			pipes(server, z, new int[][] {{12, 0, 12}, {13, 0, 12}, {14, 0, 12}, {15, 0, 12}, {16, 0, 12}, {16, 0, 11}, {16, 0, 10}});   // process steam
+			pipes(server, z, new int[][] {{19, 0, 5}});                                                                     // LPG to the boiler
+			pipes(server, z, new int[][] {{10, 0, 14}, {11, 0, 14}, {12, 0, 14}, {13, 0, 14}, {13, 0, 15}, {13, 0, 16}});   // merchant acid
+			pipes(server, z, new int[][] {{13, 0, 18}, {14, 0, 18}});                                                       // ammonia
+			pipes(server, z, new int[][] {{13, 0, 27}, {13, 0, 28}, {13, 0, 29}, {13, 0, 30}, {14, 0, 30}});                // LPG to the dryer
+			put(server, 10, up + 4, z + 28, "minecraft:hopper");                                                           // empty bags on the bagging station
+			server.runCommand("item replace block 10 " + (up + 4) + " " + (z + 28) + " container.0 with wildcatter:empty_bulk_bag 8");
+			put(server, -5, up + 4, z - 7, "minecraft:hopper");                                                            // rock on the mill
+			server.runCommand("item replace block -5 " + (up + 4) + " " + (z - 7) + " container.0 with wildcatter:phosphate 16");
+			// power. 480 V: set A the reactor, set B the evaporator, granulator and bagging station, set E the boiler
+			java.util.List<int[]> lv = new java.util.ArrayList<>();
+			BlockPos setA = new BlockPos(-20, up, z - 4);
+			genset(server, setA, north, false);
+			for (int zz = -4; zz <= 0; zz++) {
+				lv.add(new int[] {-19, zz});
+			}
+			for (int x = -18; x <= -1; x++) {
+				lv.add(new int[] {x, 0});
+			}
+			BlockPos setB = new BlockPos(5, up, z + 34);
+			genset(server, setB, north, false);
+			for (int zz = 30; zz <= 34; zz++) {
+				lv.add(new int[] {6, zz});
+			}
+			lv.add(new int[] {7, 30});
+			for (int zz = 11; zz <= 30; zz++) {
+				lv.add(new int[] {8, zz});
+			}
+			lv.add(new int[] {9, 30});
+			lv.add(new int[] {9, 29});
+			lv.add(new int[] {9, 28});
+			BlockPos setE = new BlockPos(24, up, z - 6);
+			genset(server, setE, north, false);
+			for (int zz = -6; zz <= -2; zz++) {
+				lv.add(new int[] {25, zz});
+			}
+			for (int x = 14; x <= 24; x++) {
+				lv.add(new int[] {x, -2});
+			}
+			lv.add(new int[] {14, -1});
+			lv.add(new int[] {14, 0});
+			lv.add(new int[] {14, 1});
+			for (int[] c : lv) {
+				put(server, c[0], up, z + c[1], "wildcatter:cable_industrial");
+			}
+			sizeCables(server, new BlockPos(-27, up, z - 26), new BlockPos(37, up, z + 44), WildcatterBlocks.CABLE_INDUSTRIAL, dev.wildcatter.energy.ConductorSize.KCMIL_500);
+			// 4.16 kV: set C the mill, set D the filter, each through a backward unit substation
+			BlockPos setC = new BlockPos(-20, up, z - 14);
+			genset(server, setC, north, false);
+			BlockPos mvC = inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, setC, net.minecraft.core.Direction.EAST, false);
+			for (int x = mvC.getX(); x <= -7; x++) {
+				put(server, x, up, z - 14, "wildcatter:cable_mv");
+			}
+			for (int zz = -13; zz <= -8; zz++) {
+				put(server, -7, up, z + zz, "wildcatter:cable_mv");
+			}
+			BlockPos setD = new BlockPos(-20, up, z - 24);
+			genset(server, setD, north, false);
+			BlockPos mvD = inlineTransformer(server, WildcatterBlocks.UNIT_SUBSTATION, setD, net.minecraft.core.Direction.EAST, false);
+			for (int x = mvD.getX(); x <= 8; x++) {
+				put(server, x, up, z - 24, "wildcatter:cable_mv");
+			}
+			for (int zz = -23; zz <= -1; zz++) {
+				put(server, 8, up, z + zz, "wildcatter:cable_mv");
+			}
+			fillTank(server, acidTank, dev.wildcatter.fluid.Product.SULFURIC_ACID, 40_000);
+			fillTank(server, lpg, dev.wildcatter.fluid.Product.LPG, 20_000);
+			fillTank(server, lpg2, dev.wildcatter.fluid.Product.LPG, 20_000);
+			fillTank(server, nh3, dev.wildcatter.fluid.Product.AMMONIA, 5_000);
+			water(server, mill, filter, boiler);
+			BlockPos[] staged = {evaporator, granulator, bagger};
+			server.computeOnServer(srv -> {
+				((dev.wildcatter.block.GranulationPlantBlockEntity) srv.overworld().getBlockEntity(granulator)).switchProduct();   // DAP
+				for (BlockPos at : staged) {
+					((dev.wildcatter.block.PlantUnitBlockEntity) srv.overworld().getBlockEntity(at)).cycleHoa(null);   // OFF until the sets are up
+				}
+				return null;
+			});
+			String overview = "tp @p 24 " + (up + 17) + " " + (z + 42) + " 140 28";
+			server.runCommand("gamemode spectator @p");   // a still camera for the film: no falling
+			server.runCommand(overview);
+			context.waitTicks(20);
+			film = context.computeOnClient(client -> Filming.start(client, "phosphatePlant"));   // filmed once built: the sets starting, then the plant
+			for (BlockPos set : new BlockPos[] {setA, setB, setC, setD, setE}) {
+				server.runCommand(overview);   // slow falling still sinks the camera: put it back for the film
+				startGenset(context, server, set, north, 2000);
+			}
+			for (BlockPos at : staged) {   // one motor at a time on set B
+				server.computeOnServer(srv -> {
+					dev.wildcatter.block.PlantUnitBlockEntity unit = (dev.wildcatter.block.PlantUnitBlockEntity) srv.overworld().getBlockEntity(at);
+					unit.cycleHoa(null);
+					unit.cycleHoa(null);
+					return null;
+				});
+				server.runCommand(overview);
+				context.waitTicks(60);
+				water(server, mill, filter, boiler);
+			}
+			for (int i = 0; i < 16; i++) {   // 40 s: every stage up to its rate; the camera put back each time, as slow falling sinks it
+				server.runCommand(overview);
+				context.waitTicks(50);
+				water(server, mill, filter, boiler);
+			}
+			server.runCommand(overview);
+			context.waitTicks(5);
+			String chain = " | mill " + read(server, -6, up, z - 8) + " | reactor " + read(server, 0, up, z) + " | filter " + read(server, 8, up, z) + " | evaporator "
+					+ read(server, 9, up, z + 11) + " | boiler " + read(server, 15, up, z + 1) + " | granulator " + read(server, 9, up, z + 16) + " | tower "
+					+ server.computeOnServer(srv -> ((Inspectable) srv.overworld().getBlockEntity(new BlockPos(3, up, z + 17))).inspect().getString());
+			double[] rates = server.computeOnServer(srv -> new double[] {
+					((dev.wildcatter.block.PhosphoricReactorBlockEntity) srv.overworld().getBlockEntity(reactor)).making(),
+					((dev.wildcatter.block.AcidEvaporatorBlockEntity) srv.overworld().getBlockEntity(evaporator)).making(),
+					((dev.wildcatter.block.GranulationPlantBlockEntity) srv.overworld().getBlockEntity(granulator)).making(),
+					((dev.wildcatter.block.DecantTowerBlockEntity) srv.overworld().getBlockEntity(new BlockPos(3, up, z + 17))).gypsumKg()});
+			check(Math.abs(rates[0] - dev.wildcatter.fluid.Phosphate.p2o5Kgs() * 3600) < 0.15 * dev.wildcatter.fluid.Phosphate.p2o5Kgs() * 3600,
+					"the reactor should make about 833 kg/h of P2O5: " + rates[0] + chain);
+			check(rates[1] > 0, "the evaporator should make merchant acid: " + chain);
+			check(rates[2] > 0, "the granulator should make DAP: " + chain);
+			check(rates[3] > 0, "phosphogypsum should reach the cell: " + chain);
+			System.out.println("[wildcatter-test] phosphatePlant running" + chain);
+			context.takeScreenshot("wildcatter-phosphate-plant");
+			server.computeOnServer(srv -> {
+				((dev.wildcatter.block.GranulationPlantBlockEntity) srv.overworld().getBlockEntity(granulator)).addGranules(Tuning.BULK_BAG_KG - 5);
+				return null;
+			});
+			server.runCommand("gamemode survival @p");
+			showReadout(context, server, reactor, "tp @p -5 " + (up + 9) + " " + (z - 5) + " -45 35", "wildcatter-phosphate-reactor");
+			showReadout(context, server, filter, "tp @p 18 " + (up + 8) + " " + (z - 4) + " 45 35", "wildcatter-phosphate-filter");
+			showReadout(context, server, evaporator, "tp @p 13 " + (up + 3) + " " + (z + 15) + " 150 10", "wildcatter-phosphate-evaporator");
+			showReadout(context, server, granulator, "tp @p 3 " + (up + 10) + " " + (z + 27) + " -110 35", "wildcatter-phosphate-granulator");
+			String bags = "";
+			for (int i = 0; i < 10 && !bags.contains("1 bags filled"); i++) {
+				context.waitTicks(20);
+				bags = read(server, 10, up, z + 28);
+			}
+			check(bags.contains("1 bags filled"), "a DAP bag should be filled: " + bags);
+			showReadout(context, server, bagger, "tp @p 7 " + (up + 5) + " " + (z + 34) + " -135 25", "wildcatter-phosphate-bagging");
+			server.runCommand("tp @p -4 " + (up + 9) + " " + (z + 26) + " -150 40");
+			context.waitTicks(10);
+			server.computeOnServer(srv -> {
+				Inspectable tower = (Inspectable) srv.overworld().getBlockEntity(new BlockPos(3, up, z + 17));
+				for (ServerPlayer player : srv.getPlayerList().getPlayers()) {
+					player.sendOverlayMessage(tower.inspect());
+				}
+				return null;
+			});
+			context.waitTicks(10);
+			context.takeScreenshot("wildcatter-phosphate-gypsum-cell");
+			context.waitTicks(30);
+			server.runCommand("tp @p 30 " + (up + 18) + " " + (z - 18) + " 45 30");
+			context.waitTicks(60);
+			context.takeScreenshot("wildcatter-phosphate-plant-north");
+			System.out.println("[wildcatter-test] phosphatePlant ok: " + bags);
 		} finally {
 			if (film != null) {
 				film.stop();

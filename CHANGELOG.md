@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased (branch `phase18`): phosphate (Phase 18, built 2026-11-10 while Tim was away; not approved)
+- **Fertilizer (18a):** a phosphate mill, a dihydrate phosphoric reactor with its tilting pan filter, an acid evaporator and a granulation
+  plant: 20 t of P2O5 a day from phosphate rock and sulfuric acid, its phosphogypsum to a lined tailings cell, merchant acid, and TSP or
+  DAP (on the ammonia plant's ammonia) in 1 t bags. A potash dissolver, vacuum crystallizer and dryer: 5 t/h of muriate of potash in
+  bags. The bags carry `c:fertilizers` for another mod's crops. Spec: `docs/multiblocks/fertilizer.md`.
+- **Uranium from phosphoric acid (18b):** an acid pretreatment and a DEPA-TOPO circuit take about 2.7 kg/h of uranium out of the filter
+  acid into its strip; the treated acid goes on to the evaporator. The second cycle, to the uranium calciner, waits on Phase 16. Spec:
+  `docs/multiblocks/uranium-from-phosphate.md`.
+- Existing worlds are unchanged. Decisions for review: `docs/questions/phase18-phosphate.md`.
+
 ## Unreleased (0.7.0): gas and power quick wins (Phase 14b-14d) and the protection gap wave (built 2026-11-09 while Tim was away; not approved)
 - **The sales line (14b):** a gas plant's pipeline gas goes on an off-map transmission line at a receipt meter station and comes off
   anywhere in the dimension at a delivery station, less 2 % kept as compressor fuel. Five true-size parts: meter building (2 kW,
