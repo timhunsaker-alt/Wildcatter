@@ -13,6 +13,12 @@
 - **Chlorinator:** takes zircon concentrate tagged `#wildcatter:zircon_feed` by hopper, at the kg its data file gives.
 - Decisions: `docs/questions/answers-grid.md`.
 
+### Fixes (branch `w-oom`)
+- **Circuits no longer load chunks:** finding which circuit parts touch read blocks just past the edge of the loaded area, which loaded
+  those chunks on the server thread on every solve. Round an area a server had just let go (a player walking away, a game test batch
+  finishing) it kept reloading the chunks as fast as they unloaded, which could stall the tick and run the server out of memory.
+  Circuits that are loaded solve exactly as before.
+
 ### phosphate (Phase 18, built 2026-11-10 while Tim was away; not approved)
 - **Fertilizer (18a):** a phosphate mill, a dihydrate phosphoric reactor with its tilting pan filter, an acid evaporator and a granulation
   plant: 20 t of P2O5 a day from phosphate rock and sulfuric acid, its phosphogypsum to a lined tailings cell, merchant acid, and TSP or

@@ -2063,3 +2063,10 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
 - **Zircon feed (answer 9):** `block/ZirconFeed`: `#wildcatter:zircon_feed` and kg files `data/<ns>/wildcatter/zircon_feed/*.json`;
   the chlorinator's hopper takes them in a second slot and needs no separator. Scene `zircon_feed`.
 - Field Manual: POLES AND ARMS (guys), TAILINGS CELL (rate, slurry pipe, air header), ZIRCONIUM (zircon concentrate).
+
+## Fix: circuits no longer load chunks (2026-11-10; branch `w-oom`)
+- `CircuitManager.groups` read the block beside every part's cells (`BigParts.owner` -> `getBlockState`) even in an unloaded chunk,
+  which on a server loads it synchronously. On every solve (each 4 ticks, and at once on every re-register) it reloaded the chunks
+  round an area the server had released, so an old test area (1,000+ parts) never unloaded; the NeoForge suite hung in the last
+  `minecraft:default` batch and Tailings runs ran out of heap inside the circuit manager. The walk is now `circuit/PartGroups`, which
+  asks only `level.isLoaded` about a position outside the loaded area; groups of loaded parts are unchanged. Unit test `PartGroupsTest`.
