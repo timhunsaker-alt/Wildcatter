@@ -10,3 +10,7 @@ Format of an entry:
 - **Chosen:** what was built.
 - **Why:** the reason, with the real-world counterpart.
 - **Alternatives:** the other options and what they would change.
+
+## Start here
+
+The index of both mods' questions, and the short list of what waits on you, is in Tailings: `tailings/docs/questions/README.md`.
