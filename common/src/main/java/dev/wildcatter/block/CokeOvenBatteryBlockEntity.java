@@ -131,18 +131,18 @@ public class CokeOvenBatteryBlockEntity extends UnitMotorBlockEntity {
 		double pushed = hold ? ovens.take(now, room) : ovens.takeAny(room);
 		quench.quench(pushed * Tuning.COKE_OVEN_COKE_YIELD);
 		pushedKg += pushed * Tuning.COKE_OVEN_COKE_YIELD;
-		double capacity = hold ? Tuning.COKE_OVEN_COAL_KGS * Tuning.COKING_HOLD_S : 0;
+		double capacity = hold ? Tuning.COKE_OVEN_COAL_KGS * dev.wildcatter.TimeScale.scaled(Tuning.COKING_HOLD_S) : 0;
 		double max = Math.min(Tuning.COKE_OVEN_COAL_KGS * Tuning.CARBON_CATCH_UP * seconds(), Math.min(tower.coal(), capacity - ovens.inProcess()));
 		max = Math.min(max, room(Product.RAW_COKE_OVEN_GAS) / Tuning.COKE_OVEN_GAS_PER_KG);
 		double kg = Math.max(0, max) * strength;
 		if (kg > 1e-7) {
 			tower.takeCoal(kg);
-			ovens.add(now, Tuning.COKING_HOLD_S, kg);
+			ovens.add(now, dev.wildcatter.TimeScale.scaled(Tuning.COKING_HOLD_S), kg);
 			add(Product.RAW_COKE_OVEN_GAS, kg * Tuning.COKE_OVEN_GAS_PER_KG);
 			coked += kg / 1000;
 		}
 		double next = ovens.untilNext(now);
-		unit = String.format("coking at 1,100 C (18 h a charge): %.1f t of coal in the ovens, %.2f kg/s charged, %.2f kg/s of coke pushed", ovens.inProcess() / 1000,
+		unit = String.format("coking at 1,100 C (18 h a charge" + dev.wildcatter.TimeScale.note(Tuning.COKING_HOLD_S) + "): %.1f t of coal in the ovens, %.2f kg/s charged, %.2f kg/s of coke pushed", ovens.inProcess() / 1000,
 				kg / seconds(), pushed * Tuning.COKE_OVEN_COKE_YIELD / seconds())
 				+ (next > 0 ? String.format("; the next push in %.1f h", next / 3600) : "")
 				+ (tower.coal() < 0.01 && kg <= 1e-7 ? "; NO COAL on the coal tower" : "");

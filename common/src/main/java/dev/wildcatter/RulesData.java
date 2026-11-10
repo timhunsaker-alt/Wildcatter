@@ -21,7 +21,8 @@ import net.minecraft.world.level.storage.ServerLevelData;
 public final class RulesData extends SavedData {
 	public static final Codec<RulesData> CODEC = RecordCodecBuilder.create(i -> i.group(
 			Codec.unboundedMap(Codec.STRING, Codec.BOOL).fieldOf("rules").forGetter(d -> d.values),
-			Codec.STRING.optionalFieldOf("origin", "existing").forGetter(d -> d.origin)).apply(i, RulesData::new));
+			Codec.STRING.optionalFieldOf("origin", "existing").forGetter(d -> d.origin),
+			Codec.INT.optionalFieldOf("timeScale", 1).forGetter(d -> d.timeScale)).apply(i, RulesData::new));
 	public static final SavedDataType<RulesData> TYPE = new SavedDataType<>(Wildcatter.id("rules"), RulesData::fresh, CODEC, DataFixTypes.LEVEL);
 
 	/** Game test harnesses set this so the worlds they make start as an existing world would (every rule off): their scenes were written
@@ -30,15 +31,18 @@ public final class RulesData extends SavedData {
 
 	private final Map<String, Boolean> values;
 	private final String origin;
+	/** The world's {@link TimeScale}: 1 for a world saved before it existed. */
+	private int timeScale;
 
-	private RulesData(Map<String, Boolean> values, String origin) {
+	private RulesData(Map<String, Boolean> values, String origin, int timeScale) {
 		this.values = new LinkedHashMap<>(values);
 		this.origin = origin;
+		this.timeScale = TimeScale.preset(timeScale);
 	}
 
 	/** Only reached through {@link #load}, which decides new or existing first; read from disk the codec is used instead. */
 	private static RulesData fresh() {
-		return new RulesData(Map.of(), "existing");
+		return new RulesData(Map.of(), "existing", 1);
 	}
 
 	public String origin() {
@@ -57,10 +61,11 @@ public final class RulesData extends SavedData {
 		if (data == null) {
 			boolean newWorld = !(overworld.getLevelData() instanceof ServerLevelData level) || !level.isInitialized();
 			Map<String, Boolean> start = new LinkedHashMap<>();
+			// a new world takes what was chosen on the World Rules screen (or the config file's newWorld keys), else each rule's default
 			for (Rule r : Rule.values()) {
-				start.put(r.key, !testWorldsAsExisting && Rules.defaultFor(r, newWorld));
+				start.put(r.key, !testWorldsAsExisting && newWorld && NewWorldSetup.rule(Wildcatter.MOD_ID, r.key, r.newWorld));
 			}
-			data = new RulesData(start, newWorld ? "new" : "existing");
+			data = new RulesData(start, newWorld ? "new" : "existing", !testWorldsAsExisting && newWorld ? NewWorldSetup.scale() : 1);
 			overworld.getDataStorage().set(TYPE, data);
 			data.setDirty();
 			Wildcatter.LOGGER.info("World rules: no rules saved yet; the overworld {} initialized, so this is {} world{}", newWorld ? "is not yet" : "is",
@@ -69,12 +74,17 @@ public final class RulesData extends SavedData {
 		for (Rule r : Rule.values()) {
 			Rules.set(r, data.values.getOrDefault(r.key, false));
 		}
+		TimeScale.set(data.timeScale);
 		RulesData kept = data;
 		Rules.listen((rule, on) -> {
 			kept.values.put(rule.key, on);
 			kept.setDirty();
 		});
-		Wildcatter.LOGGER.info("World rules ({} world): on: {}", data.origin, Rules.describe());
+		TimeScale.listen(scale -> {
+			kept.timeScale = scale;
+			kept.setDirty();
+		});
+		Wildcatter.LOGGER.info("World rules ({} world): time scale {}; on: {}", data.origin, TimeScale.label(data.timeScale), Rules.describe());
 	}
 
 	/** The rules of the world now loaded, for the command and the tests. */

@@ -285,18 +285,18 @@ public class BayerStageBlockEntity extends UnitMotorBlockEntity implements Hoppe
 			double slurry = Lines.available(level, inlet(), Product.BAUXITE_SLURRY, Pull.MACHINE, this);
 			double steam = Lines.available(level, east(), Product.PROCESS_STEAM, Pull.MACHINE, this);
 			double max = Math.min(Math.min(rate() * seconds(), slurry / Bayer.bauxiteSlurry()),
-					Math.min(steam / Bayer.digesterSteam(), Tuning.BAYER_ALUMINA_KGS * Tuning.DIGESTION_HOLD_S - holdup.inProcess()));
+					Math.min(steam / Bayer.digesterSteam(), Tuning.BAYER_ALUMINA_KGS * dev.wildcatter.TimeScale.scaled(Tuning.DIGESTION_HOLD_S) - holdup.inProcess()));
 			if (max > 1e-7) {
 				a = Lines.pull(level, inlet(), Product.BAUXITE_SLURRY, max * strength * Bayer.bauxiteSlurry(), Pull.MACHINE, this) / Bayer.bauxiteSlurry();
 				Lines.pull(level, east(), Product.PROCESS_STEAM, a * Bayer.digesterSteam(), Pull.MACHINE, this);
-				holdup.add(now, Tuning.DIGESTION_HOLD_S, a);
+				holdup.add(now, dev.wildcatter.TimeScale.scaled(Tuning.DIGESTION_HOLD_S), a);
 			} else if (steam < 0.001 && slurry >= 0.01) {
 				unit = "NO STEAM: pipe process steam from a package boiler to its east side; " + String.format("%,.0f kg of slurry digesting", holdup.inProcess() * Bayer.bauxiteSlurry());
 				setChanged();
 				return;
 			}
 		}
-		unit = String.format("digesting at 145 C (1 h a charge): %,.0f kg of slurry in the digesters, %.1f kg/s in, %.1f kg/s on to the flash tanks",
+		unit = String.format("digesting at 145 C (1 h a charge" + dev.wildcatter.TimeScale.note(Tuning.DIGESTION_HOLD_S) + "): %,.0f kg of slurry in the digesters, %.1f kg/s in, %.1f kg/s on to the flash tanks",
 				holdup.inProcess() * Bayer.bauxiteSlurry(), a * Bayer.bauxiteSlurry() / seconds(), out * Bayer.bauxiteSlurry() / seconds()) + nextOut(holdup, now);
 		setChanged();
 	}
@@ -319,13 +319,13 @@ public class BayerStageBlockEntity extends UnitMotorBlockEntity implements Hoppe
 		double a = 0;
 		if (hold) {
 			double waiting = Lines.available(level, inlet(), Product.POLISHED_LIQUOR, Pull.MACHINE, this) / Bayer.polishedLiquor();
-			double max = Math.min(Math.min(rate() * seconds(), waiting), Tuning.BAYER_ALUMINA_KGS * Tuning.PRECIPITATION_HOLD_S - holdup.inProcess());
+			double max = Math.min(Math.min(rate() * seconds(), waiting), Tuning.BAYER_ALUMINA_KGS * dev.wildcatter.TimeScale.scaled(Tuning.PRECIPITATION_HOLD_S) - holdup.inProcess());
 			if (max > 1e-7) {
 				a = Lines.pull(level, inlet(), Product.POLISHED_LIQUOR, max * strength * Bayer.polishedLiquor(), Pull.MACHINE, this) / Bayer.polishedLiquor();
-				holdup.add(now, Tuning.PRECIPITATION_HOLD_S, a);
+				holdup.add(now, dev.wildcatter.TimeScale.scaled(Tuning.PRECIPITATION_HOLD_S), a);
 			}
 		}
-		unit = String.format("precipitating (36 h): %,.0f kg of liquor in the train, %.1f kg/s in, %.1f kg/s of hydrate slurry out", holdup.inProcess() * Bayer.polishedLiquor(),
+		unit = String.format("precipitating (36 h" + dev.wildcatter.TimeScale.note(Tuning.PRECIPITATION_HOLD_S) + "): %,.0f kg of liquor in the train, %.1f kg/s in, %.1f kg/s of hydrate slurry out", holdup.inProcess() * Bayer.polishedLiquor(),
 				a * Bayer.polishedLiquor() / seconds(), out * Bayer.polishedLiquor() / seconds()) + nextOut(holdup, now);
 		setChanged();
 	}

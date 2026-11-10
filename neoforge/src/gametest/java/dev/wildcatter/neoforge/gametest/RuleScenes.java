@@ -6,6 +6,7 @@ import static dev.wildcatter.neoforge.gametest.GridSceneKit.log;
 
 import com.mojang.serialization.MapCodec;
 import dev.wildcatter.Rules;
+import dev.wildcatter.Tuning;
 import dev.wildcatter.Rules.Rule;
 import dev.wildcatter.RulesData;
 import dev.wildcatter.Wildcatter;
@@ -88,6 +89,40 @@ final class RuleScenes {
 		}
 	}
 
+	/** As {@link RulesOn}, and the world's time scale set for the batch (docs/time-scale.md); both handed back after it. */
+	record RulesOnAtScale(List<String> keys, int scale) implements TestEnvironmentDefinition<int[]> {
+		@Override
+		public int[] setup(ServerLevel level) {
+			boolean[] before = Rules.snapshot();
+			for (String key : keys) {
+				Rules.set(Rule.byKey(key), true);
+			}
+			int[] saved = new int[before.length + 1];
+			for (int i = 0; i < before.length; i++) {
+				saved[i] = before[i] ? 1 : 0;
+			}
+			saved[before.length] = dev.wildcatter.TimeScale.scale();
+			dev.wildcatter.TimeScale.set(scale);
+			Wildcatter.LOGGER.info("Game test environment: rules {} on, time scale {}", keys, dev.wildcatter.TimeScale.label(scale));
+			return saved;
+		}
+
+		@Override
+		public void teardown(ServerLevel level, int[] saved) {
+			boolean[] before = new boolean[saved.length - 1];
+			for (int i = 0; i < before.length; i++) {
+				before[i] = saved[i] == 1;
+			}
+			Rules.restore(before);
+			dev.wildcatter.TimeScale.set(saved[saved.length - 1]);
+		}
+
+		@Override
+		public MapCodec<RulesOnAtScale> codec() {
+			return MapCodec.unit(this);
+		}
+	}
+
 	static void worldRules(GameTestHelper helper) {
 		String scene = "world_rules";
 		ServerLevel level = helper.getLevel();
@@ -119,6 +154,26 @@ final class RuleScenes {
 			check(helper, list == Rule.values().length && bad == 0, "the command should list " + Rule.values().length + " rules (" + list + ") and refuse an unknown one (" + bad + ")");
 			rule(helper, "mudGel", false);
 			check(helper, !Rules.mudGel() && !data.saved(Rule.MUD_GEL), "the command should turn mudGel off again");
+
+			// the time scale (docs/time-scale.md): 1:1 in the test world, set by the command to a preset only, saved with the world
+			check(helper, dev.wildcatter.TimeScale.scale() == 1, "the test world should load at 1:1, not " + dev.wildcatter.TimeScale.scale());
+			int fifty;
+			int seven;
+			try {
+				fifty = server.getCommands().getDispatcher().execute("wildcatter rule timeScale 50", server.createCommandSourceStack().withSuppressedOutput());
+				seven = server.getCommands().getDispatcher().execute("wildcatter rule timeScale 7", server.createCommandSourceStack().withSuppressedOutput());
+			} catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+				fifty = -1;
+				seven = -1;
+			}
+			check(helper, fifty == 50 && seven == 0 && dev.wildcatter.TimeScale.scale() == 50, "the command should set 50:1 (" + fifty + ") and refuse 7 (" + seven + "), scale " + dev.wildcatter.TimeScale.scale());
+			check(helper, dev.wildcatter.TimeScale.scaled(3600) == 72, "an hour's wait at 50:1 should be 72 s");
+			Rules.set(Rule.REACTOR_REAL_HEATUP, true);
+			check(helper, Rules.heatupSpeedup() == 50, "a real heat-up at 50:1 should run 50 times fast, not " + Rules.heatupSpeedup());
+			Rules.set(Rule.REACTOR_REAL_HEATUP, false);
+			check(helper, Rules.heatupSpeedup() == Tuning.HEATUP_SPEEDUP, "without reactorRealHeatup the old 80x compression should stand at any scale");
+			dev.wildcatter.TimeScale.set(1);
+			log(scene, "time scale ok: the command sets presets only");
 
 			// mudGel: plain water (no bentonite in 60 m3) LOW GEL only with the rule
 			check(helper, !RigSubstructureBlockEntity.lowGel(0, 60_000), "with mudGel off plain water should drill at full rate, as before Phase 15");

@@ -2,6 +2,14 @@
 
 ## Unreleased (0.7.0, branch `w-next`): Phases 15-19, built 2026-11-10 while Tim was away
 
+### Time scale (Tim, 2026-11-10, branch `w-timescale`)
+- **A world's time scale:** 1:1, 5:1, 10:1, 20:1 or 50:1. It shortens the long waits only: a real reactor heat-up and cooldown
+  (`reactorRealHeatup`), the coke oven, digester and precipitator holds (`realResidenceTimes`), and dry cask cooling. Rates, fuel,
+  motion and electrics stay real; the old compressed waits stay as they were. An existing world is 1:1.
+- **World Rules on the Create World screen:** a button under Grid opens the time scale's five presets and every world rule, each at its
+  new-world default. `/wildcatter rule timeScale <preset>` changes the scale later. A dedicated server reads
+  `newWorld.timeScale` and `newWorld.<rule>` from `config/wildcatter.properties`. Other mods can add their rules to the screen.
+
 ### Tim's answers, grid and pit line (2026-11-10, branch `w-grid`)
 - **Firebox:** one real heat rate, 0.36 MW, in every world: piped gas, biogas and liquid fuels last their heating value. A firebox on
   biogas or pipeline gas stays lit; one on a gas well burns far less gas for the same steam. A bucket of crude or diesel burns an hour.

@@ -33,12 +33,12 @@ public final class SpentFuel {
 		/**
 		 * The decay heat a dry cask's limits are checked against (Tim, 2026-11-10, answer 20): its cooling time counted
 		 * {@link Tuning#BURNUP_SPEEDUP} times over, as burnup is, so a pool's fuel reaches a canister's 1.5 kW in days of world time
-		 * rather than months. Only the eligibility: the heat the pool, the canister and the module carry stays the real one.
+		 * rather than months, and the world's time scale more (docs/time-scale.md). Only the eligibility: the heat the pool, the canister and the module carry stays the real one.
 		 */
 		public double eligibilityWatts() {
 			double sum = 0;
 			for (int i = 0; i < decay.length; i++) {
-				sum += decay[i] * Math.exp(-Tuning.DECAY_LAMBDA[i] * (Tuning.BURNUP_SPEEDUP - 1) * cooled);
+				sum += decay[i] * Math.exp(-Tuning.DECAY_LAMBDA[i] * (Tuning.BURNUP_SPEEDUP * dev.wildcatter.TimeScale.scale() - 1) * cooled);
 			}
 			return sum * Reactor.assemblyWatts();
 		}

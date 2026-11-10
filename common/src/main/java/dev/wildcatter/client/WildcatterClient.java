@@ -88,10 +88,13 @@ public final class WildcatterClient {
 	 * each tick while that screen is open, or null.
 	 */
 	public static @Nullable Runnable screenOpened(Screen screen, List<?> widgets, Consumer<AbstractWidget> add) {
-		if (screen instanceof SelectWorldScreen) {
+		if (screen instanceof SelectWorldScreen || screen instanceof net.minecraft.client.gui.screens.TitleScreen) {
 			ElectricalStandard.setPending(null);   // a cancelled creation must not leak into the next world
+			dev.wildcatter.NewWorldSetup.clear();
 		} else if (screen instanceof CreateWorldScreen) {
-			ElectricalStandard.setPending(StandardData.configDefault());
+			if (ElectricalStandard.pending() == null) {   // not again on coming back from the World Rules screen
+				ElectricalStandard.setPending(StandardData.configDefault());
+			}
 			// It sits on the Game tab, under the Allow Commands button, lined up with the world name field.
 			EditBox nameField = null;
 			for (Object widget : widgets) {
@@ -108,13 +111,28 @@ public final class WildcatterClient {
 					.withTooltip(value -> Tooltip.create(Component.literal("The electrical standard of this world: its voltages, frequency and equipment. It cannot be changed after the world is created.")))
 					.create(anchor.getX(), anchor.getY() + 112, anchor.getWidth(), 20, Component.literal("Grid"), (b, value) -> ElectricalStandard.setPending(value));
 			add.accept(button);
+			// the time scale and the world rules of every mod that registers them (docs/time-scale.md)
+			net.minecraft.client.gui.components.Button rules = net.minecraft.client.gui.components.Button.builder(rulesLabel(),
+					b -> net.minecraft.client.Minecraft.getInstance().gui.setScreen(new WorldRulesScreen(screen)))
+					.bounds(anchor.getX(), anchor.getY() + 136, anchor.getWidth(), 20)
+					.tooltip(Tooltip.create(Component.literal("The time scale (1:1 to 50:1, for the long waits) and the world rules of this world. Changeable later by /wildcatter rule.")))
+					.build();
+			add.accept(rules);
 			return () -> {
 				button.setX(anchor.getX());
 				button.setY(anchor.getY() + 112);
 				button.visible = anchor.visible;   // only on the Game tab
+				rules.setX(anchor.getX());
+				rules.setY(anchor.getY() + 136);
+				rules.visible = anchor.visible;
+				rules.setMessage(rulesLabel());
 			};
 		}
 		return null;
+	}
+
+	private static Component rulesLabel() {
+		return Component.literal("World Rules... (time " + dev.wildcatter.TimeScale.label(dev.wildcatter.NewWorldSetup.scale()) + ")");
 	}
 
 	private static Component label(ElectricalStandard standard) {

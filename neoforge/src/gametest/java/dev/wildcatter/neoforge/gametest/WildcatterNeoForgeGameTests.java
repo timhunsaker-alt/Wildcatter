@@ -167,7 +167,8 @@ public class WildcatterNeoForgeGameTests {
 					? event.registerEnvironment(id("rules_oilfield"), new RuleScenes.RulesOn(java.util.List.of("saltDomeGrid192", "mudGel", "wellControl"))) : plain;
 			for (String scene : RESIDENCE_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
-						new TestData<>(event.registerEnvironment(id("rules_" + scene), new RuleScenes.RulesOn(java.util.List.of("realResidenceTimes"))),
+						new TestData<>(event.registerEnvironment(id("rules_" + scene), scene.equals("time_scale_holds")
+								? new RuleScenes.RulesOnAtScale(java.util.List.of("realResidenceTimes"), 50) : new RuleScenes.RulesOn(java.util.List.of("realResidenceTimes"))),
 								net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 4000, 1, true,
 								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 60)));
 			}

@@ -20,6 +20,10 @@ public final class RulesCommand {
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(Commands.literal(Wildcatter.MOD_ID).requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
 				.then(Commands.literal("rule").executes(c -> list(c.getSource()))
+						.then(Commands.literal("timeScale").executes(c -> readScale(c.getSource()))
+								.then(Commands.argument("scale", com.mojang.brigadier.arguments.IntegerArgumentType.integer(1, 50))
+										.suggests((c, b) -> SharedSuggestionProvider.suggest(java.util.Arrays.stream(TimeScale.PRESETS).mapToObj(Integer::toString), b))
+										.executes(c -> setScale(c.getSource(), com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(c, "scale")))))
 						.then(Commands.argument("name", StringArgumentType.word())
 								.suggests((c, b) -> SharedSuggestionProvider.suggest(java.util.Arrays.stream(Rule.values()).map(r -> r.key), b))
 								.executes(c -> read(c.getSource(), StringArgumentType.getString(c, "name")))
@@ -30,6 +34,7 @@ public final class RulesCommand {
 	private static int list(CommandSourceStack source) {
 		String origin = RulesData.get(source.getLevel()).origin();
 		source.sendSuccess(() -> Component.literal("Wildcatter rules for this world (" + origin + " world):"), false);
+		source.sendSuccess(() -> scaleLine(), false);
 		for (Rule r : Rule.values()) {
 			source.sendSuccess(() -> line(r), false);
 		}
@@ -61,5 +66,27 @@ public final class RulesCommand {
 		Wildcatter.LOGGER.info("World rule {} set to {} by {}", r.key, value, source.getTextName());
 		source.sendSuccess(() -> Component.literal("Rule " + r.key + " is now " + value + " in this world."), true);
 		return 1;
+	}
+
+	private static Component scaleLine() {
+		return Component.literal("  timeScale = " + TimeScale.label(TimeScale.scale()) + " (the long waits shortened: 1, 5, 10, 20 or 50; new worlds: chosen at creation, else 1)");
+	}
+
+	private static int readScale(CommandSourceStack source) {
+		RulesData.get(source.getLevel());
+		source.sendSuccess(RulesCommand::scaleLine, false);
+		return TimeScale.scale();
+	}
+
+	private static int setScale(CommandSourceStack source, int scale) {
+		if (!TimeScale.valid(scale)) {
+			source.sendFailure(Component.literal("The time scale is one of 1, 5, 10, 20 or 50, not " + scale + "."));
+			return 0;
+		}
+		RulesData.get(source.getLevel());   // make sure the world's copy is loaded before it changes
+		TimeScale.set(scale);
+		Wildcatter.LOGGER.info("World time scale set to {} by {}", TimeScale.label(scale), source.getTextName());
+		source.sendSuccess(() -> Component.literal("The time scale is now " + TimeScale.label(scale) + " in this world."), true);
+		return scale;
 	}
 }

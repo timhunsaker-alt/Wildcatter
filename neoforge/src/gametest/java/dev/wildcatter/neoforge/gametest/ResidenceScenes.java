@@ -34,6 +34,8 @@ import net.minecraft.world.item.Items;
  * tanks, on bauxite slurry and steam; a precipitator on polished liquor; all on one diesel set. Each takes its feed at the rate but
  * sends nothing on until its residence time has passed: coal coking in the ovens and no coke pushed, slurry in the digesters and none in
  * the flash tanks, liquor in the train and no hydrate out. Aged by hook (18 h, 1 h, 36 h), each sends its first product on.</li>
+ * <li>{@code time_scale_holds}: the same plant in a world at 50:1 (docs/time-scale.md): aged a fiftieth of each hold (and a bucket),
+ * each sends its first product on; at 1:1 that age would leave every hold full.</li>
  * </ul>
  */
 final class ResidenceScenes {
@@ -42,7 +44,8 @@ final class ResidenceScenes {
 
 	static Map<String, Consumer<GameTestHelper>> scenes() {
 		Map<String, Consumer<GameTestHelper>> out = new LinkedHashMap<>();
-		out.put("residence_holds", ResidenceScenes::residenceHolds);
+		out.put("residence_holds", h -> residenceHolds(h, "residence_holds"));
+		out.put("time_scale_holds", h -> residenceHolds(h, "time_scale_holds"));
 		return out;
 	}
 
@@ -93,7 +96,9 @@ final class ResidenceScenes {
 		helper.runAfterDelay(60, () -> release(helper, parts, i + 1, then));
 	}
 
-	static void residenceHolds(GameTestHelper helper) {
+	static void residenceHolds(GameTestHelper helper, String scene) {
+		int scale = dev.wildcatter.TimeScale.scale();
+		check(helper, scale == (scene.equals("time_scale_holds") ? 50 : 1), scene + " should run at " + (scene.equals("time_scale_holds") ? 50 : 1) + ":1, not " + scale);
 		floor(helper, -16, -8, 36, 40);
 		// the Bayer side
 		place(helper, WildcatterBlocks.DIGESTER, 0, 1, 0, Direction.NORTH);         // x 0-4, z 0-4
@@ -143,16 +148,16 @@ final class ResidenceScenes {
 			check(helper, battery.pushedFromHold() == 0, "no coke should be pushed before its 18 h" + in);
 			check(helper, read(helper, 0, 1, 5).contains("idle"), "no slurry should reach the flash tanks before its hour" + in);
 			check(helper, precipitator.holding(Product.HYDRATE_SLURRY) < 1e-6, "no hydrate should leave before its 36 h" + in);
-			log("residence_holds", "holding:" + in);
-			battery.ageForTest(Tuning.COKING_HOLD_S + 1800);              // and a bucket: each hold is counted in its buckets' widths
-			digester.ageForTest(Tuning.DIGESTION_HOLD_S + 60);
-			precipitator.ageForTest(Tuning.PRECIPITATION_HOLD_S + 1800);
+			log(scene, "holding:" + in);
+			battery.ageForTest(Tuning.COKING_HOLD_S / scale + 1800);              // and a bucket: each hold is counted in its buckets' widths
+			digester.ageForTest(Tuning.DIGESTION_HOLD_S / scale + 60);
+			precipitator.ageForTest(Tuning.PRECIPITATION_HOLD_S / scale + 1800);
 			await(helper, 400, () -> read(helper, 0, 1, 5).contains("flashing") && precipitator.holding(Product.HYDRATE_SLURRY) > 1 && battery.pushedFromHold() > 0, () -> {
 				String out = " | battery " + read(helper, 0, 1, 20) + " | flash " + read(helper, 0, 1, 5) + " | precipitator " + read(helper, 24, 1, 0) + " | quench " + read(helper, 14, 1, 29);
 				check(helper, battery.pushedFromHold() > 0, "after 18 h the ovens should push their coke" + out);
 				check(helper, read(helper, 0, 1, 5).contains("flashing"), "after an hour the digested slurry should reach the flash tanks" + out);
 				check(helper, precipitator.holding(Product.HYDRATE_SLURRY) > 1, "after 36 h hydrate slurry should leave the precipitator" + out);
-				log("residence_holds", "ok: " + String.format("%.1f kg of coke pushed", battery.pushedFromHold()) + out);
+				log(scene, "ok at " + scale + ":1: " + String.format("%.1f kg of coke pushed", battery.pushedFromHold()) + out);
 				helper.succeed();
 			});
 		})));

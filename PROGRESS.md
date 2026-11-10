@@ -1447,6 +1447,15 @@ sized for a 40-pot line.
 - The client game test takes screenshots into `build/run/clientGameTest/screenshots/`.
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
+## Time scale (2026-11-10, `w-timescale`; spec `docs/time-scale.md`)
+- `TimeScale` (presets 1, 5, 10, 20, 50; `scaled(seconds)`, `note(seconds)` for readouts), saved in `RulesData` as `timeScale`
+  (1 when absent). `Rules.heatupSpeedup()` is the scale with `reactorRealHeatup` on (80x as before without it). The coke oven and
+  Bayer holds take `TimeScale.scaled(...)`; cask eligibility counts cooling `BURNUP_SPEEDUP` x scale.
+- `NewWorldSetup`: the World Rules screen's choices (and `newWorld.*` config keys) for the next new world; other mods `register` rules.
+- `client/WorldRulesScreen`, opened by "World Rules..." under the Grid button on the Create World screen.
+- Command `/wildcatter rule timeScale [1|5|10|20|50]`. Field Manual: WORLD RULES page.
+- Tests: `TimeScaleTest`; `world_rules`, `time_scale_holds`; the Fabric client's Create World check.
+
 ## Known gaps
 - `guy_strand_placeholder` (the guy strand's icon) is drawn by script (2026-11-10, `w-grid`); the guy anchor has no Ludo art yet (it is
   drawn in the mod's galvanized material). A guy is drawn as a straight line.
@@ -2070,3 +2079,6 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
   round an area the server had released, so an old test area (1,000+ parts) never unloaded; the NeoForge suite hung in the last
   `minecraft:default` batch and Tailings runs ran out of heap inside the circuit manager. The walk is now `circuit/PartGroups`, which
   asks only `level.isLoaded` about a position outside the loaded area; groups of loaded parts are unchanged. Unit test `PartGroupsTest`.
+- The World Rules screen lists rules in two columns sized to the window; with many more mods' rules it would need a scrolling list.
+- No game test makes a new world from the World Rules screen's choices end to end (the test harness's worlds start as existing
+  worlds); `RulesData.load` taking `NewWorldSetup` is covered by the unit test of its parts and the client screen check.

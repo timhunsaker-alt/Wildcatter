@@ -90,6 +90,7 @@ public final class Rules {
 	/** Every rule off and no world: when a server stops, so the next world opened in this session starts clean. */
 	public static void clear() {
 		listener = null;
+		TimeScale.clear();
 		java.util.Arrays.fill(ON, false);
 	}
 
@@ -167,8 +168,9 @@ public final class Rules {
 		return on(Rule.REAL_RESIDENCE_TIMES);
 	}
 
-	/** How much the reactor's heat-up below no-load temperature is sped up: 80, or 1 with {@code reactorRealHeatup}. */
+	/** How much the reactor's heat-up below no-load temperature is sped up: 80, or with {@code reactorRealHeatup} the world's
+	 * {@link TimeScale} (1 is real hours). */
 	public static double heatupSpeedup() {
-		return reactorRealHeatup() ? 1 : Tuning.HEATUP_SPEEDUP;
+		return reactorRealHeatup() ? TimeScale.scale() : Tuning.HEATUP_SPEEDUP;
 	}
 }

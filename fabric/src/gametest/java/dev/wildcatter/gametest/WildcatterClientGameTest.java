@@ -412,6 +412,45 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		check(dev.wildcatter.energy.ElectricalStandard.pending() == dev.wildcatter.energy.ElectricalStandard.IEC, "clicking the selector should choose IEC, it is " + dev.wildcatter.energy.ElectricalStandard.pending());
 		context.takeScreenshot("wildcatter-create-world-iec");
 		System.out.println("[wildcatter-test] create world selector ok");
+
+		// World Rules... (docs/time-scale.md): the time scale's five presets and every world rule, then back with the grid choice kept
+		dev.wildcatter.NewWorldSetup.clear();
+		context.runOnClient(client -> {
+			for (var widget : net.fabricmc.fabric.api.client.screen.v1.Screens.getWidgets(opened[0])) {
+				if (widget instanceof net.minecraft.client.gui.components.Button b && b.getMessage().getString().startsWith("World Rules")) {
+					b.onPress(new net.minecraft.client.input.KeyEvent(0, 0, 0));
+				}
+			}
+		});
+		context.waitForScreen(dev.wildcatter.client.WorldRulesScreen.class);
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-world-rules");
+		String pressed = context.computeOnClient(client -> {
+			StringBuilder out = new StringBuilder();
+			for (var widget : net.fabricmc.fabric.api.client.screen.v1.Screens.getWidgets(client.gui.screen())) {
+				if (widget instanceof net.minecraft.client.gui.components.Button b) {
+					String text = b.getMessage().getString();
+					if (text.equals("20:1") || text.equals("mudGel: ON")) {
+						b.onPress(new net.minecraft.client.input.KeyEvent(0, 0, 0));
+						out.append(text).append(' ');
+					}
+				}
+			}
+			return out.toString();
+		});
+		context.waitTicks(10);
+		check(dev.wildcatter.NewWorldSetup.scale() == 20, "pressing 20:1 should choose it, not " + dev.wildcatter.NewWorldSetup.scale() + " (pressed " + pressed + ")");
+		check(!dev.wildcatter.NewWorldSetup.rule("wildcatter", "mudGel", true), "pressing mudGel should turn it off for the new world");
+		check(dev.wildcatter.NewWorldSetup.rule("wildcatter", "wellControl", true) && !dev.wildcatter.NewWorldSetup.rule("wildcatter", "reactorContamination", false),
+				"the other rules should stand at their new-world defaults");
+		context.takeScreenshot("wildcatter-world-rules-20x");
+		context.runOnClient(client -> client.gui.screen().onClose());
+		context.waitForScreen(net.minecraft.client.gui.screens.worldselection.CreateWorldScreen.class);
+		context.waitTicks(10);
+		check(dev.wildcatter.energy.ElectricalStandard.pending() == dev.wildcatter.energy.ElectricalStandard.IEC, "coming back from World Rules should keep the grid choice, not " + dev.wildcatter.energy.ElectricalStandard.pending());
+		context.takeScreenshot("wildcatter-create-world-rules-back");
+		System.out.println("[wildcatter-test] world rules screen ok: 20:1, mudGel off, grid kept");
+		dev.wildcatter.NewWorldSetup.clear();
 		dev.wildcatter.energy.ElectricalStandard.setPending(null);
 		context.setScreen(() -> null);
 		context.waitTicks(10);
