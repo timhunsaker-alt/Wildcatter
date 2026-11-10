@@ -462,8 +462,15 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 
 	/** Below 15 lb/bbl of bentonite the cuttings settle when the pumps stop: the rate of penetration is halved. */
 	public boolean lowGel() {
-		double v = mudVolume();
-		return v <= 0 || bentonite / v < Tuning.LOW_GEL_KG_PER_L;
+		return lowGel(bentonite, mudVolume());
+	}
+
+	/** LOW GEL for this much bentonite (kg) in this much mud (L), by the world's rule {@code mudGel}. */
+	public static boolean lowGel(double bentoniteKg, double mudL) {
+		if (!dev.wildcatter.Rules.mudGel()) {
+			return false;   // the world rule is off (a world from before Phase 15): any mud drills at full rate, as before
+		}
+		return mudL <= 0 || bentoniteKg / mudL < Tuning.LOW_GEL_KG_PER_L;
 	}
 
 	/** Salt-saturated: as much salt as the water holds (360 kg a m3), so rock salt does not dissolve into the hole. */
@@ -649,7 +656,7 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 	 * already drilled in salt at the bottom of the hole fill back in (docs/multiblocks/drilling-mud.md).
 	 */
 	private boolean washout(ServerLevel level) {
-		if (saltSaturated() || !isSalt(level.getBlockState(hole().below(depth + 1)))) {
+		if (!dev.wildcatter.Rules.wellControl() || saltSaturated() || !isSalt(level.getBlockState(hole().below(depth + 1)))) {
 			return false;
 		}
 		if (saltMetres > 0) {
@@ -665,10 +672,15 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		return true;
 	}
 
+	/** A strike into this field with mud this heavy kicks: a deep (geopressured) field under its kill weight, by the rule {@code wellControl}. */
+	public static boolean kicks(Reservoir field, double mudPpg) {
+		return dev.wildcatter.Rules.wellControl() && field.deep() && mudPpg < porePpg(field) + Tuning.TRIP_MARGIN_PPG - 1e-6;
+	}
+
 	/** The next block reaches a deep (geopressured) field and there is no BOP. */
 	private boolean needsBop(ServerLevel level) {
 		Reservoir field = Drilling.field(level, hole());
-		return field != null && field.deep() && hole().getY() - (depth + 1) <= field.topY() && !hasBop();
+		return dev.wildcatter.Rules.wellControl() && field != null && field.deep() && hole().getY() - (depth + 1) <= field.topY() && !hasBop();
 	}
 
 	private static boolean isSalt(BlockState state) {
@@ -701,7 +713,7 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 			}
 			Drilling.announce(level, hole, Component.literal("ISR WELL completed through a roll-front, " + depth + " m down. " + log));
 		} else if (field != null && hole.getY() - depth <= field.topY()) {
-			if (field.deep() && mudPpg() < porePpg(field) + Tuning.TRIP_MARGIN_PPG - 1e-6) {
+			if (kicks(field, mudPpg())) {
 				kick(level);   // underbalanced into a geopressured field
 			} else {
 				strike(level, field);

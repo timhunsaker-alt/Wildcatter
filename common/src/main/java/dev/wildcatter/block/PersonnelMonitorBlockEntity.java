@@ -3,7 +3,6 @@ package dev.wildcatter.block;
 import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.energy.Voltage;
 import dev.wildcatter.fluid.Radiation;
-import dev.wildcatter.fluid.ReactorRules;
 import dev.wildcatter.radiation.Contamination;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -37,7 +36,7 @@ public class PersonnelMonitorBlockEntity extends UnitMotorBlockEntity {
 		if (!powered()) {
 			return "Personnel monitor: NO POWER (" + Voltage.LOW.label() + ", single-phase, at the west face of its base): " + motor().describe();
 		}
-		if (!ReactorRules.contamination) {
+		if (!dev.wildcatter.Rules.reactorContamination()) {
 			return "Personnel monitor: CLEAN (no contamination is kept: the contamination rule is off)";
 		}
 		double was = Contamination.wash((ServerLevel) player.level(), player);

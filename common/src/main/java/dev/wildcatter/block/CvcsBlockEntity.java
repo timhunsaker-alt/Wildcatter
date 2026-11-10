@@ -109,7 +109,7 @@ public class CvcsBlockEntity extends UnitMotorBlockEntity implements HopperFed, 
 		ReactorVesselBlockEntity vessel = level == null ? null : vessel(level);
 		String state = vessel == null ? "NOT BUILT: set it against the REACTOR VESSEL"
 				: String.format("%s; RCS %.0f ppm, target %.0f ppm", vessel.reactor().cvcsState(), vessel.reactor().ppm(), vessel.reactor().targetPpm());
-		String activity = vessel != null && dev.wildcatter.fluid.ReactorRules.contamination ? String.format("; coolant activity %.3f µCi/g (limit %.1f), %d leaking assemblies",
+		String activity = vessel != null && dev.wildcatter.Rules.reactorContamination() ? String.format("; coolant activity %.3f µCi/g (limit %.1f), %d leaking assemblies",
 				vessel.reactor().activity(), Tuning.ACTIVITY_LIMIT, vessel.reactor().leakers()) : "";
 		return Component.literal(String.format("CVCS: %s; boric acid tank %.0f kg (%d bags waiting), makeup water %.0f L%s; %s", state, acid, fed(), water, activity, describe()));
 	}

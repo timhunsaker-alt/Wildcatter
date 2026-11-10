@@ -390,14 +390,14 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 		if (!alarms.isEmpty()) {
 			out.append("; ALARMS: ").append(alarms);
 		}
-		if (dev.wildcatter.fluid.ReactorRules.heatupLimit) {
+		if (dev.wildcatter.Rules.reactorHeatupLimit()) {
 			out.append(String.format("; heat-up %.0f C/h (plant time, limit %.0f), fatigue count %d", r.heatupRate(), Tuning.HEATUP_LIMIT_C_PER_H, r.fatigue()));
 		}
-		if (dev.wildcatter.fluid.ReactorRules.ltop) {
+		if (dev.wildcatter.Rules.reactorLtop()) {
 			out.append(String.format("; LTOP %s; P-T limit %s at %.0f C, %d violations", r.ltopArmed() ? "ARMED" : "not armed",
 					Double.isInfinite(Reactor.ptLimit(r.tcold())) ? "none" : String.format("%.1f MPa", Reactor.ptLimit(r.tcold())), r.tcold(), r.ptViolations()));
 		}
-		if (dev.wildcatter.fluid.ReactorRules.deltaTTrips && !Double.isNaN(r.otSetpoint())) {
+		if (dev.wildcatter.Rules.reactorDeltaTTrips() && !Double.isNaN(r.otSetpoint())) {
 			out.append(String.format("; delta-T %.1f C (OT setpoint %.1f, OP %.1f)", r.deltaT(), r.otSetpoint(), r.opSetpoint()));
 		}
 		return out.toString();
@@ -405,7 +405,7 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 
 	/** The console's LTOP ARMED switch (19a, with its rule); null without the rule. */
 	public String toggleLtop() {
-		if (!dev.wildcatter.fluid.ReactorRules.ltop) {
+		if (!dev.wildcatter.Rules.reactorLtop()) {
 			return null;
 		}
 		boolean armed = reactor.toggleLtop();

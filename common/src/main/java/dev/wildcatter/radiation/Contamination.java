@@ -3,7 +3,6 @@ package dev.wildcatter.radiation;
 import dev.wildcatter.Tuning;
 import dev.wildcatter.fluid.Radiation;
 import dev.wildcatter.fluid.Reactor;
-import dev.wildcatter.fluid.ReactorRules;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -29,7 +28,7 @@ public final class Contamination {
 	 * Returns the blocks contaminated.
 	 */
 	public static int splash(ServerLevel level, BlockPos centre, int radius, double strength) {
-		if (!ReactorRules.contamination || strength <= 0) {
+		if (!dev.wildcatter.Rules.reactorContamination() || strength <= 0) {
 			return 0;
 		}
 		ContaminationData data = ContaminationData.get(level);
@@ -60,7 +59,7 @@ public final class Contamination {
 
 	/** Sv/h at {@code at} from the contaminated blocks within 16 m (surface sources: no shielding counted). */
 	public static double rate(ServerLevel level, Vec3 at) {
-		if (!ReactorRules.contamination) {
+		if (!dev.wildcatter.Rules.reactorContamination()) {
 			return 0;
 		}
 		ContaminationData data = ContaminationData.get(level);
@@ -80,7 +79,7 @@ public final class Contamination {
 
 	/** A second on a contaminated block: the player picks up some of it. */
 	public static void pickUp(ServerLevel level, ServerPlayer player) {
-		if (!ReactorRules.contamination) {
+		if (!dev.wildcatter.Rules.reactorContamination()) {
 			return;
 		}
 		ContaminationData data = ContaminationData.get(level);
@@ -99,7 +98,7 @@ public final class Contamination {
 
 	/** Sv/h a player's own contamination gives them. */
 	public static double skinRate(ServerLevel level, ServerPlayer player) {
-		return ReactorRules.contamination ? ContaminationData.get(level).skin(player.getStringUUID(), level.getGameTime()) * Tuning.SKIN_SV_H : 0;
+		return dev.wildcatter.Rules.reactorContamination() ? ContaminationData.get(level).skin(player.getStringUUID(), level.getGameTime()) * Tuning.SKIN_SV_H : 0;
 	}
 
 	/** Washes a player clean; returns the Sv/h they carried. */

@@ -19,6 +19,7 @@ public final class OreGen {
 	public static void register() {
 		Registry.register(BuiltInRegistries.FEATURE_TYPE, Wildcatter.id("salt_dome"), SaltDomeFeature.CODEC);
 		Registry.register(BuiltInRegistries.FEATURE_TYPE, Wildcatter.id("layered"), LayeredFeature.CODEC);
+		Registry.register(BuiltInRegistries.PLACEMENT_MODIFIER_TYPE, Wildcatter.id("salt_dome_placement"), SaltDomePlacement.CODEC);
 	}
 
 	/** Each placed feature (by its path in data/wildcatter/worldgen/placed_feature) and where it goes. */
@@ -31,7 +32,7 @@ public final class OreGen {
 				default -> out.put("ore_" + ore.key, ore.where);
 			}
 		}
-		out.put("salt_dome", Ore.Where.EVERYWHERE);   // 15a: in every chunk; the grid dome checks its own centre's biome (SaltDome)
+		out.put("salt_dome", Ore.Where.SALT_DOME);   // as before Phase 15, so its place among the features is unchanged; 15a's grid dome checks its own centre's biome
 		out.put("evaporite_beds", Ore.Where.EVAPORITE);
 		out.put("bushveld_reef", Ore.Where.EVERYWHERE);
 		return out;

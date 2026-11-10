@@ -3,7 +3,6 @@ package dev.wildcatter.item;
 import dev.wildcatter.Tuning;
 import dev.wildcatter.block.ReceptacleBlockEntity;
 import dev.wildcatter.fluid.Radiation;
-import dev.wildcatter.fluid.ReactorRules;
 import dev.wildcatter.radiation.ContaminationData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -37,7 +36,7 @@ public class DeconWasherItem extends Item {
 
 	/** Washes the block at {@code pos} for {@code player}; returns what to tell them. */
 	public static String wash(ServerLevel level, BlockPos pos, Player player) {
-		if (!ReactorRules.contamination) {
+		if (!dev.wildcatter.Rules.reactorContamination()) {
 			return "Washer: nothing to wash (no contamination is kept: the contamination rule is off)";
 		}
 		if (!plugged(level, pos)) {

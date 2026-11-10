@@ -1726,8 +1726,11 @@ for key, (size, count, lo, hi, rule) in VEINS.items():
 # salt domes: a rock-salt column 8 to 14 blocks across from y -60 to a crest at y 0-20, under a 4-block calcite cap with 30 % sulfur.
 # 15a (docs/salt-dome-oil.md): where they stand is a seed grid (SaltDome.java, its sizes in Tuning), so the feature runs once in every
 # overworld chunk and draws its cell's dome where it falls in that chunk; the dome checks its own centre's biome.
-save_json(f"{WG}/feature/salt_dome.json", {"type": f"{ns}:salt_dome", "sulfur_chance": 0.3})
-save_json(f"{WG}/placed_feature/salt_dome.json", {"feature": f"{ns}:salt_dome", "placement": []})
+# With the world rule saltDomeGrid192 off (worlds from before 15a) the domes are placed exactly as before: SaltDomePlacement runs the old
+# rarity 1/150, in_square, y 0 and biome check itself on the same random numbers, and the feature keeps its old sizes for that case.
+save_json(f"{WG}/feature/salt_dome.json", {"type": f"{ns}:salt_dome", "radius_min": 4, "radius_max": 7, "bottom": -60, "top_min": 0, "top_max": 20,
+	"caprock": 4, "sulfur_chance": 0.3})
+save_json(f"{WG}/placed_feature/salt_dome.json", {"feature": f"{ns}:salt_dome", "placement": [{"type": f"{ns}:salt_dome_placement"}]})
 AIR = "minecraft:air"
 def layer(state, thickness):
 	return {"state": state, "thickness": thickness}
@@ -2472,7 +2475,7 @@ ORE_BIOMES = {
 _ore_where = {m.group(1): m.group(2) for m in re.finditer(r'^\t[A-Z_]+\("(\w+)",.*?Where\.(\w+), Tool\.\w+\)[,;]', _ore_src, re.M | re.S)}
 assert len(_ore_where) == 28, len(_ore_where)
 _placements = {f"ore_{k}": w for k, w in _ore_where.items() if k not in ("sulfur", "halite", "sylvite", "chromite", "platinum")}
-_placements.update({"salt_dome": "EVERYWHERE", "evaporite_beds": "EVAPORITE", "bushveld_reef": "EVERYWHERE"})   # 15a: the dome checks its biome
+_placements.update({"salt_dome": "SALT_DOME", "evaporite_beds": "EVAPORITE", "bushveld_reef": "EVERYWHERE"})   # as before 15a; the grid dome checks its biome
 def _holder_set(entries):
 	tags = [e for e in entries if e.startswith("#")]
 	ids = [e for e in entries if not e.startswith("#")]

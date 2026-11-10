@@ -1,6 +1,17 @@
 {
   "type": "neoforge:add_features",
-  "biomes": "#minecraft:is_overworld",
+  "biomes": {
+    "type": "neoforge:or",
+    "values": [
+      "#minecraft:is_beach",
+      [
+        "minecraft:plains",
+        "minecraft:sunflower_plains",
+        "minecraft:swamp",
+        "minecraft:mangrove_swamp"
+      ]
+    ]
+  },
   "features": "wildcatter:salt_dome",
   "step": "underground_ores"
 }

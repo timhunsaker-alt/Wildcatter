@@ -50,6 +50,12 @@ public class WildcatterNeoForge {
 				})));
 		NeoForge.EVENT_BUS.addListener(ServerStartedEvent.class, event -> Wildcatter.serverStarted(event.getServer()));
 		NeoForge.EVENT_BUS.addListener(ServerStoppedEvent.class, event -> Wildcatter.serverStopped(event.getServer()));
+		NeoForge.EVENT_BUS.addListener(net.neoforged.neoforge.event.level.LevelEvent.Load.class, event -> {
+			if (event.getLevel() instanceof ServerLevel level) {
+				Wildcatter.levelLoaded(level);
+			}
+		});
+		NeoForge.EVENT_BUS.addListener(net.neoforged.neoforge.event.RegisterCommandsEvent.class, event -> Wildcatter.registerCommands(event.getDispatcher()));
 		NeoForge.EVENT_BUS.addListener(ServerTickEvent.Post.class, event -> Wildcatter.serverTick(event.getServer()));
 		NeoForge.EVENT_BUS.addListener(LevelTickEvent.Post.class, event -> {
 			if (event.getLevel() instanceof ServerLevel level) {

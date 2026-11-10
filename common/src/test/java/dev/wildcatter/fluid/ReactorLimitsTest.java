@@ -15,24 +15,27 @@ class ReactorLimitsTest {
 
 	@BeforeEach
 	void keep() {
-		rules = ReactorRules.snapshot();
+		rules = dev.wildcatter.Rules.snapshot();
 	}
 
 	@AfterEach
 	void handBack() {
-		ReactorRules.restore(rules);
+		dev.wildcatter.Rules.restore(rules);
 	}
 
 	@Test
-	void theRulesAreOffUnlessTheConfigSaysTrue() {
-		java.util.Properties p = new java.util.Properties();
-		p.setProperty("reactorLtop", "true");
-		ReactorRules.load(p);
-		assertTrue(ReactorRules.ltop);
-		assertFalse(ReactorRules.heatupLimit || ReactorRules.realHeatup || ReactorRules.deltaTTrips || ReactorRules.contamination || ReactorRules.fuelHandlingDamage);
-		ReactorRules.load(new java.util.Properties());
-		assertFalse(ReactorRules.snapshot()[2]);
-		assertEquals(Tuning.HEATUP_SPEEDUP, ReactorRules.speedup());
+	void newWorldsStartWithTheRulesOnAndExistingOnesOff() {
+		for (dev.wildcatter.Rules.Rule r : dev.wildcatter.Rules.Rule.values()) {
+			assertFalse(dev.wildcatter.Rules.defaultFor(r, false), r.key);
+		}
+		assertTrue(dev.wildcatter.Rules.defaultFor(dev.wildcatter.Rules.Rule.REACTOR_LTOP, true));
+		assertTrue(dev.wildcatter.Rules.defaultFor(dev.wildcatter.Rules.Rule.REACTOR_REAL_HEATUP, true));
+		assertFalse(dev.wildcatter.Rules.defaultFor(dev.wildcatter.Rules.Rule.REACTOR_CONTAMINATION, true));
+		assertFalse(dev.wildcatter.Rules.defaultFor(dev.wildcatter.Rules.Rule.CASCADE_SPIN_UP, true));
+		assertFalse(dev.wildcatter.Rules.defaultFor(dev.wildcatter.Rules.Rule.REAL_RESIDENCE_TIMES, true));
+		assertEquals(dev.wildcatter.Rules.Rule.MUD_GEL, dev.wildcatter.Rules.Rule.byKey("mudgel"));
+		dev.wildcatter.Rules.restore(new boolean[dev.wildcatter.Rules.Rule.values().length]);
+		assertEquals(Tuning.HEATUP_SPEEDUP, dev.wildcatter.Rules.heatupSpeedup());
 	}
 
 	@Test
@@ -46,7 +49,7 @@ class ReactorLimitsTest {
 	/** Without the rule a cold RCS at 7 MPa is what it was before Phase 19: no alarm, no failure. */
 	@Test
 	void withoutTheRuleNothingChanges() {
-		ReactorRules.restore(new boolean[6]);
+		dev.wildcatter.Rules.restore(new boolean[dev.wildcatter.Rules.Rule.values().length]);
 		Reactor r = cold();
 		r.setPressureForTest(7.0);
 		run(r, inputs(), 5, 0.2);
@@ -57,7 +60,7 @@ class ReactorLimitsTest {
 
 	@Test
 	void ltopHoldsThePressureAndTheCurveAlarms() {
-		ReactorRules.ltop = true;
+		dev.wildcatter.Rules.set(dev.wildcatter.Rules.Rule.REACTOR_LTOP, true);
 		Reactor r = cold();
 		Reactor.Inputs in = inputs();
 		r.setPressureForTest(3.0);
@@ -87,7 +90,7 @@ class ReactorLimitsTest {
 
 	@Test
 	void aFastHeatUpAlarmsAndCounts() {
-		ReactorRules.heatupLimit = true;
+		dev.wildcatter.Rules.set(dev.wildcatter.Rules.Rule.REACTOR_HEATUP_LIMIT, true);
 		Reactor r = cold();
 		r.setTemperatureForTest(150);
 		r.setPressureForTest(7.0);   // subcooled: 286 C to boil
@@ -105,16 +108,16 @@ class ReactorLimitsTest {
 
 	@Test
 	void theRealHeatUpIs80TimesSlower() {
-		ReactorRules.realHeatup = true;
-		assertEquals(1, ReactorRules.speedup());
+		dev.wildcatter.Rules.set(dev.wildcatter.Rules.Rule.REACTOR_REAL_HEATUP, true);
+		assertEquals(1, dev.wildcatter.Rules.heatupSpeedup());
 		Reactor slow = cold();
-		ReactorRules.realHeatup = false;
+		dev.wildcatter.Rules.set(dev.wildcatter.Rules.Rule.REACTOR_REAL_HEATUP, false);
 		Reactor fast = cold();
 		Reactor.Inputs in = inputs();
 		in.loop[0] = in.loop[1] = false;
-		ReactorRules.realHeatup = true;
+		dev.wildcatter.Rules.set(dev.wildcatter.Rules.Rule.REACTOR_REAL_HEATUP, true);
 		run(slow, in, 60, 0.2);
-		ReactorRules.realHeatup = false;
+		dev.wildcatter.Rules.set(dev.wildcatter.Rules.Rule.REACTOR_REAL_HEATUP, false);
 		run(fast, in, 60, 0.2);
 		assertEquals(80, (fast.tavg() - 30) / (slow.tavg() - 30), 2);
 	}
@@ -122,7 +125,7 @@ class ReactorLimitsTest {
 	@Test
 	void aStepInTavgTripsOnOtDeltaT() {
 		Reactor r = atPower();
-		ReactorRules.deltaTTrips = true;
+		dev.wildcatter.Rules.set(dev.wildcatter.Rules.Rule.REACTOR_DELTA_T_TRIPS, true);
 		Reactor.Inputs in = inputs();
 		for (double t = 0; t < 5; t += 0.2) {
 			full(r, in, 0.2);
@@ -175,13 +178,13 @@ class ReactorLimitsTest {
 		r.setRodsForTest(Tuning.ROD_STEPS, 200);
 		r.setSetpoint(1.0);
 		r.holdPowerForTest(1.0);
-		boolean was = ReactorRules.deltaTTrips;
-		ReactorRules.deltaTTrips = false;
+		boolean was = dev.wildcatter.Rules.reactorDeltaTTrips();
+		dev.wildcatter.Rules.set(dev.wildcatter.Rules.Rule.REACTOR_DELTA_T_TRIPS, false);
 		Reactor.Inputs in = inputs();
 		for (double t = 0; t < 120; t += 0.2) {
 			full(r, in, 0.2);
 		}
-		ReactorRules.deltaTTrips = was;
+		dev.wildcatter.Rules.set(dev.wildcatter.Rules.Rule.REACTOR_DELTA_T_TRIPS, was);
 		return r;
 	}
 

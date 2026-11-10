@@ -48,8 +48,7 @@ public class StandardData extends SavedData {
 				}
 			} else {
 				java.nio.file.Files.writeString(file, "# Electrical standard for NEW worlds: NORTH_AMERICAN (60 Hz) or IEC (50 Hz). A world keeps the one it was created with.\nstandard=NORTH_AMERICAN\n"
-						+ "# Reactor rules (Phase 19), all off unless set true: reactorHeatupLimit, reactorRealHeatup, reactorLtop, reactorDeltaTTrips,\n"
-						+ "# reactorContamination, fuelHandlingDamage. Each changes what a reactor already does; see the Field Manual.\n");
+						+ "# The operating rules (reactor, uranium, oilfield) are saved with each world: /wildcatter rule lists and sets them.\n");
 			}
 			return ElectricalStandard.valueOf(props.getProperty("standard", "NORTH_AMERICAN").trim());
 		} catch (java.io.IOException | IllegalArgumentException e) {
@@ -69,18 +68,6 @@ public class StandardData extends SavedData {
 		}
 	}
 
-	/** Phase 19's reactor rules ({@link dev.wildcatter.fluid.ReactorRules}): each off unless its key in the config says true. */
-	private static void configReactorRules() {
-		java.nio.file.Path file = dev.wildcatter.platform.Platform.INSTANCE.configDir().resolve("wildcatter.properties");
-		java.util.Properties props = new java.util.Properties();
-		try (java.io.InputStream in = java.nio.file.Files.newInputStream(file)) {
-			props.load(in);
-		} catch (java.io.IOException e) {
-			// no config: every rule off
-		}
-		dev.wildcatter.fluid.ReactorRules.load(props);
-	}
-
 	/** Reads (or fixes) the world's standard and makes it the active one. Call when the server has started. */
 	public static ElectricalStandard apply(MinecraftServer server) {
 		StandardData data = server.overworld().getDataStorage().computeIfAbsent(TYPE);
@@ -88,9 +75,7 @@ public class StandardData extends SavedData {
 		ElectricalStandard.setPending(null);
 		ElectricalStandard.setActive(data.standard);
 		EnergyBridge.setWattsPerFe(configWattsPerFe());
-		configReactorRules();
 		Wildcatter.LOGGER.info("Electrical standard: {} ({} Hz)", data.standard.displayName(), data.standard.hertz());
-		Wildcatter.LOGGER.info("Reactor rules on: {}", dev.wildcatter.fluid.ReactorRules.describe());
 		return data.standard;
 	}
 }

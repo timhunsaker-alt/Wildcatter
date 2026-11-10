@@ -79,7 +79,12 @@ public class WildcatterNeoForgeGameTests {
 		return only == null || only.isBlank() || java.util.Arrays.asList(only.split(",")).contains(scene);
 	}
 
+	/** The world rules' scenes (RuleScenes): each in a batch of its own, as it switches rules on and off. */
+	private static final java.util.Map<String, Consumer<GameTestHelper>> RULE_SCENES = RuleScenes.scenes();
+
 	public WildcatterNeoForgeGameTests(IEventBus modBus) {
+		// the test world starts as an existing world would, every rule off: the scenes switch on the rules they test
+		dev.wildcatter.RulesData.testWorldsAsExisting = true;
 		modBus.addListener(RegisterEvent.class, event -> {
 			// the stand-in gas source: a block of this mod offering a product on Wildcatter's steel pipe, as another mod would (docs/biogas.md)
 			event.register(Registries.BLOCK, helper -> helper.register(id("gas_source"), new TestGasSource.SourceBlock(
@@ -115,6 +120,7 @@ public class WildcatterNeoForgeGameTests {
 			FERRO_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			REACTOR_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			OILFIELD_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
+			RULE_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 		}));
 		modBus.addListener(RegisterCapabilitiesEvent.class, event -> event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, entity, side) -> STORAGE, Blocks.GOLD_BLOCK));
 		modBus.addListener(RegisterGameTestsEvent.class, event -> {
@@ -143,9 +149,17 @@ public class WildcatterNeoForgeGameTests {
 						new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 6000, 1, true,
 								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 120)));
 			}
+			// Phase 15's scenes run in a batch whose world has its rules on (a new world's): the dome grid, the mud's gel and well control
+			Holder<TestEnvironmentDefinition<?>> oilfield = OILFIELD_SCENES.keySet().stream().anyMatch(WildcatterNeoForgeGameTests::only)
+					? event.registerEnvironment(id("rules_oilfield"), new RuleScenes.RulesOn(java.util.List.of("saltDomeGrid192", "mudGel", "wellControl"))) : plain;
+			for (String scene : RULE_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
+				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
+						new TestData<>(event.registerEnvironment(id("rules_" + scene)), net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 400, 1, true,
+								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 40)));
+			}
 			for (String scene : OILFIELD_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
-						new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 6000, 1, true,
+						new TestData<>(oilfield, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 6000, 1, true,
 								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 120)));
 			}
 			for (String scene : PHOSPHATE_SCENES) {

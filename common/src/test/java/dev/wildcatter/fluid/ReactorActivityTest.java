@@ -15,12 +15,12 @@ class ReactorActivityTest {
 
 	@BeforeEach
 	void keep() {
-		rules = ReactorRules.snapshot();
+		rules = dev.wildcatter.Rules.snapshot();
 	}
 
 	@AfterEach
 	void handBack() {
-		ReactorRules.restore(rules);
+		dev.wildcatter.Rules.restore(rules);
 	}
 
 	private static Reactor atPower(boolean bentFirst) {
@@ -79,7 +79,7 @@ class ReactorActivityTest {
 
 	@Test
 	void withoutTheRuleTheCoolantCarriesNoActivity() {
-		ReactorRules.contamination = false;
+		dev.wildcatter.Rules.set(dev.wildcatter.Rules.Rule.REACTOR_CONTAMINATION, false);
 		Reactor r = atPower(false);
 		r.setLeakingForTest(0);
 		run(r, inputs(true), 600);
@@ -89,7 +89,7 @@ class ReactorActivityTest {
 
 	@Test
 	void aLeakerRaisesTheActivityAndTheResinTakesItOut() {
-		ReactorRules.contamination = true;
+		dev.wildcatter.Rules.set(dev.wildcatter.Rules.Rule.REACTOR_CONTAMINATION, true);
 		Reactor clean = atPower(false);
 		Reactor leaky = atPower(false);
 		leaky.setLeakingForTest(0);

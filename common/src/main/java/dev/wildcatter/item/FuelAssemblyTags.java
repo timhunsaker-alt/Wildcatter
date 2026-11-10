@@ -1,7 +1,6 @@
 package dev.wildcatter.item;
 
 import dev.wildcatter.Tuning;
-import dev.wildcatter.fluid.ReactorRules;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
@@ -46,7 +45,7 @@ public final class FuelAssemblyTags {
 
 	/** A move by hopper or crane: with the rule on, its one chance of a bent grid. */
 	public static void handle(ItemStack stack, RandomSource random) {
-		if (!ReactorRules.fuelHandlingDamage || handled(stack)) {
+		if (!dev.wildcatter.Rules.fuelHandlingDamage() || handled(stack)) {
 			return;
 		}
 		put(stack, "handled", true);

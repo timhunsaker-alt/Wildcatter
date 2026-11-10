@@ -16,7 +16,7 @@ final class ReactorThermal {
 		double heat = (p * (1 - prompt) + r.decayHeat() * (1 - uncovered)) * Reactor.ratedWatts();   // an uncovered core's share heats the fuel
 		double sgHeat = 0;
 		double[] q = new double[2];
-		double speed = r.tavg < Tuning.TAVG_NO_LOAD ? ReactorRules.speedup() : 1;
+		double speed = r.tavg < Tuning.TAVG_NO_LOAD ? dev.wildcatter.Rules.heatupSpeedup() : 1;
 		int loops = (in.loop[0] ? 1 : 0) + (in.loop[1] ? 1 : 0);
 		for (int l = 0; l < 2; l++) {
 			f[l] = in.loop[l] ? Math.max(in.pump[l], Tuning.NATURAL_CIRCULATION) : 0;
@@ -25,7 +25,7 @@ final class ReactorThermal {
 				double wet = Math.min(1, r.sgKg[l] / (0.3 * Tuning.SG_WATER_KG));
 				double ua = Tuning.SG_UA_W_PER_C * Math.pow(f[l], 0.8) * wet;
 				double primary = Tuning.RCS_HEAT_J_PER_C / speed / loops;
-				double secondary = Tuning.SG_HEAT_J_PER_C / (r.sgC[l] < Tuning.TAVG_NO_LOAD ? ReactorRules.speedup() : 1);
+				double secondary = Tuning.SG_HEAT_J_PER_C / (r.sgC[l] < Tuning.TAVG_NO_LOAD ? dev.wildcatter.Rules.heatupSpeedup() : 1);
 				double both = 1 / primary + 1 / secondary;
 				q[l] = (r.tavg - r.sgC[l]) * (1 - Math.exp(-ua * both * dt)) / both;
 				sgHeat += q[l];
@@ -62,7 +62,7 @@ final class ReactorThermal {
 			if (Double.isNaN(r.cooldownC)) {
 				r.cooldownC = Math.min(r.sgC[0], r.sgC[1]);
 			}
-			r.cooldownC = Math.max(Tuning.COOLDOWN_FLOOR_C, r.cooldownC - Tuning.COOLDOWN_C_PER_H / 3600 * ReactorRules.speedup() * dt);
+			r.cooldownC = Math.max(Tuning.COOLDOWN_FLOOR_C, r.cooldownC - Tuning.COOLDOWN_C_PER_H / 3600 * dev.wildcatter.Rules.heatupSpeedup() * dt);
 		} else {
 			r.cooldownC = Double.NaN;
 		}
@@ -82,7 +82,7 @@ final class ReactorThermal {
 			r.lastSteam[l] = out;
 			double latent = Steam.hg(mpa) - Steam.hf(r.sgC[l]);
 			double sub = Steam.hf(r.sgC[l]) - Steam.hf(Tuning.FEEDWATER_C);
-			double sgSpeed = r.sgC[l] < Tuning.TAVG_NO_LOAD ? ReactorRules.speedup() : 1;
+			double sgSpeed = r.sgC[l] < Tuning.TAVG_NO_LOAD ? dev.wildcatter.Rules.heatupSpeedup() : 1;
 			double joules = q[l] - out * latent - in.feed[l] * sub;
 			r.sgC[l] += joules * (joules > 0 || controlled ? sgSpeed : 1) / Tuning.SG_HEAT_J_PER_C;
 			r.sgKg[l] = Math.max(0, r.sgKg[l] + in.feed[l] - out);
@@ -92,7 +92,7 @@ final class ReactorThermal {
 		if (!in.pressurizer) {
 			r.pzrC = Math.max(Math.min(r.pzrC, r.tavg), r.pzrC - 2 * dt);
 		} else if (r.full()) {
-			double pzrSpeed = r.tavg < Tuning.TAVG_NO_LOAD ? ReactorRules.speedup() : 1;
+			double pzrSpeed = r.tavg < Tuning.TAVG_NO_LOAD ? dev.wildcatter.Rules.heatupSpeedup() : 1;
 			double gain = in.heaters * Tuning.PZR_HEATER_WATTS - Tuning.PZR_LOSS_W * (r.pzrC - 20) / (344.8 - 20);
 			r.pzrC += gain * dt * (gain > 0 ? pzrSpeed : 1) / Tuning.PZR_HEAT_J_PER_C + Tuning.PZR_SURGE * (r.tavg - before);
 			if (controlled && r.pressure() > r.cooldownMpa() + 0.2) {
@@ -101,7 +101,7 @@ final class ReactorThermal {
 				r.pzrC = Math.max(r.tcold, r.pzrC - Tuning.PZR_SPRAY_C_PER_S * dt);
 			}
 			// the PORVs lift; with the LTOP rule and LTOP armed below its enable temperature, at 3.2 MPa
-			double lift = ReactorRules.ltop && r.ltopArmed && r.tcold < Tuning.LTOP_ENABLE_C ? Tuning.LTOP_MPA : Tuning.PORV_MPA;
+			double lift = dev.wildcatter.Rules.reactorLtop() && r.ltopArmed && r.tcold < Tuning.LTOP_ENABLE_C ? Tuning.LTOP_MPA : Tuning.PORV_MPA;
 			double capC = Steam.tsat(lift);
 			if (r.pzrC > capC) {
 				double latent = Math.max(2e5, Steam.hg(lift) - Steam.hf(capC));

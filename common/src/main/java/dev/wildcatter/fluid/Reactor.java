@@ -87,7 +87,7 @@ public final class Reactor {
 	double waterUsed;
 	String cvcsState = "idle";
 	String held = "";
-	// 19a (each read only with its rule on, ReactorRules): the heat-up rate in plant time and its excursions; LTOP and the P-T curve;
+	// 19a (each read only with its world rule on, dev.wildcatter.Rules): the heat-up rate in plant time and its excursions; LTOP and the P-T curve;
 	// the delta-T trips' filters and setpoints; what the PORVs (and a failed vessel) let go this step
 	double heatupRate;
 	boolean heatupAlarm;
@@ -300,7 +300,7 @@ public final class Reactor {
 	/** Whether the pressurizer's heaters should run. With the LTOP rule they hold the pressure under the P-T curve too. */
 	public boolean wantsHeaters() {
 		double target = coolingDown() ? cooldownMpa() : Tuning.PZR_HEATERS_ON_MPA;
-		if (ReactorRules.ltop) {
+		if (dev.wildcatter.Rules.reactorLtop()) {
 			target = Math.min(target, Tuning.LTOP_HEATER_SHARE * ptLimit(tcold));
 		}
 		return full() && pressure() < target;
@@ -344,7 +344,7 @@ public final class Reactor {
 
 	/** Below the LTOP enable temperature, filled, and LTOP not armed. */
 	public boolean ltopNotArmed() {
-		return ReactorRules.ltop && full() && tcold < Tuning.LTOP_ENABLE_C && !ltopArmed;
+		return dev.wildcatter.Rules.reactorLtop() && full() && tcold < Tuning.LTOP_ENABLE_C && !ltopArmed;
 	}
 
 	public boolean ptAlarm() {
@@ -429,7 +429,7 @@ public final class Reactor {
 		if (ltopNotArmed()) {
 			out.append(out.isEmpty() ? "" : ", ").append("LTOP NOT ARMED");
 		}
-		if (ReactorRules.contamination && activity > Tuning.ACTIVITY_LIMIT) {
+		if (dev.wildcatter.Rules.reactorContamination() && activity > Tuning.ACTIVITY_LIMIT) {
 			out.append(out.isEmpty() ? "" : ", ").append("COOLANT ACTIVITY");
 		}
 		return out.toString();

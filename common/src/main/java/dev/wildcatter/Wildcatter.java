@@ -54,12 +54,23 @@ public final class Wildcatter {
 
 	public static void serverStarted(MinecraftServer server) {
 		dev.wildcatter.energy.StandardData.apply(server);
-		Rules.load();
+	}
+
+	/** A level has loaded: for the overworld, before any of its chunks generate, the world's rules (they decide where salt domes go). */
+	public static void levelLoaded(net.minecraft.server.level.ServerLevel level) {
+		if (level.dimension() == net.minecraft.world.level.Level.OVERWORLD) {
+			RulesData.load(level);
+		}
+	}
+
+	public static void registerCommands(com.mojang.brigadier.CommandDispatcher<net.minecraft.commands.CommandSourceStack> dispatcher) {
+		RulesCommand.register(dispatcher);
 	}
 
 	/** Static per-world state must not survive into the next world opened in the same session. */
 	public static void serverStopped(MinecraftServer server) {
 		CircuitManager.clearAll();
+		Rules.clear();
 		dev.wildcatter.block.SpentFuelPoolBlockEntity.clearAll();
 		dev.wildcatter.block.NaturalDraftTowerBlockEntity.clearAll();
 		dev.wildcatter.block.ReactorVesselBlockEntity.clearAll();

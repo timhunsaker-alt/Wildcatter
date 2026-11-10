@@ -22,7 +22,7 @@ final class ReactorActivity {
 				r.leaking[i] = true;   // fretting at the bent grid wears through a rod's cladding
 			}
 		}
-		if (!ReactorRules.contamination || r.waterKg < 1) {
+		if (!dev.wildcatter.Rules.reactorContamination() || r.waterKg < 1) {
 			return;
 		}
 		double power = Math.max(0, Math.min(1.2, p));

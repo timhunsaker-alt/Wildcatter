@@ -1,4 +1,8 @@
 {
   "feature": "wildcatter:salt_dome",
-  "placement": []
+  "placement": [
+    {
+      "type": "wildcatter:salt_dome_placement"
+    }
+  ]
 }

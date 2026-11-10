@@ -125,7 +125,7 @@ public class ReactorPartBlock extends BigPartBlock implements net.minecraft.worl
 		if (player.isShiftKeyDown()) {
 			String said = switch (entity) {
 				case ReactorVesselBlockEntity vessel -> vessel.unload(player);
-				case ReactorConsoleBlockEntity console when dev.wildcatter.fluid.ReactorRules.ltop && lowerFace(pos, state, hit) -> console.toggleLtop(level);
+				case ReactorConsoleBlockEntity console when dev.wildcatter.Rules.reactorLtop() && lowerFace(pos, state, hit) -> console.toggleLtop(level);
 				case ReactorConsoleBlockEntity console -> console.nextSetpoint(level);
 				case CvcsBlockEntity cvcs -> cvcs.nextTarget(level);
 				case ReactorCoolantPumpBlockEntity pump -> pump.toggle();
@@ -151,7 +151,7 @@ public class ReactorPartBlock extends BigPartBlock implements net.minecraft.worl
 	 */
 	@Override
 	public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-		if (dev.wildcatter.fluid.ReactorRules.contamination && level instanceof ServerLevel sl && switch (part) {
+		if (dev.wildcatter.Rules.reactorContamination() && level instanceof ServerLevel sl && switch (part) {
 			case REACTOR_VESSEL, STEAM_GENERATOR, REACTOR_COOLANT_PUMP, PRESSURIZER, CVCS_SKID -> true;
 			default -> false;
 		}) {

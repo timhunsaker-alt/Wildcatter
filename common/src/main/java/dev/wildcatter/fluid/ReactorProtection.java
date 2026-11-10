@@ -53,7 +53,7 @@ final class ReactorProtection {
 	 * term f(delta-I) is left out: the model has no axial shape. Without the rule the setpoints are NaN and nothing trips.
 	 */
 	static boolean[] deltaT(Reactor r, double dt) {
-		if (!ReactorRules.deltaTTrips || !r.full() || dt <= 0) {
+		if (!dev.wildcatter.Rules.reactorDeltaTTrips() || !r.full() || dt <= 0) {
 			r.otLag = r.opLag = r.otSetpoint = r.opSetpoint = Double.NaN;
 			return new boolean[2];
 		}

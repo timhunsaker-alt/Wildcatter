@@ -41,6 +41,8 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 
 	@Override
 	public void runTest(ClientGameTestContext context) {
+		// the test world starts as an existing world would, every world rule off; the scenes switch on the rules they show
+		dev.wildcatter.RulesData.testWorldsAsExisting = true;
 		createWorldScreen(context);
 		try (TestSingleplayerContext world = context.worldBuilder().create()) {
 			TestServerContext server = world.getServer();
@@ -7702,6 +7704,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	private void landRig(ClientGameTestContext context, TestServerContext server) {
 		int hx = 30, hz = -440;
 		int pad = up + 45;
+		rules(server, true, "saltDomeGrid192", "mudGel", "wellControl");   // Phase 15's rig, as in a new world
 		BlockPos hole = new BlockPos(hx, pad + 1, hz);
 		long seed = -1;
 		for (long s = 1; s < 3_000_000 && seed < 0; s++) {
@@ -7843,6 +7846,14 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		} finally {
 			server.runCommand("effect clear @p minecraft:slow_falling");
 			ReservoirData.testSeed = null;
+			rules(server, false, "saltDomeGrid192", "mudGel", "wellControl");
+		}
+	}
+
+	/** Sets world rules as an operator would: {@code /wildcatter rule <key> <on>}. */
+	static void rules(TestServerContext server, boolean on, String... keys) {
+		for (String key : keys) {
+			server.runCommand("wildcatter rule " + key + " " + on);
 		}
 	}
 
@@ -11460,7 +11471,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		server.runCommand("tp @p " + cx + " " + (up + 4) + " " + (cz + 26) + " 180 10");
 		context.waitTicks(40);
 		server.runCommand("fill " + (cx - 7) + " -63 " + (cz - 7) + " " + (cx + 8) + " 25 " + (cz + 8) + " minecraft:stone");
+		rules(server, true, "saltDomeGrid192");   // the grid dome, as a new world has it
 		server.runCommand("place feature wildcatter:salt_dome " + cx + " 0 " + cz);
+		rules(server, false, "saltDomeGrid192");
 		ReservoirData.testSeed = null;
 		ReservoirData.testDomeBiome = null;
 		int salt = count(server, dev.wildcatter.ore.OreBlocks.block(dev.wildcatter.ore.Ore.HALITE), new BlockPos(cx - 7, -40, cz - 7), new BlockPos(cx + 8, -30, cz + 8));

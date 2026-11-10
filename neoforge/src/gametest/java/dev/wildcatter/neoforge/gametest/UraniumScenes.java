@@ -218,7 +218,7 @@ final class UraniumScenes {
 		cableRun(helper, -5, -4, -2, 16);                                                                // the KOH scrubber's box
 		cableRun(helper, -2, -5, 6, 9);                                                                  // the cathode gas scrubber's box, north
 		cableRun(helper, 6, -6, 23, 0);                                                                  // the leach tank's box
-		dev.wildcatter.Rules.setFluorinatorAshBed(true);
+		RuleScenes.rule(helper, "fluorinatorAshBed", true);
 		dev.wildcatter.block.FluorineCellHouseBlockEntity cells = entity(helper, 0, 0, dev.wildcatter.block.FluorineCellHouseBlockEntity.class);
 		cells.testCells(dev.wildcatter.fluid.Conversion.fluorineKgs());                                 // the cells at full current
 		ReductionReactorBlockEntity reducer = entity(helper, 2, 13, ReductionReactorBlockEntity.class);
@@ -264,7 +264,7 @@ final class UraniumScenes {
 						String stopped = read(helper, 2, 16);
 						check(helper, spent.contains("SPENT"), "with its KOH spent and no lime the scrubber should read SPENT: " + spent);
 						check(helper, stopped.contains("KOH SCRUBBER SPENT"), "with its scrubber spent the hydrofluorinator should stop: " + stopped);
-						dev.wildcatter.Rules.setFluorinatorAshBed(false);
+						RuleScenes.rule(helper, "fluorinatorAshBed", false);
 						log(scene, "ok: " + retired + " | " + spent + " | " + stopped);
 						helper.succeed();
 					});
@@ -345,7 +345,7 @@ final class UraniumScenes {
 					check(helper, cylinder.is(WildcatterItems.LEU_CYLINDER_30B) && Math.abs(assay - 0.03) < 0.0002, "the product 30B should read 3.00 %: " + cylinder + " " + assay
 							+ " | " + read(helper, 2, 6));
 					// the drive gone with the spin-up rule on: the machines coast and the cascade keeps feeding
-					dev.wildcatter.Rules.setCascadeSpinUp(true);
+					RuleScenes.rule(helper, "cascadeSpinUp", true);
 					for (int x = 16; x <= 25; x++) {
 						entity(helper, x, 5, dev.wildcatter.block.CentrifugeBlockEntity.class).setSpinForTest(1.0);
 					}
@@ -357,7 +357,7 @@ final class UraniumScenes {
 						String still = read(helper, 0, 0);
 						check(helper, s < 1 && s > 0.99 && coast.contains("COASTING"), "with no drive a machine should coast: " + s + " | " + coast);
 						check(helper, still.contains("feeding"), "the coasting cascade should keep feeding: " + still);
-						dev.wildcatter.Rules.setCascadeSpinUp(false);
+						RuleScenes.rule(helper, "cascadeSpinUp", false);
 						on[0] = true;
 						driveLoop(helper, 16, 25, 5, on);
 						// the cooling water cut, five minutes passed by hook

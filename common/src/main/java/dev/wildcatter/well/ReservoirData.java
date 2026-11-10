@@ -69,9 +69,10 @@ public class ReservoirData extends SavedData {
 				|| biome.is(net.minecraft.tags.BiomeTags.IS_BEACH);
 	}
 
-	/** Whether a grid dome is really there: its centre's biome (docs/salt-dome-oil.md). Works for unloaded chunks too. */
+	/** Whether a grid dome is really there: the world's rule, then its centre's biome (docs/salt-dome-oil.md). Works for unloaded chunks too. */
 	public static java.util.function.Predicate<SaltDome> site(net.minecraft.world.level.LevelReader level) {
-		return dome -> testDomeBiome != null ? testDomeBiome : domeBiome(level.getBiome(new net.minecraft.core.BlockPos(dome.centerX(), 64, dome.centerZ())));
+		// with the world rule saltDomeGrid192 off (a world from before 15a) there are no grid domes: its fields are as they were
+		return dome -> dev.wildcatter.Rules.saltDomeGrid() && (testDomeBiome != null ? testDomeBiome : domeBiome(level.getBiome(new net.minecraft.core.BlockPos(dome.centerX(), 64, dome.centerZ()))));
 	}
 
 	/** The field a hole at this column reaches first in this world, salt domes included (docs/salt-dome-oil.md). */

@@ -17,7 +17,6 @@ import dev.wildcatter.block.ReactorConsoleBlockEntity;
 import dev.wildcatter.block.ReactorVesselBlockEntity;
 import dev.wildcatter.block.ReliefTankBlockEntity;
 import dev.wildcatter.fluid.Reactor;
-import dev.wildcatter.fluid.ReactorRules;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
@@ -55,7 +54,7 @@ final class ReactorExtensionScenes {
 	/** A check that hands the rules back before it fails. */
 	private static void check(GameTestHelper helper, boolean ok, String message, boolean[] rules) {
 		if (!ok && rules != null) {
-			ReactorRules.restore(rules);
+			dev.wildcatter.Rules.restore(rules);
 		}
 		helper.assertTrue(ok, Component.literal(message));
 	}
@@ -156,7 +155,7 @@ final class ReactorExtensionScenes {
 
 	// ---- reactor_limits -----------------------------------------------------------------------------------------------------------------
 	static void reactorLimits(GameTestHelper helper) {
-		boolean[] rules = ReactorRules.snapshot();
+		boolean[] rules = dev.wildcatter.Rules.snapshot();
 		floor(helper, -6, -2, 14, 16);
 		place(helper, WildcatterBlocks.REACTOR_VESSEL, 4, 1, 4, Direction.NORTH);            // x 4-6, z 4-6, y 1-10
 		place(helper, WildcatterBlocks.CRDM_HEAD, 4, 11, 4, Direction.NORTH);
@@ -179,7 +178,7 @@ final class ReactorExtensionScenes {
 		vessel.setHotStandbyForTest(1500);
 		r.setColdForTest();
 		// LTOP: the cold RCS at 3.0 MPa, not armed
-		ReactorRules.ltop = true;
+		RuleScenes.rule(helper, "reactorLtop", true);
 		r.setPressureForTest(3.0);
 		helper.runAfterDelay(20, () -> {
 			String cold = read(helper, 4, 1, 4);
@@ -220,8 +219,8 @@ final class ReactorExtensionScenes {
 
 	/** The heat-up limit: 6 % decay heat into the RCS at 150 C, kept up by hook, is about 110 C/h in plant time. */
 	private static void heatup(GameTestHelper helper, Reactor r, boolean[] rules) {
-		ReactorRules.restore(rules);
-		ReactorRules.heatupLimit = true;
+		dev.wildcatter.Rules.restore(rules);
+		RuleScenes.rule(helper, "reactorHeatupLimit", true);
 		r.setTemperatureForTest(150);
 		r.setPressureForTest(7.0);
 		decay(helper, r, 4, () -> {
@@ -246,7 +245,7 @@ final class ReactorExtensionScenes {
 	 * the core's delta-T is far over the setpoint. Without the rule it runs on; with it, it trips naming OT-DELTA-T.
 	 */
 	private static void otDeltaT(GameTestHelper helper, Reactor r, boolean[] rules) {
-		ReactorRules.restore(rules);
+		dev.wildcatter.Rules.restore(rules);
 		helper.runAfterDelay(30, () -> GridSceneKit.start(helper, 0, 1, 2, () -> {
 			r.setHotStandbyForTest(1500);
 			r.setHistoryForTest(0.08);
@@ -256,11 +255,11 @@ final class ReactorExtensionScenes {
 			helper.runAfterDelay(40, () -> {
 				String off = read(helper, 4, 1, 4);
 				check(helper, !r.tripped(), "without the rule it should run on at 8 %: " + off + " | CRDM " + read(helper, 4, 11, 4), rules);
-				ReactorRules.deltaTTrips = true;
+				RuleScenes.rule(helper, "reactorDeltaTTrips", true);
 				helper.runAfterDelay(20, () -> {
 					String trip = read(helper, 4, 1, 4);
 					r.pinPowerForTest(-1);
-					ReactorRules.restore(rules);
+					dev.wildcatter.Rules.restore(rules);
 					check(helper, r.tripped() && r.trip().startsWith("OT-DELTA-T"), "with the rule it should trip on OT-DELTA-T: " + trip, rules);
 					log("reactor_limits", "ok: " + trip);
 					helper.succeed();
@@ -331,7 +330,7 @@ final class ReactorExtensionScenes {
 	 * plant, cleans a block by 90 %.
 	 */
 	static void contamination(GameTestHelper helper) {
-		boolean[] rules = ReactorRules.snapshot();
+		boolean[] rules = dev.wildcatter.Rules.snapshot();
 		floor(helper, -24, -4, 18, 18);
 		place(helper, WildcatterBlocks.REACTOR_VESSEL, 6, 1, 4, Direction.NORTH);             // x 6-8, z 4-6
 		place(helper, WildcatterBlocks.PRESSURIZER, 6, 1, 7, Direction.NORTH);                // x 6-7, z 7-8
@@ -363,7 +362,7 @@ final class ReactorExtensionScenes {
 		ReactorVesselBlockEntity vessel = entity(helper, 6, 1, 4, ReactorVesselBlockEntity.class);
 		vessel.setHotStandbyForTest(1500);
 		vessel.reactor().setActivityForTest(Tuning.ACTIVITY_LIMIT);
-		ReactorRules.contamination = true;
+		RuleScenes.rule(helper, "reactorContamination", true);
 		dev.wildcatter.radiation.ContaminationData data = dev.wildcatter.radiation.ContaminationData.get(helper.getLevel());
 		GridSceneKit.start(helper, -18, 1, 0, () -> {
 			net.minecraft.server.level.ServerPlayer player = helper.makeMockServerPlayerInLevel();
@@ -395,7 +394,7 @@ final class ReactorExtensionScenes {
 			String wash = dev.wildcatter.item.DeconWasherItem.wash(helper.getLevel(), near, player);
 			double after = data.at(near, helper.getLevel().getGameTime());
 			check(helper, Math.abs(after - 0.08) < 0.01, "the washer should clean the block by 90 %: " + wash + " | receptacle " + read(helper, 15, 2, 14), rules);
-			ReactorRules.restore(rules);
+			dev.wildcatter.Rules.restore(rules);
 			log("contamination", "ok: floor " + before + ", dose " + dev.wildcatter.fluid.Radiation.rateText(rate) + ", skin " + dev.wildcatter.fluid.Radiation.rateText(skin)
 					+ " | " + washed + " | " + wash);
 			helper.succeed();
@@ -409,7 +408,7 @@ final class ReactorExtensionScenes {
 	 * uninspected one, which leaks after a third of its cycle.
 	 */
 	static void fuelInspection(GameTestHelper helper) {
-		boolean[] rules = ReactorRules.snapshot();
+		boolean[] rules = dev.wildcatter.Rules.snapshot();
 		floor(helper, -6, -2, 14, 18);
 		GridSceneKit.genset(helper, 0, 1, 0);                                                 // its terminal at (1, 1, 0)
 		for (int x = 1; x <= 3; x++) {
@@ -424,10 +423,10 @@ final class ReactorExtensionScenes {
 		dev.wildcatter.block.InspectionStandBlockEntity stand = entity(helper, 4, 1, 2, dev.wildcatter.block.InspectionStandBlockEntity.class);
 		dev.wildcatter.block.AssemblyFixtureBlockEntity fixture = entity(helper, 4, 1, 6, dev.wildcatter.block.AssemblyFixtureBlockEntity.class);
 		ReactorVesselBlockEntity vessel = entity(helper, 10, 1, 2, ReactorVesselBlockEntity.class);
-		ReactorRules.fuelHandlingDamage = true;
+		RuleScenes.rule(helper, "fuelHandlingDamage", true);
 		dev.wildcatter.item.FuelAssemblyTags.setBentChanceForTest(1.0);
 		Runnable handBack = () -> {
-			ReactorRules.restore(rules);
+			dev.wildcatter.Rules.restore(rules);
 			dev.wildcatter.item.FuelAssemblyTags.setBentChanceForTest(-1);
 		};
 		stand.setSecondsForTest(1);

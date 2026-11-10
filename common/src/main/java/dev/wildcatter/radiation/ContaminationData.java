@@ -18,7 +18,7 @@ import net.minecraft.world.level.saveddata.SavedDataType;
 /**
  * Contamination (docs/multiblocks/reactor-extensions.md, 19b), stored sparsely with each level: by block, a share of a fully
  * contaminated block (1 mSv/h at 1 m), and by player, a share of a fully contaminated person. Each entry keeps its value and the game
- * time it was set, and decays with a 30-day half-life when read. Only the contamination rule (ReactorRules) puts any here.
+ * time it was set, and decays with a 30-day half-life when read. Only the contamination rule (reactorContamination, dev.wildcatter.Rules) puts any here.
  */
 public class ContaminationData extends SavedData {
 	public static final Codec<ContaminationData> CODEC = Codec.unboundedMap(Codec.STRING, Codec.DOUBLE.listOf()).xmap(ContaminationData::new, ContaminationData::lists);

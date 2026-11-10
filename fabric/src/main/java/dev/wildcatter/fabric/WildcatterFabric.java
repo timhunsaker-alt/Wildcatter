@@ -38,6 +38,8 @@ public class WildcatterFabric implements ModInitializer {
 		ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register(CircuitManager::unregister);
 		ServerLifecycleEvents.SERVER_STARTED.register(Wildcatter::serverStarted);
 		ServerLifecycleEvents.SERVER_STOPPED.register(Wildcatter::serverStopped);
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents.LOAD.register((server, level) -> Wildcatter.levelLoaded(level));
+		net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback.EVENT.register((dispatcher, context, selection) -> Wildcatter.registerCommands(dispatcher));
 		ServerTickEvents.END_LEVEL_TICK.register(CircuitManager::tick);
 		ServerTickEvents.END_SERVER_TICK.register(Wildcatter::serverTick);
 		ServerPlayerEvents.AFTER_RESPAWN.register((old, now, alive) -> Wildcatter.respawned(now));
