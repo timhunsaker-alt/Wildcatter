@@ -1,5 +1,11 @@
 package dev.wildcatter.control;
 
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import com.mojang.serialization.Codec;
 import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.energy.Inspectable;
@@ -29,6 +35,15 @@ public class RemoteIoDropBlockEntity extends BlockEntity implements Inspectable,
 	private boolean grown;
 	private ControlNet.Found net = new ControlNet.Found(List.of(), false, null);
 
+	/**
+	 * A rack has one owner, as a real adapter takes one controller's exclusive-owner connection: the first PLC to reach it, until that PLC has
+	 * not scanned it for {@link #OWNER_TIMEOUT_TICKS} (its connection timed out).
+	 */
+	public static final int OWNER_TIMEOUT_TICKS = 20;
+	private @org.jspecify.annotations.Nullable BlockPos owner;
+	private String ownerStation = "";
+	private long ownerTick = Long.MIN_VALUE;
+
 	public RemoteIoDropBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.REMOTE_IO_DROP_ENTITY, pos, state);
 	}
@@ -45,6 +60,51 @@ public class RemoteIoDropBlockEntity extends BlockEntity implements Inspectable,
 	public void nextRack() {
 		rack = rack % RACKS + 1;
 		setChanged();
+	}
+
+	/** A PLC's connection: true if this rack is, or now becomes, that PLC's. */
+	public boolean claim(BlockPos cabinet, String station, long now) {
+		if (owner == null || owner.equals(cabinet) || now - ownerTick > OWNER_TIMEOUT_TICKS || now < ownerTick) {
+			owner = cabinet.immutable();
+			ownerStation = station;
+			ownerTick = now;
+			return true;
+		}
+		return false;
+	}
+
+	/** The station that owns this rack, or empty. */
+	public String owner(long now) {
+		return owner != null && now - ownerTick <= OWNER_TIMEOUT_TICKS && now >= ownerTick ? ownerStation : "";
+	}
+
+	public ControlNet.Found net() {
+		return net;
+	}
+
+	@Override
+	public Packet<ClientGamePacketListener> getUpdatePacket() {
+		return ClientboundBlockEntityDataPacket.create(this);
+	}
+
+	@Override
+	public CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+		CompoundTag tag = new CompoundTag();
+		tag.putBoolean("grown", grown);
+		tag.putInt("rack", rack);
+		ListTag rail = new ListTag();
+		for (PlcModuleItem.Type m : modules) {
+			rail.add(StringTag.valueOf(m == null ? "" : m.name()));
+		}
+		tag.put("modules", rail);
+		return tag;
+	}
+
+	private void railChanged() {
+		setChanged();
+		if (level != null && !level.isClientSide()) {
+			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+		}
 	}
 
 	public PlcModuleItem.Type module(int slot) {
@@ -67,7 +127,7 @@ public class RemoteIoDropBlockEntity extends BlockEntity implements Inspectable,
 		for (int i = 0; i < modules.length; i++) {
 			if (modules[i] == null) {
 				modules[i] = type;
-				setChanged();
+				railChanged();
 				return null;
 			}
 		}
@@ -80,7 +140,7 @@ public class RemoteIoDropBlockEntity extends BlockEntity implements Inspectable,
 				for (var item : BuiltInRegistries.ITEM) {
 					if (item instanceof PlcModuleItem module && module.type() == modules[i]) {
 						modules[i] = null;
-						setChanged();
+						railChanged();
 						return new ItemStack(item);
 					}
 				}
@@ -98,7 +158,8 @@ public class RemoteIoDropBlockEntity extends BlockEntity implements Inspectable,
 	@Override
 	public Component inspect() {
 		StringBuilder out = new StringBuilder("Remote I/O drop, rack " + rack + ": ");
-		out.append(live() ? "24 V OK" : "NO 24 V").append(", ").append(NetworkNet.plcs(level, BigParts.cells(worldPosition, getBlockState())).size()).append(" PLC(s) on its network, ").append(net.devices().size()).append(" devices reached; ");
+		String by = level == null ? "" : owner(level.getGameTime());
+		out.append(live() ? "24 V OK" : "NO 24 V").append(", ").append(by.isEmpty() ? "no owner, " : "owned by " + by + ", ").append(NetworkNet.plcs(level, BigParts.cells(worldPosition, getBlockState())).size()).append(" PLC(s) on its network, ").append(net.devices().size()).append(" devices reached; ");
 		for (int i = 0; i < modules.length; i++) {
 			if (modules[i] != null) {
 				out.append(i).append(": ").append(modules[i]).append(" ");

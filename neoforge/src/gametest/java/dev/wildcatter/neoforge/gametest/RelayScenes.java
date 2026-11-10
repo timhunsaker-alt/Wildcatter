@@ -69,7 +69,7 @@ final class RelayScenes {
 	 * feeder 3 at x 21, the main at x 22, feeder 1 at x 23 (z -3..-1). Feeder 1 serves a unit substation and four 15 kW heaters,
 	 * feeder 3 a dead-end cable at (19..21, U+3, -1).
 	 */
-	private static void lineup(GameTestHelper helper) {
+	static void lineup(GameTestHelper helper) {
 		floor(helper, -2, -8, 40, 8);
 		genset(helper, 10, U, 0);
 		inline(helper, WildcatterBlocks.UNIT_SUBSTATION, 10, 0, false);
@@ -97,11 +97,11 @@ final class RelayScenes {
 		}
 	}
 
-	private static SwitchgearSectionBlockEntity section(GameTestHelper helper, int x) {
+	static SwitchgearSectionBlockEntity section(GameTestHelper helper, int x) {
 		return GridSceneKit.entity(helper, x, U, -3, SwitchgearSectionBlockEntity.class);
 	}
 
-	private static void closeAll(GameTestHelper helper, int mainPickup) {
+	static void closeAll(GameTestHelper helper, int mainPickup) {
 		for (int x = 21; x <= 23; x++) {
 			SwitchgearSectionBlockEntity s = section(helper, x);
 			s.setPickup(x == 22 ? mainPickup : 25);

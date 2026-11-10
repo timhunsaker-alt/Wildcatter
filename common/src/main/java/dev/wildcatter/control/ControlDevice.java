@@ -33,6 +33,15 @@ public interface ControlDevice {
 	/** An output's state, from the module, every scan. A device must fall back when these stop coming. */
 	void commandPoint(int point, boolean on, long gameTime);
 
+	/**
+	 * What an output point draws from the PLC's 24 V supply while it is on, in amps: a field device powered from the 24 V, as a lamp, a horn or a
+	 * solenoid. Zero for one whose coil has control power of its own (a starter's contactor, a breaker's close and trip coils), which the
+	 * module's relay contact only switches.
+	 */
+	default double outputAmps(int point) {
+		return 0;
+	}
+
 	/** An analog input's loop current in milliamps; under 3.6 is a failed loop (NAMUR NE 43). */
 	default double readMa(int point) {
 		return 0;

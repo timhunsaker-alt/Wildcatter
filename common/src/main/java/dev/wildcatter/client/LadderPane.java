@@ -21,6 +21,7 @@ final class LadderPane {
 	private static final int SELECT = 0xFF34507A;
 	private static final int BOX_BACK = 0xFF2C3440;
 	private static final int RAIL = 0xFFB0B6C0;
+	private static final int LABEL = 0xFFE0C060;
 
 	private record Hit(int x0, int y0, int x1, int y1, Object what, Ladder.Rung rung) {
 	}
@@ -115,7 +116,14 @@ final class LadderPane {
 			Ladder.Rung rung = ladder.rungs.get(r);
 			int[] size = measure(rung.body);
 			int height = Math.max(size[1], rung.coils.size() * ROW_H) + 12;
-			g.text(font, "Rung " + (r + 1) + (rung.comment.isEmpty() ? "" : "  " + rung.comment), railLeft + 3, y, rung == selectedRung ? 0xFF7FB2F0 : 0xFF6F7884, false);
+			int headX = railLeft + 3;
+			if (!rung.label.isBlank()) {
+				// a jump's label stands at the rung's left, as the standard draws it
+				String tag = rung.label.trim().toUpperCase(java.util.Locale.ROOT) + ":";
+				g.text(font, tag, headX, y, LABEL, false);
+				headX += font.width(tag) + 4;
+			}
+			g.text(font, "Rung " + (r + 1) + (rung.comment.isEmpty() ? "" : "  " + rung.comment), headX, y, rung == selectedRung ? 0xFF7FB2F0 : 0xFF6F7884, false);
 			hits.add(new Hit(left, y, right, y + 10, rung, rung));
 			int rowTop = y + 10;
 			int midY = rowTop + ROW_H / 2;
@@ -133,16 +141,24 @@ final class LadderPane {
 					case NOT -> "(/)";
 					case SET -> "(S)";
 					case RESET -> "(R)";
+					case JUMP -> ">>" + (coil.var.isBlank() ? "?" : coil.var.trim().toUpperCase(java.util.Locale.ROOT));
+					case RETURN -> "<RETURN>";
 				};
 				int cy = coilY + ROW_H / 2;
 				if (coil == selected) {
 					g.fill(coilLeft, coilY, railRight - 2, coilY + ROW_H, SELECT);
 				}
 				g.fill(coilLeft, midY, coilLeft + 1, cy + 1, out ? POWER : WIRE);
-				g.fill(coilLeft, cy, railRight - 2, cy + 1, out ? POWER : WIRE);
-				g.fill(coilLeft + 6, cy - 5, railRight - 8, cy + 6, 0xFF23272F);
-				g.text(font, label, coilLeft + 8, cy - 4, out ? POWER : TEXT, false);
-				g.text(font, font.plainSubstrByWidth(coil.var, COIL_W - 4), coilLeft + 4, coilY + 2 - 1, TEXT, false);
+				if (coil.kind.flow()) {
+					// a jump or return ends the rung: no wire on to the right rail
+					g.fill(coilLeft, cy, coilLeft + 3, cy + 1, out ? POWER : WIRE);
+					g.text(font, font.plainSubstrByWidth(label, railRight - 2 - coilLeft - 4), coilLeft + 4, cy - 4, out ? POWER : LABEL, false);
+				} else {
+					g.fill(coilLeft, cy, railRight - 2, cy + 1, out ? POWER : WIRE);
+					g.fill(coilLeft + 6, cy - 5, railRight - 8, cy + 6, 0xFF23272F);
+					g.text(font, label, coilLeft + 8, cy - 4, out ? POWER : TEXT, false);
+					g.text(font, font.plainSubstrByWidth(coil.var, COIL_W - 4), coilLeft + 4, coilY + 2 - 1, TEXT, false);
+				}
 				hits.add(new Hit(coilLeft, coilY, railRight, coilY + ROW_H, coil, rung));
 				coilY += ROW_H;
 			}

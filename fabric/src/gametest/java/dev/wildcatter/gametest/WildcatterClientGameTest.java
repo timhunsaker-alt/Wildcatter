@@ -4597,6 +4597,15 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			check(status.get().contains("devices reached") && !status.get().contains("NO 24 V"), "the supply should reach the cabinet: " + status.get());
 			film = context.computeOnClient(client -> Filming.start(client, "plc"));
 			context.takeScreenshot("wildcatter-plc-panel");
+			// the modules seated, drawn in the door's window (plc-gaps): the client has the rail, and a close look shows it
+			check(context.computeOnClient(client -> client.level.getBlockEntity(at) instanceof dev.wildcatter.control.PlcCabinetBlockEntity c
+					&& c.cpuModule() == dev.wildcatter.control.PlcModuleItem.Type.CPU_SMALL && c.module(0) == dev.wildcatter.control.PlcModuleItem.Type.DI16
+					&& c.module(1) == dev.wildcatter.control.PlcModuleItem.Type.DO16 && c.module(2) == null), "the client should know the modules seated");
+			server.runCommand("tp @p 15.5 " + up + " " + (z + 7.3) + " 180 -2");
+			context.waitTicks(10);
+			context.takeScreenshot("wildcatter-plc-rack");
+			server.runCommand("tp @p 15 " + (up + 2) + " " + (z + 11) + " 180 15");
+			context.waitTicks(5);
 			// the engineering station: typed into the real editor and downloaded over the real packet
 			server.runOnServer(srv -> cabinet.apply(srv).open(srv.getPlayerList().getPlayers().get(0)));
 			context.waitTicks(20);
@@ -6148,6 +6157,26 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		plcClick(context, "ONLINE CHG");
 		context.waitTicks(20);
 		check(status.get().contains("RUN") && run.get().contains("RUNNING"), "an online change should not stop anything: " + status.get() + " | " + run.get());
+		// a jump: while the motor runs, rung 4 jumps over rung 5 to the rung labelled DONE, and the rung passed over shows no power
+		plcClick(context, "RUNG");
+		plcClick(context, "NO");
+		plcField(context, "variable", "running");
+		plcClick(context, ">>");
+		plcField(context, "jump to", "DONE");
+		plcClick(context, "RUNG");
+		plcClick(context, "NO");
+		plcField(context, "variable", "running");
+		plcClick(context, "RUNG");
+		plcField(context, "label", "DONE");
+		plcClick(context, "NO");
+		plcField(context, "variable", "running");
+		plcClick(context, "ONLINE CHG");
+		context.waitTicks(40);
+		check(context.computeOnClient(client -> plcScreen(client).errorsForTest().isEmpty()), "the jump should compile: " + context.computeOnClient(client -> plcScreen(client).errorsForTest().toString()));
+		check(status.get().contains("RUN") && run.get().contains("RUNNING"), "adding a jump online should not stop anything: " + status.get() + " | " + run.get());
+		String jumped = context.computeOnClient(client -> plcScreen(client).rungPowerForTest(5) + " " + plcScreen(client).rungPowerForTest(6));
+		check(jumped.equals("false true"), "the rung jumped over should show no power and the labelled rung its own: " + jumped);
+		context.takeScreenshot("wildcatter-plc-ladder-jump");
 		// an FBD beside the ladder, in one project: run a green lamp a second after the motor starts
 		String fbd = """
 				PROGRAM GREEN

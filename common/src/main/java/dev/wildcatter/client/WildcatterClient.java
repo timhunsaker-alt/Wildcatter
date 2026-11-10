@@ -48,6 +48,8 @@ public final class WildcatterClient {
 		sink.accept(dev.wildcatter.WildcatterBlocks.NATURAL_DRAFT_TOWER_ENTITY, context -> new CoolingTowerRenderer());
 		sink.accept(dev.wildcatter.WildcatterBlocks.SPENT_FUEL_POOL_ENTITY, context -> new SpentFuelPoolRenderer());
 		sink.accept(dev.wildcatter.WildcatterBlocks.CRANE_ENTITY, CraneRenderer::new);
+		sink.accept(dev.wildcatter.WildcatterBlocks.PLC_CABINET_ENTITY, context -> new PlcRackRenderer<>());
+		sink.accept(dev.wildcatter.WildcatterBlocks.REMOTE_IO_DROP_ENTITY, context -> new PlcRackRenderer<>());
 		sink.accept(dev.wildcatter.WildcatterBlocks.GENSET_PART_ENTITY, context -> new KineticRenderer<>(context));
 		sink.accept(dev.wildcatter.WildcatterBlocks.COOLING_TOWER_ENTITY, context -> new KineticRenderer<>(context));
 		sink.accept(dev.wildcatter.WildcatterBlocks.STEAM_PLANT_PART_ENTITY, context -> new KineticRenderer<>(context));

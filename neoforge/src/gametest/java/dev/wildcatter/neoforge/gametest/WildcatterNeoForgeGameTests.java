@@ -56,6 +56,15 @@ public class WildcatterNeoForgeGameTests {
 		GRID_SCENES.putAll(DifferentialScenes.scenes());
 		GRID_SCENES.putAll(PanelScenes.scenes());
 		GRID_SCENES.putAll(DistributionScenes.scenes());
+		GRID_SCENES.putAll(PlcLimitScenes.scenes());
+		GRID_SCENES.putAll(PlcPowerScenes.scenes());
+		GRID_SCENES.putAll(PlcPlantScenes.scenes());
+	}
+
+	/** WILDCATTER_ONLY=a,b registers just those scenes while working on them; unset, every scene runs (as the Fabric client test). */
+	private static boolean only(String scene) {
+		String only = System.getenv("WILDCATTER_ONLY");
+		return only == null || only.isBlank() || java.util.Arrays.asList(only.split(",")).contains(scene);
 	}
 
 	public WildcatterNeoForgeGameTests(IEventBus modBus) {
@@ -93,19 +102,25 @@ public class WildcatterNeoForgeGameTests {
 		modBus.addListener(RegisterGameTestsEvent.class, event -> {
 			Holder<TestEnvironmentDefinition<?>> plain = event.registerEnvironment(id("plain"));
 			for (String scene : SCENES) {
+				if (!only(scene)) {
+					continue;
+				}
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
 						new TestData<>(plain, Identifier.withDefaultNamespace("empty"), 400, 1, true)));
 			}
-			for (String scene : java.util.stream.Stream.concat(java.util.Arrays.stream(PLANT_SCENES), GRID_SCENES.keySet().stream()).toList()) {
+			for (String scene : java.util.stream.Stream.concat(java.util.Arrays.stream(PLANT_SCENES), GRID_SCENES.keySet().stream()).filter(WildcatterNeoForgeGameTests::only).toList()) {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
 						new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 3000, 1, true,
 								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 40)));
 			}
 			// the ring crane's travel runs 200 m down its rails: room round it, as the sales scene has
-			event.registerTest(id("ring_travel"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id("ring_travel")),
+			if (only("ring_travel")) event.registerTest(id("ring_travel"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id("ring_travel")),
 					new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 3000, 1, true,
 							net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 240)));
 			for (String scene : GAS_POWER_SCENES) {
+				if (!only(scene)) {
+					continue;
+				}
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
 						new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 12000, 1, true,
 								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 240)));   // padding: the sales scene's delivery station is 200 blocks off

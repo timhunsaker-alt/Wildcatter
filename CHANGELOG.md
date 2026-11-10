@@ -13,6 +13,20 @@
 - **Solver:** a generator or genset closing onto a live bus takes the bus's angle to the nearest 30 degrees, so machines on either side of
   a delta-wye transformer run in parallel without circulating power.
 - Decisions for review: `docs/questions/phase14-gas-power.md`.
+- **The PLC gap wave** (decisions for review: `docs/questions/plc-gaps.md`):
+  - **Limits:**
+    - A control cable is 50-pair: 98 signal cores, a discrete signal a core, a 4-20 mA loop or pulse a pair. A landing on a full cable is
+      refused; lay a second cable beside it or use a remote drop.
+    - The 24 V supply's 10 A is enforced. Over it, it hiccups (off for 1 s, then on), and its PLCs restart warm. Horns, lamps and
+      solenoids draw from it.
+    - A remote rack has one owner. A device output wired to two PLCs ORs their contacts; a 4-20 mA loop driven by two fails.
+  - **Drawn:** the modules seated are drawn in the cabinet's and the drop's door, with the CPU's RUN lamp and the memory card.
+  - **Ladder:** rung labels, jumps and RETURN. A ladder or FBD can be a FUNCTION. FBD wires go around blocks.
+  - **Switchgear:** TRIP 50, TRIP 51, TRIP 87B and TRIP 50BF inputs.
+  - **Fixed:**
+    - a lamp switched off by its relay stayed lit;
+    - a firebox held back by its firing rate read BURNING;
+    - the rig in AUTO asked for a console click.
 - **The protection gap wave** (decisions for review: `docs/questions/protection-gaps.md`):
   - Feeder relays (switchgear, breaker relay cabinet, 15 kV feeder breakers) have settable pickup, curve (MI, VI, EI), time dial and
     50, set from the relay with the Power Meter.

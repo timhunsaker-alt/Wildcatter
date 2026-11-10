@@ -221,7 +221,7 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		if (!rig.drilling()) {
 			rig.status = !rig.formed ? "NOT BUILT: needs the " + rig.missing : !rig.topDrive ? "NO TOP DRIVE: click one into the mast"
 					: rig.phase == Phase.COMPLETE ? "WELL COMPLETE: break the rig down to move it" : rig.phase == Phase.DRY ? "DRY HOLE: nothing under it down to bedrock"
-					: "stopped: right-click the driller's console to drill";
+					: rig.remote.hand() ? "stopped: right-click the driller's console to drill" : rig.remote.auto() ? "stopped: its PLC is not enabling it" : "stopped: selector in OFF";
 		} else if (power <= 0.01) {
 			rig.status = house != null && house.undervoltage() ? "drives stopped on UNDERVOLTAGE" : "NO POWER at the drive house";
 		} else if (rig.connection > 0) {
