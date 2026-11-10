@@ -2,7 +2,9 @@ package dev.wildcatter.client;
 
 import dev.wildcatter.plc.lang.BlockLibrary;
 import dev.wildcatter.plc.lang.Fbd;
+import dev.wildcatter.plc.lang.WireRouter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -33,6 +35,9 @@ final class FbdPane {
 	private double panX;
 	private double panY;
 	private final Function<String, BlockLibrary.Pins> pins;
+	/** Each wired input's route, on the sheet, by its block and pin: worked out again only when a block moves or a wire changes. */
+	private final Map<String, int[]> routes = new HashMap<>();
+	private long routedFor;
 
 	FbdPane(Fbd fbd, Function<String, BlockLibrary.Pins> pins) {
 		this.fbd = fbd;
@@ -89,29 +94,64 @@ final class FbdPane {
 		return tag == null ? null : values.get(tag);
 	}
 
+	/** A number that changes when anything a route depends on does: the blocks' places and sizes, and the wiring. */
+	private long layoutHash() {
+		long h = 17;
+		for (Fbd.Block block : fbd.blocks) {
+			h = h * 31 + block.id;
+			h = h * 31 + block.x;
+			h = h * 31 + block.y;
+			h = h * 31 + height(block);
+			h = h * 31 + block.inputs.hashCode();
+		}
+		return h;
+	}
+
+	/** Routes every wire around the blocks, if the sheet changed since the last time. */
+	private void route() {
+		long now = layoutHash();
+		if (now == routedFor && !routes.isEmpty()) {
+			return;
+		}
+		routedFor = now;
+		routes.clear();
+		List<WireRouter.Box> boxes = new ArrayList<>();
+		for (Fbd.Block block : fbd.blocks) {
+			boxes.add(new WireRouter.Box(block.x, block.y, BLOCK_W, height(block)));
+		}
+		for (Fbd.Block block : fbd.blocks) {
+			List<String> inputs = pinsOf(block).inputs();
+			for (int i = 0; i < inputs.size(); i++) {
+				String source = block.inputs.get(inputs.get(i));
+				Fbd.Block from = Fbd.isWire(source) ? fbd.block(Fbd.wireBlock(source)) : null;
+				if (from != null) {
+					int oi = Math.max(0, pinsOf(from).outputs().indexOf(Fbd.wirePin(source)));
+					routes.put(block.id + "." + inputs.get(i), WireRouter.route(boxes, from.x + BLOCK_W, inY(from, oi), block.x, inY(block, i)));
+				}
+			}
+		}
+	}
+
 	void draw(GuiGraphicsExtractor g, Font font, int left, int top, int right, int bottom, Map<String, String> values, String prefix, boolean live) {
 		g.enableScissor(left, top, right, bottom);
 		int ox = left + 4 - scrollX;
 		int oy = top + 4 - scrollY;
 		List<Fbd.Block> order = fbd.order();
+		route();
 		for (Fbd.Block block : fbd.blocks) {
 			List<String> inputs = pinsOf(block).inputs();
 			for (int i = 0; i < inputs.size(); i++) {
 				String source = block.inputs.get(inputs.get(i));
-				if (Fbd.isWire(source)) {
-					Fbd.Block from = fbd.block(Fbd.wireBlock(source));
-					if (from != null) {
-						int oi = Math.max(0, pinsOf(from).outputs().indexOf(Fbd.wirePin(source)));
-						String v = live ? value(from, Fbd.wirePin(source), values, prefix) : null;
-						int colour = "true".equals(v) ? POWER : WIRE;
-						int x0 = ox + from.x + BLOCK_W;
-						int y0 = oy + inY(from, oi);
-						int x1 = ox + block.x;
-						int y1 = oy + inY(block, i);
-						int mid = x1 > x0 ? (x0 + x1) / 2 : x0 + 6;
-						g.fill(x0, y0, mid, y0 + 1, colour);
-						g.fill(mid, Math.min(y0, y1), mid + 1, Math.max(y0, y1) + 1, colour);
-						g.fill(Math.min(mid, x1), y1, Math.max(mid, x1), y1 + 1, colour);
+				int[] path = routes.get(block.id + "." + inputs.get(i));
+				if (path != null && Fbd.isWire(source) && fbd.block(Fbd.wireBlock(source)) != null) {
+					String v = live ? value(fbd.block(Fbd.wireBlock(source)), Fbd.wirePin(source), values, prefix) : null;
+					int colour = "true".equals(v) ? POWER : WIRE;
+					for (int k = 0; k + 3 < path.length; k += 2) {
+						int ax = ox + path[k];
+						int ay = oy + path[k + 1];
+						int bx = ox + path[k + 2];
+						int by = oy + path[k + 3];
+						g.fill(Math.min(ax, bx), Math.min(ay, by), Math.max(ax, bx) + 1, Math.max(ay, by) + 1, colour);
 					}
 				}
 			}

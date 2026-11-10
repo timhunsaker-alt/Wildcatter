@@ -65,12 +65,14 @@ public final class PlcCompiler {
 	private static Ast.Pou header(Project.Source source, List<CompileError> errors) {
 		String kind;
 		String name;
+		String returns = "";
 		String declarations;
 		switch (source.language()) {
 			case LD -> {
 				Ladder parsed = Ladder.parse(source.text());
 				kind = parsed.kind;
 				name = parsed.name;
+				returns = parsed.returns;
 				declarations = parsed.declarations;
 			}
 			case SFC -> {
@@ -78,21 +80,40 @@ public final class PlcCompiler {
 				kind = parsed.kind;
 				name = parsed.name;
 				declarations = parsed.declarations;
+				if (kind.equals("FUNCTION")) {
+					errors.add(new CompileError(source.name(), 1, 1, "a chart is a PROGRAM or FUNCTION_BLOCK: its steps last from scan to scan, which a function's variables do not"));
+					return null;
+				}
 			}
 			default -> {
 				Fbd parsed = Fbd.parse(source.text());
 				kind = parsed.kind;
 				name = parsed.name;
+				returns = parsed.returns;
 				declarations = parsed.declarations;
 			}
 		}
-		String end = kind.equals("PROGRAM") ? "END_PROGRAM" : "END_FUNCTION_BLOCK";
+		if (kind.equals("FUNCTION") && returns.isBlank()) {
+			errors.add(new CompileError(source.name(), 1, 1, "the function " + name + " needs a result type, as in FUNCTION " + name + " : INT"));
+			return null;
+		}
 		List<CompileError> found = new ArrayList<>();
-		Ast.Unit unit = Parser.parse(kind + " " + name + "\n" + declarations + "\n" + end, found);
+		Ast.Unit unit = Parser.parse(headerText(kind, name, returns, declarations), found);
 		for (CompileError error : found) {
 			errors.add(new CompileError(source.name(), Math.max(1, error.line() - 1), error.column(), "in its variables: " + error.message()));
 		}
 		return unit.pous().isEmpty() ? null : unit.pous().getFirst();
+	}
+
+	/** A graphical unit's header as the structured text it stands for, its body empty: the variables on the second line on. */
+	static String headerText(String kind, String name, String returns, String declarations) {
+		String end = switch (kind) {
+			case "PROGRAM" -> "END_PROGRAM";
+			case "FUNCTION" -> "END_FUNCTION";
+			default -> "END_FUNCTION_BLOCK";
+		};
+		String head = kind + " " + name + (kind.equals("FUNCTION") ? " : " + returns : "");
+		return head + "\n" + declarations + "\n" + end;
 	}
 
 	private static final Ast.Unit STANDARD = parseStandard();
@@ -1178,6 +1199,9 @@ public final class PlcCompiler {
 				}
 			}
 		}
+		if (target instanceof Ast.Member m) {
+			programMember(m);
+		}
 		if (target instanceof Ast.Member m && typeOf(m.base()) instanceof FbT fb) {
 			Var var = fb.pou.vars.get(m.field());
 			if (var != null && var.decl.kind() == VarKind.OUTPUT) {
@@ -1351,6 +1375,13 @@ public final class PlcCompiler {
 		return var != null ? var : globals.get(name);
 	}
 
+	/** {@code MAIN.motor}, where MAIN is a program: a program's variables are its own, so another unit reaches one through a global. */
+	private void programMember(Ast.Member m) {
+		if (m.base() instanceof Ast.Name n && lookup(n.name()) == null && pous.get(n.name()) != null && pous.get(n.name()).ast.kind() == Ast.PouKind.PROGRAM) {
+			throw error(m.line(), n.name() + " is a program, whose variables are its own: declare " + m.field() + " in VAR_GLOBAL (with its AT) and as VAR_EXTERNAL here");
+		}
+	}
+
 	private Place ioPlace(IoAddress io, Type type) {
 		Place place = new Place(IO, 0, type);
 		place.area = io.area() == 'I' ? Op.AREA_I : io.area() == 'Q' ? Op.AREA_Q : Op.AREA_M;
@@ -1395,6 +1426,7 @@ public final class PlcCompiler {
 				return ioPlace(io, new Scalar(io.type()));
 			}
 			case Ast.Member m -> {
+				programMember(m);
 				Place base = place(m.base());
 				int offset;
 				Type type;
@@ -1584,6 +1616,7 @@ public final class PlcCompiler {
 				throw error(n.line(), n.name() + " is not declared");
 			}
 			case Ast.Member m -> {
+				programMember(m);
 				Type base = typeOf(m.base());
 				if (base instanceof StructT s && s.fields.containsKey(m.field())) {
 					yield s.fields.get(m.field()).type();
