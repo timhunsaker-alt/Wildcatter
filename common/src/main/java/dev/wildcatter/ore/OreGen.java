@@ -31,7 +31,7 @@ public final class OreGen {
 				default -> out.put("ore_" + ore.key, ore.where);
 			}
 		}
-		out.put("salt_dome", Ore.Where.SALT_DOME);
+		out.put("salt_dome", Ore.Where.EVERYWHERE);   // 15a: in every chunk; the grid dome checks its own centre's biome (SaltDome)
 		out.put("evaporite_beds", Ore.Where.EVAPORITE);
 		out.put("bushveld_reef", Ore.Where.EVERYWHERE);
 		return out;

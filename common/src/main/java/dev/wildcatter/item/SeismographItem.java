@@ -34,8 +34,20 @@ public class SeismographItem extends Item {
 	}
 
 	public static String report(ServerLevel level, double x, double z) {
-		long seed = ReservoirData.seed(level);
-		Reservoir here = Reservoir.at(seed, (int) Math.floor(x), (int) Math.floor(z));
+		int bx = (int) Math.floor(x), bz = (int) Math.floor(z);
+		long seed = ReservoirData.seed(level, bx, bz);
+		Reservoir here = Reservoir.at(seed, bx, bz, ReservoirData.site(level));
+		// a salt dome: salt is fast and light, so a refraction shot and a gravity low show it (docs/salt-dome-oil.md)
+		dev.wildcatter.well.SaltDome dome = ReservoirData.dome(level, bx, bz);
+		if (dome != null && dome.overMiddle(bx, bz)) {
+			String cap = here != null ? " STRONG ECHO in the caprock: a pool of oil, its top at y=" + here.topY() + "." : " No echo from the caprock.";
+			return "SALT DOME: a fast, light salt column about " + (dome.radius() * 2) + " blocks across under you, its crest at y=" + dome.crestY()
+					+ " under " + Tuning.DOME_CAPROCK + " m of caprock. Oil gathers against its flanks." + cap;
+		}
+		if (here != null && here.source() == Reservoir.Source.FLANK) {
+			return "STRONG ECHO: you are standing over a field on a salt dome's flank, " + Math.round(here.radius() - here.inner()) + " blocks across the band. Its top is at y="
+					+ here.topY() + ". Worth a drill here.";
+		}
 		if (here != null && here.deep()) {
 			return "DEEP ECHO: you are standing over a deep field about " + Math.round(here.radius() * 2) + " blocks across. Its top is at y="
 					+ here.topY() + ", too deep for the small rig: it needs a land rig.";
@@ -44,14 +56,21 @@ public class SeismographItem extends Item {
 			return "STRONG ECHO: you are standing over a field about " + Math.round(here.radius() * 2) + " blocks across. Its top is at y="
 					+ here.topY() + ". Worth a drill here.";
 		}
-		Reservoir near = Reservoir.nearest(seed, x, z, Tuning.SURVEY_RANGE);
+		Reservoir near = Reservoir.nearest(seed, x, z, Tuning.SURVEY_RANGE, ReservoirData.site(level));
 		if (near == null) {
 			return "No echo within " + Tuning.SURVEY_RANGE + " blocks: solid rock. Try somewhere else.";
 		}
 		double distance = Math.max(1, near.edgeDistance(x, z));
-		double angle = Math.toDegrees(Math.atan2(near.centerZ() - z, near.centerX() - x));
+		double[] toward = near.source() == Reservoir.Source.FLANK ? nearestPoint(near, x, z) : new double[] {near.centerX(), near.centerZ()};
+		double angle = Math.toDegrees(Math.atan2(toward[1] - z, toward[0] - x));
 		String direction = COMPASS[(int) Math.floorMod(Math.round(angle / 45.0), 8L)];
 		String strength = distance < 24 ? "Strong" : distance < 56 ? "Fair" : "Faint";
 		return (near.deep() ? "Deep " + strength.toLowerCase() : strength) + " echo from the " + direction + ", about " + Math.round(distance) + " blocks to its edge. Walk that way and thump again.";
+	}
+
+	/** The middle of a flank field's band: where to walk toward (the dome's axis is not on the field). */
+	private static double[] nearestPoint(Reservoir field, double x, double z) {
+		int[] m = field.middle();
+		return new double[] {m[0] + 0.5, m[1] + 0.5};
 	}
 }

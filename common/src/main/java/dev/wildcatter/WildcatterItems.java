@@ -122,6 +122,13 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> QUICKLIME_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("quicklime_bag"));
 	public static final Item QUICKLIME_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(QUICKLIME_BAG_KEY),
 			String.format("%,.0f kg of quicklime (CaO)", Tuning.BULK_BAG_KG), "for the refinery's causticizer");
+	// 15b1: drilling mud (docs/multiblocks/drilling-mud.md)
+	public static final ResourceKey<Item> BARITE_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("barite_bag"));
+	public static final Item BARITE_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(BARITE_BAG_KEY),
+			String.format("%,.0f kg of drilling-grade barite, API 13A 4.1 (SG %.1f)", Tuning.BULK_BAG_KG, Tuning.BARITE_SG), "weights a land rig's mud: into its mud hopper");
+	public static final ResourceKey<Item> BENTONITE_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("bentonite_bag"));
+	public static final Item BENTONITE_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(BENTONITE_BAG_KEY),
+			String.format("%,.0f kg of drilling bentonite, API 13A section 9", Tuning.BULK_BAG_KG), "gels a land rig's mud: into its mud hopper");
 	public static final ResourceKey<Item> EMPTY_TON_CONTAINER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("empty_ton_container"));
 	public static final Item EMPTY_TON_CONTAINER = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(4).setId(EMPTY_TON_CONTAINER_KEY),
 			String.format("Welded steel chlorine ton container, %,.0f kg tare", Tuning.CL2_TON_TARE));
@@ -363,6 +370,8 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, HYDRATE_BAG_KEY, HYDRATE_BAG);
 		Registry.register(BuiltInRegistries.ITEM, ALF3_BAG_KEY, ALF3_BAG);
 		Registry.register(BuiltInRegistries.ITEM, QUICKLIME_BAG_KEY, QUICKLIME_BAG);
+		Registry.register(BuiltInRegistries.ITEM, BARITE_BAG_KEY, BARITE_BAG);
+		Registry.register(BuiltInRegistries.ITEM, BENTONITE_BAG_KEY, BENTONITE_BAG);
 		Registry.register(BuiltInRegistries.ITEM, EMPTY_TON_CONTAINER_KEY, EMPTY_TON_CONTAINER);
 		Registry.register(BuiltInRegistries.ITEM, CHLORINE_TON_CONTAINER_KEY, CHLORINE_TON_CONTAINER);
 		Registry.register(BuiltInRegistries.ITEM, GREEN_COKE_KEY, GREEN_COKE);

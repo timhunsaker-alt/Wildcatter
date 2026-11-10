@@ -384,6 +384,11 @@
     "wildcatter:estop",
     "wildcatter:pilot_light",
     "wildcatter:stack_light",
-    "wildcatter:horn"
+    "wildcatter:horn",
+    "wildcatter:barite_mill",
+    "wildcatter:bentonite_dryer",
+    "wildcatter:mud_hopper",
+    "wildcatter:bop_stack",
+    "wildcatter:bop_accumulator"
   ]
 }

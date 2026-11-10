@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased: the oilfield (Phase 15, built 2026-11-09 while Tim was away; not approved)
+- **Salt domes trap oil (15a):** salt domes now stand on a seed grid in plains, swamps and beaches, each with one to three rich flank
+  fields against the salt and sometimes a caprock pool that gushes then fades. A low hill marks them; the seismograph reads SALT DOME and
+  its crest. Domes generated before this keep their salt and have no oil. Spec: `docs/salt-dome-oil.md`.
+- **Drilling mud (15b1):** a barite mill and a bentonite dryer fill bulk bags; a mud hopper at the land rig mixes them (and rock salt)
+  into the tanks, which now keep the mud's weight, gel and salt. Plain water is LOW GEL and drills at half rate; rock salt washes out
+  unless the mud is salt-saturated. Barite and bentonite have a use at last. Spec: `docs/multiblocks/drilling-mud.md`.
+- **Well control (15b2):** a BOP stack under the rotary table and its accumulator. Deep fields are geopressured: without a BOP the land
+  rig stops short; with light mud it kicks, and must be shut in within 30 s, weighted to the kill weight and circulated; otherwise it
+  blows out, drains the field and can catch fire. PLC points for the kick, the shut-in and the mud.
+- Decisions for review: `docs/questions/phase15-oilfield.md`.
+
 ## Unreleased (0.7.0): gas and power quick wins (Phase 14b-14d) and the protection gap wave (built 2026-11-09 while Tim was away; not approved)
 - **The sales line (14b):** a gas plant's pipeline gas goes on an off-map transmission line at a receipt meter station and comes off
   anywhere in the dimension at a delivery station, less 2 % kept as compressor fuel. Five true-size parts: meter building (2 kW,

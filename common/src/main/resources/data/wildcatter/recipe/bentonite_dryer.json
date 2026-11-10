@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SHS",
+    "BPB",
+    "SXS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "B": "minecraft:bricks",
+    "P": "wildcatter:gas_line",
+    "X": "minecraft:blast_furnace"
+  },
+  "result": {
+    "id": "wildcatter:bentonite_dryer",
+    "count": 1
+  }
+}

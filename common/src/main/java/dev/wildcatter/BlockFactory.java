@@ -105,6 +105,11 @@ final class BlockFactory {
 				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
 	}
 
+	static Block mudPart(dev.wildcatter.block.MudPartBlock.Part part) {
+		return block(part.id(), props -> new dev.wildcatter.block.MudPartBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
+				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
+	}
+
 	static Block salesGasPart(dev.wildcatter.block.SalesGasPartBlock.Part part) {
 		return block(part.id(), props -> new dev.wildcatter.block.SalesGasPartBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
 				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));

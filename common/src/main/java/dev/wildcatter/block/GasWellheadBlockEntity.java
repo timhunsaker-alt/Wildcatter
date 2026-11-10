@@ -37,7 +37,7 @@ public class GasWellheadBlockEntity extends BlockEntity implements Inspectable, 
 	}
 
 	private Reservoir field(ServerLevel level) {
-		return Reservoir.at(ReservoirData.seed(level), worldPosition.getX(), worldPosition.getZ());
+		return ReservoirData.field(level, worldPosition.getX(), worldPosition.getZ());
 	}
 
 	/** Gas for whatever draws on its line: gives up to {@code units} m3, within what the well can flow this interval. */

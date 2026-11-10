@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 class OreUsesTest {
 	/** The ores no plant takes yet: a wave that gives one a user moves it out of this set and into OreUses.uses. */
 	private static final Set<Ore> NO_USE_YET = EnumSet.of(Ore.SYLVITE, Ore.PENTLANDITE, Ore.PLATINUM, Ore.MOLYBDENITE, Ore.DOLOMITE,
-			Ore.GRAPHITE, Ore.SPODUMENE, Ore.BARITE, Ore.BENTONITE, Ore.SCHEELITE, Ore.COBALTITE, Ore.PHOSPHATE);
+			Ore.GRAPHITE, Ore.SPODUMENE, Ore.SCHEELITE, Ore.COBALTITE, Ore.PHOSPHATE);
 
 	@Test
 	void everyOreHasFoundToolAndUses() {

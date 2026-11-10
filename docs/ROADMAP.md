@@ -358,6 +358,17 @@ was already the ammonia plant. Decisions for Tim: `docs/questions/specs-wildcatt
   scene `biogas` (written, to be filmed).
 - **14e, the Mekanism check** (`docs/mekanism-check.md`): a plan, blocked until Mekanism for 26.3 is released.
 
+## Phase 15 — The oilfield — BUILT 2026-11-09 (while Tim was away, on the DRAFT specs decided on recommendation; not approved)
+Decisions for Tim: `docs/questions/specs-wildcatter.md` items 14-22 and `docs/questions/phase15-oilfield.md` (25 entries). Branch `phase15`.
+- **15a, salt domes** (`docs/salt-dome-oil.md`, BUILT): domes on a seed grid with flank fields and caprock pools; a mound; the seismograph
+  reads SALT DOME. NeoForge scene `salt_dome`; unit test `SaltDomeTest`.
+- **15b1, the mud plant and weighted mud** (`docs/multiblocks/drilling-mud.md`, BUILT): barite mill, bentonite dryer, bags, the rig's mud
+  hopper; mud weight, gel and salt in the tanks; LOW GEL and WASHOUT. NeoForge scenes `mud_plant`, `rig_mud`.
+- **15b2, kicks, the BOP and blowouts** (same spec, BUILT): BOP stack and accumulator; NO BOP, KICK, SHUT IN, kill weight, the kill;
+  BLOWOUT, ignition, a relief well. NeoForge scenes `well_control`, `blowout`. Closes the known gap of no BOP stack.
+- **Planned, not built** (Known gaps): the accumulator's hydraulic line drawn as pipe; lightning and engines as ignition; SICP and the
+  choke; a relief well scene; filming the client scenes.
+
 ## The protection gap wave — DONE 2026-11-09 (the Known gaps of 10d1, 10d2, 10d3 and Phase 2's distribution; built while Tim was away: "close all known gaps")
 Decisions for Tim: `docs/questions/protection-gaps.md` (28 entries). Specs updated: `gen-bus-protection.md`, `mv-switchgear.md`,
 `breaker-relay-cabinet.md`, `power-transformer-10.md`, `panelboards.md`, `ats.md`, `poles.md`, `docs/phase2-distribution.md`.
@@ -391,7 +402,7 @@ Decisions for Tim: `docs/questions/plant-crane-gaps.md`. Branch `plant-crane-gap
   presumptive values), slews checked against blocks and tower crane masts, the ring crane travelling on crane rail.
 - Plants: the quench tower's 2,000 L sump; the stabilizer's fired reboiler; coke oven and coker gas in gas engines and turbines; the
   pots' auxiliaries on 480 V and live cut-out with shorting bars; a burner fed by a hopper at any cell.
-- Planned, for Tim: residence holds, crane erection and the crawler's jibs, spent pot lining treatment, the BOP stack (with 15b2),
+- Planned, for Tim: residence holds, crane erection and the crawler's jibs, spent pot lining treatment, the BOP stack (built in Phase 15b2),
   drawing-only gaps.
 - NeoForge scenes `crane_siting`, `ring_travel`, `quench_sump`, `stabilizer_fuel`, `cog_engine`, `pot_aux`, `burner_hopper`; client
   scene `ringTravel` (new) and `cranes`, `heavyLift`, `potline` changed, for the lead to run.
@@ -423,9 +434,9 @@ Decisions for Tim: `docs/questions/plc-gaps.md` (12 entries). Spec updated: `doc
   - lithium from spodumene;
   - ferroalloys (chromium, manganese, molybdenum, tungsten);
   - a nickel smelter;
-  - fertilizer from phosphate and potash;
-  - drilling mud from barite and bentonite.
-- Salt domes that trap oil on their flanks, as on the Gulf Coast.
+  - fertilizer from phosphate and potash.
+- Phase 15 follow-ons: brine wells and gas storage caverns in the salt domes; Frasch sulfur from the caprock; oil-based muds and lost
+  circulation; the fracture gradient (a mud too heavy for the casing shoe); a choke manifold worked by hand.
 - The purer yellowcake route: ADU precipitation on the Phase 14 ammonia and a calciner at 750-800 C (94-98 % U3O8).
 - Phase 14b-14d follow-ons: a small (100-250 kW) biogas set for farm digesters; biomethane upgrading so biogas can go on the sales line;
   line pack and pressure on the sales line; a delivery station fed from the set it supplies; the condenser's fans staged at part load.

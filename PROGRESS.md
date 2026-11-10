@@ -1460,6 +1460,13 @@ sized for a 40-pot line.
   spec's 1.4-1.8 MW, because its 480 V fan and pump motors run at about 95 % voltage on two diesel sets. An unloaded 13.8 kV delta behind
   a backward transformer can solve to nonsense currents (the `biogas` scene sets its load bank before the set starts). The client scenes
   `salesGas`, `acidSteam` and `biogas` are written and compiled, not yet run or filmed. See `docs/questions/phase14-gas-power.md`.
+- Phase 15 (the oilfield): no new script-drawn textures (the bags are Ludo icons, the five parts use the mod's materials). Not built:
+  the accumulator's hydraulic line drawn as pipe, lightning and running engines without a spark arrestor as a blowout's ignition, SICP
+  and a choke schedule, oil-based muds, lost circulation and the fracture gradient, Frasch sulfur, brine wells and storage caverns in the
+  salt. The relief well's kill is in code with no game test; the PLC's SHUT IN command and the 4-20 mA mud weight and pit volume are wired
+  but only KICK is read in a scene. Plain water now drills at half rate (LOW GEL) in every world (decision 13 for Tim). Grid domes in
+  chunks generated before 15a have their oil but no salt; old domes keep no oil. The client scenes `ores` and `landRig` were changed for
+  15a and 15b2 and not run; no Phase 15 scene was filmed or screenshotted. See `docs/questions/phase15-oilfield.md`.
 - Art (2026-11-09 art wave): no `*_placeholder` texture is left in the jar. Every placeholder named here before now has Ludo art
   (`art/source/PROMPTS.md`, "Art wave"), and `tools/make_assets.py` leaves out any placeholder nothing names. `memory_card` has its own icon.
   Still drawn by script without the `*_placeholder` name: the breaker levers and the insulator caps, glaze and pins (flat colour
@@ -1600,7 +1607,8 @@ sized for a 40-pot line.
   frequency control catches up (30 s); a real rig's power management also reads the gensets' kW.
 - The land rig's motors are inside the drive house's load; the cables to the pumps and drawworks are drawn (misc gaps wave), not
   circuits of their own.
-- There is no blowout preventer stack in the cellar yet: it comes with well control, Phase 15b2 of `docs/multiblocks/drilling-mud.md`.
+- The BOP stack stands under the rotary table since Phase 15b2; its accumulator works it from up to 20 blocks without a drawn hydraulic
+  line (`docs/questions/phase15-oilfield.md`, 20).
 - Wall-mounted gear sits 0.55 m up its cell; a player wanting it higher places it a block up.
 - Pumpjack and rig collision is the still frame: the moving beam, crank and pipe do not push anything (drawing-only; questions 15).
 - The pumpjack's linkage and the rig's head have been checked in test screenshots, not watched in a real play session.
@@ -1838,3 +1846,27 @@ Branch `misc-gaps`.
 - **Field Manual:** GENSETS (the derate on coke oven gas), PEAKER (no coke oven gas, the Wobbe index).
 - **Tests:** unit test `LeanGasTest` (3). NeoForge server scenes `cog_derate` (860 kW held against a 1 MW bank), `aero_lean_gas`,
   `cracker_pump` (a furnace filled 0 to 200 L by a process water pump on a diesel set), `alternator_frames`, `drawn_runs`.
+
+## Phase 15: the oilfield (2026-11-09)
+Built while Tim was away, on the DRAFT specs decided on recommendation; the decisions are in `docs/questions/phase15-oilfield.md` (25
+entries). Branch `phase15`.
+- **15a, salt domes trap oil** (`docs/salt-dome-oil.md`): domes on a 192-block seed grid (`well/SaltDome`), 60 % of cells whose centre is
+  plains, swamp or beach; one to three FLANK fields round each (arcs 4-12 blocks wide against the salt, tops at y -50 to -20, 150,000 to
+  400,000 units, 80 % oil) and in 30 % a CAPROCK pool (20,000-60,000 units, full rate for its first 10 %, then 35 % and falling). Nothing
+  under a dome's middle but the caprock pool. A low mound over each dome; the seismograph reads SALT DOME and its crest. The feature
+  runs in every chunk and draws its cell's dome there. `ReservoirData.field(level, x, z)` is the lookup game code uses.
+- **15b1, drilling mud** (`docs/multiblocks/drilling-mud.md`): the BARITE MILL (150 kW, 5 t/h, API 13A 4.1) and the BENTONITE DRYER
+  (75 kW and 1 MW of gas, 3 t/h) fill bulk bags of barite and bentonite through bagging stations; the MUD HOPPER (37 kW) against a land
+  rig's tanks mixes a bag a minute (or rock salt). The tanks keep water, barite, bentonite and salt: mud weight in ppg and kg/m3, gel in
+  lb/bbl, salt-saturated or not. LOW GEL (under 15 lb/bbl) halves the rate; rock salt with unsaturated mud is a WASHOUT.
+- **15b2, well control:** the BOP STACK (13-5/8 in, 5,000 psi, on the wellhead cell under the rotary table) and its ACCUMULATOR (three
+  closes, 15 kW pump). A deep field is geopressured (13.5 ppg): without a BOP the rig stops (NO BOP); under 13.8 ppg it KICKS (pit gain,
+  bell); shut in within 30 s (sneak-click the console or the PLC) it reads SIDPP and the kill weight, and once weighted a minute's
+  circulation kills it and the rig strikes. Not shut in: BLOWOUT, the field draining at five free-flowing wells' rate, lit by fire, lava
+  or a campfire within 16 blocks; shut in by a standing BOP or killed by a relief well. PLC points KICK, SHUT IN, SHUT IN (state), mud
+  weight and pit volume (4-20 mA). Closes the known gap "no blowout preventer stack".
+- **Field Manual:** SALT DOMES, DRILLING MUD (with the LAND RIG page).
+- **Art:** Ludo icons for the barite and bentonite bags (2 credits); five true-size models in `tools/models/mud.py`.
+- **Tests:** unit test `SaltDomeTest` (6). NeoForge scenes `salt_dome`, `mud_plant`, `rig_mud`, `well_control`, `blowout` (all pass;
+  each clears itself before it succeeds, and the scenes force their seeds only over their own area). Client scenes `ores` and `landRig`
+  changed (not run).

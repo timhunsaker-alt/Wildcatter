@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SHS",
+    "XCX",
+    "SFS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "X": "minecraft:piston",
+    "C": "wildcatter:crankshaft",
+    "F": "minecraft:white_wool"
+  },
+  "result": {
+    "id": "wildcatter:barite_mill",
+    "count": 1
+  }
+}

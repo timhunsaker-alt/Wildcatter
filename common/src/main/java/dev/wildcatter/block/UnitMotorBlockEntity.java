@@ -154,6 +154,10 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "nitric_acid_unit" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.NITRIC_UNIT_WATTS);
 				case "emulsion_blender" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.EMULSION_BLENDER_WATTS);
 				case "meter_building" -> new Motor(false, Voltage.LOW, Tuning.METER_BUILDING_WATTS);   // residential, single-phase
+				case "barite_mill" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BARITE_MILL_WATTS);
+				case "bentonite_dryer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BENTONITE_MILL_WATTS);
+				case "mud_hopper" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.MUD_HOPPER_WATTS);
+				case "bop_accumulator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ACCUMULATOR_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -273,6 +277,10 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "nitric_acid_unit" -> "air blower";
 			case "emulsion_blender" -> "mixer";
 			case "meter_building" -> "heaters, chromatograph and RTU charger";
+			case "barite_mill" -> "roller mill";
+			case "bentonite_dryer" -> "mill and dryer fan";
+			case "mud_hopper" -> "mixing pump";
+			case "bop_accumulator" -> "accumulator pump";
 			default -> kind();
 		};
 	}

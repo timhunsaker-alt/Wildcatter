@@ -17,8 +17,8 @@ public final class OreUses {
 		return switch (ore) {
 			case URANINITE -> "deserts and badlands, y 0 to 64";
 			case PITCHBLENDE -> "deep everywhere, y -64 to -40";
-			case SULFUR -> "salt dome caprock, y 0 to 24";
-			case HALITE -> "salt domes; evaporite beds in deserts, y -32 to 0";
+			case SULFUR -> "salt dome caprock, y 0 to 24 (domes trap oil on their flanks)";
+			case HALITE -> "salt domes (which trap oil on their flanks); evaporite beds in deserts, y -32 to 0";
 			case SYLVITE -> "evaporite beds under deserts and badlands, y -32 to 0";
 			case FLUORITE -> "everywhere, y -16 to 48";
 			case HEAVY_MINERAL -> "beaches, y 55 to 70";
@@ -54,7 +54,10 @@ public final class OreUses {
 		return switch (ore) {
 			case URANINITE, PITCHBLENDE -> List.of("the uranium mill's jaw crusher, which feeds the mill (yellowcake)");
 			case SULFUR -> List.of("the acid plant's sulfur melter (sulfuric acid)");
-			case HALITE -> List.of("the uranium mill's SX circuit and IX columns (strip salt)", "chlor-alkali cells (chlorine, caustic soda)");
+			case HALITE -> List.of("the uranium mill's SX circuit and IX columns (strip salt)", "chlor-alkali cells (chlorine, caustic soda)",
+					"a land rig's mud hopper (salt-saturated mud for drilling through salt)");
+			case BARITE -> List.of("the barite mill (drilling-grade barite, which weights a land rig's mud)");
+			case BENTONITE -> List.of("the bentonite dryer (drilling bentonite, which gels a land rig's mud)");
 			case FLUORITE -> List.of("the conversion plant's HF kiln (hydrogen fluoride)");
 			case HEAVY_MINERAL -> List.of("the zirconium plant's mineral separator (zircon)");
 			case CASSITERITE -> List.of("a furnace (tin ingot, which the zirconium plant's VAR furnace alloys into Zircaloy)");
@@ -67,7 +70,7 @@ public final class OreUses {
 			case GALENA -> List.of("a furnace (lead ingot)");
 			case SPHALERITE -> List.of("a furnace (zinc ingot)");
 			case ACANTHITE -> List.of("a furnace (silver ingot)");
-			case SYLVITE, PENTLANDITE, PLATINUM, MOLYBDENITE, DOLOMITE, GRAPHITE, SPODUMENE, BARITE, BENTONITE, SCHEELITE, COBALTITE,
+			case SYLVITE, PENTLANDITE, PLATINUM, MOLYBDENITE, DOLOMITE, GRAPHITE, SPODUMENE, SCHEELITE, COBALTITE,
 					PHOSPHATE -> List.of();
 		};
 	}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " H ",
+    "SPS",
+    "SXS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "P": "wildcatter:gas_line",
+    "X": "minecraft:piston"
+  },
+  "result": {
+    "id": "wildcatter:mud_hopper",
+    "count": 1
+  }
+}

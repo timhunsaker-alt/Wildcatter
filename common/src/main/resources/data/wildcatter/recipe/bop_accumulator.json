@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BBB",
+    "BPB",
+    "SXS"
+  ],
+  "key": {
+    "B": "minecraft:bucket",
+    "P": "wildcatter:gas_line",
+    "S": "wildcatter:steel_ingot",
+    "X": "minecraft:piston"
+  },
+  "result": {
+    "id": "wildcatter:bop_accumulator",
+    "count": 1
+  }
+}

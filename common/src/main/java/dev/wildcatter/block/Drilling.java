@@ -25,7 +25,7 @@ public final class Drilling {
 
 	/** The field a hole at this column reaches first, or null. */
 	public static @Nullable Reservoir field(ServerLevel level, BlockPos hole) {
-		return Reservoir.at(ReservoirData.seed(level), hole.getX(), hole.getZ());
+		return ReservoirData.field(level, hole.getX(), hole.getZ());
 	}
 
 	/**

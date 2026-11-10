@@ -7734,6 +7734,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			String noDrive = read(server, origin.getX(), origin.getY(), origin.getZ());
 			check(noDrive.contains("NO TOP DRIVE"), "built, it should ask for its top drive: " + noDrive);
 			check(clickWith(server, new BlockPos(hx - 1, pad + 20, hz - 1), net.minecraft.core.Direction.WEST, new ItemStack(WildcatterItems.TOP_DRIVE)), "the top drive should go into the mast");
+			// 15b2: a deep field is geopressured: a BOP stack on the wellhead cell under the rotary table and its accumulator nearby
+			placeBig(server, WildcatterBlocks.BOP_STACK, new BlockPos(hx, pad + 2, hz), net.minecraft.core.Direction.NORTH);
+			placeBig(server, WildcatterBlocks.BOP_ACCUMULATOR, new BlockPos(hx - 10, pad + 1, hz - 10), net.minecraft.core.Direction.NORTH);
 			// a ledge to watch from, south-west of the rig (the player must not fall: the genset far below only runs near a player)
 			// (near enough that the rig, its pumps and the genset all keep ticking)
 			server.runCommand("fill " + (hx - 12) + " " + (pad + 14) + " " + (hz + 18) + " " + (hx - 8) + " " + (pad + 14) + " " + (hz + 22) + " minecraft:stone");
@@ -7772,7 +7775,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			String filling = read(server, origin.getX(), origin.getY(), origin.getZ());
 			check(filling.matches(".*mud water [1-9]\\d* of.*"), "the pump should be filling the mud tanks: " + filling + " | " + stateAt(server, origin) + " | pump " + read(server, 39, pad + 1, hz + 9));
 			server.computeOnServer(srv -> {
-				rig(srv, origin).testWater(Tuning.LAND_RIG_MUD_TANK);   // topped up so the test need not wait the 75 s a full fill takes
+				weighted(rig(srv, origin));   // topped up and weighted past 13.8 ppg (15b2) so the test need not wait for the hopper
 				rig(srv, origin).toggle();   // the driller's console: drill
 				return null;
 			});
@@ -7795,7 +7798,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			String noMud = read(server, origin.getX(), origin.getY(), origin.getZ());
 			check(noMud.contains("NO MUD"), "with no water it should stop for mud: " + noMud);
 			server.computeOnServer(srv -> {
-				rig(srv, origin).testWater(Tuning.LAND_RIG_MUD_TANK);
+				weighted(rig(srv, origin));
 				srv.overworld().destroyBlock(new BlockPos(hx + 10, pad + 1, hz), false);
 				return null;
 			});
@@ -7806,6 +7809,12 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			// on to the field: a connection at 27 m, then the strike
 			boolean connected = false;
 			for (int waited = 0; waited < 4000; waited += 20) {
+				server.computeOnServer(srv -> {   // the mud engineer keeps the weight up as the pump's water thins it
+					while (rig(srv, origin).mudPpg() < 13.9 && rig(srv, origin).roomFor(dev.wildcatter.block.RigSubstructureBlockEntity.Solid.BARITE) > 1000) {
+						rig(srv, origin).testMix(dev.wildcatter.block.RigSubstructureBlockEntity.Solid.BARITE, Tuning.BULK_BAG_KG);
+					}
+					return null;
+				});
 				String now = read(server, origin.getX(), origin.getY(), origin.getZ());
 				connected |= now.contains("making a connection");
 				if (now.contains("WELL COMPLETE")) {
@@ -7822,6 +7831,16 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		} finally {
 			server.runCommand("effect clear @p minecraft:slow_falling");
 			ReservoirData.testSeed = null;
+		}
+	}
+
+	/** 45 m3 of water, gelled with bentonite and weighted with barite past 13.8 ppg: enough to drill into a deep field (15b2). */
+	private static void weighted(dev.wildcatter.block.RigSubstructureBlockEntity rig) {
+		rig.testWater(0);
+		rig.testWater(45_000);
+		rig.testMix(dev.wildcatter.block.RigSubstructureBlockEntity.Solid.BENTONITE, 71.3 * 45);
+		while (rig.mudPpg() < 13.9) {
+			rig.testMix(dev.wildcatter.block.RigSubstructureBlockEntity.Solid.BARITE, Tuning.BULK_BAG_KG);
 		}
 	}
 
@@ -11080,14 +11099,32 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		}
 		server.runCommand("fill 30 " + by + " " + (z - 30) + " 60 " + (by + 7) + " " + z + " minecraft:air");
 
-		// a salt dome in a column of stone from bedrock up, cut open on its south side for the picture
-		int cx = 20, cz = z - 12;
-		server.runCommand("fill " + (cx - 9) + " -63 " + (cz - 9) + " " + (cx + 9) + " 25 " + (cz + 9) + " minecraft:stone");
+		// a salt dome in a column of stone from bedrock up, cut open on its south side for the picture. Domes stand on a seed grid
+		// (docs/salt-dome-oil.md): a forced seed puts one near, and the feature placed by hand draws the part of it in its chunk
+		long domeSeed = -1;
+		dev.wildcatter.well.SaltDome dome = null;
+		for (long s = 1; s < 2_000_000 && domeSeed < 0; s++) {
+			dev.wildcatter.well.SaltDome d = dev.wildcatter.well.SaltDome.inCell(s, Math.floorDiv(20, Tuning.DOME_CELL), Math.floorDiv(z - 60, Tuning.DOME_CELL));
+			if (d != null && Math.abs(d.centerX() - 20) < 40 && Math.abs(d.centerZ() - (z - 60)) < 40 && (d.centerX() & 15) >= 7 && (d.centerX() & 15) <= 8
+					&& (d.centerZ() & 15) >= 7 && (d.centerZ() & 15) <= 8) {
+				domeSeed = s;
+				dome = d;
+			}
+		}
+		check(domeSeed >= 0, "no seed puts a salt dome near the ores scene");
+		ReservoirData.testSeed = domeSeed;
+		ReservoirData.testDomeBiome = true;
+		int cx = dome.centerX(), cz = dome.centerZ();
+		server.runCommand("tp @p " + cx + " " + (up + 4) + " " + (cz + 26) + " 180 10");
+		context.waitTicks(40);
+		server.runCommand("fill " + (cx - 7) + " -63 " + (cz - 7) + " " + (cx + 8) + " 25 " + (cz + 8) + " minecraft:stone");
 		server.runCommand("place feature wildcatter:salt_dome " + cx + " 0 " + cz);
-		int salt = count(server, dev.wildcatter.ore.OreBlocks.block(dev.wildcatter.ore.Ore.HALITE), new BlockPos(cx - 9, -40, cz - 9), new BlockPos(cx + 9, -30, cz + 9));
-		int sulfur = count(server, dev.wildcatter.ore.OreBlocks.block(dev.wildcatter.ore.Ore.SULFUR), new BlockPos(cx - 9, 0, cz - 9), new BlockPos(cx + 9, 25, cz + 9));
+		ReservoirData.testSeed = null;
+		ReservoirData.testDomeBiome = null;
+		int salt = count(server, dev.wildcatter.ore.OreBlocks.block(dev.wildcatter.ore.Ore.HALITE), new BlockPos(cx - 7, -40, cz - 7), new BlockPos(cx + 8, -30, cz + 8));
+		int sulfur = count(server, dev.wildcatter.ore.OreBlocks.block(dev.wildcatter.ore.Ore.SULFUR), new BlockPos(cx - 7, 0, cz - 7), new BlockPos(cx + 8, 25, cz + 8));
 		check(salt > 300 && sulfur > 5, "a salt dome should have rock salt in its column and sulfur in its cap: " + salt + " salt, " + sulfur + " sulfur");
-		server.runCommand("fill " + (cx - 9) + " " + up + " " + (cz + 1) + " " + (cx + 9) + " 25 " + (cz + 9) + " minecraft:air");
+		server.runCommand("fill " + (cx - 7) + " " + up + " " + (cz + 1) + " " + (cx + 8) + " 25 " + (cz + 8) + " minecraft:air");
 		server.runCommand("tp @p " + cx + " 4 " + (cz + 26) + " 180 -8");
 		context.waitTicks(40);
 		context.takeScreenshot("wildcatter-salt-dome");
@@ -11107,7 +11144,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		String bariteTip = tooltip(context, new ItemStack(dev.wildcatter.ore.OreBlocks.MINERALS.get(dev.wildcatter.ore.Ore.BARITE)));
 		check(saltTip.contains("Used in chlor-alkali cells") && saltTip.contains("Found: salt domes"), "rock salt's tooltip should say where it is found and what uses it: " + saltTip);
 		check(galenaTip.contains("Used in a furnace (lead ingot)") && galenaTip.contains("Mined with a stone pickaxe"), "galena ore's tooltip should say it smelts to lead: " + galenaTip);
-		check(bariteTip.contains("No use yet"), "barite's tooltip should say it has no use yet: " + bariteTip);
+		check(bariteTip.contains("Used in the barite mill"), "barite's tooltip should say the mud plant uses it: " + bariteTip);
 		// the picture: rock salt in the first hotbar slot, the inventory open and the cursor over it
 		server.runCommand("clear @p");
 		server.runCommand("item replace entity @p hotbar.0 with wildcatter:halite");

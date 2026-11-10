@@ -44,6 +44,13 @@ public interface OilGasBlocks {
 	Block GAS_COMPRESSOR = gasPlantPart(dev.wildcatter.block.GasPlantPartBlock.Part.GAS_COMPRESSOR);
 	Block TEG_DEHYDRATOR = gasPlantPart(dev.wildcatter.block.GasPlantPartBlock.Part.TEG_DEHYDRATOR);
 	Block NGL_CHILLER = gasPlantPart(dev.wildcatter.block.GasPlantPartBlock.Part.NGL_CHILLER);
+	// 15b1: the drilling mud plant and the rig's mixing hopper (docs/multiblocks/drilling-mud.md)
+	Block BARITE_MILL = mudPart(dev.wildcatter.block.MudPartBlock.Part.BARITE_MILL);
+	Block BENTONITE_DRYER = mudPart(dev.wildcatter.block.MudPartBlock.Part.BENTONITE_DRYER);
+	Block MUD_HOPPER = mudPart(dev.wildcatter.block.MudPartBlock.Part.MUD_HOPPER);
+	// 15b2: well control
+	Block BOP_STACK = mudPart(dev.wildcatter.block.MudPartBlock.Part.BOP_STACK);
+	Block BOP_ACCUMULATOR = mudPart(dev.wildcatter.block.MudPartBlock.Part.BOP_ACCUMULATOR);
 	// 14b: the sales line's meter stations (docs/multiblocks/sales-gas.md)
 	Block METER_BUILDING = salesGasPart(dev.wildcatter.block.SalesGasPartBlock.Part.METER_BUILDING);
 	Block FILTER_SEPARATOR = salesGasPart(dev.wildcatter.block.SalesGasPartBlock.Part.FILTER_SEPARATOR);

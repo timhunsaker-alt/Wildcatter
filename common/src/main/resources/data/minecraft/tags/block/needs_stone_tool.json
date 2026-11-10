@@ -290,6 +290,11 @@
     "wildcatter:junction_box",
     "wildcatter:control_supply",
     "wildcatter:plc_cabinet",
-    "wildcatter:remote_io_drop"
+    "wildcatter:remote_io_drop",
+    "wildcatter:barite_mill",
+    "wildcatter:bentonite_dryer",
+    "wildcatter:mud_hopper",
+    "wildcatter:bop_stack",
+    "wildcatter:bop_accumulator"
   ]
 }

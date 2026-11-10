@@ -560,5 +560,12 @@
   "block.wildcatter.air_compressor": "Instrument Air Compressor",
   "block.wildcatter.air_dryer": "Air Dryer",
   "block.wildcatter.day_tank": "Water Day Tank (1 m3)",
-  "block.wildcatter.transmitter": "Transmitter (4-20 mA)"
+  "block.wildcatter.transmitter": "Transmitter (4-20 mA)",
+  "block.wildcatter.barite_mill": "Barite Mill (roller, 5 t/h)",
+  "block.wildcatter.bentonite_dryer": "Bentonite Dryer (rotary, 3 t/h)",
+  "block.wildcatter.mud_hopper": "Mud Hopper (jet mixing)",
+  "block.wildcatter.bop_stack": "BOP Stack (13-5/8 in, 5,000 psi)",
+  "block.wildcatter.bop_accumulator": "BOP Accumulator Unit",
+  "item.wildcatter.barite_bag": "Bulk Bag of Barite (API 13A 4.1)",
+  "item.wildcatter.bentonite_bag": "Bulk Bag of Bentonite (API 13A)"
 }

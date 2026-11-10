@@ -48,6 +48,9 @@ public class WildcatterNeoForgeGameTests {
 	/** Phase 14b-14d's scenes (GasPowerScenes): longer still, for the acid plant to raise steam and the turbine to take the plant. */
 	private static final String[] GAS_POWER_SCENES = {"sales_gas", "acid_steam", "biogas"};
 
+	/** Phase 15's oilfield scenes (OilfieldScenes): spread out round a dome or a land rig, so each gets room, and long, for the drilling. */
+	private static final java.util.Map<String, Consumer<GameTestHelper>> OILFIELD_SCENES = OilfieldScenes.scenes();
+
 	/** The protection gap wave's grid scenes (docs/questions/protection-gaps.md), each group in its own class, all run as plant scenes. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> GRID_SCENES = new java.util.LinkedHashMap<>();
 
@@ -98,6 +101,7 @@ public class WildcatterNeoForgeGameTests {
 			helper.register(id("acid_steam"), (Consumer<GameTestHelper>) GasPowerScenes::acidSteam);
 			helper.register(id("biogas"), (Consumer<GameTestHelper>) GasPowerScenes::biogas);
 			GRID_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
+			OILFIELD_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 		}));
 		modBus.addListener(RegisterCapabilitiesEvent.class, event -> event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, entity, side) -> STORAGE, Blocks.GOLD_BLOCK));
 		modBus.addListener(RegisterGameTestsEvent.class, event -> {
@@ -118,6 +122,11 @@ public class WildcatterNeoForgeGameTests {
 			if (only("ring_travel")) event.registerTest(id("ring_travel"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id("ring_travel")),
 					new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 3000, 1, true,
 							net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 240)));
+			for (String scene : OILFIELD_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
+				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
+						new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 6000, 1, true,
+								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 120)));
+			}
 			for (String scene : GAS_POWER_SCENES) {
 				if (!only(scene)) {
 					continue;

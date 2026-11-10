@@ -131,6 +131,64 @@ public final class Tuning {
 	public static final int DEEP_OIL_MAX_UNITS = 1_000_000;
 	public static final int DEEP_GAS_MIN_UNITS = 1_000_000;
 	public static final int DEEP_GAS_MAX_UNITS = 2_500_000;
+
+	// ---- 15a: salt domes trap oil on their flanks (docs/salt-dome-oil.md; values proposed unless marked) ----------------------
+	public static final int DOME_CELL = 192;                            // blocks: a grid of its own, at most one dome a cell
+	public static final double DOME_CHANCE = 0.6;                       // of the cells whose centre biome is a dome biome
+	public static final int DOME_MARGIN = 26;                           // the dome, its flanks and its mound stay this far inside its cell
+	public static final int DOME_MIN_RADIUS = 4, DOME_MAX_RADIUS = 7;   // salt 8 to 14 blocks across (docs/ores.md)
+	public static final int DOME_BOTTOM_Y = -60;
+	public static final int DOME_MIN_CREST_Y = 0, DOME_MAX_CREST_Y = 20;
+	public static final int DOME_CAPROCK = 4;                           // blocks of calcite caprock over the crest
+	public static final int FLANK_MIN_FIELDS = 1, FLANK_MAX_FIELDS = 3;
+	public static final int FLANK_MIN_WIDTH = 4, FLANK_MAX_WIDTH = 12;  // blocks out from the salt's edge
+	public static final double FLANK_MIN_ARC = 60, FLANK_MAX_ARC = 150; // degrees round the dome (Spindletop's southeast flank)
+	public static final double FLANK_GAP = 10;                          // degrees at least between two fields of one dome
+	public static final int FLANK_MIN_Y = -50, FLANK_MAX_Y = -20;       // the field's top: under the caprock, over the deep fields
+	public static final double FLANK_OIL_FRACTION = 0.8;                // Gulf Coast domes are oil provinces
+	public static final int FLANK_OIL_MIN_UNITS = 150_000, FLANK_OIL_MAX_UNITS = 400_000;
+	public static final int FLANK_GAS_MIN_UNITS = 300_000, FLANK_GAS_MAX_UNITS = 800_000;
+	public static final double CAPROCK_POOL_CHANCE = 0.3;
+	public static final int CAPROCK_OIL_MIN_UNITS = 20_000, CAPROCK_OIL_MAX_UNITS = 60_000;
+	public static final double CAPROCK_FLUSH = 0.10;                    // a caprock pool holds full pressure for its first 10 %
+	public static final double CAPROCK_AFTER = 0.35;                    // then falls to 35 % and on down: the Lucas gusher's short life
+	public static final int MOUND_MAX_HEIGHT = 2;                       // blocks: a low hill over the dome (Spindletop Hill, unverified)
+
+	// ---- 15b1: drilling mud (docs/multiblocks/drilling-mud.md; values proposed unless marked) ---------------------------------
+	public static final double WATER_KG_PER_L = 0.9994;                 // fresh water, 8.33-8.34 ppg
+	public static final double PPG_PER_KG_L = 8.3454;                   // lb/gal per kg/L (1 kg/L = 8.345 ppg)
+	public static final double BARITE_SG = 4.1;                         // API 13A's 4.1 grade (the game's 90 % ore makes 4.1, not 4.2)
+	public static final double BENTONITE_SG = 2.6;                      // dry montmorillonite (textbook, unverified)
+	public static final double SALT_APPARENT_SG = 2.7;                  // dissolved NaCl: 0.37 L a kg, so saturated brine is 1.20 kg/L (10.0 ppg)
+	public static final double SALT_SATURATION_KG_PER_L = 0.36;         // kg of NaCl a litre of water at saturation (halite's solubility, 360 g/L)
+	public static final double SALT_SATURATED_AT = 0.97;                // of saturation: counted as salt-saturated (a mud engineer's margin)
+	public static final double LOW_GEL_KG_PER_L = 0.0428;               // 15 lb/bbl of bentonite: below it the cuttings settle (LOW GEL)
+	public static final double GOOD_GEL_KG_PER_L = 0.0713;              // 25 lb/bbl (71 kg/m3): about 8.6 ppg
+	public static final double LOW_GEL_RATE = 0.5;                      // LOW GEL halves the rig's rate of penetration
+	public static final double BARITE_MILL_WATTS = 150_000.0;           // 200 hp roller mill, classifier and baghouse fan (unverified)
+	public static final double BARITE_MILL_KGS = 5_000.0 / 3600;        // 5 t/h
+	public static final double BENTONITE_MILL_WATTS = 75_000.0;         // the dryer's mill and fan (unverified)
+	public static final double BENTONITE_DRYER_KGS = 3_000.0 / 3600;    // 3 t/h
+	public static final double BENTONITE_DRYER_J_PER_KG = 1.0e6 * 3600 / 3_000.0;   // 1 MW of gas at 3 t/h: 1.2 MJ a kg
+	public static final double MUD_HOPPER_WATTS = 37_000.0;             // 50 hp centrifugal mixing pump (unverified)
+	public static final double MUD_HOPPER_KGS = 1_000.0 / 60;           // a bag a minute (real rigs mix 1-2 sacks a minute)
+
+	// ---- 15b2: pore pressure, kicks, the BOP and blowouts (docs/multiblocks/drilling-mud.md; proposed unless marked) ---------------
+	public static final double NORMAL_PORE_PPG = 8.34;                  // shallow and flank fields: a fresh-water gradient (0.433 psi/ft)
+	public static final double DEEP_PORE_PPG = 13.5;                    // deep fields: Gulf Coast geopressure, 0.70 psi/ft (textbook, unverified)
+	public static final double TRIP_MARGIN_PPG = 0.3;                   // over the pore pressure, to drill into a deep field: 13.8 ppg
+	public static final double PSI_PER_PPG_FT = 0.052;                  // hydrostatic pressure: psi = 0.052 x ppg x ft
+	public static final double FEET_PER_M = 3.2808;
+	public static final int KICK_WINDOW_TICKS = 600;                    // 30 s from the alarm to shut in
+	public static final double KICK_GAIN_M3S = 0.05;                    // pit gain while a kick flows: 1.5 m3 (about 10 bbl) in the window
+	public static final int KILL_CIRCULATION_TICKS = 1200;              // one minute of circulating kill-weight mud kills the well
+	public static final double BLOWOUT_FLOW = 5.0;                      // a blowout flows wild at five free-flowing wells' rate
+	public static final int IGNITION_RANGE = 16;                        // blocks: a fire or lava this near lights a blowout
+	public static final int BOP_CLOSES = 3;                             // the accumulator holds pressure for three closes without power
+	public static final double ACCUMULATOR_WATTS = 15_000.0;            // its triplex pump (unverified)
+	public static final double ACCUMULATOR_RECHARGE_S = 30.0;           // seconds of pumping to bring back one close
+	public static final int ACCUMULATOR_REACH = 20;                     // blocks from the rig it may stand
+	public static final int RELIEF_MIN_DISTANCE = 20;                   // a relief well starts at least this far from the blowout
 	public static final double GAS_UNITS_PER_TICK = 1.5;      // a free-flowing well at full pressure
 	/** Fuel a firebox will take from a well before it is full, in ticks of fire. */
 	public static final double FIREBOX_FEED_CAP = 200.0;

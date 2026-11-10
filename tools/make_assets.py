@@ -1723,10 +1723,11 @@ for key, (size, count, lo, hi, rule) in VEINS.items():
 	save_json(f"{WG}/feature/ore_{key}.json", {"type": "minecraft:ore", "discard_chance_on_air_exposure": 0.0, "size": size,
 		"targets": [{"state": f"{ns}:{key}_ore", "target": rule}]})
 	placed(f"ore_{key}", count, lo, hi)
-# salt domes: a rock-salt column 8 to 14 blocks across from y -60 to a crest at y 0-20, under a 4-block calcite cap with 30 % sulfur
-save_json(f"{WG}/feature/salt_dome.json", {"type": f"{ns}:salt_dome", "radius_min": 4, "radius_max": 7, "bottom": -60, "top_min": 0, "top_max": 20,
-	"caprock": 4, "sulfur_chance": 0.3})
-placed("salt_dome", 1 / 150, 0, 0)
+# salt domes: a rock-salt column 8 to 14 blocks across from y -60 to a crest at y 0-20, under a 4-block calcite cap with 30 % sulfur.
+# 15a (docs/salt-dome-oil.md): where they stand is a seed grid (SaltDome.java, its sizes in Tuning), so the feature runs once in every
+# overworld chunk and draws its cell's dome where it falls in that chunk; the dome checks its own centre's biome.
+save_json(f"{WG}/feature/salt_dome.json", {"type": f"{ns}:salt_dome", "sulfur_chance": 0.3})
+save_json(f"{WG}/placed_feature/salt_dome.json", {"feature": f"{ns}:salt_dome", "placement": []})
 AIR = "minecraft:air"
 def layer(state, thickness):
 	return {"state": state, "thickness": thickness}
@@ -2471,7 +2472,7 @@ ORE_BIOMES = {
 _ore_where = {m.group(1): m.group(2) for m in re.finditer(r'^\t[A-Z_]+\("(\w+)",.*?Where\.(\w+), Tool\.\w+\)[,;]', _ore_src, re.M | re.S)}
 assert len(_ore_where) == 28, len(_ore_where)
 _placements = {f"ore_{k}": w for k, w in _ore_where.items() if k not in ("sulfur", "halite", "sylvite", "chromite", "platinum")}
-_placements.update({"salt_dome": "SALT_DOME", "evaporite_beds": "EVAPORITE", "bushveld_reef": "EVERYWHERE"})
+_placements.update({"salt_dome": "EVERYWHERE", "evaporite_beds": "EVAPORITE", "bushveld_reef": "EVERYWHERE"})   # 15a: the dome checks its biome
 def _holder_set(entries):
 	tags = [e for e in entries if e.startswith("#")]
 	ids = [e for e in entries if not e.startswith("#")]
@@ -2754,6 +2755,38 @@ lang.update({"block.wildcatter.control_cable": "Control Cable (multi-core)", "bl
 	"block.wildcatter.control_valve": "Control Valve (air, 2 in water)", "block.wildcatter.on_off_valve": "On-Off Valve (air, 2 in water)", "block.wildcatter.motor_operated_valve": "Motor-Operated Valve (480 V, 2 in water)",
 	"block.wildcatter.control_valve_steel": "Control Valve (air, 4 in steel)", "block.wildcatter.on_off_valve_steel": "On-Off Valve (air, 4 in steel)", "block.wildcatter.motor_operated_valve_steel": "Motor-Operated Valve (480 V, 4 in steel)",
 	"block.wildcatter.air_tubing": "Instrument Air Tubing", "block.wildcatter.air_compressor": "Instrument Air Compressor", "block.wildcatter.air_dryer": "Air Dryer", "block.wildcatter.day_tank": "Water Day Tank (1 m3)", "block.wildcatter.transmitter": "Transmitter (4-20 mA)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+# ---- Phase 15b1: the drilling mud plant and the rig's mixing hopper (docs/multiblocks/drilling-mud.md) ------------------------------
+# blockstates, models, shapes and items come from tools/models/mud.py; here loot, tags, recipes, names and the two bags. Last before
+# the models, so its placeholders shift no other's noise.
+MUD_PARTS = ("barite_mill", "bentonite_dryer", "mud_hopper", "bop_stack", "bop_accumulator")
+for name in MUD_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in MUD_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("barite_mill", ["SHS", "XCX", "SFS"], {"S": S_, "H": "minecraft:hopper", "X": "minecraft:piston", "C": f"{ns}:crankshaft", "F": "minecraft:white_wool"}, "barite_mill")
+shaped("bentonite_dryer", ["SHS", "BPB", "SXS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "P": P_, "X": "minecraft:blast_furnace"}, "bentonite_dryer")
+shaped("mud_hopper", [" H ", "SPS", "SXS"], {"S": S_, "H": "minecraft:hopper", "P": P_, "X": "minecraft:piston"}, "mud_hopper")
+shaped("bop_stack", ["SXS", "XIX", "SPS"], {"S": S_, "X": "minecraft:piston", "I": "minecraft:iron_block", "P": P_}, "bop_stack")
+shaped("bop_accumulator", ["BBB", "BPB", "SXS"], {"B": "minecraft:bucket", "P": P_, "S": S_, "X": "minecraft:piston"}, "bop_accumulator")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({f"block.{ns}.barite_mill": "Barite Mill (roller, 5 t/h)", f"block.{ns}.bentonite_dryer": "Bentonite Dryer (rotary, 3 t/h)",
+	f"block.{ns}.mud_hopper": "Mud Hopper (jet mixing)", f"block.{ns}.bop_stack": "BOP Stack (13-5/8 in, 5,000 psi)",
+	f"block.{ns}.bop_accumulator": "BOP Accumulator Unit"})
+for item, (name, colour) in {"barite_bag": ("Bulk Bag of Barite (API 13A 4.1)", (200, 196, 190)), "bentonite_bag": ("Bulk Bag of Bentonite (API 13A)", (205, 190, 150))}.items():
+	if os.path.exists(f"{ORE_ART}/{item}.png"):
+		shutil.copy(f"{ORE_ART}/{item}.png", f"{ASSETS}/textures/item/ore/{item}.png")
+		item_tex = f"{ns}:item/ore/{item}"
+	else:
+		tex(f"{item}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+		item_tex = f"{ns}:item/{item}_placeholder"
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": item_tex}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
