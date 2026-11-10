@@ -115,3 +115,16 @@ lets get all ideas done or planned out". Specs: `docs/multiblocks/sales-gas.md` 
 
 ### 19. 14e, the Mekanism check
 - **Chosen:** still a plan: Mekanism for 26.3 is not released (specs-wildcatter item 12). Re-check each phase.
+
+### 20. A firebox on piped gas (found by the lead filming `biogas`, 2026-11-09) — question for Tim
+- **Found:** a firebox counts 8 ticks of fire per unit of gas (`Tuning.GAS_FUEL_TICKS_PER_UNIT`), a unit from the early gas wells.
+  Pipeline gas and biogas are now in m3 and use the same figure: a m3 of natural gas (38 MJ) burns 0.4 s, a fire of about 95 MW, while
+  the same firebox on coal is a few hundred kW. On a digester's 1 m3/s of biogas each draw gives it under one tick of fire, so it
+  draws the gas but never shows lit.
+- **Chosen for now:** nothing changed in play. The `biogas` client scene checks that the firebox draws the gas (as the server
+  scene does) and logs that it is not lit.
+- **Recommended:** give the firebox one real heat rate (its coal fire's, about 0.36 MW) and burn every fuel by heating value: natural
+  gas about 2,100 ticks a m3, biogas about 1,270, crude by its MJ. Well gas units would need converting to m3 at the same time, so
+  gas wells under a firebox would run about 260 times longer per unit.
+- **Alternatives:** leave it (gas fireboxes stay an early-game shortcut); or fix only m3 products (pipeline gas, biogas) and leave
+  well units alone.
