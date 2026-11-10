@@ -373,17 +373,6 @@ Decisions for Tim: `docs/questions/protection-gaps.md` (28 entries). Specs updat
 - **Planned, not built (questions for Tim):** guy wires (20), the command-placed pole transformer's facing (21). Left out: AFCI (22).
 - NeoForge server scenes for each; the Fabric client scenes `switchgear`, `busProtection`, `ats` changed and wait for a client run.
 
-## Plant and crane gaps — 2026-11-09 (Known gaps wave; built while Tim was away)
-Decisions for Tim: `docs/questions/plant-crane-gaps.md`. Branch `plant-crane-gaps`.
-- Cranes: wind limits from the weather (tower 20, crawler 9, ring 14 m/s at the head), ground bearing under crawlers and ring (IBC
-  presumptive values), slews checked against blocks and tower crane masts, the ring crane travelling on crane rail.
-- Plants: the quench tower's 2,000 L sump; the stabilizer's fired reboiler; coke oven and coker gas in gas engines and turbines; the
-  pots' auxiliaries on 480 V and live cut-out with shorting bars; a burner fed by a hopper at any cell.
-- Planned, for Tim: residence holds, crane erection and the crawler's jibs, spent pot lining treatment, the BOP stack (with 15b2),
-  drawing-only gaps.
-- NeoForge scenes `crane_siting`, `ring_travel`, `quench_sump`, `stabilizer_fuel`, `cog_engine`, `pot_aux`, `burner_hopper`; client
-  scene `ringTravel` (new) and `cranes`, `heavyLift`, `potline` changed, for the lead to run.
-
 ## Misc gaps — 2026-11-09 (Known gaps wave; built while Tim was away)
 Decisions for Tim: `docs/questions/misc-gaps.md`. Branch `misc-gaps`.
 - Drawn between parts once formed: the steam plant's feedwater line (feed pump over the generator to the boiler) and the main steam
@@ -395,6 +384,17 @@ Decisions for Tim: `docs/questions/misc-gaps.md`. Branch `misc-gaps`.
 - `make_assets.py` keeps the crane rail (it deleted it).
 - NeoForge scenes `cog_derate`, `aero_lean_gas`, `cracker_pump`, `alternator_frames`, `drawn_runs`; unit test `LeanGasTest`. No
   client scene was run (the client was held by another suite).
+
+## Plant and crane gaps — 2026-11-09 (Known gaps wave; built while Tim was away)
+Decisions for Tim: `docs/questions/plant-crane-gaps.md`. Branch `plant-crane-gaps`.
+- Cranes: wind limits from the weather (tower 20, crawler 9, ring 14 m/s at the head), ground bearing under crawlers and ring (IBC
+  presumptive values), slews checked against blocks and tower crane masts, the ring crane travelling on crane rail.
+- Plants: the quench tower's 2,000 L sump; the stabilizer's fired reboiler; coke oven and coker gas in gas engines and turbines; the
+  pots' auxiliaries on 480 V and live cut-out with shorting bars; a burner fed by a hopper at any cell.
+- Planned, for Tim: residence holds, crane erection and the crawler's jibs, spent pot lining treatment, the BOP stack (with 15b2),
+  drawing-only gaps.
+- NeoForge scenes `crane_siting`, `ring_travel`, `quench_sump`, `stabilizer_fuel`, `cog_engine`, `pot_aux`, `burner_hopper`; client
+  scene `ringTravel` (new) and `cranes`, `heavyLift`, `potline` changed, for the lead to run.
 
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released (planned as 14e, `docs/mekanism-check.md`).
