@@ -28,9 +28,11 @@ import org.jspecify.annotations.Nullable;
  * then makes up what the acid carries off. Treated acid out of the south face of its back cells, for the evaporator. 60 kW on the
  * world's industrial voltage, the box on the north face of its main cell.
  *
- * <p>Built in Phase 18b without its second cycle: re-extraction and the ammonium carbonate strip need CO2 and the uranium calciner,
- * both Phase 16 (16d1, 16a), not yet merged. Until then the first cycle's strip holds the uranium it takes, up to a drum's worth, and
- * the circuit reads FULL when it is full and the acid goes round it (the plan is in the spec's "As built").
+ * <p>The second cycle (Tim, 2026-11-10, answer 22): the first cycle's strip is re-extracted and stripped with ammonium carbonate, made in
+ * line from liquid ammonia (L) and liquid CO2 (kg, 16d1's liquefier) piped to the east face of its east end's front three cells (0.4 kg of
+ * NH3 and 0.5 kg of CO2 a kg of U). The AUC goes by touching to 16a's uranium calciner against its east end, which calcines it as it
+ * does ADU (U3O8 at 96 %) for the drum filler against the calciner. Without a calciner the strip holds its uranium, up to a drum's
+ * worth; FULL then means the calciner is backed up or missing, and the acid goes round the circuit.
  */
 public class DepaTopoCircuitBlockEntity extends UnitMotorBlockEntity implements HopperFed {
 	private final NonNullList<ItemStack> slots = NonNullList.withSize(2, ItemStack.EMPTY);
@@ -40,6 +42,8 @@ public class DepaTopoCircuitBlockEntity extends UnitMotorBlockEntity implements 
 	private double extractant;   // kg of make-up extractant opened and not yet used
 	private double iron;         // kg of iron opened for the strip
 	private double uranium;      // kg of U held in the first cycle's strip
+	private double stripped;     // kg of U sent on as AUC by the second cycle
+	private String second = "second cycle: no calciner against its east end";
 	private double making;       // kg/h of U taken, the last interval
 	private long treated = -1000; // when it last took acid
 	private String unit = "FILLING: needs its first charge";
@@ -75,6 +79,62 @@ public class DepaTopoCircuitBlockEntity extends UnitMotorBlockEntity implements 
 	@Override
 	public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
 		return side == Direction.UP && takesIn(slot, stack);
+	}
+
+	/** The ammonium carbonate strip's ammonia and CO2: the east face of its east end's front cells (the calciner stands at the back ones). */
+	private List<Lines.Face> stripIn() {
+		return faces(at -> at[0] == 15 && at[1] == 0 && at[2] <= 2, Direction.EAST);
+	}
+
+	/**
+	 * The second cycle, asked by the calciner against its east end for up to {@code u3o8} kg of U3O8 as AUC: re-extracts that much of
+	 * the strip's uranium and strips it with ammonium carbonate from the ammonia and CO2 on its east face. Returns kg of U3O8.
+	 */
+	public double takeAuc(Level level, double u3o8) {
+		double u = Math.min(uranium, u3o8 * Tuning.U_PER_U3O8);
+		if (u <= 1e-9) {
+			second = "second cycle: the strip is empty";
+			return 0;
+		}
+		double nh3L = Lines.available(level, stripIn(), Product.AMMONIA, Pull.MACHINE, this);
+		double co2 = Lines.available(level, stripIn(), Product.CO2, Pull.MACHINE, this);
+		u = Math.min(u, Math.min(nh3L * Tuning.AMMONIA_KG_PER_L / Tuning.AUC_NH3_PER_U, co2 / Tuning.AUC_CO2_PER_U));
+		if (u <= 1e-9) {
+			second = nh3L * Tuning.AMMONIA_KG_PER_L < 1e-6 ? "second cycle: NO AMMONIA: pipe liquid ammonia to the east face of its east end"
+					: "second cycle: NO CO2: pipe liquid CO2 from a CO2 liquefier or its storage tank to the east face of its east end";
+			return 0;
+		}
+		Lines.pull(level, stripIn(), Product.AMMONIA, u * Tuning.AUC_NH3_PER_U / Tuning.AMMONIA_KG_PER_L, Pull.MACHINE, this);
+		Lines.pull(level, stripIn(), Product.CO2, u * Tuning.AUC_CO2_PER_U, Pull.MACHINE, this);
+		uranium -= u;
+		stripped += u;
+		second = String.format("second cycle: stripping with ammonium carbonate, AUC to the calciner (%.1f kg of U sent)", stripped);
+		setChanged();
+		return u / Tuning.U_PER_U3O8;
+	}
+
+	/** U3O8 the calciner took as AUC and could not calcine (no gas): back into the strip. */
+	public void returnAuc(double u3o8) {
+		uranium += u3o8 * Tuning.U_PER_U3O8;
+		stripped -= u3o8 * Tuning.U_PER_U3O8;
+		setChanged();
+	}
+
+	/** kg of U sent on as AUC. */
+	public double stripped() {
+		return stripped;
+	}
+
+	/** The second cycle's state, for its readout. */
+	public String secondCycle() {
+		return second;
+	}
+
+	/** Told by a calciner that it is not taking AUC (none against it is told by the absence of calls). */
+	public void calcinerIdle(String why) {
+		if (!second.contains("NO AMMONIA") && !second.contains("NO CO2")) {
+			second = "second cycle: " + why;
+		}
 	}
 
 	private List<Lines.Face> keroseneIn() {
@@ -151,7 +211,7 @@ public class DepaTopoCircuitBlockEntity extends UnitMotorBlockEntity implements 
 			}
 		}
 		if (uranium >= Tuning.DEPA_TOPO_U_HOLD_KG) {
-			return unit = String.format("FULL: its strip holds %.0f kg of U for the second cycle, which is not built yet", uranium);
+			return unit = String.format("FULL: its strip holds %.0f kg of U (%s)", uranium, second);
 		}
 		double u = litres * Phosphate.uraniumGPerL() / 1000 * Tuning.DEPA_TOPO_RECOVERY;
 		if (iron < u * Tuning.IRON_PER_URANIUM && !slots.get(1).isEmpty()) {
@@ -196,9 +256,8 @@ public class DepaTopoCircuitBlockEntity extends UnitMotorBlockEntity implements 
 	@Override
 	public Component inspect() {
 		return Component.literal(String.format("DEPA-TOPO circuit (mixer-settlers %.0f kW, %s): ", Tuning.DEPA_TOPO_WATTS / 1000, Voltage.INDUSTRIAL.label()) + unit
-				+ String.format("; organic %,.0f L; extractant %.1f kg open and %d drums; iron %.1f kg and %d ingots; U in the strip %.1f of %.0f kg (second cycle not built: "
-						+ "it needs CO2 and the uranium calciner); treated acid held %.0f L; ", organic, extractant, slots.get(0).getCount(), iron, slots.get(1).getCount(), uranium,
-						Tuning.DEPA_TOPO_U_HOLD_KG, held(Product.TREATED_ACID))
+				+ String.format("; organic %,.0f L; extractant %.1f kg open and %d drums; iron %.1f kg and %d ingots; U in the strip %.1f of %.0f kg; %s; treated acid held %.0f L; ",
+						organic, extractant, slots.get(0).getCount(), iron, slots.get(1).getCount(), uranium, Tuning.DEPA_TOPO_U_HOLD_KG, second, held(Product.TREATED_ACID))
 				+ describe());
 	}
 
@@ -227,6 +286,7 @@ public class DepaTopoCircuitBlockEntity extends UnitMotorBlockEntity implements 
 		output.putDouble("extractant", extractant);
 		output.putDouble("iron", iron);
 		output.putDouble("uranium", uranium);
+		output.putDouble("stripped", stripped);
 	}
 
 	@Override
@@ -240,5 +300,6 @@ public class DepaTopoCircuitBlockEntity extends UnitMotorBlockEntity implements 
 		extractant = input.getDoubleOr("extractant", 0);
 		iron = input.getDoubleOr("iron", 0);
 		uranium = input.getDoubleOr("uranium", 0);
+		stripped = input.getDoubleOr("stripped", 0);
 	}
 }

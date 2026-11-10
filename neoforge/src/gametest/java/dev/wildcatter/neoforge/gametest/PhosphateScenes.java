@@ -50,6 +50,10 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
  * <li>{@code phosphate_uranium}: filter acid through the pretreatment and the DEPA-TOPO circuit, FILLING until its drums come, then
  * about 2.8 kg/h of uranium into the strip and the treated acid on to an evaporator; without iron NO IRON and the acid round it; with
  * the strip full, FULL.</li>
+ * <li>{@code phosphate_auc} (18b's second cycle, Tim's answer 22): the same circuit with liquid ammonia and liquid CO2 on the east face of
+ * its east end, the uranium calciner against its east end and a drum filler against the calciner: the strip's uranium goes on as AUC,
+ * the calciner (warmed by hook) calcines it and the filler, brought near full by hook, fills a U3O8 drum; with the ammonia cut, the
+ * circuit reads NO AMMONIA.</li>
  * </ul>
  */
 final class PhosphateScenes {
@@ -449,5 +453,67 @@ final class PhosphateScenes {
 				});
 			});
 		}));
+	}
+
+	// ---- phosphate_auc (18b's second cycle) ---------------------------------------------------------------------------------------------
+	static void phosphateAuc(GameTestHelper helper) {
+		floor(helper, -14, -10, 26, 18);
+		place(helper, WildcatterBlocks.ACID_PRETREATMENT, 0, 0);         // x 0-2, z 0-5
+		place(helper, WildcatterBlocks.DEPA_TOPO_CIRCUIT, 3, 0);         // x 3-18, z 0-5, against its east side
+		place(helper, WildcatterBlocks.URANIUM_CALCINER, 19, 4);         // x 19-21, z 4-6: against the circuit's east end, its back cells
+		place(helper, WildcatterBlocks.DRUM_FILLER, 19, 7);              // x 19-20, z 7-8: against the calciner's south side
+		place(helper, WildcatterBlocks.STOCK_TANK, 4, -5);               // x 4-7, z -5..-2: the kerosene
+		place(helper, WildcatterBlocks.ACID_EVAPORATOR, 3, 9);           // x 3-5, z 9-11
+		place(helper, WildcatterBlocks.STOCK_TANK, 3, 13);               // x 3-6, z 13-16: the merchant acid
+		run(helper, "gas_line", new int[] {1, -1});
+		source(helper, 1, -2, Product.FILTER_ACID, 1.0);
+		run(helper, "gas_line", new int[] {5, -1});
+		run(helper, "gas_line", new int[] {4, 6}, new int[] {4, 8});
+		run(helper, "gas_line", new int[] {6, 10});
+		source(helper, 7, 10, Product.PROCESS_STEAM, 1.0);
+		run(helper, "gas_line", new int[] {4, 12});
+		// the ammonium carbonate strip's ammonia (the ammonia plant's) and liquid CO2 (16d1's liquefier), on the east end's front cells
+		run(helper, "gas_line", new int[] {19, 0});
+		source(helper, 20, 0, Product.AMMONIA, 1.0);
+		run(helper, "gas_line", new int[] {19, 2});
+		source(helper, 20, 2, Product.CO2, 1.0);
+		run(helper, "gas_line", new int[] {22, 5});
+		source(helper, 23, 5, Product.LPG, 5.0);                         // the calciner's burners, its east face
+		genset(helper, -6, -8);
+		run(helper, "cable_industrial", new int[] {-5, -8}, new int[] {3, -8}, new int[] {3, -1});
+		run(helper, "cable_industrial", new int[] {-1, -7}, new int[] {-1, 9}, new int[] {2, 9});
+		run(helper, "cable_industrial", new int[] {4, -8}, new int[] {25, -8}, new int[] {25, 10}, new int[] {18, 10}, new int[] {18, 7});   // the filler's box
+		run(helper, "cable_industrial", new int[] {25, 3}, new int[] {19, 3});                                                               // the calciner's box
+		entity(helper, 4, -5, StorageTankBlockEntity.class).testFill(Product.KEROSENE, 10_000);
+		DepaTopoCircuitBlockEntity circuit = entity(helper, 3, 0, DepaTopoCircuitBlockEntity.class);
+		circuit.slots().set(0, new ItemStack(WildcatterItems.EXTRACTANT_DRUM, Phosphate.chargeDrums() + 1));
+		circuit.slots().set(1, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT, 4));
+		circuit.testAddUranium(20);                                                                       // a day's strip, by hook
+		dev.wildcatter.block.DrumFillerBlockEntity filler = entity(helper, 19, 7, dev.wildcatter.block.DrumFillerBlockEntity.class);
+		filler.slots().set(0, new ItemStack(WildcatterItems.EMPTY_DRUM, 4));
+		filler.addU3o8(Tuning.DRUM_NET_KG - 2);                                                          // near full: the AUC finishes the drum
+		dev.wildcatter.block.UraniumCalcinerBlockEntity calciner = entity(helper, 19, 4, dev.wildcatter.block.UraniumCalcinerBlockEntity.class);
+		int[][] wet = {};
+		int[][] staged = {{3, 9}};
+		hold(helper, staged);
+		start(helper, new int[][] {{-6, -8}}, () -> {
+			calciner.setWarmForTest();                                                                    // five minutes of firing, by hook
+			helper.runAfterDelay(200, () -> release(helper, staged, 0, () -> {}));
+			await(helper, 1200, wet, () -> filler.drums() >= 1 && circuit.stripped() > 0, () -> {
+				String chain = " | circuit " + read(helper, 3, 0) +  " | calciner " + read(helper, 19, 4) + " | filler " + read(helper, 19, 7);
+				check(helper, circuit.stripped() > 0 && read(helper, 3, 0).contains("ammonium carbonate"), "the second cycle should strip the uranium as AUC" + chain);
+				check(helper, read(helper, 19, 4).contains("from AUC") || calciner.made() > 0, "the calciner should calcine the AUC" + chain);
+				check(helper, filler.slots().get(1).is(WildcatterItems.U3O8_DRUM), "the filler should fill a drum of U3O8, 96 %" + chain);
+				log("phosphate_auc", "running:" + chain);
+				helper.getLevel().setBlock(abs(helper, 20, U, 0), Blocks.AIR.defaultBlockState(), 3);   // the ammonia cut
+				circuit.testAddUranium(5);
+				await(helper, 400, wet, () -> circuit.secondCycle().contains("NO AMMONIA"), () -> {
+					String cut = read(helper, 3, 0);
+					check(helper, cut.contains("NO AMMONIA"), "with the ammonia cut the circuit should read NO AMMONIA: " + cut +  " | calciner " + read(helper, 19, 4));
+					log("phosphate_auc", "ok: " + String.format("%.1f kg of U as AUC, %.1f kg of U3O8 calcined, %d drums | ", circuit.stripped(), calciner.made(), filler.drums()) + cut);
+					helper.succeed();
+				});
+			});
+		});
 	}
 }

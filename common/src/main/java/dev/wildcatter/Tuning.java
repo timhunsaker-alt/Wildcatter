@@ -637,6 +637,10 @@ public final class Tuning {
 	public static final double ACID_PRETREATMENT_WATTS = 45_000.0; // clarifier rake, cooler fans and the air blower, 480 V or 400 V
 	public static final double DEPA_TOPO_WATTS = 60_000.0;         // the mixer-settlers' mixers and pumps, 480 V or 400 V
 	public static final double DEPA_TOPO_U_HOLD_KG = 326.0;        // U the first cycle's strip holds for the second cycle: one ADU drum's (proposed)
+	// 18b's second cycle (Tim, 2026-11-10, answer 22): re-extraction and the ammonium carbonate strip to AUC, calcined by 16a's calciner
+	public static final double AUC_NH3_PER_U = 0.4;                // kg of NH3 a kg of U for the ammonium carbonate strip (the spec, proposed)
+	public static final double AUC_CO2_PER_U = 0.5;                // kg of CO2 a kg of U (the spec, proposed)
+	public static final double U_PER_U3O8 = 0.848;                 // kg of U in a kg of U3O8 (714.1 of 842.1 g/mol)
 	public static final double CYLINDER_FILLER_WATTS = 5_000.0;    // 480 V (unverified)
 
 	// ---- Phase 14b: the sales line and its meter stations (docs/multiblocks/sales-gas.md) ----------------------------------------
