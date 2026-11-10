@@ -2,7 +2,6 @@ package dev.wildcatter.circuit;
 
 import dev.wildcatter.Tuning;
 import dev.wildcatter.Wildcatter;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,14 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
- * Keeps track of every circuit part in loaded chunks, groups the ones that touch, and solves each group every few ticks
+ * Keeps track of every circuit part in loaded chunks, groups the ones that touch ({@link PartGroups}, which never loads a chunk), and solves each group every few ticks
  * (and straight away when something changes). A pass that takes longer than {@link Tuning#SOLVE_BUDGET_NANOS} finishes over
  * the next ticks rather than stalling the server.
  */
@@ -108,39 +106,27 @@ public final class CircuitManager {
 
 	/** The connected groups of parts: each is solved on its own. */
 	private static List<List<BlockPos>> groups(ServerLevel level, Set<BlockPos> registered) {
-		Set<BlockPos> seen = new HashSet<>();
-		List<List<BlockPos>> groups = new ArrayList<>();
-		for (BlockPos start : new ArrayList<>(registered)) {
-			if (seen.contains(start)) {
-				continue;
+		return PartGroups.of(registered, new PartGroups.World() {
+			@Override
+			public boolean loaded(BlockPos pos) {
+				return level.isLoaded(pos);   // never level.getBlockState here: in an unloaded chunk it loads the chunk, every solve
 			}
-			List<BlockPos> group = new ArrayList<>();
-			ArrayDeque<BlockPos> queue = new ArrayDeque<>();
-			queue.add(start);
-			seen.add(start);
-			while (!queue.isEmpty()) {
-				BlockPos here = queue.poll();
-				group.add(here);
-				// a big part touches its neighbours through every one of its cells, and a neighbour that is a piece of one means its main cell
-				for (BlockPos cell : dev.wildcatter.multiblock.BigParts.cellsAt(level, here)) {
-					for (Direction side : Direction.values()) {
-						BlockPos next = dev.wildcatter.multiblock.BigParts.owner(level, cell.relative(side));
-						if (registered.contains(next) && seen.add(next)) {
-							queue.add(next);
-						}
-					}
-				}
-				if (level.getBlockEntity(here) instanceof CircuitPart part) {
-					for (BlockPos far : part.links()) {
-						if (registered.contains(far) && seen.add(far)) {
-							queue.add(far);
-						}
-					}
-				}
+
+			@Override
+			public List<BlockPos> cellsAt(BlockPos pos) {
+				return dev.wildcatter.multiblock.BigParts.cellsAt(level, pos);
 			}
-			groups.add(group);
-		}
-		return groups;
+
+			@Override
+			public BlockPos owner(BlockPos pos) {
+				return dev.wildcatter.multiblock.BigParts.owner(level, pos);
+			}
+
+			@Override
+			public java.util.Collection<BlockPos> links(BlockPos pos) {
+				return level.getBlockEntity(pos) instanceof CircuitPart part ? part.links() : List.of();
+			}
+		});
 	}
 
 	/** The biggest circuit solved since the last {@link #resetSolveStats} and how long its solve took: the game test reads these. */

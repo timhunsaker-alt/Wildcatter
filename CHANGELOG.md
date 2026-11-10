@@ -2,6 +2,11 @@
 
 ## v0.6.0 (released 2026-11-10)
 
+### Fixes
+- **The circuit manager no longer loads chunks:** working out which circuit parts touch read blocks next to a part even in unloaded
+  chunks, loading them on the server thread every few ticks; a circuit at the edge of the loaded area kept its neighbours loaded and
+  could slow the server or run it out of memory. It now stops at the loaded area's edge; solved numbers are unchanged.
+
 ### Gas and power quick wins (Phase 14b-14d), the PLC gap wave and the protection gap wave
 - **The sales line (14b):** a gas plant's pipeline gas goes on an off-map transmission line at a receipt meter station and comes off
   anywhere in the dimension at a delivery station, less 2 % kept as compressor fuel. Five true-size parts: meter building (2 kW,
