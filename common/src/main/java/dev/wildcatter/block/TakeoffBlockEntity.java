@@ -38,7 +38,7 @@ public class TakeoffBlockEntity extends UnitMotorBlockEntity implements HopperFe
 		return kind().equals("product_takeoff");
 	}
 
-	private double capacity() {
+	public double capacity() {
 		return product() ? Tuning.CYLINDER_30B_KG : Tuning.CYLINDER_48Y_KG;
 	}
 
@@ -82,13 +82,22 @@ public class TakeoffBlockEntity extends UnitMotorBlockEntity implements HopperFe
 
 	/** The feed station hands it UF6; for the game test, a top-up. */
 	public void addUf6(double kg) {
+		addUf6(kg, product() ? Tuning.ASSAY_PRODUCT : Tuning.ASSAY_TAILS);
+	}
+
+	/** 16c1: UF6 at {@code assay}; the cylinder on the scale carries the blend of what went into it. */
+	public void addUf6(double kg, double assay) {
 		if (!loaded && fed() > 0) {
 			useOne();
 			loaded = true;
 		}
+		double before = uf6;
 		uf6 = Math.min(capacity(), uf6 + kg);
+		this.assay = uf6 > 1e-9 ? (before * this.assay + (uf6 - before) * assay) / uf6 : assay;
 		setChanged();
 	}
+
+	private double assay = Tuning.ASSAY_PRODUCT;   // of the UF6 in the cylinder on the scale (16c1)
 
 	public double uf6() {
 		return uf6;
@@ -133,7 +142,8 @@ public class TakeoffBlockEntity extends UnitMotorBlockEntity implements HopperFe
 				unit = "FULL: take the cylinders (empty hand, or a hopper under it)";
 				return;
 			}
-			slots.set(out, new ItemStack(full()));
+			ItemStack cylinder = new ItemStack(full());
+			slots.set(out, product() ? dev.wildcatter.WildcatterComponents.withAssay(cylinder, assay) : cylinder);
 			loaded = false;
 			uf6 = 0;
 		}
@@ -146,7 +156,8 @@ public class TakeoffBlockEntity extends UnitMotorBlockEntity implements HopperFe
 			return;
 		}
 		ready = drive(level);
-		String what = product() ? String.format("30B of %.2f %%", Tuning.ASSAY_PRODUCT * 100) : String.format("48Y of %.2f %% tails", Tuning.ASSAY_TAILS * 100);
+		String what = product() ? String.format("30B of %.2f %%", (uf6 > 1e-6 ? assay : Tuning.ASSAY_PRODUCT) * 100)
+				: String.format("48Y of %.2f %% tails", (uf6 > 1e-6 ? assay : Tuning.ASSAY_TAILS) * 100);
 		unit = ready <= 0 ? "starting: " + describe()
 				: String.format("%s: %,.0f/%,.0f kg of UF6 (%.1f %%)", what, uf6, capacity(), uf6 / capacity() * 100);
 	}
@@ -162,6 +173,7 @@ public class TakeoffBlockEntity extends UnitMotorBlockEntity implements HopperFe
 		ContainerHelper.saveAllItems(output, slots);
 		output.putBoolean("loaded", loaded);
 		output.putDouble("uf6", uf6);
+		output.putDouble("assay", assay);
 	}
 
 	@Override
@@ -171,5 +183,6 @@ public class TakeoffBlockEntity extends UnitMotorBlockEntity implements HopperFe
 		ContainerHelper.loadAllItems(input, slots);
 		loaded = input.getBooleanOr("loaded", false);
 		uf6 = input.getDoubleOr("uf6", 0);
+		assay = input.getDoubleOr("assay", product() ? Tuning.ASSAY_PRODUCT : Tuning.ASSAY_TAILS);
 	}
 }

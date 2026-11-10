@@ -1220,4 +1220,52 @@ public final class Tuning {
 	public static final double GROUND_ELECTRODE_OHMS = 25.0;
 	/** A lead (jumper) from a line insulator down to a cutout or a pole transformer's H1 bushing is a few metres at most. */
 	public static final int LEAD_MAX_BLOCKS = 6;
+
+	// ---- Phase 16a: ADU yellowcake (docs/multiblocks/adu-yellowcake.md) --------------------------------------------------------
+	public static final double ADU_NH3_PER_U3O8 = 0.2;             // kg of NH3 a kg of U3O8: 0.072 the ADU, the rest the liquor's free acid (proposed)
+	public static final double ADU_U3O8 = 0.96;                    // calcined U3O8 (uranium-mill.md: ADU and a calciner give 94-98 %)
+	public static final double CALCINER_FIRING_WATTS = 600_000.0;  // the multiple-hearth calciner's burners at 750-800 C (proposed)
+	public static final double CALCINER_WATTS = 15_000.0;          // its rabble drive and off-gas fan (unverified), the industrial supply
+	public static final double CALCINER_U3O8_KGS = 0.45;           // the calciner's most: the mill's full rate
+	public static final double CALCINER_WARMUP_SECONDS = 300.0;    // from cold to 750 C (proposed)
+	public static final double CONV_H2_PER_U_ADU = 5.65e-3;        // kg of H2 a kg of U: U3O8 + 2 H2 -> 3 UO2 (derived)
+	public static final double CONV_HF_MGF2_PER_U = 0.084;         // the magnesia drum's extra HF, part of CONV_HF_PER_U
+	public static final double ADU_BYPRODUCT_PER_NH3 = 3.1;        // kg of ammonium salt in the barren liquor a kg of NH3 (NH4Cl 53.5/17; counted)
+
+	// ---- Phase 16b1: conversion's cathode hydrogen, the ash bed, KOH (docs/multiblocks/conversion-extensions.md) ----------------
+	public static final double CATHODE_H2_KG_PER_F2 = 2.016 / 38.0;  // one H2 at the cathode for each F2 at the anode
+	public static final double CATHODE_SCRUBBER_WATTS = 10_000.0;  // its NaF beds' heaters and KOH polishing pump (proposed), industrial supply
+	public static final double ASH_BED_KG = 2_000.0;               // the fluorinator's bed is full at this much ash (proposed)
+	public static final double ASH_U_SHARE = 0.03;                 // uranium in the fluorinator ash (proposed)
+	public static final double ASH_DRUM_KG = 400.0;                // ash a drum
+	public static final double BED_RETIRE_SECONDS = 600.0;         // the fluorinator stopped to dump its bed (proposed)
+	public static final double BED_FLUORSPAR_KG = 500.0;           // a new bed of CaF2 (proposed)
+	public static final double ASH_LEACH_U3O8_KGS = 0.05;          // ash uranium the leach tank takes into its slurry while it leaches ore (proposed)
+	public static final double KOH_SCRUBBER_WATTS = 15_000.0;      // its recirculation pumps and lime reactor agitator (proposed), industrial supply
+	public static final double KOH_CHARGE_KG = 2_000.0;            // the first charge of KOH (proposed)
+	public static final double HF_EXCESS_PER_U = 0.43 - 0.336;    // kg of HF a kg of U the hydrofluorinator sends to its scrubber
+	public static final double KOH_PER_HF = 56.1 / 20.0;           // KOH + HF -> KF + H2O
+	public static final double LIME_PER_HF = 1.40;                 // kg of CaO a kg of HF scrubbed: 2 KF + Ca(OH)2 -> CaF2 + 2 KOH
+	public static final double CAF2_PER_HF = 1.95;                 // kg of CaF2 a kg of HF scrubbed
+	public static final double KOH_REGEN_KGS = 1.0;                // KOH the lime reactor regenerates at most a second (proposed: a batch reactor)
+	public static final double KOH_PER_CL2 = 1.58;                // kg of KOH a kg of Cl2, a membrane cell on potash (derived)
+	public static final double KCL_PER_CL2 = 2.1;                 // kg of KCl a kg of Cl2 (derived)
+
+	// ---- Phase 16c1: product assay, spin-up and cooling (docs/multiblocks/enrichment-operations.md) -----------------------------
+	public static final double RHO_PER_ASSAY = 4.0;                // 4,000 pcm a percent of U-235 below 4.95 % (proposed)
+	public static final double SPIN_UP_SECONDS = 600.0;            // rest to full speed on the converter's ramp (proposed)
+	public static final double COAST_DOWN_SECONDS = 3_600.0;       // full speed to rest in the casing's vacuum, no drive (proposed)
+	public static final double CASCADE_SKID_WATTS = 55_000.0;      // the cooling skid's pumps (proposed), industrial supply
+	public static final double CASING_RISE_C = 10.0;
+	public static final double WATER_SPECIFIC_HEAT = 4_186.0;      // J/kg K               // the cooling water's rise through the casings
+	public static final double CASING_HOT_SECONDS = 300.0;         // without cooling, CASING HOT after this (proposed)
+
+	// ---- Phase 16d1: ISR CO2, the bleed, satellites (docs/multiblocks/isr-operations.md) ----------------------------------------
+	public static final double CO2_LIQUEFIER_KGH = 150.0;          // kiln-gas CO2 recovery at about 20 bar and -25 C (proposed)
+	public static final double CO2_LIQUEFIER_WATTS = 75_000.0;     // its compressor and refrigeration, about 0.4 kWh a kg (proposed), industrial supply
+	public static final double CO2_TANK_KG = 30_000.0;             // the insulated liquid CO2 tank
+	public static final double CO2_DOSE_KG_PER_L = 0.0005;         // 0.5 g/L of injection (proposed)
+	public static final double CO2_HEAD_FACTOR = 1.3;              // the head grade at the full dose against oxygen alone (proposed)
+	public static final double RESIN_TRAILER_U3O8_KG = 800.0;      // 10 m3 of resin at 80 g/L (proposed)
+	public static final double RESIN_TRANSFER_KGS = 4.0;           // U3O8 on resin moved a second between trailer and columns (proposed: a resin transfer pump)
 }

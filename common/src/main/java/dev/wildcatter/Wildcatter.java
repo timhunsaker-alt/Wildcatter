@@ -54,6 +54,7 @@ public final class Wildcatter {
 
 	public static void serverStarted(MinecraftServer server) {
 		dev.wildcatter.energy.StandardData.apply(server);
+		Rules.load();
 	}
 
 	/** Static per-world state must not survive into the next world opened in the same session. */

@@ -14,4 +14,9 @@ public final class Isr {
 	public static double headGrade(int injectors, double oxygen, double grade, double left) {
 		return Tuning.ISR_HEAD_GRADE_MG_L * Math.min(injectors, 4) / 4.0 * oxygen * grade / Tuning.ROLL_PEAK_GRADE * left;
 	}
+
+	/** 16d1: the head grade's CO2 factor: 1 with none, {@link Tuning#CO2_HEAD_FACTOR} at the full dose (the share of the full dose, 0 to 1). */
+	public static double co2Factor(double dose) {
+		return 1 + (Tuning.CO2_HEAD_FACTOR - 1) * Math.max(0, Math.min(1, dose));
+	}
 }

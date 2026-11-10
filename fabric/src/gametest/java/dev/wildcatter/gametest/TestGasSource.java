@@ -45,8 +45,15 @@ public final class TestGasSource implements ModInitializer {
 		}
 	}
 
-	static final class SourceEntity extends BlockEntity implements FluidNode {
+	static final class SourceEntity extends BlockEntity implements FluidNode, dev.wildcatter.block.Mixed {
 		Product product = Product.BIOGAS;
+		/** What a liquor it offers carries (Phase 16: strip liquor's U3O8 in kg a litre, in share 0). */
+		final double[] mix = new double[5];
+
+		@Override
+		public double[] mixOf(Product wanted) {
+			return mix;
+		}
 		double rate = 1.0;
 		double taken;
 		private double buffer;

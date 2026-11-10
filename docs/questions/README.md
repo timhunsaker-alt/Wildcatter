@@ -11,6 +11,15 @@ Format of an entry:
 - **Why:** the reason, with the real-world counterpart.
 - **Alternatives:** the other options and what they would change.
 
+## Files
+
+| File | Wave | Entries |
+|---|---|---|
+| `phase16-uranium.md` | Phase 16: ADU, conversion's cathode hydrogen, ash bed and KOH, product assay, spin-up and cooling, ISR CO2, bleed and satellites | numbered across 16a-16d1 |
+
 ## Start here
+
+- **Phase 16 opt-in rules** (`phase16-uranium.md` #8): `fluorinatorAshBed` and `cascadeSpinUp` in `config/wildcatter.properties` are
+  off by default so no existing world changes. Should they be on for new worlds?
 
 The index of both mods' questions, and the short list of what waits on you, is in Tailings: `tailings/docs/questions/README.md`.

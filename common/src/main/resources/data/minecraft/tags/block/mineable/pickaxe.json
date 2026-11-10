@@ -384,6 +384,13 @@
     "wildcatter:estop",
     "wildcatter:pilot_light",
     "wildcatter:stack_light",
-    "wildcatter:horn"
+    "wildcatter:horn",
+    "wildcatter:uranium_calciner",
+    "wildcatter:cathode_gas_scrubber",
+    "wildcatter:koh_scrubber",
+    "wildcatter:cascade_cooling_skid",
+    "wildcatter:co2_liquefier",
+    "wildcatter:co2_storage_tank",
+    "wildcatter:resin_trailer"
   ]
 }

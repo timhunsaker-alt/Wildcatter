@@ -12,7 +12,7 @@ final class ReactorNeutronics {
 		// reactivity and r.kinetics
 		double fuel = 0;
 		for (int i = 0; i < r.assemblies; i++) {
-			fuel += Tuning.ASSEMBLY_RHO_FRESH - Tuning.ASSEMBLY_RHO_PER_GWD * r.burnup[i];
+			fuel += Enrichment.freshRho(r.assay[i]) - Tuning.ASSEMBLY_RHO_PER_GWD * r.burnup[i];   // 16c1: its assay
 		}
 		fuel = r.assemblies == 0 ? -1 : fuel / Tuning.CORE_ASSEMBLIES - (Tuning.CORE_ASSEMBLIES - r.assemblies) * 0.05;
 		double centre = r.rccas > 0 ? Tuning.ROD_WORTH_CENTRE : 0;

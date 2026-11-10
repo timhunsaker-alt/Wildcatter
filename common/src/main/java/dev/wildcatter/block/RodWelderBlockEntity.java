@@ -63,6 +63,12 @@ public class RodWelderBlockEntity extends UnitMotorBlockEntity implements Hopper
 		return rack;
 	}
 
+	private double assay = Tuning.ASSAY_PRODUCT;   // 16c1: of the rods in its rack
+
+	public double rodAssay() {
+		return assay;
+	}
+
 	public boolean takeRod() {
 		if (rack <= 0) {
 			return false;
@@ -110,6 +116,7 @@ public class RodWelderBlockEntity extends UnitMotorBlockEntity implements Hopper
 			return;
 		}
 		if (progress <= 1e-9) {
+			assay = FuelStage.blend(rack, assay, 1, loader.fuelAssay());   // 16c1
 			loader.takeRod();
 			progress = 1e-6;
 		}
@@ -137,6 +144,7 @@ public class RodWelderBlockEntity extends UnitMotorBlockEntity implements Hopper
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
+		output.putDouble("assay", assay);
 		ContainerHelper.saveAllItems(output, slots);
 		output.putDouble("helium", helium);
 		output.putBoolean("cylinder", cylinder);
@@ -148,6 +156,7 @@ public class RodWelderBlockEntity extends UnitMotorBlockEntity implements Hopper
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		assay = input.getDoubleOr("assay", Tuning.ASSAY_PRODUCT);
 		slots.clear();
 		ContainerHelper.loadAllItems(input, slots);
 		helium = input.getDoubleOr("helium", 0);

@@ -33,8 +33,15 @@ final class TestGasSource {
 		}
 	}
 
-	static final class SourceEntity extends BlockEntity implements FluidNode {
+	static final class SourceEntity extends BlockEntity implements FluidNode, dev.wildcatter.block.Mixed {
 		Product product = Product.BIOGAS;
+		/** What a liquor it offers carries (Phase 16's scenes: strip liquor's U3O8 in kg a litre, in share 0). */
+		final double[] mix = new double[5];
+
+		@Override
+		public double[] mixOf(Product wanted) {
+			return mix;
+		}
 		/** m3 a second it makes; it holds a second's worth. */
 		double rate = 1.0;
 		/** m3 taken from it, all told. */

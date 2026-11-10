@@ -1448,6 +1448,11 @@ sized for a 40-pot line.
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- Phase 16 (uranium routes and plant operations, 2026-11-10; `docs/questions/phase16-uranium.md`): script-drawn icons
+  `u3o8_drum_placeholder` (16a), `fluorinator_ash_drum_placeholder`, `synthetic_fluorspar_placeholder` (16b1). The chlor-alkali cell on
+  potash has no scene (16b1). A fuel assembly stood up as a block keeps no assay and reads 4.95 % when broken (16c1). The producer's CO2
+  factor is unit-tested, not run in a scene (16d1). Not built in 16a: uranyl peroxide precipitation, ammonia recovery, ASTM C967 impurity penalties.
+  16b2, 16c2 and 16d2 are planned in ROADMAP, not built.
 - Phase 14 (the ammonia plant): the `gauze_pack` and `emulsifier_pail` icons are Ludo art since the art wave (2026-11-09); no
   placeholder is left. The six parts use the mod's materials. Not built: the ammonia leak hazard, AN solution setting in a cold
   pipe, an IBC for matrix, a PGM refinery (a gauze pack is crafted straight from platinum reef ore and a worn pack is not recovered),
@@ -1838,3 +1843,55 @@ Branch `misc-gaps`.
 - **Field Manual:** GENSETS (the derate on coke oven gas), PEAKER (no coke oven gas, the Wobbe index).
 - **Tests:** unit test `LeanGasTest` (3). NeoForge server scenes `cog_derate` (860 kW held against a 1 MW bank), `aero_lean_gas`,
   `cracker_pump` (a furnace filled 0 to 200 L by a process water pump on a diesel set), `alternator_frames`, `drawn_runs`.
+
+## Phase 16: uranium routes and plant operations (2026-11-10; built while Tim was away; decisions: `docs/questions/phase16-uranium.md`)
+Plan: `docs/ideas-plan.md`. Branch `phase16`. Nothing changes what an existing world already does.
+- **16a, ADU yellowcake** (`docs/multiblocks/adu-yellowcake.md`, "As built"):
+  - URANIUM CALCINER (3 x 8 x 3, a mill part): a six-hearth calciner against the precipitation tank and the drum filler, in the dryer's
+    place. Burners 0.6 MW on gas or LPG (east face, bottom); rabble drive and off-gas fan 15 kW on the industrial supply, its box on the
+    north face of its main cell. FIRING UP for 5 minutes from cold, then up to 0.45 kg of U3O8 a second.
+  - The precipitation tank takes liquid ammonia on the east face of its bottom cells: ADU at pH 7.5, 0.2 kg of NH3 a kg of U3O8, held
+    apart from the magnesia precipitate. NO AMMONIA, NO CALCINER. Without ammonia the tank runs on magnesia as before.
+  - New item U3O8 DRUM (96 %): 384 kg of U3O8, 326 kg of U. The drum filler holds the two concentrates apart.
+  - Conversion: the reducer takes both drums; the share from U3O8 drums follows the uranium down the line: 5.65 g of hydrogen a kg of
+    U, HF 0.43 kg (no MgF2), ash 0.049 kg.
+  - Field Manual page ADU AND THE CALCINER.
+  - Tests: NeoForge scene `adu_yellowcake` passes; unit test `UraniumOperationsTest` (16a: H2 derivation, the drums' uranium, one
+    ammonia plant feeds 76 kg/h of U3O8).
+- **16b1, conversion's by-products** (`docs/multiblocks/conversion-extensions.md`, "As built (16b1)"):
+  - CATHODE GAS SCRUBBER (2 x 4 x 2, 10 kW, box north): against the fluorine cell house, its 28.6 Nm3/h of cathode hydrogen to a pipe
+    for the reducer; what the pipe cannot take is vented, as is all of it with no scrubber.
+  - The fluorinator's bed: RETIRE BED (sneak-click, or a PLC point; also BED FULL and RETIRING): ten minutes, the ash into Fluorinator Ash
+    Drums (400 kg, 3 % U), a new bed of 500 kg of fluorspar. BED FULL at 2 t stops it only with `fluorinatorAshBed=true` in
+    `config/wildcatter.properties` (new class `Rules`; default off). The leach tank takes ash drums by hopper and leaches their uranium
+    with the ore.
+  - KOH SCRUBBER (3 x 8 x 3, 15 kW): against the hydrofluorinator; first charge of 2,000 kg of KOH as caustic potash (new pipe product,
+    32 %) from a chlor-alkali cell given potash; quicklime regenerates it; CaF2 out in 1 t bags of Synthetic Fluorspar (the HF kiln and a
+    new bed take them); SPENT stops the hydrofluorinator.
+  - Field Manual pages CONVERSION'S BY-PRODUCTS and KOH SCRUBBER.
+  - Tests: NeoForge scene `conversion_extensions` passes; `UraniumOperationsTest` adds the hydrogen, KOH and ash balances.
+- **16c1, enrichment operations** (`docs/multiblocks/enrichment-operations.md`, "As built (16c1)"):
+  - The feed station's sneak-click steps its assays (product 3.0-4.95 %, tails 0.20-0.30 %); `fluid/Enrichment` works from any pair.
+  - New item component `wildcatter:assay` on 30Bs and fuel assemblies (none means 4.95 %); the fuel plant, rod welder and assembly fixture
+    carry it; the reactor keeps each assembly's (fresh reactivity 4,000 pcm less a percent below 4.95 %).
+  - CASCADE COOLING SKID (3 x 3 x 6, 55 kW): against the header, circulating water in front, warm water out the back; a cascade that has
+    had one reads CASING HOT after 5 minutes without cooling and holds its feed.
+  - Spin-up and coast-down with `cascadeSpinUp=true` (default off): COASTING machines keep separating as they slow.
+  - Field Manual page CASCADE OPERATIONS.
+  - Tests: NeoForge scene `cascade_operations` passes; `UraniumOperationsTest` adds the spec's assay table, fresh reactivity, cooling water.
+- **16d1, ISR operations** (`docs/multiblocks/isr-operations.md`, "As built (16d1)"):
+  - CO2 LIQUEFIER (3 x 4 x 6, 75 kW) against a lime kiln: up to 150 kg/h of its CO2 as liquid CO2 (new pipe product, kg).
+  - CO2 STORAGE TANK (3 x 3 x 8, 30 t) against the header house: 0.5 g/L into the injection header; injectors carry the dose and the
+    producers' head grade rises by up to 30 %; NO CO2 with the tank empty.
+  - The bleed out of the header house's back, one up, as wellfield bleed (new pipe product) to the injection pump and a disposal well.
+  - IX columns SATELLITE / ELUTION (sneak-click); RESIN TRAILER (2 x 3 x 6 block, one item carrying its loading, 800 kg of U3O8).
+  - Field Manual page ISR: CO2, BLEED, SATELLITES.
+  - Tests: NeoForge scene `isr_operations` passes; `UraniumOperationsTest` adds the kiln's CO2, the dose, the CO2 factor, the trailer.
+- **End of the wave set (2026-11-10):** the full NeoForge server suite passes, 54 of 54 (53 Wildcatter scenes, 4 of them Phase 16's, and
+  vanilla's `always_pass`), twice in a row; a first run failed `mv_span_flashover` once (it passed alone and in both reruns: flaky, not
+  Phase 16 code). Unit tests: 360, 2 skipped, 0 failed. The runner can hang and run out of memory after the last scene when vanilla's
+  batch happens to run after Wildcatter's (seen with `cascade_operations` alone and with `mv_span_flashover` alone; both had passed).
+- **Client scene `aduYellowcake`** (filmed, passes): the ADU line on one diesel set, FIRING UP, the calciner calcining, a 96 % drum, then
+  NO AMMONIA; screenshots `wildcatter-adu-*`. The other Phase 16 waves have server scenes only; the client `conversion`, `cascade` and
+  `isrWellfield` scenes are unchanged and were not run.
+

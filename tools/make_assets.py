@@ -2756,6 +2756,56 @@ lang.update({"block.wildcatter.control_cable": "Control Cable (multi-core)", "bl
 	"block.wildcatter.air_tubing": "Instrument Air Tubing", "block.wildcatter.air_compressor": "Instrument Air Compressor", "block.wildcatter.air_dryer": "Air Dryer", "block.wildcatter.day_tank": "Water Day Tank (1 m3)", "block.wildcatter.transmitter": "Transmitter (4-20 mA)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 16: uranium routes and plant operations (docs/ideas-plan.md) --------------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/; here loot, names, tags, recipes and the items' placeholders.
+def phase16_parts(parts):
+	for name in parts:
+		big_part_loot(name)
+	for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+		t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+		wanted = [f"{ns}:{n}" for n in parts]
+		t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+		save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+
+
+def phase16_items(items):
+	lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+	for item, (name, colour) in items.items():
+		tex(f"{item}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+		save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}_placeholder"}})
+		save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+		lang[f"item.{ns}.{item}"] = name
+	save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+
+def phase16_names(names):
+	lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+	lang.update({f"block.{ns}.{k}": v for k, v in names.items()})
+	save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+
+S_, P_ = f"{ns}:steel_ingot", f"{ns}:gas_line"
+# 16a: ADU yellowcake (docs/multiblocks/adu-yellowcake.md)
+phase16_parts(("uranium_calciner",))
+shaped("uranium_calciner", ["SFS", "BXB", "SPS"], {"S": S_, "F": "minecraft:blast_furnace", "B": "minecraft:bricks", "X": "minecraft:piston", "P": P_}, "uranium_calciner")
+phase16_items({"u3o8_drum": ("U3O8 Drum (96 %)", (60, 56, 50))})
+phase16_names({"uranium_calciner": "Uranium Calciner (six hearths, 0.6 MW)"})
+# 16b1: cathode hydrogen, the ash bed, KOH (docs/multiblocks/conversion-extensions.md)
+phase16_parts(("cathode_gas_scrubber", "koh_scrubber"))
+shaped("cathode_gas_scrubber", ["SPS", "GCG", "SSS"], {"S": S_, "P": P_, "G": "minecraft:glass", "C": "minecraft:copper_ingot"}, "cathode_gas_scrubber")
+shaped("koh_scrubber", ["SPS", "SCS", "SXS"], {"S": S_, "P": P_, "C": "minecraft:cauldron", "X": "minecraft:piston"}, "koh_scrubber")
+phase16_items({"fluorinator_ash_drum": ("Fluorinator Ash Drum", (120, 110, 100)), "synthetic_fluorspar": ("Synthetic Fluorspar (1 t bag)", (200, 190, 220))})
+phase16_parts(("cascade_cooling_skid",))
+shaped("cascade_cooling_skid", ["SPS", "XWX", "SSS"], {"S": S_, "P": P_, "X": "minecraft:piston", "W": "minecraft:water_bucket"}, "cascade_cooling_skid")
+phase16_names({"cascade_cooling_skid": "Cascade Cooling Skid (55 kW)"})
+# 16d1: ISR CO2, the bleed, satellites (docs/multiblocks/isr-operations.md)
+phase16_parts(("co2_liquefier", "co2_storage_tank", "resin_trailer"))
+shaped("co2_liquefier", ["SPS", "XIX", "SGS"], {"S": S_, "P": P_, "X": "minecraft:piston", "I": "minecraft:iron_block", "G": "minecraft:glass"}, "co2_liquefier")
+shaped("co2_storage_tank", ["SSS", "W W", "SPS"], {"S": S_, "W": "minecraft:white_wool", "P": P_}, "co2_storage_tank")
+shaped("resin_trailer", ["SBS", "S S", "C C"], {"S": S_, "B": "minecraft:barrel", "C": "minecraft:minecart"}, "resin_trailer")
+phase16_names({"co2_liquefier": "CO2 Liquefier (150 kg/h, 75 kW)", "co2_storage_tank": "CO2 Storage Tank (30 t)", "resin_trailer": "Resin Trailer (10 m3 of IX resin)"})
+phase16_names({"cathode_gas_scrubber": "Cathode Gas Scrubber (NaF beds, 10 kW)", "koh_scrubber": "KOH Scrubber (with lime regeneration, 15 kW)"})
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

@@ -28,6 +28,18 @@ public class ReductionReactorBlockEntity extends PlantUnitBlockEntity implements
 	private final NonNullList<ItemStack> slots = NonNullList.withSize(1 + OUT, ItemStack.EMPTY);
 	private double feed;      // kg of U of yellowcake tipped in, not yet reduced
 	private double uranium;   // kg of U as UO2
+	private double aduFeed;   // of the feed, kg of U from 96 % U3O8 drums (16a)
+	private double aduShare;  // of the UO2 held, the share from them
+	private double hydrogenKg; // kg of H2 used, and kg of U reduced, since placed (the game test reads them)
+	private double reducedU;
+
+	public double hydrogenKg() {
+		return hydrogenKg;
+	}
+
+	public double reducedU() {
+		return reducedU;
+	}
 
 	public ReductionReactorBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.REDUCTION_REACTOR_ENTITY, pos, state);
@@ -40,7 +52,7 @@ public class ReductionReactorBlockEntity extends PlantUnitBlockEntity implements
 
 	@Override
 	public boolean takes(ItemStack stack) {
-		return stack.is(WildcatterItems.YELLOWCAKE_DRUM);
+		return stack.is(WildcatterItems.YELLOWCAKE_DRUM) || stack.is(WildcatterItems.U3O8_DRUM);
 	}
 
 	@Override
@@ -73,6 +85,21 @@ public class ReductionReactorBlockEntity extends PlantUnitBlockEntity implements
 	}
 
 	@Override
+	public double aduShare() {
+		return aduShare;
+	}
+
+	/** kg of U in a 96 % U3O8 drum (16a). */
+	public static double uraniumPerAduDrum() {
+		return Tuning.DRUM_NET_KG * Tuning.ADU_U3O8 * dev.wildcatter.ore.Ore.U_IN_U3O8;
+	}
+
+	/** kg of H2 a kg of U for a feed with this share of U3O8 drums. */
+	public static double hydrogenKgPerU(double adu) {
+		return Tuning.CONV_H2_PER_U * (1 - adu) + Tuning.CONV_H2_PER_U_ADU * adu;
+	}
+
+	@Override
 	public double takeUranium(double kg) {
 		double got = Math.min(kg, uranium);
 		uranium -= got;
@@ -90,8 +117,11 @@ public class ReductionReactorBlockEntity extends PlantUnitBlockEntity implements
 		for (int i = 1; i <= OUT; i++) {
 			ItemStack out = slots.get(i);
 			if (out.isEmpty() || (out.is(WildcatterItems.EMPTY_DRUM) && out.getCount() < out.getMaxStackSize())) {
+				boolean calcined = slots.get(0).is(WildcatterItems.U3O8_DRUM);
 				useOne();
-				feed += uraniumPerDrum();
+				double u = calcined ? uraniumPerAduDrum() : uraniumPerDrum();
+				feed += u;
+				aduFeed += calcined ? u : 0;
 				if (out.isEmpty()) {
 					slots.set(i, new ItemStack(WildcatterItems.EMPTY_DRUM));
 				} else {
@@ -114,7 +144,9 @@ public class ReductionReactorBlockEntity extends PlantUnitBlockEntity implements
 			r.tip();
 		}
 		double waiting = Lines.available(level, r.hydrogen(), Product.HYDROGEN, Pull.MACHINE, r);
-		double kg = Math.min(Math.min(max, r.feed), waiting / Conversion.hydrogenM3PerU());
+		double share = r.feed > 1e-9 ? Math.min(1, r.aduFeed / r.feed) : 0;
+		double m3PerU = hydrogenKgPerU(share) / Tuning.H2_KG_PER_M3;
+		double kg = Math.min(Math.min(max, r.feed), waiting / m3PerU);
 		if (r.feed < 1e-6) {
 			r.status = "idle: no yellowcake (put a hopper of yellowcake drums on top)";
 		} else if (waiting < 1e-6) {
@@ -122,10 +154,15 @@ public class ReductionReactorBlockEntity extends PlantUnitBlockEntity implements
 		} else if (kg <= 1e-7) {
 			r.status = "idle: the hydrofluorinator is full";
 		} else {
-			Lines.pull(level, r.hydrogen(), Product.HYDROGEN, kg * Conversion.hydrogenM3PerU(), Pull.MACHINE, r);
+			Lines.pull(level, r.hydrogen(), Product.HYDROGEN, kg * m3PerU, Pull.MACHINE, r);
+			r.aduShare = UraniumStage.blend(r.uranium, r.aduShare, kg, share);
 			r.feed -= kg;
+			r.aduFeed = Math.max(0, r.aduFeed - kg * share);
 			r.uranium += kg;
-			r.status = String.format("reducing %.3f kg/s of U to UO2 with %.1f m3/h of hydrogen", kg / seconds(), kg * Conversion.hydrogenM3PerU() / seconds() * 3600);
+			r.hydrogenKg += kg * m3PerU * Tuning.H2_KG_PER_M3;
+			r.reducedU += kg;
+			r.status = String.format("reducing %.3f kg/s of U to UO2 with %.1f m3/h of hydrogen", kg / seconds(), kg * m3PerU / seconds() * 3600)
+					+ (share > 0.001 ? String.format(" (%.0f %% of it from U3O8 drums)", share * 100) : "");
 		}
 		r.setChanged();
 	}
@@ -141,6 +178,10 @@ public class ReductionReactorBlockEntity extends PlantUnitBlockEntity implements
 		ContainerHelper.saveAllItems(output, slots);
 		output.putDouble("feed", feed);
 		output.putDouble("uranium", uranium);
+		output.putDouble("aduFeed", aduFeed);
+		output.putDouble("aduShare", aduShare);
+		output.putDouble("hydrogenKg", hydrogenKg);
+		output.putDouble("reducedU", reducedU);
 	}
 
 	@Override
@@ -150,5 +191,9 @@ public class ReductionReactorBlockEntity extends PlantUnitBlockEntity implements
 		ContainerHelper.loadAllItems(input, slots);
 		feed = input.getDoubleOr("feed", 0);
 		uranium = input.getDoubleOr("uranium", 0);
+		aduFeed = input.getDoubleOr("aduFeed", 0);
+		aduShare = input.getDoubleOr("aduShare", 0);
+		hydrogenKg = input.getDoubleOr("hydrogenKg", 0);
+		reducedU = input.getDoubleOr("reducedU", 0);
 	}
 }

@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased (phase16 branch): Phase 16, uranium routes and plant operations (built 2026-11-10 while Tim was away; not approved)
+- **ADU yellowcake (16a):** pipe liquid ammonia to the precipitation tank and set the new URANIUM CALCINER against it and the drum filler:
+  U3O8 at 96 % in a new U3O8 Drum, 326 kg of uranium against the magnesia drum's 271. Conversion needs a third less hydrogen for it, no
+  HF for magnesia and far less ash. Without ammonia the magnesia route is unchanged. Spec: `docs/multiblocks/adu-yellowcake.md`.
+- **Conversion's by-products (16b1):** a CATHODE GAS SCRUBBER sends the fluorine cells' hydrogen to the reducer; the fluorinator's bed
+  can be retired into Fluorinator Ash Drums whose uranium the mill's leach tank recovers (BED FULL stops a fluorinator only with
+  `fluorinatorAshBed=true` in `config/wildcatter.properties`); a KOH SCRUBBER cleans the hydrofluorinator's off-gas, charged with caustic
+  potash from a chlor-alkali cell run on potash and regenerated with quicklime into Synthetic Fluorspar. Spec:
+  `docs/multiblocks/conversion-extensions.md`.
+- **Enrichment operations (16c1):** sneak-click the feed station to choose the product (3.0-4.95 %) and tails (0.20-0.30 %) assays; the
+  30B, the fuel assembly and the reactor carry the assay (lower assay, shorter cycle). A CASCADE COOLING SKID cools the casings; a cascade
+  that has had one reads CASING HOT without it. Spin-up and coast-down are opt-in (`cascadeSpinUp=true`). Spec:
+  `docs/multiblocks/enrichment-operations.md`.
+- **ISR operations (16d1):** a CO2 LIQUEFIER on a lime kiln fills a CO2 STORAGE TANK; set against a header house it doses the injection
+  and raises the head grade up to 30 %. The header house's bleed can be piped to an injection pump and a disposal well. IX columns can run
+  as a SATELLITE, filling a RESIN TRAILER that the central plant's columns elute. Spec: `docs/multiblocks/isr-operations.md`.
+- Decisions for review: `docs/questions/phase16-uranium.md`.
+
 ## Unreleased (0.7.0): gas and power quick wins (Phase 14b-14d) and the protection gap wave (built 2026-11-09 while Tim was away; not approved)
 - **The sales line (14b):** a gas plant's pipeline gas goes on an off-map transmission line at a receipt meter station and comes off
   anywhere in the dimension at a delivery station, less 2 % kept as compressor fuel. Five true-size parts: meter building (2 kW,

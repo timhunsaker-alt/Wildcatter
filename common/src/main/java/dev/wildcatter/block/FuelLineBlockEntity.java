@@ -35,6 +35,8 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 	private double progress;   // the loader's rod on the bench, kg of U
 	private int rods;          // the loader's finished rods
 	private double hf, swarf;
+	private double assay = Tuning.ASSAY_PRODUCT;       // 16c1: of the uranium it holds (the loader: of its rods)
+	private double cylinderAssay = Tuning.ASSAY_PRODUCT;   // the autoclave's 30B
 	private String unit = "starting";
 
 	public FuelLineBlockEntity(BlockPos pos, BlockState state) {
@@ -45,6 +47,11 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 	@Override
 	public double fuelU() {
 		return u;
+	}
+
+	@Override
+	public double fuelAssay() {
+		return assay;
 	}
 
 	@Override
@@ -225,7 +232,9 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 			unit = "starting: " + describe();
 			return 0;
 		}
+		double a = up.fuelAssay();
 		double kg = up.takeFuelU(Math.min(Math.min(rate() * strength, room()), max));
+		assay = FuelStage.blend(u, assay, kg, a);
 		u += kg;
 		unit = String.format("%s: %.1f kg of U an hour; %.2f kg held", verb, kg / seconds() * 3600, u);
 		return kg;
@@ -242,7 +251,7 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 			loaded = false;
 		}
 		if (!loaded && fed() > 0) {
-			useOne();
+			cylinderAssay = dev.wildcatter.WildcatterComponents.assay(useOne());
 			loaded = true;
 			uf6 = Tuning.CYLINDER_30B_KG;
 		}
@@ -261,6 +270,7 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 		}
 		double kg = Math.min(Math.min(rate() * strength, room()), uf6 / Tuning.UF6_PER_U);
 		uf6 = Math.max(0, uf6 - kg * Tuning.UF6_PER_U);
+		assay = FuelStage.blend(u, assay, kg, cylinderAssay);
 		u += kg;
 		unit = String.format("vaporizing the 30B's UF6: %.0f kg/h; %,.0f kg left in it (%.1f %%)", kg * Tuning.UF6_PER_U / seconds() * 3600, uf6,
 				uf6 / Tuning.CYLINDER_30B_KG * 100);
@@ -308,7 +318,9 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 			slots.get(0).shrink(1);
 			steel -= Tuning.ROD_STEEL_KG;
 		}
+		double a = up.fuelAssay();
 		double kg = up.takeFuelU(Math.min(rate() * strength, Fuel.rodU() - progress));
+		assay = FuelStage.blend(rods * Fuel.rodU() + progress, assay, kg, a);
 		progress += kg;
 		if (progress >= Fuel.rodU() - 1e-9) {
 			progress = 0;
@@ -335,6 +347,8 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 	@Override
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
+		output.putDouble("assay", assay);
+		output.putDouble("cylinderAssay", cylinderAssay);
 		ContainerHelper.saveAllItems(output, slots);
 		output.putDouble("u", u);
 		output.putBoolean("loaded", loaded);
@@ -350,6 +364,8 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 	@Override
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
+		assay = input.getDoubleOr("assay", Tuning.ASSAY_PRODUCT);
+		cylinderAssay = input.getDoubleOr("cylinderAssay", Tuning.ASSAY_PRODUCT);
 		slots.clear();
 		ContainerHelper.loadAllItems(input, slots);
 		u = input.getDoubleOr("u", 0);

@@ -168,8 +168,9 @@ public class RefuellingMachineBlockEntity extends UnitMotorBlockEntity implement
 			switch (move) {
 				case TO_POOL -> pool.store(level, r.removeAssembly(r.mostBurned()));
 				case FRESH -> {
+					double a = dev.wildcatter.WildcatterComponents.assay(slots.get(0));
 					slots.get(0).shrink(1);
-					r.loadAssembly(0);
+					r.loadAssembly(0, a);
 				}
 				default -> {
 				}

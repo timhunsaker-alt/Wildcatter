@@ -26,8 +26,10 @@ import org.jspecify.annotations.Nullable;
  * solids for the tailings.
  */
 public class LeachTankBlockEntity extends UnitMotorBlockEntity implements HopperFed {
-	private final NonNullList<ItemStack> slots = NonNullList.withSize(1, ItemStack.EMPTY);
+	private final NonNullList<ItemStack> slots = NonNullList.withSize(2, ItemStack.EMPTY);   // pyrolusite; fluorinator ash drums (16b1)
 	private double mno2;
+	private double ashU3o8;     // kg of U3O8 from fluorinator ash drums, leached in with the ore (16b1)
+	private double ashLeached;
 	private String unit = "starting";
 
 	public LeachTankBlockEntity(BlockPos pos, BlockState state) {
@@ -42,6 +44,31 @@ public class LeachTankBlockEntity extends UnitMotorBlockEntity implements Hopper
 	@Override
 	public boolean takes(ItemStack stack) {
 		return stack.is(OreBlocks.MINERALS.get(Ore.PYROLUSITE));
+	}
+
+	@Override
+	public int[] getSlotsForFace(Direction side) {
+		return side == Direction.UP ? new int[] {0, 1} : new int[0];
+	}
+
+	@Override
+	public boolean canPlaceItem(int slot, ItemStack stack) {
+		return slot == 0 ? takes(stack) : slot == 1 && stack.is(dev.wildcatter.WildcatterItems.FLUORINATOR_ASH_DRUM);
+	}
+
+	@Override
+	public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
+		return side == Direction.UP && canPlaceItem(slot, stack);
+	}
+
+	/** kg of U3O8 from ash drums leached into its slurry so far. */
+	public double ashLeached() {
+		return ashLeached;
+	}
+
+	/** kg of U3O8 in one fluorinator ash drum. */
+	public static double u3o8PerAshDrum() {
+		return Tuning.ASH_DRUM_KG * Tuning.ASH_U_SHARE / Ore.U_IN_U3O8;
 	}
 
 	private List<Lines.Face> inlet() {
@@ -102,6 +129,15 @@ public class LeachTankBlockEntity extends UnitMotorBlockEntity implements Hopper
 		mno2 = Math.max(0, mno2 - solids * Mill.mno2PerOre());
 		double out = got + acidL * Tuning.ACID_KG_PER_L;
 		double dissolved = got * in[0] * Tuning.MILL_RECOVERY;
+		// 16b1: fluorinator ash drums tipped in and leached with the ore, their uranium into the same liquor
+		if (ashU3o8 < 1e-6 && !slots.get(1).isEmpty()) {
+			slots.get(1).shrink(1);
+			ashU3o8 += u3o8PerAshDrum();
+		}
+		double ash = Math.min(ashU3o8, Tuning.ASH_LEACH_U3O8_KGS * seconds() * strength);
+		ashU3o8 -= ash;
+		ashLeached += ash;
+		dissolved += ash * Tuning.MILL_RECOVERY;
 		addMixed(Product.LEACH_SLURRY, out, new double[] {dissolved / out, solids / out, 0, 0, 0});
 		unit = String.format("leaching %.1f kg/s of ore with %.2f L/s of acid: %.3f kg/s of U3O8 dissolved (%.0f %%)", solids / seconds(), acidL / seconds(),
 				dissolved / seconds(), Tuning.MILL_RECOVERY * 100);
@@ -109,7 +145,8 @@ public class LeachTankBlockEntity extends UnitMotorBlockEntity implements Hopper
 
 	@Override
 	public Component inspect() {
-		return Component.literal("Leach tank: " + unit + String.format("; pyrolusite %,.0f kg and %d blocks; ", mno2, fed()) + describe());
+		String ash = ashLeached > 0 || !slots.get(1).isEmpty() ? String.format("; ash drums %d waiting, %.1f kg of U3O8 from ash leached", slots.get(1).getCount(), ashLeached) : "";
+		return Component.literal("Leach tank: " + unit + String.format("; pyrolusite %,.0f kg and %d blocks%s; ", mno2, fed(), ash) + describe());
 	}
 
 	@Override
@@ -117,6 +154,8 @@ public class LeachTankBlockEntity extends UnitMotorBlockEntity implements Hopper
 		super.saveAdditional(output);
 		ContainerHelper.saveAllItems(output, slots);
 		output.putDouble("mno2", mno2);
+		output.putDouble("ashU3o8", ashU3o8);
+		output.putDouble("ashLeached", ashLeached);
 	}
 
 	@Override
@@ -125,5 +164,7 @@ public class LeachTankBlockEntity extends UnitMotorBlockEntity implements Hopper
 		slots.clear();
 		ContainerHelper.loadAllItems(input, slots);
 		mno2 = input.getDoubleOr("mno2", 0);
+		ashU3o8 = input.getDoubleOr("ashU3o8", 0);
+		ashLeached = input.getDoubleOr("ashLeached", 0);
 	}
 }

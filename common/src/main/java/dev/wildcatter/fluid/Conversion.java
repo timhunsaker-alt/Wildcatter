@@ -46,6 +46,11 @@ public final class Conversion {
 		return Tuning.CYLINDER_48Y_KG / Tuning.UF6_PER_U / uraniumKgs() / 3600;
 	}
 
+	/** m3 of cathode hydrogen a kg of fluorine: one H2 at the cathode for each F2 (16b1, docs/multiblocks/conversion-extensions.md). */
+	public static double cathodeM3PerF2() {
+		return Tuning.CATHODE_H2_KG_PER_F2 / Tuning.H2_KG_PER_M3;
+	}
+
 	/** Joules of fuel a m3 of H2 the reformer burns and reforms (natural gas, or LPG at the same heat). */
 	public static double reformerJoulesPerM3() {
 		return Tuning.SMR_GAS_PER_H2 * Tuning.GAS_JOULES_PER_M3;

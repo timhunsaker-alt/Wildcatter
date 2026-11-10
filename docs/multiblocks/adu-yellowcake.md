@@ -1,6 +1,7 @@
 # The purer yellowcake route: ADU precipitation and a calciner
 
-> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Proposed phase **16a**. Decisions are in
+> **BUILT as wave 16a (2026-11-10), decided on recommendation while Tim was away; not approved.** See "As built" at the end and
+> `docs/questions/phase16-uranium.md` (items 1-7). Drafted as proposed phase **16a**. Decisions are in
 > `docs/questions/specs-wildcatter.md` (items 23-26). Depends on the ammonia plant (ammonia-plant.md, approved 2026-11-09).
 
 The uranium mill (uranium-mill.md) precipitates with magnesia and spray-dries a **magnesium diuranate at about 80 % U3O8**. Most real
@@ -88,3 +89,24 @@ The grid is a sketch; the game test is the layout of record.
 
 ## Proposed wave
 **16a**, once the ammonia plant is built (Tailings' P3 brings it).
+
+## As built (16a, 2026-11-10; decisions in `docs/questions/phase16-uranium.md`, items 1-7)
+- **The calciner** (`wildcatter:uranium_calciner`, 3 x 8 x 3, a mill part): touches the precipitation tank and the drum filler, as the
+  dryer does. Burners 0.6 MW on pipeline gas, separator gas, LPG, coker or coke oven gas on the east face of its bottom cells; its
+  rabble drive and off-gas fan 15 kW on the world's industrial supply, **its box on the north face of its main cell** (the west face
+  stands against the tank). Five minutes from cold to 750 C (FIRING UP), up to 0.45 kg of U3O8 a second, holding its hearths hot on
+  a fifth of its gas when idle, cooling at a third of its warm-up rate when stopped. Off-gas counted (about 0.37 kg a kg of U3O8).
+- **The tank:** ammonia on the east face of its bottom cells. With ammonia waiting it precipitates ADU (0.2 kg of NH3, 0.33 L of liquid
+  ammonia, a kg of U3O8), held apart from the magnesia precipitate; with none it runs on magnesia exactly as before. After an ADU batch,
+  with neither reagent it reads **NO AMMONIA**; without a calciner touching it, **NO CALCINER** (the ADU waits). Ammonium salt in the
+  barren liquor counted (3.1 kg a kg of NH3).
+- **The drum:** a new item, **U3O8 Drum (96 %)** (`u3o8_drum`): 384 kg of U3O8, 326 kg of U. The magnesia route's Yellowcake Drum is
+  unchanged. The filler holds the two concentrates apart.
+- **Conversion:** the reduction reactor takes both drums and tracks the share of its uranium from U3O8 drums down the line: hydrogen
+  5.65 g a kg of U for that share, the hydrofluorinator's HF 0.43 kg a kg of U (no 0.084 for magnesia), the fluorinator's ash on the
+  4 % basis (0.049 kg a kg of U against 0.295).
+- **Existing worlds:** nothing changes without ammonia piped to a tank; a tank, filler, reducer or stage saved before loads with no ADU
+  and a share of 0.
+- **Tests:** NeoForge scene `adu_yellowcake` (ADU at 0.5 kg/s of U3O8 on 585 L/h of ammonia; FIRING UP; a 96 % drum; reducer 5.65 g of
+  H2 a kg of U; hydrofluorinator 0.430 kg of HF; NO AMMONIA; back to magnesia). Unit test `UraniumOperationsTest`. The dryer's magnesia
+  drum is the `uraniumMill` client scene's, unchanged.

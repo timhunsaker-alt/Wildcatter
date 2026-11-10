@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "XWX",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "X": "minecraft:piston",
+    "W": "minecraft:water_bucket"
+  },
+  "result": {
+    "id": "wildcatter:cascade_cooling_skid",
+    "count": 1
+  }
+}

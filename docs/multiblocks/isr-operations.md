@@ -1,7 +1,8 @@
 # ISR wellfield operations: CO2, monitor wells, the bleed, restoration, satellite IX
 
-> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Proposed phase **16d** (16d1 CO2, the bleed
-> and satellites; 16d2 monitor rings, excursions and restoration). Decisions are in `docs/questions/specs-wildcatter.md`
+> **16d1 BUILT (2026-11-10), decided on recommendation while Tim was away; not approved.** See "As built (16d1)" at the end and
+> `docs/questions/phase16-uranium.md` (items 24-30). **16d2 (monitor rings, excursions, restoration) is a written plan, not built.**
+> Drafted as proposed phase **16d** (16d1 CO2, the bleed and satellites; 16d2 monitor rings, excursions and restoration). Decisions are in `docs/questions/specs-wildcatter.md`
 > (items 31-35).
 
 Five items the ISR spec (isr-wellfield.md, approved 2026-11-01) left in ROADMAP Ideas. Each has its real basis and a proposed scope.
@@ -121,3 +122,24 @@ The grid is a sketch; the game test is the layout of record.
 ## Proposed waves
 - **16d1:** CO2, the bleed to disposal, satellite IX.
 - **16d2:** monitor rings, excursions, restoration.
+
+## As built (16d1, 2026-11-10; decisions in `docs/questions/phase16-uranium.md`, items 24-30)
+- **CO2 liquefier** (`wildcatter:co2_liquefier`, 3 x 4 x 6, 75 kW, box west): against a lime kiln it takes the kiln's CO2 (the kiln keeps a
+  few seconds of its 327 kg/h for it; the rest goes up the stack) up to 150 kg/h, liquid CO2 out of the south face of its back cells.
+  New pipe product `liquid CO2` (kg), which no stock tank holds.
+- **CO2 storage tank** (`wildcatter:co2_storage_tank`, 3 x 3 x 8, 30 t): fills from the pipe at the north face of its front cells; the
+  header house it stands against doses its injection at **0.5 g/L** (113 kg/h at 25 producers) into the injection header. Injectors carry
+  the dose; a producer's head grade is multiplied by **1 + 0.3 x** the dose share (1.3 at the full dose). **NO CO2** only when a tank is
+  against the house and empty. A wellfield with no tank keeps its grade.
+- **The bleed:** out of the **south face of the header house's back cells, one block up** (the bottom row there carries the IX lines; the
+  north face the spec names looks into the house) as `wellfield bleed`, only when a pipe is there; unpiped, it is counted as before.
+  The injection pump takes it when it has no produced water, with no level switch (a small steady flow), into a disposal wellhead.
+- **Satellite IX:** a sneak-click sets IX columns to **SATELLITE** (load, no elution, no salt or acid) or back to **ELUTION** (the default).
+  A **resin trailer** (`wildcatter:resin_trailer`, a 2 x 3 x 6 block, one item, 10 m3 of resin, 800 kg of U3O8) set against a satellite is
+  filled from its resin; broken, its item carries its loading (`wildcatter:resin_u3o8`); set against central columns in ELUTION, they
+  take its resin (up to 4 kg/s of U3O8) and leave it eluted.
+- **Tests:** NeoForge scene `isr_operations` (the liquefier on kiln gas by hook into the tank; the injector carrying the full 0.5 g/L dose;
+  the bleed through an injection pump to a disposal wellhead; a satellite filling a trailer; the trailer's item keeping its loading; a
+  full trailer at the central columns making eluate; NO CO2 with the tank empty). Unit test `UraniumOperationsTest` (the kiln's CO2, the
+  dose, the CO2 factor, the trailer). The producer's head grade with CO2 is checked through `Isr.co2Factor` (the scene has no roll front).
+

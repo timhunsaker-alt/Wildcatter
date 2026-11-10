@@ -19,11 +19,13 @@ import org.jspecify.annotations.Nullable;
 /**
  * The drum filling station (5 kW, 480 V) (docs/multiblocks/uranium-mill.md): the yellowcake dryer touching it fills it; each time it
  * holds 400 kg it fills an empty drum from the hopper on top. Full drums come out to a hopper under it, or to an empty hand.
+ * 16a: a uranium calciner touching it fills it with calcined U3O8 (96 %), held apart and drummed as its own grade.
  */
 public class DrumFillerBlockEntity extends UnitMotorBlockEntity implements HopperFed {
 	private static final int OUT = 4;
 	private final NonNullList<ItemStack> slots = NonNullList.withSize(1 + OUT, ItemStack.EMPTY);
 	private double yellowcake;
+	private double u3o8;   // kg of calcined U3O8 concentrate from a calciner (16a)
 	private String unit = "starting";
 
 	public DrumFillerBlockEntity(BlockPos pos, BlockState state) {
@@ -52,6 +54,21 @@ public class DrumFillerBlockEntity extends UnitMotorBlockEntity implements Hoppe
 
 	public double yellowcake() {
 		return yellowcake;
+	}
+
+	/** Room for calcined concentrate, held apart from the magnesia route's. */
+	public double roomU3o8() {
+		return Math.max(0, Tuning.DRUM_NET_KG * 2 - u3o8);
+	}
+
+	/** kg of 96 % U3O8 concentrate from the calciner (or the game test). */
+	public void addU3o8(double kg) {
+		u3o8 += kg;
+		setChanged();
+	}
+
+	public double u3o8() {
+		return u3o8;
 	}
 
 	public int drums() {
@@ -86,8 +103,10 @@ public class DrumFillerBlockEntity extends UnitMotorBlockEntity implements Hoppe
 
 	@Override
 	protected void work(Level level) {
-		if (yellowcake < Tuning.DRUM_NET_KG) {
-			unit = String.format("filling: %.0f/%.0f kg in its hopper", yellowcake, Tuning.DRUM_NET_KG);
+		boolean calcined = u3o8 >= Tuning.DRUM_NET_KG && yellowcake < Tuning.DRUM_NET_KG;
+		if (yellowcake < Tuning.DRUM_NET_KG && !calcined) {
+			unit = u3o8 > 0.5 ? String.format("filling: %.0f/%.0f kg of U3O8 (96 %%) in its hopper", u3o8, Tuning.DRUM_NET_KG)
+					: String.format("filling: %.0f/%.0f kg in its hopper", yellowcake, Tuning.DRUM_NET_KG);
 			return;
 		}
 		if (fed() == 0) {
@@ -104,6 +123,12 @@ public class DrumFillerBlockEntity extends UnitMotorBlockEntity implements Hoppe
 			return;
 		}
 		useOne();
+		if (calcined) {
+			u3o8 -= Tuning.DRUM_NET_KG;
+			slots.set(out, new ItemStack(WildcatterItems.U3O8_DRUM));
+			unit = "filled a drum of U3O8, 96 %";
+			return;
+		}
 		yellowcake -= Tuning.DRUM_NET_KG;
 		slots.set(out, new ItemStack(WildcatterItems.YELLOWCAKE_DRUM));
 		unit = "filled a drum";
@@ -111,7 +136,8 @@ public class DrumFillerBlockEntity extends UnitMotorBlockEntity implements Hoppe
 
 	@Override
 	public Component inspect() {
-		return Component.literal(String.format("Drum filler: %s; %d full drums, %d empty; %.0f kg of yellowcake held; ", unit, drums(), fed(), yellowcake) + describe());
+		String calcined = u3o8 > 0.5 ? String.format(", %.0f kg of U3O8 (96 %%)", u3o8) : "";
+		return Component.literal(String.format("Drum filler: %s; %d full drums, %d empty; %.0f kg of yellowcake held%s; ", unit, drums(), fed(), yellowcake, calcined) + describe());
 	}
 
 	// ---- empty drums in from the top, full drums out of the bottom -------------------------------------------------------
@@ -135,6 +161,7 @@ public class DrumFillerBlockEntity extends UnitMotorBlockEntity implements Hoppe
 		super.saveAdditional(output);
 		ContainerHelper.saveAllItems(output, slots);
 		output.putDouble("yellowcake", yellowcake);
+		output.putDouble("u3o8", u3o8);
 	}
 
 	@Override
@@ -143,5 +170,6 @@ public class DrumFillerBlockEntity extends UnitMotorBlockEntity implements Hoppe
 		slots.clear();
 		ContainerHelper.loadAllItems(input, slots);
 		yellowcake = input.getDoubleOr("yellowcake", 0);
+		u3o8 = input.getDoubleOr("u3o8", 0);
 	}
 }

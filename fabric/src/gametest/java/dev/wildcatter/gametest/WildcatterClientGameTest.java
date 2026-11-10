@@ -188,6 +188,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("ammoniaPlant")) {
 				ammoniaPlant(context, server);
 			}
+			if (only("aduYellowcake")) {
+				aduYellowcake(context, server);
+			}
 			if (only("salesGas")) {
 				new GasPowerClientScenes(context, server, y, up, -8200).salesGas();
 			}
@@ -9247,6 +9250,115 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			check(starved.contains("NO SYNGAS"), "once the compressor's gas is used the converter should stop: " + starved);
 			showReadout(context, server, new BlockPos(8, up, z + 11), "tp @p 4 " + (up + 3) + " " + (z + 12) + " -90 10", "wildcatter-ammonia-no-syngas");
 			System.out.println("[wildcatter-test] ammoniaPlant ok: " + noH2 + " | " + starved);
+		} finally {
+			if (film != null) {
+				film.stop();
+			}
+		}
+	}
+
+	/**
+	 * Phase 16a, ADU yellowcake (docs/multiblocks/adu-yellowcake.md), filmed. Strip liquor (a stand-in source, as the mill's SX would
+	 * make it) and liquid ammonia from a pressure bullet to the precipitation tank; the uranium calciner against it fires up on LPG from
+	 * a second bullet and calcines the ADU into the drum filler, which fills a U3O8 drum (96 %). The filler starts near full (a hook), and
+	 * the calciner's five minutes of firing up are cut short by hook once FIRING UP has shown. Then the ammonia is cut: NO AMMONIA.
+	 * One 500 kW diesel set; the parts' boxes: the tank and filler west, the calciner north.
+	 */
+	private void aduYellowcake(ClientGameTestContext context, TestServerContext server) {
+		int z = -9300;
+		int x0 = 0;
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 18 " + (up + 14) + " " + (z + 22) + " 150 30");
+		context.waitTicks(20);
+		server.runCommand("fill -12 " + (y - 1) + " " + (z - 10) + " 26 " + (y + 14) + " " + (z + 20) + " minecraft:air");
+		server.runCommand("fill -12 " + (y - 1) + " " + (z - 10) + " 26 " + (y - 1) + " " + (z + 20) + " minecraft:stone");
+		Filming film = null;
+		try {
+			film = context.computeOnClient(client -> Filming.start(client, "aduYellowcake"));
+			BlockPos tank = new BlockPos(x0, up, z);
+			placeBig(server, WildcatterBlocks.PRECIPITATION_TANK, tank, north);                         // x 0-3, z..z+3
+			BlockPos calciner = new BlockPos(x0 + 4, up, z);
+			placeBig(server, WildcatterBlocks.URANIUM_CALCINER, calciner, north);                       // x 4-6, z..z+2, against the tank
+			BlockPos filler = new BlockPos(x0 + 7, up, z - 1);
+			placeBig(server, WildcatterBlocks.DRUM_FILLER, filler, north);                              // x 7-8, z-1..z, against the calciner
+			BlockPos nh3 = new BlockPos(x0 + 3, up, z + 6);
+			placeBig(server, WildcatterBlocks.LPG_BULLET, nh3, north);                                  // x 3-5, z+6..z+17: the ammonia
+			BlockPos lpg = new BlockPos(x0 + 7, up, z + 6);
+			placeBig(server, WildcatterBlocks.LPG_BULLET, lpg, north);                                  // x 7-9, z+6..z+17: the calciner's LPG
+			pipes(server, z, new int[][] {{1, 0, -1}, {1, -1, -1}});                                     // strip liquor in, the tank's front, from the floor
+			pipes(server, z, new int[][] {{4, 0, 3}, {4, 0, 4}, {4, 0, 5}});                             // ammonia to the tank's east side
+			pipes(server, z, new int[][] {{7, 0, 2}, {7, 0, 3}, {7, 0, 4}, {7, 0, 5}});                  // LPG to the calciner's burners
+			server.computeOnServer(srv -> {
+				srv.overworld().setBlock(new BlockPos(1, up - 2, z - 1), TestGasSource.BLOCK.defaultBlockState(), 3);   // in the floor, out of sight
+				TestGasSource.SourceEntity s = (TestGasSource.SourceEntity) srv.overworld().getBlockEntity(new BlockPos(1, up - 2, z - 1));
+				s.product = dev.wildcatter.fluid.Product.STRIP_LIQUOR;
+				s.rate = 20.0;
+				s.mix[0] = Tuning.SX_STRIP_U3O8_G_PER_L / 1000;
+				return null;
+			});
+			fillTank(server, nh3, dev.wildcatter.fluid.Product.AMMONIA, 5_000);
+			fillTank(server, lpg, dev.wildcatter.fluid.Product.LPG, 20_000);
+			BlockPos set = new BlockPos(-4, up, z - 6);
+			genset(server, set, north, false);                                                          // x -9..-4, z-6..z-5
+			java.util.List<int[]> cable = new java.util.ArrayList<>();
+			for (int x = -3; x <= 6; x++) {
+				cable.add(new int[] {x, 0, -6});
+			}
+			for (int zz = -5; zz <= 0; zz++) {
+				cable.add(new int[] {-1, 0, zz});                                                        // the tank's box
+			}
+			for (int zz = -5; zz <= -1; zz++) {
+				cable.add(new int[] {4, 0, zz});                                                         // the calciner's box, north
+				cable.add(new int[] {6, 0, zz});                                                         // the filler's box
+			}
+			for (int[] c : cable) {
+				put(server, c[0], up + c[1], z + c[2], "wildcatter:cable_industrial");
+			}
+			put(server, 7, up + 4, z - 1, "minecraft:hopper");                                          // empty drums on the filler
+			server.runCommand("item replace block 7 " + (up + 4) + " " + (z - 1) + " container.0 with wildcatter:empty_drum 4");
+			server.computeOnServer(srv -> {
+				((dev.wildcatter.block.DrumFillerBlockEntity) srv.overworld().getBlockEntity(filler)).addU3o8(Tuning.DRUM_NET_KG - 2);   // near full
+				return null;
+			});
+			server.runCommand("tp @p 18 " + (up + 14) + " " + (z + 22) + " 150 30");
+			context.waitTicks(20);
+			context.takeScreenshot("wildcatter-adu-line");
+			startGenset(context, server, set, north, 2000);
+			context.waitTicks(100);
+			String firing = read(server, 4, up, z);
+			String precip = read(server, 0, up, z);
+			check(precip.contains("precipitating ADU"), "strip liquor and ammonia should make ADU: " + precip);
+			check(firing.contains("firing up"), "the calciner should be firing up: " + firing);
+			showReadout(context, server, tank, "tp @p -4 " + (up + 4) + " " + (z + 6) + " -140 20", "wildcatter-adu-tank");
+			showReadout(context, server, calciner, "tp @p 9 " + (up + 6) + " " + (z - 10) + " 25 25", "wildcatter-adu-calciner-firing");
+			server.computeOnServer(srv -> {
+				((dev.wildcatter.block.UraniumCalcinerBlockEntity) srv.overworld().getBlockEntity(calciner)).setWarmForTest();   // its five minutes
+				return null;
+			});
+			String filled = "";
+			for (int i = 0; i < 10 && !filled.contains("1 full drums"); i++) {
+				context.waitTicks(40);
+				filled = read(server, 7, up, z - 1);
+			}
+			String calcining = read(server, 4, up, z);
+			check(calcining.contains("calcining"), "at temperature the calciner should calcine: " + calcining);
+			check(filled.contains("1 full drums"), "the filler should fill a U3O8 drum: " + filled);
+			showReadout(context, server, calciner, "tp @p 9 " + (up + 6) + " " + (z - 10) + " 25 25", "wildcatter-adu-calcining");
+			showReadout(context, server, filler, "tp @p 11 " + (up + 3) + " " + (z - 4) + " 45 15", "wildcatter-adu-drum");
+			server.runCommand("tp @p 16 " + (up + 9) + " " + (z + 12) + " 140 25");
+			context.waitTicks(10);
+			context.takeScreenshot("wildcatter-adu-calciner");
+			System.out.println("[wildcatter-test] aduYellowcake running | " + precip + " | " + calcining + " | " + filled);
+			put(server, 4, up, z + 4, "minecraft:air");                                                  // the ammonia cut
+			String noNh3 = "";
+			for (int i = 0; i < 10 && !noNh3.contains("NO AMMONIA"); i++) {
+				context.waitTicks(20);
+				noNh3 = read(server, 0, up, z);
+			}
+			check(noNh3.contains("NO AMMONIA"), "without ammonia the tank should read NO AMMONIA: " + noNh3);
+			showReadout(context, server, tank, "tp @p -4 " + (up + 4) + " " + (z + 6) + " -140 20", "wildcatter-adu-no-ammonia");
+			System.out.println("[wildcatter-test] aduYellowcake ok: " + noNh3);
 		} finally {
 			if (film != null) {
 				film.stop();

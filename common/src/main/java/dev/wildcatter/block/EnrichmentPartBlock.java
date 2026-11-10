@@ -28,7 +28,8 @@ public class EnrichmentPartBlock extends BigPartBlock implements net.minecraft.w
 		FREQUENCY_CONVERTER("frequency_converter", Footprint.box(3, 3, 6, 0, 0)),
 		FEED_STATION("feed_station", Footprint.box(3, 3, 5, 0, 0)),
 		PRODUCT_TAKEOFF("product_takeoff", Footprint.box(3, 3, 4, 0, 0)),
-		TAILS_TAKEOFF("tails_takeoff", Footprint.box(3, 3, 5, 0, 0));
+		TAILS_TAKEOFF("tails_takeoff", Footprint.box(3, 3, 5, 0, 0)),
+		CASCADE_COOLING_SKID("cascade_cooling_skid", Footprint.box(3, 3, 6, 0, 0));
 
 		private final String id;
 		private final Footprint footprint;
@@ -61,6 +62,7 @@ public class EnrichmentPartBlock extends BigPartBlock implements net.minecraft.w
 			case FREQUENCY_CONVERTER -> new FrequencyConverterBlockEntity(pos, state);
 			case FEED_STATION -> new FeedStationBlockEntity(pos, state);
 			case PRODUCT_TAKEOFF, TAILS_TAKEOFF -> new TakeoffBlockEntity(pos, state);
+			case CASCADE_COOLING_SKID -> new CascadeCoolingSkidBlockEntity(pos, state);
 		};
 	}
 
@@ -70,6 +72,7 @@ public class EnrichmentPartBlock extends BigPartBlock implements net.minecraft.w
 			return switch (part) {
 				case FEED_STATION -> createTickerHelper(type, WildcatterBlocks.FEED_STATION_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
 				case PRODUCT_TAKEOFF, TAILS_TAKEOFF -> createTickerHelper(type, WildcatterBlocks.TAKEOFF_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
+				case CASCADE_COOLING_SKID -> createTickerHelper(type, WildcatterBlocks.CASCADE_COOLING_SKID_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
 				default -> null;
 			};
 		}
@@ -78,6 +81,7 @@ public class EnrichmentPartBlock extends BigPartBlock implements net.minecraft.w
 			case FREQUENCY_CONVERTER -> createTickerHelper(type, WildcatterBlocks.FREQUENCY_CONVERTER_ENTITY, FrequencyConverterBlockEntity::tick);
 			case FEED_STATION -> createTickerHelper(type, WildcatterBlocks.FEED_STATION_ENTITY, UnitMotorBlockEntity::tick);
 			case PRODUCT_TAKEOFF, TAILS_TAKEOFF -> createTickerHelper(type, WildcatterBlocks.TAKEOFF_ENTITY, UnitMotorBlockEntity::tick);
+			case CASCADE_COOLING_SKID -> createTickerHelper(type, WildcatterBlocks.CASCADE_COOLING_SKID_ENTITY, UnitMotorBlockEntity::tick);
 		};
 	}
 
@@ -96,6 +100,10 @@ public class EnrichmentPartBlock extends BigPartBlock implements net.minecraft.w
 		BlockEntity entity = level.getBlockEntity(main(pos, state));
 		if (entity instanceof TakeoffBlockEntity t && t.fullCount() > 0) {
 			t.giveAll(player);
+			return InteractionResult.SUCCESS;
+		}
+		if (entity instanceof FeedStationBlockEntity f && player.isShiftKeyDown()) {   // 16c1: the assays
+			player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Feed station set to " + f.nextAssay()));
 			return InteractionResult.SUCCESS;
 		}
 		if (entity instanceof FeedStationBlockEntity f && f.emptied() > 0) {

@@ -24,11 +24,16 @@ import org.jspecify.annotations.Nullable;
  * east half). The loaded resin is eluted in salt brine (rock salt by a hopper on top) and the eluate acidified with sulfuric acid
  * (east face of its bottom cells) to break the carbonate complex: eluate at 15 g/L of U3O8 out of the south face of its back
  * cells, the west half, for a precipitation tank.
+ * <p>16d1 (docs/multiblocks/isr-operations.md): a sneak-click sets it to SATELLITE: it loads resin but does not elute (no salt or acid),
+ * and fills a resin trailer set against it with its loaded resin. In ELUTION (the default, every set of columns already built) it
+ * takes a full trailer's resin set against it into its own and sends the trailer back eluted.
  */
 public class IxColumnsBlockEntity extends PlantUnitBlockEntity implements HopperFed {
 	private final NonNullList<ItemStack> slots = NonNullList.withSize(1, ItemStack.EMPTY);
 	private double resin;   // kg of U3O8 loaded on the resin
 	private double salt;
+	private boolean satellite;   // 16d1
+	private double trucked;      // kg of U3O8 moved by trailer, out (satellite) or in (central)
 
 	public IxColumnsBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.IX_COLUMNS_ENTITY, pos, state);
@@ -65,6 +70,27 @@ public class IxColumnsBlockEntity extends PlantUnitBlockEntity implements Hopper
 		return product == Product.ELUATE ? 200 : Tuning.IX_MAX_LPS * Tuning.PLANT_HOLD_SECONDS;
 	}
 
+	/** The sneak-click: SATELLITE or ELUTION; returns the new mode. */
+	public String toggleSatellite() {
+		satellite = !satellite;
+		setChanged();
+		return satellite ? "SATELLITE: loads its resin and fills resin trailers set against it; no elution" : "ELUTION: elutes its resin and empties full resin trailers set against it";
+	}
+
+	public boolean satellite() {
+		return satellite;
+	}
+
+	public double resin() {
+		return resin;
+	}
+
+	/** For the game test: resin loaded straight. */
+	public void setResinForTest(double kg) {
+		resin = kg;
+		setChanged();
+	}
+
 	/** kg of NaCl to make up per litre of eluate, as the mill's SX strip. */
 	private static double saltPerLitre() {
 		return Tuning.SX_NACL_G_PER_L / 1000 * Tuning.SX_NACL_MAKEUP;
@@ -87,6 +113,29 @@ public class IxColumnsBlockEntity extends PlantUnitBlockEntity implements Hopper
 		x.resin += captured;
 		if (got > 0) {
 			x.addMixed(Product.BARREN_LIXIVIANT, got, new double[] {(u - captured) / got, 0, 0, 0, 0});
+		}
+		// 16d1: resin by trailer
+		ResinTrailerBlockEntity trailer = Touching.find(level, pos, ResinTrailerBlockEntity.class, t -> true);
+		if (x.satellite) {
+			String truck = "set an eluted RESIN TRAILER against it";
+			if (trailer != null) {
+				double move = Math.min(Math.min(x.resin, trailer.room()), Tuning.RESIN_TRANSFER_KGS * seconds());
+				trailer.setU3o8(trailer.u3o8() + move);
+				x.resin -= move;
+				x.trucked += move;
+				truck = trailer.room() < 0.5 ? "its RESIN TRAILER is full: truck it to the central plant" : String.format("filling its resin trailer: %.0f of %.0f kg", trailer.u3o8(),
+						Tuning.RESIN_TRAILER_U3O8_KG);
+			}
+			x.status = String.format("SATELLITE: loading %.1f L/s of pregnant lixiviant at %.0f mg/L: %.2f g/s of U3O8 on the resin (%.0f kg, %.0f %% loaded); %s", got / seconds(),
+					got > 0 ? u / got * 1e6 : 0, captured / seconds() * 1000, x.resin, x.resin / capacity * 100, truck);
+			x.setChanged();
+			return;
+		}
+		if (trailer != null && trailer.u3o8() > 1e-6) {
+			double move = Math.min(Math.min(trailer.u3o8(), Math.max(0, capacity - x.resin)), Tuning.RESIN_TRANSFER_KGS * seconds());
+			trailer.setU3o8(trailer.u3o8() - move);
+			x.resin += move;
+			x.trucked += move;
 		}
 		// elution: brine through the loaded resin, the eluate acidified
 		if (x.salt < 1 && x.fed() > 0) {
@@ -121,7 +170,8 @@ public class IxColumnsBlockEntity extends PlantUnitBlockEntity implements Hopper
 
 	@Override
 	public Component inspect() {
-		return Component.literal("IX columns (lead and lag): " + status + String.format("; salt %,.0f kg and %d blocks", salt, fed()));
+		return Component.literal("IX columns (lead and lag): " + status + String.format("; salt %,.0f kg and %d blocks", salt, fed())
+				+ (satellite || trucked > 0 ? String.format("; %,.0f kg of U3O8 by resin trailer", trucked) : ""));
 	}
 
 	@Override
@@ -130,6 +180,8 @@ public class IxColumnsBlockEntity extends PlantUnitBlockEntity implements Hopper
 		ContainerHelper.saveAllItems(output, slots);
 		output.putDouble("resin", resin);
 		output.putDouble("salt", salt);
+		output.putBoolean("satellite", satellite);
+		output.putDouble("trucked", trucked);
 	}
 
 	@Override
@@ -139,5 +191,7 @@ public class IxColumnsBlockEntity extends PlantUnitBlockEntity implements Hopper
 		ContainerHelper.loadAllItems(input, slots);
 		resin = input.getDoubleOr("resin", 0);
 		salt = input.getDoubleOr("salt", 0);
+		satellite = input.getBooleanOr("satellite", false);
+		trucked = input.getDoubleOr("trucked", 0);
 	}
 }

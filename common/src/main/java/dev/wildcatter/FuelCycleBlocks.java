@@ -27,10 +27,17 @@ public interface FuelCycleBlocks {
 	Block PRECIPITATION_TANK = millPart(dev.wildcatter.block.MillPartBlock.Part.PRECIPITATION_TANK);
 	Block YELLOWCAKE_DRYER = millPart(dev.wildcatter.block.MillPartBlock.Part.YELLOWCAKE_DRYER);
 	Block DRUM_FILLER = millPart(dev.wildcatter.block.MillPartBlock.Part.DRUM_FILLER);
+	// 16a: the ADU route's calciner (docs/multiblocks/adu-yellowcake.md)
+	Block URANIUM_CALCINER = millPart(dev.wildcatter.block.MillPartBlock.Part.URANIUM_CALCINER);
 	// 7c: the ISR wellfield (docs/multiblocks/isr-wellfield.md)
 	Block HEADER_HOUSE = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.HEADER_HOUSE);
 	Block OXYGEN_GENERATOR = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.OXYGEN_GENERATOR);
 	Block IX_COLUMNS = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.IX_COLUMNS);
+	// 16d1 (docs/multiblocks/isr-operations.md)
+	Block CO2_LIQUEFIER = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.CO2_LIQUEFIER);
+	Block CO2_STORAGE_TANK = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.CO2_STORAGE_TANK);
+	Block RESIN_TRAILER = block("resin_trailer", props -> new dev.wildcatter.block.ResinTrailerBlock(props.mapColor(net.minecraft.world.level.material.MapColor.COLOR_LIGHT_GRAY)
+			.strength(3.0F, 6.0F).sound(net.minecraft.world.level.block.SoundType.METAL).noOcclusion()));
 	// 7d: conversion to UF6 (docs/multiblocks/conversion.md)
 	Block REDUCTION_REACTOR = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.REDUCTION_REACTOR);
 	Block HYDROFLUORINATOR = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.HYDROFLUORINATOR);
@@ -43,12 +50,17 @@ public interface FuelCycleBlocks {
 	Block HF_COLUMN = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.HF_COLUMN);
 	Block RECTIFIER = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.RECTIFIER);
 	Block FLUORINE_CELL_HOUSE = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.FLUORINE_CELL_HOUSE);
+	// 16b1 (docs/multiblocks/conversion-extensions.md)
+	Block CATHODE_GAS_SCRUBBER = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.CATHODE_GAS_SCRUBBER);
+	Block KOH_SCRUBBER = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.KOH_SCRUBBER);
 	// 7e: the centrifuge cascade (docs/multiblocks/enrichment.md)
 	Block CENTRIFUGE = enrichmentPart(dev.wildcatter.block.EnrichmentPartBlock.Part.CENTRIFUGE);
 	Block FREQUENCY_CONVERTER = enrichmentPart(dev.wildcatter.block.EnrichmentPartBlock.Part.FREQUENCY_CONVERTER);
 	Block FEED_STATION = enrichmentPart(dev.wildcatter.block.EnrichmentPartBlock.Part.FEED_STATION);
 	Block PRODUCT_TAKEOFF = enrichmentPart(dev.wildcatter.block.EnrichmentPartBlock.Part.PRODUCT_TAKEOFF);
 	Block TAILS_TAKEOFF = enrichmentPart(dev.wildcatter.block.EnrichmentPartBlock.Part.TAILS_TAKEOFF);
+	// 16c1 (docs/multiblocks/enrichment-operations.md)
+	Block CASCADE_COOLING_SKID = enrichmentPart(dev.wildcatter.block.EnrichmentPartBlock.Part.CASCADE_COOLING_SKID);
 	// 7f: the zirconium plant (docs/multiblocks/zirconium.md)
 	Block MINERAL_SEPARATOR = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.MINERAL_SEPARATOR);
 	Block CHLORINATOR = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.CHLORINATOR);

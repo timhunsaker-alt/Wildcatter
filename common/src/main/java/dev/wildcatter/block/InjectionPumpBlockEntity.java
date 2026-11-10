@@ -43,6 +43,16 @@ public class InjectionPumpBlockEntity extends BlockEntity implements CircuitPart
 	private double volts;
 	private double amps;
 	private double pumped;
+	private double total;      // litres pumped since placed (the game test reads it)
+	private boolean bleed;     // 16d1: pumping an ISR header house's bleed
+
+	public double total() {
+		return total;
+	}
+
+	public boolean pumpingBleed() {
+		return bleed;
+	}
 	private String status = "starting";
 	private boolean grown;
 
@@ -109,6 +119,15 @@ public class InjectionPumpBlockEntity extends BlockEntity implements CircuitPart
 			well |= line.touches(level, DisposalWellheadBlock.class);
 		}
 		double waiting = Lines.available(level, pump.suction(), Product.PRODUCED_WATER, FluidNode.Pull.MACHINE, pump);
+		Product fluid = Product.PRODUCED_WATER;
+		if (waiting < 1) {   // 16d1: an ISR header house's bleed, as it takes produced water; a small steady flow, so no level switch
+			double bleed = Lines.available(level, pump.suction(), Product.WELLFIELD_BLEED, FluidNode.Pull.MACHINE, pump);
+			if (bleed > 1e-3) {
+				fluid = Product.WELLFIELD_BLEED;
+				waiting = Math.max(bleed, Tuning.INJECTION_PUMP_START);
+			}
+		}
+		pump.bleed = fluid == Product.WELLFIELD_BLEED;
 		pump.called = waiting >= Tuning.INJECTION_PUMP_START || (pump.called && waiting >= 1);
 		pump.wanted = well && pump.called;
 		double strength = pump.motor.output();
@@ -122,9 +141,11 @@ public class InjectionPumpBlockEntity extends BlockEntity implements CircuitPart
 		} else if (pump.motor.reversed()) {
 			pump.status = "pumping nothing: " + pump.motor.describe();
 		} else {
-			pump.pumped = Lines.pull(level, pump.suction(), Product.PRODUCED_WATER, Tuning.INJECTION_PUMP_LPS * Tuning.WELL_INTERVAL / 20.0 * strength,
+			pump.pumped = Lines.pull(level, pump.suction(), fluid, Tuning.INJECTION_PUMP_LPS * Tuning.WELL_INTERVAL / 20.0 * strength,
 					FluidNode.Pull.MACHINE, pump);
-			pump.status = String.format("injecting %.1f L/s, %s", pump.pumped * 20.0 / Tuning.WELL_INTERVAL, pump.motor.describe());
+			pump.total += pump.pumped;
+			pump.status = fluid == Product.PRODUCED_WATER ? String.format("injecting %.1f L/s, %s", pump.pumped * 20.0 / Tuning.WELL_INTERVAL, pump.motor.describe())
+					: String.format("injecting %.2f L/s of %s, %s", pump.pumped * 20.0 / Tuning.WELL_INTERVAL, fluid.label(), pump.motor.describe());
 		}
 		pump.setChanged();
 	}

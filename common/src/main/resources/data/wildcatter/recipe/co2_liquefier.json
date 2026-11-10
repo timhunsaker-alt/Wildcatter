@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "XIX",
+    "SGS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "X": "minecraft:piston",
+    "I": "minecraft:iron_block",
+    "G": "minecraft:glass"
+  },
+  "result": {
+    "id": "wildcatter:co2_liquefier",
+    "count": 1
+  }
+}

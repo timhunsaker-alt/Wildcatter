@@ -5,7 +5,11 @@ footprints match WellfieldPartBlock's):
 - oxygen_generator, 3 x 3 x 6: the PSA skid: an air compressor, the receiver, two molecular-sieve beds and the oxygen buffer tank;
 - ix_columns, 8 x 6 x 4: the lead and lag resin columns on their skid with the elution tank and the acid day tank;
 - isr_wellhead, one cell: the PVC casing up out of the ground and its well cap; with the pump, a producer's pitless head with
-  its power cable conduit and a flow meter on the line."""
+  its power cable conduit and a flow meter on the line;
+- co2_liquefier, 3 x 4 x 6 (16d1): the kiln-gas scrubber, the two-stage compressor, the dryer and the refrigerated condenser (480 V box
+  west), liquid CO2 out the back;
+- co2_storage_tank, 3 x 3 x 8 (16d1): the 30 t insulated horizontal tank on its saddles with its vaporiser;
+- resin_trailer, 2 x 3 x 6 (16d1): a trailer carrying a 10 m3 resin vessel, its axles, wheels and kingpin."""
 import mlib
 import plantlib as g
 
@@ -84,9 +88,50 @@ ISR.export_args = {"blockstate": False, "item": True}
 ISR_PUMP = wellhead("isr_wellhead_pump", True)
 ISR_PUMP.export_args = {"blockstate": False, "item": False}
 
+# ---- 16d1: the CO2 liquefier ----------------------------------------------------------------------------------------------------
+CL = model("co2_liquefier", 3, 4, 6, "grey")
+CL.box((0.0, 0.0, 0.0), (3.0, 0.2, 6.0), "concrete")
+CL.cylinder("y", (0.8, 0.9), 0.45, 0.2, 3.8, "steel", 14)                   # the kiln-gas scrubber
+CL.box((1.5, 0.2, 0.4), (2.8, 1.6, 2.6), "blue")                            # the two-stage compressor
+CL.cylinder("z", (2.15, 1.0), 0.35, 2.6, 3.2, "blue", 12)                   # its motor
+CL.cylinder("y", (0.8, 3.3), 0.3, 0.2, 2.6, "steel", 12)                    # the dryer
+CL.box((0.3, 0.2, 4.0), (2.7, 2.2, 5.6), "louvre")                          # the refrigeration unit and condenser
+CL.box((0.5, 2.2, 4.2), (2.5, 2.6, 5.4), "radfin")                          # its condenser fans
+CL.pipe([(0.8, 3.8, 0.9), (0.8, 3.95, 0.9), (2.15, 3.95, 0.9), (2.15, 1.6, 0.9)], 4, "steel")   # gas from the scrubber to the compressor
+CL.pipe([(1.5, 0.5, 5.6), (1.5, 0.5, 6.0)], 2, "steel")                     # liquid CO2 out, the back
+CL.box((0.0, 0.5, 0.3), (0.3, 1.1, 0.8), "grey")                            # its 480 V box, the west
+CL.decal((-0.01, 0.6, 0.4), (0.0, 1.0, 0.7), "danger", "west", "grey")
+CL.collide((0.2, 0.0, 0.2), (2.8, 3.8, 5.8))
+
+# ---- 16d1: the CO2 storage tank -------------------------------------------------------------------------------------------------
+CT = model("co2_storage_tank", 3, 3, 8, "lagging")
+CT.box((0.0, 0.0, 0.0), (3.0, 0.2, 8.0), "concrete")
+for z in (1.2, 6.8):
+	CT.box((0.4, 0.2, z - 0.2), (2.6, 1.0, z + 0.2), "iron")                 # a saddle
+CT.cylinder("z", (1.5, 1.6), 1.2, 0.5, 7.5, "lagging", 20)                 # the insulated tank, 2.4 m across
+CT.cylinder("z", (1.5, 1.6), 0.9, 0.3, 0.5, "lagging", 16)                 # its dished heads
+CT.cylinder("z", (1.5, 1.6), 0.9, 7.5, 7.7, "lagging", 16)
+CT.box((2.3, 0.2, 0.1), (2.9, 1.4, 0.9), "finned")                         # the vaporiser
+CT.pipe([(1.5, 0.5, 0.0), (1.5, 0.5, 0.3)], 2, "steel")                     # liquid CO2 in, the front
+CT.collide((0.2, 0.0, 0.2), (2.8, 2.8, 7.8))
+
+# ---- 16d1: the resin trailer ----------------------------------------------------------------------------------------------------
+RT = model("resin_trailer", 2, 3, 6, "padgreen")
+RT.box((0.15, 0.7, 0.2), (1.85, 0.85, 5.9), "iron")                        # the deck
+for z in (4.3, 5.2):
+	for x in (0.15, 1.6):
+		RT.cylinder("x", (0.45, z), 0.45, x, x + 0.25, "rubber", 14)         # its wheels on two axles
+	RT.cylinder("x", (0.45, z), 0.06, 0.4, 1.6, "iron", 8)
+RT.box((0.9, 0.4, 0.3), (1.1, 0.7, 0.5), "iron")                            # the landing leg
+RT.box((0.9, 0.85, 0.2), (1.1, 1.0, 0.4), "iron")                           # the kingpin plate
+RT.cylinder("z", (1.0, 1.75), 0.85, 1.0, 5.6, "padgreen", 18)               # the 10 m3 resin vessel
+RT.cylinder("y", (1.0, 1.6), 0.2, 2.55, 2.85, "steel", 10)                  # its fill and transfer nozzles
+RT.cylinder("y", (1.0, 4.6), 0.2, 2.55, 2.85, "steel", 10)
+RT.collide((0.1, 0.0, 0.2), (1.9, 2.6, 5.9))
+
 M = HH
-EXTRA = [OG, IX, ISR, ISR_PUMP]
-for extra in (OG, IX):
+EXTRA = [OG, IX, ISR, ISR_PUMP, CL, CT, RT]
+for extra in (OG, IX, CL, CT, RT):
 	extra.export_args = {"blockstate": True, "item": True}
 
 

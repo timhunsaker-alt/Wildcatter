@@ -9,7 +9,9 @@ footprints match MillPartBlock's):
 - sx_circuit, 6 x 3 x 16: a train of covered mixer-settlers, the mixer drives along the west side; strip liquor out the back;
 - precipitation_tank, 4 x 5 x 4: the agitated tank and its magnesia feeder;
 - yellowcake_dryer, 3 x 8 x 3: the spray dryer's chamber and cone, the burner and the bag house;
-- drum_filler, 2 x 4 x 2: the filling head and its dust hood over the drum station."""
+- drum_filler, 2 x 4 x 2: the filling head and its dust hood over the drum station;
+- uranium_calciner, 3 x 8 x 3 (16a, adu-yellowcake.md): the six-hearth calciner's refractory-lined shell on its legs, the burner
+  ports down its side, the rabble arm's drive on top and the off-gas duct up to its scrubber; gas in the east."""
 import mlib
 import plantlib as g
 
@@ -140,8 +142,28 @@ DF.box((0.4, 3.0, 0.4), (1.6, 3.95, 1.6), "galv")                           # th
 box480(DF, 0.6, 0.6)
 DF.collide((0.1, 0.0, 0.1), (1.9, 3.95, 1.9))
 
+# ---- the uranium calciner (16a) -----------------------------------------------------------------------------------------------
+UC = model("uranium_calciner", 3, 8, 3, "hipaint")
+UC.box((0.0, 0.0, 0.0), (3.0, 0.25, 3.0), "concrete")
+for x in (0.25, 2.55):
+	for z in (0.25, 2.55):
+		UC.box((x, 0.25, z), (x + 0.2, 1.2, z + 0.2), "iron")                   # its legs
+UC.cylinder("y", (1.5, 1.5), 0.35, 0.6, 1.2, "steel", 12)                   # the discharge cone to the drum filler
+UC.cylinder("y", (1.5, 1.5), 1.3, 1.2, 6.4, "hipaint", 20)                  # the refractory-lined shell, six hearths
+for y in (2.0, 2.85, 3.7, 4.55, 5.4):
+	UC.ring("y", (1.5, 1.5), 1.33, y, y + 0.08, 0.04, "iron", sides=20)      # the hearth floors' bands
+for y in (1.7, 3.4, 5.1):
+	UC.box((2.75, y, 1.3), (2.95, y + 0.4, 1.7), "iron")                    # a burner port, the east side
+UC.cylinder("y", (1.5, 1.5), 0.45, 6.4, 6.9, "grey", 12)                    # the rabble arm's gearbox
+UC.box((1.2, 6.9, 1.2), (1.8, 7.5, 1.8), "blue")                            # its drive motor
+UC.pipe([(0.6, 6.4, 0.6), (0.6, 7.9, 0.6)], 10, "galv")                     # the off-gas duct to its scrubber
+UC.pipe([(3.0, 0.5, 1.5), (2.75, 0.5, 1.5), (2.75, 1.7, 1.5)], 2, "steel")  # gas in, the east, up to the burners
+UC.box((0.3, 0.4, 0.0), (0.8, 1.0, 0.3), "grey")                            # its 480 V box, the north face of its main cell
+UC.decal((0.4, 0.5, -0.01), (0.7, 0.9, 0.0), "danger", "north", "grey")
+UC.collide((0.2, 0.0, 0.2), (2.8, 7.5, 2.8))
+
 
 M = JC
-EXTRA = [SG, LT, CT, SX, PT, YD, DF]
+EXTRA = [SG, LT, CT, SX, PT, YD, DF, UC]
 for extra in EXTRA:
 	extra.export_args = {"blockstate": True, "item": True}

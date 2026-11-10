@@ -24,6 +24,9 @@ import org.jspecify.annotations.Nullable;
  * onto the cascade header at the south face of its back cells. It runs the cascade: it counts the driven centrifuges on its header,
  * at least one a stage, works out their separative work and hands the product to the product take-off and the tails to the tails
  * take-off on the same header. Without both it idles the cascade on total reflux. The emptied 48Y goes out to a hopper under it.
+ * <p>16c1 (docs/multiblocks/enrichment-operations.md): a sneak-click sets its product and tails assays (4.95 / 0.25 % until set); the
+ * 30Bs carry the product's. It counts the cascade cooling skids touching its header: once a cascade has had one, it must keep one
+ * cooling, or after five minutes it reads CASING HOT and holds its feed. A cascade that never had a skid runs as before.
  */
 public class FeedStationBlockEntity extends UnitMotorBlockEntity implements HopperFed {
 	private static final int OUT = 2;
@@ -31,6 +34,9 @@ public class FeedStationBlockEntity extends UnitMotorBlockEntity implements Hopp
 	private boolean loaded;
 	private double uf6;   // kg left in the cylinder in the cabinet
 	private double swuDone;
+	private int productStep = 4, tailsStep = 1;   // 16c1: Enrichment.PRODUCT_ASSAYS and TAILS_ASSAYS; 4.95 / 0.25 %
+	private boolean cooled;                       // a cooling skid has served its header: from now on it needs one
+	private double hot;                           // seconds without cooling
 	private String unit = "starting";
 
 	public FeedStationBlockEntity(BlockPos pos, BlockState state) {
@@ -78,6 +84,58 @@ public class FeedStationBlockEntity extends UnitMotorBlockEntity implements Hopp
 
 	public double uf6() {
 		return uf6;
+	}
+
+	public double productAssay() {
+		return Enrichment.PRODUCT_ASSAYS[Math.floorMod(productStep, Enrichment.PRODUCT_ASSAYS.length)];
+	}
+
+	public double tailsAssay() {
+		return Enrichment.TAILS_ASSAYS[Math.floorMod(tailsStep, Enrichment.TAILS_ASSAYS.length)];
+	}
+
+	/** A sneak-click: the next setting, product assay first and then tails, round all fifteen. Returns the new setting. */
+	public String nextAssay() {
+		productStep++;
+		if (productStep >= Enrichment.PRODUCT_ASSAYS.length) {
+			productStep = 0;
+			tailsStep = (tailsStep + 1) % Enrichment.TAILS_ASSAYS.length;
+		}
+		setChanged();
+		return assays();
+	}
+
+	/** For the game test: the casings already this many seconds without cooling. */
+	public void setHotForTest(double seconds) {
+		hot = seconds;
+	}
+
+	/** For the game test: set the assays straight. */
+	public void setAssaysForTest(int product, int tails) {
+		productStep = product;
+		tailsStep = tails;
+		setChanged();
+	}
+
+	private String assays() {
+		double p = productAssay(), t = tailsAssay();
+		return String.format("product %.2f %%, tails %.2f %% (%d stages, %.2f kg of feed and %.2f SWU a kg of product)", p * 100, t * 100, Enrichment.stages(p, t),
+				Enrichment.feedPerProduct(p, t), Enrichment.swuPerProduct(p, t));
+	}
+
+	/** The cooling skids touching its header (16c1). */
+	private List<CascadeCoolingSkidBlockEntity> skids(Level level) {
+		List<CascadeCoolingSkidBlockEntity> out = new java.util.ArrayList<>();
+		for (Lines.Line line : Lines.lines(level, header())) {
+			for (BlockPos pipe : line.pipes()) {
+				for (Direction side : Direction.values()) {
+					if (dev.wildcatter.multiblock.BigParts.entity(level, pipe.relative(side)) instanceof CascadeCoolingSkidBlockEntity skid && !out.contains(skid)) {
+						out.add(skid);
+					}
+				}
+			}
+		}
+		return out;
 	}
 
 	/** For the game test: the cylinder in the cabinet with only {@code kg} left. */
@@ -157,6 +215,27 @@ public class FeedStationBlockEntity extends UnitMotorBlockEntity implements Hopp
 			}
 		}
 		String cascade = String.format("%d machines driven of %d on the header, %.1f SWU/h", driven, machines.size(), swu / seconds() * 3600);
+		double pa = productAssay(), ta = tailsAssay();
+		int stages = Enrichment.stages(pa, ta);
+		// 16c1: the casings' cooling, once a skid has served this header
+		List<CascadeCoolingSkidBlockEntity> skids = skids(level);
+		boolean cooling = false;
+		for (CascadeCoolingSkidBlockEntity skid : skids) {
+			skid.serve(driven);
+			cooling |= skid.cooling(level);
+		}
+		cooled |= !skids.isEmpty();
+		if (cooled && driven > 0 && !cooling) {
+			hot += seconds();
+		} else {
+			hot = 0;
+		}
+		if (cooled && hot >= Tuning.CASING_HOT_SECONDS) {
+			unit = String.format("CASING HOT: the machines' casings have had no cooling for %.0f minutes; feed held (a CASCADE COOLING SKID on the header, with circulating water and power); %s",
+					hot / 60, cascade);
+			return;
+		}
+		String coolNote = cooled && driven > 0 && !cooling ? String.format("; NO COOLING for %.0f s (CASING HOT at %.0f)", hot, Tuning.CASING_HOT_SECONDS) : "";
 		if (!loaded) {
 			unit = "NO FEED: put a hopper of natural UF6 48Ys on top; " + cascade;
 			return;
@@ -169,8 +248,8 @@ public class FeedStationBlockEntity extends UnitMotorBlockEntity implements Hopp
 			unit = "NO DRIVE: set a FREQUENCY CONVERTER on the header; " + cascade;
 			return;
 		}
-		if (driven < Enrichment.stages()) {
-			unit = String.format("TOO FEW STAGES (%d of %d): a cascade needs a machine for each stage; %s", driven, Enrichment.stages(), cascade);
+		if (driven < stages) {
+			unit = String.format("TOO FEW STAGES (%d of %d): a cascade needs a machine for each stage at %.2f / %.2f %%; %s", driven, stages, pa * 100, ta * 100, cascade);
 			return;
 		}
 		if (product == null || tails == null || product.room() <= 0 || tails.room() <= 0) {
@@ -185,23 +264,23 @@ public class FeedStationBlockEntity extends UnitMotorBlockEntity implements Hopp
 			return;
 		}
 		// separative work into product, limited by the feed left and the cylinders' room
-		double p = swu / Enrichment.swuPerProduct();   // kg of product U
-		p = Math.min(p, uf6 / Tuning.UF6_PER_U / Enrichment.feedPerProduct());
+		double p = swu / Enrichment.swuPerProduct(pa, ta);   // kg of product U
+		p = Math.min(p, uf6 / Tuning.UF6_PER_U / Enrichment.feedPerProduct(pa, ta));
 		p = Math.min(p, product.room() / Tuning.UF6_PER_U);
-		p = Math.min(p, tails.room() / Tuning.UF6_PER_U / Enrichment.tailsPerProduct());
+		p = Math.min(p, tails.room() / Tuning.UF6_PER_U / Enrichment.tailsPerProduct(pa, ta));
 		p = Math.max(0, p);
-		uf6 = Math.max(0, uf6 - p * Enrichment.feedPerProduct() * Tuning.UF6_PER_U);
-		product.addUf6(p * Tuning.UF6_PER_U);
-		tails.addUf6(p * Enrichment.tailsPerProduct() * Tuning.UF6_PER_U);
-		swuDone += p * Enrichment.swuPerProduct();
+		uf6 = Math.max(0, uf6 - p * Enrichment.feedPerProduct(pa, ta) * Tuning.UF6_PER_U);
+		product.addUf6(p * Tuning.UF6_PER_U, pa);
+		tails.addUf6(p * Enrichment.tailsPerProduct(pa, ta) * Tuning.UF6_PER_U, ta);
+		swuDone += p * Enrichment.swuPerProduct(pa, ta);
 		unit = String.format("feeding %.0f kg of UF6 an hour; %,.0f kg left in the 48Y (%.1f %%); %s; %.1f kg of %.2f %% product an hour; %,.0f SWU done",
-				p * Enrichment.feedPerProduct() * Tuning.UF6_PER_U / seconds() * 3600, uf6, uf6 / Tuning.CYLINDER_48Y_KG * 100, cascade,
-				p * Tuning.UF6_PER_U / seconds() * 3600, Tuning.ASSAY_PRODUCT * 100, swuDone);
+				p * Enrichment.feedPerProduct(pa, ta) * Tuning.UF6_PER_U / seconds() * 3600, uf6, uf6 / Tuning.CYLINDER_48Y_KG * 100, cascade,
+				p * Tuning.UF6_PER_U / seconds() * 3600, pa * 100, swuDone) + coolNote;
 	}
 
 	@Override
 	public Component inspect() {
-		return Component.literal("Feed station: " + unit + String.format("; %d emptied, %d waiting; ", emptied(), fed()) + describe());
+		return Component.literal("Feed station: " + unit + String.format("; %d emptied, %d waiting; set to ", emptied(), fed()) + assays() + "; " + describe());
 	}
 
 	@Override
@@ -211,6 +290,10 @@ public class FeedStationBlockEntity extends UnitMotorBlockEntity implements Hopp
 		output.putBoolean("loaded", loaded);
 		output.putDouble("uf6", uf6);
 		output.putDouble("swu", swuDone);
+		output.putInt("productStep", productStep);
+		output.putInt("tailsStep", tailsStep);
+		output.putBoolean("cooled", cooled);
+		output.putDouble("hot", hot);
 	}
 
 	@Override
@@ -221,5 +304,9 @@ public class FeedStationBlockEntity extends UnitMotorBlockEntity implements Hopp
 		loaded = input.getBooleanOr("loaded", false);
 		uf6 = input.getDoubleOr("uf6", 0);
 		swuDone = input.getDoubleOr("swu", 0);
+		productStep = input.getIntOr("productStep", 4);
+		tailsStep = input.getIntOr("tailsStep", 1);
+		cooled = input.getBooleanOr("cooled", false);
+		hot = input.getDoubleOr("hot", 0);
 	}
 }

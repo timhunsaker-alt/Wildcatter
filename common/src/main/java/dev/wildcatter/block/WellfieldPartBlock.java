@@ -19,13 +19,16 @@ import net.minecraft.world.phys.BlockHitResult;
 
 /**
  * A surface part of an ISR wellfield at true size (docs/multiblocks/isr-wellfield.md): the header house with the oxygen generator
- * against it, and the IX columns, on steel pipe.
+ * against it, and the IX columns, on steel pipe. 16d1 (docs/multiblocks/isr-operations.md) adds the CO2 liquefier against a lime kiln and
+ * the CO2 storage tank against the header house.
  */
 public class WellfieldPartBlock extends BigPartBlock implements net.minecraft.world.WorldlyContainerHolder {
 	public enum Part {
 		HEADER_HOUSE("header_house", Footprint.box(4, 4, 10, 0, 0)),
 		OXYGEN_GENERATOR("oxygen_generator", Footprint.box(3, 3, 6, 0, 0)),
-		IX_COLUMNS("ix_columns", Footprint.box(8, 6, 4, 0, 0));
+		IX_COLUMNS("ix_columns", Footprint.box(8, 6, 4, 0, 0)),
+		CO2_LIQUEFIER("co2_liquefier", Footprint.box(3, 4, 6, 0, 0)),
+		CO2_STORAGE_TANK("co2_storage_tank", Footprint.box(3, 3, 8, 0, 0));
 
 		private final String id;
 		private final Footprint footprint;
@@ -57,18 +60,23 @@ public class WellfieldPartBlock extends BigPartBlock implements net.minecraft.wo
 			case HEADER_HOUSE -> new HeaderHouseBlockEntity(pos, state);
 			case OXYGEN_GENERATOR -> new OxygenGeneratorBlockEntity(pos, state);
 			case IX_COLUMNS -> new IxColumnsBlockEntity(pos, state);
+			case CO2_LIQUEFIER -> new Co2LiquefierBlockEntity(pos, state);
+			case CO2_STORAGE_TANK -> new Co2StorageTankBlockEntity(pos, state);
 		};
 	}
 
 	@Override
 	protected <T extends BlockEntity> BlockEntityTicker<T> mainTicker(Level level, BlockState state, BlockEntityType<T> type) {
 		if (level.isClientSide()) {
-			return part == Part.OXYGEN_GENERATOR ? createTickerHelper(type, WildcatterBlocks.OXYGEN_GENERATOR_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e)) : null;
+			return part == Part.OXYGEN_GENERATOR ? createTickerHelper(type, WildcatterBlocks.OXYGEN_GENERATOR_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e))
+					: part == Part.CO2_LIQUEFIER ? createTickerHelper(type, WildcatterBlocks.CO2_LIQUEFIER_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e)) : null;
 		}
 		return switch (part) {
 			case HEADER_HOUSE -> createTickerHelper(type, WildcatterBlocks.HEADER_HOUSE_ENTITY, HeaderHouseBlockEntity::tick);
 			case OXYGEN_GENERATOR -> createTickerHelper(type, WildcatterBlocks.OXYGEN_GENERATOR_ENTITY, UnitMotorBlockEntity::tick);
 			case IX_COLUMNS -> createTickerHelper(type, WildcatterBlocks.IX_COLUMNS_ENTITY, IxColumnsBlockEntity::tick);
+			case CO2_LIQUEFIER -> createTickerHelper(type, WildcatterBlocks.CO2_LIQUEFIER_ENTITY, UnitMotorBlockEntity::tick);
+			case CO2_STORAGE_TANK -> createTickerHelper(type, WildcatterBlocks.CO2_STORAGE_TANK_ENTITY, Co2StorageTankBlockEntity::tick);
 		};
 	}
 
@@ -85,6 +93,10 @@ public class WellfieldPartBlock extends BigPartBlock implements net.minecraft.wo
 			return InteractionResult.SUCCESS;
 		}
 		BlockEntity entity = level.getBlockEntity(main(pos, state));
+		if (entity instanceof IxColumnsBlockEntity ix && player.isShiftKeyDown()) {   // 16d1: SATELLITE or ELUTION
+			player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("IX columns: " + ix.toggleSatellite()));
+			return InteractionResult.SUCCESS;
+		}
 		if (entity instanceof dev.wildcatter.energy.Inspectable machine) {
 			boolean shocked = entity instanceof UnitMotorBlockEntity motor && Shock.touch((ServerLevel) level, pos, player, motor.motor().voltage(), motor.isLive())
 					|| entity instanceof GasCompressorBlockEntity c && Shock.touch((ServerLevel) level, pos, player, c.motor().voltage(), c.isLive());
