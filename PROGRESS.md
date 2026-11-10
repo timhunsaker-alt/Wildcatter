@@ -1449,8 +1449,7 @@ sized for a 40-pot line.
 
 ## Known gaps
 - Phase 18 (phosphate): the `tsp_bag`, `dap_bag`, `mop_bag` and `extractant_drum` icons are script-drawn `*_placeholder`. The ten parts
-  use the mod's materials. Not built: the DEPA-TOPO second cycle (ammonium carbonate strip, AUC to the uranium calciner; it needs Phase
-  16a and 16d1, on the `phase16` branch, planned in `docs/multiblocks/uranium-from-phosphate.md`), so the uranium stays in the strip;
+  use the mod's materials. The DEPA-TOPO second cycle is built (2026-11-10, branch `w-rules`; see "Tim's answers" below). Not built:
   the filter acid's uranium is not carried as an assay; fluorosilicic acid recovery; the hemihydrate process; potash by flotation;
   Farmings reading `c:fertilizers` (Farmings' side). See `docs/questions/phase18-phosphate.md`.
 - Phase 17a (ferroalloys): the seven bulk bag icons (`ferrochrome_bag`, `ferromanganese_bag`, `ferrosilicon_bag`, `moly_oxide_bag`,
@@ -1460,7 +1459,7 @@ sized for a 40-pot line.
   keeps its placeholder ferrosilicon recipe. See `docs/questions/phase17-ferroalloys.md`.
 - Phase 16 (uranium routes and plant operations, 2026-11-10; `docs/questions/phase16-uranium.md`): script-drawn icons
   `u3o8_drum_placeholder` (16a), `fluorinator_ash_drum_placeholder`, `synthetic_fluorspar_placeholder` (16b1). The chlor-alkali cell on
-  potash has no scene (16b1). A fuel assembly stood up as a block keeps no assay and reads 4.95 % when broken (16c1). The producer's CO2
+  potash has no scene (16b1). (A fuel assembly stood up as a block keeps its assay since 2026-11-10, Tim's answer 21.) The producer's CO2
   factor is unit-tested, not run in a scene (16d1). Not built in 16a: uranyl peroxide precipitation, ammonia recovery, ASTM C967 impurity penalties.
   16b2, 16c2 and 16d2 are planned in ROADMAP, not built.
 - Phase 14 (the ammonia plant): the `gauze_pack` and `emulsifier_pail` icons are Ludo art since the art wave (2026-11-09); no
@@ -1564,8 +1563,8 @@ sized for a 40-pot line.
   - spent pot lining has no treatment and no use (planned: `docs/questions/plant-crane-gaps.md`, 13);
   - the pot's 6 x 6 x 12 cell box stands in for the potroom building, which is not drawn;
 - Phase 10b3a:
-  - residence times are not modelled: the 18 h coking, the drums' 12-24 h fill and the furnace's two-week firing run as steady
-    flow (the drums switch at a tonne); left for Tim, with a plan: `docs/questions/plant-crane-gaps.md`, 11;
+  - the 18 h coking is a real hold only with the world rule `realResidenceTimes` (off by default, even in new worlds; Tim's answer 15);
+    the coker drums' 12-24 h fill and the furnace's two-week firing still run as steady flow (the drums switch at a tonne);
   - most of the metallurgical coke has no user in the mod beyond carbon and burner fuel (coke oven gas and coker gas now also run
     gas engines and gas turbines);
   - no ammonia, light oil or gas desulfurizing at the by-product plant; no vacuum unit ahead of the coker;
@@ -1574,8 +1573,8 @@ sized for a 40-pot line.
   - the Bayer liquor's first fill is waived: the evaporator starts with 10 minutes of strong liquor;
   - each stream carries its alumina in a fixed share. Silica, soda in the mud and liquor strength are not tracked, and the soda
     loss is one make-up figure;
-  - residence times (36 h precipitation, 1 h digestion) are not modelled: the plant runs as a steady flow with 5 s holds (left for
-    Tim, with a plan: `docs/questions/plant-crane-gaps.md`, 11);
+  - the 36 h precipitation and 1 h digestion are real holds only with the world rule `realResidenceTimes` (off by default, even in
+    new worlds; Tim's answer 15); without it the plant runs as a steady flow with 5 s holds;
   - the alumina and AlF3 now go to 10b3b's pots; the ton containers and the chlorine still have no buyer.
 - Phase 9c: Mekanism has not been tried: it is not yet released for 26.3. Plugs were checked against a real NeoForge energy
   handler on a stand-in block.
@@ -1647,12 +1646,12 @@ sized for a 40-pot line.
   concrete). The OP-delta-T constants K4, K5, K6 are from memory and unverified, and the H. B. Robinson 2 accession number is not
   recorded (questions 5). Not built: containment spray and fan coolers, the relief tank's cover gas and drain tank, a real steam-air
   mixture in the building, the airlock's doors drawn open. The OT-delta-T trip in the server scene pins the power by a test hook
-  (no coolant pumps there); the full critical startup with the rule on runs only in the unit test. The four rules are server-wide
-  keys, not stored per world (question 8). The macOS screen recorder (`Filming`) caught only the desktop wallpaper on this run (the
+  (no coolant pumps there); the full critical startup with the rule on runs only in the unit test. The rules are saved with each world
+  since 2026-11-10 (Tim's answer 23). The macOS screen recorder (`Filming`) caught only the desktop wallpaper on this run (the
   Phase 17 film shows the same); the `reactorContainment` scene therefore also saves a frame every 4 ticks, and the film is made from them.
 - Phase 19b (2026-11-10): two item icons drawn by script: `dry_storage_canister_placeholder` and `decon_washer_placeholder`; the
-  four parts use the mod's materials. With real decay heat a cask takes fuel about 160 days of world time out of the core (question 18,
-  for Tim). The washer's 2 kW is not drawn from its receptacle and its water bucket is not used up. Not built: a transfer cask vehicle,
+  four parts use the mod's materials. A cask's limits count cooling 100x, as burnup is (Tim's answer 20): fuel from a full-power run is eligible about 1.6 days of
+  world time after discharge. The washer's 2 kW is not drawn from its receptacle and its water bucket is not used up. Not built: a transfer cask vehicle,
   contamination spreading by water, nuclide-by-nuclide activity. No client scene for 19b (the phase's one film is 19a's).
 - Misc gaps wave (2026-11-09): the steam plant's feedwater line, the land rig's cables, the 1 MW alternator and the new spool icons
   have been checked in model previews and NeoForge server scenes, not yet in the client (no client scene was run in the wave).
@@ -1891,8 +1890,8 @@ Plan: `docs/ideas-plan.md`. Branch `phase16`. Nothing changes what an existing w
   - CATHODE GAS SCRUBBER (2 x 4 x 2, 10 kW, box north): against the fluorine cell house, its 28.6 Nm3/h of cathode hydrogen to a pipe
     for the reducer; what the pipe cannot take is vented, as is all of it with no scrubber.
   - The fluorinator's bed: RETIRE BED (sneak-click, or a PLC point; also BED FULL and RETIRING): ten minutes, the ash into Fluorinator Ash
-    Drums (400 kg, 3 % U), a new bed of 500 kg of fluorspar. BED FULL at 2 t stops it only with `fluorinatorAshBed=true` in
-    `config/wildcatter.properties` (new class `Rules`; default off). The leach tank takes ash drums by hopper and leaches their uranium
+    Drums (400 kg, 3 % U), a new bed of 500 kg of fluorspar. BED FULL at 2 t stops it only with the rule `fluorinatorAshBed`
+    (class `Rules`; since 2026-11-10 a world rule, on in new worlds and off in existing ones). The leach tank takes ash drums by hopper and leaches their uranium
     with the ore.
   - KOH SCRUBBER (3 x 8 x 3, 15 kW): against the hydrofluorinator; first charge of 2,000 kg of KOH as caustic potash (new pipe product,
     32 %) from a chlor-alkali cell given potash; quicklime regenerates it; CaF2 out in 1 t bags of Synthetic Fluorspar (the HF kiln and a
@@ -1948,7 +1947,7 @@ Plan: `docs/ideas-plan.md`. Branch `phase16`. Nothing changes what an existing w
 - **18b, uranium from phosphoric acid** (`docs/multiblocks/uranium-from-phosphate.md`): **acid pretreatment** (45 kW) and the
   **DEPA-TOPO circuit** against it (60 kW): first charge of kerosene and extractant drums (FILLING), then 2.7 kg/h of uranium into the
   strip on iron ingots; treated acid (a new pipe product) on to the evaporator; the acid bypasses the circuit when it cannot take it.
-  The second cycle waits on Phase 16. New item: the extractant drum.
+  The second cycle was built on 2026-11-10 (see "Tim's answers" below). New item: the extractant drum.
 - **Field Manual:** PHOSPHORIC ACID, FERTILIZER, URANIUM FROM PHOSPHATE.
 - **Tests:** `PhosphateTest` (5); NeoForge `phosphoric`, `potash`, `phosphate_uranium`; client `phosphatePlant` (filmed).
   At the end of the phase (2026-11-10): the full NeoForge server suite, 53 of 53 passed (49 earlier Wildcatter scenes, `always_pass`
@@ -1958,8 +1957,8 @@ Plan: `docs/ideas-plan.md`. Branch `phase16`. Nothing changes what an existing w
 
 ## Phase 19a: containment and protection (2026-11-10; built while Tim was away; decisions: `docs/questions/phase19-reactor.md`)
 Spec: `docs/multiblocks/reactor-extensions.md` ("As built"). Branch `phase19`.
-- **Existing worlds unchanged:** the rules that change a reactor's behaviour are keys in `config/wildcatter.properties`, off unless
-  `true` (`fluid/ReactorRules`): `reactorLtop`, `reactorHeatupLimit`, `reactorRealHeatup`, `reactorDeltaTTrips`. With them off and
+- **Existing worlds unchanged:** the rules that change a reactor's behaviour were keys in `config/wildcatter.properties`, off unless
+  `true` (`fluid/ReactorRules`; since 2026-11-10 world rules in `dev.wildcatter.Rules`, on in new worlds, off in existing ones): `reactorLtop`, `reactorHeatupLimit`, `reactorRealHeatup`, `reactorDeltaTTrips`. With them off and
   none of the new parts built, a reactor runs, reads and saves as before (the new saved keys default to nothing set).
 - **Containment:** containment concrete, the equipment hatch (sneak-click open or shut), the personnel airlock (click through; its doors
   interlocked), passive hydrogen recombiners, hydrogen igniters (160 W glow plugs on the residential tier), and the containment monitor:
@@ -2014,3 +2013,29 @@ entries). Branch `phase15`.
 - **Tests:** unit test `SaltDomeTest` (6). NeoForge scenes `salt_dome`, `mud_plant`, `rig_mud`, `well_control`, `blowout` (all pass;
   each clears itself before it succeeds, and the scenes force their seeds only over their own area). Client scenes `ores` and `landRig`
   changed (not run).
+
+## Tim's answers: world rules and the rest (2026-11-10; branch `w-rules`; decisions: `docs/questions/world-rules.md`)
+Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10.md`. Phase 15 (branch `phase15`) is merged.
+- **World rules (answer 23):** `Rules` (an enum of every rule, its command name, its new-world default; static values for plain-Java
+  models and worldgen) and `RulesData` (saved with the overworld as `wildcatter:rules`, its `origin` "new" or "existing"). Loaded as
+  the overworld loads (`ServerLevelEvents.LOAD` on Fabric, `LevelEvent.Load` on NeoForge), before its spawn chunks generate. With no
+  rules file, a world whose overworld is not yet initialized is new: every rule on except `reactorContamination`, `cascadeSpinUp`,
+  `realResidenceTimes`; an initialized one (saved before) is existing: all off; logged. `/wildcatter rule [<name> [true|false]]`
+  (game masters) lists, reads and sets. `ReactorRules` is gone; `standard` and `wattsPerFe` stay in the config file. The game test worlds
+  start as existing worlds (`RulesData.testWorldsAsExisting`); scenes switch on what they test, by command or a batch environment.
+- **Oilfield rules (answer 2):** `saltDomeGrid192` (off: the old dome placement exactly, through `ore/SaltDomePlacement` and the old
+  biomes; no grid fields), `mudGel` (off: no LOW GEL), `wellControl` (off: no kick, NO BOP or washout).
+- **Real residence times (answer 15):** `fluid/Holdup`; the coke oven battery (18 h), the Bayer digester (1 h) and precipitator (36 h)
+  hold their feed with `realResidenceTimes` on (off by default); off and empty, the old code runs.
+- **Dry casks (answer 20):** `SpentFuel.Assembly.cooled` and `eligibilityWatts` (cooling counted 100x for the station's limits).
+- **A placed fuel assembly (answer 21):** its loot table copies its assay and custom data from the block entity; a click reads its assay.
+- **18b's second cycle (answer 22):** `DepaTopoCircuitBlockEntity.takeAuc` on ammonia and liquid CO2; the uranium calciner takes AUC
+  from a circuit it touches; U3O8 drums from the drum filler.
+- **Field Manual:** WORLD RULES (new); the ash bed, spin-up and reactor pages name the world rules.
+- **Tests:** unit `HoldupTest` (4), `CaskCoolingTest` (2), `ReactorLimitsTest`'s rules test rewritten; NeoForge server scenes
+  `world_rules`, `cask_cooling`, `assembly_assay`, `phosphate_auc`, `residence_holds` (new), the oilfield scenes in a batch with their
+  rules on, the uranium and reactor scenes setting rules by command. Client scene `saltDomeFilm` (new, filmed); `ores` and `landRig`
+  switch on the rules they show (not run). At the end: the full NeoForge server suite 74 of 74 passed (63 earlier Wildcatter scenes, the
+  5 oilfield scenes, the 5 new and `always_pass`); unit tests 395, none failed (2 skipped).
+- **Known gaps:** no new placeholders. The coker drums' 12-24 h fill and the furnace's firing are still not holds. A cask record saved
+  before counts its cooling from now. The salt dome film is of a dome placed by command on a built stone column in the flat test world.

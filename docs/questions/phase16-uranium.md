@@ -65,6 +65,7 @@ is behind a default-off setting, or happens only once the player adds the new pa
   mod already takes settings, and a missing key is off, so no world changes on update.
 - **Alternatives:** on for new worlds and off for worlds made before (a saved flag, as the electrical standard is saved); a game rule;
   per-plant switches. **Tim:** should these rules stay off by default, or be on for new worlds?
+- **Tim (2026-11-10):** per-world rules, on in new worlds and off in existing ones, changeable by command (answer 23). `fluorinatorAshBed` is on in new worlds; `cascadeSpinUp` is off even in new worlds. `Rules` now reads the world's rules (`RulesData`), not the config file.
 
 ### 9. What the ash bed changes when the rule is off
 - **Chosen:** retiring works always (a sneak-click or RETIRE BED), so ash drums and their uranium are there for anyone; only the BED FULL
@@ -138,6 +139,7 @@ is behind a default-off setting, or happens only once the player adds the new pa
   assembly placed and broken again reads 4.95 %.
 - **Why:** the line passes uranium by mass between touching parts; a blend is what a real line would make if two assays met in it.
 - **Alternatives:** refuse a 30B of another assay while the line holds uranium; keep the assay on the placed block (a block entity).
+- **Tim (2026-11-10):** "it keeps its assay" (answer 21). Built: the standing assembly's block entity keeps the item's components and its drop copies the assay and the inspection record (handled, bent grid, inspected) back; a click reads its assay. Scene `assembly_assay`.
 
 ### 20. The reactor's fresh reactivity at lower assays
 - **Chosen:** the spec's proposed +16,000 pcm at 4.95 %, 4,000 pcm less for each percent below (3 %: +8,200 pcm). Each core position
@@ -150,6 +152,7 @@ is behind a default-off setting, or happens only once the player adds the new pa
 - **Why:** Tim's example of what must not change on a running cascade; on, a power cut no longer stops a cascade at once, and a new one
   takes 10 minutes to start.
 - **Alternatives:** on for cascades built after this wave (a saved flag on each machine).
+- **Tim (2026-11-10):** off even in new worlds (answer 23): the world rule `cascadeSpinUp`, set by `/wildcatter rule`.
 
 ### 22. Cooling is opt-in by placing a skid
 - **Chosen:** a feed station remembers that a skid has served its header; from then on it needs one cooling (water and power), or after 5

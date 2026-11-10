@@ -8,7 +8,7 @@
   DAP (on the ammonia plant's ammonia) in 1 t bags. A potash dissolver, vacuum crystallizer and dryer: 5 t/h of muriate of potash in
   bags. The bags carry `c:fertilizers` for another mod's crops. Spec: `docs/multiblocks/fertilizer.md`.
 - **Uranium from phosphoric acid (18b):** an acid pretreatment and a DEPA-TOPO circuit take about 2.7 kg/h of uranium out of the filter
-  acid into its strip; the treated acid goes on to the evaporator. The second cycle, to the uranium calciner, waits on Phase 16. Spec:
+  acid into its strip; the treated acid goes on to the evaporator. The second cycle sends it on to the uranium calciner (see below). Spec:
   `docs/multiblocks/uranium-from-phosphate.md`.
 - Existing worlds are unchanged. Decisions for review: `docs/questions/phase18-phosphate.md`.
 
@@ -28,12 +28,12 @@
   HF for magnesia and far less ash. Without ammonia the magnesia route is unchanged. Spec: `docs/multiblocks/adu-yellowcake.md`.
 - **Conversion's by-products (16b1):** a CATHODE GAS SCRUBBER sends the fluorine cells' hydrogen to the reducer; the fluorinator's bed
   can be retired into Fluorinator Ash Drums whose uranium the mill's leach tank recovers (BED FULL stops a fluorinator only with
-  `fluorinatorAshBed=true` in `config/wildcatter.properties`); a KOH SCRUBBER cleans the hydrofluorinator's off-gas, charged with caustic
+  the world rule `fluorinatorAshBed`); a KOH SCRUBBER cleans the hydrofluorinator's off-gas, charged with caustic
   potash from a chlor-alkali cell run on potash and regenerated with quicklime into Synthetic Fluorspar. Spec:
   `docs/multiblocks/conversion-extensions.md`.
 - **Enrichment operations (16c1):** sneak-click the feed station to choose the product (3.0-4.95 %) and tails (0.20-0.30 %) assays; the
   30B, the fuel assembly and the reactor carry the assay (lower assay, shorter cycle). A CASCADE COOLING SKID cools the casings; a cascade
-  that has had one reads CASING HOT without it. Spin-up and coast-down are opt-in (`cascadeSpinUp=true`). Spec:
+  that has had one reads CASING HOT without it. Spin-up and coast-down are opt-in (the world rule `cascadeSpinUp`, off even in new worlds). Spec:
   `docs/multiblocks/enrichment-operations.md`.
 - **ISR operations (16d1):** a CO2 LIQUEFIER on a lime kiln fills a CO2 STORAGE TANK; set against a header house it doses the injection
   and raises the head grade up to 30 %. The header house's bleed can be piped to an injection pump and a disposal well. IX columns can run
@@ -47,7 +47,7 @@
     containment monitor that reads the building CLOSED (and its volume) or OPEN. Closed, it takes the core's hydrogen, burns it with
     powered igniters, and blasts a compartment at 4 % without one; its pressure rises with the steam let in.
   - **The pressurizer relief tank:** the PORVs' discharge condenses in 30 m3 of water until its rupture disc bursts at 0.7 MPa.
-  - **New rules, all off unless `config/wildcatter.properties` turns them on** (existing reactors are unchanged): `reactorLtop` (the P-T
+  - **New world rules** (on in new worlds, off in existing ones; existing reactors are unchanged): `reactorLtop` (the P-T
     curve, LTOP, the vessel failing over twice the curve), `reactorHeatupLimit` (HEAT-UP RATE over 55 C/h), `reactorRealHeatup` (no 80x
     heat-up), `reactorDeltaTTrips` (the full OT and OP delta-T trips).
 - **Reactor extensions 19b** (same; decisions 14-20):
@@ -55,7 +55,7 @@
     horizontal concrete storage modules on a pad, freeing the pool's racks.
   - **Fresh-fuel inspection:** a new-fuel inspection stand marks assemblies INSPECTED; the assembly fixture straightens a bent grid.
   - **Contamination:** a personnel monitor and a decontamination washer.
-  - **New rules, off unless turned on:** `reactorContamination` (coolant activity; contamination where primary water gets out, its dose,
+  - **New world rules:** `reactorContamination` (off even in new worlds) (coolant activity; contamination where primary water gets out, its dose,
     and its pick-up by players), `fuelHandlingDamage` (a 1 % chance of a bent grid on a move, a leaking rod if loaded unseen).
 
 ### The oilfield (Phase 15, built 2026-11-09 while Tim was away)
@@ -69,6 +69,25 @@
   rig stops short; with light mud it kicks, and must be shut in within 30 s, weighted to the kill weight and circulated; otherwise it
   blows out, drains the field and can catch fire. PLC points for the kick, the shut-in and the mud.
 - Decisions for review: `docs/questions/phase15-oilfield.md`.
+
+### Tim's answers: world rules, the oilfield's rules, real holds, casks, assays, 18b's second cycle (built 2026-11-10, branch `w-rules`)
+- **World rules (answer 23):** every opt-in rule is saved with the world instead of in `config/wildcatter.properties`. A new world
+  starts with them on, except `reactorContamination`, `cascadeSpinUp` and `realResidenceTimes`; a world saved before this version loads
+  with all of them off. Operators list and set them with `/wildcatter rule <name> [true|false]`. The rules: `fluorinatorAshBed`,
+  `cascadeSpinUp`, `reactorLtop`, `reactorHeatupLimit`, `reactorRealHeatup`, `reactorDeltaTTrips`, `reactorContamination`,
+  `fuelHandlingDamage`, `saltDomeGrid192`, `mudGel`, `wellControl`, `realResidenceTimes`. `standard` and `wattsPerFe` stay in the config.
+- **The oilfield's rules (answer 2):** with `saltDomeGrid192` off, salt domes are placed exactly as before Phase 15 and have no oil
+  fields, so an existing world's fields do not move; with `mudGel` off, plain-water mud drills at full rate; with `wellControl` off, a
+  land rig drills into deep fields and rock salt as before (no kick, NO BOP or washout).
+- **Real residence times (answer 15):** with `realResidenceTimes` on (off by default), coke ovens coke each charge for 18 h, the Bayer
+  digester holds its slurry an hour and the precipitators their liquor 36 h before the product moves on; the steady rate is unchanged.
+- **Dry casks (answer 20):** a cask's limits count an assembly's cooling time 100x, as burnup is; fuel is eligible days, not months,
+  after discharge. The heat it carries stays the real one.
+- **A placed fuel assembly (answer 21):** stood up as a block and broken again, it keeps its assay and its inspection record.
+- **Uranium from phosphate, the second cycle (answer 22):** the DEPA-TOPO circuit's ammonium carbonate strip, on liquid ammonia and the
+  CO2 liquefier's liquid CO2, sends its uranium as AUC to the uranium calciner against it; the drum filler fills U3O8 drums.
+- **Field Manual:** WORLD RULES; the ash bed, spin-up and reactor rules pages now name the world rules.
+- Decisions for review: `docs/questions/world-rules.md`.
 
 ## v0.6.0 (released 2026-11-10)
 

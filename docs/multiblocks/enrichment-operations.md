@@ -138,7 +138,7 @@ The grid is a sketch; the game test is the layout of record.
   4.95 % is left unstamped, so it stacks and reads as every 30B before). The fuel plant carries it by mass through every stage, the rod
   welder and the assembly fixture by rods, onto the assembly; the reactor keeps each assembly's assay: starting reactivity
   +16,000 pcm at 4.95 %, 4,000 pcm less a percent below. Tooltips read it.
-- **Spin-up and coast-down** (`cascadeSpinUp=true` in `config/wildcatter.properties`, **default off**): 10 minutes from rest to full speed,
+- **Spin-up and coast-down** (the rule `cascadeSpinUp`, **off**; since 2026-11-10 a world rule, off even in new worlds, answer 23): 10 minutes from rest to full speed,
   an hour from full speed to rest with no drive, separating at its speed share; a coasting machine reads COASTING. Critical speeds and
   crashes are 16c2.
 - **Cascade cooling skid** (`wildcatter:cascade_cooling_skid`, 3 x 3 x 6, 55 kW, box west): its side against the header; circulating water
@@ -149,3 +149,7 @@ The grid is a sketch; the game test is the layout of record.
   the machines coast and the cascade feeds; water cut, CASING HOT). Unit test `UraniumOperationsTest` (the table, fresh reactivity,
   cooling water).
 
+### After Tim's answers (2026-11-10, branch `w-rules`)
+- **A placed fuel assembly keeps its assay (answer 21):** its main cell's block entity keeps the item's components; the loot table copies
+  `wildcatter:assay` and the custom data (handled, bent grid, inspected) back onto the drop, and a click reads the standing assembly's
+  assay. A standard 4.95 % assembly drops unstamped. NeoForge scene `assembly_assay`.

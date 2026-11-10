@@ -172,6 +172,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("ores")) {
 				ores(context, server);
 			}
+			if (only("saltDomeFilm")) {
+				SaltDomeFilmScene.run(context, server, y);
+			}
 			if (only("acidPlant")) {
 				acidPlant(context, server);
 			}

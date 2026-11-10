@@ -21,6 +21,7 @@ spec-level choices are items 14-22 of `docs/questions/specs-wildcatter.md`; thes
 - **Why:** a dome spans up to four chunks; drawing only inside the chunk being generated never writes outside the generation region,
   and every chunk of the dome is drawn by its own pass.
 - **Alternatives:** draw the whole dome from its centre chunk (writes into neighbours the region may not hold).
+- **Tim (2026-11-10):** "merge, with the 192-block dome grid ... as per-world rules: on in new worlds, off in existing ones" (answer 2). Built as the world rule `saltDomeGrid192`: on, as here; off (worlds from before), the dome is placed exactly as before Phase 15 and has no oil fields. To keep the old placement the placed feature went back to its old biomes; its own modifier runs the old four with the rule off and hands the chunk to the grid dome with it on (`world-rules.md` 4).
 
 ### 3. Where the flank fields lie against the salt
 - **Chosen:** a flank field's inner edge is one block inside the salt's radius at the field's top (the salt is wider low down); it runs
@@ -90,6 +91,7 @@ spec-level choices are items 14-22 of `docs/questions/specs-wildcatter.md`; thes
   rig's rate in every world until bentonite is mixed.
 - **Why:** the spec's choice; it gives bentonite its use.
 - **Alternatives:** only below 15 lb/bbl once some bentonite has been mixed (water stays full speed); or a smaller penalty.
+- **Tim (2026-11-10):** "the LOW GEL mud rule as a per-world rule: on in new worlds, off in existing ones" (answer 2). Built as the world rule `mudGel`: off, plain water drills at full rate, as before. Kicks, NO BOP and the washout went behind a third rule, `wellControl`, so an existing land rig drills as before too (`world-rules.md` 3).
 
 ### 14. Barite in a block, and bags per weight-up
 - **Chosen:** a barite block is 2.6 t at 90 %, so 2,340 kg of barite (ores.md's density, not the spec's 3.8 t); a weight-up of the land

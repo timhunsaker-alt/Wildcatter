@@ -245,9 +245,10 @@ The grid is a sketch; the game test is the layout of record.
 ## As built
 
 ### 19a (2026-11-10, branch `phase19`; decisions in `docs/questions/phase19-reactor.md`)
-- **The rule for existing worlds.** What would change an existing reactor is behind a key in `config/wildcatter.properties`, off unless
-  `true`: `reactorLtop`, `reactorHeatupLimit`, `reactorRealHeatup`, `reactorDeltaTTrips` (`fluid/ReactorRules`, read at server start in
-  `StandardData.apply`). Without them, and without the new parts, a reactor runs exactly as before.
+- **The rule for existing worlds.** What would change an existing reactor is behind a rule: `reactorLtop`, `reactorHeatupLimit`,
+  `reactorRealHeatup`, `reactorDeltaTTrips`. Built as config keys; since 2026-11-10 (answer 23) they are world rules (`dev.wildcatter.Rules`,
+  saved with the world by `RulesData`), on in new worlds and off in worlds saved before, set by `/wildcatter rule`. Without them, and
+  without the new parts, a reactor runs exactly as before.
 - **Containment** (`ContainmentPartBlock`, `ContainmentMonitorBlockEntity`, `ContainmentDoorBlockEntity`): `containment_concrete` (blast
   resistance 1,200), `equipment_hatch` 4 x 4 x 1, `personnel_airlock` 2 x 3 x 3, `hydrogen_recombiner` 1 x 2 x 1, `hydrogen_igniter`
   (one block, a 160 W load on the residential tier, lit when powered), `containment_monitor` 1 x 2 x 1. The monitor flood-fills from the
@@ -296,3 +297,10 @@ The grid is a sketch; the game test is the layout of record.
   batch).
 - **Placeholders:** `dry_storage_canister_placeholder`, `decon_washer_placeholder` (item icons drawn by script).
 
+### After Tim's answers (2026-11-10, branch `w-rules`)
+- **World rules (answer 23):** the six reactor rules are saved with the world: on in new worlds except `reactorContamination` (off even
+  there), off in worlds saved before. `/wildcatter rule <name> [true|false]` lists and sets them.
+- **Dry casks (answer 20):** each assembly record keeps its seconds since discharge (`SpentFuel.Assembly.cooled`, saved as `<prefix>Nc`);
+  the station's 1.5 kW and 12 kW limits read the decay heat at 100x that time (`eligibilityWatts`), as burnup is compressed. The module,
+  the pool and the readouts carry the real heat. Fuel from a full-power run is eligible about 1.6 days of world time after discharge.
+  Unit test `CaskCoolingTest`; NeoForge scene `cask_cooling`.

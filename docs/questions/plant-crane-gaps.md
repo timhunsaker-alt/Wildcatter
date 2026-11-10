@@ -119,6 +119,7 @@ and the oilfield and plant leftovers. Format as in `README.md` here. Built on br
   what is in process and the next product's hour. The coke drum switches on its fill time (16 h) instead of at a tonne, and its
   coke is cut out after steaming and quenching (about 8 h). Each game test gets an `age` hook to run the hold forward.
 - **Alternatives:** scaled-down holds (minutes standing for hours: not real, and CLAUDE.md asks for real values).
+- **Tim (2026-11-10):** "build the real holds as an opt-in world setting, off by default" (answer 15). Built as the world rule `realResidenceTimes` (off even in new worlds): coking 18 h, digestion 1 h, precipitation 36 h, by this plan (`fluid/Holdup`); the coker drums' fill stays a tonne switch. Scene `residence_holds`.
 
 ### 12. The cranes' remaining gaps
 - **Erection and assembly:** a tower crane erected by a mobile crane in sections (about 2 days), a crawler's boom assembled with an

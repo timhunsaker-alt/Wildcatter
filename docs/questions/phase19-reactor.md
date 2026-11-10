@@ -25,6 +25,7 @@ per world); 15 (the contamination numbers); 18 (dry casks against real decay hea
 - **Alternatives:** on for worlds created after Phase 19 (a world-stored flag beside the electrical standard); or on everywhere
   with the failure left out (alarms only). The curve above 290 C is not binding here (the safety valves cover it); a real curve keeps
   rising.
+- **Tim (2026-11-10):** on in new worlds, off in existing ones (answer 23): the world rule `reactorLtop`.
 
 ### 2. Default on for new worlds? `reactorHeatupLimit` (the 55 C/h alarm and the fatigue count) — **Needs Tim**
 - **Chosen:** off by default. On, the console works out the heat-up rate in plant time (the game's rate over the 80x compression),
@@ -33,6 +34,7 @@ per world); 15 (the contamination numbers); 18 (dry casks against real decay hea
 - **Why:** it changes the readout of every existing reactor and adds an alarm to an existing heat-up. Restricted to below no-load,
   because the power ascension's Tavg program (291.7 to 308.9 C in minutes) would alarm on every load change.
 - **Alternatives:** on for new worlds; a cool-down alarm too (8d's cool-down already holds 55 C/h on its own).
+- **Tim (2026-11-10):** on in new worlds, off in existing ones (answer 23): the world rule `reactorHeatupLimit`.
 
 ### 3. Default on for new worlds? `reactorRealHeatup` (the 80x compression removed) — **Needs Tim**
 - **Chosen:** off by default, as the spec says. On, cold to hot standby takes the real 8-12 hours (the RCS, steam generators, pressurizer
@@ -40,6 +42,7 @@ per world); 15 (the contamination numbers); 18 (dry casks against real decay hea
 - **Why:** it slows every existing heat-up 80 times.
 - **Alternatives:** the spec calls it a world setting; it is a server-wide config key here, as the others (a per-world flag would need a
   Create World option). Tim to say whether it should move to the Create World screen.
+- **Tim (2026-11-10):** on in new worlds, off in existing ones: "including `reactorRealHeatup` (the reactor heats up in real hours)" (answer 23). A world rule, set by `/wildcatter rule`, not a Create World option.
 
 ### 4. Default on for new worlds? `reactorDeltaTTrips` (the full OT-delta-T and OP-delta-T trips) — **Needs Tim**
 - **Chosen:** off by default. On, both setpoints are worked out each step and trip the reactor naming OT-DELTA-T or OP-DELTA-T, ahead
@@ -49,6 +52,7 @@ per world); 15 (the contamination numbers); 18 (dry casks against real decay hea
 - **Why:** a reactor that runs today could trip on a fast Tavg rise or on natural circulation at a few per cent (delta-T 55 C at 5 %
   with no pumps); a real plant would, an existing world must not start to.
 - **Alternatives:** on for new worlds.
+- **Tim (2026-11-10):** on in new worlds, off in existing ones (answer 23): the world rule `reactorDeltaTTrips`.
 
 ### 5. The OP-delta-T constants — **Needs Tim**
 - **Chosen:** K4 1.0864, K5 0.02 /F (0.036 /C) on rising Tavg only with a 10 s rate filter, K6 0.00277 /F (0.0050 /C) above T''. These
@@ -61,12 +65,14 @@ per world); 15 (the contamination numbers); 18 (dry casks against real decay hea
 - **Chosen:** off by default (19b; see 14-16).
 - **Why:** it puts contamination round a part broken in an existing plant, and doses players who walk there.
 - **Alternatives:** on for new worlds.
+- **Tim (2026-11-10):** off even in new worlds (answer 23): the world rule `reactorContamination`, set by `/wildcatter rule`.
 
 ### 7. Default on for new worlds? `fuelHandlingDamage` (bent grids) — **Needs Tim**
 - **Chosen:** off by default (19b; see 17).
 - **Why:** with it on an assembly moved into the refuelling machine may get a bent grid and, loaded uninspected, a leaking rod: an
   existing outage would change.
 - **Alternatives:** on for new worlds; on only with the inspection stand built.
+- **Tim (2026-11-10):** on in new worlds, off in existing ones (answer 23): the world rule `fuelHandlingDamage`.
 
 ### 8. Server-wide keys, not per world — **Needs Tim**
 - **Chosen:** each rule is one key in `config/wildcatter.properties`, read at server start, as the brief asked. A new config file is
@@ -74,6 +80,7 @@ per world); 15 (the contamination numbers); 18 (dry casks against real decay hea
 - **Why:** it is the mechanism `standard` and `wattsPerFe` already use, and a key off by default cannot touch an existing world.
 - **Alternatives:** store each rule with the world when it is created (as the electrical standard is), so "on for new worlds" becomes
   possible without touching old ones. That is the natural next step if Tim answers yes to any of 1-7.
+- **Tim (2026-11-10):** "one pattern for every opt-in rule: per-world rules, on in new worlds and off in existing ones, changeable by command" (answer 23). Built: the rules are saved with the world (`RulesData`), `/wildcatter rule <name> [true|false]`; the config file keeps only `standard` and `wattsPerFe`. How an existing world is told from a new one: `world-rules.md` 1.
 
 ## 19a: containment and protection
 
@@ -168,6 +175,7 @@ per world); 15 (the contamination numbers); 18 (dry casks against real decay hea
 - **Why:** the limit is the canister's real thermal design (cladding under 400 C); burnup is compressed 100x but decay heat is not.
 - **Alternatives (for Tim):** count cooling time 100x for cask eligibility, as burnup is; raise the per-assembly limit (about 40 kW
   would take fuel about a month old); or a bigger pool. Recommended: count cooling time 100x for eligibility only.
+- **Tim (2026-11-10):** "count cooling 100x for cask eligibility only" (answer 20). Built: each record keeps its time since discharge and the station's limits read its decay heat at 100x that time; the heat carried stays real. Scene `cask_cooling`.
 
 ### 19. Linking a module; one canister each
 - **Chosen:** a sneak-click on the station with the Power Meter links the nearest empty storage module within 64 m. A module holds one

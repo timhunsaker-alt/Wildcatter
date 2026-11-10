@@ -110,3 +110,9 @@ That is 2.78 kg/s, enough tar for the 4.7 t of pitch a day a 40-pot line's anode
   3. Pitch comes into its tank.
   4. With the by-product plant's exhauster unpowered, the battery stops: its gas has nowhere to go.
 - **Screenshot:** the battery.
+
+## As built: the real coking hold (2026-11-10, branch `w-rules`; Tim's answer 15)
+- With the world rule `realResidenceTimes` (off by default, even in new worlds) each charge cokes for 18 h (`Tuning.COKING_HOLD_S`)
+  before it is pushed to the quench tower; the battery fills until its ovens hold 18 h of its 240 t a day, so the steady rate is the
+  same; its gas comes off as it cokes. The readout shows the coal in the ovens and the next push. Turned off, what is in the ovens is
+  pushed as the quench tower takes it. `fluid/Holdup` (half-hour buckets). NeoForge scene `residence_holds`.

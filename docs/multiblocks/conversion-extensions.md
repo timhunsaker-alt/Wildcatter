@@ -120,8 +120,8 @@ touching the part they serve; any rotation. Removing one returns that part to to
 - **The ash bed:** a sneak-click on the fluorinator, or a PLC's **RETIRE BED** point, retires its bed: 10 minutes RETIRING THE BED, then its
   ash into **Fluorinator Ash Drums** (400 kg each; empty drums from a hopper on top, six out slots under it), then a new bed of 500 kg of
   fluorspar (fluorspar blocks or synthetic fluorspar bags by the same hopper). NO DRUMS, FULL, NO FLUORSPAR. PLC points also BED FULL and
-  RETIRING. **BED FULL** at 2 t stops the fluorinator **only with `fluorinatorAshBed=true`** in `config/wildcatter.properties` (default
-  off: fluorinators already built keep running as before).
+  RETIRING. **BED FULL** at 2 t stops the fluorinator **only with the rule `fluorinatorAshBed`**: built as a config key, off; since
+  2026-11-10 (Tim's answer 23) a world rule, on in new worlds and off in worlds saved before, so fluorinators already built keep running.
 - **Ash drums in the mill:** the leach tank takes them by its hopper (a second slot) and, while it leaches ore, adds their uranium (3 %,
   14.2 kg of U3O8 a drum) to its slurry at up to 0.05 kg/s; the drum is used up.
 - **KOH scrubber** (`wildcatter:koh_scrubber`, 3 x 8 x 3, 15 kW, box on the west): against the hydrofluorinator. Its first charge, 2,000 kg

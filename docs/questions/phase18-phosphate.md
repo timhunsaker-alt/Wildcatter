@@ -119,6 +119,7 @@ Specs: `docs/multiblocks/fertilizer.md` (18a) and `docs/multiblocks/uranium-from
 - **Why:** the brief: build what does not depend on Phase 16. Holding the uranium means nothing is lost when the second cycle comes.
 - **Alternatives:** leave 18b unbuilt until Phase 16 merges; or, in the meantime, send the strip to the uranium mill's precipitation
   (not the real route).
+- **Tim (2026-11-10):** "build it on `w-next`" (answer 22). Built on branch `w-rules` (cut from `w-next`): the ammonium carbonate strip on ammonia and liquid CO2, AUC to the uranium calciner against the circuit, U3O8 drums (`world-rules.md` 8). Scene `phosphate_auc`.
 
 ### 18. Treated acid is its own product
 - **Chosen:** the circuit's acid comes out as `treated acid (28 % P2O5)`, which the evaporator takes as it takes filter acid. With no

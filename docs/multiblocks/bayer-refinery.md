@@ -153,3 +153,9 @@ PACKAGE BOILER (gas or LPG, pumped water) -> process steam -> DIGESTER, EVAPORAT
   - the filter press drops red mud, which places as a block;
   - with the caustic shut off, the evaporator slows and reads NO CAUSTIC.
 - **Screenshot:** the refinery.
+
+## As built: the real holds (2026-11-10, branch `w-rules`; Tim's answer 15)
+- With the world rule `realResidenceTimes` (off by default, even in new worlds) the digester holds each charge of slurry an hour at
+  145 C before the flash tanks (minute buckets; the steam is taken with the feed), and the precipitator holds its liquor 36 h before its
+  hydrate slurry leaves (half-hour buckets). Each fills to its hold's worth of the 105 t a day; the steady rate is the same. Turned off,
+  what is held goes on. `fluid/Holdup`. NeoForge scene `residence_holds`.

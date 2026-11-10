@@ -3,7 +3,7 @@
 > **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Proposed phase **18b**. Decisions are in
 > `docs/questions/specs-wildcatter.md` (items 57-59). Depends on the fertilizer plant (fertilizer.md, 18a) and the ADU calciner
 > (adu-yellowcake.md, 16a). **The first cycle is built as 18b on branch `phase18` (2026-11-10), without Phase 16; the second cycle
-> is a plan: see "As built" below and `docs/questions/phase18-phosphate.md`.**
+> is built on branch `w-rules` (2026-11-10, Tim's answer 22): see "As built" below.**
 
 Phosphate rock carries uranium (ores.md: 70-200 ppm real, **1,300 ppm** in the game, which the scintillometer hears). Most of it
 dissolves into the wet-process phosphoric acid. From the late 1970s to the 1990s, Florida and Louisiana plants recovered it by
@@ -101,7 +101,7 @@ filter acid, **2.7 kg of U an hour** recovered at the full 0.64 L/s, a drum's 32
 | First charge | **4,000 L of kerosene** by pipe and **5 drums** | The spec's 5,000 L |
 | Make-up | 0.05 L of organic a m3 of acid, four-fifths kerosene, one-fifth extractant: a drum lasts about 8,000 h | The spec's loss |
 | Iron | **100 kg** an ingot (the mod's figure), 0.5 kg a kg of U: an ingot lasts about 72 h | The spec's figure |
-| Strip hold | **326 kg of U** (an ADU drum's) | Until the second cycle is built |
+| Strip hold | **326 kg of U** (an ADU drum's) | A buffer for the second cycle |
 | Pretreatment's bypass | the filter acid straight out of its own south face, no power needed | The spec: the fertilizer plant runs on |
 
 ### Nozzles
@@ -125,3 +125,15 @@ filter acid, **2.7 kg of U an hour** recovered at the full 0.64 L/s, a drum's 32
 3. FULL then means the calciner is backed up, not that the second cycle is missing; the strip hold stays as a buffer.
 4. Tests: `phosphate_uranium` gains the calciner and filler, a drum brought near full by hook, and NO AMMONIA with the ammonia cut, as the
    spec's game test asks; the client screenshot of the circuit beside the plant.
+
+### As built: the second cycle (2026-11-10, branch `w-rules`; Tim's answer 22; decisions `docs/questions/world-rules.md` 8)
+- **Ammonium carbonate strip:** liquid ammonia (L, the ammonia plant's) and liquid CO2 (kg, 16d1's liquefier or its storage tank) by pipe
+  on the **east face of the circuit's east end's front three cells**; 0.4 kg of NH3 and 0.5 kg of CO2 a kg of U (`Tuning.AUC_NH3_PER_U`,
+  `AUC_CO2_PER_U`). Readouts NO AMMONIA and NO CO2 (the circuit's "second cycle" line).
+- **AUC to the calciner:** 16a's `uranium_calciner` against the circuit's east end (its back cells) asks the circuit for AUC as it asks a
+  precipitation tank for ADU (`DepaTopoCircuitBlockEntity.takeAuc`), at most its 0.45 kg/s of U3O8 (U is 0.848 of U3O8); it calcines it
+  at 750 C to U3O8 at 96 % for the `drum_filler` against the calciner, which fills **U3O8 Drums**. The AUC's ammonia and CO2 go to the
+  calciner's off-gas count. What the calciner cannot burn (no gas) goes back to the strip.
+- **FULL** now means the strip's 326 kg are waiting on a calciner that is missing or backed up (its filler full).
+- **Layout of record** (the scene `phosphate_auc`): the circuit x 3-18, z 0-5; the calciner x 19-21, z 4-6 (its box north of its main
+  cell at x 19, z 3); the drum filler x 19-20, z 7-8; ammonia piped to x 19, z 0 and CO2 to x 19, z 2; the calciner's gas on its east face.

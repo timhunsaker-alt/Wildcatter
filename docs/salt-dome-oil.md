@@ -105,3 +105,13 @@ Decisions taken while building are in `docs/questions/phase15-oilfield.md` (item
 - **Tests:** unit test `SaltDomeTest` (6); NeoForge scene `salt_dome` (seismograph, the feature placed by hand matching `SaltDome` block
   for block, the small rig striking a flank field and a pumpjack lifting it, the caprock well at 99 % then 43 %). The client `ores` scene
   was updated to place a grid dome (not run). No screenshot yet (the client was not free).
+
+### After Tim's answers (2026-11-10, branch `w-rules`)
+- **The world rule `saltDomeGrid192` (answer 2):** on in new worlds, off in worlds saved before. Off, the dome is placed exactly as
+  before 15a: the placed feature `wildcatter:salt_dome` has its old biomes again (plains, sunflower plains, swamps, beaches, on both
+  loaders) and keeps its place among the features; its one modifier, `wildcatter:salt_dome_placement`, runs the old rarity 1 in 150,
+  in square, y 0 and biome check on the same random numbers, and the feature (its old sizes in its config again) runs the old code; and
+  `ReservoirData.site` finds no grid dome, so no flank field or caprock pool. On, the modifier hands each chunk to the grid dome, which
+  is drawn in the chunks whose neighbourhood holds a dome biome (a dome lies within a chunk of its centre). NeoForge scene `world_rules`
+  checks 3,000 chunks of the placement against the old modifiers; the five oilfield scenes run with the rule on. Client scene
+  `saltDomeFilm` (filmed).

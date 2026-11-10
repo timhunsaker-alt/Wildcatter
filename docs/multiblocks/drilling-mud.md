@@ -153,3 +153,9 @@ Decisions taken while building are in `docs/questions/phase15-oilfield.md` (item
   BOP). The client `landRig` scene now sets a BOP and weights its mud (not run).
 - **Not built:** the hydraulic line drawn between accumulator and stack (decision 20); lightning and running engines as ignition; a relief
   well game test (the kill is in code); SICP and the choke.
+
+### After Tim's answers (2026-11-10, branch `w-rules`)
+- **The world rule `mudGel` (answer 2):** on in new worlds, off in worlds saved before; off, no mud is LOW GEL and plain water drills at
+  full rate (`RigSubstructureBlockEntity.lowGel`).
+- **The world rule `wellControl`** (`docs/questions/world-rules.md` 3): on in new worlds, off in worlds saved before; off, a land rig
+  drills into a deep field without a BOP and without a kick, and through rock salt without a washout, as before Phase 15.
