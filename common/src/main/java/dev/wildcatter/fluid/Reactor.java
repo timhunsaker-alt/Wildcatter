@@ -33,6 +33,7 @@ public final class Reactor {
 		public double rhrPump;                        // 0 to 1: the RHR pump (8d)
 		public double rhrWaterKgs;                    // circulating water through its exchanger
 		public double rhrWaterC = Tuning.LAKE_C;
+		public boolean contained;                     // a closed containment takes the hydrogen (19a): no blast of the reactor's own
 	}
 
 	// fuel
@@ -78,6 +79,22 @@ public final class Reactor {
 	double waterUsed;
 	String cvcsState = "idle";
 	String held = "";
+	// 19a (each read only with its rule on, ReactorRules): the heat-up rate in plant time and its excursions; LTOP and the P-T curve;
+	// the delta-T trips' filters and setpoints; what the PORVs (and a failed vessel) let go this step
+	double heatupRate;
+	boolean heatupAlarm;
+	int fatigue;
+	boolean ltopArmed;
+	boolean ptAlarm;
+	int ptViolations;
+	boolean vesselFailed;
+	double otLag = Double.NaN;
+	double opLag = Double.NaN;
+	double otSetpoint = Double.NaN;
+	double opSetpoint = Double.NaN;
+	double reliefKg;
+	double reliefJ;
+	double locaKg;
 
 	// ---- numbers (ReactorDesign) -----------------------------------------------------------------------------------------------
 	public static double assemblyWatts() {
@@ -268,10 +285,119 @@ public final class Reactor {
 		return held;
 	}
 
-	/** Whether the pressurizer's heaters should run. */
+	/** Whether the pressurizer's heaters should run. With the LTOP rule they hold the pressure under the P-T curve too. */
 	public boolean wantsHeaters() {
-		return full() && pressure() < (coolingDown() ? cooldownMpa() : Tuning.PZR_HEATERS_ON_MPA);
+		double target = coolingDown() ? cooldownMpa() : Tuning.PZR_HEATERS_ON_MPA;
+		if (ReactorRules.ltop) {
+			target = Math.min(target, Tuning.LTOP_HEATER_SHARE * ptLimit(tcold));
+		}
+		return full() && pressure() < target;
 	}
+
+	// ---- 19a: the heat-up limit, LTOP and the P-T curve, the delta-T trips (docs/multiblocks/reactor-extensions.md) -----------------
+	/** The P-T limit curve (simplified): MPa allowed with the vessel at {@code c} C; no limit from 290 C, where the safety valves cover it. */
+	public static double ptLimit(double c) {
+		if (c >= Tuning.PT_HIGH_C) {
+			return Double.POSITIVE_INFINITY;
+		}
+		if (c <= Tuning.PT_LOW_C) {
+			return Tuning.PT_LOW_MPA;
+		}
+		return Tuning.PT_LOW_MPA + (Tuning.PT_HIGH_MPA - Tuning.PT_LOW_MPA) * (c - Tuning.PT_LOW_C) / (Tuning.PT_HIGH_C - Tuning.PT_LOW_C);
+	}
+
+	/** The heat-up rate in plant time (the real-rate equivalent of the compressed heat-up), C/h, averaged over a minute. */
+	public double heatupRate() {
+		return heatupRate;
+	}
+
+	public boolean heatupAlarm() {
+		return heatupAlarm;
+	}
+
+	/** Heat-ups over 55 C/h counted on the vessel (they do no damage). */
+	public int fatigue() {
+		return fatigue;
+	}
+
+	public boolean ltopArmed() {
+		return ltopArmed;
+	}
+
+	/** The console's LTOP ARMED switch. */
+	public boolean toggleLtop() {
+		ltopArmed = !ltopArmed;
+		return ltopArmed;
+	}
+
+	/** Below the LTOP enable temperature, filled, and LTOP not armed. */
+	public boolean ltopNotArmed() {
+		return ReactorRules.ltop && full() && tcold < Tuning.LTOP_ENABLE_C && !ltopArmed;
+	}
+
+	public boolean ptAlarm() {
+		return ptAlarm;
+	}
+
+	public int ptViolations() {
+		return ptViolations;
+	}
+
+	public boolean vesselFailed() {
+		return vesselFailed;
+	}
+
+	/** The core's delta-T, C. */
+	public double deltaT() {
+		return thot - tcold;
+	}
+
+	/** The OT delta-T setpoint, C (NaN without the rule). */
+	public double otSetpoint() {
+		return otSetpoint;
+	}
+
+	public double opSetpoint() {
+		return opSetpoint;
+	}
+
+	/** kg of steam and water the PORVs (and the safety valves) let go this step, and its enthalpy, J. */
+	public double reliefKg() {
+		return reliefKg;
+	}
+
+	public double reliefJ() {
+		return reliefJ;
+	}
+
+	/** kg a failed vessel let go into its building this step. */
+	public double locaKg() {
+		return locaKg;
+	}
+
+	/** The building's hydrogen burned explosively (a closed containment works it out, 19a). */
+	public void markExploded() {
+		exploded = true;
+	}
+
+	/** The alarms on the console, each with its rule on; empty when none. */
+	public String alarms() {
+		StringBuilder out = new StringBuilder();
+		if (vesselFailed) {
+			out.append("VESSEL FAILED");
+		}
+		if (heatupAlarm) {
+			out.append(out.isEmpty() ? "" : ", ").append("HEAT-UP RATE");
+		}
+		if (ptAlarm) {
+			out.append(out.isEmpty() ? "" : ", ").append("P-T LIMIT");
+		}
+		if (ltopNotArmed()) {
+			out.append(out.isEmpty() ? "" : ", ").append("LTOP NOT ARMED");
+		}
+		return out.toString();
+	}
+
 
 	/** The pressure held while cooling down: saturation 30 C over the hot leg, no higher than normal. */
 	double cooldownMpa() {
@@ -485,6 +611,24 @@ public final class Reactor {
 		bankD = d;
 	}
 
+	/** For the game test and unit tests: the pressurizer at the saturation temperature of {@code mpa}. */
+	public void setPressureForTest(double mpa) {
+		pzrC = Steam.tsat(mpa);
+	}
+
+	/** For the game test and unit tests: the RCS (and the steam generators) at {@code c} C. */
+	public void setTemperatureForTest(double c) {
+		tavg = thot = tcold = c;
+		sgC[0] = sgC[1] = Math.min(c, sgC[0]);
+	}
+
+	private double pinnedForTest = -1;
+
+	/** For the game test: the power held at {@code power} each step whatever the rods do (negative lets it go). Never saved. */
+	public void pinPowerForTest(double power) {
+		pinnedForTest = power;
+	}
+
 	/** For the game test: the core steady at {@code power}. */
 	public void holdPowerForTest(double power) {
 		kinetics.hold(power);
@@ -543,14 +687,23 @@ public final class Reactor {
 		ReactorCvcs.step(this, in, dt);
 
 		double p = ReactorNeutronics.kinetics(this, dt);
+		if (pinnedForTest >= 0) {
+			kinetics.hold(pinnedForTest);
+			p = pinnedForTest;
+		}
 
 		double prompt = ReactorNeutronics.decayAndXenon(this, p, dt);
 
+		reliefKg = 0;
+		reliefJ = 0;
+		locaKg = 0;
 		ReactorThermal.step(this, in, dt, p, prompt, before, anyPump);
 
 		ReactorNeutronics.burn(this, p, dt);
 
-		ReactorProtection.trips(this, in, p);
+		ReactorLimits.step(this, in, dt, before);
+
+		ReactorProtection.trips(this, in, p, dt);
 	}
 
 	// ---- saving ----------------------------------------------------------------------------------------------------------------

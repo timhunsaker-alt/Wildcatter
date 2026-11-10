@@ -560,5 +560,12 @@
   "block.wildcatter.air_compressor": "Instrument Air Compressor",
   "block.wildcatter.air_dryer": "Air Dryer",
   "block.wildcatter.day_tank": "Water Day Tank (1 m3)",
-  "block.wildcatter.transmitter": "Transmitter (4-20 mA)"
+  "block.wildcatter.transmitter": "Transmitter (4-20 mA)",
+  "block.wildcatter.containment_concrete": "Containment Concrete (1 m, steel-lined)",
+  "block.wildcatter.hydrogen_igniter": "Hydrogen Igniter (glow plug)",
+  "block.wildcatter.equipment_hatch": "Equipment Hatch",
+  "block.wildcatter.personnel_airlock": "Personnel Airlock",
+  "block.wildcatter.hydrogen_recombiner": "Hydrogen Recombiner (passive)",
+  "block.wildcatter.containment_monitor": "Containment Monitor",
+  "block.wildcatter.pressurizer_relief_tank": "Pressurizer Relief Tank (30 m3)"
 }

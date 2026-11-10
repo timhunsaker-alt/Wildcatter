@@ -125,6 +125,7 @@ public class ReactorPartBlock extends BigPartBlock implements net.minecraft.worl
 		if (player.isShiftKeyDown()) {
 			String said = switch (entity) {
 				case ReactorVesselBlockEntity vessel -> vessel.unload(player);
+				case ReactorConsoleBlockEntity console when dev.wildcatter.fluid.ReactorRules.ltop && lowerFace(pos, state, hit) -> console.toggleLtop(level);
 				case ReactorConsoleBlockEntity console -> console.nextSetpoint(level);
 				case CvcsBlockEntity cvcs -> cvcs.nextTarget(level);
 				case ReactorCoolantPumpBlockEntity pump -> pump.toggle();
@@ -142,6 +143,11 @@ public class ReactorPartBlock extends BigPartBlock implements net.minecraft.worl
 			}
 		}
 		return InteractionResult.SUCCESS;
+	}
+
+	/** The lower half of the console's bottom row: its LTOP ARMED switch (19a). */
+	private static boolean lowerFace(BlockPos pos, BlockState state, BlockHitResult hit) {
+		return pos.getY() == main(pos, state).getY() && hit.getLocation().y - pos.getY() < 0.5;
 	}
 
 	/** A hopper on top of the CVCS works its boric acid bin. */

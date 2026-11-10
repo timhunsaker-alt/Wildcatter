@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SBS",
+    "SGS",
+    "SBS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "B": "minecraft:iron_bars",
+    "G": "minecraft:gold_ingot"
+  },
+  "result": {
+    "id": "wildcatter:hydrogen_recombiner",
+    "count": 1
+  }
+}

@@ -384,6 +384,13 @@
     "wildcatter:estop",
     "wildcatter:pilot_light",
     "wildcatter:stack_light",
-    "wildcatter:horn"
+    "wildcatter:horn",
+    "wildcatter:equipment_hatch",
+    "wildcatter:personnel_airlock",
+    "wildcatter:hydrogen_recombiner",
+    "wildcatter:containment_monitor",
+    "wildcatter:pressurizer_relief_tank",
+    "wildcatter:containment_concrete",
+    "wildcatter:hydrogen_igniter"
   ]
 }

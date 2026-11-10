@@ -85,6 +85,13 @@ final class BlockFactory {
 				.strength(5.0F, blast).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
 	}
 
+	static Block containmentPart(dev.wildcatter.block.ContainmentPartBlock.Part part) {
+		// the hatch and airlock are part of the building's pressure boundary: they stand through a hydrogen blast as its concrete does
+		float blast = part == dev.wildcatter.block.ContainmentPartBlock.Part.EQUIPMENT_HATCH || part == dev.wildcatter.block.ContainmentPartBlock.Part.PERSONNEL_AIRLOCK ? 1200.0F : 12.0F;
+		return block(part.id(), props -> new dev.wildcatter.block.ContainmentPartBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
+				.strength(5.0F, blast).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
+	}
+
 	static Block boronPart(dev.wildcatter.block.BoronPartBlock.Part part) {
 		return block(part.id(), props -> new dev.wildcatter.block.BoronPartBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
 				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));

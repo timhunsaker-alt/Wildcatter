@@ -415,6 +415,24 @@ Decisions for Tim: `docs/questions/plc-gaps.md` (12 entries). Spec updated: `doc
   - process models (pipe pressure, drum pressure, a turbine's load setpoint, dampers, vibration, CT and PT voltage);
   - the crane's lift start.
 
+## Phase 19 — Reactor and fuel extensions — 19a BUILT 2026-11-10 (while Tim was away, on the DRAFT spec decided on recommendation; not approved)
+Spec: `docs/multiblocks/reactor-extensions.md` ("As built"); plan: `docs/ideas-plan.md`, Phase 19. Decisions for Tim:
+`docs/questions/phase19-reactor.md`. Branch `phase19`. **The rule for existing worlds:** every rule that changes what a reactor already
+does is a key in `config/wildcatter.properties`, off by default (questions 1-8: default on for new worlds?).
+- **19a, containment and protection** (BUILT): containment concrete, the equipment hatch, the personnel airlock, hydrogen recombiners and
+  igniters, the containment monitor (CLOSED or OPEN, hydrogen by compartment, pressure); the pressurizer relief tank and its rupture
+  disc. Behind keys: LTOP and the P-T curve (`reactorLtop`), the 55 C/h heat-up alarm (`reactorHeatupLimit`), the real heat-up
+  (`reactorRealHeatup`), the OT and OP delta-T trips (`reactorDeltaTTrips`). Unit test `ReactorLimitsTest`; NeoForge scenes
+  `containment`, `reactor_limits`; client scene `reactorContainment` (filmed).
+- **19b, dry casks, contamination, fresh-fuel inspection** (planned next in this branch).
+- **19c, fuel fabrication extensions** (planned, not built): `docs/multiblocks/fuel-fabrication-extensions.md`. 19c1 pellet inspection,
+  rod X-ray and helium leak tests, scrap and the zinc stearate lubricant; 19c2 HF recovery to the conversion plant, IFBA and gadolinia
+  burnable absorbers, real Inconel and stainless hardware (after 17b's nickel smelter). 19c1's leaking rods would feed 19b's coolant
+  activity (19b reads leakers from bent grids already).
+- **19d, rods and the sodium sulfate** (planned, not built): hafnium RCCAs (85 % of B4C's worth, after 17c1's hafnium), Ag-In-Cd later
+  (waits for a zinc refinery), the console's SDM LOW; helium in the B4C rodlets (B-10 burnup, REPLACE at 30 %); 1 t sodium sulfate bags to
+  a lined tailings cell.
+
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released (planned as 14e, `docs/mekanism-check.md`).
 - Plants for the 7a ores that the fuel chain doesn't use:
@@ -442,4 +460,4 @@ Decisions for Tim: `docs/questions/plc-gaps.md` (12 entries). Spec updated: `doc
   dolomite; the aluminothermic chromium step; scrap recycle and yields; Kroll and VAR batch timing.
 - Fuel: the kiln's HF back to the conversion plant; zinc stearate lubricant and pore formers; a nickel smelter for real Inconel and
   stainless hardware; pellet inspection, rod X-ray and helium leak tests; IFBA and gadolinia burnable absorbers; rejects and scrap.
-- Reactor: dry cask storage for the pool's oldest fuel; contamination and decontamination; fresh-fuel inspection; a containment building with hydrogen recombiners and igniters; low-temperature overpressure protection; the real 55 C/h heat-up limit; full OT-delta-T and OP-delta-T trips; the pressurizer relief tank; silver-indium-cadmium and hafnium rods; helium in the B4C rodlets; a buyer for the borax plant's sodium sulfate.
+- Reactor (the rest of Phase 19, planned above): silver-indium-cadmium and hafnium rods; helium in the B4C rodlets; a buyer for the borax plant's sodium sulfate. Raised by 19a: containment spray and fan coolers; a relief tank's cover gas and drain tank; the reactor rules stored per world, so they can be on for new worlds only.

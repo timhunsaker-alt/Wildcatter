@@ -1,6 +1,14 @@
 # Changelog
 
 ## Unreleased (0.7.0): gas and power quick wins (Phase 14b-14d) and the protection gap wave (built 2026-11-09 while Tim was away; not approved)
+- **Reactor extensions 19a** (built 2026-11-10 while Tim was away; not approved; decisions for review: `docs/questions/phase19-reactor.md`):
+  - **Containment:** containment concrete, an equipment hatch, a personnel airlock, hydrogen recombiners and igniters, and a
+    containment monitor that reads the building CLOSED (and its volume) or OPEN. Closed, it takes the core's hydrogen, burns it with
+    powered igniters, and blasts a compartment at 4 % without one; its pressure rises with the steam let in.
+  - **The pressurizer relief tank:** the PORVs' discharge condenses in 30 m3 of water until its rupture disc bursts at 0.7 MPa.
+  - **New rules, all off unless `config/wildcatter.properties` turns them on** (existing reactors are unchanged): `reactorLtop` (the P-T
+    curve, LTOP, the vessel failing over twice the curve), `reactorHeatupLimit` (HEAT-UP RATE over 55 C/h), `reactorRealHeatup` (no 80x
+    heat-up), `reactorDeltaTTrips` (the full OT and OP delta-T trips).
 - **The sales line (14b):** a gas plant's pipeline gas goes on an off-map transmission line at a receipt meter station and comes off
   anywhere in the dimension at a delivery station, less 2 % kept as compressor fuel. Five true-size parts: meter building (2 kW,
   residential), filter separator, ultrasonic meter run, regulator skid, pipeline tap. Off-spec gas refused (rich, wet, biogas); 8 hours on

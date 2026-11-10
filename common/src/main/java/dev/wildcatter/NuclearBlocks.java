@@ -26,6 +26,16 @@ public interface NuclearBlocks {
 	Block BORIC_ACID_CRYSTALLIZER = boronPart(dev.wildcatter.block.BoronPartBlock.Part.BORIC_ACID_CRYSTALLIZER);
 	Block B4C_FURNACE = boronPart(dev.wildcatter.block.BoronPartBlock.Part.B4C_FURNACE);
 	Block RCCA_BENCH = boronPart(dev.wildcatter.block.BoronPartBlock.Part.RCCA_BENCH);
+	// 19a: containment and protection (docs/multiblocks/reactor-extensions.md)
+	Block CONTAINMENT_CONCRETE = block("containment_concrete", props -> new Block(props.mapColor(MapColor.STONE).strength(50.0F, 1200.0F)
+			.sound(SoundType.STONE).requiresCorrectToolForDrops()));
+	Block HYDROGEN_IGNITER = block("hydrogen_igniter", props -> new dev.wildcatter.block.LoadBlock(props.mapColor(MapColor.METAL)
+			.strength(1.0F).sound(SoundType.METAL).lightLevel(state -> state.getValue(dev.wildcatter.block.LoadBlock.LIT) ? 5 : 0), dev.wildcatter.Tuning.IGNITER_WATTS));
+	Block EQUIPMENT_HATCH = containmentPart(dev.wildcatter.block.ContainmentPartBlock.Part.EQUIPMENT_HATCH);
+	Block PERSONNEL_AIRLOCK = containmentPart(dev.wildcatter.block.ContainmentPartBlock.Part.PERSONNEL_AIRLOCK);
+	Block HYDROGEN_RECOMBINER = containmentPart(dev.wildcatter.block.ContainmentPartBlock.Part.HYDROGEN_RECOMBINER);
+	Block CONTAINMENT_MONITOR = containmentPart(dev.wildcatter.block.ContainmentPartBlock.Part.CONTAINMENT_MONITOR);
+	Block PRESSURIZER_RELIEF_TANK = containmentPart(dev.wildcatter.block.ContainmentPartBlock.Part.PRESSURIZER_RELIEF_TANK);
 	Block FUEL_ASSEMBLY = block("fuel_assembly", props -> new dev.wildcatter.block.FuelAssemblyBlock(props.mapColor(MapColor.METAL)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL).noOcclusion()));
 }

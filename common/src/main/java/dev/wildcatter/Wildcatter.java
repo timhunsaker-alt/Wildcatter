@@ -62,6 +62,7 @@ public final class Wildcatter {
 		dev.wildcatter.block.SpentFuelPoolBlockEntity.clearAll();
 		dev.wildcatter.block.NaturalDraftTowerBlockEntity.clearAll();
 		dev.wildcatter.block.ReactorVesselBlockEntity.clearAll();
+		dev.wildcatter.block.ContainmentMonitorBlockEntity.clearAll();
 		dev.wildcatter.radiation.RadiationTicker.clearAll();
 		SpoolItem.clearAll();
 		dev.wildcatter.safety.BodyContact.clearAll();

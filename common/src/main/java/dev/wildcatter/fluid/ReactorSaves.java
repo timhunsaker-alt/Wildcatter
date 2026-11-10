@@ -41,6 +41,11 @@ final class ReactorSaves {
 		for (int i = 0; i < 6; i++) {
 			out.put("precursor" + i, r.kinetics.precursors()[i]);
 		}
+		// 19a
+		out.put("fatigue", r.fatigue);
+		out.put("ltopArmed", r.ltopArmed ? 1 : 0);
+		out.put("ptViolations", r.ptViolations);
+		out.put("vesselFailed", r.vesselFailed ? 1 : 0);
 	}
 
 	/** Reads the state back, with the defaults for older saves. */
@@ -79,8 +84,14 @@ final class ReactorSaves {
 		r.h2 = in.get("h2", 0);
 		r.coreDamaged = in.get("coreDamaged", 0) > 0.5;
 		r.exploded = in.get("exploded", 0) > 0.5;
+		r.fatigue = (int) in.get("fatigue", 0);
+		r.ltopArmed = in.get("ltopArmed", 0) > 0.5;
+		r.ptViolations = (int) in.get("ptViolations", 0);
+		r.vesselFailed = in.get("vesselFailed", 0) > 0.5;
 		if (r.coreDamaged) {
 			r.trip = "CORE DAMAGE";
+		} else if (r.vesselFailed) {
+			r.trip = "VESSEL FAILURE";
 		}
 		if (in.get("precursor0", -1) < 0) {
 			r.kinetics.hold(Tuning.NEUTRON_SOURCE / 0.05);

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SDS",
+    "S S",
+    "SDS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "D": "minecraft:iron_door"
+  },
+  "result": {
+    "id": "wildcatter:personnel_airlock",
+    "count": 1
+  }
+}

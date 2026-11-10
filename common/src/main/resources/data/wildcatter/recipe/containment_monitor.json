@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "GCG",
+    "SRS",
+    "SSS"
+  ],
+  "key": {
+    "G": "minecraft:glass_pane",
+    "C": "minecraft:comparator",
+    "R": "minecraft:redstone",
+    "S": "wildcatter:steel_ingot"
+  },
+  "result": {
+    "id": "wildcatter:containment_monitor",
+    "count": 1
+  }
+}

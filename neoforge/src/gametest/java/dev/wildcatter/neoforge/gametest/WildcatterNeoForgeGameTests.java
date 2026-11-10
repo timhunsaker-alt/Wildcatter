@@ -62,6 +62,9 @@ public class WildcatterNeoForgeGameTests {
 		GRID_SCENES.putAll(PlcPlantScenes.scenes());
 	}
 
+	/** Phase 19's reactor scenes (ReactorExtensionScenes): a scene that switches a reactor rule on runs in a batch of its own. */
+	private static final java.util.Map<String, Consumer<GameTestHelper>> REACTOR_SCENES = ReactorExtensionScenes.scenes();
+
 	/** WILDCATTER_ONLY=a,b registers just those scenes while working on them; unset, every scene runs (as the Fabric client test). */
 	private static boolean only(String scene) {
 		String only = System.getenv("WILDCATTER_ONLY");
@@ -98,6 +101,7 @@ public class WildcatterNeoForgeGameTests {
 			helper.register(id("acid_steam"), (Consumer<GameTestHelper>) GasPowerScenes::acidSteam);
 			helper.register(id("biogas"), (Consumer<GameTestHelper>) GasPowerScenes::biogas);
 			GRID_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
+			REACTOR_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 		}));
 		modBus.addListener(RegisterCapabilitiesEvent.class, event -> event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, entity, side) -> STORAGE, Blocks.GOLD_BLOCK));
 		modBus.addListener(RegisterGameTestsEvent.class, event -> {
@@ -118,6 +122,12 @@ public class WildcatterNeoForgeGameTests {
 			if (only("ring_travel")) event.registerTest(id("ring_travel"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id("ring_travel")),
 					new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 3000, 1, true,
 							net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 240)));
+			for (String scene : REACTOR_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
+				Holder<TestEnvironmentDefinition<?>> env = ReactorExtensionScenes.RULE_SCENES.contains(scene) ? event.registerEnvironment(id("rules_" + scene)) : plain;
+				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
+						new TestData<>(env, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 4000, 1, true,
+								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 40)));
+			}
 			for (String scene : GAS_POWER_SCENES) {
 				if (!only(scene)) {
 					continue;

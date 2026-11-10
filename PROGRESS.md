@@ -1620,6 +1620,13 @@ sized for a 40-pot line.
 - Plant and crane gaps wave (2026-11-09): the quench sump's FULL, the stabilizer's own-LPG reboiler and the pots' bath alumina
   without auxiliaries have run only in NeoForge server scenes. A pot without auxiliary power going to an anode effect has not been
   run in a test (it needs line current; the client `potline` scene runs the powered case).
+- Phase 19a (2026-11-10): no new textures (the parts are drawn in the mod's materials; the igniter's lit tip is vanilla orange
+  concrete). The OP-delta-T constants K4, K5, K6 are from memory and unverified, and the H. B. Robinson 2 accession number is not
+  recorded (questions 5). Not built: containment spray and fan coolers, the relief tank's cover gas and drain tank, a real steam-air
+  mixture in the building, the airlock's doors drawn open. The OT-delta-T trip in the server scene pins the power by a test hook
+  (no coolant pumps there); the full critical startup with the rule on runs only in the unit test. The four rules are server-wide
+  keys, not stored per world (question 8). The macOS screen recorder (`Filming`) caught only the desktop wallpaper on this run (the
+  Phase 17 film shows the same); the `reactorContainment` scene therefore also saves a frame every 4 ticks, and the film is made from them.
 - Misc gaps wave (2026-11-09): the steam plant's feedwater line, the land rig's cables, the 1 MW alternator and the new spool icons
   have been checked in model previews and NeoForge server scenes, not yet in the client (no client scene was run in the wave).
   Coker gas keeps a gas set's full rating (its heavier hydrocarbons' knock is not modelled). No new script-drawn textures.
@@ -1838,3 +1845,24 @@ Branch `misc-gaps`.
 - **Field Manual:** GENSETS (the derate on coke oven gas), PEAKER (no coke oven gas, the Wobbe index).
 - **Tests:** unit test `LeanGasTest` (3). NeoForge server scenes `cog_derate` (860 kW held against a 1 MW bank), `aero_lean_gas`,
   `cracker_pump` (a furnace filled 0 to 200 L by a process water pump on a diesel set), `alternator_frames`, `drawn_runs`.
+
+## Phase 19a: containment and protection (2026-11-10; built while Tim was away; decisions: `docs/questions/phase19-reactor.md`)
+Spec: `docs/multiblocks/reactor-extensions.md` ("As built"). Branch `phase19`.
+- **Existing worlds unchanged:** the rules that change a reactor's behaviour are keys in `config/wildcatter.properties`, off unless
+  `true` (`fluid/ReactorRules`): `reactorLtop`, `reactorHeatupLimit`, `reactorRealHeatup`, `reactorDeltaTTrips`. With them off and
+  none of the new parts built, a reactor runs, reads and saves as before (the new saved keys default to nothing set).
+- **Containment:** containment concrete, the equipment hatch (sneak-click open or shut), the personnel airlock (click through; its doors
+  interlocked), passive hydrogen recombiners, hydrogen igniters (160 W glow plugs on the residential tier), and the containment monitor:
+  it flood-fills the building's air every 10 s and reads CLOSED with the free volume, or OPEN and near where. Closed round a vessel it
+  takes 8d's hydrogen into a lower compartment and mixes it into the dome; recombiners eat it, powered igniters burn it at 4 % with no
+  blast, and a compartment at 4 % without one blasts. Steam in raises its pressure; at 2.5 times its 0.4 MPa design the hatch fails.
+- **The pressurizer relief tank:** 30 m3 against the pressurizer or the vessel; the PORVs' discharge (now counted as kg and enthalpy)
+  condenses in it; its disc bursts at 0.7 MPa and the rest goes into the building; spray off the CVCS; a new disc under 100 C.
+- **LTOP and the P-T curve** (rule): P-T LIMIT, LTOP NOT ARMED, LTOP ARMED on the console's lower face (PORVs at 3.2 MPa below 150 C),
+  the heaters held to 90 % of the curve, the vessel failing over twice the curve (a LOCA into the building).
+- **The heat-up limit** (rule): HEAT-UP RATE over 55 C/h in plant time and a fatigue count; the real heat-up (rule).
+- **OT and OP delta-T trips** (rule), with the simplified 343 C check kept as a backstop.
+- **Field Manual:** CONTAINMENT; THE RELIEF TANK AND THE REACTOR RULES.
+- **Tests:** unit `ReactorLimitsTest` (8 tests); NeoForge server scenes `containment` and `reactor_limits`; Fabric client scene
+  `reactorContainment` (filmed).
+

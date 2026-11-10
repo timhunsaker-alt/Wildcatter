@@ -290,6 +290,13 @@
     "wildcatter:junction_box",
     "wildcatter:control_supply",
     "wildcatter:plc_cabinet",
-    "wildcatter:remote_io_drop"
+    "wildcatter:remote_io_drop",
+    "wildcatter:equipment_hatch",
+    "wildcatter:personnel_airlock",
+    "wildcatter:hydrogen_recombiner",
+    "wildcatter:containment_monitor",
+    "wildcatter:pressurizer_relief_tank",
+    "wildcatter:containment_concrete",
+    "wildcatter:hydrogen_igniter"
   ]
 }

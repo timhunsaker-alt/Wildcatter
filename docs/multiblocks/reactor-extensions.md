@@ -239,3 +239,36 @@ The grid is a sketch; the game test is the layout of record.
 - **19a:** containment, PARs and igniters, LTOP, the heat-up limit, the relief tank, OTΔT and OPΔT.
 - **19b:** dry casks, contamination and decontamination, fresh-fuel inspection.
 - **19d:** hafnium (and later AIC) rods, helium in B4C, the sodium sulfate bags.
+
+---
+
+## As built
+
+### 19a (2026-11-10, branch `phase19`; decisions in `docs/questions/phase19-reactor.md`)
+- **The rule for existing worlds.** What would change an existing reactor is behind a key in `config/wildcatter.properties`, off unless
+  `true`: `reactorLtop`, `reactorHeatupLimit`, `reactorRealHeatup`, `reactorDeltaTTrips` (`fluid/ReactorRules`, read at server start in
+  `StandardData.apply`). Without them, and without the new parts, a reactor runs exactly as before.
+- **Containment** (`ContainmentPartBlock`, `ContainmentMonitorBlockEntity`, `ContainmentDoorBlockEntity`): `containment_concrete` (blast
+  resistance 1,200), `equipment_hatch` 4 x 4 x 1, `personnel_airlock` 2 x 3 x 3, `hydrogen_recombiner` 1 x 2 x 1, `hydrogen_igniter`
+  (one block, a 160 W load on the residential tier, lit when powered), `containment_monitor` 1 x 2 x 1. The monitor flood-fills from the
+  cell in front of it every 10 s through all but the concrete, a shut hatch and the airlock: CLOSED and its free volume, or OPEN and near
+  where. The floor must be concrete too. Closed round a vessel it takes the hydrogen (the lower compartment, 5,000 m3 or half the
+  building, below 13 blocks over the vessel's base; mixed into the dome over an hour), runs the recombiners (1.5 kg/h at 4 %, from 1 %)
+  and the powered igniters (a burn to 0.5 % at 4 %, no blast), and blasts a compartment at 4 % with none. Steam in raises its pressure
+  (ideal gas at 100 C, condensing over 30 minutes); over 0.4 MPa it alarms, at 1.0 MPa the hatch fails. The airlock's doors are
+  interlocked: a click passes through. PLC points: CLOSED, H2 HIGH, PRESSURE HIGH and three 4-20 mA readings.
+- **LTOP and the P-T curve** (`ReactorLimits`, with `reactorLtop`): 3.4 MPa to 100 C, a line to 15.5 MPa at 290 C, none above (the safety
+  valves cover it). P-T LIMIT and a violation count; LTOP NOT ARMED below 150 C; a sneak-click on the console's lower face arms LTOP (the
+  PORVs at 3.2 MPa below 150 C); over twice the curve the vessel fails and empties at 260 kg/s into the building. The heaters hold 90 %
+  of the curve.
+- **The heat-up limit** (with `reactorHeatupLimit`): the plant-time rate averaged over 30 s, HEAT-UP RATE over 55 C/h below no-load,
+  a fatigue count. `reactorRealHeatup` removes the 80x.
+- **The relief tank** (`ReliefTankBlockEntity`): `pressurizer_relief_tank` 2 x 2 x 6, 30 m3, against the pressurizer or the vessel. The
+  model now counts what the PORVs let go (the boil-off and the pressurizer's lift, kg and enthalpy); it condenses in the tank, which
+  bursts its disc at 0.7 MPa. Spray off the CVCS's makeup water; a new disc under 100 C. PLC points: DISC BURST, temperature, pressure.
+- **OT and OP delta-T** (`ReactorProtection.deltaT`, with `reactorDeltaTTrips`): as item 5 with K4 1.0864, K5 0.036 /C (rising Tavg),
+  K6 0.0050 /C (all unverified, question 5); the simplified 343 C check stays.
+- **Field Manual:** CONTAINMENT; THE RELIEF TANK AND THE REACTOR RULES.
+- **Tests:** unit `ReactorLimitsTest` (8); NeoForge scenes `containment` and `reactor_limits` (its own batch); Fabric client scene
+  `reactorContainment` (filmed: inside the closed building, the relief tank's disc bursting, the igniter's burn and the blast; the film
+  is assembled from the scene's own frames, `film-reactor-NNNN`, because the screen recorder caught only the desktop).

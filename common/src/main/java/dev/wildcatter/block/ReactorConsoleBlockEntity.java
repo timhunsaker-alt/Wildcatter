@@ -46,6 +46,16 @@ public class ReactorConsoleBlockEntity extends PlantUnitBlockEntity {
 				vessel.reactor().tripped() ? "resetting the trip" : "rods under automatic control");
 	}
 
+	/** A sneak-click on its lower face, with the LTOP rule: LTOP ARMED (19a). */
+	public String toggleLtop(Level level) {
+		ReactorVesselBlockEntity vessel = vessel(level);
+		if (vessel == null) {
+			return "Reactor console: NOT BUILT: set it against the REACTOR VESSEL";
+		}
+		String said = vessel.toggleLtop();
+		return said != null ? said : nextSetpoint(level);
+	}
+
 	@Override
 	public Component inspect() {
 		ReactorVesselBlockEntity vessel = level == null ? null : vessel(level);

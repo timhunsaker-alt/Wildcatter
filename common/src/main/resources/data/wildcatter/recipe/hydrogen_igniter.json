@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " R ",
+    "SCS"
+  ],
+  "key": {
+    "R": "minecraft:redstone",
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_ingot"
+  },
+  "result": {
+    "id": "wildcatter:hydrogen_igniter",
+    "count": 2
+  }
+}
