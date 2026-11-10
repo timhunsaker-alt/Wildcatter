@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased (0.7.0): gas and power quick wins (Phase 14b-14d) and the protection gap wave (built 2026-11-09 while Tim was away; not approved)
+## v0.6.0 (released 2026-11-10)
+
+### Gas and power quick wins (Phase 14b-14d), the PLC gap wave and the protection gap wave
 - **The sales line (14b):** a gas plant's pipeline gas goes on an off-map transmission line at a receipt meter station and comes off
   anywhere in the dimension at a delivery station, less 2 % kept as compressor fuel. Five true-size parts: meter building (2 kW,
   residential), filter separator, ultrasonic meter run, regulator skid, pipeline tap. Off-spec gas refused (rich, wet, biogas); 8 hours on
@@ -60,7 +62,7 @@
     gas's) and still takes coker gas.
   - The brass texture no longer shows a tile line; the conductor spool icons are new art.
 
-## v0.6.0 (built 2026-11-09; not yet released on GitHub)
+### The ammonia plant and the waves before it
 - **The ammonia plant (Phase 14):** a nitrogen generator, syngas compressor and ammonia converter on the steam reformer's hydrogen
   (15.2 kg/h of liquid ammonia), a nitric acid unit on a platinum-rhodium gauze (60 % acid), an ammonium nitrate neutraliser and an
   emulsion blender making bulk emulsion matrix (46 kg/h) for open-pit blasting. New pipe products: nitrogen, ammonia, nitric acid,
