@@ -570,5 +570,17 @@
   "block.wildcatter.co2_storage_tank": "CO2 Storage Tank (30 t)",
   "block.wildcatter.resin_trailer": "Resin Trailer (10 m3 of IX resin)",
   "block.wildcatter.cathode_gas_scrubber": "Cathode Gas Scrubber (NaF beds, 10 kW)",
-  "block.wildcatter.koh_scrubber": "KOH Scrubber (with lime regeneration, 15 kW)"
+  "block.wildcatter.koh_scrubber": "KOH Scrubber (with lime regeneration, 15 kW)",
+  "item.wildcatter.ferrochrome_bag": "Bulk Bag of HC Ferrochrome",
+  "item.wildcatter.ferromanganese_bag": "Bulk Bag of HC Ferromanganese",
+  "item.wildcatter.ferrosilicon_bag": "Bulk Bag of Ferrosilicon 75",
+  "item.wildcatter.moly_oxide_bag": "Bulk Bag of Technical Moly Oxide",
+  "item.wildcatter.scheelite_concentrate_bag": "Bulk Bag of Scheelite Concentrate",
+  "item.wildcatter.ferromolybdenum_bag": "Bulk Bag of Ferromolybdenum",
+  "item.wildcatter.ferrotungsten_bag": "Bulk Bag of Ferrotungsten",
+  "block.wildcatter.furnace_transformer": "Furnace Transformer (10 MVA, 150 V)",
+  "block.wildcatter.submerged_arc_furnace": "Submerged Arc Furnace (8 MW)",
+  "block.wildcatter.capacitor_bank": "Capacitor Bank (3 Mvar)",
+  "block.wildcatter.moly_roaster": "Moly Roaster (multiple hearth)",
+  "block.wildcatter.aluminothermic_vessel": "Aluminothermic Vessel"
 }

@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased: ferroalloys (Phase 17a, built 2026-11-10 while Tim was away; not approved)
+- **Submerged arc furnace:** a 10 MVA furnace transformer on the distribution tier feeds an 8 MW furnace at PF 0.80, the grid's first big
+  low power factor load. It smelts HC ferrochrome, HC ferromanganese or ferrosilicon 75 from ore, coke and flux by hopper, taps into 1 t
+  bulk bags every 2 hours, burns green anodes as its electrode paste, and freezes after 4 hours without power.
+- **Capacitor bank:** 3 Mvar on any 12.47 kV (11 kV) bus; on the furnace's bus it lifts the feeder from PF 0.80 to about 0.94.
+- **Moly roaster and aluminothermic vessel:** flotation concentrate (from Tailings) to moly oxide, its SO2 to the acid plant; batches of
+  oxide and aluminium fired to ferromolybdenum and ferrotungsten.
+- Nothing changes in existing worlds: no solver or existing machine changed. Spec: `docs/multiblocks/ferroalloys.md`. Decisions for
+  review: `docs/questions/phase17-ferroalloys.md`.
+
 ## Unreleased (phase16 branch): Phase 16, uranium routes and plant operations (built 2026-11-10 while Tim was away; not approved)
 - **ADU yellowcake (16a):** pipe liquid ammonia to the precipitation tank and set the new URANIUM CALCINER against it and the drum filler:
   U3O8 at 96 % in a new U3O8 Drum, 326 kg of uranium against the magnesia drum's 271. Conversion needs a third less hydrogen for it, no

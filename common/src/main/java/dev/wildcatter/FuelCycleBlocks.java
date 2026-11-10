@@ -133,6 +133,12 @@ public interface FuelCycleBlocks {
 	Block NITRIC_ACID_UNIT = ammoniaPart(dev.wildcatter.block.AmmoniaPartBlock.Part.NITRIC_ACID_UNIT);
 	Block AN_NEUTRALISER = ammoniaPart(dev.wildcatter.block.AmmoniaPartBlock.Part.AN_NEUTRALISER);
 	Block EMULSION_BLENDER = ammoniaPart(dev.wildcatter.block.AmmoniaPartBlock.Part.EMULSION_BLENDER);
+	// Phase 17a: ferroalloys (docs/multiblocks/ferroalloys.md)
+	Block FURNACE_TRANSFORMER = ferroalloyPart(dev.wildcatter.block.FerroalloyPartBlock.Part.FURNACE_TRANSFORMER);
+	Block SUBMERGED_ARC_FURNACE = ferroalloyPart(dev.wildcatter.block.FerroalloyPartBlock.Part.SUBMERGED_ARC_FURNACE);
+	Block CAPACITOR_BANK = ferroalloyPart(dev.wildcatter.block.FerroalloyPartBlock.Part.CAPACITOR_BANK);
+	Block MOLY_ROASTER = ferroalloyPart(dev.wildcatter.block.FerroalloyPartBlock.Part.MOLY_ROASTER);
+	Block ALUMINOTHERMIC_VESSEL = ferroalloyPart(dev.wildcatter.block.FerroalloyPartBlock.Part.ALUMINOTHERMIC_VESSEL);
 	// 10c2: the cranes (docs/multiblocks/tower-crane.md, crawler-crane.md)
 	Block TOWER_CRANE = cranePart(dev.wildcatter.block.CranePartBlock.Part.TOWER_CRANE);
 	Block CRAWLER_CRANE = cranePart(dev.wildcatter.block.CranePartBlock.Part.CRAWLER_CRANE);

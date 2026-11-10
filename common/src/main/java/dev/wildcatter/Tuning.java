@@ -1268,4 +1268,48 @@ public final class Tuning {
 	public static final double CO2_HEAD_FACTOR = 1.3;              // the head grade at the full dose against oxygen alone (proposed)
 	public static final double RESIN_TRAILER_U3O8_KG = 800.0;      // 10 m3 of resin at 80 g/L (proposed)
 	public static final double RESIN_TRANSFER_KGS = 4.0;           // U3O8 on resin moved a second between trailer and columns (proposed: a resin transfer pump)
+
+	// ---- Phase 17a: ferroalloys (docs/multiblocks/ferroalloys.md; decisions in docs/questions/phase17-ferroalloys.md) ----
+	/** The furnace transformer: 10 MVA, the distribution tier to a 150 V secondary at full tap (about 38 kA a phase). */
+	public static final double FURNACE_TRANSFORMER_VA = 10.0e6;
+	public static final double FURNACE_SECONDARY_VOLTS = 150.0;     // at full tap
+	public static final double FURNACE_SECONDARY_MIN_VOLTS = 105.0; // at tap 1 (proposed: a 70 % range, typical of small SAFs)
+	public static final int FURNACE_TAPS = 15;                      // its on-load tap changer
+	/** The submerged arc furnace at full tap: 8 MW at PF 0.80 (6 Mvar). Its power goes as the square of the secondary volts. */
+	public static final double SAF_WATTS = 8.0e6;
+	public static final double SAF_POWER_FACTOR = 0.80;
+	public static final double SAF_RAMP_PER_SECOND = 0.1;           // electrodes lowered into the charge: 10 % a second (proposed)
+	public static final double SAF_UNDERVOLTAGE = 0.8;              // below 80 % of its tier its breaker opens (proposed)
+	public static final double SAF_HEARTH_KG = 8_000.0;             // alloy the hearth holds before it must tap (proposed)
+	public static final double SAF_TAP_SECONDS = 2 * 3600.0;        // it taps every 2 hours
+	public static final double SAF_TAPPED_HOLD_KG = 10_000.0;       // tapped alloy waiting for bags (the ladles and casting beds)
+	public static final double SAF_FREEZE_SECONDS = 4 * 3600.0;     // the hearth freezes after 4 hours without power, as the pots
+	public static final double SAF_CHANGEOVER_SECONDS = 3600.0;     // a recipe change: the hearth is run out first
+	public static final double SAF_TAP_SHOW_SECONDS = 20.0;         // the tap's fume and sparks at the taphole
+	public static final double SAF_PASTE_KG_PER_T = 20.0;           // Soderberg paste burned a tonne of alloy (unverified)
+	public static final double SAF_ELECTRODE_PASTE_KG = 2_000.0;    // paste in the three columns over the burn zone, 100 t of alloy (proposed)
+	public static final double SAF_SHORT_POWER = 0.5;               // burnt short, the electrodes ride high: half the power (proposed)
+	public static final double SAF_CHARGE_HOLD_KG = 8_000.0;        // each charge bin's buffer, by weight
+	/** What the furnace counts an item of its charge as. */
+	public static final double QUARTZ_KG = 100.0;                   // a nether quartz, standing in for quartzite lump (proposed)
+	/** The capacitor bank: 3 Mvar at the distribution tier, in an ungrounded wye, its losses about 0.2 W a kvar. */
+	public static final double CAP_BANK_VAR = 3.0e6;
+	public static final double CAP_BANK_LOSS = 0.0002;
+	/** The moly roaster: a multiple-hearth roaster at 600-650 C, 0.25 t/h of technical moly oxide (57 % Mo), 22 kW at LV. */
+	public static final double ROASTER_OXIDE_KGH = 250.0;
+	public static final double ROASTER_WATTS = 22_000.0;
+	public static final double MOLY_OXIDE_MO = 0.57;
+	public static final double ROASTER_RECOVERY = 0.98;             // molybdenum to the oxide (proposed)
+	public static final double ROASTER_SLURRY_HOLD_KG = 2_000.0;    // its drum filter's cake (proposed)
+	public static final double SCHEELITE_BAG_WO3 = 0.65;            // a bag of dried scheelite concentrate: 65 % WO3 (proposed)
+	/** The aluminothermic vessel: a batch fires in 10 minutes; its baghouse fan 15 kW at LV. */
+	public static final double VESSEL_FIRE_SECONDS = 600.0;
+	public static final double VESSEL_FAN_WATTS = 15_000.0;
+	public static final double VESSEL_RECOVERY = 0.98;              // metal to the alloy (proposed)
+	public static final double FERROMOLY_MO = 0.65;
+	public static final double FERROTUNGSTEN_W = 0.78;
+	public static final int VESSEL_FEMO_IRON = 4;                   // iron ingots a batch of ferromolybdenum (0.43 t of iron; proposed)
+	public static final int VESSEL_FEMO_ALUMINIUM = 20;             // aluminium ingots a batch (454 kg: 0.53 t a tonne of alloy)
+	public static final int VESSEL_FEW_IRON = 1;
+	public static final int VESSEL_FEW_ALUMINIUM = 8;               // 182 kg: 0.3 t a 1.04 t of WO3
 }

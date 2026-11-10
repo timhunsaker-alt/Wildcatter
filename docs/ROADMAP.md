@@ -444,6 +444,17 @@ default-off setting or waits until the player adds the new part.
   cells run by hook. A fuel assembly stood up as a block keeps no assay (16c1); the cascade scene drives its machines by hook. The producer's CO2 factor is unit-tested only (16d1). The calciner uses the mod's materials. Not built: uranyl peroxide
   precipitation, ammonia recovery from the off-gas and barren liquor, ASTM C967 impurity penalties.
 
+## Phase 17a — Ferroalloys — BUILT 2026-11-10 (while Tim was away, on the DRAFT spec decided on recommendation; not approved)
+Spec: `docs/multiblocks/ferroalloys.md` ("As built"). Decisions for Tim: `docs/questions/phase17-ferroalloys.md`. Branch `phase17`.
+- The 10 MVA furnace transformer and the submerged arc furnace: 8 MW at PF 0.80 on the distribution tier, HC ferrochrome, HC
+  ferromanganese and ferrosilicon 75 in 1 t bags; taps, paste, freezing, PLC points.
+- The 3 Mvar capacitor bank, a grid part on any bus: the furnace's feeder from PF 0.80 to 0.935.
+- The moly roaster (moly oxide, its SO2 to the acid plant) and the aluminothermic vessel (ferromolybdenum, ferrotungsten).
+- No solver change; no existing world changes. NeoForge scenes `ferroalloys`, `alumino`; unit test `FerroalloysTest`; client scene
+  `ferroalloys` (filmed).
+- **Known gaps:** the seven bag icons are `*_placeholder`; chromium metal (needs 17c2's chromic oxide); no var controller; Tailings still
+  uses its placeholder ferrosilicon (question 1).
+
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released (planned as 14e, `docs/mekanism-check.md`).
 - Plants for the 7a ores that the fuel chain doesn't use:

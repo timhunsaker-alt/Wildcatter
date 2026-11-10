@@ -58,16 +58,18 @@ public final class OreUses {
 			case FLUORITE -> List.of("the conversion plant's HF kiln (hydrogen fluoride)");
 			case HEAVY_MINERAL -> List.of("the zirconium plant's mineral separator (zircon)");
 			case CASSITERITE -> List.of("a furnace (tin ingot, which the zirconium plant's VAR furnace alloys into Zircaloy)");
-			case CHROMITE -> List.of("the zirconium plant's VAR furnace, alloyed into Zircaloy");
+			case CHROMITE -> List.of("the zirconium plant's VAR furnace, alloyed into Zircaloy", "the submerged arc furnace (HC ferrochrome)");
 			case MAGNESITE -> List.of("a furnace (magnesia), for the uranium mill's precipitation and the magnesia chlorinator (magnesium)");
 			case BORAX -> List.of("the boron plant (boric acid, boron carbide)");
 			case BAUXITE -> List.of("the Bayer refinery's ball mill (alumina)");
-			case PYROLUSITE -> List.of("the uranium mill's leach tanks, as the oxidant");
-			case LIMESTONE -> List.of("the lime kiln (quicklime for the Bayer refinery)");
+			case PYROLUSITE -> List.of("the uranium mill's leach tanks, as the oxidant", "the submerged arc furnace (HC ferromanganese)");
+			case LIMESTONE -> List.of("the lime kiln (quicklime for the Bayer refinery)", "the submerged arc furnace, as ferromanganese's flux");
+			case MOLYBDENITE -> List.of("the moly roaster, as flotation concentrate from Tailings' concentrator (moly oxide, then ferromolybdenum)");
+			case SCHEELITE -> List.of("the aluminothermic vessel, as flotation concentrate from Tailings' concentrator dried in the moly roaster (ferrotungsten)");
 			case GALENA -> List.of("a furnace (lead ingot)");
 			case SPHALERITE -> List.of("a furnace (zinc ingot)");
 			case ACANTHITE -> List.of("a furnace (silver ingot)");
-			case SYLVITE, PENTLANDITE, PLATINUM, MOLYBDENITE, DOLOMITE, GRAPHITE, SPODUMENE, BARITE, BENTONITE, SCHEELITE, COBALTITE,
+			case SYLVITE, PENTLANDITE, PLATINUM, DOLOMITE, GRAPHITE, SPODUMENE, BARITE, BENTONITE, COBALTITE,
 					PHOSPHATE -> List.of();
 		};
 	}

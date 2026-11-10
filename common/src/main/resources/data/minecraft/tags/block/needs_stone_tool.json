@@ -297,6 +297,11 @@
     "wildcatter:cascade_cooling_skid",
     "wildcatter:co2_liquefier",
     "wildcatter:co2_storage_tank",
-    "wildcatter:resin_trailer"
+    "wildcatter:resin_trailer",
+    "wildcatter:furnace_transformer",
+    "wildcatter:submerged_arc_furnace",
+    "wildcatter:capacitor_bank",
+    "wildcatter:moly_roaster",
+    "wildcatter:aluminothermic_vessel"
   ]
 }

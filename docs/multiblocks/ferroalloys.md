@@ -1,7 +1,7 @@
 # Ferroalloys: the submerged arc furnace, the moly roaster and the aluminothermic vessel
 
-> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Proposed phase **17a**. Decisions are in
-> `docs/questions/specs-wildcatter.md` (items 41-46).
+> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Phase **17a**, BUILT 2026-11-10 (see "As built").
+> Decisions are in `docs/questions/specs-wildcatter.md` (items 41-46) and `docs/questions/phase17-ferroalloys.md`.
 
 The 7a chromitite, manganese, molybdenum and tungsten ores have no plant (ores.md: "the rest go to the plants listed under Ideas").
 Real ferroalloys are made two ways:
@@ -129,3 +129,33 @@ The grid is a sketch; the game test is the layout of record.
 
 ## Proposed wave
 **17a**: one furnace, its transformer and capacitor bank, the roaster and the vessel; the nickel smelter (17b) reuses the transformer.
+
+## As built (2026-11-10; decisions in `docs/questions/phase17-ferroalloys.md`)
+- **Parts:** `FerroalloyPartBlock` (furnace_transformer 4 x 5 x 5, submerged_arc_furnace 7 x 8 x 7, capacitor_bank 2 x 3 x 4,
+  moly_roaster 3 x 9 x 3, aluminothermic_vessel 3 x 3 x 3), true size from `tools/models/ferroalloys.py`. Numbers in `Tuning` (Phase 17a)
+  and `fluid/Ferroalloys` (unit test `FerroalloysTest`).
+- **The grid:** no solver change. The furnace is `circuit/FurnaceLoad`, a floating-star constant-power load at PF 0.80 seen from the
+  transformer's primary (its box on the west face of its main cell), ramping 10 %/s, its breaker open below 80 % volts. The bank is
+  `circuit/ShuntCapacitor`, an ungrounded wye of -jX legs sized for 3 Mvar at the tier's nominal volts (51.8 ohm a leg at 12.47 kV),
+  0.2 W/kvar of losses, X following 1/f; its box on the west face of its main cell. Sneak-click opens or closes it; PLC CLOSE, CLOSED,
+  AUTO, MVAR.
+- **Tap changer:** 15 steps, 105-150 V; P = 8 MW x (V/150)², so tap 1 is 3.9 MW. 38.5 kA an electrode at full tap.
+- **Metering:** the transformer reads the furnace's MW, Mvar, PF and electrode kA, and with banks touching it the feeder's PF; transmitters
+  read WATTS, VOLTS, AMPS, POWER_FACTOR. In the scene: 8.00 MW, 6.00 Mvar, PF 0.80; the bank closed gives 2.85 Mvar at 12.17 kV and the
+  feeder 8.0 MW, 3.1 Mvar, PF 0.935.
+- **Furnace:** bins for chromitite, manganese ore, quartz (100 kg), limestone, coke, iron (100 kg ingots) and paste (green anodes,
+  1,275 kg each, into 2,000 kg of electrode columns), any of them from a hopper on top or clicked in. Recipes per tonne as the Products
+  table; slag 1.2 / 0.6 / 0.03 t a tonne. Hearth 8 t; taps every 2 hours, when full, or on PLC TAP, into up to 10 t waiting for bags;
+  the taphole at local (6, 0, 3), lava, flame and smoke there for 20 s. A recipe change: an hour at tap power, nothing made, then a tap.
+  ELECTRODES SHORT: half power. Frozen after 4 hours without power once it holds metal. PLC: RUN, TAP, POWER SP 4-20 mA, MW, MVAR,
+  RUNNING, AUTO.
+- **Moly roaster:** thickened concentrate on the east face of its bottom cells; its assay's `wildcatter:molybdenite` roasted at 0.25 t/h of
+  oxide (0.97 kg of MoS2 a kg, 98 % recovery), the SO2 (0.78 kg a kg) on the pipe out of its south side (local 1, 0, 2) as the burner gas
+  that carries it; NO ACID PLANT when its 5 s of gas cannot go. `wildcatter:scheelite` dried to 65 % WO3 concentrate bags. 22 kW at LV,
+  box west. PLC RUN, RUNNING, AUTO, RATE.
+- **Vessel:** bins for moly oxide bags, scheelite concentrate bags, iron and aluminium ingots; FeMo batch 1 bag + 4 iron + 20 aluminium
+  = 860 kg; FeW batch 1 bag + 1 iron + 8 aluminium = 648 kg; 10 minutes, fire damage under its hood; fan 15 kW at LV, box west.
+- **Items:** 1 t bulk bags of HC ferrochrome, HC ferromanganese, ferrosilicon 75, technical moly oxide, scheelite concentrate,
+  ferromolybdenum and ferrotungsten (icons `*_placeholder`), tags `wildcatter:ferroalloys` and `c:ferroalloys/<alloy>`.
+- **Scenes:** NeoForge `ferroalloys` and `alumino` as "Game tests" above (two vessel firings fill the bag); client `ferroalloys`
+  (filmed). Chromium metal is not built (no chromic oxide before 17c2).

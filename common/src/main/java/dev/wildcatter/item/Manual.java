@@ -179,6 +179,18 @@ public final class Manual {
 
 				"KOH SCRUBBER\n\nSet it against the hydrofluorinator to scrub its excess HF. Its first charge of " + Math.round(Tuning.KOH_CHARGE_KG) + " kg of KOH comes as CAUSTIC POTASH on the north face of its front: a chlor-alkali cell given POTASH instead of rock salt makes it. QUICKLIME BAGS in a hopper on top regenerate the liquor, and the CaF2 comes out under it as SYNTHETIC FLUORSPAR, which the HF kiln takes. Without lime its KOH is spent in about a day: SPENT, and the hydrofluorinator stops. A hydrofluorinator with no scrubber runs as before.",
 
+				"SUBMERGED ARC FURNACE\n\nFerroalloys. The FURNACE TRANSFORMER (" + Math.round(Tuning.FURNACE_TRANSFORMER_VA / 1e6) + " MVA) takes " + Voltage.DISTRIBUTION.label() + " on its west box; the FURNACE goes against its east face. At full tap it draws " + Math.round(Tuning.SAF_WATTS / 1e6) + " MW at PF " + String.format("%.2f", Tuning.SAF_POWER_FACTOR) + ": a substation's or a big turbine's load. Sneak-click the transformer to step its tap (" + Tuning.FURNACE_TAPS + " steps).\n\n"
+						+ "A hopper on top feeds each bin: chromitite, quartz and coke for FERROCHROME; manganese ore, limestone and coke for FERROMANGANESE; quartz, coke and iron for FERROSILICON. Sneak-click the furnace to change; the hearth runs out first, an hour.",
+
+				"TAPPING AND PASTE\n\nThe furnace taps every 2 hours, or when its hearth is full, out of its east face: set a BAGGING STATION there with empty bulk bags. Slag is counted.\n\n"
+						+ "Its electrodes burn " + Math.round(Tuning.SAF_PASTE_KG_PER_T) + " kg of paste a tonne: feed GREEN ANODES from the anode plant. Without them the electrodes burn short, ELECTRODES SHORT, and the power halves. Four hours without power and the hearth freezes: dig the furnace out.",
+
+				"CAPACITOR BANKS\n\nA low power factor load draws vars as well as watts: the furnace's " + Math.round(Tuning.SAF_WATTS / 1e6) + " MW at PF 0.80 is " + Math.round(Tuning.SAF_WATTS / 1e6 / Tuning.SAF_POWER_FACTOR) + " MVA, and the generators and lines carry it all.\n\n"
+						+ "A CAPACITOR BANK (" + Math.round(Tuning.CAP_BANK_VAR / 1e6) + " Mvar, " + Voltage.DISTRIBUTION.label() + ", box west) gives vars back. Set against the furnace transformer and wired to its bus, it lifts the feeder to about PF 0.94; the transformer reads both. It works on any bus. Sneak-click opens or closes its breaker.",
+
+				"MOLY ROASTER AND VESSEL\n\nThe MOLY ROASTER takes thickened flotation concentrate (from Tailings' concentrator) on its east side: molybdenite is roasted to MOLY OXIDE bags, scheelite dried to SCHEELITE CONCENTRATE bags. Its SO2 goes out its south side as burner gas: pipe it to an acid plant's converter, or it stops.\n\n"
+						+ "The ALUMINOTHERMIC VESSEL: a bag, iron and aluminium ingots by hopper; sneak-click fires it, 10 minutes, to FERROMOLYBDENUM or FERROTUNGSTEN. Keep out from under its hood.",
+
 				"FLUORINE CELLS\n\nThe CELL HOUSE holds " + Tuning.F2_CELLS + " cells in series, each " + Tuning.F2_CELL_VOLTS + " V at " + Tuning.F2_CELL_KA + " kA of DC: anhydrous HF in its front, fluorine out its back, pumped cooling water. The RECTIFIER against it turns " + Voltage.MEDIUM.label() + " three-phase into that DC: about " + Math.round(dev.wildcatter.fluid.Conversion.acWatts() / 1000) + " kW, a big steady load.\n\n"
 						+ "Bring your generators on line before the cells: a lone " + Math.round(Tuning.GENSET_DIESEL_WATTS / 1000) + " kW diesel set cannot carry them and trips. The rectifier does not back off: if the supply sags, the fluorine slows with it. To set the cell house away from its rectifier, see DC: RECTIFIERS AND BUS BARS.",
 

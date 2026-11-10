@@ -1,7 +1,9 @@
 package dev.wildcatter.neoforge.gametest;
 
+import dev.wildcatter.block.Assayed;
 import dev.wildcatter.block.FluidNode;
 import dev.wildcatter.fluid.Product;
+import dev.wildcatter.fluid.SlurryAssay;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
@@ -33,10 +35,12 @@ final class TestGasSource {
 		}
 	}
 
-	static final class SourceEntity extends BlockEntity implements FluidNode, dev.wildcatter.block.Mixed {
+	static final class SourceEntity extends BlockEntity implements FluidNode, dev.wildcatter.block.Mixed, Assayed {
 		Product product = Product.BIOGAS;
 		/** What a liquor it offers carries (Phase 16's scenes: strip liquor's U3O8 in kg a litre, in share 0). */
 		final double[] mix = new double[5];
+		/** What a kg of its slurry carries, for a concentrator slurry (the moly roaster's scene); empty for a gas. */
+		SlurryAssay assay = SlurryAssay.EMPTY;
 
 		@Override
 		public double[] mixOf(Product wanted) {
@@ -61,6 +65,11 @@ final class TestGasSource {
 				buffer = Math.min(rate, buffer + rate * (now - last) / 20.0);
 			}
 			last = now;
+		}
+
+		@Override
+		public SlurryAssay assayOf(Product wanted) {
+			return wanted == product ? assay : SlurryAssay.EMPTY;
 		}
 
 		@Override
