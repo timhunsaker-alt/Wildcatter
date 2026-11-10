@@ -256,6 +256,13 @@ public class BusRelayPanelBlockEntity extends BlockEntity implements CircuitPart
 				failedFor.merge(at, dt, Double::sum);
 				if (amps <= Tuning.BF_DETECTOR_AMPS) {
 					failedFor.put(at, 0.0);
+				} else if (failedFor.get(at) >= Tuning.BF_SECONDS) {
+					// the timer runs out between solves too: a steady fault does not re-solve, so 50BF acts here as well as in protect()
+					tripBus(String.format("50BF BREAKER FAILURE: the feeder at %s failed to open on %,.0f A", at.toShortString(), amps));
+					failedFor.remove(at);
+					CircuitManager.markDirty(level);
+					setChanged();
+					return;
 				}
 				continue;
 			}

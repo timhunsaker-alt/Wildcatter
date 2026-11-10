@@ -503,11 +503,15 @@ final class GasPowerClientScenes {
 				plant.setWaterForTest(Tuning.DRUM_WATER_KG * 0.8, 1000);
 				plant.setWantRun(true);
 			});
-			for (int i = 0; i < 30; i++) {
-				context.waitTicks(10);
+			// the firebox draws the biogas; it does not stay lit on one digester's 1 m3/s, because a firebox counts 8 ticks of fire a m3
+			// of gas (an early game unit, not a real heat rate): docs/questions/phase14-gas-power.md, "A firebox on piped gas"
+			for (int i = 0; i < 300; i++) {
+				context.waitTick();
 				lit |= get(level -> level.getBlockState(at(0, 0, -2)).getValue(dev.wildcatter.block.FireboxBlock.LIT));
 			}
-			check(lit, "the firebox should burn the biogas");
+			double fireGas = get(level -> ((TestGasSource.SourceEntity) level.getBlockEntity(at(0, 0, -4))).taken);
+			log("biogas firebox: lit " + lit + ", " + fireGas + " m3 taken");
+			check(fireGas > 1, "the firebox should draw the biogas: " + fireGas + " m3 taken");
 			show(0, 0, -2, tp(-3, 2, -5, -45, 20), "wildcatter-biogas-firebox");
 			String set = read(8, 0);
 			check(set.contains("RUNNING") && set.contains("BIOGAS: 850 kW MAX"), "the gas set should run on biogas: " + set);
