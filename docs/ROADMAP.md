@@ -415,6 +415,17 @@ Decisions for Tim: `docs/questions/plc-gaps.md` (12 entries). Spec updated: `doc
   - process models (pipe pressure, drum pressure, a turbine's load setpoint, dampers, vibration, CT and PT voltage);
   - the crane's lift start.
 
+## Phase 17a — Ferroalloys — BUILT 2026-11-10 (while Tim was away, on the DRAFT spec decided on recommendation; not approved)
+Spec: `docs/multiblocks/ferroalloys.md` ("As built"). Decisions for Tim: `docs/questions/phase17-ferroalloys.md`. Branch `phase17`.
+- The 10 MVA furnace transformer and the submerged arc furnace: 8 MW at PF 0.80 on the distribution tier, HC ferrochrome, HC
+  ferromanganese and ferrosilicon 75 in 1 t bags; taps, paste, freezing, PLC points.
+- The 3 Mvar capacitor bank, a grid part on any bus: the furnace's feeder from PF 0.80 to 0.935.
+- The moly roaster (moly oxide, its SO2 to the acid plant) and the aluminothermic vessel (ferromolybdenum, ferrotungsten).
+- No solver change; no existing world changes. NeoForge scenes `ferroalloys`, `alumino`; unit test `FerroalloysTest`; client scene
+  `ferroalloys` (filmed).
+- **Known gaps:** the seven bag icons are `*_placeholder`; chromium metal (needs 17c2's chromic oxide); no var controller; Tailings still
+  uses its placeholder ferrosilicon (question 1).
+
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released (planned as 14e, `docs/mekanism-check.md`).
 - Plants for the 7a ores that the fuel chain doesn't use:

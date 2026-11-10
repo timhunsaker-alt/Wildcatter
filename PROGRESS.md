@@ -1448,6 +1448,11 @@ sized for a 40-pot line.
 - The test client needs the Mac display awake. Run `caffeinate -u -t 30` just before launching it.
 
 ## Known gaps
+- Phase 17a (ferroalloys): the seven bulk bag icons (`ferrochrome_bag`, `ferromanganese_bag`, `ferrosilicon_bag`, `moly_oxide_bag`,
+  `scheelite_concentrate_bag`, `ferromolybdenum_bag`, `ferrotungsten_bag`) are script-drawn `*_placeholder` (the Ludo bulk bag with a
+  swatch). Not built: chromium metal (needs 17c2's chromic oxide), an automatic var controller, capacitor switching inrush and harmonic
+  resonance, a slag item, a frozen-furnace drop, Soderberg paste as its own item (green anodes stand in). Tailings' dense-medium plant
+  keeps its placeholder ferrosilicon recipe. See `docs/questions/phase17-ferroalloys.md`.
 - Phase 14 (the ammonia plant): the `gauze_pack` and `emulsifier_pail` icons are Ludo art since the art wave (2026-11-09); no
   placeholder is left. The six parts use the mod's materials. Not built: the ammonia leak hazard, AN solution setting in a cold
   pipe, an IBC for matrix, a PGM refinery (a gauze pack is crafted straight from platinum reef ore and a worn pack is not recovered),
@@ -1838,3 +1843,16 @@ Branch `misc-gaps`.
 - **Field Manual:** GENSETS (the derate on coke oven gas), PEAKER (no coke oven gas, the Wobbe index).
 - **Tests:** unit test `LeanGasTest` (3). NeoForge server scenes `cog_derate` (860 kW held against a 1 MW bank), `aero_lean_gas`,
   `cracker_pump` (a furnace filled 0 to 200 L by a process water pump on a diesel set), `alternator_frames`, `drawn_runs`.
+
+## Phase 17a: ferroalloys (2026-11-10; built while Tim was away; decisions: `docs/questions/phase17-ferroalloys.md`)
+- **Furnace transformer** (10 MVA, distribution tier to 150 V, 15 taps) and the **submerged arc furnace** against it: 8 MW at PF 0.80, a
+  constant-power load in the phasor solver; HC ferrochrome (2.1 t/h), HC ferromanganese (3.2 t/h), ferrosilicon 75 (0.94 t/h) from
+  hopper-fed bins; taps every 2 hours into a bagging station; green anodes as Soderberg paste; ELECTRODES SHORT; freezing; PLC points.
+- **Capacitor bank** (3 Mvar): any bus; against the furnace transformer, the feeder's PF rises from 0.80 to 0.935, metered by the
+  transformer.
+- **Moly roaster** (0.25 t/h of moly oxide; SO2 to an acid plant's converter; scheelite concentrate dried) and **aluminothermic vessel**
+  (ferromolybdenum, ferrotungsten).
+- Seven 1 t bulk bag items, `c:ferroalloys/*` tags. Field Manual: SUBMERGED ARC FURNACE, TAPPING AND PASTE, CAPACITOR BANKS, MOLY ROASTER
+  AND VESSEL.
+- Tests: `FerroalloysTest` (7, including the solver's feeder current with and without the bank); NeoForge `ferroalloys`, `alumino`;
+  client `ferroalloys` (filmed).
