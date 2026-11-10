@@ -46,6 +46,8 @@ public class WildcatterNeoForgeGameTests {
 	/** The ammonia plant's scenes (AmmoniaPlantScenes): big, so each gets room round it, and long, for the gensets to start. */
 	private static final String[] PLANT_SCENES = {"ammonia_loop", "nitric_acid", "an_emulsion", "crane_siting", "quench_sump", "stabilizer_fuel", "cog_engine", "pot_aux", "burner_hopper"};
 	/** Phase 14b-14d's scenes (GasPowerScenes): longer still, for the acid plant to raise steam and the turbine to take the plant. */
+	/** Phase 18's scenes (PhosphateScenes): wide, so each gets room round it, and long, for four sets and the bags. */
+	private static final String[] PHOSPHATE_SCENES = {"phosphoric", "potash"};
 	private static final String[] GAS_POWER_SCENES = {"sales_gas", "acid_steam", "biogas"};
 
 	/** The protection gap wave's grid scenes (docs/questions/protection-gaps.md), each group in its own class, all run as plant scenes. */
@@ -97,6 +99,8 @@ public class WildcatterNeoForgeGameTests {
 			helper.register(id("sales_gas"), (Consumer<GameTestHelper>) GasPowerScenes::salesGas);
 			helper.register(id("acid_steam"), (Consumer<GameTestHelper>) GasPowerScenes::acidSteam);
 			helper.register(id("biogas"), (Consumer<GameTestHelper>) GasPowerScenes::biogas);
+			helper.register(id("phosphoric"), (Consumer<GameTestHelper>) PhosphateScenes::phosphoric);
+			helper.register(id("potash"), (Consumer<GameTestHelper>) PhosphateScenes::potash);
 			GRID_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 		}));
 		modBus.addListener(RegisterCapabilitiesEvent.class, event -> event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, entity, side) -> STORAGE, Blocks.GOLD_BLOCK));
@@ -118,6 +122,14 @@ public class WildcatterNeoForgeGameTests {
 			if (only("ring_travel")) event.registerTest(id("ring_travel"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id("ring_travel")),
 					new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 3000, 1, true,
 							net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 240)));
+			for (String scene : PHOSPHATE_SCENES) {
+				if (!only(scene)) {
+					continue;
+				}
+				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
+						new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 6000, 1, true,
+								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 90)));   // padding: the phosphoric scene is 64 blocks across
+			}
 			for (String scene : GAS_POWER_SCENES) {
 				if (!only(scene)) {
 					continue;

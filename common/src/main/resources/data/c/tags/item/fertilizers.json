@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "wildcatter:tsp_bag",
+    "wildcatter:dap_bag",
+    "wildcatter:mop_bag"
+  ]
+}

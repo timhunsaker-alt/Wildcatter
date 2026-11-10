@@ -67,8 +67,9 @@ public final class OreUses {
 			case GALENA -> List.of("a furnace (lead ingot)");
 			case SPHALERITE -> List.of("a furnace (zinc ingot)");
 			case ACANTHITE -> List.of("a furnace (silver ingot)");
-			case SYLVITE, PENTLANDITE, PLATINUM, MOLYBDENITE, DOLOMITE, GRAPHITE, SPODUMENE, BARITE, BENTONITE, SCHEELITE, COBALTITE,
-					PHOSPHATE -> List.of();
+			case PHOSPHATE -> List.of("the phosphate mill (phosphoric acid, TSP and DAP fertilizer)");
+			case SYLVITE -> List.of("the potash dissolver (muriate of potash fertilizer)");
+			case PENTLANDITE, PLATINUM, MOLYBDENITE, DOLOMITE, GRAPHITE, SPODUMENE, BARITE, BENTONITE, SCHEELITE, COBALTITE -> List.of();
 		};
 	}
 

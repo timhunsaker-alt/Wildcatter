@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SHS",
+    "IXI",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "I": "minecraft:iron_block",
+    "X": "minecraft:piston"
+  },
+  "result": {
+    "id": "wildcatter:phosphate_mill",
+    "count": 1
+  }
+}

@@ -129,7 +129,13 @@ public enum Product {
 	 * puts it on steel pipe by a block entity that implements {@code block.FluidNode} and offers this product. Gas sets (derated to
 	 * 850 kW) and fireboxes burn it; big burners, turbines and the sales line refuse it.
 	 */
-	BIOGAS("biogas, 60 % CH4", true);
+	BIOGAS("biogas, 60 % CH4", true),
+	/** Phase 18a (docs/multiblocks/fertilizer.md): the phosphate mill's ground rock in water, 62 % solids. Counted in kg; no tank holds it. */
+	ROCK_SLURRY("rock slurry", false),
+	/** The pan filter's wet-process phosphoric acid, 28 % P2O5, for the evaporator. Counted in litres. */
+	FILTER_ACID("filter acid (28 % P2O5)", false),
+	/** The evaporator's merchant phosphoric acid, 54 % P2O5, for the granulator; stock tanks hold it. Counted in litres. */
+	MERCHANT_ACID("merchant acid (54 % P2O5)", false);
 
 	private final String label;
 	private final boolean gas;
@@ -152,7 +158,7 @@ public enum Product {
 		return switch (this) {
 			case HOT_CRACKED_GAS, CRACKED_GAS, COMPRESSED_CRACKED_GAS, BURNER_GAS, ORE_SLURRY, LEACH_SLURRY, FLUORINE, UF6, CHLORINE, STEAM, FEEDWATER, COOLING_WATER,
 					CAUSTIC_SODA, PROCESS_STEAM, BAUXITE_SLURRY, DIGESTED_SLURRY, GREEN_LIQUOR, MUD_SLURRY, POLISHED_LIQUOR, HYDRATE_SLURRY, SPENT_LIQUOR, STRONG_LIQUOR, COAL_TAR, PITCH,
-					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY, AN_SOLUTION, EMULSION_MATRIX -> "kg";
+					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY, AN_SOLUTION, EMULSION_MATRIX, ROCK_SLURRY -> "kg";
 			default -> gas ? "m3" : "L";
 		};
 	}
@@ -162,7 +168,7 @@ public enum Product {
 		return switch (this) {
 			case MOLTEN_SULFUR, ORE_SLURRY, LEACH_SLURRY, PREGNANT_LIQUOR, STRIP_LIQUOR, PREGNANT_LIXIVIANT, BARREN_LIXIVIANT, ELUATE, ANHYDROUS_HF, FEEDWATER, COOLING_WATER,
 					BAUXITE_SLURRY, DIGESTED_SLURRY, GREEN_LIQUOR, MUD_SLURRY, POLISHED_LIQUOR, HYDRATE_SLURRY, SPENT_LIQUOR, STRONG_LIQUOR,
-					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY -> false;
+					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY, ROCK_SLURRY -> false;
 			default -> !gas;
 		};
 	}

@@ -153,6 +153,14 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "ammonia_converter" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.AMMONIA_CONVERTER_WATTS);
 				case "nitric_acid_unit" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.NITRIC_UNIT_WATTS);
 				case "emulsion_blender" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.EMULSION_BLENDER_WATTS);
+				case "phosphate_mill" -> new Motor(true, Voltage.MEDIUM, Tuning.PHOSPHATE_MILL_WATTS);
+				case "phosphoric_reactor" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PHOSPHORIC_REACTOR_WATTS);
+				case "tilting_pan_filter" -> new Motor(true, Voltage.MEDIUM, Tuning.PAN_FILTER_WATTS);
+				case "acid_evaporator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ACID_EVAPORATOR_WATTS);
+				case "granulation_plant" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.GRANULATION_WATTS);
+				case "potash_dissolver" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.POTASH_DISSOLVER_WATTS);
+				case "vacuum_crystallizer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.VACUUM_CRYSTALLIZER_WATTS);
+				case "potash_dryer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.POTASH_DRYER_WATTS);
 				case "meter_building" -> new Motor(false, Voltage.LOW, Tuning.METER_BUILDING_WATTS);   // residential, single-phase
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
@@ -272,6 +280,14 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "ammonia_converter" -> "circulator and chiller";
 			case "nitric_acid_unit" -> "air blower";
 			case "emulsion_blender" -> "mixer";
+			case "phosphate_mill" -> "mill motor";
+			case "phosphoric_reactor" -> "agitators";
+			case "tilting_pan_filter" -> "vacuum pump";
+			case "acid_evaporator" -> "circulation pump";
+			case "granulation_plant" -> "granulator drives";
+			case "potash_dissolver" -> "agitators";
+			case "vacuum_crystallizer" -> "pumps";
+			case "potash_dryer" -> "fans and compactor";
 			case "meter_building" -> "heaters, chromatograph and RTU charger";
 			default -> kind();
 		};
@@ -313,7 +329,12 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 
 	// ---- the motor ---------------------------------------------------------------------------------------------------------------
 	private List<Direction> boxFaces() {
-		return List.of(LeasePartBlock.world(getBlockState(), Direction.WEST));
+		return List.of(LeasePartBlock.world(getBlockState(), boxSide()));
+	}
+
+	/** The face of its main cell its terminal box is on, in its own frame: the west, unless a part against it covers that. */
+	protected Direction boxSide() {
+		return Direction.WEST;
 	}
 
 	@Override

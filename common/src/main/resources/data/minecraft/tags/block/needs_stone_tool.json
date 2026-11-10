@@ -290,6 +290,14 @@
     "wildcatter:junction_box",
     "wildcatter:control_supply",
     "wildcatter:plc_cabinet",
-    "wildcatter:remote_io_drop"
+    "wildcatter:remote_io_drop",
+    "wildcatter:phosphate_mill",
+    "wildcatter:phosphoric_reactor",
+    "wildcatter:tilting_pan_filter",
+    "wildcatter:acid_evaporator",
+    "wildcatter:granulation_plant",
+    "wildcatter:potash_dissolver",
+    "wildcatter:vacuum_crystallizer",
+    "wildcatter:potash_dryer"
   ]
 }

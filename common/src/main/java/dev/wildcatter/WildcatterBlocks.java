@@ -151,6 +151,14 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.NitricAcidUnitBlockEntity> NITRIC_ACID_UNIT_ENTITY = entity(dev.wildcatter.block.NitricAcidUnitBlockEntity::new, NITRIC_ACID_UNIT);
 	public static final BlockEntityType<dev.wildcatter.block.AnNeutraliserBlockEntity> AN_NEUTRALISER_ENTITY = entity(dev.wildcatter.block.AnNeutraliserBlockEntity::new, AN_NEUTRALISER);
 	public static final BlockEntityType<dev.wildcatter.block.EmulsionBlenderBlockEntity> EMULSION_BLENDER_ENTITY = entity(dev.wildcatter.block.EmulsionBlenderBlockEntity::new, EMULSION_BLENDER);
+	public static final BlockEntityType<dev.wildcatter.block.PhosphateMillBlockEntity> PHOSPHATE_MILL_ENTITY = entity(dev.wildcatter.block.PhosphateMillBlockEntity::new, PHOSPHATE_MILL);
+	public static final BlockEntityType<dev.wildcatter.block.PhosphoricReactorBlockEntity> PHOSPHORIC_REACTOR_ENTITY = entity(dev.wildcatter.block.PhosphoricReactorBlockEntity::new, PHOSPHORIC_REACTOR);
+	public static final BlockEntityType<dev.wildcatter.block.PanFilterBlockEntity> TILTING_PAN_FILTER_ENTITY = entity(dev.wildcatter.block.PanFilterBlockEntity::new, TILTING_PAN_FILTER);
+	public static final BlockEntityType<dev.wildcatter.block.AcidEvaporatorBlockEntity> ACID_EVAPORATOR_ENTITY = entity(dev.wildcatter.block.AcidEvaporatorBlockEntity::new, ACID_EVAPORATOR);
+	public static final BlockEntityType<dev.wildcatter.block.GranulationPlantBlockEntity> GRANULATION_PLANT_ENTITY = entity(dev.wildcatter.block.GranulationPlantBlockEntity::new, GRANULATION_PLANT);
+	public static final BlockEntityType<dev.wildcatter.block.PotashDissolverBlockEntity> POTASH_DISSOLVER_ENTITY = entity(dev.wildcatter.block.PotashDissolverBlockEntity::new, POTASH_DISSOLVER);
+	public static final BlockEntityType<dev.wildcatter.block.VacuumCrystallizerBlockEntity> VACUUM_CRYSTALLIZER_ENTITY = entity(dev.wildcatter.block.VacuumCrystallizerBlockEntity::new, VACUUM_CRYSTALLIZER);
+	public static final BlockEntityType<dev.wildcatter.block.PotashDryerBlockEntity> POTASH_DRYER_ENTITY = entity(dev.wildcatter.block.PotashDryerBlockEntity::new, POTASH_DRYER);
 	public static final BlockEntityType<dev.wildcatter.block.TarStillBlockEntity> TAR_STILL_ENTITY = entity(dev.wildcatter.block.TarStillBlockEntity::new, TAR_STILL);
 	public static final BlockEntityType<dev.wildcatter.block.PastePlantBlockEntity> PASTE_PLANT_ENTITY = entity(dev.wildcatter.block.PastePlantBlockEntity::new, PASTE_PLANT);
 	public static final BlockEntityType<dev.wildcatter.block.FormingPressBlockEntity> FORMING_PRESS_ENTITY = entity(dev.wildcatter.block.FormingPressBlockEntity::new, FORMING_PRESS);
@@ -439,6 +447,9 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		for (Block part : new Block[] {NITROGEN_GENERATOR, SYNGAS_COMPRESSOR, AMMONIA_CONVERTER, NITRIC_ACID_UNIT, AN_NEUTRALISER, EMULSION_BLENDER}) {
 			add(((dev.wildcatter.block.AmmoniaPartBlock) part).part().id(), part);
 		}
+		for (Block part : new Block[] {PHOSPHATE_MILL, PHOSPHORIC_REACTOR, TILTING_PAN_FILTER, ACID_EVAPORATOR, GRANULATION_PLANT, POTASH_DISSOLVER, VACUUM_CRYSTALLIZER, POTASH_DRYER}) {
+			add(((dev.wildcatter.block.PhosphatePartBlock) part).part().id(), part);
+		}
 		for (Block part : new Block[] {RECTIFORMER, POT, FUME_TREATMENT_CENTRE, FTC_FAN, CASTING_MACHINE}) {
 			add(((dev.wildcatter.block.PotlinePartBlock) part).part().id(), part);
 		}
@@ -650,6 +661,14 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("nitric_acid_unit"), NITRIC_ACID_UNIT_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("an_neutraliser"), AN_NEUTRALISER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("emulsion_blender"), EMULSION_BLENDER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("phosphate_mill"), PHOSPHATE_MILL_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("phosphoric_reactor"), PHOSPHORIC_REACTOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("tilting_pan_filter"), TILTING_PAN_FILTER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("acid_evaporator"), ACID_EVAPORATOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("granulation_plant"), GRANULATION_PLANT_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("potash_dissolver"), POTASH_DISSOLVER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("vacuum_crystallizer"), VACUUM_CRYSTALLIZER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("potash_dryer"), POTASH_DRYER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("paste_plant"), PASTE_PLANT_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("forming_press"), FORMING_PRESS_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("baking_furnace"), BAKING_FURNACE_ENTITY);

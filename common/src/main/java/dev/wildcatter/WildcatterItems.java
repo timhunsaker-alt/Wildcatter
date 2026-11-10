@@ -173,6 +173,16 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> EMULSIFIER_PAIL_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("emulsifier_pail"));
 	public static final Item EMULSIFIER_PAIL = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(EMULSIFIER_PAIL_KEY),
 			String.format("A %.0f kg pail of emulsifier (a polyisobutylene succinic anhydride in oil)", Tuning.EMULSIFIER_PAIL_KG), "for the emulsion blender");
+	// Phase 18a: fertilizer bags (docs/multiblocks/fertilizer.md)
+	public static final ResourceKey<Item> TSP_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("tsp_bag"));
+	public static final Item TSP_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(TSP_BAG_KEY),
+			String.format("%,.0f kg of triple superphosphate, 0-46-0", Tuning.BULK_BAG_KG), "a fertilizer");
+	public static final ResourceKey<Item> DAP_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("dap_bag"));
+	public static final Item DAP_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(DAP_BAG_KEY),
+			String.format("%,.0f kg of diammonium phosphate, 18-46-0", Tuning.BULK_BAG_KG), "a fertilizer");
+	public static final ResourceKey<Item> MOP_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("mop_bag"));
+	public static final Item MOP_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(MOP_BAG_KEY),
+			String.format("%,.0f kg of muriate of potash (KCl), 0-0-60", Tuning.BULK_BAG_KG), "a fertilizer");
 	// 10c1: blueprints (docs/blueprints.md)
 	public static final ResourceKey<Item> BLUEPRINT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("blueprint"));
 	public static final Item BLUEPRINT = new dev.wildcatter.item.BlueprintItem(new Item.Properties().stacksTo(1).setId(BLUEPRINT_KEY));
@@ -380,6 +390,9 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, TAPPING_CRUCIBLE_KEY, TAPPING_CRUCIBLE);
 		Registry.register(BuiltInRegistries.ITEM, GAUZE_PACK_KEY, GAUZE_PACK);
 		Registry.register(BuiltInRegistries.ITEM, EMULSIFIER_PAIL_KEY, EMULSIFIER_PAIL);
+		Registry.register(BuiltInRegistries.ITEM, TSP_BAG_KEY, TSP_BAG);
+		Registry.register(BuiltInRegistries.ITEM, DAP_BAG_KEY, DAP_BAG);
+		Registry.register(BuiltInRegistries.ITEM, MOP_BAG_KEY, MOP_BAG);
 		Registry.register(BuiltInRegistries.ITEM, BLUEPRINT_KEY, BLUEPRINT);
 		Registry.register(BuiltInRegistries.ITEM, SURVEY_TOOL_KEY, SURVEY_TOOL);
 		Registry.register(BuiltInRegistries.ITEM, GROUNDING_SET_KEY, GROUNDING_SET);

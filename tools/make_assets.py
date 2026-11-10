@@ -2756,6 +2756,41 @@ lang.update({"block.wildcatter.control_cable": "Control Cable (multi-core)", "bl
 	"block.wildcatter.air_tubing": "Instrument Air Tubing", "block.wildcatter.air_compressor": "Instrument Air Compressor", "block.wildcatter.air_dryer": "Air Dryer", "block.wildcatter.day_tank": "Water Day Tank (1 m3)", "block.wildcatter.transmitter": "Transmitter (4-20 mA)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 18a: fertilizer (docs/multiblocks/fertilizer.md) -------------------------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/phosphate.py; here loot, names, tags, recipes and the items. Drawn
+# last, so the placeholders before it keep their noise.
+PHOSPHATE_PARTS = ("phosphate_mill", "phosphoric_reactor", "tilting_pan_filter", "acid_evaporator", "granulation_plant", "potash_dissolver",
+	"vacuum_crystallizer", "potash_dryer")
+for name in PHOSPHATE_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in PHOSPHATE_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("phosphate_mill", ["SHS", "IXI", "SSS"], {"S": S_, "H": "minecraft:hopper", "I": "minecraft:iron_block", "X": "minecraft:piston"}, "phosphate_mill")
+shaped("phosphoric_reactor", ["SXS", "CPC", "CCC"], {"S": S_, "X": "minecraft:piston", "C": "minecraft:smooth_stone", "P": P_}, "phosphoric_reactor")
+shaped("tilting_pan_filter", ["SLS", "PXP", "SIS"], {"S": S_, "L": "minecraft:paper", "P": P_, "X": "minecraft:piston", "I": "minecraft:iron_block"}, "tilting_pan_filter")
+shaped("acid_evaporator", ["SPS", "SCS", "SXS"], {"S": S_, "P": P_, "C": "minecraft:copper_block", "X": "minecraft:piston"}, "acid_evaporator")
+shaped("granulation_plant", ["SPS", "IFI", "SXS"], {"S": S_, "P": P_, "I": "minecraft:iron_block", "F": "minecraft:blast_furnace", "X": "minecraft:piston"}, "granulation_plant")
+shaped("potash_dissolver", ["SHS", "SXS", "SPS"], {"S": S_, "H": "minecraft:hopper", "X": "minecraft:piston", "P": P_}, "potash_dissolver")
+shaped("vacuum_crystallizer", ["SPS", "S S", "SXS"], {"S": S_, "P": P_, "X": "minecraft:piston"}, "vacuum_crystallizer")
+shaped("potash_dryer", ["SPS", "BFB", "SXS"], {"S": S_, "P": P_, "B": "minecraft:bricks", "F": "minecraft:furnace", "X": "minecraft:piston"}, "potash_dryer")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in {"tsp_bag": ("Bulk Bag of TSP (0-46-0)", (196, 196, 180)), "dap_bag": ("Bulk Bag of DAP (18-46-0)", (170, 150, 120)),
+		"mop_bag": ("Bulk Bag of Muriate of Potash (0-0-60)", (200, 120, 110))}.items():
+	tex(f"{item}_placeholder", lambda img, d, c=colour: noise(img, c, 10), "item")
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}_placeholder"}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.phosphate_mill": "Phosphate Mill (wet ball mill, 200 kW)", f"block.{ns}.phosphoric_reactor": "Phosphoric Acid Reactor (dihydrate)",
+	f"block.{ns}.tilting_pan_filter": "Tilting Pan Filter", f"block.{ns}.acid_evaporator": "Phosphoric Acid Evaporator",
+	f"block.{ns}.granulation_plant": "Granulation Plant (TSP or DAP)", f"block.{ns}.potash_dissolver": "Potash Dissolver",
+	f"block.{ns}.vacuum_crystallizer": "Vacuum Crystallizer", f"block.{ns}.potash_dryer": "Potash Dryer and Compactor"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+# the convention tag another mod's crops can read; Wildcatter itself gives the bags no use on crops (fertilizer.md)
+save_json(f"{ROOT}/data/c/tags/item/fertilizers.json", {"replace": False, "values": [f"{ns}:tsp_bag", f"{ns}:dap_bag", f"{ns}:mop_bag"]})
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)
