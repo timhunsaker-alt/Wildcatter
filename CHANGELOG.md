@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased (branch `phase18`): phosphate (Phase 18, built 2026-11-10 while Tim was away; not approved)
+## Unreleased (0.7.0, branch `w-next`): Phases 16-19, built 2026-11-10 while Tim was away
+
+### phosphate (Phase 18, built 2026-11-10 while Tim was away; not approved)
 - **Fertilizer (18a):** a phosphate mill, a dihydrate phosphoric reactor with its tilting pan filter, an acid evaporator and a granulation
   plant: 20 t of P2O5 a day from phosphate rock and sulfuric acid, its phosphogypsum to a lined tailings cell, merchant acid, and TSP or
   DAP (on the ammonia plant's ammonia) in 1 t bags. A potash dissolver, vacuum crystallizer and dryer: 5 t/h of muriate of potash in
@@ -10,7 +12,7 @@
   `docs/multiblocks/uranium-from-phosphate.md`.
 - Existing worlds are unchanged. Decisions for review: `docs/questions/phase18-phosphate.md`.
 
-## Unreleased: ferroalloys (Phase 17a, built 2026-11-10 while Tim was away; not approved)
+### ferroalloys (Phase 17a, built 2026-11-10 while Tim was away; not approved)
 - **Submerged arc furnace:** a 10 MVA furnace transformer on the distribution tier feeds an 8 MW furnace at PF 0.80, the grid's first big
   low power factor load. It smelts HC ferrochrome, HC ferromanganese or ferrosilicon 75 from ore, coke and flux by hopper, taps into 1 t
   bulk bags every 2 hours, burns green anodes as its electrode paste, and freezes after 4 hours without power.
@@ -20,7 +22,7 @@
 - Nothing changes in existing worlds: no solver or existing machine changed. Spec: `docs/multiblocks/ferroalloys.md`. Decisions for
   review: `docs/questions/phase17-ferroalloys.md`.
 
-## Unreleased (phase16 branch): Phase 16, uranium routes and plant operations (built 2026-11-10 while Tim was away; not approved)
+### Phase 16, uranium routes and plant operations (built 2026-11-10 while Tim was away; not approved)
 - **ADU yellowcake (16a):** pipe liquid ammonia to the precipitation tank and set the new URANIUM CALCINER against it and the drum filler:
   U3O8 at 96 % in a new U3O8 Drum, 326 kg of uranium against the magnesia drum's 271. Conversion needs a third less hydrogen for it, no
   HF for magnesia and far less ash. Without ammonia the magnesia route is unchanged. Spec: `docs/multiblocks/adu-yellowcake.md`.
@@ -38,7 +40,8 @@
   as a SATELLITE, filling a RESIN TRAILER that the central plant's columns elute. Spec: `docs/multiblocks/isr-operations.md`.
 - Decisions for review: `docs/questions/phase16-uranium.md`.
 
-## Unreleased (0.7.0): gas and power quick wins (Phase 14b-14d) and the protection gap wave (built 2026-11-09 while Tim was away; not approved)
+### Reactor extensions (Phase 19a and 19b)
+
 - **Reactor extensions 19a** (built 2026-11-10 while Tim was away; not approved; decisions for review: `docs/questions/phase19-reactor.md`):
   - **Containment:** containment concrete, an equipment hatch, a personnel airlock, hydrogen recombiners and igniters, and a
     containment monitor that reads the building CLOSED (and its volume) or OPEN. Closed, it takes the core's hydrogen, burns it with
@@ -54,6 +57,10 @@
   - **Contamination:** a personnel monitor and a decontamination washer.
   - **New rules, off unless turned on:** `reactorContamination` (coolant activity; contamination where primary water gets out, its dose,
     and its pick-up by players), `fuelHandlingDamage` (a 1 % chance of a bent grid on a move, a leaking rod if loaded unseen).
+
+## v0.6.0 (released 2026-11-10)
+
+### Gas and power quick wins (Phase 14b-14d), the PLC gap wave and the protection gap wave
 - **The sales line (14b):** a gas plant's pipeline gas goes on an off-map transmission line at a receipt meter station and comes off
   anywhere in the dimension at a delivery station, less 2 % kept as compressor fuel. Five true-size parts: meter building (2 kW,
   residential), filter separator, ultrasonic meter run, regulator skid, pipeline tap. Off-spec gas refused (rich, wet, biogas); 8 hours on
@@ -113,7 +120,7 @@
     gas's) and still takes coker gas.
   - The brass texture no longer shows a tile line; the conductor spool icons are new art.
 
-## v0.6.0 (built 2026-11-09; not yet released on GitHub)
+### The ammonia plant and the waves before it
 - **The ammonia plant (Phase 14):** a nitrogen generator, syngas compressor and ammonia converter on the steam reformer's hydrogen
   (15.2 kg/h of liquid ammonia), a nitric acid unit on a platinum-rhodium gauze (60 % acid), an ammonium nitrate neutraliser and an
   emulsion blender making bulk emulsion matrix (46 kg/h) for open-pit blasting. New pipe products: nitrogen, ammonia, nitric acid,
