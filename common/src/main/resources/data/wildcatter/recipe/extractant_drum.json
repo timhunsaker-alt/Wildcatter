@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "wildcatter:empty_drum",
+    "wildcatter:phosphate",
+    "wildcatter:diesel_bucket",
+    "minecraft:iron_ingot"
+  ],
+  "result": {
+    "id": "wildcatter:extractant_drum",
+    "count": 1
+  }
+}

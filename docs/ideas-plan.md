@@ -30,8 +30,8 @@ what each needs first.
 | 11 | [multiblocks/ferroalloys.md](multiblocks/ferroalloys.md) | ferroalloys (Cr, Mn, Mo, W) | 5 | L | 4: a 10 MVA low-PF grid load, capacitor banks, uses for coke and four ores | **17a** |
 | 12 | [multiblocks/nickel-smelter.md](multiblocks/nickel-smelter.md) | a nickel smelter (and real stainless and nickel alloy) | 9 | L-XL | 3: nickel ore, real fuel hardware | **17b1, 17b2** |
 | 13 | [multiblocks/zirconium-extensions.md](multiblocks/zirconium-extensions.md) | zirconium: SiCl4, caustic, hafnium, Pidgeon Mg, chromium, scrap, batches | 3 | M | 2 | **17c1, 17c2** |
-| 14 | [multiblocks/fertilizer.md](multiblocks/fertilizer.md) | fertilizer from phosphate and potash | 8 | L | 3: two dead ores; Farmings' fertilizer | **18a** |
-| 15 | [multiblocks/uranium-from-phosphate.md](multiblocks/uranium-from-phosphate.md) | uranium from phosphoric acid | 2 | M | 2: a slow by-product uranium source | **18b** |
+| 14 | [multiblocks/fertilizer.md](multiblocks/fertilizer.md) | fertilizer from phosphate and potash | 8 | L | 3: two dead ores; Farmings' fertilizer | **18a** (built, branch `phase18`) |
+| 15 | [multiblocks/uranium-from-phosphate.md](multiblocks/uranium-from-phosphate.md) | uranium from phosphoric acid | 2 | M | 2: a slow by-product uranium source | **18b** (first cycle built, branch `phase18`; second cycle waits on 16a) |
 | 16 | [multiblocks/reactor-extensions.md](multiblocks/reactor-extensions.md) | reactor: containment, LTOP, 55 C/h, OT/OPΔT, relief tank, casks, contamination, fresh fuel, rods, sodium sulfate | 11 | L (19a), L (19b), M (19d) | 4: end-game consequences; closes 8d's and 8e's known gaps | **19a, 19b, 19d** |
 | 17 | [multiblocks/fuel-fabrication-extensions.md](multiblocks/fuel-fabrication-extensions.md) | fuel: HF back, lubricant, real hardware, inspection, IFBA, scrap | 6 | M-L | 2 | **19c1, 19c2** |
 | 18 | [multiblocks/chlor-alkali-plant.md](multiblocks/chlor-alkali-plant.md) | chlor-alkali from rock salt (full size) | 8 | L | 2: a 7f cell already does it small | **20a** |

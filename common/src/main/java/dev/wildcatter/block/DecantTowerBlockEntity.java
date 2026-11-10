@@ -34,6 +34,8 @@ public class DecantTowerBlockEntity extends BlockEntity implements Inspectable {
 
 	private double settledKg;
 	private double reclaimed;
+	private double gypsumKg;   // of the settled tails, phosphogypsum from a pan filter (Phase 18a)
+	private double saltKg;     // and salt tails from a potash dissolver
 	private int placed;
 	private List<BlockPos> floor = List.of();
 	private int rim;
@@ -167,13 +169,29 @@ public class DecantTowerBlockEntity extends BlockEntity implements Inspectable {
 		Slurry.Taken got = Slurry.take(level, Lines.faces(List.of(pos)), Product.TAILS_SLURRY, Math.min(MAX_PER_TICK, room / Tuning.CELL_SLURRY_SOLIDS), tower);
 		if (got.kg() > 0) {
 			tower.settledKg += got.kg() * Tuning.CELL_SLURRY_SOLIDS;
+			tower.gypsumKg += got.assay().kg(PanFilterBlockEntity.GYPSUM, got.kg());
+			tower.saltKg += got.assay().kg(PotashDissolverBlockEntity.SALT, got.kg());
 			tower.reclaimed += got.kg() * (1 - Tuning.CELL_SLURRY_SOLIDS) * Tuning.CELL_RECLAIM;
 			tower.setChanged();
 		}
 		if (now % Tuning.PLUMBING_INTERVAL == 0) {
 			tower.decant(level);
 		}
-		tower.status = String.format("%.1f of %.0f t of tails (%d x %d cells)", tower.settledKg / 1000, tower.capacityKg() / 1000, tower.floor.size(), tower.rim);
+		tower.status = String.format("%.1f of %.0f t of tails (%d x %d cells)", tower.settledKg / 1000, tower.capacityKg() / 1000, tower.floor.size(), tower.rim) + tower.stack();
+	}
+
+	/** What the stack is made of, when a fertilizer plant sent it: "", or "; of which 12.0 t phosphogypsum". */
+	private String stack() {
+		String out = gypsumKg >= 1 ? String.format("%.1f t phosphogypsum", gypsumKg / 1000) : "";
+		if (saltKg >= 1) {
+			out += (out.isEmpty() ? "" : " and ") + String.format("%.1f t salt", saltKg / 1000);
+		}
+		return out.isEmpty() ? "" : "; of which " + out;
+	}
+
+	/** kg of phosphogypsum it has taken. */
+	public double gypsumKg() {
+		return gypsumKg;
 	}
 
 	@Override
@@ -187,6 +205,12 @@ public class DecantTowerBlockEntity extends BlockEntity implements Inspectable {
 		output.putDouble("settled", settledKg);
 		output.putDouble("reclaimed", reclaimed);
 		output.putInt("placed", placed);
+		if (gypsumKg > 0) {
+			output.putDouble("gypsum", gypsumKg);
+		}
+		if (saltKg > 0) {
+			output.putDouble("salt", saltKg);
+		}
 	}
 
 	@Override
@@ -195,5 +219,7 @@ public class DecantTowerBlockEntity extends BlockEntity implements Inspectable {
 		settledKg = input.getDoubleOr("settled", 0);
 		reclaimed = input.getDoubleOr("reclaimed", 0);
 		placed = input.getIntOr("placed", 0);
+		gypsumKg = input.getDoubleOr("gypsum", 0);
+		saltKg = input.getDoubleOr("salt", 0);
 	}
 }

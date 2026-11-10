@@ -302,6 +302,16 @@
     "wildcatter:submerged_arc_furnace",
     "wildcatter:capacitor_bank",
     "wildcatter:moly_roaster",
-    "wildcatter:aluminothermic_vessel"
+    "wildcatter:aluminothermic_vessel",
+    "wildcatter:phosphate_mill",
+    "wildcatter:phosphoric_reactor",
+    "wildcatter:tilting_pan_filter",
+    "wildcatter:acid_evaporator",
+    "wildcatter:granulation_plant",
+    "wildcatter:potash_dissolver",
+    "wildcatter:vacuum_crystallizer",
+    "wildcatter:potash_dryer",
+    "wildcatter:acid_pretreatment",
+    "wildcatter:depa_topo_circuit"
   ]
 }

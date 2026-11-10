@@ -582,5 +582,19 @@
   "block.wildcatter.submerged_arc_furnace": "Submerged Arc Furnace (8 MW)",
   "block.wildcatter.capacitor_bank": "Capacitor Bank (3 Mvar)",
   "block.wildcatter.moly_roaster": "Moly Roaster (multiple hearth)",
-  "block.wildcatter.aluminothermic_vessel": "Aluminothermic Vessel"
+  "block.wildcatter.aluminothermic_vessel": "Aluminothermic Vessel",
+  "item.wildcatter.tsp_bag": "Bulk Bag of TSP (0-46-0)",
+  "item.wildcatter.dap_bag": "Bulk Bag of DAP (18-46-0)",
+  "item.wildcatter.mop_bag": "Bulk Bag of Muriate of Potash (0-0-60)",
+  "item.wildcatter.extractant_drum": "Extractant Drum (DEPA-TOPO)",
+  "block.wildcatter.phosphate_mill": "Phosphate Mill (wet ball mill, 200 kW)",
+  "block.wildcatter.phosphoric_reactor": "Phosphoric Acid Reactor (dihydrate)",
+  "block.wildcatter.tilting_pan_filter": "Tilting Pan Filter",
+  "block.wildcatter.acid_evaporator": "Phosphoric Acid Evaporator",
+  "block.wildcatter.granulation_plant": "Granulation Plant (TSP or DAP)",
+  "block.wildcatter.potash_dissolver": "Potash Dissolver",
+  "block.wildcatter.vacuum_crystallizer": "Vacuum Crystallizer",
+  "block.wildcatter.potash_dryer": "Potash Dryer and Compactor",
+  "block.wildcatter.acid_pretreatment": "Acid Pretreatment (uranium)",
+  "block.wildcatter.depa_topo_circuit": "DEPA-TOPO Circuit"
 }

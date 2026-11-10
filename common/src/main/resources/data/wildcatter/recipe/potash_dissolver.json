@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SHS",
+    "SXS",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "X": "minecraft:piston",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:potash_dissolver",
+    "count": 1
+  }
+}

@@ -531,6 +531,54 @@ public final class Tuning {
 	public static final double DIESEL_KG_PER_L = 0.84;
 	public static final double AMMONIA_PLANT_WATER_HOLD = 200.0;   // litres a nitric acid unit or blender holds off its pump
 	public static final double BLAST_POWDER_FACTOR_KG_PER_T = 0.37; // Tailings' open pit: kg of explosive a tonne of rock
+
+	// Phase 18a, fertilizer (docs/multiblocks/fertilizer.md): dihydrate wet-process phosphoric acid from phosphate rock and sulfuric
+	// acid, TSP and DAP granules, and muriate of potash. Every rate follows from these through fluid/Phosphate.
+	public static final double P2O5_TPD = 20.0;                    // tonnes of P2O5 a day in the filter acid (proposed size)
+	public static final double FRANCOLITE_P2O5 = 0.37;             // P2O5 in the francolite (unverified)
+	public static final double PHOSPHORIC_RECOVERY = 0.95;         // of the rock's P2O5 to the filter acid (Grzmil: 4-6 % lost)
+	public static final double H2SO4_PER_P2O5 = 2.7;               // t of H2SO4 a t of P2O5 (textbook 2.6-2.8, unverified)
+	public static final double GYPSUM_PER_P2O5 = 4.5;              // t of dry phosphogypsum a t of P2O5 (Grzmil: 4-5)
+	public static final double ROCK_SLURRY_SOLIDS = 0.62;          // the ball mill's discharge (proposed; wet grinding at 60-65 %)
+	public static final double ROCK_FLUORINE = 0.037;              // F in the francolite (unverified, textbook 3.5-3.9 %)
+	public static final double EVAPORATOR_F_SHARE = 0.25;          // of the rock's fluorine off the evaporator as SiF4 (proposed)
+	public static final double FILTER_ACID_P2O5 = 0.28;            // the filter acid (Grzmil 25-30 %; US 4,302,427 28-30 %)
+	public static final double FILTER_ACID_KG_PER_L = 1.30;        // (uranium-from-phosphate.md)
+	public static final double MERCHANT_ACID_P2O5 = 0.54;          // merchant acid (textbook 52-54 %)
+	public static final double MERCHANT_ACID_KG_PER_L = 1.68;      // 54 % P2O5, about 75 % H3PO4 (unverified)
+	public static final double EVAPORATOR_STEAM_PER_P2O5 = 2.0;    // t of process steam a t of P2O5 (unverified)
+	public static final double TSP_P2O5 = 0.46;                    // TSP, 0-46-0
+	public static final double TSP_ACID_P2O5 = 0.70;               // of TSP's P2O5 from the acid, the rest from the rock (proposed; textbook two-thirds to three-quarters)
+	public static final double DAP_P2O5 = 0.46;                    // DAP, 18-46-0
+	public static final double DAP_N = 0.18;
+	public static final double PHOSPHATE_MILL_WATTS = 200_000.0;   // the wet ball mill, 4.16 kV or 3.3 kV
+	public static final double PHOSPHORIC_REACTOR_WATTS = 150_000.0; // agitators and the flash cooler's pumps, 480 V or 400 V
+	public static final double PAN_FILTER_WATTS = 250_000.0;       // the vacuum pump, 4.16 kV or 3.3 kV (proposed)
+	public static final double ACID_EVAPORATOR_WATTS = 75_000.0;   // the circulation pump, 480 V or 400 V
+	public static final double GRANULATION_WATTS = 150_000.0;      // drum, screens, mills and fans, 480 V or 400 V
+	public static final double GRANULATION_DRYER_WATTS = 0.8e6;    // its gas-fired dryer at the TSP rating (proposed)
+	public static final double PHOSPHATE_WATER_HOLD = 2_000.0;     // litres the mill or filter keeps off its pump
+	public static final double MOP_TPH = 5.0;                      // t/h of muriate of potash (proposed size)
+	public static final double MOP_KCL = 0.95;                     // MOP, 0-0-60: 95 % KCl
+	public static final double POTASH_RECOVERY = 0.95;             // of the ore's KCl to the product
+	public static final double POTASH_DISSOLVER_STEAM = 0.30;      // kg of process steam a kg of MOP, hot leaching (proposed)
+	public static final double POTASH_EJECTOR_STEAM = 0.10;        // kg a kg of MOP, the crystallizers' steam ejectors (proposed)
+	public static final double POTASH_DISSOLVER_WATTS = 55_000.0;  // agitators and pumps, 480 V or 400 V
+	public static final double VACUUM_CRYSTALLIZER_WATTS = 110_000.0; // circulation pumps, 480 V or 400 V
+	public static final double POTASH_DRYER_WATTS = 75_000.0;      // fluid-bed fans and the compactor, 480 V or 400 V
+	public static final double POTASH_DRYER_GAS_WATTS = 0.6e6;     // its gas-fired air heater at the rating (proposed)
+
+	// Phase 18b, uranium from phosphoric acid (docs/multiblocks/uranium-from-phosphate.md): the DEPA-TOPO first cycle.
+	public static final double ACID_URANIUM_SHARE = 0.80;          // of the rock's uranium that reaches the filter acid (proposed)
+	public static final double DEPA_TOPO_RECOVERY = 0.90;          // of the acid's uranium the circuit takes (proposed)
+	public static final double DEPA_TOPO_CHARGE_L = 5_000.0;       // its first charge of organic (proposed)
+	public static final double DEPA_TOPO_EXTRACTANT = 0.20;        // kg of DEPA and TOPO a litre of organic: 0.5 M and 0.125 M (derived)
+	public static final double EXTRACTANT_DRUM_KG = 200.0;         // DEPA and TOPO in one extractant drum (proposed)
+	public static final double ORGANIC_LOSS_L_PER_M3 = 0.05;       // litres of organic lost a m3 of acid (proposed)
+	public static final double IRON_PER_URANIUM = 0.5;             // kg of iron a kg of U for the reductive strip (proposed)
+	public static final double ACID_PRETREATMENT_WATTS = 45_000.0; // clarifier rake, cooler fans and the air blower, 480 V or 400 V
+	public static final double DEPA_TOPO_WATTS = 60_000.0;         // the mixer-settlers' mixers and pumps, 480 V or 400 V
+	public static final double DEPA_TOPO_U_HOLD_KG = 326.0;        // U the first cycle's strip holds for the second cycle: one ADU drum's (proposed)
 	public static final double CYLINDER_FILLER_WATTS = 5_000.0;    // 480 V (unverified)
 
 	// ---- Phase 14b: the sales line and its meter stations (docs/multiblocks/sales-gas.md) ----------------------------------------

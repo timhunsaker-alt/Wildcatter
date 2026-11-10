@@ -135,7 +135,15 @@ public enum Product {
 	/** 16d1: liquid CO2 from a liquefier on a lime kiln, for an ISR header house's lixiviant. Counted in kg; only the CO2 storage tank holds it. */
 	CO2("liquid CO2", false),
 	/** 16d1: an ISR header house's bleed, for an injection pump and a disposal well. */
-	WELLFIELD_BLEED("wellfield bleed", false);
+	WELLFIELD_BLEED("wellfield bleed", false),
+	/** Phase 18a (docs/multiblocks/fertilizer.md): the phosphate mill's ground rock in water, 62 % solids. Counted in kg; no tank holds it. */
+	ROCK_SLURRY("rock slurry", false),
+	/** The pan filter's wet-process phosphoric acid, 28 % P2O5, for the evaporator (or the DEPA-TOPO circuit). Counted in litres. */
+	FILTER_ACID("filter acid (28 % P2O5)", false),
+	/** The evaporator's merchant phosphoric acid, 54 % P2O5, for the granulator; stock tanks hold it. Counted in litres. */
+	MERCHANT_ACID("merchant acid (54 % P2O5)", false),
+	/** Phase 18b: filter acid with its uranium taken out by the DEPA-TOPO circuit, back to the evaporator. Counted in litres. */
+	TREATED_ACID("treated acid (28 % P2O5)", false);
 
 	private final String label;
 	private final boolean gas;
@@ -158,7 +166,7 @@ public enum Product {
 		return switch (this) {
 			case HOT_CRACKED_GAS, CRACKED_GAS, COMPRESSED_CRACKED_GAS, BURNER_GAS, ORE_SLURRY, LEACH_SLURRY, FLUORINE, UF6, CHLORINE, STEAM, FEEDWATER, COOLING_WATER,
 					CAUSTIC_SODA, PROCESS_STEAM, BAUXITE_SLURRY, DIGESTED_SLURRY, GREEN_LIQUOR, MUD_SLURRY, POLISHED_LIQUOR, HYDRATE_SLURRY, SPENT_LIQUOR, STRONG_LIQUOR, COAL_TAR, PITCH,
-					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY, AN_SOLUTION, EMULSION_MATRIX, CAUSTIC_POTASH, CO2 -> "kg";
+					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY, AN_SOLUTION, EMULSION_MATRIX, CAUSTIC_POTASH, CO2, ROCK_SLURRY -> "kg";
 			default -> gas ? "m3" : "L";
 		};
 	}
@@ -168,7 +176,7 @@ public enum Product {
 		return switch (this) {
 			case MOLTEN_SULFUR, ORE_SLURRY, LEACH_SLURRY, PREGNANT_LIQUOR, STRIP_LIQUOR, PREGNANT_LIXIVIANT, BARREN_LIXIVIANT, ELUATE, ANHYDROUS_HF, FEEDWATER, COOLING_WATER,
 					BAUXITE_SLURRY, DIGESTED_SLURRY, GREEN_LIQUOR, MUD_SLURRY, POLISHED_LIQUOR, HYDRATE_SLURRY, SPENT_LIQUOR, STRONG_LIQUOR,
-					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY, CO2, WELLFIELD_BLEED -> false;
+					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY, CO2, WELLFIELD_BLEED, ROCK_SLURRY -> false;
 			default -> !gas;
 		};
 	}

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SLS",
+    "PXP",
+    "SIS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "L": "minecraft:paper",
+    "P": "wildcatter:gas_line",
+    "X": "minecraft:piston",
+    "I": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:tilting_pan_filter",
+    "count": 1
+  }
+}

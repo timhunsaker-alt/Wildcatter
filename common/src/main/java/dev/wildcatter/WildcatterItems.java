@@ -208,6 +208,19 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> FERROTUNGSTEN_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("ferrotungsten_bag"));
 	public static final Item FERROTUNGSTEN_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(FERROTUNGSTEN_BAG_KEY),
 			String.format("%,.0f kg of ferrotungsten (78 %% W)", Tuning.BULK_BAG_KG), "for tool steels");
+	// Phase 18: fertilizer bags and the DEPA-TOPO extractant (docs/multiblocks/fertilizer.md, uranium-from-phosphate.md)
+	public static final ResourceKey<Item> TSP_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("tsp_bag"));
+	public static final Item TSP_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(TSP_BAG_KEY),
+			String.format("%,.0f kg of triple superphosphate, 0-46-0", Tuning.BULK_BAG_KG), "a fertilizer");
+	public static final ResourceKey<Item> DAP_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("dap_bag"));
+	public static final Item DAP_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(DAP_BAG_KEY),
+			String.format("%,.0f kg of diammonium phosphate, 18-46-0", Tuning.BULK_BAG_KG), "a fertilizer");
+	public static final ResourceKey<Item> MOP_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("mop_bag"));
+	public static final Item MOP_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(MOP_BAG_KEY),
+			String.format("%,.0f kg of muriate of potash (KCl), 0-0-60", Tuning.BULK_BAG_KG), "a fertilizer");
+	public static final ResourceKey<Item> EXTRACTANT_DRUM_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("extractant_drum"));
+	public static final Item EXTRACTANT_DRUM = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(EXTRACTANT_DRUM_KEY),
+			String.format("%.0f kg of DEPA and TOPO, the uranium extractant", Tuning.EXTRACTANT_DRUM_KG), "for the DEPA-TOPO circuit");
 	// 10c1: blueprints (docs/blueprints.md)
 	public static final ResourceKey<Item> BLUEPRINT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("blueprint"));
 	public static final Item BLUEPRINT = new dev.wildcatter.item.BlueprintItem(new Item.Properties().stacksTo(1).setId(BLUEPRINT_KEY));
@@ -425,6 +438,10 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, SCHEELITE_CONCENTRATE_BAG_KEY, SCHEELITE_CONCENTRATE_BAG);
 		Registry.register(BuiltInRegistries.ITEM, FERROMOLYBDENUM_BAG_KEY, FERROMOLYBDENUM_BAG);
 		Registry.register(BuiltInRegistries.ITEM, FERROTUNGSTEN_BAG_KEY, FERROTUNGSTEN_BAG);
+		Registry.register(BuiltInRegistries.ITEM, TSP_BAG_KEY, TSP_BAG);
+		Registry.register(BuiltInRegistries.ITEM, DAP_BAG_KEY, DAP_BAG);
+		Registry.register(BuiltInRegistries.ITEM, MOP_BAG_KEY, MOP_BAG);
+		Registry.register(BuiltInRegistries.ITEM, EXTRACTANT_DRUM_KEY, EXTRACTANT_DRUM);
 		Registry.register(BuiltInRegistries.ITEM, BLUEPRINT_KEY, BLUEPRINT);
 		Registry.register(BuiltInRegistries.ITEM, SURVEY_TOOL_KEY, SURVEY_TOOL);
 		Registry.register(BuiltInRegistries.ITEM, GROUNDING_SET_KEY, GROUNDING_SET);

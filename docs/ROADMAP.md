@@ -455,6 +455,23 @@ Spec: `docs/multiblocks/ferroalloys.md` ("As built"). Decisions for Tim: `docs/q
 - **Known gaps:** the seven bag icons are `*_placeholder`; chromium metal (needs 17c2's chromic oxide); no var controller; Tailings still
   uses its placeholder ferrosilicon (question 1).
 
+## Phase 18 — Phosphate — 18a BUILT, 18b first cycle BUILT 2026-11-10 (while Tim was away, on the DRAFT specs decided on recommendation; not approved)
+Specs: `docs/multiblocks/fertilizer.md`, `docs/multiblocks/uranium-from-phosphate.md` ("As built" in each). Decisions for Tim:
+`docs/questions/phase18-phosphate.md` (22; items 3, 15, 17 and 19 need Tim). Branch `phase18`.
+- **18a, fertilizer:** a wet ball mill (200 kW, 4.16 kV), the dihydrate phosphoric reactor with its tilting pan filter (250 kW, 4.16 kV):
+  20 t of P2O5 a day as 28 % filter acid on 54 t of sulfuric acid, 90 t of phosphogypsum to a lined tailings cell (NO GYPSUM STACK); the
+  acid evaporator to 54 % merchant acid on process steam; the granulation plant, TSP (2.6 t/h) or DAP (on the ammonia plant, 69 kg/h),
+  into 1 t bags; potash dissolver, vacuum crystallizer and dryer, 5 t/h of MOP, salt tails to a cell. Bags tagged `c:fertilizers`.
+- **18b, uranium from phosphoric acid:** the acid pretreatment and the DEPA-TOPO circuit's first cycle: 2.7 kg/h of uranium into the
+  strip, the treated acid on to the evaporator, a bypass when the circuit cannot take it. The second cycle (ammonium carbonate strip, AUC
+  to the uranium calciner) needs Phase 16a's calciner and 16d1's CO2, on the `phase16` branch: a plan in the spec; until then the strip
+  holds up to a drum's 326 kg of U. **Now unblocked (2026-11-10, branch `w-next`):** phases 16 and 18 are merged on the same branch, so
+  the calciner (16a) and the liquid CO2 (16d1) the second cycle needs are both there. The second cycle is still a plan, not built.
+- No existing world changes (question 1); no config key was needed. NeoForge scenes `phosphoric`, `potash`, `phosphate_uranium`; unit test
+  `PhosphateTest`; client scene `phosphatePlant` (filmed).
+- **Known gaps:** the bag and extractant drum icons are `*_placeholder`; the second cycle; Farmings does not read `c:fertilizers` yet; the
+  filter acid's uranium is worked out from the rock's grade, not carried as an assay.
+
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released (planned as 14e, `docs/mekanism-check.md`).
 - Plants for the 7a ores that the fuel chain doesn't use:
@@ -463,13 +480,13 @@ Spec: `docs/multiblocks/ferroalloys.md` ("As built"). Decisions for Tim: `docs/q
   - lithium from spodumene;
   - ferroalloys (chromium, manganese, molybdenum, tungsten);
   - a nickel smelter;
-  - fertilizer from phosphate and potash;
+  - fertilizer from phosphate and potash (built as Phase 18a, branch `phase18`);
   - drilling mud from barite and bentonite.
 - Salt domes that trap oil on their flanks, as on the Gulf Coast.
 - The purer yellowcake route: ADU precipitation on the Phase 14 ammonia and a calciner at 750-800 C (94-98 % U3O8).
 - Phase 14b-14d follow-ons: a small (100-250 kW) biogas set for farm digesters; biomethane upgrading so biogas can go on the sales line;
   line pack and pressure on the sales line; a delivery station fed from the set it supplies; the condenser's fans staged at part load.
-- Uranium from phosphoric acid (phosphate rock).
+- Uranium from phosphoric acid (phosphate rock): the first cycle built as Phase 18b (branch `phase18`); the second cycle waits on Phase 16.
 - Ammonia plant (Phase 14 gaps): the ammonia leak hazard; AN solution setting in a cold pipe; an IBC for matrix; a PGM refinery so
   gauze packs are made from refined platinum and worn packs recovered; nitrous oxide abatement on the acid unit's tail gas; prill and ANFO.
 - Conversion: the fluorine cells' cathode hydrogen to the reducer; retiring the fluorinator's ash bed; regenerating the KOH

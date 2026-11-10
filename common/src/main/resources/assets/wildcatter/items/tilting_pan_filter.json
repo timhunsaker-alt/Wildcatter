@@ -1,0 +1,6 @@
+{
+ "model": {
+  "type": "minecraft:model",
+  "model": "wildcatter:block/tilting_pan_filter/item"
+ }
+}

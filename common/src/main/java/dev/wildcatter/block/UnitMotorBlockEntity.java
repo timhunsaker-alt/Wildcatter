@@ -160,6 +160,16 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "emulsion_blender" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.EMULSION_BLENDER_WATTS);
 				case "moly_roaster" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ROASTER_WATTS);
 				case "aluminothermic_vessel" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.VESSEL_FAN_WATTS);
+				case "phosphate_mill" -> new Motor(true, Voltage.MEDIUM, Tuning.PHOSPHATE_MILL_WATTS);
+				case "phosphoric_reactor" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PHOSPHORIC_REACTOR_WATTS);
+				case "tilting_pan_filter" -> new Motor(true, Voltage.MEDIUM, Tuning.PAN_FILTER_WATTS);
+				case "acid_evaporator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ACID_EVAPORATOR_WATTS);
+				case "granulation_plant" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.GRANULATION_WATTS);
+				case "potash_dissolver" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.POTASH_DISSOLVER_WATTS);
+				case "vacuum_crystallizer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.VACUUM_CRYSTALLIZER_WATTS);
+				case "potash_dryer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.POTASH_DRYER_WATTS);
+				case "acid_pretreatment" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ACID_PRETREATMENT_WATTS);
+				case "depa_topo_circuit" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.DEPA_TOPO_WATTS);
 				case "meter_building" -> new Motor(false, Voltage.LOW, Tuning.METER_BUILDING_WATTS);   // residential, single-phase
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
@@ -286,6 +296,16 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "emulsion_blender" -> "mixer";
 			case "moly_roaster" -> "rabble drive and fans";
 			case "aluminothermic_vessel" -> "baghouse fan";
+			case "phosphate_mill" -> "mill motor";
+			case "phosphoric_reactor" -> "agitators";
+			case "tilting_pan_filter" -> "vacuum pump";
+			case "acid_evaporator" -> "circulation pump";
+			case "granulation_plant" -> "granulator drives";
+			case "potash_dissolver" -> "agitators";
+			case "vacuum_crystallizer" -> "pumps";
+			case "potash_dryer" -> "fans and compactor";
+			case "acid_pretreatment" -> "clarifier and blower";
+			case "depa_topo_circuit" -> "mixers";
 			case "meter_building" -> "heaters, chromatograph and RTU charger";
 			default -> kind();
 		};
@@ -326,9 +346,14 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 	}
 
 	// ---- the motor ---------------------------------------------------------------------------------------------------------------
-	/** The faces of its main cell its motor's box takes cable on: the west, unless a part's box stands elsewhere. */
+	/** The faces of its main cell its motor's box takes cable on: the one {@link #boxSide()} gives, unless a part's box stands elsewhere. */
 	protected List<Direction> boxFaces() {
-		return List.of(LeasePartBlock.world(getBlockState(), Direction.WEST));
+		return List.of(LeasePartBlock.world(getBlockState(), boxSide()));
+	}
+
+	/** The face of its main cell its terminal box is on, in its own frame: the west, unless a part against it covers that. */
+	protected Direction boxSide() {
+		return Direction.WEST;
 	}
 
 	@Override

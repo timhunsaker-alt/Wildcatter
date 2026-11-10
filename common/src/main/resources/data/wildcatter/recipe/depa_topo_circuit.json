@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PXP",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "X": "minecraft:piston"
+  },
+  "result": {
+    "id": "wildcatter:depa_topo_circuit",
+    "count": 1
+  }
+}
