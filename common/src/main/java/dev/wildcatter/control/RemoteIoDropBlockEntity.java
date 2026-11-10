@@ -29,6 +29,15 @@ public class RemoteIoDropBlockEntity extends BlockEntity implements Inspectable,
 	private boolean grown;
 	private ControlNet.Found net = new ControlNet.Found(List.of(), false, null);
 
+	/**
+	 * A rack has one owner, as a real adapter takes one controller's exclusive-owner connection: the first PLC to reach it, until that PLC has
+	 * not scanned it for {@link #OWNER_TIMEOUT_TICKS} (its connection timed out).
+	 */
+	public static final int OWNER_TIMEOUT_TICKS = 20;
+	private @org.jspecify.annotations.Nullable BlockPos owner;
+	private String ownerStation = "";
+	private long ownerTick = Long.MIN_VALUE;
+
 	public RemoteIoDropBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.REMOTE_IO_DROP_ENTITY, pos, state);
 	}
@@ -45,6 +54,26 @@ public class RemoteIoDropBlockEntity extends BlockEntity implements Inspectable,
 	public void nextRack() {
 		rack = rack % RACKS + 1;
 		setChanged();
+	}
+
+	/** A PLC's connection: true if this rack is, or now becomes, that PLC's. */
+	public boolean claim(BlockPos cabinet, String station, long now) {
+		if (owner == null || owner.equals(cabinet) || now - ownerTick > OWNER_TIMEOUT_TICKS || now < ownerTick) {
+			owner = cabinet.immutable();
+			ownerStation = station;
+			ownerTick = now;
+			return true;
+		}
+		return false;
+	}
+
+	/** The station that owns this rack, or empty. */
+	public String owner(long now) {
+		return owner != null && now - ownerTick <= OWNER_TIMEOUT_TICKS && now >= ownerTick ? ownerStation : "";
+	}
+
+	public ControlNet.Found net() {
+		return net;
 	}
 
 	public PlcModuleItem.Type module(int slot) {
@@ -98,7 +127,8 @@ public class RemoteIoDropBlockEntity extends BlockEntity implements Inspectable,
 	@Override
 	public Component inspect() {
 		StringBuilder out = new StringBuilder("Remote I/O drop, rack " + rack + ": ");
-		out.append(live() ? "24 V OK" : "NO 24 V").append(", ").append(NetworkNet.plcs(level, BigParts.cells(worldPosition, getBlockState())).size()).append(" PLC(s) on its network, ").append(net.devices().size()).append(" devices reached; ");
+		String by = level == null ? "" : owner(level.getGameTime());
+		out.append(live() ? "24 V OK" : "NO 24 V").append(", ").append(by.isEmpty() ? "no owner, " : "owned by " + by + ", ").append(NetworkNet.plcs(level, BigParts.cells(worldPosition, getBlockState())).size()).append(" PLC(s) on its network, ").append(net.devices().size()).append(" devices reached; ");
 		for (int i = 0; i < modules.length; i++) {
 			if (modules[i] != null) {
 				out.append(i).append(": ").append(modules[i]).append(" ");

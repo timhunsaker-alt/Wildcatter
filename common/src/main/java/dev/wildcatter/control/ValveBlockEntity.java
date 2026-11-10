@@ -141,6 +141,12 @@ public class ValveBlockEntity extends BlockEntity implements ControlDevice, Circ
 		};
 	}
 
+	/** An on-off valve's 24 V solenoid pilot, 4.8 W; a control valve's positioner lives on its loop, and a motor-operated valve's motor on the mains. */
+	@Override
+	public double outputAmps(int point) {
+		return type() == ValveBlock.Type.ON_OFF && point == 0 ? 0.2 : 0;
+	}
+
 	@Override
 	public boolean readPoint(int point) {
 		String name = point < points().size() ? points().get(point).name() : "";

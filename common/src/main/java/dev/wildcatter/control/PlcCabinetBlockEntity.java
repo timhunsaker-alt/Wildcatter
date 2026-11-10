@@ -43,6 +43,14 @@ import net.minecraft.world.level.storage.ValueOutput;
 public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, BigPartEntity, PlcRequests {
 	private String station = "PLC";
 	private List<RemoteIoDropBlockEntity> drops = List.of();
+	private List<RemoteIoDropBlockEntity> reachedDrops = List.of();
+	private final Map<Integer, String> foreignRacks = new java.util.TreeMap<>();
+	/** Landings past their cable's cores: they carry nothing (docs/questions/plc-gaps.md). */
+	private final Set<Landing> overCores = new HashSet<>();
+	private String coreProblem = "";
+	/** The 24 V this cabinet and its racks draw, at the last scan. */
+	private double amps;
+	private String loopFight = "";
 	private List<PlcCabinetBlockEntity> peers = List.of();
 	/** Tag exchange: rows of {@code LOCAL = STATION/REMOTE}, as a real controller's produced and consumed data. */
 	private final List<String> exchange = new ArrayList<>();
@@ -100,7 +108,8 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 
 	private void walkNetwork(Level level) {
 		List<BlockPos> cells = BigParts.cells(worldPosition, getBlockState());
-		drops = hasComm() ? NetworkNet.all(level, cells, RemoteIoDropBlockEntity.class) : List.of();
+		reachedDrops = hasComm() ? NetworkNet.all(level, cells, RemoteIoDropBlockEntity.class) : List.of();
+		claimDrops(level.getGameTime());
 		peers = hasComm() ? NetworkNet.plcs(level, cells).stream().filter(p -> p != this).toList() : List.of();
 	}
 
@@ -118,6 +127,23 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 				exchangeFailed.add(row);
 			}
 		}
+	}
+
+	/** The racks on the network that this PLC owns; another PLC's are named, not scanned (a rack has one owner). */
+	private void claimDrops(long now) {
+		List<RemoteIoDropBlockEntity> owned = new ArrayList<>();
+		foreignRacks.clear();
+		for (RemoteIoDropBlockEntity drop : reachedDrops) {
+			if (drop.isRemoved()) {
+				continue;
+			}
+			if (powered && cpuModule != null && drop.claim(worldPosition, station, now)) {
+				owned.add(drop);
+			} else if (!drop.owner(now).isEmpty() && !drop.owner(now).equals(station)) {
+				foreignRacks.put(drop.rack(), drop.owner(now));
+			}
+		}
+		drops = owned;
 	}
 
 	public boolean hasComm() {
@@ -359,6 +385,10 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		if (cpu != null && io.byteAddress() + io.bytes() > (output ? cpu.spec().outputBytes() : cpu.spec().inputBytes())) {
 			return address + " is past this CPU's I/O: a large CPU reaches further racks";
 		}
+		if (module == null && slot >= MODULE_SLOTS && foreignRacks.containsKey((slot - MODULE_SLOTS) / MODULE_SLOTS + 1)) {
+			int rack = (slot - MODULE_SLOTS) / MODULE_SLOTS + 1;
+			return "Rack " + rack + " belongs to " + foreignRacks.get(rack) + ": a rack has one owner";
+		}
 		int channel;
 		switch (wanted.signal()) {
 			case BOOL -> {
@@ -402,8 +432,67 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 				return address + " already has a signal landed on it";
 			}
 		}
-		landings.add(new Landing(pos, point, slot, channel));
+		Landing landing = new Landing(pos, point, slot, channel);
+		landings.add(landing);
+		countCores();
+		if (overCores.contains(landing)) {
+			landings.remove(landing);
+			String full = coreProblem;
+			countCores();
+			return full + ". Lay a second cable beside it, or put a remote drop out there";
+		}
 		return null;
+	}
+
+	/** The net a landed device is reached through: this cabinet's, or a rack's. */
+	private ControlNet.@org.jspecify.annotations.Nullable Found netOf(BlockPos device) {
+		if (net.devices().contains(device)) {
+			return net;
+		}
+		for (RemoteIoDropBlockEntity drop : drops) {
+			if (drop.devices().contains(device)) {
+				return drop.net();
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Counts the cores every landed signal takes in each cable on its way, in the order they were landed; any that find a cable full carry
+	 * nothing, and the first full cable is named.
+	 */
+	private void countCores() {
+		overCores.clear();
+		coreProblem = "";
+		Map<ControlNet.Link, int[]> used = new HashMap<>();
+		for (Landing l : landings) {
+			ControlNet.Found found = netOf(l.pos());
+			ControlDevice device = found == null ? null : ControlNet.deviceAt(level, l.pos());
+			if (device == null || l.point() >= device.points().size()) {
+				continue;
+			}
+			int cores = ControlNet.coresOf(device.points().get(l.point()));
+			List<ControlNet.Link> route = found.route(l.pos());
+			ControlNet.Link full = null;
+			for (ControlNet.Link link : route) {
+				if (link.cabled() && used.computeIfAbsent(link, k -> new int[1])[0] + cores > link.cores()) {
+					full = link;
+					break;
+				}
+			}
+			if (full != null) {
+				overCores.add(l);
+				if (coreProblem.isEmpty()) {
+					coreProblem = "CABLE FULL at " + full.cable().toShortString() + ": its " + full.cores() + " signal cores are taken";
+				}
+				continue;
+			}
+			for (ControlNet.Link link : route) {
+				if (link.cabled()) {
+					used.computeIfAbsent(link, k -> new int[1])[0] += cores;
+				}
+			}
+		}
 	}
 
 	public void setTag(BlockPos pos, String tag) {
@@ -454,6 +543,9 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		if (now % WALK_TICKS == 0) {
 			net = ControlNet.walk(level, BigParts.cells(worldPosition, getBlockState()));
 			walkNetwork(level);
+			countCores();
+		} else if (!reachedDrops.isEmpty()) {
+			claimDrops(now);
 		}
 		boolean wasPowered = powered;
 		powered = net.supplyLive();
@@ -492,7 +584,7 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 			}
 		}
 		for (Landing l : landings) {
-			ControlDevice device = reachable.contains(l.pos()) ? ControlNet.deviceAt(level, l.pos()) : null;
+			ControlDevice device = reachable.contains(l.pos()) && !overCores.contains(l) ? ControlNet.deviceAt(level, l.pos()) : null;
 			if (device != null && l.point() >= device.points().size()) {
 				device = null;
 			}
@@ -517,21 +609,95 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		cpu.scan();
 		// a stopped or faulted CPU writes no analog signal, so the loop is dead rather than a false 4 mA
 		boolean writesAnalog = cpu.mode() == Cpu.Mode.RUN && !cpu.faulted();
+		// the 24 V drawn: the CPU and each module's electronics, then each signal by what it carries (docs/questions/plc-gaps.md)
+		double here = CPU_AMPS.getOrDefault(cpuModule, 0.0);
+		for (PlcModuleItem.Type module : modules) {
+			here += module == null ? 0 : module == PlcModuleItem.Type.COMM ? COMM_AMPS : MODULE_AMPS;
+		}
+		Map<RemoteIoDropBlockEntity, double[]> rackAmps = new HashMap<>();
+		for (RemoteIoDropBlockEntity drop : drops) {
+			double rail = ADAPTER_AMPS;
+			for (int i = 0; i < MODULE_SLOTS; i++) {
+				rail += drop.module(i) == null ? 0 : MODULE_AMPS;
+			}
+			rackAmps.put(drop, new double[] {rail});
+		}
+		loopFight = "";
 		for (Landing l : landings) {
-			ControlDevice device = reachable.contains(l.pos()) ? ControlNet.deviceAt(level, l.pos()) : null;
-			if (device == null || l.point() >= device.points().size() || !device.points().get(l.point()).output()) {
+			ControlDevice device = reachable.contains(l.pos()) && !overCores.contains(l) ? ControlNet.deviceAt(level, l.pos()) : null;
+			if (device == null || l.point() >= device.points().size()) {
 				continue;
 			}
 			int base = l.slot() * BYTES_PER_SLOT;
 			PlcModuleItem.Type module = moduleAt(l.slot());
-			if (module == PlcModuleItem.Type.DO16) {
-				device.commandPoint(l.point(), cpu.outputBit(base + l.channel() / 8, l.channel() % 8), now);
+			double draw = 0;
+			if (!device.points().get(l.point()).output()) {
+				if (module == PlcModuleItem.Type.DI16 && device.readPoint(l.point())) {
+					draw = DI_AMPS;
+				} else if (module == PlcModuleItem.Type.AI8) {
+					double ma = device.readMa(l.point());
+					draw = ma >= 3.6 && ma <= 21 ? ma / 1000 : 0;   // a loop-powered transmitter takes its loop current from the 24 V
+				}
+			} else if (module == PlcModuleItem.Type.DO16) {
+				boolean mine = cpu.outputBit(base + l.channel() / 8, l.channel() % 8);
+				device.commandPoint(l.point(), SharedOutputs.bool(level, l.pos(), l.point(), worldPosition, mine, now), now);
+				draw = mine ? RELAY_AMPS + device.outputAmps(l.point()) : 0;   // a contact in parallel with another PLC's carries its share; counted whole here
 			} else if (module == PlcModuleItem.Type.AO4 && writesAnalog) {
-				device.commandMa(l.point(), milliampsOf(cpu.outputWord(base + l.channel() * 2)), now);
+				double ma = SharedOutputs.milliamps(level, l.pos(), l.point(), worldPosition, milliampsOf(cpu.outputWord(base + l.channel() * 2)), now);
+				if (ma == 0 && loopFight.isEmpty()) {
+					loopFight = "TWO PLCs ON ONE LOOP: " + device.deviceName() + " " + device.points().get(l.point()).name() + " at " + l.pos().toShortString();
+				}
+				device.commandMa(l.point(), ma, now);
+				draw = ma / 1000;
+			}
+			RemoteIoDropBlockEntity rack = l.slot() >= MODULE_SLOTS ? rackOf(l.slot()) : null;
+			if (rack != null && rackAmps.containsKey(rack)) {
+				rackAmps.get(rack)[0] += draw;
+			} else {
+				here += draw;
 			}
 		}
+		amps = here;
+		report(net, here, now);
+		rackAmps.forEach((drop, a) -> report(drop.net(), a[0], now));
 		setChanged();
 	}
+
+	/** A load to the supplies of a net, shared among them as supplies in parallel share it. */
+	private void report(ControlNet.Found found, double load, long now) {
+		List<ControlSupplyBlockEntity> supplies = new ArrayList<>();
+		for (BlockPos at : found.supplies()) {
+			if (level.getBlockEntity(at) instanceof ControlSupplyBlockEntity supply && supply.live()) {
+				supplies.add(supply);
+			}
+		}
+		for (ControlSupplyBlockEntity supply : supplies) {
+			supply.report(worldPosition, load / supplies.size(), now);
+		}
+	}
+
+	private @org.jspecify.annotations.Nullable RemoteIoDropBlockEntity rackOf(int slot) {
+		int rack = (slot - MODULE_SLOTS) / MODULE_SLOTS + 1;
+		for (RemoteIoDropBlockEntity drop : drops) {
+			if (drop.rack() == rack) {
+				return drop;
+			}
+		}
+		return null;
+	}
+
+	/** What the cabinet draws from its 24 V at the last scan, its racks' not counted. */
+	public double amps() {
+		return amps;
+	}
+
+	/** Each signal's 24 V, in amps (proposed, docs/questions/plc-gaps.md): a compact and a standard CPU, a module's electronics, a network module and a rack's adapter, an input that is on, a relay's coil. */
+	public static final Map<PlcModuleItem.Type, Double> CPU_AMPS = Map.of(PlcModuleItem.Type.CPU_SMALL, 0.4, PlcModuleItem.Type.CPU_LARGE, 0.7);
+	public static final double MODULE_AMPS = 0.05;
+	public static final double COMM_AMPS = 0.15;
+	public static final double ADAPTER_AMPS = 0.2;
+	public static final double DI_AMPS = 0.007;
+	public static final double RELAY_AMPS = 0.01;
 
 	// ---- the screen ------------------------------------------------------------------------------------------------------------------
 
@@ -833,6 +999,11 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 			return "BAD JOINT at " + net.badJoint().toShortString() + ": a cable makes one run; fan out at a junction box";
 		}
 		if (!powered) {
+			for (BlockPos at : net.supplies()) {
+				if (level != null && level.getBlockEntity(at) instanceof ControlSupplyBlockEntity supply && supply.overloaded()) {
+					return "NO 24 V: its supply is OVERLOADED (over " + (int) ControlSupplyBlockEntity.RATED_AMPS + " A) and trying again";
+				}
+			}
 			return "NO 24 V: a live control power supply must reach it by control cable";
 		}
 		if (cpuModule == null) {
@@ -841,7 +1012,9 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		if (cpu == null) {
 			return project.isEmpty() ? "NO PROJECT" : "The project does not compile: " + compileText;
 		}
-		return (cpu.faulted() ? "CPU FAULT" : cpu.mode() == Cpu.Mode.RUN ? "RUN" : "STOP") + (cpu.forcing() ? ", FORCING" : "");
+		return (cpu.faulted() ? "CPU FAULT" : cpu.mode() == Cpu.Mode.RUN ? "RUN" : "STOP") + (cpu.forcing() ? ", FORCING" : "") + (coreProblem.isEmpty() ? "" : ", " + coreProblem)
+				+ (loopFight.isEmpty() ? "" : ", " + loopFight) + (foreignRacks.isEmpty() ? "" : ", " + foreignRacks.entrySet().stream().map(e -> "RACK " + e.getKey() + " OWNED BY " + e.getValue()).collect(Collectors.joining(", ")))
+				+ String.format(", 24 V %.2f A", amps);
 	}
 
 	@Override

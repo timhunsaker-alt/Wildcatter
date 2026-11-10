@@ -80,6 +80,17 @@ public class OperatorDeviceBlockEntity extends BlockEntity implements ControlDev
 		};
 	}
 
+	/** A 24 V LED pilot light 0.02 A, a stack light's LED tier 0.1 A, a 100 dB horn 0.25 A (docs/questions/plc-gaps.md). */
+	@Override
+	public double outputAmps(int point) {
+		return switch (kind()) {
+			case PILOT_LIGHT -> 0.02;
+			case STACK_LIGHT -> 0.1;
+			case HORN -> 0.25;
+			default -> 0;
+		};
+	}
+
 	@Override
 	public boolean readPoint(int point) {
 		return contact();
