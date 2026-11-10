@@ -1,4 +1,4 @@
-"""Phase 18a at true size (docs/multiblocks/fertilizer.md), each part drawn facing north from its own main
+"""Phase 18 at true size (docs/multiblocks/fertilizer.md, uranium-from-phosphate.md), each part drawn facing north from its own main
 cell (the footprints match PhosphatePartBlock's). The motor box is on the west face of the main cell (4.16 kV on the mill and the
 filter, 480 V on the rest), or on its north face where a part against it covers the west:
 - phosphate_mill, 3 x 4 x 6: a wet ball mill on its trunnions, girth gear and motor; rock slurry out of the south;
@@ -8,7 +8,9 @@ filter, 480 V on the rest), or on its north face where a part against it covers 
 - granulation_plant, 4 x 5 x 12: the pre-neutraliser, the granulation drum, the dryer drum with its burner, the screens and stack;
 - potash_dissolver, 4 x 5 x 4: the hot leach tank with its agitator and feed chute; steam south, salt tails west;
 - vacuum_crystallizer, 3 x 10 x 3: the crystallizer body with its steam ejectors and condenser; steam south;
-- potash_dryer, 8 x 4 x 3: the fluid-bed dryer, its air heater, the cyclone and the compactor; gas south."""
+- potash_dryer, 8 x 4 x 3: the fluid-bed dryer, its air heater, the cyclone and the compactor; gas south;
+- acid_pretreatment, 3 x 6 x 6: the clarifier, the acid cooler and the air oxidiser column; acid in north, out south;
+- depa_topo_circuit, 16 x 3 x 6: two rows of mixer-settlers, their mixer drives and the organic tank; kerosene north, acid south."""
 import mlib
 import plantlib as g
 
@@ -200,7 +202,39 @@ stub(PY, (7.2, 0.5, 2.6), (7.2, 0.5, 3.0), 2, "steel")                          
 box_north(PY, 0.4, 0.1)
 PY.collide((0.0, 0.0, 0.0), (8.0, 2.0, 3.0))
 
+# ---- the acid pretreatment -------------------------------------------------------------------------------------------------------
+AP = model("acid_pretreatment", 3, 6, 6, "steel")
+AP.box((0.0, 0.0, 0.0), (3.0, 0.3, 6.0), "concrete")
+vessel(AP, 1.5, 1.5, 1.3, 0.3, 2.4, "rubber", 18)                                # the clarifier
+AP.box((0.2, 2.4, 1.4), (2.8, 2.6, 1.6), "galv")                                 # its bridge
+drive(AP, 1.5, 1.5, 2.6)
+AP.box((0.4, 0.3, 3.0), (2.6, 1.6, 3.8), "radfin")                               # the acid cooler
+AP.cylinder("y", (1.5, 4.9), 0.5, 0.3, 5.6, "steel", 14)                          # the air oxidiser column
+AP.box((0.3, 0.3, 4.2), (0.9, 0.9, 4.8), "blue")                                 # its blower
+stub(AP, (1.5, 0.5, 0.0), (1.5, 0.5, 0.3), 2, "steel")                           # filter acid in, the north
+stub(AP, (1.5, 0.5, 5.4), (1.5, 0.5, 6.0), 2, "steel")                           # bypass out, the south
+box480(AP, 0.4, 2.6)
+AP.collide((0.2, 0.0, 0.2), (2.8, 2.6, 5.8))
+
+# ---- the DEPA-TOPO circuit -------------------------------------------------------------------------------------------------------
+DT = model("depa_topo_circuit", 16, 3, 6, "steel")
+DT.box((0.0, 0.0, 0.0), (16.0, 0.3, 6.0), "concrete")
+for row, z0 in enumerate((0.5, 3.3)):
+	for k in range(5):
+		x = 0.6 + k * 3.0
+		DT.box((x, 0.3, z0), (x + 0.8, 1.5, z0 + 0.8), "polymer")                 # a mixer box
+		drive(DT, x + 0.4, z0 + 0.4, 1.5, "blue")
+		DT.box((x + 0.9, 0.3, z0), (x + 2.8, 1.1, z0 + 2.2), "polymer")           # its settler
+		DT.box((x + 0.9, 1.1, z0), (x + 2.8, 1.15, z0 + 2.2), "grating")
+DT.cylinder("y", (15.4, 2.9), 0.5, 0.3, 2.6, "steel", 14)                        # the organic tank
+DT.pipe([(0.4, 1.3, 2.9), (15.0, 1.3, 2.9)], 3, "steel")                         # the organic header between the rows
+stub(DT, (1.0, 0.5, 0.0), (1.0, 0.5, 0.5), 2, "steel")                           # kerosene in, the north
+stub(DT, (14.0, 0.5, 5.6), (14.0, 0.5, 6.0), 2, "steel")                         # treated acid out, the south
+box_north(DT, 0.4, 0.1)
+DT.collide((0.0, 0.0, 0.0), (16.0, 1.5, 6.0))
+
+
 M = PM
-EXTRA = [PR, TF, AE, GP, PD, VC, PY]
+EXTRA = [PR, TF, AE, GP, PD, VC, PY, AP, DT]
 for extra in EXTRA:
 	extra.export_args = {"blockstate": True, "item": True}

@@ -161,6 +161,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "potash_dissolver" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.POTASH_DISSOLVER_WATTS);
 				case "vacuum_crystallizer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.VACUUM_CRYSTALLIZER_WATTS);
 				case "potash_dryer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.POTASH_DRYER_WATTS);
+				case "acid_pretreatment" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ACID_PRETREATMENT_WATTS);
+				case "depa_topo_circuit" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.DEPA_TOPO_WATTS);
 				case "meter_building" -> new Motor(false, Voltage.LOW, Tuning.METER_BUILDING_WATTS);   // residential, single-phase
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
@@ -288,6 +290,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "potash_dissolver" -> "agitators";
 			case "vacuum_crystallizer" -> "pumps";
 			case "potash_dryer" -> "fans and compactor";
+			case "acid_pretreatment" -> "clarifier and blower";
+			case "depa_topo_circuit" -> "mixers";
 			case "meter_building" -> "heaters, chromatograph and RTU charger";
 			default -> kind();
 		};

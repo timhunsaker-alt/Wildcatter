@@ -298,6 +298,8 @@
     "wildcatter:granulation_plant",
     "wildcatter:potash_dissolver",
     "wildcatter:vacuum_crystallizer",
-    "wildcatter:potash_dryer"
+    "wildcatter:potash_dryer",
+    "wildcatter:acid_pretreatment",
+    "wildcatter:depa_topo_circuit"
   ]
 }

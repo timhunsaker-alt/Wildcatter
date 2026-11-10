@@ -16,7 +16,8 @@ import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 /**
- * The acid evaporator (docs/multiblocks/fertilizer.md): a forced-circulation vacuum evaporator concentrating filter acid from 28 % to 54 % P2O5 merchant acid on process steam, about 2 t of steam a tonne of P2O5. Acid in
+ * The acid evaporator (docs/multiblocks/fertilizer.md): a forced-circulation vacuum evaporator concentrating filter acid (or the
+ * DEPA-TOPO circuit's treated acid) from 28 % to 54 % P2O5 merchant acid on process steam, about 2 t of steam a tonne of P2O5. Acid in
  * on the north face of its bottom cells, steam on the east; merchant acid out of the south. Its fluorine off-gas (SiF4) is counted.
  * The circulation pump is 75 kW on the world's industrial voltage, the box on the west face of its main cell.
  */
@@ -56,7 +57,8 @@ public class AcidEvaporatorBlockEntity extends UnitMotorBlockEntity {
 	protected void work(Level level) {
 		making = 0;
 		double filter = Lines.available(level, acidIn(), Product.FILTER_ACID, Pull.MACHINE, this);
-		if (filter < 1e-6) {
+		double treated = Lines.available(level, acidIn(), Product.TREATED_ACID, Pull.MACHINE, this);
+		if (filter + treated < 1e-6) {
 			unit = "NO ACID: pipe filter acid to its north side";
 			return;
 		}
@@ -66,7 +68,7 @@ public class AcidEvaporatorBlockEntity extends UnitMotorBlockEntity {
 			return;
 		}
 		double perKg = Phosphate.steamPerFilterAcid();
-		double kg = Math.min(Phosphate.filterAcidLps() * Tuning.FILTER_ACID_KG_PER_L * seconds(), filter * Tuning.FILTER_ACID_KG_PER_L);
+		double kg = Math.min(Phosphate.filterAcidLps() * Tuning.FILTER_ACID_KG_PER_L * seconds(), (filter + treated) * Tuning.FILTER_ACID_KG_PER_L);
 		kg = Math.min(kg, steam / perKg);
 		kg = Math.min(kg, room(Product.MERCHANT_ACID) * Tuning.MERCHANT_ACID_KG_PER_L / Phosphate.merchantPerFilterAcid());
 		if (kg <= 1e-7) {
@@ -84,7 +86,8 @@ public class AcidEvaporatorBlockEntity extends UnitMotorBlockEntity {
 		}
 		kg *= strength;
 		double l = kg / Tuning.FILTER_ACID_KG_PER_L;
-		double got = Lines.pull(level, acidIn(), Product.FILTER_ACID, l, Pull.MACHINE, this);
+		double got = Lines.pull(level, acidIn(), Product.TREATED_ACID, l, Pull.MACHINE, this);
+		got += Lines.pull(level, acidIn(), Product.FILTER_ACID, l - got, Pull.MACHINE, this);
 		kg = got * Tuning.FILTER_ACID_KG_PER_L;
 		Lines.pull(level, steamIn(), Product.PROCESS_STEAM, kg * perKg, Pull.MACHINE, this);
 		double merchant = kg * Phosphate.merchantPerFilterAcid() / Tuning.MERCHANT_ACID_KG_PER_L;

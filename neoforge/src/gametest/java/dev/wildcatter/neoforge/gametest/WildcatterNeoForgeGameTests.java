@@ -47,7 +47,7 @@ public class WildcatterNeoForgeGameTests {
 	private static final String[] PLANT_SCENES = {"ammonia_loop", "nitric_acid", "an_emulsion", "crane_siting", "quench_sump", "stabilizer_fuel", "cog_engine", "pot_aux", "burner_hopper"};
 	/** Phase 14b-14d's scenes (GasPowerScenes): longer still, for the acid plant to raise steam and the turbine to take the plant. */
 	/** Phase 18's scenes (PhosphateScenes): wide, so each gets room round it, and long, for four sets and the bags. */
-	private static final String[] PHOSPHATE_SCENES = {"phosphoric", "potash"};
+	private static final String[] PHOSPHATE_SCENES = {"phosphoric", "potash", "phosphate_uranium"};
 	private static final String[] GAS_POWER_SCENES = {"sales_gas", "acid_steam", "biogas"};
 
 	/** The protection gap wave's grid scenes (docs/questions/protection-gaps.md), each group in its own class, all run as plant scenes. */
@@ -101,6 +101,7 @@ public class WildcatterNeoForgeGameTests {
 			helper.register(id("biogas"), (Consumer<GameTestHelper>) GasPowerScenes::biogas);
 			helper.register(id("phosphoric"), (Consumer<GameTestHelper>) PhosphateScenes::phosphoric);
 			helper.register(id("potash"), (Consumer<GameTestHelper>) PhosphateScenes::potash);
+			helper.register(id("phosphate_uranium"), (Consumer<GameTestHelper>) PhosphateScenes::phosphateUranium);
 			GRID_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 		}));
 		modBus.addListener(RegisterCapabilitiesEvent.class, event -> event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, entity, side) -> STORAGE, Blocks.GOLD_BLOCK));

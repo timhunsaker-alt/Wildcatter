@@ -7,6 +7,7 @@ import dev.wildcatter.WildcatterItems;
 import dev.wildcatter.block.AcidEvaporatorBlockEntity;
 import dev.wildcatter.block.BaggingStationBlockEntity;
 import dev.wildcatter.block.DecantTowerBlockEntity;
+import dev.wildcatter.block.DepaTopoCircuitBlockEntity;
 import dev.wildcatter.block.GensetControlPanelBlockEntity;
 import dev.wildcatter.block.GensetPartBlockEntity;
 import dev.wildcatter.block.GensetSkid;
@@ -37,8 +38,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 /**
- * Phase 18 (docs/multiblocks/fertilizer.md), the spec's two scenes. Every part faces north at y 2 (main
- * cell at the north-west bottom corner); test sources stand in for process steam, gas, rock slurry where the spec's
+ * Phase 18 (docs/multiblocks/fertilizer.md, uranium-from-phosphate.md), the specs' three scenes. Every part faces north at y 2 (main
+ * cell at the north-west bottom corner); test sources stand in for process steam, gas, rock slurry and filter acid where the spec's
  * own source is another plant; diesel sets (through unit substations for the 4.16 kV mill and filter) on cable to each box.
  * <ul>
  * <li>{@code phosphoric}: rock by hopper to the mill, its slurry to the reactor with sulfuric acid from a test-filled stock tank; the pan
@@ -46,6 +47,9 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
  * fills a bag (brought near full by hook), then on DAP with ammonia from a test-filled bullet a DAP bag; the ammonia cut, NO AMMONIA;
  * the cell's floor broken, NO GYPSUM STACK.</li>
  * <li>{@code potash}: potash by hopper and process steam; a MOP bag under the bagging station; salt tails to a lined cell.</li>
+ * <li>{@code phosphate_uranium}: filter acid through the pretreatment and the DEPA-TOPO circuit, FILLING until its drums come, then
+ * about 2.8 kg/h of uranium into the strip and the treated acid on to an evaporator; without iron NO IRON and the acid round it; with
+ * the strip full, FULL.</li>
  * </ul>
  */
 final class PhosphateScenes {
@@ -390,5 +394,60 @@ final class PhosphateScenes {
 
 	private static boolean towerSalt(GameTestHelper helper, BlockPos tower) {
 		return towerRead(helper, tower).contains("t salt");
+	}
+
+	// ---- phosphate_uranium --------------------------------------------------------------------------------------------------------------
+	static void phosphateUranium(GameTestHelper helper) {
+		floor(helper, -14, -10, 20, 18);
+		place(helper, WildcatterBlocks.ACID_PRETREATMENT, 0, 0);         // x 0-2, z 0-5
+		place(helper, WildcatterBlocks.DEPA_TOPO_CIRCUIT, 3, 0);         // x 3-18, z 0-5, against its east side
+		place(helper, WildcatterBlocks.STOCK_TANK, 4, -5);               // x 4-7, z -5..-2: the kerosene
+		place(helper, WildcatterBlocks.ACID_EVAPORATOR, 3, 9);           // x 3-5, z 9-11
+		place(helper, WildcatterBlocks.STOCK_TANK, 3, 13);               // x 3-6, z 13-16: the merchant acid
+		run(helper, "gas_line", new int[] {1, -1});
+		source(helper, 1, -2, Product.FILTER_ACID, 1.0);                                                    // the pan filter's acid
+		run(helper, "gas_line", new int[] {5, -1});                                                         // kerosene
+		run(helper, "gas_line", new int[] {4, 6}, new int[] {4, 8});                                         // treated acid to the evaporator
+		run(helper, "gas_line", new int[] {6, 10});
+		source(helper, 7, 10, Product.PROCESS_STEAM, 1.0);
+		run(helper, "gas_line", new int[] {4, 12});                                                         // merchant acid to its tank
+		genset(helper, -6, -8);
+		run(helper, "cable_industrial", new int[] {-5, -8}, new int[] {3, -8}, new int[] {3, -1});
+		run(helper, "cable_industrial", new int[] {-1, -7}, new int[] {-1, 9}, new int[] {2, 9});
+		entity(helper, 4, -5, StorageTankBlockEntity.class).testFill(Product.KEROSENE, 10_000);
+		DepaTopoCircuitBlockEntity circuit = entity(helper, 3, 0, DepaTopoCircuitBlockEntity.class);
+		circuit.slots().set(1, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT, 2));
+		AcidEvaporatorBlockEntity evaporator = entity(helper, 3, 9, AcidEvaporatorBlockEntity.class);
+		int[][] wet = {};
+		int[][] staged = {{3, 9}};
+		hold(helper, staged);
+		start(helper, new int[][] {{-6, -8}}, () -> await(helper, 200, wet, () -> read(helper, 0, 0).contains("FILLING"), () -> {
+			String filling = read(helper, 0, 0);
+			check(helper, filling.contains("FILLING") && filling.contains("passing"), "without its drums the circuit should read FILLING and the acid go round it: " + filling);
+			circuit.slots().set(0, new ItemStack(WildcatterItems.EXTRACTANT_DRUM, Phosphate.chargeDrums() + 1));
+			helper.runAfterDelay(200, () -> release(helper, staged, 0, () -> {}));   // the evaporator once the circuit's motors are up
+			await(helper, 600, wet, () -> circuit.making() > 0 && evaporator.making() > 0, () -> {
+				String chain = " | pretreatment " + read(helper, 0, 0) + " | circuit " + read(helper, 3, 0) + " | evaporator " + read(helper, 3, 9) + " | set " + read(helper, -6, -8);
+				check(helper, circuit.charged(), "the circuit should hold its first charge: " + chain);
+				check(helper, near(circuit.making(), Phosphate.uraniumKgh(), 0.10), "the circuit should take about 2.8 kg/h of uranium: " + circuit.making() + chain);
+				check(helper, circuit.uranium() > 0, "uranium should be in the strip: " + chain);
+				check(helper, evaporator.making() > 0, "the treated acid should reach the evaporator: " + chain);
+				log("phosphate_uranium", "running:" + chain);
+				circuit.slots().set(1, ItemStack.EMPTY);
+				circuit.testDrainIron();
+				await(helper, 100, wet, () -> read(helper, 0, 0).contains("NO IRON"), () -> {
+					String noIron = read(helper, 0, 0);
+					check(helper, noIron.contains("NO IRON") && (noIron.contains("passing") || noIron.contains("bypass")), "without iron the circuit should stop and the acid go round it: " + noIron);
+					circuit.slots().set(1, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT, 1));
+					circuit.testAddUranium(Tuning.DEPA_TOPO_U_HOLD_KG);
+					await(helper, 100, wet, () -> read(helper, 0, 0).contains("FULL"), () -> {
+						String full = read(helper, 0, 0);
+						check(helper, full.contains("FULL"), "with its strip full the circuit should read FULL: " + full);
+						log("phosphate_uranium", "ok: " + filling + " | " + noIron + " | " + full);
+						helper.succeed();
+					});
+				});
+			});
+		}));
 	}
 }

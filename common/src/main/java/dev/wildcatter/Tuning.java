@@ -568,6 +568,17 @@ public final class Tuning {
 	public static final double POTASH_DRYER_WATTS = 75_000.0;      // fluid-bed fans and the compactor, 480 V or 400 V
 	public static final double POTASH_DRYER_GAS_WATTS = 0.6e6;     // its gas-fired air heater at the rating (proposed)
 
+	// Phase 18b, uranium from phosphoric acid (docs/multiblocks/uranium-from-phosphate.md): the DEPA-TOPO first cycle.
+	public static final double ACID_URANIUM_SHARE = 0.80;          // of the rock's uranium that reaches the filter acid (proposed)
+	public static final double DEPA_TOPO_RECOVERY = 0.90;          // of the acid's uranium the circuit takes (proposed)
+	public static final double DEPA_TOPO_CHARGE_L = 5_000.0;       // its first charge of organic (proposed)
+	public static final double DEPA_TOPO_EXTRACTANT = 0.20;        // kg of DEPA and TOPO a litre of organic: 0.5 M and 0.125 M (derived)
+	public static final double EXTRACTANT_DRUM_KG = 200.0;         // DEPA and TOPO in one extractant drum (proposed)
+	public static final double ORGANIC_LOSS_L_PER_M3 = 0.05;       // litres of organic lost a m3 of acid (proposed)
+	public static final double IRON_PER_URANIUM = 0.5;             // kg of iron a kg of U for the reductive strip (proposed)
+	public static final double ACID_PRETREATMENT_WATTS = 45_000.0; // clarifier rake, cooler fans and the air blower, 480 V or 400 V
+	public static final double DEPA_TOPO_WATTS = 60_000.0;         // the mixer-settlers' mixers and pumps, 480 V or 400 V
+	public static final double DEPA_TOPO_U_HOLD_KG = 326.0;        // U the first cycle's strip holds for the second cycle: one ADU drum's (proposed)
 	public static final double CYLINDER_FILLER_WATTS = 5_000.0;    // 480 V (unverified)
 
 	// ---- Phase 14b: the sales line and its meter stations (docs/multiblocks/sales-gas.md) ----------------------------------------

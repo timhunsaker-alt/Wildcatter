@@ -4,7 +4,7 @@ import dev.wildcatter.Tuning;
 import dev.wildcatter.ore.Ore;
 
 /**
- * The rates of Phase 18 (docs/multiblocks/fertilizer.md), all sized from {@link Tuning#P2O5_TPD} and
+ * The rates of Phase 18 (docs/multiblocks/fertilizer.md, uranium-from-phosphate.md), all sized from {@link Tuning#P2O5_TPD} and
  * {@link Tuning#MOP_TPH}:
  * <ul>
  * <li>the attack: Ca5(PO4)3F + 5 H2SO4 + 10 H2O -> 3 H3PO4 + 5 CaSO4.2H2O + HF, at the spec's 2.7 t of acid and 4.5 t of gypsum a
@@ -12,6 +12,7 @@ import dev.wildcatter.ore.Ore;
  * <li>the evaporator: filter acid at 28 % P2O5 to merchant acid at 54 %;</li>
  * <li>TSP from merchant acid and rock (Ca(H2PO4)2.H2O, 0-46-0); DAP from merchant acid and ammonia ((NH4)2HPO4, 18-46-0);</li>
  * <li>potash: KCl dissolved hot off the halite and crystallized under vacuum, 95 % KCl;</li>
+ * <li>the DEPA-TOPO first cycle on the filter acid's uranium.</li>
  * </ul>
  * Masses in kg, rates a second unless named. Plain Java, so it is unit-tested without Minecraft.
  */
@@ -179,4 +180,29 @@ public final class Phosphate {
 		return Tuning.POTASH_DRYER_GAS_WATTS / mopKgs();
 	}
 
+	// ---- uranium from the acid ----------------------------------------------------------------------------------------------------
+	/** g of uranium a litre of filter acid: about 1.3 (ten times real). */
+	public static double uraniumGPerL() {
+		return Tuning.ACID_URANIUM_SHARE * Ore.PHOSPHATE_URANIUM_PPM * 1e-6 * 1000 / (filterAcidPerRock() / Tuning.FILTER_ACID_KG_PER_L);
+	}
+
+	/** kg/h of uranium the circuit takes from the plant's whole acid: about 2.8. */
+	public static double uraniumKgh() {
+		return filterAcidLps() * uraniumGPerL() / 1000 * Tuning.DEPA_TOPO_RECOVERY * 3600;
+	}
+
+	/** Days to fill the first cycle's strip with a drum's uranium: about 5. */
+	public static double daysPerDrum() {
+		return Tuning.DEPA_TOPO_U_HOLD_KG / uraniumKgh() / 24;
+	}
+
+	/** Extractant drums in the first charge: 5. */
+	public static int chargeDrums() {
+		return (int) Math.ceil(Tuning.DEPA_TOPO_CHARGE_L * Tuning.DEPA_TOPO_EXTRACTANT / Tuning.EXTRACTANT_DRUM_KG);
+	}
+
+	/** Litres of kerosene in the first charge, the drums counted at a litre a kg: 4,000. */
+	public static double chargeKeroseneL() {
+		return Tuning.DEPA_TOPO_CHARGE_L - chargeDrums() * Tuning.EXTRACTANT_DRUM_KG;
+	}
 }

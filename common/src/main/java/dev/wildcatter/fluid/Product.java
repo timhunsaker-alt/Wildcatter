@@ -132,10 +132,12 @@ public enum Product {
 	BIOGAS("biogas, 60 % CH4", true),
 	/** Phase 18a (docs/multiblocks/fertilizer.md): the phosphate mill's ground rock in water, 62 % solids. Counted in kg; no tank holds it. */
 	ROCK_SLURRY("rock slurry", false),
-	/** The pan filter's wet-process phosphoric acid, 28 % P2O5, for the evaporator. Counted in litres. */
+	/** The pan filter's wet-process phosphoric acid, 28 % P2O5, for the evaporator (or the DEPA-TOPO circuit). Counted in litres. */
 	FILTER_ACID("filter acid (28 % P2O5)", false),
 	/** The evaporator's merchant phosphoric acid, 54 % P2O5, for the granulator; stock tanks hold it. Counted in litres. */
-	MERCHANT_ACID("merchant acid (54 % P2O5)", false);
+	MERCHANT_ACID("merchant acid (54 % P2O5)", false),
+	/** Phase 18b: filter acid with its uranium taken out by the DEPA-TOPO circuit, back to the evaporator. Counted in litres. */
+	TREATED_ACID("treated acid (28 % P2O5)", false);
 
 	private final String label;
 	private final boolean gas;

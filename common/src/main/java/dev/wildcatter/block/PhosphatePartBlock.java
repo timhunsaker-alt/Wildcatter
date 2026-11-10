@@ -19,8 +19,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 /**
- * One part of Phase 18 at true size (docs/multiblocks/fertilizer.md): the phosphoric acid plant (mill, reactor with its pan filter,
- * evaporator, granulation plant) and the potash plant (dissolver, crystallizer, dryer). Joined by steel pipe, or by touching where the spec says so.
+ * One part of Phase 18 at true size (docs/multiblocks/fertilizer.md, uranium-from-phosphate.md): the phosphoric acid plant (mill,
+ * reactor with its pan filter, evaporator, granulation plant), the potash plant (dissolver, crystallizer, dryer) and the uranium
+ * recovery on its acid (pretreatment, DEPA-TOPO circuit). Joined by steel pipe, or by touching where the spec says so.
  */
 public class PhosphatePartBlock extends BigPartBlock implements net.minecraft.world.WorldlyContainerHolder {
 	public enum Part {
@@ -31,7 +32,9 @@ public class PhosphatePartBlock extends BigPartBlock implements net.minecraft.wo
 		GRANULATION_PLANT("granulation_plant", Footprint.box(4, 5, 12, 0, 0)),
 		POTASH_DISSOLVER("potash_dissolver", Footprint.box(4, 5, 4, 0, 0)),
 		VACUUM_CRYSTALLIZER("vacuum_crystallizer", Footprint.box(3, 10, 3, 0, 0)),
-		POTASH_DRYER("potash_dryer", Footprint.box(8, 4, 3, 0, 0));
+		POTASH_DRYER("potash_dryer", Footprint.box(8, 4, 3, 0, 0)),
+		ACID_PRETREATMENT("acid_pretreatment", Footprint.box(3, 6, 6, 0, 0)),
+		DEPA_TOPO_CIRCUIT("depa_topo_circuit", Footprint.box(16, 3, 6, 0, 0));
 
 		private final String id;
 		private final Footprint footprint;
@@ -68,6 +71,8 @@ public class PhosphatePartBlock extends BigPartBlock implements net.minecraft.wo
 			case POTASH_DISSOLVER -> new PotashDissolverBlockEntity(pos, state);
 			case VACUUM_CRYSTALLIZER -> new VacuumCrystallizerBlockEntity(pos, state);
 			case POTASH_DRYER -> new PotashDryerBlockEntity(pos, state);
+			case ACID_PRETREATMENT -> new AcidPretreatmentBlockEntity(pos, state);
+			case DEPA_TOPO_CIRCUIT -> new DepaTopoCircuitBlockEntity(pos, state);
 		};
 	}
 
@@ -81,6 +86,8 @@ public class PhosphatePartBlock extends BigPartBlock implements net.minecraft.wo
 			case POTASH_DISSOLVER -> WildcatterBlocks.POTASH_DISSOLVER_ENTITY;
 			case VACUUM_CRYSTALLIZER -> WildcatterBlocks.VACUUM_CRYSTALLIZER_ENTITY;
 			case POTASH_DRYER -> WildcatterBlocks.POTASH_DRYER_ENTITY;
+			case ACID_PRETREATMENT -> WildcatterBlocks.ACID_PRETREATMENT_ENTITY;
+			case DEPA_TOPO_CIRCUIT -> WildcatterBlocks.DEPA_TOPO_CIRCUIT_ENTITY;
 		};
 	}
 
@@ -103,7 +110,7 @@ public class PhosphatePartBlock extends BigPartBlock implements net.minecraft.wo
 		if (read != null) {
 			return read;
 		}
-		// what a hopper on top would put in, clicked in by hand: rock, potash
+		// what a hopper on top would put in, clicked in by hand: rock, potash, extractant drums, iron
 		if (level.getBlockEntity(main(pos, state)) instanceof HopperFed fed && fed.takes(stack)) {
 			if (level.isClientSide()) {
 				return InteractionResult.SUCCESS;

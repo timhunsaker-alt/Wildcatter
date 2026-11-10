@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import dev.wildcatter.Tuning;
 import org.junit.jupiter.api.Test;
 
-/** Phase 18 (docs/multiblocks/fertilizer.md): the specs' numbers follow from the sizes. */
+/** Phase 18 (docs/multiblocks/fertilizer.md, uranium-from-phosphate.md): the specs' numbers follow from the sizes. */
 class PhosphateTest {
 	@Test
 	void theReactorAttacksSeventyTonnesOfRockADay() {
@@ -46,4 +46,12 @@ class PhosphateTest {
 		assertEquals(Tuning.POTASH_DRYER_GAS_WATTS, Phosphate.dryerJPerKg() * Phosphate.mopKgs(), 1e-6);
 	}
 
+	@Test
+	void theCircuitTakesThreeKilogramsOfUraniumAnHour() {
+		assertEquals(1.3, Phosphate.uraniumGPerL(), 0.06, "about 1.3 g of U a litre of acid");
+		assertEquals(2.7, Phosphate.uraniumKgh(), 0.1, "2.7 kg of U an hour");
+		assertEquals(5, Phosphate.daysPerDrum(), 0.2, "a drum in about five days");
+		assertEquals(5, Phosphate.chargeDrums());
+		assertEquals(4_000, Phosphate.chargeKeroseneL(), 1e-9);
+	}
 }

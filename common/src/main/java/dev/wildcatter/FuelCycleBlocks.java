@@ -121,7 +121,7 @@ public interface FuelCycleBlocks {
 	Block NITRIC_ACID_UNIT = ammoniaPart(dev.wildcatter.block.AmmoniaPartBlock.Part.NITRIC_ACID_UNIT);
 	Block AN_NEUTRALISER = ammoniaPart(dev.wildcatter.block.AmmoniaPartBlock.Part.AN_NEUTRALISER);
 	Block EMULSION_BLENDER = ammoniaPart(dev.wildcatter.block.AmmoniaPartBlock.Part.EMULSION_BLENDER);
-	// Phase 18a: fertilizer (docs/multiblocks/fertilizer.md)
+	// Phase 18: fertilizer and uranium from phosphoric acid (docs/multiblocks/fertilizer.md, uranium-from-phosphate.md)
 	Block PHOSPHATE_MILL = phosphatePart(dev.wildcatter.block.PhosphatePartBlock.Part.PHOSPHATE_MILL);
 	Block PHOSPHORIC_REACTOR = phosphatePart(dev.wildcatter.block.PhosphatePartBlock.Part.PHOSPHORIC_REACTOR);
 	Block TILTING_PAN_FILTER = phosphatePart(dev.wildcatter.block.PhosphatePartBlock.Part.TILTING_PAN_FILTER);
@@ -130,6 +130,8 @@ public interface FuelCycleBlocks {
 	Block POTASH_DISSOLVER = phosphatePart(dev.wildcatter.block.PhosphatePartBlock.Part.POTASH_DISSOLVER);
 	Block VACUUM_CRYSTALLIZER = phosphatePart(dev.wildcatter.block.PhosphatePartBlock.Part.VACUUM_CRYSTALLIZER);
 	Block POTASH_DRYER = phosphatePart(dev.wildcatter.block.PhosphatePartBlock.Part.POTASH_DRYER);
+	Block ACID_PRETREATMENT = phosphatePart(dev.wildcatter.block.PhosphatePartBlock.Part.ACID_PRETREATMENT);
+	Block DEPA_TOPO_CIRCUIT = phosphatePart(dev.wildcatter.block.PhosphatePartBlock.Part.DEPA_TOPO_CIRCUIT);
 	// 10c2: the cranes (docs/multiblocks/tower-crane.md, crawler-crane.md)
 	Block TOWER_CRANE = cranePart(dev.wildcatter.block.CranePartBlock.Part.TOWER_CRANE);
 	Block CRAWLER_CRANE = cranePart(dev.wildcatter.block.CranePartBlock.Part.CRAWLER_CRANE);
