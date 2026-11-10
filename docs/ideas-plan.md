@@ -21,8 +21,8 @@ what each needs first.
 | 2 | [multiblocks/acid-plant-steam.md](multiblocks/acid-plant-steam.md) | acid plant waste-heat steam to a turbine | 1 | S | 4: the acid plant exports about 1.3 MW and can island itself | **14c** (built) |
 | 3 | [biogas.md](biogas.md) | biogas as an engine fuel | 0 | S | 3: Farmings' digester joins the grid | **14d** (built) |
 | 4 | [mekanism-check.md](mekanism-check.md) | check plugs against real Mekanism | 0 | S | 4 when possible: the "power base" claim; **blocked** (Mekanism for 26.3 not released, checked 2026-11-09) | **14e** (when released) |
-| 5 | [salt-dome-oil.md](salt-dome-oil.md) | salt domes trap oil on their flanks | worldgen | M | 4: richer early oil, a reason to survey domes | **15a** |
-| 6 | [multiblocks/drilling-mud.md](multiblocks/drilling-mud.md) | drilling mud from barite and bentonite | 5 | M (15b1), M (15b2) | 4: two dead ores get a use; kicks, the BOP and blowouts; closes a known gap | **15b1, 15b2** |
+| 5 | [salt-dome-oil.md](salt-dome-oil.md) | salt domes trap oil on their flanks | worldgen | M | 4: richer early oil, a reason to survey domes | **15a** (built) |
+| 6 | [multiblocks/drilling-mud.md](multiblocks/drilling-mud.md) | drilling mud from barite and bentonite | 5 | M (15b1), M (15b2) | 4: two dead ores get a use; kicks, the BOP and blowouts; closes a known gap | **15b1, 15b2** (built) |
 | 7 | [multiblocks/adu-yellowcake.md](multiblocks/adu-yellowcake.md) | the purer yellowcake route | 1 | S | 3: cleaner conversion, uses the ammonia plant | **16a** |
 | 8 | [multiblocks/conversion-extensions.md](multiblocks/conversion-extensions.md) | conversion: cathode H2, ash bed, KOH, full size | 3 (+6) | M (16b1), L (16b2) | 3 | **16b1, 16b2** |
 | 9 | [multiblocks/enrichment-operations.md](multiblocks/enrichment-operations.md) | enrichment: spin-up, crashes, cooling, sampling, heels, assay | 2 | M | 3: product assay is a real choice; crashes are a consequence | **16c1, 16c2** |

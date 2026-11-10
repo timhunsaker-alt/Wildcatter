@@ -167,7 +167,7 @@ public class PumpjackBlockEntity extends BlockEntity implements CircuitPart, Ins
 			return;
 		}
 		BlockPos well = jack.wellhead();
-		Reservoir field = jack.overWell() ? Reservoir.at(ReservoirData.seed(server), well.getX(), well.getZ()) : null;
+		Reservoir field = jack.overWell() ? ReservoirData.field(server, well.getX(), well.getZ()) : null;
 		ReservoirData data = ReservoirData.get(server);
 		double room = Tuning.PUMPJACK_TANK - jack.line.liquid();
 		jack.wanted = field != null && data.remaining(field) > 0 && room >= 1;
@@ -202,7 +202,7 @@ public class PumpjackBlockEntity extends BlockEntity implements CircuitPart, Ins
 	public Component inspect() {
 		String field = "";
 		if (level instanceof ServerLevel server && overWell()) {
-			Reservoir reservoir = Reservoir.at(ReservoirData.seed(server), wellhead().getX(), wellhead().getZ());
+			Reservoir reservoir = ReservoirData.field(server, wellhead().getX(), wellhead().getZ());
 			if (reservoir != null) {
 				ReservoirData data = ReservoirData.get(server);
 				field = Math.round(data.pressure(reservoir) * 100) + "% pressure, about " + data.remaining(reservoir) + " units left in the field; ";

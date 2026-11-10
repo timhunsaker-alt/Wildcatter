@@ -91,6 +91,10 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.WasteHeatBoilerBlockEntity> WASTE_HEAT_BOILER_ENTITY = entity(dev.wildcatter.block.WasteHeatBoilerBlockEntity::new, WASTE_HEAT_BOILER);
 	public static final BlockEntityType<dev.wildcatter.block.ConverterBlockEntity> CONVERTER_ENTITY = entity(dev.wildcatter.block.ConverterBlockEntity::new, CONVERTER);
 	public static final BlockEntityType<dev.wildcatter.block.FinalAbsorberBlockEntity> FINAL_ABSORBER_ENTITY = entity(dev.wildcatter.block.FinalAbsorberBlockEntity::new, FINAL_ABSORBER);
+	public static final BlockEntityType<dev.wildcatter.block.MudMillBlockEntity> MUD_MILL_ENTITY = entity(dev.wildcatter.block.MudMillBlockEntity::new, BARITE_MILL, BENTONITE_DRYER);
+	public static final BlockEntityType<dev.wildcatter.block.MudHopperBlockEntity> MUD_HOPPER_ENTITY = entity(dev.wildcatter.block.MudHopperBlockEntity::new, MUD_HOPPER);
+	public static final BlockEntityType<dev.wildcatter.block.BopStackBlockEntity> BOP_STACK_ENTITY = entity(dev.wildcatter.block.BopStackBlockEntity::new, BOP_STACK);
+	public static final BlockEntityType<dev.wildcatter.block.BopAccumulatorBlockEntity> BOP_ACCUMULATOR_ENTITY = entity(dev.wildcatter.block.BopAccumulatorBlockEntity::new, BOP_ACCUMULATOR);
 	public static final BlockEntityType<dev.wildcatter.block.MeterBuildingBlockEntity> METER_BUILDING_ENTITY = entity(dev.wildcatter.block.MeterBuildingBlockEntity::new, METER_BUILDING);
 	public static final BlockEntityType<dev.wildcatter.block.SalesGasUnitBlockEntity> SALES_GAS_UNIT_ENTITY = entity(dev.wildcatter.block.SalesGasUnitBlockEntity::new, FILTER_SEPARATOR, ULTRASONIC_METER_RUN, REGULATOR_SKID, PIPELINE_TAP);
 	public static final BlockEntityType<dev.wildcatter.block.AcidSuperheaterBlockEntity> ACID_SUPERHEATER_ENTITY = entity(dev.wildcatter.block.AcidSuperheaterBlockEntity::new, ACID_SUPERHEATER);
@@ -463,6 +467,9 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		for (Block part : new Block[] {COKER_FRACTIONATOR, COKER_HEATER, COKE_DRUM, COKE_PIT, COKE_KILN, COKE_COOLER, COAL_TOWER, COKE_OVEN_BATTERY, PUSHER_MACHINE, COKE_QUENCH_TOWER, BYPRODUCT_PLANT, TAR_STILL, PASTE_PLANT, FORMING_PRESS, BAKING_FURNACE, RODDING_SHOP}) {
 			add(((dev.wildcatter.block.CarbonPartBlock) part).part().id(), part);
 		}
+		for (Block part : new Block[] {BARITE_MILL, BENTONITE_DRYER, MUD_HOPPER, BOP_STACK, BOP_ACCUMULATOR}) {
+			add(((dev.wildcatter.block.MudPartBlock) part).part().id(), part);
+		}
 		for (Block part : new Block[] {METER_BUILDING, FILTER_SEPARATOR, ULTRASONIC_METER_RUN, REGULATOR_SKID, PIPELINE_TAP}) {
 			add(((dev.wildcatter.block.SalesGasPartBlock) part).part().id(), part);
 		}
@@ -633,6 +640,10 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("waste_heat_boiler"), WASTE_HEAT_BOILER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("acid_superheater"), ACID_SUPERHEATER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("meter_building"), METER_BUILDING_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("mud_mill"), MUD_MILL_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("mud_hopper"), MUD_HOPPER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("bop_stack"), BOP_STACK_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("bop_accumulator"), BOP_ACCUMULATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("sales_gas_unit"), SALES_GAS_UNIT_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("converter"), CONVERTER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("final_absorber"), FINAL_ABSORBER_ENTITY);

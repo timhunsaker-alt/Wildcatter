@@ -417,6 +417,11 @@
     "wildcatter:cask_loading_station",
     "wildcatter:storage_module",
     "wildcatter:new_fuel_inspection_stand",
-    "wildcatter:personnel_monitor"
+    "wildcatter:personnel_monitor",
+    "wildcatter:barite_mill",
+    "wildcatter:bentonite_dryer",
+    "wildcatter:mud_hopper",
+    "wildcatter:bop_stack",
+    "wildcatter:bop_accumulator"
   ]
 }

@@ -174,6 +174,10 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "personnel_monitor" -> new Motor(false, Voltage.LOW, Tuning.PERSONNEL_MONITOR_WATTS);   // residential, single-phase (19b)
 				case "cask_loading_station" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CASK_STATION_WATTS);
 				case "new_fuel_inspection_stand" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.INSPECTION_STAND_WATTS);
+				case "barite_mill" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BARITE_MILL_WATTS);
+				case "bentonite_dryer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BENTONITE_MILL_WATTS);
+				case "mud_hopper" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.MUD_HOPPER_WATTS);
+				case "bop_accumulator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ACCUMULATOR_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -313,6 +317,10 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "personnel_monitor" -> "detectors and shower heater";
 			case "cask_loading_station" -> "welder, vacuum pump and helium skid";
 			case "new_fuel_inspection_stand" -> "lights and camera";
+			case "barite_mill" -> "roller mill";
+			case "bentonite_dryer" -> "mill and dryer fan";
+			case "mud_hopper" -> "mixing pump";
+			case "bop_accumulator" -> "accumulator pump";
 			default -> kind();
 		};
 	}

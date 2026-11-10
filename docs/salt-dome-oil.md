@@ -1,6 +1,7 @@
 # Salt domes that trap oil on their flanks (worldgen)
 
-> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Proposed phase **15a**. Decisions are in
+> **BUILT as wave 15a (2026-11-09), decided on recommendation while Tim was away; not approved.** See "As built" at the end and
+> `docs/questions/phase15-oilfield.md`. Proposed phase **15a**. Decisions are in
 > `docs/questions/specs-wildcatter.md` (items 14-17). A worldgen spec, like `docs/ores.md`; it has no multiblock.
 
 The 7a salt domes (ores.md) are a column of rock salt under a calcite caprock with native sulfur. Real Gulf Coast domes are oil traps:
@@ -87,3 +88,20 @@ the rig drills salt as it drills stone.
 
 ## Proposed wave
 **15a**, with drilling mud (15b) after it, so salt can wash out.
+
+## As built (15a, 2026-11-09)
+Decisions taken while building are in `docs/questions/phase15-oilfield.md` (items 1-10).
+- **Code:** `well/SaltDome.java` (the 192-block grid, the shape, the flank fields and caprock pool, all from the seed); `well/Reservoir.java`
+  gained a `Source` (FIELD, DEEP, FLANK, CAPROCK) and an arc (inner radius, start angle, arc); `Reservoir.at(seed, x, z, site)` checks the
+  dome first. `ReservoirData.field(level, x, z)` is what game code asks: it checks the dome's centre biome (decision 1). The drilling rigs,
+  pumpjacks, gas wellheads and the seismograph all use it. Values in `Tuning` ("15a").
+- **Worldgen:** the `salt_dome` feature runs in every overworld chunk and draws its cell's dome inside that chunk, if the dome's centre is
+  a dome biome, with the mound on top (decisions 2 and 7). Its JSON keeps only `sulfur_chance`; the shape lives in `Tuning`.
+- **Flank fields:** their inner edge one block inside the salt's flank at their top, so a hole on the inner ring goes through salt
+  (decision 3). **Caprock pool:** its top at crest + 2, in the caprock; full pressure to 10 % taken, then 35 % and falling (decision 4).
+- **The middle of a dome** (caprock footprint) holds the caprock pool or nothing; no shallow or deep field under the salt (decision 5).
+- **Seismograph:** SALT DOME with its width and crest over the middle; flank fields read as "on a salt dome's flank" (decision 6).
+- **Tooltips:** rock salt and native sulfur say domes trap oil on their flanks.
+- **Tests:** unit test `SaltDomeTest` (6); NeoForge scene `salt_dome` (seismograph, the feature placed by hand matching `SaltDome` block
+  for block, the small rig striking a flank field and a pumpjack lifting it, the caprock well at 99 % then 43 %). The client `ores` scene
+  was updated to place a grid dome (not run). No screenshot yet (the client was not free).

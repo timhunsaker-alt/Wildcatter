@@ -52,6 +52,8 @@ public class WildcatterNeoForgeGameTests {
 
 	/** Phase 17a's scenes (FerroalloyScenes): a peaker and its substation round the furnace, so room round them and time for the turbine. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> FERRO_SCENES = FerroalloyScenes.scenes();
+	/** Phase 15's oilfield scenes (OilfieldScenes): spread out round a dome or a land rig, so each gets room, and long, for the drilling. */
+	private static final java.util.Map<String, Consumer<GameTestHelper>> OILFIELD_SCENES = OilfieldScenes.scenes();
 
 	/** The protection gap wave's grid scenes (docs/questions/protection-gaps.md), each group in its own class, all run as plant scenes. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> GRID_SCENES = new java.util.LinkedHashMap<>();
@@ -112,6 +114,7 @@ public class WildcatterNeoForgeGameTests {
 			GRID_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			FERRO_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			REACTOR_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
+			OILFIELD_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 		}));
 		modBus.addListener(RegisterCapabilitiesEvent.class, event -> event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, entity, side) -> STORAGE, Blocks.GOLD_BLOCK));
 		modBus.addListener(RegisterGameTestsEvent.class, event -> {
@@ -136,6 +139,11 @@ public class WildcatterNeoForgeGameTests {
 				if (!only(scene)) {
 					continue;
 				}
+				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
+						new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 6000, 1, true,
+								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 120)));
+			}
+			for (String scene : OILFIELD_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
 						new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 6000, 1, true,
 								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 120)));

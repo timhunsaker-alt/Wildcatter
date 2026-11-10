@@ -45,7 +45,9 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 
 	@Override
 	public java.util.List<Point> points() {
-		return java.util.List.of(new Point("DRILL ENABLE", true), new Point("DRILLING", false), new Point("MUD PUMPS", false), new Point("IN A CONNECTION", false), new Point("AUTO", false));
+		return java.util.List.of(new Point("DRILL ENABLE", true), new Point("DRILLING", false), new Point("MUD PUMPS", false), new Point("IN A CONNECTION", false), new Point("AUTO", false),
+				new Point("KICK", false), new Point("SHUT IN", true), new Point("SHUT IN (state)", false), new Point("MUD WEIGHT 4-20 mA (8-20 ppg)", false, Signal.MA),
+				new Point("PIT VOLUME 4-20 mA (0-60 m3)", false, Signal.MA));
 	}
 
 	@Override
@@ -55,7 +57,18 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 			case 2 -> pumping();
 			case 3 -> connecting();
 			case 4 -> remote.auto();
+			case 5 -> phase == Phase.KICK || phase == Phase.BLOWOUT;
+			case 7 -> phase == Phase.SHUT_IN;
 			default -> false;
+		};
+	}
+
+	@Override
+	public double readMa(int point) {
+		return switch (point) {
+			case 8 -> 4 + 16 * Math.max(0, Math.min(1, (mudPpg() - 8) / 12));
+			case 9 -> 4 + 16 * Math.max(0, Math.min(1, mudVolume() / Tuning.LAND_RIG_MUD_TANK));
+			default -> 0;
 		};
 	}
 
@@ -63,6 +76,8 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 	public void commandPoint(int point, boolean on, long gameTime) {
 		if (point == 0) {
 			remote.command(0, on, gameTime);
+		} else if (point == 6 && on && (phase == Phase.KICK || phase == Phase.BLOWOUT) && level instanceof ServerLevel server) {
+			shutIn(server);   // the PLC's SHUT IN command
 		}
 	}
 
@@ -90,7 +105,239 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 	private static final float TOP_DRIVE_TOP = 6.0F + Tuning.LAND_RIG_STAND_BLOCKS + 3.0F;
 
 	public enum Phase {
-		IDLE, DRILLING, COMPLETE, DRY
+		IDLE, DRILLING, COMPLETE, DRY,
+		/** 15b2 (docs/multiblocks/drilling-mud.md): the well flowing into the hole, the shut-in well, a wild well, one killed by a relief well. */
+		KICK, SHUT_IN, BLOWOUT, KILLED
+	}
+
+	// ---- 15b2: well control -------------------------------------------------------------------------------------------------------
+	/** The rigs blowing out now, for a relief well to find. Server side only. */
+	private static final java.util.Set<RigSubstructureBlockEntity> BLOWING = java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
+	private @Nullable BlockPos accumulatorAt;
+	private long accumulatorSeen = -1000;
+	private long kickAt;
+	private double pitGain;
+	private double killPpg;
+	private double sidpp;
+	private double killing;
+	private double blowCarry;
+	private boolean onFire;
+
+	/** The accumulator within reach tells the rig it is there, every 20 ticks. */
+	void accumulatorHere(BlockPos at, long now) {
+		accumulatorAt = at;
+		accumulatorSeen = now;
+	}
+
+	public Phase phase() {
+		return phase;
+	}
+
+	public boolean onFire() {
+		return onFire;
+	}
+
+	/** The BOP stack on the wellhead cell under the rotary table, or null. */
+	public @Nullable BopStackBlockEntity bop() {
+		return level != null && dev.wildcatter.multiblock.BigParts.entity(level, hole().above()) instanceof BopStackBlockEntity stack ? stack : null;
+	}
+
+	public @Nullable BopAccumulatorBlockEntity accumulator() {
+		return level != null && accumulatorAt != null && level.getGameTime() - accumulatorSeen < 80
+				&& level.getBlockEntity(accumulatorAt) instanceof BopAccumulatorBlockEntity a ? a : null;
+	}
+
+	/** A BOP stack under the floor and its accumulator within reach: what a geopressured (deep) field needs. */
+	public boolean hasBop() {
+		return bop() != null && accumulator() != null;
+	}
+
+	/** The pore pressure of a field as an equivalent mud weight: deep fields are geopressured. */
+	public static double porePpg(Reservoir field) {
+		return field.deep() ? Tuning.DEEP_PORE_PPG : Tuning.NORMAL_PORE_PPG;
+	}
+
+	/** The hole's true vertical depth, feet. */
+	private double tvdFeet() {
+		return depth * Tuning.FEET_PER_M;
+	}
+
+	/** The mud is under the field's pore pressure and the trip margin: the well kicks. */
+	private void kick(ServerLevel level) {
+		phase = Phase.KICK;
+		kickAt = level.getGameTime();
+		pitGain = 0;
+		level.playSound(null, hole(), SoundEvents.BELL_BLOCK, SoundSource.BLOCKS, 2.0F, 0.6F);
+		Drilling.announce(level, hole(), Component.literal("KICK! The pits are gaining: shut the well in (sneak-click the driller's console) within "
+				+ Tuning.KICK_WINDOW_TICKS / 20 + " s"));
+		setChanged();
+		sync();
+	}
+
+	/**
+	 * Closes the annular and the rams from the accumulator: in a kick's window or on a wild well whose stack still stands. Returns
+	 * what happened, for the console.
+	 */
+	public Component shutIn(ServerLevel level) {
+		if (phase != Phase.KICK && phase != Phase.BLOWOUT) {
+			return Component.literal("Nothing to shut in: " + status);
+		}
+		BopStackBlockEntity stack = bop();
+		BopAccumulatorBlockEntity acc = accumulator();
+		if (stack == null || acc == null) {
+			return Component.literal("NO BOP: no stack or no accumulator to close it");
+		}
+		if (!acc.takeClose()) {
+			return Component.literal("The accumulator's bottles are spent: no close left");
+		}
+		stack.setClosed(true);
+		Reservoir field = Drilling.field(level, hole());
+		double pore = field != null ? porePpg(field) : Tuning.DEEP_PORE_PPG;
+		sidpp = Math.max(0, (pore - mudPpg()) * Tuning.PSI_PER_PPG_FT * tvdFeet());   // SIDPP = 0.052 x (pore - mud) x TVD
+		killPpg = pore + Tuning.TRIP_MARGIN_PPG;
+		killing = 0;
+		phase = Phase.SHUT_IN;
+		BLOWING.remove(this);
+		setChanged();
+		sync();
+		return Component.literal("SHUT IN: annular and rams closed. " + status());
+	}
+
+	private String status() {
+		return String.format("SHUT IN: SIDPP %,.0f psi, kill weight %.1f ppg (mud %.2f ppg, %.1f m3 pit gain)", sidpp, killPpg, mudPpg(), pitGain);
+	}
+
+	/** The wild well flows, may ignite, and can still be shut in or killed by a relief well. */
+	private void blowout(ServerLevel level) {
+		phase = Phase.BLOWOUT;
+		BLOWING.add(this);
+		Drilling.announce(level, hole(), Component.literal("BLOWOUT! The well is flowing wild round the rig floor. Keep fire away; close the BOP if it stands, or drill a relief well."));
+		setChanged();
+		sync();
+	}
+
+	/** Every tick of a kick, a shut-in well or a blowout. */
+	private void wellControl(ServerLevel level, double power) {
+		long now = level.getGameTime();
+		Reservoir field = Drilling.field(level, hole());
+		switch (phase) {
+			case KICK -> {
+				pitGain += Tuning.KICK_GAIN_M3S / 20;
+				long left = Tuning.KICK_WINDOW_TICKS - (now - kickAt);
+				status = String.format("KICK: PIT GAIN %.1f m3: shut in (sneak-click the driller's console) within %d s", pitGain, Math.max(0, left / 20));
+				if (now % 40 == 0) {
+					level.playSound(null, hole(), SoundEvents.BELL_BLOCK, SoundSource.BLOCKS, 2.0F, 0.6F);
+				}
+				if (left <= 0) {
+					blowout(level);
+				}
+			}
+			case SHUT_IN -> {
+				if (mudPpg() + 1e-6 < killPpg) {
+					status = status() + ": weight the mud to the kill weight";
+				} else {
+					killing += power;
+					status = String.format("CIRCULATING KILL MUD through the choke: %.0f %%", Math.min(100, killing * 100 / Tuning.KILL_CIRCULATION_TICKS));
+					if (killing >= Tuning.KILL_CIRCULATION_TICKS) {
+						BopStackBlockEntity stack = bop();
+						if (stack != null) {
+							stack.setClosed(false);
+						}
+						phase = Phase.DRILLING;
+						if (field != null) {
+							strike(level, field);
+						}
+					}
+				}
+			}
+			case BLOWOUT -> {
+				status = onFire ? "BLOWOUT ON FIRE: the rig is burning" : "BLOWOUT: the well is flowing wild; close the BOP if it stands, or kill it with a relief well";
+				if (field != null) {
+					blowCarry += Tuning.BLOWOUT_FLOW * Tuning.GAS_UNITS_PER_TICK;
+					int whole = (int) blowCarry;
+					if (whole > 0) {
+						blowCarry -= whole;
+						ReservoirData.get(level).draw(field, whole);
+					}
+					if (ReservoirData.get(level).remaining(field) <= 0) {
+						phase = Phase.DRY;
+						BLOWING.remove(this);
+						status = "BLOWN DOWN: the field is empty";
+					}
+				}
+				BlockPos h = hole();
+				if (now % 4 == 0) {
+					level.sendParticles(onFire ? net.minecraft.core.particles.ParticleTypes.FLAME : net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE,
+							h.getX() + 0.5, h.getY() + 7, h.getZ() + 0.5, 20, 0.6, 2.0, 0.6, 0.1);
+				}
+				if (!onFire && now % 20 == 0 && fireNear(level, h)) {
+					ignite(level, h);
+				}
+			}
+			default -> {
+			}
+		}
+		setChanged();
+	}
+
+	/** A fire, lava or a lit campfire within {@link Tuning#IGNITION_RANGE} of the hole: the gas round the floor finds it. */
+	private static boolean fireNear(ServerLevel level, BlockPos hole) {
+		int r = Tuning.IGNITION_RANGE;
+		for (BlockPos p : BlockPos.betweenClosed(hole.offset(-r, -2, -r), hole.offset(r, 10, r))) {
+			BlockState state = level.getBlockState(p);
+			if (state.is(net.minecraft.tags.BlockTags.FIRE) || state.getFluidState().is(net.minecraft.tags.FluidTags.LAVA)
+					|| (state.is(net.minecraft.tags.BlockTags.CAMPFIRES) && state.getValue(net.minecraft.world.level.block.CampfireBlock.LIT))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** The gas round the floor lights: fire on the ground under the floor round the hole. */
+	private void ignite(ServerLevel level, BlockPos hole) {
+		onFire = true;
+		for (BlockPos p : BlockPos.betweenClosed(hole.offset(-2, 0, -2), hole.offset(2, 0, 2))) {
+			if (level.getBlockState(p).isAir() && !p.equals(hole) && level.getBlockState(p.below()).isFaceSturdy(level, p.below(), Direction.UP)) {
+				level.setBlock(p, net.minecraft.world.level.block.Blocks.FIRE.defaultBlockState(), 3);
+			}
+		}
+		level.playSound(null, hole, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 3.0F, 0.6F);
+		Drilling.announce(level, hole, Component.literal("The blowout has caught fire: the rig is burning"));
+	}
+
+	/** A relief well that has reached this field with kill-weight mud kills every wild well on it at least 20 blocks off. */
+	private void relieve(ServerLevel level, Reservoir field) {
+		for (RigSubstructureBlockEntity wild : java.util.List.copyOf(BLOWING)) {
+			if (wild != this && wild.level == level && !wild.isRemoved() && wild.phase == Phase.BLOWOUT
+					&& wild.hole().distSqr(hole()) >= Tuning.RELIEF_MIN_DISTANCE * Tuning.RELIEF_MIN_DISTANCE) {
+				Reservoir theirs = Drilling.field(level, wild.hole());
+				if (theirs != null && theirs.key().equals(field.key())) {
+					wild.phase = Phase.KILLED;
+					wild.status = "KILLED by a relief well's kill-weight mud";
+					BLOWING.remove(wild);
+					wild.setChanged();
+					wild.sync();
+					Drilling.announce(level, wild.hole(), Component.literal("The relief well has killed the blowout"));
+				}
+			}
+		}
+	}
+
+	/** Game test hook: as if it had already drilled (and cased) this far. */
+	public void testDepth(int blocks) {
+		depth = blocks;
+		stand = 0;
+		setChanged();
+	}
+
+	/** Game test hook: as if this many ticks of full-power circulation had gone by. */
+	public void testCirculated(double ticks) {
+		killing += ticks;
+	}
+
+	/** Game test hook: as if the kick's window had run out. */
+	public void testKickTimeout() {
+		kickAt -= Tuning.KICK_WINDOW_TICKS;
 	}
 
 	private Phase phase = Phase.IDLE;
@@ -98,6 +345,10 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 	private String missing = "";
 	private boolean topDrive;
 	private int water;
+	/** kg of barite, bentonite and rock salt mixed into the mud in the tanks (docs/multiblocks/drilling-mud.md). */
+	private double barite, bentonite, salt;
+	/** Blocks of rock salt drilled at the bottom of the hole: a washout fills them back in. */
+	private int saltMetres;
 	private int depth;
 	/** Blocks drilled in the current stand, and progress toward the next block in ticks of full power. */
 	private int stand;
@@ -159,9 +410,113 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		return drilling() && connection > 0;
 	}
 
-	/** The mud pumps run while it drills between connections, with water in the tanks. */
+	/** The mud pumps run while it drills between connections, with mud in the tanks. */
 	public boolean pumping() {
-		return drilling() && connection <= 0 && water >= Tuning.LAND_RIG_MUD_PER_BLOCK;
+		return drilling() && connection <= 0 && mudVolume() >= Tuning.LAND_RIG_MUD_PER_BLOCK;
+	}
+
+	// ---- the mud (docs/multiblocks/drilling-mud.md): water, bentonite gel, barite weight, salt --------------------------------------
+	/** What the mixing hopper puts into the tanks. */
+	public enum Solid {
+		BARITE("barite", Tuning.BARITE_SG), BENTONITE("bentonite", Tuning.BENTONITE_SG), SALT("rock salt", Tuning.SALT_APPARENT_SG);
+
+		private final String label;
+		final double sg;
+
+		Solid(String label, double sg) {
+			this.label = label;
+			this.sg = sg;
+		}
+
+		public String label() {
+			return label;
+		}
+	}
+
+	/** kg of salt dissolved: up to saturation; the rest lies undissolved in the pits. */
+	private double dissolvedSalt() {
+		return Math.min(salt, water * Tuning.SALT_SATURATION_KG_PER_L);
+	}
+
+	/** Litres of mud in the tanks: the water and what the solids add to it. */
+	public double mudVolume() {
+		return water + barite / Tuning.BARITE_SG + bentonite / Tuning.BENTONITE_SG + dissolvedSalt() / Tuning.SALT_APPARENT_SG;
+	}
+
+	/** The mud's density, kg/L (water alone 1.0). */
+	public double mudDensity() {
+		double v = mudVolume();
+		return v <= 0 ? Tuning.WATER_KG_PER_L : (water * Tuning.WATER_KG_PER_L + barite + bentonite + dissolvedSalt()) / v;
+	}
+
+	/** The mud weight in lb/gal (ppg), as a mud engineer reads it off a mud balance: water 8.34. */
+	public double mudPpg() {
+		return mudDensity() * Tuning.PPG_PER_KG_L;
+	}
+
+	/** Bentonite in the mud, lb/bbl (1 kg/m3 = 0.3505 lb/bbl). */
+	public double gelLbBbl() {
+		double v = mudVolume();
+		return v <= 0 ? 0 : bentonite / v * 1000 * 0.3505;
+	}
+
+	/** Below 15 lb/bbl of bentonite the cuttings settle when the pumps stop: the rate of penetration is halved. */
+	public boolean lowGel() {
+		double v = mudVolume();
+		return v <= 0 || bentonite / v < Tuning.LOW_GEL_KG_PER_L;
+	}
+
+	/** Salt-saturated: as much salt as the water holds (360 kg a m3), so rock salt does not dissolve into the hole. */
+	public boolean saltSaturated() {
+		return water > 0 && salt >= water * Tuning.SALT_SATURATION_KG_PER_L * Tuning.SALT_SATURATED_AT;
+	}
+
+	/** "8.34 ppg (1,000 kg/m3), gel 0 lb/bbl LOW GEL, fresh": the mud for a readout. */
+	public String mudText() {
+		return String.format("%.2f ppg (%,.0f kg/m3), gel %.0f lb/bbl%s, %s", mudPpg(), mudDensity() * 1000, gelLbBbl(), lowGel() ? " LOW GEL" : "",
+				saltSaturated() ? "salt-saturated" : salt > 1 ? "salty (not saturated)" : "fresh");
+	}
+
+	/** kg of this solid the tanks have room for. */
+	public double roomFor(Solid solid) {
+		double room = Tuning.LAND_RIG_MUD_TANK - mudVolume();
+		if (solid == Solid.SALT) {
+			double toSaturate = Math.max(0, water * Tuning.SALT_SATURATION_KG_PER_L - salt);
+			return Math.max(0, Math.min(toSaturate + 50, room * solid.sg));   // salt past saturation is not wanted: the hopper stops there
+		}
+		return Math.max(0, room * solid.sg);
+	}
+
+	/** The mixing hopper puts {@code kg} of a solid into the tanks; returns how much fitted. */
+	public double addSolid(Solid solid, double kg) {
+		double took = Math.max(0, Math.min(kg, roomFor(solid)));
+		switch (solid) {
+			case BARITE -> barite += took;
+			case BENTONITE -> bentonite += took;
+			case SALT -> salt += took;
+		}
+		if (took > 0) {
+			setChanged();
+		}
+		return took;
+	}
+
+	/** {@code litres} of mud go down the hole: water and solids alike. */
+	private void useMud(double litres) {
+		double v = mudVolume();
+		if (v <= 0) {
+			return;
+		}
+		double keep = Math.max(0, 1 - litres / v);
+		water = (int) Math.round(water * keep);
+		barite *= keep;
+		bentonite *= keep;
+		salt *= keep;
+	}
+
+	/** Game test hook: mixes this much straight into the tanks, as the hopper would. */
+	public void testMix(Solid solid, double kg) {
+		addSolid(solid, kg);
 	}
 
 	private @Nullable RigDriveHouseBlockEntity driveHouse() {
@@ -175,6 +530,9 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		}
 		if (connecting()) {
 			return Tuning.LAND_RIG_CONNECTION_WATTS;
+		}
+		if (phase == Phase.SHUT_IN && mudPpg() + 1e-6 >= killPpg) {
+			return Tuning.LAND_RIG_DRILL_WATTS;   // the mud pumps circulating kill mud through the choke
 		}
 		return pumping() ? Tuning.LAND_RIG_DRILL_WATTS : Tuning.LAND_RIG_IDLE_WATTS;
 	}
@@ -203,9 +561,9 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		return inspect();
 	}
 
-	/** Water from a pump's pipe into the mud tanks; returns how much fitted. */
+	/** Water from a pump's pipe into the mud tanks; returns how much fitted. It dilutes the mud's weight. */
 	public int addWater(int amount) {
-		int took = Math.max(0, Math.min(amount, Tuning.LAND_RIG_MUD_TANK - water));
+		int took = Math.max(0, Math.min(amount, (int) Math.floor(Tuning.LAND_RIG_MUD_TANK - mudVolume())));
 		water += took;
 		if (took > 0) {
 			setChanged();
@@ -217,9 +575,12 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		return water / (double) Tuning.LAND_RIG_MUD_TANK;
 	}
 
-	/** Game test hook: empties or fills the mud tanks. */
+	/** Game test hook: empties or fills the mud tanks with water (what was mixed in stays, and is thinned or thickened). */
 	public void testWater(int litres) {
 		water = litres;
+		if (litres <= 0) {
+			barite = bentonite = salt = 0;
+		}
 		setChanged();
 	}
 
@@ -242,9 +603,12 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		RigDriveHouseBlockEntity house = rig.driveHouse();
 		double power = house != null && rig.formed ? house.delivered() : 0;
 		float rpm = 0;
-		if (!rig.drilling()) {
+		if (rig.formed && (rig.phase == Phase.KICK || rig.phase == Phase.SHUT_IN || rig.phase == Phase.BLOWOUT)) {
+			rig.wellControl(server, power);
+		} else if (!rig.drilling()) {
 			rig.status = !rig.formed ? "NOT BUILT: needs the " + rig.missing : !rig.topDrive ? "NO TOP DRIVE: click one into the mast"
-					: rig.phase == Phase.COMPLETE ? "WELL COMPLETE: break the rig down to move it" : rig.phase == Phase.DRY ? "DRY HOLE: nothing under it down to bedrock"
+					: rig.phase == Phase.COMPLETE ? "WELL COMPLETE: break the rig down to move it" : rig.phase == Phase.DRY ? (rig.status.startsWith("BLOWN") ? rig.status : "DRY HOLE: nothing under it down to bedrock")
+					: rig.phase == Phase.KILLED ? "KILLED by a relief well's kill-weight mud"
 					: rig.remote.hand() ? "stopped: right-click the driller's console to drill" : rig.remote.auto() ? "stopped: its PLC is not enabling it" : "stopped: selector in OFF";
 		} else if (power <= 0.01) {
 			rig.status = house != null && house.undervoltage() ? "drives stopped on UNDERVOLTAGE" : "NO POWER at the drive house";
@@ -255,12 +619,19 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 				rig.connection = 0;
 				rig.sync();
 			}
-		} else if (rig.water < Tuning.LAND_RIG_MUD_PER_BLOCK) {
+		} else if (rig.mudVolume() < Tuning.LAND_RIG_MUD_PER_BLOCK) {
 			rig.status = "NO MUD: pipe water from a pump to the mud tanks";
+		} else if (rig.needsBop(server)) {
+			rig.status = "NO BOP: the deep field ahead is geopressured: set a BOP STACK under the rotary table and its ACCUMULATOR within "
+					+ Tuning.ACCUMULATOR_REACH + " blocks";
+		} else if (rig.washout(server)) {
+			rig.status = "WASHOUT: fresh mud dissolves the rock salt and the hole washes out; mix rock salt into the mud until it is salt-saturated ("
+					+ Math.round(Tuning.SALT_SATURATION_KG_PER_L * 1000) + " kg a m3 of water)";
 		} else {
 			rpm = (float) Tuning.TOP_DRIVE_RPM;
-			rig.progress += power;
-			rig.status = "drilling at " + Math.round(power * 100) + "% of full rate";
+			double rate = power * (rig.lowGel() ? Tuning.LOW_GEL_RATE : 1);
+			rig.progress += rate;
+			rig.status = "drilling at " + Math.round(rate * 100) + "% of full rate" + (rig.lowGel() ? " (LOW GEL: the cuttings settle; mix bentonite to " + Math.round(Tuning.LOW_GEL_KG_PER_L * 350.5) + " lb/bbl)" : "");
 			while (rig.progress >= Tuning.LAND_RIG_TICKS_PER_BLOCK && rig.drilling() && rig.connection <= 0) {
 				rig.progress -= Tuning.LAND_RIG_TICKS_PER_BLOCK;
 				rig.advance(server);
@@ -273,9 +644,41 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		}
 	}
 
+	/**
+	 * True if the next block down is rock salt and the mud is not salt-saturated: the hole washes out. The first time, the metres
+	 * already drilled in salt at the bottom of the hole fill back in (docs/multiblocks/drilling-mud.md).
+	 */
+	private boolean washout(ServerLevel level) {
+		if (saltSaturated() || !isSalt(level.getBlockState(hole().below(depth + 1)))) {
+			return false;
+		}
+		if (saltMetres > 0) {
+			for (int k = 0; k < saltMetres && depth > 0; k++) {
+				level.setBlock(hole().below(depth), dev.wildcatter.ore.OreBlocks.block(dev.wildcatter.ore.Ore.HALITE).defaultBlockState(), 3);
+				depth--;
+				stand = Math.max(0, stand - 1);
+			}
+			saltMetres = 0;
+			setChanged();
+			sync();
+		}
+		return true;
+	}
+
+	/** The next block reaches a deep (geopressured) field and there is no BOP. */
+	private boolean needsBop(ServerLevel level) {
+		Reservoir field = Drilling.field(level, hole());
+		return field != null && field.deep() && hole().getY() - (depth + 1) <= field.topY() && !hasBop();
+	}
+
+	private static boolean isSalt(BlockState state) {
+		return state.is(dev.wildcatter.ore.OreBlocks.block(dev.wildcatter.ore.Ore.HALITE));
+	}
+
 	private void advance(ServerLevel level) {
 		BlockPos hole = hole();
 		Reservoir field = Drilling.field(level, hole);
+		boolean salty = isSalt(level.getBlockState(hole.below(depth + 1)));
 		if (!Drilling.caseNext(level, hole, depth)) {
 			phase = field == null ? Phase.DRY : Phase.COMPLETE;   // bedrock: with a field above it, the hole has already struck
 			if (field == null) {
@@ -286,7 +689,8 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 			return;
 		}
 		depth++;
-		water -= Tuning.LAND_RIG_MUD_PER_BLOCK;
+		saltMetres = salty ? saltMetres + 1 : 0;
+		useMud(Tuning.LAND_RIG_MUD_PER_BLOCK);
 		stand++;
 		dev.wildcatter.well.RollFront front = Drilling.isrFirst(level, hole) ? Drilling.rollFront(level, hole) : null;
 		if (front != null && hole.getY() - depth <= front.bottomY()) {
@@ -297,7 +701,11 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 			}
 			Drilling.announce(level, hole, Component.literal("ISR WELL completed through a roll-front, " + depth + " m down. " + log));
 		} else if (field != null && hole.getY() - depth <= field.topY()) {
-			strike(level, field);
+			if (field.deep() && mudPpg() < porePpg(field) + Tuning.TRIP_MARGIN_PPG - 1e-6) {
+				kick(level);   // underbalanced into a geopressured field
+			} else {
+				strike(level, field);
+			}
 		} else if (stand >= Tuning.LAND_RIG_STAND_BLOCKS) {
 			stand = 0;
 			connection = Tuning.LAND_RIG_CONNECTION_TICKS;
@@ -317,6 +725,9 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		if (level.getBlockState(hole).canBeReplaced()) {
 			Drilling.setWellhead(level, hole, field.kind(), facing());
 		}
+		if (field.deep() && mudPpg() >= porePpg(field) + Tuning.TRIP_MARGIN_PPG - 1e-6) {
+			relieve(level, field);   // a relief well: kill-weight mud into the field kills a wild well on it
+		}
 		Drilling.announce(level, hole, Component.literal("STRIKE! " + (field.deep() ? "Deep " : "") + (field.kind() == Reservoir.Kind.OIL ? "oil" : "gas") + " at "
 				+ depth + " m. The wellhead is set in the cellar under the rig floor: break the rig down to move it."));
 	}
@@ -331,8 +742,18 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 	public Component inspect() {
 		RigDriveHouseBlockEntity house = driveHouse();
 		return Component.literal("Land rig (1,000 hp, " + Voltage.MEDIUM.label() + " three-phase): " + status + "; " + depth + " m down, stand "
-				+ stand + "/" + Tuning.LAND_RIG_STAND_BLOCKS + ", mud water " + water / 1000 + " of " + Tuning.LAND_RIG_MUD_TANK / 1000 + " m3, top drive "
-				+ (topDrive ? "in" : "MISSING") + (house != null && formed ? "; drive house " + house.load().describe() : ""));
+				+ stand + "/" + Tuning.LAND_RIG_STAND_BLOCKS + ", mud water " + (int) (mudVolume() / 1000) + " of " + Tuning.LAND_RIG_MUD_TANK / 1000 + " m3 at " + mudText() + ", top drive "
+				+ (topDrive ? "in" : "MISSING") + bopText() + (house != null && formed ? "; drive house " + house.load().describe() : ""));
+	}
+
+	private String bopText() {
+		BopStackBlockEntity stack = bop();
+		BopAccumulatorBlockEntity acc = accumulator();
+		if (stack == null && acc == null) {
+			return ", NO BOP";
+		}
+		return stack == null ? ", NO BOP (accumulator but no stack)" : acc == null ? ", BOP " + (stack.closed() ? "CLOSED" : "open") + " but NO ACCUMULATOR"
+				: ", BOP " + (stack.closed() ? "CLOSED" : "open") + " (" + acc.closes() + " closes)";
 	}
 
 	// ---- moving parts: the top drive rides down the stand, its quill and the pipe below turning --------------------------------
@@ -409,6 +830,17 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		output.putInt("phase", phase.ordinal());
 		output.putBoolean("topDrive", topDrive);
 		output.putInt("water", water);
+		output.putDouble("barite", barite);
+		output.putDouble("bentonite", bentonite);
+		output.putDouble("salt", salt);
+		output.putInt("saltMetres", saltMetres);
+		output.putLong("kickAt", kickAt);
+		output.putDouble("pitGain", pitGain);
+		output.putDouble("killPpg", killPpg);
+		output.putDouble("sidpp", sidpp);
+		output.putDouble("killing", killing);
+		output.putBoolean("onFire", onFire);
+		output.putString("status", status);
 		output.putInt("depth", depth);
 		output.putInt("stand", stand);
 		output.putDouble("progress", progress);
@@ -424,6 +856,17 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		phase = Phase.values()[Math.max(0, Math.min(Phase.values().length - 1, input.getIntOr("phase", 0)))];
 		topDrive = input.getBooleanOr("topDrive", false);
 		water = input.getIntOr("water", 0);
+		barite = input.getDoubleOr("barite", 0);
+		bentonite = input.getDoubleOr("bentonite", 0);
+		salt = input.getDoubleOr("salt", 0);
+		saltMetres = input.getIntOr("saltMetres", 0);
+		kickAt = input.getLongOr("kickAt", 0);
+		pitGain = input.getDoubleOr("pitGain", 0);
+		killPpg = input.getDoubleOr("killPpg", 0);
+		sidpp = input.getDoubleOr("sidpp", 0);
+		killing = input.getDoubleOr("killing", 0);
+		onFire = input.getBooleanOr("onFire", false);
+		status = input.getStringOr("status", "");
 		depth = input.getIntOr("depth", 0);
 		stand = input.getIntOr("stand", 0);
 		progress = input.getDoubleOr("progress", 0);

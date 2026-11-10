@@ -1,6 +1,7 @@
 # Drilling mud: barite, bentonite, weighted mud and well control
 
-> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Proposed phase **15b** (two waves, 15b1 and
+> **BUILT as waves 15b1 and 15b2 (2026-11-09), decided on recommendation while Tim was away; not approved.** See "As built" at the end
+> and `docs/questions/phase15-oilfield.md`. Proposed phase **15b** (two waves, 15b1 and
 > 15b2). Decisions are in `docs/questions/specs-wildcatter.md` (items 18-22).
 
 Today the land rig's "mud" is water: 80 L a metre drilled, out of its 60 m3 mud tanks (land-rig.md). The 7a barite and bentonite have
@@ -46,7 +47,7 @@ Sources:
 | Part | Cells (W x H x L) | Real-world basis and values |
 |---|---|---|
 | `mud_hopper` | 2 x 3 x 3 | **New.** A jet mixing hopper and its centrifugal mixing pump, **37 kW (50 hp) at 480 V** *(unverified)*, against the mud tanks. Bags of barite or bentonite, or rock salt, by a hopper on top: **one bag a minute** *(proposed; real rigs mix 1-2 sacks a minute)*. |
-| `bop_stack` | 2 x 5 x 2 | **New** (15b2). A 13-5/8 in, 5,000 psi stack in the substructure's BOP space under the rotary table: annular, pipe rams, blind-shear rams, the choke and kill lines. |
+| `bop_stack` | 2 x 4 x 2 (as built; was 2 x 5 x 2) | **New** (15b2). A 13-5/8 in, 5,000 psi stack in the substructure's BOP space under the rotary table: annular, pipe rams, blind-shear rams, the choke and kill lines. |
 | `bop_accumulator` | 2 x 2 x 4 | **New** (15b2). The accumulator unit (bottles, a 480 V triplex pump of **15 kW** *(unverified)* and the remote panel), within 20 blocks of the stack, joined by a hydraulic line drawn as steel pipe. It holds pressure for **three closes** without power. |
 | `mud_tanks` | 3 x 3 x 12 | **Existing.** Now keeps the mud's weight, its bentonite and salt, and its pit volume (the kick alarm watches it). |
 
@@ -126,3 +127,29 @@ The grids are sketches; the game tests are the layout of record.
 ## Proposed waves
 - **15b1:** the mud plant, the hopper, mud weight, gel and salt.
 - **15b2:** pore pressure, the BOP stack and accumulator, kicks, blowouts and relief wells.
+
+## As built (15b1 and 15b2, 2026-11-09)
+Decisions taken while building are in `docs/questions/phase15-oilfield.md` (items 11-25).
+- **Parts** (`block/MudPartBlock.java`): `barite_mill` 3 x 6 x 4 and `bentonite_dryer` 3 x 4 x 8 (`MudMillBlockEntity`), `mud_hopper` 2 x 3 x 3
+  (`MudHopperBlockEntity`), `bop_stack` 2 x 4 x 2 (`BopStackBlockEntity`), `bop_accumulator` 2 x 2 x 4 (`BopAccumulatorBlockEntity`). Motors on
+  the world's industrial tier, boxes on the west face of the main cell. Models in `tools/models/mud.py`. Items: `barite_bag`, `bentonite_bag`
+  (Ludo icons).
+- **Layout of record** (the NeoForge scenes): the mud plant facing north, mill at x 4 z 0, its bagging station against its south side
+  (x 4 z 4), the dryer at x 4 z 8 with its gas on the east of its bottom cells (x 7), its station at x 4 z 16; the cable down x 3 to each box.
+  At the rig (`PlcPlantScenes.rig`'s layout, hole at 30, 0): the mud hopper's main cell at x 40 z 5 facing south (x 39-40, z 3-5), against the
+  tanks' east face; the BOP stack's main cell on the cell above the hole; the accumulator within 20 blocks.
+- **The mud:** water, barite, bentonite and salt in kg (decision 11); `mudPpg`, `gelLbBbl`, `lowGel`, `saltSaturated`; the readout "mud water
+  N of 60 m3 at 8.34 ppg (999 kg/m3), gel 0 lb/bbl LOW GEL, fresh". 40 m3 of water and 42 bags reach 13.89 ppg; salt-saturated mud with
+  25 lb/bbl gel reads 10.3 ppg.
+- **15b1 rules:** LOW GEL halves the rate (decision 13); WASHOUT on any rock salt with unsaturated mud, the salt drilled at the bottom
+  filling back in (decision 17); the hopper mixes a tonne a minute (decision 15).
+- **15b2 rules:** a deep field needs a BOP stack and an accumulator (NO BOP), and kicks with mud under 13.8 ppg (decision 21); shut in by a
+  sneak-click on the console or the PLC's SHUT IN within 30 s, else BLOWOUT; SIDPP and kill weight; one minute of circulation at kill
+  weight kills it and the rig strikes (decision 22); blowouts drain the field at 7.5 units a tick, light from fire, lava or a lit campfire
+  within 16 blocks, and are shut in by a standing BOP with a close left or killed by a relief well (decision 23).
+- **PLC points** added to the rig: KICK, SHUT IN (command), SHUT IN (state), MUD WEIGHT 4-20 mA (8-20 ppg), PIT VOLUME 4-20 mA (0-60 m3).
+- **Tests:** NeoForge scenes `mud_plant`, `rig_mud` (hopper a bag a minute, 8.34 to 13.89 ppg, LOW GEL, WASHOUT and through salt
+  saturated), `well_control` (NO BOP, KICK, shut in, kill weight, kill, strike) and `blowout` (blowout, field drained, ignition, shut in by the
+  BOP). The client `landRig` scene now sets a BOP and weights its mud (not run).
+- **Not built:** the hydraulic line drawn between accumulator and stack (decision 20); lightning and running engines as ignition; a relief
+  well game test (the kill is in code); SICP and the choke.

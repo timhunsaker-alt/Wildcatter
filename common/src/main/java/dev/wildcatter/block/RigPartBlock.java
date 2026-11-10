@@ -155,7 +155,9 @@ public class RigPartBlock extends BigPartBlock {
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 		if (!level.isClientSide()) {
 			RigSubstructureBlockEntity rig = controller(level, main(pos, state), state);
-			if (part == Part.SUBSTRUCTURE && rig != null) {
+			if (part == Part.SUBSTRUCTURE && rig != null && player.isShiftKeyDown()) {
+				player.sendOverlayMessage(rig.shutIn((net.minecraft.server.level.ServerLevel) level));   // the console's SHUT IN (15b2)
+			} else if (part == Part.SUBSTRUCTURE && rig != null) {
 				player.sendOverlayMessage(rig.toggle());   // the driller's console
 			} else if (level.getBlockEntity(main(pos, state)) instanceof dev.wildcatter.energy.Inspectable i) {
 				player.sendOverlayMessage(i.inspect());

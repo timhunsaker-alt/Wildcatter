@@ -36,6 +36,55 @@ public class ReservoirData extends SavedData {
 		return testSeed != null ? testSeed : level.getServer().overworld().getSeed();
 	}
 
+	/** A game test's own seed over its own area, so scenes running side by side each keep the field they forced. */
+	public record TestRegion(int minX, int minZ, int maxX, int maxZ, long seed) {
+		boolean has(int x, int z) {
+			return x >= minX && x <= maxX && z >= minZ && z <= maxZ;
+		}
+	}
+
+	public static final java.util.List<TestRegion> TEST_REGIONS = new java.util.concurrent.CopyOnWriteArrayList<>();
+
+	/** The seed the fields at this column come from: a test region's, the test seed, or the world's. */
+	public static long seed(net.minecraft.world.level.LevelReader level, int x, int z) {
+		for (TestRegion r : TEST_REGIONS) {
+			if (r.has(x, z)) {
+				return r.seed();
+			}
+		}
+		if (testSeed != null) {
+			return testSeed;
+		}
+		return level instanceof ServerLevel server ? server.getServer().overworld().getSeed()
+				: level instanceof net.minecraft.world.level.WorldGenLevel gen ? gen.getSeed() : 0;
+	}
+
+	/** The game test sets this to stand a grid dome wherever it needs one, whatever the biome. Null in play. */
+	public static volatile Boolean testDomeBiome;
+
+	/** True for the biomes a salt dome stands in (docs/ores.md): plains, swamps and beaches, the Gulf Coast's. */
+	public static boolean domeBiome(net.minecraft.core.Holder<net.minecraft.world.level.biome.Biome> biome) {
+		return biome.is(net.minecraft.world.level.biome.Biomes.PLAINS) || biome.is(net.minecraft.world.level.biome.Biomes.SUNFLOWER_PLAINS)
+				|| biome.is(net.minecraft.world.level.biome.Biomes.SWAMP) || biome.is(net.minecraft.world.level.biome.Biomes.MANGROVE_SWAMP)
+				|| biome.is(net.minecraft.tags.BiomeTags.IS_BEACH);
+	}
+
+	/** Whether a grid dome is really there: its centre's biome (docs/salt-dome-oil.md). Works for unloaded chunks too. */
+	public static java.util.function.Predicate<SaltDome> site(net.minecraft.world.level.LevelReader level) {
+		return dome -> testDomeBiome != null ? testDomeBiome : domeBiome(level.getBiome(new net.minecraft.core.BlockPos(dome.centerX(), 64, dome.centerZ())));
+	}
+
+	/** The field a hole at this column reaches first in this world, salt domes included (docs/salt-dome-oil.md). */
+	public static @org.jspecify.annotations.Nullable Reservoir field(ServerLevel level, int x, int z) {
+		return Reservoir.at(seed(level, x, z), x, z, site(level));
+	}
+
+	/** The grid dome under this column in this world (its middle or flanks), or null. */
+	public static @org.jspecify.annotations.Nullable SaltDome dome(ServerLevel level, int x, int z) {
+		SaltDome dome = SaltDome.near(seed(level, x, z), x, z);
+		return dome != null && site(level).test(dome) ? dome : null;
+	}
+
 	public int remaining(Reservoir field) {
 		return Math.max(0, field.units() - taken.getOrDefault(field.key(), 0));
 	}
@@ -51,8 +100,23 @@ public class ReservoirData extends SavedData {
 		return got;
 	}
 
-	/** 1 when full, falling to 0 as it is emptied. This is the pressure that pushes the oil or gas up. */
+	/**
+	 * 1 when full, falling to 0 as it is emptied. This is the pressure that pushes the oil or gas up. A dome's caprock pool holds
+	 * its full pressure for its first {@link dev.wildcatter.Tuning#CAPROCK_FLUSH} and then falls fast (docs/salt-dome-oil.md): a
+	 * big first week and a short life, as the Lucas gusher's.
+	 */
 	public double pressure(Reservoir field) {
-		return remaining(field) / (double) field.units();
+		double left = remaining(field) / (double) field.units();
+		if (field.source() == Reservoir.Source.CAPROCK) {
+			double knee = 1 - dev.wildcatter.Tuning.CAPROCK_FLUSH;
+			return left >= knee ? 1 : dev.wildcatter.Tuning.CAPROCK_AFTER * left / knee;
+		}
+		return left;
+	}
+
+	/** Game test hook: as if {@code units} had been taken out of the field. */
+	public void testTake(Reservoir field, int units) {
+		taken.merge(field.key(), units, Integer::sum);
+		setDirty();
 	}
 }

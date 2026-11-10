@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (0.7.0, branch `w-next`): Phases 16-19, built 2026-11-10 while Tim was away
+## Unreleased (0.7.0, branch `w-next`): Phases 15-19, built 2026-11-10 while Tim was away
 
 ### phosphate (Phase 18, built 2026-11-10 while Tim was away; not approved)
 - **Fertilizer (18a):** a phosphate mill, a dihydrate phosphoric reactor with its tilting pan filter, an acid evaporator and a granulation
@@ -57,6 +57,18 @@
   - **Contamination:** a personnel monitor and a decontamination washer.
   - **New rules, off unless turned on:** `reactorContamination` (coolant activity; contamination where primary water gets out, its dose,
     and its pick-up by players), `fuelHandlingDamage` (a 1 % chance of a bent grid on a move, a leaking rod if loaded unseen).
+
+### The oilfield (Phase 15, built 2026-11-09 while Tim was away)
+- **Salt domes trap oil (15a):** salt domes now stand on a seed grid in plains, swamps and beaches, each with one to three rich flank
+  fields against the salt and sometimes a caprock pool that gushes then fades. A low hill marks them; the seismograph reads SALT DOME and
+  its crest. Domes generated before this keep their salt and have no oil. Spec: `docs/salt-dome-oil.md`.
+- **Drilling mud (15b1):** a barite mill and a bentonite dryer fill bulk bags; a mud hopper at the land rig mixes them (and rock salt)
+  into the tanks, which now keep the mud's weight, gel and salt. Plain water is LOW GEL and drills at half rate; rock salt washes out
+  unless the mud is salt-saturated. Barite and bentonite have a use at last. Spec: `docs/multiblocks/drilling-mud.md`.
+- **Well control (15b2):** a BOP stack under the rotary table and its accumulator. Deep fields are geopressured: without a BOP the land
+  rig stops short; with light mud it kicks, and must be shut in within 30 s, weighted to the kill weight and circulated; otherwise it
+  blows out, drains the field and can catch fire. PLC points for the kick, the shut-in and the mud.
+- Decisions for review: `docs/questions/phase15-oilfield.md`.
 
 ## v0.6.0 (released 2026-11-10)
 

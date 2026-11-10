@@ -609,5 +609,12 @@
   "block.wildcatter.cask_loading_station": "Cask Loading Station",
   "block.wildcatter.storage_module": "Dry Cask Storage Module (horizontal)",
   "block.wildcatter.new_fuel_inspection_stand": "New-Fuel Inspection Stand",
-  "block.wildcatter.personnel_monitor": "Personnel Contamination Monitor"
+  "block.wildcatter.personnel_monitor": "Personnel Contamination Monitor",
+  "block.wildcatter.barite_mill": "Barite Mill (roller, 5 t/h)",
+  "block.wildcatter.bentonite_dryer": "Bentonite Dryer (rotary, 3 t/h)",
+  "block.wildcatter.mud_hopper": "Mud Hopper (jet mixing)",
+  "block.wildcatter.bop_stack": "BOP Stack (13-5/8 in, 5,000 psi)",
+  "block.wildcatter.bop_accumulator": "BOP Accumulator Unit",
+  "item.wildcatter.barite_bag": "Bulk Bag of Barite (API 13A 4.1)",
+  "item.wildcatter.bentonite_bag": "Bulk Bag of Bentonite (API 13A)"
 }

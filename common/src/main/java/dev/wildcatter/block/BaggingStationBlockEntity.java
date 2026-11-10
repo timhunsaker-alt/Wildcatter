@@ -31,7 +31,7 @@ public class BaggingStationBlockEntity extends FillerBlockEntity {
 	protected void work(Level level) {
 		Bagged source = Touching.find(level, worldPosition, Bagged.class, b -> true);
 		if (source == null) {
-			unit = "NOT BUILT: set it against a calciner, hydrate filter, AlF3 reactor, lime kiln, coke cooler, granulation plant or potash dryer";
+			unit = "NOT BUILT: set it against a calciner, hydrate filter, AlF3 reactor, lime kiln, coke cooler, granulation plant, potash dryer, barite mill or bentonite dryer";
 			return;
 		}
 		ItemStack bag = new ItemStack(source.bagItem());
