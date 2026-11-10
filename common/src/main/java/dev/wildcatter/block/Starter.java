@@ -124,9 +124,16 @@ public final class Starter {
 		commandTick = now;
 	}
 
+	/** A contactor whose contacts have welded: it stays closed when its coil drops (a test hook; nothing in play welds one yet). */
+	private boolean welded;
+
+	public void setWeldedForTest(boolean welded) {
+		this.welded = welded;
+	}
+
 	/** Follows the PLC, in AUTO. True if the run state changed. A trip stays until its hand reset. */
 	public boolean followCommand(long now) {
-		if (hoa != dev.wildcatter.control.Hoa.AUTO || run == MotorStarterBlock.Run.TRIPPED) {
+		if (hoa != dev.wildcatter.control.Hoa.AUTO || run == MotorStarterBlock.Run.TRIPPED || welded && run == MotorStarterBlock.Run.RUNNING) {
 			return false;
 		}
 		return setRun(commanded && now - commandTick <= COMMAND_STALE_TICKS ? MotorStarterBlock.Run.RUNNING : MotorStarterBlock.Run.STOPPED);
