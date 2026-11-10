@@ -457,6 +457,10 @@ public final class Tuning {
 	public static final double COKE_KILN_WATTS = 75_000.0;
 	public static final double COKE_COOLER_WATTS = 30_000.0;
 	public static final double COKE_OVEN_COAL_KGS = 240_000.0 / 86_400;   // 240 t of coal a day
+	// residence times as real holds (plant-crane-gaps #11), only with the world rule realResidenceTimes (off by default, even in new worlds)
+	public static final double COKING_HOLD_S = 18 * 3600.0;        // a slot oven's coking time (coke-ovens.md: 18 h)
+	public static final double DIGESTION_HOLD_S = 3600.0;          // the Bayer digesters' residence (bayer-refinery.md: about an hour at 145 C)
+	public static final double PRECIPITATION_HOLD_S = 36 * 3600.0; // the precipitators' residence (bayer-refinery.md: cooled from 75 to 60 C over 36 h)
 	public static final double COKE_OVEN_COKE_YIELD = 0.75;
 	public static final double COKE_OVEN_GAS_PER_KG = 0.40;        // m3 of raw gas a kg of coal
 	public static final double COKE_OVEN_UNDERFIRE = 0.40;         // the share of the gas that heats the battery

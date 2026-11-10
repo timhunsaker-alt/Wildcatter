@@ -32,10 +32,13 @@ public class BayerStageBlockEntity extends UnitMotorBlockEntity implements Hoppe
 	private double water;     // litres the washer or the boiler holds
 	private double reserve;   // kg of strong liquor in the evaporator's storage
 	private boolean charged;
+	/** With the world rule realResidenceTimes: kg of alumina's worth in process (the digesters 1 h in minute buckets, the precipitators 36 h in half hours). */
+	private final dev.wildcatter.fluid.Holdup holdup;
 	private String unit = "starting";
 
 	public BayerStageBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.BAYER_STAGE_ENTITY, pos, state);
+		holdup = new dev.wildcatter.fluid.Holdup(state.getBlock() instanceof AluminaPartBlock b && b.part() == AluminaPartBlock.Part.DIGESTER ? 60 : 1800);
 	}
 
 	public AluminaPartBlock.Part part() {
@@ -141,7 +144,13 @@ public class BayerStageBlockEntity extends UnitMotorBlockEntity implements Hoppe
 	protected void work(Level level) {
 		switch (part()) {
 			case BALL_MILL -> mill(level);
-			case DIGESTER -> digester(level);
+			case DIGESTER -> {
+				if (dev.wildcatter.Rules.realResidenceTimes() || !holdup.isEmpty()) {
+					heldDigester(level);
+				} else {
+					digester(level);
+				}
+			}
 			case FLASH_TANKS -> unit = held(Product.DIGESTED_SLURRY) > 0.5 ? String.format("flashing to atmospheric: %.0f kg held", held(Product.DIGESTED_SLURRY))
 					: "idle: no slurry from the digester it touches";
 			case SETTLER -> pass(level, Product.DIGESTED_SLURRY, Bayer.bauxiteSlurry(), 0, new Product[] {Product.GREEN_LIQUOR, Product.MUD_SLURRY},
@@ -150,8 +159,14 @@ public class BayerStageBlockEntity extends UnitMotorBlockEntity implements Hoppe
 					new double[] {Bayer.washWater(), Bayer.mudSlurry()}, "washing");
 			case POLISHING_FILTER -> pass(level, Product.GREEN_LIQUOR, Bayer.polishedLiquor(), 0, new Product[] {Product.POLISHED_LIQUOR},
 					new double[] {Bayer.polishedLiquor()}, "filtering");
-			case PRECIPITATOR -> pass(level, Product.POLISHED_LIQUOR, Bayer.polishedLiquor(), 0, new Product[] {Product.HYDRATE_SLURRY},
-					new double[] {Bayer.polishedLiquor()}, "precipitating");
+			case PRECIPITATOR -> {
+				if (dev.wildcatter.Rules.realResidenceTimes() || !holdup.isEmpty()) {
+					heldPrecipitator(level);
+				} else {
+					pass(level, Product.POLISHED_LIQUOR, Bayer.polishedLiquor(), 0, new Product[] {Product.HYDRATE_SLURRY},
+							new double[] {Bayer.polishedLiquor()}, "precipitating");
+				}
+			}
 			case EVAPORATOR -> evaporator(level);
 			case PACKAGE_BOILER -> boiler(level);
 			default -> {
@@ -221,6 +236,98 @@ public class BayerStageBlockEntity extends UnitMotorBlockEntity implements Hoppe
 		Lines.pull(level, east(), Product.PROCESS_STEAM, a * Bayer.digesterSteam(), Pull.MACHINE, this);
 		flash.give(Product.DIGESTED_SLURRY, a * Bayer.bauxiteSlurry());
 		unit = String.format("digesting at 145 C: %.1f kg/s of slurry on %.2f kg/s of steam", a * Bayer.bauxiteSlurry() / seconds(), a * Bayer.digesterSteam() / seconds());
+	}
+
+	/** kg of a stream it holds to send on (for the game test). */
+	public double holding(Product product) {
+		return held(product);
+	}
+
+	/** kg of alumina's worth in process (the rule's hold). */
+	public double inProcess() {
+		return holdup.inProcess();
+	}
+
+	/** Game test hook: as if {@code seconds} had passed for what is in process. */
+	public void ageForTest(double seconds) {
+		holdup.age(seconds);
+		setChanged();
+	}
+
+	private static String nextOut(dev.wildcatter.fluid.Holdup h, double now) {
+		double next = h.untilNext(now);
+		return next > 0 ? String.format("; the next out in %.1f h", next / 3600) : "";
+	}
+
+	/**
+	 * The digester with the world rule realResidenceTimes (plant-crane-gaps #11): slurry and its steam go in at the rate, and each
+	 * charge is digested for its real hour at 145 C before it goes to the flash tanks; it holds up to an hour's feed. With the rule
+	 * turned off again, what it holds goes on as the flash tanks take it.
+	 */
+	private void heldDigester(Level level) {
+		boolean hold = dev.wildcatter.Rules.realResidenceTimes();
+		double now = level.getGameTime() / 20.0;
+		BayerStageBlockEntity flash = Touching.find(level, worldPosition, BayerStageBlockEntity.class, b -> b.part() == AluminaPartBlock.Part.FLASH_TANKS);
+		if (flash == null) {
+			unit = "NOT BUILT: set it against the flash tanks";
+			return;
+		}
+		double strength = Math.min(drive(level), flash.drive(level));
+		if (strength <= 0) {
+			unit = "starting: " + describe() + "; flash pump " + flash.motor().describe();
+			return;
+		}
+		double room = flash.roomFor(Product.DIGESTED_SLURRY) / Bayer.bauxiteSlurry();
+		double out = hold ? holdup.take(now, room) : holdup.takeAny(room);
+		flash.give(Product.DIGESTED_SLURRY, out * Bayer.bauxiteSlurry());
+		double a = 0;
+		if (hold) {
+			double slurry = Lines.available(level, inlet(), Product.BAUXITE_SLURRY, Pull.MACHINE, this);
+			double steam = Lines.available(level, east(), Product.PROCESS_STEAM, Pull.MACHINE, this);
+			double max = Math.min(Math.min(rate() * seconds(), slurry / Bayer.bauxiteSlurry()),
+					Math.min(steam / Bayer.digesterSteam(), Tuning.BAYER_ALUMINA_KGS * Tuning.DIGESTION_HOLD_S - holdup.inProcess()));
+			if (max > 1e-7) {
+				a = Lines.pull(level, inlet(), Product.BAUXITE_SLURRY, max * strength * Bayer.bauxiteSlurry(), Pull.MACHINE, this) / Bayer.bauxiteSlurry();
+				Lines.pull(level, east(), Product.PROCESS_STEAM, a * Bayer.digesterSteam(), Pull.MACHINE, this);
+				holdup.add(now, Tuning.DIGESTION_HOLD_S, a);
+			} else if (steam < 0.001 && slurry >= 0.01) {
+				unit = "NO STEAM: pipe process steam from a package boiler to its east side; " + String.format("%,.0f kg of slurry digesting", holdup.inProcess() * Bayer.bauxiteSlurry());
+				setChanged();
+				return;
+			}
+		}
+		unit = String.format("digesting at 145 C (1 h a charge): %,.0f kg of slurry in the digesters, %.1f kg/s in, %.1f kg/s on to the flash tanks",
+				holdup.inProcess() * Bayer.bauxiteSlurry(), a * Bayer.bauxiteSlurry() / seconds(), out * Bayer.bauxiteSlurry() / seconds()) + nextOut(holdup, now);
+		setChanged();
+	}
+
+	/**
+	 * The precipitator train with the world rule realResidenceTimes: polished liquor in at the rate, its hydrate slurry out after the
+	 * real 36 h of seeded precipitation; it holds up to 36 h of feed. With the rule turned off again, what it holds comes out.
+	 */
+	private void heldPrecipitator(Level level) {
+		boolean hold = dev.wildcatter.Rules.realResidenceTimes();
+		double now = level.getGameTime() / 20.0;
+		double strength = drive(level);
+		if (strength <= 0) {
+			unit = "starting: " + describe();
+			return;
+		}
+		double room = room(Product.HYDRATE_SLURRY) / Bayer.polishedLiquor();
+		double out = hold ? holdup.take(now, room) : holdup.takeAny(room);
+		add(Product.HYDRATE_SLURRY, out * Bayer.polishedLiquor());
+		double a = 0;
+		if (hold) {
+			double waiting = Lines.available(level, inlet(), Product.POLISHED_LIQUOR, Pull.MACHINE, this) / Bayer.polishedLiquor();
+			double max = Math.min(Math.min(rate() * seconds(), waiting), Tuning.BAYER_ALUMINA_KGS * Tuning.PRECIPITATION_HOLD_S - holdup.inProcess());
+			if (max > 1e-7) {
+				a = Lines.pull(level, inlet(), Product.POLISHED_LIQUOR, max * strength * Bayer.polishedLiquor(), Pull.MACHINE, this) / Bayer.polishedLiquor();
+				holdup.add(now, Tuning.PRECIPITATION_HOLD_S, a);
+			}
+		}
+		unit = String.format("precipitating (36 h): %,.0f kg of liquor in the train, %.1f kg/s in, %.1f kg/s of hydrate slurry out", holdup.inProcess() * Bayer.polishedLiquor(),
+				a * Bayer.polishedLiquor() / seconds(), out * Bayer.polishedLiquor() / seconds()) + nextOut(holdup, now);
+		setChanged();
 	}
 
 	/** One stream in, its products out by fixed shares; {@code waterPerA} litres of pumped water a kg of alumina's worth. */
@@ -381,6 +488,7 @@ public class BayerStageBlockEntity extends UnitMotorBlockEntity implements Hoppe
 		output.putDouble("water", water);
 		output.putDouble("reserve", reserve);
 		output.putBoolean("charged", charged);
+		output.putString("holdup", holdup.save());
 	}
 
 	@Override
@@ -392,5 +500,6 @@ public class BayerStageBlockEntity extends UnitMotorBlockEntity implements Hoppe
 		water = input.getDoubleOr("water", 0);
 		reserve = input.getDoubleOr("reserve", 0);
 		charged = input.getBooleanOr("charged", false);
+		holdup.load(input.getStringOr("holdup", ""));
 	}
 }

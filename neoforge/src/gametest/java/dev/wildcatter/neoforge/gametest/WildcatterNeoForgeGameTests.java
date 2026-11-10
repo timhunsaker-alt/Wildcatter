@@ -81,6 +81,8 @@ public class WildcatterNeoForgeGameTests {
 
 	/** The world rules' scenes (RuleScenes): each in a batch of its own, as it switches rules on and off. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> RULE_SCENES = RuleScenes.scenes();
+	/** The residence holds' scene (ResidenceScenes): in a batch whose world has realResidenceTimes on. */
+	private static final java.util.Map<String, Consumer<GameTestHelper>> RESIDENCE_SCENES = ResidenceScenes.scenes();
 
 	public WildcatterNeoForgeGameTests(IEventBus modBus) {
 		// the test world starts as an existing world would, every rule off: the scenes switch on the rules they test
@@ -122,6 +124,7 @@ public class WildcatterNeoForgeGameTests {
 			REACTOR_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			OILFIELD_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			RULE_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
+			RESIDENCE_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 		}));
 		modBus.addListener(RegisterCapabilitiesEvent.class, event -> event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, entity, side) -> STORAGE, Blocks.GOLD_BLOCK));
 		modBus.addListener(RegisterGameTestsEvent.class, event -> {
@@ -153,6 +156,12 @@ public class WildcatterNeoForgeGameTests {
 			// Phase 15's scenes run in a batch whose world has its rules on (a new world's): the dome grid, the mud's gel and well control
 			Holder<TestEnvironmentDefinition<?>> oilfield = OILFIELD_SCENES.keySet().stream().anyMatch(WildcatterNeoForgeGameTests::only)
 					? event.registerEnvironment(id("rules_oilfield"), new RuleScenes.RulesOn(java.util.List.of("saltDomeGrid192", "mudGel", "wellControl"))) : plain;
+			for (String scene : RESIDENCE_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
+				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
+						new TestData<>(event.registerEnvironment(id("rules_" + scene), new RuleScenes.RulesOn(java.util.List.of("realResidenceTimes"))),
+								net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 4000, 1, true,
+								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 60)));
+			}
 			for (String scene : RULE_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
 						new TestData<>(event.registerEnvironment(id("rules_" + scene)), net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 400, 1, true,
