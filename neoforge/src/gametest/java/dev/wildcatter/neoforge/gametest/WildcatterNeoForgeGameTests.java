@@ -53,6 +53,7 @@ public class WildcatterNeoForgeGameTests {
 
 	static {
 		GRID_SCENES.putAll(RelayScenes.scenes());
+		GRID_SCENES.putAll(MiscGapScenes.scenes());
 		GRID_SCENES.putAll(DifferentialScenes.scenes());
 		GRID_SCENES.putAll(PanelScenes.scenes());
 		GRID_SCENES.putAll(DistributionScenes.scenes());

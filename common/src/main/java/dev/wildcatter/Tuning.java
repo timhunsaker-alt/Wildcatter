@@ -558,6 +558,21 @@ public final class Tuning {
 	public static final double GENSET_BIOGAS_WATTS = 850_000.0;    // the CG260-12's biogas rating is 84 % of its natural gas rating
 	public static final double BIOGAS_HEAT_RATE_MJ_KWH = 11.0;     // lean biogas at full load (proposed): 23 m3 make 48 kWh, Farmings' OMAFA figure
 
+	// ---- Lean and carbon-plant gases in engines and turbines (docs/questions/misc-gaps.md, 5) -------------------------------------
+	// A gas engine on coke oven gas (about 55 % hydrogen, 18 MJ/m3) is rated below its natural gas rating: the Profusa coke gas plant in
+	// Bilbao runs 12 lean-burn V16 sets at 5,642 kW on 100 % coke gas against 6,528 kW on natural gas, 86.4 %. Coker gas is richer than
+	// pipeline gas and keeps the full rating.
+	public static final double GENSET_COKE_OVEN_GAS_DERATE = 5_642.0 / 6_528.0;
+	// Specific gravity against air, for the Wobbe index (heating value / sqrt(SG)): pipeline gas 0.60 (NAESB's typical); coke oven gas
+	// 0.37 (55 % H2, 25 % CH4, 6 % CO, 6 % N2 and the rest CO2 and ethylene: 0.45 kg/m3); coker gas 1.0 kg/m3 on air's 1.225.
+	public static final double PIPELINE_GAS_SG = 0.60;
+	public static final double COKE_OVEN_GAS_SG = 0.37;
+	public static final double COKER_GAS_SG = COKER_GAS_KG_PER_M3 / 1.225;
+	// An aeroderivative's dry low-emission fuel system takes gas within a few percent of the Wobbe index it is tuned to (Siemens' fuel
+	// gas specification: within 5 %, special controls beyond); 10 % is allowed here, so coker gas (+1 %) runs and coke oven gas
+	// (-40 %, and over the combustor's hydrogen limit) does not. The heavy-duty frames' diffusion combustors take both.
+	public static final double AERO_WOBBE_TOLERANCE = 0.10;
+
 	// ---- The centrifuge cascade (docs/multiblocks/enrichment.md, approved 2026-11-01) ------------------------------------------
 	public static final double ASSAY_FEED = 0.00711;               // natural U-235
 	public static final double ASSAY_PRODUCT = 0.0495;             // LEU for the 17x17 fuel

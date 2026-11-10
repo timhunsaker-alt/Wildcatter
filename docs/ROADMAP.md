@@ -384,6 +384,18 @@ Decisions for Tim: `docs/questions/plant-crane-gaps.md`. Branch `plant-crane-gap
 - NeoForge scenes `crane_siting`, `ring_travel`, `quench_sump`, `stabilizer_fuel`, `cog_engine`, `pot_aux`, `burner_hopper`; client
   scene `ringTravel` (new) and `cranes`, `heavyLift`, `potline` changed, for the lead to run.
 
+## Misc gaps — 2026-11-09 (Known gaps wave; built while Tim was away)
+Decisions for Tim: `docs/questions/misc-gaps.md`. Branch `misc-gaps`.
+- Drawn between parts once formed: the steam plant's feedwater line (feed pump over the generator to the boiler) and the main steam
+  line flange to flange; the land rig's cable trays and drops from the drive house to both mud pumps and the drawworks.
+- The alternator drawn 1.6 m on the 1 MW gas set (a `frame` state; the gas engine drawn 3.4 m), 1 m on the 500 kW set.
+- Coke oven gas holds a gas set to 864 kW (86.4 %, a real coke gas plant's figure); the aeroderivative refuses gas more than 10 %
+  off pipeline gas's Wobbe index (coke oven gas: 40 % off), the 16.5 MW turbine takes it.
+- Art: the brass swatch made seamless; all eight conductor spool icons from Ludo.
+- `make_assets.py` keeps the crane rail (it deleted it).
+- NeoForge scenes `cog_derate`, `aero_lean_gas`, `cracker_pump`, `alternator_frames`, `drawn_runs`; unit test `LeanGasTest`. No
+  client scene was run (the client was held by another suite).
+
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released (planned as 14e, `docs/mekanism-check.md`).
 - Plants for the 7a ores that the fuel chain doesn't use:

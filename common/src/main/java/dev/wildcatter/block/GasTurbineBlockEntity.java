@@ -189,6 +189,11 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 		return fuelWatts;
 	}
 
+	/** The fuel on its nozzle as its readout names it, or why it refuses it ("WRONG GAS: ..."). */
+	public String fuelName() {
+		return fuel;
+	}
+
 	// ---- its parts, by touching --------------------------------------------------------------------------------------------------
 	private @Nullable GeneratorPartBlockEntity generator(Level level) {
 		net.minecraft.world.level.block.Block mine = aero() ? WildcatterBlocks.AERO_GENERATOR : WildcatterBlocks.GT_GENERATOR;
@@ -240,13 +245,20 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 		for (Lines.Line line : Lines.lines(level, fuelFaces())) {
 			Product p = line.run().product();
 			double per = p == null ? 0 : joules(p);
+			if (per > 0 && aero() && p.gas() && !dev.wildcatter.fluid.LeanGas.aeroTakes(p)) {
+				// its dry low-emission fuel system is tuned to pipeline gas's Wobbe index (docs/questions/misc-gaps.md, 5)
+				fuel = String.format("WRONG GAS: %s's Wobbe index is %.0f MJ/m3, %.0f %% off the pipeline gas its fuel nozzles are tuned to "
+						+ "(%.0f): burn it in the 16.5 MW turbine or a gas engine", p.label(), dev.wildcatter.fluid.LeanGas.wobbe(p) / 1e6,
+						Math.abs(dev.wildcatter.fluid.LeanGas.wobbeShift(p)) * 100, dev.wildcatter.fluid.LeanGas.wobbe(Product.PIPELINE_GAS) / 1e6);
+				continue;
+			}
 			if (per > 0) {
 				fuelJoules += Lines.pull(line, p, room / per, FluidNode.Pull.MACHINE, this) * per;
 				fuel = p.label();
 				return;
 			}
 			if (p != null && p.gas()) {
-				fuel = "WRONG GAS: " + p.label() + " - it needs pipeline gas (process it in a gas plant), coke oven gas or coker gas";
+				fuel = "WRONG GAS: " + p.label() + " - it needs pipeline gas (process it in a gas plant)" + (aero() ? " or coker gas" : ", coke oven gas or coker gas");
 			}
 		}
 	}

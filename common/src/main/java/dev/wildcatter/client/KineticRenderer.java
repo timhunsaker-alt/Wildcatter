@@ -33,6 +33,8 @@ public class KineticRenderer<T extends BlockEntity & Kinetic> implements BlockEn
 		final List<Kinetic.Rotor> rotors = new ArrayList<>();
 		float angle;
 		Direction facing = Direction.NORTH;
+		/** The pipes and cables between a formed machine's parts, if it draws any (RunsRenderer). */
+		final List<dev.wildcatter.kinetic.DrawnRuns.Run> runs = new ArrayList<>();
 	}
 
 	private final BlockModelResolver resolver;
@@ -53,6 +55,10 @@ public class KineticRenderer<T extends BlockEntity & Kinetic> implements BlockEn
 		state.angle = machine.spin().angle(System.nanoTime(), machine.displayDivisor());
 		state.rotors.clear();
 		state.rotors.addAll(machine.rotors());
+		state.runs.clear();
+		if (machine instanceof dev.wildcatter.kinetic.DrawnRuns drawn) {
+			state.runs.addAll(drawn.drawnRuns());
+		}
 		while (state.models.size() < state.rotors.size()) {
 			state.models.add(new BlockModelRenderState());
 		}
@@ -63,6 +69,7 @@ public class KineticRenderer<T extends BlockEntity & Kinetic> implements BlockEn
 
 	@Override
 	public void submit(State state, PoseStack pose, SubmitNodeCollector collector, CameraRenderState camera) {
+		RunsRenderer.draw(state.runs, state.facing, state.lightCoords, pose, collector);
 		for (int i = 0; i < state.rotors.size(); i++) {
 			Kinetic.Rotor rotor = state.rotors.get(i);
 			pose.pushPose();

@@ -82,6 +82,8 @@ and the oilfield and plant leftovers. Format as in `README.md` here. Built on br
   common in coke and steel works.
 - **Alternatives:** derating the engine on lean gas (real engines on coke oven gas are derated 10-20 %; left out, as the mod's engine
   has one rating); blocking the aeroderivative (real aeroderivatives need a cleaner, richer gas: left for Tim).
+- **Since:** both done in the misc gaps wave (`misc-gaps.md`, 5): 864 kW on coke oven gas; the aeroderivative refuses it by its Wobbe
+  index.
 
 ### 8. The pots' auxiliaries
 - **Chosen:** each pot's auxiliaries (its pot controller, beam jacks, point feeders and crust breakers, and its share of the
@@ -150,6 +152,8 @@ and the oilfield and plant leftovers. Format as in `README.md` here. Built on br
   the drive house's east end to each pump and the drawworks, as a part renderer on the drive house, no new blocks. Plan for the steam
   lines: a pipe renderer joining each part's nozzle to the next part's along the plant's layout.
 - **Crane paint:** already Ludo art since the art wave (`mat_paint_crane_yellow`); nothing to do.
+- **Since:** the rig cables, the steam lines, the alternator and the brass swatch are done in the misc gaps wave (`misc-gaps.md`, 1-4);
+  the potroom building and pumpjack and rig collision remain.
 
 ### 16. Potroom magnetics, heat balance, bath chemistry, cathode life, bake-in
 - Very large; unchanged. A plan needs its own spec (MHD stability against the busbar layout, a pot heat balance with ledge freeze,

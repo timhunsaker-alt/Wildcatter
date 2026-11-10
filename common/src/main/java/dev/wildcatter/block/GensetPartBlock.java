@@ -89,6 +89,51 @@ public class GensetPartBlock extends BaseEntityBlock implements BigPart {
 		registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(piece, 0));
 	}
 
+	/**
+	 * The alternator: one item for both sets, drawn at the frame its set needs (docs/questions/misc-gaps.md, 2). The 500 kW diesel
+	 * set's is a 1 m frame; a 1 MW frame is about 1.6 m, so on the gas set its adapter and fan end reach 0.6 m back under the gas
+	 * engine's turbochargers, over its flywheel housing. The control panel sets it when the set forms.
+	 */
+	public static final class Alternator extends GensetPartBlock {
+		public enum Frame implements net.minecraft.util.StringRepresentable {
+			KW500("kw500"), MW1("mw1");
+
+			private final String name;
+
+			Frame(String name) {
+				this.name = name;
+			}
+
+			@Override
+			public String getSerializedName() {
+				return name;
+			}
+		}
+
+		public static final EnumProperty<Frame> FRAME = EnumProperty.create("frame", Frame.class);
+
+		public Alternator(Properties properties) {
+			super(properties, Part.ALTERNATOR);
+			registerDefaultState(defaultBlockState().setValue(FRAME, Frame.KW500));
+		}
+
+		@Override
+		protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+			super.createBlockStateDefinition(builder);
+			builder.add(FRAME);
+		}
+
+		/** Draws every cell of the alternator whose main cell is {@code main} at {@code frame}. */
+		public static void setFrame(Level level, BlockPos main, Frame frame) {
+			for (BlockPos cell : BigParts.cellsAt(level, main)) {
+				BlockState state = level.getBlockState(cell);
+				if (state.getBlock() instanceof Alternator && state.getValue(FRAME) != frame) {
+					level.setBlock(cell, state.setValue(FRAME, frame), Block.UPDATE_CLIENTS);
+				}
+			}
+		}
+	}
+
 	private static Properties constructing(Properties properties, Part part) {
 		BigParts.CONSTRUCTING.set(part.footprint);
 		return properties;

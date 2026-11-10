@@ -275,6 +275,22 @@ Blocks, `texture`, each "Seamless flat texture, <straight-on / top-down> orthogr
 | mat_paint_crane_yellow (b) | steel plate painted bright crane yellow, slightly weathered gloss enamel with a few small scratches and faint dirt, plain, no seams |
 | rotor (b) | dark grey painted machined steel of a fan hub and shaft, slightly worn paint with faint circular machining marks, plain (`tools/process_art.py` paints the yellow stripe across it, as the placeholder had, so the turning shows) |
 
+## Misc gaps wave: the conductor spools (2026-11-09, art/source/ore/)
+`createImage`, `item-icon`, `Photorealistic 3D`, model klimt, 2 variations each, the better kept; `tools/make_assets.py` lays them over
+the drawn icons. "A single small wooden cable reel (drum) with round plywood flanges, tightly wound with <conductor>, <end>, seen at an
+angle, generic, no brand, game item icon, plain <white | dark grey> background, no text":
+
+| File | Conductor and end |
+|---|---|
+| conductor_spool_lv (a) | bare bright orange-copper stranded conductor wire, a loose end of the copper strands sticking out |
+| conductor_spool_mv (a) | bare dull bronze-tan weathered stranded overhead line conductor, a loose end of the strands sticking out |
+| conductor_spool_dist (b) | bare pale silver-grey stranded aluminium overhead line conductor, a loose end of the strands sticking out |
+| conductor_spool_hv (a) | thick bare steel-grey ACSR transmission line conductor, a loose end showing the darker steel core strands |
+| covered_conductor_spool_lv (a) | white plastic-covered insulated conductor, the cut end showing bright orange copper strands (dark ground) |
+| covered_conductor_spool_mv (a) | white polyethylene-covered overhead conductor, the cut end showing dull bronze-tan strands (dark ground) |
+| covered_conductor_spool_dist (a) | white polyethylene-covered overhead conductor, the cut end showing pale silver aluminium strands (dark ground) |
+| covered_conductor_spool_hv (b) | thick white polyethylene-covered transmission conductor, the cut end showing aluminium and steel core strands (dark ground) |
+
 ## Art wave, Phase 14's items (2026-11-09, art/source/ore/)
 `item-icon`, `Photorealistic 3D`, 2 variations each, "..., generic, no brand, game item icon, plain dark grey background, no text":
 - `gauze_pack` (b): "A small stack of round woven fine platinum-rhodium wire gauze pads, catalyst gauze for nitric acid, shiny silver metal

@@ -22,6 +22,10 @@ CROP = {"decal_nameplate": (0.0, 0.0, 0.5, 0.5), "decal_controller": (0.0, 0.0, 
 PATTERN = {"mat_enclosure_louvre": ((0.0, 0.3, 0.45, 0.75), 1.0, 1.0), "mat_filter_house": ((0.0, 0.0, 0.5, 0.5), 1.0, 1.0),
 	"mat_radiator_fins": ((0.0, 0.0, 0.4, 0.4), 1.9, 0.45), "mat_grating": ((0.0, 0.0, 0.3, 0.3), 1.3, 1.0),
 	"mat_finned_tube": ((0.0, 0.0, 0.35, 0.35), 1.0, 1.0)}
+# a material Ludo drew as tiles too big for any window to miss a grout line: one tile's face, made seamless by blending it
+# with itself offset half a swatch (so no edge is ever cross-faded against a different tone), then held at the tone the
+# swatch had before, so the parts read the same (crop, mean RGB). The brass's tile line (Known gaps, questions 15).
+SEAMLESS = {"mat_brass": ((0.42, 0.44, 0.62, 0.64), (202, 147, 65))}
 WINDOW = 0.34   # a material swatch is the cleanest window this big (a fraction of the picture)
 DECALS = ("decal_",)
 
@@ -40,6 +44,22 @@ def cleanest(img):
 				best, at = e, (x, y)
 	k = img.width / 96
 	return img.crop((int(at[0] * k), int(at[1] * k), int((at[0] + w) * k), int((at[1] + w) * k)))
+
+
+def seamless(img, tone):
+	"""Blends the swatch with itself shifted half its size: the middle is the picture, the edges the shifted copy, whose edges are
+	the picture's own middle, so it repeats with no seam. Then each channel is scaled to the tone's mean."""
+	from PIL import ImageChops, ImageStat
+	w, h = img.size
+	shifted = ImageChops.offset(img, w // 2, h // 2)
+	mask = Image.new("L", (w, h))
+	for y in range(h):
+		for x in range(w):
+			d = min(x + 0.5, w - 0.5 - x, y + 0.5, h - 0.5 - y) / (min(w, h) / 2)
+			mask.putpixel((x, y), int(255 * min(1.0, max(0.0, (d - 0.1) / 0.5))))
+	img = Image.composite(img, shifted, mask)
+	mean = ImageStat.Stat(img).mean
+	return Image.merge("RGB", [ch.point(lambda v, k=tone[i] / mean[i]: min(255, int(v * k))) for i, ch in enumerate(img.split())])
 
 
 def tileable(img, band=4):
@@ -73,6 +93,13 @@ for f in sorted(os.listdir(SRC)):
 	if name.startswith(DECALS):
 		l, t, r, b = CROP.get(name, (0.0, 0.0, 1.0, 1.0))
 		img = img.crop((int(l * img.width), int(t * img.height), int(r * img.width), int(b * img.height)))
+	elif name in SEAMLESS:
+		(l, t, r, b), tone = SEAMLESS[name]
+		img = img.crop((int(l * img.width), int(t * img.height), int(r * img.width), int(b * img.height)))
+		img = seamless(ImageEnhance.Contrast(img.resize((SIZE, SIZE), Image.BOX)).enhance(1.1), tone)
+		img.convert("RGBA").save(f"{OUT}/{name}.png")
+		print(name, "(seamless)")
+		continue
 	elif name in PATTERN:
 		(l, t, r, b), bright, colour = PATTERN[name]
 		img = img.crop((int(l * img.width), int(t * img.height), int(r * img.width), int(b * img.height)))

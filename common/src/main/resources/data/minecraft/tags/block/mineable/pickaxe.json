@@ -303,6 +303,12 @@
     "wildcatter:nitric_acid_unit",
     "wildcatter:an_neutraliser",
     "wildcatter:emulsion_blender",
+    "wildcatter:meter_building",
+    "wildcatter:filter_separator",
+    "wildcatter:ultrasonic_meter_run",
+    "wildcatter:regulator_skid",
+    "wildcatter:pipeline_tap",
+    "wildcatter:acid_superheater",
     "wildcatter:uf6_autoclave",
     "wildcatter:idr_kiln",
     "wildcatter:granulator",
@@ -353,6 +359,7 @@
     "wildcatter:ats_480",
     "wildcatter:decant_tower",
     "wildcatter:process_water_pump",
+    "wildcatter:crane_rail",
     "wildcatter:pull_cord",
     "wildcatter:remote_io_drop",
     "wildcatter:network_cable",
@@ -377,13 +384,6 @@
     "wildcatter:estop",
     "wildcatter:pilot_light",
     "wildcatter:stack_light",
-    "wildcatter:horn",
-    "wildcatter:meter_building",
-    "wildcatter:filter_separator",
-    "wildcatter:ultrasonic_meter_run",
-    "wildcatter:regulator_skid",
-    "wildcatter:pipeline_tap",
-    "wildcatter:acid_superheater",
-    "wildcatter:crane_rail"
+    "wildcatter:horn"
   ]
 }

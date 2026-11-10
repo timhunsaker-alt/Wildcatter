@@ -1450,6 +1450,9 @@ sized for a 40-pot line.
 ## Known gaps
 - Phase 14 (the ammonia plant): the `gauze_pack` and `emulsifier_pail` icons are Ludo art since the art wave (2026-11-09); no
   placeholder is left. The six parts use the mod's materials. Not built: the ammonia leak hazard, AN solution setting in a cold
+  pipe, an IBC for matrix, a PGM refinery (a gauze pack is crafted straight from platinum reef ore and a worn pack is not recovered),
+  the purge gas, nitrous oxide abatement. The client scene `ammoniaPlant` passes (filmed 2026-11-09). See
+  `docs/questions/ammonia-plant.md`.
 
 - Phase 14b-14d (gas and power quick wins): no new script-drawn textures (the six parts use the mod's materials). Not built: line pack
   and pressure on the sales line, a delivery station fed from the set it supplies (the scenes run it on its battery), the condenser's fans
@@ -1457,12 +1460,6 @@ sized for a 40-pot line.
   spec's 1.4-1.8 MW, because its 480 V fan and pump motors run at about 95 % voltage on two diesel sets. An unloaded 13.8 kV delta behind
   a backward transformer can solve to nonsense currents (the `biogas` scene sets its load bank before the set starts). The client scenes
   `salesGas`, `acidSteam` and `biogas` are written and compiled, not yet run or filmed. See `docs/questions/phase14-gas-power.md`.
-- Phase 14 (the ammonia plant): `gauze_pack_placeholder` and `emulsifier_pail_placeholder` are item textures drawn by script, until
-  the art comes from Ludo. The six parts use the mod's materials. Not built: the ammonia leak hazard, AN solution setting in a cold
-  pipe, an IBC for matrix, a PGM refinery (a gauze pack is crafted straight from platinum reef ore and a worn pack is not recovered),
-  the purge gas, nitrous oxide abatement. The client scene `ammoniaPlant` passes (filmed 2026-11-09). See
-  `docs/questions/ammonia-plant.md`.
-
 - Art (2026-11-09 art wave): no `*_placeholder` texture is left in the jar. Every placeholder named here before now has Ludo art
   (`art/source/PROMPTS.md`, "Art wave"), and `tools/make_assets.py` leaves out any placeholder nothing names. `memory_card` has its own icon.
   Still drawn by script without the `*_placeholder` name: the breaker levers and the insulator caps, glaze and pins (flat colour
@@ -1565,7 +1562,8 @@ sized for a 40-pot line.
 - The aeroderivative's exhaust stack is drawn as an octagon; its SCR housing is blank (no NOx chemistry).
 - Phase 5 is complete with 5c and 5d (the lease, the gas plant, the crude units, the cracker). Tim checks each in a real session.
 - Gasoline and kerosene have no engine of their own yet: kerosene and diesel are for the Phase 6 gas turbine.
-- The cracker test tops up the furnace's water with a hook; the pump feeding a furnace is wired but not exercised in a test.
+- The client `cracker` scene still tops up the furnace's water with a hook; a pump filling a furnace is exercised in the NeoForge
+  scene `cracker_pump` (misc gaps wave).
 - Phase 10a: the 250 hp charge pump does start direct on line on one 500 kW set (172 A peak at 4.16 kV); the older gap saying it
   needed two sets no longer holds (the crude unit scene still uses two). The soft starter and drive look the same in every state
   (no run lights on their models), and the MCC's soft-starter and drive buckets show the combination starter's door. The drive's
@@ -1573,8 +1571,8 @@ sized for a 40-pot line.
 - Pipe arms join every face of a lease part, though only its nozzles connect; the Power Meter on a pipe says what a run carries.
 - The land rig's power limit works on frequency, so on a small set it holds back well below the set's rating until the
   frequency control catches up (30 s); a real rig's power management also reads the gensets' kW.
-- The land rig's motors are inside the drive house's load: there are no cables drawn from the drive house to the pumps and
-  drawworks (a drawing-only gap; planned: `docs/questions/plant-crane-gaps.md`, 15).
+- The land rig's motors are inside the drive house's load; the cables to the pumps and drawworks are drawn (misc gaps wave), not
+  circuits of their own.
 - There is no blowout preventer stack in the cellar yet: it comes with well control, Phase 15b2 of `docs/multiblocks/drilling-mud.md`.
 - Wall-mounted gear sits 0.55 m up its cell; a player wanting it higher places it a block up.
 - Pumpjack and rig collision is the still frame: the moving beam, crank and pipe do not push anything (drawing-only; questions 15).
@@ -1582,11 +1580,7 @@ sized for a 40-pot line.
 - A lead runs only from an insulator to a cutout or a pole unit; the cutout-to-transformer link is still by touching faces.
 - A pole transformer placed by command keeps its old facing rule, so in some test scenes its brackets face away from the pole (planned: protection-gaps 21).
 - There are no guy wires (planned: protection-gaps 20; Tim to choose what an unguyed pole does).
-- The MV spool icons are script-drawn like the other spool icons (no spool has Ludo art).
-- The steam plant's main steam line and feedwater line are drawn only within each part: they meet at the parts' edges, and the feedwater line stops at the boiler (drawing-only; questions 15).
 - The frame-rate check runs at the client's 120 fps cap, so it shows no drop but not how much headroom is left.
-- The alternator is drawn 1 m long for both sets; a real 1 MW frame is about 1.6 m (model; questions 15).
-- The brass swatch keeps a faint tile line (art; questions 15).
 - The test skips the steam plant's five-minute warm-up with a hook (it checks the drum starts rising, then jumps to pressure).
 - A small genset cannot drive enough fault current through the 20 MVA substation to reach real relay settings; the test scales the relays down. In play, such a source's own protection clears a feeder fault first.
 - The 1/0 and 4/0 MV cable ampacities are from the NEC 310.60 table family but not checked line by line (500 kcmil, 450 A, is).
@@ -1596,10 +1590,12 @@ sized for a 40-pot line.
 - Gas fields are large, so a gas well lasts hours.
 - Only the fused cutout shocks on touch; enclosed gear is dead-front by design.
 
-- Plant and crane gaps wave (2026-11-09): the coke oven gas engine is not derated on lean gas; the aeroderivative takes coke oven gas
-  and coker gas as the heavy-duty turbines do. The quench sump's FULL, the stabilizer's own-LPG reboiler and the pots' bath alumina
+- Plant and crane gaps wave (2026-11-09): the quench sump's FULL, the stabilizer's own-LPG reboiler and the pots' bath alumina
   without auxiliaries have run only in NeoForge server scenes. A pot without auxiliary power going to an anode effect has not been
   run in a test (it needs line current; the client `potline` scene runs the powered case).
+- Misc gaps wave (2026-11-09): the steam plant's feedwater line, the land rig's cables, the 1 MW alternator and the new spool icons
+  have been checked in model previews and NeoForge server scenes, not yet in the client (no client scene was run in the wave).
+  Coker gas keeps a gas set's full rating (its heavier hydrocarbons' knock is not modelled). No new script-drawn textures.
 
 ## Ideas not started
 Ideas live in one list: `docs/ROADMAP.md`, "Ideas (not scheduled)". Phase 10 took switches and panels, the art, drives, the DC tier
@@ -1762,3 +1758,26 @@ through. Branch `plant-crane-gaps`.
   checks unchanged).
 - **Planned, not built:** residence holds, crane erection and assembly, the crawler's jibs and travel, spent pot lining's treatment,
   the BOP stack (with Phase 15b2), and the drawing-only gaps (`docs/questions/plant-crane-gaps.md`, 11-16).
+
+## Misc gaps (2026-11-09)
+Built while Tim was away, on the best recommendation; the decisions are in `docs/questions/misc-gaps.md` for him to go through.
+Branch `misc-gaps`.
+- **Runs drawn between parts** (`kinetic/DrawnRuns`, `client/RunsRenderer`; `KineticRenderer` draws them too): a formed steam plant's
+  generator draws the NPS 2 feedwater line from the feed pump's new discharge flange, up 2.1 m over the generator on two posts, to the
+  boiler's new feedwater flange (its stop and check valves now on the boiler's south side); the main steam line meets flange to flange
+  at the boiler-superheater and superheater-turbine edges in the part models. A formed land rig's substructure draws a 0.45 m tray from
+  the drive house's east end along the pumps' east side, with three cables up to each pump motor's terminal box, and a tray up the back
+  of the substructure with the drawworks motor's cables. Both controllers now send `formed` to the client.
+- **The alternator's frame:** `GensetPartBlock.Alternator`, a `frame` state (kw500, mw1) set by the control panel when its set forms:
+  1 m on the 500 kW diesel set, 1.6 m on the 1 MW gas set, reaching 0.6 m back over the gas engine's flywheel housing (the gas engine
+  is now drawn 3.4 m long, its turbochargers over the alternator's adapter). Rotors move with the frame.
+- **Coke oven gas (`fluid/LeanGas`):** a gas set on coke oven gas is held to 864 kW (5,642 / 6,528 kW, the Profusa coke gas plant), at
+  the same heat rate, its readout `COKE OVEN GAS: 864 kW MAX`. The aeroderivative takes a gas only within 10 % of pipeline gas's Wobbe
+  index (49.1 MJ/m3): coke oven gas (29.6, 40 % off) is refused with a WRONG GAS readout naming its Wobbe index, coker gas (49.8)
+  runs; the 16.5 MW turbine takes both.
+- **Art:** `mat_brass` made seamless in `tools/process_materials.py` (one tile's face, offset-blended, the old tone); all eight
+  conductor spool icons from Ludo (`art/source/PROMPTS.md`).
+- **Tools:** `tools/make_assets.py` had deleted the hand-made crane rail; it is in `art/hand_assets` now, with its name and tags.
+- **Field Manual:** GENSETS (the derate on coke oven gas), PEAKER (no coke oven gas, the Wobbe index).
+- **Tests:** unit test `LeanGasTest` (3). NeoForge server scenes `cog_derate` (860 kW held against a 1 MW bank), `aero_lean_gas`,
+  `cracker_pump` (a furnace filled 0 to 200 L by a process water pump on a diesel set), `alternator_frames`, `drawn_runs`.

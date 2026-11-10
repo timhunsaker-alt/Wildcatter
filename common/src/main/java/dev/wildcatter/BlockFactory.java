@@ -35,6 +35,10 @@ final class BlockFactory {
 	}
 
 	static Block gensetPart(String name, dev.wildcatter.block.GensetPartBlock.Part part) {
+		if (part == dev.wildcatter.block.GensetPartBlock.Part.ALTERNATOR) {   // drawn at its set's frame
+			return block(name, props -> new dev.wildcatter.block.GensetPartBlock.Alternator(props.mapColor(MapColor.COLOR_GRAY)
+					.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion()));
+		}
 		return block(name, props -> new dev.wildcatter.block.GensetPartBlock(props.mapColor(MapColor.COLOR_GRAY)
 				.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
 	}
