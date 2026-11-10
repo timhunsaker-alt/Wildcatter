@@ -51,6 +51,8 @@ things a player meets early.
 **16a** ADU (once Tailings' P3 has built the ammonia plant); **16b1** conversion's cathode hydrogen, ash bed and KOH; **16c1** product
 assay, spin-up and cooling; **16d1** ISR CO2, bleed and satellites. Then **16b2** (full-size conversion), **16c2** (crashes, sampling,
 heels), **16d2** (monitor rings, restoration), which can wait.
+*Built 2026-11-10 (branch `phase16`): 16a, 16b1, 16c1, 16d1; see ROADMAP and `docs/questions/phase16-uranium.md`. 16b2, 16c2, 16d2 stay
+plans.*
 
 ### Phase 17: metals
 **17a** ferroalloys (the furnace transformer, the SAF, the capacitor bank, the moly roaster, the aluminothermic vessel); **17b1** the

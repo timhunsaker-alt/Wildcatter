@@ -1887,4 +1887,11 @@ Plan: `docs/ideas-plan.md`. Branch `phase16`. Nothing changes what an existing w
   - IX columns SATELLITE / ELUTION (sneak-click); RESIN TRAILER (2 x 3 x 6 block, one item carrying its loading, 800 kg of U3O8).
   - Field Manual page ISR: CO2, BLEED, SATELLITES.
   - Tests: NeoForge scene `isr_operations` passes; `UraniumOperationsTest` adds the kiln's CO2, the dose, the CO2 factor, the trailer.
+- **End of the wave set (2026-11-10):** the full NeoForge server suite passes, 54 of 54 (53 Wildcatter scenes, 4 of them Phase 16's, and
+  vanilla's `always_pass`), twice in a row; a first run failed `mv_span_flashover` once (it passed alone and in both reruns: flaky, not
+  Phase 16 code). Unit tests: 360, 2 skipped, 0 failed. The runner can hang and run out of memory after the last scene when vanilla's
+  batch happens to run after Wildcatter's (seen with `cascade_operations` alone and with `mv_span_flashover` alone; both had passed).
+- **Client scene `aduYellowcake`** (filmed, passes): the ADU line on one diesel set, FIRING UP, the calciner calcining, a 96 % drum, then
+  NO AMMONIA; screenshots `wildcatter-adu-*`. The other Phase 16 waves have server scenes only; the client `conversion`, `cascade` and
+  `isrWellfield` scenes are unchanged and were not run.
 
