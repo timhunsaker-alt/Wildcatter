@@ -21,6 +21,7 @@ import static dev.wildcatter.neoforge.gametest.PlcKit.on;
 import static dev.wildcatter.neoforge.gametest.PlcKit.run;
 import static dev.wildcatter.neoforge.gametest.PlcKit.supply;
 
+import dev.wildcatter.Tuning;
 import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.WildcatterItems;
 import dev.wildcatter.fluid.AmmoniaPlant;
@@ -52,6 +53,12 @@ import net.minecraft.world.item.ItemStack;
  * <li>{@code plc_motor_faults}: a 480 V drive and a 37 kW pump under {@code MOTOR_CTRL}, its RUNNING proved by the drive's speed: a
  * welded contactor (a test hook) keeps it running after a stop and latches FAIL_STOP; with the drive's supply cut, a start sees the
  * contactor in and no speed, and latches FAIL_START. Each clears on RESET.</li>
+ * <li>{@code plc_rig}: the 1,000 hp land rig on a 500 kW set, its selector in AUTO: the driller's console does nothing; without DRILL ENABLE it
+ * stands; enabled it drills, DRILLING and MUD PUMPS read, and after its first 27 m stand IN A CONNECTION reads; the enable withdrawn, it
+ * stops where it is.</li>
+ * <li>{@code plc_rcp}: a reactor at hot standby with one loop, its coolant pump on 4.16 kV from two 500 kW sets, its selector in AUTO: the
+ * PLC's START brings it up to full flow, read back on RUNNING and FLOW 4-20 mA; START dropped, it stops and its flywheel carries the flow
+ * down.</li>
  * </ul>
  */
 final class PlcPlantScenes {
@@ -66,6 +73,8 @@ final class PlcPlantScenes {
 		scenes.put("plc_units", PlcPlantScenes::units);
 		scenes.put("plc_crane", PlcPlantScenes::crane);
 		scenes.put("plc_motor_faults", PlcPlantScenes::motorFaults);
+		scenes.put("plc_rig", PlcPlantScenes::rig);
+		scenes.put("plc_rcp", PlcPlantScenes::coolantPump);
 		return scenes;
 	}
 
@@ -411,6 +420,154 @@ final class PlcPlantScenes {
 				log(scene, "ok: " + back + " | state " + number(cabinet, "MAIN.M.STATE"));
 				check(helper, number(cabinet, "MAIN.M.STATE") == 2 && !on(cabinet, "MAIN.M.FAULT"), "supply back and reset, it should run: " + back);
 				helper.succeed();
+			});
+		});
+	}
+
+	// ---- plc_rig ----------------------------------------------------------------------------------------------------------------------
+	private static int depth(String rig) {
+		java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d+) m down").matcher(rig);
+		return m.find() ? Integer.parseInt(m.group(1)) : -1;
+	}
+
+	static void rig(GameTestHelper helper) {
+		String scene = "plc_rig";
+		floor(helper, 3, -14, 46, 16);
+		int y = 1;                                                                  // the rig stands on the floor; its hole at (30, 1, 0)
+		place(helper, WildcatterBlocks.RIG_SUBSTRUCTURE, 26, y, -4, NORTH);
+		place(helper, WildcatterBlocks.RIG_MAST, 29, y + 6, -1, NORTH);
+		place(helper, WildcatterBlocks.RIG_DRAWWORKS, 27, y + 6, 2, NORTH);
+		place(helper, WildcatterBlocks.MUD_TANKS, 36, y, -5, NORTH);
+		place(helper, WildcatterBlocks.MUD_PUMP, 40, y, -4, NORTH);
+		place(helper, WildcatterBlocks.MUD_PUMP, 40, y, 0, NORTH);
+		place(helper, WildcatterBlocks.RIG_DRIVE_HOUSE, 24, y, 7, NORTH);
+		dev.wildcatter.block.RigSubstructureBlockEntity rig = entity(helper, 26, y, -4, dev.wildcatter.block.RigSubstructureBlockEntity.class);
+		// 500 kW at 4.16 kV: the set, a unit substation run backward, MV cable to the drive house's west end
+		genset(helper, 10, U, 7);
+		place(helper, WildcatterBlocks.UNIT_SUBSTATION, 14, U, 7, Direction.SOUTH);
+		line(helper, "cable_mv", 15, U, 7, 23, U, 7);
+		put(helper, "cable_mv", 23, y, 7);
+		// the PLC to the north-west, a cable along the ground to the substructure's main cell
+		supply(helper, 14, U, -10);                                                 // supply at (17, U, -10)
+		put(helper, "junction_box", 18, U, -10);
+		PlcCabinetBlockEntity cabinet = cabinet(helper, 19, U, -10, Type.CPU_SMALL, Type.DI16, Type.DO16);
+		line(helper, "control_cable", 18, y, -10, 18, y, -4);
+		line(helper, "control_cable", 19, y, -4, 25, y, -4);
+		helper.runAfterDelay(40, () -> {
+			log(scene, "built | " + read(helper, 26, y, -4) + " | " + read(helper, 19, U, -10));
+			check(helper, rig.formed() && rig.installTopDrive(), "the rig should be built and take its top drive: " + read(helper, 26, y, -4));
+			rig.testWater(Tuning.LAND_RIG_MUD_TANK);
+			auto(helper, 26, y, -4);
+			String console = rig.toggle().getString();
+			check(helper, console.contains("not in HAND") && !rig.drilling(), "in AUTO the driller's console should do nothing: " + console);
+			for (int point = 0; point < 5; point++) {
+				land(helper, cabinet, 26, y, -4, point, point == 0 ? "%QX16.0" : "%IX0." + (point - 1));
+			}
+			run(helper, cabinet, """
+					PROGRAM MAIN
+					VAR
+						enable AT %QX16.0 : BOOL; drilling AT %IX0.0 : BOOL; pumps AT %IX0.1 : BOOL; connection AT %IX0.2 : BOOL; auto AT %IX0.3 : BOOL;
+						go, sawDrilling, sawPumps, sawConnection : BOOL;
+					END_VAR
+					enable := go;
+					sawDrilling := sawDrilling OR drilling;
+					sawPumps := sawPumps OR pumps;
+					sawConnection := sawConnection OR connection;
+					END_PROGRAM""");
+		});
+		int[] stopped = {-1};
+		start(helper, 10, U, 7, () -> {
+			String standing = read(helper, 26, y, -4);
+			log(scene, "no enable | " + standing);
+			check(helper, on(cabinet, "MAIN.AUTO") && !on(cabinet, "MAIN.DRILLING") && depth(standing) == 0 && standing.contains("stopped: its PLC is not enabling it"), "without DRILL ENABLE the rig should stand: " + standing);
+			cabinet.cpu().write("MAIN.GO", true);
+		});
+		// polled from the top, as callbacks scheduled by the hundred inside one upset the runner
+		for (int t = 300; t <= 2700; t += 10) {
+			helper.runAfterDelay(t, () -> {
+				if (on(cabinet, "MAIN.GO")) {
+					rig.testWater(Tuning.LAND_RIG_MUD_TANK);   // a pump would keep the tanks up; the scene tops them
+				}
+				if (stopped[0] < 0 && on(cabinet, "MAIN.SAWCONNECTION")) {
+					String conn = read(helper, 26, y, -4);
+					log(scene, "connection | " + conn);
+					check(helper, on(cabinet, "MAIN.SAWDRILLING") && on(cabinet, "MAIN.SAWPUMPS") && depth(conn) >= Tuning.LAND_RIG_STAND_BLOCKS,
+							"enabled, it should have drilled its first stand, DRILLING and MUD PUMPS read, and gone into a connection: " + conn);
+					cabinet.cpu().write("MAIN.GO", false);
+					stopped[0] = depth(conn);
+					helper.runAfterDelay(400, () -> {
+						String held = read(helper, 26, y, -4);
+						log(scene, "enable withdrawn | " + held);
+						check(helper, !rig.drilling() && !on(cabinet, "MAIN.DRILLING") && held.contains("stopped: its PLC is not enabling it") && depth(held) <= stopped[0] + 1,
+								"with its enable withdrawn it should stop where it is: " + held);
+						log(scene, "ok: stood at " + depth(held) + " m after its first stand");
+						helper.succeed();
+					});
+				}
+			});
+		}
+	}
+
+	// ---- plc_rcp ----------------------------------------------------------------------------------------------------------------------
+	static void coolantPump(GameTestHelper helper) {
+		String scene = "plc_rcp";
+		floor(helper, -22, -16, 16, 10);
+		place(helper, WildcatterBlocks.REACTOR_VESSEL, 0, U, 0, NORTH);           // x 0-2, z 0-2
+		place(helper, WildcatterBlocks.CRDM_HEAD, 0, U + 10, 0, NORTH);
+		place(helper, WildcatterBlocks.STEAM_GENERATOR, 0, U, -3, NORTH);         // loop A, z -3..-1
+		place(helper, WildcatterBlocks.REACTOR_COOLANT_PUMP, 0, U, -5, NORTH);    // z -5..-4
+		place(helper, WildcatterBlocks.PRESSURIZER, -2, U, -3, NORTH);            // x -2..-1, z -3..-2
+		place(helper, WildcatterBlocks.CVCS_SKID, -3, U, 0, NORTH);               // x -3..-1, z 0-5
+		entity(helper, 0, U, 0, dev.wildcatter.block.ReactorVesselBlockEntity.class).setHotStandbyForTest(1500);
+		entity(helper, -3, U, 0, dev.wildcatter.block.CvcsBlockEntity.class).setAcidForTest(500);
+		entity(helper, -3, U, 0, WaterUser.class).addWater(100_000);
+		dev.wildcatter.block.ReactorCoolantPumpBlockEntity pump = entity(helper, 0, U, -5, dev.wildcatter.block.ReactorCoolantPumpBlockEntity.class);
+		auto(helper, 0, U, -5);   // in AUTO from the start: with no PLC yet it stays stopped
+		// 4.16 kV: two sets on a busway, a unit substation run backward, MV cable round to the pump's west side
+		genset(helper, -14, U, -13);
+		genset(helper, -6, U, -13);
+		put(helper, "busway_industrial", -13, U, -13);
+		put(helper, "busway_industrial", -5, U, -13);
+		line(helper, "busway_industrial", -13, U, -14, 2, U, -14);
+		place(helper, WildcatterBlocks.UNIT_SUBSTATION, 6, U, -14, Direction.SOUTH);   // x 3-6; its 4.16 kV out at x 7
+		line(helper, "cable_mv", 7, U, -14, 7, U, -12);
+		line(helper, "cable_mv", -1, U, -12, 6, U, -12);
+		line(helper, "cable_mv", -1, U, -11, -1, U, -5);
+		// the PLC to the east; a cable along the ground to under the pump
+		supply(helper, 8, U, -8);                                                  // supply at (11, U, -8)
+		put(helper, "junction_box", 12, U, -8);
+		PlcCabinetBlockEntity cabinet = cabinet(helper, 13, U, -8, Type.CPU_SMALL, Type.DI16, Type.DO16, Type.AI8);
+		line(helper, "control_cable", 12, 1, -8, 12, 1, -7);
+		line(helper, "control_cable", 11, 1, -7, 0, 1, -7);
+		line(helper, "control_cable", 0, 1, -6, 0, 1, -5);
+		helper.runAfterDelay(40, () -> {
+			log(scene, "built | " + read(helper, 0, U, 0) + " | " + read(helper, 0, U, -5) + " | " + read(helper, 13, U, -8));
+			land(helper, cabinet, 0, U, -5, 0, "%QX16.0");
+			land(helper, cabinet, 0, U, -5, 1, "%IX0.0");
+			land(helper, cabinet, 0, U, -5, 2, "%IX0.1");
+			land(helper, cabinet, 0, U, -5, 3, "%IW32");
+			run(helper, cabinet, "PROGRAM MAIN VAR start AT %QX16.0 : BOOL; running AT %IX0.0 : BOOL; auto AT %IX0.1 : BOOL; flow AT %IW32 : INT; go : BOOL; END_VAR start := go; END_PROGRAM");
+		});
+		start(helper, -14, U, -13, () -> { });
+		start(helper, -6, U, -13, () -> {
+			String stood = read(helper, 0, U, -5);
+			log(scene, "no START | " + stood + " | sets " + read(helper, -14, U, -13) + " | " + read(helper, -6, U, -13) + " | sub " + read(helper, 6, U, -14) + " | mv " + read(helper, -1, U, -6) + " | " + read(helper, 7, U, -12));
+			check(helper, !pump.on() && pump.flow() == 0 && !on(cabinet, "MAIN.RUNNING") && on(cabinet, "MAIN.AUTO"), "in AUTO with no START the pump should stand: " + stood);
+			cabinet.cpu().write("MAIN.GO", true);
+			helper.runAfterDelay(400, () -> {
+				String up = read(helper, 0, U, -5);
+				log(scene, "START | " + up + " | flow raw " + number(cabinet, "MAIN.FLOW"));
+				check(helper, pump.on() && on(cabinet, "MAIN.RUNNING") && pump.flow() > 0.95 && number(cabinet, "MAIN.FLOW") > 30_000,
+						"the PLC's START should bring the pump to full flow, read back on RUNNING and FLOW: " + up);
+				cabinet.cpu().write("MAIN.GO", false);
+				helper.runAfterDelay(100, () -> {
+					String down = read(helper, 0, U, -5);
+					log(scene, "START dropped | " + down + " | flow raw " + number(cabinet, "MAIN.FLOW"));
+					check(helper, !pump.on() && !on(cabinet, "MAIN.RUNNING") && pump.flow() > 0.2 && pump.flow() < 0.9 && number(cabinet, "MAIN.FLOW") < 30_000,
+							"START dropped, the pump should stop, its flywheel carrying the flow down: " + down);
+					log(scene, String.format("ok: flow %.0f %% 5 s after the stop", pump.flow() * 100));
+					helper.succeed();
+				});
 			});
 		});
 	}
