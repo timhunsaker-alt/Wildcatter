@@ -6,7 +6,15 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "wildcatter:fuel_assembly"
+          "name": "wildcatter:fuel_assembly",
+          "modifier": {
+            "source": "block_entity",
+            "include": [
+              "wildcatter:assay",
+              "minecraft:custom_data"
+            ],
+            "type": "minecraft:copy_components"
+          }
         }
       ],
       "conditions": [

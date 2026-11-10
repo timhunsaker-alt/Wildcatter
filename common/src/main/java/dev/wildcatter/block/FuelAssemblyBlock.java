@@ -41,7 +41,10 @@ public class FuelAssemblyBlock extends BigPartBlock {
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 		if (!level.isClientSide()) {
-			player.sendOverlayMessage(Component.literal(describe()));
+			// its main cell's block entity keeps the item's components (answer 21): the assay it was made at and its handling record
+			BlockEntity main = level.getBlockEntity(dev.wildcatter.multiblock.BigParts.main(pos, state));
+			Double assay = main == null ? null : main.components().get(dev.wildcatter.WildcatterComponents.ASSAY);
+			player.sendOverlayMessage(Component.literal(describe(assay == null ? Tuning.ASSAY_PRODUCT : assay)));
 		}
 		return InteractionResult.SUCCESS;
 	}

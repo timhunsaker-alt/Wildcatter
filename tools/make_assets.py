@@ -1749,6 +1749,10 @@ FUEL_PARTS = ("sulfur_melter", "drying_tower", "main_blower", "sulfur_furnace", 
 	"jaw_crusher", "sag_mill", "leach_tank", "ccd_thickener", "sx_circuit", "precipitation_tank", "yellowcake_dryer", "drum_filler")
 for name in FUEL_PARTS:
 	big_part_loot(name)
+# a placed assembly keeps its assay and its handling record (Tim, answer 21): the block entity holds the item's components; the drop copies them back
+_fa = json.load(open(f"{DATA}/loot_table/blocks/fuel_assembly.json"))
+_fa["pools"][0]["entries"][0]["modifier"] = {"type": "minecraft:copy_components", "source": "block_entity", "include": [f"{ns}:assay", "minecraft:custom_data"]}
+save_json(f"{DATA}/loot_table/blocks/fuel_assembly.json", _fa)
 for t_name in ("mineable/pickaxe", "needs_stone_tool"):
 	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
 	t["values"] = [v for v in t["values"] if v not in [f"{ns}:{n}" for n in FUEL_PARTS]] + [f"{ns}:{n}" for n in FUEL_PARTS]

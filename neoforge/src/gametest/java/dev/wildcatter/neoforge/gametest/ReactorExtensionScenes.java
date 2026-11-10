@@ -44,6 +44,7 @@ final class ReactorExtensionScenes {
 		out.put("reactor_limits", ReactorExtensionScenes::reactorLimits);
 		out.put("casks", ReactorExtensionScenes::casks);
 		out.put("cask_cooling", ReactorExtensionScenes::caskCooling);
+		out.put("assembly_assay", ReactorExtensionScenes::assemblyAssay);
 		out.put("contamination", ReactorExtensionScenes::contamination);
 		out.put("fuel_inspection", ReactorExtensionScenes::fuelInspection);
 		return out;
@@ -362,6 +363,53 @@ final class ReactorExtensionScenes {
 				log("cask_cooling", "ok: " + moved + String.format(" | carried %.0f W", carried));
 				helper.succeed();
 			}));
+		});
+	}
+
+	/**
+	 * A fuel assembly stood up as a block keeps its assay and its handling record (Tim's answer 21): a 3.00 % assembly, inspected and
+	 * found bent, placed by a player's click, reads 3.00 % when clicked, and broken drops as a 3.00 % assembly still INSPECTED and bent.
+	 * An unstamped (4.95 %) one drops unstamped, as before, so it still stacks.
+	 */
+	static void assemblyAssay(GameTestHelper helper) {
+		floor(helper, 0, 0, 6, 6);
+		net.minecraft.server.level.ServerLevel level = helper.getLevel();
+		net.minecraft.world.item.ItemStack low = dev.wildcatter.WildcatterComponents.withAssay(new net.minecraft.world.item.ItemStack(WildcatterBlocks.FUEL_ASSEMBLY), 0.03);
+		dev.wildcatter.item.FuelAssemblyTags.markBent(low);
+		dev.wildcatter.item.FuelAssemblyTags.markInspected(low);
+		net.minecraft.world.entity.player.Player player = helper.makeMockPlayer(net.minecraft.world.level.GameType.CREATIVE);
+		BlockPos[] placed = new BlockPos[2];
+		int i = 0;
+		for (net.minecraft.world.item.ItemStack stack : new net.minecraft.world.item.ItemStack[] {low, new net.minecraft.world.item.ItemStack(WildcatterBlocks.FUEL_ASSEMBLY)}) {
+			BlockPos floorAt = abs(helper, 2 + 2 * i, 0, 3);
+			player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, stack.copy());
+			net.minecraft.world.InteractionResult result = player.getMainHandItem().useOn(new net.minecraft.world.item.context.UseOnContext(level, player,
+					net.minecraft.world.InteractionHand.MAIN_HAND, player.getMainHandItem(),
+					new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(floorAt).add(0, 0.5, 0), Direction.UP, floorAt, false)));
+			placed[i] = floorAt.above();
+			GridSceneKit.check(helper, result.consumesAction() && level.getBlockState(placed[i]).is(WildcatterBlocks.FUEL_ASSEMBLY),
+					"the assembly should stand up where it was clicked: " + result + ", " + level.getBlockState(placed[i]));
+			i++;
+		}
+		BlockPos main = dev.wildcatter.multiblock.BigParts.main(placed[0], level.getBlockState(placed[0]));
+		Double kept = level.getBlockEntity(main).components().get(dev.wildcatter.WildcatterComponents.ASSAY);
+		GridSceneKit.check(helper, kept != null && Math.abs(kept - 0.03) < 1e-9, "the standing assembly should keep its 3.00 % assay: " + kept);
+		helper.runAfterDelay(20, () -> {
+			java.util.List<net.minecraft.world.item.ItemStack> drops = new java.util.ArrayList<>();
+			for (BlockPos at : placed) {
+				BlockPos m = dev.wildcatter.multiblock.BigParts.main(at, level.getBlockState(at));
+				drops.addAll(net.minecraft.world.level.block.Block.getDrops(level.getBlockState(m), level, m, level.getBlockEntity(m)));
+				level.destroyBlock(m, false);
+			}
+			GridSceneKit.check(helper, drops.size() == 2, "each assembly should drop itself: " + drops);
+			net.minecraft.world.item.ItemStack back = drops.get(0), plain = drops.get(1);
+			double assay = dev.wildcatter.WildcatterComponents.assay(back);
+			GridSceneKit.check(helper, Math.abs(assay - 0.03) < 1e-9 && dev.wildcatter.item.FuelAssemblyTags.bent(back) && dev.wildcatter.item.FuelAssemblyTags.inspected(back),
+					String.format("broken, it should come back at 3.00 %% (%.2f %%), bent and inspected", assay * 100));
+			GridSceneKit.check(helper, plain.getComponentsPatch().isEmpty() && net.minecraft.world.item.ItemStack.isSameItemSameComponents(plain, new net.minecraft.world.item.ItemStack(WildcatterBlocks.FUEL_ASSEMBLY)),
+					"a standard assembly should drop unstamped: " + plain.getComponentsPatch());
+			log("assembly_assay", "ok: " + String.format("%.2f %%, bent %s, inspected %s", assay * 100, dev.wildcatter.item.FuelAssemblyTags.bent(back), dev.wildcatter.item.FuelAssemblyTags.inspected(back)));
+			helper.succeed();
 		});
 	}
 
