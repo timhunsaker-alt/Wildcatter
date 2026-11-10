@@ -83,6 +83,11 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 	private boolean grown;
 	private Phase phase = Phase.STOPPED;
 	private boolean wantRun;
+
+	/** True while it is asked to run, by its button or its PLC. */
+	public boolean wantRun() {
+		return wantRun;
+	}
 	private boolean starterWanted;
 	private double speed;
 	private double timer;

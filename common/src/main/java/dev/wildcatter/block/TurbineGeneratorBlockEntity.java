@@ -99,6 +99,11 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 	private String missing = "";
 	private Run run = Run.COLD;
 	private boolean wantRun;
+
+	/** True while it is asked to run, by its button or its PLC. */
+	public boolean wantRun() {
+		return wantRun;
+	}
 	private boolean breakerClosed;
 	private boolean tripped;
 	private String tripReason = "";

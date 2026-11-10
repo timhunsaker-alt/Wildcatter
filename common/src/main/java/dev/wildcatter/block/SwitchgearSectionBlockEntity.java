@@ -60,7 +60,8 @@ public class SwitchgearSectionBlockEntity extends BlockEntity implements Circuit
 	@Override
 	public java.util.List<Point> points() {
 		return java.util.List.of(new Point("CLOSE", true), new Point("TRIP COIL", true), new Point("CLOSED", false), new Point("TRIPPED", false), new Point("REMOTE", false),
-				new Point("AMPS 4-20 mA, 150 %", false, Signal.MA), new Point("RACK IN", true), new Point("RACK OUT", true), new Point("CONNECTED", false), new Point("RACKING", false));
+				new Point("AMPS 4-20 mA, 150 %", false, Signal.MA), new Point("RACK IN", true), new Point("RACK OUT", true), new Point("CONNECTED", false), new Point("RACKING", false),
+				new Point("TRIP 50", false), new Point("TRIP 51", false), new Point("TRIP 87B", false), new Point("TRIP 50BF", false));
 	}
 
 	@Override
@@ -71,6 +72,11 @@ public class SwitchgearSectionBlockEntity extends BlockEntity implements Circuit
 			case 4 -> remote.auto();
 			case 8 -> rack == Rack.CONNECTED && rackTarget == null;
 			case 9 -> rackTarget != null;
+			// the relay's targets: which element tripped it, as a multifunction relay's trip flags (50BF also marks the breaker that failed)
+			case 10 -> tripped() && lastTrip.startsWith("50 ");
+			case 11 -> tripped() && lastTrip.startsWith("51 ");
+			case 12 -> tripped() && lastTrip.startsWith("87B");
+			case 13 -> lastTrip.contains("50BF");
 			default -> false;
 		};
 	}

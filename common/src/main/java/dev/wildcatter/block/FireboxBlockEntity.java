@@ -55,7 +55,7 @@ public class FireboxBlockEntity extends BaseContainerBlockEntity implements Worl
 
 	@Override
 	public boolean readPoint(int point) {
-		return point == 1 ? burnLeft > 0 : point == 2 && remote.auto();
+		return point == 1 ? burning : point == 2 && remote.auto();   // a fire held back by its firing rate is banked, not burning
 	}
 
 	@Override
@@ -91,6 +91,8 @@ public class FireboxBlockEntity extends BaseContainerBlockEntity implements Worl
 	private NonNullList<ItemStack> items = NonNullList.withSize(Tuning.FIREBOX_SLOTS, ItemStack.EMPTY);
 	/** Ticks of fire left in the fuel that is burning. */
 	private double burnLeft;
+	/** True in the last tick it burned, so fuel was going: a fire held back by its firing rate holds its fuel and is not burning. */
+	private boolean burning;
 
 	public FireboxBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.FIREBOX_ENTITY, pos, state);
@@ -236,6 +238,7 @@ public class FireboxBlockEntity extends BaseContainerBlockEntity implements Worl
 			}
 			firebox.setChanged();
 		}
+		firebox.burning = wants && firebox.burnLeft > 0;
 		boolean lit = firebox.burnLeft > 0;
 		BlockState now = firebox.getBlockState();
 		if (now.getValue(FireboxBlock.LIT) != lit) {

@@ -151,11 +151,11 @@ final class GasPowerScenes {
 		return s;
 	}
 
-	private static void genset(GameTestHelper helper, int x, int z, boolean gas) {
+	static void genset(GameTestHelper helper, int x, int z, boolean gas) {
 		GensetSkid.build(level(helper), abs(helper, x, U, z), NORTH, gas);
 	}
 
-	private static GensetControlPanelBlockEntity panel(GameTestHelper helper, int x, int z) {
+	static GensetControlPanelBlockEntity panel(GameTestHelper helper, int x, int z) {
 		return (GensetControlPanelBlockEntity) level(helper).getBlockEntity(abs(helper, x, U, z));
 	}
 
@@ -171,7 +171,7 @@ final class GasPowerScenes {
 	 * A pad-mount or unit substation in a line (as the client scenes' inlineTransformer): fed from {@code (x, z)} going {@code d}, on its
 	 * main cell's terminal if {@code feedMain}; returns the x (or z) of the cell its other terminal feeds.
 	 */
-	private static BlockPos inline(GameTestHelper helper, Block block, int x, int z, Direction d, boolean feedMain) {
+	static BlockPos inline(GameTestHelper helper, Block block, int x, int z, Direction d, boolean feedMain) {
 		int across = block == WildcatterBlocks.UNIT_SUBSTATION ? 3 : 1;
 		BlockPos from = new BlockPos(x, U, z);
 		BlockPos first = from.relative(d);

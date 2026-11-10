@@ -75,6 +75,11 @@ public class LoadBankBlockEntity extends BlockEntity implements CircuitPart, Ins
 	private final int[] hot = new int[3];
 	private final int[] element = {-1, -1, -1};
 	private int steps;
+
+	/** The 1 MW steps switched in. */
+	public int steps() {
+		return steps;
+	}
 	private double watts;
 	private boolean grown;
 

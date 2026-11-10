@@ -128,7 +128,7 @@ public class LoadBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		amps = Math.abs(circuit.current(resistor));
 		double nominal = Voltage.LOW.nominal();
 
-		boolean working = volts > nominal * Tuning.BRIGHT_ABOVE;
+		boolean working = relayOn && volts > nominal * Tuning.BRIGHT_ABOVE;   // an open relay leaves the voltage across it and no current: dark
 		BlockState state = getBlockState();
 		if (state.getValue(LoadBlock.LIT) != working) {
 			server.setBlock(worldPosition, state.setValue(LoadBlock.LIT, working), 3);
