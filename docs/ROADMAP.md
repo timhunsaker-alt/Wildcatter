@@ -547,6 +547,9 @@ Decisions taken while building: `docs/questions/answers-grid.md`. NeoForge scene
 - **Zircon concentrate (9):** `#wildcatter:zircon_feed` and a kg data file; the chlorinator's hopper takes it.
 
 ## Ideas (not scheduled)
+- **Time scale (Tim, 2026-11-10):** a world setting with presets 1:1, 5:1, 10:1, 20:1 and 50:1 that shortens the long waits (reactor heat-up
+  and cooldown, residence holds, cask cooling, Tailings' paste cure), chosen on the Create World screen with the world rules. Spec and
+  questions: `docs/time-scale.md`. Planned for 0.7.0.
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released (planned as 14e, `docs/mekanism-check.md`).
 - Plants for the 7a ores that the fuel chain doesn't use:
   - chlor-alkali from rock salt;
