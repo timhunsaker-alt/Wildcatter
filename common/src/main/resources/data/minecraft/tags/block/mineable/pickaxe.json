@@ -384,6 +384,11 @@
     "wildcatter:estop",
     "wildcatter:pilot_light",
     "wildcatter:stack_light",
-    "wildcatter:horn"
+    "wildcatter:horn",
+    "wildcatter:furnace_transformer",
+    "wildcatter:submerged_arc_furnace",
+    "wildcatter:capacitor_bank",
+    "wildcatter:moly_roaster",
+    "wildcatter:aluminothermic_vessel"
   ]
 }

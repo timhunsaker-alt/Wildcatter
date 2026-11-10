@@ -2756,6 +2756,50 @@ lang.update({"block.wildcatter.control_cable": "Control Cable (multi-core)", "bl
 	"block.wildcatter.air_tubing": "Instrument Air Tubing", "block.wildcatter.air_compressor": "Instrument Air Compressor", "block.wildcatter.air_dryer": "Air Dryer", "block.wildcatter.day_tank": "Water Day Tank (1 m3)", "block.wildcatter.transmitter": "Transmitter (4-20 mA)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 17a: ferroalloys (docs/multiblocks/ferroalloys.md) ---------------------------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/ferroalloys.py; here loot, names, tags, recipes and the bags. Each bag's
+# icon is the Ludo bulk bag with a swatch of what it holds drawn on it by this script: a placeholder until it has art of its own.
+FERRO_PARTS = ("furnace_transformer", "submerged_arc_furnace", "capacitor_bank", "moly_roaster", "aluminothermic_vessel")
+for name in FERRO_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in FERRO_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("furnace_transformer", ["SCS", "CIC", "SCS"], {"S": S_, "C": "minecraft:copper_block", "I": "minecraft:iron_block"}, "furnace_transformer")
+shaped("submerged_arc_furnace", ["SHS", "BFB", "SBS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace"}, "submerged_arc_furnace")
+shaped("capacitor_bank", ["CCC", "SRS", "SIS"], {"C": "minecraft:copper_ingot", "S": S_, "R": "minecraft:redstone_block", "I": "minecraft:iron_bars"}, "capacitor_bank")
+shaped("moly_roaster", ["SBS", "SFS", "SBS"], {"S": S_, "B": "minecraft:bricks", "F": "minecraft:furnace"}, "moly_roaster")
+shaped("aluminothermic_vessel", ["SHS", "BCB", "SSS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "C": "minecraft:cauldron"}, "aluminothermic_vessel")
+FERRO_BAGS = {"ferrochrome_bag": ("Bulk Bag of HC Ferrochrome", (150, 154, 160)), "ferromanganese_bag": ("Bulk Bag of HC Ferromanganese", (120, 112, 104)),
+	"ferrosilicon_bag": ("Bulk Bag of Ferrosilicon 75", (170, 176, 186)), "moly_oxide_bag": ("Bulk Bag of Technical Moly Oxide", (196, 206, 150)),
+	"scheelite_concentrate_bag": ("Bulk Bag of Scheelite Concentrate", (226, 214, 170)), "ferromolybdenum_bag": ("Bulk Bag of Ferromolybdenum", (140, 146, 156)),
+	"ferrotungsten_bag": ("Bulk Bag of Ferrotungsten", (100, 104, 112))}
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in FERRO_BAGS.items():
+	if os.path.exists(f"{ORE_ART}/{item}.png"):
+		shutil.copy(f"{ORE_ART}/{item}.png", f"{ASSETS}/textures/item/ore/{item}.png")
+		item_tex = f"{ns}:item/ore/{item}"
+	else:
+		bag = Image.open(f"{ORE_ART}/empty_bulk_bag.png").convert("RGBA")
+		d = ImageDraw.Draw(bag)
+		d.rectangle([10, 13, 21, 22], fill=colour + (255,), outline=(60, 60, 60, 255))   # a swatch of what it holds
+		d.rectangle([12, 15, 14, 17], fill=tuple(min(255, c + 40) for c in colour) + (255,))
+		bag.save(f"{ASSETS}/textures/item/{item}_placeholder.png")
+		item_tex = f"{ns}:item/{item}_placeholder"
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": item_tex}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.furnace_transformer": "Furnace Transformer (10 MVA, 150 V)", f"block.{ns}.submerged_arc_furnace": "Submerged Arc Furnace (8 MW)",
+	f"block.{ns}.capacitor_bank": "Capacitor Bank (3 Mvar)", f"block.{ns}.moly_roaster": "Moly Roaster (multiple hearth)",
+	f"block.{ns}.aluminothermic_vessel": "Aluminothermic Vessel"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+# the alloys for other mods: a tag of them all, and the common tags another mod looks for
+save_json(f"{DATA}/tags/item/ferroalloys.json", {"values": [f"{ns}:{b}" for b in ("ferrochrome_bag", "ferromanganese_bag", "ferrosilicon_bag", "ferromolybdenum_bag", "ferrotungsten_bag")]})
+for metal in ("ferrochrome", "ferromanganese", "ferrosilicon", "ferromolybdenum", "ferrotungsten"):
+	save_json(f"{ROOT}/data/c/tags/item/ferroalloys/{metal}.json", {"values": [f"{ns}:{metal}_bag"]})
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

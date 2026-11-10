@@ -1,7 +1,9 @@
 package dev.wildcatter.neoforge.gametest;
 
+import dev.wildcatter.block.Assayed;
 import dev.wildcatter.block.FluidNode;
 import dev.wildcatter.fluid.Product;
+import dev.wildcatter.fluid.SlurryAssay;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
@@ -33,8 +35,10 @@ final class TestGasSource {
 		}
 	}
 
-	static final class SourceEntity extends BlockEntity implements FluidNode {
+	static final class SourceEntity extends BlockEntity implements FluidNode, Assayed {
 		Product product = Product.BIOGAS;
+		/** What a kg of its slurry carries, for a concentrator slurry (the moly roaster's scene); empty for a gas. */
+		SlurryAssay assay = SlurryAssay.EMPTY;
 		/** m3 a second it makes; it holds a second's worth. */
 		double rate = 1.0;
 		/** m3 taken from it, all told. */
@@ -54,6 +58,11 @@ final class TestGasSource {
 				buffer = Math.min(rate, buffer + rate * (now - last) / 20.0);
 			}
 			last = now;
+		}
+
+		@Override
+		public SlurryAssay assayOf(Product wanted) {
+			return wanted == product ? assay : SlurryAssay.EMPTY;
 		}
 
 		@Override

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SHS",
+    "BFB",
+    "SBS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "B": "minecraft:bricks",
+    "F": "minecraft:blast_furnace"
+  },
+  "result": {
+    "id": "wildcatter:submerged_arc_furnace",
+    "count": 1
+  }
+}

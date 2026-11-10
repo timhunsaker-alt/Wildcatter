@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 /** Every ore's tooltip says where it is found, what mines it and what uses it (docs/ores.md, "Tooltips and JEI"). */
 class OreUsesTest {
 	/** The ores no plant takes yet: a wave that gives one a user moves it out of this set and into OreUses.uses. */
-	private static final Set<Ore> NO_USE_YET = EnumSet.of(Ore.SYLVITE, Ore.PENTLANDITE, Ore.PLATINUM, Ore.MOLYBDENITE, Ore.DOLOMITE,
-			Ore.GRAPHITE, Ore.SPODUMENE, Ore.BARITE, Ore.BENTONITE, Ore.SCHEELITE, Ore.COBALTITE, Ore.PHOSPHATE);
+	private static final Set<Ore> NO_USE_YET = EnumSet.of(Ore.SYLVITE, Ore.PENTLANDITE, Ore.PLATINUM, Ore.DOLOMITE,
+			Ore.GRAPHITE, Ore.SPODUMENE, Ore.BARITE, Ore.BENTONITE, Ore.COBALTITE, Ore.PHOSPHATE);
 
 	@Test
 	void everyOreHasFoundToolAndUses() {

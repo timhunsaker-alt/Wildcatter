@@ -173,6 +173,28 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> EMULSIFIER_PAIL_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("emulsifier_pail"));
 	public static final Item EMULSIFIER_PAIL = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(EMULSIFIER_PAIL_KEY),
 			String.format("A %.0f kg pail of emulsifier (a polyisobutylene succinic anhydride in oil)", Tuning.EMULSIFIER_PAIL_KG), "for the emulsion blender");
+	// Phase 17a: ferroalloys (docs/multiblocks/ferroalloys.md), each in a 1 t bulk bag
+	public static final ResourceKey<Item> FERROCHROME_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("ferrochrome_bag"));
+	public static final Item FERROCHROME_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(FERROCHROME_BAG_KEY),
+			String.format("%,.0f kg of high-carbon ferrochrome (65 %% Cr, 7 %% C)", Tuning.BULK_BAG_KG), "for stainless steel; the alloy melt shop (17b)");
+	public static final ResourceKey<Item> FERROMANGANESE_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("ferromanganese_bag"));
+	public static final Item FERROMANGANESE_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(FERROMANGANESE_BAG_KEY),
+			String.format("%,.0f kg of high-carbon ferromanganese (76 %% Mn, 7 %% C)", Tuning.BULK_BAG_KG), "for steel and stainless; the alloy melt shop (17b)");
+	public static final ResourceKey<Item> FERROSILICON_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("ferrosilicon_bag"));
+	public static final Item FERROSILICON_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(FERROSILICON_BAG_KEY),
+			String.format("%,.0f kg of ferrosilicon 75 (75 %% Si)", Tuning.BULK_BAG_KG), "for Pidgeon magnesium; milled and diluted, a dense medium");
+	public static final ResourceKey<Item> MOLY_OXIDE_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("moly_oxide_bag"));
+	public static final Item MOLY_OXIDE_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(MOLY_OXIDE_BAG_KEY),
+			String.format("%,.0f kg of technical moly oxide (57 %% Mo)", Tuning.BULK_BAG_KG), "for the aluminothermic vessel");
+	public static final ResourceKey<Item> SCHEELITE_CONCENTRATE_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("scheelite_concentrate_bag"));
+	public static final Item SCHEELITE_CONCENTRATE_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(SCHEELITE_CONCENTRATE_BAG_KEY),
+			String.format("%,.0f kg of dried scheelite concentrate (65 %% WO3)", Tuning.BULK_BAG_KG), "for the aluminothermic vessel");
+	public static final ResourceKey<Item> FERROMOLYBDENUM_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("ferromolybdenum_bag"));
+	public static final Item FERROMOLYBDENUM_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(FERROMOLYBDENUM_BAG_KEY),
+			String.format("%,.0f kg of ferromolybdenum (65 %% Mo)", Tuning.BULK_BAG_KG), "for Alloy 718 and 316 stainless; the alloy melt shop (17b)");
+	public static final ResourceKey<Item> FERROTUNGSTEN_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("ferrotungsten_bag"));
+	public static final Item FERROTUNGSTEN_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(FERROTUNGSTEN_BAG_KEY),
+			String.format("%,.0f kg of ferrotungsten (78 %% W)", Tuning.BULK_BAG_KG), "for tool steels");
 	// 10c1: blueprints (docs/blueprints.md)
 	public static final ResourceKey<Item> BLUEPRINT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("blueprint"));
 	public static final Item BLUEPRINT = new dev.wildcatter.item.BlueprintItem(new Item.Properties().stacksTo(1).setId(BLUEPRINT_KEY));
@@ -380,6 +402,13 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, TAPPING_CRUCIBLE_KEY, TAPPING_CRUCIBLE);
 		Registry.register(BuiltInRegistries.ITEM, GAUZE_PACK_KEY, GAUZE_PACK);
 		Registry.register(BuiltInRegistries.ITEM, EMULSIFIER_PAIL_KEY, EMULSIFIER_PAIL);
+		Registry.register(BuiltInRegistries.ITEM, FERROCHROME_BAG_KEY, FERROCHROME_BAG);
+		Registry.register(BuiltInRegistries.ITEM, FERROMANGANESE_BAG_KEY, FERROMANGANESE_BAG);
+		Registry.register(BuiltInRegistries.ITEM, FERROSILICON_BAG_KEY, FERROSILICON_BAG);
+		Registry.register(BuiltInRegistries.ITEM, MOLY_OXIDE_BAG_KEY, MOLY_OXIDE_BAG);
+		Registry.register(BuiltInRegistries.ITEM, SCHEELITE_CONCENTRATE_BAG_KEY, SCHEELITE_CONCENTRATE_BAG);
+		Registry.register(BuiltInRegistries.ITEM, FERROMOLYBDENUM_BAG_KEY, FERROMOLYBDENUM_BAG);
+		Registry.register(BuiltInRegistries.ITEM, FERROTUNGSTEN_BAG_KEY, FERROTUNGSTEN_BAG);
 		Registry.register(BuiltInRegistries.ITEM, BLUEPRINT_KEY, BLUEPRINT);
 		Registry.register(BuiltInRegistries.ITEM, SURVEY_TOOL_KEY, SURVEY_TOOL);
 		Registry.register(BuiltInRegistries.ITEM, GROUNDING_SET_KEY, GROUNDING_SET);

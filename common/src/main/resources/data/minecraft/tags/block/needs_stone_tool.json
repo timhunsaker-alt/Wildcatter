@@ -290,6 +290,11 @@
     "wildcatter:junction_box",
     "wildcatter:control_supply",
     "wildcatter:plc_cabinet",
-    "wildcatter:remote_io_drop"
+    "wildcatter:remote_io_drop",
+    "wildcatter:furnace_transformer",
+    "wildcatter:submerged_arc_furnace",
+    "wildcatter:capacitor_bank",
+    "wildcatter:moly_roaster",
+    "wildcatter:aluminothermic_vessel"
   ]
 }
