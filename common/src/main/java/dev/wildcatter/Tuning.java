@@ -129,6 +129,8 @@ public final class Tuning {
 	/** Gasoline, natural gasoline and condensate: about 32 MJ/L (proposed; motor gasoline is 32-34). */
 	public static final double GASOLINE_JOULES_PER_L = 32.0e6;
 	public static final int CRUDE_BUCKET_UNITS = 1000;
+	/** A bucket of crude or diesel in a firebox burns one hour (Tim, 2026-11-10), whatever it would give off a pipe. */
+	public static final int FIREBOX_BUCKET_TICKS = 3600 * 20;
 	public static final double RIG_WATTS = 30_000.0;          // a 40 hp, 480 V three-phase drive: about 45 A (docs/phase3-three-phase.md)
 	public static final int DRILL_TICKS_PER_BLOCK = 20;       // at full voltage
 	public static final double PUMPJACK_WATTS = 7_500.0;      // a 10 hp, 480 V three-phase motor: about 11 A

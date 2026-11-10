@@ -7,7 +7,7 @@ The NeoForge scenes are in `GridAnswerScenes`; the client scene `guyWire` films 
 - **Chosen:** 0.36 MW (`Tuning.FIREBOX_HEAT_WATTS`), a vanilla coal's 80 s at about 29 MJ, in every world. Every piped fuel lasts its
   heating value at that rate (`fluid/FireboxFuel`): natural gas, wet gas and well gas 38 MJ/m3 (2,111 ticks a m3), biogas 23 MJ/m3 (1,278),
   crude 38 MJ/L (new `CRUDE_JOULES_PER_L`, as fuel oil), diesel and kerosene 36 MJ/L, gasoline, natural gasoline and condensate 32 MJ/L
-  (new `GASOLINE_JOULES_PER_L`), residue 38 MJ/L. The crude and diesel bucket items burn by the same rule: a bucket of crude is about 29 hours.
+  (new `GASOLINE_JOULES_PER_L`), residue 38 MJ/L. The crude and diesel bucket items burn by the same rule: a bucket of crude is about 29 hours. **Changed (Tim, 2026-11-10): a bucket of crude or diesel burns one hour; piped fuel keeps the heating-value rule.**
 - **Why:** "one real heat rate" covers the liquids too; the bucket burning 100 times shorter than the same 1,000 L off a pipe would be
   inconsistent. Coal, wood and other item fuels keep their vanilla burn times (they set the rate).
 - **What changes in an existing world (approved):** a firebox on a gas well or oil well burns about 260 (gas) or 105 (oil) times less for

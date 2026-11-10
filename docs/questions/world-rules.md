@@ -24,6 +24,7 @@ here. These are the choices made while building the answers; none of them reopen
 - **Why:** every scene before this was written against the rules off; a new world's defaults (the real heat-up, bent grids, LOW GEL)
   would change dozens of scenes that do not test them.
 - **Alternatives:** let the test world take a new world's defaults and rewrite the scenes that break.
+- **Tim (2026-11-10):** `reactorRealHeatup` stays on in new worlds.
 
 ### 3. A third oilfield rule: `wellControl`
 - **Chosen:** besides `saltDomeGrid192` and `mudGel`, Phase 15b2's kicks, NO BOP, blowouts and the washout in rock salt are behind a rule
@@ -31,6 +32,7 @@ here. These are the choices made while building the answers; none of them reopen
 - **Why:** the brief's rule that nothing may change an existing world except through a rule that is off there: a land rig in an existing
   world drilling toward a deep field would otherwise stop at NO BOP, and one drilling through an evaporite bed at WASHOUT.
 - **Alternatives:** leave them always on (an existing rig's behaviour changes on update); fold them into `mudGel`.
+- **Tim (2026-11-10):** keep it.
 
 ### 4. Exactly the old dome placement with `saltDomeGrid192` off
 - **Chosen:** the placed feature `wildcatter:salt_dome` keeps its id, its biomes (plains, sunflower plains, swamps and beaches again,

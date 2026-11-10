@@ -157,12 +157,9 @@ public class FireboxBlockEntity extends BaseContainerBlockEntity implements Worl
 	}
 
 	/** How many ticks a piece of fuel burns, or 0 if it is not fuel. */
-	private static int burnTicks(ServerLevel level, ItemStack stack) {
-		if (stack.is(dev.wildcatter.WildcatterItems.CRUDE_OIL_BUCKET)) {
-			return (int) (Tuning.CRUDE_BUCKET_UNITS * FireboxFuel.ticksPerUnit(Product.CRUDE));
-		}
-		if (stack.is(dev.wildcatter.WildcatterItems.DIESEL_BUCKET)) {
-			return (int) (Tuning.DIESEL_BUCKET_UNITS * FireboxFuel.ticksPerUnit(Product.DIESEL));
+	public static int burnTicks(ServerLevel level, ItemStack stack) {
+		if (stack.is(dev.wildcatter.WildcatterItems.CRUDE_OIL_BUCKET) || stack.is(dev.wildcatter.WildcatterItems.DIESEL_BUCKET)) {
+			return Tuning.FIREBOX_BUCKET_TICKS;   // one hour a bucket (Tim, 2026-11-10); piped fuel burns by its heating value
 		}
 		if (stack.isEmpty() || stack.get(DataComponents.COOKING_FUEL) == null) {
 			return 0;

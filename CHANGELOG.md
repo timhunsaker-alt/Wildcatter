@@ -4,7 +4,7 @@
 
 ### Tim's answers, grid and pit line (2026-11-10, branch `w-grid`)
 - **Firebox:** one real heat rate, 0.36 MW, in every world: piped gas, biogas and liquid fuels last their heating value. A firebox on
-  biogas or pipeline gas stays lit; one on a gas well burns far less gas for the same steam.
+  biogas or pipeline gas stays lit; one on a gas well burns far less gas for the same steam. A bucket of crude or diesel burns an hour.
 - **Guy wires:** a Guy Anchor and Guy Strand. A pole whose line pulls it past its class load reads UNGUYED on the Power Meter and, if
   placed in this version, leans over time; a guy that holds the pull stands it plumb. Poles never break on their own; built poles never lean.
 - **Pole transformer set by command:** in its default facing it turns its back to its pole. Built units keep their terminals.

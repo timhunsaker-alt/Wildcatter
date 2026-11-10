@@ -49,7 +49,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * NeoForge server scenes for Tim's answers of 2026-11-10 built on branch {@code w-grid} (docs/questions/answers-grid.md). Helpers in
  * {@link GridSceneKit}; the scenes build at y {@link #U} on a stone floor.
  * <ul>
- * <li>{@code firebox_heat_rate}: fireboxes on pipeline gas and on biogas stay lit and burn at their one 0.36 MW heat rate (answer 17).</li>
+ * <li>{@code firebox_heat_rate}: fireboxes on pipeline gas and on biogas stay lit and burn at their one 0.36 MW heat rate (answer 17); a bucket of crude or diesel burns one hour.</li>
  * <li>{@code guy_wire}: a dead-end 40 ft pole reads UNGUYED and leans; a tangent pole holds; a pole from an older save reads UNGUYED and
  * stays plumb; a guy to an anchor holds the pull and draws the leaning pole plumb (answer 16).</li>
  * <li>{@code pole_unit_facing}: a pole unit set by command in its default facing turns its back to its pole; a named facing and a unit
@@ -128,6 +128,10 @@ final class GridAnswerScenes {
 				check(helper, taken > want * 0.5 && taken < want * 1.6, "a firebox on " + fuels[i].label() + " should burn about " + want + " m3, not " + taken);
 			}
 			check(helper, Math.abs(FireboxFuel.ticksPerUnit(Product.PIPELINE_GAS) - 2111.1) < 0.1, "a m3 of natural gas is 2,111 ticks of fire");
+			for (net.minecraft.world.item.Item bucket : new net.minecraft.world.item.Item[] {dev.wildcatter.WildcatterItems.CRUDE_OIL_BUCKET, dev.wildcatter.WildcatterItems.DIESEL_BUCKET}) {
+				int ticks = dev.wildcatter.block.FireboxBlockEntity.burnTicks(helper.getLevel(), new net.minecraft.world.item.ItemStack(bucket));
+				check(helper, ticks == 72_000, "a bucket of " + bucket + " should burn one hour (72,000 ticks) in a firebox, not " + ticks);
+			}
 			log("firebox_heat_rate", "ok");
 			helper.succeed();
 		});

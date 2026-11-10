@@ -2046,7 +2046,7 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
 
 ## Tim's answers, grid and pit line (2026-11-10; branch `w-grid`; decisions: `docs/questions/answers-grid.md`)
 - **Firebox (answer 17):** one heat rate, 0.36 MW, in every world (`Tuning.FIREBOX_HEAT_WATTS`, `fluid/FireboxFuel`): natural gas 2,111
-  ticks a m3, biogas 1,278, liquids by their MJ a litre; buckets by the same rule. A firebox now stays lit on a digester's biogas or a
+  ticks a m3, biogas 1,278, liquids by their MJ a litre. A bucket of crude or diesel burns one hour (Tim, 2026-11-10). A firebox now stays lit on a digester's biogas or a
   pipeline. The `biogas` scenes (server and client) check it.
 - **Guy wires (answer 16):** `guy_anchor` (block and entity, its guy drawn by `GuyRenderer`) and `guy_strand` (60 m coil). `PoleLoad`
   weighs each wood pole's span pulls (25 % of the conductor's breaking strength, `ConductorSize.breakingLbf`) against its class load,

@@ -245,7 +245,7 @@ public final class WildcatterItems {
 	public static final Item ANODE_ROD = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(ANODE_ROD_KEY),
 			"Anode rod: a stem with its steel yoke and stubs", "reused round and round");
 
-	/** A bucket of crude oil. It burns in a firebox (as long as lava) and leaves the bucket behind. */
+	/** A bucket of crude oil. It burns in a firebox for an hour and leaves the bucket behind. */
 	public static final ResourceKey<Item> CRUDE_OIL_BUCKET_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("crude_oil_bucket"));
 	public static final Item CRUDE_OIL_BUCKET = new Item(new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET).setId(CRUDE_OIL_BUCKET_KEY));
 
