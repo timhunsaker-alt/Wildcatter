@@ -32,8 +32,8 @@ M.box((1.15, Y + 0.45, Z - 0.3), (1.65, Y + 0.75, Z + 0.3), "iron")
 M.cylinder("y", (1.4, Z), 0.08, Y + 0.75, Y + 0.9, "steel", 10)
 M.box((1.28, Y + 0.9, Z - 0.12), (1.52, 1.98, Z + 0.12), "blue")
 # inlet from the superheater above the north side: down at IX, through the trip-and-throttle valve, into the chest
-M.pipe([(IX, 1.75, 0.095), (IX, 1.75, Z - 0.3)], 6, "lagging")
-M.flange("z", (IX, 1.75), 0.15, 0.1, 0.03, "steel", bolts=8, bolt_tex="galv")
+M.pipe([(IX, 1.75, 0.0), (IX, 1.75, Z - 0.3)], 6, "lagging")
+M.flange("z", (IX, 1.75), 0.15, 0.015, 0.03, "steel", bolts=8, bolt_tex="galv")   # meets the superheater's flange at the cell edge
 M.box((IX - 0.13, 1.6, 0.35), (IX + 0.13, 1.9, 0.6), "steel")   # trip-and-throttle valve
 M.cylinder("y", (IX, 0.47), 0.03, 1.9, 1.97, "steel", 8)
 M.cylinder("y", (IX, 0.47), 0.11, 1.97, 1.99, "rubber", 12)       # its handwheel

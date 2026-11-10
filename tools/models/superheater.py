@@ -25,18 +25,19 @@ M.cylinder("y", (0.45, 0.8), 0.32, TOP + 0.3, 3.9, "iron", 16)
 M.ring("y", (0.45, 0.8), 0.33, 3.6, 3.64, 0.02, "iron", sides=16)
 M.cylinder("y", (0.45, 0.8), 0.36, 3.94, 3.98, "iron", 16)
 # steam in from the drum, the outlet header, its safety valve and thermometer
-M.pipe([(0.09, 3.85, 1.85), (HX, 3.85, 1.85), (HX, HY + 0.1, 1.85)], 6, "lagging")
+M.pipe([(0.0, 3.85, 1.85), (HX, 3.85, 1.85), (HX, HY + 0.1, 1.85)], 6, "lagging")
+M.flange("x", (3.85, 1.85), 0.15, 0.015, 0.03, "steel", bolts=8, bolt_tex="galv")   # bolted to the boiler's outlet flange
 M.cylinder("z", (HX, HY), 0.12, 1.5, 2.65, "lagging", 12)
 M.cylinder("y", (HX, 2.3), 0.05, HY + 0.1, HY + 0.3, "steel", 8)
 M.cylinder("y", (HX, 2.3), 0.035, HY + 0.3, 3.95, "brass", 8)
 M.cylinder("x", (HY, 2.0), 0.05, HX + 0.12, HX + 0.2, "galv", 10)
 M.decal((HX + 0.2, HY - 0.04, 1.96), (HX + 0.205, HY + 0.04, 2.04), "gauge", "east", "galv")
 # the main steam stop valve and the line down the south side into the turbine below
-M.pipe([(HX, HY, 2.65), (HX, HY, 2.75), (HX, 1.75, 2.75), (HX, 1.75, 2.9)], 6, "lagging")
+M.pipe([(HX, HY, 2.65), (HX, HY, 2.75), (HX, 1.75, 2.75), (HX, 1.75, 3.0)], 6, "lagging")
 M.box((HX - 0.14, 2.6, 2.62), (HX + 0.14, 2.9, 2.88), "steel")   # stop valve body
 M.cylinder("x", (2.75, 2.75), 0.04, HX + 0.14, HX + 0.4, "steel", 8)   # its stem
 M.cylinder("x", (2.75, 2.75), 0.14, HX + 0.4, HX + 0.43, "rubber", 12) # handwheel
-M.flange("z", (HX, 1.75), 0.15, 2.92, 0.03, "steel", bolts=8, bolt_tex="galv")
+M.flange("z", (HX, 1.75), 0.15, 2.965, 0.03, "steel", bolts=8, bolt_tex="galv")   # bolted to the turbine's inlet flange
 
 M.collide((0, 0, 0.1), (0.92, TOP + 0.04, 2.9))
 M.collide((0.08, TOP, 0.3), (0.82, 3.98, 1.3))

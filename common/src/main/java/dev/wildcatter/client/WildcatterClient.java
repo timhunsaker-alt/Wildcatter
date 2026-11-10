@@ -65,6 +65,7 @@ public final class WildcatterClient {
 		sink.accept(dev.wildcatter.WildcatterBlocks.UNIT_MOTOR_ENTITY, context -> new KineticRenderer<>(context));
 		sink.accept(dev.wildcatter.WildcatterBlocks.PE_REACTOR_ENTITY, context -> new KineticRenderer<>(context));
 		sink.accept(dev.wildcatter.WildcatterBlocks.PELLETIZER_ENTITY, context -> new KineticRenderer<>(context));
+		sink.accept(dev.wildcatter.WildcatterBlocks.TURBINE_GENERATOR_ENTITY, context -> new RunsRenderer<>());   // the steam plant's feedwater line
 	}
 
 	/** Leaving a world: forget its machine loops. */

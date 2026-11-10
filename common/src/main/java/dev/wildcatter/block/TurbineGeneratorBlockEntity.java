@@ -41,7 +41,7 @@ import net.minecraft.world.level.storage.ValueOutput;
  * (3.3 kV on IEC worlds) for the GSU. Without a cooling tower on the condenser's water the back pressure takes a third more steam,
  * so the plant makes at most three quarters of its rating. A low drum level trips it.
  */
-public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitPart, Generator, Inspectable, dev.wildcatter.multiblock.BigPartEntity, dev.wildcatter.control.ControlDevice, dev.wildcatter.control.Measurable {
+public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitPart, Generator, Inspectable, dev.wildcatter.multiblock.BigPartEntity, dev.wildcatter.control.ControlDevice, dev.wildcatter.control.Measurable, dev.wildcatter.kinetic.DrawnRuns {
 	private final dev.wildcatter.control.Remote remote = new dev.wildcatter.control.Remote(1);
 
 	@Override
@@ -135,8 +135,24 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 		setChanged();
 	}
 
-	private Direction facing() {
+	@Override
+	public Direction facing() {
 		return getBlockState().getValue(TurbineGeneratorBlock.FACING);
+	}
+
+	/**
+	 * The feedwater line from the feed pump's discharge flange, up over the generator on two posts, to the boiler's feedwater flange on
+	 * its south edge (docs/questions/misc-gaps.md, 1): NPS 2 steel, in the generator's frame (the pump is 2 m south of it, the boiler
+	 * 3 m north; tools/models/feed_pump.py and boiler_drum.py). Drawn once the plant is formed. The main steam line runs within the
+	 * boiler, superheater and turbine, flange to flange at their edges.
+	 */
+	private static final List<dev.wildcatter.kinetic.DrawnRuns.Run> FEEDWATER = List.of(
+			dev.wildcatter.kinetic.DrawnRuns.Run.of(dev.wildcatter.kinetic.DrawnRuns.Kind.PIPE, "block/mat/mat_stainless", 0.0302, new double[] {1.49, 1.0, 2.5}, new double[] {1.49, 2.1, 2.5}, new double[] {1.49, 2.1, 0.0}),
+			dev.wildcatter.kinetic.DrawnRuns.Run.of(dev.wildcatter.kinetic.DrawnRuns.Kind.POSTS, "block/mat/mat_galvanized", 0.04, new double[] {1.49, 2.07, 1.95}, new double[] {1.49, 2.07, 0.15}));
+
+	@Override
+	public List<dev.wildcatter.kinetic.DrawnRuns.Run> drawnRuns() {
+		return formed ? FEEDWATER : List.of();
 	}
 
 	public Spin spin() {
@@ -224,6 +240,7 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 		if (found.parts() != null) {
 			if (!formed) {
 				level.playSound(null, worldPosition, WildcatterSounds.STRUCTURE_FORMED, SoundSource.BLOCKS, 1.5F, 0.8F);
+				level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
 			}
 			formed = true;
 			missing = "";
@@ -245,6 +262,7 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 				formed = false;
 				breakerClosed = false;
 				run = Run.COLD;
+				level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
 				CircuitManager.markDirty(level);
 			}
 		}
@@ -510,6 +528,7 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 		tag.putFloat("rpm", spin.rpm());
 		tag.putDouble("firing", firing);
 		tag.putDouble("watts", outWatts);
+		tag.putBoolean("formed", formed);   // the feedwater line is drawn only on a formed plant
 		return tag;
 	}
 

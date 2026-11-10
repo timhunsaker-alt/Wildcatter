@@ -1,6 +1,7 @@
 """Genset gas engine, 1 MW lean-burn V20 (docs/multiblocks/genset.md), at true size: 4 x 2 x 2.
 
-About 3.8 m long: a deep crankcase and oil pan, two banks of ten cylinders in a V with their head covers, the ignition
+About 3.4 m long to its flywheel housing (a 1 MW V20 is about 3.3 m), the last 0.6 m of its cells left to the 1 MW alternator's
+adapter and fan end under the turbochargers (docs/questions/misc-gaps.md, 2): a deep crankcase and oil pan, two banks of ten cylinders in a V with their head covers, the ignition
 harness rail and coil leads along each bank, the intake manifold in the V, insulated exhaust manifolds outboard of both
 banks, twin turbochargers and the charge-air cooler at the rear, the exhaust riser to the silencer, and the gas train on
 the north side (the pipeline connects to any cell of the engine). The crank pulley turns (pivot x 0.06, y 0.55, z 1.0).
@@ -9,7 +10,7 @@ import gensetlib as g
 
 M = g.model("genset_gas_engine", 4, 2, "gasgreen")
 Y, Z = g.SHAFT_Y, g.SHAFT_Z
-X1, X2 = 0.18, 3.82
+X1, X2 = 0.18, 3.3
 CYL = [X1 + 0.22 + k * (X2 - X1 - 0.44) / 9 for k in range(10)]
 
 # bottom end
@@ -70,9 +71,9 @@ M.cylinder("y", (1.3, 0.12), 0.07, 0.9, 1.0, "grey", 10)
 M.pipe([(1.6, 0.7, 0.12), (1.6, 1.2, 0.12), (1.6, 1.2, 0.9)], 3, "galv")
 M.decal((2.0, 0.5, 0.455), (2.3, 0.7, 0.46), "engineplate", "north", "gasgreen")
 # rear: flywheel housing; feet; the silencer's stands
-M.cylinder("x", (Y, Z), 0.5, X2, 4.0, "gasgreen", 16)
+M.cylinder("x", (Y, Z), 0.5, X2, X2 + 0.1, "gasgreen", 16)   # the alternator's adapter bolts to its face
 M.bolt_circle("x", (Y, Z), 0.46, X2 - 0.02, 14, "galv")
-g.feet(M, (0.5, 1.5, 2.5, 3.5), (0.31, 1.69), 0.32, "gasgreen")
+g.feet(M, (0.5, 1.4, 2.3, 3.1), (0.31, 1.69), 0.32, "gasgreen")
 for x in (1.3, 2.4):
 	M.box((x - 0.04, 1.3, 1.46), (x + 0.04, 2.0, 1.54), "iron")
 	M.box((x - 0.06, 1.24, 1.42), (x + 0.06, 1.3, 1.58), "iron")

@@ -132,9 +132,14 @@ public class GensetPartBlockEntity extends BlockEntity implements Kinetic, Sound
 		return switch (part()) {
 			case RADIATOR -> List.of(new Rotor(rotor.part(RotorBlock.Part.RADIATOR_FAN), new Vector3f(0.78F, 1.0F, 1.0F), Direction.Axis.X, 1.2F));
 			case DIESEL_ENGINE, GAS_ENGINE -> List.of(new Rotor(rotor.part(RotorBlock.Part.CRANK_PULLEY), new Vector3f(0.06F, 0.55F, 1.0F), Direction.Axis.X, 1.0F));
-			case ALTERNATOR -> List.of(
-					new Rotor(rotor.part(RotorBlock.Part.COUPLING), new Vector3f(0.1F, 0.55F, 1.0F), Direction.Axis.X, 1.0F),
-					new Rotor(rotor.part(RotorBlock.Part.ALTERNATOR_FAN), new Vector3f(0.3F, 0.55F, 1.0F), Direction.Axis.X, 1.0F));
+			case ALTERNATOR -> {
+				// the 1 MW frame reaches 0.6 m further back, its coupling and fan with it (tools/models/alternator.py)
+				float back = getBlockState().hasProperty(GensetPartBlock.Alternator.FRAME)
+						&& getBlockState().getValue(GensetPartBlock.Alternator.FRAME) == GensetPartBlock.Alternator.Frame.MW1 ? 0.6F : 0.0F;
+				yield List.of(
+						new Rotor(rotor.part(RotorBlock.Part.COUPLING), new Vector3f(0.1F - back, 0.55F, 1.0F), Direction.Axis.X, 1.0F),
+						new Rotor(rotor.part(RotorBlock.Part.ALTERNATOR_FAN), new Vector3f(0.3F - back, 0.55F, 1.0F), Direction.Axis.X, 1.0F));
+			}
 			default -> List.of();
 		};
 	}

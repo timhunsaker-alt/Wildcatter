@@ -47,13 +47,19 @@ for y in (DY - 0.15, DY, DY + 0.15):
 	M.box((0.17, y - 0.015, DZ - 0.76), (0.2, y + 0.015, DZ - 0.62), "brass")   # try cocks
 M.pipe([(0.25, DY - 0.45, DZ - 0.68), (0.25, 0.3, DZ - 0.68)], 0.75, "steel")
 M.cylinder("x", (0.6, DZ - 0.68), 0.05, 0.12, 0.22, "brass", 8)
-# steam outlet to the superheater at the rear, lagged
-M.pipe([(3.5, DY + DR - 0.05, DZ), (3.5, 3.85, DZ), (3.91, 3.85, DZ)], 6, "lagging")
-# feedwater line down the south side: stop valve and check valve, into the drum
-M.pipe([(2.4, 0.4, 2.93), (2.4, DY, 2.93), (2.4, DY, DZ + DR - 0.05)], 2, "steel")
-M.cylinder("z", (2.4, 1.2), 0.08, 2.9, 2.98, "brass", 10)        # stop valve and handwheel
-M.cylinder("z", (2.4, 1.2), 0.11, 2.98, 3.0, "rubber", 12)
-M.box((2.33, 1.7, 2.88), (2.47, 1.86, 2.98), "steel")              # check valve
+# steam outlet to the superheater at the rear, lagged, to its flange at the boiler's end, where the superheater's inlet bolts on
+M.pipe([(3.5, DY + DR - 0.05, DZ), (3.5, 3.85, DZ), (4.0, 3.85, DZ)], 6, "lagging")
+M.flange("x", (3.85, DZ), 0.15, 3.965, 0.03, "steel", bolts=8, bolt_tex="galv")
+# feedwater line: in from the feed pump over the generator (the plant draws that run, docs/questions/misc-gaps.md, 1) to its
+# flange on the south edge 2.1 m up, along the south side through the stop valve and check valve, and up into the drum
+FY = 2.1
+M.pipe([(1.49, FY, 3.0), (1.49, FY, 2.93), (2.4, FY, 2.93), (2.4, DY, 2.93), (2.4, DY, DZ + DR - 0.05)], 2, "steel")
+M.flange("z", (1.49, FY), 0.07, 2.965, 0.03, "steel", bolts=4, bolt_tex="galv")
+M.box((1.72, FY - 0.07, 2.88), (1.88, FY + 0.07, 2.98), "steel")   # stop valve body, its stem and handwheel up
+M.cylinder("y", (1.8, 2.93), 0.015, FY + 0.07, FY + 0.22, "steel", 6)
+M.cylinder("y", (1.8, 2.93), 0.08, FY + 0.22, FY + 0.24, "rubber", 12)
+M.box((2.04, FY - 0.06, 2.89), (2.24, FY + 0.06, 2.97), "steel")   # check valve
+M.box((2.11, FY + 0.06, 2.9), (2.17, FY + 0.1, 2.96), "steel")     # its cover
 # blowdown valves on the mud drum, low on the front
 for z in (2.0, 2.3):
 	M.pipe([(0.0 + 0.05, 0.32, z), (0.2, 0.32, z)], 1.5, "steel")

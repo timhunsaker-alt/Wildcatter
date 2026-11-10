@@ -52,6 +52,13 @@
     gas plant's stabilizer fires its reboiler on piped gas or its own LPG; gas engine sets and gas turbines burn coke oven gas and coker
     gas; each pot's auxiliaries take 3 kW at the industrial voltage on its front, and a pot can be cut out of a live line (sneak-right-click);
     a hopper on any cell of the steam plant's burner feeds it.
+- **The misc gaps wave** (decisions for review: `docs/questions/misc-gaps.md`):
+  - A formed steam plant draws its feedwater line from the feed pump to the boiler, and its main steam line runs flange to flange from
+    boiler to superheater to turbine; a formed land rig draws its cable trays from the drive house to the mud pumps and the drawworks.
+  - The 1 MW gas set's alternator is drawn at its real 1.6 m (the 500 kW set's stays 1 m); built sets redraw on their own.
+  - A gas set on coke oven gas is held to 864 kW; the aeroderivative refuses coke oven gas (its Wobbe index is 40 % off pipeline
+    gas's) and still takes coker gas.
+  - The brass texture no longer shows a tile line; the conductor spool icons are new art.
 
 ## v0.6.0 (built 2026-11-09; not yet released on GitHub)
 - **The ammonia plant (Phase 14):** a nitrogen generator, syngas compressor and ammonia converter on the steam reformer's hydrogen

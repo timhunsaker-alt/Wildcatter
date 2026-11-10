@@ -1,0 +1,11 @@
+{
+ "variants": {
+  "axis=z": {
+   "model": "wildcatter:block/crane_rail"
+  },
+  "axis=x": {
+   "model": "wildcatter:block/crane_rail",
+   "y": 90
+  }
+ }
+}

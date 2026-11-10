@@ -28,7 +28,8 @@ M.box((1.2, 0.1, Z - 0.08), (1.4, Y + 0.06, Z + 0.08), "iron")
 M.cylinder("x", (Y, Z), 0.2, 1.4, 1.58, "iron", 12)
 M.cylinder("x", (Y - 0.02, Z), 0.05, 1.58, 1.98, "steel", 8)
 M.flange("x", (Y - 0.02, Z), 0.08, 1.96, 0.02, "steel", bolts=4, bolt_tex="galv")
-M.pipe([(1.49, Y + 0.18, Z), (1.49, 0.94, Z)], 1.5, "steel")
+M.pipe([(1.49, Y + 0.18, Z), (1.49, 1.0, Z)], 1.5, "steel")
+M.flange("y", (1.49, Z), 0.07, 0.965, 0.03, "steel", bolts=4, bolt_tex="galv")   # where the feedwater line to the boiler bolts on
 M.cylinder("y", (1.49, Z), 0.04, 0.62, 0.7, "brass", 8)   # discharge check valve
 M.cylinder("z", (1.49, 0.8), 0.04, Z - 0.1, Z - 0.04, "galv", 8)
 M.decal((1.45, 0.76, Z - 0.105), (1.53, 0.84, Z - 0.1), "gauge", "north", "galv")

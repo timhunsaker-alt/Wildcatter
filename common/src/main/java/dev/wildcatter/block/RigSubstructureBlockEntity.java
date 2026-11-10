@@ -35,7 +35,7 @@ import org.jspecify.annotations.Nullable;
  * it gets allows: {@link Tuning#LAND_RIG_TICKS_PER_BLOCK} a block at full power, a 15 s connection after each 27 m stand. On a
  * strike it sets the wellhead in the hole cell under its floor and stops.
  */
-public class RigSubstructureBlockEntity extends BlockEntity implements Inspectable, BigPartEntity, Kinetic, dev.wildcatter.control.ControlDevice {
+public class RigSubstructureBlockEntity extends BlockEntity implements Inspectable, BigPartEntity, Kinetic, dev.wildcatter.control.ControlDevice, dev.wildcatter.kinetic.DrawnRuns {
 	private final dev.wildcatter.control.Remote remote = new dev.wildcatter.control.Remote(1);
 
 	@Override
@@ -127,6 +127,29 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		return formed;
 	}
 
+	/**
+	 * The motor cables from the drive house (docs/questions/misc-gaps.md, 4), in the substructure's frame (the hole is at x 4..5, z
+	 * 4..5; LandRig's offsets): a ladder tray on the ground out of the drive house's east end, along its side and up the pumps' east
+	 * side, with each pump's three cables rising to its motor's terminal box; and a tray out of the drive house's north side, up the
+	 * back of the substructure to the drill floor, the drawworks motor's cables over to its terminal box. Drawn once the rig is formed.
+	 */
+	private static final List<dev.wildcatter.kinetic.DrawnRuns.Run> CABLES = List.of(
+			dev.wildcatter.kinetic.DrawnRuns.Run.of(dev.wildcatter.kinetic.DrawnRuns.Kind.TRAY, "block/mat/mat_galvanized", 0.45,
+					new double[] {10.0, 0.05, 13.0}, new double[] {19.6, 0.05, 13.0}, new double[] {19.6, 0.05, 1.25}),
+			dev.wildcatter.kinetic.DrawnRuns.Run.of(dev.wildcatter.kinetic.DrawnRuns.Kind.CABLES, "block/mat/mat_rubber", 0.03,
+					new double[] {19.6, 0.1, 5.25}, new double[] {19.6, 2.08, 5.25}, new double[] {19.0, 2.08, 5.25}),
+			dev.wildcatter.kinetic.DrawnRuns.Run.of(dev.wildcatter.kinetic.DrawnRuns.Kind.CABLES, "block/mat/mat_rubber", 0.03,
+					new double[] {19.6, 0.1, 1.25}, new double[] {19.6, 2.08, 1.25}, new double[] {19.0, 2.08, 1.25}),
+			dev.wildcatter.kinetic.DrawnRuns.Run.of(dev.wildcatter.kinetic.DrawnRuns.Kind.TRAY, "block/mat/mat_galvanized", 0.45,
+					new double[] {5.25, 0.05, 11.0}, new double[] {5.25, 0.05, 9.15}, new double[] {5.25, 8.3, 9.15}),
+			dev.wildcatter.kinetic.DrawnRuns.Run.of(dev.wildcatter.kinetic.DrawnRuns.Kind.CABLES, "block/mat/mat_rubber", 0.03,
+					new double[] {5.25, 8.3, 9.2}, new double[] {5.25, 8.3, 7.5}, new double[] {6.25, 8.3, 7.5}, new double[] {6.25, 8.05, 7.5}));
+
+	@Override
+	public List<dev.wildcatter.kinetic.DrawnRuns.Run> drawnRuns() {
+		return formed ? CABLES : List.of();
+	}
+
 	public boolean drilling() {
 		return phase == Phase.DRILLING && formed && topDrive;
 	}
@@ -212,6 +235,7 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 			rig.missing = found.missing();
 			if (was != rig.formed) {
 				rig.setChanged();
+				level.sendBlockUpdated(pos, state, state, 3);   // the client draws the cables of a formed rig
 				dev.wildcatter.circuit.CircuitManager.markDirty(level);
 			}
 		}
@@ -405,6 +429,7 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		progress = input.getDoubleOr("progress", 0);
 		connection = input.getDoubleOr("connection", 0);
 		grown = input.getBooleanOr("grown", grown);
+		formed = input.getBooleanOr("formed", formed);   // sent to the client for the cables; the server finds it again on its next check
 		spin.setRpm(input.getFloatOr("rpm", 0));
 	}
 
@@ -421,6 +446,7 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		tag.putInt("stand", stand);
 		tag.putDouble("connection", connection);
 		tag.putFloat("rpm", spin.rpm());
+		tag.putBoolean("formed", formed);
 		return tag;
 	}
 }

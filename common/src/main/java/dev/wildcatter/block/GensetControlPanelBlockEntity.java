@@ -157,6 +157,8 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 	private double biogasBuffer;
 	/** Burning biogas this tick: the set is derated to 850 kW and its governor holds it there. */
 	private boolean biogas;
+	/** Its last gas was coke oven gas: derated to 86 % of its natural gas rating, its governor holding it there (LeanGas). */
+	private boolean cokeGas;
 	/** The derate's hold on the set's voltage, so a resistive load takes no more than the biogas rating (1 when not held). */
 	private double limitTrim = 1.0;
 	/** m3 of biogas burned since it was placed, for the readout's rate and the game test. */
@@ -337,6 +339,11 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 				}
 			}
 			parts = found.parts();
+			for (BlockPos at : parts) {   // the alternator drawn at the frame this set's rating needs
+				if (level.getBlockState(at).getBlock() instanceof GensetPartBlock.Alternator) {
+					GensetPartBlock.Alternator.setFrame(level, at, gas ? GensetPartBlock.Alternator.Frame.MW1 : GensetPartBlock.Alternator.Frame.KW500);
+				}
+			}
 		} else {
 			missing = found.missing();
 			if (formed) {
@@ -394,15 +401,26 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		got += piped;
 		// a carbon plant's gases, counted as the natural gas of the same heat (docs/questions/plant-crane-gaps.md, 7)
 		String lean = null;
+		boolean coke = false;
 		for (Product p : new Product[] {Product.COKE_OVEN_GAS, Product.COKER_GAS}) {
-			double per = p == Product.COKE_OVEN_GAS ? Tuning.COKE_OVEN_GAS_JOULES_PER_M3 : Tuning.COKER_GAS_JOULES_PER_M3;
+			double per = dev.wildcatter.fluid.LeanGas.joulesPerM3(p);
 			if (want - got > 1e-9) {
 				double m3 = Lines.pull(level, faces, p, (want - got) * Tuning.GAS_JOULES_PER_M3 / per, FluidNode.Pull.MACHINE, null);
 				if (m3 > 0) {
 					got += m3 * per / Tuning.GAS_JOULES_PER_M3;
 					lean = p.label();
+					coke |= p == Product.COKE_OVEN_GAS;
 				}
 			}
+		}
+		if (got > 0) {
+			if (coke != cokeGas && level != null) {
+				CircuitManager.markDirty(level);   // its rating changed
+			}
+			cokeGas = coke;
+		}
+		if (coke) {
+			lean += String.format("; COKE OVEN GAS: %d kW MAX", Math.round(cokeGasWatts() / 1000));
 		}
 		gasBuffer += got;
 		double bio = gasBuffer < fuelPerTick() && wantBio > 0 ? Lines.pull(level, faces, Product.BIOGAS, wantBio, FluidNode.Pull.MACHINE, null) : 0;
@@ -433,12 +451,23 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 	/** Fuel for one tick at the present load: 15 % of full-load fuel at no load, rising in a straight line to full. */
 	private double fuelPerTick() {
 		double fullPerSecond = (gas ? Tuning.GAS_FULL_LOAD_M3H : Tuning.DIESEL_FULL_LOAD_LPH) / 3600.0;
-		return fullPerSecond * (Tuning.GENSET_NO_LOAD_FUEL + (1 - Tuning.GENSET_NO_LOAD_FUEL) * loadShare()) / 20.0;
+		double derated = gas && cokeGas ? Tuning.GENSET_COKE_OVEN_GAS_DERATE : 1.0;   // the same heat rate on its lower rating
+		return fullPerSecond * derated * (Tuning.GENSET_NO_LOAD_FUEL + (1 - Tuning.GENSET_NO_LOAD_FUEL) * loadShare()) / 20.0;
 	}
 
 	/** Biogas for one tick at the present load, on the derated rating (docs/biogas.md). */
 	private double biogasPerTick() {
 		return dev.wildcatter.fluid.Biogas.fuelM3h(outWatts / Tuning.GENSET_BIOGAS_WATTS) / 3600.0 / 20.0;
+	}
+
+	/** Its rating on coke oven gas: 86 % of its natural gas rating (Tuning.GENSET_COKE_OVEN_GAS_DERATE). */
+	private static double cokeGasWatts() {
+		return Tuning.GENSET_GAS_WATTS * dev.wildcatter.fluid.LeanGas.engineDerate(Product.COKE_OVEN_GAS);
+	}
+
+	/** True while its gas is coke oven gas, and it is derated. */
+	public boolean onCokeOvenGas() {
+		return gas && cokeGas;
 	}
 
 	/** True while it burns biogas: derated to 850 kW. */
@@ -474,6 +503,7 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		}
 		if (run == Run.STOPPED) {
 			biogas = false;
+			cokeGas = false;
 		}
 		// fuel
 		if (run != Run.STOPPED) {
@@ -633,7 +663,7 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		double ratedAmps = ratedWatts() / Tuning.GENERATOR_RATED_PF / (3 * nominal);
 		double ohms = nominal * Tuning.ENGINE_SAG / ratedAmps;   // sags ENGINE_SAG at full current
 		phases.build(circuit, GensetControlPanelBlock.terminalCells(worldPosition, getBlockState()),
-				List.of(GensetControlPanelBlock.terminalFace(getBlockState())), Voltage.INDUSTRIAL, nominal * appliedTrim * (biogas ? limitTrim : 1.0), ohms, sync.angle());
+				List.of(GensetControlPanelBlock.terminalFace(getBlockState())), Voltage.INDUSTRIAL, nominal * appliedTrim * (held() ? limitTrim : 1.0), ohms, sync.angle());
 	}
 
 	@Override
@@ -647,21 +677,26 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 		amps = phases.amps(circuit);
 		outWatts = phases.watts(circuit);
 		hertz = circuit.hertz();
-		holdBiogasLimit();
+		holdDeratedLimit();
 		if (stator.step(phases.phaseAmps(circuit), StatorHeating.ratedPhaseAmps(ratedWatts(), Voltage.INDUSTRIAL.nominal()), ticks / 20.0)) {
 			trip(String.format("on stator overcurrent (phase %s at %.1fx its rating)", "ABC".charAt(stator.hottestPhase()), stator.worstRatio()));
 		}
 	}
 
+	/** Running on a derated gas, biogas or coke oven gas. */
+	private boolean held() {
+		return gas && (biogas || cokeGas);
+	}
+
 	/**
-	 * On biogas the governor holds the set to its derated 850 kW: asked for more, it droops, as a set at its limit does. In this model a
-	 * set's load follows its voltage, so the hold lowers the voltage until the load takes no more than the rating (a load's power goes
-	 * with the square of its voltage), and lets it back up as the load falls.
+	 * On biogas or coke oven gas the governor holds the set to its derated rating: asked for more, it droops, as a set at its limit
+	 * does. In this model a set's load follows its voltage, so the hold lowers the voltage until the load takes no more than the rating
+	 * (a load's power goes with the square of its voltage), and lets it back up as the load falls.
 	 */
-	private void holdBiogasLimit() {
-		double limit = Tuning.GENSET_BIOGAS_WATTS * 0.995;
+	private void holdDeratedLimit() {
+		double limit = ratedWatts() * 0.995;
 		double before = limitTrim;
-		if (!biogas) {
+		if (!held()) {
 			limitTrim = 1.0;
 		} else if (outWatts > limit || limitTrim < 1.0) {
 			limitTrim = outWatts > 1 ? Math.max(0.5, Math.min(1.0, limitTrim * Math.sqrt(limit / outWatts))) : 1.0;
@@ -686,7 +721,7 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 	// ---- Generator: the island's frequency ----------------------------------------------------------------------------
 	@Override
 	public double ratedWatts() {
-		return gas ? (biogas ? Tuning.GENSET_BIOGAS_WATTS : Tuning.GENSET_GAS_WATTS) : Tuning.GENSET_DIESEL_WATTS;
+		return gas ? (biogas ? Tuning.GENSET_BIOGAS_WATTS : cokeGas ? cokeGasWatts() : Tuning.GENSET_GAS_WATTS) : Tuning.GENSET_DIESEL_WATTS;
 	}
 
 	@Override

@@ -491,6 +491,12 @@ def spool_icon(metal, covered):
 for tier, metal in (("lv", COPPER), ("mv", (186, 150, 120)), ("dist", (178, 164, 150)), ("hv", STEEL_WIRE)):
 	tex(f"conductor_spool_{tier}", spool_icon(metal, False), kind="item")
 	tex(f"covered_conductor_spool_{tier}", spool_icon(metal, True), kind="item")
+# the misc gaps wave: Ludo's reels (art/source/ore/, through tools/process_art.py's icon()) over the drawn ones, drawn first so the noise
+# of every later script texture stays the same
+for _tier in ("lv", "mv", "dist", "hv"):
+	for _name in (f"conductor_spool_{_tier}", f"covered_conductor_spool_{_tier}"):
+		if os.path.exists(f"art/final/ore/{_name}.png"):
+			shutil.copy(f"art/final/ore/{_name}.png", f"{ASSETS}/textures/item/{_name}.png")
 
 # ---- receptacles and plug adapters ----------------------------------------------------------------------------
 PLUG_COLORS = {"nema_5_15": (238, 238, 232), "nema_5_20": (200, 60, 50), "nema_14_50": (46, 46, 52), "cee_7": (246, 246, 246), "iec_60309_blue": (40, 92, 204), "nema_l21_30": (60, 60, 66), "nema_l22_30": (180, 120, 40), "iec_60309_red_32": (196, 40, 36), "iec_60309_red_63": (150, 26, 24)}
@@ -2560,9 +2566,10 @@ for _dir, _, _files in os.walk("art/hand_assets"):
 		shutil.copy(os.path.join(_dir, _f), _to)
 
 lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
-lang.update({"block.wildcatter.process_water_pump": "Process Water Pump", "block.wildcatter.cell_liner": "Cell Liner", "block.wildcatter.decant_tower": "Decant Tower", "block.wildcatter.settled_tails": "Settled Tails"})
+lang.update({"block.wildcatter.process_water_pump": "Process Water Pump", "block.wildcatter.cell_liner": "Cell Liner", "block.wildcatter.decant_tower": "Decant Tower", "block.wildcatter.settled_tails": "Settled Tails",
+	"block.wildcatter.crane_rail": "Crane Rail"})   # the plant-crane-gaps wave's rail, made by hand (this script lost it once: misc-gaps)
 save_json(f"{ASSETS}/lang/en_us.json", lang)
-for tag, names in {"mineable/pickaxe": ["wildcatter:decant_tower", "wildcatter:process_water_pump"], "needs_stone_tool": []}.items():
+for tag, names in {"mineable/pickaxe": ["wildcatter:decant_tower", "wildcatter:process_water_pump", "wildcatter:crane_rail"], "needs_stone_tool": ["wildcatter:crane_rail"]}.items():
 	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
 	t["values"] += [n for n in names if n not in t["values"]]
 	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
