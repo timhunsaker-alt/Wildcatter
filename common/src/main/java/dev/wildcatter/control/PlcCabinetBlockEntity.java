@@ -1,5 +1,8 @@
 package dev.wildcatter.control;
 
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.energy.Inspectable;
 import dev.wildcatter.multiblock.BigPartEntity;
@@ -214,6 +217,66 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		return project;
 	}
 
+
+	// ---- what a client draws: the rail as seated, and the CPU's lamp (docs/questions/plc-gaps.md) -------------------------------------
+
+	/** The CPU's RUN lamp a client draws: 0 dark (no 24 V or no CPU), 1 RUN, 2 STOP, 3 FAULT. */
+	private int lamp;
+
+	public int lamp() {
+		return lamp;
+	}
+
+	private int lampNow() {
+		if (!powered || cpuModule == null) {
+			return 0;
+		}
+		return cpu == null ? 2 : cpu.faulted() ? 3 : cpu.mode() == Cpu.Mode.RUN ? 1 : 2;
+	}
+
+	public PlcModuleItem.@org.jspecify.annotations.Nullable Type cpuModule() {
+		return cpuModule;
+	}
+
+	public PlcModuleItem.@org.jspecify.annotations.Nullable Type module(int slot) {
+		return modules[slot];
+	}
+
+	/** A client's copy: whether a card is in the door. */
+	private boolean clientCard;
+
+	public boolean hasCard() {
+		return level != null && level.isClientSide() ? clientCard : !card.isEmpty();
+	}
+
+	/** Tells watching clients what is seated, after a change. */
+	private void railChanged() {
+		setChanged();
+		if (level != null && !level.isClientSide()) {
+			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+		}
+	}
+
+	@Override
+	public Packet<ClientGamePacketListener> getUpdatePacket() {
+		return ClientboundBlockEntityDataPacket.create(this);
+	}
+
+	@Override
+	public CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+		CompoundTag tag = new CompoundTag();
+		tag.putBoolean("grown", grown);
+		tag.putString("cpuModule", cpuModule == null ? "" : cpuModule.name());
+		ListTag rail = new ListTag();
+		for (PlcModuleItem.Type m : modules) {
+			rail.add(StringTag.valueOf(m == null ? "" : m.name()));
+		}
+		tag.put("modules", rail);
+		tag.putBoolean("hasCard", !card.isEmpty());
+		tag.putInt("lamp", lamp);
+		return tag;
+	}
+
 	// ---- the rail --------------------------------------------------------------------------------------------------------------------
 
 	/** Seats a module in the next free slot; why not, or null when it went in. */
@@ -224,13 +287,13 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 			}
 			cpuModule = type;
 			compile();
-			setChanged();
+			railChanged();
 			return null;
 		}
 		for (int i = 0; i < modules.length; i++) {
 			if (modules[i] == null) {
 				modules[i] = type;
-				setChanged();
+				railChanged();
 				return null;
 			}
 		}
@@ -243,7 +306,7 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 			return "This cabinet already has a card in it";
 		}
 		card = stack.copyWithCount(1);
-		setChanged();
+		railChanged();
 		return null;
 	}
 
@@ -260,7 +323,7 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 			return "The cabinet has no project to copy";
 		}
 		String refused = MemoryCardItem.write(card, project);
-		setChanged();
+		railChanged();
 		return refused;
 	}
 
@@ -278,14 +341,14 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		if (!card.isEmpty()) {
 			ItemStack out = card;
 			card = ItemStack.EMPTY;
-			setChanged();
+			railChanged();
 			return out;
 		}
 		for (int i = modules.length - 1; i >= 0; i--) {
 			if (modules[i] != null) {
 				ItemStack out = item(modules[i]);
 				modules[i] = null;
-				setChanged();
+				railChanged();
 				return out;
 			}
 		}
@@ -293,7 +356,7 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 			ItemStack out = item(cpuModule);
 			cpuModule = null;
 			cpu = null;
-			setChanged();
+			railChanged();
 			return out;
 		}
 		return ItemStack.EMPTY;
@@ -558,6 +621,10 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		}
 		if (powered && cpu != null) {
 			scan(level, now);
+		}
+		if (lampNow() != lamp) {
+			lamp = lampNow();
+			railChanged();
 		}
 		if (now % STATE_TICKS == 0 && !watchers.isEmpty() && level.getServer() != null) {
 			for (UUID id : List.copyOf(watchers)) {
@@ -1109,6 +1176,8 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		exchange.clear();
 		exchange.addAll(input.read("exchange", Codec.STRING.listOf()).orElse(List.of()));
 		card = input.read("card", ItemStack.CODEC).orElse(ItemStack.EMPTY);
+		lamp = input.getIntOr("lamp", lamp);
+		clientCard = input.getBooleanOr("hasCard", !card.isEmpty());
 		String name = input.getStringOr("cpuModule", "");
 		cpuModule = name.isEmpty() ? null : PlcModuleItem.Type.valueOf(name);
 		List<String> rail = input.read("modules", Codec.STRING.listOf()).orElse(List.of());

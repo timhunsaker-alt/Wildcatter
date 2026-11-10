@@ -1,5 +1,11 @@
 package dev.wildcatter.control;
 
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import com.mojang.serialization.Codec;
 import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.energy.Inspectable;
@@ -76,6 +82,31 @@ public class RemoteIoDropBlockEntity extends BlockEntity implements Inspectable,
 		return net;
 	}
 
+	@Override
+	public Packet<ClientGamePacketListener> getUpdatePacket() {
+		return ClientboundBlockEntityDataPacket.create(this);
+	}
+
+	@Override
+	public CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+		CompoundTag tag = new CompoundTag();
+		tag.putBoolean("grown", grown);
+		tag.putInt("rack", rack);
+		ListTag rail = new ListTag();
+		for (PlcModuleItem.Type m : modules) {
+			rail.add(StringTag.valueOf(m == null ? "" : m.name()));
+		}
+		tag.put("modules", rail);
+		return tag;
+	}
+
+	private void railChanged() {
+		setChanged();
+		if (level != null && !level.isClientSide()) {
+			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+		}
+	}
+
 	public PlcModuleItem.Type module(int slot) {
 		return modules[slot];
 	}
@@ -96,7 +127,7 @@ public class RemoteIoDropBlockEntity extends BlockEntity implements Inspectable,
 		for (int i = 0; i < modules.length; i++) {
 			if (modules[i] == null) {
 				modules[i] = type;
-				setChanged();
+				railChanged();
 				return null;
 			}
 		}
@@ -109,7 +140,7 @@ public class RemoteIoDropBlockEntity extends BlockEntity implements Inspectable,
 				for (var item : BuiltInRegistries.ITEM) {
 					if (item instanceof PlcModuleItem module && module.type() == modules[i]) {
 						modules[i] = null;
-						setChanged();
+						railChanged();
 						return new ItemStack(item);
 					}
 				}
