@@ -131,7 +131,11 @@ public enum Product {
 	 */
 	BIOGAS("biogas, 60 % CH4", true),
 	/** 16b1: 32 % potassium hydroxide from a chlor-alkali cell run on potash, the KOH scrubber's first charge. Counted in kg. */
-	CAUSTIC_POTASH("caustic potash (32 %)", false);
+	CAUSTIC_POTASH("caustic potash (32 %)", false),
+	/** 16d1: liquid CO2 from a liquefier on a lime kiln, for an ISR header house's lixiviant. Counted in kg; only the CO2 storage tank holds it. */
+	CO2("liquid CO2", false),
+	/** 16d1: an ISR header house's bleed, for an injection pump and a disposal well. */
+	WELLFIELD_BLEED("wellfield bleed", false);
 
 	private final String label;
 	private final boolean gas;
@@ -154,7 +158,7 @@ public enum Product {
 		return switch (this) {
 			case HOT_CRACKED_GAS, CRACKED_GAS, COMPRESSED_CRACKED_GAS, BURNER_GAS, ORE_SLURRY, LEACH_SLURRY, FLUORINE, UF6, CHLORINE, STEAM, FEEDWATER, COOLING_WATER,
 					CAUSTIC_SODA, PROCESS_STEAM, BAUXITE_SLURRY, DIGESTED_SLURRY, GREEN_LIQUOR, MUD_SLURRY, POLISHED_LIQUOR, HYDRATE_SLURRY, SPENT_LIQUOR, STRONG_LIQUOR, COAL_TAR, PITCH,
-					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY, AN_SOLUTION, EMULSION_MATRIX, CAUSTIC_POTASH -> "kg";
+					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY, AN_SOLUTION, EMULSION_MATRIX, CAUSTIC_POTASH, CO2 -> "kg";
 			default -> gas ? "m3" : "L";
 		};
 	}
@@ -164,7 +168,7 @@ public enum Product {
 		return switch (this) {
 			case MOLTEN_SULFUR, ORE_SLURRY, LEACH_SLURRY, PREGNANT_LIQUOR, STRIP_LIQUOR, PREGNANT_LIXIVIANT, BARREN_LIXIVIANT, ELUATE, ANHYDROUS_HF, FEEDWATER, COOLING_WATER,
 					BAUXITE_SLURRY, DIGESTED_SLURRY, GREEN_LIQUOR, MUD_SLURRY, POLISHED_LIQUOR, HYDRATE_SLURRY, SPENT_LIQUOR, STRONG_LIQUOR,
-					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY -> false;
+					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY, CO2, WELLFIELD_BLEED -> false;
 			default -> !gas;
 		};
 	}

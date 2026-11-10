@@ -87,12 +87,31 @@ public class IsrWellheadBlockEntity extends BlockEntity implements FluidNode, Mi
 
 	/** The header house's injection manifold sends this injector {@code litres} this interval, {@code oxygen} of it oxygenated. */
 	public void inject(Level level, double litres, double oxygen, double seconds) {
+		inject(level, litres, oxygen, 0, seconds);
+	}
+
+	/** 16d1: and {@code co2} of the full CO2 dose. */
+	public void inject(Level level, double litres, double oxygen, double co2, double seconds) {
 		if (litres > 0.0001) {
 			injected = level.getGameTime();
 			injecting = litres / seconds;
 			this.oxygen = this.oxygen * 0.8 + oxygen * 0.2;
+			this.co2 = this.co2 * 0.8 + co2 * 0.2;
 			setChanged();
 		}
+	}
+
+	private double co2;   // 16d1: the share of the full CO2 dose its lixiviant carried, smoothed
+
+	/** The share of the full CO2 dose its lixiviant carries (an injector), smoothed. */
+	public double co2() {
+		return co2;
+	}
+
+	/** For the game test: its oxygen and CO2 shares set straight (the smoothing skipped). */
+	public void setLixiviantForTest(double oxygen, double co2) {
+		this.oxygen = oxygen;
+		this.co2 = co2;
 	}
 
 	/** The header house runs this producer's pump at {@code strength} (its drives' share, 0 to 1) this interval. */
@@ -133,7 +152,7 @@ public class IsrWellheadBlockEntity extends BlockEntity implements FluidNode, Mi
 		} else if (level.getGameTime() - w.powered > 40) {
 			w.status = "PRODUCER: its pump is idle; pipe the well to a header house, which runs its pump";
 		} else {
-			double oxygen = 0;
+			double oxygen = 0, co2 = 0;
 			int n = 0;
 			Set<BlockPos> wells = WELLS.getOrDefault(level, Set.of());
 			synchronized (wells) {
@@ -144,12 +163,14 @@ public class IsrWellheadBlockEntity extends BlockEntity implements FluidNode, Mi
 							&& front.equals(injector.front(server))) {
 						n++;
 						oxygen += injector.oxygen;
+						co2 += injector.co2;
 					}
 				}
 			}
 			w.injectors = n;
 			RollFrontData data = RollFrontData.get(server);
-			w.headGrade = dev.wildcatter.fluid.Isr.headGrade(n, n > 0 ? oxygen / n : 0, front.grade(pos.getX(), pos.getZ()), data.left(front));
+			w.headGrade = dev.wildcatter.fluid.Isr.headGrade(n, n > 0 ? oxygen / n : 0, front.grade(pos.getX(), pos.getZ()), data.left(front))
+					* dev.wildcatter.fluid.Isr.co2Factor(n > 0 ? co2 / n : 0);   // 16d1: the CO2 dose
 			double litres = Math.min(Tuning.ISR_PRODUCER_LPS * seconds * w.strength, Math.max(0, Tuning.ISR_PRODUCER_LPS * Tuning.PLANT_HOLD_SECONDS - w.pregnant));
 			double u = data.draw(front, litres * w.headGrade * 1e-6);
 			w.conc = w.pregnant + litres > 0 ? (w.conc * w.pregnant + u) / (w.pregnant + litres) : 0;
@@ -198,6 +219,7 @@ public class IsrWellheadBlockEntity extends BlockEntity implements FluidNode, Mi
 		output.putDouble("pregnant", pregnant);
 		output.putDouble("conc", conc);
 		output.putDouble("oxygen", oxygen);
+		output.putDouble("co2", co2);
 	}
 
 	@Override
@@ -207,5 +229,6 @@ public class IsrWellheadBlockEntity extends BlockEntity implements FluidNode, Mi
 		pregnant = input.getDoubleOr("pregnant", 0);
 		conc = input.getDoubleOr("conc", 0);
 		oxygen = input.getDoubleOr("oxygen", 0);
+		co2 = input.getDoubleOr("co2", 0);
 	}
 }

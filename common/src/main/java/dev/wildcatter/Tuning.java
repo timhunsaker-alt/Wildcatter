@@ -1259,4 +1259,13 @@ public final class Tuning {
 	public static final double CASING_RISE_C = 10.0;
 	public static final double WATER_SPECIFIC_HEAT = 4_186.0;      // J/kg K               // the cooling water's rise through the casings
 	public static final double CASING_HOT_SECONDS = 300.0;         // without cooling, CASING HOT after this (proposed)
+
+	// ---- Phase 16d1: ISR CO2, the bleed, satellites (docs/multiblocks/isr-operations.md) ----------------------------------------
+	public static final double CO2_LIQUEFIER_KGH = 150.0;          // kiln-gas CO2 recovery at about 20 bar and -25 C (proposed)
+	public static final double CO2_LIQUEFIER_WATTS = 75_000.0;     // its compressor and refrigeration, about 0.4 kWh a kg (proposed), industrial supply
+	public static final double CO2_TANK_KG = 30_000.0;             // the insulated liquid CO2 tank
+	public static final double CO2_DOSE_KG_PER_L = 0.0005;         // 0.5 g/L of injection (proposed)
+	public static final double CO2_HEAD_FACTOR = 1.3;              // the head grade at the full dose against oxygen alone (proposed)
+	public static final double RESIN_TRAILER_U3O8_KG = 800.0;      // 10 m3 of resin at 80 g/L (proposed)
+	public static final double RESIN_TRANSFER_KGS = 4.0;           // U3O8 on resin moved a second between trailer and columns (proposed: a resin transfer pump)
 }

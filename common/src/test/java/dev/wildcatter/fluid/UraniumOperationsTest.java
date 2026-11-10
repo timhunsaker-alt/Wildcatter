@@ -78,4 +78,19 @@ class UraniumOperationsTest {
 	void aMachineTakes13Point6KgOfWaterASecond() {
 		assertEquals(13.6, Enrichment.machineWatts() / (Tuning.WATER_SPECIFIC_HEAT * Tuning.CASING_RISE_C), 0.2);
 	}
+
+	// ---- 16d1: ISR CO2, the bleed, satellites (docs/multiblocks/isr-operations.md) ---------------------------------------------------
+	@Test
+	void theKilnsCo2AndTheDose() {
+		assertEquals(327, Tuning.LIME_KILN_KGS * Bayer.co2PerLime() * 3600, 2);
+		assertEquals(113, Tuning.HEADER_HOUSE_PRODUCERS * Tuning.ISR_PRODUCER_LPS * Tuning.CO2_DOSE_KG_PER_L * 3600, 1);
+		assertEquals(1.0, Isr.co2Factor(0), 1e-12);                      // today's wellfields keep their grade
+		assertEquals(1.3, Isr.co2Factor(1), 1e-12);
+		assertEquals(1.3, Isr.co2Factor(2), 1e-12);
+	}
+
+	@Test
+	void aTrailerHolds800KgOfU3o8() {
+		assertEquals(Tuning.RESIN_TRAILER_U3O8_KG, 10_000 * Tuning.IX_RESIN_KG_PER_L, 1e-9);
+	}
 }

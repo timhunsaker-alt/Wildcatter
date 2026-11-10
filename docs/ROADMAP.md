@@ -415,7 +415,7 @@ Decisions for Tim: `docs/questions/plc-gaps.md` (12 entries). Spec updated: `doc
   - process models (pipe pressure, drum pressure, a turbine's load setpoint, dampers, vibration, CT and PT voltage);
   - the crane's lift start.
 
-## Phase 16 — Uranium routes and plant operations — 16a, 16b1, 16c1 BUILT 2026-11-10 (built while Tim was away, on the DRAFT specs decided on recommendation; not approved)
+## Phase 16 — Uranium routes and plant operations — 16a, 16b1, 16c1, 16d1 BUILT 2026-11-10; 16b2, 16c2, 16d2 planned (built while Tim was away, on the DRAFT specs decided on recommendation; not approved)
 Plan: `docs/ideas-plan.md`, Phase 16. Branch `phase16`. Decisions for Tim: `docs/questions/phase16-uranium.md` (numbered across the waves).
 Rule: nothing changes or slows what an existing world already does; anything that would alter a plant already built is behind a
 default-off setting or waits until the player adds the new part.
@@ -432,13 +432,16 @@ default-off setting or waits until the player adds the new part.
   3.0-4.95 % and tails 0.20-0.30 %; 30Bs, the fuel plant, assemblies and the reactor carry the assay (3 % fuel starts at +8,200 pcm); a
   CASCADE COOLING SKID on the header (13.6 kg/s of circulating water a machine), and once a cascade has had one, CASING HOT after 5 minutes
   without cooling; spin-up (10 min) and coast-down (1 h) opt-in (`cascadeSpinUp=true`). NeoForge scene `cascade_operations`.
-- **16d1** (ISR CO2, bleed and satellites): next.
+- **16d1, ISR operations** (`docs/multiblocks/isr-operations.md`, BUILT): a CO2 LIQUEFIER on a lime kiln (150 kg/h) fills a 30 t CO2
+  STORAGE TANK against the header house, which doses 0.5 g/L into its injection (head grade up to 1.3 x; NO CO2 when the tank is empty);
+  the bleed goes out the house's back to an injection pump and a disposal well; IX columns in SATELLITE fill a RESIN TRAILER (800 kg of
+  U3O8, carried as one item) that the central columns elute. NeoForge scene `isr_operations`.
 - **Planned, not built (can wait):** **16b2** the full-size conversion plant (four cell houses in series on a 12.47 kV `rectifier_mv`,
   a second, larger main line); **16c2** machine crashes, the sampling autoclave and blending, cylinder heels; **16d2** monitor-well rings,
   excursions and groundwater restoration (RO unit). Each is written in its spec.
 - **Known gaps:** script-drawn icons `u3o8_drum_placeholder` (16a), `fluorinator_ash_drum_placeholder` and
   `synthetic_fluorspar_placeholder` (16b1). The chlor-alkali cell on potash has no scene. The cathode scrubber's hydrogen is checked with the
-  cells run by hook. A fuel assembly stood up as a block keeps no assay (16c1); the cascade scene drives its machines by hook. The calciner uses the mod's materials. Not built: uranyl peroxide
+  cells run by hook. A fuel assembly stood up as a block keeps no assay (16c1); the cascade scene drives its machines by hook. The producer's CO2 factor is unit-tested only (16d1). The calciner uses the mod's materials. Not built: uranyl peroxide
   precipitation, ammonia recovery from the off-gas and barren liquor, ASTM C967 impurity penalties.
 
 ## Ideas (not scheduled)

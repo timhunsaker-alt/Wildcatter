@@ -29,6 +29,7 @@ public class LimeKilnBlockEntity extends UnitMotorBlockEntity implements HopperF
 	private double caco3;
 	private double quicklime;
 	private double co2;   // t sent out
+	private double kilnGas;   // 16d1: kg of CO2 a liquefier against it may take, a few seconds' worth; the rest goes up the stack
 	private String unit = "starting";
 
 	public LimeKilnBlockEntity(BlockPos pos, BlockState state) {
@@ -73,6 +74,18 @@ public class LimeKilnBlockEntity extends UnitMotorBlockEntity implements HopperF
 		setChanged();
 	}
 
+	/** 16d1: a CO2 liquefier takes up to {@code kg} of the kiln's CO2; returns what it got. */
+	public double takeKilnGas(double kg) {
+		double got = Math.min(kg, kilnGas);
+		kilnGas -= got;
+		return got;
+	}
+
+	/** For the game test: kiln gas as if it were burning. */
+	public void addKilnGasForTest(double kg) {
+		kilnGas += kg;
+	}
+
 	@Override
 	protected void work(Level level) {
 		double max = Tuning.LIME_KILN_KGS * seconds();
@@ -105,6 +118,7 @@ public class LimeKilnBlockEntity extends UnitMotorBlockEntity implements HopperF
 		caco3 -= kg / Tuning.CAO_PER_CACO3;
 		quicklime += kg;
 		co2 += kg * Bayer.co2PerLime() / 1000;
+		kilnGas = Math.min(Tuning.LIME_KILN_KGS * Bayer.co2PerLime() * Tuning.PLANT_HOLD_SECONDS, kilnGas + kg * Bayer.co2PerLime());
 		unit = String.format("burning at 1,000 C: %.0f kg/h of quicklime, %.0f kW of gas", kg / seconds() * 3600, got / seconds() / 1000);
 	}
 

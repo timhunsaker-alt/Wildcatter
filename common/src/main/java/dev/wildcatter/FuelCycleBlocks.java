@@ -33,6 +33,11 @@ public interface FuelCycleBlocks {
 	Block HEADER_HOUSE = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.HEADER_HOUSE);
 	Block OXYGEN_GENERATOR = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.OXYGEN_GENERATOR);
 	Block IX_COLUMNS = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.IX_COLUMNS);
+	// 16d1 (docs/multiblocks/isr-operations.md)
+	Block CO2_LIQUEFIER = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.CO2_LIQUEFIER);
+	Block CO2_STORAGE_TANK = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.CO2_STORAGE_TANK);
+	Block RESIN_TRAILER = block("resin_trailer", props -> new dev.wildcatter.block.ResinTrailerBlock(props.mapColor(net.minecraft.world.level.material.MapColor.COLOR_LIGHT_GRAY)
+			.strength(3.0F, 6.0F).sound(net.minecraft.world.level.block.SoundType.METAL).noOcclusion()));
 	// 7d: conversion to UF6 (docs/multiblocks/conversion.md)
 	Block REDUCTION_REACTOR = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.REDUCTION_REACTOR);
 	Block HYDROFLUORINATOR = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.HYDROFLUORINATOR);

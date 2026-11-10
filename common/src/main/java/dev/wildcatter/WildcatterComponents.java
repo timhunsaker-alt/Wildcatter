@@ -41,6 +41,12 @@ public final class WildcatterComponents {
 			.networkSynchronized(ByteBufCodecs.DOUBLE)
 			.build();
 
+	/** 16d1: the kg of U3O8 on a resin trailer's resin. */
+	public static final DataComponentType<Double> RESIN_U3O8 = DataComponentType.<Double>builder()
+			.persistent(com.mojang.serialization.Codec.DOUBLE)
+			.networkSynchronized(ByteBufCodecs.DOUBLE)
+			.build();
+
 	/** The assay a stack carries: its component, or the standard product assay. */
 	public static double assay(net.minecraft.world.item.ItemStack stack) {
 		Double a = stack.get(ASSAY);
@@ -65,5 +71,6 @@ public final class WildcatterComponents {
 		Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wildcatter.id("survey_a"), SURVEY_A);
 		Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wildcatter.id("survey_b"), SURVEY_B);
 		Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wildcatter.id("assay"), ASSAY);
+		Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wildcatter.id("resin_u3o8"), RESIN_U3O8);
 	}
 }

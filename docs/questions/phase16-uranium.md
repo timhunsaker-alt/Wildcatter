@@ -166,4 +166,51 @@ is behind a default-off setting, or happens only once the player adds the new pa
   scene tests the feed station, take-offs, skid and machines.
 - **Alternatives:** the full power chain in a server scene.
 
+## 16d1: ISR CO2, the bleed, satellites
+
+### 24. Where the CO2 is dosed
+- **Chosen:** into the injection header, on what goes to the injectors (0.5 g/L), drawn from a CO2 storage tank that touches the header
+  house; each injector carries the share of the full dose it got, and a producer's grade takes the average of its pattern's injectors.
+- **Why:** real plants add CO2 at the injection manifold; dosing what is held back first lagged the dose by minutes.
+- **Alternatives:** dose the returned barren lixiviant; a CO2 nozzle on the house fed by pipe.
+
+### 25. How the liquefier gets the kiln's CO2
+- **Chosen:** by touching the lime kiln, which now keeps a few seconds of its CO2 for a liquefier (the rest, as before, goes up its
+  stack); the liquefier takes up to 150 kg/h of the kiln's 327.
+- **Why:** the spec stands it "against the lime kiln"; a CO2 pipe from the kiln would be a pipe product the kiln has never had.
+- **Alternatives:** a kiln-gas nozzle on the kiln.
+
+### 26. The bleed's nozzle
+- **Chosen:** the south face of the header house's back cells, one block up; the bleed goes into the house's hold only when a pipe is
+  there, so an unpiped house counts it exactly as before (its PLC level reading unchanged).
+- **Why:** the spec's "north face of its back cells" looks into the house itself; the bottom row of the back is the IX lines.
+- **Alternatives:** the top of the house.
+
+### 27. The injection pump on the bleed
+- **Chosen:** it takes wellfield bleed when it has no produced water, and starts on any bleed (no 2,000 L level switch).
+- **Why:** 0.6 L/s of bleed would take an hour to reach the produced-water tank's switch level; real bleed lines run to the pump
+  continuously.
+- **Alternatives:** a bleed pond (a stock tank) ahead of the pump with the same switch.
+
+### 28. The resin trailer
+- **Chosen:** a 2 x 3 x 6 block with its own block entity (kg of U3O8 on its resin, up to 800); broken, its item carries the loading in
+  an item component; set down, the block takes it back. It moves resin at up to 4 kg/s of U3O8 (*proposed*, a resin transfer pump).
+  It is not a vehicle: carried in the inventory, as the fuel assembly is.
+- **Why:** the spec's "a placeable 2 x 3 x 6 block when set down, carried as one item".
+- **Alternatives:** a driveable trailer entity (Tailings' trucks); a trailer that keeps its own resin (loaded and eluted) rather than
+  swapping it.
+
+### 29. A full trailer at the central plant
+- **Chosen:** the central columns in ELUTION take the trailer's resin into their own lead column (up to its 3,520 kg capacity) and elute
+  it with their salt and acid as their own; the trailer goes back eluted.
+- **Why:** the central plant's elution circuit is what real satellites truck to.
+- **Alternatives:** a separate elution vessel for trailers.
+
+### 30. The producer's grade with CO2 in the scene
+- **Chosen:** `isr_operations` checks that the injector carries the full dose; the 1.3 x on the producer is checked through
+  `Isr.co2Factor` in the unit test, which the producer's grade multiplies by.
+- **Why:** a producer needs a roll front from world generation, which the server scene does not have; the client `isrWellfield` scene
+  has one.
+- **Alternatives:** extend the client scene with a CO2 tank.
+
 There is no `docs/DESIGN.md` in Wildcatter (that file is Tailings'). The design record for each wave is its spec's "As built" section.

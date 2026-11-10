@@ -43,6 +43,10 @@ import net.minecraft.world.level.block.Block;
  * 12.47 kV and several MW); set to 3.00 / 0.25 %, ten machines are enough and the 30B the product take-off fills reads 3.00 %; with the
  * spin-up rule on and the drive gone, the machines coast and the cascade still feeds; with the cooling skid's water cut and five
  * minutes passed by hook, CASING HOT holds the feed.</li>
+ * <li>{@code isr_operations} (16d1, isr-operations.md): a CO2 liquefier on a lime kiln's gas (the kiln burning by hook) fills the CO2
+ * storage tank against a header house, which doses its injection at 0.5 g/L (the injector carries the full dose); with the tank empty,
+ * NO CO2. The header house's bleed reaches a disposal wellhead through an injection pump. A satellite's IX columns fill a resin trailer,
+ * which carries its loading as an item; a full trailer against the central columns gives eluate.</li>
  * </ul>
  */
 final class UraniumScenes {
@@ -54,6 +58,7 @@ final class UraniumScenes {
 		scenes.put("adu_yellowcake", UraniumScenes::aduYellowcake);
 		scenes.put("conversion_extensions", UraniumScenes::conversionExtensions);
 		scenes.put("cascade_operations", UraniumScenes::cascadeOperations);
+		scenes.put("isr_operations", UraniumScenes::isrOperations);
 		return scenes;
 	}
 
@@ -366,6 +371,75 @@ final class UraniumScenes {
 							helper.succeed();
 						});
 					});
+				});
+			});
+		});
+	}
+
+	// ---- isr_operations (16d1) -----------------------------------------------------------------------------------------------------
+	static void isrOperations(GameTestHelper helper) {
+		String scene = "isr_operations";
+		floor(helper, -18, -10, 32, 22);
+		place(helper, WildcatterBlocks.HEADER_HOUSE, 0, 0);            // x 0-3, z 0-9
+		place(helper, WildcatterBlocks.CO2_STORAGE_TANK, -3, 0);       // x -3..-1, z 0-7, against its west side
+		place(helper, WildcatterBlocks.CO2_LIQUEFIER, -3, -8);         // x -3..-1, z -8..-3
+		place(helper, WildcatterBlocks.LIME_KILN, 0, -8);              // x 0-2, z -8..-6, against the liquefier
+		place(helper, WildcatterBlocks.INJECTION_PUMP, -6, 6);         // x -6..-5, z 6-11
+		place(helper, WildcatterBlocks.IX_COLUMNS, 20, 0);             // x 20-27, z 0-3: the satellite
+		place(helper, WildcatterBlocks.RESIN_TRAILER, 28, 0);          // x 28-29, z 0-5, against it
+		place(helper, WildcatterBlocks.IX_COLUMNS, 20, 10);            // x 20-27, z 10-13: the central plant's
+		pipe(helper, new int[] {-2, 0, -2}, new int[] {-2, 0, -1});                                       // liquid CO2 to the tank
+		pipe(helper, new int[] {2, 0, 10});
+		TestGasSource.SourceEntity barren = source(helper, 2, 11, Product.BARREN_LIXIVIANT, 20.0);       // barren lixiviant back from IX columns
+		pipe(helper, new int[] {4, 0, 2}, new int[] {5, 0, 2});                                           // the injection header
+		GridSceneKit.put(helper, "isr_wellhead", 6, U, 2);                                                // an injector on it
+		pipe(helper, new int[] {0, 1, 10}, new int[] {0, 1, 11}, new int[] {0, 1, 12}, new int[] {-1, 1, 12}, new int[] {-2, 1, 12}, new int[] {-3, 1, 12},
+				new int[] {-4, 1, 12}, new int[] {-5, 1, 12}, new int[] {-5, 0, 12});                    // the bleed, one up on its back, to the pump's suction
+		pipe(helper, new int[] {-6, 1, 9});                                                               // the pump's discharge
+		GridSceneKit.put(helper, "disposal_wellhead", -6, U + 2, 9);
+		pipe(helper, new int[] {28, 0, 11});
+		source(helper, 29, 11, Product.SULFURIC_ACID, 5.0);                                               // the central columns' acid
+		genset(helper, -12, -4);                                                                         // skid x -17..-12, z -4..-3
+		cableRun(helper, -11, -4, -4, -8);                                                               // the liquefier's box
+		cableRun(helper, -11, -3, -7, 6);                                                                // the pump's box
+		dev.wildcatter.block.LimeKilnBlockEntity kiln = entity(helper, 0, -8, dev.wildcatter.block.LimeKilnBlockEntity.class);
+		dev.wildcatter.block.IxColumnsBlockEntity satellite = entity(helper, 20, 0, dev.wildcatter.block.IxColumnsBlockEntity.class);
+		satellite.toggleSatellite();
+		satellite.setResinForTest(100);
+		dev.wildcatter.block.ResinTrailerBlockEntity trailer = entity(helper, 28, 0, dev.wildcatter.block.ResinTrailerBlockEntity.class);
+		trailer.setU3o8(Tuning.RESIN_TRAILER_U3O8_KG - 10);                                              // a hook brings it near full
+		dev.wildcatter.block.IxColumnsBlockEntity central = entity(helper, 20, 10, dev.wildcatter.block.IxColumnsBlockEntity.class);
+		central.slots().set(0, new ItemStack(dev.wildcatter.ore.OreBlocks.MINERALS.get(dev.wildcatter.ore.Ore.HALITE), 4));
+		start(helper, -12, -4, () -> {
+			kiln.addKilnGasForTest(50);                                                                   // the kiln burning
+			helper.runAfterDelay(240, () -> {
+				dev.wildcatter.block.Co2LiquefierBlockEntity liquefier = entity(helper, -3, -8, dev.wildcatter.block.Co2LiquefierBlockEntity.class);
+				dev.wildcatter.block.Co2StorageTankBlockEntity tank = entity(helper, -3, 0, dev.wildcatter.block.Co2StorageTankBlockEntity.class);
+				dev.wildcatter.block.IsrWellheadBlockEntity injector = (dev.wildcatter.block.IsrWellheadBlockEntity) helper.getLevel().getBlockEntity(abs(helper, 6, U, 2));
+				dev.wildcatter.block.InjectionPumpBlockEntity pump = (dev.wildcatter.block.InjectionPumpBlockEntity) dev.wildcatter.multiblock.BigParts.entity(helper.getLevel(), abs(helper, -6, U, 6));
+				String chain = " | liquefier " + read(helper, -3, -8) + " | tank " + read(helper, -3, 0) + " | header " + read(helper, 0, 0) + " | pump " + pump.inspect().getString()
+						+ " | satellite " + read(helper, 20, 0) + " | trailer " + trailer.describe() + " | central " + read(helper, 20, 10);
+				check(helper, read(helper, -3, -8).contains("liquefying") || tank.co2() > 0, "the liquefier should liquefy the kiln's CO2 into the tank" + chain);
+				check(helper, read(helper, 0, 0).contains("CO2 0.50 g/L") && injector.co2() > 0.9, "the header house should dose its injection with 0.5 g/L of CO2: " + injector.co2() + chain);
+				check(helper, pump.pumpingBleed() && pump.total() > 0, "the bleed should reach the disposal well through the injection pump" + chain);
+				check(helper, trailer.u3o8() >= Tuning.RESIN_TRAILER_U3O8_KG - 0.5 && read(helper, 20, 0).contains("full"), "the satellite should fill its resin trailer" + chain);
+				log(scene, "running:" + chain);
+				// the trailer carried: its drop keeps its loading; set down against the central columns, eluted
+				java.util.List<ItemStack> drops = net.minecraft.world.level.block.Block.getDrops(helper.getLevel().getBlockState(abs(helper, 28, U, 0)), helper.getLevel(),
+						abs(helper, 28, U, 0), trailer);
+				double carried = drops.isEmpty() ? 0 : drops.get(0).getOrDefault(dev.wildcatter.WildcatterComponents.RESIN_U3O8, 0.0);
+				check(helper, carried >= Tuning.RESIN_TRAILER_U3O8_KG - 0.5, "the trailer's item should carry its loading: " + drops);
+				place(helper, WildcatterBlocks.RESIN_TRAILER, 18, 10);                                     // x 18-19, z 10-15, against the central columns
+				entity(helper, 18, 10, dev.wildcatter.block.ResinTrailerBlockEntity.class).setU3o8(carried);
+				tank.take(Tuning.CO2_TANK_KG);                                                             // the CO2 tank run dry
+				helper.getLevel().setBlock(abs(helper, -2, U, -1), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+				helper.runAfterDelay(60, () -> {
+					String eluting = read(helper, 20, 10);
+					String noCo2 = read(helper, 0, 0);
+					check(helper, eluting.contains("eluting") || eluting.contains("eluate waiting") && eluting.contains("by resin trailer"), "the full trailer's resin should give eluate at the central columns: " + eluting);
+					check(helper, noCo2.contains("NO CO2"), "with its CO2 tank empty the header house should read NO CO2: " + noCo2);
+					log(scene, "ok: " + eluting + " | " + noCo2);
+					helper.succeed();
 				});
 			});
 		});

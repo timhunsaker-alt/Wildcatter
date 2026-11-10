@@ -28,11 +28,17 @@ import org.jspecify.annotations.Nullable;
  * - Barren lixiviant back from them: the south face of its back cells, the east two.
  * - Barren lixiviant with oxygen out to the injectors on the pipe at the east face of its bottom cells, less 1 % bleed: its
  *   injection manifold meters each its share, up to 1.24 L/s.
+ * - 16d1 (docs/multiblocks/isr-operations.md): a CO2 storage tank against it doses the injection with CO2 at 0.5 g/L, raising the head
+ *   grade by up to 30 %; NO CO2 only when such a tank is there and empty. The bleed goes out of the south face of its back cells, one
+ *   up (the bottom row there is the IX lines), as
+ *   wellfield bleed, for an injection pump and a disposal well; what nothing takes is only counted, as before.
  */
 public class HeaderHouseBlockEntity extends PlantUnitBlockEntity implements CircuitPart {
 	private final DriveLoad load = new DriveLoad(Voltage.INDUSTRIAL);
 	private int producers;
 	private double bleed;   // m3 of bleed held back so far
+	private double co2Share;   // 16d1: of the full dose, the last interval
+	private double co2Used;    // kg
 
 	public HeaderHouseBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.HEADER_HOUSE_ENTITY, pos, state);
@@ -46,12 +52,19 @@ public class HeaderHouseBlockEntity extends PlantUnitBlockEntity implements Circ
 		return faces(at -> at[1] == 0, Direction.EAST);
 	}
 
+	private List<Lines.Face> bleedFaces() {
+		return faces(at -> at[2] == 9 && at[1] == 1, Direction.SOUTH);
+	}
+
 	private List<Lines.Face> fromIx() {
 		return faces(at -> at[2] == 9 && at[1] == 0 && at[0] >= 2, Direction.SOUTH);
 	}
 
 	@Override
 	protected @Nullable Product nozzle(int[] at, Direction side) {
+		if (side == Direction.SOUTH && at[2] == 9 && at[1] == 1) {
+			return Product.WELLFIELD_BLEED;   // 16d1: the bleed, one up on its back, to an injection pump and a disposal well
+		}
 		if (at[1] != 0) {
 			return null;
 		}
@@ -60,7 +73,8 @@ public class HeaderHouseBlockEntity extends PlantUnitBlockEntity implements Circ
 
 	@Override
 	protected double hold(Product product) {
-		return Tuning.HEADER_HOUSE_PRODUCERS * Tuning.ISR_PRODUCER_LPS * Tuning.PLANT_HOLD_SECONDS;
+		return product == Product.WELLFIELD_BLEED ? Tuning.HEADER_HOUSE_PRODUCERS * Tuning.ISR_PRODUCER_LPS * Tuning.ISR_BLEED * 60
+				: Tuning.HEADER_HOUSE_PRODUCERS * Tuning.ISR_PRODUCER_LPS * Tuning.PLANT_HOLD_SECONDS;
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, HeaderHouseBlockEntity h) {
@@ -98,8 +112,13 @@ public class HeaderHouseBlockEntity extends PlantUnitBlockEntity implements Circ
 		double returned = back > 0.001 ? h.pullMixed(level, h.fromIx(), Product.BARREN_LIXIVIANT, back, barren) : 0;
 		OxygenGeneratorBlockEntity oxygen = Touching.find(level, pos, OxygenGeneratorBlockEntity.class, o -> true);
 		double share = returned > 0 && oxygen != null ? oxygen.supply(level, returned * Tuning.O2_DOSE_KG_PER_L) : 0;
+		Co2StorageTankBlockEntity tank = Touching.find(level, pos, Co2StorageTankBlockEntity.class, t -> true);
+		double co2 = 0;
 		if (returned > 0) {
 			h.bleed += returned * Tuning.ISR_BLEED / 1000;
+			if (!Lines.lines(level, h.bleedFaces()).isEmpty()) {
+				h.add(Product.WELLFIELD_BLEED, returned * Tuning.ISR_BLEED);   // piped: for the injection pump; what has nowhere to go is only counted
+			}
 			h.addMixed(Product.BARREN_LIXIVIANT, returned * (1 - Tuning.ISR_BLEED), new double[] {barren[0], share, 0, 0, 0});
 		}
 		// the injection manifold: a metered share for each injector on its east pipe, up to each one's rate
@@ -117,16 +136,26 @@ public class HeaderHouseBlockEntity extends PlantUnitBlockEntity implements Circ
 		if (!injectors.isEmpty()) {
 			double each = Math.min(Tuning.ISR_INJECTOR_LPS * seconds(), h.held(Product.BARREN_LIXIVIANT) / injectors.size());
 			double oxygenated = h.mixOf(Product.BARREN_LIXIVIANT)[1];
+			// 16d1: CO2 from a storage tank against it, 0.5 g/L of what goes to the injectors, dosed into the injection header
+			if (tank != null && each > 0) {
+				double want = each * injectors.size() * Tuning.CO2_DOSE_KG_PER_L;
+				double got2 = tank.take(want);
+				h.co2Used += got2;
+				co2 = got2 / want;
+			}
 			for (IsrWellheadBlockEntity well : injectors) {
-				well.inject(level, each, oxygenated, seconds());
+				well.inject(level, each, oxygenated, co2, seconds());
 			}
 			injected = each * injectors.size();
 			h.held.put(Product.BARREN_LIXIVIANT, h.held(Product.BARREN_LIXIVIANT) - injected);
 		}
+		h.co2Share = co2;
+		String co2Note = tank == null ? "" : injected <= 0 ? "" : tank.co2() < 1e-3 && co2 < 0.01 ? "; NO CO2: its CO2 tank is empty"
+				: String.format("; CO2 %.2f g/L (%.0f %% of the dose)", co2 * Tuning.CO2_DOSE_KG_PER_L * 1000, co2 * 100);
 		h.status = String.format("%d producers, %d injectors (%.0f kW of pumps, %.0f %% delivered); %.1f L/s in from the wells, %.1f L/s back to the injectors%s; bleed %.1f m3",
 				h.producers, injectors.size(), h.producers * Tuning.ISR_PUMP_WATTS / 1000, strength * 100, got / seconds(), returned * (1 - Tuning.ISR_BLEED) / seconds(),
 				returned <= 0 ? "" : oxygen == null ? ", NO OXYGEN: set an oxygen generator against it" : share < 0.99 ? String.format(", only %.0f %% oxygenated", share * 100) : " with oxygen",
-				h.bleed);
+				h.bleed) + co2Note;
 		h.setChanged();
 	}
 
@@ -167,6 +196,7 @@ public class HeaderHouseBlockEntity extends PlantUnitBlockEntity implements Circ
 		super.saveAdditional(output);
 		output.putInt("producers", producers);
 		output.putDouble("bleed", bleed);
+		output.putDouble("co2Used", co2Used);
 	}
 
 	@Override
@@ -174,5 +204,6 @@ public class HeaderHouseBlockEntity extends PlantUnitBlockEntity implements Circ
 		super.loadAdditional(input);
 		producers = input.getIntOr("producers", 0);
 		bleed = input.getDoubleOr("bleed", 0);
+		co2Used = input.getDoubleOr("co2Used", 0);
 	}
 }

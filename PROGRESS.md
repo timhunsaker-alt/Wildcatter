@@ -1450,7 +1450,8 @@ sized for a 40-pot line.
 ## Known gaps
 - Phase 16 (uranium routes and plant operations, 2026-11-10; `docs/questions/phase16-uranium.md`): script-drawn icons
   `u3o8_drum_placeholder` (16a), `fluorinator_ash_drum_placeholder`, `synthetic_fluorspar_placeholder` (16b1). The chlor-alkali cell on
-  potash has no scene (16b1). A fuel assembly stood up as a block keeps no assay and reads 4.95 % when broken (16c1). Not built in 16a: uranyl peroxide precipitation, ammonia recovery, ASTM C967 impurity penalties.
+  potash has no scene (16b1). A fuel assembly stood up as a block keeps no assay and reads 4.95 % when broken (16c1). The producer's CO2
+  factor is unit-tested, not run in a scene (16d1). Not built in 16a: uranyl peroxide precipitation, ammonia recovery, ASTM C967 impurity penalties.
   16b2, 16c2 and 16d2 are planned in ROADMAP, not built.
 - Phase 14 (the ammonia plant): the `gauze_pack` and `emulsifier_pail` icons are Ludo art since the art wave (2026-11-09); no
   placeholder is left. The six parts use the mod's materials. Not built: the ammonia leak hazard, AN solution setting in a cold
@@ -1878,4 +1879,12 @@ Plan: `docs/ideas-plan.md`. Branch `phase16`. Nothing changes what an existing w
   - Spin-up and coast-down with `cascadeSpinUp=true` (default off): COASTING machines keep separating as they slow.
   - Field Manual page CASCADE OPERATIONS.
   - Tests: NeoForge scene `cascade_operations` passes; `UraniumOperationsTest` adds the spec's assay table, fresh reactivity, cooling water.
+- **16d1, ISR operations** (`docs/multiblocks/isr-operations.md`, "As built (16d1)"):
+  - CO2 LIQUEFIER (3 x 4 x 6, 75 kW) against a lime kiln: up to 150 kg/h of its CO2 as liquid CO2 (new pipe product, kg).
+  - CO2 STORAGE TANK (3 x 3 x 8, 30 t) against the header house: 0.5 g/L into the injection header; injectors carry the dose and the
+    producers' head grade rises by up to 30 %; NO CO2 with the tank empty.
+  - The bleed out of the header house's back, one up, as wellfield bleed (new pipe product) to the injection pump and a disposal well.
+  - IX columns SATELLITE / ELUTION (sneak-click); RESIN TRAILER (2 x 3 x 6 block, one item carrying its loading, 800 kg of U3O8).
+  - Field Manual page ISR: CO2, BLEED, SATELLITES.
+  - Tests: NeoForge scene `isr_operations` passes; `UraniumOperationsTest` adds the kiln's CO2, the dose, the CO2 factor, the trailer.
 

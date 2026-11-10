@@ -13,6 +13,9 @@
   30B, the fuel assembly and the reactor carry the assay (lower assay, shorter cycle). A CASCADE COOLING SKID cools the casings; a cascade
   that has had one reads CASING HOT without it. Spin-up and coast-down are opt-in (`cascadeSpinUp=true`). Spec:
   `docs/multiblocks/enrichment-operations.md`.
+- **ISR operations (16d1):** a CO2 LIQUEFIER on a lime kiln fills a CO2 STORAGE TANK; set against a header house it doses the injection
+  and raises the head grade up to 30 %. The header house's bleed can be piped to an injection pump and a disposal well. IX columns can run
+  as a SATELLITE, filling a RESIN TRAILER that the central plant's columns elute. Spec: `docs/multiblocks/isr-operations.md`.
 - Decisions for review: `docs/questions/phase16-uranium.md`.
 
 ## Unreleased (0.7.0): gas and power quick wins (Phase 14b-14d) and the protection gap wave (built 2026-11-09 while Tim was away; not approved)

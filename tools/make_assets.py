@@ -2798,6 +2798,12 @@ phase16_items({"fluorinator_ash_drum": ("Fluorinator Ash Drum", (120, 110, 100))
 phase16_parts(("cascade_cooling_skid",))
 shaped("cascade_cooling_skid", ["SPS", "XWX", "SSS"], {"S": S_, "P": P_, "X": "minecraft:piston", "W": "minecraft:water_bucket"}, "cascade_cooling_skid")
 phase16_names({"cascade_cooling_skid": "Cascade Cooling Skid (55 kW)"})
+# 16d1: ISR CO2, the bleed, satellites (docs/multiblocks/isr-operations.md)
+phase16_parts(("co2_liquefier", "co2_storage_tank", "resin_trailer"))
+shaped("co2_liquefier", ["SPS", "XIX", "SGS"], {"S": S_, "P": P_, "X": "minecraft:piston", "I": "minecraft:iron_block", "G": "minecraft:glass"}, "co2_liquefier")
+shaped("co2_storage_tank", ["SSS", "W W", "SPS"], {"S": S_, "W": "minecraft:white_wool", "P": P_}, "co2_storage_tank")
+shaped("resin_trailer", ["SBS", "S S", "C C"], {"S": S_, "B": "minecraft:barrel", "C": "minecraft:minecart"}, "resin_trailer")
+phase16_names({"co2_liquefier": "CO2 Liquefier (150 kg/h, 75 kW)", "co2_storage_tank": "CO2 Storage Tank (30 t)", "resin_trailer": "Resin Trailer (10 m3 of IX resin)"})
 phase16_names({"cathode_gas_scrubber": "Cathode Gas Scrubber (NaF beds, 10 kW)", "koh_scrubber": "KOH Scrubber (with lime regeneration, 15 kW)"})
 
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
