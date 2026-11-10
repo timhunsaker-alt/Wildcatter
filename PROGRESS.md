@@ -1468,11 +1468,38 @@ sized for a 40-pot line.
   Still drawn by script without the `*_placeholder` name: the breaker levers and the insulator caps, glaze and pins (flat colour
   markers; `docs/questions/art-wave.md`, 7).
 - Phase 13i: Tailings' sorter routing and its TBM's course are not on a signal (Tailings' Known gaps).
-- Phase 13g and 13h: see `docs/multiblocks/plc.md`, "As built". One process unit has run under a PLC in the world; the rig, crane and coolant pump signals are compiled only. Nothing stops two PLCs landing on one rack.
-- Phase 13f: see `docs/multiblocks/plc.md`, "As built: 13f, Not yet". Most power equipment's signals compile but have not been exercised in the world.
-- Phase 13e: see `docs/multiblocks/plc.md`, "As built: 13e, Not yet". New module items borrow existing decal art; the new blocks are boxes in the mod's materials and vanilla concrete, no new script-drawn textures.
-- Phase 13d: see `docs/multiblocks/plc.md`, "As built: 13d, Not yet". PLCopen import has been tested on hand-written files, not on a real vendor's export.
-- Phase 13b: see `docs/multiblocks/plc.md`, "As built: 13b, Not yet". The modules seated are not drawn, cable core counts and the supply's 10 A are not enforced, and the NeoForge jar has not opened the screen in a world. No new script-drawn textures: the devices use the mod's materials and vanilla's coloured blocks.
+- Phase 13 after the PLC gap wave (2026-11-09; `docs/multiblocks/plc.md`, "The PLC gap wave", "Planned, not built";
+  `docs/questions/plc-gaps.md`, 12). Every signal family now runs under a real PLC in a server scene. Cable cores, the supply's 10 A and a
+  rack's single owner are enforced. The modules are drawn, and ladder jumps, labels, RETURN and FUNCTIONs and FBD wire routing are built.
+  - **Still open, appearance and sound:**
+    - no drawn HOA position on a device;
+    - the horn borrows a note block sound;
+    - the module items borrow `decal_relays` and the control key the trial key, with their recipes proposed;
+    - the rack is drawn in the mod's materials, with no new texture and no placeholder.
+  - **Still open, the NeoForge screen:** the NeoForge jar has not opened the PLC screen in a world by hand.
+  - **Still open, SFC:**
+    - ladder and FBD conditions and macro steps in a chart;
+    - no chart safety check;
+    - no SFC reset or pause.
+  - **Still open, the card and PLCopen:**
+    - the card carries no retained values and does not boot a blank CPU;
+    - XML loses comments in variable blocks;
+    - import has no undo;
+    - a jump wire is removed only from its target;
+    - PLCopen import has been tried only on hand-written files.
+  - **Still open, the supply's mains draw:** it stays 100 W whatever its 24 V load.
+  - **Still open, process models first:**
+    - pipe pressure, vibration and dampers;
+    - CT and PT voltage on a cable;
+    - speed references on soft starters and MCC drives;
+    - a valve's air per stroke;
+    - boiler pressure and three-element drum control;
+    - a gas turbine's load setpoint and a steam turbine's valve;
+    - feedwater and a well choke on a signal;
+    - a unit's own flows and temperatures;
+    - a crane's lift start and its load and boom readings;
+    - HMI piping graphics and pages.
+  - **Still open, contactors:** FAIL_STOP comes only from a welded-contactor test hook.
 - Phase 12: the process water pump borrows the water pump's model.
 - Phase 10b1:
   - the bus bars' standoffs stand on the floor of their own cell, so a run carried up in the air shows them hanging (no
@@ -1726,6 +1753,36 @@ facing (planned, questions 20 and 21) and AFCI (left out: question 22).
   server scenes `switchgear_settings`, `switchgear_bf_87b`, `cabinet_reclose`, `unit_differentials`, `gsu_backfeed`, `clamp_burn`,
   `panel_gfci_shock`, `fuse_let_through`, `ats_timers`, `ats_closed_in_phase`, `span_burns`, `mv_span_flashover`, `house_earth` (21 scenes
   pass). Client scenes changed but not yet run: `switchgear` (racking hook), `busProtection` (a 50BF step), `ats` (short timers).
+
+## The PLC gap wave (2026-11-09; built while Tim was away; decisions: `docs/questions/plc-gaps.md`)
+Closes the "Not yet" items of Phase 13b-13h that could be done properly. The rest are planned in `docs/multiblocks/plc.md`, "The PLC gap
+wave", "Planned, not built".
+- **Limits enforced (13b, 13h):**
+  - **Cable:** a control cable is 50-pair, 98 signal cores. A discrete signal takes a core, a loop or pulse a pair, counted along each
+    signal's way, with side-by-side runs adding. A landing that finds a cable full is refused, and a cut that leaves signals past the
+    cores names the full cable.
+  - **Supply:** the 24 V supply holds 10 A, then hiccups (off 1 s and on). The 24 V draw is counted from the CPU, the modules, the inputs
+    that are on, the relays and the field devices they power (`ControlDevice.outputAmps`), and the loops.
+  - **Racks:** a rack has one owner, the first PLC to reach it, until its connection times out.
+  - **Shared points:** a device point wired to two PLCs ORs a discrete output and fails a shared loop.
+- **Drawn (13b, 13h):** the modules seated, in the cabinet's and the drop's door window (`client/PlcRackRenderer`), with the CPU's RUN
+  lamp and the card.
+- **Ladder and FBD (13c):**
+  - rung labels, forward jumps and RETURN;
+  - a ladder or FBD as a FUNCTION;
+  - a clearer error for another program's variable, with the standard's ways (direct address, VAR_GLOBAL AT and VAR_EXTERNAL) tested;
+  - FBD wires routed around blocks (`plc.lang.WireRouter`).
+- **Relay flags (13f):** TRIP 50, 51, 87B and 50BF on each switchgear section.
+- **Fixed:**
+  - a lamp or heater on an open relay stayed lit;
+  - a firebox held back by its firing rate read BURNING;
+  - the rig in AUTO told the player to click the console.
+- **Tests:**
+  - 18 more unit tests in `PlcGraphicalTest` and `PlcOpenTest`.
+  - 14 new NeoForge server scenes, each with a real PLC: `plc_supply`, `plc_cores`, `plc_owners`, `plc_switchgear`, `plc_ats`,
+    `plc_gas_turbine`, `plc_loads`, `plc_steam`, `plc_rectifier`, `plc_units`, `plc_crane`, `plc_motor_faults`, `plc_rig`, `plc_rcp`.
+    `WILDCATTER_ONLY=a,b` now picks NeoForge server scenes too.
+  - Client scenes: `plc` (rack screenshot, a ladder jump and a skipped rung).
 
 ## Plant and crane gaps (2026-11-09)
 Built while Tim was away, on the best recommendation; the decisions are in `docs/questions/plant-crane-gaps.md` for him to go

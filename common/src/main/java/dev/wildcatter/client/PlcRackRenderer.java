@@ -114,7 +114,7 @@ public class PlcRackRenderer<T extends BlockEntity> implements BlockEntityRender
 			float hx = X0 + 0.2F * px;
 			float top = rowY[0];
 			if (state.drop || state.cpu >= 0) {
-				box(p, v, polymer, hx, top, FACE - 0.9F * px, hx + headW - 0.06F * px, top + rowH, FACE - 0.12F * px, state.drop ? 0xFF6A7078 : 0xFF50555E, light);
+				box(p, v, polymer, hx, top, FACE - 0.9F * px, hx + headW - 0.06F * px, top + rowH, FACE - 0.12F * px, state.drop ? 0xFF9AA2AC : 0xFF5A6A80, light);
 				int lampColour = switch (state.lamp) {
 					case 1 -> 0xFF40FF50;
 					case 2 -> 0xFFFFB020;
@@ -138,8 +138,8 @@ public class PlcRackRenderer<T extends BlockEntity> implements BlockEntityRender
 				int row = slot / 6;
 				float x = X0 + 0.2F * px + headW + (slot % 6) * slotW;
 				float y = rowY[row];
-				box(p, v, polymer, x, y, FACE - 0.8F * px, x + slotW - 0.06F * px, y + rowH, FACE - 0.12F * px, 0xFF3A3D42, light);
-				box(p, v, polymer, x + 0.05F * px, y + rowH - 0.55F * px, FACE - 0.85F * px, x + slotW - 0.11F * px, y + rowH - 0.15F * px, FACE - 0.8F * px, labelColour(type), light);
+				box(p, v, polymer, x, y, FACE - 0.8F * px, x + slotW - 0.06F * px, y + rowH, FACE - 0.12F * px, 0xFFB4B8BE, light);   // a light grey body against the dark enclosure
+				box(p, v, polymer, x + 0.05F * px, y + rowH - 1.4F * px, FACE - 0.85F * px, x + slotW - 0.11F * px, y + rowH - 0.2F * px, FACE - 0.8F * px, labelColour(type), light);
 			}
 		});
 		pose.popPose();

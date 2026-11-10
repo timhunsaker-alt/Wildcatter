@@ -4601,7 +4601,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			check(context.computeOnClient(client -> client.level.getBlockEntity(at) instanceof dev.wildcatter.control.PlcCabinetBlockEntity c
 					&& c.cpuModule() == dev.wildcatter.control.PlcModuleItem.Type.CPU_SMALL && c.module(0) == dev.wildcatter.control.PlcModuleItem.Type.DI16
 					&& c.module(1) == dev.wildcatter.control.PlcModuleItem.Type.DO16 && c.module(2) == null), "the client should know the modules seated");
-			server.runCommand("tp @p 15.5 " + up + " " + (z + 7.6) + " 180 14");
+			server.runCommand("tp @p 15.5 " + up + " " + (z + 7.3) + " 180 -2");
 			context.waitTicks(10);
 			context.takeScreenshot("wildcatter-plc-rack");
 			server.runCommand("tp @p 15 " + (up + 2) + " " + (z + 11) + " 180 15");

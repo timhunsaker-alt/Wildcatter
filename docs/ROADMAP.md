@@ -384,6 +384,25 @@ Decisions for Tim: `docs/questions/plant-crane-gaps.md`. Branch `plant-crane-gap
 - NeoForge scenes `crane_siting`, `ring_travel`, `quench_sump`, `stabilizer_fuel`, `cog_engine`, `pot_aux`, `burner_hopper`; client
   scene `ringTravel` (new) and `cranes`, `heavyLift`, `potline` changed, for the lead to run.
 
+## PLC gaps — 2026-11-09 (Known gaps wave; built while Tim was away)
+Decisions for Tim: `docs/questions/plc-gaps.md` (12 entries). Spec updated: `docs/multiblocks/plc.md`, "The PLC gap wave". Branch `plc-gaps`.
+- **Enforced:** 50-pair control cable (98 signal cores); the 24 V supply's 10 A with hiccup; one owner a rack; a point on two PLCs ORs
+  or fails its loop.
+- **Built:** the modules drawn in the cabinet's and the drop's window; ladder labels, jumps, RETURN and FUNCTIONs; FBD wires routed around
+  blocks; switchgear relay flags.
+- **Every compiled-only signal family run under a real PLC** in NeoForge server scenes:
+  - switchgear, ATS, gas turbine, steam plant, firebox, load bank, lamp and rectifier;
+  - process units through steel-pipe valves with VALVE_CTRL;
+  - MOTOR_CTRL's FAIL_START and FAIL_STOP;
+  - the rig, the crane and the reactor coolant pump.
+- **Planned, for Tim (question 12):**
+  - the selector drawn on devices, the horn's sound, module and key icons;
+  - a NeoForge screen check;
+  - SFC ladder conditions, macro steps, reset and pause;
+  - card retain and boot;
+  - process models (pipe pressure, drum pressure, a turbine's load setpoint, dampers, vibration, CT and PT voltage);
+  - the crane's lift start.
+
 ## Ideas (not scheduled)
 - Check plugs against real Mekanism machines once Mekanism for 26.3 (10.8.0) is released (planned as 14e, `docs/mekanism-check.md`).
 - Plants for the 7a ores that the fuel chain doesn't use:

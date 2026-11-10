@@ -196,11 +196,11 @@ Tailings compiles against a Wildcatter release, so it comes after 13h's release.
 `dev.wildcatter.control`, `client/PlcScreen`, and the `plc` game scene, on the Fabric client.
 - **Proved in the world:** a pushbutton starts a pumpjack's real 480 V motor through a real program. In AUTO the starter's own button does nothing, the e-stop drops it and refuses a start, a cut cable stops it, a T in a cable is named as a bad joint, a runaway program faults and drops it, a save and load keeps the project and the latch, and losing 24 V stops it. The repeated direct-on-line starts tripped the starter's real overload at 67.5 A inrush on the way, and the hand reset worked in AUTO.
 - **Not yet:**
-  - the modules seated are not drawn in the cabinet's window, as the spec wants: the door shows a fixed picture;
-  - a cable's core count: any number of signals may share a run;
-  - the supply's 10 A rating is not enforced;
+  - ~~the modules seated are not drawn in the cabinet's window~~ *(closed in the gap wave, below)*;
+  - ~~a cable's core count: any number of signals may share a run~~ *(closed in the gap wave, below)*;
+  - ~~the supply's 10 A rating is not enforced~~ *(closed in the gap wave, below)*;
   - `control_key` steps a selector with no drawn switch position on the device: its readout shows it;
-  - a project is one source, so errors carry a line and no POU;
+  - ~~a project is one source, so errors carry a line and no POU~~ (closed in 13c: each unit is its own source, and errors name it);
   - the horn borrows a vanilla note block sound;
   - module and key icons borrow existing art, and the recipes are proposed;
   - the NeoForge jar compiles with its packet registered, but has not opened this screen in a world.
@@ -213,7 +213,7 @@ Tailings compiles against a Wildcatter release, so it comes after 13h's release.
 - **Online change:** the project is replaced with the CPU running; variables of the same name and type keep their values, and nothing misses a scan.
 - **Large projects:** a download goes in pieces, as a client's packet holds 32 KB, up to 4 million characters *(proposed)*. A 150 KB project is tested.
 - **Proved in the world:** the same motor from a ladder drawn with the real toolbar and mouse: running from the button, the live view showing the seal branch powered and the start branch not, an online change without a stop, an FBD beside it lighting the stack's green lamp after its timer, a force from the ONLINE tab starting the motor with its light on, and a release.
-- **Not yet:** ladder jumps and labels; a function or a ladder as a FUNCTION (a ladder or FBD is a PROGRAM or FUNCTION_BLOCK); a ladder's `Coil` on a located output of another unit; FBD wires routed around blocks, as they are drawn straight through.
+- **Not yet:** ~~ladder jumps and labels; a function or a ladder as a FUNCTION (a ladder or FBD is a PROGRAM or FUNCTION_BLOCK); a ladder's `Coil` on a located output of another unit; FBD wires routed around blocks, as they are drawn straight through~~ (all four closed in the gap wave, below).
 
 - **A regression, fixed:** running the asset generator for 13b deleted Phase 12's lined cell and process water pump assets, and 13b's commits carried that. No release had it. They are back, and `art/hand_assets` and a check at the start of the client suite keep it from recurring.
 
@@ -248,7 +248,7 @@ Tailings compiles against a Wildcatter release, so it comes after 13h's release.
   - conditions and action bodies are structured text only, not ladder or FBD; a chart can call a ladder function block from a body;
   - a chart's safety (a token stranded or doubled by odd wiring) is not checked, nor are macro steps;
   - no SFC-wide reset or pause: a sequence stops through its own transitions;
-  - `VALVE_CTRL` has unit tests only, as the valves come with 13e; of the motor block's faults, only FAIL_RUN has run in the world;
+  - ~~`VALVE_CTRL` has unit tests only; of the motor block's faults, only FAIL_RUN has run in the world~~: VALVE_CTRL on steel-pipe valves and MOTOR_CTRL's FAIL_START and FAIL_STOP now run in the world *(closed in the gap wave, below)*;
   - the card holds no retained values and does not load itself into a blank CPU;
   - comments in variable blocks are lost through XML (a body's stay), and imported STRING lengths are ignored, as the CPU ignores them;
   - import replaces a unit of the same name with no undo, so unsaved edits to that unit are lost;
@@ -272,7 +272,7 @@ Tailings compiles against a Wildcatter release, so it comes after 13h's release.
   - transmitters read tanks, boilers, pumps, drives, starters, valves and the compressor. Cables, and the CT and PT transducers, are not done: 13f;
   - a throttled valve caps the whole run it is on, as pipes have no flow model: parallel branches are not told apart;
   - a soft starter or an MCC bucket's drive has no speed reference signals: only the drive cabinet and lineup control section has them, and the MCC's drive buckets wait for its point numbering to change;
-  - valves on steel pipe are built and share the code, but only water valves have run in the world;
+  - ~~valves on steel pipe have not run in the world~~: an on-off and a motor-operated steel valve feed two units under a PLC *(closed in the gap wave, below)*;
   - a valve's air use per stroke is not modelled, only leakage.
 
 ## As built: 13f (2026-11-07)
@@ -282,12 +282,12 @@ Tailings compiles against a Wildcatter release, so it comes after 13h's release.
 - **Figures, all proposed:** trims of 2 % (speed) and 5 % (voltage); kW read on 125 % of rating; a shelf of 10 minutes; 100 history rows; a sample a second kept 10 minutes; a firebox's burner modulating by time over 10 s.
 - **A stated shortcut:** a set's share of the load moves with its source voltage here, as its sag is a resistance standing in for droop. In a real set speed moves kW and voltage moves VARs. Both trims shift load in this model.
 - **Not yet:**
-  - only breakers, gensets and the HMI have run in the world under a PLC. The transfer switch, switchgear, steam and gas turbines, fireboxes, rectifiers, load banks and lamps have their signals compiled and not yet exercised;
+  - ~~only breakers, gensets and the HMI have run in the world under a PLC~~: the transfer switch, switchgear, steam and gas turbines, fireboxes, rectifiers, load banks and lamps now run under a real PLC in server scenes *(closed in the gap wave, below)*;
   - boiler pressure and three-element drum control: boilers report only their level, and the steam plant has no setpoint to take; the HRSG only follows its gas turbine;
   - a gas turbine's load setpoint and a steam turbine's own valve: both still follow the grid;
   - dampers, still, as nothing has a duct;
   - CT and PT transducers are a transmitter on a cable, reading amps only; a cable has no voltage reading yet;
-  - relay flags (50/51, 87B) are read only as TRIPPED;
+  - ~~relay flags (50/51, 87B) are read only as TRIPPED~~: the switchgear has TRIP 50, 51, 87B and 50BF *(closed in the gap wave, below)*;
   - the HMI's symbols use a device block's STATE; there are no piping graphics, and HMI screens are one page.
 
 ## As built: 13g (2026-11-07)
@@ -296,8 +296,8 @@ A selector and a run enable on every plant unit, in `PlantUnitBlockEntity`; rod 
 - **Also, in the `toppingUnit` scene:** a real column enabled by a real program; off, it holds and says so and tells its PLC; on, it goes on; a cut cable holds it.
 - **The review of the 43 units:** 25 have a tick of their own and take the gate at its top. Motor-driven units take it in `UnitMotorBlockEntity.drive`, where 51 subclasses meet. **Left out on purpose:** the reactor vessel (its protection lives in its tick), the natural draft tower and the frequency converter (a heat sink and a grid tie, not a process run). The units with no tick are parts their controller runs, so they stop with it.
 - **Not yet:**
-  - only one process unit has run under a PLC in the world: the others take the same line of code;
-  - the rig, crane and coolant pump signals compile and have not been exercised;
+  - ~~only one process unit has run under a PLC in the world~~: the nitric acid unit (motor-driven) and the AN neutraliser (its own tick) now do too *(closed in the gap wave, below)*;
+  - ~~the rig, crane and coolant pump signals compile and have not been exercised~~: each runs under a real PLC *(closed in the gap wave, below)*;
   - **a level is the fullest thing a unit holds;** a unit's own flows and temperatures have no reading yet;
   - **feedwater** is not on a signal, nor a well's choke beyond a valve in its line: the valve is real, the scene has not run one;
   - the crane has no lift-start signal, only a hold; its load and boom are not read.
@@ -307,16 +307,152 @@ A selector and a run enable on every plant unit, in `PlantUnitBlockEntity`; rod 
 - **Proved in the world:** a button and a starter on a drop 60 blocks from its PLC, across a real network cable; a second PLC taking two tags by rows entered in its real NET tab, lighting its own lamp from one; an HMI's network seeing both, reading by station, and writing a marker as a register; a cut network stopping the remote starter and showing the exchange as FAILED with its last values held; a save and load keeping the rows and name.
 - **Addressing:** rack 1's slot 0 is slot 12, so `%IX192.0`, and each rack takes 12 more *(proposed)*. A small CPU's 512 bytes reach rack 1 and part of rack 2; a large CPU's 4,096 reach all four.
 - **Not yet:**
-  - **nothing stops two PLCs landing signals on one rack,** where their outputs would fight. A real rack has one owner; here it is the player's to keep;
+  - ~~nothing stops two PLCs landing signals on one rack~~: a rack has one owner, and a point wired to two PLCs does what it would in the field *(closed in the gap wave, below)*;
   - no traffic, timing, or lost-packet model, as the spec says;
   - the exchange copies each row every half second, one way; a row's types must match or it shows FAILED;
-  - a drop's modules are not drawn, as a cabinet's are not.
+  - ~~a drop's modules are not drawn, as a cabinet's are not~~ *(closed in the gap wave, below)*.
 
 ## As built: 13i (2026-11-07)
 Wildcatter v0.5.0, holding everything above, and Tailings on it.
 - **Found by the full suite:** since 13c, a world could not be saved with a program unit over 64 KB in a cabinet: the unit went to disk as one string, and a save writes no string past 65,535 bytes. Units are now saved in pieces of 20,000 characters, as they already went to the screen; a world saved before loads them the old way. The `plc` scene now writes a cabinet holding a 150 KB unit to bytes, as a save does.
 - **Found by Tailings' playthrough (v0.5.1):** a cabinet's walk along its cables counted the blocks beside each cable toward its limit of 8,192, so a trunk stopped after about 1,600 cables. Only cable and boxes count now: about 8 km of cable.
 - **Tailings:** its plant machines, mine switches, signals and the TBM's cable junction are devices on Wildcatter's control cable. See Tailings' `DESIGN.md` and its `plc_*` scenes.
+
+## The PLC gap wave (2026-11-09; built while Tim was away; decisions: `docs/questions/plc-gaps.md`)
+Closes the "Not yet" items above that could be done properly. The rest are planned below and stay in PROGRESS.md's Known gaps.
+
+**Built, all figures proposed:**
+- **Cable cores (13b):** a control cable is a 50-pair multi-pair instrument cable, 98 signal cores after its two commons.
+  - **What a signal takes:** a discrete signal takes a core; a 4-20 mA loop or a pulse input a twisted pair.
+  - **Counting:** a walk finds each run of cable between two places (the cabinet, a group of touching boxes, a device). The cabinet counts
+    every landed signal's cores in each run on its way, in landing order. Runs side by side between the same places add their cores.
+  - **When a cable is full:** the landing that finds it full is refused, naming the cable. A signal left past the cores by a cut carries
+    nothing, and the status says "CABLE FULL at ...". `ControlNet.Found` carries the routes and supplies; its old constructor stays for
+    Tailings.
+- **The 24 V supply's 10 A (13b):** each scan, a cabinet reports its 24 V load to the supplies on its net, shared among them; a rack's
+  load goes to the rack's own supplies.
+  - **What it counts:** the CPU 0.4 A small or 0.7 A large; 0.05 A a module; COMM 0.15 A; a drop's adapter 0.2 A; 7 mA an input that is
+    on; 10 mA a relay that is on, plus the field device it powers (`ControlDevice.outputAmps`: pilot light 0.02 A, stack light tier 0.1 A,
+    horn 0.25 A, on-off valve solenoid 0.2 A); each analog loop its current.
+  - **Over 10 A:** the supply goes into hiccup, off for 1 s and on again. Its PLCs lose 24 V and make their warm restart.
+- **The modules drawn (13b, 13h):** `client/PlcRackRenderer` draws the rail through the door's window, synced to clients.
+  - **The rails:** two DIN rails, the CPU with its RUN lamp (green RUN, amber STOP, red FAULT) and its card, then each module in its slot,
+    its label strip coloured by kind.
+  - **The drop** is drawn the same way, with its adapter in the CPU's place.
+- **One owner a rack (13h):** the first PLC with a CPU and 24 V to reach a drop owns it; another's landing on it is refused, naming the
+  owner. When the owner's connection has been silent for 1 s, the next PLC takes it.
+  - **A device point wired to two PLCs:** discrete outputs OR, as relay contacts in parallel. A loop driven by both reads as failed (two
+    sources fight), named on both cabinets (`SharedOutputs`).
+- **Ladder and FBD (13c):**
+  - **Jumps:** rung labels, jump coils (forward only) and RETURN, in the editor, the compiler, the live view and PLCopen.
+  - **FUNCTIONs:** a ladder or FBD can be a FUNCTION, called from every language.
+  - **Other units' outputs:** a coil reaches one by the standard's ways (a direct address, or VAR_GLOBAL AT plus VAR_EXTERNAL). Another
+    program's variable is refused with that advice.
+  - **Wires:** FBD wires route around blocks (`plc.lang.WireRouter`).
+- **Relay flags (13f):** each switchgear section adds TRIP 50, TRIP 51, TRIP 87B and TRIP 50BF.
+- **Bugs found and fixed:** a lamp or heater on an open relay stayed lit; a firebox held back by its firing rate read BURNING.
+
+**Proved in the world, NeoForge server scenes with a real PLC each (`PlcLimitScenes`, `PlcPowerScenes`):**
+- `plc_supply`:
+  - 30 horns draw 8.35 A and sound;
+  - the program adds 14 more, taking it to 11.99 A, and the supply hiccups;
+  - the warm restart brings it back at 8.35 A.
+- `plc_cores`:
+  - 34 stack lights behind one cable: the 99th signal is refused as CABLE FULL;
+  - a second cable to the same box takes the rest, and every green lights;
+  - with that cable cut, the last light goes dark and the status names the full cable.
+- `plc_owners`:
+  - rack 1 is PLC-A's, and PLC-B's landing on it is refused;
+  - a lamp on both lights from either PLC;
+  - a control valve's loop on both fights;
+  - cutting A's network hands the rack to B, which lights the rack's lamp.
+- `plc_switchgear`, a 4.16 kV feeder on REMOTE:
+  - its trip coil opens it, not as a relay trip;
+  - RACK OUT takes it to TEST in 15 s, and RACK IN brings it back;
+  - the close coil closes it;
+  - its amps are read on 4-20 mA;
+  - a 5 A pickup trips it, read as TRIP 51 and only 51, and the close coil cannot close over the trip.
+- `plc_ats`:
+  - TEST starts the standby set;
+  - with INHIBIT TRANSFER it stays on normal with emergency OK;
+  - released, it transfers;
+  - TEST off, it goes back to normal.
+- `plc_gas_turbine`: RUN starts the 16.5 MW unit's sequence; RUNNING reads it up; RUN off stops it.
+- `plc_loads`:
+  - a lamp switched by the PLC;
+  - a 13.8 kV load bank stepped by 4-20 mA to one 1 MW step, its watts read back (883 kW, the 1 MW gas set's sag).
+- `plc_steam`:
+  - a coal firebox at 0 % does not burn, and at 50 % burns about half of each period, as BURNING reads;
+  - the 1 MW steam plant is started by RUN, read RUNNING at 3,600 rpm, and stopped by RUN off.
+- `plc_rectifier`:
+  - a rectifier on a magnesium cell is run by RUN and holds the PLC's 8 kA, then 12 kA, setpoint;
+  - its amps (8.00 kA) and volts are read back;
+  - RUN off stops it.
+
+**Proved in the world, plant scenes (`PlcPlantScenes`):**
+- `plc_units`:
+  - **The nitric acid unit:** its ammonia comes through a motor-operated valve on steel pipe, driven by VALVE_CTRL's CMD_OPEN and
+    CMD_CLOSE. It reads HELD with no enable, and makes 26.6 kg/h of HNO3 once enabled, its RATE read back.
+  - **The AN neutraliser:** its ammonia comes through an on-off steel valve on instrument air, and it is enabled only while VALVE_CTRL
+    proves the valve open. It runs at 34.6 kg/h. Air cut, the valve springs shut, VALVE_CTRL latches FAIL_OPEN and the unit is held. Air
+    back and a RESET, it runs again.
+- `plc_crane`, a crawler crane in AUTO:
+  - with no RUN ENABLE it does not start;
+  - enabled, it lifts, and CARRYING reads true (14.9 t on the hook);
+  - with the enable withdrawn mid-lift it holds, still carrying, for 5 s;
+  - enabled again, it goes on.
+- `plc_motor_faults`, a 37 kW pump on a drive under MOTOR_CTRL, running proved by the drive's speed signal:
+  - a welded contactor (a test hook) and a stop latch FAIL_STOP;
+  - a dead supply and a start latch FAIL_START;
+  - supply back and RESET, it runs.
+- `plc_rig`, the full land rig on a 500 kW set:
+  - in AUTO the driller's console is refused;
+  - with no DRILL ENABLE it stands at 0 m;
+  - enabled, it drills, with DRILLING, MUD PUMPS and IN A CONNECTION read;
+  - enable withdrawn, it stops at 27 m.
+- `plc_rcp`, a one-loop reactor at hot standby:
+  - the coolant pump's START runs it to 100 % flow at 452 kW on 4.16 kV, RUNNING and FLOW read back;
+  - START dropped, it stops, and its flywheel carries the flow down to 67 % after 5 s.
+- **Found and fixed:** in AUTO or OFF the rig's readout said "right-click the driller's console", which does nothing there. It now says
+  its PLC is not enabling it, or that its selector is in OFF.
+- **Found, stated:**
+  - a starter's RUNNING is its contactor, which closes on command even with no power, so a program proves running by speed or current,
+    as a real one does;
+  - nothing in play welds a contactor, so FAIL_STOP comes only from a test hook.
+
+**Planned, not built** (questions in `docs/questions/plc-gaps.md`, 12):
+- **The selector's position on each device:** a `hoa` block-state property (HAND, OFF, AUTO) drawn as a keyswitch on the face of each
+  controllable device, set by `Remote.cycle`. Or a client overlay while the control key is held.
+- **The horn's sound:** a `wildcatter:horn` sound event from Ludo, a 100 dB motor horn at about 400 Hz, replacing the note block.
+- **Icons:** Ludo art for the nine module items and the control key (`art/source/PROMPTS.md`). The rack renderer could then draw each
+  module's front from its item model.
+- **The NeoForge screen:** one manual check of the PLC screen opening on the NeoForge jar; a NeoForge client scene would need its own
+  harness.
+- **SFC (13d):**
+  - ladder or FBD transition conditions (IEC's form: a transition names a rung or network);
+  - macro steps;
+  - an unsafe-chart check (a token stranded or doubled) as a compile warning;
+  - `SFC_INIT` and `SFC_PAUSE` implicit inputs per chart.
+- **The card (13d):** retained values on the card (the CPU's RETAIN area as bytes); a blank CPU loading the card at power-up.
+- **PLCopen (13d):** variable comments kept through XML; import with an undo.
+- **The supply's mains draw:** it follows its load (idle 5 W plus the 24 V load at 90 % efficiency). This needs a solver hook for a load
+  that changes between rebuilds.
+- **The crane (13g):** a LIFT START point and HOOK LOAD and BOOM ANGLE 4-20 mA readings (`CraneBlockEntity` knows both). This needs
+  a decision on what a PLC may start: a crane lift is a person's job.
+- **Feedwater and a well's choke (13g):** a well choke on a signal; feedwater as a valve in the feed line under a three-element program.
+  This waits on drum pressure.
+- **A unit's own flows and temperatures (13g):** a `Measurable` on each of the 43 units, one by one, as the waves reach them.
+- **Contactor wear:** a welded contactor after many starts under load, so that FAIL_STOP happens in play.
+- **Carried from 13e and 13f, each needing a process model first:**
+  - pipe pressure;
+  - vibration;
+  - dampers on ducts;
+  - CT and PT voltage on a cable;
+  - speed references on soft starters and MCC drive buckets;
+  - a valve's air per stroke (an actuator volume against a receiver);
+  - boiler pressure and three-element drum control;
+  - a gas turbine's load setpoint and a steam turbine's own valve;
+  - HMI piping graphics and several pages.
 
 ## The plan for 13e to 13i (surveyed 2026-11-07; Tim: "let's finish out the rest of 13")
 What the survey found that the waves above did not say, and how each is met. All figures *(proposed)*.
