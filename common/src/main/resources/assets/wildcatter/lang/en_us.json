@@ -686,5 +686,7 @@
   "block.wildcatter.chromate_kiln": "Chromate Kiln (0.3 MW of gas)",
   "item.wildcatter.rotor_shard": "Rotor Shard (carbon fibre)",
   "block.wildcatter.sampling_autoclave": "Sampling Autoclave (50 kW)",
-  "block.wildcatter.crashed_centrifuge": "Crashed Centrifuge"
+  "block.wildcatter.crashed_centrifuge": "Crashed Centrifuge",
+  "block.wildcatter.ro_unit": "RO Unit (30 L/s, 160 kW)",
+  "block.wildcatter.monitor_wellhead": "Monitor Wellhead (sampling pump 1.5 kW)"
 }

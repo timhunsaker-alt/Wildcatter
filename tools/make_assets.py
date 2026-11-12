@@ -2833,6 +2833,12 @@ phase16_parts(("sampling_autoclave",))
 shaped("sampling_autoclave", ["SPS", "SCS", "SXS"], {"S": S_, "P": P_, "C": "minecraft:cauldron", "X": "minecraft:furnace"}, "sampling_autoclave")
 phase16_names({"sampling_autoclave": "Sampling Autoclave (50 kW)", "crashed_centrifuge": "Crashed Centrifuge"})
 phase16_items({"rotor_shard": ("Rotor Shard (carbon fibre)", (40, 40, 44))})
+# 16d2: monitor wells, the RO unit (docs/multiblocks/isr-operations.md)
+phase16_parts(("ro_unit",))
+shaped("ro_unit", ["SPS", "GXG", "SPS"], {"S": S_, "P": P_, "G": "minecraft:paper", "X": "minecraft:piston"}, "ro_unit")
+shaped("monitor_wellhead", [" C ", " P ", " S "], {"C": "minecraft:iron_trapdoor", "P": P_, "S": S_}, "monitor_wellhead")
+big_part_loot_simple("monitor_wellhead")
+phase16_names({"ro_unit": "RO Unit (30 L/s, 160 kW)", "monitor_wellhead": "Monitor Wellhead (sampling pump 1.5 kW)"})
 # ---- Phase 17a: ferroalloys (docs/multiblocks/ferroalloys.md) ---------------------------------------------------------------------
 # blockstates, models, shapes and items come from tools/models/ferroalloys.py; here loot, names, tags, recipes and the bags. Each bag's
 # icon is the Ludo bulk bag with a swatch of what it holds drawn on it by this script: a placeholder until it has art of its own.

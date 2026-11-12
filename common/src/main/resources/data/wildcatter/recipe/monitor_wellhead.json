@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " C ",
+    " P ",
+    " S "
+  ],
+  "key": {
+    "C": "minecraft:iron_trapdoor",
+    "P": "wildcatter:gas_line",
+    "S": "wildcatter:steel_ingot"
+  },
+  "result": {
+    "id": "wildcatter:monitor_wellhead",
+    "count": 1
+  }
+}

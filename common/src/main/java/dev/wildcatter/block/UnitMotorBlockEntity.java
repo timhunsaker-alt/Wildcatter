@@ -80,6 +80,7 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "cascade_cooling_skid" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CASCADE_SKID_WATTS);
 				case "sampling_autoclave" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.SAMPLING_WATTS);
 				case "co2_liquefier" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CO2_LIQUEFIER_WATTS);
+				case "ro_unit" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.RO_WATTS);
 				case "oxygen_generator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.O2_GENERATOR_WATTS);
 				case "cold_traps" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.COLD_TRAP_WATTS);
 				case "distillation_columns" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.REBOILER_WATTS);
@@ -337,6 +338,7 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "cascade_cooling_skid" -> "cooling water pumps";
 			case "sampling_autoclave" -> "steam heater and sample pump";
 			case "co2_liquefier" -> "compressor and refrigeration";
+			case "ro_unit" -> "high-pressure pumps";
 			case "emulsion_blender" -> "mixer";
 			case "moly_roaster" -> "rabble drive and fans";
 			case "aluminothermic_vessel" -> "baghouse fan";

@@ -428,7 +428,7 @@ Decisions for Tim: `docs/questions/plc-gaps.md` (12 entries). Spec updated: `doc
   - process models (pipe pressure, drum pressure, a turbine's load setpoint, dampers, vibration, CT and PT voltage);
   - the crane's lift start.
 
-## Phase 16 — Uranium routes and plant operations — 16a, 16b1, 16c1, 16d1 BUILT 2026-11-10; 16c2 BUILT 2026-11-12; 16b2, 16d2 planned (built while Tim was away, on the DRAFT specs decided on recommendation; not approved)
+## Phase 16 — Uranium routes and plant operations — 16a, 16b1, 16c1, 16d1 BUILT 2026-11-10; 16c2, 16d2 BUILT 2026-11-12; 16b2 planned (built while Tim was away, on the DRAFT specs decided on recommendation; not approved)
 Plan: `docs/ideas-plan.md`, Phase 16. Branch `phase16`. Decisions for Tim: `docs/questions/phase16-uranium.md` (numbered across the waves).
 Rule: nothing changes or slows what an existing world already does; anything that would alter a plant already built is behind a
 default-off setting or waits until the player adds the new part.
@@ -457,8 +457,10 @@ default-off setting or waits until the player adds the new part.
   houses in series on bus bars from the 12.47 kV `rectifier_mv` (433 V, 6 kA, 2.6 MW), a larger main line (reducer, hydrofluorinator,
   fluorinator, cold traps, columns at 0.3 kg of U a second, twice the height); the filler keeps up. NeoForge scene `conversion_large`;
   unit test `ConversionLargeTest`. Decisions 31-35.
-- **Planned, not built (can wait):** **16d2** monitor-well rings,
-  excursions and groundwater restoration (RO unit). Each is written in its spec.
+- **16d2, monitor rings, excursions, restoration** (BUILT 2026-11-12, branch `w-17c`): MONITOR WELLHEADS on the well pipe, 30-60 blocks
+  out, one every 40 blocks of ring and 6 at least; behind `isrExcursions`, NO MONITOR RING holds injection, the front spreads under 0.5 %
+  bleed to an EXCURSION and stops injection after 3 game days; restoration by a sneak-click: SWEEP, RO through an RO UNIT, STABILITY,
+  RESTORED. NeoForge scene `isr_monitor`.
 - **Known gaps:** script-drawn icons `u3o8_drum_placeholder` (16a), `fluorinator_ash_drum_placeholder` and
   `synthetic_fluorspar_placeholder` (16b1). The chlor-alkali cell on potash has no scene. The cathode scrubber's hydrogen is checked with the
   cells run by hook. A fuel assembly stood up as a block keeps its assay since 2026-11-10 (answer 21); the cascade scene drives its machines by hook. The producer's CO2 factor is unit-tested only (16d1). The calciner uses the mod's materials. Not built: uranyl peroxide
@@ -626,8 +628,7 @@ Plan: `docs/ideas-plan.md`, Phase 20. Decisions for Tim: `docs/questions/phase20
   gauze packs are made from refined platinum and worn packs recovered; nitrous oxide abatement on the acid unit's tail gas; prill and ANFO.
 - Conversion: the fluorine cells' cathode hydrogen to the reducer; retiring the fluorinator's ash bed; regenerating the KOH
   scrubbers; a full-size plant.
-- ISR: bottled CO2 for the lixiviant, monitor-well rings and excursions, groundwater restoration (sweep, reverse osmosis,
-  stability monitoring), a disposal well for the bleed, satellite IX with trucked resin.
+- ISR: all built in 16d1 and 16d2. Raised by 16d2: monitor wells completed by the rig; fronts left behind by unrestored wellfields.
 - Enrichment: all built in 16c1 and 16c2. Raised by 16c2: a converter speed reference (overspeed can be counted but not commanded);
   partly filled cylinders for metered blending.
 - Zirconium: all built in 17c (the caustic's uses were struck: it goes to the Bayer refinery). Raised by 17c2: water for the HCl

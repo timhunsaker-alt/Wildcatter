@@ -1478,6 +1478,9 @@ sized for a 40-pot line.
   use the mod's materials. The DEPA-TOPO second cycle is built (2026-11-10, branch `w-rules`; see "Tim's answers" below). Not built:
   the filter acid's uranium is not carried as an assay; fluorosilicic acid recovery; the hemihydrate process; potash by flotation;
   Farmings reading `c:fertilizers` (Farmings' side). See `docs/questions/phase18-phosphate.md`.
+- Phase 16d2 (2026-11-12): no new textures (the two parts use the mod's materials). The monitor well is a placed block, not completed by
+  the rig; an unrestored wellfield's front is not left behind for a new house; no client scene (the scene's producer has no roll front,
+  so the restoration volumes are given by hook).
 - Phase 16c2 (2026-11-12): `rotor_shard_placeholder` drawn by script. Overspeed is checked but nothing can command it (no converter speed
   reference). A blend makes whole cylinders (no partly filled cylinder items). The heel's assay is not carried. The cascade scene
   drives its machines by hook.
@@ -2098,6 +2101,13 @@ Spec: `docs/multiblocks/reactor-extensions.md` ("As built", 19b). Branch `phase1
   there, refused by the refuelling machine and the vessel, and straightened at the assembly fixture; loaded unseen, it leaks.
 - **Field Manual:** DRY CASKS; CONTAMINATION AND NEW FUEL.
 - **Tests:** unit `ReactorActivityTest` (3 tests); NeoForge server scenes `casks`, `contamination`, `fuel_inspection`.
+## Phase 16d2: monitor rings, excursions, restoration (2026-11-12; built while Tim was away; decisions: `docs/questions/phase16-uranium.md`, 41-45)
+- Spec `docs/multiblocks/isr-operations.md` items 3-4 ("As built (16d2)"). World rule `isrExcursions`.
+- `MonitorWellheadBlock` / `MonitorWellheadBlockEntity` (`monitor_wellhead`); `RoUnitBlockEntity` (`ro_unit`, 3 x 3 x 8, in
+  `WellfieldPartBlock`); `HeaderHouseBlockEntity`: the ring, the front, excursions, the restoration modes (sneak-click). Models in
+  `tools/models/wellfield.py`.
+- Field Manual page MONITOR WELLS AND RESTORATION. Tests: NeoForge scene `isr_monitor`; `UraniumOperationsTest`.
+
 ## Phase 16c2: crashes, sampling and blending, heels (2026-11-12; built while Tim was away; decisions: `docs/questions/phase16-uranium.md`, 36-40)
 - Spec `docs/multiblocks/enrichment-operations.md` items 4-6 ("As built (16c2)"). World rules `centrifugeCrashes`, `uf6Cylinders`.
 - `CentrifugeBlockEntity` crash checks and crash; `CrashedCentrifugeBlockEntity` (`crashed_centrifuge`, 1 x 6 x 1); the feed station counts

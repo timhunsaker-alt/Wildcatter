@@ -36,6 +36,10 @@ public interface FuelCycleBlocks {
 	// 16d1 (docs/multiblocks/isr-operations.md)
 	Block CO2_LIQUEFIER = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.CO2_LIQUEFIER);
 	Block CO2_STORAGE_TANK = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.CO2_STORAGE_TANK);
+	// 16d2 (docs/multiblocks/isr-operations.md)
+	Block RO_UNIT = wellfieldPart(dev.wildcatter.block.WellfieldPartBlock.Part.RO_UNIT);
+	Block MONITOR_WELLHEAD = block("monitor_wellhead", props -> new dev.wildcatter.block.MonitorWellheadBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL)));
 	Block RESIN_TRAILER = block("resin_trailer", props -> new dev.wildcatter.block.ResinTrailerBlock(props.mapColor(net.minecraft.world.level.material.MapColor.COLOR_LIGHT_GRAY)
 			.strength(3.0F, 6.0F).sound(net.minecraft.world.level.block.SoundType.METAL).noOcclusion()));
 	// 7d: conversion to UF6 (docs/multiblocks/conversion.md)

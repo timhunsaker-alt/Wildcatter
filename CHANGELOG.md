@@ -2,6 +2,13 @@
 
 ## Unreleased (0.7.0, branch `w-next`): Phases 15-19, built 2026-11-10 while Tim was away
 
+### 16d2: monitor wells, excursions, groundwater restoration (built 2026-11-12 while Tim was away; not approved)
+- **Monitor wellheads** on a header house's well pipe, 30-60 blocks from its patterns. With the world rule `isrExcursions` (on in new
+  worlds) a house needs its ring (one every 40 blocks, 6 at least) to inject; under 0.5 % bleed its lixiviant front spreads to an
+  EXCURSION, and after 3 game days injection stops until more bleed pulls it back.
+- **Restoration:** sneak-click the header house: SWEEP, RO through a new RO unit (30 L/s), STABILITY, RESTORED.
+- Decisions for review: `docs/questions/phase16-uranium.md` (41-45).
+
 ### 16c2: centrifuge crashes, the sampling autoclave, heels (built 2026-11-12 while Tim was away; not approved)
 - **Crashes** (the world rule `centrifugeCrashes`, on in new worlds): never at random. A machine held at 30-60 % speed for 2 minutes, a
   casing without cooling past 15 minutes, overspeed, or a converter closing onto coasting machines: a bang, a puff of UF6 that hurts

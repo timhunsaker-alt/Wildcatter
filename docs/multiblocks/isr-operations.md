@@ -1,7 +1,7 @@
 # ISR wellfield operations: CO2, monitor wells, the bleed, restoration, satellite IX
 
 > **16d1 BUILT (2026-11-10), decided on recommendation while Tim was away; not approved.** See "As built (16d1)" at the end and
-> `docs/questions/phase16-uranium.md` (items 24-30). **16d2 (monitor rings, excursions, restoration) is a written plan, not built.**
+> `docs/questions/phase16-uranium.md` (items 24-30). **16d2 BUILT 2026-11-12** (see "As built (16d2)").
 > Drafted as proposed phase **16d** (16d1 CO2, the bleed and satellites; 16d2 monitor rings, excursions and restoration). Decisions are in `docs/questions/specs-wildcatter.md`
 > (items 31-35).
 
@@ -143,3 +143,15 @@ The grid is a sketch; the game test is the layout of record.
   full trailer at the central columns making eluate; NO CO2 with the tank empty). Unit test `UraniumOperationsTest` (the kiln's CO2, the
   dose, the CO2 factor, the trailer). The producer's head grade with CO2 is checked through `Isr.co2Factor` (the scene has no roll front).
 
+
+## As built (16d2, 2026-11-12, branch `w-17c`; decisions in `docs/questions/phase16-uranium.md`, items 41-45)
+- **Rule:** `isrExcursions` (on in new worlds): the ring requirement, the front and excursions.
+- **Monitor wellhead** (`MonitorWellheadBlock`, one block, on the header house's well pipe; question 42): its 1.5 kW sampling pump on the
+  house's drives; it reads its distance and its sample, or EXCURSION.
+- **The ring** (`HeaderHouseBlockEntity.ring`): 30-60 blocks from the nearest pattern well, one every 40 blocks of a ring of the wells'
+  mean radius, 6 at least; NO MONITOR RING holds injection. **The front:** 1 block a game hour for each 0.1 % of bleed under 0.5 %, back as
+  fast over it; EXCURSION at the nearest monitor; injection stops after 3 game days out.
+- **Restoration:** a sneak-click starts SWEEP (a pore volume, 48 m3 a producer, to the bleed), then RO through an `ro_unit` (3 x 3 x 8,
+  160 kW, 30 L/s at 75 %) against the house (two pore volumes), STABILITY (two game days), RESTORED.
+- **Tests:** NeoForge scene `isr_monitor` (its rule on); unit tests in `UraniumOperationsTest`. No client screenshot (the spec's is the
+  16d1 header house with its CO2 tank).

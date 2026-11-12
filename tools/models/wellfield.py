@@ -129,9 +129,32 @@ RT.cylinder("y", (1.0, 1.6), 0.2, 2.55, 2.85, "steel", 10)                  # it
 RT.cylinder("y", (1.0, 4.6), 0.2, 2.55, 2.85, "steel", 10)
 RT.collide((0.1, 0.0, 0.2), (1.9, 2.6, 5.9))
 
+# ---- 16d2: the monitor wellhead and the RO unit ---------------------------------------------------------------------------------
+MW = mlib.Model("monitor_wellhead", [(0, 0, 0)], TEX, TEX["polymer"])
+MW.box((0.25, 0.0, 0.25), (0.75, 0.08, 0.75), "concrete")                  # the well pad
+MW.cylinder("y", (0.5, 0.5), 0.06, 0.0, 0.7, "polymer", 10)                # 4 in PVC casing
+MW.cylinder("y", (0.5, 0.5), 0.08, 0.7, 0.8, "danger", 10)                 # its locked cap, painted
+MW.box((0.62, 0.08, 0.35), (0.9, 0.5, 0.65), "grey")                       # the sampling pump's control box
+MW.pipe([(0.5, 0.35, 0.5), (0.0, 0.35, 0.5)], 1, "polymer")                # its sample line, west
+MW.collide((0.4, 0.0, 0.4), (0.6, 0.8, 0.6))
+MW.export_args = {"blockstate": True, "item": True}
+
+RO = model("ro_unit", 3, 3, 8, "grey")
+RO.box((0.0, 0.0, 0.0), (3.0, 0.2, 8.0), "concrete")
+RO.box((0.3, 0.2, 0.3), (1.3, 1.6, 1.5), "steel")                          # cartridge filters
+RO.box((1.6, 0.2, 0.3), (2.7, 1.3, 1.8), "blue")                           # the high-pressure pumps
+for y in (0.6, 1.2, 1.8, 2.4):
+	RO.cylinder("z", (0.9, y), 0.18, 2.0, 7.6, "polymer", 10)             # spiral-wound membrane vessels
+	RO.cylinder("z", (2.1, y), 0.18, 2.0, 7.6, "polymer", 10)
+RO.box((0.4, 0.2, 2.0), (2.6, 0.35, 7.6), "iron")                          # their rack
+RO.pipe([(1.5, 0.5, 0.0), (1.5, 0.5, 0.3)], 4, "steel")                    # feed in, the front
+RO.box((0.0, 0.5, 0.3), (0.3, 1.1, 0.8), "grey")                            # its 480 V box, the west
+RO.decal((-0.01, 0.6, 0.4), (0.0, 1.0, 0.7), "danger", "west", "grey")
+RO.collide((0.2, 0.0, 0.2), (2.8, 2.7, 7.8))
+
 M = HH
-EXTRA = [OG, IX, ISR, ISR_PUMP, CL, CT, RT]
-for extra in (OG, IX, CL, CT, RT):
+EXTRA = [OG, IX, ISR, ISR_PUMP, CL, CT, RT, MW, RO]
+for extra in (OG, IX, CL, CT, RT, RO):
 	extra.export_args = {"blockstate": True, "item": True}
 
 

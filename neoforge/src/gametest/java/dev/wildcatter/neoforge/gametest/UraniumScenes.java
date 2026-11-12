@@ -560,4 +560,121 @@ final class UraniumScenes {
 			});
 		});
 	}
+
+	// ---- isr_monitor (16d2) ----------------------------------------------------------------------------------------------------------
+	/**
+	 * 16d2 (isr-operations.md items 3 and 4), with the rule isrExcursions on: a header house with a producer on its well pipe and an
+	 * injector on its injection pipe, six monitor wellheads 31-35 blocks out on its well pipe, an RO unit against its north end on a
+	 * diesel set. With five monitor wells it reads NO MONITOR RING; with six, the ring is whole. The bleed cut to nothing by hook and the
+	 * front brought near the nearest monitor: EXCURSION; the bleed back, the front falls back. A SWEEP, RO and STABILITY sequence (sped by
+	 * hook) ends RESTORED.
+	 */
+	static void isrMonitor(GameTestHelper helper) {
+		String scene = "isr_monitor";
+		floor(helper, -32, -34, 34, 42);
+		place(helper, WildcatterBlocks.HEADER_HOUSE, 0, 0);            // x 0-3, z 0-9; wells on its west face, injectors on its east
+		place(helper, WildcatterBlocks.RO_UNIT, 1, -8);                // x 1-3, z -8..-1, against its north end; box (0, -8)
+		for (int z = -31; z <= 40; z++) {
+			pipe(helper, new int[] {-1, 0, z});                                                  // the well pipe, a trunk north and south
+		}
+		pipe(helper, new int[] {-2, 0, 5});
+		GridSceneKit.put(helper, "isr_wellhead", -3, U, 5);                                      // the producer
+		helper.getLevel().setBlock(abs(helper, -3, U, 5), helper.getLevel().getBlockState(abs(helper, -3, U, 5)).setValue(dev.wildcatter.block.IsrWellheadBlock.PUMP, true), 3);
+		pipe(helper, new int[] {4, 0, 5});
+		GridSceneKit.put(helper, "isr_wellhead", 5, U, 5);                                       // the injector
+		// six monitor wells on a ring of 35 blocks round the patterns' middle, each piped to the trunk
+		int[][] monitors = {{31, 23}, {1, 40}, {-29, 23}, {-29, -13}, {1, -30}, {31, -13}};
+		for (int[] m : monitors) {
+			GridSceneKit.put(helper, "monitor_wellhead", m[0], U, m[1]);
+		}
+		for (int x = 0; x <= 30; x++) {
+			pipe(helper, new int[] {x, 0, 23});                                                  // (31, 23)
+		}
+		pipe(helper, new int[] {0, 0, 40});                                                     // (1, 40)
+		for (int x = -28; x <= -2; x++) {
+			pipe(helper, new int[] {x, 0, 23});                                                  // (-29, 23)
+			pipe(helper, new int[] {x, 0, -13});                                                 // (-29, -13)
+		}
+		pipe(helper, new int[] {0, 0, -30});                                                    // (1, -30)
+		for (int z = -31; z <= -14; z++) {
+			pipe(helper, new int[] {31, 0, z});                                                  // (31, -13), round by z -31
+		}
+		for (int x = 0; x <= 30; x++) {
+			pipe(helper, new int[] {x, 0, -31});
+		}
+		genset(helper, 12, -22);                                                                // skid x 7-12, z -22..-21
+		cableRun(helper, 13, -22, 13, -9);
+		cableRun(helper, 0, -9, 13, -9);
+		for (int z = -8; z <= -1; z++) {
+			cable(helper, 0, z);                                                                 // the RO unit's box (0, -8) and the house's (0, -1)
+		}
+		dev.wildcatter.block.HeaderHouseBlockEntity house = entity(helper, 0, 0, dev.wildcatter.block.HeaderHouseBlockEntity.class);
+		start(helper, 12, -22, () -> { });
+		// five monitor wells: no ring
+		GridSceneKit.air(helper, 31, U, 23);
+		helper.runAfterDelay(40, () -> {
+			String five = read(helper, 0, 0);
+			log(scene, "five | " + five);
+			check(helper, !house.ringOk() && five.contains("NO MONITOR RING") && five.contains("monitor ring 5 of 6"), "with five monitor wells it should read NO MONITOR RING: " + five);
+			GridSceneKit.put(helper, "monitor_wellhead", 31, U, 23);
+			helper.runAfterDelay(40, () -> {
+				String six = read(helper, 0, 0);
+				log(scene, "six | " + six + " | monitor " + GridSceneKit.read(helper, 1, U, 40));
+				check(helper, house.ringOk() && six.contains("monitor ring 6 of 6") && !six.contains("NO MONITOR RING"), "with six monitor wells the ring should be whole: " + six);
+				check(helper, GridSceneKit.read(helper, 1, U, 40).contains("within their limits"), "a monitor well should read its sample: " + GridSceneKit.read(helper, 1, U, 40));
+				// the bleed cut to nothing, the front brought near the nearest monitor (31.6 blocks)
+				house.setBleedForTest(0);
+				house.setFrontForTest(31.5);
+				helper.runAfterDelay(100, () -> {
+					String exc = read(helper, 0, 0);
+					log(scene, "excursion | " + exc + " | monitor " + GridSceneKit.read(helper, 31, U, 23));
+					check(helper, exc.startsWith("Header house: EXCURSION") || exc.contains("EXCURSION"), "the front at the ring should read EXCURSION: " + exc);
+					check(helper, GridSceneKit.read(helper, 31, U, 23).contains("EXCURSION") || GridSceneKit.read(helper, -29, U, -13).contains("EXCURSION"),
+							"the nearest monitor wells should read the excursion");
+					// three game days out: injection stops
+					house.setExcursionForTest(Tuning.EXCURSION_DAYS * 24000 / 20.0);
+					helper.runAfterDelay(20, () -> {
+						check(helper, house.stoppedByExcursion() && read(helper, 0, 0).contains("injection stopped"), "after three game days out it should stop injecting: " + read(helper, 0, 0));
+						// the bleed back: the front falls back
+						house.setBleedForTest(-1);
+						double before = house.front();
+						helper.runAfterDelay(200, () -> {
+							String back = read(helper, 0, 0);
+							log(scene, "bleed back | " + back);
+							check(helper, house.front() < before && !house.stoppedByExcursion(), "with the bleed back the front should fall back: " + before + " -> " + house.front() + " | " + back);
+							// restoration: SWEEP, RO, STABILITY, RESTORED, each sped by hook
+							house.setFrontForTest(0);
+							house.nextMode();
+							house.setRestorationForTest(house.poreVolume(), 0, 0);   // one pore volume swept, by hook
+							helper.runAfterDelay(40, () -> {
+								check(helper, house.mode() == dev.wildcatter.block.HeaderHouseBlockEntity.RO, "one pore volume swept, it should go on to RO: " + read(helper, 0, 0));
+								house.setRestorationForTest(house.poreVolume(), Tuning.RO_PORE_VOLUMES * house.poreVolume(), 0);   // two through the RO unit, by hook
+								await(helper, 400, () -> house.mode() == dev.wildcatter.block.HeaderHouseBlockEntity.STABILITY, () -> {
+									String ro = read(helper, 0, 0) + " | ro " + read(helper, 1, -8);
+									log(scene, "ro | " + ro);
+									check(helper, house.mode() == dev.wildcatter.block.HeaderHouseBlockEntity.STABILITY, "two pore volumes through the RO unit, it should go on to STABILITY: " + ro);
+									house.setRestorationForTest(house.poreVolume(), 2 * house.poreVolume(), Tuning.STABILITY_DAYS * 24000 / 20.0 - 0.1);
+									helper.runAfterDelay(40, () -> {
+										String done = read(helper, 0, 0);
+										log(scene, "restored | " + done);
+										check(helper, house.mode() == dev.wildcatter.block.HeaderHouseBlockEntity.RESTORED && done.contains("RESTORED"), "it should end RESTORED: " + done);
+										log(scene, "ok");
+										helper.succeed();
+									});
+								});
+							});
+						});
+					});
+				});
+			});
+		});
+	}
+
+	static void await(GameTestHelper helper, int ticks, java.util.function.BooleanSupplier done, Runnable then) {
+		if (ticks <= 0 || done.getAsBoolean()) {
+			then.run();
+			return;
+		}
+		helper.runAfterDelay(10, () -> await(helper, ticks - 10, done, then));
+	}
 }

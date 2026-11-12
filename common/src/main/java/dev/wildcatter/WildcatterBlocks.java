@@ -112,6 +112,8 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.IxColumnsBlockEntity> IX_COLUMNS_ENTITY = entity(dev.wildcatter.block.IxColumnsBlockEntity::new, IX_COLUMNS);
 	public static final BlockEntityType<dev.wildcatter.block.Co2LiquefierBlockEntity> CO2_LIQUEFIER_ENTITY = entity(dev.wildcatter.block.Co2LiquefierBlockEntity::new, CO2_LIQUEFIER);
 	public static final BlockEntityType<dev.wildcatter.block.Co2StorageTankBlockEntity> CO2_STORAGE_TANK_ENTITY = entity(dev.wildcatter.block.Co2StorageTankBlockEntity::new, CO2_STORAGE_TANK);
+	public static final BlockEntityType<dev.wildcatter.block.RoUnitBlockEntity> RO_UNIT_ENTITY = entity(dev.wildcatter.block.RoUnitBlockEntity::new, RO_UNIT);
+	public static final BlockEntityType<dev.wildcatter.block.MonitorWellheadBlockEntity> MONITOR_WELLHEAD_ENTITY = entity(dev.wildcatter.block.MonitorWellheadBlockEntity::new, MONITOR_WELLHEAD);
 	public static final BlockEntityType<dev.wildcatter.block.ResinTrailerBlockEntity> RESIN_TRAILER_ENTITY = entity(dev.wildcatter.block.ResinTrailerBlockEntity::new, RESIN_TRAILER);
 	public static final BlockEntityType<dev.wildcatter.block.IsrWellheadBlockEntity> ISR_WELLHEAD_ENTITY = entity(dev.wildcatter.block.IsrWellheadBlockEntity::new, ISR_WELLHEAD);
 	public static final BlockEntityType<dev.wildcatter.block.ReductionReactorBlockEntity> REDUCTION_REACTOR_ENTITY = entity(dev.wildcatter.block.ReductionReactorBlockEntity::new, REDUCTION_REACTOR, REDUCTION_REACTOR_LARGE);
@@ -487,11 +489,12 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		for (Block part : new Block[] {JAW_CRUSHER, SAG_MILL, LEACH_TANK, CCD_THICKENER, SX_CIRCUIT, PRECIPITATION_TANK, YELLOWCAKE_DRYER, DRUM_FILLER, URANIUM_CALCINER}) {
 			add(((dev.wildcatter.block.MillPartBlock) part).part().id(), part);
 		}
-		for (Block part : new Block[] {HEADER_HOUSE, OXYGEN_GENERATOR, IX_COLUMNS, CO2_LIQUEFIER, CO2_STORAGE_TANK}) {
+		for (Block part : new Block[] {HEADER_HOUSE, OXYGEN_GENERATOR, IX_COLUMNS, CO2_LIQUEFIER, CO2_STORAGE_TANK, RO_UNIT}) {
 			add(((dev.wildcatter.block.WellfieldPartBlock) part).part().id(), part);
 		}
 		add("resin_trailer", RESIN_TRAILER);
 		add("isr_wellhead", ISR_WELLHEAD);
+		add("monitor_wellhead", MONITOR_WELLHEAD);
 		add("brine_wellhead", BRINE_WELLHEAD);
 		for (Block part : new Block[] {BRINE_SATURATOR, BRINE_TREATMENT, MEMBRANE_CELL_ROOM, CHLORINE_TRAIN, CAUSTIC_EVAPORATOR, HCL_SYNTHESIS_UNIT, TI_CHLORINATOR, TICL4_PURIFICATION, TICL4_OXIDISER, VPSA_OXYGEN, PIGMENT_FINISHING, DECREPITATION_KILN, ACID_ROAST_KILN, LITHIUM_LEACH, LIOH_CRYSTALLIZER, LITHIUM_CARBONATOR}) {
 			add(((dev.wildcatter.block.ChemPartBlock) part).part().id(), part);
@@ -713,6 +716,8 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("ix_columns"), IX_COLUMNS_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("co2_liquefier"), CO2_LIQUEFIER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("co2_storage_tank"), CO2_STORAGE_TANK_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("ro_unit"), RO_UNIT_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("monitor_wellhead"), MONITOR_WELLHEAD_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("resin_trailer"), RESIN_TRAILER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("isr_wellhead"), ISR_WELLHEAD_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("reduction_reactor"), REDUCTION_REACTOR_ENTITY);

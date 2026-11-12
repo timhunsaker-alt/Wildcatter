@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "GXG",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "G": "minecraft:paper",
+    "X": "minecraft:piston"
+  },
+  "result": {
+    "id": "wildcatter:ro_unit",
+    "count": 1
+  }
+}

@@ -283,5 +283,38 @@ is behind a default-off setting, or happens only once the player adds the new pa
   conversion cylinder filler fills it again. The heel's assay is not carried (the new UF6 sets it).
 - **Why:** an existing fuel plant would stop on its unsampled 30Bs.
 
+## 16d2: monitor rings, excursions, restoration (2026-11-12, branch `w-17c`; decided on recommendation, for Tim)
+
+### 41. The ring, the front and excursions are behind a world rule, `isrExcursions`
+- **Chosen:** on in new worlds, off in old. Off, monitor wells only read their samples and nothing stops injecting. Restoration needs no
+  rule: it starts only by a sneak-click.
+
+### 42. The monitor wellhead is a placed block (needs you)
+- **Chosen:** `monitor_wellhead`, a 1-block locked casing and sampling pump (1.5 kW, drawn on the header house's drives) set anywhere and
+  joined to the header house's well pipe; the rig's completion of a non-ISR hole as a monitor well (the spec) is not built.
+- **Why:** completing a monitor well by the rig needs a new completion path in the land rig; the ring's play (distances, count) is the same.
+- **Alternatives:** the rig route, a later wave.
+
+### 43. Counting the ring
+- **Chosen:** a monitor well counts when it is 30 to 60 blocks from the nearest pattern well (producer or injector). The ring's length is
+  2 pi times the counted wells' mean distance from the patterns' middle; it needs one well every 40 blocks of it, 6 at least. 35 blocks
+  out that is 6; 50 blocks out, 8.
+
+### 44. The front
+- **Chosen:** the front's spread beyond the patterns, in blocks, starts at 0; while the house mines with producers and injectors it
+  grows by 1 block a game hour (1,000 ticks) for each 0.1 % the bleed is under 0.5 %, and shrinks as fast for each 0.1 % over (the house's
+  1 % pulls it back 5 blocks an hour); SWEEP, RO and a stopped house pull it back. The bleed counts as 1 % unless it is piped and backed up
+  (a disposal well full or stopped), then 0. EXCURSION when the front reaches the nearest counted monitor well; 3 game days out
+  (72,000 ticks, not through the time scale: they are already compressed from 60 real days), the house stops injecting until the front
+  is back inside.
+
+### 45. Restoration's volumes
+- **Chosen:** a pore volume is 48 m3 a producer *(proposed)*: a 20 x 20 x 4 block pattern at 0.3 porosity, a tenth as the fields are
+  (grades are 10x). SWEEP pumps one pore volume to the bleed (about 5 hours at a producer's 2.5 L/s); RO two through the RO unit (30 L/s,
+  75 % recovery, 160 kW; about 22 hours for a full house), the permeate to the injectors, the brine to the bleed; STABILITY two game days
+  without an excursion; then RESTORED (nothing pumps). A sneak-click on a RESTORED house goes back to MINE.
+- **Not built:** a wellfield taken up unrestored leaving its front behind, and a new house within it starting in EXCURSION (it needs
+  world-saved fronts).
+
 There is no `docs/DESIGN.md` in Wildcatter (that file is Tailings'). The design record for each wave is its spec's "As built" section.
 

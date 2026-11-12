@@ -752,6 +752,22 @@ public final class Tuning {
 	public static final double SAMPLING_WATTS = 50_000.0;          // 480 V (proposed)
 	public static final double HEEL_48Y_KG = 20.0;                 // left in an emptied 48Y (proposed; ANSI N14.1 limit about 22.7)
 	public static final double HEEL_30B_KG = 10.0;                 // an emptied 30B (proposed; limit about 11.3)
+	// 16d2: monitor rings, excursions, restoration (docs/multiblocks/isr-operations.md items 3, 4)
+	public static final double MONITOR_PUMP_WATTS = 1_500.0;       // a sampling pump, 480 V (proposed)
+	public static final int MONITOR_MIN_BLOCKS = 30;               // from the nearest pattern well (proposed, compressed as the fields are)
+	public static final int MONITOR_MAX_BLOCKS = 60;
+	public static final double MONITOR_SPACING = 40.0;             // blocks of ring a monitor well (proposed)
+	public static final int MONITOR_MIN_WELLS = 6;
+	public static final double FRONT_HOLD_BLEED = 0.005;           // at or over it the front stays put (proposed)
+	public static final double FRONT_BLOCKS_PER_HOUR = 1.0;        // a game hour, for each 0.1 % short (proposed)
+	public static final double FRONT_STEP_BLEED = 0.001;
+	public static final double EXCURSION_DAYS = 3.0;               // game days out before injection stops (proposed; real 60 days)
+	public static final double PORE_M3_PER_PRODUCER = 48.0;        // a pattern's 20 x 20 x 4 blocks at 0.3 porosity, a tenth as the fields are (proposed)
+	public static final double RO_LPS = 30.0;                      // feed (unverified)
+	public static final double RO_RECOVERY = 0.75;                 // permeate share (unverified)
+	public static final double RO_WATTS = 160_000.0;               // 480 V
+	public static final double RO_PORE_VOLUMES = 2.0;
+	public static final double STABILITY_DAYS = 2.0;               // game days without excursion (proposed; real 6-12 months)
 	public static final double UF6_SUBLIMATION_J_PER_KG = 137_000.0;   // 48 kJ/mol
 	public static final double FEED_STATION_WATTS = 30_000.0;      // its heater, 480 V (unverified)
 	public static final double PRODUCT_TAKEOFF_WATTS = 15_000.0;   // refrigeration, 480 V (unverified)

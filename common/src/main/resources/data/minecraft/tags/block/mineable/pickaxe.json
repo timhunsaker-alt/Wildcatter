@@ -467,6 +467,8 @@
     "wildcatter:pidgeon_furnace",
     "wildcatter:chromate_kiln",
     "wildcatter:sampling_autoclave",
-    "wildcatter:crashed_centrifuge"
+    "wildcatter:crashed_centrifuge",
+    "wildcatter:ro_unit",
+    "wildcatter:monitor_wellhead"
   ]
 }

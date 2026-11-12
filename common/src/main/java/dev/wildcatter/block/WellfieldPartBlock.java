@@ -28,7 +28,8 @@ public class WellfieldPartBlock extends BigPartBlock implements net.minecraft.wo
 		OXYGEN_GENERATOR("oxygen_generator", Footprint.box(3, 3, 6, 0, 0)),
 		IX_COLUMNS("ix_columns", Footprint.box(8, 6, 4, 0, 0)),
 		CO2_LIQUEFIER("co2_liquefier", Footprint.box(3, 4, 6, 0, 0)),
-		CO2_STORAGE_TANK("co2_storage_tank", Footprint.box(3, 3, 8, 0, 0));
+		CO2_STORAGE_TANK("co2_storage_tank", Footprint.box(3, 3, 8, 0, 0)),
+		RO_UNIT("ro_unit", Footprint.box(3, 3, 8, 0, 0));
 
 		private final String id;
 		private final Footprint footprint;
@@ -62,6 +63,7 @@ public class WellfieldPartBlock extends BigPartBlock implements net.minecraft.wo
 			case IX_COLUMNS -> new IxColumnsBlockEntity(pos, state);
 			case CO2_LIQUEFIER -> new Co2LiquefierBlockEntity(pos, state);
 			case CO2_STORAGE_TANK -> new Co2StorageTankBlockEntity(pos, state);
+			case RO_UNIT -> new RoUnitBlockEntity(pos, state);
 		};
 	}
 
@@ -69,7 +71,8 @@ public class WellfieldPartBlock extends BigPartBlock implements net.minecraft.wo
 	protected <T extends BlockEntity> BlockEntityTicker<T> mainTicker(Level level, BlockState state, BlockEntityType<T> type) {
 		if (level.isClientSide()) {
 			return part == Part.OXYGEN_GENERATOR ? createTickerHelper(type, WildcatterBlocks.OXYGEN_GENERATOR_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e))
-					: part == Part.CO2_LIQUEFIER ? createTickerHelper(type, WildcatterBlocks.CO2_LIQUEFIER_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e)) : null;
+					: part == Part.CO2_LIQUEFIER ? createTickerHelper(type, WildcatterBlocks.CO2_LIQUEFIER_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e))
+					: part == Part.RO_UNIT ? createTickerHelper(type, WildcatterBlocks.RO_UNIT_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e)) : null;
 		}
 		return switch (part) {
 			case HEADER_HOUSE -> createTickerHelper(type, WildcatterBlocks.HEADER_HOUSE_ENTITY, HeaderHouseBlockEntity::tick);
@@ -77,6 +80,7 @@ public class WellfieldPartBlock extends BigPartBlock implements net.minecraft.wo
 			case IX_COLUMNS -> createTickerHelper(type, WildcatterBlocks.IX_COLUMNS_ENTITY, IxColumnsBlockEntity::tick);
 			case CO2_LIQUEFIER -> createTickerHelper(type, WildcatterBlocks.CO2_LIQUEFIER_ENTITY, UnitMotorBlockEntity::tick);
 			case CO2_STORAGE_TANK -> createTickerHelper(type, WildcatterBlocks.CO2_STORAGE_TANK_ENTITY, Co2StorageTankBlockEntity::tick);
+			case RO_UNIT -> createTickerHelper(type, WildcatterBlocks.RO_UNIT_ENTITY, UnitMotorBlockEntity::tick);
 		};
 	}
 
@@ -93,6 +97,10 @@ public class WellfieldPartBlock extends BigPartBlock implements net.minecraft.wo
 			return InteractionResult.SUCCESS;
 		}
 		BlockEntity entity = level.getBlockEntity(main(pos, state));
+		if (entity instanceof HeaderHouseBlockEntity house && player.isShiftKeyDown()) {   // 16d2: restoration
+			player.sendOverlayMessage(net.minecraft.network.chat.Component.literal(house.nextMode()));
+			return InteractionResult.SUCCESS;
+		}
 		if (entity instanceof IxColumnsBlockEntity ix && player.isShiftKeyDown()) {   // 16d1: SATELLITE or ELUTION
 			player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("IX columns: " + ix.toggleSatellite()));
 			return InteractionResult.SUCCESS;

@@ -48,6 +48,8 @@ public final class Rules {
 		CENTRIFUGE_CRASHES("centrifugeCrashes", true, "centrifuge crashes: critical speeds, hot casings, overspeed, a converter closing onto coasting machines"),
 		/** 16c2: the fuel plant's autoclave takes only sampled 30Bs, and emptied cylinders keep their heels (48Y 20 kg, 30B 10 kg). */
 		UF6_CYLINDERS("uf6Cylinders", true, "the fuel plant takes only sampled 30Bs; emptied UF6 cylinders keep their heels"),
+		/** 16d2: a header house needs its monitor-well ring to inject; its lixiviant front grows under 0.5 % bleed, and an excursion stops it. */
+		ISR_EXCURSIONS("isrExcursions", true, "an ISR wellfield needs its monitor ring; under 0.5 % bleed its front spreads to an excursion"),
 		/** 19c1: green pellets crack without zinc stearate, scrap comes out in cans, uninspected assemblies may carry a leaking rod. */
 		FUEL_LINE_DEFECTS("fuelLineDefects", true, "pellets crack without zinc stearate, scrap comes out in cans, uninspected assemblies may leak"),
 		/** 19c2: the assembly fixture and the rod loader take 304 stainless and nickel-chromium alloy for the hardware, not steel. */
@@ -174,6 +176,10 @@ public final class Rules {
 
 	public static boolean wellControl() {
 		return on(Rule.WELL_CONTROL);
+	}
+
+	public static boolean isrExcursions() {
+		return on(Rule.ISR_EXCURSIONS);
 	}
 
 	public static boolean centrifugeCrashes() {

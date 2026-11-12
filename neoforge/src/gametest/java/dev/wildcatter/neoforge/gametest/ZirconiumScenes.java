@@ -50,7 +50,7 @@ final class ZirconiumScenes {
 
 	/** Each scene and the world rules it runs with (a batch of its own). */
 	static final Map<String, List<String>> RULES = Map.of("zirconium_batches", List.of("zirconiumBatches"),
-			"cascade_crash", List.of("centrifugeCrashes", "uf6Cylinders"));
+			"cascade_crash", List.of("centrifugeCrashes", "uf6Cylinders"), "isr_monitor", List.of("isrExcursions"));
 
 	static Map<String, Consumer<GameTestHelper>> scenes() {
 		Map<String, Consumer<GameTestHelper>> scenes = new LinkedHashMap<>();
@@ -59,6 +59,7 @@ final class ZirconiumScenes {
 		scenes.put("chromium", ZirconiumScenes::chromium);
 		scenes.put("fumed_silica", ZirconiumScenes::fumedSilica);
 		scenes.put("cascade_crash", UraniumScenes::cascadeCrash);   // 16c2, in UraniumScenes
+		scenes.put("isr_monitor", UraniumScenes::isrMonitor);       // 16d2, in UraniumScenes
 		return scenes;
 	}
 

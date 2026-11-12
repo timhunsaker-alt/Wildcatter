@@ -114,4 +114,27 @@ class UraniumOperationsTest {
 		// a converter at full output drives past them; only a machine held part way lingers there
 		assertEquals(true, Tuning.CRITICAL_SPEED_HIGH < 1.0 && Tuning.CENTRIFUGE_HERTZ < Tuning.OVERSPEED_HZ);
 	}
+
+	// ---- 16d2: monitor rings, excursions, restoration (docs/multiblocks/isr-operations.md) ----------------------------------------
+	@Test
+	void aRing35BlocksOutNeedsSixMonitorWells() {
+		assertEquals(6, Math.max(Tuning.MONITOR_MIN_WELLS, (int) Math.ceil(2 * Math.PI * 35 / Tuning.MONITOR_SPACING)));
+		assertEquals(8, Math.max(Tuning.MONITOR_MIN_WELLS, (int) Math.ceil(2 * Math.PI * 50 / Tuning.MONITOR_SPACING)));
+	}
+
+	@Test
+	void withNoBleedTheFrontSpreadsFiveBlocksAGameHour() {
+		assertEquals(5.0, (Tuning.FRONT_HOLD_BLEED - 0) / Tuning.FRONT_STEP_BLEED * Tuning.FRONT_BLOCKS_PER_HOUR, 1e-9);
+		// at the house's 1 % bleed it falls back as fast
+		assertEquals(-5.0, (Tuning.FRONT_HOLD_BLEED - Tuning.ISR_BLEED) / Tuning.FRONT_STEP_BLEED * Tuning.FRONT_BLOCKS_PER_HOUR, 1e-9);
+	}
+
+	@Test
+	void restorationTakesHoursNotYears() {
+		// a sweep of one pore volume at a producer's 2.5 L/s, and two through the RO unit for a full house
+		assertEquals(5.3, Tuning.PORE_M3_PER_PRODUCER * 1000 / Tuning.ISR_PRODUCER_LPS / 3600, 0.05);
+		assertEquals(22.2, Tuning.RO_PORE_VOLUMES * Tuning.PORE_M3_PER_PRODUCER * Tuning.HEADER_HOUSE_PRODUCERS * 1000 / Tuning.RO_LPS / 3600, 0.05);
+		// the RO unit's power: about 1.5 kWh a m3 at 30 L/s is 162 kW
+		assertEquals(162, 1.5 * Tuning.RO_LPS * 3.6, 1);
+	}
 }
