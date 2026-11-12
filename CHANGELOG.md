@@ -114,7 +114,20 @@
 - **Field Manual:** WORLD RULES; the ash bed, spin-up and reactor rules pages now name the world rules.
 - Decisions for review: `docs/questions/world-rules.md`.
 
+## v0.6.1 (released 2026-11-12)
+
+### Fixes
+- **The NeoForge client starts again:** NeoForge 26.3.0.101 wants the client-side handler of a clientbound payload registered on the client
+  (`RegisterClientPayloadHandlersEvent`). The PLC payload had only its two-way handler, so a NeoForge client refused to start with
+  "Some clientbound payloads are missing client-side handlers: [wildcatter:plc]". Found by Farmings' first NeoForge client launch. The
+  Fabric client and dedicated servers were not affected.
+
 ## v0.6.0 (released 2026-11-10)
+
+### Fixes
+- **The circuit manager no longer loads chunks:** working out which circuit parts touch read blocks next to a part even in unloaded
+  chunks, loading them on the server thread every few ticks; a circuit at the edge of the loaded area kept its neighbours loaded and
+  could slow the server or run it out of memory. It now stops at the loaded area's edge; solved numbers are unchanged.
 
 ### Gas and power quick wins (Phase 14b-14d), the PLC gap wave and the protection gap wave
 - **The sales line (14b):** a gas plant's pipeline gas goes on an off-map transmission line at a receipt meter station and comes off
