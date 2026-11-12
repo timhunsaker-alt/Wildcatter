@@ -3037,6 +3037,33 @@ for tag in ("mineable/pickaxe",):
 	t["values"] += [f"{ns}:{n}" for n in ("slurry_pipe", "air_header", "guy_anchor") if f"{ns}:{n}" not in t["values"]]
 	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
 
+# ---- Phase 20a: the chlor-alkali plant (docs/multiblocks/chlor-alkali-plant.md) --------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/chemicals.py; here loot, names, tags and recipes.
+CHEM_PARTS_20A = ("brine_saturator", "brine_treatment", "membrane_cell_room", "chlorine_train", "caustic_evaporator", "hcl_synthesis_unit", "rectifier_mv")
+for name in CHEM_PARTS_20A:
+	big_part_loot(name)
+big_part_loot_simple("brine_wellhead")
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in CHEM_PARTS_20A + ("brine_wellhead",)]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+S_, P_ = f"{ns}:steel_ingot", f"{ns}:gas_line"
+shaped("brine_saturator", ["SHS", "SXS", "SPS"], {"S": S_, "H": "minecraft:hopper", "X": "minecraft:piston", "P": P_}, "brine_saturator")
+shaped("brine_treatment", ["SPS", "CXC", "SPS"], {"S": S_, "P": P_, "C": "minecraft:cauldron", "X": "minecraft:piston"}, "brine_treatment")
+shaped("membrane_cell_room", ["SPS", "CIC", "SCS"], {"S": S_, "P": P_, "C": "minecraft:copper_block", "I": "minecraft:iron_block"}, "membrane_cell_room")
+shaped("rectifier_mv", ["SCS", "CRC", "SIS"], {"S": S_, "C": "minecraft:copper_block", "R": "minecraft:redstone_block", "I": "minecraft:iron_block"}, "rectifier_mv")
+shaped("chlorine_train", ["SPS", "PXP", "SIS"], {"S": S_, "P": P_, "X": "minecraft:piston", "I": "minecraft:iron_block"}, "chlorine_train")
+shaped("caustic_evaporator", ["SPS", "SCS", "SPS"], {"S": S_, "P": P_, "C": "minecraft:copper_block"}, "caustic_evaporator")
+shaped("hcl_synthesis_unit", ["SPS", "SBS", "SPS"], {"S": S_, "P": P_, "B": "minecraft:blast_furnace"}, "hcl_synthesis_unit")
+shaped("brine_wellhead", [" P ", "SVS", " S "], {"S": S_, "P": P_, "V": "minecraft:lever"}, "brine_wellhead")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({f"block.{ns}.brine_saturator": "Brine Saturator", f"block.{ns}.brine_treatment": "Brine Treatment (controller)",
+	f"block.{ns}.membrane_cell_room": "Membrane Cell Room (52 elements, 15 kA)", f"block.{ns}.chlorine_train": "Chlorine Drying and Liquefaction Train",
+	f"block.{ns}.caustic_evaporator": "Caustic Evaporator (to 50 %)", f"block.{ns}.hcl_synthesis_unit": "HCl Synthesis Unit",
+	f"block.{ns}.rectifier_mv": "Rectifier Transformer (distribution, 3.2 MVA)", f"block.{ns}.brine_wellhead": "Brine Wellhead (solution mining)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

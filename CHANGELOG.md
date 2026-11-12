@@ -2,6 +2,13 @@
 
 ## Unreleased (0.7.0, branch `w-next`): Phases 15-19, built 2026-11-10 while Tim was away
 
+### 20a: the chlor-alkali plant (built 2026-11-12 while Tim was away; not approved)
+- A full-size chlor-alkali plant, about a tonne of chlorine an hour: a brine saturator, the brine treatment, a membrane cell room of 52
+  elements at 15 kA and 161 V (2.4 MW of DC) on a new 12.47 kV rectifier transformer, a chlorine train that dries, compresses and
+  liquefies into ton containers, a caustic evaporator (50 % caustic) and an HCl synthesis unit (32 % hydrochloric acid). A brine wellhead
+  solution-mines a salt dome. Spec: `docs/multiblocks/chlor-alkali-plant.md`. Existing worlds are unchanged. Decisions for review:
+  `docs/questions/phase20-chemicals.md`.
+
 ### Time scale (Tim, 2026-11-10, branch `w-timescale`)
 - **A world's time scale:** 1:1, 5:1, 10:1, 20:1 or 50:1. It shortens the long waits only: a real reactor heat-up and cooldown
   (`reactorRealHeatup`), the coke oven, digester and precipitator holds (`realResidenceTimes`), and dry cask cooling. Rates, fuel,

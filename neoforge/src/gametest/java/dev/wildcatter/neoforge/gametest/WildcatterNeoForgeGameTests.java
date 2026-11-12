@@ -52,6 +52,8 @@ public class WildcatterNeoForgeGameTests {
 
 	/** Phase 17a's scenes (FerroalloyScenes): a peaker and its substation round the furnace, so room round them and time for the turbine. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> FERRO_SCENES = FerroalloyScenes.scenes();
+	/** Phase 20's scenes (ChemicalScenes): a peaker and its substation round the plant, as the ferroalloys scene. */
+	private static final java.util.Map<String, Consumer<GameTestHelper>> CHEM_SCENES = ChemicalScenes.scenes();
 	/** Phase 15's oilfield scenes (OilfieldScenes): spread out round a dome or a land rig, so each gets room, and long, for the drilling. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> OILFIELD_SCENES = OilfieldScenes.scenes();
 
@@ -130,6 +132,7 @@ public class WildcatterNeoForgeGameTests {
 			helper.register(id("phosphate_auc"), (Consumer<GameTestHelper>) PhosphateScenes::phosphateAuc);
 			GRID_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			FERRO_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
+			CHEM_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			REACTOR_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			OILFIELD_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			RULE_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
@@ -154,6 +157,11 @@ public class WildcatterNeoForgeGameTests {
 			if (only("ring_travel")) event.registerTest(id("ring_travel"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id("ring_travel")),
 					new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 3000, 1, true,
 							net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 240)));
+			for (String scene : CHEM_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
+				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
+						new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 6000, 1, true,
+								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 120)));
+			}
 			for (String scene : FERRO_SCENES.keySet()) {
 				if (!only(scene)) {
 					continue;

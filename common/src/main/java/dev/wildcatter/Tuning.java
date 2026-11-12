@@ -1533,4 +1533,32 @@ public final class Tuning {
 	public static final int VESSEL_FEMO_ALUMINIUM = 20;             // aluminium ingots a batch (454 kg: 0.53 t a tonne of alloy)
 	public static final int VESSEL_FEW_IRON = 1;
 	public static final int VESSEL_FEW_ALUMINIUM = 8;               // 182 kg: 0.3 t a 1.04 t of WO3
+	// ---- Phase 20a: the chlor-alkali plant (docs/multiblocks/chlor-alkali-plant.md) ------------------------------------------------
+	// Every rate follows from these through fluid/ChlorAlkaliPlant.
+	public static final int CAP_ELEMENTS = 52;                     // bipolar membrane elements, two electrolysers in series
+	public static final double CAP_ELEMENT_KA = 15.0;              // kA through each
+	public static final double CAP_ELEMENT_VOLTS = 3.1;            // at 15 kA (zirconium.md): 161 V for 52
+	public static final double CAP_CREEP_VOLTS_PER_DAY = 0.1;      // an element's voltage creep a day on brine that holds calcium (proposed)
+	public static final double CAP_CREEP_MAX_VOLTS = 0.5;          // where the creep stops: the membranes blinded (proposed)
+	public static final double BRINE_NACL = 0.26;                  // saturated brine, NaCl by weight
+	public static final double BRINE_SALT_CA_CO2 = 0.0032;         // kg of CO2 a kg of salt for its calcium as carbonate, with excess (proposed, see questions)
+	public static final double BRINE_SATURATOR_WATTS = 22_000.0;   // its agitator and brine pumps, LV
+	public static final double BRINE_TREATMENT_WATTS = 45_000.0;   // clarifier, filters and IX pumps, LV
+	public static final double BRINE_SALT_HOLD_KG = 4_000.0;       // salt the saturator keeps dissolving (about two rock salt blocks)
+	public static final double BRINE_WATER_HOLD = 6_000.0;         // litres of make-up water the saturator holds
+	public static final double DRYING_ACID_PER_CL2 = 0.015;        // kg of 98 % H2SO4 a kg of chlorine dried (unverified), out as spent 75 % acid
+	public static final double CL2_COMPRESSOR_WATTS = 250_000.0;   // the chlorine compressor, MV (proposed)
+	public static final double CL2_LIQUEFIER_WATTS = 110_000.0;    // the refrigerated liquefier, LV
+	public static final double CL2_LIQUEFIER_KGS = 1_100.0 / 3600; // what the liquefier condenses at most (the cell room's rating with a margin, proposed)
+	public static final double CAUSTIC_50_STRENGTH = 0.50;         // the evaporator's product
+	public static final double CAUSTIC_EVAPORATOR_STEAM = 0.7;     // t of process steam a t of NaOH, double effect (unverified)
+	public static final double HCL_MAX_KGH = 100.0;                // the HCl burner's rating, kg of HCl an hour (proposed)
+	public static final double HCL_STRENGTH = 0.32;                // its acid
+	/** rectifier_mv (shared with 16b2): a 12-pulse thyristor rectifier transformer on distribution voltage, 3.2 MVA, 16 kA, 500 V. */
+	public static final double RECTIFIER_MV_MAX_DC_VOLTS = 500.0;
+	public static final double RECTIFIER_MV_DC_OHMS = 0.3e-3;      // about 1 % of 500 V at 16 kA (proposed, as the 4.16 kV unit)
+	public static final double RECTIFIER_MV_RAMP_VOLTS_PER_S = 50.0; // its tap changer over the wider range (proposed)
+	public static final double BRINE_WELL_INJECT_LPS = 3.0;        // fresh water down the inner string, litres a second (proposed: 1.65 t/h of salt needs about 1.3)
+	public static final int BRINE_CAVERN_REACH = 12;               // blocks from the hole's bottom the cavern can reach (proposed)
+
 }

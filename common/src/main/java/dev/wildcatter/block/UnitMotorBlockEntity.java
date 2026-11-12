@@ -178,6 +178,9 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "bentonite_dryer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BENTONITE_MILL_WATTS);
 				case "mud_hopper" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.MUD_HOPPER_WATTS);
 				case "bop_accumulator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ACCUMULATOR_WATTS);
+				case "brine_saturator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BRINE_SATURATOR_WATTS);
+				case "brine_treatment" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BRINE_TREATMENT_WATTS);
+				case "chlorine_train" -> new Motor(true, Voltage.MEDIUM, Tuning.CL2_COMPRESSOR_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -321,6 +324,9 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "bentonite_dryer" -> "mill and dryer fan";
 			case "mud_hopper" -> "mixing pump";
 			case "bop_accumulator" -> "accumulator pump";
+			case "brine_saturator" -> "agitator and brine pumps";
+			case "brine_treatment" -> "clarifier, filter and IX pumps";
+			case "chlorine_train" -> "chlorine compressor";
 			default -> kind();
 		};
 	}

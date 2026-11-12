@@ -54,7 +54,7 @@ public final class OreUses {
 		return switch (ore) {
 			case URANINITE, PITCHBLENDE -> List.of("the uranium mill's jaw crusher, which feeds the mill (yellowcake)");
 			case SULFUR -> List.of("the acid plant's sulfur melter (sulfuric acid)");
-			case HALITE -> List.of("the uranium mill's SX circuit and IX columns (strip salt)", "chlor-alkali cells (chlorine, caustic soda)",
+			case HALITE -> List.of("the uranium mill's SX circuit and IX columns (strip salt)", "chlor-alkali cells (chlorine, caustic soda)", "the chlor-alkali plant's brine saturator, or a brine well in a salt dome (chlorine, caustic soda, hydrochloric acid)",
 					"a land rig's mud hopper (salt-saturated mud for drilling through salt)");
 			case BARITE -> List.of("the barite mill (drilling-grade barite, which weights a land rig's mud)");
 			case BENTONITE -> List.of("the bentonite dryer (drilling bentonite, which gels a land rig's mud)");

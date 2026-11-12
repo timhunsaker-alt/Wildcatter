@@ -1457,6 +1457,10 @@ sized for a 40-pot line.
 - Tests: `TimeScaleTest`; `world_rules`, `time_scale_holds`; the Fabric client's Create World check.
 
 ## Known gaps
+- Phase 20a (chlor-alkali, 2026-11-12): the parts use the mod's materials (no Ludo art; no new placeholders). The treatment's own caustic
+  and HCl for the magnesium and the IX regeneration are not drawn; the depleted brine's return is in the balance, not piped; the
+  rectifier_mv is modelled as the diode rectifier's regulation (no thyristor firing angle). Not built: hypochlorite, mercury and
+  diaphragm cells, gas storage in the brine caverns. See `docs/questions/phase20-chemicals.md`.
 - `guy_strand_placeholder` (the guy strand's icon) is drawn by script (2026-11-10, `w-grid`); the guy anchor has no Ludo art yet (it is
   drawn in the mod's galvanized material). A guy is drawn as a straight line.
 - The lean of an overloaded pole is drawn on the pole only (turned about its top cell); guys and spans are not redrawn for it.
@@ -2082,3 +2086,17 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
 - The World Rules screen lists rules in two columns sized to the window; with many more mods' rules it would need a scrolling list.
 - No game test makes a new world from the World Rules screen's choices end to end (the test harness's worlds start as existing
   worlds); `RulesData.load` taking `NewWorldSetup` is covered by the unit test of its parts and the client screen check.
+
+## Phase 20a: the chlor-alkali plant (2026-11-12; built while Tim was away; decisions: `docs/questions/phase20-chemicals.md`, 1-14)
+- Spec `docs/multiblocks/chlor-alkali-plant.md` ("As built"). The full-size plant, about a tonne of chlorine an hour: **brine saturator**
+  (22 kW; rock salt by hopper, water by pump, or brine from a well), **brine treatment** (the controller, 45 kW; liquid CO2 for the
+  calcium, else the cell room's voltage creeps), **membrane cell room** (52 elements, 15 kA, 161 V, 2.4 MW of DC), the **rectifier
+  transformer** `rectifier_mv` (distribution tier, 3.2 MVA, 16 kA, 500 V; shared with 16b2), **chlorine train** (drying on sulfuric acid,
+  compressor 250 kW at medium voltage, liquefier 110 kW into a chlorine filler it touches; WET CHLORINE without it), **caustic evaporator**
+  (32 % to 50 % on process steam) and **HCl synthesis unit** (32 % hydrochloric acid, up to 100 kg/h of HCl). The **brine wellhead**
+  solution-mines a salt dome through an injection pump fed fresh water, turning rock salt into a cavern of water.
+- New pipe products: brine, wet chlorine, caustic soda (50 %), hydrochloric acid (32 %). The small chlor-alkali cell is unchanged.
+- **Field Manual:** CHLOR-ALKALI PLANT, CHLORINE, CAUSTIC, HCl, BRINE WELLS. JEI: rock salt's uses name the plant and brine wells.
+- **Tests:** `ChlorAlkaliPlantTest` (3); NeoForge `chlor_alkali`, `brine_well`; client screenshots `chlorAlkali` (plant, cell room, train).
+- **Existing worlds:** unchanged: all new parts; the injection pump takes fresh water only when its discharge reaches a brine wellhead.
+

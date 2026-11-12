@@ -1,6 +1,6 @@
 # The chlor-alkali plant: brine, a full-size membrane cell room, chlorine liquefaction and HCl
 
-> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Proposed phase **20a**. Decisions are in
+> **20a BUILT (2026-11-12), decided on recommendation while Tim was away; not approved.** See "As built" at the end. Proposed phase **20a**. Decisions are in
 > `docs/questions/specs-wildcatter.md` (items 60-63).
 
 **What exists already.** The ROADMAP idea "chlor-alkali from rock salt" was written in 7a. Since then the zirconium plant (7f) built a
@@ -93,3 +93,22 @@ The grid is a sketch; the game test is the layout of record.
 
 ## Proposed wave
 **20a**, before the titanium pigment plant (20b), which needs its chlorine.
+
+## As built (20a, 2026-11-12; decisions in `docs/questions/phase20-chemicals.md`, items 1-14)
+- **Parts** (`ChemPartBlock`): brine saturator (22 kW, box west), brine treatment (the controller, 45 kW, box north: the saturator
+  covers its west), membrane cell room (52 elements, 15 kA, 3.1 V: 161 V, 2.4 MW; terminals on its east face at z 8, + over -), chlorine
+  train (compressor 250 kW at medium voltage, box west; liquefier 110 kW at 480 V, box north), caustic evaporator and HCl synthesis unit
+  (no motors: the spec gives none), and the `rectifier_mv` (a conversion part, the 4.16 kV rectifier's second size: distribution tier,
+  500 V, 16 kA). The brine wellhead is a one-cell block on a cased hole.
+- **Layout:** as the `chlor_alkali` scene: the room faces north beside the treatment, the rectifier against its north end (item 1).
+- **Brine:** the treatment draws 26 % brine from the saturator and hands it treated to the room; the saturator is the plant's one water
+  user (item 3). CO2 3.2 g a kg of salt (item 4); without it the elements creep 0.1 V a day up to 0.5 V; a sneak-click replaces the
+  membranes (item 5). The treatment's own caustic and HCl are not drawn (item 6).
+- **Outputs:** wet chlorine (a new pipe product only the train takes: WET CHLORINE without one), hydrogen (vented when it has nowhere to
+  go, item 7), 32 % caustic. The train dries on 15 kg of acid a tonne, puts dry chlorine on its pipe and liquefies the rest into a
+  chlorine filler it touches (item 9). New pipe products: brine, wet chlorine, caustic soda (50 %), hydrochloric acid (32 %).
+- **Brine well:** an injection pump whose discharge reaches a brine wellhead takes fresh water from a water pump (item 13); without one
+  the pump is as before.
+- **The small chlor-alkali cell** (7f) is unchanged.
+- **Tests:** unit `ChlorAlkaliPlantTest`; NeoForge `chlor_alkali` (rectifier 161 V, 15.0 kA, 2.42 MW; 990 kg/h of chlorine; 50 % caustic,
+  100 kg/h of HCl, a ton container filled, WET CHLORINE with the train broken) and `brine_well`; client screenshots `chlorAlkali`.

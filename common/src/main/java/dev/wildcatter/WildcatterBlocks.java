@@ -174,6 +174,14 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.GranulationPlantBlockEntity> GRANULATION_PLANT_ENTITY = entity(dev.wildcatter.block.GranulationPlantBlockEntity::new, GRANULATION_PLANT);
 	public static final BlockEntityType<dev.wildcatter.block.PotashDissolverBlockEntity> POTASH_DISSOLVER_ENTITY = entity(dev.wildcatter.block.PotashDissolverBlockEntity::new, POTASH_DISSOLVER);
 	public static final BlockEntityType<dev.wildcatter.block.VacuumCrystallizerBlockEntity> VACUUM_CRYSTALLIZER_ENTITY = entity(dev.wildcatter.block.VacuumCrystallizerBlockEntity::new, VACUUM_CRYSTALLIZER);
+	public static final BlockEntityType<dev.wildcatter.block.BrineSaturatorBlockEntity> BRINE_SATURATOR_ENTITY = entity(dev.wildcatter.block.BrineSaturatorBlockEntity::new, BRINE_SATURATOR);
+	public static final BlockEntityType<dev.wildcatter.block.BrineTreatmentBlockEntity> BRINE_TREATMENT_ENTITY = entity(dev.wildcatter.block.BrineTreatmentBlockEntity::new, BRINE_TREATMENT);
+	public static final BlockEntityType<dev.wildcatter.block.MembraneCellRoomBlockEntity> MEMBRANE_CELL_ROOM_ENTITY = entity(dev.wildcatter.block.MembraneCellRoomBlockEntity::new, MEMBRANE_CELL_ROOM);
+	public static final BlockEntityType<dev.wildcatter.block.ChlorineTrainBlockEntity> CHLORINE_TRAIN_ENTITY = entity(dev.wildcatter.block.ChlorineTrainBlockEntity::new, CHLORINE_TRAIN);
+	public static final BlockEntityType<dev.wildcatter.block.CausticEvaporatorBlockEntity> CAUSTIC_EVAPORATOR_ENTITY = entity(dev.wildcatter.block.CausticEvaporatorBlockEntity::new, CAUSTIC_EVAPORATOR);
+	public static final BlockEntityType<dev.wildcatter.block.HclSynthesisBlockEntity> HCL_SYNTHESIS_UNIT_ENTITY = entity(dev.wildcatter.block.HclSynthesisBlockEntity::new, HCL_SYNTHESIS_UNIT);
+	public static final BlockEntityType<dev.wildcatter.block.RectifierMvBlockEntity> RECTIFIER_MV_ENTITY = entity(dev.wildcatter.block.RectifierMvBlockEntity::new, RECTIFIER_MV);
+	public static final BlockEntityType<dev.wildcatter.block.BrineWellheadBlockEntity> BRINE_WELLHEAD_ENTITY = entity(dev.wildcatter.block.BrineWellheadBlockEntity::new, BRINE_WELLHEAD);
 	public static final BlockEntityType<dev.wildcatter.block.PotashDryerBlockEntity> POTASH_DRYER_ENTITY = entity(dev.wildcatter.block.PotashDryerBlockEntity::new, POTASH_DRYER);
 	public static final BlockEntityType<dev.wildcatter.block.AcidPretreatmentBlockEntity> ACID_PRETREATMENT_ENTITY = entity(dev.wildcatter.block.AcidPretreatmentBlockEntity::new, ACID_PRETREATMENT);
 	public static final BlockEntityType<dev.wildcatter.block.DepaTopoCircuitBlockEntity> DEPA_TOPO_CIRCUIT_ENTITY = entity(dev.wildcatter.block.DepaTopoCircuitBlockEntity::new, DEPA_TOPO_CIRCUIT);
@@ -455,7 +463,11 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		}
 		add("resin_trailer", RESIN_TRAILER);
 		add("isr_wellhead", ISR_WELLHEAD);
-		for (Block part : new Block[] {REDUCTION_REACTOR, HYDROFLUORINATOR, FLUORINATOR, COLD_TRAPS, DISTILLATION_COLUMNS, CYLINDER_FILLER, STEAM_REFORMER, HF_KILN, HF_COLUMN, RECTIFIER, FLUORINE_CELL_HOUSE, CATHODE_GAS_SCRUBBER, KOH_SCRUBBER}) {
+		add("brine_wellhead", BRINE_WELLHEAD);
+		for (Block part : new Block[] {BRINE_SATURATOR, BRINE_TREATMENT, MEMBRANE_CELL_ROOM, CHLORINE_TRAIN, CAUSTIC_EVAPORATOR, HCL_SYNTHESIS_UNIT}) {
+			add(((dev.wildcatter.block.ChemPartBlock) part).part().id(), part);
+		}
+		for (Block part : new Block[] {REDUCTION_REACTOR, HYDROFLUORINATOR, FLUORINATOR, COLD_TRAPS, DISTILLATION_COLUMNS, CYLINDER_FILLER, STEAM_REFORMER, HF_KILN, HF_COLUMN, RECTIFIER, FLUORINE_CELL_HOUSE, CATHODE_GAS_SCRUBBER, KOH_SCRUBBER, RECTIFIER_MV}) {
 			add(((dev.wildcatter.block.ConversionPartBlock) part).part().id(), part);
 		}
 		for (Block part : new Block[] {CENTRIFUGE, FREQUENCY_CONVERTER, FEED_STATION, PRODUCT_TAKEOFF, TAILS_TAKEOFF, CASCADE_COOLING_SKID}) {
@@ -730,6 +742,14 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("potash_dissolver"), POTASH_DISSOLVER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("vacuum_crystallizer"), VACUUM_CRYSTALLIZER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("potash_dryer"), POTASH_DRYER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("brine_saturator"), BRINE_SATURATOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("brine_treatment"), BRINE_TREATMENT_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("membrane_cell_room"), MEMBRANE_CELL_ROOM_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("chlorine_train"), CHLORINE_TRAIN_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("caustic_evaporator"), CAUSTIC_EVAPORATOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("hcl_synthesis_unit"), HCL_SYNTHESIS_UNIT_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rectifier_mv"), RECTIFIER_MV_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("brine_wellhead"), BRINE_WELLHEAD_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("acid_pretreatment"), ACID_PRETREATMENT_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("depa_topo_circuit"), DEPA_TOPO_CIRCUIT_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("paste_plant"), PASTE_PLANT_ENTITY);

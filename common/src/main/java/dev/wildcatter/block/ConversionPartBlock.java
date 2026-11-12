@@ -37,7 +37,9 @@ public class ConversionPartBlock extends BigPartBlock implements net.minecraft.w
 		RECTIFIER("rectifier", Footprint.box(3, 4, 4, 0, 0)),
 		FLUORINE_CELL_HOUSE("fluorine_cell_house", Footprint.box(6, 4, 12, 0, 0)),
 		CATHODE_GAS_SCRUBBER("cathode_gas_scrubber", Footprint.box(2, 4, 2, 0, 0)),
-		KOH_SCRUBBER("koh_scrubber", Footprint.box(3, 8, 3, 0, 0));
+		KOH_SCRUBBER("koh_scrubber", Footprint.box(3, 8, 3, 0, 0)),
+		/** 20a, shared with 16b2: the 12.47 kV rectifier (docs/multiblocks/chlor-alkali-plant.md). */
+		RECTIFIER_MV("rectifier_mv", Footprint.box(3, 4, 4, 0, 0));
 
 		private final String id;
 		private final Footprint footprint;
@@ -74,6 +76,7 @@ public class ConversionPartBlock extends BigPartBlock implements net.minecraft.w
 			case HF_KILN -> new HfKilnBlockEntity(pos, state);
 			case HF_COLUMN -> new HfColumnBlockEntity(pos, state);
 			case RECTIFIER -> new RectifierBlockEntity(pos, state);
+			case RECTIFIER_MV -> new RectifierMvBlockEntity(pos, state);
 			case FLUORINE_CELL_HOUSE -> new FluorineCellHouseBlockEntity(pos, state);
 			case CATHODE_GAS_SCRUBBER -> new CathodeGasScrubberBlockEntity(pos, state);
 			case KOH_SCRUBBER -> new KohScrubberBlockEntity(pos, state);
@@ -100,7 +103,7 @@ public class ConversionPartBlock extends BigPartBlock implements net.minecraft.w
 			case STEAM_REFORMER -> createTickerHelper(type, WildcatterBlocks.STEAM_REFORMER_ENTITY, SteamReformerBlockEntity::tick);
 			case HF_KILN -> createTickerHelper(type, WildcatterBlocks.HF_KILN_ENTITY, UnitMotorBlockEntity::tick);
 			case HF_COLUMN -> createTickerHelper(type, WildcatterBlocks.HF_COLUMN_ENTITY, HfColumnBlockEntity::tick);
-			case RECTIFIER -> null;
+			case RECTIFIER, RECTIFIER_MV -> null;
 			case FLUORINE_CELL_HOUSE -> createTickerHelper(type, WildcatterBlocks.FLUORINE_CELL_HOUSE_ENTITY, FluorineCellHouseBlockEntity::tick);
 			case CATHODE_GAS_SCRUBBER -> createTickerHelper(type, WildcatterBlocks.CATHODE_GAS_SCRUBBER_ENTITY, UnitMotorBlockEntity::tick);
 			case KOH_SCRUBBER -> createTickerHelper(type, WildcatterBlocks.KOH_SCRUBBER_ENTITY, UnitMotorBlockEntity::tick);

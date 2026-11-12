@@ -425,6 +425,14 @@
     "wildcatter:bop_accumulator",
     "wildcatter:slurry_pipe",
     "wildcatter:air_header",
-    "wildcatter:guy_anchor"
+    "wildcatter:guy_anchor",
+    "wildcatter:brine_saturator",
+    "wildcatter:brine_treatment",
+    "wildcatter:membrane_cell_room",
+    "wildcatter:chlorine_train",
+    "wildcatter:caustic_evaporator",
+    "wildcatter:hcl_synthesis_unit",
+    "wildcatter:rectifier_mv",
+    "wildcatter:brine_wellhead"
   ]
 }

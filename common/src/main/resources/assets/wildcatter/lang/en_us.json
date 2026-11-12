@@ -620,5 +620,13 @@
   "block.wildcatter.slurry_pipe": "Slurry Pipe (600 mm)",
   "block.wildcatter.air_header": "Air Header (600 mm)",
   "block.wildcatter.guy_anchor": "Guy Anchor",
-  "item.wildcatter.guy_strand": "Guy Strand (3/8 in EHS)"
+  "item.wildcatter.guy_strand": "Guy Strand (3/8 in EHS)",
+  "block.wildcatter.brine_saturator": "Brine Saturator",
+  "block.wildcatter.brine_treatment": "Brine Treatment (controller)",
+  "block.wildcatter.membrane_cell_room": "Membrane Cell Room (52 elements, 15 kA)",
+  "block.wildcatter.chlorine_train": "Chlorine Drying and Liquefaction Train",
+  "block.wildcatter.caustic_evaporator": "Caustic Evaporator (to 50 %)",
+  "block.wildcatter.hcl_synthesis_unit": "HCl Synthesis Unit",
+  "block.wildcatter.rectifier_mv": "Rectifier Transformer (distribution, 3.2 MVA)",
+  "block.wildcatter.brine_wellhead": "Brine Wellhead (solution mining)"
 }

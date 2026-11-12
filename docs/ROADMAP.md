@@ -546,6 +546,15 @@ Decisions taken while building: `docs/questions/answers-grid.md`. NeoForge scene
 - **Pit line (12):** the 600 mm `slurry_pipe` (rated 1 m3/s), the decant tower's rate scaling with its cell's floor, the 600 mm `air_header`.
 - **Zircon concentrate (9):** `#wildcatter:zircon_feed` and a kg data file; the chlorinator's hopper takes it.
 
+## Phase 20 — Chemicals — 20a BUILT 2026-11-12 (while Tim was away, on the DRAFT specs decided on recommendation; not approved)
+Plan: `docs/ideas-plan.md`, Phase 20. Decisions for Tim: `docs/questions/phase20-chemicals.md`. Branch `w-20`.
+- **20a, the chlor-alkali plant** (`docs/multiblocks/chlor-alkali-plant.md`, BUILT 2026-11-12): brine saturator, brine treatment, a
+  membrane cell room (15 kA, 161 V, 2.4 MW DC) on the new `rectifier_mv` (distribution tier), a chlorine train, a caustic evaporator (50 %),
+  an HCl synthesis unit (32 %), a brine wellhead into a salt dome. NeoForge scenes `chlor_alkali`, `brine_well`; unit test
+  `ChlorAlkaliPlantTest`; client screenshots `chlorAlkali`.
+- **20b, titanium pigment** (`docs/multiblocks/titanium-pigment.md`): planned.
+- **20c, lithium** (`docs/multiblocks/lithium.md`): planned.
+
 ## Ideas (not scheduled)
 - **Time scale (Tim, 2026-11-10):** a world setting with presets 1:1, 5:1, 10:1, 20:1 and 50:1 that shortens the long waits (reactor heat-up
   and cooldown, residence holds, cask cooling, Tailings' paste cure), chosen on the Create World screen with the world rules. Spec and

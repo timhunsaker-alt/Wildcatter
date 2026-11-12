@@ -164,6 +164,16 @@ public interface FuelCycleBlocks {
 	Block ALUMINIUM_BLOCK = block("aluminium_block", props -> new Block(props.mapColor(MapColor.METAL).strength(5.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
 	/** A placed block of red mud filter cake, for a dry stack. */
 	Block RED_MUD = block("red_mud", props -> new Block(props.mapColor(MapColor.TERRACOTTA_RED).strength(0.8F).sound(SoundType.MUD)));
+	// Phase 20a: the chlor-alkali plant (docs/multiblocks/chlor-alkali-plant.md)
+	Block BRINE_SATURATOR = chemPart(dev.wildcatter.block.ChemPartBlock.Part.BRINE_SATURATOR);
+	Block BRINE_TREATMENT = chemPart(dev.wildcatter.block.ChemPartBlock.Part.BRINE_TREATMENT);
+	Block MEMBRANE_CELL_ROOM = chemPart(dev.wildcatter.block.ChemPartBlock.Part.MEMBRANE_CELL_ROOM);
+	Block CHLORINE_TRAIN = chemPart(dev.wildcatter.block.ChemPartBlock.Part.CHLORINE_TRAIN);
+	Block CAUSTIC_EVAPORATOR = chemPart(dev.wildcatter.block.ChemPartBlock.Part.CAUSTIC_EVAPORATOR);
+	Block HCL_SYNTHESIS_UNIT = chemPart(dev.wildcatter.block.ChemPartBlock.Part.HCL_SYNTHESIS_UNIT);
+	Block RECTIFIER_MV = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.RECTIFIER_MV);
+	Block BRINE_WELLHEAD = block("brine_wellhead", props -> new dev.wildcatter.block.BrineWellheadBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL)));
 	Block ISR_WELLHEAD = block("isr_wellhead", props -> new dev.wildcatter.block.IsrWellheadBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL)));
 }

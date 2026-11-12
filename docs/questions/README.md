@@ -15,6 +15,7 @@ Format of an entry:
 
 | File | Wave | Entries |
 |---|---|---|
+| `phase20-chemicals.md` | Phase 20: the chlor-alkali plant, the titanium pigment plant, lithium hydroxide | numbered across 20a-20c |
 | `phase16-uranium.md` | Phase 16: ADU, conversion's cathode hydrogen, ash bed and KOH, product assay, spin-up and cooling, ISR CO2, bleed and satellites | numbered across 16a-16d1 |
 
 ## Start here
