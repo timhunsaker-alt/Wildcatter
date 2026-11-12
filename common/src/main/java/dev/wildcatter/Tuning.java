@@ -1588,4 +1588,23 @@ public final class Tuning {
 	public static final double PIGMENT_HYDRATE_PER_T = 30.0;       // kg of alumina hydrate a tonne of TiO2 for its surface treatment (proposed)
 	public static final double PIGMENT_STEAM_PER_T = 2.0;          // t of process steam a tonne of TiO2 for the micronizer (unverified)
 	public static final double PIGMENT_DYE_PER_BAG = 64;           // white dye a bag of pigment crafts into (proposed)
+
+	// ---- Phase 20c: lithium hydroxide from spodumene (docs/multiblocks/lithium.md) ----------------------------------------------
+	public static final double SPODUMENE_ORE_LI2O = 0.06;          // 80 % spodumene at 7.5 % Li2O (proposed)
+	public static final double LITHIUM_RECOVERY = 0.90;            // of the ore's Li2O to the hydroxide (proposed)
+	public static final double LIOH_TPH = 0.5;                     // t/h of LiOH.H2O (proposed size)
+	public static final double DECREPITATION_J_PER_KG = 1.0e6;     // about 1 GJ a tonne of ore (unverified)
+	public static final double ROAST_ACID_EXCESS = 1.30;           // the acid roast's 30 % excess
+	public static final double ROAST_GAS_WATTS = 0.2e6;            // the roast kiln's indirect firing (proposed)
+	public static final double LEACH_LIME_PER_T_ORE = 20.0;        // kg of quicklime a tonne of ore (proposed)
+	public static final double LEACH_CO2_PER_T_ORE = 2.0;          // kg of CO2 a tonne of ore for the calcium (proposed: 3 m3 of liquor a tonne at 0.6 g/L Ca)
+	public static final double LIOH_STEAM_PER_T = 3.0;             // t of process steam a tonne of LiOH.H2O (unverified)
+	public static final double DECREPITATION_KILN_WATTS = 30_000.0; // drive and fans, LV
+	public static final double ACID_ROAST_KILN_WATTS = 15_000.0;
+	public static final double LITHIUM_LEACH_WATTS = 37_000.0;
+	public static final double LIOH_CRYSTALLIZER_WATTS = 110_000.0;
+	public static final double LITHIUM_CARBONATOR_WATTS = 10_000.0;
+	public static final double LITHIUM_CARBONATOR_KGH = 100.0;     // kg/h of Li2CO3 at most (proposed: "a little carbonate")
+	public static final double POT_LITHIUM_VOLTS = 0.1;            // a pot with lithium in its bath runs this much lower (proposed)
+	public static final double POT_LI2CO3_PER_T_AL = 1.5;          // kg of Li2CO3 a tonne of aluminium (unverified)
 }

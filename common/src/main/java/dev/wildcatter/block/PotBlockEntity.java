@@ -42,7 +42,10 @@ import org.jspecify.annotations.Nullable;
 public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart, HopperFed {
 	private static final Item[] INS = {WildcatterItems.REACTED_ALUMINA_BAG, WildcatterItems.ALUMINA_BAG, WildcatterItems.ALF3_BAG, WildcatterItems.RODDED_ANODE};
 	private static final int OUT = 4;
-	private final NonNullList<ItemStack> slots = NonNullList.withSize(INS.length + OUT, ItemStack.EMPTY);
+	/** 20c: lithium carbonate bags, a slot after the 17a ones so theirs keep their numbers. */
+	private static final int LITHIUM_SLOT = INS.length + OUT;
+	private final NonNullList<ItemStack> slots = NonNullList.withSize(LITHIUM_SLOT + 1, ItemStack.EMPTY);
+	private double lithium;          // kg of Li2CO3 in its bath (20c): it runs 0.1 V lower while it has some
 	private final DcCell cell = new DcCell(1, Tuning.POT_BACK_EMF, Tuning.POT_CELL_VOLTS, Tuning.POT_AMPS);
 	private int plus;
 	private int minus;
@@ -79,12 +82,12 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 	}
 
 	private static boolean takesIn(int slot, ItemStack stack) {
-		return slot < INS.length && stack.is(INS[slot]);
+		return slot < INS.length && stack.is(INS[slot]) || slot == LITHIUM_SLOT && stack.is(WildcatterItems.LI2CO3_BAG);
 	}
 
 	@Override
 	public int[] getSlotsForFace(Direction side) {
-		return side == Direction.UP ? new int[] {0, 1, 2, 3} : side == Direction.DOWN ? new int[] {4, 5, 6, 7} : new int[0];
+		return side == Direction.UP ? new int[] {0, 1, 2, 3, LITHIUM_SLOT} : side == Direction.DOWN ? new int[] {4, 5, 6, 7} : new int[0];
 	}
 
 	@Override
@@ -99,19 +102,29 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 
 	@Override
 	public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
-		return slot >= INS.length && side == Direction.DOWN;
+		return slot >= INS.length && slot < LITHIUM_SLOT && side == Direction.DOWN;
+	}
+
+	/** Volts across the pot, the last solve. */
+	public double cellVolts() {
+		return cell.volts();
+	}
+
+	/** kg of lithium carbonate in its bath (20c). */
+	public double lithium() {
+		return lithium;
 	}
 
 	public int outCount() {
 		int n = 0;
-		for (int i = INS.length; i < slots.size(); i++) {
+		for (int i = INS.length; i < LITHIUM_SLOT; i++) {
 			n += slots.get(i).getCount();
 		}
 		return n;
 	}
 
 	public void giveAll(Player player) {
-		for (int i = INS.length; i < slots.size(); i++) {
+		for (int i = INS.length; i < LITHIUM_SLOT; i++) {
 			ItemStack stack = slots.get(i);
 			if (!stack.isEmpty()) {
 				if (!player.getInventory().add(stack.copy())) {
@@ -124,7 +137,7 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 	}
 
 	private boolean putOut(ItemStack made) {
-		for (int i = INS.length; i < slots.size(); i++) {
+		for (int i = INS.length; i < LITHIUM_SLOT; i++) {
 			ItemStack in = slots.get(i);
 			if (in.isEmpty()) {
 				slots.set(i, made);
@@ -225,7 +238,7 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 		aux.build(circuit, worldPosition, List.of(auxFace()));
 		plus = circuit.node();
 		minus = circuit.node();
-		cell.setBackEmf(effect ? Potline.anodeEffectBackEmf() : Tuning.POT_BACK_EMF);
+		cell.setBackEmf(effect ? Potline.anodeEffectBackEmf() : Tuning.POT_BACK_EMF - (lithium > 1e-6 ? Tuning.POT_LITHIUM_VOLTS : 0));
 		cell.build(circuit, plus, minus, !frozen && !cutOut);   // a pot in series is never opened, but a frozen bath is solid
 		if (cutOut) {
 			circuit.resistor(plus, minus, Tuning.POT_SHORTING_OHMS);   // its shorting bars carry the line past it
@@ -297,6 +310,11 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 			slots.get(2).shrink(1);
 			alf3 += Tuning.BULK_BAG_KG;
 		}
+		if (lithium <= 1e-6 && !slots.get(LITHIUM_SLOT).isEmpty()) {   // 20c: a bag of lithium carbonate into its bath
+			slots.get(LITHIUM_SLOT).shrink(1);
+			lithium += Tuning.BULK_BAG_KG;
+			dev.wildcatter.circuit.CircuitManager.markDirty(level);
+		}
 		// its point feeders keep its bath's alumina up while its auxiliaries have power; without, it runs on what is dissolved
 		boolean fed = auxPowered();
 		if (fed) {
@@ -359,6 +377,12 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 		}
 		metal += al;
 		made = al / s;
+		if (lithium > 1e-6) {   // 20c: its bath's lithium is used with the metal
+			lithium = Math.max(0, lithium - al / 1000 * Tuning.POT_LI2CO3_PER_T_AL);
+			if (lithium <= 1e-6) {
+				dev.wildcatter.circuit.CircuitManager.markDirty(level);
+			}
+		}
 		burned += al * Tuning.POT_CARBON_PER_AL;
 		while (burned >= Potline.carbonPerAnode()) {
 			burned -= Potline.carbonPerAnode();
@@ -496,6 +520,7 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 		ContainerHelper.saveAllItems(output, slots);
 		output.putDouble("alumina", alumina);
 		output.putDouble("alf3", alf3);
+		output.putDouble("lithium", lithium);
 		output.putDouble("metal", metal);
 		output.putDouble("burned", burned);
 		output.putInt("overdue", overdue);
@@ -516,6 +541,7 @@ public class PotBlockEntity extends PlantUnitBlockEntity implements CircuitPart,
 		ContainerHelper.loadAllItems(input, slots);
 		alumina = input.getDoubleOr("alumina", Tuning.POT_ALUMINA_BIN_KG);
 		alf3 = input.getDoubleOr("alf3", Tuning.POT_ALF3_BIN_KG);
+		lithium = input.getDoubleOr("lithium", 0);
 		metal = input.getDoubleOr("metal", 0);
 		burned = input.getDoubleOr("burned", 0);
 		overdue = input.getIntOr("overdue", 0);

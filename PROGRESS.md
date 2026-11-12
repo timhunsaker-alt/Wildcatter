@@ -1457,6 +1457,10 @@ sized for a 40-pot line.
 - Tests: `TimeScaleTest`; `world_rules`, `time_scale_holds`; the Fabric client's Create World check.
 
 ## Known gaps
+- Phase 20c (lithium, 2026-11-12): `lioh_bag_placeholder`, `sodium_sulfate_bag_placeholder` and `li2co3_bag_placeholder` (item icons) are
+  drawn by script; the five parts use the mod's materials. The carbonator takes LiOH bags, not solution; the pot takes its lithium from its
+  own hopper, not the fume treatment centre's; sodium sulfate has no buyer. Not built: lithium from brines or clays, battery-grade
+  polishing, lithium-7 for a PWR, grid batteries (an Idea).
 - Phase 20b (titanium pigment, 2026-11-12): `ilmenite_placeholder`, `rutile_placeholder`, `ti_slag_bag_placeholder` and
   `tio2_pigment_bag_placeholder` (item icons) are drawn by script; the five parts use the mod's materials. The feed's impurities are not
   carried as an assay (waste chlorides and SiCl4 are counted from fixed shares); the VPSA oxygen has no other user (no AOD). Not built: the
@@ -2123,4 +2127,16 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
 - **Field Manual:** TITANIUM PIGMENT, THE CHLORINE LOOP. JEI: heavy mineral sand's use; info on the pigment, ilmenite and rutile.
 - **Tests:** `TitaniumPigmentTest` (2); NeoForge `ti_pigment`, `ferroalloys` (extended for Ti slag); client screenshots `tiPigment`.
 - **Existing worlds:** unchanged: the separator changes only with a hopper under it; the furnace's slots keep their numbers.
+
+## Phase 20c: lithium hydroxide (2026-11-12; built while Tim was away; decisions: `docs/questions/phase20-chemicals.md`, 27-34)
+- Spec `docs/multiblocks/lithium.md` ("As built"). The sulfate route from spodumene: **decrepitation kiln** (1,050 C, 0.9 MW of gas),
+  **acid roast kiln** (250 C, sulfuric acid), **lithium leach** (the controller; lime, CO2, residue to a lined tailings cell), **LiOH
+  crystallizer** (caustic and process steam; lithium hydroxide and sodium sulfate, each to its own bagging station), **lithium
+  carbonator** (LiOH bags and CO2 to Li2CO3). 0.5 t of LiOH.H2O an hour. A lithium carbonate bag in a potline pot's hopper runs the pot
+  0.1 V lower while its bath holds it. Spodumene now has a use.
+- New items: lithium hydroxide, sodium sulfate and lithium carbonate bags (tagged `c:dusts/...` for the lithium ones).
+- **Field Manual:** LITHIUM HYDROXIDE, LITHIUM CARBONATE. JEI: spodumene's use; info on the carbonate and sulfate bags.
+- **Tests:** `LithiumTest` (3); NeoForge `lithium`; client screenshots `lithium`.
+- **Existing worlds:** unchanged: a pot changes only once a bag is put in it (its slots keep their numbers); the bagging station's
+  per-station bag defaults to the one bag every earlier part makes.
 

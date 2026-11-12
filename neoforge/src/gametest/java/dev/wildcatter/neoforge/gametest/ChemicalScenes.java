@@ -70,6 +70,7 @@ final class ChemicalScenes {
 		scenes.put("chlor_alkali", ChemicalScenes::chlorAlkali);
 		scenes.put("brine_well", ChemicalScenes::brineWell);
 		scenes.put("ti_pigment", ChemicalScenes::tiPigment);
+		scenes.put("lithium", ChemicalScenes::lithium);
 		scenes.putAll(ConversionLargeScenes.scenes());   // 16b2, on the same peaker
 		return scenes;
 	}
@@ -389,6 +390,149 @@ final class ChemicalScenes {
 					check(helper, noO2.contains("NO OXYGEN"), "with the VPSA unit gone the oxidiser should read NO OXYGEN: " + noO2);
 					log(scene, "ok: " + noO2);
 					helper.succeed();
+				});
+			});
+		}));
+	}
+
+	// ---- lithium (20c) -------------------------------------------------------------------------------------------------------------
+	/** A lined tailings cell, 7 x 7 and 3 high, its floor at y U-1 from (x0, z0); its feed column at (x0+3, z0-1), as PhosphateScenes.cell. */
+	private static void cell(GameTestHelper helper, int x0, int z0) {
+		for (int x = x0; x <= x0 + 6; x++) {
+			for (int z = z0; z <= z0 + 6; z++) {
+				put(helper, "cell_liner", x, U - 1, z);
+				if (x == x0 || x == x0 + 6 || z == z0 || z == z0 + 6) {
+					for (int y = U; y <= U + 2; y++) {
+						put(helper, "cell_liner", x, y, z);
+					}
+				}
+			}
+		}
+		int tx = x0 + 3;
+		put(helper, "decant_tower", tx, U, z0 + 1);
+		for (int y = U; y <= U + 3; y++) {
+			put(helper, "gas_line", tx, y, z0 - 1);
+		}
+		put(helper, "gas_line", tx, U + 3, z0);
+		for (int y = U + 1; y <= U + 3; y++) {
+			put(helper, "gas_line", tx, y, z0 + 1);
+		}
+	}
+
+	private static int count(dev.wildcatter.block.BaggingStationBlockEntity station, net.minecraft.world.item.Item item) {
+		int n = 0;
+		for (ItemStack st : station.slots()) {
+			if (st.is(item)) {
+				n += st.getCount();
+			}
+		}
+		return n;
+	}
+
+	static void lithium(GameTestHelper helper) {
+		String scene = "lithium";
+		floor(helper, -12, -6, 40, 32);
+		place(helper, WildcatterBlocks.LITHIUM_LEACH, 0, U, 0, NORTH);          // x 0-3, z 0-5, box north (0, -1)
+		place(helper, WildcatterBlocks.ACID_ROAST_KILN, -3, U, 0, NORTH);       // x -3..-1, z 0-7, box north (-3, -1)
+		place(helper, WildcatterBlocks.DECREPITATION_KILN, -6, U, 0, NORTH);    // x -6..-4, z 0-11, box west (-7, 0)
+		place(helper, WildcatterBlocks.LIOH_CRYSTALLIZER, 4, U, 0, NORTH);      // x 4-6, z 0-3, box north (4, -1)
+		place(helper, WildcatterBlocks.BAGGING_STATION, 6, U, -1, Direction.SOUTH);   // x 5-6, z -2..-1, against its north face: sodium sulfate; box (7, -1)
+		place(helper, WildcatterBlocks.BAGGING_STATION, 8, U, 1, Direction.SOUTH);    // x 7-8, z 0-1, against its east face: LiOH; box (9, 1)
+		place(helper, WildcatterBlocks.LITHIUM_CARBONATOR, 12, U, 6, NORTH);    // x 12-13, z 6-8, box west (11, 6)
+		place(helper, WildcatterBlocks.BAGGING_STATION, 13, U, 10, Direction.SOUTH);  // x 12-13, z 9-10, against it: Li2CO3; box (14, 10)
+		cell(helper, -2, 12);                                                   // x -2..4, z 12-18; feed column (1, 11)
+		// pipe
+		run(helper, "gas_line", new int[] {7, 3});
+		TestGasSource.SourceEntity caustic = source(helper, 8, 3, Product.CAUSTIC_SODA, 2.0);           // 32 % caustic to the crystallizer
+		run(helper, "gas_line", new int[] {5, 4});
+		source(helper, 5, 5, Product.PROCESS_STEAM, 1.0);                                                // its steam
+		run(helper, "gas_line", new int[] {3, 6});
+		source(helper, 3, 7, Product.CO2, 0.1);                                                          // the leach's CO2
+		run(helper, "gas_line", new int[] {0, 7});
+		source(helper, 0, 8, Product.SULFURIC_ACID, 1.0);                                                // the roast's acid
+		run(helper, "gas_line", new int[] {-3, 9}, new int[] {-3, 8}, new int[] {-2, 8});
+		source(helper, -2, 9, Product.PIPELINE_GAS, 0.2);                                                // both kilns' gas
+		put(helper, "gas_line", 1, U, 6);                                                                // the residue, up and south to the cell
+		for (int z = 6; z <= 10; z++) {
+			put(helper, "gas_line", 1, U + 1, z);
+		}
+		run(helper, "gas_line", new int[] {14, 6});
+		source(helper, 15, 6, Product.CO2, 0.1);                                                         // the carbonator's CO2
+		// power: A (480 V) the plant; B (480 V) the carbonator and its station
+		genset(helper, -10, U, -4);
+		run(helper, "cable_industrial", new int[] {-9, -4}, new int[] {-9, -1}, new int[] {4, -1});
+		run(helper, "cable_industrial", new int[] {-7, 0});
+		run(helper, "cable_industrial", new int[] {-9, -4}, new int[] {9, -4}, new int[] {9, 1});
+		run(helper, "cable_industrial", new int[] {7, -4}, new int[] {7, -1});
+		genset(helper, 8, U, 14);
+		run(helper, "cable_industrial", new int[] {9, 14}, new int[] {11, 14}, new int[] {11, 6});
+		run(helper, "cable_industrial", new int[] {11, 12}, new int[] {14, 12}, new int[] {14, 10});
+		// the pot, on DC from a 4.16 kV rectifier at 6 kA by bus bars
+		place(helper, WildcatterBlocks.POT, 30, U, 20, NORTH);                  // x 30-35, z 20-31: + in at (29, U+1, 25), - out at (36, U+1, 25)
+		place(helper, WildcatterBlocks.RECTIFIER, 24, U, 22, NORTH);            // x 24-26, z 22-25: + (27, U+2, 24), - (27, U, 24); box (23, 22)
+		for (int[] c : new int[][] {{27, 2, 24}, {27, 2, 25}, {28, 2, 25}, {29, 2, 25}, {29, 1, 25}}) {
+			put(helper, "dc_bus_16k", c[0], U + c[1], c[2]);
+		}
+		for (int z = 18; z <= 24; z++) {
+			put(helper, "dc_bus_16k", 27, U, z);
+		}
+		for (int x = 28; x <= 37; x++) {
+			put(helper, "dc_bus_16k", x, U, 18);
+		}
+		for (int z = 19; z <= 25; z++) {
+			put(helper, "dc_bus_16k", 37, U, z);
+		}
+		put(helper, "dc_bus_16k", 37, U + 1, 25);
+		put(helper, "dc_bus_16k", 36, U + 1, 25);
+		mvSet(helper, 14, 22);
+		run(helper, "cable_mv", new int[] {19, 22}, new int[] {23, 22});
+		// feeds
+		entity(helper, -6, U, 0, dev.wildcatter.block.DecrepitationKilnBlockEntity.class).slots().set(0, new ItemStack(OreBlocks.MINERALS.get(Ore.SPODUMENE), 8));
+		dev.wildcatter.block.LithiumLeachBlockEntity leach = entity(helper, 0, U, 0, dev.wildcatter.block.LithiumLeachBlockEntity.class);
+		leach.slots().set(0, new ItemStack(WildcatterItems.QUICKLIME_BAG, 2));
+		dev.wildcatter.block.LiohCrystallizerBlockEntity crystallizer = entity(helper, 4, U, 0, dev.wildcatter.block.LiohCrystallizerBlockEntity.class);
+		dev.wildcatter.block.BaggingStationBlockEntity sulfate = entity(helper, 6, U, -1, dev.wildcatter.block.BaggingStationBlockEntity.class);
+		dev.wildcatter.block.BaggingStationBlockEntity hydroxide = entity(helper, 8, U, 1, dev.wildcatter.block.BaggingStationBlockEntity.class);
+		dev.wildcatter.block.BaggingStationBlockEntity carbonate = entity(helper, 13, U, 10, dev.wildcatter.block.BaggingStationBlockEntity.class);
+		for (var st : new dev.wildcatter.block.BaggingStationBlockEntity[] {sulfate, hydroxide, carbonate}) {
+			st.slots().set(0, new ItemStack(WildcatterItems.EMPTY_BULK_BAG, 4));
+		}
+		dev.wildcatter.block.LithiumCarbonatorBlockEntity carbonator = entity(helper, 12, U, 6, dev.wildcatter.block.LithiumCarbonatorBlockEntity.class);
+		carbonator.slots().set(0, new ItemStack(WildcatterItems.LIOH_BAG, 2));
+		dev.wildcatter.block.PotBlockEntity pot = entity(helper, 30, U, 20, dev.wildcatter.block.PotBlockEntity.class);
+		int[][] wet = {};
+		start(helper, 8, U, 14, () -> { });
+		start(helper, 14, U, 22, () -> { });
+		start(helper, -10, U, -4, () -> await(helper, 900, wet, () -> leach.making() > 0 && carbonator.making() > 0, () -> {
+			String chain = " | leach " + read(helper, 0, U, 0) + " | roast " + read(helper, -3, U, 0) + " | kiln " + read(helper, -6, U, 0) + " | crystallizer "
+					+ read(helper, 4, U, 0) + " | carbonator " + read(helper, 12, U, 6);
+			log(scene, "running:" + chain);
+			check(helper, near(leach.making(), dev.wildcatter.fluid.Lithium.liohKgs() * 3600, 0.15), "the plant should make about 500 kg/h of LiOH.H2O: " + leach.making() + chain);
+			crystallizer.testAdd(Tuning.BULK_BAG_KG, Tuning.BULK_BAG_KG);                                 // brought near full by hook
+			carbonator.testAdd(Tuning.BULK_BAG_KG);
+			await(helper, 300, wet, () -> count(hydroxide, WildcatterItems.LIOH_BAG) >= 1 && count(sulfate, WildcatterItems.SODIUM_SULFATE_BAG) >= 1
+					&& count(carbonate, WildcatterItems.LI2CO3_BAG) >= 1, () -> {
+				String bags = " | LiOH station " + read(helper, 8, U, 1) + " | sulfate station " + read(helper, 6, U, -1) + " | carbonate station " + read(helper, 13, U, 10);
+				check(helper, count(hydroxide, WildcatterItems.LIOH_BAG) >= 1, "a lithium hydroxide bag should drop at the east station" + bags);
+				check(helper, count(sulfate, WildcatterItems.SODIUM_SULFATE_BAG) >= 1, "a sodium sulfate bag should drop at the north station" + bags);
+				check(helper, count(carbonate, WildcatterItems.LI2CO3_BAG) >= 1, "the carbonator should fill a lithium carbonate bag" + bags);
+				log(scene, "bags:" + bags);
+				double before = pot.cellVolts();
+				String potBefore = pot.inspect().getString();
+				check(helper, before > 1.0, "the pot should be on DC: " + before + " | " + potBefore + " | rectifier " + read(helper, 24, U, 22));
+				pot.slots().set(8, new ItemStack(WildcatterItems.LI2CO3_BAG));                               // the carbonate bag in its hopper
+				await(helper, 200, wet, () -> pot.lithium() > 0 && before - pot.cellVolts() > 0.05, () -> {
+					double after = pot.cellVolts();
+					log(scene, String.format("pot %.3f V to %.3f V | %s", before, after, pot.inspect().getString()));
+					check(helper, near(before - after, Tuning.POT_LITHIUM_VOLTS, 0.3), "lithium in its bath should lower the pot by about 0.1 V: " + before + " to " + after);
+					air(helper, 7, U, 3);                                                                     // the caustic cut
+					air(helper, 8, U, 3);
+					await(helper, 200, wet, () -> read(helper, 0, U, 0).contains("NO CAUSTIC"), () -> {
+						String noCaustic = read(helper, 0, U, 0);
+						check(helper, noCaustic.contains("NO CAUSTIC"), "with the caustic cut the leach should read NO CAUSTIC: " + noCaustic);
+						log(scene, "ok: " + noCaustic + String.format(" | caustic taken %.0f kg", caustic.taken));
+						helper.succeed();
+					});
 				});
 			});
 		}));

@@ -642,5 +642,13 @@
   "block.wildcatter.ticl4_purification": "TiCl4 Purification",
   "block.wildcatter.ticl4_oxidiser": "TiCl4 Oxidiser",
   "block.wildcatter.vpsa_oxygen": "VPSA Oxygen Unit (100 Nm3/h)",
-  "block.wildcatter.pigment_finishing": "Pigment Finishing"
+  "block.wildcatter.pigment_finishing": "Pigment Finishing",
+  "item.wildcatter.lioh_bag": "Bulk Bag of Lithium Hydroxide (LiOH.H2O)",
+  "item.wildcatter.sodium_sulfate_bag": "Bulk Bag of Sodium Sulfate",
+  "item.wildcatter.li2co3_bag": "Bulk Bag of Lithium Carbonate",
+  "block.wildcatter.decrepitation_kiln": "Decrepitation Kiln (1,050 C)",
+  "block.wildcatter.acid_roast_kiln": "Acid Roast Kiln (250 C)",
+  "block.wildcatter.lithium_leach": "Lithium Leach (controller)",
+  "block.wildcatter.lioh_crystallizer": "LiOH Crystallizer",
+  "block.wildcatter.lithium_carbonator": "Lithium Carbonator"
 }

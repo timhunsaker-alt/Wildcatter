@@ -141,4 +141,33 @@ final class ChemicalClientScenes {
 		shot(-5, 6, 8, -130, 15, "wildcatter-ti-pigment-chlorinator");
 		System.out.println("[wildcatter-test] tiPigment ok");
 	}
+
+	// ---- lithium: the lithium hydroxide plant, as the NeoForge scene lithium lays it out ----------------------------------------------
+	void lithium() {
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 16 " + (up + 14) + " " + (z0 - 10) + " 40 30");
+		context.waitTicks(20);
+		clear(-10, -8, 18, 20, 12);
+		place(WildcatterBlocks.LITHIUM_LEACH, 0, 0);
+		place(WildcatterBlocks.ACID_ROAST_KILN, -3, 0);
+		place(WildcatterBlocks.DECREPITATION_KILN, -6, 0);
+		place(WildcatterBlocks.LIOH_CRYSTALLIZER, 4, 0);
+		on(level -> {
+			for (int[] st : new int[][] {{6, -1}, {8, 1}}) {
+				BlockState state = WildcatterBlocks.BAGGING_STATION.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.SOUTH);
+				level.setBlock(at(st[0], 0, st[1]), state, 3);
+				BigParts.grow(level, at(st[0], 0, st[1]), state);
+			}
+		});
+		place(WildcatterBlocks.LITHIUM_CARBONATOR, 12, 6);
+		run("gas_line", new int[] {7, 3});
+		run("gas_line", new int[] {5, 4});
+		run("gas_line", new int[] {3, 6});
+		run("gas_line", new int[] {0, 7});
+		run("gas_line", new int[] {-3, 9}, new int[] {-3, 8}, new int[] {-2, 8});
+		context.waitTicks(40);
+		shot(14, 12, -8, 40, 30, "wildcatter-lithium-plant");
+		shot(-12, 5, 14, -140, 20, "wildcatter-lithium-kilns");
+		System.out.println("[wildcatter-test] lithium ok");
+	}
 }

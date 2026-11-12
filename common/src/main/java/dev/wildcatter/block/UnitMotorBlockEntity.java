@@ -187,6 +187,11 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "ticl4_purification" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.TICL4_PURIFICATION_WATTS);
 				case "vpsa_oxygen" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.VPSA_WATTS);
 				case "pigment_finishing" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PIGMENT_FINISHING_WATTS);
+				case "decrepitation_kiln" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.DECREPITATION_KILN_WATTS);
+				case "acid_roast_kiln" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ACID_ROAST_KILN_WATTS);
+				case "lithium_leach" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LITHIUM_LEACH_WATTS);
+				case "lioh_crystallizer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LIOH_CRYSTALLIZER_WATTS);
+				case "lithium_carbonator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LITHIUM_CARBONATOR_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -337,6 +342,11 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "ticl4_purification" -> "reboiler";
 			case "vpsa_oxygen" -> "blower and vacuum pump";
 			case "pigment_finishing" -> "mills, filters and dryer fans";
+			case "decrepitation_kiln" -> "kiln drive and fans";
+			case "acid_roast_kiln" -> "pug mill and kiln drive";
+			case "lithium_leach" -> "agitators and belt filter";
+			case "lioh_crystallizer" -> "pumps, chiller and centrifuges";
+			case "lithium_carbonator" -> "agitator and pumps";
 			default -> kind();
 		};
 	}

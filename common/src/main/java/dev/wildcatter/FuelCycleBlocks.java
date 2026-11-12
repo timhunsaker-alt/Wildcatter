@@ -177,6 +177,12 @@ public interface FuelCycleBlocks {
 	Block TICL4_OXIDISER = chemPart(dev.wildcatter.block.ChemPartBlock.Part.TICL4_OXIDISER);
 	Block VPSA_OXYGEN = chemPart(dev.wildcatter.block.ChemPartBlock.Part.VPSA_OXYGEN);
 	Block PIGMENT_FINISHING = chemPart(dev.wildcatter.block.ChemPartBlock.Part.PIGMENT_FINISHING);
+	// Phase 20c: lithium hydroxide (docs/multiblocks/lithium.md)
+	Block DECREPITATION_KILN = chemPart(dev.wildcatter.block.ChemPartBlock.Part.DECREPITATION_KILN);
+	Block ACID_ROAST_KILN = chemPart(dev.wildcatter.block.ChemPartBlock.Part.ACID_ROAST_KILN);
+	Block LITHIUM_LEACH = chemPart(dev.wildcatter.block.ChemPartBlock.Part.LITHIUM_LEACH);
+	Block LIOH_CRYSTALLIZER = chemPart(dev.wildcatter.block.ChemPartBlock.Part.LIOH_CRYSTALLIZER);
+	Block LITHIUM_CARBONATOR = chemPart(dev.wildcatter.block.ChemPartBlock.Part.LITHIUM_CARBONATOR);
 	Block RECTIFIER_MV = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.RECTIFIER_MV);
 	// 16b2: the full-size conversion plant's larger main line (docs/multiblocks/conversion-extensions.md)
 	Block REDUCTION_REACTOR_LARGE = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.REDUCTION_REACTOR_LARGE);

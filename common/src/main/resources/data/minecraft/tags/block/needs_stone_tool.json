@@ -346,6 +346,11 @@
     "wildcatter:ticl4_purification",
     "wildcatter:ticl4_oxidiser",
     "wildcatter:vpsa_oxygen",
-    "wildcatter:pigment_finishing"
+    "wildcatter:pigment_finishing",
+    "wildcatter:decrepitation_kiln",
+    "wildcatter:acid_roast_kiln",
+    "wildcatter:lithium_leach",
+    "wildcatter:lioh_crystallizer",
+    "wildcatter:lithium_carbonator"
   ]
 }

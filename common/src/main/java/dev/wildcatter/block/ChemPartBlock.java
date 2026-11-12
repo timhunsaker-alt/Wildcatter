@@ -36,7 +36,13 @@ public class ChemPartBlock extends BigPartBlock implements net.minecraft.world.W
 		TICL4_PURIFICATION("ticl4_purification", Footprint.box(3, 12, 3, 0, 0), TiCl4PurificationBlockEntity::new),
 		TICL4_OXIDISER("ticl4_oxidiser", Footprint.box(3, 4, 10, 0, 0), TiCl4OxidiserBlockEntity::new),
 		VPSA_OXYGEN("vpsa_oxygen", Footprint.box(3, 4, 6, 0, 0), VpsaOxygenBlockEntity::new),
-		PIGMENT_FINISHING("pigment_finishing", Footprint.box(4, 5, 10, 0, 0), PigmentFinishingBlockEntity::new);
+		PIGMENT_FINISHING("pigment_finishing", Footprint.box(4, 5, 10, 0, 0), PigmentFinishingBlockEntity::new),
+		// 20c, lithium hydroxide
+		DECREPITATION_KILN("decrepitation_kiln", Footprint.box(3, 4, 12, 0, 0), DecrepitationKilnBlockEntity::new),
+		ACID_ROAST_KILN("acid_roast_kiln", Footprint.box(3, 3, 8, 0, 0), AcidRoastKilnBlockEntity::new),
+		LITHIUM_LEACH("lithium_leach", Footprint.box(4, 5, 6, 0, 0), LithiumLeachBlockEntity::new),
+		LIOH_CRYSTALLIZER("lioh_crystallizer", Footprint.box(3, 10, 4, 0, 0), LiohCrystallizerBlockEntity::new),
+		LITHIUM_CARBONATOR("lithium_carbonator", Footprint.box(2, 4, 3, 0, 0), LithiumCarbonatorBlockEntity::new);
 
 		private final String id;
 		private final Footprint footprint;

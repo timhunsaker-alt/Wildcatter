@@ -3120,6 +3120,42 @@ lang.update({f"block.{ns}.ti_chlorinator": "Titanium Chlorinator (controller)", 
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 save_json(f"{ROOT}/data/c/tags/item/pigments/titanium_dioxide.json", {"values": [f"{ns}:tio2_pigment_bag"]})
 
+# ---- Phase 20c: lithium hydroxide from spodumene (docs/multiblocks/lithium.md) -------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/lithium.py; here loot, names, tags, recipes and the three bags (the Ludo
+# bulk bag with a swatch: placeholders).
+LI_PARTS = ("decrepitation_kiln", "acid_roast_kiln", "lithium_leach", "lioh_crystallizer", "lithium_carbonator")
+for name in LI_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in LI_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+S_, P_ = f"{ns}:steel_ingot", f"{ns}:gas_line"
+shaped("decrepitation_kiln", ["SHS", "BFB", "SSS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace"}, "decrepitation_kiln")
+shaped("acid_roast_kiln", ["SPS", "BFB", "SSS"], {"S": S_, "P": P_, "B": "minecraft:bricks", "F": "minecraft:furnace"}, "acid_roast_kiln")
+shaped("lithium_leach", ["SHS", "CXC", "SPS"], {"S": S_, "H": "minecraft:hopper", "C": "minecraft:cauldron", "X": "minecraft:piston", "P": P_}, "lithium_leach")
+shaped("lioh_crystallizer", ["SPS", "SCS", "SXS"], {"S": S_, "P": P_, "C": "minecraft:copper_block", "X": "minecraft:piston"}, "lioh_crystallizer")
+shaped("lithium_carbonator", ["SHS", "SCS", "SPS"], {"S": S_, "H": "minecraft:hopper", "C": "minecraft:cauldron", "P": P_}, "lithium_carbonator")
+LI_BAGS = {"lioh_bag": ("Bulk Bag of Lithium Hydroxide (LiOH.H2O)", (236, 236, 228)), "sodium_sulfate_bag": ("Bulk Bag of Sodium Sulfate", (220, 220, 236)),
+	"li2co3_bag": ("Bulk Bag of Lithium Carbonate", (240, 232, 220))}
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in LI_BAGS.items():
+	bag = Image.open(f"{ORE_ART}/empty_bulk_bag.png").convert("RGBA")
+	d = ImageDraw.Draw(bag)
+	d.rectangle([10, 13, 21, 22], fill=colour + (255,), outline=(60, 60, 60, 255))
+	d.rectangle([12, 15, 14, 17], fill=tuple(max(0, c - 40) for c in colour) + (255,))
+	bag.save(f"{ASSETS}/textures/item/{item}_placeholder.png")
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}_placeholder"}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.decrepitation_kiln": "Decrepitation Kiln (1,050 C)", f"block.{ns}.acid_roast_kiln": "Acid Roast Kiln (250 C)",
+	f"block.{ns}.lithium_leach": "Lithium Leach (controller)", f"block.{ns}.lioh_crystallizer": "LiOH Crystallizer",
+	f"block.{ns}.lithium_carbonator": "Lithium Carbonator"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+save_json(f"{ROOT}/data/c/tags/item/dusts/lithium_hydroxide.json", {"values": [f"{ns}:lioh_bag"]})
+save_json(f"{ROOT}/data/c/tags/item/dusts/lithium_carbonate.json", {"values": [f"{ns}:li2co3_bag"]})
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

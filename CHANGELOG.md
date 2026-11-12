@@ -2,6 +2,12 @@
 
 ## Unreleased (0.7.0, branch `w-next`): Phases 15-19, built 2026-11-10 while Tim was away
 
+### 20c: lithium (built 2026-11-12 while Tim was away; not approved)
+- Lithium hydroxide from spodumene by the sulfate route: a decrepitation kiln, an acid roast kiln, the lithium leach, a LiOH crystallizer
+  (lithium hydroxide and sodium sulfate in 1 t bags) and a lithium carbonator; 0.5 t of LiOH.H2O an hour. A bag of lithium carbonate in a
+  potline pot's hopper runs the pot 0.1 V lower. Spec: `docs/multiblocks/lithium.md`. Existing worlds are unchanged. Decisions:
+  `docs/questions/phase20-chemicals.md` (27-34).
+
 ### 20b: titanium pigment (built 2026-11-12 while Tim was away; not approved)
 - The mineral separator puts its ilmenite and rutile out as items to a hopper under it; the submerged arc furnace smelts ilmenite to
   titanium slag and pig iron; a titanium chlorinator, TiCl4 purification, TiCl4 oxidiser, VPSA oxygen unit and pigment finishing make 0.25 t

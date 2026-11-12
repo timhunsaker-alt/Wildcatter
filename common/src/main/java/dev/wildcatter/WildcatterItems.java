@@ -246,6 +246,16 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> TIO2_PIGMENT_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("tio2_pigment_bag"));
 	public static final Item TIO2_PIGMENT_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(TIO2_PIGMENT_BAG_KEY),
 			String.format("%,.0f kg of titanium dioxide pigment, rutile grade", Tuning.BULK_BAG_KG), "white pigment");
+	// Phase 20c: lithium (docs/multiblocks/lithium.md)
+	public static final ResourceKey<Item> LIOH_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("lioh_bag"));
+	public static final Item LIOH_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(LIOH_BAG_KEY),
+			String.format("%,.0f kg of lithium hydroxide monohydrate (LiOH.H2O)", Tuning.BULK_BAG_KG), "for the lithium carbonator");
+	public static final ResourceKey<Item> SODIUM_SULFATE_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("sodium_sulfate_bag"));
+	public static final Item SODIUM_SULFATE_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(SODIUM_SULFATE_BAG_KEY),
+			String.format("%,.0f kg of sodium sulfate (Glauber's salt, dried)", Tuning.BULK_BAG_KG), "no buyer yet");
+	public static final ResourceKey<Item> LI2CO3_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("li2co3_bag"));
+	public static final Item LI2CO3_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(LI2CO3_BAG_KEY),
+			String.format("%,.0f kg of lithium carbonate (Li2CO3)", Tuning.BULK_BAG_KG), "for a potline pot's bath");
 	// 10c1: blueprints (docs/blueprints.md)
 	public static final ResourceKey<Item> BLUEPRINT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("blueprint"));
 	public static final Item BLUEPRINT = new dev.wildcatter.item.BlueprintItem(new Item.Properties().stacksTo(1).setId(BLUEPRINT_KEY));
@@ -480,6 +490,9 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, RUTILE_KEY, RUTILE);
 		Registry.register(BuiltInRegistries.ITEM, TI_SLAG_BAG_KEY, TI_SLAG_BAG);
 		Registry.register(BuiltInRegistries.ITEM, TIO2_PIGMENT_BAG_KEY, TIO2_PIGMENT_BAG);
+		Registry.register(BuiltInRegistries.ITEM, LIOH_BAG_KEY, LIOH_BAG);
+		Registry.register(BuiltInRegistries.ITEM, SODIUM_SULFATE_BAG_KEY, SODIUM_SULFATE_BAG);
+		Registry.register(BuiltInRegistries.ITEM, LI2CO3_BAG_KEY, LI2CO3_BAG);
 		Registry.register(BuiltInRegistries.ITEM, BLUEPRINT_KEY, BLUEPRINT);
 		Registry.register(BuiltInRegistries.ITEM, SURVEY_TOOL_KEY, SURVEY_TOOL);
 		Registry.register(BuiltInRegistries.ITEM, GROUNDING_SET_KEY, GROUNDING_SET);

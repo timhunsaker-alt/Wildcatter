@@ -187,6 +187,11 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.TiCl4OxidiserBlockEntity> TICL4_OXIDISER_ENTITY = entity(dev.wildcatter.block.TiCl4OxidiserBlockEntity::new, TICL4_OXIDISER);
 	public static final BlockEntityType<dev.wildcatter.block.VpsaOxygenBlockEntity> VPSA_OXYGEN_ENTITY = entity(dev.wildcatter.block.VpsaOxygenBlockEntity::new, VPSA_OXYGEN);
 	public static final BlockEntityType<dev.wildcatter.block.PigmentFinishingBlockEntity> PIGMENT_FINISHING_ENTITY = entity(dev.wildcatter.block.PigmentFinishingBlockEntity::new, PIGMENT_FINISHING);
+	public static final BlockEntityType<dev.wildcatter.block.DecrepitationKilnBlockEntity> DECREPITATION_KILN_ENTITY = entity(dev.wildcatter.block.DecrepitationKilnBlockEntity::new, DECREPITATION_KILN);
+	public static final BlockEntityType<dev.wildcatter.block.AcidRoastKilnBlockEntity> ACID_ROAST_KILN_ENTITY = entity(dev.wildcatter.block.AcidRoastKilnBlockEntity::new, ACID_ROAST_KILN);
+	public static final BlockEntityType<dev.wildcatter.block.LithiumLeachBlockEntity> LITHIUM_LEACH_ENTITY = entity(dev.wildcatter.block.LithiumLeachBlockEntity::new, LITHIUM_LEACH);
+	public static final BlockEntityType<dev.wildcatter.block.LiohCrystallizerBlockEntity> LIOH_CRYSTALLIZER_ENTITY = entity(dev.wildcatter.block.LiohCrystallizerBlockEntity::new, LIOH_CRYSTALLIZER);
+	public static final BlockEntityType<dev.wildcatter.block.LithiumCarbonatorBlockEntity> LITHIUM_CARBONATOR_ENTITY = entity(dev.wildcatter.block.LithiumCarbonatorBlockEntity::new, LITHIUM_CARBONATOR);
 	public static final BlockEntityType<dev.wildcatter.block.PotashDryerBlockEntity> POTASH_DRYER_ENTITY = entity(dev.wildcatter.block.PotashDryerBlockEntity::new, POTASH_DRYER);
 	public static final BlockEntityType<dev.wildcatter.block.AcidPretreatmentBlockEntity> ACID_PRETREATMENT_ENTITY = entity(dev.wildcatter.block.AcidPretreatmentBlockEntity::new, ACID_PRETREATMENT);
 	public static final BlockEntityType<dev.wildcatter.block.DepaTopoCircuitBlockEntity> DEPA_TOPO_CIRCUIT_ENTITY = entity(dev.wildcatter.block.DepaTopoCircuitBlockEntity::new, DEPA_TOPO_CIRCUIT);
@@ -469,7 +474,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		add("resin_trailer", RESIN_TRAILER);
 		add("isr_wellhead", ISR_WELLHEAD);
 		add("brine_wellhead", BRINE_WELLHEAD);
-		for (Block part : new Block[] {BRINE_SATURATOR, BRINE_TREATMENT, MEMBRANE_CELL_ROOM, CHLORINE_TRAIN, CAUSTIC_EVAPORATOR, HCL_SYNTHESIS_UNIT, TI_CHLORINATOR, TICL4_PURIFICATION, TICL4_OXIDISER, VPSA_OXYGEN, PIGMENT_FINISHING}) {
+		for (Block part : new Block[] {BRINE_SATURATOR, BRINE_TREATMENT, MEMBRANE_CELL_ROOM, CHLORINE_TRAIN, CAUSTIC_EVAPORATOR, HCL_SYNTHESIS_UNIT, TI_CHLORINATOR, TICL4_PURIFICATION, TICL4_OXIDISER, VPSA_OXYGEN, PIGMENT_FINISHING, DECREPITATION_KILN, ACID_ROAST_KILN, LITHIUM_LEACH, LIOH_CRYSTALLIZER, LITHIUM_CARBONATOR}) {
 			add(((dev.wildcatter.block.ChemPartBlock) part).part().id(), part);
 		}
 		for (Block part : new Block[] {REDUCTION_REACTOR, HYDROFLUORINATOR, FLUORINATOR, COLD_TRAPS, DISTILLATION_COLUMNS, CYLINDER_FILLER, STEAM_REFORMER, HF_KILN, HF_COLUMN, RECTIFIER, FLUORINE_CELL_HOUSE, CATHODE_GAS_SCRUBBER, KOH_SCRUBBER, RECTIFIER_MV, REDUCTION_REACTOR_LARGE, HYDROFLUORINATOR_LARGE, FLUORINATOR_LARGE, COLD_TRAPS_LARGE, DISTILLATION_COLUMNS_LARGE}) {
@@ -755,6 +760,11 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("hcl_synthesis_unit"), HCL_SYNTHESIS_UNIT_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rectifier_mv"), RECTIFIER_MV_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("brine_wellhead"), BRINE_WELLHEAD_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("decrepitation_kiln"), DECREPITATION_KILN_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("acid_roast_kiln"), ACID_ROAST_KILN_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("lithium_leach"), LITHIUM_LEACH_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("lioh_crystallizer"), LIOH_CRYSTALLIZER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("lithium_carbonator"), LITHIUM_CARBONATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("ti_chlorinator"), TI_CHLORINATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("ticl4_purification"), TICL4_PURIFICATION_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("ticl4_oxidiser"), TICL4_OXIDISER_ENTITY);

@@ -1,6 +1,6 @@
 # Phase 20, chemicals: decisions taken while Tim was away (2026-11-12)
 
-Plan: `docs/ideas-plan.md`, Phase 20. Built: **20a** the chlor-alkali plant, **20b** titanium pigment. Specs: `docs/multiblocks/chlor-alkali-plant.md` (and, as
+Plan: `docs/ideas-plan.md`, Phase 20. Built: **20a** the chlor-alkali plant, **20b** titanium pigment, **20c** lithium hydroxide. Specs: `docs/multiblocks/chlor-alkali-plant.md` (and, as
 they are built, `titanium-pigment.md`, `lithium.md`); each has an "As built" section. Format as in `docs/questions/README.md`. Every
 entry was decided on the best real-world recommendation; none needs Tim before it can stand, but each can be changed.
 
@@ -176,4 +176,58 @@ injection pump) behaves as before unless its discharge reaches the new brine wel
 - **Chosen:** steel, gas line, bricks, a blast furnace for the chlorinator, a furnace for the oxidiser, pistons (*proposed*).
 - **Why:** none are in the spec.
 - **Alternatives:** any.
+
+## 20c: lithium hydroxide
+
+### 27. A block of spodumene ore
+- **Chosen:** the mod's block of spodumene pegmatite, 2,700 kg (density 2.7, `docs/ores.md`), at the spec's 6 % Li2O: 162 kg of Li2O, 409 kg
+  of LiOH.H2O at 90 % recovery; 1.22 blocks an hour at the rating (3.3 t/h of ore).
+- **Why:** the spec's 2,900 kg is marked unverified; the ore table is the mod's record.
+- **Alternatives:** a density of 2.9 for spodumene (174 kg of Li2O, the spec's figure).
+
+### 28. Where things go on the parts
+- **Chosen:** set out as the spec's sketch, the roast kiln covers the leach's west face and the decrepitation kiln the roast kiln's, so: the
+  leach's residue and CO2 on the south face of its back cells; the roast kiln's acid on the east face of its back cell and its gas on its
+  south face; the decrepitation kiln's gas on the east face of its back end; the leach's, roast kiln's and crystallizer's boxes on their
+  north faces. The roast kiln and the decrepitation kiln can share one gas line.
+- **Why:** the spec's "west face" for the residue is covered by the roast kiln.
+- **Alternatives:** a gap between the parts (then they would not touch).
+
+### 29. CO2 for the calcium
+- **Chosen:** 2 kg a tonne of ore (*proposed*: about 3 m3 of leach liquor a tonne at 0.6 g/L of calcium, as carbonate).
+- **Why:** the spec names the step but gives no rate.
+- **Alternatives:** none needed if the lime is dosed to leave no calcium.
+
+### 30. Two bagging stations on one crystallizer
+- **Chosen:** the station against the crystallizer's north face bags sodium sulfate; one against any other face, lithium hydroxide. A part
+  that bags one product (every earlier one) is unchanged: the bagging station asks for the bag "for this station", which by default is the
+  one bag.
+- **Why:** the spec's "each with its own bagging station".
+- **Alternatives:** a sneak-click switch on the station.
+
+### 31. The carbonator's feed
+- **Chosen:** lithium hydroxide **bags** by a hopper on top, dissolved and carbonated with liquid CO2 (east face of its main cell), up to
+  100 kg of Li2CO3 an hour (*proposed*); 1 t bags at a station against it. It need not touch the crystallizer.
+- **Why:** the crystallizer's faces are all taken (box, caustic, steam, two stations); a pipe product for LiOH solution would be one more
+  product for one small part. The chemistry is the same: 1.14 kg of LiOH.H2O and 0.60 kg of CO2 a kg of Li2CO3.
+- **Alternatives:** a LiOH solution pipe product from the crystallizer.
+
+### 32. Lithium in the pot (the potline)
+- **Chosen:** a lithium carbonate bag in a **pot's own hopper** goes into its bath (1 t); while the bath holds any the pot's back-EMF is
+  0.1 V lower, so it runs 0.1 V lower at the same current (the scene: 1.728 V to 1.628 V at 6 kA), using 1.5 kg a tonne of aluminium. Only a
+  pot given a bag changes; its 17a slots keep their numbers.
+- **Why:** the spec's game test puts the bag in a pot's hopper; its Uses section says the fume treatment centre's hopper. A pot does not
+  know which centre its gas reaches, and a bag at the pot is how the test reads.
+- **Alternatives:** the bag in the fume treatment centre, shared by every pot whose duct reaches it.
+
+### 33. No water at the leach
+- **Chosen:** the leach takes no water: the spec gives none (the acid and caustic carry the liquor).
+- **Why:** no invented numbers.
+- **Alternatives:** a water feed and a NO WATER readout.
+
+### 34. Sodium sulfate and tags
+- **Chosen:** sodium sulfate bags have no use (decision 71 in `specs-wildcatter.md`); lithium hydroxide and carbonate bags are tagged
+  `c:dusts/lithium_hydroxide` and `c:dusts/lithium_carbonate` for other mods. Recipes for the five parts are *proposed*.
+- **Why:** the spec ("tagged for other mods").
+- **Alternatives:** a tailings cell for the sulfate (19d plans that).
 
