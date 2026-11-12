@@ -1464,6 +1464,9 @@ sized for a 40-pot line.
   use the mod's materials. The DEPA-TOPO second cycle is built (2026-11-10, branch `w-rules`; see "Tim's answers" below). Not built:
   the filter acid's uranium is not carried as an assay; fluorosilicic acid recovery; the hemihydrate process; potash by flotation;
   Farmings reading `c:fertilizers` (Farmings' side). See `docs/questions/phase18-phosphate.md`.
+- Phase 16c2 (2026-11-12): `rotor_shard_placeholder` drawn by script. Overspeed is checked but nothing can command it (no converter speed
+  reference). A blend makes whole cylinders (no partly filled cylinder items). The heel's assay is not carried. The cascade scene
+  drives its machines by hook.
 - Phase 17c2 (2026-11-12): item icons `fumed_silica_placeholder`, `dolime_bag_placeholder`, `magnesium_ingot_placeholder`,
   `chromic_oxide_placeholder`, `chromium_metal_placeholder` drawn by script; the three parts use the mod's materials. The scenes take
   hydrogen, oxygen, caustic and gas from stand-in sources (no oxygen plant in Wildcatter yet: the VPSA unit is another track's). Not
@@ -2021,6 +2024,14 @@ Spec: `docs/multiblocks/reactor-extensions.md` ("As built", 19b). Branch `phase1
   there, refused by the refuelling machine and the vessel, and straightened at the assembly fixture; loaded unseen, it leaks.
 - **Field Manual:** DRY CASKS; CONTAMINATION AND NEW FUEL.
 - **Tests:** unit `ReactorActivityTest` (3 tests); NeoForge server scenes `casks`, `contamination`, `fuel_inspection`.
+## Phase 16c2: crashes, sampling and blending, heels (2026-11-12; built while Tim was away; decisions: `docs/questions/phase16-uranium.md`, 31-35)
+- Spec `docs/multiblocks/enrichment-operations.md` items 4-6 ("As built (16c2)"). World rules `centrifugeCrashes`, `uf6Cylinders`.
+- `CentrifugeBlockEntity` crash checks and crash; `CrashedCentrifugeBlockEntity` (`crashed_centrifuge`, 1 x 6 x 1); the feed station counts
+  crashes; `SamplingAutoclaveBlockEntity` (`sampling_autoclave`, 3 x 3 x 5, 50 kW); `item/CylinderTags` (sampled, heel); the take-offs,
+  cylinder filler and fuel plant's autoclave honour them. Item `rotor_shard`. Models in `tools/models/enrichment.py`.
+- Field Manual page CRASHES, SAMPLING AND HEELS; JEI page. Tests: NeoForge scene `cascade_crash`; `UraniumOperationsTest`; client scene
+  `cascadeCrash`.
+
 ## Phase 17c2: fumed silica, Pidgeon magnesium, chromium (2026-11-12; built while Tim was away; decisions: `docs/questions/phase17c-zirconium.md`, 9-17)
 - Spec `docs/multiblocks/zirconium-extensions.md` items 1, 4, 5 ("As built"). Parts (in `ZirconiumPartBlock`): `fumed_silica_burner`
   2 x 6 x 3, `pidgeon_furnace` 4 x 4 x 10, `chromate_kiln` 3 x 3 x 8, models in `tools/models/zirconium.py`. Pipe products `oxygen` and

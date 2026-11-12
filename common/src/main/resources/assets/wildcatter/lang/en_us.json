@@ -633,5 +633,8 @@
   "item.wildcatter.chromium_metal": "Chromium Metal (10 kg)",
   "block.wildcatter.fumed_silica_burner": "Fumed Silica Burner (15 kW)",
   "block.wildcatter.pidgeon_furnace": "Pidgeon Furnace (retorts, 0.5 MW of gas)",
-  "block.wildcatter.chromate_kiln": "Chromate Kiln (0.3 MW of gas)"
+  "block.wildcatter.chromate_kiln": "Chromate Kiln (0.3 MW of gas)",
+  "item.wildcatter.rotor_shard": "Rotor Shard (carbon fibre)",
+  "block.wildcatter.sampling_autoclave": "Sampling Autoclave (50 kW)",
+  "block.wildcatter.crashed_centrifuge": "Crashed Centrifuge"
 }

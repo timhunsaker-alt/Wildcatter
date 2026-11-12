@@ -331,6 +331,7 @@
     "wildcatter:bop_accumulator",
     "wildcatter:fumed_silica_burner",
     "wildcatter:pidgeon_furnace",
-    "wildcatter:chromate_kiln"
+    "wildcatter:chromate_kiln",
+    "wildcatter:sampling_autoclave"
   ]
 }

@@ -2828,6 +2828,11 @@ phase16_names({"fumed_silica_burner": "Fumed Silica Burner (15 kW)", "pidgeon_fu
 phase16_items({"fumed_silica": ("Fumed Silica (25 kg sack)", (236, 238, 240)), "dolime_bag": ("Dolime (1 t bag)", (222, 218, 206)), "magnesium_ingot": ("Magnesium Ingot", (196, 200, 204)),
 	"chromic_oxide": ("Chromic Oxide (25 kg sack)", (70, 120, 60)), "chromium_metal": ("Chromium Metal (10 kg)", (180, 186, 196))})
 save_json(f"{ROOT}/data/c/tags/item/fumed_silica.json", {"replace": False, "values": [f"{ns}:fumed_silica"]})
+# 16c2: crashes, sampling, heels (docs/multiblocks/enrichment-operations.md); crashed_centrifuge's loot (4 steel and a rotor shard) is written by hand
+phase16_parts(("sampling_autoclave",))
+shaped("sampling_autoclave", ["SPS", "SCS", "SXS"], {"S": S_, "P": P_, "C": "minecraft:cauldron", "X": "minecraft:furnace"}, "sampling_autoclave")
+phase16_names({"sampling_autoclave": "Sampling Autoclave (50 kW)", "crashed_centrifuge": "Crashed Centrifuge"})
+phase16_items({"rotor_shard": ("Rotor Shard (carbon fibre)", (40, 40, 44))})
 # ---- Phase 17a: ferroalloys (docs/multiblocks/ferroalloys.md) ---------------------------------------------------------------------
 # blockstates, models, shapes and items come from tools/models/ferroalloys.py; here loot, names, tags, recipes and the bags. Each bag's
 # icon is the Ludo bulk bag with a swatch of what it holds drawn on it by this script: a placeholder until it has art of its own.

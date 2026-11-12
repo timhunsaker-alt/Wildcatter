@@ -444,5 +444,120 @@ final class UraniumScenes {
 			});
 		});
 	}
-}
 
+	// ---- cascade_crash (16c2) --------------------------------------------------------------------------------------------------------
+	/**
+	 * 16c2 (enrichment-operations.md items 4-6), with the rules centrifugeCrashes and uf6Cylinders on: six machines on a feed station's
+	 * header, driven by hook, one held at 45 % speed with its two minutes all but run: it crashes, and (the shake chance set to certain)
+	 * the machines within a block of it crash too; the one further on runs. A crashed machine breaks to steel and a rotor shard. A 30B
+	 * through the sampling autoclave comes out SAMPLED; the fuel plant's autoclave refuses an unsampled one. Set to blend to 4.00 %, the
+	 * autoclave makes a 30B of 4.00 % and one of the rest from a 3.00 % and a 4.95 % 30B. An emptied 48Y keeps its 20 kg heel, and a
+	 * take-off filling it again counts it.
+	 */
+	static void cascadeCrash(GameTestHelper helper) {
+		String scene = "cascade_crash";
+		floor(helper, -12, -8, 26, 20);
+		place(helper, WildcatterBlocks.FEED_STATION, 0, 0);            // x 0-2, z 0-4; the header at z 5
+		for (int x = 0; x <= 15; x++) {
+			pipe(helper, new int[] {x, 0, 5});
+		}
+		for (int y = 1; y <= 6; y++) {
+			pipe(helper, new int[] {15, y, 5});
+		}
+		for (int x = 16; x <= 21; x++) {
+			place(helper, WildcatterBlocks.CENTRIFUGE, x, 5);
+			pipe(helper, new int[] {x, 6, 5});
+		}
+		place(helper, WildcatterBlocks.SAMPLING_AUTOCLAVE, 0, 10);    // x 0-2, z 10-14, box (-1, 10)
+		place(helper, WildcatterBlocks.UF6_AUTOCLAVE, 8, 10);          // x 8-10, z 10-13 (unpowered: it only judges cylinders here)
+		place(helper, WildcatterBlocks.TAILS_TAKEOFF, 14, 10);         // x 14-16, z 10-14
+		genset(helper, -6, -6);
+		cableRun(helper, -5, -6, -1, 10);
+		dev.wildcatter.block.FeedStationBlockEntity feed = entity(helper, 0, 0, dev.wildcatter.block.FeedStationBlockEntity.class);
+		dev.wildcatter.block.SamplingAutoclaveBlockEntity sampler = entity(helper, 0, 10, dev.wildcatter.block.SamplingAutoclaveBlockEntity.class);
+		dev.wildcatter.block.FuelLineBlockEntity fuel = entity(helper, 8, 10, dev.wildcatter.block.FuelLineBlockEntity.class);
+		dev.wildcatter.block.TakeoffBlockEntity tails = entity(helper, 14, 10, dev.wildcatter.block.TakeoffBlockEntity.class);
+		dev.wildcatter.block.CentrifugeBlockEntity.setShakeChanceForTest(1.0);
+		start(helper, -6, -6, () -> { });   // the sampling autoclave's 480 V
+		boolean[] on = {true};
+		java.util.function.Consumer<Void>[] drive = new java.util.function.Consumer[1];
+		drive[0] = v -> {
+			if (!on[0]) {
+				return;
+			}
+			long now = helper.getLevel().getGameTime();
+			net.minecraft.core.BlockPos fake = abs(helper, -50, U, -50);
+			for (int x = 16; x <= 21; x++) {
+				if (helper.getLevel().getBlockEntity(abs(helper, x, U, 5)) instanceof dev.wildcatter.block.CentrifugeBlockEntity c) {
+					c.drive(fake, x == 18 ? 0.45 : 1.0, now);
+				}
+			}
+			helper.runAfterDelay(20, () -> drive[0].accept(null));
+		};
+		drive[0].accept(null);
+		entity(helper, 18, 5, dev.wildcatter.block.CentrifugeBlockEntity.class).setCriticalForTest(Tuning.CRITICAL_SECONDS - 2);
+		helper.runAfterDelay(100, () -> {
+			String after = " | feed " + read(helper, 0, 0) + " | 18: " + read(helper, 18, 5) + " | 21: " + read(helper, 21, 5);
+			log(scene, "crash" + after);
+			boolean crashed18 = helper.getLevel().getBlockState(abs(helper, 18, U, 5)).is(WildcatterBlocks.CRASHED_CENTRIFUGE);
+			check(helper, crashed18 && read(helper, 18, 5).contains("CRASHED: held at a critical speed"), "the machine held at 45 % should crash" + after);
+			for (int x : new int[] {16, 17, 19, 20}) {
+				check(helper, helper.getLevel().getBlockState(abs(helper, x, U, 5)).is(WildcatterBlocks.CRASHED_CENTRIFUGE), "the machine at " + x + ", within a block, should be shaken apart" + after);
+			}
+			check(helper, helper.getLevel().getBlockEntity(abs(helper, 21, U, 5)) instanceof dev.wildcatter.block.CentrifugeBlockEntity, "the machine two blocks on should still turn" + after);
+			check(helper, read(helper, 0, 0).contains("5 machines CRASHED"), "the feed station should count the crashes" + after);
+			on[0] = false;
+			dev.wildcatter.block.CentrifugeBlockEntity.setShakeChanceForTest(-1);
+			helper.getLevel().destroyBlock(abs(helper, 18, U, 5), true);
+			java.util.List<net.minecraft.world.entity.item.ItemEntity> drops = helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+					new net.minecraft.world.phys.AABB(abs(helper, 18, U, 5)).inflate(3));
+			check(helper, drops.stream().anyMatch(e -> e.getItem().is(WildcatterItems.ROTOR_SHARD)) && drops.stream().anyMatch(e -> e.getItem().is(WildcatterItems.STEEL_INGOT)),
+					"a crashed machine should break to steel and a rotor shard: " + drops);
+			// sampling, and the fuel plant's autoclave
+			ItemStack unsampled = dev.wildcatter.WildcatterComponents.withAssay(new ItemStack(WildcatterItems.LEU_CYLINDER_30B), 0.03);
+			check(helper, !fuel.canPlaceItem(0, unsampled), "the fuel plant's autoclave should refuse an unsampled 30B");
+			sampler.slots().set(0, unsampled.copy());
+			helper.runAfterDelay(400, () -> {
+				sampler.finishForTest();
+				helper.runAfterDelay(40, () -> {
+					ItemStack out = sampler.slots().get(3);
+					String sampledRead = read(helper, 0, 10);
+					log(scene, "sampled | " + sampledRead);
+					check(helper, dev.wildcatter.item.CylinderTags.sampled(out) && Math.abs(dev.wildcatter.WildcatterComponents.assay(out) - 0.03) < 1e-9
+							&& sampledRead.contains("SAMPLED, 3.00 %"), "the 30B should come out SAMPLED, 3.00 %: " + out + " | " + sampledRead);
+					check(helper, fuel.canPlaceItem(0, out), "the fuel plant's autoclave should take a sampled 30B");
+					sampler.slots().set(3, ItemStack.EMPTY);
+					// blend a 3.00 % and a 4.95 % 30B to 4.00 %
+					while (Math.abs(sampler.target() - 0.04) > 1e-9) {
+						sampler.nextMode();
+					}
+					sampler.slots().set(0, dev.wildcatter.WildcatterComponents.withAssay(new ItemStack(WildcatterItems.LEU_CYLINDER_30B), 0.03));
+					sampler.slots().set(1, new ItemStack(WildcatterItems.LEU_CYLINDER_30B));
+					sampler.slots().set(2, new ItemStack(WildcatterItems.EMPTY_30B_CYLINDER));
+					helper.runAfterDelay(40, () -> {
+						sampler.finishForTest();
+						helper.runAfterDelay(40, () -> {
+							String blend = read(helper, 0, 10);
+							log(scene, "blend | " + blend);
+							double a = dev.wildcatter.WildcatterComponents.assay(sampler.slots().get(3)), b = dev.wildcatter.WildcatterComponents.assay(sampler.slots().get(4));
+							check(helper, Math.abs(a - 0.04) < 1e-9 && Math.abs(b - 0.0395) < 1e-9 && sampler.slots().get(5).is(WildcatterItems.EMPTY_30B_CYLINDER),
+									"the blend should give a 30B of 4.00 %, one of 3.95 % and the empty shell: " + a + " " + b + " | " + blend);
+							// heels: the 48Y emptied to its heel, and a take-off counting it
+							feed.setUf6ForTest(Tuning.HEEL_48Y_KG);
+							helper.runAfterDelay(20, () -> {
+								ItemStack emptied = feed.slots().get(1);
+								check(helper, emptied.is(WildcatterItems.EMPTY_48Y_CYLINDER) && Math.abs(dev.wildcatter.item.CylinderTags.heel(emptied) - Tuning.HEEL_48Y_KG) < 1e-6,
+										"an emptied 48Y should keep its 20 kg heel: " + emptied + " | " + read(helper, 0, 0));
+								tails.slots().set(0, emptied.copy());
+								tails.addUf6(1.0, Tuning.ASSAY_TAILS);
+								check(helper, Math.abs(tails.uf6() - (Tuning.HEEL_48Y_KG + 1.0)) < 1e-6, "the tails take-off should count the heel: " + tails.uf6());
+								log(scene, "ok");
+								helper.succeed();
+							});
+						});
+					});
+				});
+			});
+		});
+	}
+}

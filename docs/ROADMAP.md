@@ -428,7 +428,7 @@ Decisions for Tim: `docs/questions/plc-gaps.md` (12 entries). Spec updated: `doc
   - process models (pipe pressure, drum pressure, a turbine's load setpoint, dampers, vibration, CT and PT voltage);
   - the crane's lift start.
 
-## Phase 16 — Uranium routes and plant operations — 16a, 16b1, 16c1, 16d1 BUILT 2026-11-10; 16b2, 16c2, 16d2 planned (built while Tim was away, on the DRAFT specs decided on recommendation; not approved)
+## Phase 16 — Uranium routes and plant operations — 16a, 16b1, 16c1, 16d1 BUILT 2026-11-10; 16c2 BUILT 2026-11-12; 16b2, 16d2 planned (built while Tim was away, on the DRAFT specs decided on recommendation; not approved)
 Plan: `docs/ideas-plan.md`, Phase 16. Branch `phase16`. Decisions for Tim: `docs/questions/phase16-uranium.md` (numbered across the waves).
 Rule: nothing changes or slows what an existing world already does; anything that would alter a plant already built is behind a
 default-off setting or waits until the player adds the new part.
@@ -449,8 +449,12 @@ default-off setting or waits until the player adds the new part.
   STORAGE TANK against the header house, which doses 0.5 g/L into its injection (head grade up to 1.3 x; NO CO2 when the tank is empty);
   the bleed goes out the house's back to an injection pump and a disposal well; IX columns in SATELLITE fill a RESIN TRAILER (800 kg of
   U3O8, carried as one item) that the central columns elute. NeoForge scene `isr_operations`.
+- **16c2, crashes, sampling and heels** (BUILT 2026-11-12, branch `w-17c`): behind `centrifugeCrashes`, machines crash at a critical speed
+  held 2 minutes, a hot casing past 15 minutes, overspeed, or a converter closing onto them coasting, becoming crashed centrifuges and
+  shaking their neighbours (20 %); a SAMPLING AUTOCLAVE signs off 30Bs and blends two to a chosen assay; behind `uf6Cylinders`, the fuel
+  plant takes only sampled 30Bs and emptied cylinders keep their heels. NeoForge scene `cascade_crash`; client scene `cascadeCrash`.
 - **Planned, not built (can wait):** **16b2** the full-size conversion plant (four cell houses in series on a 12.47 kV `rectifier_mv`,
-  a second, larger main line); **16c2** machine crashes, the sampling autoclave and blending, cylinder heels; **16d2** monitor-well rings,
+  a second, larger main line); **16d2** monitor-well rings,
   excursions and groundwater restoration (RO unit). Each is written in its spec.
 - **Known gaps:** script-drawn icons `u3o8_drum_placeholder` (16a), `fluorinator_ash_drum_placeholder` and
   `synthetic_fluorspar_placeholder` (16b1). The chlor-alkali cell on potash has no scene. The cathode scrubber's hydrogen is checked with the
@@ -586,8 +590,8 @@ Decisions taken while building: `docs/questions/answers-grid.md`. NeoForge scene
   scrubbers; a full-size plant.
 - ISR: bottled CO2 for the lixiviant, monitor-well rings and excursions, groundwater restoration (sweep, reverse osmosis,
   stability monitoring), a disposal well for the bleed, satellite IX with trucked resin.
-- Enrichment: centrifuge spin-up and coast-down hours, machine crashes, cooling water to the casings, the product sampling autoclave
-  and blending, cylinder heels, a choice of product assay.
+- Enrichment: all built in 16c1 and 16c2. Raised by 16c2: a converter speed reference (overspeed can be counted but not commanded);
+  partly filled cylinders for metered blending.
 - Zirconium: all built in 17c (the caustic's uses were struck: it goes to the Bayer refinery). Raised by 17c2: water for the HCl
   absorber; the chromate kiln's sodium sulfate in bags.
 - Fuel: the kiln's HF back to the conversion plant; zinc stearate lubricant and pore formers; a nickel smelter for real Inconel and

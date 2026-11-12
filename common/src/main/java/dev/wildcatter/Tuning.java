@@ -736,6 +736,22 @@ public final class Tuning {
 	public static final double CONVERTER_POWER_FACTOR = 0.95;      // its front end, as the land rig's drives
 	public static final double CYLINDER_30B_KG = 2_277.0;          // UF6 at up to 5 % (NRC package certificates)
 	public static final double CYLINDER_30B_TARE = 635.0;          // about 1,400 lb
+	// 16c2: crashes, sampling and blending, heels (docs/multiblocks/enrichment-operations.md items 4-6)
+	public static final double CRITICAL_SPEED_LOW = 0.30;          // of full speed: a rotor's resonances (proposed)
+	public static final double CRITICAL_SPEED_HIGH = 0.60;
+	public static final double CRITICAL_SECONDS = 120.0;           // held there this long, it crashes (proposed)
+	public static final double OVERSPEED_HZ = 1300.0;              // (proposed)
+	public static final double OVERSPEED_SECONDS = 900.0;          // (proposed)
+	public static final double CASING_CRASH_SECONDS = 900.0;       // without cooling, then a machine a minute crashes (proposed)
+	public static final double CLOSE_ONTO_SPEED = 0.30;            // a converter closing onto a machine coasting above this crashes it (proposed)
+	public static final double CRASH_SHAKE_CHANCE = 0.20;          // each machine within a block of a crash (proposed)
+	public static final double CRASH_UF6_KG = 0.1;                 // let out by a crash (proposed)
+	public static final double CRASH_HARM_RADIUS = 3.0;            // m
+	public static final int CRASH_SCRAP_STEEL = 4;                 // steel ingots a crashed machine breaks to (proposed)
+	public static final double SAMPLING_SECONDS = 1800.0;          // a 30B in the autoclave (proposed), through TimeScale
+	public static final double SAMPLING_WATTS = 50_000.0;          // 480 V (proposed)
+	public static final double HEEL_48Y_KG = 20.0;                 // left in an emptied 48Y (proposed; ANSI N14.1 limit about 22.7)
+	public static final double HEEL_30B_KG = 10.0;                 // an emptied 30B (proposed; limit about 11.3)
 	public static final double UF6_SUBLIMATION_J_PER_KG = 137_000.0;   // 48 kJ/mol
 	public static final double FEED_STATION_WATTS = 30_000.0;      // its heater, 480 V (unverified)
 	public static final double PRODUCT_TAKEOFF_WATTS = 15_000.0;   // refrigeration, 480 V (unverified)

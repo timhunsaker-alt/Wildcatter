@@ -2,6 +2,15 @@
 
 ## Unreleased (0.7.0, branch `w-next`): Phases 15-19, built 2026-11-10 while Tim was away
 
+### 16c2: centrifuge crashes, the sampling autoclave, heels (built 2026-11-12 while Tim was away; not approved)
+- **Crashes** (the world rule `centrifugeCrashes`, on in new worlds): never at random. A machine held at 30-60 % speed for 2 minutes, a
+  casing without cooling past 15 minutes, overspeed, or a converter closing onto coasting machines: a bang, a puff of UF6 that hurts
+  nearby players, a crashed centrifuge (steel and a rotor shard when broken), and a 20 % chance for each machine beside it.
+- **Sampling autoclave:** signs off 30Bs (SAMPLED, n.nn %) in 30 minutes, or blends two to a chosen assay.
+- **Heels and sampled 30Bs** (the world rule `uf6Cylinders`): the fuel plant takes only sampled 30Bs; emptied 48Ys keep 20 kg and 30Bs
+  10 kg, counted when they are filled again.
+- Decisions for review: `docs/questions/phase16-uranium.md` (31-35).
+
 ### 17c2: fumed silica, Pidgeon magnesium, chromium (built 2026-11-12 while Tim was away; not approved)
 - **Fumed silica burner:** against the chlorinator, it burns the SiCl4 in hydrogen and oxygen to 25 kg sacks of fumed silica
   (`c:fumed_silica`) and 32 % hydrochloric acid on a pipe. Oxygen and hydrochloric acid are new pipe products.

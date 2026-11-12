@@ -217,6 +217,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("pidgeon")) {   // 17c2 (track w-17c)
 				new TrackClientScenes(context, server, y, up, -13600).pidgeon();
 			}
+			if (only("cascadeCrash")) {   // 16c2 (track w-17c)
+				new TrackClientScenes(context, server, y, up, -13800).cascadeCrash();
+			}
 			if (only("cascade")) {
 				cascade(context, server);
 			}

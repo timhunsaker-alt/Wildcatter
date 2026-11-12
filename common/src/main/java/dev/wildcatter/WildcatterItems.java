@@ -131,6 +131,11 @@ public final class WildcatterItems {
 	public static final Item CHROMIUM_METAL = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(64).setId(CHROMIUM_METAL_KEY),
 			String.format("A %.0f kg piece of aluminothermic chromium, 99 %% Cr", Tuning.CHROMIUM_PIECE_KG), "the VAR furnace takes it in place of chromite");
 
+	/** 16c2: what a crashed centrifuge's carbon-fibre rotor leaves (docs/multiblocks/enrichment-operations.md). */
+	public static final ResourceKey<Item> ROTOR_SHARD_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("rotor_shard"));
+	public static final Item ROTOR_SHARD = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(64).setId(ROTOR_SHARD_KEY),
+			"A shard of a crashed centrifuge's carbon-fibre rotor", "scrap");
+
 	/** 7g: helium cylinders (docs/multiblocks/fuel.md), from the gas plant's helium recovery unit to the rod welder. */
 	public static final ResourceKey<Item> EMPTY_HELIUM_CYLINDER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("empty_helium_cylinder"));
 	public static final Item EMPTY_HELIUM_CYLINDER = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(EMPTY_HELIUM_CYLINDER_KEY),
@@ -466,6 +471,7 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, ZIRCALOY_SCRAP_KEY, ZIRCALOY_SCRAP);
 		Registry.register(BuiltInRegistries.ITEM, HFCL4_DRUM_KEY, HFCL4_DRUM);
 		Registry.register(BuiltInRegistries.ITEM, HAFNIUM_RODLET_KEY, HAFNIUM_RODLET);
+		Registry.register(BuiltInRegistries.ITEM, ROTOR_SHARD_KEY, ROTOR_SHARD);
 		Registry.register(BuiltInRegistries.ITEM, FUMED_SILICA_KEY, FUMED_SILICA);
 		Registry.register(BuiltInRegistries.ITEM, DOLIME_BAG_KEY, DOLIME_BAG);
 		Registry.register(BuiltInRegistries.ITEM, MAGNESIUM_INGOT_KEY, MAGNESIUM_INGOT);

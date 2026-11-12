@@ -428,6 +428,8 @@
     "wildcatter:guy_anchor",
     "wildcatter:fumed_silica_burner",
     "wildcatter:pidgeon_furnace",
-    "wildcatter:chromate_kiln"
+    "wildcatter:chromate_kiln",
+    "wildcatter:sampling_autoclave",
+    "wildcatter:crashed_centrifuge"
   ]
 }

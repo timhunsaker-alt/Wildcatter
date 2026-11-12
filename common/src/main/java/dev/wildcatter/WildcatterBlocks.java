@@ -130,6 +130,8 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.FeedStationBlockEntity> FEED_STATION_ENTITY = entity(dev.wildcatter.block.FeedStationBlockEntity::new, FEED_STATION);
 	public static final BlockEntityType<dev.wildcatter.block.TakeoffBlockEntity> TAKEOFF_ENTITY = entity(dev.wildcatter.block.TakeoffBlockEntity::new, PRODUCT_TAKEOFF, TAILS_TAKEOFF);
 	public static final BlockEntityType<dev.wildcatter.block.CascadeCoolingSkidBlockEntity> CASCADE_COOLING_SKID_ENTITY = entity(dev.wildcatter.block.CascadeCoolingSkidBlockEntity::new, CASCADE_COOLING_SKID);
+	public static final BlockEntityType<dev.wildcatter.block.CrashedCentrifugeBlockEntity> CRASHED_CENTRIFUGE_ENTITY = entity(dev.wildcatter.block.CrashedCentrifugeBlockEntity::new, CRASHED_CENTRIFUGE);
+	public static final BlockEntityType<dev.wildcatter.block.SamplingAutoclaveBlockEntity> SAMPLING_AUTOCLAVE_ENTITY = entity(dev.wildcatter.block.SamplingAutoclaveBlockEntity::new, SAMPLING_AUTOCLAVE);
 	public static final BlockEntityType<dev.wildcatter.block.ZrLineBlockEntity> ZR_LINE_ENTITY = entity(dev.wildcatter.block.ZrLineBlockEntity::new, MINERAL_SEPARATOR, HAFNIUM_COLUMN, VACUUM_DISTILLATION, VAR_FURNACE, EXTRUSION_PRESS, VACUUM_ANNEAL_FURNACE);
 	public static final BlockEntityType<dev.wildcatter.block.ChlorinatorBlockEntity> CHLORINATOR_ENTITY = entity(dev.wildcatter.block.ChlorinatorBlockEntity::new, CHLORINATOR);
 	public static final BlockEntityType<dev.wildcatter.block.KrollReactorBlockEntity> KROLL_REACTOR_ENTITY = entity(dev.wildcatter.block.KrollReactorBlockEntity::new, KROLL_REACTOR);
@@ -461,7 +463,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		for (Block part : new Block[] {REDUCTION_REACTOR, HYDROFLUORINATOR, FLUORINATOR, COLD_TRAPS, DISTILLATION_COLUMNS, CYLINDER_FILLER, STEAM_REFORMER, HF_KILN, HF_COLUMN, RECTIFIER, FLUORINE_CELL_HOUSE, CATHODE_GAS_SCRUBBER, KOH_SCRUBBER}) {
 			add(((dev.wildcatter.block.ConversionPartBlock) part).part().id(), part);
 		}
-		for (Block part : new Block[] {CENTRIFUGE, FREQUENCY_CONVERTER, FEED_STATION, PRODUCT_TAKEOFF, TAILS_TAKEOFF, CASCADE_COOLING_SKID}) {
+		for (Block part : new Block[] {CENTRIFUGE, FREQUENCY_CONVERTER, FEED_STATION, PRODUCT_TAKEOFF, TAILS_TAKEOFF, CASCADE_COOLING_SKID, CRASHED_CENTRIFUGE, SAMPLING_AUTOCLAVE}) {
 			add(((dev.wildcatter.block.EnrichmentPartBlock) part).part().id(), part);
 		}
 		for (Block part : new Block[] {MINERAL_SEPARATOR, CHLORINATOR, HAFNIUM_COLUMN, KROLL_REACTOR, VACUUM_DISTILLATION, VAR_FURNACE, EXTRUSION_PRESS, PILGER_MILL, VACUUM_ANNEAL_FURNACE, MAGNESIUM_CELL, MAGNESIA_CHLORINATOR, CHLOR_ALKALI_CELL,
@@ -688,6 +690,8 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("feed_station"), FEED_STATION_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("takeoff"), TAKEOFF_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("cascade_cooling_skid"), CASCADE_COOLING_SKID_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("crashed_centrifuge"), CRASHED_CENTRIFUGE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("sampling_autoclave"), SAMPLING_AUTOCLAVE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("zr_line"), ZR_LINE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("chlorinator"), CHLORINATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("kroll_reactor"), KROLL_REACTOR_ENTITY);

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "SCS",
+    "SXS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "C": "minecraft:cauldron",
+    "X": "minecraft:furnace"
+  },
+  "result": {
+    "id": "wildcatter:sampling_autoclave",
+    "count": 1
+  }
+}

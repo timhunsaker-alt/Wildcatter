@@ -1,7 +1,7 @@
 # Enrichment operations: spin-up, crashes, cooling, sampling, heels, product assay
 
 > **16c1 BUILT (2026-11-10), decided on recommendation while Tim was away; not approved.** See "As built (16c1)" at the end and
-> `docs/questions/phase16-uranium.md` (items 17-23). **16c2 (crashes, sampling and blending, heels) is a written plan, not built.**
+> `docs/questions/phase16-uranium.md` (items 17-23). **16c2 BUILT 2026-11-12** (see "As built (16c2)").
 > Drafted as proposed phase **16c** (16c1 assay choice, spin-up and cooling; 16c2 crashes, sampling and heels). Decisions are in `docs/questions/specs-wildcatter.md` (items 36-40).
 
 Six items the cascade spec (enrichment.md, approved 2026-11-01) left in ROADMAP Ideas. Each has its real basis and a proposed scope.
@@ -153,3 +153,16 @@ The grid is a sketch; the game test is the layout of record.
 - **A placed fuel assembly keeps its assay (answer 21):** its main cell's block entity keeps the item's components; the loot table copies
   `wildcatter:assay` and the custom data (handled, bent grid, inspected) back onto the drop, and a click reads the standing assembly's
   assay. A standard 4.95 % assembly drops unstamped. NeoForge scene `assembly_assay`.
+
+## As built (16c2, 2026-11-12, branch `w-17c`; decisions in `docs/questions/phase16-uranium.md`, items 31-35)
+- **Rules:** `centrifugeCrashes` (crashes) and `uf6Cylinders` (sampled 30Bs only at the fuel plant; heels), both on in new worlds.
+- **Crashes** (`CentrifugeBlockEntity.crashCheck`, `crash`; the feed station looks): critical speed 30-60 % for 2 minutes; overspeed over
+  1,300 Hz for 15 minutes (nothing commands it yet); 15 minutes without cooling, then a machine a minute; a converter closing onto a
+  machine coasting over 30 % (with `cascadeSpinUp`). A bang, 0.1 kg of UF6 (4 damage and poison within 3 m), a `crashed_centrifuge` in its
+  place (4 steel and a `rotor_shard` when broken), 20 % for each machine within 2 blocks. The feed station counts the crashes.
+- **Sampling autoclave** (`SamplingAutoclaveBlockEntity`, 3 x 3 x 5, 50 kW): SAMPLE (30 minutes, through `TimeScale`) or BLEND to a
+  product assay (two full 30Bs and an empty; a 30B at the target and one at the rest, both sampled). Sneak-click for the mode.
+- **Heels:** 48Y 20 kg, 30B 10 kg, on the item (`item/CylinderTags`), counted by the take-offs and the cylinder filler.
+- **Tests:** NeoForge scene `cascade_crash` (its rules on); unit tests in `UraniumOperationsTest`; client scene `cascadeCrash`
+  (screenshot `wildcatter-cascade-crash`).
+- **Placeholders:** `rotor_shard_placeholder` (item icon).

@@ -37,6 +37,8 @@ public class FeedStationBlockEntity extends UnitMotorBlockEntity implements Hopp
 	private int productStep = 4, tailsStep = 1;   // 16c1: Enrichment.PRODUCT_ASSAYS and TAILS_ASSAYS; 4.95 / 0.25 %
 	private boolean cooled;                       // a cooling skid has served its header: from now on it needs one
 	private double hot;                           // seconds without cooling
+	private int crashes, hotCrashes;              // 16c2: machines crashed on its header; of them, for a hot casing this spell
+	private String lastCrash = "";
 	private String unit = "starting";
 
 	public FeedStationBlockEntity(BlockPos pos, BlockState state) {
@@ -177,13 +179,14 @@ public class FeedStationBlockEntity extends UnitMotorBlockEntity implements Hopp
 
 	@Override
 	protected void work(Level level) {
-		if (loaded && uf6 <= 1e-6) {
+		double heel = dev.wildcatter.Rules.uf6Cylinders() ? Tuning.HEEL_48Y_KG : 0;   // 16c2: the heel stays in the emptied 48Y
+		if (loaded && uf6 <= heel + 1e-6) {
 			int out = freeOut();
 			if (out < 0) {
 				unit = "FULL: take the emptied 48Ys (empty hand, or a hopper under it)";
 				return;
 			}
-			slots.set(out, new ItemStack(WildcatterItems.EMPTY_48Y_CYLINDER));
+			slots.set(out, dev.wildcatter.item.CylinderTags.withHeel(new ItemStack(WildcatterItems.EMPTY_48Y_CYLINDER), Math.min(heel, uf6)));
 			loaded = false;
 			uf6 = 0;
 		}
@@ -194,6 +197,20 @@ public class FeedStationBlockEntity extends UnitMotorBlockEntity implements Hopp
 		}
 		// the cascade on its header
 		List<CentrifugeBlockEntity> machines = FrequencyConverterBlockEntity.centrifuges(level, header());
+		if (dev.wildcatter.Rules.centrifugeCrashes() && level instanceof net.minecraft.server.level.ServerLevel sl) {   // 16c2
+			boolean any = false;
+			for (CentrifugeBlockEntity c : List.copyOf(machines)) {
+				String why = c.isRemoved() ? null : c.crashCheck(seconds());
+				if (why != null) {
+					crashes += c.crash(sl, why, true);
+					lastCrash = why;
+					any = true;
+				}
+			}
+			if (any) {
+				machines = FrequencyConverterBlockEntity.centrifuges(level, header());
+			}
+		}
 		int driven = 0;
 		double swu = 0;
 		for (CentrifugeBlockEntity c : machines) {
@@ -229,6 +246,18 @@ public class FeedStationBlockEntity extends UnitMotorBlockEntity implements Hopp
 			hot += seconds();
 		} else {
 			hot = 0;
+			hotCrashes = 0;
+		}
+		// 16c2: past 15 minutes without cooling, a machine a minute crashes
+		if (dev.wildcatter.Rules.centrifugeCrashes() && cooled && hot >= Tuning.CASING_CRASH_SECONDS + 60 * hotCrashes && level instanceof net.minecraft.server.level.ServerLevel sl) {
+			for (CentrifugeBlockEntity c : machines) {
+				if (!c.isRemoved() && c.speed() > 0) {
+					crashes += c.crash(sl, String.format("its casing hot for %.0f minutes", hot / 60), true);
+					hotCrashes++;
+					lastCrash = "a hot casing";
+					break;
+				}
+			}
 		}
 		if (cooled && hot >= Tuning.CASING_HOT_SECONDS) {
 			unit = String.format("CASING HOT: the machines' casings have had no cooling for %.0f minutes; feed held (a CASCADE COOLING SKID on the header, with circulating water and power); %s",
@@ -265,7 +294,7 @@ public class FeedStationBlockEntity extends UnitMotorBlockEntity implements Hopp
 		}
 		// separative work into product, limited by the feed left and the cylinders' room
 		double p = swu / Enrichment.swuPerProduct(pa, ta);   // kg of product U
-		p = Math.min(p, uf6 / Tuning.UF6_PER_U / Enrichment.feedPerProduct(pa, ta));
+		p = Math.min(p, Math.max(0, uf6 - heel) / Tuning.UF6_PER_U / Enrichment.feedPerProduct(pa, ta));
 		p = Math.min(p, product.room() / Tuning.UF6_PER_U);
 		p = Math.min(p, tails.room() / Tuning.UF6_PER_U / Enrichment.tailsPerProduct(pa, ta));
 		p = Math.max(0, p);
@@ -280,7 +309,8 @@ public class FeedStationBlockEntity extends UnitMotorBlockEntity implements Hopp
 
 	@Override
 	public Component inspect() {
-		return Component.literal("Feed station: " + unit + String.format("; %d emptied, %d waiting; set to ", emptied(), fed()) + assays() + "; " + describe());
+		return Component.literal("Feed station: " + unit + String.format("; %d emptied, %d waiting; set to ", emptied(), fed()) + assays()
+				+ (crashes > 0 ? String.format("; %d machines CRASHED (last: %s), %.1f kg of UF6 let out", crashes, lastCrash, crashes * Tuning.CRASH_UF6_KG) : "") + "; " + describe());
 	}
 
 	@Override
@@ -294,6 +324,8 @@ public class FeedStationBlockEntity extends UnitMotorBlockEntity implements Hopp
 		output.putInt("tailsStep", tailsStep);
 		output.putBoolean("cooled", cooled);
 		output.putDouble("hot", hot);
+		output.putInt("crashes", crashes);
+		output.putString("lastCrash", lastCrash);
 	}
 
 	@Override
@@ -308,5 +340,7 @@ public class FeedStationBlockEntity extends UnitMotorBlockEntity implements Hopp
 		tailsStep = input.getIntOr("tailsStep", 1);
 		cooled = input.getBooleanOr("cooled", false);
 		hot = input.getDoubleOr("hot", 0);
+		crashes = input.getIntOr("crashes", 0);
+		lastCrash = input.getStringOr("lastCrash", "");
 	}
 }

@@ -66,6 +66,8 @@ public class WildcatterJeiPlugin implements IModPlugin {
 		info(registration, WildcatterItems.CHROMIC_OXIDE, "From the chromate kiln: chromite roasted with caustic soda, leached and reduced with sulfur. Four sacks and two "
 				+ "aluminium ingots fire in the aluminothermic vessel to chromium metal.");
 		info(registration, WildcatterItems.CHROMIUM_METAL, "Aluminothermic chromium. The VAR furnace takes it by hopper in place of chromite for Zircaloy-4's 0.10 % Cr.");
+		// 16c2 (docs/multiblocks/enrichment-operations.md)
+		info(registration, WildcatterItems.ROTOR_SHARD, "What a crashed centrifuge's carbon-fibre rotor leaves; break a crashed machine for it and steel. Scrap.");
 		// 19d: rod materials and the sodium sulfate (docs/multiblocks/reactor-extensions.md)
 		info(registration, WildcatterItems.HAFNIUM_RCCA, "24 hafnium rodlets on a spider, from the RCCA bench (the rodlets in its tray hopper, with steel). "
 				+ "85 % of a B4C RCCA's worth; it takes no helium and does not wear. Load it into the cold vessel as a B4C RCCA.");

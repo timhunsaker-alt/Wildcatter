@@ -93,4 +93,25 @@ class UraniumOperationsTest {
 	void aTrailerHolds800KgOfU3o8() {
 		assertEquals(Tuning.RESIN_TRAILER_U3O8_KG, 10_000 * Tuning.IX_RESIN_KG_PER_L, 1e-9);
 	}
+
+	// ---- 16c2: crashes, sampling and blending, heels (docs/multiblocks/enrichment-operations.md) ----------------------------------
+	@Test
+	void heelsStayUnderTheAnsiLimits() {
+		assertEquals(true, Tuning.HEEL_48Y_KG < 22.7);
+		assertEquals(true, Tuning.HEEL_30B_KG < 11.3);
+	}
+
+	@Test
+	void aBlendKeepsTheU235() {
+		// two full 30Bs at a and b blended: one full at t, the rest in the other at a + b - t
+		double a = 0.03, b = 0.0495, t = 0.04, rest = a + b - t;
+		assertEquals((a + b) * Tuning.CYLINDER_30B_KG, (t + rest) * Tuning.CYLINDER_30B_KG, 1e-9);
+		assertEquals(0.0395, rest, 1e-12);
+	}
+
+	@Test
+	void criticalSpeedsLieBelowTheConvertersRamp() {
+		// a converter at full output drives past them; only a machine held part way lingers there
+		assertEquals(true, Tuning.CRITICAL_SPEED_HIGH < 1.0 && Tuning.CENTRIFUGE_HERTZ < Tuning.OVERSPEED_HZ);
+	}
 }

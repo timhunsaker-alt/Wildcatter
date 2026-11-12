@@ -103,7 +103,8 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 
 	private boolean takes(int slot, ItemStack stack) {
 		return switch (kind()) {
-			case "uf6_autoclave" -> slot == 0 && stack.is(WildcatterItems.LEU_CYLINDER_30B);
+			case "uf6_autoclave" -> slot == 0 && stack.is(WildcatterItems.LEU_CYLINDER_30B)
+					&& (!dev.wildcatter.Rules.uf6Cylinders() || dev.wildcatter.item.CylinderTags.sampled(stack));   // 16c2: its certificate first
 			case "rod_loader" -> slot == 0 && stack.is(WildcatterItems.ZIRCALOY_TUBE) || slot == 1 && stack.is(WildcatterItems.STEEL_INGOT);
 			default -> false;
 		};
@@ -241,13 +242,15 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 	}
 
 	private void vaporize(Level level) {
-		if (loaded && uf6 <= 1e-6) {
+		double heel = dev.wildcatter.Rules.uf6Cylinders() ? Tuning.HEEL_30B_KG : 0;   // 16c2: the heel stays in the emptied 30B
+		if (loaded && uf6 <= heel + 1e-6) {
 			int out = slots.get(1).isEmpty() ? 1 : slots.get(2).isEmpty() ? 2 : -1;
 			if (out < 0) {
 				unit = "FULL: take the empty 30Bs (a hopper under it)";
 				return;
 			}
-			slots.set(out, new ItemStack(WildcatterItems.EMPTY_30B_CYLINDER));
+			slots.set(out, dev.wildcatter.item.CylinderTags.withHeel(new ItemStack(WildcatterItems.EMPTY_30B_CYLINDER), Math.min(heel, uf6)));
+			uf6 = 0;
 			loaded = false;
 		}
 		if (!loaded && fed() > 0) {
@@ -256,7 +259,8 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 			uf6 = Tuning.CYLINDER_30B_KG;
 		}
 		if (!loaded) {
-			unit = "NO CYLINDER: put a hopper of 30Bs of LEU on top";
+			unit = dev.wildcatter.Rules.uf6Cylinders() ? "NO CYLINDER: put a hopper of SAMPLED 30Bs of LEU on top (the sampling autoclave signs them off)"
+					: "NO CYLINDER: put a hopper of 30Bs of LEU on top";
 			return;
 		}
 		if (room() <= 1e-9) {
@@ -268,7 +272,7 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 			unit = "starting the heaters: " + describe();
 			return;
 		}
-		double kg = Math.min(Math.min(rate() * strength, room()), uf6 / Tuning.UF6_PER_U);
+		double kg = Math.min(Math.min(rate() * strength, room()), Math.max(0, uf6 - heel) / Tuning.UF6_PER_U);
 		uf6 = Math.max(0, uf6 - kg * Tuning.UF6_PER_U);
 		assay = FuelStage.blend(u, assay, kg, cylinderAssay);
 		u += kg;

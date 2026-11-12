@@ -88,7 +88,7 @@ public class TakeoffBlockEntity extends UnitMotorBlockEntity implements HopperFe
 	/** 16c1: UF6 at {@code assay}; the cylinder on the scale carries the blend of what went into it. */
 	public void addUf6(double kg, double assay) {
 		if (!loaded && fed() > 0) {
-			useOne();
+			uf6 = dev.wildcatter.item.CylinderTags.heel(useOne());   // 16c2: its heel counted
 			loaded = true;
 		}
 		double before = uf6;
@@ -148,7 +148,7 @@ public class TakeoffBlockEntity extends UnitMotorBlockEntity implements HopperFe
 			uf6 = 0;
 		}
 		if (!loaded && fed() > 0) {
-			useOne();   // the next empty in the bin goes on the scale
+			uf6 = dev.wildcatter.item.CylinderTags.heel(useOne());   // the next empty in the bin goes on the scale; 16c2: its heel counted
 			loaded = true;
 		}
 		if (!loaded) {

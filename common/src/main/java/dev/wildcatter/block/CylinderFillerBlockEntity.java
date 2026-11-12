@@ -104,7 +104,7 @@ public class CylinderFillerBlockEntity extends UnitMotorBlockEntity implements H
 			slots.set(out, new ItemStack(WildcatterItems.UF6_CYLINDER_48Y));
 			uf6 = 0;
 			if (fed() > 0) {
-				useOne();   // the cylinder just filled leaves the scale; the next empty in the bin goes on
+				uf6 = dev.wildcatter.item.CylinderTags.heel(useOne());   // the cylinder just filled leaves the scale; the next empty goes on (16c2: its heel counted)
 			}
 		}
 		if (fed() == 0 && uf6 <= 0) {

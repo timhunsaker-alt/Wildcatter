@@ -216,4 +216,38 @@ is behind a default-off setting, or happens only once the player adds the new pa
   has one.
 - **Alternatives:** extend the client scene with a CO2 tank.
 
+## 16c2: crashes, sampling and blending, heels (2026-11-12, branch `w-17c`; decided on recommendation, for Tim)
+
+### 31. Crashes are behind a world rule, `centrifugeCrashes`
+- **Chosen:** on in new worlds, off in old. Off, no machine ever crashes. No random crashes: only the spec's four causes.
+
+### 32. How each cause is counted
+- **Chosen:** the feed station looks at each machine on its header each interval. **Critical speed:** held between 30 % and 60 % of full
+  speed for 2 minutes (the time resets on leaving the band). Without `cascadeSpinUp` a machine's speed is its converter's delivered
+  share, so a converter on a sagging supply can hold machines there. **Overspeed:** over 1,300 Hz for 15 minutes; nothing can command
+  it yet (the converter has no speed reference; plc.md 13e), so it is counted but cannot happen. **Hot casing:** 15 minutes without
+  cooling (10 after CASING HOT), then one machine a minute crashes, the first on the header. **Closing onto a coasting machine:** with
+  `cascadeSpinUp` on, a converter that drives a machine again while it coasts over 30 % *(proposed)* crashes it (a machine first driven
+  after a world loads is not counted).
+- **Alternatives:** a crash chance a minute past 15 minutes of a hot casing (the spec's "may crash").
+
+### 33. The crash
+- **Chosen:** a bang and a cloud of white smoke; 0.1 kg of UF6 let out (counted on the feed station), which deals 4 points of damage and
+  10 s of poison to any creature within 3 m *(proposed)*. The machine becomes a `crashed_centrifuge` (1 x 6 x 1, its casing split, top
+  askew), out of the count. Each machine within 2 blocks (one block between) crashes too at 20 %; those do not shake further. Broken, a
+  crashed machine gives 4 steel ingots and a `rotor_shard` *(proposed)*.
+
+### 34. The sampling autoclave, its 30 minutes and its blend
+- **Chosen:** `sampling_autoclave`, 3 x 3 x 5, 50 kW at 480 V (box west); full 30Bs by hopper, out SAMPLED below after 30 minutes
+  (`TimeScale.scaled`). Sneak-click: SAMPLE, or BLEND to one of the product assays. A blend takes two full 30Bs with assays either side of
+  the target and an empty 30B: out come a 30B at the target and one at the rest (a + b - target, U-235 kept), both sampled, and an empty
+  shell. Real blending meters part cylinders; with whole-cylinder items, the rest going into one cylinder keeps the mass and the U-235.
+- **Alternatives:** blending only to a full and a partly filled cylinder (no partial cylinder items exist).
+
+### 35. The sampling requirement and the heels are behind a rule, `uf6Cylinders`
+- **Chosen:** on in new worlds, off in old: the fuel plant's UF6 autoclave takes only sampled 30Bs (its hopper refuses others); an emptied
+  48Y keeps **20 kg** and an emptied 30B **10 kg** of UF6, carried on the item (custom data `heel`) and counted when a take-off or the
+  conversion cylinder filler fills it again. The heel's assay is not carried (the new UF6 sets it).
+- **Why:** an existing fuel plant would stop on its unsampled 30Bs.
+
 There is no `docs/DESIGN.md` in Wildcatter (that file is Tailings'). The design record for each wave is its spec's "As built" section.

@@ -186,4 +186,28 @@ final class TrackClientScenes {
 		show(0, 0, 0, tp(10, 6, -8, 40, 25), "wildcatter-pidgeon");   // from the north-east: the retorts' cold ends and condensers
 		log("pidgeon ok");
 	}
+
+	// ---- cascadeCrash (16c2) --------------------------------------------------------------------------------------------------------
+	/** A row of centrifuges on their header, the middle one crashed (its rotor broken up in its casing): the hall after a crash. */
+	void cascadeCrash() {
+		Direction north = Direction.NORTH;
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand(tp(4, 4, 7, 160, 15));
+		context.waitTicks(20);
+		clear(-6, -6, 14, 12, 10);
+		for (int x = 0; x <= 8; x++) {
+			place(x == 4 ? WildcatterBlocks.CRASHED_CENTRIFUGE : WildcatterBlocks.CENTRIFUGE, x, 0, 0, north);
+			put("gas_line", x, 6, 0);
+		}
+		on(level -> {
+			if (level.getBlockEntity(at(4, 0, 0)) instanceof dev.wildcatter.block.CrashedCentrifugeBlockEntity wreck) {
+				wreck.setReason("held at a critical speed (45 %) for 120 s");
+			}
+		});
+		context.waitTicks(20);
+		String wreck = read(4, 0, 0);
+		check(wreck.contains("CRASHED"), "the crashed machine should read CRASHED: " + wreck);
+		show(4, 0, 0, tp(4, 3, 6, 180, 10), "wildcatter-cascade-crash");
+		log("cascadeCrash ok: " + wreck);
+	}
 }

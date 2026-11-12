@@ -5,6 +5,8 @@ footprints match EnrichmentPartBlock's):
 - feed_station, 3 x 3 x 5: the heated cabinet around a 48Y, its header valve out the back (480 V box west);
 - product_takeoff, 3 x 3 x 4: a 30B on its scale under the chilled desublimers (480 V box west);
 - tails_takeoff, 3 x 3 x 5: a 48Y on its scale under the desublimers (480 V box west);
+- crashed_centrifuge, 1 x 6 x 1 (16c2): a machine whose rotor broke up: its casing split and bulged, its top cover blown askew;
+- sampling_autoclave, 3 x 3 x 5 (16c2): a horizontal steam autoclave with its door, sample station and steam line (480 V box west);
 - cascade_cooling_skid, 3 x 3 x 6 (16c1): two plate exchangers and two pumps on a skid, circulating water in at the front and out
   at the back (480 V box west)."""
 import mlib
@@ -92,7 +94,29 @@ box480(CK, 0.4, 2.5)
 CK.collide((0.1, 0.0, 0.1), (2.9, 2.6, 5.9))
 
 
+# ---- 16c2: the crashed centrifuge and the sampling autoclave -------------------------------------------------------------------------
+CC = model("crashed_centrifuge", 1, 6, 1, "dark")
+CC.box((0.1, 0.0, 0.1), (0.9, 0.15, 0.9), "concrete")                      # its plinth
+CC.cylinder("y", (0.5, 0.5), 0.26, 0.15, 0.6, "blue", 14)                   # the motor housing, still on its foot
+CC.cylinder("y", (0.5, 0.5), 0.2, 0.6, 2.4, "galv", 14)                     # the casing, intact below
+CC.cylinder("y", (0.5, 0.5), 0.27, 2.4, 3.6, "dark", 14)                    # split and bulged where the rotor broke up
+CC.cylinder("y", (0.52, 0.47), 0.2, 3.6, 5.2, "galv", 14)                   # the upper casing, knocked off line
+CC.box((0.18, 5.2, 0.3), (0.86, 5.36, 0.9), "iron")                        # the top cover, blown askew
+CC.box((0.3, 0.15, 0.62), (0.5, 0.25, 0.86), "dark")                       # rotor shards on the plinth
+CC.collide((0.25, 0.0, 0.25), (0.75, 5.4, 0.75))
+
+SA = model("sampling_autoclave", 3, 3, 5, "galv")
+SA.box((0.0, 0.0, 0.0), (3.0, 0.2, 5.0), "concrete")
+for z in (0.8, 4.0):
+	SA.box((0.6, 0.2, z), (2.4, 0.7, z + 0.3), "iron")                      # its saddles
+SA.cylinder("z", (1.5, 1.5), 1.05, 0.5, 4.5, "galv", 16)                    # the autoclave shell, a 30B inside
+SA.cylinder("z", (1.5, 1.5), 1.15, 0.3, 0.6, "steel", 16)                   # its door at the front
+SA.box((2.5, 0.2, 2.0), (2.95, 1.6, 3.0), "grey")                          # the sample station
+SA.pipe([(1.5, 2.55, 1.0), (1.5, 2.8, 1.0), (1.5, 2.8, 4.0)], 3, "pipe_steam")   # its steam line along the top
+box480(SA, 0.5, 0.3)
+SA.collide((0.3, 0.0, 0.3), (2.9, 2.8, 4.7))
+
 M = CE
-EXTRA = [FC, FS, PT, TT, CK]
+EXTRA = [FC, FS, PT, TT, CK, CC, SA]
 for extra in EXTRA:
 	extra.export_args = {"blockstate": True, "item": True}

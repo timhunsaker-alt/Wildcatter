@@ -43,7 +43,11 @@ public final class Rules {
 		/** 17c1: the Kroll reactor's two retorts and the VAR furnace's ingots run as batches, and the line loses scrap (84 % to tube). */
 		ZIRCONIUM_BATCHES("zirconiumBatches", true, "Kroll retorts and VAR ingots as batches, and the zirconium line's scrap losses"),
 		/** 19d: B4C rodlets burn their boron-10 (REPLACE at 30 %, worth falling past 40 %), and the console alarms SDM LOW. */
-		REACTOR_ROD_WEAR("reactorRodWear", true, "B-10 burnup in B4C control rods and the SDM LOW alarm");
+		REACTOR_ROD_WEAR("reactorRodWear", true, "B-10 burnup in B4C control rods and the SDM LOW alarm"),
+		/** 16c2: a centrifuge crashes at a critical speed held 2 minutes, a hot casing past 15 minutes, overspeed, or a converter closing onto it coasting. */
+		CENTRIFUGE_CRASHES("centrifugeCrashes", true, "centrifuge crashes: critical speeds, hot casings, overspeed, a converter closing onto coasting machines"),
+		/** 16c2: the fuel plant's autoclave takes only sampled 30Bs, and emptied cylinders keep their heels (48Y 20 kg, 30B 10 kg). */
+		UF6_CYLINDERS("uf6Cylinders", true, "the fuel plant takes only sampled 30Bs; emptied UF6 cylinders keep their heels");
 
 		public final String key;
 		public final boolean newWorld;
@@ -166,6 +170,14 @@ public final class Rules {
 
 	public static boolean wellControl() {
 		return on(Rule.WELL_CONTROL);
+	}
+
+	public static boolean centrifugeCrashes() {
+		return on(Rule.CENTRIFUGE_CRASHES);
+	}
+
+	public static boolean uf6Cylinders() {
+		return on(Rule.UF6_CYLINDERS);
 	}
 
 	public static boolean reactorRodWear() {
