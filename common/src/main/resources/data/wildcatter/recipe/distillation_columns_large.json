@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "XSX",
+    "S S",
+    "XSX"
+  ],
+  "key": {
+    "X": "wildcatter:distillation_columns",
+    "S": "wildcatter:steel_ingot"
+  },
+  "result": {
+    "id": "wildcatter:distillation_columns_large",
+    "count": 1
+  }
+}

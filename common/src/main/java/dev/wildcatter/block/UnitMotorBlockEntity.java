@@ -82,6 +82,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "oxygen_generator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.O2_GENERATOR_WATTS);
 				case "cold_traps" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.COLD_TRAP_WATTS);
 				case "distillation_columns" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.REBOILER_WATTS);
+				case "cold_traps_large" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.COLD_TRAP_WATTS * Tuning.CONVERSION_LARGE_SCALE);
+				case "distillation_columns_large" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.REBOILER_WATTS * Tuning.CONVERSION_LARGE_SCALE);
 				case "cylinder_filler" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CYLINDER_FILLER_WATTS);
 				case "hf_kiln" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.HF_KILN_WATTS);
 				case "feed_station" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.FEED_STATION_WATTS);
@@ -230,8 +232,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "precipitation_tank" -> "precipitation agitator";
 			case "drum_filler" -> "drum filler";
 			case "oxygen_generator" -> "oxygen generator's air compressor";
-			case "cold_traps" -> "refrigeration";
-			case "distillation_columns" -> "reboiler";
+			case "cold_traps", "cold_traps_large" -> "refrigeration";
+			case "distillation_columns", "distillation_columns_large" -> "reboiler";
 			case "cylinder_filler" -> "filler";
 			case "hf_kiln" -> "kiln drive";
 			case "feed_station" -> "heater";

@@ -3064,6 +3064,25 @@ lang.update({f"block.{ns}.brine_saturator": "Brine Saturator", f"block.{ns}.brin
 	f"block.{ns}.rectifier_mv": "Rectifier Transformer (distribution, 3.2 MVA)", f"block.{ns}.brine_wellhead": "Brine Wellhead (solution mining)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- 16b2: the full-size conversion plant's larger main line (docs/multiblocks/conversion-extensions.md) --------------------------
+# blockstates, models, shapes and items come from tools/models/conversion_large.py; here loot, names, tags and recipes.
+CONV_LARGE = ("reduction_reactor_large", "hydrofluorinator_large", "fluorinator_large", "cold_traps_large", "distillation_columns_large")
+for name in CONV_LARGE:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in CONV_LARGE]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+for name in CONV_LARGE:   # the large size: four of the 7d part and steel
+	small = name[:-len("_large")]
+	shaped(name, ["XSX", "S S", "XSX"], {"X": f"{ns}:{small}", "S": f"{ns}:steel_ingot"}, name)
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({f"block.{ns}.reduction_reactor_large": "Reduction Reactor (large, 0.3 kg U/s)", f"block.{ns}.hydrofluorinator_large": "Hydrofluorinator (large)",
+	f"block.{ns}.fluorinator_large": "Fluorinator (large)", f"block.{ns}.cold_traps_large": "UF6 Cold Traps (large)",
+	f"block.{ns}.distillation_columns_large": "UF6 Distillation Columns (large)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

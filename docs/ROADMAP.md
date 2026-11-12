@@ -449,8 +449,11 @@ default-off setting or waits until the player adds the new part.
   STORAGE TANK against the header house, which doses 0.5 g/L into its injection (head grade up to 1.3 x; NO CO2 when the tank is empty);
   the bleed goes out the house's back to an injection pump and a disposal well; IX columns in SATELLITE fill a RESIN TRAILER (800 kg of
   U3O8, carried as one item) that the central columns elute. NeoForge scene `isr_operations`.
-- **Planned, not built (can wait):** **16b2** the full-size conversion plant (four cell houses in series on a 12.47 kV `rectifier_mv`,
-  a second, larger main line); **16c2** machine crashes, the sampling autoclave and blending, cylinder heels; **16d2** monitor-well rings,
+- **16b2, the full-size conversion plant** (`docs/multiblocks/conversion-extensions.md`, BUILT 2026-11-12, branch `w-20`): four cell
+  houses in series on bus bars from the 12.47 kV `rectifier_mv` (433 V, 6 kA, 2.6 MW), a larger main line (reducer, hydrofluorinator,
+  fluorinator, cold traps, columns at 0.3 kg of U a second, twice the height); the filler keeps up. NeoForge scene `conversion_large`;
+  unit test `ConversionLargeTest`. Decisions 31-35.
+- **Planned, not built (can wait):** **16c2** machine crashes, the sampling autoclave and blending, cylinder heels; **16d2** monitor-well rings,
   excursions and groundwater restoration (RO unit). Each is written in its spec.
 - **Known gaps:** script-drawn icons `u3o8_drum_placeholder` (16a), `fluorinator_ash_drum_placeholder` and
   `synthetic_fluorspar_placeholder` (16b1). The chlor-alkali cell on potash has no scene. The cathode scrubber's hydrogen is checked with the

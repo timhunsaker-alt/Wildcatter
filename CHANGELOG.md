@@ -2,6 +2,12 @@
 
 ## Unreleased (0.7.0, branch `w-next`): Phases 15-19, built 2026-11-10 while Tim was away
 
+### 16b2: the full-size conversion plant (built 2026-11-12 while Tim was away; not approved)
+- Four fluorine cell houses in series on bus bars from the 12.47 kV rectifier transformer (432 V, 6 kA), and a larger size of the
+  reduction reactor, hydrofluorinator, fluorinator, cold traps and distillation columns, each 0.3 kg of U a second: a 48Y about every 8
+  hours. Spec: `docs/multiblocks/conversion-extensions.md`. Existing conversion plants are unchanged. Decisions:
+  `docs/questions/phase16-uranium.md` (31-35).
+
 ### 20a: the chlor-alkali plant (built 2026-11-12 while Tim was away; not approved)
 - A full-size chlor-alkali plant, about a tonne of chlorine an hour: a brine saturator, the brine treatment, a membrane cell room of 52
   elements at 15 kA and 161 V (2.4 MW of DC) on a new 12.47 kV rectifier transformer, a chlorine train that dries, compresses and

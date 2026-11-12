@@ -33,7 +33,7 @@ public class ConversionStageBlockEntity extends PlantUnitBlockEntity implements 
 	}
 
 	private boolean fluorinator() {
-		return getBlockState().getBlock() instanceof dev.wildcatter.multiblock.BigPart part && part.shapeName().equals("fluorinator");
+		return ConversionSize.base(this).equals("fluorinator");
 	}
 
 	private List<Lines.Face> reagentFaces() {
@@ -252,8 +252,9 @@ public class ConversionStageBlockEntity extends PlantUnitBlockEntity implements 
 			s.status = "idle: no " + (f ? "UF4" : "UO2") + " in the stage before it";
 		} else {
 			double waiting = Lines.available(level, s.reagentFaces(), reagent, Pull.MACHINE, s);
-			double room = Conversion.uraniumKgs() * Tuning.PLANT_HOLD_SECONDS - s.uranium;
-			double kg = Math.min(Math.min(Conversion.uraniumKgs() * 1.2 * seconds(), up.uranium()), Math.min(room, waiting / perU));
+			double rate = Conversion.uraniumKgs() * ConversionSize.scale(s);   // 16b2: the large size, four times
+			double room = rate * Tuning.PLANT_HOLD_SECONDS - s.uranium;
+			double kg = Math.min(Math.min(rate * 1.2 * seconds(), up.uranium()), Math.min(room, waiting / perU));
 			KohScrubberBlockEntity koh = f ? null : Touching.find(level, pos, KohScrubberBlockEntity.class, k -> true);
 			if (koh != null && !koh.ready(kg * Tuning.HF_EXCESS_PER_U)) {
 				s.status = "KOH SCRUBBER SPENT: its off-gas has nowhere to go (lime to the KOH scrubber, or caustic potash for its charge)";

@@ -69,6 +69,7 @@ final class ChemicalScenes {
 		Map<String, Consumer<GameTestHelper>> scenes = new LinkedHashMap<>();
 		scenes.put("chlor_alkali", ChemicalScenes::chlorAlkali);
 		scenes.put("brine_well", ChemicalScenes::brineWell);
+		scenes.putAll(ConversionLargeScenes.scenes());   // 16b2, on the same peaker
 		return scenes;
 	}
 

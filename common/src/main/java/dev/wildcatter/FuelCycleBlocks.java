@@ -172,6 +172,12 @@ public interface FuelCycleBlocks {
 	Block CAUSTIC_EVAPORATOR = chemPart(dev.wildcatter.block.ChemPartBlock.Part.CAUSTIC_EVAPORATOR);
 	Block HCL_SYNTHESIS_UNIT = chemPart(dev.wildcatter.block.ChemPartBlock.Part.HCL_SYNTHESIS_UNIT);
 	Block RECTIFIER_MV = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.RECTIFIER_MV);
+	// 16b2: the full-size conversion plant's larger main line (docs/multiblocks/conversion-extensions.md)
+	Block REDUCTION_REACTOR_LARGE = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.REDUCTION_REACTOR_LARGE);
+	Block HYDROFLUORINATOR_LARGE = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.HYDROFLUORINATOR_LARGE);
+	Block FLUORINATOR_LARGE = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.FLUORINATOR_LARGE);
+	Block COLD_TRAPS_LARGE = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.COLD_TRAPS_LARGE);
+	Block DISTILLATION_COLUMNS_LARGE = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.DISTILLATION_COLUMNS_LARGE);
 	Block BRINE_WELLHEAD = block("brine_wellhead", props -> new dev.wildcatter.block.BrineWellheadBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL)));
 	Block ISR_WELLHEAD = block("isr_wellhead", props -> new dev.wildcatter.block.IsrWellheadBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)

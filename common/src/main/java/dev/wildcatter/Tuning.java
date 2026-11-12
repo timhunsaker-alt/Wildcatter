@@ -1561,4 +1561,7 @@ public final class Tuning {
 	public static final double BRINE_WELL_INJECT_LPS = 3.0;        // fresh water down the inner string, litres a second (proposed: 1.65 t/h of salt needs about 1.3)
 	public static final int BRINE_CAVERN_REACH = 12;               // blocks from the hole's bottom the cavern can reach (proposed)
 
+	// ---- 16b2: the full-size conversion plant (docs/multiblocks/conversion-extensions.md, "A full-size plant") ---------------------
+	public static final double CONVERSION_LARGE_SCALE = 4.0;      // the large main line's parts: 0.3 kg of U a second, four times the 7d parts
+	public static final int F2_HOUSES_IN_SERIES = 4;               // cell houses on one rectifier_mv: 48 cells, 432 V at 6 kA
 }

@@ -336,6 +336,11 @@
     "wildcatter:caustic_evaporator",
     "wildcatter:hcl_synthesis_unit",
     "wildcatter:rectifier_mv",
-    "wildcatter:brine_wellhead"
+    "wildcatter:brine_wellhead",
+    "wildcatter:reduction_reactor_large",
+    "wildcatter:hydrofluorinator_large",
+    "wildcatter:fluorinator_large",
+    "wildcatter:cold_traps_large",
+    "wildcatter:distillation_columns_large"
   ]
 }

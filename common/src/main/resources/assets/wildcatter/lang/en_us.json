@@ -628,5 +628,10 @@
   "block.wildcatter.caustic_evaporator": "Caustic Evaporator (to 50 %)",
   "block.wildcatter.hcl_synthesis_unit": "HCl Synthesis Unit",
   "block.wildcatter.rectifier_mv": "Rectifier Transformer (distribution, 3.2 MVA)",
-  "block.wildcatter.brine_wellhead": "Brine Wellhead (solution mining)"
+  "block.wildcatter.brine_wellhead": "Brine Wellhead (solution mining)",
+  "block.wildcatter.reduction_reactor_large": "Reduction Reactor (large, 0.3 kg U/s)",
+  "block.wildcatter.hydrofluorinator_large": "Hydrofluorinator (large)",
+  "block.wildcatter.fluorinator_large": "Fluorinator (large)",
+  "block.wildcatter.cold_traps_large": "UF6 Cold Traps (large)",
+  "block.wildcatter.distillation_columns_large": "UF6 Distillation Columns (large)"
 }

@@ -217,3 +217,37 @@ is behind a default-off setting, or happens only once the player adds the new pa
 - **Alternatives:** extend the client scene with a CO2 tank.
 
 There is no `docs/DESIGN.md` in Wildcatter (that file is Tailings'). The design record for each wave is its spec's "As built" section.
+
+## 16b2: the full-size conversion plant (built 2026-11-12, branch `w-20`)
+
+### 31. The larger main line is five new blocks of the same machines
+- **Chosen:** `reduction_reactor_large`, `hydrofluorinator_large`, `fluorinator_large`, `cold_traps_large` and `distillation_columns_large`,
+  each the 7d part's block entity rated four times (0.3 kg of U a second) and drawn at twice the height (3 x 20 x 3, 3 x 20 x 6,
+  3 x 20 x 3, 3 x 8 x 6, 3 x 24 x 3). Everything a part takes goes with its uranium, so its hydrogen, HF, fluorine and ash are four times
+  too. They join each other, and the 7d parts, by touching as the small line does; a mixed line runs at its slowest part.
+- **Why:** the spec's "a second, larger size ... at twice their height"; one machine class keeps the small and large lines the same.
+- **Alternatives:** wider parts rather than taller.
+
+### 32. The large cold traps' and columns' power
+- **Chosen:** four times the small ones': 120 kW of refrigeration and 80 kW of reboiler, at 480 V (*proposed*, scaled with the UF6).
+- **Why:** the spec gives no rating; refrigeration and reboil duty go with the throughput.
+- **Alternatives:** a medium-voltage supply for the large traps.
+
+### 33. No large cylinder filler
+- **Chosen:** the existing cylinder filler fills at the rate of the columns it stands against: against the large columns, four times as
+  fast (a 48Y about every 8 hours). Against the small columns it is unchanged.
+- **Why:** the spec lists five main-line parts, not the filler; a scale and a fill valve are not what limits a real plant.
+- **Alternatives:** a large filler block.
+
+### 34. Four cell houses in series
+- **Chosen:** on DC bus bars: the rectifier's + to the first house's +, each house's - to the next one's +, the last - back. No cell
+  house may touch the rectifier (one that touches is joined to it directly, as in 7d, which would short the string); the rectifier_mv's
+  dial (default 6 kA) sets the current. Built and tested at 433 V and 6.00 kA, 2.60 MW.
+- **Why:** the potline's precedent (pots in series) and the 10b1 bus bars; nothing new in the solver.
+- **Alternatives:** a "series" link part between houses.
+
+### 35. Recipes
+- **Chosen:** each large part from four of its small part and four steel ingots (*proposed*).
+- **Why:** none are in the spec; it keeps the large part dearer than four small ones' worth of uranium throughput.
+- **Alternatives:** any.
+

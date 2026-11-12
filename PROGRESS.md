@@ -1457,6 +1457,8 @@ sized for a 40-pot line.
 - Tests: `TimeScaleTest`; `world_rules`, `time_scale_holds`; the Fabric client's Create World check.
 
 ## Known gaps
+- 16b2 (full-size conversion, 2026-11-12): the large parts use the mod's materials; no large cylinder filler or large steam reformer; the
+  large line's cathode gas scrubbers (one a house) are not in the scene.
 - Phase 20a (chlor-alkali, 2026-11-12): the parts use the mod's materials (no Ludo art; no new placeholders). The treatment's own caustic
   and HCl for the magnesium and the IX regeneration are not drawn; the depleted brine's return is in the balance, not piped; the
   rectifier_mv is modelled as the diode rectifier's regulation (no thyristor firing angle). Not built: hypochlorite, mercury and
@@ -2099,4 +2101,11 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
 - **Field Manual:** CHLOR-ALKALI PLANT, CHLORINE, CAUSTIC, HCl, BRINE WELLS. JEI: rock salt's uses name the plant and brine wells.
 - **Tests:** `ChlorAlkaliPlantTest` (3); NeoForge `chlor_alkali`, `brine_well`; client screenshots `chlorAlkali` (plant, cell room, train).
 - **Existing worlds:** unchanged: all new parts; the injection pump takes fresh water only when its discharge reaches a brine wellhead.
+
+## 16b2: the full-size conversion plant (2026-11-12; built while Tim was away; decisions: `docs/questions/phase16-uranium.md`, 31-35)
+- Spec `docs/multiblocks/conversion-extensions.md` ("As built (16b2)"). Four fluorine cell houses in series on DC bus bars from the
+  `rectifier_mv` (433 V, 6 kA, 2.6 MW); the **large reduction reactor, hydrofluorinator, fluorinator, cold traps and distillation
+  columns**, 0.3 kg of U a second at twice the height; the cylinder filler fills at the rate of the columns it stands against. About a 48Y
+  every 8 hours, 9,400 t of U a year. An existing conversion plant is unchanged.
+- **Field Manual:** FULL-SIZE CONVERSION. **Tests:** `ConversionLargeTest` (2); NeoForge `conversion_large`.
 

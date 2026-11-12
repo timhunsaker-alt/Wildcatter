@@ -114,9 +114,9 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.Co2StorageTankBlockEntity> CO2_STORAGE_TANK_ENTITY = entity(dev.wildcatter.block.Co2StorageTankBlockEntity::new, CO2_STORAGE_TANK);
 	public static final BlockEntityType<dev.wildcatter.block.ResinTrailerBlockEntity> RESIN_TRAILER_ENTITY = entity(dev.wildcatter.block.ResinTrailerBlockEntity::new, RESIN_TRAILER);
 	public static final BlockEntityType<dev.wildcatter.block.IsrWellheadBlockEntity> ISR_WELLHEAD_ENTITY = entity(dev.wildcatter.block.IsrWellheadBlockEntity::new, ISR_WELLHEAD);
-	public static final BlockEntityType<dev.wildcatter.block.ReductionReactorBlockEntity> REDUCTION_REACTOR_ENTITY = entity(dev.wildcatter.block.ReductionReactorBlockEntity::new, REDUCTION_REACTOR);
-	public static final BlockEntityType<dev.wildcatter.block.ConversionStageBlockEntity> CONVERSION_STAGE_ENTITY = entity((pos, state) -> new dev.wildcatter.block.ConversionStageBlockEntity(WildcatterBlocks.CONVERSION_STAGE_ENTITY, pos, state), HYDROFLUORINATOR, FLUORINATOR);
-	public static final BlockEntityType<dev.wildcatter.block.Uf6StageBlockEntity> UF6_STAGE_ENTITY = entity((pos, state) -> new dev.wildcatter.block.Uf6StageBlockEntity(WildcatterBlocks.UF6_STAGE_ENTITY, pos, state), COLD_TRAPS, DISTILLATION_COLUMNS);
+	public static final BlockEntityType<dev.wildcatter.block.ReductionReactorBlockEntity> REDUCTION_REACTOR_ENTITY = entity(dev.wildcatter.block.ReductionReactorBlockEntity::new, REDUCTION_REACTOR, REDUCTION_REACTOR_LARGE);
+	public static final BlockEntityType<dev.wildcatter.block.ConversionStageBlockEntity> CONVERSION_STAGE_ENTITY = entity((pos, state) -> new dev.wildcatter.block.ConversionStageBlockEntity(WildcatterBlocks.CONVERSION_STAGE_ENTITY, pos, state), HYDROFLUORINATOR, FLUORINATOR, HYDROFLUORINATOR_LARGE, FLUORINATOR_LARGE);
+	public static final BlockEntityType<dev.wildcatter.block.Uf6StageBlockEntity> UF6_STAGE_ENTITY = entity((pos, state) -> new dev.wildcatter.block.Uf6StageBlockEntity(WildcatterBlocks.UF6_STAGE_ENTITY, pos, state), COLD_TRAPS, DISTILLATION_COLUMNS, COLD_TRAPS_LARGE, DISTILLATION_COLUMNS_LARGE);
 	public static final BlockEntityType<dev.wildcatter.block.CylinderFillerBlockEntity> CYLINDER_FILLER_ENTITY = entity(dev.wildcatter.block.CylinderFillerBlockEntity::new, CYLINDER_FILLER);
 	public static final BlockEntityType<dev.wildcatter.block.SteamReformerBlockEntity> STEAM_REFORMER_ENTITY = entity(dev.wildcatter.block.SteamReformerBlockEntity::new, STEAM_REFORMER);
 	public static final BlockEntityType<dev.wildcatter.block.HfKilnBlockEntity> HF_KILN_ENTITY = entity(dev.wildcatter.block.HfKilnBlockEntity::new, HF_KILN);
@@ -467,7 +467,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		for (Block part : new Block[] {BRINE_SATURATOR, BRINE_TREATMENT, MEMBRANE_CELL_ROOM, CHLORINE_TRAIN, CAUSTIC_EVAPORATOR, HCL_SYNTHESIS_UNIT}) {
 			add(((dev.wildcatter.block.ChemPartBlock) part).part().id(), part);
 		}
-		for (Block part : new Block[] {REDUCTION_REACTOR, HYDROFLUORINATOR, FLUORINATOR, COLD_TRAPS, DISTILLATION_COLUMNS, CYLINDER_FILLER, STEAM_REFORMER, HF_KILN, HF_COLUMN, RECTIFIER, FLUORINE_CELL_HOUSE, CATHODE_GAS_SCRUBBER, KOH_SCRUBBER, RECTIFIER_MV}) {
+		for (Block part : new Block[] {REDUCTION_REACTOR, HYDROFLUORINATOR, FLUORINATOR, COLD_TRAPS, DISTILLATION_COLUMNS, CYLINDER_FILLER, STEAM_REFORMER, HF_KILN, HF_COLUMN, RECTIFIER, FLUORINE_CELL_HOUSE, CATHODE_GAS_SCRUBBER, KOH_SCRUBBER, RECTIFIER_MV, REDUCTION_REACTOR_LARGE, HYDROFLUORINATOR_LARGE, FLUORINATOR_LARGE, COLD_TRAPS_LARGE, DISTILLATION_COLUMNS_LARGE}) {
 			add(((dev.wildcatter.block.ConversionPartBlock) part).part().id(), part);
 		}
 		for (Block part : new Block[] {CENTRIFUGE, FREQUENCY_CONVERTER, FEED_STATION, PRODUCT_TAKEOFF, TAILS_TAKEOFF, CASCADE_COOLING_SKID}) {

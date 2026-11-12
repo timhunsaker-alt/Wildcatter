@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "XSX",
+    "S S",
+    "XSX"
+  ],
+  "key": {
+    "X": "wildcatter:hydrofluorinator",
+    "S": "wildcatter:steel_ingot"
+  },
+  "result": {
+    "id": "wildcatter:hydrofluorinator_large",
+    "count": 1
+  }
+}
