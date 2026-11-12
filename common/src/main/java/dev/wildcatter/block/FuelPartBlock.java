@@ -32,7 +32,11 @@ public class FuelPartBlock extends BigPartBlock implements net.minecraft.world.W
 		ROD_LOADER("rod_loader", Footprint.box(3, 3, 10, 0, 0)),
 		ROD_WELDER("rod_welder", Footprint.box(3, 3, 6, 0, 0)),
 		ASSEMBLY_FIXTURE("assembly_fixture", Footprint.box(3, 6, 10, 0, 0)),
-		HELIUM_RECOVERY_UNIT("helium_recovery_unit", Footprint.box(3, 6, 4, 0, 0));
+		HELIUM_RECOVERY_UNIT("helium_recovery_unit", Footprint.box(3, 6, 4, 0, 0)),
+		// 19c1 (docs/multiblocks/fuel-fabrication-extensions.md)
+		PELLET_INSPECTION("pellet_inspection", Footprint.box(2, 3, 4, 0, 0)),
+		ROD_INSPECTION("rod_inspection", Footprint.box(3, 3, 10, 0, 0)),
+		SCRAP_OXIDIZER("scrap_oxidizer", Footprint.box(2, 3, 4, 0, 0));
 
 		private final String id;
 		private final Footprint footprint;
@@ -64,6 +68,9 @@ public class FuelPartBlock extends BigPartBlock implements net.minecraft.world.W
 			case ROD_WELDER -> new RodWelderBlockEntity(pos, state);
 			case ASSEMBLY_FIXTURE -> new AssemblyFixtureBlockEntity(pos, state);
 			case HELIUM_RECOVERY_UNIT -> new HeliumRecoveryBlockEntity(pos, state);
+			case PELLET_INSPECTION -> new PelletInspectionBlockEntity(pos, state);
+			case ROD_INSPECTION -> new RodInspectionBlockEntity(pos, state);
+			case SCRAP_OXIDIZER -> new ScrapOxidizerBlockEntity(pos, state);
 			default -> new FuelLineBlockEntity(pos, state);
 		};
 	}
@@ -73,6 +80,9 @@ public class FuelPartBlock extends BigPartBlock implements net.minecraft.world.W
 			case ROD_WELDER -> WildcatterBlocks.ROD_WELDER_ENTITY;
 			case ASSEMBLY_FIXTURE -> WildcatterBlocks.ASSEMBLY_FIXTURE_ENTITY;
 			case HELIUM_RECOVERY_UNIT -> WildcatterBlocks.HELIUM_RECOVERY_ENTITY;
+			case PELLET_INSPECTION -> WildcatterBlocks.PELLET_INSPECTION_ENTITY;
+			case ROD_INSPECTION -> WildcatterBlocks.ROD_INSPECTION_ENTITY;
+			case SCRAP_OXIDIZER -> WildcatterBlocks.SCRAP_OXIDIZER_ENTITY;
 			default -> WildcatterBlocks.FUEL_LINE_ENTITY;
 		};
 	}

@@ -79,6 +79,8 @@ public class WildcatterNeoForgeGameTests {
 
 	/** Phase 19's reactor scenes (ReactorExtensionScenes): a scene that switches a reactor rule on runs in a batch of its own. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> REACTOR_SCENES = ReactorExtensionScenes.scenes();
+	/** Phase 19c's scenes (FuelExtensionScenes): each switches its rule on, so each in a batch of its own. */
+	private static final java.util.Map<String, Consumer<GameTestHelper>> FUEL_X_SCENES = FuelExtensionScenes.scenes();
 
 	/** WILDCATTER_ONLY=a,b registers just those scenes while working on them; unset, every scene runs (as the Fabric client test). */
 	private static boolean only(String scene) {
@@ -134,6 +136,7 @@ public class WildcatterNeoForgeGameTests {
 			GRID_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			FERRO_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			REACTOR_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
+			FUEL_X_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			OILFIELD_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			RULE_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			RESIDENCE_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
@@ -198,6 +201,11 @@ public class WildcatterNeoForgeGameTests {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
 						new TestData<>(env, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 4000, 1, true,
 								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 40)));
+			}
+			for (String scene : FUEL_X_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
+				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
+						new TestData<>(event.registerEnvironment(id("rules_" + scene)), net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 4000, 1, true,
+								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 60)));
 			}
 			for (String scene : GAS_POWER_SCENES) {
 				if (!only(scene)) {

@@ -434,6 +434,9 @@
     "wildcatter:nickel_tankhouse",
     "wildcatter:induction_furnace",
     "wildcatter:aod_converter",
-    "wildcatter:ingot_caster"
+    "wildcatter:ingot_caster",
+    "wildcatter:pellet_inspection",
+    "wildcatter:rod_inspection",
+    "wildcatter:scrap_oxidizer"
   ]
 }

@@ -70,7 +70,7 @@ public final class OreUses {
 			case MOLYBDENITE -> List.of("the moly roaster, as flotation concentrate from Tailings' concentrator (moly oxide, then ferromolybdenum)");
 			case SCHEELITE -> List.of("the aluminothermic vessel, as flotation concentrate from Tailings' concentrator dried in the moly roaster (ferrotungsten)");
 			case GALENA -> List.of("a furnace (lead ingot)");
-			case SPHALERITE -> List.of("a furnace (zinc ingot)");
+			case SPHALERITE -> List.of("a furnace (zinc ingot, which with an animal fat makes zinc stearate for the fuel pellet press)");
 			case ACANTHITE -> List.of("a furnace (silver ingot)");
 			case PHOSPHATE -> List.of("the phosphate mill (phosphoric acid, TSP and DAP fertilizer; uranium from the acid)");
 			case SYLVITE -> List.of("the potash dissolver (muriate of potash fertilizer)");

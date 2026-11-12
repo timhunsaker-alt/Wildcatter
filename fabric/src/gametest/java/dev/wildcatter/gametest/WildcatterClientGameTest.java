@@ -214,6 +214,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("nickelSmelter")) {
 				new NickelClientScenes(context, server, y, up, -11400).smelter();
 			}
+			if (only("fuelInspection")) {
+				new NickelClientScenes(context, server, y, up, -11600).fuelInspection();
+			}
 			if (only("guyWire")) {
 				new GridClientScenes(context, server, y, up, -10400).guyWire();
 			}

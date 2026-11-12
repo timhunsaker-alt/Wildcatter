@@ -26,7 +26,10 @@ import org.jspecify.annotations.Nullable;
  */
 public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelStage, HopperFed, WaterUser {
 	private static final double WATER_HOLD = 200.0;
-	private final NonNullList<ItemStack> slots = NonNullList.withSize(3, ItemStack.EMPTY);
+	private static final int SCRAP_OUT = 3;   // 19c1: the press's and the grinder's scrap cans, for a hopper under them
+	private final NonNullList<ItemStack> slots = NonNullList.withSize(4, ItemStack.EMPTY);
+	private final ScrapCans scrap = new ScrapCans();
+	private double lubricant;  // the press's zinc stearate, kg in its feeder
 	private double u;          // kg of U held for the next stage
 	private boolean loaded;    // the autoclave's 30B
 	private double uf6;        // kg left in it
@@ -105,8 +108,13 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 		return switch (kind()) {
 			case "uf6_autoclave" -> slot == 0 && stack.is(WildcatterItems.LEU_CYLINDER_30B);
 			case "rod_loader" -> slot == 0 && stack.is(WildcatterItems.ZIRCALOY_TUBE) || slot == 1 && stack.is(WildcatterItems.STEEL_INGOT);
+			case "pellet_press" -> slot == 0 && stack.is(WildcatterItems.ZINC_STEARATE);
 			default -> false;
 		};
+	}
+
+	private boolean scrapping() {
+		return kind().equals("pellet_press") || kind().equals("pellet_grinder");
 	}
 
 	@Override
@@ -114,6 +122,8 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 		return switch (kind()) {
 			case "uf6_autoclave" -> side == Direction.UP ? new int[] {0} : side == Direction.DOWN ? new int[] {1, 2} : new int[0];
 			case "rod_loader" -> side == Direction.UP ? new int[] {0, 1} : new int[0];
+			case "pellet_press" -> side == Direction.UP ? new int[] {0} : side == Direction.DOWN ? new int[] {SCRAP_OUT} : new int[0];
+			case "pellet_grinder" -> side == Direction.DOWN ? new int[] {SCRAP_OUT} : new int[0];
 			default -> new int[0];
 		};
 	}
@@ -130,7 +140,7 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 
 	@Override
 	public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
-		return kind().equals("uf6_autoclave") && slot > 0 && side == Direction.DOWN;
+		return kind().equals("uf6_autoclave") && slot > 0 && slot < SCRAP_OUT && side == Direction.DOWN || scrapping() && slot == SCRAP_OUT && side == Direction.DOWN;
 	}
 
 	@Override
@@ -186,8 +196,38 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 				water = Math.max(0, water - got * Fuel.waterPerU());
 				hf += got * Fuel.hfPerU();
 			}
-			case "granulator" -> pass(level, up(level, "idr_kiln"), "IDR KILN", Double.MAX_VALUE, "granulating the powder");
-			case "pellet_press" -> pass(level, up(level, "granulator"), "GRANULATOR", Double.MAX_VALUE, "pressing green pellets");
+			case "granulator" -> {
+				double got = pass(level, up(level, "idr_kiln"), "IDR KILN", Double.MAX_VALUE, "granulating the powder");
+				// 19c1: the scrap oxidizer's U3O8 blended in, at most a tenth of the feed: the pore former
+				ScrapOxidizerBlockEntity oxidizer = Touching.find(level, worldPosition, ScrapOxidizerBlockEntity.class, o -> true);
+				if (oxidizer != null && got > 0 && oxidizer.oxideU() > 0) {
+					double a = oxidizer.assay();
+					double ox = oxidizer.takeOxide(Math.min(got * Tuning.SCRAP_SHARE_MAX / (1 - Tuning.SCRAP_SHARE_MAX), room()));
+					assay = FuelStage.blend(u, assay, ox, a);
+					u += ox;
+					unit += String.format("; %.1f kg/h of recycled U3O8 blended in", ox / seconds() * 3600);
+				}
+			}
+			case "pellet_press" -> {
+				double before = u;
+				pass(level, up(level, "granulator"), "GRANULATOR", Double.MAX_VALUE, "pressing green pellets");
+				double pressed = u - before;
+				// 19c1: zinc stearate, 2.5 g a kg of UO2; without it, with the line defects rule, a tenth of the green pellets crack
+				double need = pressed / Tuning.U_IN_UO2 * Tuning.ZINC_STEARATE_G_PER_KG_UO2 / 1000;
+				if (lubricant < need && !slots.get(0).isEmpty()) {
+					slots.get(0).shrink(1);
+					lubricant += Tuning.ZINC_STEARATE_SACK_KG;
+				}
+				if (lubricant >= need) {
+					lubricant -= need;
+				} else if (dev.wildcatter.Rules.fuelLineDefects()) {
+					double cracked = pressed * Tuning.CRACKED_WITHOUT_LUBRICANT;
+					u -= cracked;
+					scrap.add(cracked, assay);
+					unit = "NO LUBRICANT: put zinc stearate in a hopper on its top; " + Math.round(Tuning.CRACKED_WITHOUT_LUBRICANT * 100) + " % of its green pellets crack to scrap; " + unit;
+				}
+				scrap.emit(slots, SCRAP_OUT);
+			}
 			case "sintering_furnace" -> {
 				double want = Tuning.SINTER_H2_M3H / 3600 * seconds();
 				double h2 = Lines.available(level, hydrogen(), Product.HYDROGEN, Pull.MACHINE, this);
@@ -205,7 +245,12 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 				pass(level, up(level, "sintering_furnace"), "SINTERING FURNACE", Double.MAX_VALUE, "grinding to " + Tuning.PELLET_DIAMETER_MM + " mm");
 				double ground = u - before;
 				u -= ground * Tuning.GRIND_SWARF;
-				swarf += ground * Tuning.GRIND_SWARF;
+				if (dev.wildcatter.Rules.fuelLineDefects()) {   // 19c1: the swarf goes out in scrap cans for the oxidizer
+					scrap.add(ground * Tuning.GRIND_SWARF, assay);
+					scrap.emit(slots, SCRAP_OUT);
+				} else {
+					swarf += ground * Tuning.GRIND_SWARF;
+				}
 			}
 			case "rod_loader" -> load(level);
 			default -> {
@@ -276,6 +321,11 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 				uf6 / Tuning.CYLINDER_30B_KG * 100);
 	}
 
+	/** For the game test: kg of U cracked or ground to scrap here (19c1). */
+	public double scrapTotal() {
+		return scrap.total();
+	}
+
 	/** For the game test: the 30B in the autoclave with only {@code kg} left. */
 	public void setUf6ForTest(double kg) {
 		loaded = true;
@@ -284,7 +334,10 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 	}
 
 	private void load(Level level) {
-		FuelStage up = up(level, "pellet_grinder");
+		FuelStage up = Touching.find(level, worldPosition, PelletInspectionBlockEntity.class, i -> true);   // 19c1: inspected pellets first
+		if (up == null) {
+			up = up(level, "pellet_grinder");
+		}
 		if (up == null) {
 			unit = "NOT BUILT: set it against the PELLET GRINDER";
 			return;
@@ -335,9 +388,11 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 			case "uf6_autoclave" -> "UF6 autoclave: " + unit;
 			case "idr_kiln" -> String.format("IDR kiln: %s; water %.0f/%.0f L; HF %.0f kg to the scrubber", unit, water, WATER_HOLD, hf);
 			case "granulator" -> "Granulator: " + unit;
-			case "pellet_press" -> "Pellet press: " + unit;
+			case "pellet_press" -> String.format("Pellet press: %s; zinc stearate %.2f kg in its feeder, %d sacks; scrap %.2f kg of U cracked, %d cans", unit, lubricant,
+					slots.get(0).getCount(), scrap.total(), slots.get(SCRAP_OUT).getCount());
 			case "sintering_furnace" -> "Sintering furnace (pusher): " + unit;
-			case "pellet_grinder" -> String.format("Pellet grinder (centreless): %s; swarf %.1f kg of U", unit, swarf);
+			case "pellet_grinder" -> String.format("Pellet grinder (centreless): %s; swarf %.1f kg of U%s", unit, swarf + scrap.total(),
+					scrap.total() > 0 ? String.format(" (%d scrap cans)", slots.get(SCRAP_OUT).getCount()) : "");
 			case "rod_loader" -> String.format("Rod loader: %s; tubes %d, steel %.1f kg", unit, slots.get(0).getCount(), steel);
 			default -> kind();
 		};
@@ -359,6 +414,8 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 		output.putInt("rods", rods);
 		output.putDouble("hf", hf);
 		output.putDouble("swarf", swarf);
+		output.putDouble("lubricant", lubricant);
+		scrap.save(output, "scrap");
 	}
 
 	@Override
@@ -377,5 +434,7 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 		rods = input.getIntOr("rods", 0);
 		hf = input.getDoubleOr("hf", 0);
 		swarf = input.getDoubleOr("swarf", 0);
+		lubricant = input.getDoubleOr("lubricant", 0);
+		scrap.load(input, "scrap");
 	}
 }

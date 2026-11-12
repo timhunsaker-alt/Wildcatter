@@ -634,5 +634,10 @@
   "item.wildcatter.nickel_chromium_ingot": "Nickel-Chromium Alloy Ingot",
   "block.wildcatter.induction_furnace": "Induction Furnace (2 t, 1.5 MW)",
   "block.wildcatter.aod_converter": "AOD Converter",
-  "block.wildcatter.ingot_caster": "Ingot Caster (bottom-poured)"
+  "block.wildcatter.ingot_caster": "Ingot Caster (bottom-poured)",
+  "item.wildcatter.zinc_stearate": "Sack of Zinc Stearate",
+  "item.wildcatter.uo2_scrap_can": "Can of UO2 Scrap",
+  "block.wildcatter.pellet_inspection": "Pellet Inspection Bench",
+  "block.wildcatter.rod_inspection": "Rod Inspection (X-ray, Helium Leak, Gamma Scan)",
+  "block.wildcatter.scrap_oxidizer": "Scrap Oxidizer"
 }

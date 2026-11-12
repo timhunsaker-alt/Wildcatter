@@ -320,7 +320,8 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 		if (!rcca && dev.wildcatter.item.FuelAssemblyTags.inspected(stack) && dev.wildcatter.item.FuelAssemblyTags.bent(stack)) {
 			return "Reactor vessel: its inspection found a bent grid: straighten it at the assembly fixture first";
 		}
-		boolean ok = rcca ? reactor.loadRcca() : reactor.loadAssembly(0, dev.wildcatter.WildcatterComponents.assay(stack), dev.wildcatter.item.FuelAssemblyTags.bent(stack));
+		boolean ok = rcca ? reactor.loadRcca() : reactor.loadAssembly(0, dev.wildcatter.WildcatterComponents.assay(stack), dev.wildcatter.item.FuelAssemblyTags.bent(stack),
+				level != null && dev.wildcatter.item.FuelAssemblyTags.rollLeak(stack, level.getRandom()));
 		if (!ok) {
 			return rcca ? "Reactor vessel: all 5 RCCAs are in" : "Reactor vessel: the core is full (9 assemblies)";
 		}

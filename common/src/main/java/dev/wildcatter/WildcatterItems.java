@@ -250,6 +250,13 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> NICKEL_CHROMIUM_INGOT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("nickel_chromium_ingot"));
 	public static final Item NICKEL_CHROMIUM_INGOT = new dev.wildcatter.item.LabelledItem(new Item.Properties().setId(NICKEL_CHROMIUM_INGOT_KEY),
 			String.format("A %.0f kg ingot of nickel-chromium alloy, Alloy 600 type (72 %% Ni, 15.5 %% Cr)", Tuning.ALLOY_INGOT_KG), "for the fuel assembly's end grids, springs and plugs");
+	// Phase 19c1: fuel fabrication's lubricant and scrap
+	public static final ResourceKey<Item> ZINC_STEARATE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("zinc_stearate"));
+	public static final Item ZINC_STEARATE = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(ZINC_STEARATE_KEY),
+			String.format("A %.0f kg sack of zinc stearate, the pellet press's die lubricant", Tuning.ZINC_STEARATE_SACK_KG), "about 30 hours of the fuel line's pellets");
+	public static final ResourceKey<Item> UO2_SCRAP_CAN_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("uo2_scrap_can"));
+	public static final Item UO2_SCRAP_CAN = new dev.wildcatter.item.AssayedItem(new Item.Properties().stacksTo(16).setId(UO2_SCRAP_CAN_KEY),
+			String.format("A can of dry UO2 scrap (cracked pellets, swarf, rejects): %.0f kg of uranium, for the scrap oxidizer", Tuning.SCRAP_CAN_KG_U));
 	// 10c1: blueprints (docs/blueprints.md)
 	public static final ResourceKey<Item> BLUEPRINT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("blueprint"));
 	public static final Item BLUEPRINT = new dev.wildcatter.item.BlueprintItem(new Item.Properties().stacksTo(1).setId(BLUEPRINT_KEY));
@@ -481,6 +488,8 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, STAINLESS_304_INGOT_KEY, STAINLESS_304_INGOT);
 		Registry.register(BuiltInRegistries.ITEM, STAINLESS_316_INGOT_KEY, STAINLESS_316_INGOT);
 		Registry.register(BuiltInRegistries.ITEM, NICKEL_CHROMIUM_INGOT_KEY, NICKEL_CHROMIUM_INGOT);
+		Registry.register(BuiltInRegistries.ITEM, ZINC_STEARATE_KEY, ZINC_STEARATE);
+		Registry.register(BuiltInRegistries.ITEM, UO2_SCRAP_CAN_KEY, UO2_SCRAP_CAN);
 		Registry.register(BuiltInRegistries.ITEM, TSP_BAG_KEY, TSP_BAG);
 		Registry.register(BuiltInRegistries.ITEM, DAP_BAG_KEY, DAP_BAG);
 		Registry.register(BuiltInRegistries.ITEM, MOP_BAG_KEY, MOP_BAG);

@@ -27,6 +27,15 @@
   finishing) it kept reloading the chunks as fast as they unloaded, which could stall the tick and run the server out of memory.
   Circuits that are loaded solve exactly as before.
 
+### 19c1 (fuel fabrication: inspection, scrap and lubricant; built 2026-11-12 while Tim was away; not approved)
+- **Pellet inspection bench** between the grinder and the rod loader (1 % of pellets rejected) and **rod inspection line** between the
+  welder and the fixture (X-ray, helium leak test, gamma scan; one rod in 200 rejected); rejects go out as **cans of UO2 scrap**.
+- **Scrap oxidizer** against the granulator: scrap cans to U3O8, blended into the granulator's powder (up to a tenth).
+- **Zinc stearate** (a zinc ingot and an animal fat, `c:animal_fats`; rotten flesh stands in) for the pellet press.
+- New world rule **`fuelLineDefects`** (on in new worlds, off in existing ones): without zinc stearate the press reads NO LUBRICANT and
+  a tenth of its pellets crack to scrap; the grinder's swarf goes out in cans; an assembly made without the inspection parts carries a
+  leak chance (0.5 % each), rolled when it is loaded into a core. Field Manual: FUEL INSPECTION AND SCRAP.
+
 ### 17b2 (the alloy melt shop, built 2026-11-12 while Tim was away; not approved)
 - **Induction furnace** (2 t, 1.5 MW at 4.16 kV or 3.3 kV, PF 0.95): melts a heat of the grade set by sneak-click (304, 316 or the
   nickel-chromium alloy) from bags of HC ferrochrome, cathode nickel, HC ferromanganese and ferromolybdenum and iron ingots by hopper.

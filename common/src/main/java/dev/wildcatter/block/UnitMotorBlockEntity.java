@@ -105,6 +105,9 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "rod_loader" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ROD_LOADER_WATTS);
 				case "rod_welder" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ROD_WELDER_WATTS);
 				case "assembly_fixture" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ASSEMBLY_FIXTURE_WATTS);
+				case "pellet_inspection" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PELLET_INSPECTION_WATTS);
+				case "rod_inspection" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ROD_INSPECTION_WATTS);
+				case "scrap_oxidizer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.SCRAP_OXIDIZER_WATTS);
 				case "helium_recovery_unit" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.HELIUM_UNIT_WATTS);
 				case "crdm_head" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CRDM_WATTS);
 				case "pressurizer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PZR_HEATER_WATTS);
@@ -253,6 +256,9 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "rod_loader" -> "loader";
 			case "rod_welder" -> "welding sets";
 			case "assembly_fixture" -> "fixture drives";
+			case "pellet_inspection" -> "conveyor, gauges and cameras";
+			case "rod_inspection" -> "X-ray set, vacuum pumps and scanner";
+			case "scrap_oxidizer" -> "furnace heaters and fan";
 			case "helium_recovery_unit" -> "cold box compressors";
 			case "crdm_head" -> "rod drive power";
 			case "pressurizer" -> "heaters";

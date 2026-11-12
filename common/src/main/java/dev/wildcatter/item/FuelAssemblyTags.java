@@ -54,6 +54,21 @@ public final class FuelAssemblyTags {
 		}
 	}
 
+	/** 19c1: the chance it carries a leaking rod, made without the line's inspection parts (0 when inspected or made before 19c1). */
+	public static double leakChance(ItemStack stack) {
+		return tag(stack).getDoubleOr("leakChance", 0.0);
+	}
+
+	public static void setLeakChance(ItemStack stack, double chance) {
+		CustomData.update(DataComponents.CUSTOM_DATA, stack, t -> t.putDouble("leakChance", chance));
+	}
+
+	/** Loaded into a core: whether its uninspected manufacture left it a leaking rod (its one roll). */
+	public static boolean rollLeak(ItemStack stack, RandomSource random) {
+		double c = leakChance(stack);
+		return c > 0 && random.nextDouble() < c;
+	}
+
 	public static void markInspected(ItemStack stack) {
 		put(stack, "inspected", true);
 	}

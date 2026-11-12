@@ -90,13 +90,16 @@ final class NickelScenes {
 		return n;
 	}
 
-	/** Lays {@code id} along the straight legs between the points (x, z) at y U. */
+	/** Lays {@code id} along the straight legs between the points (x, z) at y U (480 V cable sized to 500 kcmil). */
 	static void run(GameTestHelper helper, String id, int[]... points) {
 		for (int i = 0; i + 1 < points.length; i++) {
 			int[] a = points[i], b = points[i + 1];
 			int dx = Integer.signum(b[0] - a[0]), dz = Integer.signum(b[1] - a[1]);
 			for (int x = a[0], z = a[1]; ; x += dx, z += dz) {
 				put(helper, id, x, U, z);
+				if (id.equals("cable_industrial") && helper.getLevel().getBlockEntity(abs(helper, x, U, z)) instanceof dev.wildcatter.block.MultiCableBlockEntity cable) {
+					cable.setSize(dev.wildcatter.energy.ConductorSize.KCMIL_500);   // 500 kcmil, 380 A: the default 2 AWG would burn on a line of motors
+				}
 				if (x == b[0] && z == b[1]) {
 					break;
 				}

@@ -39,7 +39,9 @@ public final class Rules {
 		/** 15b2 and the washout: a deep field kicks under light mud and needs a BOP (NO BOP); unsaturated mud washes out in rock salt. */
 		WELL_CONTROL("wellControl", true, "kicks, NO BOP into a deep field, blowouts, and washouts in rock salt"),
 		/** Plant residence times as real holds: coking 18 h, digestion 1 h, precipitation 36 h. Off even in new worlds. */
-		REAL_RESIDENCE_TIMES("realResidenceTimes", false, "coking 18 h, digestion 1 h and precipitation 36 h as real holds");
+		REAL_RESIDENCE_TIMES("realResidenceTimes", false, "coking 18 h, digestion 1 h and precipitation 36 h as real holds"),
+		/** 19c1: green pellets crack without zinc stearate, scrap comes out in cans, uninspected assemblies may carry a leaking rod. */
+		FUEL_LINE_DEFECTS("fuelLineDefects", true, "pellets crack without zinc stearate, scrap comes out in cans, uninspected assemblies may leak");
 
 		public final String key;
 		public final boolean newWorld;
@@ -166,6 +168,10 @@ public final class Rules {
 
 	public static boolean realResidenceTimes() {
 		return on(Rule.REAL_RESIDENCE_TIMES);
+	}
+
+	public static boolean fuelLineDefects() {
+		return on(Rule.FUEL_LINE_DEFECTS);
 	}
 
 	/** How much the reactor's heat-up below no-load temperature is sped up: 80, or with {@code reactorRealHeatup} the world's

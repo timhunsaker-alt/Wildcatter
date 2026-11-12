@@ -132,4 +132,27 @@ final class NickelClientScenes {
 		show(34, 0, 7, tp(42, 7, 14, 135, 30), "wildcatter-nickel-melt-shop");
 		System.out.println("[wildcatter-test] nickelSmelter ok: " + furnace);
 	}
+
+	// ---- 19c: the fuel line's inspection parts (run alone with WILDCATTER_ONLY=fuelInspection) ---------------------------------------
+	void fuelInspection() {
+		Direction north = Direction.NORTH;
+		server.runCommand("effect give @p minecraft:slow_falling 600 0 true");
+		server.runCommand(tp(12, 8, 30, 135, 30));
+		context.waitTicks(20);
+		clear(-6, -4, 20, 44, 10);
+		place(WildcatterBlocks.GRANULATOR, 0, 0, north);                    // z 0-3
+		place(WildcatterBlocks.SCRAP_OXIDIZER, 3, 0, north);                // x 3-4, z 0-3
+		place(WildcatterBlocks.PELLET_GRINDER, 0, 6, north);                // z 6-9
+		place(WildcatterBlocks.PELLET_INSPECTION, 0, 10, north);            // x 0-1, z 10-13
+		place(WildcatterBlocks.ROD_LOADER, 0, 14, north);                   // z 14-23
+		place(WildcatterBlocks.ROD_WELDER, 0, 24, north);                   // z 24-29
+		place(WildcatterBlocks.ROD_INSPECTION, 0, 30, north);               // z 30-39
+		context.waitTicks(40);
+		String bench = read(0, 0, 10);
+		check(bench.contains("Pellet inspection"), "the bench should read: " + bench);
+		show(0, 0, 10, tp(6, 4, 15, 125, 25), "wildcatter-fuel-pellet-inspection");
+		show(0, 0, 30, tp(7, 5, 42, 140, 30), "wildcatter-fuel-rod-inspection");
+		show(3, 0, 0, tp(8, 4, -3, 45, 30), "wildcatter-fuel-scrap-oxidizer");
+		System.out.println("[wildcatter-test] fuelInspection ok: " + bench);
+	}
 }

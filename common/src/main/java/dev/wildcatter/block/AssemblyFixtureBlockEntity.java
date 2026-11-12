@@ -124,9 +124,13 @@ public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements 
 			}
 			return;
 		}
-		RodWelderBlockEntity welder = Touching.find(level, worldPosition, RodWelderBlockEntity.class, w -> true);
+		// 19c1: its rods from the rod inspection line when one stands between it and the welder
+		RodSource welder = Touching.find(level, worldPosition, RodInspectionBlockEntity.class, w -> true);
 		if (welder == null) {
-			unit = "NOT BUILT: set it against the ROD WELDER";
+			welder = Touching.find(level, worldPosition, RodWelderBlockEntity.class, w -> true);
+		}
+		if (welder == null) {
+			unit = "NOT BUILT: set it against the ROD WELDER (or the rod inspection line)";
 			return;
 		}
 		if (!slots.get(OUT).isEmpty()) {
@@ -163,7 +167,12 @@ public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements 
 			rods++;
 		}
 		if (rods >= Tuning.ASSEMBLY_RODS) {
-			slots.set(OUT, dev.wildcatter.WildcatterComponents.withAssay(new ItemStack(WildcatterBlocks.FUEL_ASSEMBLY), assay));
+			ItemStack made = dev.wildcatter.WildcatterComponents.withAssay(new ItemStack(WildcatterBlocks.FUEL_ASSEMBLY), assay);
+			double leak = leakChance(level, welder);
+			if (leak > 0) {
+				dev.wildcatter.item.FuelAssemblyTags.setLeakChance(made, leak);
+			}
+			slots.set(OUT, made);
 			skeleton = false;
 			rods = 0;
 			built++;
@@ -171,6 +180,29 @@ public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements 
 			return;
 		}
 		unit = String.format("pulling rods into the skeleton: %d of %d", rods, Tuning.ASSEMBLY_RODS);
+	}
+
+	/**
+	 * 19c1, with the fuel line defects rule: the chance the assembly carries a leaking rod, 0.5 % for each inspection part missing from
+	 * its line: the rod inspection line before it, the pellet inspection bench before the rod loader.
+	 */
+	private static double leakChance(Level level, RodSource source) {
+		if (!dev.wildcatter.Rules.fuelLineDefects()) {
+			return 0;
+		}
+		int missing = 0;
+		RodWelderBlockEntity welder;
+		if (source instanceof RodInspectionBlockEntity inspection) {
+			welder = Touching.find(level, inspection.getBlockPos(), RodWelderBlockEntity.class, w -> true);
+		} else {
+			missing++;
+			welder = source instanceof RodWelderBlockEntity w ? w : null;
+		}
+		FuelLineBlockEntity loader = welder == null ? null : Touching.find(level, welder.getBlockPos(), FuelLineBlockEntity.class, f -> f.kind().equals("rod_loader"));
+		if (loader == null || Touching.find(level, loader.getBlockPos(), PelletInspectionBlockEntity.class, i -> true) == null) {
+			missing++;
+		}
+		return missing * Tuning.LEAK_CHANCE_PER_MISSING_INSPECTION;
 	}
 
 	@Override

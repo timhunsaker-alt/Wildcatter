@@ -45,7 +45,7 @@ public class WildcatterJeiPlugin implements IModPlugin {
 		}
 		ingot(registration, "tin", "Smelted from cassiterite. The zirconium plant's VAR furnace alloys it into Zircaloy.");
 		ingot(registration, "lead", "Smelted from galena. No use yet.");
-		ingot(registration, "zinc", "Smelted from sphalerite. No use yet.");
+		ingot(registration, "zinc", "Smelted from sphalerite. With an animal fat (rotten flesh stands in), zinc stearate: the fuel pellet press's die lubricant.");
 		ingot(registration, "silver", "Smelted from acanthite. No use yet.");
 		registration.addItemStackInfo(new ItemStack(WildcatterItems.BESSEMER_MATTE_BAG), Component.literal("Bessemer matte (50 % Ni, 25 % Cu, 20 % S), "
 				+ "blown from the nickel electric furnace's matte in the Peirce-Smith converter and bagged at a bagging station against it. "

@@ -477,12 +477,17 @@ public final class Reactor {
 
 	/** Loads a fresh assembly of this assay (16c1), with or without a bent grid nobody found (19b); false when the core is full. */
 	public boolean loadAssembly(double gwd, double u235, boolean bentGrid) {
+		return loadAssembly(gwd, u235, bentGrid, false);
+	}
+
+	/** As above, with a rod that leaks from the start (19c1: made without inspection). */
+	public boolean loadAssembly(double gwd, double u235, boolean bentGrid, boolean leakingRod) {
 		if (assemblies >= Tuning.CORE_ASSEMBLIES) {
 			return false;
 		}
 		assay[assemblies] = u235;
 		bent[assemblies] = bentGrid;
-		leaking[assemblies] = false;
+		leaking[assemblies] = leakingRod;
 		burnup[assemblies++] = gwd;
 		return true;
 	}

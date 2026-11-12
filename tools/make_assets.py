@@ -3104,6 +3104,43 @@ lang.update({f"block.{ns}.induction_furnace": "Induction Furnace (2 t, 1.5 MW)",
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 save_json(f"{ROOT}/data/c/tags/item/ingots/stainless_steel.json", {"values": [f"{ns}:stainless_304_ingot", f"{ns}:stainless_316_ingot"]})
 
+# ---- Phase 19c1: fuel fabrication's inspection, scrap and lubricant (docs/multiblocks/fuel-fabrication-extensions.md) ----------------
+# blockstates, models, shapes and items from tools/models/fuel_extensions.py; the sack's and the can's icons are drawn here: placeholders.
+FUEL_X_PARTS = ("pellet_inspection", "rod_inspection", "scrap_oxidizer")
+for name in FUEL_X_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in FUEL_X_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("pellet_inspection", ["GOG", "SRS", "SSS"], {"G": "minecraft:glass_pane", "O": "minecraft:observer", "S": S_, "R": "minecraft:redstone"}, "pellet_inspection")
+shaped("rod_inspection", ["GOG", "SLS", "SSS"], {"G": "minecraft:glass_pane", "O": "minecraft:observer", "S": S_, "L": f"{ns}:lead_ingot"}, "rod_inspection")
+shaped("scrap_oxidizer", ["SBS", "SFS", "SSS"], {"S": S_, "B": "minecraft:bricks", "F": "minecraft:furnace"}, "scrap_oxidizer")
+# zinc stearate: a zinc ingot and an animal fat (c:animal_fats: rotten flesh stands in until a mod's tallow joins the tag)
+shapeless("zinc_stearate", [f"{ns}:zinc_ingot", "#c:animal_fats"], "zinc_stearate")
+save_json(f"{ROOT}/data/c/tags/item/animal_fats.json", {"replace": False, "values": ["minecraft:rotten_flesh"]})
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+def sack(img, d, colour):
+	d.rectangle([4, 4, 11, 14], fill=colour + (255,), outline=(90, 80, 60, 255))     # the paper sack
+	d.rectangle([5, 2, 10, 4], fill=tuple(c - 30 for c in colour) + (255,))           # its folded top
+	d.rectangle([6, 8, 9, 10], fill=(150, 150, 160, 255))                               # its label
+def can(img, d, colour):
+	d.rectangle([4, 3, 11, 14], fill=colour + (255,), outline=(60, 60, 60, 255))       # the steel can
+	d.rectangle([4, 3, 11, 5], fill=(110, 110, 110, 255))                               # its lid
+	d.rectangle([6, 8, 9, 11], fill=(230, 200, 40, 255))                                # its trefoil label
+for item, name, colour, draw in (("zinc_stearate", "Sack of Zinc Stearate", (232, 226, 210), sack), ("uo2_scrap_can", "Can of UO2 Scrap", (150, 156, 160), can)):
+	img = Image.new("RGBA", (16, 16))
+	draw(img, ImageDraw.Draw(img), colour)
+	os.makedirs(f"{ASSETS}/textures/item", exist_ok=True)
+	img.save(f"{ASSETS}/textures/item/{item}_placeholder.png")
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}_placeholder"}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.pellet_inspection": "Pellet Inspection Bench", f"block.{ns}.rod_inspection": "Rod Inspection (X-ray, Helium Leak, Gamma Scan)",
+	f"block.{ns}.scrap_oxidizer": "Scrap Oxidizer"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

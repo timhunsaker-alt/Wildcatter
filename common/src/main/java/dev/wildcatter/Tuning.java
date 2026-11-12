@@ -1598,4 +1598,22 @@ public final class Tuning {
 	/** The ingot caster: twenty 100 kg ingots a heat, bottom-poured in 10 minutes (proposed). */
 	public static final double ALLOY_INGOT_KG = 100.0;
 	public static final double CASTER_POUR_SECONDS = 600.0;
+
+	// ---- Phase 19c1: fuel fabrication's inspection, scrap and lubricant (docs/multiblocks/fuel-fabrication-extensions.md) -------------
+	/** Zinc stearate: 5 kg sacks; the granulator's press feed takes 2.5 g a kg of UO2; without it 10 % of the green pellets crack. */
+	public static final double ZINC_STEARATE_SACK_KG = 5.0;
+	public static final double ZINC_STEARATE_G_PER_KG_UO2 = 2.5;
+	public static final double CRACKED_WITHOUT_LUBRICANT = 0.10;
+	/** The pellet inspection bench (10 kW) rejects 1 % of pellets; the rod inspection line (25 kW) 0.5 % of rods. */
+	public static final double PELLET_INSPECTION_WATTS = 10_000.0;
+	public static final double PELLET_REJECT = 0.01;
+	public static final double ROD_INSPECTION_WATTS = 25_000.0;
+	public static final double ROD_REJECT = 0.005;
+	/** An assembly made without an inspection part: a 0.5 % chance of a leaking rod for each one missing (1 % with neither). */
+	public static final double LEAK_CHANCE_PER_MISSING_INSPECTION = 0.005;
+	/** The scrap oxidizer: 30 kW, about 5 kg of U an hour of scrap to U3O8 (proposed), at most 10 % of the granulator's feed. */
+	public static final double SCRAP_OXIDIZER_WATTS = 30_000.0;
+	public static final double SCRAP_OXIDIZER_U_KGH = 5.0;
+	public static final double SCRAP_SHARE_MAX = 0.10;
+	public static final double SCRAP_CAN_KG_U = 5.0;               // a can of scrap: 5 kg of U (proposed)
 }

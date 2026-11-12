@@ -524,7 +524,11 @@ does was a key in `config/wildcatter.properties`, off by default; since 2026-11-
   - not built: containment spray and fan coolers, the relief tank's cover gas and drain tank, a transfer cask vehicle, contamination
     spreading with water;
   - the screen recorder caught only the desktop, so the `reactorContainment` film is made from the scene's own frames.
-- **19c, fuel fabrication extensions** (planned, not built): `docs/multiblocks/fuel-fabrication-extensions.md`. 19c1 pellet inspection,
+- **19c1, inspection, scrap and lubricant** (BUILT 2026-11-12, branch `w-17b`; decisions `docs/questions/phase19c-fuel.md`): the pellet
+  inspection bench, the rod inspection line, the scrap oxidizer, zinc stearate and scrap cans; the leak chance of an uninspected line's
+  assemblies, rolled at loading into 19b's leakers. Behind the new world rule `fuelLineDefects` where it would change a built line.
+  NeoForge scene `fuel_quality`; client scene `fuelInspection`. Known gaps: the sack and can icons are `*_placeholder`.
+- **19c, fuel fabrication extensions** (19c1 built; 19c2 planned): `docs/multiblocks/fuel-fabrication-extensions.md`. 19c1 pellet inspection,
   rod X-ray and helium leak tests, scrap and the zinc stearate lubricant; 19c2 HF recovery to the conversion plant, IFBA and gadolinia
   burnable absorbers, real Inconel and stainless hardware (after 17b's nickel smelter). 19c1's leaking rods would feed 19b's coolant
   activity (19b reads leakers from bent grids already).

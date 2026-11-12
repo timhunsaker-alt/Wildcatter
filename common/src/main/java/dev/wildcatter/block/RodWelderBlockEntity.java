@@ -21,7 +21,7 @@ import org.jspecify.annotations.Nullable;
  * rod with helium at 2 MPa (0.4 L at STP) and TIG-welds its top plug and fill hole, then racks it, up to 264, for the assembly
  * fixture it touches. Helium cylinders come in by a hopper on top; the empties go out to a hopper under it.
  */
-public class RodWelderBlockEntity extends UnitMotorBlockEntity implements HopperFed {
+public class RodWelderBlockEntity extends UnitMotorBlockEntity implements HopperFed, RodSource {
 	private final NonNullList<ItemStack> slots = NonNullList.withSize(3, ItemStack.EMPTY);
 	private double helium;     // m3 left in the cylinder on the manifold
 	private boolean cylinder;
@@ -59,16 +59,19 @@ public class RodWelderBlockEntity extends UnitMotorBlockEntity implements Hopper
 		return slot == 0 && side == Direction.UP && takes(stack);
 	}
 
+	@Override
 	public int rack() {
 		return rack;
 	}
 
 	private double assay = Tuning.ASSAY_PRODUCT;   // 16c1: of the rods in its rack
 
+	@Override
 	public double rodAssay() {
 		return assay;
 	}
 
+	@Override
 	public boolean takeRod() {
 		if (rack <= 0) {
 			return false;

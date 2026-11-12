@@ -1464,6 +1464,9 @@ sized for a 40-pot line.
   use the mod's materials. The DEPA-TOPO second cycle is built (2026-11-10, branch `w-rules`; see "Tim's answers" below). Not built:
   the filter acid's uranium is not carried as an assay; fluorosilicic acid recovery; the hemihydrate process; potash by flotation;
   Farmings reading `c:fertilizers` (Farmings' side). See `docs/questions/phase18-phosphate.md`.
+- Phase 19c1 (fuel inspection and scrap): `zinc_stearate_placeholder` and `uo2_scrap_can_placeholder` (item icons) are drawn by script;
+  the three parts use the mod's materials. The `fuel` client scene still films the 7g line without the new parts (`fuel_quality` and
+  `fuelInspection` cover them).
 - Phase 17b2 (alloy melt shop): the `stainless_304_ingot`, `stainless_316_ingot` and `nickel_chromium_ingot` icons are script-drawn
   `*_placeholder`; the three parts use the mod's materials. No argon finish in the AOD, no Alloy 718 (no niobium), no casting losses.
 - Phase 17b1 (nickel smelter and refinery): the `bessemer_matte_bag` and `nickel_cathode_bag` icons are script-drawn `*_placeholder`
@@ -1981,6 +1984,19 @@ Plan: `docs/ideas-plan.md`. Branch `phase16`. Nothing changes what an existing w
 - **Ingot caster** (`IngotCasterBlockEntity`, 2 x 3 x 6): twenty 100 kg ingots in 10 minutes to a hopper under it.
 - Numbers in `fluid/MeltShop` (`MeltShopTest`, 4). Items `stainless_304_ingot`, `stainless_316_ingot`, `nickel_chromium_ingot`; JEI
   pages. Field Manual: ALLOY MELT SHOP. NeoForge scene `melt_shop`; client `nickelSmelter` screenshot of the melt shop.
+
+## Phase 19c1: fuel fabrication's inspection, scrap and lubricant (2026-11-12; built while Tim was away; decisions: `docs/questions/phase19c-fuel.md`)
+- **Pellet inspection** (`PelletInspectionBlockEntity`, a `FuelStage` between grinder and loader, 10 kW, 1 % to scrap), **rod inspection**
+  (`RodInspectionBlockEntity`, a `RodSource` between welder and fixture, 25 kW, every 200th rod to scrap), **scrap oxidizer**
+  (`ScrapOxidizerBlockEntity`, 30 kW, box north; cans by hopper, one assay at a time, 5 kg/h to U3O8 for the granulator, at most 10 %).
+  Models in `tools/models/fuel_extensions.py`.
+- `FuelLineBlockEntity`: the press takes zinc stearate (2.5 g a kg of UO2) and, with `fuelLineDefects`, cracks 10 % without it; press
+  and grinder scrap to cans (`ScrapCans`, a fourth slot for a hopper under them); the loader prefers a touching bench; the granulator
+  blends the oxidizer's U3O8. `AssemblyFixtureBlockEntity` takes a touching rod line first and writes the leak chance
+  (`FuelAssemblyTags.leakChance`), rolled by the vessel and the refuelling machine (`Reactor.loadAssembly(..., leakingRod)`).
+- World rule `fuelLineDefects` (`Rules`). Items `zinc_stearate`, `uo2_scrap_can`; tag `c:animal_fats` (rotten flesh). Field Manual:
+  FUEL INSPECTION AND SCRAP; WORLD RULES lists the rule. Zinc ingot's JEI page and sphalerite's uses name zinc stearate.
+- Tests: NeoForge `fuel_quality`; client `fuelInspection` (screenshots of the bench, the rod line and the oxidizer).
 
 ## Phase 18: phosphate (2026-11-10; built while Tim was away; decisions: `docs/questions/phase18-phosphate.md`)
 - **18a, fertilizer** (`docs/multiblocks/fertilizer.md`): **phosphate mill** (wet ball mill, 200 kW at 4.16 kV; rock by hopper, water,
