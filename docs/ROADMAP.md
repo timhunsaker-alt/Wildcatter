@@ -468,15 +468,18 @@ Spec: `docs/multiblocks/ferroalloys.md` ("As built"). Decisions for Tim: `docs/q
 - **Known gaps:** the seven bag icons are `*_placeholder`; chromium metal (needs 17c2's chromic oxide); no var controller; Tailings still
   uses its placeholder ferrosilicon (question 1).
 
-## Phase 17b — Nickel smelter, refinery and alloy melt shop — 17b1 BUILT 2026-11-12 (while Tim was away, on the DRAFT spec decided on recommendation; not approved)
+## Phase 17b — Nickel smelter, refinery and alloy melt shop — 17b1 and 17b2 BUILT 2026-11-12 (while Tim was away, on the DRAFT spec decided on recommendation; not approved)
 Spec: `docs/multiblocks/nickel-smelter.md` ("As built"). Decisions for Tim: `docs/questions/phase17b-nickel.md`. Branch `w-17b`.
 - **17b1, the smelter and refinery** (BUILT 2026-11-12): the fluid-bed roaster (2 t/h, 110 kW at MV, its SO2 to an acid plant), the
   six-in-line nickel electric furnace (1 MW on the 17a furnace transformer), the Peirce-Smith converter (250 kW blower, a 2-hour blow at
   the world's time scale, Bessemer matte in 1 t bags), the chlorine leach reactor, the purification circuit (kerosene first charge;
   copper ingots, cobalt counted) and the 18-cell tankhouse (12.3 kA, 63 V DC on a rectifier; 230 kg/h of cathode nickel in 1 t bags).
   No existing world changes. NeoForge scenes `nickel_smelter`, `nickel_refinery`; unit test `NickelTest`; client scene `nickelSmelter`.
-- **17b2, the alloy melt shop** (planned): induction furnace, AOD converter, ingot caster; 304, 316 and nickel-chromium alloy ingots.
-- **Known gaps:** the Bessemer matte and cathode nickel bag icons are `*_placeholder`; the nickel furnace runs at the transformer's PF
+- **17b2, the alloy melt shop** (BUILT 2026-11-12): the induction furnace (2 t heats, 1.5 MW at MV, PF 0.95), the AOD converter (PSA
+  oxygen and piped nitrogen, carbon to 0.05 %) and the ingot caster: 304, 316 and nickel-chromium alloy (Alloy 600 type) in 100 kg
+  ingots. NeoForge scene `melt_shop`; unit test `MeltShopTest`; the `nickelSmelter` client scene shows the melt shop.
+- **Known gaps:** the Bessemer matte and cathode nickel bag icons and the three ingot icons are `*_placeholder`; no argon (the AOD's
+  low-nitrogen finish) and no Alloy 718 (no niobium); the nickel furnace runs at the transformer's PF
   0.80 (question 4); copper refining, cobalt metal, precious metals, flash smelting and the Mond process are not built (the spec).
 
 ## Phase 18 — Phosphate — 18a BUILT, 18b first cycle BUILT 2026-11-10 (while Tim was away, on the DRAFT specs decided on recommendation; not approved)

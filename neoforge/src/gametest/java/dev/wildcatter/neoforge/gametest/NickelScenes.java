@@ -52,6 +52,9 @@ import net.minecraft.world.level.block.entity.HopperBlockEntity;
  * circuit (kerosene from a stand-in supply) and the tankhouse, a rectifier at its south end on a 1 MW gas set stepped up to 4.16 kV: the
  * tankhouse holds 12.3 kA at about 63 V and a bagging station fills a bag of cathode nickel a hook has brought near full; the rectifier
  * broken, NO DC, and the leach reads NO CHLORINE.</li>
+ * <li>{@code melt_shop} (17b2): the induction furnace on two 1 MW gas sets in parallel stepped up to 4.16 kV, a 304 heat's FeCr, nickel,
+ * FeMn and iron by hopper; the AOD converter with a PSA oxygen generator against it and nitrogen from a stand-in supply; the ingot caster
+ * against the AOD: twenty 304 ingots in the hopper under it.</li>
  * </ul>
  */
 final class NickelScenes {
@@ -65,6 +68,7 @@ final class NickelScenes {
 		Map<String, Consumer<GameTestHelper>> scenes = new LinkedHashMap<>();
 		scenes.put("nickel_smelter", NickelScenes::smelter);
 		scenes.put("nickel_refinery", NickelScenes::refinery);
+		scenes.put("melt_shop", NickelScenes::meltShop);
 		return scenes;
 	}
 
@@ -304,6 +308,73 @@ final class NickelScenes {
 							check(helper, read(helper, 0, U, 0).contains("NO CHLORINE"), "its chlorine not coming back, the leach should read NO CHLORINE: " + noDc);
 							helper.succeed();
 						});
+					});
+				});
+			});
+		});
+	}
+
+	// ---- melt_shop ----------------------------------------------------------------------------------------------------------------
+	static void meltShop(GameTestHelper helper) {
+		String scene = "melt_shop";
+		floor(helper, -14, -20, 26, 14);
+		place(helper, WildcatterBlocks.INDUCTION_FURNACE, 0, U, 0, NORTH);           // x 0-2, z 0-2, box (0, 0) west, MV
+		place(helper, WildcatterBlocks.AOD_CONVERTER, 0, U, 3, NORTH);               // x 0-2, z 3-5, box (0, 3) west, nitrogen east
+		place(helper, WildcatterBlocks.INGOT_CASTER, 0, U, 6, NORTH);                // x 0-1, z 6-11
+		place(helper, WildcatterBlocks.OXYGEN_GENERATOR, -3, U, 4, NORTH);           // x -3..-1, z 4-9, against the AOD's west side; box (-4, 4)
+		helper.getLevel().setBlock(abs(helper, 0, U - 1, 7), Blocks.HOPPER.defaultBlockState(), 3);   // under the caster
+		put(helper, "gas_line", 3, U, 4);
+		source(helper, 4, 4, Product.NITROGEN, 1.0);
+		// LV: a diesel set for the AOD and the oxygen generator
+		genset(helper, -6, U, -4);                                                   // 480 V at (-5, -4)
+		run(helper, "cable_industrial", new int[] {-5, -4}, new int[] {-5, 3}, new int[] {-1, 3});
+		put(helper, "cable_industrial", -4, U, 4);
+		// MV: two 1 MW gas sets in parallel, each stepped up to 4.16 kV, along x 20 and z -1 to the furnace's box
+		BlockPos setA = gasSet(helper, 14, -8);
+		place(helper, WildcatterBlocks.UNIT_SUBSTATION, 18, U, -8, Direction.SOUTH);  // 4.16 kV out at (19, -8)
+		BlockPos setB = gasSet(helper, 14, -16);
+		place(helper, WildcatterBlocks.UNIT_SUBSTATION, 18, U, -16, Direction.SOUTH); // 4.16 kV out at (19, -16)
+		run(helper, "cable_mv", new int[] {19, -16}, new int[] {20, -16}, new int[] {20, -1}, new int[] {-1, -1}, new int[] {-1, 0});
+		put(helper, "cable_mv", 19, U, -8);
+		dev.wildcatter.block.InductionFurnaceBlockEntity furnace = entity(helper, 0, U, 0, dev.wildcatter.block.InductionFurnaceBlockEntity.class);
+		dev.wildcatter.block.AodConverterBlockEntity aod = entity(helper, 0, U, 3, dev.wildcatter.block.AodConverterBlockEntity.class);
+		dev.wildcatter.block.IngotCasterBlockEntity caster = entity(helper, 0, U, 6, dev.wildcatter.block.IngotCasterBlockEntity.class);
+		start(helper, -6, U, -4, () -> { });
+		startGasSet(helper, setA);
+		helper.runAfterDelay(300, () -> startGasSet(helper, setB));
+		// the charge once both sets are on the bus: the furnace's 1.5 MW is more than one set carries
+		helper.runAfterDelay(700, () -> hopper(helper, 1, U + 3, 1, new ItemStack(WildcatterItems.FERROCHROME_BAG, 1), new ItemStack(WildcatterItems.NICKEL_CATHODE_BAG, 1),
+				new ItemStack(WildcatterItems.FERROMANGANESE_BAG, 1), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT, 13)));
+		helper.runAfterDelay(1100, () -> {
+			String chain = " | furnace " + read(helper, 0, U, 0) + " | set A " + read(helper, 14, U, -8) + " | set B " + read(helper, 14, U, -16);
+			log(scene, "melting:" + chain);
+			check(helper, furnace.melting(), "the hopper's 304 charge should be melting: " + chain);
+			double mw = furnace.load().watts() / 1e6;
+			check(helper, mw > 1.4 && mw < 1.6, "the induction furnace should draw about 1.5 MW: " + mw + chain);
+			furnace.testFinishMelt();
+			helper.runAfterDelay(300, () -> {
+				String blowing = " | aod " + read(helper, 0, U, 3) + " | oxygen " + read(helper, -3, U, 4) + " | furnace " + read(helper, 0, U, 0);
+				log(scene, "blowing:" + blowing);
+				check(helper, aod.o2Rate() > 40 && aod.n2Rate() > 10, "the AOD should blow oxygen and nitrogen: " + blowing);
+				check(helper, aod.carbonShare() > 0.0008, "the heat should still carry its ferrochrome's carbon: " + blowing);
+				aod.testNearlyDone();
+				helper.runAfterDelay(100, () -> {
+					String pouring = " | aod " + read(helper, 0, U, 3) + " | caster " + read(helper, 0, U, 6);
+					log(scene, "pouring:" + pouring);
+					check(helper, caster.pouring(), "the caster should take the finished heat: " + pouring);
+					caster.testFinishPour();
+					helper.runAfterDelay(240, () -> {   // the hopper under it takes an ingot every 8 ticks
+						HopperBlockEntity under = (HopperBlockEntity) helper.getLevel().getBlockEntity(abs(helper, 0, U - 1, 7));
+						int n = 0;
+						for (int i = 0; i < under.getContainerSize(); i++) {
+							if (under.getItem(i).is(WildcatterItems.STAINLESS_304_INGOT)) {
+								n += under.getItem(i).getCount();
+							}
+						}
+						String cast = " | caster " + read(helper, 0, U, 6);
+						log(scene, "ok: " + n + " ingots" + cast);
+						check(helper, n == 20, "twenty 304 ingots should be in the hopper under the caster: " + n + cast);
+						helper.succeed();
 					});
 				});
 			});

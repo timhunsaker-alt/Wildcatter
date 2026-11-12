@@ -27,6 +27,13 @@
   finishing) it kept reloading the chunks as fast as they unloaded, which could stall the tick and run the server out of memory.
   Circuits that are loaded solve exactly as before.
 
+### 17b2 (the alloy melt shop, built 2026-11-12 while Tim was away; not approved)
+- **Induction furnace** (2 t, 1.5 MW at 4.16 kV or 3.3 kV, PF 0.95): melts a heat of the grade set by sneak-click (304, 316 or the
+  nickel-chromium alloy) from bags of HC ferrochrome, cathode nickel, HC ferromanganese and ferromolybdenum and iron ingots by hopper.
+- **AOD converter:** blows the ferrochrome's carbon to 0.05 % with oxygen from PSA oxygen generators against it and piped nitrogen.
+- **Ingot caster:** twenty 100 kg ingots a heat to a hopper under it. New items: 304 and 316 stainless ingots (`c:ingots/stainless_steel`)
+  and nickel-chromium alloy ingots. Field Manual: ALLOY MELT SHOP.
+
 ### 17b1 (the nickel smelter and refinery, built 2026-11-12 while Tim was away; not approved)
 - **Nickel smelter:** the fluid-bed roaster takes nickel ore by hopper (or Tailings' concentrate carrying pentlandite) at 2 t/h, its SO2
   to an acid plant's converter (NO ACID PLANT otherwise); the six-in-line electric furnace on a 17a furnace transformer smelts the

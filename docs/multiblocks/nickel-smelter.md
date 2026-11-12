@@ -172,3 +172,14 @@ The grids are sketches; the game tests are the layout of record.
     broken: NO ACID PLANT) and `nickel_refinery` (12.3 kA at 63.0 V, 230 kg/h; a bag of cathode nickel; the rectifier broken: NO DC and
     the leach's NO CHLORINE). The blowers' MV comes from diesel and gas sets stepped up through unit substations (the 250 kW blower's
     start trips a 500 kW diesel set on frequency, so it is on a 1 MW gas set).
+### 17b2 (2026-11-12, branch `w-17b`)
+- Built as specified: the induction furnace (controller, 3 x 3 x 3, 1.5 MW at MV, PF 0.95, box west), the AOD converter (3 x 6 x 3,
+  30 kW, box west) and the ingot caster (2 x 3 x 6), each against the next (the scene runs them along z). The grade is set by sneak-click
+  on the furnace: 304, 316 or the nickel-chromium alloy. Items `stainless_304_ingot`, `stainless_316_ingot`, `nickel_chromium_ingot`.
+- **Differences:** 316 takes 260 kg of FeCr a tonne, not 304's 280 (question 14); the nickel-chromium alloy adds 40 kg of iron to make a
+  tonne (15); the AOD's nitrogen comes on its east face and its oxygen from PSA generators set against it; its gas numbers (17). The
+  caster needs no power (18). Numbers in `fluid/MeltShop` (`MeltShopTest`).
+- **Test:** `melt_shop`: a 304 heat by hopper melts at 1.50 MW; the AOD blows about 49 Nm3/h of oxygen and 16 of nitrogen; twenty 304
+  ingots reach the hopper under the caster. The furnace's melt, the AOD's blow and the caster's pour are shortened by hooks.
+- The fuel plant's hardware (fuel-fabrication-extensions.md, item 3) is built in 19c2.
+

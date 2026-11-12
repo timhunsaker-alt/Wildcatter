@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "I I",
+    "IBI",
+    "SSS"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "B": "minecraft:bricks",
+    "S": "wildcatter:steel_ingot"
+  },
+  "result": {
+    "id": "wildcatter:ingot_caster",
+    "count": 1
+  }
+}

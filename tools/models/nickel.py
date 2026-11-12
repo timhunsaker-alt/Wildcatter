@@ -168,8 +168,55 @@ NT.box((1.0, 2.0, 13.4), (1.6, 2.6, 14.0), "copper")                        # th
 NT.box((1.0, 0.3, 13.4), (1.6, 0.9, 14.0), "copper")                        # the - terminal
 NT.collide((0.0, 0.0, 0.0), (6.0, 2.6, 14.0))
 
+# ---- the induction furnace ------------------------------------------------------------------------------------------------------------
+IF = model("induction_furnace", 3, 3, 3, "blue")
+IF.box((0.0, 0.0, 0.0), (3.0, 0.4, 3.0), "concrete")
+IF.box((0.4, 0.4, 0.4), (2.6, 1.6, 2.6), "blue")                             # the furnace body: the yoke frame round the coil
+for y in (0.6, 0.9, 1.2):
+	IF.ring("y", (1.5, 1.5), 1.0, y, y + 0.12, 0.08, "copper", sides=16)     # the water-cooled copper coil turns, seen at its gaps
+IF.cylinder("y", (1.5, 1.5), 0.75, 1.6, 1.8, "dark", 16)                     # the crucible's lip, refractory
+IF.box((1.3, 1.6, 2.6), (1.7, 1.75, 3.0), "hipaint")                         # the pouring spout, south: to the AOD
+IF.box((0.2, 1.8, 0.2), (1.0, 2.9, 1.0), "galv")                             # the charge bucket and its hopper, over the crucible
+IF.box((0.0, 0.4, 0.0), (0.4, 1.6, 0.4), "grey")                             # the power cabinet's bus to the coil, west
+IF.box((0.0, 0.3, 0.6), (0.4, 1.1, 1.3), "grey")                             # its 4.16 kV box
+IF.decal((-0.01, 0.4, 0.7), (0.0, 0.9, 1.2), "arcflash", "west", "grey")
+IF.collide((0.0, 0.0, 0.0), (3.0, 1.8, 3.0))
+
+# ---- the AOD converter --------------------------------------------------------------------------------------------------------------------
+AD = model("aod_converter", 3, 6, 3, "iron")
+AD.box((0.0, 0.0, 0.0), (3.0, 0.3, 3.0), "concrete")
+for x in (0.2, 2.5):
+	AD.box((x, 0.3, 1.2), (x + 0.3, 2.4, 1.8), "blue")                       # the trunnion stands
+AD.cylinder("x", (2.2, 1.5), 0.25, 0.2, 2.8, "steel", 10)                    # the trunnion ring's pins
+AD.cylinder("y", (1.5, 1.5), 1.05, 0.6, 3.6, "iron", 16)                     # the vessel, magnesia-chrome lined
+AD.cylinder("y", (1.5, 1.5), 0.7, 3.6, 4.2, "iron", 14)                      # its cone
+AD.cylinder("y", (1.5, 1.5), 0.45, 4.2, 4.3, "dark", 12)                     # the mouth
+for z in (1.0, 1.5, 2.0):
+	AD.cylinder("x", (0.9, z), 0.06, 2.5, 2.9, "copper", 6)                  # the side tuyeres, east
+AD.pipe([(2.9, 0.9, 1.0), (2.9, 0.9, 2.0)], 3, "steel")                      # their gas manifold
+AD.pipe([(3.0, 0.5, 1.5), (2.9, 0.5, 1.5), (2.9, 0.9, 1.5)], 3, "steel")      # nitrogen in, east
+AD.box((0.5, 4.8, 0.5), (2.5, 5.4, 2.5), "galv")                             # the fume hood
+AD.cylinder("y", (2.2, 0.8), 0.3, 5.4, 6.0, "galv", 10)                      # its duct
+box480(AD, 0.4, 0.3)
+AD.collide((0.0, 0.0, 0.0), (3.0, 4.3, 3.0))
+
+# ---- the ingot caster ---------------------------------------------------------------------------------------------------------------------
+IC = model("ingot_caster", 2, 3, 6, "iron")
+IC.box((0.0, 0.0, 0.0), (2.0, 0.3, 6.0), "concrete")
+for x in (0.3, 1.7):
+	IC.box((x - 0.05, 0.3, 0.2), (x + 0.05, 0.4, 5.8), "steel")              # the car's rails
+IC.box((0.2, 0.4, 0.4), (1.8, 0.6, 5.6), "iron")                             # the mould car
+for k in range(10):
+	x = 0.55 if k % 2 == 0 else 1.45
+	z = 0.8 + (k // 2) * 1.0
+	IC.box((x - 0.25, 0.6, z - 0.25), (x + 0.25, 1.5, z + 0.25), "dark")    # a cast-iron ingot mould
+IC.cylinder("y", (1.0, 3.0), 0.12, 0.6, 1.9, "hipaint", 8)                   # the trumpet, bottom-pouring through the runners
+IC.box((0.7, 1.9, 2.7), (1.3, 2.1, 3.3), "hipaint")
+IC.box((0.0, 2.2, 0.2), (2.0, 2.4, 0.6), "steel")                            # the ladle's stand, north
+IC.collide((0.0, 0.0, 0.0), (2.0, 1.5, 6.0))
+
 
 M = FB
-EXTRA = [EF, PS, LR, PU, NT]
+EXTRA = [EF, PS, LR, PU, NT, IF, AD, IC]
 for extra in EXTRA:
 	extra.export_args = {"blockstate": True, "item": True}

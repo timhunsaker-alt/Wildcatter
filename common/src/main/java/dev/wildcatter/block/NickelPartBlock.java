@@ -32,7 +32,10 @@ public class NickelPartBlock extends BigPartBlock implements net.minecraft.world
 		PEIRCE_SMITH_CONVERTER("peirce_smith_converter", 5, 5, 10),
 		CHLORINE_LEACH_REACTOR("chlorine_leach_reactor", 3, 8, 3),
 		NI_PURIFICATION("ni_purification", 4, 4, 10),
-		NICKEL_TANKHOUSE("nickel_tankhouse", 6, 4, 14);
+		NICKEL_TANKHOUSE("nickel_tankhouse", 6, 4, 14),
+		INDUCTION_FURNACE("induction_furnace", 3, 3, 3),
+		AOD_CONVERTER("aod_converter", 3, 6, 3),
+		INGOT_CASTER("ingot_caster", 2, 3, 6);
 
 		private final String id;
 		public final int w, h, l;
@@ -69,6 +72,9 @@ public class NickelPartBlock extends BigPartBlock implements net.minecraft.world
 			case CHLORINE_LEACH_REACTOR -> new ChlorineLeachReactorBlockEntity(pos, state);
 			case NI_PURIFICATION -> new NiPurificationBlockEntity(pos, state);
 			case NICKEL_TANKHOUSE -> new NickelTankhouseBlockEntity(pos, state);
+			case INDUCTION_FURNACE -> new InductionFurnaceBlockEntity(pos, state);
+			case AOD_CONVERTER -> new AodConverterBlockEntity(pos, state);
+			case INGOT_CASTER -> new IngotCasterBlockEntity(pos, state);
 		};
 	}
 
@@ -78,6 +84,7 @@ public class NickelPartBlock extends BigPartBlock implements net.minecraft.world
 			return switch (part) {
 				case FLUID_BED_ROASTER -> createTickerHelper(type, WildcatterBlocks.FLUID_BED_ROASTER_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
 				case PEIRCE_SMITH_CONVERTER -> createTickerHelper(type, WildcatterBlocks.PEIRCE_SMITH_CONVERTER_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
+				case AOD_CONVERTER -> createTickerHelper(type, WildcatterBlocks.AOD_CONVERTER_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
 				default -> null;
 			};
 		}
@@ -88,6 +95,9 @@ public class NickelPartBlock extends BigPartBlock implements net.minecraft.world
 			case CHLORINE_LEACH_REACTOR -> createTickerHelper(type, WildcatterBlocks.CHLORINE_LEACH_REACTOR_ENTITY, UnitMotorBlockEntity::tick);
 			case NI_PURIFICATION -> createTickerHelper(type, WildcatterBlocks.NI_PURIFICATION_ENTITY, UnitMotorBlockEntity::tick);
 			case NICKEL_TANKHOUSE -> createTickerHelper(type, WildcatterBlocks.NICKEL_TANKHOUSE_ENTITY, NickelTankhouseBlockEntity::tick);
+			case INDUCTION_FURNACE -> createTickerHelper(type, WildcatterBlocks.INDUCTION_FURNACE_ENTITY, InductionFurnaceBlockEntity::tick);
+			case AOD_CONVERTER -> createTickerHelper(type, WildcatterBlocks.AOD_CONVERTER_ENTITY, UnitMotorBlockEntity::tick);
+			case INGOT_CASTER -> createTickerHelper(type, WildcatterBlocks.INGOT_CASTER_ENTITY, IngotCasterBlockEntity::tick);
 		};
 	}
 

@@ -79,3 +79,43 @@ Format as in `docs/questions/README.md`.
 ### 13. Placeholders
 - The two bulk bag icons (`bessemer_matte_bag_placeholder`, `nickel_cathode_bag_placeholder`) are the Ludo bulk bag with a swatch drawn
   by script (as 17a's). Listed in PROGRESS.md, Known gaps.
+
+## 17b2: the alloy melt shop
+
+### 14. 316's charge
+- **Decided on recommendation; for Tim.** 316 a tonne: 260 kg of HC FeCr, 120 of nickel, 20 of FeMn, 40 of FeMo, 560 of iron: 16.9 % Cr,
+  12 % Ni, 2.6 % Mo. The spec's "as 304 with more nickel and FeMo" kept 304's 280 kg of FeCr, which would give 18.2 % Cr, over 316's
+  16-18 %.
+- **Real counterpart:** ASTM A240 316: 16-18 % Cr, 10-14 % Ni, 2-3 % Mo.
+
+### 15. The nickel-chromium alloy's iron
+- **Decided on recommendation; for Tim.** 720 kg of nickel, 240 of FeCr and 40 of iron a tonne: about 72 % Ni, 15.6 % Cr and 9.8 % Fe (the
+  FeCr's own iron counted). The spec's charge (0.72 + 0.24 t) made only 0.96 t.
+- **Real counterpart:** Alloy 600 (UNS N06600): Ni 72 % min, Cr 14-17 %, Fe 6-10 %.
+
+### 16. The induction furnace is a constant-power load at 0.95; it melts by energy
+- **Decided on recommendation; for Tim.** 1.5 MW at MV, PF 0.95, in the phasor solver as the furnace transformer's load is (ramping 10 %
+  a second); a heat melts when 1.2 MWh (600 kWh a tonne) has gone in: 48 minutes at full power. It takes a heat only when its bins hold
+  all of the grade's charge, and holds a molten heat until the AOD is empty.
+- **Real counterpart:** medium-frequency coreless furnaces 500-700 kWh a tonne for stainless (textbook, unverified).
+
+### 17. The AOD's gas
+- **Decided on recommendation; for Tim.** Oxygen from PSA oxygen generators set against it (50 Nm3/h each; it blows up to 200 Nm3/h);
+  nitrogen off the pipe on the east face of its bottom cells at a third of the oxygen (the first stage's 3:1); 60 % of the oxygen burns
+  carbon to CO; it stops at 0.05 % carbon. A 304 heat's 42 kg of carbon takes about 64 Nm3 of oxygen: 1.3 hours on one generator.
+- **Real counterpart:** AOD blowing 1-2 Nm3 of gas a tonne a minute, O2:inert 3:1 to 1:3 in stages; oxygen efficiency for carbon
+  removal 40-80 % (textbook, unverified). Argon (the spec leaves it out) would need an air separation unit.
+
+### 18. Casting
+- **Decided on recommendation; for Tim.** The caster pours a heat in 10 minutes into twenty 100 kg ingots, stripped to a hopper under
+  it; it has no power of its own (the ladle is the shop crane's). No metal is lost from charge to ingot.
+- **Real counterpart:** bottom-pouring a small heat takes minutes; yield 95-98 % in practice (left out).
+
+### 19. The scene's power: two 1 MW gas sets in parallel
+- The furnace's 1.5 MW is more than any one set; the `melt_shop` scene runs two gas sets, each through a unit substation, onto one
+  4.16 kV run (they synchronise and share the load: 765 kW each). Not a decision about the game; noted for the record.
+
+### 20. Placeholders
+- The three ingot icons (`stainless_304_ingot_placeholder`, `stainless_316_ingot_placeholder`, `nickel_chromium_ingot_placeholder`) are
+  drawn by script. Listed in PROGRESS.md, Known gaps. 304 and 316 carry `c:ingots/stainless_steel`.
+

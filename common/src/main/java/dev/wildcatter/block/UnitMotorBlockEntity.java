@@ -164,6 +164,7 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "peirce_smith_converter" -> new Motor(true, Voltage.MEDIUM, Tuning.PS_BLOWER_WATTS);
 				case "chlorine_leach_reactor" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LEACH_WATTS);
 				case "ni_purification" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PURIFICATION_WATTS);
+				case "aod_converter" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.AOD_WATTS);
 				case "phosphate_mill" -> new Motor(true, Voltage.MEDIUM, Tuning.PHOSPHATE_MILL_WATTS);
 				case "phosphoric_reactor" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PHOSPHORIC_REACTOR_WATTS);
 				case "tilting_pan_filter" -> new Motor(true, Voltage.MEDIUM, Tuning.PAN_FILTER_WATTS);
@@ -311,6 +312,7 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "peirce_smith_converter" -> "air blower";
 			case "chlorine_leach_reactor" -> "agitator";
 			case "ni_purification" -> "mixer-settler drives and pumps";
+			case "aod_converter" -> "tilt drive and fume fan";
 			case "phosphate_mill" -> "mill motor";
 			case "phosphoric_reactor" -> "agitators";
 			case "tilting_pan_filter" -> "vacuum pump";

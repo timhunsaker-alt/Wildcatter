@@ -240,6 +240,16 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> NICKEL_CATHODE_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("nickel_cathode_bag"));
 	public static final Item NICKEL_CATHODE_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(NICKEL_CATHODE_BAG_KEY),
 			String.format("%,.0f kg of electrowon cathode nickel (99.9 %% Ni)", Tuning.BULK_BAG_KG), "for 304 and 316 stainless and the nickel-chromium alloy; the alloy melt shop (17b2)");
+	// Phase 17b2: the alloy melt shop's 100 kg ingots
+	public static final ResourceKey<Item> STAINLESS_304_INGOT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("stainless_304_ingot"));
+	public static final Item STAINLESS_304_INGOT = new dev.wildcatter.item.LabelledItem(new Item.Properties().setId(STAINLESS_304_INGOT_KEY),
+			String.format("A %.0f kg ingot of 304 stainless (18 %% Cr, 8 %% Ni)", Tuning.ALLOY_INGOT_KG), "for the fuel assembly's nozzles");
+	public static final ResourceKey<Item> STAINLESS_316_INGOT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("stainless_316_ingot"));
+	public static final Item STAINLESS_316_INGOT = new dev.wildcatter.item.LabelledItem(new Item.Properties().setId(STAINLESS_316_INGOT_KEY),
+			String.format("A %.0f kg ingot of 316 stainless (17 %% Cr, 12 %% Ni, 2.5 %% Mo)", Tuning.ALLOY_INGOT_KG), "for chloride and acid service");
+	public static final ResourceKey<Item> NICKEL_CHROMIUM_INGOT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("nickel_chromium_ingot"));
+	public static final Item NICKEL_CHROMIUM_INGOT = new dev.wildcatter.item.LabelledItem(new Item.Properties().setId(NICKEL_CHROMIUM_INGOT_KEY),
+			String.format("A %.0f kg ingot of nickel-chromium alloy, Alloy 600 type (72 %% Ni, 15.5 %% Cr)", Tuning.ALLOY_INGOT_KG), "for the fuel assembly's end grids, springs and plugs");
 	// 10c1: blueprints (docs/blueprints.md)
 	public static final ResourceKey<Item> BLUEPRINT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("blueprint"));
 	public static final Item BLUEPRINT = new dev.wildcatter.item.BlueprintItem(new Item.Properties().stacksTo(1).setId(BLUEPRINT_KEY));
@@ -468,6 +478,9 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, FERROTUNGSTEN_BAG_KEY, FERROTUNGSTEN_BAG);
 		Registry.register(BuiltInRegistries.ITEM, BESSEMER_MATTE_BAG_KEY, BESSEMER_MATTE_BAG);
 		Registry.register(BuiltInRegistries.ITEM, NICKEL_CATHODE_BAG_KEY, NICKEL_CATHODE_BAG);
+		Registry.register(BuiltInRegistries.ITEM, STAINLESS_304_INGOT_KEY, STAINLESS_304_INGOT);
+		Registry.register(BuiltInRegistries.ITEM, STAINLESS_316_INGOT_KEY, STAINLESS_316_INGOT);
+		Registry.register(BuiltInRegistries.ITEM, NICKEL_CHROMIUM_INGOT_KEY, NICKEL_CHROMIUM_INGOT);
 		Registry.register(BuiltInRegistries.ITEM, TSP_BAG_KEY, TSP_BAG);
 		Registry.register(BuiltInRegistries.ITEM, DAP_BAG_KEY, DAP_BAG);
 		Registry.register(BuiltInRegistries.ITEM, MOP_BAG_KEY, MOP_BAG);

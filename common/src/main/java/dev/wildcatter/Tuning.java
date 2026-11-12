@@ -1581,4 +1581,21 @@ public final class Tuning {
 	public static final double NI_CURRENT_EFFICIENCY = 0.95;
 	public static final double NI_G_PER_AH = 1.095;                  // Faraday: 58.69 g/mol over 2 x 26.8 Ah
 	public static final double NI_CATHODE_HOLD_KG = 3_000.0;         // cathode waiting for bags (proposed)
+
+	// ---- Phase 17b2: the alloy melt shop (docs/multiblocks/nickel-smelter.md; decisions in docs/questions/phase17b-nickel.md) ---------
+	/** The induction furnace: a 2 t coreless medium-frequency furnace, 1.5 MW at MV, PF 0.95 (its inverter's front end), 600 kWh a tonne. */
+	public static final double INDUCTION_WATTS = 1.5e6;
+	public static final double INDUCTION_POWER_FACTOR = 0.95;
+	public static final double INDUCTION_HEAT_KG = 2_000.0;
+	public static final double INDUCTION_KWH_PER_T = 600.0;        // (unverified)
+	/** The AOD: 30 kW at LV; oxygen through its side tuyeres at up to 200 Nm3/h, a third as much nitrogen; carbon down to 0.05 %. */
+	public static final double AOD_WATTS = 30_000.0;
+	public static final double AOD_MAX_O2_NM3H = 200.0;             // (proposed: about 1.7 Nm3 a tonne a minute)
+	public static final double AOD_N2_PER_O2 = 1.0 / 3;             // the blow's mean O2:N2, its first stage's 3:1 (proposed)
+	public static final double AOD_O2_EFFICIENCY = 0.6;             // of the oxygen, the share that burns carbon (proposed)
+	public static final double AOD_FINAL_CARBON = 0.0005;           // 0.05 %, under 304's 0.08 % (proposed)
+	public static final double FERROALLOY_CARBON = 0.07;            // HC ferrochrome's and HC ferromanganese's 7 % C (ferroalloys.md)
+	/** The ingot caster: twenty 100 kg ingots a heat, bottom-poured in 10 minutes (proposed). */
+	public static final double ALLOY_INGOT_KG = 100.0;
+	public static final double CASTER_POUR_SECONDS = 600.0;
 }

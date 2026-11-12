@@ -183,6 +183,9 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.ChlorineLeachReactorBlockEntity> CHLORINE_LEACH_REACTOR_ENTITY = entity(dev.wildcatter.block.ChlorineLeachReactorBlockEntity::new, CHLORINE_LEACH_REACTOR);
 	public static final BlockEntityType<dev.wildcatter.block.NiPurificationBlockEntity> NI_PURIFICATION_ENTITY = entity(dev.wildcatter.block.NiPurificationBlockEntity::new, NI_PURIFICATION);
 	public static final BlockEntityType<dev.wildcatter.block.NickelTankhouseBlockEntity> NICKEL_TANKHOUSE_ENTITY = entity(dev.wildcatter.block.NickelTankhouseBlockEntity::new, NICKEL_TANKHOUSE);
+	public static final BlockEntityType<dev.wildcatter.block.InductionFurnaceBlockEntity> INDUCTION_FURNACE_ENTITY = entity(dev.wildcatter.block.InductionFurnaceBlockEntity::new, INDUCTION_FURNACE);
+	public static final BlockEntityType<dev.wildcatter.block.AodConverterBlockEntity> AOD_CONVERTER_ENTITY = entity(dev.wildcatter.block.AodConverterBlockEntity::new, AOD_CONVERTER);
+	public static final BlockEntityType<dev.wildcatter.block.IngotCasterBlockEntity> INGOT_CASTER_ENTITY = entity(dev.wildcatter.block.IngotCasterBlockEntity::new, INGOT_CASTER);
 	public static final BlockEntityType<dev.wildcatter.block.TarStillBlockEntity> TAR_STILL_ENTITY = entity(dev.wildcatter.block.TarStillBlockEntity::new, TAR_STILL);
 	public static final BlockEntityType<dev.wildcatter.block.PastePlantBlockEntity> PASTE_PLANT_ENTITY = entity(dev.wildcatter.block.PastePlantBlockEntity::new, PASTE_PLANT);
 	public static final BlockEntityType<dev.wildcatter.block.FormingPressBlockEntity> FORMING_PRESS_ENTITY = entity(dev.wildcatter.block.FormingPressBlockEntity::new, FORMING_PRESS);
@@ -489,7 +492,8 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		for (Block part : new Block[] {FURNACE_TRANSFORMER, SUBMERGED_ARC_FURNACE, CAPACITOR_BANK, MOLY_ROASTER, ALUMINOTHERMIC_VESSEL}) {
 			add(((dev.wildcatter.block.FerroalloyPartBlock) part).part().id(), part);
 		}
-		for (Block part : new Block[] {FLUID_BED_ROASTER, NICKEL_ELECTRIC_FURNACE, PEIRCE_SMITH_CONVERTER, CHLORINE_LEACH_REACTOR, NI_PURIFICATION, NICKEL_TANKHOUSE}) {
+		for (Block part : new Block[] {FLUID_BED_ROASTER, NICKEL_ELECTRIC_FURNACE, PEIRCE_SMITH_CONVERTER, CHLORINE_LEACH_REACTOR, NI_PURIFICATION, NICKEL_TANKHOUSE,
+				INDUCTION_FURNACE, AOD_CONVERTER, INGOT_CASTER}) {
 			add(((dev.wildcatter.block.NickelPartBlock) part).part().id(), part);
 		}
 		for (Block part : new Block[] {PHOSPHATE_MILL, PHOSPHORIC_REACTOR, TILTING_PAN_FILTER, ACID_EVAPORATOR, GRANULATION_PLANT, POTASH_DISSOLVER, VACUUM_CRYSTALLIZER, POTASH_DRYER, ACID_PRETREATMENT, DEPA_TOPO_CIRCUIT}) {
@@ -737,6 +741,9 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("chlorine_leach_reactor"), CHLORINE_LEACH_REACTOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("ni_purification"), NI_PURIFICATION_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("nickel_tankhouse"), NICKEL_TANKHOUSE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("induction_furnace"), INDUCTION_FURNACE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("aod_converter"), AOD_CONVERTER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("ingot_caster"), INGOT_CASTER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("phosphate_mill"), PHOSPHATE_MILL_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("phosphoric_reactor"), PHOSPHORIC_REACTOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("tilting_pan_filter"), TILTING_PAN_FILTER_ENTITY);

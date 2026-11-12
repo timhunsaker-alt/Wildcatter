@@ -53,6 +53,11 @@ public class WildcatterJeiPlugin implements IModPlugin {
 		registration.addItemStackInfo(new ItemStack(WildcatterItems.NICKEL_CATHODE_BAG), Component.literal("Cathode nickel, electrowon in the "
 				+ "nickel tankhouse from the chlorine leach's purified liquor and bagged at a bagging station against it. The alloy melt shop "
 				+ "makes 304 and 316 stainless and the nickel-chromium alloy from it."));
+		for (net.minecraft.world.item.Item ingot : new net.minecraft.world.item.Item[] {WildcatterItems.STAINLESS_304_INGOT, WildcatterItems.STAINLESS_316_INGOT, WildcatterItems.NICKEL_CHROMIUM_INGOT}) {
+			registration.addItemStackInfo(new ItemStack(ingot), Component.literal("Cast in the alloy melt shop: the induction furnace melts a 2 t heat of "
+					+ "HC ferrochrome, cathode nickel, HC ferromanganese, ferromolybdenum and iron for the grade set on it, the AOD converter blows its "
+					+ "carbon out with oxygen and nitrogen, and the ingot caster pours twenty 100 kg ingots."));
+		}
 		registration.addItemStackInfo(new ItemStack(WildcatterItems.MAGNESIA), Component.literal("Caustic-calcined magnesia (MgO), "
 				+ "from magnesite in a furnace. The uranium mill's precipitation tank uses it to precipitate the uranium, and the "
 				+ "magnesia chlorinator turns it into MgCl2 for the magnesium cell."));

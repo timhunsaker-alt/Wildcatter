@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "wildcatter:item/nickel_chromium_ingot_placeholder"
+  }
+}

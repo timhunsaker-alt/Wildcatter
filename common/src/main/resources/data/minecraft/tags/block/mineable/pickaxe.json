@@ -431,6 +431,9 @@
     "wildcatter:peirce_smith_converter",
     "wildcatter:chlorine_leach_reactor",
     "wildcatter:ni_purification",
-    "wildcatter:nickel_tankhouse"
+    "wildcatter:nickel_tankhouse",
+    "wildcatter:induction_furnace",
+    "wildcatter:aod_converter",
+    "wildcatter:ingot_caster"
   ]
 }

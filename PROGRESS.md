@@ -1464,6 +1464,8 @@ sized for a 40-pot line.
   use the mod's materials. The DEPA-TOPO second cycle is built (2026-11-10, branch `w-rules`; see "Tim's answers" below). Not built:
   the filter acid's uranium is not carried as an assay; fluorosilicic acid recovery; the hemihydrate process; potash by flotation;
   Farmings reading `c:fertilizers` (Farmings' side). See `docs/questions/phase18-phosphate.md`.
+- Phase 17b2 (alloy melt shop): the `stainless_304_ingot`, `stainless_316_ingot` and `nickel_chromium_ingot` icons are script-drawn
+  `*_placeholder`; the three parts use the mod's materials. No argon finish in the AOD, no Alloy 718 (no niobium), no casting losses.
 - Phase 17b1 (nickel smelter and refinery): the `bessemer_matte_bag` and `nickel_cathode_bag` icons are script-drawn `*_placeholder`
   (the Ludo bulk bag with a swatch); the six parts use the mod's materials. The nickel furnace runs at its transformer's PF 0.80
   (`docs/questions/phase17b-nickel.md`, 4). Not built (the spec): copper refining beyond ingots, cobalt metal, precious metals, flash
@@ -1970,6 +1972,15 @@ Plan: `docs/ideas-plan.md`. Branch `phase16`. Nothing changes what an existing w
   CONVERTER, NICKEL REFINERY.
 - Tests: `NickelTest` (5); NeoForge `nickel_smelter`, `nickel_refinery`; client `nickelSmelter` (screenshots of the smelter, converter,
   roaster and refinery).
+
+## Phase 17b2: the alloy melt shop (2026-11-12; built while Tim was away; decisions: `docs/questions/phase17b-nickel.md`, 14-20)
+- **Induction furnace** (`InductionFurnaceBlockEntity`, 3 x 3 x 3, the melt shop's controller): a `FurnaceLoad` at MV, 1.5 MW, PF 0.95;
+  bins for FeCr, nickel, FeMn and FeMo bags and iron ingots by hopper; melts a 2 t heat by energy (1.2 MWh); sneak-click sets the grade.
+- **AOD converter** (`AodConverterBlockEntity`, 3 x 6 x 3, 30 kW): oxygen from touching PSA oxygen generators, nitrogen on its east side
+  (a third of the oxygen), carbon to 0.05 %; NO OXYGEN, NO NITROGEN.
+- **Ingot caster** (`IngotCasterBlockEntity`, 2 x 3 x 6): twenty 100 kg ingots in 10 minutes to a hopper under it.
+- Numbers in `fluid/MeltShop` (`MeltShopTest`, 4). Items `stainless_304_ingot`, `stainless_316_ingot`, `nickel_chromium_ingot`; JEI
+  pages. Field Manual: ALLOY MELT SHOP. NeoForge scene `melt_shop`; client `nickelSmelter` screenshot of the melt shop.
 
 ## Phase 18: phosphate (2026-11-10; built while Tim was away; decisions: `docs/questions/phase18-phosphate.md`)
 - **18a, fertilizer** (`docs/multiblocks/fertilizer.md`): **phosphate mill** (wet ball mill, 200 kW at 4.16 kV; rock by hopper, water,

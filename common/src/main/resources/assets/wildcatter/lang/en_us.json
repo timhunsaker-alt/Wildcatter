@@ -628,5 +628,11 @@
   "block.wildcatter.peirce_smith_converter": "Peirce-Smith Converter",
   "block.wildcatter.chlorine_leach_reactor": "Chlorine Leach Reactor",
   "block.wildcatter.ni_purification": "Nickel Liquor Purification",
-  "block.wildcatter.nickel_tankhouse": "Nickel Tankhouse (18 cells, 12.3 kA)"
+  "block.wildcatter.nickel_tankhouse": "Nickel Tankhouse (18 cells, 12.3 kA)",
+  "item.wildcatter.stainless_304_ingot": "304 Stainless Steel Ingot",
+  "item.wildcatter.stainless_316_ingot": "316 Stainless Steel Ingot",
+  "item.wildcatter.nickel_chromium_ingot": "Nickel-Chromium Alloy Ingot",
+  "block.wildcatter.induction_furnace": "Induction Furnace (2 t, 1.5 MW)",
+  "block.wildcatter.aod_converter": "AOD Converter",
+  "block.wildcatter.ingot_caster": "Ingot Caster (bottom-poured)"
 }

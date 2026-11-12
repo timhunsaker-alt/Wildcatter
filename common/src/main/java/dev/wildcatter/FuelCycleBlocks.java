@@ -157,6 +157,10 @@ public interface FuelCycleBlocks {
 	Block CHLORINE_LEACH_REACTOR = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.CHLORINE_LEACH_REACTOR);
 	Block NI_PURIFICATION = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.NI_PURIFICATION);
 	Block NICKEL_TANKHOUSE = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.NICKEL_TANKHOUSE);
+	// Phase 17b2: the alloy melt shop
+	Block INDUCTION_FURNACE = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.INDUCTION_FURNACE);
+	Block AOD_CONVERTER = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.AOD_CONVERTER);
+	Block INGOT_CASTER = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.INGOT_CASTER);
 	// 10c2: the cranes (docs/multiblocks/tower-crane.md, crawler-crane.md)
 	Block TOWER_CRANE = cranePart(dev.wildcatter.block.CranePartBlock.Part.TOWER_CRANE);
 	Block CRAWLER_CRANE = cranePart(dev.wildcatter.block.CranePartBlock.Part.CRAWLER_CRANE);

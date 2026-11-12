@@ -105,7 +105,7 @@ final class NickelClientScenes {
 		server.runCommand("effect give @p minecraft:slow_falling 600 0 true");
 		server.runCommand(tp(30, 14, 10, 135, 30));
 		context.waitTicks(20);
-		clear(-6, -26, 40, 26, 14);
+		clear(-6, -26, 46, 26, 14);
 		place(WildcatterBlocks.FURNACE_TRANSFORMER, 0, -20, north);         // x 0-3, z -20..-16
 		place(WildcatterBlocks.NICKEL_ELECTRIC_FURNACE, 4, -20, north);     // x 4-9, z -20..-9
 		place(WildcatterBlocks.FLUID_BED_ROASTER, 4, -8, north);            // x 4-7, z -8..-5
@@ -116,6 +116,11 @@ final class NickelClientScenes {
 		place(WildcatterBlocks.NICKEL_TANKHOUSE, 20, 7, north);             // x 20-25, z 7-20
 		place(WildcatterBlocks.NI_PURIFICATION, 26, 5, north);              // x 26-29, z 5-14
 		place(WildcatterBlocks.RECTIFIER, 20, 21, north);                   // x 20-22, z 21-24
+		// the alloy melt shop (17b2), east of the refinery
+		place(WildcatterBlocks.INDUCTION_FURNACE, 34, 4, north);           // x 34-36, z 4-6
+		place(WildcatterBlocks.AOD_CONVERTER, 34, 7, north);               // x 34-36, z 7-9
+		place(WildcatterBlocks.INGOT_CASTER, 34, 10, north);               // x 34-35, z 10-15
+		place(WildcatterBlocks.OXYGEN_GENERATOR, 31, 8, north);            // x 31-33, z 8-13
 		context.waitTicks(60);
 		String furnace = read(4, 0, -20);
 		check(!furnace.contains("NOT BUILT"), "the furnace should find its transformer and roaster: " + furnace);
@@ -124,6 +129,7 @@ final class NickelClientScenes {
 		show(10, 0, -22, tp(20, 6, -26, 50, 20), "wildcatter-nickel-converter");
 		show(4, 0, -8, tp(-4, 8, 0, -135, 25), "wildcatter-nickel-roaster");
 		show(23, 0, 4, tp(36, 10, 26, 145, 30), "wildcatter-nickel-refinery");
+		show(34, 0, 7, tp(42, 7, 14, 135, 30), "wildcatter-nickel-melt-shop");
 		System.out.println("[wildcatter-test] nickelSmelter ok: " + furnace);
 	}
 }

@@ -3070,6 +3070,40 @@ lang.update({f"block.{ns}.fluid_bed_roaster": "Fluid-Bed Roaster (110 kW)", f"bl
 	f"block.{ns}.ni_purification": "Nickel Liquor Purification", f"block.{ns}.nickel_tankhouse": "Nickel Tankhouse (18 cells, 12.3 kA)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 17b2: the alloy melt shop (docs/multiblocks/nickel-smelter.md) -------------------------------------------------------------
+# blockstates, models, shapes and items from tools/models/nickel.py; the three ingots' icons are drawn here: placeholders.
+MELT_PARTS = ("induction_furnace", "aod_converter", "ingot_caster")
+for name in MELT_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in MELT_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("induction_furnace", ["CCC", "CBC", "SRS"], {"C": "minecraft:copper_ingot", "B": "minecraft:cauldron", "S": S_, "R": "minecraft:redstone_block"}, "induction_furnace")
+shaped("aod_converter", ["SBS", "BCB", "SIS"], {"S": S_, "B": "minecraft:bricks", "C": "minecraft:cauldron", "I": "minecraft:iron_bars"}, "aod_converter")
+shaped("ingot_caster", ["I I", "IBI", "SSS"], {"I": "minecraft:iron_ingot", "B": "minecraft:bricks", "S": S_}, "ingot_caster")
+INGOTS = {"stainless_304_ingot": ("304 Stainless Steel Ingot", (186, 190, 196)), "stainless_316_ingot": ("316 Stainless Steel Ingot", (170, 182, 194)),
+	"nickel_chromium_ingot": ("Nickel-Chromium Alloy Ingot", (196, 192, 170))}
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in INGOTS.items():
+	img = Image.new("RGBA", (16, 16))
+	d = ImageDraw.Draw(img)
+	dark = tuple(max(0, c - 60) for c in colour) + (255,)
+	light = tuple(min(255, c + 40) for c in colour) + (255,)
+	d.polygon([(2, 10), (6, 5), (14, 5), (10, 10)], fill=light, outline=dark)        # the ingot's top
+	d.polygon([(2, 10), (10, 10), (10, 13), (2, 13)], fill=colour + (255,), outline=dark)
+	d.polygon([(10, 10), (14, 5), (14, 8), (10, 13)], fill=dark)
+	os.makedirs(f"{ASSETS}/textures/item", exist_ok=True)
+	img.save(f"{ASSETS}/textures/item/{item}_placeholder.png")
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}_placeholder"}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.induction_furnace": "Induction Furnace (2 t, 1.5 MW)", f"block.{ns}.aod_converter": "AOD Converter",
+	f"block.{ns}.ingot_caster": "Ingot Caster (bottom-poured)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+save_json(f"{ROOT}/data/c/tags/item/ingots/stainless_steel.json", {"values": [f"{ns}:stainless_304_ingot", f"{ns}:stainless_316_ingot"]})
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)
