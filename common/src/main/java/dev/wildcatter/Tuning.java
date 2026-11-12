@@ -796,6 +796,24 @@ public final class Tuning {
 	public static final double PILGER_WATTS = 75_000.0;
 	public static final double ANNEAL_FURNACE_WATTS = 100_000.0;
 	public static final double SPACER_GRID_KG = 0.9;               // a Zircaloy mid grid (proposed)
+	// 17c1: batches, scrap and hafnium (docs/multiblocks/zirconium-extensions.md items 3, 6, 7; the rule zirconiumBatches)
+	public static final double KROLL_BATCH_KG = 50.0;              // a retort's batch (proposed)
+	public static final double KROLL_REDUCTION_S = 5 * 3600.0;     // a retort in the furnace (proposed), through TimeScale
+	public static final double KROLL_DISTILLATION_S = 4 * 3600.0;  // then in the vacuum distillation (proposed), through TimeScale
+	public static final double VAR_INGOT_KG = 100.0;               // a VAR ingot (proposed)
+	public static final int VAR_MELTS = 2;                         // melted twice
+	public static final double VAR_MELT_S = 3600.0;                // an hour a melt (proposed), through TimeScale
+	public static final double VAR_SCRAP_SHARE = 0.30;             // the most of an ingot's charge that is scrap (proposed)
+	public static final double ZR_LOSS_EXTRUSION = 0.08;           // of the metal: crop ends at the press (proposed)
+	public static final double ZR_LOSS_PILGER = 0.06;              // turnings and ends at the mill (proposed)
+	public static final double ZR_LOSS_INSPECTION = 0.02;          // rejected tubes (proposed)
+	public static final double ZR_SCRAP_KG = 25.0;                 // a bundle of Zircaloy scrap (proposed)
+	public static final double HFCL4_DRUM_HF_KG = 50.0;            // hafnium in a HfCl4 drum (proposed)
+	public static final double HF = 178.49;                        // g/mol
+	public static final double HF_DENSITY = 13.31;                 // g/cm3
+	public static final double HF_RODLET_OD_MM = 9.7;              // a hafnium rodlet: the B4C rodlet's size, solid metal (derived)
+	public static final double HF_RODLET_LENGTH_M = 3.66;
+	public static final int HF_RODLETS_PER_RCCA = 24;
 
 	// ---- The fuel plant (docs/multiblocks/fuel.md, approved 2026-11-01) --------------------------------------------------------
 	public static final double FUEL_LINE_U_KGS = 50.0 / 3600;      // kg of U a second: a small line (proposed)

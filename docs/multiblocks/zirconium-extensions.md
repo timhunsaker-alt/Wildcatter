@@ -1,6 +1,6 @@
 # Zirconium extensions: fumed silica, hafnium metal, Pidgeon magnesium, chromium, scrap, batches
 
-> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Proposed phase **17c** (17c1 batches, scrap and
+> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved. 17c1 BUILT 2026-11-12 (see "As built").** Proposed phase **17c** (17c1 batches, scrap and
 > hafnium; 17c2 Pidgeon magnesium, chromium and fumed silica). Decisions are in `docs/questions/specs-wildcatter.md` (items 72-78).
 
 Seven items the zirconium spec (zirconium.md, approved 2026-11-01) left in ROADMAP Ideas. Each has its real basis and a proposed scope.
@@ -124,3 +124,30 @@ its stream to being counted.
 ## Proposed waves
 - **17c1:** batches, scrap and hafnium (no new parts; the pilger mill's fourth die and new items).
 - **17c2:** Pidgeon magnesium, the chromium step, fumed silica (three new parts; need 17a's FeSi and aluminothermic vessel).
+
+## As built
+
+### 17c1 (2026-11-12, branch `w-17c`; decisions in `docs/questions/phase17c-zirconium.md`, 1-8)
+- **The rule for existing worlds:** batches and scrap losses are behind the world rule `zirconiumBatches` (on in new worlds, off in worlds
+  saved before), not on in every world as item 7's "Old worlds" line reads (question 1). Off, the line runs as 7f's steady flow. On in an
+  old world, metal already held is kept and passes on; the first retort starts at once.
+- **Kroll** (`KrollReactorBlockEntity`): two retorts, A and B. The one in the furnace takes ZrCl4 at the line rate on the cell's
+  magnesium and is REDUCED when it holds 50 kg and 5 hours of furnace time have passed (`TimeScale.scaled`; question 2); it then goes to
+  the vacuum distillation when that is free (4 hours, the distillation's furnace drawn while it runs), and the other takes the furnace.
+  A distilled retort puts its 50 kg into the distillation's hold as one lump and its excess magnesium back to the cell. The readout shows
+  each retort's step and share of its time.
+- **VAR** (`ZrLineBlockEntity`): charges 100 kg (sponge and its additions, and Zircaloy scrap by hopper up to 30 kg, welded in at once),
+  then two melts of an hour each; the ingot goes to its hold for the press. The arc supply stays 20 kW (question 3).
+- **Scrap** (`PilgerMillBlockEntity`): the press keeps 92 % as hollows, the mill 0.84/0.92 of its hollows as tube (84 % of the metal to
+  tube; `Zirconium.lineYield`). The crop ends and the mill's losses go to the mill's bin: `zircaloy_scrap`, 25 kg, out to a hopper under
+  the mill (question 4). Hafnium losses are counted (question 5).
+- **Hafnium** (in every world): the hafnium column drops `hfcl4_drum` (50 kg of Hf) into a hopper under it (question 6). A sneak-click
+  on the Kroll reactor starts a HAFNIUM CAMPAIGN: HfCl4 drums by a hopper on top; each stage after it holds one metal at a time and
+  follows (question 7); the VAR furnace melts hafnium unalloyed; the pilger mill's fourth die rolls `hafnium_rodlet` (9.7 mm, 3.66 m,
+  3.6 kg). 24 make a hafnium RCCA (19d).
+- **Item 2** (the caustic) was struck from ROADMAP Ideas: nothing to build (question 8).
+- **Field Manual:** BATCHES, SCRAP AND HAFNIUM. JEI pages for the three items.
+- **Tests:** unit `ZirconiumExtensionsTest` (84 %, 8.4 or 10 kg/h of tube, 10 kg/h from two retorts, the waits at 50:1, the rodlet, about
+  2,100 hours for 5 RCCAs, Mg per Hf); NeoForge scene `zirconium_batches` (the rule on; the line from the hafnium column to the anneal
+  furnace on two paralleled sets; the press, chlorinator and magnesium cell unpowered and fed by hook).
+- **Placeholders:** `zircaloy_scrap_placeholder`, `hfcl4_drum_placeholder`, `hafnium_rodlet_placeholder` (item icons drawn by script).

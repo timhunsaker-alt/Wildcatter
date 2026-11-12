@@ -620,5 +620,8 @@
   "block.wildcatter.slurry_pipe": "Slurry Pipe (600 mm)",
   "block.wildcatter.air_header": "Air Header (600 mm)",
   "block.wildcatter.guy_anchor": "Guy Anchor",
-  "item.wildcatter.guy_strand": "Guy Strand (3/8 in EHS)"
+  "item.wildcatter.guy_strand": "Guy Strand (3/8 in EHS)",
+  "item.wildcatter.zircaloy_scrap": "Zircaloy Scrap (25 kg)",
+  "item.wildcatter.hfcl4_drum": "HfCl4 Drum (50 kg of Hf)",
+  "item.wildcatter.hafnium_rodlet": "Hafnium Rodlet"
 }

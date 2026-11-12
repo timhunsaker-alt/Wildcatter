@@ -112,6 +112,10 @@ public class ZirconiumPartBlock extends BigPartBlock implements net.minecraft.wo
 			return InteractionResult.SUCCESS;
 		}
 		BlockEntity entity = level.getBlockEntity(main(pos, state));
+		if (entity instanceof KrollReactorBlockEntity kroll && player.isShiftKeyDown()) {
+			player.sendOverlayMessage(Component.literal(kroll.toggleCampaign()));
+			return InteractionResult.SUCCESS;
+		}
 		if (entity instanceof PilgerMillBlockEntity mill && player.isShiftKeyDown()) {
 			player.sendOverlayMessage(Component.literal(mill.changeDies()));
 			return InteractionResult.SUCCESS;

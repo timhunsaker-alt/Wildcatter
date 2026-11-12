@@ -468,6 +468,16 @@ Spec: `docs/multiblocks/ferroalloys.md` ("As built"). Decisions for Tim: `docs/q
 - **Known gaps:** the seven bag icons are `*_placeholder`; chromium metal (needs 17c2's chromic oxide); no var controller; Tailings still
   uses its placeholder ferrosilicon (question 1).
 
+## Phase 17c — Zirconium extensions — 17c1 BUILT 2026-11-12 (while Tim was away, on the DRAFT spec decided on recommendation; not approved)
+Spec: `docs/multiblocks/zirconium-extensions.md` ("As built"). Decisions for Tim: `docs/questions/phase17c-zirconium.md`. Branch `w-17c`.
+- **17c1, batches, scrap and hafnium** (BUILT 2026-11-12): behind the world rule `zirconiumBatches` (on in new worlds), the Kroll
+  reactor's two retorts alternate (50 kg, 5 h reduction, 4 h in the vacuum distillation), the VAR furnace melts 100 kg ingots twice (an
+  hour a melt), all through `TimeScale`; the press and pilger mill lose 16 % as Zircaloy scrap, binned to a hopper under the mill, which
+  the VAR furnace takes back up to 30 % of an ingot. In every world: HfCl4 drums under the hafnium column, a hafnium campaign on the
+  Kroll reactor (sneak-click), the pilger mill's hafnium rodlet dies. NeoForge scene `zirconium_batches`; unit test
+  `ZirconiumExtensionsTest`.
+- **17c2** (planned): fumed silica, Pidgeon magnesium, chromic oxide and chromium metal.
+
 ## Phase 18 — Phosphate — 18a BUILT, 18b first cycle BUILT 2026-11-10 (while Tim was away, on the DRAFT specs decided on recommendation; not approved)
 Specs: `docs/multiblocks/fertilizer.md`, `docs/multiblocks/uranium-from-phosphate.md` ("As built" in each). Decisions for Tim:
 `docs/questions/phase18-phosphate.md` (22; items 3, 15, 17 and 19 need Tim). Branch `phase18`.
@@ -572,8 +582,8 @@ Decisions taken while building: `docs/questions/answers-grid.md`. NeoForge scene
   stability monitoring), a disposal well for the bleed, satellite IX with trucked resin.
 - Enrichment: centrifuge spin-up and coast-down hours, machine crashes, cooling water to the casings, the product sampling autoclave
   and blending, cylinder heels, a choice of product assay.
-- Zirconium: SiCl4 to fumed silica; uses for the chlor-alkali caustic soda; hafnium metal for control rods; Pidgeon magnesium from
-  dolomite; the aluminothermic chromium step; scrap recycle and yields; Kroll and VAR batch timing.
+- Zirconium: SiCl4 to fumed silica; Pidgeon magnesium from dolomite; the aluminothermic chromium step. (Hafnium metal, scrap and
+  batches: 17c1. The caustic's uses were struck: it goes to the Bayer refinery.)
 - Fuel: the kiln's HF back to the conversion plant; zinc stearate lubricant and pore formers; a nickel smelter for real Inconel and
   stainless hardware; pellet inspection, rod X-ray and helium leak tests; IFBA and gadolinia burnable absorbers; rejects and scrap.
 - Reactor (the rest of Phase 19, planned above): silver-indium-cadmium and hafnium rods; helium in the B4C rodlets; a buyer for the borax plant's sodium sulfate. Raised by 19a: containment spray and fan coolers; a relief tank's cover gas and drain tank; the reactor rules stored per world, so they can be on for new worlds only. Raised by 19b: a crawler transporter for the transfer cask; the washer as a placed skid on the circuit; contamination spreading with water; nuclide-by-nuclide coolant activity.

@@ -2813,6 +2813,9 @@ shaped("co2_storage_tank", ["SSS", "W W", "SPS"], {"S": S_, "W": "minecraft:whit
 shaped("resin_trailer", ["SBS", "S S", "C C"], {"S": S_, "B": "minecraft:barrel", "C": "minecraft:minecart"}, "resin_trailer")
 phase16_names({"co2_liquefier": "CO2 Liquefier (150 kg/h, 75 kW)", "co2_storage_tank": "CO2 Storage Tank (30 t)", "resin_trailer": "Resin Trailer (10 m3 of IX resin)"})
 phase16_names({"cathode_gas_scrubber": "Cathode Gas Scrubber (NaF beds, 10 kW)", "koh_scrubber": "KOH Scrubber (with lime regeneration, 15 kW)"})
+# 17c1: zirconium scrap and hafnium (docs/multiblocks/zirconium-extensions.md)
+phase16_items({"zircaloy_scrap": ("Zircaloy Scrap (25 kg)", (150, 150, 140)), "hfcl4_drum": ("HfCl4 Drum (50 kg of Hf)", (200, 196, 180)),
+	"hafnium_rodlet": ("Hafnium Rodlet", (120, 124, 132))})
 # ---- Phase 17a: ferroalloys (docs/multiblocks/ferroalloys.md) ---------------------------------------------------------------------
 # blockstates, models, shapes and items come from tools/models/ferroalloys.py; here loot, names, tags, recipes and the bags. Each bag's
 # icon is the Ludo bulk bag with a swatch of what it holds drawn on it by this script: a placeholder until it has art of its own.

@@ -2,6 +2,16 @@
 
 ## Unreleased (0.7.0, branch `w-next`): Phases 15-19, built 2026-11-10 while Tim was away
 
+### 17c1: zirconium batches, scrap and hafnium (built 2026-11-12 while Tim was away; not approved)
+- **Batches** (the world rule `zirconiumBatches`, on in new worlds): the Kroll reactor's two retorts alternate, 50 kg reduced for 5 hours
+  and then 4 hours in the vacuum distillation; the VAR furnace melts 100 kg ingots twice, an hour a melt. The world's time scale shortens
+  the waits. Existing worlds keep the steady flow.
+- **Scrap** (same rule): 84 % of the metal reaches a tube; the pilger mill bins the rest as 25 kg bundles of Zircaloy scrap into a
+  hopper under it, and the VAR furnace takes them back, up to 30 % of an ingot.
+- **Hafnium:** HfCl4 drums (50 kg of Hf) drop under the hafnium column. Sneak-click the Kroll reactor for a hafnium campaign: the line
+  follows the hafnium, and the pilger mill's fourth dies roll 3.6 kg hafnium rodlets for hafnium RCCAs.
+- Decisions for review: `docs/questions/phase17c-zirconium.md`.
+
 ### Time scale (Tim, 2026-11-10, branch `w-timescale`)
 - **A world's time scale:** 1:1, 5:1, 10:1, 20:1 or 50:1. It shortens the long waits only: a real reactor heat-up and cooldown
   (`reactorRealHeatup`), the coke oven, digester and precipitator holds (`realResidenceTimes`), and dry cask cooling. Rates, fuel,

@@ -8,6 +8,11 @@ package dev.wildcatter.block;
 public interface ZrStage {
 	double zirconium();
 
+	/** True when the metal it holds is hafnium, on a hafnium campaign (17c1); the stages after it follow it. */
+	default boolean hafnium() {
+		return false;
+	}
+
 	/** Takes up to {@code kg} of metal; returns what it gave. */
 	double takeZirconium(double kg);
 

@@ -50,6 +50,17 @@ public class WildcatterJeiPlugin implements IModPlugin {
 		registration.addItemStackInfo(new ItemStack(WildcatterItems.MAGNESIA), Component.literal("Caustic-calcined magnesia (MgO), "
 				+ "from magnesite in a furnace. The uranium mill's precipitation tank uses it to precipitate the uranium, and the "
 				+ "magnesia chlorinator turns it into MgCl2 for the magnesium cell."));
+		// 17c1: the zirconium line's scrap and hafnium (docs/multiblocks/zirconium-extensions.md)
+		info(registration, WildcatterItems.ZIRCALOY_SCRAP, "Crop ends, turnings and rejected tubes from the extrusion press and pilger mill (the rule zirconiumBatches), "
+				+ "binned by the pilger mill into a hopper under it. The VAR furnace takes it by hopper, up to 30 % of an ingot, saving sponge.");
+		info(registration, WildcatterItems.HFCL4_DRUM, "The hafnium the hafnium column takes out of the zirconium, 50 kg of Hf a drum, into a hopper under the column. "
+				+ "A Kroll reactor on a hafnium campaign (sneak-click it) takes it by a hopper on top.");
+		info(registration, WildcatterItems.HAFNIUM_RODLET, "Solid hafnium, 9.7 mm across and 3.66 m long, rolled by the pilger mill's rodlet dies on a hafnium campaign. "
+				+ "24 make a hafnium RCCA at the RCCA bench.");
+	}
+
+	private static void info(IRecipeRegistration registration, net.minecraft.world.item.Item item, String text) {
+		registration.addItemStackInfo(new ItemStack(item), Component.literal(text));
 	}
 
 	private static void ingot(IRecipeRegistration registration, String metal, String text) {

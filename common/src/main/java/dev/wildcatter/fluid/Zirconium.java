@@ -108,4 +108,51 @@ public final class Zirconium {
 	public static double hoursPerAssembly() {
 		return (264 * claddingKg() + 25 * thimbleKg()) / Tuning.ZR_LINE_KGS / 3600;
 	}
+	// ---- 17c1: batches, scrap and hafnium (docs/multiblocks/zirconium-extensions.md) --------------------------------------------
+
+	/** Of the metal into the extrusion press, the share that leaves it as hollows (the rest is crop ends, scrap). */
+	public static double extrusionYield() {
+		return 1 - Tuning.ZR_LOSS_EXTRUSION;
+	}
+
+	/** Of the hollows into the pilger mill, the share that becomes tube: the mill's and inspection's losses are shares of the metal. */
+	public static double pilgerYield() {
+		return (1 - Tuning.ZR_LOSS_EXTRUSION - Tuning.ZR_LOSS_PILGER - Tuning.ZR_LOSS_INSPECTION) / extrusionYield();
+	}
+
+	/** Of the metal into the extrusion press, the share that reaches a finished tube: 84 %. */
+	public static double lineYield() {
+		return extrusionYield() * pilgerYield();
+	}
+
+	/** Tube a line of this many kg an hour makes, with its scrap recycled into the VAR or not. */
+	public static double tubeKgh(double lineKgh, boolean recycled) {
+		// recycled, the scrap goes back as part of the next ingots' charge: what comes out as tube is what comes in as sponge
+		return recycled ? lineKgh : lineKgh * lineYield();
+	}
+
+	/** Mg reacted a kg of hafnium: HfCl4 + 2Mg -> Hf + 2MgCl2. */
+	public static double magnesiumPerHf() {
+		return 2 * MG / Tuning.HF;
+	}
+
+	public static double mgCl2PerHf() {
+		return 2 * MGCL2 / Tuning.HF;
+	}
+
+	/** kg of a solid hafnium rodlet, 9.7 mm across and 3.66 m long, at 13.31 g/cm3: about 3.6 kg. */
+	public static double hafniumRodletKg() {
+		double areaMm2 = Math.PI / 4 * Tuning.HF_RODLET_OD_MM * Tuning.HF_RODLET_OD_MM;
+		return areaMm2 * Tuning.HF_RODLET_LENGTH_M * Tuning.HF_DENSITY / 1000;
+	}
+
+	/** Hafnium the line makes an hour, kg: 2 % of the metal through the column. */
+	public static double hafniumKgh() {
+		return Tuning.ZR_LINE_KGS * 3600 * Tuning.ZR_HF_FRACTION / (1 - Tuning.ZR_HF_FRACTION);
+	}
+
+	/** Hours of the line's hafnium for a set of RCCAs of hafnium rodlets: about 2,100 for 5. */
+	public static double hoursForHafniumRccas(int rccas) {
+		return rccas * Tuning.HF_RODLETS_PER_RCCA * hafniumRodletKg() / hafniumKgh();
+	}
 }

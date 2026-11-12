@@ -97,6 +97,21 @@ public final class WildcatterItems {
 	public static final Item SPACER_GRID = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(64).setId(SPACER_GRID_KEY),
 			String.format("Zircaloy-4 mid grid for a 17x17 assembly, %.1f kg", Tuning.SPACER_GRID_KG), "6 to an assembly, with 2 end grids");
 
+	/** 17c1: Zircaloy scrap, HfCl4 drums and hafnium rodlets (docs/multiblocks/zirconium-extensions.md). */
+	public static final ResourceKey<Item> ZIRCALOY_SCRAP_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("zircaloy_scrap"));
+	public static final Item ZIRCALOY_SCRAP = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(64).setId(ZIRCALOY_SCRAP_KEY),
+			String.format("%.0f kg of clean Zircaloy-4 scrap: crop ends, turnings, rejected tubes", Tuning.ZR_SCRAP_KG),
+			String.format("the VAR furnace takes it by hopper, up to %.0f %% of an ingot", Tuning.VAR_SCRAP_SHARE * 100));
+	public static final ResourceKey<Item> HFCL4_DRUM_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("hfcl4_drum"));
+	public static final Item HFCL4_DRUM = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(HFCL4_DRUM_KEY),
+			String.format("Hafnium tetrachloride, %.0f kg of hafnium (%.0f kg of HfCl4)", Tuning.HFCL4_DRUM_HF_KG,
+					Tuning.HFCL4_DRUM_HF_KG * (Tuning.HF + 2 * dev.wildcatter.fluid.Zirconium.CL2) / Tuning.HF),
+			"for a Kroll reactor on a hafnium campaign (sneak-click it)");
+	public static final ResourceKey<Item> HAFNIUM_RODLET_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("hafnium_rodlet"));
+	public static final Item HAFNIUM_RODLET = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(64).setId(HAFNIUM_RODLET_KEY),
+			String.format("Hafnium metal rodlet, %.1f mm, %.2f m, %.1f kg", Tuning.HF_RODLET_OD_MM, Tuning.HF_RODLET_LENGTH_M, dev.wildcatter.fluid.Zirconium.hafniumRodletKg()),
+			String.format("%d make a hafnium RCCA at the RCCA bench", Tuning.HF_RODLETS_PER_RCCA));
+
 	/** 7g: helium cylinders (docs/multiblocks/fuel.md), from the gas plant's helium recovery unit to the rod welder. */
 	public static final ResourceKey<Item> EMPTY_HELIUM_CYLINDER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("empty_helium_cylinder"));
 	public static final Item EMPTY_HELIUM_CYLINDER = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(EMPTY_HELIUM_CYLINDER_KEY),
@@ -420,6 +435,9 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, ZIRCALOY_TUBE_KEY, ZIRCALOY_TUBE);
 		Registry.register(BuiltInRegistries.ITEM, GUIDE_THIMBLE_KEY, GUIDE_THIMBLE);
 		Registry.register(BuiltInRegistries.ITEM, SPACER_GRID_KEY, SPACER_GRID);
+		Registry.register(BuiltInRegistries.ITEM, ZIRCALOY_SCRAP_KEY, ZIRCALOY_SCRAP);
+		Registry.register(BuiltInRegistries.ITEM, HFCL4_DRUM_KEY, HFCL4_DRUM);
+		Registry.register(BuiltInRegistries.ITEM, HAFNIUM_RODLET_KEY, HAFNIUM_RODLET);
 		Registry.register(BuiltInRegistries.ITEM, EMPTY_HELIUM_CYLINDER_KEY, EMPTY_HELIUM_CYLINDER);
 		Registry.register(BuiltInRegistries.ITEM, HELIUM_CYLINDER_KEY, HELIUM_CYLINDER);
 		Registry.register(BuiltInRegistries.ITEM, BORIC_ACID_KEY, BORIC_ACID);

@@ -1464,6 +1464,10 @@ sized for a 40-pot line.
   use the mod's materials. The DEPA-TOPO second cycle is built (2026-11-10, branch `w-rules`; see "Tim's answers" below). Not built:
   the filter acid's uranium is not carried as an assay; fluorosilicic acid recovery; the hemihydrate process; potash by flotation;
   Farmings reading `c:fertilizers` (Farmings' side). See `docs/questions/phase18-phosphate.md`.
+- Phase 17c1 (zirconium batches and hafnium, 2026-11-12): item icons `zircaloy_scrap_placeholder`, `hfcl4_drum_placeholder` and
+  `hafnium_rodlet_placeholder` are drawn by script. The VAR arc stays 20 kW while a 100 kg melt would really draw 100 kW (question 3).
+  The scene runs the extrusion press, chlorinator and magnesium cell unpowered, fed by hook; the client `zirconium` scene still runs the
+  steady flow (its world has the rule off). Hafnium scrap is counted, not an item.
 - Phase 17a (ferroalloys): the seven bulk bag icons (`ferrochrome_bag`, `ferromanganese_bag`, `ferrosilicon_bag`, `moly_oxide_bag`,
   `scheelite_concentrate_bag`, `ferromolybdenum_bag`, `ferrotungsten_bag`) are script-drawn `*_placeholder` (the Ludo bulk bag with a
   swatch). Not built: chromium metal (needs 17c2's chromic oxide), an automatic var controller, capacitor switching inrush and harmonic
@@ -1946,6 +1950,15 @@ Plan: `docs/ideas-plan.md`. Branch `phase16`. Nothing changes what an existing w
   AND VESSEL.
 - Tests: `FerroalloysTest` (7, including the solver's feeder current with and without the bank); NeoForge `ferroalloys`, `alumino`;
   client `ferroalloys` (filmed).
+
+## Phase 17c1: zirconium batches, scrap and hafnium (2026-11-12; built while Tim was away; decisions: `docs/questions/phase17c-zirconium.md`)
+- Spec `docs/multiblocks/zirconium-extensions.md` items 3, 6, 7 ("As built"). New world rule `zirconiumBatches` (on in new worlds).
+- `KrollReactorBlockEntity`: two retorts (charging and reducing 50 kg for 5 h, then 4 h in the vacuum distillation), a hafnium campaign
+  (sneak-click; HfCl4 drums by hopper). `ZrLineBlockEntity`: HfCl4 drums under the column; each stage follows the metal it holds; VAR
+  ingots of 100 kg melted twice with Zircaloy scrap; the press's crop ends. `PilgerMillBlockEntity`: the hafnium rodlet die, the scrap
+  bin out to a hopper under it. Waits through `TimeScale.scaled`.
+- Items `zircaloy_scrap`, `hfcl4_drum`, `hafnium_rodlet`. Field Manual page BATCHES, SCRAP AND HAFNIUM; JEI pages.
+- Tests: unit `ZirconiumExtensionsTest`; NeoForge scene `zirconium_batches`.
 
 ## Phase 18: phosphate (2026-11-10; built while Tim was away; decisions: `docs/questions/phase18-phosphate.md`)
 - **18a, fertilizer** (`docs/multiblocks/fertilizer.md`): **phosphate mill** (wet ball mill, 200 kW at 4.16 kV; rock by hopper, water,

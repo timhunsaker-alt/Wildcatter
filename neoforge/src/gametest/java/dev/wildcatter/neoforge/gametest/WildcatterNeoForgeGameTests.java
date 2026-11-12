@@ -85,6 +85,15 @@ public class WildcatterNeoForgeGameTests {
 
 	/** The world rules' scenes (RuleScenes): each in a batch of its own, as it switches rules on and off. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> RULE_SCENES = RuleScenes.scenes();
+	/** Phases 17c, 19d, 16c2 and 16d2 (track w-17c): each scene in a batch of its own, with the world rules it names on. */
+	private static final java.util.Map<String, Consumer<GameTestHelper>> TRACK_17C_SCENES = new java.util.LinkedHashMap<>();
+	private static final java.util.Map<String, java.util.List<String>> TRACK_17C_RULES = new java.util.HashMap<>();
+
+	static {
+		TRACK_17C_SCENES.putAll(ZirconiumScenes.scenes());
+		TRACK_17C_RULES.putAll(ZirconiumScenes.RULES);
+	}
+
 	/** The residence holds' scene (ResidenceScenes): in a batch whose world has realResidenceTimes on. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> RESIDENCE_SCENES = ResidenceScenes.scenes();
 
@@ -134,6 +143,7 @@ public class WildcatterNeoForgeGameTests {
 			OILFIELD_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			RULE_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			RESIDENCE_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
+			TRACK_17C_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 		}));
 		modBus.addListener(RegisterCapabilitiesEvent.class, event -> event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, entity, side) -> STORAGE, Blocks.GOLD_BLOCK));
 		modBus.addListener(RegisterGameTestsEvent.class, event -> {
@@ -171,6 +181,13 @@ public class WildcatterNeoForgeGameTests {
 								? new RuleScenes.RulesOnAtScale(java.util.List.of("realResidenceTimes"), 50) : new RuleScenes.RulesOn(java.util.List.of("realResidenceTimes"))),
 								net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 4000, 1, true,
 								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 60)));
+			}
+			for (String scene : TRACK_17C_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
+				java.util.List<String> rules = TRACK_17C_RULES.getOrDefault(scene, java.util.List.of());
+				Holder<TestEnvironmentDefinition<?>> env = rules.isEmpty() ? plain : event.registerEnvironment(id("rules_" + scene), new RuleScenes.RulesOn(rules));
+				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
+						new TestData<>(env, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 4000, 1, true,
+								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 80)));
 			}
 			for (String scene : RULE_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
