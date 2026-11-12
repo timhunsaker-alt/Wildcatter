@@ -428,7 +428,7 @@ Decisions for Tim: `docs/questions/plc-gaps.md` (12 entries). Spec updated: `doc
   - process models (pipe pressure, drum pressure, a turbine's load setpoint, dampers, vibration, CT and PT voltage);
   - the crane's lift start.
 
-## Phase 16 — Uranium routes and plant operations — 16a, 16b1, 16c1, 16d1 BUILT 2026-11-10; 16c2, 16d2 BUILT 2026-11-12; 16b2 planned (built while Tim was away, on the DRAFT specs decided on recommendation; not approved)
+## Phase 16 — Uranium routes and plant operations — 16a, 16b1, 16c1, 16d1 BUILT 2026-11-10; 16b2, 16c2, 16d2 BUILT 2026-11-12 (built while Tim was away, on the DRAFT specs decided on recommendation; not approved)
 Plan: `docs/ideas-plan.md`, Phase 16. Branch `phase16`. Decisions for Tim: `docs/questions/phase16-uranium.md` (numbered across the waves).
 Rule: nothing changes or slows what an existing world already does; anything that would alter a plant already built is behind a
 default-off setting or waits until the player adds the new part.

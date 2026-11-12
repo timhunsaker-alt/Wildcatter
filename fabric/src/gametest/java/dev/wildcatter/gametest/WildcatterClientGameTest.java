@@ -7871,13 +7871,16 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			check(Math.abs(topRpm - Tuning.TOP_DRIVE_RPM) < 1, "the client should see the top drive turning at 120 rpm: " + topRpm);
 			context.takeScreenshot("wildcatter-land-rig");
 			// with no water it stops for mud; with a mud pump gone it is not built
+			// the pond pump lifted out first: it refills past a metre's 80 L within the few ticks the reading waits
 			server.computeOnServer(srv -> {
+				srv.overworld().destroyBlock(new BlockPos(39, pad + 1, hz + 9), false);
 				rig(srv, origin).testWater(0);
 				return null;
 			});
 			context.waitTicks(5);
 			String noMud = read(server, origin.getX(), origin.getY(), origin.getZ());
 			check(noMud.contains("NO MUD"), "with no water it should stop for mud: " + noMud);
+			put(server, 39, pad + 1, hz + 9, "wildcatter:pump");
 			server.computeOnServer(srv -> {
 				weighted(rig(srv, origin));
 				srv.overworld().destroyBlock(new BlockPos(hx + 10, pad + 1, hz), false);
@@ -7891,8 +7894,12 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			boolean connected = false;
 			for (int waited = 0; waited < 4000; waited += 20) {
 				server.computeOnServer(srv -> {   // the mud engineer keeps the weight up as the pump's water thins it
-					while (rig(srv, origin).mudPpg() < 13.9 && rig(srv, origin).roomFor(dev.wildcatter.block.RigSubstructureBlockEntity.Solid.BARITE) > 1000) {
-						rig(srv, origin).testMix(dev.wildcatter.block.RigSubstructureBlockEntity.Solid.BARITE, Tuning.BULK_BAG_KG);
+					while (rig(srv, origin).mudPpg() < 13.9) {
+						if (rig(srv, origin).roomFor(dev.wildcatter.block.RigSubstructureBlockEntity.Solid.BARITE) > 1000) {
+							rig(srv, origin).testMix(dev.wildcatter.block.RigSubstructureBlockEntity.Solid.BARITE, Tuning.BULK_BAG_KG);
+						} else {
+							weighted(rig(srv, origin));   // the tanks full of the pump's water: dumped and mixed again
+						}
 					}
 					return null;
 				});
