@@ -316,11 +316,13 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 			return String.format("Reactor vessel: it opens only cold (under %.0f C), depressurized and with its pumps stopped (%.0f C, %.1f MPa)", Tuning.LOADING_MAX_C,
 					reactor.tavg(), reactor.pressure());
 		}
-		boolean rcca = stack.is(WildcatterItems.RCCA);
+		boolean hafnium = stack.is(WildcatterItems.HAFNIUM_RCCA);
+		boolean rcca = stack.is(WildcatterItems.RCCA) || hafnium;
 		if (!rcca && dev.wildcatter.item.FuelAssemblyTags.inspected(stack) && dev.wildcatter.item.FuelAssemblyTags.bent(stack)) {
 			return "Reactor vessel: its inspection found a bent grid: straighten it at the assembly fixture first";
 		}
-		boolean ok = rcca ? reactor.loadRcca() : reactor.loadAssembly(0, dev.wildcatter.WildcatterComponents.assay(stack), dev.wildcatter.item.FuelAssemblyTags.bent(stack));
+		boolean ok = rcca ? reactor.loadRcca(hafnium ? dev.wildcatter.fluid.ControlRods.HAFNIUM : dev.wildcatter.fluid.ControlRods.B4C,
+				dev.wildcatter.item.RccaTags.b10(stack)) : reactor.loadAssembly(0, dev.wildcatter.WildcatterComponents.assay(stack), dev.wildcatter.item.FuelAssemblyTags.bent(stack));
 		if (!ok) {
 			return rcca ? "Reactor vessel: all 5 RCCAs are in" : "Reactor vessel: the core is full (9 assemblies)";
 		}
@@ -336,8 +338,12 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 		}
 		ItemStack out;
 		boolean bentGrid = reactor.lastBent();
+		int last = reactor.rccas() - 1;
+		int kind = last >= 0 ? reactor.rccaKind(last) : 0;
+		double b10 = last >= 0 ? reactor.rccaB10(last) : 0;
 		if (reactor.unloadRcca()) {
-			out = new ItemStack(WildcatterItems.RCCA);
+			out = kind == dev.wildcatter.fluid.ControlRods.HAFNIUM ? new ItemStack(WildcatterItems.HAFNIUM_RCCA)
+					: dev.wildcatter.item.RccaTags.withB10(new ItemStack(WildcatterItems.RCCA), b10);
 		} else if (reactor.assemblies() > 0 && reactor.burnup(reactor.assemblies() - 1) <= 0) {
 			double a = reactor.lastAssay();
 			reactor.unloadFreshAssembly();
@@ -396,6 +402,9 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 		if (dev.wildcatter.Rules.reactorLtop()) {
 			out.append(String.format("; LTOP %s; P-T limit %s at %.0f C, %d violations", r.ltopArmed() ? "ARMED" : "not armed",
 					Double.isInfinite(Reactor.ptLimit(r.tcold())) ? "none" : String.format("%.1f MPa", Reactor.ptLimit(r.tcold())), r.tcold(), r.ptViolations()));
+		}
+		if ((dev.wildcatter.Rules.reactorRodWear() || r.hasHafnium()) && r.rccas() > 0) {   // 19d
+			out.append(String.format("; RCCAs %s; shutdown margin %.0f pcm (highest-worth rod stuck out)", r.rccaReadout(), r.rodShutdownMargin() * 1e5));
 		}
 		if (dev.wildcatter.Rules.reactorDeltaTTrips() && !Double.isNaN(r.otSetpoint())) {
 			out.append(String.format("; delta-T %.1f C (OT setpoint %.1f, OP %.1f)", r.deltaT(), r.otSetpoint(), r.opSetpoint()));

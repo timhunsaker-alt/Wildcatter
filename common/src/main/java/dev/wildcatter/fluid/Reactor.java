@@ -48,6 +48,8 @@ public final class Reactor {
 	}
 	int assemblies;
 	int rccas;
+	final int[] rccaKind = new int[Tuning.RCCAS];        // 19d: ControlRods.B4C or HAFNIUM, in loading order (the first is bank D's)
+	final double[] rccaB10 = new double[Tuning.RCCAS];   // 19d: a B4C RCCA's B-10 burnup at its tip
 	// rods
 	double shutdownBank;
 	double bankD;
@@ -426,6 +428,9 @@ public final class Reactor {
 		if (ptAlarm) {
 			out.append(out.isEmpty() ? "" : ", ").append("P-T LIMIT");
 		}
+		if (sdmLow()) {
+			out.append(out.isEmpty() ? "" : ", ").append("SDM LOW");
+		}
 		if (ltopNotArmed()) {
 			out.append(out.isEmpty() ? "" : ", ").append("LTOP NOT ARMED");
 		}
@@ -559,11 +564,71 @@ public final class Reactor {
 	}
 
 	public boolean loadRcca() {
+		return loadRcca(ControlRods.B4C, 0);
+	}
+
+	/** 19d: loads an RCCA of this kind with this much B-10 burnt; false when all 5 are in. */
+	public boolean loadRcca(int kind, double b10) {
 		if (rccas >= Tuning.RCCAS) {
 			return false;
 		}
+		rccaKind[rccas] = kind;
+		rccaB10[rccas] = b10;
 		rccas++;
 		return true;
+	}
+
+	public int rccaKind(int i) {
+		return rccaKind[i];
+	}
+
+	public double rccaB10(int i) {
+		return rccaB10[i];
+	}
+
+	/** 19d: RCCA {@code i}'s worth as a share of a fresh B4C RCCA's. */
+	public double rccaWorthShare(int i) {
+		return ControlRods.worthShare(rccaKind[i], rccaB10[i], dev.wildcatter.Rules.reactorRodWear());
+	}
+
+	/** 19d: the shutdown margin of the RCCAs loaded, the highest-worth one stuck out, less the power defect (fraction; 0.013 is 1,300 pcm). */
+	public double rodShutdownMargin() {
+		return ReactorNeutronics.rodShutdownMargin(this);
+	}
+
+	/** 19d: true when the margin is under 1,300 pcm with a full core and all 5 RCCAs in, the rule reactorRodWear on (or a hafnium RCCA in). */
+	public boolean sdmLow() {
+		return (dev.wildcatter.Rules.reactorRodWear() || hasHafnium()) && assemblies == Tuning.CORE_ASSEMBLIES && rccas == Tuning.RCCAS && rodShutdownMargin() < Tuning.SHUTDOWN_MARGIN;
+	}
+
+	/** 19d: a hafnium RCCA is in: a new part, so its SDM reading needs no rule. */
+	public boolean hasHafnium() {
+		for (int i = 0; i < rccas; i++) {
+			if (rccaKind[i] == ControlRods.HAFNIUM) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** 19d: the RCCAs, for a readout: "B4C 12 % B-10, Hf, ...", REPLACE after one that needs it. */
+	public String rccaReadout() {
+		StringBuilder out = new StringBuilder();
+		for (int i = 0; i < rccas; i++) {
+			out.append(i == 0 ? "" : ", ").append(ControlRods.name(rccaKind[i]));
+			if (rccaKind[i] == ControlRods.B4C && (rccaB10[i] > 0 || dev.wildcatter.Rules.reactorRodWear())) {
+				out.append(String.format(" %.0f %% B-10", rccaB10[i] * 100));
+			}
+			if (ControlRods.replace(rccaKind[i], rccaB10[i])) {
+				out.append(" REPLACE");
+			}
+		}
+		return out.toString();
+	}
+
+	/** For the game test: RCCA {@code i}'s B-10 burnup. */
+	public void setRccaB10ForTest(int i, double b10) {
+		rccaB10[i] = b10;
 	}
 
 	public boolean unloadRcca() {

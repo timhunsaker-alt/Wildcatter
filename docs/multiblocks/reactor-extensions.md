@@ -1,6 +1,6 @@
 # Reactor extensions: containment, protection, casks, contamination, rods
 
-> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved. 19a and 19b BUILT 2026-11-10 (see "As built").** Proposed phase **19** in three waves here:
+> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved. 19a and 19b BUILT 2026-11-10, 19d BUILT 2026-11-12 (see "As built").** Proposed phase **19** in three waves here:
 > **19a** containment and protection; **19b** dry casks, contamination and fresh-fuel inspection; **19d** rod materials and the sodium
 > sulfate. (19c is fuel-fabrication-extensions.md.) Decisions are in `docs/questions/specs-wildcatter.md` (items 85-96).
 
@@ -304,3 +304,21 @@ The grid is a sketch; the game test is the layout of record.
   the station's 1.5 kW and 12 kW limits read the decay heat at 100x that time (`eligibilityWatts`), as burnup is compressed. The module,
   the pool and the readouts carry the real heat. Fuel from a full-power run is eligible about 1.6 days of world time after discharge.
   Unit test `CaskCoolingTest`; NeoForge scene `cask_cooling`.
+
+### 19d (2026-11-12, branch `w-17c`; decisions in `docs/questions/phase19d-rods.md`, 1-9)
+- **Rule:** `reactorRodWear` (on in new worlds, off in old): B-10 burnup, the worth loss, the vessel's RCCA and margin readout, SDM LOW.
+  A hafnium RCCA loaded shows the readout and SDM LOW without it.
+- **Hafnium RCCAs** (`hafnium_rcca`): the RCCA bench takes 24 hafnium rodlets (17c1) in its tray hopper; 85 % of a B4C RCCA's worth
+  (`fluid/ControlRods`), no wear. The vessel takes any mix, each RCCA's kind and B-10 saved with the reactor (`rccaKind<i>`,
+  `rccaB10<i>`); the first is bank D. Ag-In-Cd is not built (question 4).
+- **Helium in B4C:** each B4C RCCA burns B-10 at the power times its inserted share; 30 % reads REPLACE, past 40 % its worth falls to
+  70 % at 60 %. 5 EFPY fully inserted to REPLACE, 438 hours at 100x (question 2). An RCCA unloaded carries its B-10 on the item; no
+  swap at the refuelling machine (question 5).
+- **SDM:** the rods' margin as the design check (every RCCA but the strongest, less the power defect); SDM LOW under 1,300 pcm
+  (question 3).
+- **Sodium sulfate:** the borax dissolver is `Bagged`: a bagging station against it fills `sodium_sulfate_bag` (1 t, `c:sodium_sulfate`).
+  The decant tower takes the bags by a hopper on top or a right-click, as settled tails.
+- **Field Manual:** CONTROL RODS. JEI pages for the two items.
+- **Tests:** unit `ControlRodsTest` (85 %, the worth curve, 438 hours, the margins 2,212 / 1,552 / under 1,300 pcm, bank D's burn only
+  with the rule); NeoForge scene `rods` (its own batch, the rule on).
+- **Placeholders:** `hafnium_rcca_placeholder`, `sodium_sulfate_bag_placeholder` (item icons drawn by script).

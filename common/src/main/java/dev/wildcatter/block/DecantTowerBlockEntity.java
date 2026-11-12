@@ -27,13 +27,15 @@ import org.jspecify.annotations.Nullable;
  * The lined tailings cell (docs/multiblocks/tailings-cell.md): finds its basin from where it stands, takes tails slurry off any steel
  * pipe touching it until the basin is full or breached, fills the basin with settled tails, and returns the water on a water pipe.
  */
-public class DecantTowerBlockEntity extends BlockEntity implements Inspectable {
+public class DecantTowerBlockEntity extends BlockEntity implements Inspectable, net.minecraft.world.WorldlyContainer {
 	private static final int SCAN_TICKS = 40;
 
 	private double settledKg;
 	private double reclaimed;
 	private double gypsumKg;   // of the settled tails, phosphogypsum from a pan filter (Phase 18a)
 	private double saltKg;     // and salt tails from a potash dissolver
+	private double sulfateKg;  // 19d: sodium sulfate bags dumped in it
+	private net.minecraft.world.item.ItemStack bags = net.minecraft.world.item.ItemStack.EMPTY;   // from a hopper on top, dumped as it ticks
 	private int placed;
 	private List<BlockPos> floor = List.of();
 	private int rim;
@@ -178,6 +180,9 @@ public class DecantTowerBlockEntity extends BlockEntity implements Inspectable {
 			tower.status = "BREACHED: seeping at " + tower.breach.toShortString() + ": put the liner back";
 			return;
 		}
+		if (!tower.bags.isEmpty() && tower.breach == null && !tower.floor.isEmpty()) {
+			tower.dump(tower.bags);   // a bag from the hopper on top
+		}
 		double room = tower.capacityKg() - tower.settledKg;
 		if (room <= 0) {
 			tower.status = String.format("FULL: %.0f t of tails", tower.settledKg / 1000);
@@ -198,11 +203,96 @@ public class DecantTowerBlockEntity extends BlockEntity implements Inspectable {
 				tower.floor.size(), tower.rim, tower.ratePerTick() * 20 * 3.6) + tower.stack();
 	}
 
+	// ---- 19d: sodium sulfate bags, dumped as solid waste (reactor-extensions.md item 11) ------------------------------------------
+	/** Dumps one bag of {@code stack} into the cell; returns what it says. */
+	public String dump(net.minecraft.world.item.ItemStack stack) {
+		if (breach != null) {
+			return "Decant tower: BREACHED: put the liner back before dumping into it";
+		}
+		double kg = dev.wildcatter.Tuning.BULK_BAG_KG;
+		if (capacityKg() - settledKg < kg) {
+			return "Decant tower: FULL: no room for a 1 t bag";
+		}
+		stack.shrink(1);
+		settledKg += kg;
+		sulfateKg += kg;
+		setChanged();
+		return String.format("Decant tower: a bag of sodium sulfate dumped; %.1f t of it in the cell", sulfateKg / 1000);
+	}
+
+	public double sulfateKg() {
+		return sulfateKg;
+	}
+
+	@Override
+	public int getContainerSize() {
+		return 1;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return bags.isEmpty();
+	}
+
+	@Override
+	public net.minecraft.world.item.ItemStack getItem(int slot) {
+		return bags;
+	}
+
+	@Override
+	public net.minecraft.world.item.ItemStack removeItem(int slot, int count) {
+		return net.minecraft.world.item.ItemStack.EMPTY;
+	}
+
+	@Override
+	public net.minecraft.world.item.ItemStack removeItemNoUpdate(int slot) {
+		return net.minecraft.world.item.ItemStack.EMPTY;
+	}
+
+	@Override
+	public void setItem(int slot, net.minecraft.world.item.ItemStack stack) {
+		bags = stack;
+		setChanged();
+	}
+
+	@Override
+	public boolean stillValid(net.minecraft.world.entity.player.Player player) {
+		return false;
+	}
+
+	@Override
+	public void clearContent() {
+		bags = net.minecraft.world.item.ItemStack.EMPTY;
+	}
+
+	@Override
+	public int[] getSlotsForFace(Direction side) {
+		return side == Direction.UP ? new int[] {0} : new int[0];
+	}
+
+	@Override
+	public boolean canPlaceItem(int slot, net.minecraft.world.item.ItemStack stack) {
+		return stack.is(dev.wildcatter.WildcatterItems.SODIUM_SULFATE_BAG);
+	}
+
+	@Override
+	public boolean canPlaceItemThroughFace(int slot, net.minecraft.world.item.ItemStack stack, @Nullable Direction side) {
+		return side == Direction.UP && canPlaceItem(slot, stack);
+	}
+
+	@Override
+	public boolean canTakeItemThroughFace(int slot, net.minecraft.world.item.ItemStack stack, Direction side) {
+		return false;
+	}
+
 	/** What the stack is made of, when a fertilizer plant sent it: "", or "; of which 12.0 t phosphogypsum". */
 	private String stack() {
 		String out = gypsumKg >= 1 ? String.format("%.1f t phosphogypsum", gypsumKg / 1000) : "";
 		if (saltKg >= 1) {
 			out += (out.isEmpty() ? "" : " and ") + String.format("%.1f t salt", saltKg / 1000);
+		}
+		if (sulfateKg >= 1) {
+			out += (out.isEmpty() ? "" : " and ") + String.format("%.1f t sodium sulfate", sulfateKg / 1000);
 		}
 		return out.isEmpty() ? "" : "; of which " + out;
 	}
@@ -230,6 +320,12 @@ public class DecantTowerBlockEntity extends BlockEntity implements Inspectable {
 		if (saltKg > 0) {
 			output.putDouble("salt", saltKg);
 		}
+		if (sulfateKg > 0) {
+			output.putDouble("sulfate", sulfateKg);
+		}
+		if (!bags.isEmpty()) {
+			output.store("bags", net.minecraft.world.item.ItemStack.OPTIONAL_CODEC, bags);
+		}
 	}
 
 	@Override
@@ -241,5 +337,7 @@ public class DecantTowerBlockEntity extends BlockEntity implements Inspectable {
 		scales = input.getBooleanOr("scales", false);   // an older save keeps 20 kg a tick
 		gypsumKg = input.getDoubleOr("gypsum", 0);
 		saltKg = input.getDoubleOr("salt", 0);
+		sulfateKg = input.getDoubleOr("sulfate", 0);
+		bags = input.read("bags", net.minecraft.world.item.ItemStack.OPTIONAL_CODEC).orElse(net.minecraft.world.item.ItemStack.EMPTY);
 	}
 }

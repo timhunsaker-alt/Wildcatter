@@ -40,8 +40,12 @@ final class ReactorDesign {
 	/** The rods' worth with the most reactive one (the centre) stuck out, less the power defect at full power: the shutdown margin. */
 	static double shutdownMargin() {
 		double rods = 4 * Tuning.ROD_WORTH_EDGE;
-		double defect = -Tuning.DOPPLER_PER_C * Tuning.FUEL_RISE_C - Tuning.MTC_AT_0_PPM * (Tuning.TAVG_FULL_LOAD - Tuning.TAVG_NO_LOAD);
-		return rods - defect;
+		return rods - powerDefect();
+	}
+
+	/** The reactivity the core gains going from full power to hot zero power: the Doppler and moderator defects. */
+	static double powerDefect() {
+		return -Tuning.DOPPLER_PER_C * Tuning.FUEL_RISE_C - Tuning.MTC_AT_0_PPM * (Tuning.TAVG_FULL_LOAD - Tuning.TAVG_NO_LOAD);
 	}
 
 	/** The fraction of a rod's worth still in at {@code steps} withdrawn: the S-curve. */

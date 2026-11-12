@@ -2,6 +2,16 @@
 
 ## Unreleased (0.7.0, branch `w-next`): Phases 15-19, built 2026-11-10 while Tim was away
 
+### 19d: rods and the sodium sulfate (built 2026-11-12 while Tim was away; not approved)
+- **Hafnium RCCAs:** 24 hafnium rodlets at the RCCA bench make a hafnium RCCA, worth 85 % of a B4C one, that never wears. The vessel
+  takes any mix.
+- **Worn B4C rods and the shutdown margin** (the world rule `reactorRodWear`, on in new worlds): a B4C RCCA burns its boron-10 while it
+  is in at power, reads REPLACE at 30 % and loses worth past 40 %; the vessel reads the rods' shutdown margin and alarms SDM LOW under
+  1,300 pcm. An RCCA taken out keeps its count.
+- **Sodium sulfate:** a bagging station against the borax dissolver fills 1 t bags (`c:sodium_sulfate`); dump them in a lined cell
+  through its decant tower.
+- Decisions for review: `docs/questions/phase19d-rods.md`.
+
 ### 17c1: zirconium batches, scrap and hafnium (built 2026-11-12 while Tim was away; not approved)
 - **Batches** (the world rule `zirconiumBatches`, on in new worlds): the Kroll reactor's two retorts alternate, 50 kg reduced for 5 hours
   and then 4 hours in the vacuum distillation; the VAR furnace melts 100 kg ingots twice, an hour a melt. The world's time scale shortens

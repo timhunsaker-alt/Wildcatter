@@ -27,10 +27,11 @@ import org.jspecify.annotations.Nullable;
  * - the borax dissolver (borax by hopper, sulfuric acid off its east pipe, pumped water), making boric acid liquor at 90 C;
  * - the boric acid crystallizer against it, bagging 25 kg of boric acid to a hopper under it;
  * - the B4C furnace (boric acid and coal by hopper), 1 kg trays of pellets out below;
- * - the RCCA bench (trays and steel by hopper), building an RCCA of 24 rodlets out below.
+ * - the RCCA bench (trays and steel by hopper), building an RCCA of 24 rodlets out below; from 19d, 24 hafnium rodlets in the trays'
+ *   place make a hafnium RCCA (docs/multiblocks/reactor-extensions.md item 9).
  * Slots: 0 and 1 in from the hopper on top, 2 and 3 out to the hopper under it.
  */
-public class BoronLineBlockEntity extends UnitMotorBlockEntity implements HopperFed, WaterUser {
+public class BoronLineBlockEntity extends UnitMotorBlockEntity implements HopperFed, WaterUser, Bagged {
 	private static final double WATER_HOLD = 200.0;
 	private final NonNullList<ItemStack> slots = NonNullList.withSize(4, ItemStack.EMPTY);
 	private double borax;      // kg in the dissolver
@@ -41,6 +42,7 @@ public class BoronLineBlockEntity extends UnitMotorBlockEntity implements Hopper
 	private double steel;      // kg on the bench
 	private double progress;   // kg of the bag or tray, or seconds of the RCCA
 	private boolean building;  // the bench has an RCCA on it
+	private boolean hafnium;   // 19d: of hafnium rodlets
 	private double sulfate, co;
 	private String unit = "starting";
 
@@ -62,7 +64,7 @@ public class BoronLineBlockEntity extends UnitMotorBlockEntity implements Hopper
 		return switch (kind()) {
 			case "borax_dissolver" -> slot == 0 && stack.is(boraxItem());
 			case "b4c_furnace" -> slot == 0 && stack.is(WildcatterItems.BORIC_ACID) || slot == 1 && SolidCarbon.is(stack);
-			case "rcca_bench" -> slot == 0 && stack.is(WildcatterItems.B4C_PELLETS) || slot == 1 && stack.is(WildcatterItems.STEEL_INGOT);
+			case "rcca_bench" -> slot == 0 && (stack.is(WildcatterItems.B4C_PELLETS) || stack.is(WildcatterItems.HAFNIUM_RODLET)) || slot == 1 && stack.is(WildcatterItems.STEEL_INGOT);
 			default -> false;
 		};
 	}
@@ -126,6 +128,31 @@ public class BoronLineBlockEntity extends UnitMotorBlockEntity implements Hopper
 			}
 		}
 		return false;
+	}
+
+	// ---- 19d: the dissolver's sodium sulfate to a bagging station set against it ---------------------------------------------------
+	@Override
+	public Item bagItem() {
+		return WildcatterItems.SODIUM_SULFATE_BAG;
+	}
+
+	@Override
+	public double bagReady() {
+		return kind().equals("borax_dissolver") ? sulfate : 0;
+	}
+
+	@Override
+	public double takeForBag(double kg) {
+		double got = Math.max(0, Math.min(kg, bagReady()));
+		sulfate -= got;
+		setChanged();
+		return got;
+	}
+
+	/** For the game test: sodium sulfate made. */
+	public void addSulfateForTest(double kg) {
+		sulfate += kg;
+		setChanged();
 	}
 
 	public double liquor() {
@@ -261,17 +288,19 @@ public class BoronLineBlockEntity extends UnitMotorBlockEntity implements Hopper
 			steel += Tuning.STEEL_INGOT_KG;
 		}
 		if (building && progress >= Tuning.RCCA_SECONDS - 1e-9) {
-			if (!out(WildcatterItems.RCCA)) {
+			if (!out(hafnium ? WildcatterItems.HAFNIUM_RCCA : WildcatterItems.RCCA)) {
 				unit = "FULL: take the RCCA (a hopper under it)";
 				return;
 			}
 			building = false;
 			progress = 0;
 		}
+		boolean rodlets = slots.get(0).is(WildcatterItems.HAFNIUM_RODLET);
+		int need = rodlets ? Tuning.HF_RODLETS_PER_RCCA : (int) Math.round(Tuning.B4C_ROD_KG);
 		if (!building) {
-			int trays = (int) Math.round(Tuning.B4C_ROD_KG);
-			if (slots.get(0).getCount() < trays) {
-				unit = String.format("NO PELLETS: it needs %d trays of B4C pellets in its hopper (%d there)", trays, slots.get(0).getCount());
+			if (slots.get(0).getCount() < need) {
+				unit = rodlets ? String.format("NO RODLETS: it needs %d hafnium rodlets in its hopper (%d there)", need, slots.get(0).getCount())
+						: String.format("NO PELLETS: it needs %d trays of B4C pellets in its hopper (%d there)", need, slots.get(0).getCount());
 				return;
 			}
 			if (steel < Tuning.RCCA_STEEL_KG) {
@@ -285,12 +314,14 @@ public class BoronLineBlockEntity extends UnitMotorBlockEntity implements Hopper
 			return;
 		}
 		if (!building) {
-			slots.get(0).shrink((int) Math.round(Tuning.B4C_ROD_KG));
+			slots.get(0).shrink(need);
 			steel -= Tuning.RCCA_STEEL_KG;
 			building = true;
+			hafnium = rodlets;
 		}
 		progress += seconds() * strength;
-		unit = String.format("loading and welding 24 B4C rodlets onto the spider: %.0f %%", progress / Tuning.RCCA_SECONDS * 100);
+		unit = String.format(hafnium ? "fitting 24 hafnium rodlets to the spider: %.0f %%" : "loading and welding 24 B4C rodlets onto the spider: %.0f %%",
+				progress / Tuning.RCCA_SECONDS * 100);
 	}
 
 	/** For the game test: the bag, tray or RCCA on the part brought nearly to its end. */
@@ -315,7 +346,8 @@ public class BoronLineBlockEntity extends UnitMotorBlockEntity implements Hopper
 			case "borax_dissolver" -> String.format("Borax dissolver: %s; borax %.0f kg, water %.0f/%.0f L; Na2SO4 %.0f kg", unit, borax, water, WATER_HOLD, sulfate);
 			case "boric_acid_crystallizer" -> "Boric acid crystallizer: " + unit;
 			case "b4c_furnace" -> String.format("B4C furnace (Acheson): %s; boric acid %.0f kg, carbon %.0f kg; CO %.0f kg", unit, acid, carbon, co);
-			case "rcca_bench" -> String.format("RCCA bench: %s; trays %d, steel %.0f kg", unit, slots.get(0).getCount(), steel);
+			case "rcca_bench" -> String.format("RCCA bench: %s; %s %d, steel %.0f kg", unit, slots.get(0).is(WildcatterItems.HAFNIUM_RODLET) ? "hafnium rodlets" : "trays",
+					slots.get(0).getCount(), steel);
 			default -> kind();
 		};
 		return Component.literal(label + "; " + describe());
@@ -333,6 +365,7 @@ public class BoronLineBlockEntity extends UnitMotorBlockEntity implements Hopper
 		output.putDouble("steel", steel);
 		output.putDouble("progress", progress);
 		output.putBoolean("building", building);
+		output.putBoolean("hafnium", hafnium);
 		output.putDouble("sulfate", sulfate);
 		output.putDouble("co", co);
 	}

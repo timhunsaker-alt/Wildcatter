@@ -15,6 +15,12 @@ final class ReactorSaves {
 		}
 		out.put("assemblies", r.assemblies);
 		out.put("rccas", r.rccas);
+		for (int i = 0; i < r.rccaKind.length; i++) {   // 19d
+			if (r.rccaKind[i] != 0 || r.rccaB10[i] != 0) {
+				out.put("rccaKind" + i, r.rccaKind[i]);
+				out.put("rccaB10" + i, r.rccaB10[i]);
+			}
+		}
 		out.put("shutdownBank", r.shutdownBank);
 		out.put("bankD", r.bankD);
 		out.put("setpoint", r.setpoint);
@@ -63,6 +69,10 @@ final class ReactorSaves {
 		}
 		r.assemblies = (int) in.get("assemblies", 0);
 		r.rccas = (int) in.get("rccas", 0);
+		for (int i = 0; i < r.rccaKind.length; i++) {
+			r.rccaKind[i] = (int) in.get("rccaKind" + i, 0);
+			r.rccaB10[i] = in.get("rccaB10" + i, 0);
+		}
 		r.shutdownBank = in.get("shutdownBank", 0);
 		r.bankD = in.get("bankD", 0);
 		r.setpoint = (int) in.get("setpoint", 0);

@@ -92,6 +92,8 @@ public class WildcatterNeoForgeGameTests {
 	static {
 		TRACK_17C_SCENES.putAll(ZirconiumScenes.scenes());
 		TRACK_17C_RULES.putAll(ZirconiumScenes.RULES);
+		TRACK_17C_SCENES.putAll(RodScenes.scenes());
+		TRACK_17C_RULES.putAll(RodScenes.RULES);
 	}
 
 	/** The residence holds' scene (ResidenceScenes): in a batch whose world has realResidenceTimes on. */

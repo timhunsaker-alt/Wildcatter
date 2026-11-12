@@ -1464,6 +1464,9 @@ sized for a 40-pot line.
   use the mod's materials. The DEPA-TOPO second cycle is built (2026-11-10, branch `w-rules`; see "Tim's answers" below). Not built:
   the filter acid's uranium is not carried as an assay; fluorosilicic acid recovery; the hemihydrate process; potash by flotation;
   Farmings reading `c:fertilizers` (Farmings' side). See `docs/questions/phase18-phosphate.md`.
+- Phase 19d (rods, 2026-11-12): item icons `hafnium_rcca_placeholder` and `sodium_sulfate_bag_placeholder` drawn by script. Not built:
+  Ag-In-Cd RCCAs (no zinc refinery), RCCA swaps at the refuelling machine and RCCA records in the pool (RCCAs come out by hand with
+  their B-10 on the item), the boron side of the shutdown margin (Modes 3-5). The rods scene runs the vessel alone (no island).
 - Phase 17c1 (zirconium batches and hafnium, 2026-11-12): item icons `zircaloy_scrap_placeholder`, `hfcl4_drum_placeholder` and
   `hafnium_rodlet_placeholder` are drawn by script. The VAR arc stays 20 kW while a 100 kg melt would really draw 100 kW (question 3).
   The scene runs the extrusion press, chlorinator and magnesium cell unpowered, fed by hook; the client `zirconium` scene still runs the
@@ -2014,6 +2017,13 @@ Spec: `docs/multiblocks/reactor-extensions.md` ("As built", 19b). Branch `phase1
   there, refused by the refuelling machine and the vessel, and straightened at the assembly fixture; loaded unseen, it leaks.
 - **Field Manual:** DRY CASKS; CONTAMINATION AND NEW FUEL.
 - **Tests:** unit `ReactorActivityTest` (3 tests); NeoForge server scenes `casks`, `contamination`, `fuel_inspection`.
+## Phase 19d: rods and the sodium sulfate (2026-11-12; built while Tim was away; decisions: `docs/questions/phase19d-rods.md`)
+- Spec `docs/multiblocks/reactor-extensions.md` items 9-11 ("As built (19d)"). New world rule `reactorRodWear` (on in new worlds).
+- `fluid/ControlRods` (plain Java): worth by material and B-10, the burn rate. `Reactor`: each RCCA's kind and B-10 (saved), its worth in
+  the kinetics, `rodShutdownMargin`, SDM LOW. The RCCA bench makes `hafnium_rcca` from 24 hafnium rodlets; RCCAs carry B-10 on the item
+  (`item/RccaTags`). The borax dissolver bags `sodium_sulfate_bag` at a bagging station; the decant tower takes the bags.
+- Field Manual page CONTROL RODS; JEI pages. Tests: unit `ControlRodsTest`; NeoForge scene `rods`.
+
 ## Phase 15: the oilfield (2026-11-09)
 Built while Tim was away, on the DRAFT specs decided on recommendation; the decisions are in `docs/questions/phase15-oilfield.md` (25
 entries). Branch `phase15`.

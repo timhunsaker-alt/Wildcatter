@@ -41,7 +41,9 @@ public final class Rules {
 		/** Plant residence times as real holds: coking 18 h, digestion 1 h, precipitation 36 h. Off even in new worlds. */
 		REAL_RESIDENCE_TIMES("realResidenceTimes", false, "coking 18 h, digestion 1 h and precipitation 36 h as real holds"),
 		/** 17c1: the Kroll reactor's two retorts and the VAR furnace's ingots run as batches, and the line loses scrap (84 % to tube). */
-		ZIRCONIUM_BATCHES("zirconiumBatches", true, "Kroll retorts and VAR ingots as batches, and the zirconium line's scrap losses");
+		ZIRCONIUM_BATCHES("zirconiumBatches", true, "Kroll retorts and VAR ingots as batches, and the zirconium line's scrap losses"),
+		/** 19d: B4C rodlets burn their boron-10 (REPLACE at 30 %, worth falling past 40 %), and the console alarms SDM LOW. */
+		REACTOR_ROD_WEAR("reactorRodWear", true, "B-10 burnup in B4C control rods and the SDM LOW alarm");
 
 		public final String key;
 		public final boolean newWorld;
@@ -164,6 +166,10 @@ public final class Rules {
 
 	public static boolean wellControl() {
 		return on(Rule.WELL_CONTROL);
+	}
+
+	public static boolean reactorRodWear() {
+		return on(Rule.REACTOR_ROD_WEAR);
 	}
 
 	public static boolean zirconiumBatches() {

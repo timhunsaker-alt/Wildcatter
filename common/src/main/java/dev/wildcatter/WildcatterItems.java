@@ -135,6 +135,15 @@ public final class WildcatterItems {
 			"An empty welded steel canister for dry storage: 12 assemblies, at most 12 kW", "for the cask loading station's hopper");
 	public static final ResourceKey<Item> DECON_WASHER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("decon_washer"));
 	public static final Item DECON_WASHER = new dev.wildcatter.item.DeconWasherItem(new Item.Properties().stacksTo(1).setId(DECON_WASHER_KEY));
+	/** 19d: a hafnium RCCA (docs/multiblocks/reactor-extensions.md item 9), from 24 hafnium rodlets at the RCCA bench. */
+	public static final ResourceKey<Item> HAFNIUM_RCCA_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("hafnium_rcca"));
+	public static final Item HAFNIUM_RCCA = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(1).setId(HAFNIUM_RCCA_KEY),
+			String.format("Rod cluster control assembly: 24 hafnium rodlets on a spider, %.0f %% of a B4C RCCA's worth", Tuning.HF_RCCA_WORTH * 100),
+			"no helium, no boron to burn: it lasts; load it as a B4C RCCA");
+	/** 19d: sodium sulfate (salt cake) in a 1 t bag, from a bagging station against the borax dissolver. */
+	public static final ResourceKey<Item> SODIUM_SULFATE_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("sodium_sulfate_bag"));
+	public static final Item SODIUM_SULFATE_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(SODIUM_SULFATE_BAG_KEY),
+			String.format("Sodium sulfate (salt cake), a %,.0f kg bulk bag", Tuning.BULK_BAG_KG), "no use in Wildcatter: dump it in a lined tailings cell (its decant tower)");
 	public static final ResourceKey<Item> RCCA_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("rcca"));
 	public static final Item RCCA = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(1).setId(RCCA_KEY),
 			"Rod cluster control assembly: 24 B4C rodlets on a spider", "5 to the reactor's core; load it by right-click on the cold vessel");
@@ -443,6 +452,8 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, BORIC_ACID_KEY, BORIC_ACID);
 		Registry.register(BuiltInRegistries.ITEM, B4C_PELLETS_KEY, B4C_PELLETS);
 		Registry.register(BuiltInRegistries.ITEM, RCCA_KEY, RCCA);
+		Registry.register(BuiltInRegistries.ITEM, HAFNIUM_RCCA_KEY, HAFNIUM_RCCA);
+		Registry.register(BuiltInRegistries.ITEM, SODIUM_SULFATE_BAG_KEY, SODIUM_SULFATE_BAG);
 		Registry.register(BuiltInRegistries.ITEM, DOSIMETER_KEY, DOSIMETER);
 		Registry.register(BuiltInRegistries.ITEM, DRY_STORAGE_CANISTER_KEY, DRY_STORAGE_CANISTER);
 		Registry.register(BuiltInRegistries.ITEM, DECON_WASHER_KEY, DECON_WASHER);

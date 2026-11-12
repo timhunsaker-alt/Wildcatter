@@ -497,7 +497,7 @@ Specs: `docs/multiblocks/fertilizer.md`, `docs/multiblocks/uranium-from-phosphat
 - **Known gaps:** the bag and extractant drum icons are `*_placeholder`; Farmings does not read `c:fertilizers` yet; the
   filter acid's uranium is worked out from the rock's grade, not carried as an assay.
 
-## Phase 19 — Reactor and fuel extensions — 19a and 19b BUILT 2026-11-10 (while Tim was away, on the DRAFT spec decided on recommendation; not approved)
+## Phase 19 — Reactor and fuel extensions — 19a and 19b BUILT 2026-11-10, 19d BUILT 2026-11-12 (while Tim was away, on the DRAFT spec decided on recommendation; not approved)
 Spec: `docs/multiblocks/reactor-extensions.md` ("As built"); plan: `docs/ideas-plan.md`, Phase 19. Decisions for Tim:
 `docs/questions/phase19-reactor.md`. Branch `phase19`. **The rule for existing worlds:** every rule that changes what a reactor already
 does was a key in `config/wildcatter.properties`, off by default; since 2026-11-10 they are world rules, on in new worlds except
@@ -524,9 +524,11 @@ does was a key in `config/wildcatter.properties`, off by default; since 2026-11-
   rod X-ray and helium leak tests, scrap and the zinc stearate lubricant; 19c2 HF recovery to the conversion plant, IFBA and gadolinia
   burnable absorbers, real Inconel and stainless hardware (after 17b's nickel smelter). 19c1's leaking rods would feed 19b's coolant
   activity (19b reads leakers from bent grids already).
-- **19d, rods and the sodium sulfate** (planned, not built): hafnium RCCAs (85 % of B4C's worth, after 17c1's hafnium), Ag-In-Cd later
-  (waits for a zinc refinery), the console's SDM LOW; helium in the B4C rodlets (B-10 burnup, REPLACE at 30 %); 1 t sodium sulfate bags to
-  a lined tailings cell.
+- **19d, rods and the sodium sulfate** (BUILT 2026-11-12, branch `w-17c`; decisions `docs/questions/phase19d-rods.md`): hafnium RCCAs
+  from 24 hafnium rodlets at the RCCA bench (85 % of B4C's worth); behind the world rule `reactorRodWear`, B-10 burnup in B4C RCCAs
+  (REPLACE at 30 %, worth falling past 40 %) and the vessel's shutdown margin with SDM LOW under 1,300 pcm; sodium sulfate in 1 t bags
+  from the borax dissolver, dumped in a lined cell through its decant tower. Ag-In-Cd waits for a zinc refinery. NeoForge scene `rods`;
+  unit test `ControlRodsTest`.
 
 ## Tim's answers: world rules and the rest (2026-11-10, branch `w-rules`, cut from `w-next`) — BUILT
 Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10.md`. Decisions: `docs/questions/world-rules.md`.
@@ -586,4 +588,4 @@ Decisions taken while building: `docs/questions/answers-grid.md`. NeoForge scene
   batches: 17c1. The caustic's uses were struck: it goes to the Bayer refinery.)
 - Fuel: the kiln's HF back to the conversion plant; zinc stearate lubricant and pore formers; a nickel smelter for real Inconel and
   stainless hardware; pellet inspection, rod X-ray and helium leak tests; IFBA and gadolinia burnable absorbers; rejects and scrap.
-- Reactor (the rest of Phase 19, planned above): silver-indium-cadmium and hafnium rods; helium in the B4C rodlets; a buyer for the borax plant's sodium sulfate. Raised by 19a: containment spray and fan coolers; a relief tank's cover gas and drain tank; the reactor rules stored per world, so they can be on for new worlds only. Raised by 19b: a crawler transporter for the transfer cask; the washer as a placed skid on the circuit; contamination spreading with water; nuclide-by-nuclide coolant activity.
+- Reactor (the rest of Phase 19, planned above): silver-indium-cadmium rods (waits for a zinc refinery); RCCA swaps at the refuelling machine and RCCA records in the pool (19d left them out). Raised by 19a: containment spray and fan coolers; a relief tank's cover gas and drain tank; the reactor rules stored per world, so they can be on for new worlds only. Raised by 19b: a crawler transporter for the transfer cask; the washer as a placed skid on the circuit; contamination spreading with water; nuclide-by-nuclide coolant activity.

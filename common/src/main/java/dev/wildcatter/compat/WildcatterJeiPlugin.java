@@ -57,6 +57,11 @@ public class WildcatterJeiPlugin implements IModPlugin {
 				+ "A Kroll reactor on a hafnium campaign (sneak-click it) takes it by a hopper on top.");
 		info(registration, WildcatterItems.HAFNIUM_RODLET, "Solid hafnium, 9.7 mm across and 3.66 m long, rolled by the pilger mill's rodlet dies on a hafnium campaign. "
 				+ "24 make a hafnium RCCA at the RCCA bench.");
+		// 19d: rod materials and the sodium sulfate (docs/multiblocks/reactor-extensions.md)
+		info(registration, WildcatterItems.HAFNIUM_RCCA, "24 hafnium rodlets on a spider, from the RCCA bench (the rodlets in its tray hopper, with steel). "
+				+ "85 % of a B4C RCCA's worth; it takes no helium and does not wear. Load it into the cold vessel as a B4C RCCA.");
+		info(registration, WildcatterItems.SODIUM_SULFATE_BAG, "Salt cake from the borax dissolver, bagged by a bagging station set against it. "
+				+ "Wildcatter has no use for it (tagged c:sodium_sulfate for other mods): dump it in a lined tailings cell through its decant tower.");
 	}
 
 	private static void info(IRecipeRegistration registration, net.minecraft.world.item.Item item, String text) {

@@ -34,6 +34,20 @@ public class DecantTowerBlock extends BaseEntityBlock {
 		return level.isClientSide() ? null : createTickerHelper(type, WildcatterBlocks.DECANT_TOWER_ENTITY, DecantTowerBlockEntity::tick);
 	}
 
+	/** 19d: a sodium sulfate bag dumped in the cell (reactor-extensions.md item 11). */
+	@Override
+	protected InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+			net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+		if (!stack.is(dev.wildcatter.WildcatterItems.SODIUM_SULFATE_BAG)) {
+			return InteractionResult.TRY_WITH_EMPTY_HAND;
+		}
+		if (!level.isClientSide() && level.getBlockEntity(pos) instanceof DecantTowerBlockEntity tower) {
+			String said = tower.dump(stack);
+			player.sendOverlayMessage(net.minecraft.network.chat.Component.literal(said));
+		}
+		return InteractionResult.SUCCESS;
+	}
+
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 		if (!level.isClientSide() && level.getBlockEntity(pos) instanceof DecantTowerBlockEntity tower) {

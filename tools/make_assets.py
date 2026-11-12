@@ -2816,6 +2816,9 @@ phase16_names({"cathode_gas_scrubber": "Cathode Gas Scrubber (NaF beds, 10 kW)",
 # 17c1: zirconium scrap and hafnium (docs/multiblocks/zirconium-extensions.md)
 phase16_items({"zircaloy_scrap": ("Zircaloy Scrap (25 kg)", (150, 150, 140)), "hfcl4_drum": ("HfCl4 Drum (50 kg of Hf)", (200, 196, 180)),
 	"hafnium_rodlet": ("Hafnium Rodlet", (120, 124, 132))})
+# 19d: hafnium RCCAs and sodium sulfate bags (docs/multiblocks/reactor-extensions.md)
+phase16_items({"hafnium_rcca": ("Hafnium RCCA", (110, 116, 126)), "sodium_sulfate_bag": ("Sodium Sulfate (1 t bag)", (236, 232, 220))})
+save_json(f"{ROOT}/data/c/tags/item/sodium_sulfate.json", {"replace": False, "values": [f"{ns}:sodium_sulfate_bag"]})
 # ---- Phase 17a: ferroalloys (docs/multiblocks/ferroalloys.md) ---------------------------------------------------------------------
 # blockstates, models, shapes and items come from tools/models/ferroalloys.py; here loot, names, tags, recipes and the bags. Each bag's
 # icon is the Ludo bulk bag with a swatch of what it holds drawn on it by this script: a placeholder until it has art of its own.

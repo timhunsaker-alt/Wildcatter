@@ -107,7 +107,7 @@ public class ReactorPartBlock extends BigPartBlock implements net.minecraft.worl
 			return read;
 		}
 		if (level.getBlockEntity(main(pos, state)) instanceof ReactorVesselBlockEntity vessel
-				&& (stack.is(WildcatterBlocks.FUEL_ASSEMBLY.asItem()) || stack.is(WildcatterItems.RCCA))) {
+				&& (stack.is(WildcatterBlocks.FUEL_ASSEMBLY.asItem()) || stack.is(WildcatterItems.RCCA) || stack.is(WildcatterItems.HAFNIUM_RCCA))) {
 			if (!level.isClientSide()) {
 				player.sendOverlayMessage(Component.literal(vessel.load(stack)));
 			}

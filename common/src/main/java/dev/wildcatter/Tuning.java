@@ -1114,6 +1114,15 @@ public final class Tuning {
 	public static final double B4C_ROD_KG = 9.0;                   // an RCCA: 24 rodlets of 0.37 kg
 	public static final double RCCA_STEEL_KG = 20.0;               // (unverified)
 	public static final double RCCA_SECONDS = 3600.0;              // (proposed)
+	// 19d: rod materials (docs/multiblocks/reactor-extensions.md items 9-11; the rule reactorRodWear)
+	public static final double HF_RCCA_WORTH = 0.85;               // of a B4C RCCA's worth (proposed, unverified)
+	public static final double AIC_RCCA_WORTH = 0.90;              // Ag-In-Cd, not built: it waits for a zinc refinery (proposed, unverified)
+	public static final double B10_REPLACE = 0.30;                 // B-10 burnup at the tip that reads REPLACE (proposed)
+	public static final double B10_WORTH_FALL_FROM = 0.40;         // past it the worth falls in a straight line (proposed)
+	public static final double B10_WORTH_FALL_TO = 0.60;           // to its floor here (proposed)
+	public static final double B10_WORTH_FLOOR = 0.70;
+	public static final double B10_REPLACE_EFPY = 5.0;             // years fully inserted at full power to reach REPLACE (proposed, unverified)
+	public static final double HF_RCCA_STEEL_KG = 20.0;            // the spider, plugs and hardware, as the B4C RCCA's (unverified)
 	public static final double DISSOLVER_WATTS = 30_000.0;
 	public static final double CRYSTALLIZER_WATTS = 40_000.0;
 	public static final double B4C_FURNACE_WATTS = 150_000.0;
