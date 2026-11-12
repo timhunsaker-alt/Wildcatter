@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SHS",
+    "BFB",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "B": "minecraft:bricks",
+    "F": "minecraft:blast_furnace"
+  },
+  "result": {
+    "id": "wildcatter:decrepitation_kiln",
+    "count": 1
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " P ",
+    "SVS",
+    " S "
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "V": "minecraft:lever"
+  },
+  "result": {
+    "id": "wildcatter:brine_wellhead",
+    "count": 1
+  }
+}

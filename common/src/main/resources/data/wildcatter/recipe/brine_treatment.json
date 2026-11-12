@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "CXC",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "C": "minecraft:cauldron",
+    "X": "minecraft:piston"
+  },
+  "result": {
+    "id": "wildcatter:brine_treatment",
+    "count": 1
+  }
+}

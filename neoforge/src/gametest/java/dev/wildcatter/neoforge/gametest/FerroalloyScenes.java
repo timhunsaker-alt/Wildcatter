@@ -191,9 +191,37 @@ final class FerroalloyScenes {
 						String si = " | furnace " + read(helper, 48, U, -20) + " | station " + read(helper, 56, U, -16);
 						log(scene, "ferrosilicon:" + si);
 						check(helper, fesi >= 1, "a tap on ferrosilicon should fill bags of ferrosilicon: " + fesi + si);
+						// 20b: Ti slag, ilmenite and coke to 85 % slag and pig iron
+						saf.nextRecipe();
+						saf.testSkipChangeover();
+						saf.slots().set(7, new ItemStack(WildcatterItems.ILMENITE, 16));
+						for (int i = 0; i < station.slots().size(); i++) {   // the bags so far taken away, fresh empties in its hopper
+							station.slots().set(i, ItemStack.EMPTY);
+						}
+						station.slots().set(0, new ItemStack(WildcatterItems.EMPTY_BULK_BAG, 16));
+						helper.runAfterDelay(40, () -> {
+							check(helper, saf.recipe() == Ferroalloys.Recipe.TI_SLAG, "the furnace should be on Ti slag: " + read(helper, 48, U, -20));
+							saf.testFillHearth(Tuning.SAF_HEARTH_KG - 0.2);
+							helper.runAfterDelay(200, () -> {
+								int ti = count(station, WildcatterItems.TI_SLAG_BAG);
+								String tiRead = " | furnace " + read(helper, 48, U, -20) + " | station " + read(helper, 56, U, -16);
+								log(scene, "ti slag: " + ti + " bags, " + saf.pigIronIngots() + " iron ingots" + tiRead);
+								check(helper, ti >= 1, "a tap on Ti slag should fill slag bags: " + ti + tiRead);
+								check(helper, saf.pigIronIngots() > 0, "a tap on Ti slag should cast pig iron as iron ingots: " + saf.pigIronIngots() + tiRead);
+								shortElectrodes(helper, scene, tx, saf);
+							});
+						});
+					});
+				});
+			});
+		});
+	}
+
+	/** The paste bin emptied and the electrodes burned short: ELECTRODES SHORT and the MW fall. */
+	private static void shortElectrodes(GameTestHelper helper, String scene, FurnaceTransformerBlockEntity tx, SubmergedArcFurnaceBlockEntity saf) {
 						double before = tx.load().watts();
 						// the paste bin emptied and the electrodes burned short
-						saf.slots().set(saf.slots().size() - 1, ItemStack.EMPTY);
+						saf.slots().set(6, ItemStack.EMPTY);   // the paste bin
 						saf.testBurnElectrodes();
 						helper.runAfterDelay(80, () -> {
 							String shortRead = read(helper, 48, U, -20);
@@ -204,10 +232,6 @@ final class FerroalloyScenes {
 							log(scene, "ok");
 							helper.succeed();
 						});
-					});
-				});
-			});
-		});
 	}
 
 	// ---- alumino --------------------------------------------------------------------------------------------------------------------

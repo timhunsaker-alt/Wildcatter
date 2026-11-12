@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SHS",
+    "SCS",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "C": "minecraft:cauldron",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:lithium_carbonator",
+    "count": 1
+  }
+}

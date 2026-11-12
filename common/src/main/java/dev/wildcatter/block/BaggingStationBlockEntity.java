@@ -34,9 +34,9 @@ public class BaggingStationBlockEntity extends FillerBlockEntity {
 			unit = "NOT BUILT: set it against a calciner, hydrate filter, AlF3 reactor, lime kiln, coke cooler, granulation plant, potash dryer, barite mill or bentonite dryer";
 			return;
 		}
-		ItemStack bag = new ItemStack(source.bagItem());
-		if (source.bagReady() < Tuning.BULK_BAG_KG) {
-			unit = String.format("filling %s: %.0f/%.0f kg ready", bag.getHoverName().getString(), source.bagReady(), Tuning.BULK_BAG_KG);
+		ItemStack bag = new ItemStack(source.bagItem(worldPosition));
+		if (source.bagReady(worldPosition) < Tuning.BULK_BAG_KG) {
+			unit = String.format("filling %s: %.0f/%.0f kg ready", bag.getHoverName().getString(), source.bagReady(worldPosition), Tuning.BULK_BAG_KG);
 			return;
 		}
 		if (fed() == 0) {
@@ -52,7 +52,7 @@ public class BaggingStationBlockEntity extends FillerBlockEntity {
 			return;
 		}
 		useOne();
-		source.takeForBag(Tuning.BULK_BAG_KG);
+		source.takeForBag(worldPosition, Tuning.BULK_BAG_KG);
 		putOut(bag);
 		filled++;
 		unit = "filled a bag";

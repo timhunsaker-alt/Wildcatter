@@ -111,7 +111,7 @@ public class CylinderFillerBlockEntity extends UnitMotorBlockEntity implements H
 			unit = "NO CYLINDER: put a hopper of empty 48Y cylinders on top";
 			return;
 		}
-		UraniumStage columns = Touching.find(level, worldPosition, Uf6StageBlockEntity.class, s -> s.kind().equals("distillation_columns"));
+		UraniumStage columns = Touching.find(level, worldPosition, Uf6StageBlockEntity.class, s -> ConversionSize.base(s).equals("distillation_columns"));
 		if (columns == null) {
 			unit = "NOT BUILT: set it against the DISTILLATION COLUMNS";
 			return;
@@ -126,7 +126,7 @@ public class CylinderFillerBlockEntity extends UnitMotorBlockEntity implements H
 			return;
 		}
 		double room = (Tuning.CYLINDER_48Y_KG - uf6) / Tuning.UF6_PER_U;
-		double u = columns.takeUranium(Math.min(Conversion.uraniumKgs() * 1.2 * seconds(), room));
+		double u = columns.takeUranium(Math.min(Conversion.uraniumKgs() * ConversionSize.scale((Uf6StageBlockEntity) columns) * 1.2 * seconds(), room));
 		uf6 += u * Tuning.UF6_PER_U;
 		unit = String.format("filling: %,.0f/%,.0f kg of UF6 (%.1f %%)", uf6, Tuning.CYLINDER_48Y_KG, uf6 / Tuning.CYLINDER_48Y_KG * 100);
 	}

@@ -2,6 +2,31 @@
 
 ## Unreleased (0.7.0, branch `w-next`): Phases 15-19, built 2026-11-10 while Tim was away
 
+### 20c: lithium (built 2026-11-12 while Tim was away; not approved)
+- Lithium hydroxide from spodumene by the sulfate route: a decrepitation kiln, an acid roast kiln, the lithium leach, a LiOH crystallizer
+  (lithium hydroxide and sodium sulfate in 1 t bags) and a lithium carbonator; 0.5 t of LiOH.H2O an hour. A bag of lithium carbonate in a
+  potline pot's hopper runs the pot 0.1 V lower. Spec: `docs/multiblocks/lithium.md`. Existing worlds are unchanged. Decisions:
+  `docs/questions/phase20-chemicals.md` (27-34).
+
+### 20b: titanium pigment (built 2026-11-12 while Tim was away; not approved)
+- The mineral separator puts its ilmenite and rutile out as items to a hopper under it; the submerged arc furnace smelts ilmenite to
+  titanium slag and pig iron; a titanium chlorinator, TiCl4 purification, TiCl4 oxidiser, VPSA oxygen unit and pigment finishing make 0.25 t
+  of TiO2 pigment an hour on a chlorine loop. A bag crafts into 64 white dye. Spec: `docs/multiblocks/titanium-pigment.md`. Existing worlds
+  are unchanged. Decisions: `docs/questions/phase20-chemicals.md` (15-26).
+
+### 16b2: the full-size conversion plant (built 2026-11-12 while Tim was away; not approved)
+- Four fluorine cell houses in series on bus bars from the 12.47 kV rectifier transformer (432 V, 6 kA), and a larger size of the
+  reduction reactor, hydrofluorinator, fluorinator, cold traps and distillation columns, each 0.3 kg of U a second: a 48Y about every 8
+  hours. Spec: `docs/multiblocks/conversion-extensions.md`. Existing conversion plants are unchanged. Decisions:
+  `docs/questions/phase16-uranium.md` (31-35).
+
+### 20a: the chlor-alkali plant (built 2026-11-12 while Tim was away; not approved)
+- A full-size chlor-alkali plant, about a tonne of chlorine an hour: a brine saturator, the brine treatment, a membrane cell room of 52
+  elements at 15 kA and 161 V (2.4 MW of DC) on a new 12.47 kV rectifier transformer, a chlorine train that dries, compresses and
+  liquefies into ton containers, a caustic evaporator (50 % caustic) and an HCl synthesis unit (32 % hydrochloric acid). A brine wellhead
+  solution-mines a salt dome. Spec: `docs/multiblocks/chlor-alkali-plant.md`. Existing worlds are unchanged. Decisions for review:
+  `docs/questions/phase20-chemicals.md`.
+
 ### Time scale (Tim, 2026-11-10, branch `w-timescale`)
 - **A world's time scale:** 1:1, 5:1, 10:1, 20:1 or 50:1. It shortens the long waits only: a real reactor heat-up and cooldown
   (`reactorRealHeatup`), the coke oven, digester and precipitator holds (`realResidenceTimes`), and dry cask cooling. Rates, fuel,

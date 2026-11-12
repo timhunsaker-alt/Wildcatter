@@ -1634,4 +1634,78 @@ public final class Tuning {
 	/** The fixture's hardware with the fuelNickelHardware rule: 16 kg of 304 (nozzles) and 4 kg of nickel-chromium alloy. */
 	public static final double ASSEMBLY_304_KG = 16.0;
 	public static final double ASSEMBLY_NICR_KG = 4.0;
+	// ---- Phase 20a: the chlor-alkali plant (docs/multiblocks/chlor-alkali-plant.md) ------------------------------------------------
+	// Every rate follows from these through fluid/ChlorAlkaliPlant.
+	public static final int CAP_ELEMENTS = 52;                     // bipolar membrane elements, two electrolysers in series
+	public static final double CAP_ELEMENT_KA = 15.0;              // kA through each
+	public static final double CAP_ELEMENT_VOLTS = 3.1;            // at 15 kA (zirconium.md): 161 V for 52
+	public static final double CAP_CREEP_VOLTS_PER_DAY = 0.1;      // an element's voltage creep a day on brine that holds calcium (proposed)
+	public static final double CAP_CREEP_MAX_VOLTS = 0.5;          // where the creep stops: the membranes blinded (proposed)
+	public static final double BRINE_NACL = 0.26;                  // saturated brine, NaCl by weight
+	public static final double BRINE_SALT_CA_CO2 = 0.0032;         // kg of CO2 a kg of salt for its calcium as carbonate, with excess (proposed, see questions)
+	public static final double BRINE_SATURATOR_WATTS = 22_000.0;   // its agitator and brine pumps, LV
+	public static final double BRINE_TREATMENT_WATTS = 45_000.0;   // clarifier, filters and IX pumps, LV
+	public static final double BRINE_SALT_HOLD_KG = 4_000.0;       // salt the saturator keeps dissolving (about two rock salt blocks)
+	public static final double BRINE_WATER_HOLD = 6_000.0;         // litres of make-up water the saturator holds
+	public static final double DRYING_ACID_PER_CL2 = 0.015;        // kg of 98 % H2SO4 a kg of chlorine dried (unverified), out as spent 75 % acid
+	public static final double CL2_COMPRESSOR_WATTS = 250_000.0;   // the chlorine compressor, MV (proposed)
+	public static final double CL2_LIQUEFIER_WATTS = 110_000.0;    // the refrigerated liquefier, LV
+	public static final double CL2_LIQUEFIER_KGS = 1_100.0 / 3600; // what the liquefier condenses at most (the cell room's rating with a margin, proposed)
+	public static final double CAUSTIC_50_STRENGTH = 0.50;         // the evaporator's product
+	public static final double CAUSTIC_EVAPORATOR_STEAM = 0.7;     // t of process steam a t of NaOH, double effect (unverified)
+	public static final double HCL_MAX_KGH = 100.0;                // the HCl burner's rating, kg of HCl an hour (proposed)
+	public static final double HCL_STRENGTH = 0.32;                // its acid
+	/** rectifier_mv (shared with 16b2): a 12-pulse thyristor rectifier transformer on distribution voltage, 3.2 MVA, 16 kA, 500 V. */
+	public static final double RECTIFIER_MV_MAX_DC_VOLTS = 500.0;
+	public static final double RECTIFIER_MV_DC_OHMS = 0.3e-3;      // about 1 % of 500 V at 16 kA (proposed, as the 4.16 kV unit)
+	public static final double RECTIFIER_MV_RAMP_VOLTS_PER_S = 50.0; // its tap changer over the wider range (proposed)
+	public static final double BRINE_WELL_INJECT_LPS = 3.0;        // fresh water down the inner string, litres a second (proposed: 1.65 t/h of salt needs about 1.3)
+	public static final int BRINE_CAVERN_REACH = 12;               // blocks from the hole's bottom the cavern can reach (proposed)
+
+	// ---- 16b2: the full-size conversion plant (docs/multiblocks/conversion-extensions.md, "A full-size plant") ---------------------
+	public static final double CONVERSION_LARGE_SCALE = 4.0;      // the large main line's parts: 0.3 kg of U a second, four times the 7d parts
+	public static final int F2_HOUSES_IN_SERIES = 4;               // cell houses on one rectifier_mv: 48 cells, 432 V at 6 kA
+
+	// ---- Phase 20b: the titanium pigment plant (docs/multiblocks/titanium-pigment.md) -------------------------------------------
+	public static final double TI_MINERAL_ITEM_KG = 500.0;         // a bag of ilmenite or rutile out of the mineral separator (proposed)
+	public static final double ILMENITE_TIO2 = 0.50;               // the separator's ilmenite (unverified)
+	public static final double ILMENITE_FE = 0.40;                 // its iron, derived from the spec's 0.12 t/h of pig iron with 0.18 t/h of slag
+	public static final double TI_SLAG_TIO2 = 0.85;                // the smelter's slag
+	public static final double TI_SLAG_FE_RECOVERY = 0.98;         // of the ilmenite's iron to the pig iron (proposed)
+	public static final double TI_SLAG_COKE_PER_ILMENITE = 0.12;   // kg of coke a kg of ilmenite (unverified; anthracite in real plants)
+	public static final double RUTILE_TIO2 = 0.95;                 // the separator's rutile (proposed)
+	public static final double TIO2_TPH = 0.25;                    // t/h of TiO2 pigment (proposed size)
+	public static final double TIO2_COKE_PER_T = 370.0;            // kg of coke a tonne of TiO2 (chloride process)
+	public static final double TIO2_O2_NM3_PER_T = 350.0;          // Nm3 of oxygen a tonne of TiO2
+	public static final double TIO2_CL2_MAKEUP_PER_T = 400.0;      // kg of make-up chlorine a tonne of TiO2 on this blend (proposed, unverified)
+	public static final double TICL4_SICL4_SHARE = 0.005;          // SiCl4 a kg of crude TiCl4, distilled off and counted (proposed)
+	public static final double TI_CHLORINATOR_WATTS = 30_000.0;    // its fluidizing blower, LV
+	public static final double TICL4_PURIFICATION_WATTS = 40_000.0; // the reboiler, LV
+	public static final double TICL4_OXIDISER_GAS_WATTS = 0.2e6;   // its preheaters on pipeline gas (proposed)
+	public static final double VPSA_O2_NM3H = 100.0;               // the VPSA oxygen unit, 93 % O2
+	public static final double VPSA_WATTS = 35_000.0;              // about 0.35 kWh a Nm3 (unverified), LV
+	public static final double O2_KG_PER_M3 = 1.429;               // oxygen at 0 C, 1 atm
+	public static final double PIGMENT_FINISHING_WATTS = 75_000.0; // mills, filters, dryer fans, LV
+	public static final double PIGMENT_HYDRATE_PER_T = 30.0;       // kg of alumina hydrate a tonne of TiO2 for its surface treatment (proposed)
+	public static final double PIGMENT_STEAM_PER_T = 2.0;          // t of process steam a tonne of TiO2 for the micronizer (unverified)
+	public static final double PIGMENT_DYE_PER_BAG = 64;           // white dye a bag of pigment crafts into (proposed)
+
+	// ---- Phase 20c: lithium hydroxide from spodumene (docs/multiblocks/lithium.md) ----------------------------------------------
+	public static final double SPODUMENE_ORE_LI2O = 0.06;          // 80 % spodumene at 7.5 % Li2O (proposed)
+	public static final double LITHIUM_RECOVERY = 0.90;            // of the ore's Li2O to the hydroxide (proposed)
+	public static final double LIOH_TPH = 0.5;                     // t/h of LiOH.H2O (proposed size)
+	public static final double DECREPITATION_J_PER_KG = 1.0e6;     // about 1 GJ a tonne of ore (unverified)
+	public static final double ROAST_ACID_EXCESS = 1.30;           // the acid roast's 30 % excess
+	public static final double ROAST_GAS_WATTS = 0.2e6;            // the roast kiln's indirect firing (proposed)
+	public static final double LEACH_LIME_PER_T_ORE = 20.0;        // kg of quicklime a tonne of ore (proposed)
+	public static final double LEACH_CO2_PER_T_ORE = 2.0;          // kg of CO2 a tonne of ore for the calcium (proposed: 3 m3 of liquor a tonne at 0.6 g/L Ca)
+	public static final double LIOH_STEAM_PER_T = 3.0;             // t of process steam a tonne of LiOH.H2O (unverified)
+	public static final double DECREPITATION_KILN_WATTS = 30_000.0; // drive and fans, LV
+	public static final double ACID_ROAST_KILN_WATTS = 15_000.0;
+	public static final double LITHIUM_LEACH_WATTS = 37_000.0;
+	public static final double LIOH_CRYSTALLIZER_WATTS = 110_000.0;
+	public static final double LITHIUM_CARBONATOR_WATTS = 10_000.0;
+	public static final double LITHIUM_CARBONATOR_KGH = 100.0;     // kg/h of Li2CO3 at most (proposed: "a little carbonate")
+	public static final double POT_LITHIUM_VOLTS = 0.1;            // a pot with lithium in its bath runs this much lower (proposed)
+	public static final double POT_LI2CO3_PER_T_AL = 1.5;          // kg of Li2CO3 a tonne of aluminium (unverified)
 }

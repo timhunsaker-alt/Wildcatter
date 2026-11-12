@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SHS",
+    "CXC",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "C": "minecraft:cauldron",
+    "X": "minecraft:piston",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:lithium_leach",
+    "count": 1
+  }
+}

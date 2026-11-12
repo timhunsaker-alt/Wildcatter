@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "CIC",
+    "SCS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "C": "minecraft:copper_block",
+    "I": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:membrane_cell_room",
+    "count": 1
+  }
+}

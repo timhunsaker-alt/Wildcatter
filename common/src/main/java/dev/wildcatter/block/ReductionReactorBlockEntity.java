@@ -139,7 +139,8 @@ public class ReductionReactorBlockEntity extends PlantUnitBlockEntity implements
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
 			return;
 		}
-		double max = Math.min(Conversion.uraniumKgs() * 1.2 * seconds(), Conversion.uraniumKgs() * Tuning.PLANT_HOLD_SECONDS - r.uranium);
+		double rate = Conversion.uraniumKgs() * ConversionSize.scale(r);   // 16b2: the large size, four times
+		double max = Math.min(rate * 1.2 * seconds(), rate * Tuning.PLANT_HOLD_SECONDS - r.uranium);
 		if (r.feed < max && r.fed() > 0) {
 			r.tip();
 		}

@@ -59,7 +59,7 @@ public class RectifierBlockEntity extends PlantUnitBlockEntity implements Circui
 	@Override
 	public double readMa(int point) {
 		double top = Tuning.RECTIFIER_SETPOINTS_KA[Tuning.RECTIFIER_SETPOINTS_KA.length - 1] * 1000;
-		return 4 + 16 * Math.min(1.03, point == 4 ? dc.amps() / top : dc.volts() / Tuning.RECTIFIER_MAX_DC_VOLTS);
+		return 4 + 16 * Math.min(1.03, point == 4 ? dc.amps() / top : dc.volts() / dc.maxVolts());
 	}
 
 	@Override
@@ -86,13 +86,26 @@ public class RectifierBlockEntity extends PlantUnitBlockEntity implements Circui
 		return remote.hand() || remote.on(0, now);
 	}
 
-	private final DcSupply dc = new DcSupply(Voltage.MEDIUM);
+	private final DcSupply dc;
+	private final Voltage acVoltage;
 	private int setting = Tuning.RECTIFIER_SETPOINT_DEFAULT;
 	/** The rated amps of a cell set against it, or 0: then its dial. */
 	private double cellAmps;
 
 	public RectifierBlockEntity(BlockPos pos, BlockState state) {
-		super(WildcatterBlocks.RECTIFIER_ENTITY, pos, state);
+		this(WildcatterBlocks.RECTIFIER_ENTITY, pos, state, new DcSupply(Voltage.MEDIUM), Voltage.MEDIUM);
+	}
+
+	/** A rectifier of another size (20a's rectifier_mv on the distribution tier). */
+	protected RectifierBlockEntity(net.minecraft.world.level.block.entity.BlockEntityType<?> type, BlockPos pos, BlockState state, DcSupply dc, Voltage acVoltage) {
+		super(type, pos, state);
+		this.dc = dc;
+		this.acVoltage = acVoltage;
+	}
+
+	/** Its name in a readout. */
+	protected String label() {
+		return String.format("Rectifier (12-pulse, %s in)", acVoltage.label());
 	}
 
 	public DcSupply dc() {
@@ -150,7 +163,7 @@ public class RectifierBlockEntity extends PlantUnitBlockEntity implements Circui
 
 	@Override
 	public boolean hasPortAt(BlockPos cell, Direction face, Conductor role, Voltage voltage) {
-		return cell.equals(worldPosition) && face == boxFace() && voltage == Voltage.MEDIUM && role != Conductor.N;
+		return cell.equals(worldPosition) && face == boxFace() && voltage == acVoltage && role != Conductor.N;
 	}
 
 	@Override
@@ -190,9 +203,9 @@ public class RectifierBlockEntity extends PlantUnitBlockEntity implements Circui
 			String ground = fault.isEmpty() ? "ground OK"
 					: String.format("GROUND FAULT on %s: %s at %.0f V to ground", fault, fault.equals("+") ? "-" : "+",
 							Math.abs(fault.equals("+") ? dc.minusToEarth() : dc.plusToEarth()));
-			state = String.format("DC %.0f V, %.2f kA (%s), %s", dc.volts(), dc.amps() / 1000, setpoint, ground);
+			state = String.format("DC %.0f V, %.2f kA, %.2f MW (%s), %s", dc.volts(), dc.amps() / 1000, dc.volts() * dc.amps() / 1e6, setpoint, ground);
 		}
-		return Component.literal(String.format("Rectifier (12-pulse, %s in): %s; AC %s; sneak and right-click steps the setpoint", Voltage.MEDIUM.label(), state,
+		return Component.literal(String.format("%s: %s; AC %s; sneak and right-click steps the setpoint", label(), state,
 				dc.ac().describe()));
 	}
 

@@ -449,8 +449,11 @@ default-off setting or waits until the player adds the new part.
   STORAGE TANK against the header house, which doses 0.5 g/L into its injection (head grade up to 1.3 x; NO CO2 when the tank is empty);
   the bleed goes out the house's back to an injection pump and a disposal well; IX columns in SATELLITE fill a RESIN TRAILER (800 kg of
   U3O8, carried as one item) that the central columns elute. NeoForge scene `isr_operations`.
-- **Planned, not built (can wait):** **16b2** the full-size conversion plant (four cell houses in series on a 12.47 kV `rectifier_mv`,
-  a second, larger main line); **16c2** machine crashes, the sampling autoclave and blending, cylinder heels; **16d2** monitor-well rings,
+- **16b2, the full-size conversion plant** (`docs/multiblocks/conversion-extensions.md`, BUILT 2026-11-12, branch `w-20`): four cell
+  houses in series on bus bars from the 12.47 kV `rectifier_mv` (433 V, 6 kA, 2.6 MW), a larger main line (reducer, hydrofluorinator,
+  fluorinator, cold traps, columns at 0.3 kg of U a second, twice the height); the filler keeps up. NeoForge scene `conversion_large`;
+  unit test `ConversionLargeTest`. Decisions 31-35.
+- **Planned, not built (can wait):** **16c2** machine crashes, the sampling autoclave and blending, cylinder heels; **16d2** monitor-well rings,
   excursions and groundwater restoration (RO unit). Each is written in its spec.
 - **Known gaps:** script-drawn icons `u3o8_drum_placeholder` (16a), `fluorinator_ash_drum_placeholder` and
   `synthetic_fluorspar_placeholder` (16b1). The chlor-alkali cell on potash has no scene. The cathode scrubber's hydrogen is checked with the
@@ -567,6 +570,20 @@ Decisions taken while building: `docs/questions/answers-grid.md`. NeoForge scene
 - **Pole transformer by command (18):** a new unit in the default facing turns its back to its pole; built units keep their terminals.
 - **Pit line (12):** the 600 mm `slurry_pipe` (rated 1 m3/s), the decant tower's rate scaling with its cell's floor, the 600 mm `air_header`.
 - **Zircon concentrate (9):** `#wildcatter:zircon_feed` and a kg data file; the chlorinator's hopper takes it.
+
+## Phase 20 — Chemicals — 20a, 20b, 20c BUILT 2026-11-12 (while Tim was away, on the DRAFT specs decided on recommendation; not approved)
+Plan: `docs/ideas-plan.md`, Phase 20. Decisions for Tim: `docs/questions/phase20-chemicals.md`. Branch `w-20`.
+- **20a, the chlor-alkali plant** (`docs/multiblocks/chlor-alkali-plant.md`, BUILT 2026-11-12): brine saturator, brine treatment, a
+  membrane cell room (15 kA, 161 V, 2.4 MW DC) on the new `rectifier_mv` (distribution tier), a chlorine train, a caustic evaporator (50 %),
+  an HCl synthesis unit (32 %), a brine wellhead into a salt dome. NeoForge scenes `chlor_alkali`, `brine_well`; unit test
+  `ChlorAlkaliPlantTest`; client screenshots `chlorAlkali`.
+- **20b, titanium pigment** (`docs/multiblocks/titanium-pigment.md`, BUILT 2026-11-12): the separator's ilmenite and rutile as items (with a
+  hopper under it), a Ti slag recipe on the submerged arc furnace, the titanium chlorinator, TiCl4 purification, TiCl4 oxidiser, VPSA oxygen
+  and pigment finishing, 0.25 t of TiO2 an hour on a chlorine loop. NeoForge scenes `ti_pigment`, `ferroalloys` (extended); unit test
+  `TitaniumPigmentTest`; client screenshots `tiPigment`.
+- **20c, lithium** (`docs/multiblocks/lithium.md`, BUILT 2026-11-12): decrepitation kiln, acid roast kiln, lithium leach, LiOH crystallizer
+  and lithium carbonator, 0.5 t of LiOH.H2O an hour with sodium sulfate bags; a lithium carbonate bag in a potline pot's hopper runs it
+  0.1 V lower. NeoForge scene `lithium`; unit test `LithiumTest`; client screenshots `lithium`.
 
 ## Ideas (not scheduled)
 - **Time scale (Tim, 2026-11-10):** a world setting with presets 1:1, 5:1, 10:1, 20:1 and 50:1 that shortens the long waits (reactor heat-up

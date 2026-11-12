@@ -1,6 +1,6 @@
 # Lithium hydroxide from spodumene
 
-> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Proposed phase **20c**. Decisions are in
+> **20c BUILT (2026-11-12), decided on recommendation while Tim was away; not approved.** See "As built" at the end. Proposed phase **20c**. Decisions are in
 > `docs/questions/specs-wildcatter.md` (items 68-71). Depends on the chlor-alkali plant (20a) for caustic.
 
 The 7a spodumene pegmatite (Greenbushes) has no plant. Hard-rock lithium is made by the **sulfate route**: spodumene is **decrepitated**
@@ -88,3 +88,15 @@ The grid is a sketch; the game test is the layout of record. (R is drawn shorten
 
 ## Proposed wave
 **20c**, last of the ore plants.
+
+## As built (20c, 2026-11-12; decisions in `docs/questions/phase20-chemicals.md`, items 27-34)
+- **Parts** (`ChemPartBlock`): decrepitation kiln (30 kW, box west; spodumene by hopper; gas on the east face of its back end, 1 GJ a tonne
+  of ore), acid roast kiln (15 kW, box north; acid east at its back cell, 0.2 MW of gas south), lithium leach (the controller, 37 kW, box
+  north; lime bags by hopper, CO2 and the residue as tails slurry on the south face of its back cells), LiOH crystallizer (110 kW, box north;
+  caustic east, process steam south; sodium sulfate to a station on its north face, LiOH to one on any other), lithium carbonator (10 kW;
+  LiOH bags by hopper, CO2, 100 kg/h of Li2CO3 at most). Layout as the `lithium` scene (item 28).
+- **Numbers:** 0.5 t of LiOH.H2O an hour from 3.3 t/h of ore (the mod's 2,700 kg block, item 27); 0.84 t/h of acid, 1.44 t/h of 32 %
+  caustic, 0.85 t/h of sodium sulfate, 0.9 MW of decrepitation gas, about 3 t/h of residue.
+- **The pot:** a lithium carbonate bag in a pot's hopper lowers it 0.1 V while its bath holds lithium (item 32).
+- **Tests:** NeoForge `lithium` (483 kg/h of LiOH.H2O; the three bags; the pot 1.728 V to 1.628 V; NO CAUSTIC); unit `LithiumTest`; client
+  screenshots `lithium` (the plant, the kilns).

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "BFB",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "B": "minecraft:bricks",
+    "F": "minecraft:furnace"
+  },
+  "result": {
+    "id": "wildcatter:acid_roast_kiln",
+    "count": 1
+  }
+}

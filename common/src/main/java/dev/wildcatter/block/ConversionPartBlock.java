@@ -37,7 +37,15 @@ public class ConversionPartBlock extends BigPartBlock implements net.minecraft.w
 		RECTIFIER("rectifier", Footprint.box(3, 4, 4, 0, 0)),
 		FLUORINE_CELL_HOUSE("fluorine_cell_house", Footprint.box(6, 4, 12, 0, 0)),
 		CATHODE_GAS_SCRUBBER("cathode_gas_scrubber", Footprint.box(2, 4, 2, 0, 0)),
-		KOH_SCRUBBER("koh_scrubber", Footprint.box(3, 8, 3, 0, 0));
+		KOH_SCRUBBER("koh_scrubber", Footprint.box(3, 8, 3, 0, 0)),
+		/** 20a, shared with 16b2: the 12.47 kV rectifier (docs/multiblocks/chlor-alkali-plant.md). */
+		RECTIFIER_MV("rectifier_mv", Footprint.box(3, 4, 4, 0, 0)),
+		/** 16b2: the main line's larger size, 0.3 kg of U a second, twice the height (docs/multiblocks/conversion-extensions.md). */
+		REDUCTION_REACTOR_LARGE("reduction_reactor_large", Footprint.box(3, 20, 3, 0, 0)),
+		HYDROFLUORINATOR_LARGE("hydrofluorinator_large", Footprint.box(3, 20, 6, 0, 0)),
+		FLUORINATOR_LARGE("fluorinator_large", Footprint.box(3, 20, 3, 0, 0)),
+		COLD_TRAPS_LARGE("cold_traps_large", Footprint.box(3, 8, 6, 0, 0)),
+		DISTILLATION_COLUMNS_LARGE("distillation_columns_large", Footprint.box(3, 24, 3, 0, 0));
 
 		private final String id;
 		private final Footprint footprint;
@@ -66,14 +74,15 @@ public class ConversionPartBlock extends BigPartBlock implements net.minecraft.w
 	@Override
 	protected BlockEntity createMain(BlockPos pos, BlockState state) {
 		return switch (part) {
-			case REDUCTION_REACTOR -> new ReductionReactorBlockEntity(pos, state);
-			case HYDROFLUORINATOR, FLUORINATOR -> new ConversionStageBlockEntity(WildcatterBlocks.CONVERSION_STAGE_ENTITY, pos, state);
-			case COLD_TRAPS, DISTILLATION_COLUMNS -> new Uf6StageBlockEntity(WildcatterBlocks.UF6_STAGE_ENTITY, pos, state);
+			case REDUCTION_REACTOR, REDUCTION_REACTOR_LARGE -> new ReductionReactorBlockEntity(pos, state);
+			case HYDROFLUORINATOR, FLUORINATOR, HYDROFLUORINATOR_LARGE, FLUORINATOR_LARGE -> new ConversionStageBlockEntity(WildcatterBlocks.CONVERSION_STAGE_ENTITY, pos, state);
+			case COLD_TRAPS, DISTILLATION_COLUMNS, COLD_TRAPS_LARGE, DISTILLATION_COLUMNS_LARGE -> new Uf6StageBlockEntity(WildcatterBlocks.UF6_STAGE_ENTITY, pos, state);
 			case CYLINDER_FILLER -> new CylinderFillerBlockEntity(pos, state);
 			case STEAM_REFORMER -> new SteamReformerBlockEntity(pos, state);
 			case HF_KILN -> new HfKilnBlockEntity(pos, state);
 			case HF_COLUMN -> new HfColumnBlockEntity(pos, state);
 			case RECTIFIER -> new RectifierBlockEntity(pos, state);
+			case RECTIFIER_MV -> new RectifierMvBlockEntity(pos, state);
 			case FLUORINE_CELL_HOUSE -> new FluorineCellHouseBlockEntity(pos, state);
 			case CATHODE_GAS_SCRUBBER -> new CathodeGasScrubberBlockEntity(pos, state);
 			case KOH_SCRUBBER -> new KohScrubberBlockEntity(pos, state);
@@ -84,7 +93,7 @@ public class ConversionPartBlock extends BigPartBlock implements net.minecraft.w
 	protected <T extends BlockEntity> BlockEntityTicker<T> mainTicker(Level level, BlockState state, BlockEntityType<T> type) {
 		if (level.isClientSide()) {
 			return switch (part) {
-				case COLD_TRAPS, DISTILLATION_COLUMNS -> createTickerHelper(type, WildcatterBlocks.UF6_STAGE_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
+				case COLD_TRAPS, DISTILLATION_COLUMNS, COLD_TRAPS_LARGE, DISTILLATION_COLUMNS_LARGE -> createTickerHelper(type, WildcatterBlocks.UF6_STAGE_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
 				case CYLINDER_FILLER -> createTickerHelper(type, WildcatterBlocks.CYLINDER_FILLER_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
 				case HF_KILN -> createTickerHelper(type, WildcatterBlocks.HF_KILN_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
 				case CATHODE_GAS_SCRUBBER -> createTickerHelper(type, WildcatterBlocks.CATHODE_GAS_SCRUBBER_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
@@ -93,14 +102,14 @@ public class ConversionPartBlock extends BigPartBlock implements net.minecraft.w
 			};
 		}
 		return switch (part) {
-			case REDUCTION_REACTOR -> createTickerHelper(type, WildcatterBlocks.REDUCTION_REACTOR_ENTITY, ReductionReactorBlockEntity::tick);
-			case HYDROFLUORINATOR, FLUORINATOR -> createTickerHelper(type, WildcatterBlocks.CONVERSION_STAGE_ENTITY, ConversionStageBlockEntity::tick);
-			case COLD_TRAPS, DISTILLATION_COLUMNS -> createTickerHelper(type, WildcatterBlocks.UF6_STAGE_ENTITY, UnitMotorBlockEntity::tick);
+			case REDUCTION_REACTOR, REDUCTION_REACTOR_LARGE -> createTickerHelper(type, WildcatterBlocks.REDUCTION_REACTOR_ENTITY, ReductionReactorBlockEntity::tick);
+			case HYDROFLUORINATOR, FLUORINATOR, HYDROFLUORINATOR_LARGE, FLUORINATOR_LARGE -> createTickerHelper(type, WildcatterBlocks.CONVERSION_STAGE_ENTITY, ConversionStageBlockEntity::tick);
+			case COLD_TRAPS, DISTILLATION_COLUMNS, COLD_TRAPS_LARGE, DISTILLATION_COLUMNS_LARGE -> createTickerHelper(type, WildcatterBlocks.UF6_STAGE_ENTITY, UnitMotorBlockEntity::tick);
 			case CYLINDER_FILLER -> createTickerHelper(type, WildcatterBlocks.CYLINDER_FILLER_ENTITY, UnitMotorBlockEntity::tick);
 			case STEAM_REFORMER -> createTickerHelper(type, WildcatterBlocks.STEAM_REFORMER_ENTITY, SteamReformerBlockEntity::tick);
 			case HF_KILN -> createTickerHelper(type, WildcatterBlocks.HF_KILN_ENTITY, UnitMotorBlockEntity::tick);
 			case HF_COLUMN -> createTickerHelper(type, WildcatterBlocks.HF_COLUMN_ENTITY, HfColumnBlockEntity::tick);
-			case RECTIFIER -> null;
+			case RECTIFIER, RECTIFIER_MV -> null;
 			case FLUORINE_CELL_HOUSE -> createTickerHelper(type, WildcatterBlocks.FLUORINE_CELL_HOUSE_ENTITY, FluorineCellHouseBlockEntity::tick);
 			case CATHODE_GAS_SCRUBBER -> createTickerHelper(type, WildcatterBlocks.CATHODE_GAS_SCRUBBER_ENTITY, UnitMotorBlockEntity::tick);
 			case KOH_SCRUBBER -> createTickerHelper(type, WildcatterBlocks.KOH_SCRUBBER_ENTITY, UnitMotorBlockEntity::tick);

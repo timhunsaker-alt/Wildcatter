@@ -1457,6 +1457,20 @@ sized for a 40-pot line.
 - Tests: `TimeScaleTest`; `world_rules`, `time_scale_holds`; the Fabric client's Create World check.
 
 ## Known gaps
+- Phase 20c (lithium, 2026-11-12): `lioh_bag_placeholder`, `sodium_sulfate_bag_placeholder` and `li2co3_bag_placeholder` (item icons) are
+  drawn by script; the five parts use the mod's materials. The carbonator takes LiOH bags, not solution; the pot takes its lithium from its
+  own hopper, not the fume treatment centre's; sodium sulfate has no buyer. Not built: lithium from brines or clays, battery-grade
+  polishing, lithium-7 for a PWR, grid batteries (an Idea).
+- Phase 20b (titanium pigment, 2026-11-12): `ilmenite_placeholder`, `rutile_placeholder`, `ti_slag_bag_placeholder` and
+  `tio2_pigment_bag_placeholder` (item icons) are drawn by script; the five parts use the mod's materials. The feed's impurities are not
+  carried as an assay (waste chlorides and SiCl4 are counted from fixed shares); the VPSA oxygen has no other user (no AOD). Not built: the
+  sulfate process, titanium sponge, synthetic rutile.
+- 16b2 (full-size conversion, 2026-11-12): the large parts use the mod's materials; no large cylinder filler or large steam reformer; the
+  large line's cathode gas scrubbers (one a house) are not in the scene.
+- Phase 20a (chlor-alkali, 2026-11-12): the parts use the mod's materials (no Ludo art; no new placeholders). The treatment's own caustic
+  and HCl for the magnesium and the IX regeneration are not drawn; the depleted brine's return is in the balance, not piped; the
+  rectifier_mv is modelled as the diode rectifier's regulation (no thyristor firing angle). Not built: hypochlorite, mercury and
+  diaphragm cells, gas storage in the brine caverns. See `docs/questions/phase20-chemicals.md`.
 - `guy_strand_placeholder` (the guy strand's icon) is drawn by script (2026-11-10, `w-grid`); the guy anchor has no Ludo art yet (it is
   drawn in the mod's galvanized material). A guy is drawn as a straight line.
 - The lean of an overloaded pole is drawn on the pole only (turned about its top cell); guys and spans are not redrawn for it.
@@ -2143,3 +2157,47 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
 - The World Rules screen lists rules in two columns sized to the window; with many more mods' rules it would need a scrolling list.
 - No game test makes a new world from the World Rules screen's choices end to end (the test harness's worlds start as existing
   worlds); `RulesData.load` taking `NewWorldSetup` is covered by the unit test of its parts and the client screen check.
+
+## Phase 20a: the chlor-alkali plant (2026-11-12; built while Tim was away; decisions: `docs/questions/phase20-chemicals.md`, 1-14)
+- Spec `docs/multiblocks/chlor-alkali-plant.md` ("As built"). The full-size plant, about a tonne of chlorine an hour: **brine saturator**
+  (22 kW; rock salt by hopper, water by pump, or brine from a well), **brine treatment** (the controller, 45 kW; liquid CO2 for the
+  calcium, else the cell room's voltage creeps), **membrane cell room** (52 elements, 15 kA, 161 V, 2.4 MW of DC), the **rectifier
+  transformer** `rectifier_mv` (distribution tier, 3.2 MVA, 16 kA, 500 V; shared with 16b2), **chlorine train** (drying on sulfuric acid,
+  compressor 250 kW at medium voltage, liquefier 110 kW into a chlorine filler it touches; WET CHLORINE without it), **caustic evaporator**
+  (32 % to 50 % on process steam) and **HCl synthesis unit** (32 % hydrochloric acid, up to 100 kg/h of HCl). The **brine wellhead**
+  solution-mines a salt dome through an injection pump fed fresh water, turning rock salt into a cavern of water.
+- New pipe products: brine, wet chlorine, caustic soda (50 %), hydrochloric acid (32 %). The small chlor-alkali cell is unchanged.
+- **Field Manual:** CHLOR-ALKALI PLANT, CHLORINE, CAUSTIC, HCl, BRINE WELLS. JEI: rock salt's uses name the plant and brine wells.
+- **Tests:** `ChlorAlkaliPlantTest` (3); NeoForge `chlor_alkali`, `brine_well`; client screenshots `chlorAlkali` (plant, cell room, train).
+- **Existing worlds:** unchanged: all new parts; the injection pump takes fresh water only when its discharge reaches a brine wellhead.
+
+## 16b2: the full-size conversion plant (2026-11-12; built while Tim was away; decisions: `docs/questions/phase16-uranium.md`, 31-35)
+- Spec `docs/multiblocks/conversion-extensions.md` ("As built (16b2)"). Four fluorine cell houses in series on DC bus bars from the
+  `rectifier_mv` (433 V, 6 kA, 2.6 MW); the **large reduction reactor, hydrofluorinator, fluorinator, cold traps and distillation
+  columns**, 0.3 kg of U a second at twice the height; the cylinder filler fills at the rate of the columns it stands against. About a 48Y
+  every 8 hours, 9,400 t of U a year. An existing conversion plant is unchanged.
+- **Field Manual:** FULL-SIZE CONVERSION. **Tests:** `ConversionLargeTest` (2); NeoForge `conversion_large`.
+
+## Phase 20b: titanium pigment (2026-11-12; built while Tim was away; decisions: `docs/questions/phase20-chemicals.md`, 15-26)
+- Spec `docs/multiblocks/titanium-pigment.md` ("As built"). The **mineral separator** puts its ilmenite and rutile out as 500 kg items to a
+  hopper under it (without one it counts them, as before). The **submerged arc furnace** has a fourth recipe, **Ti slag** (85 % TiO2 in 1 t
+  bags, 2.2 MWh a tonne), its pig iron cast as iron ingots out of a hopper under it. The chloride process at 0.25 t of TiO2 an hour: the
+  **titanium chlorinator** (controller), **TiCl4 purification**, **TiCl4 oxidiser**, **VPSA oxygen** and **pigment finishing**, the
+  chlorine coming back from the oxidiser and 0.1 t/h of make-up from a chlor-alkali plant. A pigment bag crafts into 64 white dye.
+- New pipe product oxygen (93 %); new items ilmenite, rutile, Ti slag bag, TiO2 pigment bag.
+- **Field Manual:** TITANIUM PIGMENT, THE CHLORINE LOOP. JEI: heavy mineral sand's use; info on the pigment, ilmenite and rutile.
+- **Tests:** `TitaniumPigmentTest` (2); NeoForge `ti_pigment`, `ferroalloys` (extended for Ti slag); client screenshots `tiPigment`.
+- **Existing worlds:** unchanged: the separator changes only with a hopper under it; the furnace's slots keep their numbers.
+
+## Phase 20c: lithium hydroxide (2026-11-12; built while Tim was away; decisions: `docs/questions/phase20-chemicals.md`, 27-34)
+- Spec `docs/multiblocks/lithium.md` ("As built"). The sulfate route from spodumene: **decrepitation kiln** (1,050 C, 0.9 MW of gas),
+  **acid roast kiln** (250 C, sulfuric acid), **lithium leach** (the controller; lime, CO2, residue to a lined tailings cell), **LiOH
+  crystallizer** (caustic and process steam; lithium hydroxide and sodium sulfate, each to its own bagging station), **lithium
+  carbonator** (LiOH bags and CO2 to Li2CO3). 0.5 t of LiOH.H2O an hour. A lithium carbonate bag in a potline pot's hopper runs the pot
+  0.1 V lower while its bath holds it. Spodumene now has a use.
+- New items: lithium hydroxide, sodium sulfate and lithium carbonate bags (tagged `c:dusts/...` for the lithium ones).
+- **Field Manual:** LITHIUM HYDROXIDE, LITHIUM CARBONATE. JEI: spodumene's use; info on the carbonate and sulfate bags.
+- **Tests:** `LithiumTest` (3); NeoForge `lithium`; client screenshots `lithium`.
+- **Existing worlds:** unchanged: a pot changes only once a bag is put in it (its slots keep their numbers); the bagging station's
+  per-station bag defaults to the one bag every earlier part makes.
+

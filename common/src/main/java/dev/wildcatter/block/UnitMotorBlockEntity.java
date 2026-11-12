@@ -82,6 +82,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "oxygen_generator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.O2_GENERATOR_WATTS);
 				case "cold_traps" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.COLD_TRAP_WATTS);
 				case "distillation_columns" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.REBOILER_WATTS);
+				case "cold_traps_large" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.COLD_TRAP_WATTS * Tuning.CONVERSION_LARGE_SCALE);
+				case "distillation_columns_large" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.REBOILER_WATTS * Tuning.CONVERSION_LARGE_SCALE);
 				case "cylinder_filler" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CYLINDER_FILLER_WATTS);
 				case "hf_kiln" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.HF_KILN_WATTS);
 				case "feed_station" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.FEED_STATION_WATTS);
@@ -188,6 +190,18 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "bentonite_dryer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BENTONITE_MILL_WATTS);
 				case "mud_hopper" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.MUD_HOPPER_WATTS);
 				case "bop_accumulator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ACCUMULATOR_WATTS);
+				case "brine_saturator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BRINE_SATURATOR_WATTS);
+				case "brine_treatment" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BRINE_TREATMENT_WATTS);
+				case "chlorine_train" -> new Motor(true, Voltage.MEDIUM, Tuning.CL2_COMPRESSOR_WATTS);
+				case "ti_chlorinator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.TI_CHLORINATOR_WATTS);
+				case "ticl4_purification" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.TICL4_PURIFICATION_WATTS);
+				case "vpsa_oxygen" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.VPSA_WATTS);
+				case "pigment_finishing" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PIGMENT_FINISHING_WATTS);
+				case "decrepitation_kiln" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.DECREPITATION_KILN_WATTS);
+				case "acid_roast_kiln" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ACID_ROAST_KILN_WATTS);
+				case "lithium_leach" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LITHIUM_LEACH_WATTS);
+				case "lioh_crystallizer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LIOH_CRYSTALLIZER_WATTS);
+				case "lithium_carbonator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LITHIUM_CARBONATOR_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -237,8 +251,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "precipitation_tank" -> "precipitation agitator";
 			case "drum_filler" -> "drum filler";
 			case "oxygen_generator" -> "oxygen generator's air compressor";
-			case "cold_traps" -> "refrigeration";
-			case "distillation_columns" -> "reboiler";
+			case "cold_traps", "cold_traps_large" -> "refrigeration";
+			case "distillation_columns", "distillation_columns_large" -> "reboiler";
 			case "cylinder_filler" -> "filler";
 			case "hf_kiln" -> "kiln drive";
 			case "feed_station" -> "heater";
@@ -341,6 +355,18 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "bentonite_dryer" -> "mill and dryer fan";
 			case "mud_hopper" -> "mixing pump";
 			case "bop_accumulator" -> "accumulator pump";
+			case "brine_saturator" -> "agitator and brine pumps";
+			case "brine_treatment" -> "clarifier, filter and IX pumps";
+			case "chlorine_train" -> "chlorine compressor";
+			case "ti_chlorinator" -> "fluidizing blower";
+			case "ticl4_purification" -> "reboiler";
+			case "vpsa_oxygen" -> "blower and vacuum pump";
+			case "pigment_finishing" -> "mills, filters and dryer fans";
+			case "decrepitation_kiln" -> "kiln drive and fans";
+			case "acid_roast_kiln" -> "pug mill and kiln drive";
+			case "lithium_leach" -> "agitators and belt filter";
+			case "lioh_crystallizer" -> "pumps, chiller and centrifuges";
+			case "lithium_carbonator" -> "agitator and pumps";
 			default -> kind();
 		};
 	}
