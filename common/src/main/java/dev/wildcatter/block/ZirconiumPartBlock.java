@@ -36,7 +36,10 @@ public class ZirconiumPartBlock extends BigPartBlock implements net.minecraft.wo
 		VACUUM_ANNEAL_FURNACE("vacuum_anneal_furnace", Footprint.box(3, 3, 8, 0, 0)),
 		MAGNESIUM_CELL("magnesium_cell", Footprint.box(3, 3, 6, 0, 0)),
 		MAGNESIA_CHLORINATOR("magnesia_chlorinator", Footprint.box(3, 6, 3, 0, 0)),
-		CHLOR_ALKALI_CELL("chlor_alkali_cell", Footprint.box(3, 3, 6, 0, 0));
+		CHLOR_ALKALI_CELL("chlor_alkali_cell", Footprint.box(3, 3, 6, 0, 0)),
+		FUMED_SILICA_BURNER("fumed_silica_burner", Footprint.box(2, 6, 3, 0, 0)),
+		PIDGEON_FURNACE("pidgeon_furnace", Footprint.box(4, 4, 10, 0, 0)),
+		CHROMATE_KILN("chromate_kiln", Footprint.box(3, 3, 8, 0, 0));
 
 		private final String id;
 		private final Footprint footprint;
@@ -72,6 +75,9 @@ public class ZirconiumPartBlock extends BigPartBlock implements net.minecraft.wo
 			case MAGNESIUM_CELL -> new MagnesiumCellBlockEntity(pos, state);
 			case MAGNESIA_CHLORINATOR -> new MagnesiaChlorinatorBlockEntity(pos, state);
 			case CHLOR_ALKALI_CELL -> new ChlorAlkaliCellBlockEntity(pos, state);
+			case FUMED_SILICA_BURNER -> new FumedSilicaBurnerBlockEntity(pos, state);
+			case PIDGEON_FURNACE -> new PidgeonFurnaceBlockEntity(pos, state);
+			case CHROMATE_KILN -> new ChromateKilnBlockEntity(pos, state);
 		};
 	}
 
@@ -84,6 +90,9 @@ public class ZirconiumPartBlock extends BigPartBlock implements net.minecraft.wo
 				case CHLORINATOR -> createTickerHelper(type, WildcatterBlocks.CHLORINATOR_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
 				case KROLL_REACTOR -> createTickerHelper(type, WildcatterBlocks.KROLL_REACTOR_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
 				case PILGER_MILL -> createTickerHelper(type, WildcatterBlocks.PILGER_MILL_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
+				case FUMED_SILICA_BURNER -> createTickerHelper(type, WildcatterBlocks.FUMED_SILICA_BURNER_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
+				case PIDGEON_FURNACE -> createTickerHelper(type, WildcatterBlocks.PIDGEON_FURNACE_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
+				case CHROMATE_KILN -> createTickerHelper(type, WildcatterBlocks.CHROMATE_KILN_ENTITY, (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e));
 				default -> null;
 			};
 		}
@@ -96,6 +105,9 @@ public class ZirconiumPartBlock extends BigPartBlock implements net.minecraft.wo
 			case MAGNESIUM_CELL -> createTickerHelper(type, WildcatterBlocks.MAGNESIUM_CELL_ENTITY, MagnesiumCellBlockEntity::tick);
 			case MAGNESIA_CHLORINATOR -> createTickerHelper(type, WildcatterBlocks.MAGNESIA_CHLORINATOR_ENTITY, MagnesiaChlorinatorBlockEntity::tick);
 			case CHLOR_ALKALI_CELL -> createTickerHelper(type, WildcatterBlocks.CHLOR_ALKALI_CELL_ENTITY, ChlorAlkaliCellBlockEntity::tick);
+			case FUMED_SILICA_BURNER -> createTickerHelper(type, WildcatterBlocks.FUMED_SILICA_BURNER_ENTITY, UnitMotorBlockEntity::tick);
+			case PIDGEON_FURNACE -> createTickerHelper(type, WildcatterBlocks.PIDGEON_FURNACE_ENTITY, UnitMotorBlockEntity::tick);
+			case CHROMATE_KILN -> createTickerHelper(type, WildcatterBlocks.CHROMATE_KILN_ENTITY, UnitMotorBlockEntity::tick);
 		};
 	}
 
@@ -131,6 +143,15 @@ public class ZirconiumPartBlock extends BigPartBlock implements net.minecraft.wo
 			}
 		}
 		return InteractionResult.SUCCESS;
+	}
+
+	/** 17c2: a chromate kiln broken while it holds chromate leaves a toxic spill of hexavalent chromium. */
+	@Override
+	public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+		if (level instanceof ServerLevel sl && level.getBlockEntity(main(pos, state)) instanceof ChromateKilnBlockEntity kiln) {
+			kiln.spill(sl);
+		}
+		return super.playerWillDestroy(level, pos, state, player);
 	}
 
 	/** A hopper on top of the part, or under it, works its main cell's bins. */

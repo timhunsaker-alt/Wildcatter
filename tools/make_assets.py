@@ -2819,6 +2819,15 @@ phase16_items({"zircaloy_scrap": ("Zircaloy Scrap (25 kg)", (150, 150, 140)), "h
 # 19d: hafnium RCCAs and sodium sulfate bags (docs/multiblocks/reactor-extensions.md)
 phase16_items({"hafnium_rcca": ("Hafnium RCCA", (110, 116, 126)), "sodium_sulfate_bag": ("Sodium Sulfate (1 t bag)", (236, 232, 220))})
 save_json(f"{ROOT}/data/c/tags/item/sodium_sulfate.json", {"replace": False, "values": [f"{ns}:sodium_sulfate_bag"]})
+# 17c2: fumed silica, Pidgeon magnesium, chromium (docs/multiblocks/zirconium-extensions.md)
+phase16_parts(("fumed_silica_burner", "pidgeon_furnace", "chromate_kiln"))
+shaped("fumed_silica_burner", ["SPS", "GFG", "SBS"], {"S": S_, "P": P_, "G": "minecraft:glass", "F": "minecraft:blast_furnace", "B": "minecraft:bucket"}, "fumed_silica_burner")
+shaped("pidgeon_furnace", ["BPB", "FXF", "BSB"], {"B": "minecraft:bricks", "P": P_, "F": "minecraft:blast_furnace", "X": "minecraft:piston", "S": S_}, "pidgeon_furnace")
+shaped("chromate_kiln", ["SPS", "BFB", "SXS"], {"S": S_, "P": P_, "B": "minecraft:bricks", "F": "minecraft:blast_furnace", "X": "minecraft:cauldron"}, "chromate_kiln")
+phase16_names({"fumed_silica_burner": "Fumed Silica Burner (15 kW)", "pidgeon_furnace": "Pidgeon Furnace (retorts, 0.5 MW of gas)", "chromate_kiln": "Chromate Kiln (0.3 MW of gas)"})
+phase16_items({"fumed_silica": ("Fumed Silica (25 kg sack)", (236, 238, 240)), "dolime_bag": ("Dolime (1 t bag)", (222, 218, 206)), "magnesium_ingot": ("Magnesium Ingot", (196, 200, 204)),
+	"chromic_oxide": ("Chromic Oxide (25 kg sack)", (70, 120, 60)), "chromium_metal": ("Chromium Metal (10 kg)", (180, 186, 196))})
+save_json(f"{ROOT}/data/c/tags/item/fumed_silica.json", {"replace": False, "values": [f"{ns}:fumed_silica"]})
 # ---- Phase 17a: ferroalloys (docs/multiblocks/ferroalloys.md) ---------------------------------------------------------------------
 # blockstates, models, shapes and items come from tools/models/ferroalloys.py; here loot, names, tags, recipes and the bags. Each bag's
 # icon is the Ludo bulk bag with a swatch of what it holds drawn on it by this script: a placeholder until it has art of its own.

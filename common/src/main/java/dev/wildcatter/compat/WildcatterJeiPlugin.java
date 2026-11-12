@@ -57,6 +57,15 @@ public class WildcatterJeiPlugin implements IModPlugin {
 				+ "A Kroll reactor on a hafnium campaign (sneak-click it) takes it by a hopper on top.");
 		info(registration, WildcatterItems.HAFNIUM_RODLET, "Solid hafnium, 9.7 mm across and 3.66 m long, rolled by the pilger mill's rodlet dies on a hafnium campaign. "
 				+ "24 make a hafnium RCCA at the RCCA bench.");
+		// 17c2: fumed silica, Pidgeon magnesium, chromium (docs/multiblocks/zirconium-extensions.md)
+		info(registration, WildcatterItems.FUMED_SILICA, "SiCl4 from the chlorinator burned in a hydrogen-oxygen flame by the fumed silica burner. No use in Wildcatter; "
+				+ "tagged c:fumed_silica for other mods.");
+		info(registration, WildcatterItems.DOLIME_BAG, "Calcined dolomite from a lime kiln fed dolomite, bagged by a bagging station against it. For the Pidgeon furnace.");
+		info(registration, WildcatterItems.MAGNESIUM_INGOT, "Pidgeon magnesium, cast from the furnace's crowns at the end of each cycle. A hopper on the magnesium cell takes it as "
+				+ "make-up for the Kroll loop.");
+		info(registration, WildcatterItems.CHROMIC_OXIDE, "From the chromate kiln: chromite roasted with caustic soda, leached and reduced with sulfur. Four sacks and two "
+				+ "aluminium ingots fire in the aluminothermic vessel to chromium metal.");
+		info(registration, WildcatterItems.CHROMIUM_METAL, "Aluminothermic chromium. The VAR furnace takes it by hopper in place of chromite for Zircaloy-4's 0.10 % Cr.");
 		// 19d: rod materials and the sodium sulfate (docs/multiblocks/reactor-extensions.md)
 		info(registration, WildcatterItems.HAFNIUM_RCCA, "24 hafnium rodlets on a spider, from the RCCA bench (the rodlets in its tray hopper, with steel). "
 				+ "85 % of a B4C RCCA's worth; it takes no helium and does not wear. Load it into the cold vessel as a B4C RCCA.");

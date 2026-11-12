@@ -143,7 +143,11 @@ public enum Product {
 	/** The evaporator's merchant phosphoric acid, 54 % P2O5, for the granulator; stock tanks hold it. Counted in litres. */
 	MERCHANT_ACID("merchant acid (54 % P2O5)", false),
 	/** Phase 18b: filter acid with its uranium taken out by the DEPA-TOPO circuit, back to the evaporator. Counted in litres. */
-	TREATED_ACID("treated acid (28 % P2O5)", false);
+	TREATED_ACID("treated acid (28 % P2O5)", false),
+	/** 17c2: oxygen for the fumed silica burner (an oxygen plant's, or a test tank's). */
+	OXYGEN("oxygen", true),
+	/** 17c2: 32 % hydrochloric acid from the fumed silica burner. Counted in kg; stock tanks hold it. */
+	HYDROCHLORIC_ACID("hydrochloric acid (32 %)", false);
 
 	private final String label;
 	private final boolean gas;
@@ -166,7 +170,7 @@ public enum Product {
 		return switch (this) {
 			case HOT_CRACKED_GAS, CRACKED_GAS, COMPRESSED_CRACKED_GAS, BURNER_GAS, ORE_SLURRY, LEACH_SLURRY, FLUORINE, UF6, CHLORINE, STEAM, FEEDWATER, COOLING_WATER,
 					CAUSTIC_SODA, PROCESS_STEAM, BAUXITE_SLURRY, DIGESTED_SLURRY, GREEN_LIQUOR, MUD_SLURRY, POLISHED_LIQUOR, HYDRATE_SLURRY, SPENT_LIQUOR, STRONG_LIQUOR, COAL_TAR, PITCH,
-					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY, AN_SOLUTION, EMULSION_MATRIX, CAUSTIC_POTASH, CO2, ROCK_SLURRY -> "kg";
+					MILL_DISCHARGE, FINES_SLURRY, CONDITIONED_SLURRY, CONCENTRATE_SLURRY, THICKENED_CONCENTRATE, TAILS_SLURRY, AN_SOLUTION, EMULSION_MATRIX, CAUSTIC_POTASH, CO2, ROCK_SLURRY, HYDROCHLORIC_ACID -> "kg";
 			default -> gas ? "m3" : "L";
 		};
 	}

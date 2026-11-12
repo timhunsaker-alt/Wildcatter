@@ -625,5 +625,13 @@
   "item.wildcatter.hfcl4_drum": "HfCl4 Drum (50 kg of Hf)",
   "item.wildcatter.hafnium_rodlet": "Hafnium Rodlet",
   "item.wildcatter.hafnium_rcca": "Hafnium RCCA",
-  "item.wildcatter.sodium_sulfate_bag": "Sodium Sulfate (1 t bag)"
+  "item.wildcatter.sodium_sulfate_bag": "Sodium Sulfate (1 t bag)",
+  "item.wildcatter.fumed_silica": "Fumed Silica (25 kg sack)",
+  "item.wildcatter.dolime_bag": "Dolime (1 t bag)",
+  "item.wildcatter.magnesium_ingot": "Magnesium Ingot",
+  "item.wildcatter.chromic_oxide": "Chromic Oxide (25 kg sack)",
+  "item.wildcatter.chromium_metal": "Chromium Metal (10 kg)",
+  "block.wildcatter.fumed_silica_burner": "Fumed Silica Burner (15 kW)",
+  "block.wildcatter.pidgeon_furnace": "Pidgeon Furnace (retorts, 0.5 MW of gas)",
+  "block.wildcatter.chromate_kiln": "Chromate Kiln (0.3 MW of gas)"
 }

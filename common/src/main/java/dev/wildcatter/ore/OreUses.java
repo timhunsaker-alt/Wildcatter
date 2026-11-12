@@ -53,15 +53,15 @@ public final class OreUses {
 	public static List<String> uses(Ore ore) {
 		return switch (ore) {
 			case URANINITE, PITCHBLENDE -> List.of("the uranium mill's jaw crusher, which feeds the mill (yellowcake)");
-			case SULFUR -> List.of("the acid plant's sulfur melter (sulfuric acid)");
+			case SULFUR -> List.of("the acid plant's sulfur melter (sulfuric acid)", "the chromate kiln (it reduces the chromate)");
 			case HALITE -> List.of("the uranium mill's SX circuit and IX columns (strip salt)", "chlor-alkali cells (chlorine, caustic soda)",
 					"a land rig's mud hopper (salt-saturated mud for drilling through salt)");
 			case BARITE -> List.of("the barite mill (drilling-grade barite, which weights a land rig's mud)");
 			case BENTONITE -> List.of("the bentonite dryer (drilling bentonite, which gels a land rig's mud)");
-			case FLUORITE -> List.of("the conversion plant's HF kiln (hydrogen fluoride)");
+			case FLUORITE -> List.of("the conversion plant's HF kiln (hydrogen fluoride)", "the Pidgeon furnace (3 % of its briquettes)");
 			case HEAVY_MINERAL -> List.of("the zirconium plant's mineral separator (zircon)");
 			case CASSITERITE -> List.of("a furnace (tin ingot, which the zirconium plant's VAR furnace alloys into Zircaloy)");
-			case CHROMITE -> List.of("the zirconium plant's VAR furnace, alloyed into Zircaloy", "the submerged arc furnace (HC ferrochrome)");
+			case CHROMITE -> List.of("the zirconium plant's VAR furnace, alloyed into Zircaloy", "the submerged arc furnace (HC ferrochrome)", "the chromate kiln (chromic oxide)");
 			case MAGNESITE -> List.of("a furnace (magnesia), for the uranium mill's precipitation and the magnesia chlorinator (magnesium)");
 			case BORAX -> List.of("the boron plant (boric acid, boron carbide)");
 			case BAUXITE -> List.of("the Bayer refinery's ball mill (alumina)");
@@ -74,7 +74,8 @@ public final class OreUses {
 			case ACANTHITE -> List.of("a furnace (silver ingot)");
 			case PHOSPHATE -> List.of("the phosphate mill (phosphoric acid, TSP and DAP fertilizer; uranium from the acid)");
 			case SYLVITE -> List.of("the potash dissolver (muriate of potash fertilizer)");
-			case PENTLANDITE, PLATINUM, DOLOMITE, GRAPHITE, SPODUMENE, COBALTITE -> List.of();
+			case DOLOMITE -> List.of("the lime kiln, burned to dolime for the Pidgeon furnace (magnesium)");
+			case PENTLANDITE, PLATINUM, GRAPHITE, SPODUMENE, COBALTITE -> List.of();
 		};
 	}
 

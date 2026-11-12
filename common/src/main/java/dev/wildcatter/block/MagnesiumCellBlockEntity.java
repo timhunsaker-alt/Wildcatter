@@ -18,7 +18,9 @@ import org.jspecify.annotations.Nullable;
  * its terminals (east face, z 3) or on the rectifier it touches, 90 % current efficiency. It splits the MgCl2 the Kroll reactor taps back to it (and the magnesia chlorinator's make-up)
  * into molten magnesium for the Kroll reactor and chlorine, out on the pipe at the east face of its front cells.
  */
-public class MagnesiumCellBlockEntity extends PlantUnitBlockEntity implements dev.wildcatter.circuit.CircuitPart, Electrolysis.Part {
+public class MagnesiumCellBlockEntity extends PlantUnitBlockEntity implements dev.wildcatter.circuit.CircuitPart, Electrolysis.Part, HopperFed {
+	/** 17c2: Pidgeon magnesium ingots by a hopper on top, make-up for the Kroll loop (zirconium-extensions.md item 4). */
+	private final net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> slots = net.minecraft.core.NonNullList.withSize(1, net.minecraft.world.item.ItemStack.EMPTY);
 	private final Electrolysis dc = new Electrolysis(new dev.wildcatter.circuit.DcCell(1, Tuning.MG_CELL_BACK_EMF, Tuning.MG_CELL_VOLTS, Tuning.MG_CELL_KA * 1000), 2, 3, Direction.EAST);
 	private double mg;      // molten magnesium, kg
 	private double mgCl2;   // kg
@@ -70,7 +72,29 @@ public class MagnesiumCellBlockEntity extends PlantUnitBlockEntity implements de
 		setChanged();
 	}
 
+	@Override
+	public net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> slots() {
+		return slots;
+	}
+
+	@Override
+	public boolean takes(net.minecraft.world.item.ItemStack stack) {
+		return stack.is(dev.wildcatter.WildcatterItems.MAGNESIUM_INGOT);
+	}
+
+	/** 17c2: an ingot from its hopper melted into its magnesium when it has room for it. */
+	private void meltIngot() {
+		if (fed() > 0 && Tuning.MG_CELL_HOLD_KG - mg >= Tuning.MG_INGOT_KG) {
+			useOne();
+			mg += Tuning.MG_INGOT_KG;
+			setChanged();
+		}
+	}
+
 	public static void tick(Level level, BlockPos pos, BlockState state, MagnesiumCellBlockEntity c) {
+		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL == 0) {
+			c.meltIngot();
+		}
 		if (c.plcHold(level)) {
 			return;
 		}
@@ -121,7 +145,8 @@ public class MagnesiumCellBlockEntity extends PlantUnitBlockEntity implements de
 
 	@Override
 	public Component inspect() {
-		return Component.literal(String.format("Magnesium cell: %s; magnesium %.1f kg, MgCl2 %.1f kg, chlorine %.1f kg held", status, mg, mgCl2, held(Product.CHLORINE)));
+		return Component.literal(String.format("Magnesium cell: %s; magnesium %.1f kg, MgCl2 %.1f kg, chlorine %.1f kg held%s", status, mg, mgCl2, held(Product.CHLORINE),
+				fed() > 0 ? String.format("; %d magnesium ingots in its hopper bin", fed()) : ""));
 	}
 
 	@Override
@@ -129,6 +154,7 @@ public class MagnesiumCellBlockEntity extends PlantUnitBlockEntity implements de
 		super.saveAdditional(output);
 		output.putDouble("mg", mg);
 		output.putDouble("mgcl2", mgCl2);
+		net.minecraft.world.ContainerHelper.saveAllItems(output, slots);
 	}
 
 	@Override
@@ -136,5 +162,7 @@ public class MagnesiumCellBlockEntity extends PlantUnitBlockEntity implements de
 		super.loadAdditional(input);
 		mg = input.getDoubleOr("mg", 0);
 		mgCl2 = input.getDoubleOr("mgcl2", 0);
+		slots.clear();
+		net.minecraft.world.ContainerHelper.loadAllItems(input, slots);
 	}
 }

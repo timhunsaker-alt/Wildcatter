@@ -137,6 +137,9 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.MagnesiumCellBlockEntity> MAGNESIUM_CELL_ENTITY = entity(dev.wildcatter.block.MagnesiumCellBlockEntity::new, MAGNESIUM_CELL);
 	public static final BlockEntityType<dev.wildcatter.block.MagnesiaChlorinatorBlockEntity> MAGNESIA_CHLORINATOR_ENTITY = entity(dev.wildcatter.block.MagnesiaChlorinatorBlockEntity::new, MAGNESIA_CHLORINATOR);
 	public static final BlockEntityType<dev.wildcatter.block.ChlorAlkaliCellBlockEntity> CHLOR_ALKALI_CELL_ENTITY = entity(dev.wildcatter.block.ChlorAlkaliCellBlockEntity::new, CHLOR_ALKALI_CELL);
+	public static final BlockEntityType<dev.wildcatter.block.FumedSilicaBurnerBlockEntity> FUMED_SILICA_BURNER_ENTITY = entity(dev.wildcatter.block.FumedSilicaBurnerBlockEntity::new, FUMED_SILICA_BURNER);
+	public static final BlockEntityType<dev.wildcatter.block.PidgeonFurnaceBlockEntity> PIDGEON_FURNACE_ENTITY = entity(dev.wildcatter.block.PidgeonFurnaceBlockEntity::new, PIDGEON_FURNACE);
+	public static final BlockEntityType<dev.wildcatter.block.ChromateKilnBlockEntity> CHROMATE_KILN_ENTITY = entity(dev.wildcatter.block.ChromateKilnBlockEntity::new, CHROMATE_KILN);
 	public static final BlockEntityType<dev.wildcatter.block.BayerStageBlockEntity> BAYER_STAGE_ENTITY = entity(dev.wildcatter.block.BayerStageBlockEntity::new, BALL_MILL, DIGESTER, FLASH_TANKS, SETTLER, MUD_WASHER, POLISHING_FILTER, PRECIPITATOR, EVAPORATOR, PACKAGE_BOILER);
 	public static final BlockEntityType<dev.wildcatter.block.ResidueFilterPressBlockEntity> RESIDUE_FILTER_PRESS_ENTITY = entity(dev.wildcatter.block.ResidueFilterPressBlockEntity::new, RESIDUE_FILTER_PRESS);
 	public static final BlockEntityType<dev.wildcatter.block.HydrateFilterBlockEntity> HYDRATE_FILTER_ENTITY = entity(dev.wildcatter.block.HydrateFilterBlockEntity::new, HYDRATE_FILTER);
@@ -461,7 +464,8 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		for (Block part : new Block[] {CENTRIFUGE, FREQUENCY_CONVERTER, FEED_STATION, PRODUCT_TAKEOFF, TAILS_TAKEOFF, CASCADE_COOLING_SKID}) {
 			add(((dev.wildcatter.block.EnrichmentPartBlock) part).part().id(), part);
 		}
-		for (Block part : new Block[] {MINERAL_SEPARATOR, CHLORINATOR, HAFNIUM_COLUMN, KROLL_REACTOR, VACUUM_DISTILLATION, VAR_FURNACE, EXTRUSION_PRESS, PILGER_MILL, VACUUM_ANNEAL_FURNACE, MAGNESIUM_CELL, MAGNESIA_CHLORINATOR, CHLOR_ALKALI_CELL}) {
+		for (Block part : new Block[] {MINERAL_SEPARATOR, CHLORINATOR, HAFNIUM_COLUMN, KROLL_REACTOR, VACUUM_DISTILLATION, VAR_FURNACE, EXTRUSION_PRESS, PILGER_MILL, VACUUM_ANNEAL_FURNACE, MAGNESIUM_CELL, MAGNESIA_CHLORINATOR, CHLOR_ALKALI_CELL,
+				FUMED_SILICA_BURNER, PIDGEON_FURNACE, CHROMATE_KILN}) {
 			add(((dev.wildcatter.block.ZirconiumPartBlock) part).part().id(), part);
 		}
 		for (Block part : new Block[] {BALL_MILL, DIGESTER, FLASH_TANKS, SETTLER, MUD_WASHER, RESIDUE_FILTER_PRESS, POLISHING_FILTER, PRECIPITATOR, HYDRATE_FILTER, CALCINER, EVAPORATOR, CAUSTICIZER, PACKAGE_BOILER, LIME_KILN, ALF3_REACTOR, BAGGING_STATION, CHLORINE_FILLER}) {
@@ -691,6 +695,9 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("magnesium_cell"), MAGNESIUM_CELL_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("magnesia_chlorinator"), MAGNESIA_CHLORINATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("chlor_alkali_cell"), CHLOR_ALKALI_CELL_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("fumed_silica_burner"), FUMED_SILICA_BURNER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("pidgeon_furnace"), PIDGEON_FURNACE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("chromate_kiln"), CHROMATE_KILN_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("bayer_stage"), BAYER_STAGE_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("residue_filter_press"), RESIDUE_FILTER_PRESS_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("hydrate_filter"), HYDRATE_FILTER_ENTITY);

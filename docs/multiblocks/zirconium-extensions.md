@@ -1,6 +1,6 @@
 # Zirconium extensions: fumed silica, hafnium metal, Pidgeon magnesium, chromium, scrap, batches
 
-> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved. 17c1 BUILT 2026-11-12 (see "As built").** Proposed phase **17c** (17c1 batches, scrap and
+> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved. 17c1 and 17c2 BUILT 2026-11-12 (see "As built").** Proposed phase **17c** (17c1 batches, scrap and
 > hafnium; 17c2 Pidgeon magnesium, chromium and fumed silica). Decisions are in `docs/questions/specs-wildcatter.md` (items 72-78).
 
 Seven items the zirconium spec (zirconium.md, approved 2026-11-01) left in ROADMAP Ideas. Each has its real basis and a proposed scope.
@@ -151,3 +151,23 @@ its stream to being counted.
   2,100 hours for 5 RCCAs, Mg per Hf); NeoForge scene `zirconium_batches` (the rule on; the line from the hafnium column to the anneal
   furnace on two paralleled sets; the press, chlorinator and magnesium cell unpowered and fed by hook).
 - **Placeholders:** `zircaloy_scrap_placeholder`, `hfcl4_drum_placeholder`, `hafnium_rodlet_placeholder` (item icons drawn by script).
+
+### 17c2 (2026-11-12, branch `w-17c`; decisions in `docs/questions/phase17c-zirconium.md`, 9-17)
+- **No rule needed:** every change waits for a new part or a new feed (dolomite in a lime kiln, ingots on a magnesium cell, chromium
+  metal in a VAR).
+- **Fumed silica burner** (`FumedSilicaBurnerBlockEntity`, 2 x 6 x 3, 15 kW, box on the **north** face of its main cell): against the
+  chlorinator's east face, offset a cell south so the chlorine inlet keeps the front cell (question 10). The chlorinator keeps 20 kg of
+  SiCl4 for it. Hydrogen east (bottom), new pipe product `oxygen` east one up; `fumed_silica` sacks (25 kg, `c:fumed_silica`) out below; new
+  pipe product `hydrochloric acid (32 %)` out of the south face of its back cells (question 9).
+- **Pidgeon furnace** (`PidgeonFurnaceBlockEntity`, 4 x 4 x 10, 30 kW pumps, 0.5 MW of gas on the east face of its bottom cells): dolime
+  bags, FeSi bags, fluorspar by hopper; 10 kg/h of Mg as crowns, cast into `magnesium_ingot` (22.7 kg) out below at the end of each
+  12-hour cycle (`TimeScale`; question 13). The lime kiln burns dolomite to `dolime_bag`s; the magnesium cell takes ingots by a hopper.
+- **Chromate kiln** (`ChromateKilnBlockEntity`, 3 x 3 x 8, 15 kW, 0.3 MW of gas): chromite and sulfur by hopper, caustic on the north
+  face of its front cells; `chromic_oxide` sacks (25 kg) an hour out below; a poison cloud when broken holding chromate (question 16).
+- **Chromium:** the aluminothermic vessel's new batch, 4 sacks and 2 aluminium ingots to 67 kg of `chromium_metal` in 10 kg pieces out
+  below; the VAR furnace takes them in its chromite slot (question 17).
+- **Field Manual:** SILICA, MAGNESIUM AND CHROMIUM. JEI pages; ore uses for dolomite, chromite, sulfur, fluorite.
+- **Tests:** unit `ZirconiumExtensionsTest` (17c2 numbers); NeoForge scenes `pidgeon`, `chromium`, `fumed_silica`; Fabric client scene
+  `pidgeon` (screenshot `wildcatter-pidgeon`).
+- **Placeholders:** item icons `fumed_silica_placeholder`, `dolime_bag_placeholder`, `magnesium_ingot_placeholder`,
+  `chromic_oxide_placeholder`, `chromium_metal_placeholder`. The three parts are drawn in the mod's materials.

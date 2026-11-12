@@ -2,6 +2,15 @@
 
 ## Unreleased (0.7.0, branch `w-next`): Phases 15-19, built 2026-11-10 while Tim was away
 
+### 17c2: fumed silica, Pidgeon magnesium, chromium (built 2026-11-12 while Tim was away; not approved)
+- **Fumed silica burner:** against the chlorinator, it burns the SiCl4 in hydrogen and oxygen to 25 kg sacks of fumed silica
+  (`c:fumed_silica`) and 32 % hydrochloric acid on a pipe. Oxygen and hydrochloric acid are new pipe products.
+- **Pidgeon magnesium:** a lime kiln fed dolomite burns dolime; the Pidgeon furnace (dolime, ferrosilicon and fluorspar, 0.5 MW of gas)
+  makes 10 kg of magnesium an hour, cast into ingots at the end of each 12-hour cycle; a hopper on the magnesium cell takes them.
+- **Chromium:** the chromate kiln roasts chromite with caustic soda to chromic oxide (it spills poison if broken while it holds chromate);
+  the aluminothermic vessel fires it with aluminium to chromium metal, which the VAR furnace takes in place of chromite.
+- Decisions for review: `docs/questions/phase17c-zirconium.md` (9-17).
+
 ### 19d: rods and the sodium sulfate (built 2026-11-12 while Tim was away; not approved)
 - **Hafnium RCCAs:** 24 hafnium rodlets at the RCCA bench make a hafnium RCCA, worth 85 % of a B4C one, that never wears. The vessel
   takes any mix.

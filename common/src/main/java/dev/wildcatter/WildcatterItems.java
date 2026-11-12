@@ -112,6 +112,25 @@ public final class WildcatterItems {
 			String.format("Hafnium metal rodlet, %.1f mm, %.2f m, %.1f kg", Tuning.HF_RODLET_OD_MM, Tuning.HF_RODLET_LENGTH_M, dev.wildcatter.fluid.Zirconium.hafniumRodletKg()),
 			String.format("%d make a hafnium RCCA at the RCCA bench", Tuning.HF_RODLETS_PER_RCCA));
 
+	/** 17c2: fumed silica, dolime, Pidgeon magnesium, chromic oxide and chromium (docs/multiblocks/zirconium-extensions.md). */
+	public static final ResourceKey<Item> FUMED_SILICA_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("fumed_silica"));
+	public static final Item FUMED_SILICA = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(64).setId(FUMED_SILICA_KEY),
+			String.format("A %.0f kg sack of fumed silica (SiO2), from SiCl4 burned in a hydrogen-oxygen flame", Tuning.FUMED_SILICA_SACK_KG),
+			"no use in Wildcatter; tagged c:fumed_silica for other mods");
+	public static final ResourceKey<Item> DOLIME_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("dolime_bag"));
+	public static final Item DOLIME_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(DOLIME_BAG_KEY),
+			String.format("Dolime (calcined dolomite, CaO.MgO), a %,.0f kg bulk bag", Tuning.BULK_BAG_KG), "for the Pidgeon furnace");
+	public static final ResourceKey<Item> MAGNESIUM_INGOT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("magnesium_ingot"));
+	public static final Item MAGNESIUM_INGOT = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(64).setId(MAGNESIUM_INGOT_KEY),
+			String.format("A %.1f kg ingot of Pidgeon magnesium", Tuning.MG_INGOT_KG), "make-up for the Kroll loop: a hopper on the magnesium cell");
+	public static final ResourceKey<Item> CHROMIC_OXIDE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("chromic_oxide"));
+	public static final Item CHROMIC_OXIDE = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(64).setId(CHROMIC_OXIDE_KEY),
+			String.format("A %.0f kg sack of chromic oxide (Cr2O3)", Tuning.CR2O3_SACK_KG), String.format("%d sacks and %d aluminium ingots fire to chromium in the aluminothermic vessel",
+					Tuning.VESSEL_CR_SACKS, Tuning.VESSEL_CR_ALUMINIUM));
+	public static final ResourceKey<Item> CHROMIUM_METAL_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("chromium_metal"));
+	public static final Item CHROMIUM_METAL = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(64).setId(CHROMIUM_METAL_KEY),
+			String.format("A %.0f kg piece of aluminothermic chromium, 99 %% Cr", Tuning.CHROMIUM_PIECE_KG), "the VAR furnace takes it in place of chromite");
+
 	/** 7g: helium cylinders (docs/multiblocks/fuel.md), from the gas plant's helium recovery unit to the rod welder. */
 	public static final ResourceKey<Item> EMPTY_HELIUM_CYLINDER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("empty_helium_cylinder"));
 	public static final Item EMPTY_HELIUM_CYLINDER = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(EMPTY_HELIUM_CYLINDER_KEY),
@@ -447,6 +466,11 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, ZIRCALOY_SCRAP_KEY, ZIRCALOY_SCRAP);
 		Registry.register(BuiltInRegistries.ITEM, HFCL4_DRUM_KEY, HFCL4_DRUM);
 		Registry.register(BuiltInRegistries.ITEM, HAFNIUM_RODLET_KEY, HAFNIUM_RODLET);
+		Registry.register(BuiltInRegistries.ITEM, FUMED_SILICA_KEY, FUMED_SILICA);
+		Registry.register(BuiltInRegistries.ITEM, DOLIME_BAG_KEY, DOLIME_BAG);
+		Registry.register(BuiltInRegistries.ITEM, MAGNESIUM_INGOT_KEY, MAGNESIUM_INGOT);
+		Registry.register(BuiltInRegistries.ITEM, CHROMIC_OXIDE_KEY, CHROMIC_OXIDE);
+		Registry.register(BuiltInRegistries.ITEM, CHROMIUM_METAL_KEY, CHROMIUM_METAL);
 		Registry.register(BuiltInRegistries.ITEM, EMPTY_HELIUM_CYLINDER_KEY, EMPTY_HELIUM_CYLINDER);
 		Registry.register(BuiltInRegistries.ITEM, HELIUM_CYLINDER_KEY, HELIUM_CYLINDER);
 		Registry.register(BuiltInRegistries.ITEM, BORIC_ACID_KEY, BORIC_ACID);

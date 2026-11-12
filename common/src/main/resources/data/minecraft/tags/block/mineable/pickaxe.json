@@ -425,6 +425,9 @@
     "wildcatter:bop_accumulator",
     "wildcatter:slurry_pipe",
     "wildcatter:air_header",
-    "wildcatter:guy_anchor"
+    "wildcatter:guy_anchor",
+    "wildcatter:fumed_silica_burner",
+    "wildcatter:pidgeon_furnace",
+    "wildcatter:chromate_kiln"
   ]
 }

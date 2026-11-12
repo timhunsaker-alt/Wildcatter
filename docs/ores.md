@@ -106,7 +106,7 @@ Every other mineral waits for its plant:
 - 7b: sulfur, uranium ore, pitchblende, pyrolusite and rock salt (uranium-mill.md, acid-plant.md).
 - 7d: fluorspar, roasted with sulfuric acid in the HF kiln (multiblocks/conversion.md).
 - 7f: heavy mineral sand, separated for its zircon (multiblocks/zirconium.md); halite and magnesia also feed it.
-- Dolomite waits for a Pidgeon magnesium plant (ROADMAP Ideas).
+- Dolomite: the lime kiln burns it to dolime for the Pidgeon furnace (17c2, zirconium-extensions.md).
 - 8a: borax, dissolved in sulfuric acid for boric acid and reduced to boron carbide (multiblocks/boron.md). Silver waits.
 - The rest go to the plants listed under Ideas in ROADMAP.
 

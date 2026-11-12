@@ -814,6 +814,31 @@ public final class Tuning {
 	public static final double HF_RODLET_OD_MM = 9.7;              // a hafnium rodlet: the B4C rodlet's size, solid metal (derived)
 	public static final double HF_RODLET_LENGTH_M = 3.66;
 	public static final int HF_RODLETS_PER_RCCA = 24;
+	// 17c2: fumed silica, Pidgeon magnesium, chromium (docs/multiblocks/zirconium-extensions.md items 1, 4, 5)
+	public static final double FUMED_SILICA_WATTS = 15_000.0;      // the burner's fans and baghouse, 480 V
+	public static final double FUMED_SILICA_SACK_KG = 25.0;        // (proposed)
+	public static final double SICL4_HOLD_KG = 20.0;               // SiCl4 a chlorinator keeps for a burner against it (proposed)
+	public static final double HCL_STRENGTH = 0.32;                // the burner's hydrochloric acid, HCl by weight
+	public static final double NM3_PER_KMOL = 22.414;
+	public static final double PIDGEON_MG_KGS = 10.0 / 3600;       // (proposed)
+	public static final double PIDGEON_CYCLE_S = 12 * 3600.0;      // a retort cycle (proposed; real 10-12 h), through TimeScale
+	public static final double PIDGEON_DOLOMITE_PER_MG = 11.0;     // 10-12 t of dolomite a t of Mg (textbook, unverified)
+	public static final double PIDGEON_FESI_PER_MG = 1.0;          // about 1 t of FeSi 75 a t of Mg (textbook, unverified)
+	public static final double PIDGEON_FLUORSPAR_SHARE = 0.03;     // of the briquette
+	public static final double PIDGEON_GAS_J_PER_KG = 180e6;       // (proposed; coal-fired plants use more, unverified)
+	public static final double PIDGEON_PUMP_WATTS = 30_000.0;      // vacuum pumps, 480 V
+	public static final double PIDGEON_SLAG_PER_MG = 6.0;          // dicalcium silicate, counted
+	public static final double MG_INGOT_KG = 22.7;                 // a magnesium ingot (proposed)
+	public static final double DOLIME_PER_DOLOMITE = 96.38 / 184.40;   // CaMg(CO3)2 -> CaO.MgO + 2 CO2
+	public static final double CHROMATE_KILN_GAS_WATTS = 300_000.0;
+	public static final double CHROMATE_KILN_WATTS = 15_000.0;     // its drive and fans, 480 V
+	public static final double CR2O3_KGS = 25.0 / 3600;            // a sack an hour (proposed)
+	public static final double CR2O3_SACK_KG = 25.0;
+	public static final double CHROMITE_RECOVERY = 0.90;           // of the chromite's chromium to the chromate (proposed)
+	public static final double CHROMATE_SPILL_SECONDS = 600.0;     // the toxic spill a broken kiln leaves (proposed)
+	public static final double CHROMIUM_PIECE_KG = 10.0;           // a piece of aluminothermic chromium (proposed)
+	public static final int VESSEL_CR_SACKS = 4;                   // chromic oxide sacks a chromium batch (100 kg)
+	public static final int VESSEL_CR_ALUMINIUM = 2;               // aluminium ingots a batch (45 kg; 36 kg react)
 
 	// ---- The fuel plant (docs/multiblocks/fuel.md, approved 2026-11-01) --------------------------------------------------------
 	public static final double FUEL_LINE_U_KGS = 50.0 / 3600;      // kg of U a second: a small line (proposed)

@@ -155,4 +155,80 @@ public final class Zirconium {
 	public static double hoursForHafniumRccas(int rccas) {
 		return rccas * Tuning.HF_RODLETS_PER_RCCA * hafniumRodletKg() / hafniumKgh();
 	}
+
+	// ---- 17c2: fumed silica, Pidgeon magnesium, chromium (docs/multiblocks/zirconium-extensions.md) ------------------------------
+	public static final double SICL4 = SI + 2 * CL2, SIO2 = SI + 32.00, HCL = 36.461, CR = 51.996, CR2O3 = 2 * CR + 48.00, FECR2O4 = 55.845 + 2 * CR + 64.00,
+			NAOH = 39.997, S = 32.06, NA2SO4 = 142.04, AL = 26.98;
+
+	/** SiCl4 + 2 H2 + O2 -> SiO2 + 4 HCl: kg of fumed silica a kg of SiCl4. */
+	public static double silicaPerSiCl4() {
+		return SIO2 / SICL4;
+	}
+
+	public static double hclPerSiCl4() {
+		return 4 * HCL / SICL4;
+	}
+
+	/** Nm3 of hydrogen a kg of SiCl4. */
+	public static double hydrogenPerSiCl4() {
+		return 2 * Tuning.NM3_PER_KMOL / SICL4;
+	}
+
+	public static double oxygenPerSiCl4() {
+		return Tuning.NM3_PER_KMOL / SICL4;
+	}
+
+	/** The line's SiCl4, kg an hour: 18.6. */
+	public static double siCl4Kgh() {
+		return Tuning.ZR_LINE_KGS * 3600 * siCl4PerZr();
+	}
+
+	/** kg of dolime a kg of Pidgeon magnesium: 5.75. */
+	public static double dolimePerMg() {
+		return Tuning.PIDGEON_DOLOMITE_PER_MG * Tuning.DOLIME_PER_DOLOMITE;
+	}
+
+	/** kg of fluorspar a kg of magnesium: 3 % of the briquette. */
+	public static double fluorsparPerMg() {
+		return (dolimePerMg() + Tuning.PIDGEON_FESI_PER_MG) * Tuning.PIDGEON_FLUORSPAR_SHARE / (1 - Tuning.PIDGEON_FLUORSPAR_SHARE);
+	}
+
+	/** Watts of gas the Pidgeon furnace burns at its rate: 0.5 MW. */
+	public static double pidgeonGasWatts() {
+		return Tuning.PIDGEON_MG_KGS * Tuning.PIDGEON_GAS_J_PER_KG;
+	}
+
+	/** Chromic oxide's chromium share: 0.684. */
+	public static double crInCr2o3() {
+		return 2 * CR / CR2O3;
+	}
+
+	/** kg of chromite (FeCr2O4) a kg of Cr2O3, at the roast's recovery. */
+	public static double chromitePerCr2o3() {
+		return FECR2O4 / CR2O3 / Tuning.CHROMITE_RECOVERY;
+	}
+
+	/** kg of NaOH a kg of Cr2O3: two a Cr (4 FeCr2O4 + 16 NaOH + 7 O2 -> 8 Na2CrO4 + 2 Fe2O3 + 8 H2O). */
+	public static double naohPerCr2o3() {
+		return 4 * NAOH / CR2O3;
+	}
+
+	/** kg of sulfur a kg of Cr2O3, and of sodium sulfate made (Na2Cr2O7 + S -> Cr2O3 + Na2SO4, simplified). */
+	public static double sulfurPerCr2o3() {
+		return S / CR2O3;
+	}
+
+	public static double sulfatePerCr2o3() {
+		return NA2SO4 / CR2O3;
+	}
+
+	/** kg of chromium a vessel batch makes: 4 sacks of Cr2O3 reduced by aluminium, at the vessel's recovery. */
+	public static double chromiumPerBatch() {
+		return Tuning.VESSEL_CR_SACKS * Tuning.CR2O3_SACK_KG * crInCr2o3() * Tuning.VESSEL_RECOVERY;
+	}
+
+	/** kg of aluminium a batch needs: Cr2O3 + 2 Al -> 2 Cr + Al2O3. */
+	public static double aluminiumPerChromiumBatch() {
+		return Tuning.VESSEL_CR_SACKS * Tuning.CR2O3_SACK_KG / CR2O3 * 2 * AL;
+	}
 }

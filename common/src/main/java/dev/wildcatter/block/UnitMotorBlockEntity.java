@@ -95,6 +95,9 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "var_furnace" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.VAR_WATTS);
 				case "extrusion_press" -> new Motor(true, Voltage.MEDIUM, Tuning.EXTRUSION_PRESS_WATTS);
 				case "pilger_mill" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PILGER_WATTS);
+				case "fumed_silica_burner" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.FUMED_SILICA_WATTS);
+				case "pidgeon_furnace" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PIDGEON_PUMP_WATTS);
+				case "chromate_kiln" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CHROMATE_KILN_WATTS);
 				case "vacuum_anneal_furnace" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ANNEAL_FURNACE_WATTS);
 				case "uf6_autoclave" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.AUTOCLAVE_WATTS);
 				case "idr_kiln" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.IDR_KILN_WATTS);
@@ -238,6 +241,9 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "hafnium_column", "kroll_reactor", "vacuum_distillation", "vacuum_anneal_furnace" -> "furnace";
 			case "var_furnace" -> "arc supply";
 			case "extrusion_press" -> "hydraulic pumps";
+			case "fumed_silica_burner" -> "burner fans and baghouse";
+			case "pidgeon_furnace" -> "vacuum pumps";
+			case "chromate_kiln" -> "kiln drive and fans";
 			case "pilger_mill" -> "mill drive";
 			case "uf6_autoclave" -> "heaters";
 			case "idr_kiln" -> "kiln heaters and drive";

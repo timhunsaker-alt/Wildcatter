@@ -30,6 +30,7 @@ public class ChlorinatorBlockEntity extends UnitMotorBlockEntity implements ZrSt
 	private double zircon;   // kg of ZrSiO4 from zircon feed, not yet chlorinated
 	private double carbon;   // kg
 	private double siCl4, co;
+	private double siCl4Held;   // 17c2: SiCl4 kept for a fumed silica burner against it, a little at a time; the rest is counted
 	private String unit = "starting";
 
 	public ChlorinatorBlockEntity(BlockPos pos, BlockState state) {
@@ -150,6 +151,7 @@ public class ChlorinatorBlockEntity extends UnitMotorBlockEntity implements ZrSt
 		carbon -= zr * Zirconium.carbonPerZr();
 		metal += zr;
 		siCl4 += zr * Zirconium.siCl4PerZr();
+		siCl4Held = Math.min(Tuning.SICL4_HOLD_KG, siCl4Held + zr * Zirconium.siCl4PerZr());
 		co += zr * 4 * 28.01 / Zirconium.ZR;
 		unit = String.format("chlorinating at about 1,200 C: %.1f kg/h of zircon, %.1f kg/h of chlorine; carbon %.0f kg", zr * Zirconium.zirconPerZr() / seconds() * 3600,
 				zr * Zirconium.chlorinePerZr() / seconds() * 3600, carbon);
@@ -177,6 +179,24 @@ public class ChlorinatorBlockEntity extends UnitMotorBlockEntity implements ZrSt
 		};
 	}
 
+	/** 17c2: SiCl4 a fumed silica burner against it may take. */
+	public double siCl4Held() {
+		return siCl4Held;
+	}
+
+	public double takeSiCl4(double kg) {
+		double got = Math.max(0, Math.min(kg, siCl4Held));
+		siCl4Held -= got;
+		setChanged();
+		return got;
+	}
+
+	/** For the game test: SiCl4 as if chlorinated. */
+	public void addSiCl4ForTest(double kg) {
+		siCl4Held += kg;
+		setChanged();
+	}
+
 	@Override
 	public Component inspect() {
 		return Component.literal(String.format("Chlorinator (fluid bed): %s; ZrCl4 %.2f kg of metal held; SiCl4 %.0f kg, CO %.0f kg to the scrubber; %s", unit, metal,
@@ -190,6 +210,7 @@ public class ChlorinatorBlockEntity extends UnitMotorBlockEntity implements ZrSt
 		output.putDouble("metal", metal);
 		output.putDouble("carbon", carbon);
 		output.putDouble("sicl4", siCl4);
+		output.putDouble("sicl4Held", siCl4Held);
 		output.putDouble("co", co);
 		if (zircon > 0) {
 			output.putDouble("zircon", zircon);
@@ -204,6 +225,7 @@ public class ChlorinatorBlockEntity extends UnitMotorBlockEntity implements ZrSt
 		metal = input.getDoubleOr("metal", 0);
 		carbon = input.getDoubleOr("carbon", 0);
 		siCl4 = input.getDoubleOr("sicl4", 0);
+		siCl4Held = input.getDoubleOr("sicl4Held", 0);
 		co = input.getDoubleOr("co", 0);
 		zircon = input.getDoubleOr("zircon", 0);
 	}

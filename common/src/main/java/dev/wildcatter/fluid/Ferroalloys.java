@@ -177,7 +177,9 @@ public final class Ferroalloys {
 	/** A batch: one bag of oxide or concentrate, iron and aluminium ingots; kg of alloy and slag. */
 	public enum Batch {
 		FERROMOLY("ferromolybdenum", Tuning.VESSEL_FEMO_IRON, Tuning.VESSEL_FEMO_ALUMINIUM),
-		FERROTUNGSTEN("ferrotungsten", Tuning.VESSEL_FEW_IRON, Tuning.VESSEL_FEW_ALUMINIUM);
+		FERROTUNGSTEN("ferrotungsten", Tuning.VESSEL_FEW_IRON, Tuning.VESSEL_FEW_ALUMINIUM),
+		/** 17c2 (zirconium-extensions.md item 5): 4 sacks of chromic oxide and 2 aluminium ingots, no iron: chromium metal. */
+		CHROMIUM("chromium", 0, Tuning.VESSEL_CR_ALUMINIUM);
 
 		public final String label;
 		public final int iron;
@@ -194,16 +196,17 @@ public final class Ferroalloys {
 			return switch (this) {
 				case FERROMOLY -> Tuning.BULK_BAG_KG * Tuning.MOLY_OXIDE_MO * Tuning.VESSEL_RECOVERY;
 				case FERROTUNGSTEN -> Tuning.BULK_BAG_KG * Tuning.SCHEELITE_BAG_WO3 * W / WO3 * Tuning.VESSEL_RECOVERY;
+				case CHROMIUM -> Zirconium.chromiumPerBatch();
 			};
 		}
 
 		public double alloyKg() {
-			return metalKg() / (this == FERROMOLY ? Tuning.FERROMOLY_MO : Tuning.FERROTUNGSTEN_W);
+			return this == CHROMIUM ? metalKg() : metalKg() / (this == FERROMOLY ? Tuning.FERROMOLY_MO : Tuning.FERROTUNGSTEN_W);
 		}
 
 		/** kg of aluminium the oxide's reduction takes: MoO3 + 2 Al -> Mo + Al2O3; WO3 + 2 Al -> W + Al2O3. */
 		public double aluminiumNeededKg() {
-			return metalKg() / (this == FERROMOLY ? MO : W) * 2 * AL;
+			return this == CHROMIUM ? Zirconium.aluminiumPerChromiumBatch() : metalKg() / (this == FERROMOLY ? MO : W) * 2 * AL;
 		}
 
 		public double aluminiumKg() {
@@ -212,6 +215,9 @@ public final class Ferroalloys {
 
 		/** The slag block: the alumina the aluminium burns to, and what the bag carried that is not metal oxide (proposed). */
 		public double slagKg() {
+			if (this == CHROMIUM) {
+				return Zirconium.aluminiumPerChromiumBatch() * AL2O3 / (2 * AL);
+			}
 			double oxide = this == FERROMOLY ? Tuning.BULK_BAG_KG * Tuning.MOLY_OXIDE_MO * MOO3 / MO : Tuning.BULK_BAG_KG * Tuning.SCHEELITE_BAG_WO3;
 			return aluminiumKg() * AL2O3 / (2 * AL) + (Tuning.BULK_BAG_KG - oxide);
 		}

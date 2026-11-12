@@ -57,4 +57,36 @@ class ZirconiumExtensionsTest {
 		assertEquals(0.272, Zirconium.magnesiumPerHf(), 0.001);
 		assertEquals(1.067, Zirconium.mgCl2PerHf(), 0.001);
 	}
+
+	// ---- 17c2: fumed silica, Pidgeon magnesium, chromium --------------------------------------------------------------------------
+	@Test
+	void theLinesSiCl4MakesFumedSilicaAndHcl() {
+		double sicl4 = Zirconium.siCl4Kgh();
+		assertEquals(18.6, sicl4, 0.1);
+		assertEquals(6.6, sicl4 * Zirconium.silicaPerSiCl4(), 0.05);
+		assertEquals(16.0, sicl4 * Zirconium.hclPerSiCl4(), 0.05);
+		assertEquals(4.9, sicl4 * Zirconium.hydrogenPerSiCl4(), 0.05);
+		assertEquals(2.45, sicl4 * Zirconium.oxygenPerSiCl4(), 0.05);
+	}
+
+	@Test
+	void pidgeonMagnesiumTakesItsDolimeFesiAndGas() {
+		assertEquals(5.75, Zirconium.dolimePerMg(), 0.01);
+		assertEquals(0.209, Zirconium.fluorsparPerMg(), 0.002);
+		assertEquals(500_000, Zirconium.pidgeonGasWatts(), 1);
+		// a 12-hour cycle at 10 kg an hour is about five ingots
+		assertEquals(5.3, Tuning.PIDGEON_MG_KGS * Tuning.PIDGEON_CYCLE_S / Tuning.MG_INGOT_KG, 0.05);
+	}
+
+	@Test
+	void chromicOxideAndChromium() {
+		assertEquals(0.684, Zirconium.crInCr2o3(), 0.001);
+		assertEquals(1.052, Zirconium.naohPerCr2o3(), 0.001);
+		assertEquals(67.0, Zirconium.chromiumPerBatch(), 0.1);
+		// the two ingots carry more aluminium than the reduction takes
+		assertEquals(35.5, Zirconium.aluminiumPerChromiumBatch(), 0.1);
+		assertEquals(true, Tuning.VESSEL_CR_ALUMINIUM * Tuning.AL_INGOT_KG > Zirconium.aluminiumPerChromiumBatch());
+		// a 10 kg piece of chromium is about 1,000 hours of the VAR furnace's 0.10 %
+		assertEquals(1000, Tuning.CHROMIUM_PIECE_KG / (Tuning.ZR_LINE_KGS * 3600 * Tuning.ZIRCALOY_CR), 1);
+	}
 }

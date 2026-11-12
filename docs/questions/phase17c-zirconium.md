@@ -69,3 +69,62 @@ decided on recommendation; for Tim. Entries marked **(needs you)** change someth
 
 ### 8. Strike item 2 (uses for the caustic) from Ideas
 - **Chosen:** the caustic already goes to the Bayer refinery (10b2); nothing was built for it. ROADMAP Ideas no longer lists it.
+
+## 17c2: fumed silica, Pidgeon magnesium, chromium
+
+### 9. Oxygen and hydrochloric acid are new pipe products (needs you)
+- **Chosen:** `oxygen` (a gas, m3) and `hydrochloric acid (32 %)` (kg, stock tanks hold it). Wildcatter had no oxygen product (the ISR
+  oxygen generator doses its injection directly); the brief's "existing oxygen product" does not exist, so the burner takes `OXYGEN`
+  from a pipe and the scene from a stand-in source. The HCl product is declared exactly as the chlor-alkali track (w-20) declares it, so
+  the two merge as one.
+- **For the merge:** the VPSA oxygen unit (titanium-pigment.md, another track) should put out this `OXYGEN`.
+
+### 10. Where the fumed silica burner stands
+- **Chosen:** against the chlorinator's east face, one cell south of its front, so the chlorine inlet keeps the front cell (the burner,
+  3 long, would otherwise cover all three of the chlorinator's east bottom cells). Its 480 V box is on the **north** face of its main cell,
+  since its west is against the chlorinator. Hydrogen on the east face of its bottom cells, oxygen one up, 32 % HCl out of the south face
+  of its back cells, sacks out below.
+- **Why:** the spec's "against its east face" with the box on the west face is not buildable as drawn.
+
+### 11. The chlorinator keeps 20 kg of SiCl4 for a burner
+- **Chosen:** the chlorinator keeps up to 20 kg of the SiCl4 it makes for a burner against it *(proposed)*; the rest, and all of it with no
+  burner, is counted as before. The burner runs at the line's 18.6 kg/h and a fifth, as every stage does: 6.6 kg/h of fumed silica, 16
+  kg/h of HCl (50 kg/h of 32 % acid), 4.9 Nm3/h of hydrogen and 2.45 of oxygen. It stops when its acid has nowhere to go. The water the
+  acid is absorbed in is not drawn (simplified).
+
+### 12. Fumed silica is tagged `c:fumed_silica`
+- **Chosen:** 25 kg sacks, tagged `c:fumed_silica`; no use in Wildcatter (as the spec says).
+
+### 13. The Pidgeon cycle: magnesium at its rate, ingots at the cycle's end
+- **Chosen:** magnesium condenses at 10 kg/h while the furnace runs (dolime, FeSi, fluorspar and gas drawn at that rate); at the end of
+  each 12-hour cycle (`TimeScale.scaled`) the crowns are cast into 22.7 kg ingots (the part of an ingot left over waits for the next
+  cycle). At 50:1 the cycles are 14.4 minutes and give smaller casts; the rate stays 10 kg/h.
+- **Why:** the time scale shortens waits, not rates (docs/time-scale.md). Charging a whole cycle's briquettes at once and releasing
+  them in a scaled cycle would make the furnace 50 times faster at 50:1.
+- **Alternatives:** a full 120 kg charge at the cycle's start (real retorts are charged at the start).
+
+### 14. Pidgeon numbers
+- **Chosen:** 11 t of dolomite a t of Mg (the middle of 10-12), as dolime 5.75 kg a kg of Mg (dolime 52.3 % of dolomite's weight);
+  1.0 kg of FeSi 75 a kg; fluorspar 3 % of the briquette, 0.21 kg a kg (the fluorite block's 2,160 kg of CaF2, or a 1 t synthetic
+  fluorspar bag); gas on the east face of its bottom cells (the spec names no nozzle), 180 MJ a kg; slag 6 t a t counted.
+
+### 15. Dolime in the lime kiln
+- **Chosen:** the lime kiln takes dolomite by the same hopper and burns it first while it has some, at its 10 t a day of product and its
+  4.0 GJ a t *(proposed: the same as quicklime)*; CO2 0.913 kg a kg of dolime (the liquefier can take it). A bagging station against it
+  fills dolime bags while it holds more dolime than quicklime.
+
+### 16. The chromate kiln
+- **Chosen:** a sack (25 kg of Cr2O3) an hour *(proposed; the VAR needs 10 g of Cr an hour)*. Chromite and sulfur by hopper; 32 % caustic
+  soda on the north face of its front cells, gas on the east face of its bottom cells (the spec names no nozzles); 0.3 MW of gas.
+  Stoichiometry: 4 FeCr2O4 + 16 NaOH + 7 O2 -> 8 Na2CrO4 + 2 Fe2O3 + 8 H2O (1.05 kg of NaOH a kg of Cr2O3); the leach and reduction
+  simplified to Na2Cr2O7 + S -> Cr2O3 + Na2SO4 (0.21 kg of S, 0.93 kg of Na2SO4 counted a kg); 90 % of the chromite's chromium
+  recovered *(proposed)*.
+- **Hexavalent chromium:** it holds up to a sack's worth of chromate between roasting and reduction; broken while it holds any, it leaves
+  a poison cloud (vanilla's lingering cloud, Poison II, 4 m, 10 minutes) *(proposed)*.
+- **The sodium sulfate** stays counted (19d bags only the borax dissolver's).
+
+### 17. Chromium metal from the aluminothermic vessel
+- **Chosen:** a chromium batch is 4 sacks of chromic oxide (100 kg) and 2 aluminium ingots (45 kg; Cr2O3 + 2 Al -> 2 Cr + Al2O3 takes
+  35.5 kg), fired as the vessel's other batches: 67 kg of chromium at its 98 %, broken into **10 kg pieces** *(proposed)* out to a hopper
+  under the vessel (not a bulk bag: the VAR uses 10 g an hour). The VAR furnace takes a piece in its chromite slot (10 kg of Cr, about
+  1,000 hours); chromite still works.

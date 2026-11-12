@@ -35,8 +35,9 @@ import org.jspecify.annotations.Nullable;
  * the while; a player inside its hood takes fire damage. The alloy goes to the bagging station against it in 1 t bags.
  */
 public class AluminothermicVesselBlockEntity extends UnitMotorBlockEntity implements HopperFed, Bagged {
-	private static final int MOLY = 0, SCHEELITE = 1, IRON = 2, ALUMINIUM = 3;
-	private final NonNullList<ItemStack> slots = NonNullList.withSize(4, ItemStack.EMPTY);
+	private static final int MOLY = 0, SCHEELITE = 1, IRON = 2, ALUMINIUM = 3, CR2O3 = 4, CHROMIUM_OUT = 5;   // 17c2: chromic oxide in, chromium out below
+	private final NonNullList<ItemStack> slots = NonNullList.withSize(6, ItemStack.EMPTY);
+	private double chromium;   // 17c2: kg toward the next piece
 	private final double[] alloy = new double[Batch.values().length];   // kg waiting for bags
 	private @Nullable Batch firing;
 	private double fireLeft;   // s
@@ -58,13 +59,15 @@ public class AluminothermicVesselBlockEntity extends UnitMotorBlockEntity implem
 			case MOLY -> WildcatterItems.MOLY_OXIDE_BAG;
 			case SCHEELITE -> WildcatterItems.SCHEELITE_CONCENTRATE_BAG;
 			case IRON -> Items.IRON_INGOT;
+			case CR2O3 -> WildcatterItems.CHROMIC_OXIDE;
+			case CHROMIUM_OUT -> Items.AIR;
 			default -> WildcatterItems.ALUMINIUM_INGOT;
 		};
 	}
 
 	@Override
 	public boolean takes(ItemStack stack) {
-		for (int i = 0; i < slots.size(); i++) {
+		for (int i = 0; i < CHROMIUM_OUT; i++) {
 			if (stack.is(itemOf(i))) {
 				return true;
 			}
@@ -74,12 +77,21 @@ public class AluminothermicVesselBlockEntity extends UnitMotorBlockEntity implem
 
 	@Override
 	public int[] getSlotsForFace(Direction side) {
-		return side == Direction.UP ? new int[] {MOLY, SCHEELITE, IRON, ALUMINIUM} : new int[0];
+		return side == Direction.UP ? new int[] {MOLY, SCHEELITE, IRON, ALUMINIUM, CR2O3} : side == Direction.DOWN ? new int[] {CHROMIUM_OUT} : new int[0];
 	}
 
 	@Override
 	public boolean canPlaceItem(int slot, ItemStack stack) {
-		return slot >= 0 && slot < slots.size() && stack.is(itemOf(slot));
+		return slot >= 0 && slot < CHROMIUM_OUT && stack.is(itemOf(slot));
+	}
+
+	@Override
+	public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
+		return slot == CHROMIUM_OUT && side == Direction.DOWN;
+	}
+
+	public int chromiumPieces() {
+		return slots.get(CHROMIUM_OUT).getCount();
 	}
 
 	@Override
@@ -94,6 +106,9 @@ public class AluminothermicVesselBlockEntity extends UnitMotorBlockEntity implem
 		}
 		if (slots.get(SCHEELITE).getCount() >= 1 && slots.get(IRON).getCount() >= Batch.FERROTUNGSTEN.iron && slots.get(ALUMINIUM).getCount() >= Batch.FERROTUNGSTEN.aluminium) {
 			return Batch.FERROTUNGSTEN;
+		}
+		if (slots.get(CR2O3).getCount() >= Tuning.VESSEL_CR_SACKS && slots.get(ALUMINIUM).getCount() >= Batch.CHROMIUM.aluminium) {
+			return Batch.CHROMIUM;
 		}
 		return null;
 	}
@@ -114,9 +129,11 @@ public class AluminothermicVesselBlockEntity extends UnitMotorBlockEntity implem
 		Batch batch = ready();
 		if (batch == null) {
 			return "Aluminothermic vessel: NO BATCH: a bag of moly oxide, " + Batch.FERROMOLY.iron + " iron and " + Batch.FERROMOLY.aluminium
-					+ " aluminium ingots; or a bag of scheelite concentrate, " + Batch.FERROTUNGSTEN.iron + " iron and " + Batch.FERROTUNGSTEN.aluminium + " aluminium ingots";
+					+ " aluminium ingots; or a bag of scheelite concentrate, " + Batch.FERROTUNGSTEN.iron + " iron and " + Batch.FERROTUNGSTEN.aluminium + " aluminium ingots; or "
+					+ Tuning.VESSEL_CR_SACKS + " sacks of chromic oxide and " + Batch.CHROMIUM.aluminium + " aluminium ingots";
 		}
-		slots.get(batch == Batch.FERROMOLY ? MOLY : SCHEELITE).shrink(1);
+		slots.get(batch == Batch.FERROMOLY ? MOLY : batch == Batch.CHROMIUM ? CR2O3 : SCHEELITE)
+				.shrink(batch == Batch.CHROMIUM ? Tuning.VESSEL_CR_SACKS : 1);
 		slots.get(IRON).shrink(batch.iron);
 		slots.get(ALUMINIUM).shrink(batch.aluminium);
 		firing = batch;
@@ -152,7 +169,22 @@ public class AluminothermicVesselBlockEntity extends UnitMotorBlockEntity implem
 			unit = String.format("FIRING %s: %.0f s left%s", firing.label, fireLeft, strength <= 0 ? "; NO FAN: its fume goes nowhere (its " + describe() + ")" : "");
 			return;
 		}
-		alloy[firing.ordinal()] += firing.alloyKg();
+		if (firing == Batch.CHROMIUM) {
+			chromium += firing.alloyKg();   // broken from its button into 10 kg pieces, out to a hopper under it
+			int n = (int) Math.floor(chromium / Tuning.CHROMIUM_PIECE_KG + 1e-9);
+			ItemStack out = slots.get(CHROMIUM_OUT);
+			n = Math.min(n, out.isEmpty() ? 64 : out.getMaxStackSize() - out.getCount());
+			if (n > 0) {
+				if (out.isEmpty()) {
+					slots.set(CHROMIUM_OUT, new ItemStack(WildcatterItems.CHROMIUM_METAL, n));
+				} else {
+					out.grow(n);
+				}
+				chromium -= n * Tuning.CHROMIUM_PIECE_KG;
+			}
+		} else {
+			alloy[firing.ordinal()] += firing.alloyKg();
+		}
 		slag += firing.slagKg() / 1000;
 		batches++;
 		unit = String.format("fired: %.0f kg of %s and %.0f kg of alumina slag", firing.alloyKg(), firing.label, firing.slagKg());
@@ -215,9 +247,9 @@ public class AluminothermicVesselBlockEntity extends UnitMotorBlockEntity implem
 	@Override
 	public Component inspect() {
 		return Component.literal(String.format("Aluminothermic vessel (baghouse fan %.0f kW, %s): ", Tuning.VESSEL_FAN_WATTS / 1000, Voltage.INDUSTRIAL.label()) + unit
-				+ String.format("; bins: %d moly oxide, %d scheelite concentrate, %d iron, %d aluminium; %.0f kg of ferromolybdenum and %.0f kg of ferrotungsten for bags; %d batches, %.1f t of slag; ",
-						slots.get(MOLY).getCount(), slots.get(SCHEELITE).getCount(), slots.get(IRON).getCount(), slots.get(ALUMINIUM).getCount(),
-						alloy[Batch.FERROMOLY.ordinal()], alloy[Batch.FERROTUNGSTEN.ordinal()], batches, slag)
+				+ String.format("; bins: %d moly oxide, %d scheelite concentrate, %d iron, %d aluminium, %d chromic oxide; %.0f kg of ferromolybdenum and %.0f kg of ferrotungsten for bags; %d pieces of chromium for a hopper; %d batches, %.1f t of slag; ",
+						slots.get(MOLY).getCount(), slots.get(SCHEELITE).getCount(), slots.get(IRON).getCount(), slots.get(ALUMINIUM).getCount(), slots.get(CR2O3).getCount(),
+						alloy[Batch.FERROMOLY.ordinal()], alloy[Batch.FERROTUNGSTEN.ordinal()], chromiumPieces(), batches, slag)
 				+ describe());
 	}
 
@@ -247,6 +279,7 @@ public class AluminothermicVesselBlockEntity extends UnitMotorBlockEntity implem
 		output.putDouble("fireLeft", fireLeft);
 		output.putInt("batches", batches);
 		output.putDouble("slag", slag);
+		output.putDouble("chromium", chromium);
 	}
 
 	@Override
@@ -257,6 +290,7 @@ public class AluminothermicVesselBlockEntity extends UnitMotorBlockEntity implem
 		for (Batch b : Batch.values()) {
 			alloy[b.ordinal()] = input.getDoubleOr("alloy_" + b.name(), 0);
 		}
+		chromium = input.getDoubleOr("chromium", 0);
 		String f = input.getStringOr("firing", "");
 		firing = null;
 		for (Batch b : Batch.values()) {

@@ -11,7 +11,13 @@ footprints match ZirconiumPartBlock's):
 - vacuum_anneal_furnace, 3 x 3 x 8: the horizontal vacuum furnace and its pumps;
 - magnesium_cell, 3 x 3 x 6: the refractory cell, its electrodes, the bus bars on the east, the chlorine line on the east front;
 - magnesia_chlorinator, 3 x 6 x 3: the shaft furnace with its charging hopper, chlorine in on the north;
-- chlor_alkali_cell, 3 x 3 x 6: the bipolar electrolyser stack in its frame, brine tank, bus bars east."""
+- chlor_alkali_cell, 3 x 3 x 6: the bipolar electrolyser stack in its frame, brine tank, bus bars east;
+- fumed_silica_burner, 2 x 6 x 3 (17c2): the burner and its reaction chamber, the coagulation pipes, a cyclone and a baghouse; hydrogen and
+  oxygen in on the east, hydrochloric acid out of the back (480 V box north: its west is against the chlorinator);
+- pidgeon_furnace, 4 x 4 x 10 (17c2): the brick furnace with its row of horizontal retorts, their condensers and vacuum pumps on the
+  north end, the charging hopper on top, gas in on the east (480 V box west);
+- chromate_kiln, 3 x 3 x 8 (17c2): the rotary kiln on its tyres and rollers, its burner hood, the leach tank and the reduction tank (480
+  V box west)."""
 import mlib
 import plantlib as g
 
@@ -154,8 +160,58 @@ CA.pipe([(1.5, 0.5, 5.2), (1.5, 0.5, 6.0)], 2, "steel")                     # ch
 CA.pipe([(2.4, 0.5, 0.0), (2.4, 0.5, 0.4)], 2, "steel")                     # hydrogen out, the front
 CA.collide((0.4, 0.0, 0.2), (2.6, 2.6, 5.8))
 
+# ---- 17c2: the fumed silica burner --------------------------------------------------------------------------------------------------
+FB = model("fumed_silica_burner", 2, 6, 3, "galv")
+FB.box((0.0, 0.0, 0.0), (2.0, 0.2, 3.0), "concrete")
+FB.cylinder("y", (0.6, 0.6), 0.45, 0.2, 2.6, "hipaint", 12)                # the burner and its reaction chamber
+FB.cylinder("y", (0.6, 0.6), 0.25, 2.6, 3.0, "steel", 10)                  # the burner head
+FB.pipe([(0.6, 2.4, 1.0), (0.6, 2.4, 1.8), (1.4, 2.4, 1.8), (1.4, 4.2, 1.8)], 6, "steel")   # the coagulation pipes
+FB.cylinder("y", (1.4, 0.6), 0.35, 3.2, 5.2, "galv", 12)                   # the cyclone
+FB.cylinder("y", (1.4, 0.6), 0.1, 2.6, 3.2, "galv", 8)                     # its cone
+FB.box((0.2, 0.2, 1.6), (1.8, 3.6, 2.9), "grey")                           # the baghouse
+FB.box((0.4, 3.6, 1.8), (1.6, 3.9, 2.7), "iron")                           # its pulse-jet header
+FB.pipe([(2.0, 0.5, 2.5), (1.8, 0.5, 2.5)], 2, "pipe_gas")                 # hydrogen in, the east, bottom
+FB.pipe([(2.0, 1.5, 1.5), (1.4, 1.5, 1.5), (1.4, 1.5, 1.0)], 2, "steel")   # oxygen in, the east, one up
+FB.pipe([(1.0, 0.5, 2.6), (1.0, 0.5, 3.0)], 2, "polymer")                  # hydrochloric acid out, the back
+FB.box((0.1, 0.5, 0.0), (0.6, 1.1, 0.3), "grey")                            # its 480 V box, on the north: the chlorinator is on its west
+FB.decal((0.2, 0.6, -0.01), (0.5, 1.0, 0.0), "danger", "north", "grey")
+FB.collide((0.1, 0.0, 0.1), (1.9, 5.2, 2.9))
+
+# ---- 17c2: the Pidgeon furnace ----------------------------------------------------------------------------------------------------------
+PF = model("pidgeon_furnace", 4, 4, 10, "concrete")
+PF.box((0.0, 0.0, 0.0), (4.0, 0.3, 10.0), "concrete")
+PF.box((0.3, 0.3, 1.5), (3.7, 3.0, 9.7), "hipaint")                        # the brick-lined furnace
+for x in (0.9, 2.0, 3.1):
+	for y in (0.9, 2.0):
+		PF.cylinder("z", (x, y), 0.3, 0.3, 1.5, "steel", 10)                 # a retort's cold end, out of the north wall
+		PF.cylinder("z", (x, y), 0.36, 0.5, 0.8, "copper", 10)               # its water-cooled condenser
+PF.box((0.4, 0.3, 0.0), (1.4, 0.9, 0.4), "blue")                           # the vacuum pumps
+PF.box((2.6, 0.3, 0.0), (3.6, 0.9, 0.4), "blue")
+PF.pipe([(1.0, 1.0, 0.2), (3.0, 1.0, 0.2)], 3, "steel")                    # the vacuum header
+PF.box((1.3, 3.0, 4.5), (2.7, 3.9, 6.0), "galv")                           # the charging hopper
+PF.cylinder("y", (3.3, 9.3), 0.25, 3.0, 3.9, "steel", 8)                   # the flue
+PF.pipe([(4.0, 0.5, 5.0), (3.7, 0.5, 5.0)], 2, "pipe_gas")                 # gas in, the east
+box480(PF, 0.5, 0.5)
+PF.collide((0.3, 0.0, 0.1), (3.7, 3.9, 9.7))
+
+# ---- 17c2: the chromate kiln ----------------------------------------------------------------------------------------------------------
+CK = model("chromate_kiln", 3, 3, 8, "hipaint")
+CK.box((0.0, 0.0, 0.0), (3.0, 0.2, 8.0), "concrete")
+for z in (1.5, 5.5):
+	CK.box((0.6, 0.2, z - 0.3), (2.4, 0.7, z + 0.3), "iron")               # its rollers' piers
+	CK.cylinder("z", (1.5, 1.2), 0.72, z - 0.2, z + 0.2, "steel", 14)        # the tyres
+CK.cylinder("z", (1.5, 1.2), 0.62, 0.6, 7.0, "hipaint", 14)                 # the rotary kiln
+CK.box((0.6, 0.2, 7.0), (2.4, 2.4, 7.9), "grey")                           # the burner hood
+CK.cylinder("y", (0.6, 0.5), 0.35, 0.2, 1.6, "galv", 10)                    # the leach tank
+CK.cylinder("y", (2.4, 0.5), 0.35, 0.2, 1.6, "polymer", 10)                 # the reduction tank
+CK.box((1.1, 2.0, 2.8), (1.9, 2.9, 3.8), "galv")                           # the charging hopper
+CK.pipe([(1.5, 0.5, 0.0), (1.5, 0.5, 0.3)], 2, "steel")                    # caustic soda in, the north
+CK.pipe([(3.0, 0.5, 7.4), (2.4, 0.5, 7.4)], 2, "pipe_gas")                 # gas in, the east
+box480(CK, 0.5, 0.6)
+CK.collide((0.1, 0.0, 0.1), (2.9, 2.9, 7.9))
+
 
 M = MS
-EXTRA = [CL, HC, KR, VD, VA, EP, PM, AF, MC, MG, CA]
+EXTRA = [CL, HC, KR, VD, VA, EP, PM, AF, MC, MG, CA, FB, PF, CK]
 for extra in EXTRA:
 	extra.export_args = {"blockstate": True, "item": True}

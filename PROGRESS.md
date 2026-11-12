@@ -1464,6 +1464,10 @@ sized for a 40-pot line.
   use the mod's materials. The DEPA-TOPO second cycle is built (2026-11-10, branch `w-rules`; see "Tim's answers" below). Not built:
   the filter acid's uranium is not carried as an assay; fluorosilicic acid recovery; the hemihydrate process; potash by flotation;
   Farmings reading `c:fertilizers` (Farmings' side). See `docs/questions/phase18-phosphate.md`.
+- Phase 17c2 (2026-11-12): item icons `fumed_silica_placeholder`, `dolime_bag_placeholder`, `magnesium_ingot_placeholder`,
+  `chromic_oxide_placeholder`, `chromium_metal_placeholder` drawn by script; the three parts use the mod's materials. The scenes take
+  hydrogen, oxygen, caustic and gas from stand-in sources (no oxygen plant in Wildcatter yet: the VPSA unit is another track's). Not
+  built: the HCl absorber's water, the chromate kiln's sodium sulfate in bags, a dolime kiln's own energy figure.
 - Phase 19d (rods, 2026-11-12): item icons `hafnium_rcca_placeholder` and `sodium_sulfate_bag_placeholder` drawn by script. Not built:
   Ag-In-Cd RCCAs (no zinc refinery), RCCA swaps at the refuelling machine and RCCA records in the pool (RCCAs come out by hand with
   their B-10 on the item), the boron side of the shutdown margin (Modes 3-5). The rods scene runs the vessel alone (no island).
@@ -1473,7 +1477,7 @@ sized for a 40-pot line.
   steady flow (its world has the rule off). Hafnium scrap is counted, not an item.
 - Phase 17a (ferroalloys): the seven bulk bag icons (`ferrochrome_bag`, `ferromanganese_bag`, `ferrosilicon_bag`, `moly_oxide_bag`,
   `scheelite_concentrate_bag`, `ferromolybdenum_bag`, `ferrotungsten_bag`) are script-drawn `*_placeholder` (the Ludo bulk bag with a
-  swatch). Not built: chromium metal (needs 17c2's chromic oxide), an automatic var controller, capacitor switching inrush and harmonic
+  swatch). Not built: an automatic var controller (chromium metal: 17c2), capacitor switching inrush and harmonic
   resonance, a slag item, a frozen-furnace drop, Soderberg paste as its own item (green anodes stand in). Tailings' dense-medium plant
   keeps its placeholder ferrosilicon recipe. See `docs/questions/phase17-ferroalloys.md`.
 - Phase 16 (uranium routes and plant operations, 2026-11-10; `docs/questions/phase16-uranium.md`): script-drawn icons
@@ -2017,6 +2021,15 @@ Spec: `docs/multiblocks/reactor-extensions.md` ("As built", 19b). Branch `phase1
   there, refused by the refuelling machine and the vessel, and straightened at the assembly fixture; loaded unseen, it leaks.
 - **Field Manual:** DRY CASKS; CONTAMINATION AND NEW FUEL.
 - **Tests:** unit `ReactorActivityTest` (3 tests); NeoForge server scenes `casks`, `contamination`, `fuel_inspection`.
+## Phase 17c2: fumed silica, Pidgeon magnesium, chromium (2026-11-12; built while Tim was away; decisions: `docs/questions/phase17c-zirconium.md`, 9-17)
+- Spec `docs/multiblocks/zirconium-extensions.md` items 1, 4, 5 ("As built"). Parts (in `ZirconiumPartBlock`): `fumed_silica_burner`
+  2 x 6 x 3, `pidgeon_furnace` 4 x 4 x 10, `chromate_kiln` 3 x 3 x 8, models in `tools/models/zirconium.py`. Pipe products `oxygen` and
+  `hydrochloric acid (32 %)`. The lime kiln burns dolomite to dolime; the magnesium cell takes Mg ingots by hopper; the aluminothermic
+  vessel's chromium batch; the VAR takes chromium metal. Items `fumed_silica`, `dolime_bag`, `magnesium_ingot`, `chromic_oxide`,
+  `chromium_metal`.
+- Field Manual page SILICA, MAGNESIUM AND CHROMIUM; JEI pages. Tests: unit `ZirconiumExtensionsTest`; NeoForge scenes `pidgeon`,
+  `chromium`, `fumed_silica`; client scene `pidgeon` (screenshot `wildcatter-pidgeon`).
+
 ## Phase 19d: rods and the sodium sulfate (2026-11-12; built while Tim was away; decisions: `docs/questions/phase19d-rods.md`)
 - Spec `docs/multiblocks/reactor-extensions.md` items 9-11 ("As built (19d)"). New world rule `reactorRodWear` (on in new worlds).
 - `fluid/ControlRods` (plain Java): worth by material and B-10, the burn rate. `Reactor`: each RCCA's kind and B-10 (saved), its worth in

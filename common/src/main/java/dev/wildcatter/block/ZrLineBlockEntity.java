@@ -94,7 +94,8 @@ public class ZrLineBlockEntity extends UnitMotorBlockEntity implements ZrStage, 
 		return switch (kind()) {
 			case "mineral_separator" -> slot == 0 && takes(stack);
 			case "var_furnace" -> slot == 0 && stack.is(OreBlocks.INGOTS.get("tin")) || slot == 1 && stack.is(Items.IRON_INGOT)
-					|| slot == 2 && stack.is(OreBlocks.MINERALS.get(Ore.CHROMITE)) || slot == 3 && stack.is(WildcatterItems.ZIRCALOY_SCRAP);
+					|| slot == 2 && (stack.is(OreBlocks.MINERALS.get(Ore.CHROMITE)) || stack.is(WildcatterItems.CHROMIUM_METAL))
+					|| slot == 3 && stack.is(WildcatterItems.ZIRCALOY_SCRAP);
 			default -> false;
 		};
 	}
@@ -319,11 +320,11 @@ public class ZrLineBlockEntity extends UnitMotorBlockEntity implements ZrStage, 
 		if (iron < want * Tuning.ZIRCALOY_FE && !useFrom(1).isEmpty()) {
 			iron += Tuning.IRON_INGOT_KG;
 		}
-		if (chromium < want * Tuning.ZIRCALOY_CR && !useFrom(2).isEmpty()) {
-			chromium += Ore.CHROMITE.kgPerBlock() * 104.0 / 223.84;
+		if (chromium < want * Tuning.ZIRCALOY_CR) {
+			chromium += chromiumFrom(useFrom(2));
 		}
 		String missing = tin <= 1e-9 ? "NO TIN: put tin ingots in its hopper" : iron <= 1e-9 ? "NO IRON: put iron ingots in its hopper"
-				: chromium <= 1e-9 ? "NO CHROMIUM: put chromite in its hopper" : null;
+				: chromium <= 1e-9 ? "NO CHROMIUM: put chromium metal or chromite in its hopper" : null;
 		if (missing != null) {
 			unit = missing;
 			return;
@@ -346,6 +347,11 @@ public class ZrLineBlockEntity extends UnitMotorBlockEntity implements ZrStage, 
 		metal += out;
 		unit = String.format("remelting into Zircaloy-4 (%.1f %% Sn, %.2f %% Fe, %.2f %% Cr): %.1f kg/h; tin %.0f kg, iron %.0f kg, chromium %.0f kg on hand",
 				Tuning.ZIRCALOY_SN * 100, Tuning.ZIRCALOY_FE * 100, Tuning.ZIRCALOY_CR * 100, out / seconds() * 3600, tin, iron, chromium);
+	}
+
+	/** kg of chromium in an item from the VAR's chromium bin: a chromite block (the 7f stand-in) or a piece of chromium metal (17c2). */
+	private static double chromiumFrom(ItemStack item) {
+		return item.isEmpty() ? 0 : item.is(WildcatterItems.CHROMIUM_METAL) ? Tuning.CHROMIUM_PIECE_KG : Ore.CHROMITE.kgPerBlock() * 104.0 / 223.84;
 	}
 
 	/** The steady flow's VAR on a hafnium campaign: hafnium sponge melted unalloyed. */
@@ -404,11 +410,11 @@ public class ZrLineBlockEntity extends UnitMotorBlockEntity implements ZrStage, 
 					if (iron < want * Tuning.ZIRCALOY_FE && !useFrom(1).isEmpty()) {
 						iron += Tuning.IRON_INGOT_KG;
 					}
-					if (chromium < want * Tuning.ZIRCALOY_CR && !useFrom(2).isEmpty()) {
-						chromium += Ore.CHROMITE.kgPerBlock() * 104.0 / 223.84;
+					if (chromium < want * Tuning.ZIRCALOY_CR) {
+						chromium += chromiumFrom(useFrom(2));
 					}
 					missing = tin <= 1e-9 ? "NO TIN: put tin ingots in its hopper" : iron <= 1e-9 ? "NO IRON: put iron ingots in its hopper"
-							: chromium <= 1e-9 ? "NO CHROMIUM: put chromite in its hopper" : null;
+							: chromium <= 1e-9 ? "NO CHROMIUM: put chromium metal or chromite in its hopper" : null;
 					if (missing == null) {
 						double out = Math.min(want, Math.min(Math.min(tin / Tuning.ZIRCALOY_SN, iron / Tuning.ZIRCALOY_FE), chromium / Tuning.ZIRCALOY_CR));
 						out = up.takeZirconium(out * alloy) / alloy;

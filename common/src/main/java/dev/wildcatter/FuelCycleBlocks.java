@@ -74,6 +74,10 @@ public interface FuelCycleBlocks {
 	Block MAGNESIUM_CELL = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.MAGNESIUM_CELL);
 	Block MAGNESIA_CHLORINATOR = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.MAGNESIA_CHLORINATOR);
 	Block CHLOR_ALKALI_CELL = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.CHLOR_ALKALI_CELL);
+	// 17c2 (docs/multiblocks/zirconium-extensions.md)
+	Block FUMED_SILICA_BURNER = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.FUMED_SILICA_BURNER);
+	Block PIDGEON_FURNACE = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.PIDGEON_FURNACE);
+	Block CHROMATE_KILN = zirconiumPart(dev.wildcatter.block.ZirconiumPartBlock.Part.CHROMATE_KILN);
 	// 7g: the fuel plant (docs/multiblocks/fuel.md), and the gas plant's helium recovery unit
 	Block UF6_AUTOCLAVE = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.UF6_AUTOCLAVE);
 	Block IDR_KILN = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.IDR_KILN);
