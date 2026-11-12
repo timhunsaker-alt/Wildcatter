@@ -3083,6 +3083,43 @@ lang.update({f"block.{ns}.reduction_reactor_large": "Reduction Reactor (large, 0
 	f"block.{ns}.distillation_columns_large": "UF6 Distillation Columns (large)"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 20b: the titanium pigment plant (docs/multiblocks/titanium-pigment.md) ----------------------------------------------
+# blockstates, models, shapes and items come from tools/models/titanium.py; here loot, names, tags, recipes and the four items. The
+# bags' icons are the Ludo bulk bag with a swatch (placeholders); the separator's ilmenite and rutile the same in a smaller swatch.
+TI_PARTS = ("ti_chlorinator", "ticl4_purification", "ticl4_oxidiser", "vpsa_oxygen", "pigment_finishing")
+for name in TI_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in TI_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+S_, P_ = f"{ns}:steel_ingot", f"{ns}:gas_line"
+shaped("ti_chlorinator", ["SHS", "BFB", "SPS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace", "P": P_}, "ti_chlorinator")
+shaped("ticl4_purification", ["SPS", "SCS", "SPS"], {"S": S_, "P": P_, "C": "minecraft:copper_block"}, "ticl4_purification")
+shaped("ticl4_oxidiser", ["SPS", "BFB", "SPS"], {"S": S_, "P": P_, "B": "minecraft:bricks", "F": "minecraft:furnace"}, "ticl4_oxidiser")
+shaped("vpsa_oxygen", ["SPS", "SXS", "SIS"], {"S": S_, "P": P_, "X": "minecraft:piston", "I": "minecraft:iron_block"}, "vpsa_oxygen")
+shaped("pigment_finishing", ["SHS", "XFX", "SPS"], {"S": S_, "H": "minecraft:hopper", "X": "minecraft:piston", "F": "minecraft:furnace", "P": P_}, "pigment_finishing")
+save_json(f"{DATA}/recipe/white_dye_from_tio2_pigment.json", {"type": "minecraft:crafting_shapeless", "category": "misc",
+	"ingredients": [f"{ns}:tio2_pigment_bag"], "result": {"id": "minecraft:white_dye", "count": 64}})   # the only vanilla use (titanium-pigment.md)
+TI_ITEMS = {"ilmenite": ("Ilmenite Concentrate (500 kg)", (40, 36, 34)), "rutile": ("Rutile Concentrate (500 kg)", (150, 70, 40)),
+	"ti_slag_bag": ("Bulk Bag of Titanium Slag (85 % TiO2)", (70, 70, 74)), "tio2_pigment_bag": ("Bulk Bag of TiO2 Pigment", (246, 246, 244))}
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in TI_ITEMS.items():
+	bag = Image.open(f"{ORE_ART}/empty_bulk_bag.png").convert("RGBA")
+	d = ImageDraw.Draw(bag)
+	d.rectangle([10, 13, 21, 22], fill=colour + (255,), outline=(60, 60, 60, 255))
+	d.rectangle([12, 15, 14, 17], fill=tuple(min(255, c + 40) for c in colour) + (255,))
+	bag.save(f"{ASSETS}/textures/item/{item}_placeholder.png")
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}_placeholder"}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.ti_chlorinator": "Titanium Chlorinator (controller)", f"block.{ns}.ticl4_purification": "TiCl4 Purification",
+	f"block.{ns}.ticl4_oxidiser": "TiCl4 Oxidiser", f"block.{ns}.vpsa_oxygen": "VPSA Oxygen Unit (100 Nm3/h)",
+	f"block.{ns}.pigment_finishing": "Pigment Finishing"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+save_json(f"{ROOT}/data/c/tags/item/pigments/titanium_dioxide.json", {"values": [f"{ns}:tio2_pigment_bag"]})
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

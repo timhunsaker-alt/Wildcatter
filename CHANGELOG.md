@@ -2,6 +2,12 @@
 
 ## Unreleased (0.7.0, branch `w-next`): Phases 15-19, built 2026-11-10 while Tim was away
 
+### 20b: titanium pigment (built 2026-11-12 while Tim was away; not approved)
+- The mineral separator puts its ilmenite and rutile out as items to a hopper under it; the submerged arc furnace smelts ilmenite to
+  titanium slag and pig iron; a titanium chlorinator, TiCl4 purification, TiCl4 oxidiser, VPSA oxygen unit and pigment finishing make 0.25 t
+  of TiO2 pigment an hour on a chlorine loop. A bag crafts into 64 white dye. Spec: `docs/multiblocks/titanium-pigment.md`. Existing worlds
+  are unchanged. Decisions: `docs/questions/phase20-chemicals.md` (15-26).
+
 ### 16b2: the full-size conversion plant (built 2026-11-12 while Tim was away; not approved)
 - Four fluorine cell houses in series on bus bars from the 12.47 kV rectifier transformer (432 V, 6 kA), and a larger size of the
   reduction reactor, hydrofluorinator, fluorinator, cold traps and distillation columns, each 0.3 kg of U a second: a 48Y about every 8

@@ -151,7 +151,9 @@ public enum Product {
 	/** The caustic evaporator's product. Counted in kg; stock tanks hold it. */
 	CAUSTIC_SODA_50("caustic soda (50 %)", false),
 	/** The HCl synthesis unit's acid. Counted in kg; stock tanks hold it. */
-	HYDROCHLORIC_ACID("hydrochloric acid (32 %)", false);
+	HYDROCHLORIC_ACID("hydrochloric acid (32 %)", false),
+	/** Phase 20b (docs/multiblocks/titanium-pigment.md): 93 % oxygen from a VPSA unit, for the TiCl4 oxidiser. Counted in m3. */
+	OXYGEN("oxygen (93 %)", true);
 
 	private final String label;
 	private final boolean gas;

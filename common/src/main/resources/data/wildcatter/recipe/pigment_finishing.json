@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SHS",
+    "XFX",
+    "SPS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "H": "minecraft:hopper",
+    "X": "minecraft:piston",
+    "F": "minecraft:furnace",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:pigment_finishing",
+    "count": 1
+  }
+}

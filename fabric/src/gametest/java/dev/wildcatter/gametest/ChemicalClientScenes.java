@@ -119,4 +119,26 @@ final class ChemicalClientScenes {
 		shot(-9, 6, 23, -90, 20, "wildcatter-chlor-alkali-train");
 		System.out.println("[wildcatter-test] chlorAlkali ok");
 	}
+
+	// ---- tiPigment: the titanium pigment plant, as the NeoForge scene ti_pigment lays it out ----------------------------------------
+	void tiPigment() {
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 22 " + (up + 18) + " " + (z0 - 12) + " 40 30");
+		context.waitTicks(20);
+		clear(-6, -12, 20, 26, 16);
+		place(WildcatterBlocks.TI_CHLORINATOR, 0, 0);
+		place(WildcatterBlocks.TICL4_PURIFICATION, 4, 0);
+		place(WildcatterBlocks.TICL4_OXIDISER, 7, 0);
+		place(WildcatterBlocks.PIGMENT_FINISHING, 7, 10);
+		place(WildcatterBlocks.BAGGING_STATION, 8, 20);
+		place(WildcatterBlocks.VPSA_OXYGEN, 7, -7);
+		run("gas_line", new int[] {8, -1});
+		run("gas_line", new int[] {10, 1});
+		run("gas_line", new int[] {6, 9}, new int[] {6, 4}, new int[] {2, 4});
+		run("gas_line", new int[] {11, 10});
+		context.waitTicks(40);
+		shot(20, 14, -10, 40, 30, "wildcatter-ti-pigment-plant");
+		shot(-5, 6, 8, -130, 15, "wildcatter-ti-pigment-chlorinator");
+		System.out.println("[wildcatter-test] tiPigment ok");
+	}
 }

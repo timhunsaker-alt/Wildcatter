@@ -31,6 +31,7 @@ public class ZrLineBlockEntity extends UnitMotorBlockEntity implements ZrStage, 
 	private double feed;     // the separator's heavy minerals, kg
 	private double tin, iron, chromium;   // the VAR furnace's additions, kg
 	private double ilmenite, rutile, monazite, hafnium;
+	private double ilmeniteOut, rutileOut;   // 20b: kg toward the next 500 kg item, made only while a hopper stands under the separator
 	private String unit = "starting";
 
 	public ZrLineBlockEntity(BlockPos pos, BlockState state) {
@@ -80,7 +81,7 @@ public class ZrLineBlockEntity extends UnitMotorBlockEntity implements ZrStage, 
 	@Override
 	public int[] getSlotsForFace(Direction side) {
 		return switch (kind()) {
-			case "mineral_separator" -> side == Direction.UP ? new int[] {0} : new int[0];
+			case "mineral_separator" -> side == Direction.UP ? new int[] {0} : side == Direction.DOWN ? new int[] {1, 2} : new int[0];
 			case "var_furnace" -> side == Direction.UP ? new int[] {0, 1, 2} : new int[0];
 			case "vacuum_anneal_furnace" -> side == Direction.DOWN ? new int[] {1, 2} : new int[0];
 			default -> new int[0];
@@ -99,7 +100,7 @@ public class ZrLineBlockEntity extends UnitMotorBlockEntity implements ZrStage, 
 
 	@Override
 	public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
-		return kind().equals("vacuum_anneal_furnace") && slot > 0 && side == Direction.DOWN;
+		return (kind().equals("vacuum_anneal_furnace") || kind().equals("mineral_separator")) && slot > 0 && side == Direction.DOWN;
 	}
 
 	private ItemStack useFrom(int slot) {
@@ -211,6 +212,46 @@ public class ZrLineBlockEntity extends UnitMotorBlockEntity implements ZrStage, 
 		unit = String.format("%s: %.1f kg/h; %.2f kg held", verb, kg * factor / seconds() * 3600, metal);
 	}
 
+	/** For the game test (20b): ilmenite as if separated toward the next item, with a hopper under it. */
+	public void testIlmeniteOut(double kg) {
+		ilmeniteOut = kg;
+		setChanged();
+	}
+
+	/** kg of ilmenite the separator has counted, all told. */
+	public double ilmeniteCounted() {
+		return ilmenite;
+	}
+
+	/** 20b: a hopper under any cell of the separator (the part the player adds for the titanium plant). */
+	private boolean hopperUnder(Level level) {
+		for (int x = 0; x < 3; x++) {
+			for (int z = 0; z < 6; z++) {
+				if (level.getBlockState(LeasePartBlock.at(worldPosition, getBlockState(), x, -1, z)).getBlock() instanceof net.minecraft.world.level.block.HopperBlock) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/** Whole 500 kg items of {@code item} into slot {@code slot} while it has room; returns the kg left toward the next. */
+	private double bag(int slot, net.minecraft.world.item.Item item, double kg) {
+		while (kg >= Tuning.TI_MINERAL_ITEM_KG) {
+			ItemStack out = slots.get(slot);
+			if (out.isEmpty()) {
+				slots.set(slot, new ItemStack(item));
+			} else if (out.is(item) && out.getCount() < out.getMaxStackSize()) {
+				out.grow(1);
+			} else {
+				break;
+			}
+			kg -= Tuning.TI_MINERAL_ITEM_KG;
+			setChanged();
+		}
+		return kg;
+	}
+
 	private void separate(Level level) {
 		if (feed <= 1e-6 && fed() > 0) {
 			useOne();
@@ -236,6 +277,12 @@ public class ZrLineBlockEntity extends UnitMotorBlockEntity implements ZrStage, 
 		metal += zr;
 		ilmenite += hm * Tuning.HM_ILMENITE;
 		rutile += hm * Tuning.HM_RUTILE;
+		if (hopperUnder(level)) {   // 20b: with a hopper under it, its ilmenite and rutile go out as items instead of only being counted
+			ilmeniteOut += hm * Tuning.HM_ILMENITE;
+			rutileOut += hm * Tuning.HM_RUTILE;
+			ilmeniteOut = bag(1, dev.wildcatter.WildcatterItems.ILMENITE, ilmeniteOut);
+			rutileOut = bag(2, dev.wildcatter.WildcatterItems.RUTILE, rutileOut);
+		}
 		monazite += hm * Tuning.HM_MONAZITE;
 		unit = String.format("separating %.0f kg/h of heavy minerals: %.1f kg/h of zircon on; %,.0f kg left in the bin", hm / seconds() * 3600,
 				zr * Zirconium.zirconPerZr() / seconds() * 3600, feed);
@@ -313,6 +360,8 @@ public class ZrLineBlockEntity extends UnitMotorBlockEntity implements ZrStage, 
 		output.putDouble("chromium", chromium);
 		output.putDouble("ilmenite", ilmenite);
 		output.putDouble("rutile", rutile);
+		output.putDouble("ilmeniteOut", ilmeniteOut);
+		output.putDouble("rutileOut", rutileOut);
 		output.putDouble("monazite", monazite);
 		output.putDouble("hafnium", hafnium);
 	}
@@ -329,6 +378,8 @@ public class ZrLineBlockEntity extends UnitMotorBlockEntity implements ZrStage, 
 		chromium = input.getDoubleOr("chromium", 0);
 		ilmenite = input.getDoubleOr("ilmenite", 0);
 		rutile = input.getDoubleOr("rutile", 0);
+		ilmeniteOut = input.getDoubleOr("ilmeniteOut", 0);
+		rutileOut = input.getDoubleOr("rutileOut", 0);
 		monazite = input.getDoubleOr("monazite", 0);
 		hafnium = input.getDoubleOr("hafnium", 0);
 	}

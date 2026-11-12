@@ -171,6 +171,12 @@ public interface FuelCycleBlocks {
 	Block CHLORINE_TRAIN = chemPart(dev.wildcatter.block.ChemPartBlock.Part.CHLORINE_TRAIN);
 	Block CAUSTIC_EVAPORATOR = chemPart(dev.wildcatter.block.ChemPartBlock.Part.CAUSTIC_EVAPORATOR);
 	Block HCL_SYNTHESIS_UNIT = chemPart(dev.wildcatter.block.ChemPartBlock.Part.HCL_SYNTHESIS_UNIT);
+	// Phase 20b: the titanium pigment plant (docs/multiblocks/titanium-pigment.md)
+	Block TI_CHLORINATOR = chemPart(dev.wildcatter.block.ChemPartBlock.Part.TI_CHLORINATOR);
+	Block TICL4_PURIFICATION = chemPart(dev.wildcatter.block.ChemPartBlock.Part.TICL4_PURIFICATION);
+	Block TICL4_OXIDISER = chemPart(dev.wildcatter.block.ChemPartBlock.Part.TICL4_OXIDISER);
+	Block VPSA_OXYGEN = chemPart(dev.wildcatter.block.ChemPartBlock.Part.VPSA_OXYGEN);
+	Block PIGMENT_FINISHING = chemPart(dev.wildcatter.block.ChemPartBlock.Part.PIGMENT_FINISHING);
 	Block RECTIFIER_MV = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.RECTIFIER_MV);
 	// 16b2: the full-size conversion plant's larger main line (docs/multiblocks/conversion-extensions.md)
 	Block REDUCTION_REACTOR_LARGE = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.REDUCTION_REACTOR_LARGE);

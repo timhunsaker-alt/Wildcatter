@@ -1564,4 +1564,28 @@ public final class Tuning {
 	// ---- 16b2: the full-size conversion plant (docs/multiblocks/conversion-extensions.md, "A full-size plant") ---------------------
 	public static final double CONVERSION_LARGE_SCALE = 4.0;      // the large main line's parts: 0.3 kg of U a second, four times the 7d parts
 	public static final int F2_HOUSES_IN_SERIES = 4;               // cell houses on one rectifier_mv: 48 cells, 432 V at 6 kA
+
+	// ---- Phase 20b: the titanium pigment plant (docs/multiblocks/titanium-pigment.md) -------------------------------------------
+	public static final double TI_MINERAL_ITEM_KG = 500.0;         // a bag of ilmenite or rutile out of the mineral separator (proposed)
+	public static final double ILMENITE_TIO2 = 0.50;               // the separator's ilmenite (unverified)
+	public static final double ILMENITE_FE = 0.40;                 // its iron, derived from the spec's 0.12 t/h of pig iron with 0.18 t/h of slag
+	public static final double TI_SLAG_TIO2 = 0.85;                // the smelter's slag
+	public static final double TI_SLAG_FE_RECOVERY = 0.98;         // of the ilmenite's iron to the pig iron (proposed)
+	public static final double TI_SLAG_COKE_PER_ILMENITE = 0.12;   // kg of coke a kg of ilmenite (unverified; anthracite in real plants)
+	public static final double RUTILE_TIO2 = 0.95;                 // the separator's rutile (proposed)
+	public static final double TIO2_TPH = 0.25;                    // t/h of TiO2 pigment (proposed size)
+	public static final double TIO2_COKE_PER_T = 370.0;            // kg of coke a tonne of TiO2 (chloride process)
+	public static final double TIO2_O2_NM3_PER_T = 350.0;          // Nm3 of oxygen a tonne of TiO2
+	public static final double TIO2_CL2_MAKEUP_PER_T = 400.0;      // kg of make-up chlorine a tonne of TiO2 on this blend (proposed, unverified)
+	public static final double TICL4_SICL4_SHARE = 0.005;          // SiCl4 a kg of crude TiCl4, distilled off and counted (proposed)
+	public static final double TI_CHLORINATOR_WATTS = 30_000.0;    // its fluidizing blower, LV
+	public static final double TICL4_PURIFICATION_WATTS = 40_000.0; // the reboiler, LV
+	public static final double TICL4_OXIDISER_GAS_WATTS = 0.2e6;   // its preheaters on pipeline gas (proposed)
+	public static final double VPSA_O2_NM3H = 100.0;               // the VPSA oxygen unit, 93 % O2
+	public static final double VPSA_WATTS = 35_000.0;              // about 0.35 kWh a Nm3 (unverified), LV
+	public static final double O2_KG_PER_M3 = 1.429;               // oxygen at 0 C, 1 atm
+	public static final double PIGMENT_FINISHING_WATTS = 75_000.0; // mills, filters, dryer fans, LV
+	public static final double PIGMENT_HYDRATE_PER_T = 30.0;       // kg of alumina hydrate a tonne of TiO2 for its surface treatment (proposed)
+	public static final double PIGMENT_STEAM_PER_T = 2.0;          // t of process steam a tonne of TiO2 for the micronizer (unverified)
+	public static final double PIGMENT_DYE_PER_BAG = 64;           // white dye a bag of pigment crafts into (proposed)
 }

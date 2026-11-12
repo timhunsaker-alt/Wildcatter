@@ -1,6 +1,6 @@
 # The titanium pigment plant: ilmenite to slag, the chloride process, TiO2
 
-> **DRAFT — decided on recommendation while Tim was away (2026-11-09); not approved.** Proposed phase **20b**. Decisions are in
+> **20b BUILT (2026-11-12), decided on recommendation while Tim was away; not approved.** See "As built" at the end. Proposed phase **20b**. Decisions are in
 > `docs/questions/specs-wildcatter.md` (items 64-67). Depends on the chlor-alkali plant (20a) for chlorine and on 17a's furnace.
 
 The zirconium plant's mineral separator (zirconium.md) takes the zircon from heavy mineral sand and only **counts** its ilmenite and
@@ -96,3 +96,17 @@ The grid is a sketch; the game test is the layout of record.
 
 ## Proposed wave
 **20b**, after the chlor-alkali plant (20a).
+
+## As built (20b, 2026-11-12; decisions in `docs/questions/phase20-chemicals.md`, items 15-26)
+- **The separator:** with a hopper under it, its ilmenite and rutile go out as 500 kg items; without one it only counts them, as before
+  (item 15).
+- **Ti slag:** the submerged arc furnace's fourth recipe: 1.7 t of ilmenite and 0.2 t of coke a tonne of 85 % slag, 2.2 MWh, slag in 1 t
+  bags at its taphole and the pig iron (0.67 t a tonne) as iron ingots out of a hopper under it (items 16, 17).
+- **Parts** (`ChemPartBlock`): titanium chlorinator (the controller, 30 kW, box west; slag or rutile and coke by hopper, chlorine on the
+  south face of its back), TiCl4 purification (40 kW, box north), TiCl4 oxidiser (no motor; 0.2 MW of gas; oxygen north, chlorine back west),
+  VPSA oxygen (100 Nm3/h, 35 kW), pigment finishing (75 kW; hydrate by hopper, process steam). TiCl4 moves by touching (item 21). New pipe
+  product oxygen (93 %); new items ilmenite, rutile, Ti slag bag, TiO2 pigment bag (crafts into 64 white dye).
+- **The loop:** the chlorinator takes the oxidiser's chlorine first and the make-up after on one line (item 19).
+- **Tests:** NeoForge `ti_pigment` (295 kg/h of TiO2 chlorinated while catching up, 641 kg/h of chlorine in and 523 back, a pigment bag,
+  the dye recipe, NO OXYGEN with the VPSA unit broken; the separator with and without a hopper) and `ferroalloys` extended (Ti slag bags,
+  53 iron ingots a tap); unit `TitaniumPigmentTest`; client screenshots `tiPigment`.

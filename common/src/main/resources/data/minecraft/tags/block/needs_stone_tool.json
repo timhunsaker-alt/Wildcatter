@@ -341,6 +341,11 @@
     "wildcatter:hydrofluorinator_large",
     "wildcatter:fluorinator_large",
     "wildcatter:cold_traps_large",
-    "wildcatter:distillation_columns_large"
+    "wildcatter:distillation_columns_large",
+    "wildcatter:ti_chlorinator",
+    "wildcatter:ticl4_purification",
+    "wildcatter:ticl4_oxidiser",
+    "wildcatter:vpsa_oxygen",
+    "wildcatter:pigment_finishing"
   ]
 }

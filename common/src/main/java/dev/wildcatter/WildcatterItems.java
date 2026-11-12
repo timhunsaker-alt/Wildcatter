@@ -233,6 +233,19 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> EXTRACTANT_DRUM_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("extractant_drum"));
 	public static final Item EXTRACTANT_DRUM = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(EXTRACTANT_DRUM_KEY),
 			String.format("%.0f kg of DEPA and TOPO, the uranium extractant", Tuning.EXTRACTANT_DRUM_KG), "for the DEPA-TOPO circuit");
+	// Phase 20b: the titanium pigment plant (docs/multiblocks/titanium-pigment.md)
+	public static final ResourceKey<Item> ILMENITE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("ilmenite"));
+	public static final Item ILMENITE = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(ILMENITE_KEY),
+			String.format("%,.0f kg of ilmenite concentrate (FeTiO3, about %.0f %% TiO2)", Tuning.TI_MINERAL_ITEM_KG, Tuning.ILMENITE_TIO2 * 100), "for the submerged arc furnace's Ti slag");
+	public static final ResourceKey<Item> RUTILE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("rutile"));
+	public static final Item RUTILE = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(RUTILE_KEY),
+			String.format("%,.0f kg of rutile concentrate (about %.0f %% TiO2)", Tuning.TI_MINERAL_ITEM_KG, Tuning.RUTILE_TIO2 * 100), "for the titanium chlorinator");
+	public static final ResourceKey<Item> TI_SLAG_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("ti_slag_bag"));
+	public static final Item TI_SLAG_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(TI_SLAG_BAG_KEY),
+			String.format("%,.0f kg of titanium slag, %.0f %% TiO2", Tuning.BULK_BAG_KG, Tuning.TI_SLAG_TIO2 * 100), "for the titanium chlorinator");
+	public static final ResourceKey<Item> TIO2_PIGMENT_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("tio2_pigment_bag"));
+	public static final Item TIO2_PIGMENT_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(TIO2_PIGMENT_BAG_KEY),
+			String.format("%,.0f kg of titanium dioxide pigment, rutile grade", Tuning.BULK_BAG_KG), "white pigment");
 	// 10c1: blueprints (docs/blueprints.md)
 	public static final ResourceKey<Item> BLUEPRINT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("blueprint"));
 	public static final Item BLUEPRINT = new dev.wildcatter.item.BlueprintItem(new Item.Properties().stacksTo(1).setId(BLUEPRINT_KEY));
@@ -463,6 +476,10 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, DAP_BAG_KEY, DAP_BAG);
 		Registry.register(BuiltInRegistries.ITEM, MOP_BAG_KEY, MOP_BAG);
 		Registry.register(BuiltInRegistries.ITEM, EXTRACTANT_DRUM_KEY, EXTRACTANT_DRUM);
+		Registry.register(BuiltInRegistries.ITEM, ILMENITE_KEY, ILMENITE);
+		Registry.register(BuiltInRegistries.ITEM, RUTILE_KEY, RUTILE);
+		Registry.register(BuiltInRegistries.ITEM, TI_SLAG_BAG_KEY, TI_SLAG_BAG);
+		Registry.register(BuiltInRegistries.ITEM, TIO2_PIGMENT_BAG_KEY, TIO2_PIGMENT_BAG);
 		Registry.register(BuiltInRegistries.ITEM, BLUEPRINT_KEY, BLUEPRINT);
 		Registry.register(BuiltInRegistries.ITEM, SURVEY_TOOL_KEY, SURVEY_TOOL);
 		Registry.register(BuiltInRegistries.ITEM, GROUNDING_SET_KEY, GROUNDING_SET);

@@ -1,6 +1,6 @@
 # Phase 20, chemicals: decisions taken while Tim was away (2026-11-12)
 
-Plan: `docs/ideas-plan.md`, Phase 20. Built: **20a** the chlor-alkali plant. Specs: `docs/multiblocks/chlor-alkali-plant.md` (and, as
+Plan: `docs/ideas-plan.md`, Phase 20. Built: **20a** the chlor-alkali plant, **20b** titanium pigment. Specs: `docs/multiblocks/chlor-alkali-plant.md` (and, as
 they are built, `titanium-pigment.md`, `lithium.md`); each has an "As built" section. Format as in `docs/questions/README.md`. Every
 entry was decided on the best real-world recommendation; none needs Tim before it can stand, but each can be changed.
 
@@ -100,3 +100,80 @@ injection pump) behaves as before unless its discharge reaches the new brine wel
   the pattern of the other plant parts).
 - **Why:** none are in the spec.
 - **Alternatives:** any.
+
+## 20b: titanium pigment
+
+### 15. The mineral separator in an existing world
+- **Chosen:** the separator keeps counting its ilmenite and rutile exactly as before. Only while a **hopper stands under it** does it also
+  put them out, as 500 kg items (*proposed*, the spec's "500 kg each"), into two out bins the hopper empties. What it counted before is not
+  turned into items. The hopper is the part the player adds; a separator never had anything to give downward, so no built plant has a
+  reason to have one there.
+- **Why:** Tim's rule: nothing changes what an existing plant does until the player adds the new part.
+- **Alternatives:** a world rule (`separatorTitanium`), off in old worlds; or put the items out always.
+
+### 16. The furnace's bins
+- **Chosen:** the submerged arc furnace keeps its 17a slots (six charges, then the paste in slot 6); ilmenite gets slot 7 and the pig iron
+  an out slot 8, which a hopper under the furnace empties. The sneak-click recipe cycle is FeCr, FeMn, FeSi, Ti slag.
+- **Why:** a slot moved would load an existing furnace's paste into the ilmenite bin.
+- **Alternatives:** none.
+
+### 17. The Ti slag numbers
+- **Chosen:** ilmenite 50 % TiO2 (the spec, *unverified*) to 85 % slag: 1.7 t of ilmenite a tonne of slag; its iron 40 % of the ilmenite
+  (derived from the spec's 0.12 t/h of pig iron with 0.18 t/h of slag), 98 % of it to pig iron (*proposed*), cast as iron ingots of 100 kg
+  (the mod's ingot); coke **0.12 kg a kg of ilmenite** (*unverified*; real smelters use anthracite at about that). 2.2 MWh a tonne of slag (the
+  spec). The slag is the product, in 1 t bags; no waste slag is counted.
+- **Why:** the spec gives no coke rate; 0.12 covers the iron oxide's reduction with the usual excess.
+- **Alternatives:** a coke rate from Richards Bay or Sorel data when Tim has it.
+
+### 18. The chlorinator's feed
+- **Chosen:** one bin takes Ti slag bags or rutile (and a second, coke); whichever is there is chlorinated, its TiO2 counted (85 % or 95 %).
+  The spec's 60/40 blend is how a player would feed it, not a rule. All the feed's TiO2 goes to TiCl4.
+- **Why:** a fixed blend would stop the plant when one feed runs out.
+- **Alternatives:** two bins with a fixed blend.
+
+### 19. The chlorine loop
+- **Chosen:** the oxidiser's chlorine and the make-up (from a chlor-alkali plant) share the chlorinator's one chlorine line; the
+  chlorinator takes the oxidiser's first when the oxidiser is on that line, then the make-up: 1.78 kg back and 0.4 kg of make-up a kg of
+  TiO2. In the scene, 641 kg/h in and 523 kg/h back.
+- **Why:** the spec's "takes it first and the make-up after"; a pipe carries one product, and both are chlorine.
+- **Alternatives:** two inlets.
+
+### 20. What is counted
+- **Chosen:** the waste chlorides as FeCl2 from the make-up chlorine (0.71 kg a kg of TiO2, *proposed*), and SiCl4 at 0.5 % of the crude
+  TiCl4 (*proposed*). VOCl3 is in the readout, not counted.
+- **Why:** the spec says counted but gives no amounts.
+- **Alternatives:** a feed assay that carries the impurities.
+
+### 21. TiCl4 between the parts
+- **Chosen:** handed by touching (chlorinator, purification, oxidiser, finishing), not a pipe product.
+- **Why:** the spec's layout has them touching and the controller finding them that way.
+- **Alternatives:** a TiCl4 pipe product and a stock tank.
+
+### 22. The oxidiser
+- **Chosen:** no motor (the spec gives none); its preheaters burn 0.2 MW of pipeline gas or LPG on the east face of its front; oxygen on the
+  north face of its front; chlorine back out of the west face of its back cell. NO OXYGEN, NO GAS, FULL.
+- **Why:** the spec's numbers.
+- **Alternatives:** none.
+
+### 23. Oxygen
+- **Chosen:** a new pipe product, **oxygen (93 %)**, in Nm3. The VPSA unit makes 100 Nm3/h while it is drawn. The alloy melt shop's AOD
+  is not in the mod, so nothing else takes it yet.
+- **Why:** the spec pipes it.
+- **Alternatives:** none.
+
+### 24. The finishing
+- **Chosen:** alumina hydrate from the Bayer refinery's 1 t hydrate bags in its hopper (30 kg a tonne), process steam on the east face of
+  its front (2 t a tonne), 75 kW; no water (the spec gives none). Pigment to a bagging station against it.
+- **Why:** the spec's numbers.
+- **Alternatives:** a water feed for the wet milling.
+
+### 25. Pigment's use
+- **Chosen:** a bag crafts into 64 white dye; tagged `c:pigments/titanium_dioxide` for other mods.
+- **Why:** the spec (and decision 66 in `specs-wildcatter.md`).
+- **Alternatives:** a tag other mods already read (`c:dyes/white` would make a 1 t bag a dye in every recipe).
+
+### 26. Recipes
+- **Chosen:** steel, gas line, bricks, a blast furnace for the chlorinator, a furnace for the oxidiser, pistons (*proposed*).
+- **Why:** none are in the spec.
+- **Alternatives:** any.
+

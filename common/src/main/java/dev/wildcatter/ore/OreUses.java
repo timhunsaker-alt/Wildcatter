@@ -59,7 +59,7 @@ public final class OreUses {
 			case BARITE -> List.of("the barite mill (drilling-grade barite, which weights a land rig's mud)");
 			case BENTONITE -> List.of("the bentonite dryer (drilling bentonite, which gels a land rig's mud)");
 			case FLUORITE -> List.of("the conversion plant's HF kiln (hydrogen fluoride)");
-			case HEAVY_MINERAL -> List.of("the zirconium plant's mineral separator (zircon)");
+			case HEAVY_MINERAL -> List.of("the zirconium plant's mineral separator (zircon; with a hopper under it, ilmenite and rutile for the titanium pigment plant)");
 			case CASSITERITE -> List.of("a furnace (tin ingot, which the zirconium plant's VAR furnace alloys into Zircaloy)");
 			case CHROMITE -> List.of("the zirconium plant's VAR furnace, alloyed into Zircaloy", "the submerged arc furnace (HC ferrochrome)");
 			case MAGNESITE -> List.of("a furnace (magnesia), for the uranium mill's precipitation and the magnesia chlorinator (magnesium)");

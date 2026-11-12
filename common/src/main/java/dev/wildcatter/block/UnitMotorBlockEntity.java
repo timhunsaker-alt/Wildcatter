@@ -183,6 +183,10 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "brine_saturator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BRINE_SATURATOR_WATTS);
 				case "brine_treatment" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BRINE_TREATMENT_WATTS);
 				case "chlorine_train" -> new Motor(true, Voltage.MEDIUM, Tuning.CL2_COMPRESSOR_WATTS);
+				case "ti_chlorinator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.TI_CHLORINATOR_WATTS);
+				case "ticl4_purification" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.TICL4_PURIFICATION_WATTS);
+				case "vpsa_oxygen" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.VPSA_WATTS);
+				case "pigment_finishing" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PIGMENT_FINISHING_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -329,6 +333,10 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "brine_saturator" -> "agitator and brine pumps";
 			case "brine_treatment" -> "clarifier, filter and IX pumps";
 			case "chlorine_train" -> "chlorine compressor";
+			case "ti_chlorinator" -> "fluidizing blower";
+			case "ticl4_purification" -> "reboiler";
+			case "vpsa_oxygen" -> "blower and vacuum pump";
+			case "pigment_finishing" -> "mills, filters and dryer fans";
 			default -> kind();
 		};
 	}

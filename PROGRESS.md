@@ -1457,6 +1457,10 @@ sized for a 40-pot line.
 - Tests: `TimeScaleTest`; `world_rules`, `time_scale_holds`; the Fabric client's Create World check.
 
 ## Known gaps
+- Phase 20b (titanium pigment, 2026-11-12): `ilmenite_placeholder`, `rutile_placeholder`, `ti_slag_bag_placeholder` and
+  `tio2_pigment_bag_placeholder` (item icons) are drawn by script; the five parts use the mod's materials. The feed's impurities are not
+  carried as an assay (waste chlorides and SiCl4 are counted from fixed shares); the VPSA oxygen has no other user (no AOD). Not built: the
+  sulfate process, titanium sponge, synthetic rutile.
 - 16b2 (full-size conversion, 2026-11-12): the large parts use the mod's materials; no large cylinder filler or large steam reformer; the
   large line's cathode gas scrubbers (one a house) are not in the scene.
 - Phase 20a (chlor-alkali, 2026-11-12): the parts use the mod's materials (no Ludo art; no new placeholders). The treatment's own caustic
@@ -2108,4 +2112,15 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
   columns**, 0.3 kg of U a second at twice the height; the cylinder filler fills at the rate of the columns it stands against. About a 48Y
   every 8 hours, 9,400 t of U a year. An existing conversion plant is unchanged.
 - **Field Manual:** FULL-SIZE CONVERSION. **Tests:** `ConversionLargeTest` (2); NeoForge `conversion_large`.
+
+## Phase 20b: titanium pigment (2026-11-12; built while Tim was away; decisions: `docs/questions/phase20-chemicals.md`, 15-26)
+- Spec `docs/multiblocks/titanium-pigment.md` ("As built"). The **mineral separator** puts its ilmenite and rutile out as 500 kg items to a
+  hopper under it (without one it counts them, as before). The **submerged arc furnace** has a fourth recipe, **Ti slag** (85 % TiO2 in 1 t
+  bags, 2.2 MWh a tonne), its pig iron cast as iron ingots out of a hopper under it. The chloride process at 0.25 t of TiO2 an hour: the
+  **titanium chlorinator** (controller), **TiCl4 purification**, **TiCl4 oxidiser**, **VPSA oxygen** and **pigment finishing**, the
+  chlorine coming back from the oxidiser and 0.1 t/h of make-up from a chlor-alkali plant. A pigment bag crafts into 64 white dye.
+- New pipe product oxygen (93 %); new items ilmenite, rutile, Ti slag bag, TiO2 pigment bag.
+- **Field Manual:** TITANIUM PIGMENT, THE CHLORINE LOOP. JEI: heavy mineral sand's use; info on the pigment, ilmenite and rutile.
+- **Tests:** `TitaniumPigmentTest` (2); NeoForge `ti_pigment`, `ferroalloys` (extended for Ti slag); client screenshots `tiPigment`.
+- **Existing worlds:** unchanged: the separator changes only with a hopper under it; the furnace's slots keep their numbers.
 

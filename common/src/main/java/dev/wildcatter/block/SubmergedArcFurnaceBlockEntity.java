@@ -38,9 +38,16 @@ import org.jspecify.annotations.Nullable;
  * run out first, an hour at power. Four hours without power and the hearth freezes; a frozen furnace is dug out (broken and placed again).
  */
 public class SubmergedArcFurnaceBlockEntity extends PlantUnitBlockEntity implements HopperFed, Bagged {
-	/** Its bins: one for each charge, then the paste. */
-	private static final int PASTE = Charge.values().length;
-	private final NonNullList<ItemStack> slots = NonNullList.withSize(PASTE + 1, ItemStack.EMPTY);
+	/** Its bins: one for each of the six 17a charges, then the paste, then (20b) ilmenite, then the pig iron out. Slots keep their numbers. */
+	private static final int PASTE = 6;
+	private static final int ILMENITE_SLOT = 7;
+	private static final int PIG_IRON_SLOT = 8;
+	private final NonNullList<ItemStack> slots = NonNullList.withSize(PIG_IRON_SLOT + 1, ItemStack.EMPTY);
+	private double pigIron;         // kg of pig iron tapped toward the next ingot (20b, the Ti slag recipe)
+
+	private static int slotOf(Charge charge) {
+		return charge == Charge.ILMENITE ? ILMENITE_SLOT : charge.ordinal();
+	}
 	private final double[] stock = new double[Charge.values().length];   // kg of each charge in its bins' chutes
 	private final double[] tapped = new double[Recipe.values().length];  // kg of each alloy tapped, waiting for bags
 	private Recipe recipe = Recipe.FECR;
@@ -79,6 +86,12 @@ public class SubmergedArcFurnaceBlockEntity extends PlantUnitBlockEntity impleme
 		if (slot == PASTE) {
 			return WildcatterItems.GREEN_ANODE;
 		}
+		if (slot == ILMENITE_SLOT) {
+			return WildcatterItems.ILMENITE;
+		}
+		if (slot == PIG_IRON_SLOT) {
+			return Items.AIR;   // out only
+		}
 		return switch (Charge.values()[slot]) {
 			case CHROMITE -> OreBlocks.MINERALS.get(Ore.CHROMITE);
 			case PYROLUSITE -> OreBlocks.MINERALS.get(Ore.PYROLUSITE);
@@ -86,6 +99,7 @@ public class SubmergedArcFurnaceBlockEntity extends PlantUnitBlockEntity impleme
 			case LIMESTONE -> OreBlocks.MINERALS.get(Ore.LIMESTONE);
 			case COKE -> WildcatterItems.MET_COKE;
 			case IRON -> Items.IRON_INGOT;
+			case ILMENITE -> WildcatterItems.ILMENITE;
 		};
 	}
 
@@ -101,10 +115,13 @@ public class SubmergedArcFurnaceBlockEntity extends PlantUnitBlockEntity impleme
 
 	@Override
 	public int[] getSlotsForFace(Direction side) {
+		if (side == Direction.DOWN) {
+			return new int[] {PIG_IRON_SLOT};   // 20b: the pig iron, to a hopper under it
+		}
 		if (side != Direction.UP) {
 			return new int[0];
 		}
-		int[] all = new int[slots.size()];
+		int[] all = new int[PIG_IRON_SLOT];
 		for (int i = 0; i < all.length; i++) {
 			all[i] = i;
 		}
@@ -112,8 +129,13 @@ public class SubmergedArcFurnaceBlockEntity extends PlantUnitBlockEntity impleme
 	}
 
 	@Override
+	public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
+		return slot == PIG_IRON_SLOT && side == Direction.DOWN;
+	}
+
+	@Override
 	public boolean canPlaceItem(int slot, ItemStack stack) {
-		return slot >= 0 && slot < slots.size() && stack.is(itemOf(slot));
+		return slot >= 0 && slot < PIG_IRON_SLOT && stack.is(itemOf(slot));
 	}
 
 	@Override
@@ -123,14 +145,14 @@ public class SubmergedArcFurnaceBlockEntity extends PlantUnitBlockEntity impleme
 
 	/** kg of {@code charge} it has, in its bin's chute and its bin. */
 	private double have(Charge charge) {
-		return stock[charge.ordinal()] + slots.get(charge.ordinal()).getCount() * charge.itemKg();
+		return stock[charge.ordinal()] + slots.get(slotOf(charge)).getCount() * charge.itemKg();
 	}
 
 	/** Takes {@code kg} of {@code charge}, opening items from its bin as it needs them. */
 	private void use(Charge charge, double kg) {
 		int i = charge.ordinal();
-		while (stock[i] < kg && !slots.get(i).isEmpty()) {
-			slots.get(i).shrink(1);
+		while (stock[i] < kg && !slots.get(slotOf(charge)).isEmpty()) {
+			slots.get(slotOf(charge)).shrink(1);
 			stock[i] += charge.itemKg();
 		}
 		stock[i] = Math.max(0, stock[i] - kg);
@@ -352,6 +374,25 @@ public class SubmergedArcFurnaceBlockEntity extends PlantUnitBlockEntity impleme
 		return waiting < Tuning.SAF_TAPPED_HOLD_KG;
 	}
 
+	/** Whole ingots of the pig iron into its out slot, for a hopper under it; what does not fit waits. */
+	private void castPigIron() {
+		ItemStack out = slots.get(PIG_IRON_SLOT);
+		while (pigIron >= Tuning.IRON_INGOT_KG && (out.isEmpty() || out.getCount() < out.getMaxStackSize())) {
+			if (out.isEmpty()) {
+				out = new ItemStack(Items.IRON_INGOT);
+				slots.set(PIG_IRON_SLOT, out);
+			} else {
+				out.grow(1);
+			}
+			pigIron -= Tuning.IRON_INGOT_KG;
+		}
+	}
+
+	/** Iron ingots waiting under it (20b). */
+	public int pigIronIngots() {
+		return slots.get(PIG_IRON_SLOT).getCount();
+	}
+
 	/** Opens the taphole: the hearth's alloy runs into the ladles for the bagging station. */
 	private void tap(boolean runOut) {
 		if (hearth <= 0) {
@@ -359,6 +400,10 @@ public class SubmergedArcFurnaceBlockEntity extends PlantUnitBlockEntity impleme
 			return;
 		}
 		tapped[recipe.ordinal()] += hearth;
+		if (recipe == Recipe.TI_SLAG) {   // 20b: the ilmenite's iron runs out under the slag, cast as ingots
+			pigIron += hearth * Ferroalloys.pigIronPerSlag();
+			castPigIron();
+		}
 		lastTapKg = hearth;
 		hearth = 0;
 		sinceTap = 0;
@@ -404,6 +449,7 @@ public class SubmergedArcFurnaceBlockEntity extends PlantUnitBlockEntity impleme
 			case FECR -> WildcatterItems.FERROCHROME_BAG;
 			case FEMN -> WildcatterItems.FERROMANGANESE_BAG;
 			case FESI -> WildcatterItems.FERROSILICON_BAG;
+			case TI_SLAG -> WildcatterItems.TI_SLAG_BAG;
 		};
 	}
 
@@ -528,6 +574,7 @@ public class SubmergedArcFurnaceBlockEntity extends PlantUnitBlockEntity impleme
 		output.putBoolean("frozen", frozen);
 		output.putDouble("made", made);
 		output.putDouble("slag", slag);
+		output.putDouble("pigIron", pigIron);
 	}
 
 	@Override
@@ -554,6 +601,7 @@ public class SubmergedArcFurnaceBlockEntity extends PlantUnitBlockEntity impleme
 		frozen = input.getBooleanOr("frozen", false);
 		made = input.getDoubleOr("made", 0);
 		slag = input.getDoubleOr("slag", 0);
+		pigIron = input.getDoubleOr("pigIron", 0);
 	}
 
 	private static @Nullable Recipe parse(String name, @Nullable Recipe fallback) {

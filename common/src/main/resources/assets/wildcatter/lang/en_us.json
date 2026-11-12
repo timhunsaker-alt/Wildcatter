@@ -633,5 +633,14 @@
   "block.wildcatter.hydrofluorinator_large": "Hydrofluorinator (large)",
   "block.wildcatter.fluorinator_large": "Fluorinator (large)",
   "block.wildcatter.cold_traps_large": "UF6 Cold Traps (large)",
-  "block.wildcatter.distillation_columns_large": "UF6 Distillation Columns (large)"
+  "block.wildcatter.distillation_columns_large": "UF6 Distillation Columns (large)",
+  "item.wildcatter.ilmenite": "Ilmenite Concentrate (500 kg)",
+  "item.wildcatter.rutile": "Rutile Concentrate (500 kg)",
+  "item.wildcatter.ti_slag_bag": "Bulk Bag of Titanium Slag (85 % TiO2)",
+  "item.wildcatter.tio2_pigment_bag": "Bulk Bag of TiO2 Pigment",
+  "block.wildcatter.ti_chlorinator": "Titanium Chlorinator (controller)",
+  "block.wildcatter.ticl4_purification": "TiCl4 Purification",
+  "block.wildcatter.ticl4_oxidiser": "TiCl4 Oxidiser",
+  "block.wildcatter.vpsa_oxygen": "VPSA Oxygen Unit (100 Nm3/h)",
+  "block.wildcatter.pigment_finishing": "Pigment Finishing"
 }

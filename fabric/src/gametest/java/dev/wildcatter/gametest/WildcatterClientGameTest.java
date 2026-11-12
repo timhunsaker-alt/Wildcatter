@@ -214,6 +214,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("chlorAlkali")) {
 				new ChemicalClientScenes(context, server, y, up, -13000).chlorAlkali();
 			}
+			if (only("tiPigment")) {
+				new ChemicalClientScenes(context, server, y, up, -13800).tiPigment();
+			}
 			if (only("guyWire")) {
 				new GridClientScenes(context, server, y, up, -10400).guyWire();
 			}

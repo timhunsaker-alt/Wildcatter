@@ -69,6 +69,7 @@ final class ChemicalScenes {
 		Map<String, Consumer<GameTestHelper>> scenes = new LinkedHashMap<>();
 		scenes.put("chlor_alkali", ChemicalScenes::chlorAlkali);
 		scenes.put("brine_well", ChemicalScenes::brineWell);
+		scenes.put("ti_pigment", ChemicalScenes::tiPigment);
 		scenes.putAll(ConversionLargeScenes.scenes());   // 16b2, on the same peaker
 		return scenes;
 	}
@@ -306,6 +307,91 @@ final class ChemicalScenes {
 				helper.succeed();
 			});
 		});
+	}
+
+	// ---- ti_pigment (20b) ------------------------------------------------------------------------------------------------------------
+	static void tiPigment(GameTestHelper helper) {
+		String scene = "ti_pigment";
+		floor(helper, -28, -16, 16, 24);
+		// the mineral separator: A with a hopper under its main cell puts out ilmenite and rutile; B with none only counts them, as before 20b
+		place(helper, WildcatterBlocks.MINERAL_SEPARATOR, -16, U, -12, NORTH);   // x -16..-14, z -12..-7, box (-17, -12)
+		place(helper, WildcatterBlocks.MINERAL_SEPARATOR, -16, U, -4, NORTH);    // x -16..-14, z -4..1, box (-17, -4)
+		helper.getLevel().setBlock(abs(helper, -16, U - 1, -12), net.minecraft.world.level.block.Blocks.HOPPER.defaultBlockState(), 3);
+		genset(helper, -22, U, -14);
+		run(helper, "cable_industrial", new int[] {-21, -14}, new int[] {-21, -4}, new int[] {-17, -4});
+		run(helper, "cable_industrial", new int[] {-21, -12}, new int[] {-17, -12});
+		dev.wildcatter.block.ZrLineBlockEntity sepA = entity(helper, -16, U, -12, dev.wildcatter.block.ZrLineBlockEntity.class);
+		dev.wildcatter.block.ZrLineBlockEntity sepB = entity(helper, -16, U, -4, dev.wildcatter.block.ZrLineBlockEntity.class);
+		for (dev.wildcatter.block.ZrLineBlockEntity sep : new dev.wildcatter.block.ZrLineBlockEntity[] {sepA, sepB}) {
+			sep.slots().set(0, new ItemStack(dev.wildcatter.ore.OreBlocks.MINERALS.get(Ore.HEAVY_MINERAL), 4));
+		}
+		sepA.testIlmeniteOut(Tuning.TI_MINERAL_ITEM_KG - 0.3);   // near an item, by hook
+		start(helper, -22, U, -14, () -> { });
+		place(helper, WildcatterBlocks.TI_CHLORINATOR, 0, U, 0, NORTH);        // x 0-3, z 0-3, box (-1, 0)
+		place(helper, WildcatterBlocks.TICL4_PURIFICATION, 4, U, 0, NORTH);    // x 4-6, z 0-2, box north (4, -1)
+		place(helper, WildcatterBlocks.TICL4_OXIDISER, 7, U, 0, NORTH);        // x 7-9, z 0-9
+		place(helper, WildcatterBlocks.PIGMENT_FINISHING, 7, U, 10, NORTH);    // x 7-10, z 10-19, box (6, 10)
+		place(helper, WildcatterBlocks.BAGGING_STATION, 8, U, 20, NORTH);      // x 8-9, z 20-21, box (7, 20)
+		place(helper, WildcatterBlocks.VPSA_OXYGEN, 7, U, -7, NORTH);          // x 7-9, z -7..-2, box (6, -7)
+		run(helper, "gas_line", new int[] {8, -1});                                                     // oxygen, VPSA to oxidiser
+		run(helper, "gas_line", new int[] {10, 1});
+		source(helper, 11, 1, Product.PIPELINE_GAS, 0.1);                                               // the preheaters' gas
+		run(helper, "gas_line", new int[] {6, 9}, new int[] {6, 4}, new int[] {2, 4});                  // chlorine back to the chlorinator
+		TestGasSource.SourceEntity makeup = source(helper, 2, 5, Product.CHLORINE, 0.2);                // the make-up, a test-filled supply
+		run(helper, "gas_line", new int[] {11, 10});
+		source(helper, 12, 10, Product.PROCESS_STEAM, 1.0);                                             // the micronizer's steam
+		genset(helper, -6, U, -10);
+		run(helper, "cable_industrial", new int[] {-5, -10}, new int[] {-5, -1}, new int[] {4, -1});
+		run(helper, "cable_industrial", new int[] {-1, 0});
+		run(helper, "cable_industrial", new int[] {-5, -8}, new int[] {6, -8}, new int[] {6, -7});
+		genset(helper, -6, U, 14);
+		run(helper, "cable_industrial", new int[] {-5, 14}, new int[] {-5, 10}, new int[] {6, 10});
+		run(helper, "cable_industrial", new int[] {-5, 14}, new int[] {-5, 20}, new int[] {7, 20});
+		dev.wildcatter.block.TiChlorinatorBlockEntity chlorinator = entity(helper, 0, U, 0, dev.wildcatter.block.TiChlorinatorBlockEntity.class);
+		chlorinator.slots().set(0, new ItemStack(WildcatterItems.TI_SLAG_BAG, 8));
+		chlorinator.slots().set(1, new ItemStack(WildcatterItems.MET_COKE, 64));
+		check(helper, chlorinator.canPlaceItem(0, new ItemStack(WildcatterItems.RUTILE)), "the chlorinator should take rutile as its feed");
+		dev.wildcatter.block.PigmentFinishingBlockEntity finishing = entity(helper, 7, U, 10, dev.wildcatter.block.PigmentFinishingBlockEntity.class);
+		finishing.slots().set(0, new ItemStack(WildcatterItems.HYDRATE_BAG, 2));
+		dev.wildcatter.block.BaggingStationBlockEntity bagger = entity(helper, 8, U, 20, dev.wildcatter.block.BaggingStationBlockEntity.class);
+		bagger.slots().set(0, new ItemStack(WildcatterItems.EMPTY_BULK_BAG, 4));
+		dev.wildcatter.block.TiCl4OxidiserBlockEntity oxidiser = entity(helper, 7, U, 0, dev.wildcatter.block.TiCl4OxidiserBlockEntity.class);
+		int[][] wet = {};
+		start(helper, -6, U, 14, () -> { });
+		start(helper, -6, U, -10, () -> await(helper, 900, wet, () -> chlorinator.making() > 0 && oxidiser.returned() > 20, () -> {
+			String chain = " | chlorinator " + read(helper, 0, U, 0) + " | purification " + read(helper, 4, U, 0) + " | oxidiser " + read(helper, 7, U, 0)
+					+ " | finishing " + read(helper, 7, U, 10) + " | vpsa " + read(helper, 7, U, -7) + String.format(" | make-up taken %.0f kg", makeup.taken);
+			log(scene, "running:" + chain);
+			check(helper, near(chlorinator.chlorinating(), dev.wildcatter.fluid.TitaniumPigment.tio2Kgs() * 3600, 0.25), "the chlorinator should take about 250 kg/h of TiO2: " + chain);
+			check(helper, read(helper, 7, U, 0).contains("TiCl4 in"), "TiCl4 should reach the oxidiser: " + chain);
+			check(helper, oxidiser.returned() > 0, "chlorine should come back to the chlorinator: " + chain);
+			check(helper, chlorinator.making() > 0, "the finishing should make pigment: " + chain);
+			var hopper = (net.minecraft.world.level.block.entity.HopperBlockEntity) helper.getLevel().getBlockEntity(abs(helper, -16, U - 1, -12));
+			boolean ilmenite = false;
+			for (int i = 0; i < hopper.getContainerSize(); i++) {
+				ilmenite |= hopper.getItem(i).is(WildcatterItems.ILMENITE);
+			}
+			ilmenite |= sepA.slots().get(1).is(WildcatterItems.ILMENITE);
+			String seps = " | separator A " + read(helper, -16, U, -12) + " | separator B " + read(helper, -16, U, -4);
+			check(helper, ilmenite, "with a hopper under it the separator should put out ilmenite: " + seps);
+			check(helper, sepB.ilmeniteCounted() > 0 && sepB.slots().get(1).isEmpty() && sepB.slots().get(2).isEmpty(),
+					"without a hopper the separator should only count its ilmenite, as before: " + seps);
+			log(scene, "separators:" + seps);
+			finishing.testAddPigment(Tuning.BULK_BAG_KG);   // a bag's worth, by hook
+			await(helper, 300, wet, () -> bagger.slots().stream().anyMatch(st -> st.is(WildcatterItems.TIO2_PIGMENT_BAG)), () -> {
+				check(helper, bagger.slots().stream().anyMatch(st -> st.is(WildcatterItems.TIO2_PIGMENT_BAG)), "a bag of TiO2 should drop: " + read(helper, 8, U, 20));
+				var dye = helper.getLevel().getServer().getRecipeManager().byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE,
+						dev.wildcatter.Wildcatter.id("white_dye_from_tio2_pigment")));
+				check(helper, dye.isPresent(), "the bag should craft into white dye");
+				helper.getLevel().destroyBlock(abs(helper, 7, U, -7), false);                                // the oxygen unit broken
+				await(helper, 300, wet, () -> read(helper, 7, U, 0).contains("NO OXYGEN"), () -> {
+					String noO2 = read(helper, 7, U, 0);
+					check(helper, noO2.contains("NO OXYGEN"), "with the VPSA unit gone the oxidiser should read NO OXYGEN: " + noO2);
+					log(scene, "ok: " + noO2);
+					helper.succeed();
+				});
+			});
+		}));
 	}
 
 	/** Gives the pump fresh water each second, as a water pump on its suction would, until {@code done}. */

@@ -30,7 +30,13 @@ public class ChemPartBlock extends BigPartBlock implements net.minecraft.world.W
 		MEMBRANE_CELL_ROOM("membrane_cell_room", Footprint.box(6, 4, 16, 0, 0), MembraneCellRoomBlockEntity::new),
 		CHLORINE_TRAIN("chlorine_train", Footprint.box(4, 6, 10, 0, 0), ChlorineTrainBlockEntity::new),
 		CAUSTIC_EVAPORATOR("caustic_evaporator", Footprint.box(3, 10, 3, 0, 0), CausticEvaporatorBlockEntity::new),
-		HCL_SYNTHESIS_UNIT("hcl_synthesis_unit", Footprint.box(2, 8, 2, 0, 0), HclSynthesisBlockEntity::new);
+		HCL_SYNTHESIS_UNIT("hcl_synthesis_unit", Footprint.box(2, 8, 2, 0, 0), HclSynthesisBlockEntity::new),
+		// 20b, the titanium pigment plant
+		TI_CHLORINATOR("ti_chlorinator", Footprint.box(4, 12, 4, 0, 0), TiChlorinatorBlockEntity::new),
+		TICL4_PURIFICATION("ticl4_purification", Footprint.box(3, 12, 3, 0, 0), TiCl4PurificationBlockEntity::new),
+		TICL4_OXIDISER("ticl4_oxidiser", Footprint.box(3, 4, 10, 0, 0), TiCl4OxidiserBlockEntity::new),
+		VPSA_OXYGEN("vpsa_oxygen", Footprint.box(3, 4, 6, 0, 0), VpsaOxygenBlockEntity::new),
+		PIGMENT_FINISHING("pigment_finishing", Footprint.box(4, 5, 10, 0, 0), PigmentFinishingBlockEntity::new);
 
 		private final String id;
 		private final Footprint footprint;

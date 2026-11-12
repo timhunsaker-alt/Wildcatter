@@ -182,6 +182,11 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.HclSynthesisBlockEntity> HCL_SYNTHESIS_UNIT_ENTITY = entity(dev.wildcatter.block.HclSynthesisBlockEntity::new, HCL_SYNTHESIS_UNIT);
 	public static final BlockEntityType<dev.wildcatter.block.RectifierMvBlockEntity> RECTIFIER_MV_ENTITY = entity(dev.wildcatter.block.RectifierMvBlockEntity::new, RECTIFIER_MV);
 	public static final BlockEntityType<dev.wildcatter.block.BrineWellheadBlockEntity> BRINE_WELLHEAD_ENTITY = entity(dev.wildcatter.block.BrineWellheadBlockEntity::new, BRINE_WELLHEAD);
+	public static final BlockEntityType<dev.wildcatter.block.TiChlorinatorBlockEntity> TI_CHLORINATOR_ENTITY = entity(dev.wildcatter.block.TiChlorinatorBlockEntity::new, TI_CHLORINATOR);
+	public static final BlockEntityType<dev.wildcatter.block.TiCl4PurificationBlockEntity> TICL4_PURIFICATION_ENTITY = entity(dev.wildcatter.block.TiCl4PurificationBlockEntity::new, TICL4_PURIFICATION);
+	public static final BlockEntityType<dev.wildcatter.block.TiCl4OxidiserBlockEntity> TICL4_OXIDISER_ENTITY = entity(dev.wildcatter.block.TiCl4OxidiserBlockEntity::new, TICL4_OXIDISER);
+	public static final BlockEntityType<dev.wildcatter.block.VpsaOxygenBlockEntity> VPSA_OXYGEN_ENTITY = entity(dev.wildcatter.block.VpsaOxygenBlockEntity::new, VPSA_OXYGEN);
+	public static final BlockEntityType<dev.wildcatter.block.PigmentFinishingBlockEntity> PIGMENT_FINISHING_ENTITY = entity(dev.wildcatter.block.PigmentFinishingBlockEntity::new, PIGMENT_FINISHING);
 	public static final BlockEntityType<dev.wildcatter.block.PotashDryerBlockEntity> POTASH_DRYER_ENTITY = entity(dev.wildcatter.block.PotashDryerBlockEntity::new, POTASH_DRYER);
 	public static final BlockEntityType<dev.wildcatter.block.AcidPretreatmentBlockEntity> ACID_PRETREATMENT_ENTITY = entity(dev.wildcatter.block.AcidPretreatmentBlockEntity::new, ACID_PRETREATMENT);
 	public static final BlockEntityType<dev.wildcatter.block.DepaTopoCircuitBlockEntity> DEPA_TOPO_CIRCUIT_ENTITY = entity(dev.wildcatter.block.DepaTopoCircuitBlockEntity::new, DEPA_TOPO_CIRCUIT);
@@ -464,7 +469,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		add("resin_trailer", RESIN_TRAILER);
 		add("isr_wellhead", ISR_WELLHEAD);
 		add("brine_wellhead", BRINE_WELLHEAD);
-		for (Block part : new Block[] {BRINE_SATURATOR, BRINE_TREATMENT, MEMBRANE_CELL_ROOM, CHLORINE_TRAIN, CAUSTIC_EVAPORATOR, HCL_SYNTHESIS_UNIT}) {
+		for (Block part : new Block[] {BRINE_SATURATOR, BRINE_TREATMENT, MEMBRANE_CELL_ROOM, CHLORINE_TRAIN, CAUSTIC_EVAPORATOR, HCL_SYNTHESIS_UNIT, TI_CHLORINATOR, TICL4_PURIFICATION, TICL4_OXIDISER, VPSA_OXYGEN, PIGMENT_FINISHING}) {
 			add(((dev.wildcatter.block.ChemPartBlock) part).part().id(), part);
 		}
 		for (Block part : new Block[] {REDUCTION_REACTOR, HYDROFLUORINATOR, FLUORINATOR, COLD_TRAPS, DISTILLATION_COLUMNS, CYLINDER_FILLER, STEAM_REFORMER, HF_KILN, HF_COLUMN, RECTIFIER, FLUORINE_CELL_HOUSE, CATHODE_GAS_SCRUBBER, KOH_SCRUBBER, RECTIFIER_MV, REDUCTION_REACTOR_LARGE, HYDROFLUORINATOR_LARGE, FLUORINATOR_LARGE, COLD_TRAPS_LARGE, DISTILLATION_COLUMNS_LARGE}) {
@@ -750,6 +755,11 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("hcl_synthesis_unit"), HCL_SYNTHESIS_UNIT_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rectifier_mv"), RECTIFIER_MV_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("brine_wellhead"), BRINE_WELLHEAD_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("ti_chlorinator"), TI_CHLORINATOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("ticl4_purification"), TICL4_PURIFICATION_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("ticl4_oxidiser"), TICL4_OXIDISER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("vpsa_oxygen"), VPSA_OXYGEN_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("pigment_finishing"), PIGMENT_FINISHING_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("acid_pretreatment"), ACID_PRETREATMENT_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("depa_topo_circuit"), DEPA_TOPO_CIRCUIT_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("paste_plant"), PASTE_PLANT_ENTITY);

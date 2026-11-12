@@ -47,6 +47,10 @@ public class WildcatterJeiPlugin implements IModPlugin {
 		ingot(registration, "lead", "Smelted from galena. No use yet.");
 		ingot(registration, "zinc", "Smelted from sphalerite. No use yet.");
 		ingot(registration, "silver", "Smelted from acanthite. No use yet.");
+		registration.addItemStackInfo(new ItemStack(WildcatterItems.TIO2_PIGMENT_BAG), Component.literal("Titanium dioxide pigment, rutile grade, from the "
+				+ "titanium pigment plant's finishing. It crafts into white dye."));
+		registration.addItemStackInfo(List.of(new ItemStack(WildcatterItems.ILMENITE), new ItemStack(WildcatterItems.RUTILE)), Component.literal("From the mineral "
+				+ "separator, with a hopper under it. Ilmenite goes to the submerged arc furnace's Ti slag recipe; rutile and the slag to the titanium chlorinator."));
 		registration.addItemStackInfo(new ItemStack(WildcatterItems.MAGNESIA), Component.literal("Caustic-calcined magnesia (MgO), "
 				+ "from magnesite in a furnace. The uranium mill's precipitation tank uses it to precipitate the uranium, and the "
 				+ "magnesia chlorinator turns it into MgCl2 for the magnesium cell."));
