@@ -670,13 +670,13 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		long found = -1;
 		search:
 		for (long seed = 1; seed < 2_000_000; seed++) {
-			Reservoir oil = Reservoir.at(seed, rx + 7, rz);   // under the rig's hole
+			Reservoir oil = fieldAnyRule(seed, rx + 7, rz);   // under the rig's hole
 			if (oil == null || oil.deep() || oil.kind() != Reservoir.Kind.OIL || oil.topY() > -42) {
 				continue;
 			}
 			for (int x = 20; x <= 60; x += 2) {
 				for (int z = 40; z <= 70; z += 2) {
-					Reservoir gas = Reservoir.at(seed, x, z);
+					Reservoir gas = fieldAnyRule(seed, x, z);
 					if (gas != null && gas.kind() == Reservoir.Kind.GAS && gas.units() > 0 && !gas.key().equals(oil.key())) {
 						found = seed;
 						gx = x;
@@ -724,7 +724,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			float rigRpm = context.computeOnClient(client -> client.level.getBlockEntity(hole) instanceof dev.wildcatter.block.DrillingRigBlockEntity r ? r.spin().rpm() : -1F);
 			check(Math.abs(rigRpm - Tuning.RIG_ROTARY_RPM) < 1, "the client should see the top head turning at 80 rpm: " + rigRpm);
 			context.takeScreenshot("wildcatter-drilling-rig");
-			int topY = Reservoir.at(seed, hx, rz).topY();
+			int topY = fieldAnyRule(seed, hx, rz).topY();
 			for (int waited = 0; waited < 3000; waited += 100) {
 				if (server.computeOnServer(srv -> srv.overworld().getBlockState(hole).is(WildcatterBlocks.OIL_WELLHEAD))) {
 					break;
@@ -2865,8 +2865,11 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 				"the pots' auxiliaries should have their 480 V: " + read(server, row1[1].getX(), up, row1[1].getZ()) + " | " + read(server, row2[2].getX(), up, row2[2].getZ()));
 		// a pot cut out live: its shorting bars carry the line past it, and the line holds
 		String cut = server.computeOnServer(srv -> ((dev.wildcatter.block.PotBlockEntity) srv.overworld().getBlockEntity(row1[3])).toggleCutOut().getString());
-		context.waitTicks(100);
-		amps = potAmps.applyAsDouble(row1[0]);
+		amps = 0;
+		for (int i = 0; i < 40 && Math.abs(amps - 180_000) > 3_000; i++) {   // the regulator settles over its solves, fewer on a loaded machine
+			context.waitTicks(20);
+			amps = potAmps.applyAsDouble(row1[0]);
+		}
 		String cutRead = read(server, row1[3].getX(), up, row1[3].getZ());
 		System.out.println("[wildcatter-test] potline: cut out " + cut + " | " + cutRead + " | line " + Math.round(amps) + " A");
 		check(cutRead.contains("CUT OUT") && Math.abs(amps - 180_000) < 5_000, "a pot cut out live should leave the line at 180 kA: " + amps + " | " + cutRead);
@@ -4381,7 +4384,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		server.runCommand("fill 6 " + (y - 1) + " " + (z - 4) + " 22 " + (y - 1) + " " + (z + 4) + " minecraft:stone");
 		long seed = -1;
 		for (long s = 1; s < 2_000_000 && seed < 0; s++) {
-			Reservoir oil = Reservoir.at(s, px + 6, z);   // under its wellhead
+			Reservoir oil = fieldAnyRule(s, px + 6, z);   // under its wellhead
 			if (oil != null && oil.kind() == Reservoir.Kind.OIL && oil.units() > 10_000) {
 				seed = s;
 			}
@@ -4463,8 +4466,8 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		server.runCommand("kill @e[type=item]");
 		long seed = -1;
 		for (long s = 1; s < 3_000_000 && seed < 0; s++) {
-			Reservoir a = Reservoir.at(s, 15, z - 8);   // under the two pumpjacks' wellheads
-			Reservoir b = Reservoir.at(s, 18, z - 9);
+			Reservoir a = fieldAnyRule(s, 15, z - 8);   // under the two pumpjacks' wellheads
+			Reservoir b = fieldAnyRule(s, 18, z - 9);
 			if (a != null && b != null && a.kind() == Reservoir.Kind.OIL && b.kind() == Reservoir.Kind.OIL && a.units() > 10_000 && b.units() > 10_000) {
 				seed = s;
 			}
@@ -4607,7 +4610,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		server.runCommand("fill 2 " + (y - 1) + " " + (z - 6) + " 34 " + (y - 1) + " " + (z + 12) + " minecraft:stone");
 		long seed = -1;
 		for (long s = 1; s < 2_000_000 && seed < 0; s++) {
-			Reservoir oil = Reservoir.at(s, px + 6, z);
+			Reservoir oil = fieldAnyRule(s, px + 6, z);
 			if (oil != null && oil.kind() == Reservoir.Kind.OIL && oil.units() > 10_000) {
 				seed = s;
 			}
@@ -4908,7 +4911,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		for (long s = 1; s < 4_000_000 && seed < 0; s++) {
 			boolean all = true;
 			for (int i = 0; i < 3 && all; i++) {
-				Reservoir oil = Reservoir.at(s, px + 6, z + i * 6);
+				Reservoir oil = fieldAnyRule(s, px + 6, z + i * 6);
 				all = oil != null && oil.kind() == Reservoir.Kind.OIL && oil.units() > 10_000;
 			}
 			if (all) {
@@ -6308,7 +6311,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		server.runCommand("fill 6 " + (y - 1) + " " + (z - 4) + " 24 " + (y - 1) + " " + (z + 4) + " minecraft:stone");
 		long seed = -1;
 		for (long s = 1; s < 2_000_000 && seed < 0; s++) {
-			Reservoir oil = Reservoir.at(s, px + 6, z);   // under its wellhead
+			Reservoir oil = fieldAnyRule(s, px + 6, z);   // under its wellhead
 			if (oil != null && oil.kind() == Reservoir.Kind.OIL && oil.units() > 10_000) {
 				seed = s;
 			}
@@ -6891,7 +6894,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		server.runCommand("fill 4 " + (y - 1) + " " + (z - 10) + " 46 " + (y - 1) + " " + (z + 16) + " minecraft:stone");
 		long seed = -1;
 		for (long s = 1; s < 2_000_000 && seed < 0; s++) {
-			Reservoir oil = Reservoir.at(s, 21, z);   // under the wellhead
+			Reservoir oil = fieldAnyRule(s, 21, z);   // under the wellhead
 			if (oil != null && !oil.deep() && oil.kind() == Reservoir.Kind.OIL && oil.units() > 30_000) {
 				seed = s;
 			}
@@ -7041,7 +7044,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		server.runCommand("fill 4 " + (y - 1) + " " + (z - 12) + " 50 " + (y - 1) + " " + (z + 8) + " minecraft:stone");
 		long seed = -1;
 		for (long s = 1; s < 2_000_000 && seed < 0; s++) {
-			Reservoir gas = Reservoir.at(s, 8, z);   // under the Christmas tree
+			Reservoir gas = fieldAnyRule(s, 8, z);   // under the Christmas tree
 			if (gas != null && !gas.deep() && gas.kind() == Reservoir.Kind.GAS && gas.units() > 100_000) {
 				seed = s;
 			}
@@ -7921,6 +7924,15 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			ReservoirData.testSeed = null;
 			rules(server, false, "saltDomeGrid192", "mudGel", "wellControl");
 		}
+	}
+
+	/**
+	 * The field a hole at this column reaches whether the world rule saltDomeGrid192 is on or off: null where a grid dome would change
+	 * it. A scene that wants an ordinary field picks its seed with this, so the field it found is the one the game reads either way.
+	 */
+	static Reservoir fieldAnyRule(long seed, int x, int z) {
+		Reservoir plain = Reservoir.at(seed, x, z, dome -> false);
+		return java.util.Objects.equals(plain, Reservoir.at(seed, x, z)) ? plain : null;
 	}
 
 	/** Sets world rules as an operator would: {@code /wildcatter rule <key> <on>}. */
