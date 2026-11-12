@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.6.1 (released 2026-11-12)
+
+### Fixes
+- **The NeoForge client starts again:** NeoForge 26.3.0.101 wants the client-side handler of a clientbound payload registered on the client
+  (`RegisterClientPayloadHandlersEvent`). The PLC payload had only its two-way handler, so a NeoForge client refused to start with
+  "Some clientbound payloads are missing client-side handlers: [wildcatter:plc]". Found by Farmings' first NeoForge client launch. The
+  Fabric client and dedicated servers were not affected.
+
 ## v0.6.0 (released 2026-11-10)
 
 ### Fixes
