@@ -91,6 +91,13 @@ public interface FuelCycleBlocks {
 	Block ROD_LOADER = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.ROD_LOADER);
 	Block ROD_WELDER = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.ROD_WELDER);
 	Block ASSEMBLY_FIXTURE = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.ASSEMBLY_FIXTURE);
+	// 19c1: inspection and scrap (docs/multiblocks/fuel-fabrication-extensions.md)
+	Block PELLET_INSPECTION = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.PELLET_INSPECTION);
+	Block ROD_INSPECTION = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.ROD_INSPECTION);
+	Block SCRAP_OXIDIZER = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.SCRAP_OXIDIZER);
+	// 19c2: HF recovery and IFBA
+	Block HF_RECOVERY_CONDENSER = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.HF_RECOVERY_CONDENSER);
+	Block IFBA_COATER = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.IFBA_COATER);
 	Block HELIUM_RECOVERY_UNIT = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.HELIUM_RECOVERY_UNIT);
 	// 10b2: the Bayer refinery, lime kiln, AlF3 reactor, bagging station and chlorine filler (docs/multiblocks/bayer-refinery.md, alumina-plant.md)
 	Block BALL_MILL = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.BALL_MILL);
@@ -157,6 +164,17 @@ public interface FuelCycleBlocks {
 	Block POTASH_DRYER = phosphatePart(dev.wildcatter.block.PhosphatePartBlock.Part.POTASH_DRYER);
 	Block ACID_PRETREATMENT = phosphatePart(dev.wildcatter.block.PhosphatePartBlock.Part.ACID_PRETREATMENT);
 	Block DEPA_TOPO_CIRCUIT = phosphatePart(dev.wildcatter.block.PhosphatePartBlock.Part.DEPA_TOPO_CIRCUIT);
+	// Phase 17b1: the nickel smelter and refinery (docs/multiblocks/nickel-smelter.md)
+	Block FLUID_BED_ROASTER = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.FLUID_BED_ROASTER);
+	Block NICKEL_ELECTRIC_FURNACE = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.NICKEL_ELECTRIC_FURNACE);
+	Block PEIRCE_SMITH_CONVERTER = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.PEIRCE_SMITH_CONVERTER);
+	Block CHLORINE_LEACH_REACTOR = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.CHLORINE_LEACH_REACTOR);
+	Block NI_PURIFICATION = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.NI_PURIFICATION);
+	Block NICKEL_TANKHOUSE = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.NICKEL_TANKHOUSE);
+	// Phase 17b2: the alloy melt shop
+	Block INDUCTION_FURNACE = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.INDUCTION_FURNACE);
+	Block AOD_CONVERTER = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.AOD_CONVERTER);
+	Block INGOT_CASTER = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.INGOT_CASTER);
 	// 10c2: the cranes (docs/multiblocks/tower-crane.md, crawler-crane.md)
 	Block TOWER_CRANE = cranePart(dev.wildcatter.block.CranePartBlock.Part.TOWER_CRANE);
 	Block CRAWLER_CRANE = cranePart(dev.wildcatter.block.CranePartBlock.Part.CRAWLER_CRANE);
@@ -171,6 +189,34 @@ public interface FuelCycleBlocks {
 	Block ALUMINIUM_BLOCK = block("aluminium_block", props -> new Block(props.mapColor(MapColor.METAL).strength(5.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
 	/** A placed block of red mud filter cake, for a dry stack. */
 	Block RED_MUD = block("red_mud", props -> new Block(props.mapColor(MapColor.TERRACOTTA_RED).strength(0.8F).sound(SoundType.MUD)));
+	// Phase 20a: the chlor-alkali plant (docs/multiblocks/chlor-alkali-plant.md)
+	Block BRINE_SATURATOR = chemPart(dev.wildcatter.block.ChemPartBlock.Part.BRINE_SATURATOR);
+	Block BRINE_TREATMENT = chemPart(dev.wildcatter.block.ChemPartBlock.Part.BRINE_TREATMENT);
+	Block MEMBRANE_CELL_ROOM = chemPart(dev.wildcatter.block.ChemPartBlock.Part.MEMBRANE_CELL_ROOM);
+	Block CHLORINE_TRAIN = chemPart(dev.wildcatter.block.ChemPartBlock.Part.CHLORINE_TRAIN);
+	Block CAUSTIC_EVAPORATOR = chemPart(dev.wildcatter.block.ChemPartBlock.Part.CAUSTIC_EVAPORATOR);
+	Block HCL_SYNTHESIS_UNIT = chemPart(dev.wildcatter.block.ChemPartBlock.Part.HCL_SYNTHESIS_UNIT);
+	// Phase 20b: the titanium pigment plant (docs/multiblocks/titanium-pigment.md)
+	Block TI_CHLORINATOR = chemPart(dev.wildcatter.block.ChemPartBlock.Part.TI_CHLORINATOR);
+	Block TICL4_PURIFICATION = chemPart(dev.wildcatter.block.ChemPartBlock.Part.TICL4_PURIFICATION);
+	Block TICL4_OXIDISER = chemPart(dev.wildcatter.block.ChemPartBlock.Part.TICL4_OXIDISER);
+	Block VPSA_OXYGEN = chemPart(dev.wildcatter.block.ChemPartBlock.Part.VPSA_OXYGEN);
+	Block PIGMENT_FINISHING = chemPart(dev.wildcatter.block.ChemPartBlock.Part.PIGMENT_FINISHING);
+	// Phase 20c: lithium hydroxide (docs/multiblocks/lithium.md)
+	Block DECREPITATION_KILN = chemPart(dev.wildcatter.block.ChemPartBlock.Part.DECREPITATION_KILN);
+	Block ACID_ROAST_KILN = chemPart(dev.wildcatter.block.ChemPartBlock.Part.ACID_ROAST_KILN);
+	Block LITHIUM_LEACH = chemPart(dev.wildcatter.block.ChemPartBlock.Part.LITHIUM_LEACH);
+	Block LIOH_CRYSTALLIZER = chemPart(dev.wildcatter.block.ChemPartBlock.Part.LIOH_CRYSTALLIZER);
+	Block LITHIUM_CARBONATOR = chemPart(dev.wildcatter.block.ChemPartBlock.Part.LITHIUM_CARBONATOR);
+	Block RECTIFIER_MV = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.RECTIFIER_MV);
+	// 16b2: the full-size conversion plant's larger main line (docs/multiblocks/conversion-extensions.md)
+	Block REDUCTION_REACTOR_LARGE = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.REDUCTION_REACTOR_LARGE);
+	Block HYDROFLUORINATOR_LARGE = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.HYDROFLUORINATOR_LARGE);
+	Block FLUORINATOR_LARGE = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.FLUORINATOR_LARGE);
+	Block COLD_TRAPS_LARGE = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.COLD_TRAPS_LARGE);
+	Block DISTILLATION_COLUMNS_LARGE = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.DISTILLATION_COLUMNS_LARGE);
+	Block BRINE_WELLHEAD = block("brine_wellhead", props -> new dev.wildcatter.block.BrineWellheadBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL)));
 	Block ISR_WELLHEAD = block("isr_wellhead", props -> new dev.wildcatter.block.IsrWellheadBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
 			.strength(3.0F, 6.0F).sound(SoundType.METAL)));
 }

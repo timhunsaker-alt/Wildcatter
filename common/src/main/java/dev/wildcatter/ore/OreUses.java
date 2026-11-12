@@ -54,12 +54,12 @@ public final class OreUses {
 		return switch (ore) {
 			case URANINITE, PITCHBLENDE -> List.of("the uranium mill's jaw crusher, which feeds the mill (yellowcake)");
 			case SULFUR -> List.of("the acid plant's sulfur melter (sulfuric acid)", "the chromate kiln (it reduces the chromate)");
-			case HALITE -> List.of("the uranium mill's SX circuit and IX columns (strip salt)", "chlor-alkali cells (chlorine, caustic soda)",
+			case HALITE -> List.of("the uranium mill's SX circuit and IX columns (strip salt)", "chlor-alkali cells (chlorine, caustic soda)", "the chlor-alkali plant's brine saturator, or a brine well in a salt dome (chlorine, caustic soda, hydrochloric acid)",
 					"a land rig's mud hopper (salt-saturated mud for drilling through salt)");
 			case BARITE -> List.of("the barite mill (drilling-grade barite, which weights a land rig's mud)");
 			case BENTONITE -> List.of("the bentonite dryer (drilling bentonite, which gels a land rig's mud)");
 			case FLUORITE -> List.of("the conversion plant's HF kiln (hydrogen fluoride)", "the Pidgeon furnace (3 % of its briquettes)");
-			case HEAVY_MINERAL -> List.of("the zirconium plant's mineral separator (zircon)");
+			case HEAVY_MINERAL -> List.of("the zirconium plant's mineral separator (zircon; with a hopper under it, ilmenite and rutile for the titanium pigment plant)");
 			case CASSITERITE -> List.of("a furnace (tin ingot, which the zirconium plant's VAR furnace alloys into Zircaloy)");
 			case CHROMITE -> List.of("the zirconium plant's VAR furnace, alloyed into Zircaloy", "the submerged arc furnace (HC ferrochrome)", "the chromate kiln (chromic oxide)");
 			case MAGNESITE -> List.of("a furnace (magnesia), for the uranium mill's precipitation and the magnesia chlorinator (magnesium)");
@@ -70,12 +70,14 @@ public final class OreUses {
 			case MOLYBDENITE -> List.of("the moly roaster, as flotation concentrate from Tailings' concentrator (moly oxide, then ferromolybdenum)");
 			case SCHEELITE -> List.of("the aluminothermic vessel, as flotation concentrate from Tailings' concentrator dried in the moly roaster (ferrotungsten)");
 			case GALENA -> List.of("a furnace (lead ingot)");
-			case SPHALERITE -> List.of("a furnace (zinc ingot)");
+			case SPHALERITE -> List.of("a furnace (zinc ingot, which with an animal fat makes zinc stearate for the fuel pellet press)");
 			case ACANTHITE -> List.of("a furnace (silver ingot)");
 			case PHOSPHATE -> List.of("the phosphate mill (phosphoric acid, TSP and DAP fertilizer; uranium from the acid)");
 			case SYLVITE -> List.of("the potash dissolver (muriate of potash fertilizer)");
+			case PENTLANDITE -> List.of("the nickel smelter's fluid-bed roaster, as ore or as flotation concentrate from Tailings' concentrator (Bessemer matte, then cathode nickel at the refinery)");
+			case SPODUMENE -> List.of("the lithium plant's decrepitation kiln (lithium hydroxide and carbonate)");
 			case DOLOMITE -> List.of("the lime kiln, burned to dolime for the Pidgeon furnace (magnesium)");
-			case PENTLANDITE, PLATINUM, GRAPHITE, SPODUMENE, COBALTITE -> List.of();
+			case PLATINUM, GRAPHITE, COBALTITE -> List.of();
 		};
 	}
 

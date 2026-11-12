@@ -834,7 +834,6 @@ public final class Tuning {
 	public static final double FUMED_SILICA_WATTS = 15_000.0;      // the burner's fans and baghouse, 480 V
 	public static final double FUMED_SILICA_SACK_KG = 25.0;        // (proposed)
 	public static final double SICL4_HOLD_KG = 20.0;               // SiCl4 a chlorinator keeps for a burner against it (proposed)
-	public static final double HCL_STRENGTH = 0.32;                // the burner's hydrochloric acid, HCl by weight
 	public static final double NM3_PER_KMOL = 22.414;
 	public static final double PIDGEON_MG_KGS = 10.0 / 3600;       // (proposed)
 	public static final double PIDGEON_CYCLE_S = 12 * 3600.0;      // a retort cycle (proposed; real 10-12 h), through TimeScale
@@ -1601,4 +1600,179 @@ public final class Tuning {
 	public static final int VESSEL_FEMO_ALUMINIUM = 20;             // aluminium ingots a batch (454 kg: 0.53 t a tonne of alloy)
 	public static final int VESSEL_FEW_IRON = 1;
 	public static final int VESSEL_FEW_ALUMINIUM = 8;               // 182 kg: 0.3 t a 1.04 t of WO3
+
+	// ---- Phase 17b1: the nickel smelter and refinery (docs/multiblocks/nickel-smelter.md; decisions in docs/questions/phase17b-nickel.md) ----
+	/** A block of nickel ore (its 60 % nickel sulfides at a concentrate grade): about 4 t (unverified density), 12 % Ni, 4 % Cu, 0.4 % Co. */
+	public static final double NICKEL_ORE_KG = 4_000.0;
+	public static final double NICKEL_FEED_NI = 0.12;
+	public static final double NICKEL_FEED_CU = 0.04;
+	public static final double NICKEL_FEED_CO = 0.004;
+	public static final double NICKEL_FEED_S = 0.30;                // (unverified)
+	/** The fluid-bed roaster: 2 t of feed an hour at about 700 C, 70 % of the sulfur to the acid plant as SO2; its blower 110 kW at MV. */
+	public static final double NI_ROASTER_FEED_KGH = 2_000.0;
+	public static final double NI_ROASTER_WATTS = 110_000.0;
+	public static final double NI_ROASTER_S_TO_GAS = 0.70;
+	public static final double NI_ROASTER_CALCINE_HOLD_KG = 8_000.0;   // calcine waiting for the furnace (proposed)
+	public static final double NI_ROASTER_SLURRY_HOLD_KG = 2_000.0;    // concentrate in its feed tank (proposed)
+	/** The electric furnace: 500 kWh a tonne of calcine (unverified), 1 MW off the furnace transformer; furnace matte 25 % Ni (proposed). */
+	public static final double NI_FURNACE_WATTS = 1.0e6;
+	public static final double NI_FURNACE_KWH_PER_T = 500.0;
+	public static final double NI_FURNACE_MATTE_NI = 0.25;
+	public static final double NI_FURNACE_MATTE_HOLD_KG = 10_000.0;    // matte in its hearth before it reads FULL (proposed)
+	public static final double NI_FURNACE_PASTE_KG_PER_T = 2.5;        // Soderberg paste a tonne of calcine (proposed)
+	public static final double NI_FURNACE_ELECTRODE_PASTE_KG = 2_000.0; // paste in its six columns (proposed, as the SAF's)
+	public static final double NI_FURNACE_SLAG_PER_T = 0.7;            // t of slag a tonne of calcine (proposed)
+	/** The Peirce-Smith converter: a blow every 2 hours; its air blower 250 kW at MV; Bessemer matte 50 % Ni, 25 % Cu, 20 % S. */
+	public static final double PS_BLOWER_WATTS = 250_000.0;
+	public static final double PS_BLOW_SECONDS = 2 * 3600.0;
+	public static final double PS_CHARGE_MAX_KG = 4_000.0;           // furnace matte a blow takes at most (proposed: two hours of the furnace's)
+	public static final double PS_CHARGE_MIN_KG = 500.0;             // a blow waits for this much (proposed)
+	public static final double BESSEMER_MATTE_NI = 0.50;
+	public static final double BESSEMER_MATTE_CU = 0.25;
+	public static final double BESSEMER_MATTE_S = 0.20;
+	public static final double PS_MATTE_HOLD_KG = 10_000.0;          // Bessemer matte waiting for bags or the leach (proposed)
+	/** The chlorine leach reactor: about 110 C (unverified), 30 kW at LV, 0.5 t of Bessemer matte an hour (proposed). */
+	public static final double LEACH_WATTS = 30_000.0;
+	public static final double LEACH_MATTE_KGH = 500.0;
+	public static final double LEACH_LIQUOR_HOLD_KG_NI = 500.0;      // nickel in its liquor before it reads FULL (proposed)
+	/** Purification: copper cementation, cobalt by amine SX, iron by oxidation; 40 kW at LV; a 5,000 L kerosene first charge. */
+	public static final double PURIFICATION_WATTS = 40_000.0;
+	public static final double PURIFICATION_KEROSENE_L = 5_000.0;
+	public static final double NI_RECOVERY = 0.95;                   // to the cathode, the rest with the residues (counted)
+	public static final double COPPER_INGOT_KG = 100.0;              // the by-product copper, cast (proposed, as the iron ingot)
+	/** The tankhouse: 18 chloride electrowinning cells in series at 12.3 kA and 3.5 V (textbook, unverified), 95 % current efficiency. */
+	public static final int NI_CELLS = 18;
+	public static final double NI_CELL_KA = 12.3;
+	public static final double NI_CELL_VOLTS = 3.5;
+	public static final double NI_CELL_BACK_EMF = 1.6;               // NiCl2's decomposition voltage (textbook: 1.36 + 0.26 V)
+	public static final double NI_CURRENT_EFFICIENCY = 0.95;
+	public static final double NI_G_PER_AH = 1.095;                  // Faraday: 58.69 g/mol over 2 x 26.8 Ah
+	public static final double NI_CATHODE_HOLD_KG = 3_000.0;         // cathode waiting for bags (proposed)
+
+	// ---- Phase 17b2: the alloy melt shop (docs/multiblocks/nickel-smelter.md; decisions in docs/questions/phase17b-nickel.md) ---------
+	/** The induction furnace: a 2 t coreless medium-frequency furnace, 1.5 MW at MV, PF 0.95 (its inverter's front end), 600 kWh a tonne. */
+	public static final double INDUCTION_WATTS = 1.5e6;
+	public static final double INDUCTION_POWER_FACTOR = 0.95;
+	public static final double INDUCTION_HEAT_KG = 2_000.0;
+	public static final double INDUCTION_KWH_PER_T = 600.0;        // (unverified)
+	/** The AOD: 30 kW at LV; oxygen through its side tuyeres at up to 200 Nm3/h, a third as much nitrogen; carbon down to 0.05 %. */
+	public static final double AOD_WATTS = 30_000.0;
+	public static final double AOD_MAX_O2_NM3H = 200.0;             // (proposed: about 1.7 Nm3 a tonne a minute)
+	public static final double AOD_N2_PER_O2 = 1.0 / 3;             // the blow's mean O2:N2, its first stage's 3:1 (proposed)
+	public static final double AOD_O2_EFFICIENCY = 0.6;             // of the oxygen, the share that burns carbon (proposed)
+	public static final double AOD_FINAL_CARBON = 0.0005;           // 0.05 %, under 304's 0.08 % (proposed)
+	public static final double FERROALLOY_CARBON = 0.07;            // HC ferrochrome's and HC ferromanganese's 7 % C (ferroalloys.md)
+	/** The ingot caster: twenty 100 kg ingots a heat, bottom-poured in 10 minutes (proposed). */
+	public static final double ALLOY_INGOT_KG = 100.0;
+	public static final double CASTER_POUR_SECONDS = 600.0;
+
+	// ---- Phase 19c1: fuel fabrication's inspection, scrap and lubricant (docs/multiblocks/fuel-fabrication-extensions.md) -------------
+	/** Zinc stearate: 5 kg sacks; the granulator's press feed takes 2.5 g a kg of UO2; without it 10 % of the green pellets crack. */
+	public static final double ZINC_STEARATE_SACK_KG = 5.0;
+	public static final double ZINC_STEARATE_G_PER_KG_UO2 = 2.5;
+	public static final double CRACKED_WITHOUT_LUBRICANT = 0.10;
+	/** The pellet inspection bench (10 kW) rejects 1 % of pellets; the rod inspection line (25 kW) 0.5 % of rods. */
+	public static final double PELLET_INSPECTION_WATTS = 10_000.0;
+	public static final double PELLET_REJECT = 0.01;
+	public static final double ROD_INSPECTION_WATTS = 25_000.0;
+	public static final double ROD_REJECT = 0.005;
+	/** An assembly made without an inspection part: a 0.5 % chance of a leaking rod for each one missing (1 % with neither). */
+	public static final double LEAK_CHANCE_PER_MISSING_INSPECTION = 0.005;
+	/** The scrap oxidizer: 30 kW, about 5 kg of U an hour of scrap to U3O8 (proposed), at most 10 % of the granulator's feed. */
+	public static final double SCRAP_OXIDIZER_WATTS = 30_000.0;
+	public static final double SCRAP_OXIDIZER_U_KGH = 5.0;
+	public static final double SCRAP_SHARE_MAX = 0.10;
+	public static final double SCRAP_CAN_KG_U = 5.0;               // a can of scrap: 5 kg of U (proposed)
+
+	// ---- Phase 19c2: HF recovery, IFBA and the real hardware (docs/multiblocks/fuel-fabrication-extensions.md) ----------------------
+	/** The HF recovery condenser: 10 kW at LV; the kiln's HF as 70 % aqueous HF; the HF column takes 0.5 kg of sulfuric acid a kg of HF. */
+	public static final double HF_CONDENSER_WATTS = 10_000.0;
+	public static final double AQUEOUS_HF_STRENGTH = 0.70;
+	public static final double HF_RECOVERY_ACID_PER_HF = 0.5;
+	/** The IFBA coater: 50 kW; about 4 g of zirconium and 5.7 g of boric acid a coated rod (ZrB2, 10 um on 300 pellets; estimate). */
+	public static final double IFBA_COATER_WATTS = 50_000.0;
+	public static final double IFBA_ZR_KG_PER_ROD = 0.004;
+	public static final double IFBA_BORIC_KG_PER_ROD = 0.0057;
+	public static final int[] IFBA_SETTINGS = {0, 32, 64, 104};
+	/** In the reactor: 104 IFBA rods start an assembly 3,000 pcm lower, burning out in a straight line by 12 GWd/t (proposed). */
+	public static final double IFBA_RHO_104 = 0.03;
+	public static final int IFBA_FULL_RODS = 104;
+	public static final double IFBA_BURNOUT_GWD = 12.0;
+	/** The fixture's hardware with the fuelNickelHardware rule: 16 kg of 304 (nozzles) and 4 kg of nickel-chromium alloy. */
+	public static final double ASSEMBLY_304_KG = 16.0;
+	public static final double ASSEMBLY_NICR_KG = 4.0;
+	// ---- Phase 20a: the chlor-alkali plant (docs/multiblocks/chlor-alkali-plant.md) ------------------------------------------------
+	// Every rate follows from these through fluid/ChlorAlkaliPlant.
+	public static final int CAP_ELEMENTS = 52;                     // bipolar membrane elements, two electrolysers in series
+	public static final double CAP_ELEMENT_KA = 15.0;              // kA through each
+	public static final double CAP_ELEMENT_VOLTS = 3.1;            // at 15 kA (zirconium.md): 161 V for 52
+	public static final double CAP_CREEP_VOLTS_PER_DAY = 0.1;      // an element's voltage creep a day on brine that holds calcium (proposed)
+	public static final double CAP_CREEP_MAX_VOLTS = 0.5;          // where the creep stops: the membranes blinded (proposed)
+	public static final double BRINE_NACL = 0.26;                  // saturated brine, NaCl by weight
+	public static final double BRINE_SALT_CA_CO2 = 0.0032;         // kg of CO2 a kg of salt for its calcium as carbonate, with excess (proposed, see questions)
+	public static final double BRINE_SATURATOR_WATTS = 22_000.0;   // its agitator and brine pumps, LV
+	public static final double BRINE_TREATMENT_WATTS = 45_000.0;   // clarifier, filters and IX pumps, LV
+	public static final double BRINE_SALT_HOLD_KG = 4_000.0;       // salt the saturator keeps dissolving (about two rock salt blocks)
+	public static final double BRINE_WATER_HOLD = 6_000.0;         // litres of make-up water the saturator holds
+	public static final double DRYING_ACID_PER_CL2 = 0.015;        // kg of 98 % H2SO4 a kg of chlorine dried (unverified), out as spent 75 % acid
+	public static final double CL2_COMPRESSOR_WATTS = 250_000.0;   // the chlorine compressor, MV (proposed)
+	public static final double CL2_LIQUEFIER_WATTS = 110_000.0;    // the refrigerated liquefier, LV
+	public static final double CL2_LIQUEFIER_KGS = 1_100.0 / 3600; // what the liquefier condenses at most (the cell room's rating with a margin, proposed)
+	public static final double CAUSTIC_50_STRENGTH = 0.50;         // the evaporator's product
+	public static final double CAUSTIC_EVAPORATOR_STEAM = 0.7;     // t of process steam a t of NaOH, double effect (unverified)
+	public static final double HCL_MAX_KGH = 100.0;                // the HCl burner's rating, kg of HCl an hour (proposed)
+	public static final double HCL_STRENGTH = 0.32;                // its acid
+	/** rectifier_mv (shared with 16b2): a 12-pulse thyristor rectifier transformer on distribution voltage, 3.2 MVA, 16 kA, 500 V. */
+	public static final double RECTIFIER_MV_MAX_DC_VOLTS = 500.0;
+	public static final double RECTIFIER_MV_DC_OHMS = 0.3e-3;      // about 1 % of 500 V at 16 kA (proposed, as the 4.16 kV unit)
+	public static final double RECTIFIER_MV_RAMP_VOLTS_PER_S = 50.0; // its tap changer over the wider range (proposed)
+	public static final double BRINE_WELL_INJECT_LPS = 3.0;        // fresh water down the inner string, litres a second (proposed: 1.65 t/h of salt needs about 1.3)
+	public static final int BRINE_CAVERN_REACH = 12;               // blocks from the hole's bottom the cavern can reach (proposed)
+
+	// ---- 16b2: the full-size conversion plant (docs/multiblocks/conversion-extensions.md, "A full-size plant") ---------------------
+	public static final double CONVERSION_LARGE_SCALE = 4.0;      // the large main line's parts: 0.3 kg of U a second, four times the 7d parts
+	public static final int F2_HOUSES_IN_SERIES = 4;               // cell houses on one rectifier_mv: 48 cells, 432 V at 6 kA
+
+	// ---- Phase 20b: the titanium pigment plant (docs/multiblocks/titanium-pigment.md) -------------------------------------------
+	public static final double TI_MINERAL_ITEM_KG = 500.0;         // a bag of ilmenite or rutile out of the mineral separator (proposed)
+	public static final double ILMENITE_TIO2 = 0.50;               // the separator's ilmenite (unverified)
+	public static final double ILMENITE_FE = 0.40;                 // its iron, derived from the spec's 0.12 t/h of pig iron with 0.18 t/h of slag
+	public static final double TI_SLAG_TIO2 = 0.85;                // the smelter's slag
+	public static final double TI_SLAG_FE_RECOVERY = 0.98;         // of the ilmenite's iron to the pig iron (proposed)
+	public static final double TI_SLAG_COKE_PER_ILMENITE = 0.12;   // kg of coke a kg of ilmenite (unverified; anthracite in real plants)
+	public static final double RUTILE_TIO2 = 0.95;                 // the separator's rutile (proposed)
+	public static final double TIO2_TPH = 0.25;                    // t/h of TiO2 pigment (proposed size)
+	public static final double TIO2_COKE_PER_T = 370.0;            // kg of coke a tonne of TiO2 (chloride process)
+	public static final double TIO2_O2_NM3_PER_T = 350.0;          // Nm3 of oxygen a tonne of TiO2
+	public static final double TIO2_CL2_MAKEUP_PER_T = 400.0;      // kg of make-up chlorine a tonne of TiO2 on this blend (proposed, unverified)
+	public static final double TICL4_SICL4_SHARE = 0.005;          // SiCl4 a kg of crude TiCl4, distilled off and counted (proposed)
+	public static final double TI_CHLORINATOR_WATTS = 30_000.0;    // its fluidizing blower, LV
+	public static final double TICL4_PURIFICATION_WATTS = 40_000.0; // the reboiler, LV
+	public static final double TICL4_OXIDISER_GAS_WATTS = 0.2e6;   // its preheaters on pipeline gas (proposed)
+	public static final double VPSA_O2_NM3H = 100.0;               // the VPSA oxygen unit, 93 % O2
+	public static final double VPSA_WATTS = 35_000.0;              // about 0.35 kWh a Nm3 (unverified), LV
+	public static final double O2_KG_PER_M3 = 1.429;               // oxygen at 0 C, 1 atm
+	public static final double PIGMENT_FINISHING_WATTS = 75_000.0; // mills, filters, dryer fans, LV
+	public static final double PIGMENT_HYDRATE_PER_T = 30.0;       // kg of alumina hydrate a tonne of TiO2 for its surface treatment (proposed)
+	public static final double PIGMENT_STEAM_PER_T = 2.0;          // t of process steam a tonne of TiO2 for the micronizer (unverified)
+	public static final double PIGMENT_DYE_PER_BAG = 64;           // white dye a bag of pigment crafts into (proposed)
+
+	// ---- Phase 20c: lithium hydroxide from spodumene (docs/multiblocks/lithium.md) ----------------------------------------------
+	public static final double SPODUMENE_ORE_LI2O = 0.06;          // 80 % spodumene at 7.5 % Li2O (proposed)
+	public static final double LITHIUM_RECOVERY = 0.90;            // of the ore's Li2O to the hydroxide (proposed)
+	public static final double LIOH_TPH = 0.5;                     // t/h of LiOH.H2O (proposed size)
+	public static final double DECREPITATION_J_PER_KG = 1.0e6;     // about 1 GJ a tonne of ore (unverified)
+	public static final double ROAST_ACID_EXCESS = 1.30;           // the acid roast's 30 % excess
+	public static final double ROAST_GAS_WATTS = 0.2e6;            // the roast kiln's indirect firing (proposed)
+	public static final double LEACH_LIME_PER_T_ORE = 20.0;        // kg of quicklime a tonne of ore (proposed)
+	public static final double LEACH_CO2_PER_T_ORE = 2.0;          // kg of CO2 a tonne of ore for the calcium (proposed: 3 m3 of liquor a tonne at 0.6 g/L Ca)
+	public static final double LIOH_STEAM_PER_T = 3.0;             // t of process steam a tonne of LiOH.H2O (unverified)
+	public static final double DECREPITATION_KILN_WATTS = 30_000.0; // drive and fans, LV
+	public static final double ACID_ROAST_KILN_WATTS = 15_000.0;
+	public static final double LITHIUM_LEACH_WATTS = 37_000.0;
+	public static final double LIOH_CRYSTALLIZER_WATTS = 110_000.0;
+	public static final double LITHIUM_CARBONATOR_WATTS = 10_000.0;
+	public static final double LITHIUM_CARBONATOR_KGH = 100.0;     // kg/h of Li2CO3 at most (proposed: "a little carbonate")
+	public static final double POT_LITHIUM_VOLTS = 0.1;            // a pot with lithium in its bath runs this much lower (proposed)
+	public static final double POT_LI2CO3_PER_T_AL = 1.5;          // kg of Li2CO3 a tonne of aluminium (unverified)
 }

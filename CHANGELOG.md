@@ -9,7 +9,7 @@
 - **Sampling autoclave:** signs off 30Bs (SAMPLED, n.nn %) in 30 minutes, or blends two to a chosen assay.
 - **Heels and sampled 30Bs** (the world rule `uf6Cylinders`): the fuel plant takes only sampled 30Bs; emptied 48Ys keep 20 kg and 30Bs
   10 kg, counted when they are filled again.
-- Decisions for review: `docs/questions/phase16-uranium.md` (31-35).
+- Decisions for review: `docs/questions/phase16-uranium.md` (36-40).
 
 ### 17c2: fumed silica, Pidgeon magnesium, chromium (built 2026-11-12 while Tim was away; not approved)
 - **Fumed silica burner:** against the chlorinator, it burns the SiCl4 in hydrogen and oxygen to 25 kg sacks of fumed silica
@@ -39,6 +39,30 @@
 - **Hafnium:** HfCl4 drums (50 kg of Hf) drop under the hafnium column. Sneak-click the Kroll reactor for a hafnium campaign: the line
   follows the hafnium, and the pilger mill's fourth dies roll 3.6 kg hafnium rodlets for hafnium RCCAs.
 - Decisions for review: `docs/questions/phase17c-zirconium.md`.
+### 20c: lithium (built 2026-11-12 while Tim was away; not approved)
+- Lithium hydroxide from spodumene by the sulfate route: a decrepitation kiln, an acid roast kiln, the lithium leach, a LiOH crystallizer
+  (lithium hydroxide and sodium sulfate in 1 t bags) and a lithium carbonator; 0.5 t of LiOH.H2O an hour. A bag of lithium carbonate in a
+  potline pot's hopper runs the pot 0.1 V lower. Spec: `docs/multiblocks/lithium.md`. Existing worlds are unchanged. Decisions:
+  `docs/questions/phase20-chemicals.md` (27-34).
+
+### 20b: titanium pigment (built 2026-11-12 while Tim was away; not approved)
+- The mineral separator puts its ilmenite and rutile out as items to a hopper under it; the submerged arc furnace smelts ilmenite to
+  titanium slag and pig iron; a titanium chlorinator, TiCl4 purification, TiCl4 oxidiser, VPSA oxygen unit and pigment finishing make 0.25 t
+  of TiO2 pigment an hour on a chlorine loop. A bag crafts into 64 white dye. Spec: `docs/multiblocks/titanium-pigment.md`. Existing worlds
+  are unchanged. Decisions: `docs/questions/phase20-chemicals.md` (15-26).
+
+### 16b2: the full-size conversion plant (built 2026-11-12 while Tim was away; not approved)
+- Four fluorine cell houses in series on bus bars from the 12.47 kV rectifier transformer (432 V, 6 kA), and a larger size of the
+  reduction reactor, hydrofluorinator, fluorinator, cold traps and distillation columns, each 0.3 kg of U a second: a 48Y about every 8
+  hours. Spec: `docs/multiblocks/conversion-extensions.md`. Existing conversion plants are unchanged. Decisions:
+  `docs/questions/phase16-uranium.md` (36-40).
+
+### 20a: the chlor-alkali plant (built 2026-11-12 while Tim was away; not approved)
+- A full-size chlor-alkali plant, about a tonne of chlorine an hour: a brine saturator, the brine treatment, a membrane cell room of 52
+  elements at 15 kA and 161 V (2.4 MW of DC) on a new 12.47 kV rectifier transformer, a chlorine train that dries, compresses and
+  liquefies into ton containers, a caustic evaporator (50 % caustic) and an HCl synthesis unit (32 % hydrochloric acid). A brine wellhead
+  solution-mines a salt dome. Spec: `docs/multiblocks/chlor-alkali-plant.md`. Existing worlds are unchanged. Decisions for review:
+  `docs/questions/phase20-chemicals.md`.
 
 ### Time scale (Tim, 2026-11-10, branch `w-timescale`)
 - **A world's time scale:** 1:1, 5:1, 10:1, 20:1 or 50:1. It shortens the long waits only: a real reactor heat-up and cooldown
@@ -64,6 +88,42 @@
   those chunks on the server thread on every solve. Round an area a server had just let go (a player walking away, a game test batch
   finishing) it kept reloading the chunks as fast as they unloaded, which could stall the tick and run the server out of memory.
   Circuits that are loaded solve exactly as before.
+
+### 19c2 (fuel fabrication: HF recovery, IFBA and the real hardware; built 2026-11-12 while Tim was away; not approved)
+- **HF recovery condenser** against the IDR kiln: its HF as 70 % aqueous HF (a new pipe product) for the conversion plant's HF column,
+  which distils it over its kiln's sulfuric acid; the HF kiln then roasts less fluorspar.
+- **IFBA coater** against the rod loader (Zircaloy tubes and boric acid); sneak-click the loader for 0, 32, 64 or 104 IFBA rods an
+  assembly. In the reactor 104 IFBA rods start an assembly 3,000 pcm lower, burning out by 12 GWd/t.
+- New world rule **`fuelNickelHardware`** (on in new worlds, off in existing ones): the assembly fixture takes 304 stainless and
+  nickel-chromium alloy ingots for its hardware, and the rod loader the alloy for its plugs, instead of steel. Field Manual: HF RECOVERY,
+  IFBA AND HARDWARE.
+
+### 19c1 (fuel fabrication: inspection, scrap and lubricant; built 2026-11-12 while Tim was away; not approved)
+- **Pellet inspection bench** between the grinder and the rod loader (1 % of pellets rejected) and **rod inspection line** between the
+  welder and the fixture (X-ray, helium leak test, gamma scan; one rod in 200 rejected); rejects go out as **cans of UO2 scrap**.
+- **Scrap oxidizer** against the granulator: scrap cans to U3O8, blended into the granulator's powder (up to a tenth).
+- **Zinc stearate** (a zinc ingot and an animal fat, `c:animal_fats`; rotten flesh stands in) for the pellet press.
+- New world rule **`fuelLineDefects`** (on in new worlds, off in existing ones): without zinc stearate the press reads NO LUBRICANT and
+  a tenth of its pellets crack to scrap; the grinder's swarf goes out in cans; an assembly made without the inspection parts carries a
+  leak chance (0.5 % each), rolled when it is loaded into a core. Field Manual: FUEL INSPECTION AND SCRAP.
+
+### 17b2 (the alloy melt shop, built 2026-11-12 while Tim was away; not approved)
+- **Induction furnace** (2 t, 1.5 MW at 4.16 kV or 3.3 kV, PF 0.95): melts a heat of the grade set by sneak-click (304, 316 or the
+  nickel-chromium alloy) from bags of HC ferrochrome, cathode nickel, HC ferromanganese and ferromolybdenum and iron ingots by hopper.
+- **AOD converter:** blows the ferrochrome's carbon to 0.05 % with oxygen from PSA oxygen generators against it and piped nitrogen.
+- **Ingot caster:** twenty 100 kg ingots a heat to a hopper under it. New items: 304 and 316 stainless ingots (`c:ingots/stainless_steel`)
+  and nickel-chromium alloy ingots. Field Manual: ALLOY MELT SHOP.
+
+### 17b1 (the nickel smelter and refinery, built 2026-11-12 while Tim was away; not approved)
+- **Nickel smelter:** the fluid-bed roaster takes nickel ore by hopper (or Tailings' concentrate carrying pentlandite) at 2 t/h, its SO2
+  to an acid plant's converter (NO ACID PLANT otherwise); the six-in-line electric furnace on a 17a furnace transformer smelts the
+  calcine at 1 MW into matte; the Peirce-Smith converter blows it to Bessemer matte (50 % Ni) in 2-hour blows, its off-gas to the acid
+  plant too. A furnace transformer now feeds either furnace against it.
+- **Nickel refinery:** the chlorine leach reactor (Bessemer matte by touching or in 1 t bags), the purification circuit (5,000 L of
+  kerosene first; copper cast to copper ingots, cobalt counted) and the tankhouse: 18 chloride cells, 12.3 kA at 63 V DC on a rectifier,
+  about 230 kg of cathode nickel an hour into 1 t bags; its anode chlorine goes back to the leach (no DC: NO CHLORINE).
+- Nickel ore has a use. Field Manual: NICKEL SMELTER, PEIRCE-SMITH CONVERTER, NICKEL REFINERY. Decisions:
+  `docs/questions/phase17b-nickel.md`.
 
 ### phosphate (Phase 18, built 2026-11-10 while Tim was away; not approved)
 - **Fertilizer (18a):** a phosphate mill, a dihydrate phosphoric reactor with its tilting pan filter, an acid evaporator and a granulation

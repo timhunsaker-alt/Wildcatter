@@ -83,6 +83,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "oxygen_generator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.O2_GENERATOR_WATTS);
 				case "cold_traps" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.COLD_TRAP_WATTS);
 				case "distillation_columns" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.REBOILER_WATTS);
+				case "cold_traps_large" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.COLD_TRAP_WATTS * Tuning.CONVERSION_LARGE_SCALE);
+				case "distillation_columns_large" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.REBOILER_WATTS * Tuning.CONVERSION_LARGE_SCALE);
 				case "cylinder_filler" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CYLINDER_FILLER_WATTS);
 				case "hf_kiln" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.HF_KILN_WATTS);
 				case "feed_station" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.FEED_STATION_WATTS);
@@ -109,6 +111,11 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "rod_loader" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ROD_LOADER_WATTS);
 				case "rod_welder" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ROD_WELDER_WATTS);
 				case "assembly_fixture" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ASSEMBLY_FIXTURE_WATTS);
+				case "pellet_inspection" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PELLET_INSPECTION_WATTS);
+				case "rod_inspection" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ROD_INSPECTION_WATTS);
+				case "scrap_oxidizer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.SCRAP_OXIDIZER_WATTS);
+				case "hf_recovery_condenser" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.HF_CONDENSER_WATTS);
+				case "ifba_coater" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.IFBA_COATER_WATTS);
 				case "helium_recovery_unit" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.HELIUM_UNIT_WATTS);
 				case "crdm_head" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CRDM_WATTS);
 				case "pressurizer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PZR_HEATER_WATTS);
@@ -164,6 +171,11 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "emulsion_blender" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.EMULSION_BLENDER_WATTS);
 				case "moly_roaster" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ROASTER_WATTS);
 				case "aluminothermic_vessel" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.VESSEL_FAN_WATTS);
+				case "fluid_bed_roaster" -> new Motor(true, Voltage.MEDIUM, Tuning.NI_ROASTER_WATTS);
+				case "peirce_smith_converter" -> new Motor(true, Voltage.MEDIUM, Tuning.PS_BLOWER_WATTS);
+				case "chlorine_leach_reactor" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LEACH_WATTS);
+				case "ni_purification" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PURIFICATION_WATTS);
+				case "aod_converter" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.AOD_WATTS);
 				case "phosphate_mill" -> new Motor(true, Voltage.MEDIUM, Tuning.PHOSPHATE_MILL_WATTS);
 				case "phosphoric_reactor" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PHOSPHORIC_REACTOR_WATTS);
 				case "tilting_pan_filter" -> new Motor(true, Voltage.MEDIUM, Tuning.PAN_FILTER_WATTS);
@@ -182,6 +194,18 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "bentonite_dryer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BENTONITE_MILL_WATTS);
 				case "mud_hopper" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.MUD_HOPPER_WATTS);
 				case "bop_accumulator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ACCUMULATOR_WATTS);
+				case "brine_saturator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BRINE_SATURATOR_WATTS);
+				case "brine_treatment" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BRINE_TREATMENT_WATTS);
+				case "chlorine_train" -> new Motor(true, Voltage.MEDIUM, Tuning.CL2_COMPRESSOR_WATTS);
+				case "ti_chlorinator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.TI_CHLORINATOR_WATTS);
+				case "ticl4_purification" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.TICL4_PURIFICATION_WATTS);
+				case "vpsa_oxygen" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.VPSA_WATTS);
+				case "pigment_finishing" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PIGMENT_FINISHING_WATTS);
+				case "decrepitation_kiln" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.DECREPITATION_KILN_WATTS);
+				case "acid_roast_kiln" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ACID_ROAST_KILN_WATTS);
+				case "lithium_leach" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LITHIUM_LEACH_WATTS);
+				case "lioh_crystallizer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LIOH_CRYSTALLIZER_WATTS);
+				case "lithium_carbonator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LITHIUM_CARBONATOR_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -231,8 +255,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "precipitation_tank" -> "precipitation agitator";
 			case "drum_filler" -> "drum filler";
 			case "oxygen_generator" -> "oxygen generator's air compressor";
-			case "cold_traps" -> "refrigeration";
-			case "distillation_columns" -> "reboiler";
+			case "cold_traps", "cold_traps_large" -> "refrigeration";
+			case "distillation_columns", "distillation_columns_large" -> "reboiler";
 			case "cylinder_filler" -> "filler";
 			case "hf_kiln" -> "kiln drive";
 			case "feed_station" -> "heater";
@@ -255,6 +279,11 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "rod_loader" -> "loader";
 			case "rod_welder" -> "welding sets";
 			case "assembly_fixture" -> "fixture drives";
+			case "pellet_inspection" -> "conveyor, gauges and cameras";
+			case "rod_inspection" -> "X-ray set, vacuum pumps and scanner";
+			case "scrap_oxidizer" -> "furnace heaters and fan";
+			case "hf_recovery_condenser" -> "condensate pumps and chiller";
+			case "ifba_coater" -> "sputter power supply and vacuum pumps";
 			case "helium_recovery_unit" -> "cold box compressors";
 			case "crdm_head" -> "rod drive power";
 			case "pressurizer" -> "heaters";
@@ -311,6 +340,11 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "emulsion_blender" -> "mixer";
 			case "moly_roaster" -> "rabble drive and fans";
 			case "aluminothermic_vessel" -> "baghouse fan";
+			case "fluid_bed_roaster" -> "fluidizing blower";
+			case "peirce_smith_converter" -> "air blower";
+			case "chlorine_leach_reactor" -> "agitator";
+			case "ni_purification" -> "mixer-settler drives and pumps";
+			case "aod_converter" -> "tilt drive and fume fan";
 			case "phosphate_mill" -> "mill motor";
 			case "phosphoric_reactor" -> "agitators";
 			case "tilting_pan_filter" -> "vacuum pump";
@@ -329,6 +363,18 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "bentonite_dryer" -> "mill and dryer fan";
 			case "mud_hopper" -> "mixing pump";
 			case "bop_accumulator" -> "accumulator pump";
+			case "brine_saturator" -> "agitator and brine pumps";
+			case "brine_treatment" -> "clarifier, filter and IX pumps";
+			case "chlorine_train" -> "chlorine compressor";
+			case "ti_chlorinator" -> "fluidizing blower";
+			case "ticl4_purification" -> "reboiler";
+			case "vpsa_oxygen" -> "blower and vacuum pump";
+			case "pigment_finishing" -> "mills, filters and dryer fans";
+			case "decrepitation_kiln" -> "kiln drive and fans";
+			case "acid_roast_kiln" -> "pug mill and kiln drive";
+			case "lithium_leach" -> "agitators and belt filter";
+			case "lioh_crystallizer" -> "pumps, chiller and centrifuges";
+			case "lithium_carbonator" -> "agitator and pumps";
 			default -> kind();
 		};
 	}

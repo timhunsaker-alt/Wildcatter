@@ -154,7 +154,7 @@ The grid is a sketch; the game test is the layout of record.
   `wildcatter:assay` and the custom data (handled, bent grid, inspected) back onto the drop, and a click reads the standing assembly's
   assay. A standard 4.95 % assembly drops unstamped. NeoForge scene `assembly_assay`.
 
-## As built (16c2, 2026-11-12, branch `w-17c`; decisions in `docs/questions/phase16-uranium.md`, items 31-35)
+## As built (16c2, 2026-11-12, branch `w-17c`; decisions in `docs/questions/phase16-uranium.md`, items 36-40)
 - **Rules:** `centrifugeCrashes` (crashes) and `uf6Cylinders` (sampled 30Bs only at the fuel plant; heels), both on in new worlds.
 - **Crashes** (`CentrifugeBlockEntity.crashCheck`, `crash`; the feed station looks): critical speed 30-60 % for 2 minutes; overspeed over
   1,300 Hz for 15 minutes (nothing commands it yet); 15 minutes without cooling, then a machine a minute; a converter closing onto a

@@ -1,7 +1,7 @@
 # Conversion extensions: cathode hydrogen, the ash bed, KOH regeneration, a full-size plant
 
 > **16b1 BUILT (2026-11-10), decided on recommendation while Tim was away; not approved.** See "As built (16b1)" at the end and
-> `docs/questions/phase16-uranium.md` (items 8-16). **16b2 (the full-size plant) is a written plan, not built.** Drafted as proposed phase
+> `docs/questions/phase16-uranium.md` (items 8-16). **16b2 (the full-size plant) BUILT 2026-11-12**, see "As built (16b2)". Drafted as proposed phase
 > **16b** (16b1 the first three items; 16b2 the full-size plant). Decisions are in `docs/questions/specs-wildcatter.md` (items 27-30).
 
 Four items the conversion spec (conversion.md, approved 2026-11-01) left in ROADMAP Ideas. Each has its real basis and a proposed
@@ -137,3 +137,12 @@ touching the part they serve; any rotation. Removing one returns that part to to
   SPENT stops the hydrofluorinator). Unit test `UraniumOperationsTest` (the hydrogen, lime, CaF2 and 28-hour balances). The chlor-alkali
   cell on potash has no scene yet (it needs DC).
 
+## As built (16b2, 2026-11-12; decisions in `docs/questions/phase16-uranium.md`, items 31-35)
+- **The cells:** four fluorine cell houses in series on DC bus bars from the `rectifier_mv` (built in 20a: distribution tier, up to 500 V and
+  16 kA, its dial at 6 kA): 48 cells, **433 V at 6.00 kA, 2.60 MW** in the scene. No house touches the rectifier (item 34).
+- **The main line:** `reduction_reactor_large`, `hydrofluorinator_large`, `fluorinator_large`, `cold_traps_large` and
+  `distillation_columns_large`, the 7d machines rated four times (0.3 kg of U a second) at twice the height (item 31); the large traps and
+  columns draw 120 and 80 kW (item 32). The existing cylinder filler fills at the rate of the columns it stands against (item 33). A mixed
+  line runs at its slowest part. An existing conversion plant is unchanged.
+- **Tests:** NeoForge `conversion_large` (433 V, 6.00 kA; 0.299 kg of U a second through the large line; a 48Y brought near full by hook
+  fills); unit `ConversionLargeTest` (432 V, 2.6 MW, 0.3 kg/s, a 48Y every 7.8 hours, 9,400 t a year).

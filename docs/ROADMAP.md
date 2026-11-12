@@ -453,8 +453,11 @@ default-off setting or waits until the player adds the new part.
   held 2 minutes, a hot casing past 15 minutes, overspeed, or a converter closing onto them coasting, becoming crashed centrifuges and
   shaking their neighbours (20 %); a SAMPLING AUTOCLAVE signs off 30Bs and blends two to a chosen assay; behind `uf6Cylinders`, the fuel
   plant takes only sampled 30Bs and emptied cylinders keep their heels. NeoForge scene `cascade_crash`; client scene `cascadeCrash`.
-- **Planned, not built (can wait):** **16b2** the full-size conversion plant (four cell houses in series on a 12.47 kV `rectifier_mv`,
-  a second, larger main line); **16d2** monitor-well rings,
+- **16b2, the full-size conversion plant** (`docs/multiblocks/conversion-extensions.md`, BUILT 2026-11-12, branch `w-20`): four cell
+  houses in series on bus bars from the 12.47 kV `rectifier_mv` (433 V, 6 kA, 2.6 MW), a larger main line (reducer, hydrofluorinator,
+  fluorinator, cold traps, columns at 0.3 kg of U a second, twice the height); the filler keeps up. NeoForge scene `conversion_large`;
+  unit test `ConversionLargeTest`. Decisions 31-35.
+- **Planned, not built (can wait):** **16d2** monitor-well rings,
   excursions and groundwater restoration (RO unit). Each is written in its spec.
 - **Known gaps:** script-drawn icons `u3o8_drum_placeholder` (16a), `fluorinator_ash_drum_placeholder` and
   `synthetic_fluorspar_placeholder` (16b1). The chlor-alkali cell on potash has no scene. The cathode scrubber's hydrogen is checked with the
@@ -485,6 +488,19 @@ Spec: `docs/multiblocks/zirconium-extensions.md` ("As built"). Decisions for Tim
   dolime and a PIDGEON FURNACE (0.5 MW of gas) makes 10 kg/h of magnesium, cast into ingots each 12-hour cycle, which the magnesium cell
   takes by hopper; a CHROMATE KILN roasts chromite with caustic to chromic oxide, which the aluminothermic vessel fires to chromium metal
   for the VAR furnace. NeoForge scenes `pidgeon`, `chromium`, `fumed_silica`; client scene `pidgeon`.
+## Phase 17b — Nickel smelter, refinery and alloy melt shop — 17b1 and 17b2 BUILT 2026-11-12 (while Tim was away, on the DRAFT spec decided on recommendation; not approved)
+Spec: `docs/multiblocks/nickel-smelter.md` ("As built"). Decisions for Tim: `docs/questions/phase17b-nickel.md`. Branch `w-17b`.
+- **17b1, the smelter and refinery** (BUILT 2026-11-12): the fluid-bed roaster (2 t/h, 110 kW at MV, its SO2 to an acid plant), the
+  six-in-line nickel electric furnace (1 MW on the 17a furnace transformer), the Peirce-Smith converter (250 kW blower, a 2-hour blow at
+  the world's time scale, Bessemer matte in 1 t bags), the chlorine leach reactor, the purification circuit (kerosene first charge;
+  copper ingots, cobalt counted) and the 18-cell tankhouse (12.3 kA, 63 V DC on a rectifier; 230 kg/h of cathode nickel in 1 t bags).
+  No existing world changes. NeoForge scenes `nickel_smelter`, `nickel_refinery`; unit test `NickelTest`; client scene `nickelSmelter`.
+- **17b2, the alloy melt shop** (BUILT 2026-11-12): the induction furnace (2 t heats, 1.5 MW at MV, PF 0.95), the AOD converter (PSA
+  oxygen and piped nitrogen, carbon to 0.05 %) and the ingot caster: 304, 316 and nickel-chromium alloy (Alloy 600 type) in 100 kg
+  ingots. NeoForge scene `melt_shop`; unit test `MeltShopTest`; the `nickelSmelter` client scene shows the melt shop.
+- **Known gaps:** the Bessemer matte and cathode nickel bag icons and the three ingot icons are `*_placeholder`; no argon (the AOD's
+  low-nitrogen finish) and no Alloy 718 (no niobium); the nickel furnace runs at the transformer's PF
+  0.80 (question 4); copper refining, cobalt metal, precious metals, flash smelting and the Mond process are not built (the spec).
 
 ## Phase 18 — Phosphate — 18a BUILT, 18b first cycle BUILT 2026-11-10 (while Tim was away, on the DRAFT specs decided on recommendation; not approved)
 Specs: `docs/multiblocks/fertilizer.md`, `docs/multiblocks/uranium-from-phosphate.md` ("As built" in each). Decisions for Tim:
@@ -528,7 +544,15 @@ does was a key in `config/wildcatter.properties`, off by default; since 2026-11-
   - not built: containment spray and fan coolers, the relief tank's cover gas and drain tank, a transfer cask vehicle, contamination
     spreading with water;
   - the screen recorder caught only the desktop, so the `reactorContainment` film is made from the scene's own frames.
-- **19c, fuel fabrication extensions** (planned, not built): `docs/multiblocks/fuel-fabrication-extensions.md`. 19c1 pellet inspection,
+- **19c1, inspection, scrap and lubricant** (BUILT 2026-11-12, branch `w-17b`; decisions `docs/questions/phase19c-fuel.md`): the pellet
+  inspection bench, the rod inspection line, the scrap oxidizer, zinc stearate and scrap cans; the leak chance of an uninspected line's
+  assemblies, rolled at loading into 19b's leakers. Behind the new world rule `fuelLineDefects` where it would change a built line.
+  NeoForge scene `fuel_quality`; client scene `fuelInspection`. Known gaps: the sack and can icons are `*_placeholder`.
+- **19c2, HF recovery, IFBA and the real hardware** (BUILT 2026-11-12, branch `w-17b`): the HF recovery condenser (aqueous HF to the
+  conversion plant's HF column), the IFBA coater and the loader's IFBA setting (3,000 pcm at 104 rods, burning out by 12 GWd/t), and
+  304 and nickel-chromium alloy hardware behind the new world rule `fuelNickelHardware` (steel as before in existing worlds). Scene
+  `fuel_hardware`; unit test `ReactorIfbaTest`. Gadolinia is not built (no rare-earth plant).
+- **19c, fuel fabrication extensions** (19c1 and 19c2 BUILT 2026-11-12): `docs/multiblocks/fuel-fabrication-extensions.md`. 19c1 pellet inspection,
   rod X-ray and helium leak tests, scrap and the zinc stearate lubricant; 19c2 HF recovery to the conversion plant, IFBA and gadolinia
   burnable absorbers, real Inconel and stainless hardware (after 17b's nickel smelter). 19c1's leaking rods would feed 19b's coolant
   activity (19b reads leakers from bent grids already).
@@ -565,6 +589,20 @@ Decisions taken while building: `docs/questions/answers-grid.md`. NeoForge scene
 - **Pole transformer by command (18):** a new unit in the default facing turns its back to its pole; built units keep their terminals.
 - **Pit line (12):** the 600 mm `slurry_pipe` (rated 1 m3/s), the decant tower's rate scaling with its cell's floor, the 600 mm `air_header`.
 - **Zircon concentrate (9):** `#wildcatter:zircon_feed` and a kg data file; the chlorinator's hopper takes it.
+
+## Phase 20 — Chemicals — 20a, 20b, 20c BUILT 2026-11-12 (while Tim was away, on the DRAFT specs decided on recommendation; not approved)
+Plan: `docs/ideas-plan.md`, Phase 20. Decisions for Tim: `docs/questions/phase20-chemicals.md`. Branch `w-20`.
+- **20a, the chlor-alkali plant** (`docs/multiblocks/chlor-alkali-plant.md`, BUILT 2026-11-12): brine saturator, brine treatment, a
+  membrane cell room (15 kA, 161 V, 2.4 MW DC) on the new `rectifier_mv` (distribution tier), a chlorine train, a caustic evaporator (50 %),
+  an HCl synthesis unit (32 %), a brine wellhead into a salt dome. NeoForge scenes `chlor_alkali`, `brine_well`; unit test
+  `ChlorAlkaliPlantTest`; client screenshots `chlorAlkali`.
+- **20b, titanium pigment** (`docs/multiblocks/titanium-pigment.md`, BUILT 2026-11-12): the separator's ilmenite and rutile as items (with a
+  hopper under it), a Ti slag recipe on the submerged arc furnace, the titanium chlorinator, TiCl4 purification, TiCl4 oxidiser, VPSA oxygen
+  and pigment finishing, 0.25 t of TiO2 an hour on a chlorine loop. NeoForge scenes `ti_pigment`, `ferroalloys` (extended); unit test
+  `TitaniumPigmentTest`; client screenshots `tiPigment`.
+- **20c, lithium** (`docs/multiblocks/lithium.md`, BUILT 2026-11-12): decrepitation kiln, acid roast kiln, lithium leach, LiOH crystallizer
+  and lithium carbonator, 0.5 t of LiOH.H2O an hour with sodium sulfate bags; a lithium carbonate bag in a potline pot's hopper runs it
+  0.1 V lower. NeoForge scene `lithium`; unit test `LithiumTest`; client screenshots `lithium`.
 
 ## Ideas (not scheduled)
 - **Time scale (Tim, 2026-11-10):** a world setting with presets 1:1, 5:1, 10:1, 20:1 and 50:1 that shortens the long waits (reactor heat-up

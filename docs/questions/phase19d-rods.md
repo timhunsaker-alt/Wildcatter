@@ -51,7 +51,7 @@ recommendation; for Tim. Entries marked **(needs you)** change something outside
 ### 8. Sodium sulfate bags come from the borax dissolver only
 - **Chosen:** the borax dissolver (where the boron plant counts its Na2SO4, 0.57 kg a kg of boric acid) fills 1 t bags at a bagging
   station set against it (`sodium_sulfate_bag`, tagged `c:sodium_sulfate`). An existing dissolver's counted sulfate becomes bags once a
-  station is set against it. Wildcatter has no lithium plant; the chromate kiln (17c2) keeps its sulfate counted.
+  station is set against it. The lithium plant (20c, merged later on `w-next`) bags its sulfate as the same `sodium_sulfate_bag` (one item kept on the merge); the chromate kiln (17c2) keeps its sulfate counted.
 
 ### 9. The bags are dumped through the decant tower
 - **Chosen:** a lined cell's decant tower takes sodium sulfate bags from a hopper on top, or a right-click with one: each adds 1 t to

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "XSX",
+    "S S",
+    "XSX"
+  ],
+  "key": {
+    "X": "wildcatter:reduction_reactor",
+    "S": "wildcatter:steel_ingot"
+  },
+  "result": {
+    "id": "wildcatter:reduction_reactor_large",
+    "count": 1
+  }
+}

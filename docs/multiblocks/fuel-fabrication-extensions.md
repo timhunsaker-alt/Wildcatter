@@ -118,3 +118,30 @@ rotation.
 ## Proposed waves
 - **19c1:** inspection, scrap and lubricant.
 - **19c2:** HF recovery, IFBA, the real hardware (needs 17b2).
+
+## As built
+### 19c1 (2026-11-12, branch `w-17b`; decisions `docs/questions/phase19c-fuel.md`)
+- **Parts:** `pellet_inspection` (2 x 3 x 4, 10 kW, 1 % of the U to scrap), `rod_inspection` (3 x 3 x 10, 25 kW, every 200th rod cut up to
+  scrap), `scrap_oxidizer` (2 x 3 x 4, 30 kW, box north; 5 kg of U an hour of scrap to U3O8, the granulator takes up to a tenth of its
+  feed). The rod loader takes pellets from a touching bench before the grinder; the fixture takes rods from a touching rod line before
+  the welder. Items `zinc_stearate` (5 kg sacks, a zinc ingot and `#c:animal_fats`) and `uo2_scrap_can` (5 kg of U, its assay).
+- **Existing worlds:** cracking, swarf in cans and the leak chance are behind the new world rule `fuelLineDefects` (on in new worlds,
+  off in existing ones). The new parts work in any world once placed.
+- **Leaking rods:** the fixture writes a leak chance on the assembly (0.5 % for each inspection part missing); it is rolled when the
+  assembly is loaded into a core, and a leaker from it counts in 19b's coolant activity from the start.
+- **Test:** `fuel_quality` (a NeoForge scene of its own, not an extension of the `fuel` client scene): NO LUBRICANT and cracked pellets;
+  the oxidizer's U3O8 into the granulator; the bench's 1 %; the rod line's one in 200; a bare line's 1 % leak chance; with zinc
+  stearate nothing cracks. Client scene `fuelInspection` (screenshots).
+### 19c2 (2026-11-12, branch `w-17b`)
+- **Parts:** `hf_recovery_condenser` (2 x 6 x 2, 10 kW, box north; against the IDR kiln, 70 % aqueous HF out the south face of its bottom
+  cells), `ifba_coater` (3 x 3 x 6, 50 kW, box north; against the rod loader, Zircaloy tubes and boric acid by hopper). A new pipe product,
+  aqueous HF (70 %). The conversion plant's HF column takes it on its north face and distils it over its HF kiln's sulfuric acid.
+- **IFBA:** sneak-click on the rod loader (0, 32, 64, 104); the fixture writes the count on the assembly; in the reactor 3,000 pcm at 104
+  rods, burning out in a straight line by 12 GWd/t (`Reactor.ifbaRho`, `ReactorIfbaTest`).
+- **Hardware:** behind the new world rule `fuelNickelHardware` (on in new worlds): the fixture takes 16 kg of 304 and 4 kg of
+  nickel-chromium alloy (NO STAINLESS, NO NICKEL ALLOY), the loader its plugs of the alloy. Off (existing worlds) the line takes steel
+  exactly as before; the spec's "steel stops working" applies only with the rule.
+- **Test:** `fuel_hardware` (a NeoForge scene of its own): the condenser's aqueous HF into a tank and the HF column's recovery; the
+  coater coating the loader's 104 IFBA rods; the loader on nickel alloy; the fixture's 304 and alloy skeleton, and NO STAINLESS on steel;
+  an IFBA assembly 3,000 pcm lower in a vessel. Screenshots in the `fuelInspection` client scene.
+

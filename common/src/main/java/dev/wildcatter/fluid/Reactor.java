@@ -107,6 +107,7 @@ public final class Reactor {
 	double locaKg;
 	// 19b: bent grids and leaking rods by assembly; the coolant's activity, µCi/g dose-equivalent I-131
 	final boolean[] bent = new boolean[Tuning.CORE_ASSEMBLIES];
+	final int[] ifba = new int[Tuning.CORE_ASSEMBLIES];   // 19c2: each assembly's IFBA rods
 	final boolean[] leaking = new boolean[Tuning.CORE_ASSEMBLIES];
 	double activity;
 
@@ -482,12 +483,23 @@ public final class Reactor {
 
 	/** Loads a fresh assembly of this assay (16c1), with or without a bent grid nobody found (19b); false when the core is full. */
 	public boolean loadAssembly(double gwd, double u235, boolean bentGrid) {
+		return loadAssembly(gwd, u235, bentGrid, false);
+	}
+
+	/** As above, with a rod that leaks from the start (19c1: made without inspection). */
+	public boolean loadAssembly(double gwd, double u235, boolean bentGrid, boolean leakingRod) {
+		return loadAssembly(gwd, u235, bentGrid, leakingRod, 0);
+	}
+
+	/** As above, with {@code ifbaRods} rods carrying the IFBA burnable absorber (19c2). */
+	public boolean loadAssembly(double gwd, double u235, boolean bentGrid, boolean leakingRod, int ifbaRods) {
 		if (assemblies >= Tuning.CORE_ASSEMBLIES) {
 			return false;
 		}
+		ifba[assemblies] = Math.max(0, ifbaRods);
 		assay[assemblies] = u235;
 		bent[assemblies] = bentGrid;
-		leaking[assemblies] = false;
+		leaking[assemblies] = leakingRod;
 		burnup[assemblies++] = gwd;
 		return true;
 	}
@@ -501,6 +513,25 @@ public final class Reactor {
 		return assay[i];
 	}
 
+	public int ifba(int i) {
+		return ifba[i];
+	}
+
+	/** The IFBA rods of the last assembly loaded (what a fresh one taken back out carries). */
+	public int lastIfba() {
+		return assemblies == 0 ? 0 : ifba[assemblies - 1];
+	}
+
+	/** Assembly {@code i}'s reactivity: its assay's (16c1), less its burnup, less its IFBA while it lasts (19c2). */
+	public double assemblyRho(int i) {
+		return Enrichment.freshRho(assay[i]) - Tuning.ASSEMBLY_RHO_PER_GWD * burnup[i] - ifbaRho(ifba[i], burnup[i]);
+	}
+
+	/** The IFBA's worth: 3,000 pcm for 104 rods, in proportion, burning out in a straight line by 12 GWd/t. */
+	public static double ifbaRho(int rods, double gwd) {
+		return Tuning.IFBA_RHO_104 * rods / Tuning.IFBA_FULL_RODS * Math.max(0, 1 - gwd / Tuning.IFBA_BURNOUT_GWD);
+	}
+
 	/** Takes the last assembly back out if it is fresh; returns false otherwise. */
 	public boolean unloadFreshAssembly() {
 		if (assemblies == 0 || burnup[assemblies - 1] > 0) {
@@ -508,6 +539,7 @@ public final class Reactor {
 		}
 		assemblies--;
 		bent[assemblies] = false;
+		ifba[assemblies] = 0;
 		return true;
 	}
 
@@ -536,12 +568,14 @@ public final class Reactor {
 		for (int k = i; k < assemblies - 1; k++) {
 			burnup[k] = burnup[k + 1];
 			assay[k] = assay[k + 1];
+			ifba[k] = ifba[k + 1];
 			bent[k] = bent[k + 1];
 			leaking[k] = leaking[k + 1];
 		}
 		assemblies--;
 		burnup[assemblies] = 0;
 		assay[assemblies] = Tuning.ASSAY_PRODUCT;
+		ifba[assemblies] = 0;
 		bent[assemblies] = false;
 		leaking[assemblies] = false;
 		for (int g = 0; g < decay.length; g++) {

@@ -151,3 +151,35 @@ The grids are sketches; the game tests are the layout of record.
 ## Proposed waves
 - **17b1:** roaster, electric furnace, converter, leach, purification, tankhouse.
 - **17b2:** the alloy melt shop, and the fuel plant's hardware (fuel-fabrication-extensions.md, item 3).
+
+## As built
+### 17b1 (2026-11-12, branch `w-17b`; decisions `docs/questions/phase17b-nickel.md`)
+- Built as specified, with these differences and additions:
+  - **Frames:** each part is drawn facing north with its length along z (the electric furnace 6 wide and 12 long, the tankhouse 6 by
+    14); the scenes turn nothing. `nickel_smelter`: the transformer against the furnace's west side, the roaster against its south end,
+    the converter against its east side; `nickel_refinery`: the leach reactor, the tankhouse against its south side, the purification
+    circuit against the east sides of both, the rectifier against the tankhouse's south end.
+  - **Chlorine** comes on the leach reactor's **north** face (the layout's tankhouse takes its east face; question 8). The tankhouse's
+    terminals are on its south end; the purification circuit's motor box on its north face (question 12).
+  - **Numbers added** (each in the questions file): a block of ore is 4 t of feed (1); concentrate counted kg for kg (2); calcine 1 t a
+    tonne of feed (3); the furnace holds its own 1 MW at the transformer's PF 0.80 (4); furnace matte 25 % Ni, slag 0.7 t/t, paste
+    2.5 kg/t, FULL at 10 t (5); a blow 0.5-4 t of furnace matte (6); converter off-gas 0.35 kg of S a kg of Ni (7); leach 0.5 t/h and
+    the buffers (9); the cells' 1.6 V back-EMF (11).
+  - **Readouts:** NO FEED, NO ACID PLANT, FULL, NOT BUILT (with the missing part), NO CHLORINE, NO KEROSENE, NO DC, FROZEN, ELECTRODES SHORT.
+  - The converter's 2-hour blow goes through `TimeScale.scaled`. No existing world changes: every behaviour is in new parts; the
+    furnace transformer finds the new furnace by touching and an SAF against it runs as before.
+  - **Tests:** `nickel_smelter` (the roaster at 2 t/h, its gas made into acid; the furnace at 1.00 MW; a blow; the acid plant's converter
+    broken: NO ACID PLANT) and `nickel_refinery` (12.3 kA at 63.0 V, 230 kg/h; a bag of cathode nickel; the rectifier broken: NO DC and
+    the leach's NO CHLORINE). The blowers' MV comes from diesel and gas sets stepped up through unit substations (the 250 kW blower's
+    start trips a 500 kW diesel set on frequency, so it is on a 1 MW gas set).
+### 17b2 (2026-11-12, branch `w-17b`)
+- Built as specified: the induction furnace (controller, 3 x 3 x 3, 1.5 MW at MV, PF 0.95, box west), the AOD converter (3 x 6 x 3,
+  30 kW, box west) and the ingot caster (2 x 3 x 6), each against the next (the scene runs them along z). The grade is set by sneak-click
+  on the furnace: 304, 316 or the nickel-chromium alloy. Items `stainless_304_ingot`, `stainless_316_ingot`, `nickel_chromium_ingot`.
+- **Differences:** 316 takes 260 kg of FeCr a tonne, not 304's 280 (question 14); the nickel-chromium alloy adds 40 kg of iron to make a
+  tonne (15); the AOD's nitrogen comes on its east face and its oxygen from PSA generators set against it; its gas numbers (17). The
+  caster needs no power (18). Numbers in `fluid/MeltShop` (`MeltShopTest`).
+- **Test:** `melt_shop`: a 304 heat by hopper melts at 1.50 MW; the AOD blows about 49 Nm3/h of oxygen and 16 of nitrogen; twenty 304
+  ingots reach the hopper under the caster. The furnace's melt, the AOD's blow and the caster's pour are shortened by hooks.
+- The fuel plant's hardware (fuel-fabrication-extensions.md, item 3) is built in 19c2.
+

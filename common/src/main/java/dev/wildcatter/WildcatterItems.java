@@ -281,6 +281,51 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> EXTRACTANT_DRUM_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("extractant_drum"));
 	public static final Item EXTRACTANT_DRUM = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(EXTRACTANT_DRUM_KEY),
 			String.format("%.0f kg of DEPA and TOPO, the uranium extractant", Tuning.EXTRACTANT_DRUM_KG), "for the DEPA-TOPO circuit");
+	// Phase 17b1: the nickel smelter and refinery (docs/multiblocks/nickel-smelter.md), each in a 1 t bulk bag
+	public static final ResourceKey<Item> BESSEMER_MATTE_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("bessemer_matte_bag"));
+	public static final Item BESSEMER_MATTE_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(BESSEMER_MATTE_BAG_KEY),
+			String.format("%,.0f kg of Bessemer matte granules (50 %% Ni, 25 %% Cu, 20 %% S)", Tuning.BULK_BAG_KG), "for the nickel refinery's chlorine leach reactor");
+	public static final ResourceKey<Item> NICKEL_CATHODE_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("nickel_cathode_bag"));
+	public static final Item NICKEL_CATHODE_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(NICKEL_CATHODE_BAG_KEY),
+			String.format("%,.0f kg of electrowon cathode nickel (99.9 %% Ni)", Tuning.BULK_BAG_KG), "for 304 and 316 stainless and the nickel-chromium alloy; the alloy melt shop (17b2)");
+	// Phase 17b2: the alloy melt shop's 100 kg ingots
+	public static final ResourceKey<Item> STAINLESS_304_INGOT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("stainless_304_ingot"));
+	public static final Item STAINLESS_304_INGOT = new dev.wildcatter.item.LabelledItem(new Item.Properties().setId(STAINLESS_304_INGOT_KEY),
+			String.format("A %.0f kg ingot of 304 stainless (18 %% Cr, 8 %% Ni)", Tuning.ALLOY_INGOT_KG), "for the fuel assembly's nozzles");
+	public static final ResourceKey<Item> STAINLESS_316_INGOT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("stainless_316_ingot"));
+	public static final Item STAINLESS_316_INGOT = new dev.wildcatter.item.LabelledItem(new Item.Properties().setId(STAINLESS_316_INGOT_KEY),
+			String.format("A %.0f kg ingot of 316 stainless (17 %% Cr, 12 %% Ni, 2.5 %% Mo)", Tuning.ALLOY_INGOT_KG), "for chloride and acid service");
+	public static final ResourceKey<Item> NICKEL_CHROMIUM_INGOT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("nickel_chromium_ingot"));
+	public static final Item NICKEL_CHROMIUM_INGOT = new dev.wildcatter.item.LabelledItem(new Item.Properties().setId(NICKEL_CHROMIUM_INGOT_KEY),
+			String.format("A %.0f kg ingot of nickel-chromium alloy, Alloy 600 type (72 %% Ni, 15.5 %% Cr)", Tuning.ALLOY_INGOT_KG), "for the fuel assembly's end grids, springs and plugs");
+	// Phase 19c1: fuel fabrication's lubricant and scrap
+	public static final ResourceKey<Item> ZINC_STEARATE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("zinc_stearate"));
+	public static final Item ZINC_STEARATE = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(ZINC_STEARATE_KEY),
+			String.format("A %.0f kg sack of zinc stearate, the pellet press's die lubricant", Tuning.ZINC_STEARATE_SACK_KG), "about 30 hours of the fuel line's pellets");
+	public static final ResourceKey<Item> UO2_SCRAP_CAN_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("uo2_scrap_can"));
+	public static final Item UO2_SCRAP_CAN = new dev.wildcatter.item.AssayedItem(new Item.Properties().stacksTo(16).setId(UO2_SCRAP_CAN_KEY),
+			String.format("A can of dry UO2 scrap (cracked pellets, swarf, rejects): %.0f kg of uranium, for the scrap oxidizer", Tuning.SCRAP_CAN_KG_U));
+	// Phase 20b: the titanium pigment plant (docs/multiblocks/titanium-pigment.md)
+	public static final ResourceKey<Item> ILMENITE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("ilmenite"));
+	public static final Item ILMENITE = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(ILMENITE_KEY),
+			String.format("%,.0f kg of ilmenite concentrate (FeTiO3, about %.0f %% TiO2)", Tuning.TI_MINERAL_ITEM_KG, Tuning.ILMENITE_TIO2 * 100), "for the submerged arc furnace's Ti slag");
+	public static final ResourceKey<Item> RUTILE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("rutile"));
+	public static final Item RUTILE = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(RUTILE_KEY),
+			String.format("%,.0f kg of rutile concentrate (about %.0f %% TiO2)", Tuning.TI_MINERAL_ITEM_KG, Tuning.RUTILE_TIO2 * 100), "for the titanium chlorinator");
+	public static final ResourceKey<Item> TI_SLAG_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("ti_slag_bag"));
+	public static final Item TI_SLAG_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(TI_SLAG_BAG_KEY),
+			String.format("%,.0f kg of titanium slag, %.0f %% TiO2", Tuning.BULK_BAG_KG, Tuning.TI_SLAG_TIO2 * 100), "for the titanium chlorinator");
+	public static final ResourceKey<Item> TIO2_PIGMENT_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("tio2_pigment_bag"));
+	public static final Item TIO2_PIGMENT_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(TIO2_PIGMENT_BAG_KEY),
+			String.format("%,.0f kg of titanium dioxide pigment, rutile grade", Tuning.BULK_BAG_KG), "white pigment");
+	// Phase 20c: lithium (docs/multiblocks/lithium.md)
+	public static final ResourceKey<Item> LIOH_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("lioh_bag"));
+	public static final Item LIOH_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(LIOH_BAG_KEY),
+			String.format("%,.0f kg of lithium hydroxide monohydrate (LiOH.H2O)", Tuning.BULK_BAG_KG), "for the lithium carbonator");
+	// sodium_sulfate_bag: the one item, declared with 19d's (the borax dissolver's bags; the lithium plant's too)
+	public static final ResourceKey<Item> LI2CO3_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("li2co3_bag"));
+	public static final Item LI2CO3_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(LI2CO3_BAG_KEY),
+			String.format("%,.0f kg of lithium carbonate (Li2CO3)", Tuning.BULK_BAG_KG), "for a potline pot's bath");
 	// 10c1: blueprints (docs/blueprints.md)
 	public static final ResourceKey<Item> BLUEPRINT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("blueprint"));
 	public static final Item BLUEPRINT = new dev.wildcatter.item.BlueprintItem(new Item.Properties().stacksTo(1).setId(BLUEPRINT_KEY));
@@ -518,10 +563,23 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, SCHEELITE_CONCENTRATE_BAG_KEY, SCHEELITE_CONCENTRATE_BAG);
 		Registry.register(BuiltInRegistries.ITEM, FERROMOLYBDENUM_BAG_KEY, FERROMOLYBDENUM_BAG);
 		Registry.register(BuiltInRegistries.ITEM, FERROTUNGSTEN_BAG_KEY, FERROTUNGSTEN_BAG);
+		Registry.register(BuiltInRegistries.ITEM, BESSEMER_MATTE_BAG_KEY, BESSEMER_MATTE_BAG);
+		Registry.register(BuiltInRegistries.ITEM, NICKEL_CATHODE_BAG_KEY, NICKEL_CATHODE_BAG);
+		Registry.register(BuiltInRegistries.ITEM, STAINLESS_304_INGOT_KEY, STAINLESS_304_INGOT);
+		Registry.register(BuiltInRegistries.ITEM, STAINLESS_316_INGOT_KEY, STAINLESS_316_INGOT);
+		Registry.register(BuiltInRegistries.ITEM, NICKEL_CHROMIUM_INGOT_KEY, NICKEL_CHROMIUM_INGOT);
+		Registry.register(BuiltInRegistries.ITEM, ZINC_STEARATE_KEY, ZINC_STEARATE);
+		Registry.register(BuiltInRegistries.ITEM, UO2_SCRAP_CAN_KEY, UO2_SCRAP_CAN);
 		Registry.register(BuiltInRegistries.ITEM, TSP_BAG_KEY, TSP_BAG);
 		Registry.register(BuiltInRegistries.ITEM, DAP_BAG_KEY, DAP_BAG);
 		Registry.register(BuiltInRegistries.ITEM, MOP_BAG_KEY, MOP_BAG);
 		Registry.register(BuiltInRegistries.ITEM, EXTRACTANT_DRUM_KEY, EXTRACTANT_DRUM);
+		Registry.register(BuiltInRegistries.ITEM, ILMENITE_KEY, ILMENITE);
+		Registry.register(BuiltInRegistries.ITEM, RUTILE_KEY, RUTILE);
+		Registry.register(BuiltInRegistries.ITEM, TI_SLAG_BAG_KEY, TI_SLAG_BAG);
+		Registry.register(BuiltInRegistries.ITEM, TIO2_PIGMENT_BAG_KEY, TIO2_PIGMENT_BAG);
+		Registry.register(BuiltInRegistries.ITEM, LIOH_BAG_KEY, LIOH_BAG);
+		Registry.register(BuiltInRegistries.ITEM, LI2CO3_BAG_KEY, LI2CO3_BAG);
 		Registry.register(BuiltInRegistries.ITEM, BLUEPRINT_KEY, BLUEPRINT);
 		Registry.register(BuiltInRegistries.ITEM, SURVEY_TOOL_KEY, SURVEY_TOOL);
 		Registry.register(BuiltInRegistries.ITEM, GROUNDING_SET_KEY, GROUNDING_SET);

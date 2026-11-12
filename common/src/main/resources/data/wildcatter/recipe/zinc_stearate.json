@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "wildcatter:zinc_ingot",
+    "#c:animal_fats"
+  ],
+  "result": {
+    "id": "wildcatter:zinc_stearate",
+    "count": 1
+  }
+}

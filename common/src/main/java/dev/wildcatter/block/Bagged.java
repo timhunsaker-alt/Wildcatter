@@ -15,4 +15,17 @@ public interface Bagged {
 
 	/** Takes up to {@code kg} for a bag; returns what it gave. */
 	double takeForBag(double kg);
+
+	/** 20c: the bag for the station at {@code station}, for a part with two products, each to its own station; by default the one bag. */
+	default Item bagItem(net.minecraft.core.BlockPos station) {
+		return bagItem();
+	}
+
+	default double bagReady(net.minecraft.core.BlockPos station) {
+		return bagReady();
+	}
+
+	default double takeForBag(net.minecraft.core.BlockPos station, double kg) {
+		return takeForBag(kg);
+	}
 }

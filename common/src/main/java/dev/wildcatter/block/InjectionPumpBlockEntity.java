@@ -33,7 +33,7 @@ import org.joml.Vector3f;
  * a multistage pump barrel, about 10 L/s at 6 MPa. It draws produced water at its suction (the back end) and pushes it out of its
  * discharge (on top, near the thrust chamber) into a disposal wellhead. The motor runs only while there is water and a disposal well.
  */
-public class InjectionPumpBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, BigPartEntity, Kinetic, dev.wildcatter.kinetic.Sounding {
+public class InjectionPumpBlockEntity extends BlockEntity implements CircuitPart, Inspectable, Bondable, BigPartEntity, Kinetic, dev.wildcatter.kinetic.Sounding, WaterUser {
 	private final Motor motor = new Motor(true, Voltage.INDUSTRIAL, Tuning.INJECTION_PUMP_WATTS);
 	private final dev.wildcatter.kinetic.RunningSound running = new dev.wildcatter.kinetic.RunningSound();
 	private final Spin spin = new Spin();
@@ -45,6 +45,27 @@ public class InjectionPumpBlockEntity extends BlockEntity implements CircuitPart
 	private double pumped;
 	private double total;      // litres pumped since placed (the game test reads it)
 	private boolean bleed;     // 16d1: pumping an ISR header house's bleed
+	/** 20a: litres of fresh water a water pump has put in its suction, for a brine wellhead on its discharge. */
+	private double fresh;
+	private boolean brineWell;  // its discharge reaches a brine wellhead (20a): it takes fresh water from a water pump
+	private static final double FRESH_HOLD = 2_000.0;
+
+	/** A water pump fills it only while its discharge reaches a brine wellhead; otherwise it reads full and takes none, as before 20a. */
+	@Override
+	public double waterLevel() {
+		return brineWell ? fresh / FRESH_HOLD : 1.0;
+	}
+
+	@Override
+	public int addWater(int litres) {
+		if (!brineWell) {
+			return 0;
+		}
+		int fits = (int) Math.max(0, Math.min(litres, FRESH_HOLD - fresh));
+		fresh += fits;
+		setChanged();
+		return fits;
+	}
 
 	public double total() {
 		return total;
@@ -115,8 +136,36 @@ public class InjectionPumpBlockEntity extends BlockEntity implements CircuitPart
 			return;
 		}
 		boolean well = false;
+		BrineWellheadBlockEntity brine = null;
 		for (Lines.Line line : Lines.lines(level, pump.discharge())) {
 			well |= line.touches(level, DisposalWellheadBlock.class);
+			for (BlockPos pipe : line.pipes()) {
+				for (Direction side : Direction.values()) {
+					if (brine == null && level.getBlockEntity(pipe.relative(side)) instanceof BrineWellheadBlockEntity head) {
+						brine = head;
+					}
+				}
+			}
+		}
+		pump.brineWell = brine != null;
+		if (brine != null && !well) {   // 20a: solution mining, fresh water down a brine well
+			pump.called = pump.fresh >= 1;
+			pump.wanted = pump.called;
+			double strength = pump.motor.output();
+			pump.pumped = 0;
+			if (!pump.called) {
+				pump.status = "NO WATER: pump fresh water to it (a water pump on its suction) for the brine well";
+			} else if (strength == 0 || pump.motor.reversed()) {
+				pump.status = "pumping nothing: " + pump.motor.describe();
+			} else {
+				double litres = Math.min(pump.fresh, Tuning.BRINE_WELL_INJECT_LPS * Tuning.WELL_INTERVAL / 20.0 * strength);
+				pump.pumped = brine.inject(level, litres);
+				pump.fresh -= pump.pumped;
+				pump.total += pump.pumped;
+				pump.status = String.format("injecting %.2f L/s of fresh water down the brine well, %s", pump.pumped * 20.0 / Tuning.WELL_INTERVAL, pump.motor.describe());
+			}
+			pump.setChanged();
+			return;
 		}
 		double waiting = Lines.available(level, pump.suction(), Product.PRODUCED_WATER, FluidNode.Pull.MACHINE, pump);
 		Product fluid = Product.PRODUCED_WATER;
@@ -206,6 +255,7 @@ public class InjectionPumpBlockEntity extends BlockEntity implements CircuitPart
 		output.putBoolean("leadsSwapped", motor.leadsSwapped());
 		output.putBoolean("grown", grown);
 		output.putBoolean("called", called);
+		output.putDouble("fresh", fresh);
 		output.putFloat("rpm", spin.rpm());
 	}
 
@@ -216,6 +266,7 @@ public class InjectionPumpBlockEntity extends BlockEntity implements CircuitPart
 		motor.setLeadsSwapped(input.getBooleanOr("leadsSwapped", false));
 		grown = input.getBooleanOr("grown", grown);
 		called = input.getBooleanOr("called", false);
+		fresh = input.getDoubleOr("fresh", 0);
 		spin.setRpm(input.getFloatOr("rpm", 0));
 	}
 

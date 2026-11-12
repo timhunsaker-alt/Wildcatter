@@ -322,7 +322,8 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 			return "Reactor vessel: its inspection found a bent grid: straighten it at the assembly fixture first";
 		}
 		boolean ok = rcca ? reactor.loadRcca(hafnium ? dev.wildcatter.fluid.ControlRods.HAFNIUM : dev.wildcatter.fluid.ControlRods.B4C,
-				dev.wildcatter.item.RccaTags.b10(stack)) : reactor.loadAssembly(0, dev.wildcatter.WildcatterComponents.assay(stack), dev.wildcatter.item.FuelAssemblyTags.bent(stack));
+				dev.wildcatter.item.RccaTags.b10(stack)) : reactor.loadAssembly(0, dev.wildcatter.WildcatterComponents.assay(stack), dev.wildcatter.item.FuelAssemblyTags.bent(stack),
+				level != null && dev.wildcatter.item.FuelAssemblyTags.rollLeak(stack, level.getRandom()), dev.wildcatter.item.FuelAssemblyTags.ifbaRods(stack));
 		if (!ok) {
 			return rcca ? "Reactor vessel: all 5 RCCAs are in" : "Reactor vessel: the core is full (9 assemblies)";
 		}
@@ -346,8 +347,12 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 					: dev.wildcatter.item.RccaTags.withB10(new ItemStack(WildcatterItems.RCCA), b10);
 		} else if (reactor.assemblies() > 0 && reactor.burnup(reactor.assemblies() - 1) <= 0) {
 			double a = reactor.lastAssay();
+			int ifbaRods = reactor.lastIfba();
 			reactor.unloadFreshAssembly();
 			out = dev.wildcatter.WildcatterComponents.withAssay(new ItemStack(WildcatterBlocks.FUEL_ASSEMBLY), a);
+			if (ifbaRods > 0) {
+				dev.wildcatter.item.FuelAssemblyTags.setIfbaRods(out, ifbaRods);
+			}
 			if (bentGrid) {
 				dev.wildcatter.item.FuelAssemblyTags.markBent(out);
 			}

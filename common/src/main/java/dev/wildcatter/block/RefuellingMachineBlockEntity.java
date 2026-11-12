@@ -176,8 +176,10 @@ public class RefuellingMachineBlockEntity extends UnitMotorBlockEntity implement
 					// 19b, with the fuel handling damage rule: the crane's move is its one chance of a bent grid, unseen unless inspected
 					dev.wildcatter.item.FuelAssemblyTags.handle(slots.get(0), level.getRandom());
 					boolean bentGrid = dev.wildcatter.item.FuelAssemblyTags.bent(slots.get(0));
+					boolean leakingRod = dev.wildcatter.item.FuelAssemblyTags.rollLeak(slots.get(0), level.getRandom());   // 19c1
+					int ifbaRods = dev.wildcatter.item.FuelAssemblyTags.ifbaRods(slots.get(0));                          // 19c2
 					slots.get(0).shrink(1);
-					r.loadAssembly(0, a, bentGrid);
+					r.loadAssembly(0, a, bentGrid, leakingRod, ifbaRods);
 				}
 				default -> {
 				}

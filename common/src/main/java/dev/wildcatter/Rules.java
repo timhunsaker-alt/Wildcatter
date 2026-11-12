@@ -47,7 +47,11 @@ public final class Rules {
 		/** 16c2: a centrifuge crashes at a critical speed held 2 minutes, a hot casing past 15 minutes, overspeed, or a converter closing onto it coasting. */
 		CENTRIFUGE_CRASHES("centrifugeCrashes", true, "centrifuge crashes: critical speeds, hot casings, overspeed, a converter closing onto coasting machines"),
 		/** 16c2: the fuel plant's autoclave takes only sampled 30Bs, and emptied cylinders keep their heels (48Y 20 kg, 30B 10 kg). */
-		UF6_CYLINDERS("uf6Cylinders", true, "the fuel plant takes only sampled 30Bs; emptied UF6 cylinders keep their heels");
+		UF6_CYLINDERS("uf6Cylinders", true, "the fuel plant takes only sampled 30Bs; emptied UF6 cylinders keep their heels"),
+		/** 19c1: green pellets crack without zinc stearate, scrap comes out in cans, uninspected assemblies may carry a leaking rod. */
+		FUEL_LINE_DEFECTS("fuelLineDefects", true, "pellets crack without zinc stearate, scrap comes out in cans, uninspected assemblies may leak"),
+		/** 19c2: the assembly fixture and the rod loader take 304 stainless and nickel-chromium alloy for the hardware, not steel. */
+		FUEL_NICKEL_HARDWARE("fuelNickelHardware", true, "fuel assemblies take 304 stainless and nickel-chromium alloy hardware, not steel");
 
 		public final String key;
 		public final boolean newWorld;
@@ -190,6 +194,14 @@ public final class Rules {
 
 	public static boolean realResidenceTimes() {
 		return on(Rule.REAL_RESIDENCE_TIMES);
+	}
+
+	public static boolean fuelLineDefects() {
+		return on(Rule.FUEL_LINE_DEFECTS);
+	}
+
+	public static boolean fuelNickelHardware() {
+		return on(Rule.FUEL_NICKEL_HARDWARE);
 	}
 
 	/** How much the reactor's heat-up below no-load temperature is sped up: 80, or with {@code reactorRealHeatup} the world's

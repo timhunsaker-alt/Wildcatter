@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "BFB",
+    "SBS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:hopper",
+    "B": "minecraft:bricks",
+    "F": "minecraft:blast_furnace"
+  },
+  "result": {
+    "id": "wildcatter:fluid_bed_roaster",
+    "count": 1
+  }
+}

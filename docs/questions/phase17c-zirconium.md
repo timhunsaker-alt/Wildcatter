@@ -72,12 +72,10 @@ decided on recommendation; for Tim. Entries marked **(needs you)** change someth
 
 ## 17c2: fumed silica, Pidgeon magnesium, chromium
 
-### 9. Oxygen and hydrochloric acid are new pipe products (needs you)
-- **Chosen:** `oxygen` (a gas, m3) and `hydrochloric acid (32 %)` (kg, stock tanks hold it). Wildcatter had no oxygen product (the ISR
-  oxygen generator doses its injection directly); the brief's "existing oxygen product" does not exist, so the burner takes `OXYGEN`
-  from a pipe and the scene from a stand-in source. The HCl product is declared exactly as the chlor-alkali track (w-20) declares it, so
-  the two merge as one.
-- **For the merge:** the VPSA oxygen unit (titanium-pigment.md, another track) should put out this `OXYGEN`.
+### 9. Oxygen and hydrochloric acid on pipes
+- **Chosen:** the burner takes `OXYGEN` and puts out `HYDROCHLORIC_ACID (32 %)`, the pipe products the titanium pigment and chlor-alkali
+  track (w-20, Phase 20) added: on the merge (2026-11-12) this track's identical declarations were dropped for theirs, so the VPSA unit's
+  93 % oxygen feeds the burner. The scene takes both gases from stand-in sources.
 
 ### 10. Where the fumed silica burner stands
 - **Chosen:** against the chlorinator's east face, one cell south of its front, so the chlorine inlet keeps the front cell (the burner,

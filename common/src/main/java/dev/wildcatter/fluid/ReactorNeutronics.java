@@ -12,7 +12,7 @@ final class ReactorNeutronics {
 		// reactivity and r.kinetics
 		double fuel = 0;
 		for (int i = 0; i < r.assemblies; i++) {
-			fuel += Enrichment.freshRho(r.assay[i]) - Tuning.ASSEMBLY_RHO_PER_GWD * r.burnup[i];   // 16c1: its assay
+			fuel += r.assemblyRho(i);   // 16c1: its assay; 19c2: its IFBA
 		}
 		fuel = r.assemblies == 0 ? -1 : fuel / Tuning.CORE_ASSEMBLIES - (Tuning.CORE_ASSEMBLIES - r.assemblies) * 0.05;
 		double rods = worth(r, 0) * Reactor.inserted(r.bankD);

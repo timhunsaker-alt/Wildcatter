@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "CCC",
+    "CBC",
+    "SRS"
+  ],
+  "key": {
+    "C": "minecraft:copper_ingot",
+    "B": "minecraft:cauldron",
+    "S": "wildcatter:steel_ingot",
+    "R": "minecraft:redstone_block"
+  },
+  "result": {
+    "id": "wildcatter:induction_furnace",
+    "count": 1
+  }
+}

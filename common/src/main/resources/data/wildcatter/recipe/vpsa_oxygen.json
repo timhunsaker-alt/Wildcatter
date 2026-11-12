@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "SXS",
+    "SIS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "X": "minecraft:piston",
+    "I": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:vpsa_oxygen",
+    "count": 1
+  }
+}

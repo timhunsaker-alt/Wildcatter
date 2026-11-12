@@ -3057,6 +3057,242 @@ for tag in ("mineable/pickaxe",):
 	t["values"] += [f"{ns}:{n}" for n in ("slurry_pipe", "air_header", "guy_anchor") if f"{ns}:{n}" not in t["values"]]
 	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
 
+# ---- Phase 17b1: the nickel smelter and refinery (docs/multiblocks/nickel-smelter.md) --------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/nickel.py; here loot, names, tags, recipes and the bags (placeholder icons:
+# the Ludo bulk bag with a swatch of what it holds, as 17a's).
+NICKEL_PARTS = ("fluid_bed_roaster", "nickel_electric_furnace", "peirce_smith_converter", "chlorine_leach_reactor", "ni_purification", "nickel_tankhouse")
+for name in NICKEL_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in NICKEL_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("fluid_bed_roaster", ["SCS", "BFB", "SBS"], {"S": S_, "C": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace"}, "fluid_bed_roaster")
+shaped("nickel_electric_furnace", ["SHS", "BFB", "BBB"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace"}, "nickel_electric_furnace")
+shaped("peirce_smith_converter", ["SBS", "BCB", "SIS"], {"S": S_, "B": "minecraft:bricks", "C": "minecraft:cauldron", "I": "minecraft:iron_block"}, "peirce_smith_converter")
+shaped("chlorine_leach_reactor", ["SGS", "SCS", "SSS"], {"S": S_, "G": "minecraft:glass", "C": "minecraft:cauldron"}, "chlorine_leach_reactor")
+shaped("ni_purification", ["SGS", "CBC", "SSS"], {"S": S_, "G": "minecraft:glass", "C": "minecraft:cauldron", "B": "minecraft:barrel"}, "ni_purification")
+shaped("nickel_tankhouse", ["CCC", "PRP", "SSS"], {"C": "minecraft:copper_ingot", "P": "minecraft:cauldron", "R": "minecraft:redstone_block", "S": S_}, "nickel_tankhouse")
+NICKEL_BAGS = {"bessemer_matte_bag": ("Bulk Bag of Bessemer Matte", (88, 92, 84)), "nickel_cathode_bag": ("Bulk Bag of Cathode Nickel", (196, 198, 190))}
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in NICKEL_BAGS.items():
+	bag = Image.open(f"{ORE_ART}/empty_bulk_bag.png").convert("RGBA")
+	d = ImageDraw.Draw(bag)
+	d.rectangle([10, 13, 21, 22], fill=colour + (255,), outline=(60, 60, 60, 255))
+	d.rectangle([12, 15, 14, 17], fill=tuple(min(255, c + 40) for c in colour) + (255,))
+	bag.save(f"{ASSETS}/textures/item/{item}_placeholder.png")
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}_placeholder"}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.fluid_bed_roaster": "Fluid-Bed Roaster (110 kW)", f"block.{ns}.nickel_electric_furnace": "Nickel Electric Furnace (1 MW, six-in-line)",
+	f"block.{ns}.peirce_smith_converter": "Peirce-Smith Converter", f"block.{ns}.chlorine_leach_reactor": "Chlorine Leach Reactor",
+	f"block.{ns}.ni_purification": "Nickel Liquor Purification", f"block.{ns}.nickel_tankhouse": "Nickel Tankhouse (18 cells, 12.3 kA)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+# ---- Phase 17b2: the alloy melt shop (docs/multiblocks/nickel-smelter.md) -------------------------------------------------------------
+# blockstates, models, shapes and items from tools/models/nickel.py; the three ingots' icons are drawn here: placeholders.
+MELT_PARTS = ("induction_furnace", "aod_converter", "ingot_caster")
+for name in MELT_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in MELT_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("induction_furnace", ["CCC", "CBC", "SRS"], {"C": "minecraft:copper_ingot", "B": "minecraft:cauldron", "S": S_, "R": "minecraft:redstone_block"}, "induction_furnace")
+shaped("aod_converter", ["SBS", "BCB", "SIS"], {"S": S_, "B": "minecraft:bricks", "C": "minecraft:cauldron", "I": "minecraft:iron_bars"}, "aod_converter")
+shaped("ingot_caster", ["I I", "IBI", "SSS"], {"I": "minecraft:iron_ingot", "B": "minecraft:bricks", "S": S_}, "ingot_caster")
+INGOTS = {"stainless_304_ingot": ("304 Stainless Steel Ingot", (186, 190, 196)), "stainless_316_ingot": ("316 Stainless Steel Ingot", (170, 182, 194)),
+	"nickel_chromium_ingot": ("Nickel-Chromium Alloy Ingot", (196, 192, 170))}
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in INGOTS.items():
+	img = Image.new("RGBA", (16, 16))
+	d = ImageDraw.Draw(img)
+	dark = tuple(max(0, c - 60) for c in colour) + (255,)
+	light = tuple(min(255, c + 40) for c in colour) + (255,)
+	d.polygon([(2, 10), (6, 5), (14, 5), (10, 10)], fill=light, outline=dark)        # the ingot's top
+	d.polygon([(2, 10), (10, 10), (10, 13), (2, 13)], fill=colour + (255,), outline=dark)
+	d.polygon([(10, 10), (14, 5), (14, 8), (10, 13)], fill=dark)
+	os.makedirs(f"{ASSETS}/textures/item", exist_ok=True)
+	img.save(f"{ASSETS}/textures/item/{item}_placeholder.png")
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}_placeholder"}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.induction_furnace": "Induction Furnace (2 t, 1.5 MW)", f"block.{ns}.aod_converter": "AOD Converter",
+	f"block.{ns}.ingot_caster": "Ingot Caster (bottom-poured)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+save_json(f"{ROOT}/data/c/tags/item/ingots/stainless_steel.json", {"values": [f"{ns}:stainless_304_ingot", f"{ns}:stainless_316_ingot"]})
+
+# ---- Phase 19c1: fuel fabrication's inspection, scrap and lubricant (docs/multiblocks/fuel-fabrication-extensions.md) ----------------
+# blockstates, models, shapes and items from tools/models/fuel_extensions.py; the sack's and the can's icons are drawn here: placeholders.
+FUEL_X_PARTS = ("pellet_inspection", "rod_inspection", "scrap_oxidizer")
+for name in FUEL_X_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in FUEL_X_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("pellet_inspection", ["GOG", "SRS", "SSS"], {"G": "minecraft:glass_pane", "O": "minecraft:observer", "S": S_, "R": "minecraft:redstone"}, "pellet_inspection")
+shaped("rod_inspection", ["GOG", "SLS", "SSS"], {"G": "minecraft:glass_pane", "O": "minecraft:observer", "S": S_, "L": f"{ns}:lead_ingot"}, "rod_inspection")
+shaped("scrap_oxidizer", ["SBS", "SFS", "SSS"], {"S": S_, "B": "minecraft:bricks", "F": "minecraft:furnace"}, "scrap_oxidizer")
+# zinc stearate: a zinc ingot and an animal fat (c:animal_fats: rotten flesh stands in until a mod's tallow joins the tag)
+shapeless("zinc_stearate", [f"{ns}:zinc_ingot", "#c:animal_fats"], "zinc_stearate")
+save_json(f"{ROOT}/data/c/tags/item/animal_fats.json", {"replace": False, "values": ["minecraft:rotten_flesh"]})
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+def sack(img, d, colour):
+	d.rectangle([4, 4, 11, 14], fill=colour + (255,), outline=(90, 80, 60, 255))     # the paper sack
+	d.rectangle([5, 2, 10, 4], fill=tuple(c - 30 for c in colour) + (255,))           # its folded top
+	d.rectangle([6, 8, 9, 10], fill=(150, 150, 160, 255))                               # its label
+def can(img, d, colour):
+	d.rectangle([4, 3, 11, 14], fill=colour + (255,), outline=(60, 60, 60, 255))       # the steel can
+	d.rectangle([4, 3, 11, 5], fill=(110, 110, 110, 255))                               # its lid
+	d.rectangle([6, 8, 9, 11], fill=(230, 200, 40, 255))                                # its trefoil label
+for item, name, colour, draw in (("zinc_stearate", "Sack of Zinc Stearate", (232, 226, 210), sack), ("uo2_scrap_can", "Can of UO2 Scrap", (150, 156, 160), can)):
+	img = Image.new("RGBA", (16, 16))
+	draw(img, ImageDraw.Draw(img), colour)
+	os.makedirs(f"{ASSETS}/textures/item", exist_ok=True)
+	img.save(f"{ASSETS}/textures/item/{item}_placeholder.png")
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}_placeholder"}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.pellet_inspection": "Pellet Inspection Bench", f"block.{ns}.rod_inspection": "Rod Inspection (X-ray, Helium Leak, Gamma Scan)",
+	f"block.{ns}.scrap_oxidizer": "Scrap Oxidizer"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+# ---- Phase 19c2: HF recovery and IFBA (docs/multiblocks/fuel-fabrication-extensions.md) ------------------------------------------------
+FUEL_X2_PARTS = ("hf_recovery_condenser", "ifba_coater")
+for name in FUEL_X2_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in FUEL_X2_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("hf_recovery_condenser", ["SGS", "SCS", "SBS"], {"S": S_, "G": "minecraft:glass", "C": "minecraft:coal_block", "B": "minecraft:bucket"}, "hf_recovery_condenser")
+shaped("ifba_coater", ["SCS", "GRG", "SSS"], {"S": S_, "C": "minecraft:copper_block", "G": "minecraft:glass", "R": "minecraft:redstone_block"}, "ifba_coater")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({f"block.{ns}.hf_recovery_condenser": "HF Recovery Condenser", f"block.{ns}.ifba_coater": "IFBA Coater (ZrB2 sputter)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+# ---- Phase 20a: the chlor-alkali plant (docs/multiblocks/chlor-alkali-plant.md) --------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/chemicals.py; here loot, names, tags and recipes.
+CHEM_PARTS_20A = ("brine_saturator", "brine_treatment", "membrane_cell_room", "chlorine_train", "caustic_evaporator", "hcl_synthesis_unit", "rectifier_mv")
+for name in CHEM_PARTS_20A:
+	big_part_loot(name)
+big_part_loot_simple("brine_wellhead")
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in CHEM_PARTS_20A + ("brine_wellhead",)]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+S_, P_ = f"{ns}:steel_ingot", f"{ns}:gas_line"
+shaped("brine_saturator", ["SHS", "SXS", "SPS"], {"S": S_, "H": "minecraft:hopper", "X": "minecraft:piston", "P": P_}, "brine_saturator")
+shaped("brine_treatment", ["SPS", "CXC", "SPS"], {"S": S_, "P": P_, "C": "minecraft:cauldron", "X": "minecraft:piston"}, "brine_treatment")
+shaped("membrane_cell_room", ["SPS", "CIC", "SCS"], {"S": S_, "P": P_, "C": "minecraft:copper_block", "I": "minecraft:iron_block"}, "membrane_cell_room")
+shaped("rectifier_mv", ["SCS", "CRC", "SIS"], {"S": S_, "C": "minecraft:copper_block", "R": "minecraft:redstone_block", "I": "minecraft:iron_block"}, "rectifier_mv")
+shaped("chlorine_train", ["SPS", "PXP", "SIS"], {"S": S_, "P": P_, "X": "minecraft:piston", "I": "minecraft:iron_block"}, "chlorine_train")
+shaped("caustic_evaporator", ["SPS", "SCS", "SPS"], {"S": S_, "P": P_, "C": "minecraft:copper_block"}, "caustic_evaporator")
+shaped("hcl_synthesis_unit", ["SPS", "SBS", "SPS"], {"S": S_, "P": P_, "B": "minecraft:blast_furnace"}, "hcl_synthesis_unit")
+shaped("brine_wellhead", [" P ", "SVS", " S "], {"S": S_, "P": P_, "V": "minecraft:lever"}, "brine_wellhead")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({f"block.{ns}.brine_saturator": "Brine Saturator", f"block.{ns}.brine_treatment": "Brine Treatment (controller)",
+	f"block.{ns}.membrane_cell_room": "Membrane Cell Room (52 elements, 15 kA)", f"block.{ns}.chlorine_train": "Chlorine Drying and Liquefaction Train",
+	f"block.{ns}.caustic_evaporator": "Caustic Evaporator (to 50 %)", f"block.{ns}.hcl_synthesis_unit": "HCl Synthesis Unit",
+	f"block.{ns}.rectifier_mv": "Rectifier Transformer (distribution, 3.2 MVA)", f"block.{ns}.brine_wellhead": "Brine Wellhead (solution mining)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+# ---- 16b2: the full-size conversion plant's larger main line (docs/multiblocks/conversion-extensions.md) --------------------------
+# blockstates, models, shapes and items come from tools/models/conversion_large.py; here loot, names, tags and recipes.
+CONV_LARGE = ("reduction_reactor_large", "hydrofluorinator_large", "fluorinator_large", "cold_traps_large", "distillation_columns_large")
+for name in CONV_LARGE:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in CONV_LARGE]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+for name in CONV_LARGE:   # the large size: four of the 7d part and steel
+	small = name[:-len("_large")]
+	shaped(name, ["XSX", "S S", "XSX"], {"X": f"{ns}:{small}", "S": f"{ns}:steel_ingot"}, name)
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({f"block.{ns}.reduction_reactor_large": "Reduction Reactor (large, 0.3 kg U/s)", f"block.{ns}.hydrofluorinator_large": "Hydrofluorinator (large)",
+	f"block.{ns}.fluorinator_large": "Fluorinator (large)", f"block.{ns}.cold_traps_large": "UF6 Cold Traps (large)",
+	f"block.{ns}.distillation_columns_large": "UF6 Distillation Columns (large)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
+# ---- Phase 20b: the titanium pigment plant (docs/multiblocks/titanium-pigment.md) ----------------------------------------------
+# blockstates, models, shapes and items come from tools/models/titanium.py; here loot, names, tags, recipes and the four items. The
+# bags' icons are the Ludo bulk bag with a swatch (placeholders); the separator's ilmenite and rutile the same in a smaller swatch.
+TI_PARTS = ("ti_chlorinator", "ticl4_purification", "ticl4_oxidiser", "vpsa_oxygen", "pigment_finishing")
+for name in TI_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in TI_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+S_, P_ = f"{ns}:steel_ingot", f"{ns}:gas_line"
+shaped("ti_chlorinator", ["SHS", "BFB", "SPS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace", "P": P_}, "ti_chlorinator")
+shaped("ticl4_purification", ["SPS", "SCS", "SPS"], {"S": S_, "P": P_, "C": "minecraft:copper_block"}, "ticl4_purification")
+shaped("ticl4_oxidiser", ["SPS", "BFB", "SPS"], {"S": S_, "P": P_, "B": "minecraft:bricks", "F": "minecraft:furnace"}, "ticl4_oxidiser")
+shaped("vpsa_oxygen", ["SPS", "SXS", "SIS"], {"S": S_, "P": P_, "X": "minecraft:piston", "I": "minecraft:iron_block"}, "vpsa_oxygen")
+shaped("pigment_finishing", ["SHS", "XFX", "SPS"], {"S": S_, "H": "minecraft:hopper", "X": "minecraft:piston", "F": "minecraft:furnace", "P": P_}, "pigment_finishing")
+save_json(f"{DATA}/recipe/white_dye_from_tio2_pigment.json", {"type": "minecraft:crafting_shapeless", "category": "misc",
+	"ingredients": [f"{ns}:tio2_pigment_bag"], "result": {"id": "minecraft:white_dye", "count": 64}})   # the only vanilla use (titanium-pigment.md)
+TI_ITEMS = {"ilmenite": ("Ilmenite Concentrate (500 kg)", (40, 36, 34)), "rutile": ("Rutile Concentrate (500 kg)", (150, 70, 40)),
+	"ti_slag_bag": ("Bulk Bag of Titanium Slag (85 % TiO2)", (70, 70, 74)), "tio2_pigment_bag": ("Bulk Bag of TiO2 Pigment", (246, 246, 244))}
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in TI_ITEMS.items():
+	bag = Image.open(f"{ORE_ART}/empty_bulk_bag.png").convert("RGBA")
+	d = ImageDraw.Draw(bag)
+	d.rectangle([10, 13, 21, 22], fill=colour + (255,), outline=(60, 60, 60, 255))
+	d.rectangle([12, 15, 14, 17], fill=tuple(min(255, c + 40) for c in colour) + (255,))
+	bag.save(f"{ASSETS}/textures/item/{item}_placeholder.png")
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}_placeholder"}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.ti_chlorinator": "Titanium Chlorinator (controller)", f"block.{ns}.ticl4_purification": "TiCl4 Purification",
+	f"block.{ns}.ticl4_oxidiser": "TiCl4 Oxidiser", f"block.{ns}.vpsa_oxygen": "VPSA Oxygen Unit (100 Nm3/h)",
+	f"block.{ns}.pigment_finishing": "Pigment Finishing"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+save_json(f"{ROOT}/data/c/tags/item/pigments/titanium_dioxide.json", {"values": [f"{ns}:tio2_pigment_bag"]})
+
+# ---- Phase 20c: lithium hydroxide from spodumene (docs/multiblocks/lithium.md) -------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/lithium.py; here loot, names, tags, recipes and the three bags (the Ludo
+# bulk bag with a swatch: placeholders).
+LI_PARTS = ("decrepitation_kiln", "acid_roast_kiln", "lithium_leach", "lioh_crystallizer", "lithium_carbonator")
+for name in LI_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in LI_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+S_, P_ = f"{ns}:steel_ingot", f"{ns}:gas_line"
+shaped("decrepitation_kiln", ["SHS", "BFB", "SSS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace"}, "decrepitation_kiln")
+shaped("acid_roast_kiln", ["SPS", "BFB", "SSS"], {"S": S_, "P": P_, "B": "minecraft:bricks", "F": "minecraft:furnace"}, "acid_roast_kiln")
+shaped("lithium_leach", ["SHS", "CXC", "SPS"], {"S": S_, "H": "minecraft:hopper", "C": "minecraft:cauldron", "X": "minecraft:piston", "P": P_}, "lithium_leach")
+shaped("lioh_crystallizer", ["SPS", "SCS", "SXS"], {"S": S_, "P": P_, "C": "minecraft:copper_block", "X": "minecraft:piston"}, "lioh_crystallizer")
+shaped("lithium_carbonator", ["SHS", "SCS", "SPS"], {"S": S_, "H": "minecraft:hopper", "C": "minecraft:cauldron", "P": P_}, "lithium_carbonator")
+LI_BAGS = {"lioh_bag": ("Bulk Bag of Lithium Hydroxide (LiOH.H2O)", (236, 236, 228)), "sodium_sulfate_bag": ("Bulk Bag of Sodium Sulfate", (220, 220, 236)),
+	"li2co3_bag": ("Bulk Bag of Lithium Carbonate", (240, 232, 220))}
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in LI_BAGS.items():
+	bag = Image.open(f"{ORE_ART}/empty_bulk_bag.png").convert("RGBA")
+	d = ImageDraw.Draw(bag)
+	d.rectangle([10, 13, 21, 22], fill=colour + (255,), outline=(60, 60, 60, 255))
+	d.rectangle([12, 15, 14, 17], fill=tuple(max(0, c - 40) for c in colour) + (255,))
+	bag.save(f"{ASSETS}/textures/item/{item}_placeholder.png")
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}_placeholder"}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.decrepitation_kiln": "Decrepitation Kiln (1,050 C)", f"block.{ns}.acid_roast_kiln": "Acid Roast Kiln (250 C)",
+	f"block.{ns}.lithium_leach": "Lithium Leach (controller)", f"block.{ns}.lioh_crystallizer": "LiOH Crystallizer",
+	f"block.{ns}.lithium_carbonator": "Lithium Carbonator"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+save_json(f"{ROOT}/data/c/tags/item/dusts/lithium_hydroxide.json", {"values": [f"{ns}:lioh_bag"]})
+save_json(f"{ROOT}/data/c/tags/item/dusts/lithium_carbonate.json", {"values": [f"{ns}:li2co3_bag"]})
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

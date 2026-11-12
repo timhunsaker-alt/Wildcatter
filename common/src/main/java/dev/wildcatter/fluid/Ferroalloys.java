@@ -18,7 +18,9 @@ public final class Ferroalloys {
 
 	/** What goes into the furnace through the hopper on its top, one bin each. */
 	public enum Charge {
-		CHROMITE("chromitite"), PYROLUSITE("manganese ore"), QUARTZ("quartz"), LIMESTONE("limestone"), COKE("coke"), IRON("iron");
+		CHROMITE("chromitite"), PYROLUSITE("manganese ore"), QUARTZ("quartz"), LIMESTONE("limestone"), COKE("coke"), IRON("iron"),
+		/** 20b: the mineral separator's ilmenite, in 500 kg bags (docs/multiblocks/titanium-pigment.md). New charges go last. */
+		ILMENITE("ilmenite");
 
 		public final String label;
 
@@ -35,6 +37,7 @@ public final class Ferroalloys {
 				case LIMESTONE -> Ore.LIMESTONE.blockKg();
 				case COKE -> Tuning.MET_COKE_KG;
 				case IRON -> Tuning.IRON_INGOT_KG;
+				case ILMENITE -> Tuning.TI_MINERAL_ITEM_KG;
 			};
 		}
 	}
@@ -49,7 +52,14 @@ public final class Ferroalloys {
 		FEMN("HC ferromanganese", "FeMn", "76 % Mn, 7 % C", 2.5, 0.6, Charge.PYROLUSITE, Charge.LIMESTONE,
 				new double[] {0, 1600, 0, 150, 400, 0}),
 		FESI("ferrosilicon 75", "FeSi", "75 % Si", 8.5, 0.03, Charge.QUARTZ, null,
-				new double[] {0, 0, 1800, 0, 900, 250});
+				new double[] {0, 0, 1800, 0, 900, 250}),
+		/**
+		 * 20b (docs/multiblocks/titanium-pigment.md): ilmenite smelted with coke to 85 % TiO2 slag, its iron tapped as pig iron (counted
+		 * apart, cast as iron ingots); the slag is the product, in 1 t bags. 2.2 MWh a tonne of slag.
+		 */
+		TI_SLAG("titanium slag", "Ti slag", "85 % TiO2", 2.2, 0, Charge.ILMENITE, null,
+				new double[] {0, 0, 0, 0, Tuning.TI_SLAG_COKE_PER_ILMENITE * Tuning.TI_SLAG_TIO2 / Tuning.ILMENITE_TIO2 * 1000, 0,
+						Tuning.TI_SLAG_TIO2 / Tuning.ILMENITE_TIO2 * 1000});
 
 		public final String label, shortName, grade;
 		/** MWh a tonne of alloy. */
@@ -73,7 +83,7 @@ public final class Ferroalloys {
 
 		/** kg of {@code charge} a tonne of alloy. */
 		public double kgPerTonne(Charge charge) {
-			return kgPerTonne[charge.ordinal()];
+			return charge.ordinal() < kgPerTonne.length ? kgPerTonne[charge.ordinal()] : 0;
 		}
 
 		/** Joules a kg of alloy. */
@@ -100,6 +110,11 @@ public final class Ferroalloys {
 		public Recipe next() {
 			return values()[(ordinal() + 1) % values().length];
 		}
+	}
+
+	/** kg of pig iron a kg of Ti slag: the ilmenite's iron, reduced (derived; the spec's 0.12 t/h with 0.18 t/h of slag). */
+	public static double pigIronPerSlag() {
+		return Tuning.TI_SLAG_TIO2 / Tuning.ILMENITE_TIO2 * Tuning.ILMENITE_FE * Tuning.TI_SLAG_FE_RECOVERY;
 	}
 
 	// ---- the furnace transformer ------------------------------------------------------------------------------------------------------

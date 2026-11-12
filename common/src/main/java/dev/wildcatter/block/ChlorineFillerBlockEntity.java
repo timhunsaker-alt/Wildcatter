@@ -37,6 +37,11 @@ public class ChlorineFillerBlockEntity extends FillerBlockEntity {
 		return faces(at -> at[2] == 0 && at[1] == 0, Direction.NORTH);
 	}
 
+	/** kg of liquid chlorine it can still take (two containers' worth): 20a's chlorine train liquefies into it. */
+	public double liquidRoom() {
+		return Math.max(0, 2 * Tuning.CL2_TON_KG - chlorine);
+	}
+
 	/** For the game test: liquid chlorine as if liquefied. */
 	public void addChlorine(double kg) {
 		chlorine += kg;

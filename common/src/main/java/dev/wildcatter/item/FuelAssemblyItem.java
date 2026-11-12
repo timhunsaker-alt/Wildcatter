@@ -20,6 +20,13 @@ public class FuelAssemblyItem extends BigPartItem {
 		super.appendHoverText(stack, context, display, tooltip, flag);
 		tooltip.accept(Component.literal(FuelAssemblyBlock.describe(dev.wildcatter.WildcatterComponents.assay(stack))).withStyle(ChatFormatting.GRAY));
 		tooltip.accept(Component.literal("214 mm square, 4.06 m tall: 24 guide thimbles, 1 instrument tube, 8 grids").withStyle(ChatFormatting.GRAY));
+		if (FuelAssemblyTags.ifbaRods(stack) > 0) {
+			tooltip.accept(Component.literal(String.format("%d IFBA rods (ZrB2-coated pellets): a burnable absorber", FuelAssemblyTags.ifbaRods(stack))).withStyle(ChatFormatting.GRAY));
+		}
+		if (FuelAssemblyTags.leakChance(stack) > 0) {
+			tooltip.accept(Component.literal(String.format("Made without full inspection: a %.1f %% chance of a leaking rod", FuelAssemblyTags.leakChance(stack) * 100))
+					.withStyle(ChatFormatting.GOLD));
+		}
 		if (FuelAssemblyTags.inspected(stack)) {
 			tooltip.accept(Component.literal(FuelAssemblyTags.bent(stack) ? "INSPECTED: BENT GRID: straighten it at the assembly fixture" : "INSPECTED: grids and nozzles good")
 					.withStyle(FuelAssemblyTags.bent(stack) ? ChatFormatting.RED : ChatFormatting.GREEN));

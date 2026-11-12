@@ -21,7 +21,7 @@ import org.jspecify.annotations.Nullable;
  * rod with helium at 2 MPa (0.4 L at STP) and TIG-welds its top plug and fill hole, then racks it, up to 264, for the assembly
  * fixture it touches. Helium cylinders come in by a hopper on top; the empties go out to a hopper under it.
  */
-public class RodWelderBlockEntity extends UnitMotorBlockEntity implements HopperFed {
+public class RodWelderBlockEntity extends UnitMotorBlockEntity implements HopperFed, RodSource {
 	private final NonNullList<ItemStack> slots = NonNullList.withSize(3, ItemStack.EMPTY);
 	private double helium;     // m3 left in the cylinder on the manifold
 	private boolean cylinder;
@@ -59,19 +59,34 @@ public class RodWelderBlockEntity extends UnitMotorBlockEntity implements Hopper
 		return slot == 0 && side == Direction.UP && takes(stack);
 	}
 
+	@Override
 	public int rack() {
 		return rack;
 	}
 
 	private double assay = Tuning.ASSAY_PRODUCT;   // 16c1: of the rods in its rack
+	private int ifbaRack;          // 19c2: IFBA rods among them
+	private boolean chamberIfba;   // the rod in the chamber is one
+	private boolean lastIfba;
 
+	@Override
+	public boolean lastTakenIfba() {
+		return lastIfba;
+	}
+
+	@Override
 	public double rodAssay() {
 		return assay;
 	}
 
+	@Override
 	public boolean takeRod() {
 		if (rack <= 0) {
 			return false;
+		}
+		lastIfba = ifbaRack > 0;
+		if (lastIfba) {
+			ifbaRack--;
 		}
 		rack--;
 		setChanged();
@@ -118,6 +133,7 @@ public class RodWelderBlockEntity extends UnitMotorBlockEntity implements Hopper
 		if (progress <= 1e-9) {
 			assay = FuelStage.blend(rack, assay, 1, loader.fuelAssay());   // 16c1
 			loader.takeRod();
+			chamberIfba = loader.lastTakenIfba();
 			progress = 1e-6;
 		}
 		progress += Tuning.FUEL_LINE_U_KGS * 1.2 * seconds() * strength / Fuel.rodU();
@@ -125,6 +141,9 @@ public class RodWelderBlockEntity extends UnitMotorBlockEntity implements Hopper
 			progress = 0;
 			helium -= perRod;
 			rack++;
+			if (chamberIfba) {
+				ifbaRack++;
+			}
 			welded++;
 		}
 		unit = String.format("filling with helium at 2 MPa and welding: rod %.0f %% done; %d in the rack; helium %.2f m3 left", Math.min(progress, 1) * 100, rack, helium);
@@ -151,6 +170,8 @@ public class RodWelderBlockEntity extends UnitMotorBlockEntity implements Hopper
 		output.putDouble("progress", progress);
 		output.putInt("rack", rack);
 		output.putInt("welded", welded);
+		output.putInt("ifbaRack", ifbaRack);
+		output.putBoolean("chamberIfba", chamberIfba);
 	}
 
 	@Override
@@ -164,5 +185,7 @@ public class RodWelderBlockEntity extends UnitMotorBlockEntity implements Hopper
 		progress = input.getDoubleOr("progress", 0);
 		rack = input.getIntOr("rack", 0);
 		welded = input.getIntOr("welded", 0);
+		ifbaRack = input.getIntOr("ifbaRack", 0);
+		chamberIfba = input.getBooleanOr("chamberIfba", false);
 	}
 }

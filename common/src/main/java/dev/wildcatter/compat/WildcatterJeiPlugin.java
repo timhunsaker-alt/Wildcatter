@@ -45,8 +45,26 @@ public class WildcatterJeiPlugin implements IModPlugin {
 		}
 		ingot(registration, "tin", "Smelted from cassiterite. The zirconium plant's VAR furnace alloys it into Zircaloy.");
 		ingot(registration, "lead", "Smelted from galena. No use yet.");
-		ingot(registration, "zinc", "Smelted from sphalerite. No use yet.");
+		ingot(registration, "zinc", "Smelted from sphalerite. With an animal fat (rotten flesh stands in), zinc stearate: the fuel pellet press's die lubricant.");
 		ingot(registration, "silver", "Smelted from acanthite. No use yet.");
+		registration.addItemStackInfo(new ItemStack(WildcatterItems.BESSEMER_MATTE_BAG), Component.literal("Bessemer matte (50 % Ni, 25 % Cu, 20 % S), "
+				+ "blown from the nickel electric furnace's matte in the Peirce-Smith converter and bagged at a bagging station against it. "
+				+ "The nickel refinery's chlorine leach reactor takes it by a hopper on top."));
+		registration.addItemStackInfo(new ItemStack(WildcatterItems.NICKEL_CATHODE_BAG), Component.literal("Cathode nickel, electrowon in the "
+				+ "nickel tankhouse from the chlorine leach's purified liquor and bagged at a bagging station against it. The alloy melt shop "
+				+ "makes 304 and 316 stainless and the nickel-chromium alloy from it."));
+		for (net.minecraft.world.item.Item ingot : new net.minecraft.world.item.Item[] {WildcatterItems.STAINLESS_304_INGOT, WildcatterItems.STAINLESS_316_INGOT, WildcatterItems.NICKEL_CHROMIUM_INGOT}) {
+			registration.addItemStackInfo(new ItemStack(ingot), Component.literal("Cast in the alloy melt shop: the induction furnace melts a 2 t heat of "
+					+ "HC ferrochrome, cathode nickel, HC ferromanganese, ferromolybdenum and iron for the grade set on it, the AOD converter blows its "
+					+ "carbon out with oxygen and nitrogen, and the ingot caster pours twenty 100 kg ingots."));
+		}
+		registration.addItemStackInfo(new ItemStack(WildcatterItems.TIO2_PIGMENT_BAG), Component.literal("Titanium dioxide pigment, rutile grade, from the "
+				+ "titanium pigment plant's finishing. It crafts into white dye."));
+		registration.addItemStackInfo(List.of(new ItemStack(WildcatterItems.ILMENITE), new ItemStack(WildcatterItems.RUTILE)), Component.literal("From the mineral "
+				+ "separator, with a hopper under it. Ilmenite goes to the submerged arc furnace's Ti slag recipe; rutile and the slag to the titanium chlorinator."));
+		registration.addItemStackInfo(new ItemStack(WildcatterItems.LI2CO3_BAG), Component.literal("Lithium carbonate from the lithium carbonator. In a potline "
+				+ "pot's hopper it goes into the bath and the pot runs 0.1 V lower."));
+		registration.addItemStackInfo(new ItemStack(WildcatterItems.SODIUM_SULFATE_BAG), Component.literal("Sodium sulfate from the LiOH crystallizer. No use yet."));
 		registration.addItemStackInfo(new ItemStack(WildcatterItems.MAGNESIA), Component.literal("Caustic-calcined magnesia (MgO), "
 				+ "from magnesite in a furnace. The uranium mill's precipitation tank uses it to precipitate the uranium, and the "
 				+ "magnesia chlorinator turns it into MgCl2 for the magnesium cell."));

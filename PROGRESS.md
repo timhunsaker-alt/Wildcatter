@@ -1457,6 +1457,20 @@ sized for a 40-pot line.
 - Tests: `TimeScaleTest`; `world_rules`, `time_scale_holds`; the Fabric client's Create World check.
 
 ## Known gaps
+- Phase 20c (lithium, 2026-11-12): `lioh_bag_placeholder`, `sodium_sulfate_bag_placeholder` and `li2co3_bag_placeholder` (item icons) are
+  drawn by script; the five parts use the mod's materials. The carbonator takes LiOH bags, not solution; the pot takes its lithium from its
+  own hopper, not the fume treatment centre's; sodium sulfate has no buyer. Not built: lithium from brines or clays, battery-grade
+  polishing, lithium-7 for a PWR, grid batteries (an Idea).
+- Phase 20b (titanium pigment, 2026-11-12): `ilmenite_placeholder`, `rutile_placeholder`, `ti_slag_bag_placeholder` and
+  `tio2_pigment_bag_placeholder` (item icons) are drawn by script; the five parts use the mod's materials. The feed's impurities are not
+  carried as an assay (waste chlorides and SiCl4 are counted from fixed shares); the VPSA oxygen has no other user (no AOD). Not built: the
+  sulfate process, titanium sponge, synthetic rutile.
+- 16b2 (full-size conversion, 2026-11-12): the large parts use the mod's materials; no large cylinder filler or large steam reformer; the
+  large line's cathode gas scrubbers (one a house) are not in the scene.
+- Phase 20a (chlor-alkali, 2026-11-12): the parts use the mod's materials (no Ludo art; no new placeholders). The treatment's own caustic
+  and HCl for the magnesium and the IX regeneration are not drawn; the depleted brine's return is in the balance, not piped; the
+  rectifier_mv is modelled as the diode rectifier's regulation (no thyristor firing angle). Not built: hypochlorite, mercury and
+  diaphragm cells, gas storage in the brine caverns. See `docs/questions/phase20-chemicals.md`.
 - `guy_strand_placeholder` (the guy strand's icon) is drawn by script (2026-11-10, `w-grid`); the guy anchor has no Ludo art yet (it is
   drawn in the mod's galvanized material). A guy is drawn as a straight line.
 - The lean of an overloaded pole is drawn on the pole only (turned about its top cell); guys and spans are not redrawn for it.
@@ -1478,6 +1492,15 @@ sized for a 40-pot line.
   `hafnium_rodlet_placeholder` are drawn by script. The VAR arc stays 20 kW while a 100 kg melt would really draw 100 kW (question 3).
   The scene runs the extrusion press, chlorinator and magnesium cell unpowered, fed by hook; the client `zirconium` scene still runs the
   steady flow (its world has the rule off). Hafnium scrap is counted, not an item.
+- Phase 19c1 (fuel inspection and scrap): `zinc_stearate_placeholder` and `uo2_scrap_can_placeholder` (item icons) are drawn by script;
+  the three parts use the mod's materials. The `fuel` client scene still films the 7g line without the new parts (`fuel_quality` and
+  `fuelInspection` cover them).
+- Phase 17b2 (alloy melt shop): the `stainless_304_ingot`, `stainless_316_ingot` and `nickel_chromium_ingot` icons are script-drawn
+  `*_placeholder`; the three parts use the mod's materials. No argon finish in the AOD, no Alloy 718 (no niobium), no casting losses.
+- Phase 17b1 (nickel smelter and refinery): the `bessemer_matte_bag` and `nickel_cathode_bag` icons are script-drawn `*_placeholder`
+  (the Ludo bulk bag with a swatch); the six parts use the mod's materials. The nickel furnace runs at its transformer's PF 0.80
+  (`docs/questions/phase17b-nickel.md`, 4). Not built (the spec): copper refining beyond ingots, cobalt metal, precious metals, flash
+  smelting, the Mond process.
 - Phase 17a (ferroalloys): the seven bulk bag icons (`ferrochrome_bag`, `ferromanganese_bag`, `ferrosilicon_bag`, `moly_oxide_bag`,
   `scheelite_concentrate_bag`, `ferromolybdenum_bag`, `ferrotungsten_bag`) are script-drawn `*_placeholder` (the Ludo bulk bag with a
   swatch). Not built: an automatic var controller (chromium metal: 17c2), capacitor switching inrush and harmonic
@@ -1969,6 +1992,57 @@ Plan: `docs/ideas-plan.md`. Branch `phase16`. Nothing changes what an existing w
   bin out to a hopper under it. Waits through `TimeScale.scaled`.
 - Items `zircaloy_scrap`, `hfcl4_drum`, `hafnium_rodlet`. Field Manual page BATCHES, SCRAP AND HAFNIUM; JEI pages.
 - Tests: unit `ZirconiumExtensionsTest`; NeoForge scene `zirconium_batches`.
+## Phase 17b1: the nickel smelter and refinery (2026-11-12; built while Tim was away; decisions: `docs/questions/phase17b-nickel.md`)
+- `block/NickelPartBlock` (six parts, true size; `tools/models/nickel.py`), numbers in `fluid/Nickel` (`NickelTest`).
+- **Fluid-bed roaster** (`FluidBedRoasterBlockEntity`, 4 x 10 x 4, 110 kW at MV): nickel ore by hopper (4 t of feed at 12 % Ni an item) or
+  thickened concentrate's pentlandite on its north side; 2 t/h; 420 kg/h of sulfur as burner gas out its south side (NO ACID PLANT).
+- **Nickel electric furnace** (`NickelFurnaceBlockEntity`, 6 x 6 x 12, the smelter's controller): a `TransformerFurnace` on the 17a furnace
+  transformer (which now finds either furnace), 1 MW, 500 kWh a tonne of calcine, furnace matte 25 % Ni; green anodes as paste; NOT BUILT
+  without transformer or roaster; FULL at 10 t of matte; freezes after 4 hours without power.
+- **Peirce-Smith converter** (`PeirceSmithConverterBlockEntity`, 5 x 5 x 10, 250 kW at MV): up to 4 t of furnace matte a blow, 2 hours at
+  the world's time scale, 0.35 kg of sulfur a kg of Ni to the acid plant; Bessemer matte for the leach or a bagging station (1 t bags).
+- **Chlorine leach reactor** (`ChlorineLeachReactorBlockEntity`, 3 x 8 x 3, 30 kW): 0.5 t/h of matte; the tankhouse's chlorine back first,
+  make-up off the pipe on its north side; NO CHLORINE when the tankhouse has no DC.
+- **Purification** (`NiPurificationBlockEntity`, 4 x 4 x 10, 40 kW, box north): 5,000 L kerosene first charge (NO KEROSENE); 95 % of the
+  nickel on, copper ingots out a hopper under it, cobalt carbonate counted.
+- **Nickel tankhouse** (`NickelTankhouseBlockEntity`, 6 x 4 x 14): 18 cells (`DcCell`, 1.6 V back-EMF, 3.5 V at 12.3 kA), terminals on its
+  south end or a rectifier against it; Faraday's 1.095 g/Ah at 95 %: 230 kg/h; cathode nickel bags at a bagging station.
+- Items: `bessemer_matte_bag`, `nickel_cathode_bag`. JEI pages for both; nickel ore's uses. Field Manual: NICKEL SMELTER, PEIRCE-SMITH
+  CONVERTER, NICKEL REFINERY.
+- Tests: `NickelTest` (5); NeoForge `nickel_smelter`, `nickel_refinery`; client `nickelSmelter` (screenshots of the smelter, converter,
+  roaster and refinery).
+
+## Phase 17b2: the alloy melt shop (2026-11-12; built while Tim was away; decisions: `docs/questions/phase17b-nickel.md`, 14-20)
+- **Induction furnace** (`InductionFurnaceBlockEntity`, 3 x 3 x 3, the melt shop's controller): a `FurnaceLoad` at MV, 1.5 MW, PF 0.95;
+  bins for FeCr, nickel, FeMn and FeMo bags and iron ingots by hopper; melts a 2 t heat by energy (1.2 MWh); sneak-click sets the grade.
+- **AOD converter** (`AodConverterBlockEntity`, 3 x 6 x 3, 30 kW): oxygen from touching PSA oxygen generators, nitrogen on its east side
+  (a third of the oxygen), carbon to 0.05 %; NO OXYGEN, NO NITROGEN.
+- **Ingot caster** (`IngotCasterBlockEntity`, 2 x 3 x 6): twenty 100 kg ingots in 10 minutes to a hopper under it.
+- Numbers in `fluid/MeltShop` (`MeltShopTest`, 4). Items `stainless_304_ingot`, `stainless_316_ingot`, `nickel_chromium_ingot`; JEI
+  pages. Field Manual: ALLOY MELT SHOP. NeoForge scene `melt_shop`; client `nickelSmelter` screenshot of the melt shop.
+
+## Phase 19c2: HF recovery, IFBA and the real hardware (2026-11-12; built while Tim was away; decisions: `docs/questions/phase19c-fuel.md`, 9-14)
+- **HF recovery condenser** (`HfRecoveryCondenserBlockEntity`, 10 kW, box north): takes the IDR kiln's HF (`FuelLineBlockEntity.takeKilnHf`,
+  held for it while one touches), 70 % `Product.AQUEOUS_HF` out its south side. `HfColumnBlockEntity` takes aqueous HF on its north face
+  and the acid off its HF kiln's pipe (`HfKilnBlockEntity.takeAcid`), into its anhydrous hold.
+- **IFBA coater** (`IfbaCoaterBlockEntity`, 50 kW, box north) and the rod loader's sneak-click IFBA setting; coated rods carried through
+  welder (`RodSource.lastTakenIfba`), rod line and fixture to the assembly (`FuelAssemblyTags.ifbaRods`); the vessel and the refuelling
+  machine load it (`Reactor.ifba`, saved), `Reactor.assemblyRho` subtracts `ifbaRho`.
+- **Hardware:** world rule `fuelNickelHardware`; the fixture's 304 and alloy slots, the loader's alloy slot.
+- Tests: `ReactorIfbaTest` (3); NeoForge `fuel_hardware`; client `fuelInspection` adds the coater and the condenser.
+
+## Phase 19c1: fuel fabrication's inspection, scrap and lubricant (2026-11-12; built while Tim was away; decisions: `docs/questions/phase19c-fuel.md`)
+- **Pellet inspection** (`PelletInspectionBlockEntity`, a `FuelStage` between grinder and loader, 10 kW, 1 % to scrap), **rod inspection**
+  (`RodInspectionBlockEntity`, a `RodSource` between welder and fixture, 25 kW, every 200th rod to scrap), **scrap oxidizer**
+  (`ScrapOxidizerBlockEntity`, 30 kW, box north; cans by hopper, one assay at a time, 5 kg/h to U3O8 for the granulator, at most 10 %).
+  Models in `tools/models/fuel_extensions.py`.
+- `FuelLineBlockEntity`: the press takes zinc stearate (2.5 g a kg of UO2) and, with `fuelLineDefects`, cracks 10 % without it; press
+  and grinder scrap to cans (`ScrapCans`, a fourth slot for a hopper under them); the loader prefers a touching bench; the granulator
+  blends the oxidizer's U3O8. `AssemblyFixtureBlockEntity` takes a touching rod line first and writes the leak chance
+  (`FuelAssemblyTags.leakChance`), rolled by the vessel and the refuelling machine (`Reactor.loadAssembly(..., leakingRod)`).
+- World rule `fuelLineDefects` (`Rules`). Items `zinc_stearate`, `uo2_scrap_can`; tag `c:animal_fats` (rotten flesh). Field Manual:
+  FUEL INSPECTION AND SCRAP; WORLD RULES lists the rule. Zinc ingot's JEI page and sphalerite's uses name zinc stearate.
+- Tests: NeoForge `fuel_quality`; client `fuelInspection` (screenshots of the bench, the rod line and the oxidizer).
 
 ## Phase 18: phosphate (2026-11-10; built while Tim was away; decisions: `docs/questions/phase18-phosphate.md`)
 - **18a, fertilizer** (`docs/multiblocks/fertilizer.md`): **phosphate mill** (wet ball mill, 200 kW at 4.16 kV; rock by hopper, water,
@@ -2024,7 +2098,7 @@ Spec: `docs/multiblocks/reactor-extensions.md` ("As built", 19b). Branch `phase1
   there, refused by the refuelling machine and the vessel, and straightened at the assembly fixture; loaded unseen, it leaks.
 - **Field Manual:** DRY CASKS; CONTAMINATION AND NEW FUEL.
 - **Tests:** unit `ReactorActivityTest` (3 tests); NeoForge server scenes `casks`, `contamination`, `fuel_inspection`.
-## Phase 16c2: crashes, sampling and blending, heels (2026-11-12; built while Tim was away; decisions: `docs/questions/phase16-uranium.md`, 31-35)
+## Phase 16c2: crashes, sampling and blending, heels (2026-11-12; built while Tim was away; decisions: `docs/questions/phase16-uranium.md`, 36-40)
 - Spec `docs/multiblocks/enrichment-operations.md` items 4-6 ("As built (16c2)"). World rules `centrifugeCrashes`, `uf6Cylinders`.
 - `CentrifugeBlockEntity` crash checks and crash; `CrashedCentrifugeBlockEntity` (`crashed_centrifuge`, 1 x 6 x 1); the feed station counts
   crashes; `SamplingAutoclaveBlockEntity` (`sampling_autoclave`, 3 x 3 x 5, 50 kW); `item/CylinderTags` (sampled, heel); the take-offs,
@@ -2129,3 +2203,47 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
 - The World Rules screen lists rules in two columns sized to the window; with many more mods' rules it would need a scrolling list.
 - No game test makes a new world from the World Rules screen's choices end to end (the test harness's worlds start as existing
   worlds); `RulesData.load` taking `NewWorldSetup` is covered by the unit test of its parts and the client screen check.
+
+## Phase 20a: the chlor-alkali plant (2026-11-12; built while Tim was away; decisions: `docs/questions/phase20-chemicals.md`, 1-14)
+- Spec `docs/multiblocks/chlor-alkali-plant.md` ("As built"). The full-size plant, about a tonne of chlorine an hour: **brine saturator**
+  (22 kW; rock salt by hopper, water by pump, or brine from a well), **brine treatment** (the controller, 45 kW; liquid CO2 for the
+  calcium, else the cell room's voltage creeps), **membrane cell room** (52 elements, 15 kA, 161 V, 2.4 MW of DC), the **rectifier
+  transformer** `rectifier_mv` (distribution tier, 3.2 MVA, 16 kA, 500 V; shared with 16b2), **chlorine train** (drying on sulfuric acid,
+  compressor 250 kW at medium voltage, liquefier 110 kW into a chlorine filler it touches; WET CHLORINE without it), **caustic evaporator**
+  (32 % to 50 % on process steam) and **HCl synthesis unit** (32 % hydrochloric acid, up to 100 kg/h of HCl). The **brine wellhead**
+  solution-mines a salt dome through an injection pump fed fresh water, turning rock salt into a cavern of water.
+- New pipe products: brine, wet chlorine, caustic soda (50 %), hydrochloric acid (32 %). The small chlor-alkali cell is unchanged.
+- **Field Manual:** CHLOR-ALKALI PLANT, CHLORINE, CAUSTIC, HCl, BRINE WELLS. JEI: rock salt's uses name the plant and brine wells.
+- **Tests:** `ChlorAlkaliPlantTest` (3); NeoForge `chlor_alkali`, `brine_well`; client screenshots `chlorAlkali` (plant, cell room, train).
+- **Existing worlds:** unchanged: all new parts; the injection pump takes fresh water only when its discharge reaches a brine wellhead.
+
+## 16b2: the full-size conversion plant (2026-11-12; built while Tim was away; decisions: `docs/questions/phase16-uranium.md`, 36-40)
+- Spec `docs/multiblocks/conversion-extensions.md` ("As built (16b2)"). Four fluorine cell houses in series on DC bus bars from the
+  `rectifier_mv` (433 V, 6 kA, 2.6 MW); the **large reduction reactor, hydrofluorinator, fluorinator, cold traps and distillation
+  columns**, 0.3 kg of U a second at twice the height; the cylinder filler fills at the rate of the columns it stands against. About a 48Y
+  every 8 hours, 9,400 t of U a year. An existing conversion plant is unchanged.
+- **Field Manual:** FULL-SIZE CONVERSION. **Tests:** `ConversionLargeTest` (2); NeoForge `conversion_large`.
+
+## Phase 20b: titanium pigment (2026-11-12; built while Tim was away; decisions: `docs/questions/phase20-chemicals.md`, 15-26)
+- Spec `docs/multiblocks/titanium-pigment.md` ("As built"). The **mineral separator** puts its ilmenite and rutile out as 500 kg items to a
+  hopper under it (without one it counts them, as before). The **submerged arc furnace** has a fourth recipe, **Ti slag** (85 % TiO2 in 1 t
+  bags, 2.2 MWh a tonne), its pig iron cast as iron ingots out of a hopper under it. The chloride process at 0.25 t of TiO2 an hour: the
+  **titanium chlorinator** (controller), **TiCl4 purification**, **TiCl4 oxidiser**, **VPSA oxygen** and **pigment finishing**, the
+  chlorine coming back from the oxidiser and 0.1 t/h of make-up from a chlor-alkali plant. A pigment bag crafts into 64 white dye.
+- New pipe product oxygen (93 %); new items ilmenite, rutile, Ti slag bag, TiO2 pigment bag.
+- **Field Manual:** TITANIUM PIGMENT, THE CHLORINE LOOP. JEI: heavy mineral sand's use; info on the pigment, ilmenite and rutile.
+- **Tests:** `TitaniumPigmentTest` (2); NeoForge `ti_pigment`, `ferroalloys` (extended for Ti slag); client screenshots `tiPigment`.
+- **Existing worlds:** unchanged: the separator changes only with a hopper under it; the furnace's slots keep their numbers.
+
+## Phase 20c: lithium hydroxide (2026-11-12; built while Tim was away; decisions: `docs/questions/phase20-chemicals.md`, 27-34)
+- Spec `docs/multiblocks/lithium.md` ("As built"). The sulfate route from spodumene: **decrepitation kiln** (1,050 C, 0.9 MW of gas),
+  **acid roast kiln** (250 C, sulfuric acid), **lithium leach** (the controller; lime, CO2, residue to a lined tailings cell), **LiOH
+  crystallizer** (caustic and process steam; lithium hydroxide and sodium sulfate, each to its own bagging station), **lithium
+  carbonator** (LiOH bags and CO2 to Li2CO3). 0.5 t of LiOH.H2O an hour. A lithium carbonate bag in a potline pot's hopper runs the pot
+  0.1 V lower while its bath holds it. Spodumene now has a use.
+- New items: lithium hydroxide, sodium sulfate and lithium carbonate bags (tagged `c:dusts/...` for the lithium ones).
+- **Field Manual:** LITHIUM HYDROXIDE, LITHIUM CARBONATE. JEI: spodumene's use; info on the carbonate and sulfate bags.
+- **Tests:** `LithiumTest` (3); NeoForge `lithium`; client screenshots `lithium`.
+- **Existing worlds:** unchanged: a pot changes only once a bag is put in it (its slots keep their numbers); the bagging station's
+  per-station bag defaults to the one bag every earlier part makes.
+

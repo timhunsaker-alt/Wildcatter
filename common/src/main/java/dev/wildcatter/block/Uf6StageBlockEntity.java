@@ -24,7 +24,7 @@ public class Uf6StageBlockEntity extends UnitMotorBlockEntity implements Uranium
 	}
 
 	private boolean traps() {
-		return kind().equals("cold_traps");
+		return ConversionSize.base(this).equals("cold_traps");
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class Uf6StageBlockEntity extends UnitMotorBlockEntity implements Uranium
 	@Override
 	protected void work(Level level) {
 		boolean traps = traps();
-		UraniumStage up = traps ? Touching.find(level, worldPosition, ConversionStageBlockEntity.class, s -> s.getBlockState().getBlock() instanceof dev.wildcatter.multiblock.BigPart p && p.shapeName().equals("fluorinator"))
+		UraniumStage up = traps ? Touching.find(level, worldPosition, ConversionStageBlockEntity.class, s -> ConversionSize.base(s).equals("fluorinator"))
 				: Touching.find(level, worldPosition, Uf6StageBlockEntity.class, Uf6StageBlockEntity::traps);
 		if (up == null) {
 			unit = "NOT BUILT: set it against the " + (traps ? "FLUORINATOR" : "COLD TRAPS");
@@ -53,7 +53,8 @@ public class Uf6StageBlockEntity extends UnitMotorBlockEntity implements Uranium
 			unit = "idle: no UF6 coming";
 			return;
 		}
-		double room = Conversion.uraniumKgs() * Tuning.PLANT_HOLD_SECONDS - uranium;
+		double rate = Conversion.uraniumKgs() * ConversionSize.scale(this);   // 16b2: the large size, four times
+		double room = rate * Tuning.PLANT_HOLD_SECONDS - uranium;
 		if (room <= 1e-7) {
 			unit = "idle: full";
 			return;
@@ -63,7 +64,7 @@ public class Uf6StageBlockEntity extends UnitMotorBlockEntity implements Uranium
 			unit = "starting: " + describe();
 			return;
 		}
-		double kg = up.takeUranium(Math.min(Conversion.uraniumKgs() * 1.2 * seconds() * strength, room));
+		double kg = up.takeUranium(Math.min(rate * 1.2 * seconds() * strength, room));
 		uranium += kg;
 		unit = String.format("%s %.3f kg/s of UF6", traps ? "trapping" : "distilling", kg * Tuning.UF6_PER_U / seconds());
 	}

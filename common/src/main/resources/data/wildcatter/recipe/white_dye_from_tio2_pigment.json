@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "wildcatter:tio2_pigment_bag"
+  ],
+  "result": {
+    "id": "minecraft:white_dye",
+    "count": 64
+  }
+}

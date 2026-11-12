@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "GOG",
+    "SRS",
+    "SSS"
+  ],
+  "key": {
+    "G": "minecraft:glass_pane",
+    "O": "minecraft:observer",
+    "S": "wildcatter:steel_ingot",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "wildcatter:pellet_inspection",
+    "count": 1
+  }
+}

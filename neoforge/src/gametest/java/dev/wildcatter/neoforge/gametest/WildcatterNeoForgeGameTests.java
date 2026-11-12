@@ -51,7 +51,12 @@ public class WildcatterNeoForgeGameTests {
 	private static final String[] GAS_POWER_SCENES = {"sales_gas", "acid_steam", "biogas"};
 
 	/** Phase 17a's scenes (FerroalloyScenes): a peaker and its substation round the furnace, so room round them and time for the turbine. */
-	private static final java.util.Map<String, Consumer<GameTestHelper>> FERRO_SCENES = FerroalloyScenes.scenes();
+	private static final java.util.Map<String, Consumer<GameTestHelper>> FERRO_SCENES = new java.util.LinkedHashMap<>(FerroalloyScenes.scenes());
+	static {
+		FERRO_SCENES.putAll(NickelScenes.scenes());   // Phase 17b: the nickel smelter, refinery and melt shop, as big as the ferroalloy scenes
+	}
+	/** Phase 20's scenes (ChemicalScenes): a peaker and its substation round the plant, as the ferroalloys scene. */
+	private static final java.util.Map<String, Consumer<GameTestHelper>> CHEM_SCENES = ChemicalScenes.scenes();
 	/** Phase 15's oilfield scenes (OilfieldScenes): spread out round a dome or a land rig, so each gets room, and long, for the drilling. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> OILFIELD_SCENES = OilfieldScenes.scenes();
 
@@ -76,6 +81,8 @@ public class WildcatterNeoForgeGameTests {
 
 	/** Phase 19's reactor scenes (ReactorExtensionScenes): a scene that switches a reactor rule on runs in a batch of its own. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> REACTOR_SCENES = ReactorExtensionScenes.scenes();
+	/** Phase 19c's scenes (FuelExtensionScenes): each switches its rule on, so each in a batch of its own. */
+	private static final java.util.Map<String, Consumer<GameTestHelper>> FUEL_X_SCENES = FuelExtensionScenes.scenes();
 
 	/** WILDCATTER_ONLY=a,b registers just those scenes while working on them; unset, every scene runs (as the Fabric client test). */
 	private static boolean only(String scene) {
@@ -141,7 +148,9 @@ public class WildcatterNeoForgeGameTests {
 			helper.register(id("phosphate_auc"), (Consumer<GameTestHelper>) PhosphateScenes::phosphateAuc);
 			GRID_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			FERRO_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
+			CHEM_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			REACTOR_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
+			FUEL_X_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			OILFIELD_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			RULE_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			RESIDENCE_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
@@ -166,6 +175,11 @@ public class WildcatterNeoForgeGameTests {
 			if (only("ring_travel")) event.registerTest(id("ring_travel"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id("ring_travel")),
 					new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 3000, 1, true,
 							net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 240)));
+			for (String scene : CHEM_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
+				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
+						new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 6000, 1, true,
+								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 120)));
+			}
 			for (String scene : FERRO_SCENES.keySet()) {
 				if (!only(scene)) {
 					continue;
@@ -214,6 +228,11 @@ public class WildcatterNeoForgeGameTests {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
 						new TestData<>(env, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 4000, 1, true,
 								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 40)));
+			}
+			for (String scene : FUEL_X_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
+				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
+						new TestData<>(event.registerEnvironment(id("rules_" + scene)), net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 4000, 1, true,
+								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 60)));
 			}
 			for (String scene : GAS_POWER_SCENES) {
 				if (!only(scene)) {
