@@ -160,6 +160,10 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "emulsion_blender" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.EMULSION_BLENDER_WATTS);
 				case "moly_roaster" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ROASTER_WATTS);
 				case "aluminothermic_vessel" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.VESSEL_FAN_WATTS);
+				case "fluid_bed_roaster" -> new Motor(true, Voltage.MEDIUM, Tuning.NI_ROASTER_WATTS);
+				case "peirce_smith_converter" -> new Motor(true, Voltage.MEDIUM, Tuning.PS_BLOWER_WATTS);
+				case "chlorine_leach_reactor" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LEACH_WATTS);
+				case "ni_purification" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PURIFICATION_WATTS);
 				case "phosphate_mill" -> new Motor(true, Voltage.MEDIUM, Tuning.PHOSPHATE_MILL_WATTS);
 				case "phosphoric_reactor" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PHOSPHORIC_REACTOR_WATTS);
 				case "tilting_pan_filter" -> new Motor(true, Voltage.MEDIUM, Tuning.PAN_FILTER_WATTS);
@@ -303,6 +307,10 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "emulsion_blender" -> "mixer";
 			case "moly_roaster" -> "rabble drive and fans";
 			case "aluminothermic_vessel" -> "baghouse fan";
+			case "fluid_bed_roaster" -> "fluidizing blower";
+			case "peirce_smith_converter" -> "air blower";
+			case "chlorine_leach_reactor" -> "agitator";
+			case "ni_purification" -> "mixer-settler drives and pumps";
 			case "phosphate_mill" -> "mill motor";
 			case "phosphoric_reactor" -> "agitators";
 			case "tilting_pan_filter" -> "vacuum pump";

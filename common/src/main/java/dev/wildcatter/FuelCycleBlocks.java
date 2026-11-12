@@ -150,6 +150,13 @@ public interface FuelCycleBlocks {
 	Block POTASH_DRYER = phosphatePart(dev.wildcatter.block.PhosphatePartBlock.Part.POTASH_DRYER);
 	Block ACID_PRETREATMENT = phosphatePart(dev.wildcatter.block.PhosphatePartBlock.Part.ACID_PRETREATMENT);
 	Block DEPA_TOPO_CIRCUIT = phosphatePart(dev.wildcatter.block.PhosphatePartBlock.Part.DEPA_TOPO_CIRCUIT);
+	// Phase 17b1: the nickel smelter and refinery (docs/multiblocks/nickel-smelter.md)
+	Block FLUID_BED_ROASTER = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.FLUID_BED_ROASTER);
+	Block NICKEL_ELECTRIC_FURNACE = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.NICKEL_ELECTRIC_FURNACE);
+	Block PEIRCE_SMITH_CONVERTER = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.PEIRCE_SMITH_CONVERTER);
+	Block CHLORINE_LEACH_REACTOR = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.CHLORINE_LEACH_REACTOR);
+	Block NI_PURIFICATION = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.NI_PURIFICATION);
+	Block NICKEL_TANKHOUSE = nickelPart(dev.wildcatter.block.NickelPartBlock.Part.NICKEL_TANKHOUSE);
 	// 10c2: the cranes (docs/multiblocks/tower-crane.md, crawler-crane.md)
 	Block TOWER_CRANE = cranePart(dev.wildcatter.block.CranePartBlock.Part.TOWER_CRANE);
 	Block CRAWLER_CRANE = cranePart(dev.wildcatter.block.CranePartBlock.Part.CRAWLER_CRANE);

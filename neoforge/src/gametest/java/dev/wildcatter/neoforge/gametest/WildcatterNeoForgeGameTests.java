@@ -51,7 +51,10 @@ public class WildcatterNeoForgeGameTests {
 	private static final String[] GAS_POWER_SCENES = {"sales_gas", "acid_steam", "biogas"};
 
 	/** Phase 17a's scenes (FerroalloyScenes): a peaker and its substation round the furnace, so room round them and time for the turbine. */
-	private static final java.util.Map<String, Consumer<GameTestHelper>> FERRO_SCENES = FerroalloyScenes.scenes();
+	private static final java.util.Map<String, Consumer<GameTestHelper>> FERRO_SCENES = new java.util.LinkedHashMap<>(FerroalloyScenes.scenes());
+	static {
+		FERRO_SCENES.putAll(NickelScenes.scenes());   // Phase 17b: the nickel smelter, refinery and melt shop, as big as the ferroalloy scenes
+	}
 	/** Phase 15's oilfield scenes (OilfieldScenes): spread out round a dome or a land rig, so each gets room, and long, for the drilling. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> OILFIELD_SCENES = OilfieldScenes.scenes();
 

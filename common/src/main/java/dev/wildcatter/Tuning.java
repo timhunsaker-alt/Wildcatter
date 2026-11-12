@@ -1533,4 +1533,52 @@ public final class Tuning {
 	public static final int VESSEL_FEMO_ALUMINIUM = 20;             // aluminium ingots a batch (454 kg: 0.53 t a tonne of alloy)
 	public static final int VESSEL_FEW_IRON = 1;
 	public static final int VESSEL_FEW_ALUMINIUM = 8;               // 182 kg: 0.3 t a 1.04 t of WO3
+
+	// ---- Phase 17b1: the nickel smelter and refinery (docs/multiblocks/nickel-smelter.md; decisions in docs/questions/phase17b-nickel.md) ----
+	/** A block of nickel ore (its 60 % nickel sulfides at a concentrate grade): about 4 t (unverified density), 12 % Ni, 4 % Cu, 0.4 % Co. */
+	public static final double NICKEL_ORE_KG = 4_000.0;
+	public static final double NICKEL_FEED_NI = 0.12;
+	public static final double NICKEL_FEED_CU = 0.04;
+	public static final double NICKEL_FEED_CO = 0.004;
+	public static final double NICKEL_FEED_S = 0.30;                // (unverified)
+	/** The fluid-bed roaster: 2 t of feed an hour at about 700 C, 70 % of the sulfur to the acid plant as SO2; its blower 110 kW at MV. */
+	public static final double NI_ROASTER_FEED_KGH = 2_000.0;
+	public static final double NI_ROASTER_WATTS = 110_000.0;
+	public static final double NI_ROASTER_S_TO_GAS = 0.70;
+	public static final double NI_ROASTER_CALCINE_HOLD_KG = 8_000.0;   // calcine waiting for the furnace (proposed)
+	public static final double NI_ROASTER_SLURRY_HOLD_KG = 2_000.0;    // concentrate in its feed tank (proposed)
+	/** The electric furnace: 500 kWh a tonne of calcine (unverified), 1 MW off the furnace transformer; furnace matte 25 % Ni (proposed). */
+	public static final double NI_FURNACE_WATTS = 1.0e6;
+	public static final double NI_FURNACE_KWH_PER_T = 500.0;
+	public static final double NI_FURNACE_MATTE_NI = 0.25;
+	public static final double NI_FURNACE_MATTE_HOLD_KG = 10_000.0;    // matte in its hearth before it reads FULL (proposed)
+	public static final double NI_FURNACE_PASTE_KG_PER_T = 2.5;        // Soderberg paste a tonne of calcine (proposed)
+	public static final double NI_FURNACE_ELECTRODE_PASTE_KG = 2_000.0; // paste in its six columns (proposed, as the SAF's)
+	public static final double NI_FURNACE_SLAG_PER_T = 0.7;            // t of slag a tonne of calcine (proposed)
+	/** The Peirce-Smith converter: a blow every 2 hours; its air blower 250 kW at MV; Bessemer matte 50 % Ni, 25 % Cu, 20 % S. */
+	public static final double PS_BLOWER_WATTS = 250_000.0;
+	public static final double PS_BLOW_SECONDS = 2 * 3600.0;
+	public static final double PS_CHARGE_MAX_KG = 4_000.0;           // furnace matte a blow takes at most (proposed: two hours of the furnace's)
+	public static final double PS_CHARGE_MIN_KG = 500.0;             // a blow waits for this much (proposed)
+	public static final double BESSEMER_MATTE_NI = 0.50;
+	public static final double BESSEMER_MATTE_CU = 0.25;
+	public static final double BESSEMER_MATTE_S = 0.20;
+	public static final double PS_MATTE_HOLD_KG = 10_000.0;          // Bessemer matte waiting for bags or the leach (proposed)
+	/** The chlorine leach reactor: about 110 C (unverified), 30 kW at LV, 0.5 t of Bessemer matte an hour (proposed). */
+	public static final double LEACH_WATTS = 30_000.0;
+	public static final double LEACH_MATTE_KGH = 500.0;
+	public static final double LEACH_LIQUOR_HOLD_KG_NI = 500.0;      // nickel in its liquor before it reads FULL (proposed)
+	/** Purification: copper cementation, cobalt by amine SX, iron by oxidation; 40 kW at LV; a 5,000 L kerosene first charge. */
+	public static final double PURIFICATION_WATTS = 40_000.0;
+	public static final double PURIFICATION_KEROSENE_L = 5_000.0;
+	public static final double NI_RECOVERY = 0.95;                   // to the cathode, the rest with the residues (counted)
+	public static final double COPPER_INGOT_KG = 100.0;              // the by-product copper, cast (proposed, as the iron ingot)
+	/** The tankhouse: 18 chloride electrowinning cells in series at 12.3 kA and 3.5 V (textbook, unverified), 95 % current efficiency. */
+	public static final int NI_CELLS = 18;
+	public static final double NI_CELL_KA = 12.3;
+	public static final double NI_CELL_VOLTS = 3.5;
+	public static final double NI_CELL_BACK_EMF = 1.6;               // NiCl2's decomposition voltage (textbook: 1.36 + 0.26 V)
+	public static final double NI_CURRENT_EFFICIENCY = 0.95;
+	public static final double NI_G_PER_AH = 1.095;                  // Faraday: 58.69 g/mol over 2 x 26.8 Ah
+	public static final double NI_CATHODE_HOLD_KG = 3_000.0;         // cathode waiting for bags (proposed)
 }

@@ -27,6 +27,17 @@
   finishing) it kept reloading the chunks as fast as they unloaded, which could stall the tick and run the server out of memory.
   Circuits that are loaded solve exactly as before.
 
+### 17b1 (the nickel smelter and refinery, built 2026-11-12 while Tim was away; not approved)
+- **Nickel smelter:** the fluid-bed roaster takes nickel ore by hopper (or Tailings' concentrate carrying pentlandite) at 2 t/h, its SO2
+  to an acid plant's converter (NO ACID PLANT otherwise); the six-in-line electric furnace on a 17a furnace transformer smelts the
+  calcine at 1 MW into matte; the Peirce-Smith converter blows it to Bessemer matte (50 % Ni) in 2-hour blows, its off-gas to the acid
+  plant too. A furnace transformer now feeds either furnace against it.
+- **Nickel refinery:** the chlorine leach reactor (Bessemer matte by touching or in 1 t bags), the purification circuit (5,000 L of
+  kerosene first; copper cast to copper ingots, cobalt counted) and the tankhouse: 18 chloride cells, 12.3 kA at 63 V DC on a rectifier,
+  about 230 kg of cathode nickel an hour into 1 t bags; its anode chlorine goes back to the leach (no DC: NO CHLORINE).
+- Nickel ore has a use. Field Manual: NICKEL SMELTER, PEIRCE-SMITH CONVERTER, NICKEL REFINERY. Decisions:
+  `docs/questions/phase17b-nickel.md`.
+
 ### phosphate (Phase 18, built 2026-11-10 while Tim was away; not approved)
 - **Fertilizer (18a):** a phosphate mill, a dihydrate phosphoric reactor with its tilting pan filter, an acid evaporator and a granulation
   plant: 20 t of P2O5 a day from phosphate rock and sulfuric acid, its phosphogypsum to a lined tailings cell, merchant acid, and TSP or

@@ -56,9 +56,9 @@ public class FurnaceTransformerBlockEntity extends PlantUnitBlockEntity implemen
 				Ferroalloys.tapWatts(tap) / 1e6);
 	}
 
-	/** The furnace against its east face (its secondary side). */
-	public @Nullable SubmergedArcFurnaceBlockEntity furnace() {
-		return level == null ? null : Touching.find(level, worldPosition, SubmergedArcFurnaceBlockEntity.class, f -> true);
+	/** The furnace against its east face (its secondary side): a submerged arc furnace, or the nickel smelter's electric furnace (17b). */
+	public @Nullable TransformerFurnace furnace() {
+		return level == null ? null : Touching.find(level, worldPosition, TransformerFurnace.class, f -> true);
 	}
 
 	/** The capacitor banks against it, on its primary bus. */
@@ -133,7 +133,7 @@ public class FurnaceTransformerBlockEntity extends PlantUnitBlockEntity implemen
 
 	@Override
 	public void build(Circuit circuit) {
-		SubmergedArcFurnaceBlockEntity furnace = furnace();
+		TransformerFurnace furnace = furnace();
 		load.setDemand(furnace == null ? 0 : furnace.wantedWatts(Ferroalloys.tapWatts(tap)));
 		load.build(circuit, worldPosition, List.of(terminalFace()));
 	}
@@ -162,7 +162,7 @@ public class FurnaceTransformerBlockEntity extends PlantUnitBlockEntity implemen
 	@Override
 	public Component inspect() {
 		String state = load.undervoltage() ? load.describe() : load.watts() > 1000 ? metering() + (load.ramping() ? ", the electrodes going down" : "")
-				: furnace() == null ? "NO FURNACE: set a submerged arc furnace against its east face" : "idle: the furnace is not drawing";
+				: furnace() == null ? "NO FURNACE: set a submerged arc furnace or a nickel electric furnace against its east face" : "idle: the furnace is not drawing";
 		return Component.literal(String.format("Furnace transformer (%.0f MVA, %s to %.0f V): tap %d of %d (%.0f V secondary, %.1f MW at the furnace); primary %s; ",
 				Tuning.FURNACE_TRANSFORMER_VA / 1e6, Voltage.DISTRIBUTION.label(), Tuning.FURNACE_SECONDARY_VOLTS, tap, Tuning.FURNACE_TAPS, Ferroalloys.secondaryVolts(tap),
 				Ferroalloys.tapWatts(tap) / 1e6, load.describe()) + state + "; sneak and right-click steps the tap");

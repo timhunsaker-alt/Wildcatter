@@ -151,3 +151,24 @@ The grids are sketches; the game tests are the layout of record.
 ## Proposed waves
 - **17b1:** roaster, electric furnace, converter, leach, purification, tankhouse.
 - **17b2:** the alloy melt shop, and the fuel plant's hardware (fuel-fabrication-extensions.md, item 3).
+
+## As built
+### 17b1 (2026-11-12, branch `w-17b`; decisions `docs/questions/phase17b-nickel.md`)
+- Built as specified, with these differences and additions:
+  - **Frames:** each part is drawn facing north with its length along z (the electric furnace 6 wide and 12 long, the tankhouse 6 by
+    14); the scenes turn nothing. `nickel_smelter`: the transformer against the furnace's west side, the roaster against its south end,
+    the converter against its east side; `nickel_refinery`: the leach reactor, the tankhouse against its south side, the purification
+    circuit against the east sides of both, the rectifier against the tankhouse's south end.
+  - **Chlorine** comes on the leach reactor's **north** face (the layout's tankhouse takes its east face; question 8). The tankhouse's
+    terminals are on its south end; the purification circuit's motor box on its north face (question 12).
+  - **Numbers added** (each in the questions file): a block of ore is 4 t of feed (1); concentrate counted kg for kg (2); calcine 1 t a
+    tonne of feed (3); the furnace holds its own 1 MW at the transformer's PF 0.80 (4); furnace matte 25 % Ni, slag 0.7 t/t, paste
+    2.5 kg/t, FULL at 10 t (5); a blow 0.5-4 t of furnace matte (6); converter off-gas 0.35 kg of S a kg of Ni (7); leach 0.5 t/h and
+    the buffers (9); the cells' 1.6 V back-EMF (11).
+  - **Readouts:** NO FEED, NO ACID PLANT, FULL, NOT BUILT (with the missing part), NO CHLORINE, NO KEROSENE, NO DC, FROZEN, ELECTRODES SHORT.
+  - The converter's 2-hour blow goes through `TimeScale.scaled`. No existing world changes: every behaviour is in new parts; the
+    furnace transformer finds the new furnace by touching and an SAF against it runs as before.
+  - **Tests:** `nickel_smelter` (the roaster at 2 t/h, its gas made into acid; the furnace at 1.00 MW; a blow; the acid plant's converter
+    broken: NO ACID PLANT) and `nickel_refinery` (12.3 kA at 63.0 V, 230 kg/h; a bag of cathode nickel; the rectifier broken: NO DC and
+    the leach's NO CHLORINE). The blowers' MV comes from diesel and gas sets stepped up through unit substations (the 250 kW blower's
+    start trips a 500 kW diesel set on frequency, so it is on a 1 MW gas set).

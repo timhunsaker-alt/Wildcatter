@@ -37,7 +37,7 @@ import org.jspecify.annotations.Nullable;
  * at the taphole on its east face into the bagging station there; slag is counted. Sneak and right-click changes the recipe: the hearth is
  * run out first, an hour at power. Four hours without power and the hearth freezes; a frozen furnace is dug out (broken and placed again).
  */
-public class SubmergedArcFurnaceBlockEntity extends PlantUnitBlockEntity implements HopperFed, Bagged {
+public class SubmergedArcFurnaceBlockEntity extends PlantUnitBlockEntity implements HopperFed, Bagged, TransformerFurnace {
 	/** Its bins: one for each charge, then the paste. */
 	private static final int PASTE = Charge.values().length;
 	private final NonNullList<ItemStack> slots = NonNullList.withSize(PASTE + 1, ItemStack.EMPTY);
@@ -143,6 +143,7 @@ public class SubmergedArcFurnaceBlockEntity extends PlantUnitBlockEntity impleme
 	}
 
 	/** What it asks its transformer for, given the tap's power: nothing while it is held or has no charge; half with its electrodes short. */
+	@Override
 	public double wantedWatts(double tapWatts) {
 		if (!want || frozen) {
 			return 0;

@@ -425,6 +425,12 @@
     "wildcatter:bop_accumulator",
     "wildcatter:slurry_pipe",
     "wildcatter:air_header",
-    "wildcatter:guy_anchor"
+    "wildcatter:guy_anchor",
+    "wildcatter:fluid_bed_roaster",
+    "wildcatter:nickel_electric_furnace",
+    "wildcatter:peirce_smith_converter",
+    "wildcatter:chlorine_leach_reactor",
+    "wildcatter:ni_purification",
+    "wildcatter:nickel_tankhouse"
   ]
 }

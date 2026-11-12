@@ -620,5 +620,13 @@
   "block.wildcatter.slurry_pipe": "Slurry Pipe (600 mm)",
   "block.wildcatter.air_header": "Air Header (600 mm)",
   "block.wildcatter.guy_anchor": "Guy Anchor",
-  "item.wildcatter.guy_strand": "Guy Strand (3/8 in EHS)"
+  "item.wildcatter.guy_strand": "Guy Strand (3/8 in EHS)",
+  "item.wildcatter.bessemer_matte_bag": "Bulk Bag of Bessemer Matte",
+  "item.wildcatter.nickel_cathode_bag": "Bulk Bag of Cathode Nickel",
+  "block.wildcatter.fluid_bed_roaster": "Fluid-Bed Roaster (110 kW)",
+  "block.wildcatter.nickel_electric_furnace": "Nickel Electric Furnace (1 MW, six-in-line)",
+  "block.wildcatter.peirce_smith_converter": "Peirce-Smith Converter",
+  "block.wildcatter.chlorine_leach_reactor": "Chlorine Leach Reactor",
+  "block.wildcatter.ni_purification": "Nickel Liquor Purification",
+  "block.wildcatter.nickel_tankhouse": "Nickel Tankhouse (18 cells, 12.3 kA)"
 }

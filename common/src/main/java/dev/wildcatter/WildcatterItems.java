@@ -233,6 +233,13 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> EXTRACTANT_DRUM_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("extractant_drum"));
 	public static final Item EXTRACTANT_DRUM = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(EXTRACTANT_DRUM_KEY),
 			String.format("%.0f kg of DEPA and TOPO, the uranium extractant", Tuning.EXTRACTANT_DRUM_KG), "for the DEPA-TOPO circuit");
+	// Phase 17b1: the nickel smelter and refinery (docs/multiblocks/nickel-smelter.md), each in a 1 t bulk bag
+	public static final ResourceKey<Item> BESSEMER_MATTE_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("bessemer_matte_bag"));
+	public static final Item BESSEMER_MATTE_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(BESSEMER_MATTE_BAG_KEY),
+			String.format("%,.0f kg of Bessemer matte granules (50 %% Ni, 25 %% Cu, 20 %% S)", Tuning.BULK_BAG_KG), "for the nickel refinery's chlorine leach reactor");
+	public static final ResourceKey<Item> NICKEL_CATHODE_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("nickel_cathode_bag"));
+	public static final Item NICKEL_CATHODE_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(NICKEL_CATHODE_BAG_KEY),
+			String.format("%,.0f kg of electrowon cathode nickel (99.9 %% Ni)", Tuning.BULK_BAG_KG), "for 304 and 316 stainless and the nickel-chromium alloy; the alloy melt shop (17b2)");
 	// 10c1: blueprints (docs/blueprints.md)
 	public static final ResourceKey<Item> BLUEPRINT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("blueprint"));
 	public static final Item BLUEPRINT = new dev.wildcatter.item.BlueprintItem(new Item.Properties().stacksTo(1).setId(BLUEPRINT_KEY));
@@ -459,6 +466,8 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, SCHEELITE_CONCENTRATE_BAG_KEY, SCHEELITE_CONCENTRATE_BAG);
 		Registry.register(BuiltInRegistries.ITEM, FERROMOLYBDENUM_BAG_KEY, FERROMOLYBDENUM_BAG);
 		Registry.register(BuiltInRegistries.ITEM, FERROTUNGSTEN_BAG_KEY, FERROTUNGSTEN_BAG);
+		Registry.register(BuiltInRegistries.ITEM, BESSEMER_MATTE_BAG_KEY, BESSEMER_MATTE_BAG);
+		Registry.register(BuiltInRegistries.ITEM, NICKEL_CATHODE_BAG_KEY, NICKEL_CATHODE_BAG);
 		Registry.register(BuiltInRegistries.ITEM, TSP_BAG_KEY, TSP_BAG);
 		Registry.register(BuiltInRegistries.ITEM, DAP_BAG_KEY, DAP_BAG);
 		Registry.register(BuiltInRegistries.ITEM, MOP_BAG_KEY, MOP_BAG);

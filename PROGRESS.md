@@ -1464,6 +1464,10 @@ sized for a 40-pot line.
   use the mod's materials. The DEPA-TOPO second cycle is built (2026-11-10, branch `w-rules`; see "Tim's answers" below). Not built:
   the filter acid's uranium is not carried as an assay; fluorosilicic acid recovery; the hemihydrate process; potash by flotation;
   Farmings reading `c:fertilizers` (Farmings' side). See `docs/questions/phase18-phosphate.md`.
+- Phase 17b1 (nickel smelter and refinery): the `bessemer_matte_bag` and `nickel_cathode_bag` icons are script-drawn `*_placeholder`
+  (the Ludo bulk bag with a swatch); the six parts use the mod's materials. The nickel furnace runs at its transformer's PF 0.80
+  (`docs/questions/phase17b-nickel.md`, 4). Not built (the spec): copper refining beyond ingots, cobalt metal, precious metals, flash
+  smelting, the Mond process.
 - Phase 17a (ferroalloys): the seven bulk bag icons (`ferrochrome_bag`, `ferromanganese_bag`, `ferrosilicon_bag`, `moly_oxide_bag`,
   `scheelite_concentrate_bag`, `ferromolybdenum_bag`, `ferrotungsten_bag`) are script-drawn `*_placeholder` (the Ludo bulk bag with a
   swatch). Not built: chromium metal (needs 17c2's chromic oxide), an automatic var controller, capacitor switching inrush and harmonic
@@ -1946,6 +1950,26 @@ Plan: `docs/ideas-plan.md`. Branch `phase16`. Nothing changes what an existing w
   AND VESSEL.
 - Tests: `FerroalloysTest` (7, including the solver's feeder current with and without the bank); NeoForge `ferroalloys`, `alumino`;
   client `ferroalloys` (filmed).
+
+## Phase 17b1: the nickel smelter and refinery (2026-11-12; built while Tim was away; decisions: `docs/questions/phase17b-nickel.md`)
+- `block/NickelPartBlock` (six parts, true size; `tools/models/nickel.py`), numbers in `fluid/Nickel` (`NickelTest`).
+- **Fluid-bed roaster** (`FluidBedRoasterBlockEntity`, 4 x 10 x 4, 110 kW at MV): nickel ore by hopper (4 t of feed at 12 % Ni an item) or
+  thickened concentrate's pentlandite on its north side; 2 t/h; 420 kg/h of sulfur as burner gas out its south side (NO ACID PLANT).
+- **Nickel electric furnace** (`NickelFurnaceBlockEntity`, 6 x 6 x 12, the smelter's controller): a `TransformerFurnace` on the 17a furnace
+  transformer (which now finds either furnace), 1 MW, 500 kWh a tonne of calcine, furnace matte 25 % Ni; green anodes as paste; NOT BUILT
+  without transformer or roaster; FULL at 10 t of matte; freezes after 4 hours without power.
+- **Peirce-Smith converter** (`PeirceSmithConverterBlockEntity`, 5 x 5 x 10, 250 kW at MV): up to 4 t of furnace matte a blow, 2 hours at
+  the world's time scale, 0.35 kg of sulfur a kg of Ni to the acid plant; Bessemer matte for the leach or a bagging station (1 t bags).
+- **Chlorine leach reactor** (`ChlorineLeachReactorBlockEntity`, 3 x 8 x 3, 30 kW): 0.5 t/h of matte; the tankhouse's chlorine back first,
+  make-up off the pipe on its north side; NO CHLORINE when the tankhouse has no DC.
+- **Purification** (`NiPurificationBlockEntity`, 4 x 4 x 10, 40 kW, box north): 5,000 L kerosene first charge (NO KEROSENE); 95 % of the
+  nickel on, copper ingots out a hopper under it, cobalt carbonate counted.
+- **Nickel tankhouse** (`NickelTankhouseBlockEntity`, 6 x 4 x 14): 18 cells (`DcCell`, 1.6 V back-EMF, 3.5 V at 12.3 kA), terminals on its
+  south end or a rectifier against it; Faraday's 1.095 g/Ah at 95 %: 230 kg/h; cathode nickel bags at a bagging station.
+- Items: `bessemer_matte_bag`, `nickel_cathode_bag`. JEI pages for both; nickel ore's uses. Field Manual: NICKEL SMELTER, PEIRCE-SMITH
+  CONVERTER, NICKEL REFINERY.
+- Tests: `NickelTest` (5); NeoForge `nickel_smelter`, `nickel_refinery`; client `nickelSmelter` (screenshots of the smelter, converter,
+  roaster and refinery).
 
 ## Phase 18: phosphate (2026-11-10; built while Tim was away; decisions: `docs/questions/phase18-phosphate.md`)
 - **18a, fertilizer** (`docs/multiblocks/fertilizer.md`): **phosphate mill** (wet ball mill, 200 kW at 4.16 kV; rock by hopper, water,

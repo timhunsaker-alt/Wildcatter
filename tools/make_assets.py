@@ -3037,6 +3037,39 @@ for tag in ("mineable/pickaxe",):
 	t["values"] += [f"{ns}:{n}" for n in ("slurry_pipe", "air_header", "guy_anchor") if f"{ns}:{n}" not in t["values"]]
 	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
 
+# ---- Phase 17b1: the nickel smelter and refinery (docs/multiblocks/nickel-smelter.md) --------------------------------------------------
+# blockstates, models, shapes and items come from tools/models/nickel.py; here loot, names, tags, recipes and the bags (placeholder icons:
+# the Ludo bulk bag with a swatch of what it holds, as 17a's).
+NICKEL_PARTS = ("fluid_bed_roaster", "nickel_electric_furnace", "peirce_smith_converter", "chlorine_leach_reactor", "ni_purification", "nickel_tankhouse")
+for name in NICKEL_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in NICKEL_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("fluid_bed_roaster", ["SCS", "BFB", "SBS"], {"S": S_, "C": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace"}, "fluid_bed_roaster")
+shaped("nickel_electric_furnace", ["SHS", "BFB", "BBB"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace"}, "nickel_electric_furnace")
+shaped("peirce_smith_converter", ["SBS", "BCB", "SIS"], {"S": S_, "B": "minecraft:bricks", "C": "minecraft:cauldron", "I": "minecraft:iron_block"}, "peirce_smith_converter")
+shaped("chlorine_leach_reactor", ["SGS", "SCS", "SSS"], {"S": S_, "G": "minecraft:glass", "C": "minecraft:cauldron"}, "chlorine_leach_reactor")
+shaped("ni_purification", ["SGS", "CBC", "SSS"], {"S": S_, "G": "minecraft:glass", "C": "minecraft:cauldron", "B": "minecraft:barrel"}, "ni_purification")
+shaped("nickel_tankhouse", ["CCC", "PRP", "SSS"], {"C": "minecraft:copper_ingot", "P": "minecraft:cauldron", "R": "minecraft:redstone_block", "S": S_}, "nickel_tankhouse")
+NICKEL_BAGS = {"bessemer_matte_bag": ("Bulk Bag of Bessemer Matte", (88, 92, 84)), "nickel_cathode_bag": ("Bulk Bag of Cathode Nickel", (196, 198, 190))}
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in NICKEL_BAGS.items():
+	bag = Image.open(f"{ORE_ART}/empty_bulk_bag.png").convert("RGBA")
+	d = ImageDraw.Draw(bag)
+	d.rectangle([10, 13, 21, 22], fill=colour + (255,), outline=(60, 60, 60, 255))
+	d.rectangle([12, 15, 14, 17], fill=tuple(min(255, c + 40) for c in colour) + (255,))
+	bag.save(f"{ASSETS}/textures/item/{item}_placeholder.png")
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}_placeholder"}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.fluid_bed_roaster": "Fluid-Bed Roaster (110 kW)", f"block.{ns}.nickel_electric_furnace": "Nickel Electric Furnace (1 MW, six-in-line)",
+	f"block.{ns}.peirce_smith_converter": "Peirce-Smith Converter", f"block.{ns}.chlorine_leach_reactor": "Chlorine Leach Reactor",
+	f"block.{ns}.ni_purification": "Nickel Liquor Purification", f"block.{ns}.nickel_tankhouse": "Nickel Tankhouse (18 cells, 12.3 kA)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

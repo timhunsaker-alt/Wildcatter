@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SBS",
+    "BCB",
+    "SIS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "B": "minecraft:bricks",
+    "C": "minecraft:cauldron",
+    "I": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:peirce_smith_converter",
+    "count": 1
+  }
+}

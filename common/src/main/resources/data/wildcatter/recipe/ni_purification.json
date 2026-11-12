@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SGS",
+    "CBC",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "G": "minecraft:glass",
+    "C": "minecraft:cauldron",
+    "B": "minecraft:barrel"
+  },
+  "result": {
+    "id": "wildcatter:ni_purification",
+    "count": 1
+  }
+}

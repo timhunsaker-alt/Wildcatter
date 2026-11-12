@@ -74,7 +74,8 @@ public final class OreUses {
 			case ACANTHITE -> List.of("a furnace (silver ingot)");
 			case PHOSPHATE -> List.of("the phosphate mill (phosphoric acid, TSP and DAP fertilizer; uranium from the acid)");
 			case SYLVITE -> List.of("the potash dissolver (muriate of potash fertilizer)");
-			case PENTLANDITE, PLATINUM, DOLOMITE, GRAPHITE, SPODUMENE, COBALTITE -> List.of();
+			case PENTLANDITE -> List.of("the nickel smelter's fluid-bed roaster, as ore or as flotation concentrate from Tailings' concentrator (Bessemer matte, then cathode nickel at the refinery)");
+			case PLATINUM, DOLOMITE, GRAPHITE, SPODUMENE, COBALTITE -> List.of();
 		};
 	}
 

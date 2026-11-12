@@ -47,6 +47,12 @@ public class WildcatterJeiPlugin implements IModPlugin {
 		ingot(registration, "lead", "Smelted from galena. No use yet.");
 		ingot(registration, "zinc", "Smelted from sphalerite. No use yet.");
 		ingot(registration, "silver", "Smelted from acanthite. No use yet.");
+		registration.addItemStackInfo(new ItemStack(WildcatterItems.BESSEMER_MATTE_BAG), Component.literal("Bessemer matte (50 % Ni, 25 % Cu, 20 % S), "
+				+ "blown from the nickel electric furnace's matte in the Peirce-Smith converter and bagged at a bagging station against it. "
+				+ "The nickel refinery's chlorine leach reactor takes it by a hopper on top."));
+		registration.addItemStackInfo(new ItemStack(WildcatterItems.NICKEL_CATHODE_BAG), Component.literal("Cathode nickel, electrowon in the "
+				+ "nickel tankhouse from the chlorine leach's purified liquor and bagged at a bagging station against it. The alloy melt shop "
+				+ "makes 304 and 316 stainless and the nickel-chromium alloy from it."));
 		registration.addItemStackInfo(new ItemStack(WildcatterItems.MAGNESIA), Component.literal("Caustic-calcined magnesia (MgO), "
 				+ "from magnesite in a furnace. The uranium mill's precipitation tank uses it to precipitate the uranium, and the "
 				+ "magnesia chlorinator turns it into MgCl2 for the magnesium cell."));
