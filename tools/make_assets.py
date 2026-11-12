@@ -1749,10 +1749,6 @@ FUEL_PARTS = ("sulfur_melter", "drying_tower", "main_blower", "sulfur_furnace", 
 	"jaw_crusher", "sag_mill", "leach_tank", "ccd_thickener", "sx_circuit", "precipitation_tank", "yellowcake_dryer", "drum_filler")
 for name in FUEL_PARTS:
 	big_part_loot(name)
-# a placed assembly keeps its assay and its handling record (Tim, answer 21): the block entity holds the item's components; the drop copies them back
-_fa = json.load(open(f"{DATA}/loot_table/blocks/fuel_assembly.json"))
-_fa["pools"][0]["entries"][0]["modifier"] = {"type": "minecraft:copy_components", "source": "block_entity", "include": [f"{ns}:assay", "minecraft:custom_data"]}
-save_json(f"{DATA}/loot_table/blocks/fuel_assembly.json", _fa)
 for t_name in ("mineable/pickaxe", "needs_stone_tool"):
 	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
 	t["values"] = [v for v in t["values"] if v not in [f"{ns}:{n}" for n in FUEL_PARTS]] + [f"{ns}:{n}" for n in FUEL_PARTS]
@@ -2310,6 +2306,11 @@ FUEL_PARTS = ("uf6_autoclave", "idr_kiln", "granulator", "pellet_press", "sinter
 	"assembly_fixture", "helium_recovery_unit", "fuel_assembly")
 for name in FUEL_PARTS:
 	big_part_loot(name)
+# a placed assembly keeps its assay and its handling record (Tim, answer 21): the block entity holds the item's components; the drop
+# copies them back. After big_part_loot above, which writes the plain table this patches.
+_fa = json.load(open(f"{DATA}/loot_table/blocks/fuel_assembly.json"))
+_fa["pools"][0]["entries"][0]["modifier"] = {"type": "minecraft:copy_components", "source": "block_entity", "include": [f"{ns}:assay", "minecraft:custom_data"]}
+save_json(f"{DATA}/loot_table/blocks/fuel_assembly.json", _fa)
 for t_name in ("mineable/pickaxe", "needs_stone_tool"):
 	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
 	wanted = [f"{ns}:{n}" for n in FUEL_PARTS if n != "fuel_assembly"]
@@ -2817,7 +2818,7 @@ phase16_names({"cathode_gas_scrubber": "Cathode Gas Scrubber (NaF beds, 10 kW)",
 phase16_items({"zircaloy_scrap": ("Zircaloy Scrap (25 kg)", (150, 150, 140)), "hfcl4_drum": ("HfCl4 Drum (50 kg of Hf)", (200, 196, 180)),
 	"hafnium_rodlet": ("Hafnium Rodlet", (120, 124, 132))})
 # 19d: hafnium RCCAs and sodium sulfate bags (docs/multiblocks/reactor-extensions.md)
-phase16_items({"hafnium_rcca": ("Hafnium RCCA", (110, 116, 126)), "sodium_sulfate_bag": ("Sodium Sulfate (1 t bag)", (236, 232, 220))})
+phase16_items({"hafnium_rcca": ("Hafnium RCCA", (110, 116, 126)), "sodium_sulfate_bag": ("Bulk Bag of Sodium Sulfate", (236, 232, 220))})
 save_json(f"{ROOT}/data/c/tags/item/sodium_sulfate.json", {"replace": False, "values": [f"{ns}:sodium_sulfate_bag"]})
 # 17c2: fumed silica, Pidgeon magnesium, chromium (docs/multiblocks/zirconium-extensions.md)
 phase16_parts(("fumed_silica_burner", "pidgeon_furnace", "chromate_kiln"))
@@ -2828,16 +2829,24 @@ phase16_names({"fumed_silica_burner": "Fumed Silica Burner (15 kW)", "pidgeon_fu
 phase16_items({"fumed_silica": ("Fumed Silica (25 kg sack)", (236, 238, 240)), "dolime_bag": ("Dolime (1 t bag)", (222, 218, 206)), "magnesium_ingot": ("Magnesium Ingot", (196, 200, 204)),
 	"chromic_oxide": ("Chromic Oxide (25 kg sack)", (70, 120, 60)), "chromium_metal": ("Chromium Metal (10 kg)", (180, 186, 196))})
 save_json(f"{ROOT}/data/c/tags/item/fumed_silica.json", {"replace": False, "values": [f"{ns}:fumed_silica"]})
-# 16c2: crashes, sampling, heels (docs/multiblocks/enrichment-operations.md); crashed_centrifuge's loot (4 steel and a rotor shard) is written by hand
+# 16c2: crashes, sampling, heels (docs/multiblocks/enrichment-operations.md); crashed_centrifuge's loot (4 steel and a rotor shard) below
 phase16_parts(("sampling_autoclave",))
 shaped("sampling_autoclave", ["SPS", "SCS", "SXS"], {"S": S_, "P": P_, "C": "minecraft:cauldron", "X": "minecraft:furnace"}, "sampling_autoclave")
 phase16_names({"sampling_autoclave": "Sampling Autoclave (50 kW)", "crashed_centrifuge": "Crashed Centrifuge"})
 phase16_items({"rotor_shard": ("Rotor Shard (carbon fibre)", (40, 40, 44))})
+# a crashed machine drops 4 steel and a rotor shard, from its main cell only
+_cc_pool = lambda entry: {"rolls": 1, "entries": [entry], "conditions": [{"condition": "minecraft:block_state_property", "block": f"{ns}:crashed_centrifuge", "properties": {"piece": "0"}}]}
+save_json(f"{DATA}/loot_table/blocks/crashed_centrifuge.json", {"type": "minecraft:block", "pools": [
+	_cc_pool({"type": "minecraft:item", "name": f"{ns}:steel_ingot", "functions": [{"function": "minecraft:set_count", "count": 4}]}),
+	_cc_pool({"type": "minecraft:item", "name": f"{ns}:rotor_shard"})]})
 # 16d2: monitor wells, the RO unit (docs/multiblocks/isr-operations.md)
 phase16_parts(("ro_unit",))
 shaped("ro_unit", ["SPS", "GXG", "SPS"], {"S": S_, "P": P_, "G": "minecraft:paper", "X": "minecraft:piston"}, "ro_unit")
 shaped("monitor_wellhead", [" C ", " P ", " S "], {"C": "minecraft:iron_trapdoor", "P": P_, "S": S_}, "monitor_wellhead")
 big_part_loot_simple("monitor_wellhead")
+_pk = json.load(open(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json"))
+_pk["values"] = [v for v in _pk["values"] if v not in (f"{ns}:crashed_centrifuge", f"{ns}:monitor_wellhead")] + [f"{ns}:crashed_centrifuge", f"{ns}:monitor_wellhead"]
+save_json(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json", _pk)
 phase16_names({"ro_unit": "RO Unit (30 L/s, 160 kW)", "monitor_wellhead": "Monitor Wellhead (sampling pump 1.5 kW)"})
 # ---- Phase 17a: ferroalloys (docs/multiblocks/ferroalloys.md) ---------------------------------------------------------------------
 # blockstates, models, shapes and items come from tools/models/ferroalloys.py; here loot, names, tags, recipes and the bags. Each bag's
@@ -3281,7 +3290,8 @@ shaped("acid_roast_kiln", ["SPS", "BFB", "SSS"], {"S": S_, "P": P_, "B": "minecr
 shaped("lithium_leach", ["SHS", "CXC", "SPS"], {"S": S_, "H": "minecraft:hopper", "C": "minecraft:cauldron", "X": "minecraft:piston", "P": P_}, "lithium_leach")
 shaped("lioh_crystallizer", ["SPS", "SCS", "SXS"], {"S": S_, "P": P_, "C": "minecraft:copper_block", "X": "minecraft:piston"}, "lioh_crystallizer")
 shaped("lithium_carbonator", ["SHS", "SCS", "SPS"], {"S": S_, "H": "minecraft:hopper", "C": "minecraft:cauldron", "P": P_}, "lithium_carbonator")
-LI_BAGS = {"lioh_bag": ("Bulk Bag of Lithium Hydroxide (LiOH.H2O)", (236, 236, 228)), "sodium_sulfate_bag": ("Bulk Bag of Sodium Sulfate", (220, 220, 236)),
+# sodium_sulfate_bag is 19d's (Phase 16 items above); the lithium plant fills the same bag
+LI_BAGS = {"lioh_bag": ("Bulk Bag of Lithium Hydroxide (LiOH.H2O)", (236, 236, 228)),
 	"li2co3_bag": ("Bulk Bag of Lithium Carbonate", (240, 232, 220))}
 lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
 for item, (name, colour) in LI_BAGS.items():

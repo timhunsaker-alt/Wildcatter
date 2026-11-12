@@ -298,6 +298,11 @@
     "wildcatter:co2_liquefier",
     "wildcatter:co2_storage_tank",
     "wildcatter:resin_trailer",
+    "wildcatter:fumed_silica_burner",
+    "wildcatter:pidgeon_furnace",
+    "wildcatter:chromate_kiln",
+    "wildcatter:sampling_autoclave",
+    "wildcatter:ro_unit",
     "wildcatter:furnace_transformer",
     "wildcatter:submerged_arc_furnace",
     "wildcatter:capacitor_bank",
@@ -365,11 +370,6 @@
     "wildcatter:acid_roast_kiln",
     "wildcatter:lithium_leach",
     "wildcatter:lioh_crystallizer",
-    "wildcatter:lithium_carbonator",
-    "wildcatter:fumed_silica_burner",
-    "wildcatter:pidgeon_furnace",
-    "wildcatter:chromate_kiln",
-    "wildcatter:sampling_autoclave",
-    "wildcatter:ro_unit"
+    "wildcatter:lithium_carbonator"
   ]
 }

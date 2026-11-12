@@ -8,12 +8,12 @@
           "type": "minecraft:item",
           "name": "wildcatter:fuel_assembly",
           "modifier": {
+            "type": "minecraft:copy_components",
             "source": "block_entity",
             "include": [
               "wildcatter:assay",
               "minecraft:custom_data"
-            ],
-            "type": "minecraft:copy_components"
+            ]
           }
         }
       ],
