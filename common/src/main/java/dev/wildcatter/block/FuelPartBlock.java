@@ -36,7 +36,10 @@ public class FuelPartBlock extends BigPartBlock implements net.minecraft.world.W
 		// 19c1 (docs/multiblocks/fuel-fabrication-extensions.md)
 		PELLET_INSPECTION("pellet_inspection", Footprint.box(2, 3, 4, 0, 0)),
 		ROD_INSPECTION("rod_inspection", Footprint.box(3, 3, 10, 0, 0)),
-		SCRAP_OXIDIZER("scrap_oxidizer", Footprint.box(2, 3, 4, 0, 0));
+		SCRAP_OXIDIZER("scrap_oxidizer", Footprint.box(2, 3, 4, 0, 0)),
+		// 19c2
+		HF_RECOVERY_CONDENSER("hf_recovery_condenser", Footprint.box(2, 6, 2, 0, 0)),
+		IFBA_COATER("ifba_coater", Footprint.box(3, 3, 6, 0, 0));
 
 		private final String id;
 		private final Footprint footprint;
@@ -71,6 +74,8 @@ public class FuelPartBlock extends BigPartBlock implements net.minecraft.world.W
 			case PELLET_INSPECTION -> new PelletInspectionBlockEntity(pos, state);
 			case ROD_INSPECTION -> new RodInspectionBlockEntity(pos, state);
 			case SCRAP_OXIDIZER -> new ScrapOxidizerBlockEntity(pos, state);
+			case HF_RECOVERY_CONDENSER -> new HfRecoveryCondenserBlockEntity(pos, state);
+			case IFBA_COATER -> new IfbaCoaterBlockEntity(pos, state);
 			default -> new FuelLineBlockEntity(pos, state);
 		};
 	}
@@ -83,6 +88,8 @@ public class FuelPartBlock extends BigPartBlock implements net.minecraft.world.W
 			case PELLET_INSPECTION -> WildcatterBlocks.PELLET_INSPECTION_ENTITY;
 			case ROD_INSPECTION -> WildcatterBlocks.ROD_INSPECTION_ENTITY;
 			case SCRAP_OXIDIZER -> WildcatterBlocks.SCRAP_OXIDIZER_ENTITY;
+			case HF_RECOVERY_CONDENSER -> WildcatterBlocks.HF_RECOVERY_CONDENSER_ENTITY;
+			case IFBA_COATER -> WildcatterBlocks.IFBA_COATER_ENTITY;
 			default -> WildcatterBlocks.FUEL_LINE_ENTITY;
 		};
 	}
@@ -110,6 +117,10 @@ public class FuelPartBlock extends BigPartBlock implements net.minecraft.world.W
 			return InteractionResult.SUCCESS;
 		}
 		BlockEntity entity = level.getBlockEntity(main(pos, state));
+		if (player.isShiftKeyDown() && entity instanceof FuelLineBlockEntity loader && loader.kind().equals("rod_loader")) {
+			player.sendOverlayMessage(net.minecraft.network.chat.Component.literal(loader.nextIfba()));   // 19c2
+			return InteractionResult.SUCCESS;
+		}
 		if (entity instanceof AssemblyFixtureBlockEntity fixture && fixture.finished() > 0) {
 			fixture.giveAll(player);
 			return InteractionResult.SUCCESS;

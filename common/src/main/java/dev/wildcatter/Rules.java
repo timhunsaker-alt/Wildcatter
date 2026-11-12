@@ -41,7 +41,9 @@ public final class Rules {
 		/** Plant residence times as real holds: coking 18 h, digestion 1 h, precipitation 36 h. Off even in new worlds. */
 		REAL_RESIDENCE_TIMES("realResidenceTimes", false, "coking 18 h, digestion 1 h and precipitation 36 h as real holds"),
 		/** 19c1: green pellets crack without zinc stearate, scrap comes out in cans, uninspected assemblies may carry a leaking rod. */
-		FUEL_LINE_DEFECTS("fuelLineDefects", true, "pellets crack without zinc stearate, scrap comes out in cans, uninspected assemblies may leak");
+		FUEL_LINE_DEFECTS("fuelLineDefects", true, "pellets crack without zinc stearate, scrap comes out in cans, uninspected assemblies may leak"),
+		/** 19c2: the assembly fixture and the rod loader take 304 stainless and nickel-chromium alloy for the hardware, not steel. */
+		FUEL_NICKEL_HARDWARE("fuelNickelHardware", true, "fuel assemblies take 304 stainless and nickel-chromium alloy hardware, not steel");
 
 		public final String key;
 		public final boolean newWorld;
@@ -172,6 +174,10 @@ public final class Rules {
 
 	public static boolean fuelLineDefects() {
 		return on(Rule.FUEL_LINE_DEFECTS);
+	}
+
+	public static boolean fuelNickelHardware() {
+		return on(Rule.FUEL_NICKEL_HARDWARE);
 	}
 
 	/** How much the reactor's heat-up below no-load temperature is sped up: 80, or with {@code reactorRealHeatup} the world's

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SGS",
+    "SCS",
+    "SBS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "G": "minecraft:glass",
+    "C": "minecraft:coal_block",
+    "B": "minecraft:bucket"
+  },
+  "result": {
+    "id": "wildcatter:hf_recovery_condenser",
+    "count": 1
+  }
+}

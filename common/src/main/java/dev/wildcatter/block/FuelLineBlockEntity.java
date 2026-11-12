@@ -30,6 +30,12 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 	private final NonNullList<ItemStack> slots = NonNullList.withSize(4, ItemStack.EMPTY);
 	private final ScrapCans scrap = new ScrapCans();
 	private double lubricant;  // the press's zinc stearate, kg in its feeder
+	private int ifbaSetting;   // 19c2: the loader's IFBA rods an assembly: 0, 32, 64 or 104
+	private int rodIndex;      // the rod's place in its assembly's 264
+	private boolean benchIfba; // the rod on the bench is coated
+	private int ifbaReady;     // coated rods among those ready
+	private boolean lastIfba;
+	private double hfPending;  // 19c2: the kiln's HF for a recovery condenser against it, kg
 	private double u;          // kg of U held for the next stage
 	private boolean loaded;    // the autoclave's 30B
 	private double uf6;        // kg left in it
@@ -79,6 +85,35 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 		setChanged();
 	}
 
+	/** 19c2: whether the rod the last {@link #takeRod} gave is IFBA-coated. */
+	public boolean lastTakenIfba() {
+		return lastIfba;
+	}
+
+	public int ifbaSetting() {
+		return ifbaSetting;
+	}
+
+	/** Sneak and right-click on the rod loader: the next IFBA setting (0, 32, 64, 104 rods an assembly). */
+	public String nextIfba() {
+		int[] s = Tuning.IFBA_SETTINGS;
+		int i = 0;
+		while (i < s.length && s[i] != ifbaSetting) {
+			i++;
+		}
+		ifbaSetting = s[(i + 1) % s.length];
+		setChanged();
+		return ifbaSetting == 0 ? "Rod loader: no IFBA rods" : "Rod loader: " + ifbaSetting + " IFBA rods an assembly (the IFBA coater against it coats their pellets)";
+	}
+
+	/** 19c2: the HF recovery condenser takes up to {@code kg} of the kiln's HF; returns what it gave. */
+	public double takeKilnHf(double kg) {
+		double got = Math.max(0, Math.min(kg, hfPending));
+		hfPending -= got;
+		setChanged();
+		return got;
+	}
+
 	/** The rod loader's finished rods, for the welder. */
 	public int rods() {
 		return rods;
@@ -87,6 +122,10 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 	public boolean takeRod() {
 		if (rods <= 0) {
 			return false;
+		}
+		lastIfba = ifbaReady > 0;
+		if (lastIfba) {
+			ifbaReady--;
 		}
 		rods--;
 		setChanged();
@@ -107,7 +146,8 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 	private boolean takes(int slot, ItemStack stack) {
 		return switch (kind()) {
 			case "uf6_autoclave" -> slot == 0 && stack.is(WildcatterItems.LEU_CYLINDER_30B);
-			case "rod_loader" -> slot == 0 && stack.is(WildcatterItems.ZIRCALOY_TUBE) || slot == 1 && stack.is(WildcatterItems.STEEL_INGOT);
+			case "rod_loader" -> slot == 0 && stack.is(WildcatterItems.ZIRCALOY_TUBE) || slot == 1 && stack.is(WildcatterItems.STEEL_INGOT)
+					|| slot == 2 && stack.is(WildcatterItems.NICKEL_CHROMIUM_INGOT);
 			case "pellet_press" -> slot == 0 && stack.is(WildcatterItems.ZINC_STEARATE);
 			default -> false;
 		};
@@ -121,7 +161,7 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 	public int[] getSlotsForFace(Direction side) {
 		return switch (kind()) {
 			case "uf6_autoclave" -> side == Direction.UP ? new int[] {0} : side == Direction.DOWN ? new int[] {1, 2} : new int[0];
-			case "rod_loader" -> side == Direction.UP ? new int[] {0, 1} : new int[0];
+			case "rod_loader" -> side == Direction.UP ? new int[] {0, 1, 2} : new int[0];
 			case "pellet_press" -> side == Direction.UP ? new int[] {0} : side == Direction.DOWN ? new int[] {SCRAP_OUT} : new int[0];
 			case "pellet_grinder" -> side == Direction.DOWN ? new int[] {SCRAP_OUT} : new int[0];
 			default -> new int[0];
@@ -194,7 +234,15 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 				double got = pass(level, up(level, "uf6_autoclave"), "UF6 AUTOCLAVE", max, "converting UF6 to UO2 at 500-800 C");
 				Lines.pull(level, hydrogen(), Product.HYDROGEN, got * Fuel.hydrogenPerU(), Pull.MACHINE, this);
 				water = Math.max(0, water - got * Fuel.waterPerU());
-				hf += got * Fuel.hfPerU();
+				// 19c2: with a recovery condenser against it, its HF waits there (five minutes' worth) instead of going to the scrubber
+				if (Touching.find(level, worldPosition, HfRecoveryCondenserBlockEntity.class, c -> true) != null) {
+					double cap = Tuning.FUEL_LINE_U_KGS * Fuel.hfPerU() * 300;
+					double to = Math.min(got * Fuel.hfPerU(), Math.max(0, cap - hfPending));
+					hfPending += to;
+					hf += got * Fuel.hfPerU() - to;
+				} else {
+					hf += got * Fuel.hfPerU();
+				}
 			}
 			case "granulator" -> {
 				double got = pass(level, up(level, "idr_kiln"), "IDR KILN", Double.MAX_VALUE, "granulating the powder");
@@ -342,16 +390,19 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 			unit = "NOT BUILT: set it against the PELLET GRINDER";
 			return;
 		}
-		if (steel < Tuning.ROD_STEEL_KG && !slots.get(1).isEmpty()) {
-			slots.get(1).shrink(1);
-			steel += Tuning.STEEL_INGOT_KG;
+		boolean nickel = dev.wildcatter.Rules.fuelNickelHardware();   // 19c2: its plugs and spring of nickel-chromium alloy
+		int plugSlot = nickel ? 2 : 1;
+		if (steel < Tuning.ROD_STEEL_KG && !slots.get(plugSlot).isEmpty()) {
+			slots.get(plugSlot).shrink(1);
+			steel += nickel ? Tuning.ALLOY_INGOT_KG : Tuning.STEEL_INGOT_KG;
 		}
 		if (progress <= 1e-9 && slots.get(0).isEmpty()) {
 			unit = "NO TUBES: put Zircaloy cladding tubes in its hopper";
 			return;
 		}
 		if (steel < Tuning.ROD_STEEL_KG && progress <= 1e-9) {
-			unit = "NO STEEL: put steel ingots in its hopper (the plugs and plenum spring)";
+			unit = nickel ? "NO NICKEL ALLOY: put nickel-chromium alloy ingots in its hopper (the plugs and plenum spring)"
+					: "NO STEEL: put steel ingots in its hopper (the plugs and plenum spring)";
 			return;
 		}
 		if (rods >= 20) {
@@ -368,6 +419,16 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 			return;
 		}
 		if (progress <= 1e-9) {   // a new rod: a tube on the bench, its bottom plug welded on
+			benchIfba = ifbaSetting > 0 && rodIndex < ifbaSetting;
+			if (benchIfba) {   // 19c2: its pellets coated with ZrB2 first
+				IfbaCoaterBlockEntity coater = Touching.find(level, worldPosition, IfbaCoaterBlockEntity.class, c -> true);
+				String why = coater == null ? "NO IFBA: set an IFBA coater against it, or sneak-click it to 0 IFBA rods" : coater.coat(level);
+				if (why != null) {
+					unit = why;
+					return;
+				}
+			}
+			rodIndex = (rodIndex + 1) % Tuning.ASSEMBLY_RODS;
 			slots.get(0).shrink(1);
 			steel -= Tuning.ROD_STEEL_KG;
 		}
@@ -378,6 +439,9 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 		if (progress >= Fuel.rodU() - 1e-9) {
 			progress = 0;
 			rods++;
+			if (benchIfba) {
+				ifbaReady++;
+			}
 		}
 		unit = String.format("loading rod pellets: %.0f of %d in the rod on the bench; %d rods ready", progress / Fuel.rodU() * Fuel.pelletsPerRod(), Fuel.pelletsPerRod(), rods);
 	}
@@ -393,7 +457,9 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 			case "sintering_furnace" -> "Sintering furnace (pusher): " + unit;
 			case "pellet_grinder" -> String.format("Pellet grinder (centreless): %s; swarf %.1f kg of U%s", unit, swarf + scrap.total(),
 					scrap.total() > 0 ? String.format(" (%d scrap cans)", slots.get(SCRAP_OUT).getCount()) : "");
-			case "rod_loader" -> String.format("Rod loader: %s; tubes %d, steel %.1f kg", unit, slots.get(0).getCount(), steel);
+			case "rod_loader" -> String.format("Rod loader: %s; tubes %d, %s %.1f kg%s", unit, slots.get(0).getCount(),
+					dev.wildcatter.Rules.fuelNickelHardware() ? "nickel alloy" : "steel", steel,
+					ifbaSetting > 0 ? String.format("; %d IFBA rods an assembly (%d coated rods ready); sneak-click to change", ifbaSetting, ifbaReady) : "; sneak-click sets IFBA rods");
 			default -> kind();
 		};
 		return Component.literal(label + "; " + describe());
@@ -415,6 +481,11 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 		output.putDouble("hf", hf);
 		output.putDouble("swarf", swarf);
 		output.putDouble("lubricant", lubricant);
+		output.putInt("ifbaSetting", ifbaSetting);
+		output.putInt("rodIndex", rodIndex);
+		output.putBoolean("benchIfba", benchIfba);
+		output.putInt("ifbaReady", ifbaReady);
+		output.putDouble("hfPending", hfPending);
 		scrap.save(output, "scrap");
 	}
 
@@ -435,6 +506,11 @@ public class FuelLineBlockEntity extends UnitMotorBlockEntity implements FuelSta
 		hf = input.getDoubleOr("hf", 0);
 		swarf = input.getDoubleOr("swarf", 0);
 		lubricant = input.getDoubleOr("lubricant", 0);
+		ifbaSetting = input.getIntOr("ifbaSetting", 0);
+		rodIndex = input.getIntOr("rodIndex", 0);
+		benchIfba = input.getBooleanOr("benchIfba", false);
+		ifbaReady = input.getIntOr("ifbaReady", 0);
+		hfPending = input.getDoubleOr("hfPending", 0);
 		scrap.load(input, "scrap");
 	}
 }

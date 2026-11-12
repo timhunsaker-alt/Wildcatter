@@ -24,7 +24,9 @@ import org.jspecify.annotations.Nullable;
 public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements HopperFed {
 	private static final int OUT = 3;
 	private static final int REPAIR = 4;   // 19b: a bent assembly to straighten, by a hopper on top
-	private final NonNullList<ItemStack> slots = NonNullList.withSize(REPAIR + 1, ItemStack.EMPTY);
+	private static final int S304 = 5;     // 19c2: 304 stainless and nickel-chromium alloy ingots
+	private static final int NICR = 6;
+	private final NonNullList<ItemStack> slots = NonNullList.withSize(NICR + 1, ItemStack.EMPTY);
 	private double repair;
 	private double repairSeconds = Tuning.GRID_REPAIR_SECONDS;
 	private boolean skeleton;
@@ -32,6 +34,9 @@ public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements 
 	private int rods;
 	private double assay = Tuning.ASSAY_PRODUCT;   // 16c1: of the rods in the skeleton
 	private int built;
+	private int ifbaRods;      // 19c2: IFBA rods in the skeleton
+	private double stainless;  // 19c2: kg of 304 for the nozzles, with the fuelNickelHardware rule
+	private double nickelAlloy;   // kg of nickel-chromium alloy for the end grids, springs and plugs
 	private String unit = "starting";
 
 	public AssemblyFixtureBlockEntity(BlockPos pos, BlockState state) {
@@ -45,17 +50,18 @@ public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements 
 
 	@Override
 	public boolean takes(ItemStack stack) {
-		return takes(0, stack) || takes(1, stack) || takes(2, stack) || takes(REPAIR, stack);
+		return takes(0, stack) || takes(1, stack) || takes(2, stack) || takes(REPAIR, stack) || takes(S304, stack) || takes(NICR, stack);
 	}
 
 	private boolean takes(int slot, ItemStack stack) {
 		return slot == 0 && stack.is(WildcatterItems.GUIDE_THIMBLE) || slot == 1 && stack.is(WildcatterItems.SPACER_GRID) || slot == 2 && stack.is(WildcatterItems.STEEL_INGOT)
-				|| slot == REPAIR && stack.is(WildcatterBlocks.FUEL_ASSEMBLY.asItem()) && dev.wildcatter.item.FuelAssemblyTags.bent(stack);
+				|| slot == REPAIR && stack.is(WildcatterBlocks.FUEL_ASSEMBLY.asItem()) && dev.wildcatter.item.FuelAssemblyTags.bent(stack)
+				|| slot == S304 && stack.is(WildcatterItems.STAINLESS_304_INGOT) || slot == NICR && stack.is(WildcatterItems.NICKEL_CHROMIUM_INGOT);
 	}
 
 	@Override
 	public int[] getSlotsForFace(Direction side) {
-		return side == Direction.UP ? new int[] {0, 1, 2, REPAIR} : side == Direction.DOWN ? new int[] {OUT} : new int[0];
+		return side == Direction.UP ? new int[] {0, 1, 2, REPAIR, S304, NICR} : side == Direction.DOWN ? new int[] {OUT} : new int[0];
 	}
 
 	@Override
@@ -137,14 +143,26 @@ public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements 
 			unit = "FULL: take the finished assembly (empty hand, or a hopper under it)";
 			return;
 		}
+		boolean nickelHardware = dev.wildcatter.Rules.fuelNickelHardware();   // 19c2: 304 and nickel alloy, not steel
 		if (!skeleton) {
-			if (steel < Tuning.ASSEMBLY_STEEL_KG && !slots.get(2).isEmpty()) {
+			if (nickelHardware) {
+				if (stainless < Tuning.ASSEMBLY_304_KG && !slots.get(S304).isEmpty()) {
+					slots.get(S304).shrink(1);
+					stainless += Tuning.ALLOY_INGOT_KG;
+				}
+				if (nickelAlloy < Tuning.ASSEMBLY_NICR_KG && !slots.get(NICR).isEmpty()) {
+					slots.get(NICR).shrink(1);
+					nickelAlloy += Tuning.ALLOY_INGOT_KG;
+				}
+			} else if (steel < Tuning.ASSEMBLY_STEEL_KG && !slots.get(2).isEmpty()) {
 				slots.get(2).shrink(1);
 				steel += Tuning.STEEL_INGOT_KG;
 			}
 			String missing = slots.get(0).getCount() < Tuning.ASSEMBLY_THIMBLES ? String.format("NO THIMBLES: it needs %d guide thimbles, has %d", Tuning.ASSEMBLY_THIMBLES, slots.get(0).getCount())
 					: slots.get(1).getCount() < Tuning.ASSEMBLY_MID_GRIDS ? String.format("NO GRIDS: it needs %d spacer grids, has %d", Tuning.ASSEMBLY_MID_GRIDS, slots.get(1).getCount())
-					: steel < Tuning.ASSEMBLY_STEEL_KG ? "NO STEEL: put steel ingots in its hopper (nozzles and end grids)" : null;
+					: nickelHardware && stainless < Tuning.ASSEMBLY_304_KG ? "NO STAINLESS: put 304 stainless ingots in its hopper (the nozzles)"
+					: nickelHardware && nickelAlloy < Tuning.ASSEMBLY_NICR_KG ? "NO NICKEL ALLOY: put nickel-chromium alloy ingots in its hopper (end grids and springs)"
+					: !nickelHardware && steel < Tuning.ASSEMBLY_STEEL_KG ? "NO STEEL: put steel ingots in its hopper (nozzles and end grids)" : null;
 			if (missing != null) {
 				unit = missing;
 				return;
@@ -158,16 +176,28 @@ public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements 
 		if (!skeleton) {   // the thimbles through the grids, the nozzles on
 			slots.get(0).shrink(Tuning.ASSEMBLY_THIMBLES);
 			slots.get(1).shrink(Tuning.ASSEMBLY_MID_GRIDS);
-			steel -= Tuning.ASSEMBLY_STEEL_KG;
+			if (nickelHardware) {
+				stainless -= Tuning.ASSEMBLY_304_KG;
+				nickelAlloy -= Tuning.ASSEMBLY_NICR_KG;
+			} else {
+				steel -= Tuning.ASSEMBLY_STEEL_KG;
+			}
 			skeleton = true;
 		}
 		double a = welder.rodAssay();
 		if (rods < Tuning.ASSEMBLY_RODS && welder.takeRod()) {
 			assay = FuelStage.blend(rods, assay, 1, a);   // 16c1
 			rods++;
+			if (welder.lastTakenIfba()) {
+				ifbaRods++;   // 19c2
+			}
 		}
 		if (rods >= Tuning.ASSEMBLY_RODS) {
 			ItemStack made = dev.wildcatter.WildcatterComponents.withAssay(new ItemStack(WildcatterBlocks.FUEL_ASSEMBLY), assay);
+			if (ifbaRods > 0) {
+				dev.wildcatter.item.FuelAssemblyTags.setIfbaRods(made, ifbaRods);
+			}
+			ifbaRods = 0;
 			double leak = leakChance(level, welder);
 			if (leak > 0) {
 				dev.wildcatter.item.FuelAssemblyTags.setLeakChance(made, leak);
@@ -207,7 +237,8 @@ public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements 
 
 	@Override
 	public Component inspect() {
-		return Component.literal(String.format("Assembly fixture: %s; %d built; %s", unit, built, describe()));
+		String hardware = dev.wildcatter.Rules.fuelNickelHardware() ? String.format("304 %.0f kg, nickel alloy %.0f kg", stainless, nickelAlloy) : String.format("steel %.0f kg", steel);
+		return Component.literal(String.format("Assembly fixture: %s; %d built; %s; %s", unit, built, hardware, describe()));
 	}
 
 	@Override
@@ -219,6 +250,9 @@ public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements 
 		output.putDouble("steel", steel);
 		output.putInt("rods", rods);
 		output.putInt("built", built);
+		output.putInt("ifbaRods", ifbaRods);
+		output.putDouble("stainless", stainless);
+		output.putDouble("nickelAlloy", nickelAlloy);
 		output.putDouble("repair", repair);
 	}
 
@@ -232,6 +266,9 @@ public class AssemblyFixtureBlockEntity extends UnitMotorBlockEntity implements 
 		steel = input.getDoubleOr("steel", 0);
 		rods = input.getIntOr("rods", 0);
 		built = input.getIntOr("built", 0);
+		ifbaRods = input.getIntOr("ifbaRods", 0);
+		stainless = input.getDoubleOr("stainless", 0);
+		nickelAlloy = input.getDoubleOr("nickelAlloy", 0);
 		repair = input.getDoubleOr("repair", 0);
 	}
 }

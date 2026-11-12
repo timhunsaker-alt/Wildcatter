@@ -47,6 +47,15 @@ public class HfKilnBlockEntity extends UnitMotorBlockEntity implements HopperFed
 		return faces(at -> at[1] == 0, Direction.EAST);
 	}
 
+	/** 19c2: litres of sulfuric acid off its acid pipe for the HF column's recovered HF; returns what came. */
+	public double takeAcid(Level level, double litres) {
+		return Lines.pull(level, east(), Product.SULFURIC_ACID, litres, Pull.MACHINE, this);
+	}
+
+	public double acidAvailable(Level level) {
+		return Lines.available(level, east(), Product.SULFURIC_ACID, Pull.MACHINE, this);
+	}
+
 	public double takeHf(double kg) {
 		double got = Math.min(kg, hf);
 		hf -= got;

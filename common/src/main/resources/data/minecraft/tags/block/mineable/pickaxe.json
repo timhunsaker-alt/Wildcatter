@@ -437,6 +437,8 @@
     "wildcatter:ingot_caster",
     "wildcatter:pellet_inspection",
     "wildcatter:rod_inspection",
-    "wildcatter:scrap_oxidizer"
+    "wildcatter:scrap_oxidizer",
+    "wildcatter:hf_recovery_condenser",
+    "wildcatter:ifba_coater"
   ]
 }

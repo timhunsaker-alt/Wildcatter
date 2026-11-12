@@ -31,6 +31,8 @@ public class RodInspectionBlockEntity extends UnitMotorBlockEntity implements Ro
 	private double rejectDue;   // rods' worth of rejects owed
 	private int inspected;
 	private int rejected;
+	private int ifbaRack;      // 19c2
+	private boolean lastIfba;
 	private String unit = "starting";
 
 	public RodInspectionBlockEntity(BlockPos pos, BlockState state) {
@@ -47,6 +49,10 @@ public class RodInspectionBlockEntity extends UnitMotorBlockEntity implements Ro
 		if (rack <= 0) {
 			return false;
 		}
+		lastIfba = ifbaRack > 0;
+		if (lastIfba) {
+			ifbaRack--;
+		}
 		rack--;
 		setChanged();
 		return true;
@@ -55,6 +61,11 @@ public class RodInspectionBlockEntity extends UnitMotorBlockEntity implements Ro
 	@Override
 	public double rodAssay() {
 		return assay;
+	}
+
+	@Override
+	public boolean lastTakenIfba() {
+		return lastIfba;
 	}
 
 	public int inspected() {
@@ -94,6 +105,7 @@ public class RodInspectionBlockEntity extends UnitMotorBlockEntity implements Ro
 	private void inspectOne(RodWelderBlockEntity welder) {
 		double a = welder.rodAssay();
 		welder.takeRod();
+		boolean coated = welder.lastTakenIfba();
 		inspected++;
 		rejectDue += Tuning.ROD_REJECT;
 		if (rejectDue >= 1) {
@@ -103,6 +115,9 @@ public class RodInspectionBlockEntity extends UnitMotorBlockEntity implements Ro
 		} else {
 			assay = FuelStage.blend(rack, assay, 1, a);
 			rack++;
+			if (coated) {
+				ifbaRack++;
+			}
 		}
 	}
 
@@ -165,6 +180,7 @@ public class RodInspectionBlockEntity extends UnitMotorBlockEntity implements Ro
 		output.putDouble("rejectDue", rejectDue);
 		output.putInt("inspected", inspected);
 		output.putInt("rejected", rejected);
+		output.putInt("ifbaRack", ifbaRack);
 	}
 
 	@Override
@@ -179,5 +195,6 @@ public class RodInspectionBlockEntity extends UnitMotorBlockEntity implements Ro
 		rejectDue = input.getDoubleOr("rejectDue", 0);
 		inspected = input.getIntOr("inspected", 0);
 		rejected = input.getIntOr("rejected", 0);
+		ifbaRack = input.getIntOr("ifbaRack", 0);
 	}
 }

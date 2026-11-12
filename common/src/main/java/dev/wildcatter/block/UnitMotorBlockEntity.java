@@ -108,6 +108,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "pellet_inspection" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PELLET_INSPECTION_WATTS);
 				case "rod_inspection" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ROD_INSPECTION_WATTS);
 				case "scrap_oxidizer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.SCRAP_OXIDIZER_WATTS);
+				case "hf_recovery_condenser" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.HF_CONDENSER_WATTS);
+				case "ifba_coater" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.IFBA_COATER_WATTS);
 				case "helium_recovery_unit" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.HELIUM_UNIT_WATTS);
 				case "crdm_head" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CRDM_WATTS);
 				case "pressurizer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.PZR_HEATER_WATTS);
@@ -259,6 +261,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "pellet_inspection" -> "conveyor, gauges and cameras";
 			case "rod_inspection" -> "X-ray set, vacuum pumps and scanner";
 			case "scrap_oxidizer" -> "furnace heaters and fan";
+			case "hf_recovery_condenser" -> "condensate pumps and chiller";
+			case "ifba_coater" -> "sputter power supply and vacuum pumps";
 			case "helium_recovery_unit" -> "cold box compressors";
 			case "crdm_head" -> "rod drive power";
 			case "pressurizer" -> "heaters";

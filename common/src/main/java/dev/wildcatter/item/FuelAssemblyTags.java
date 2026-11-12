@@ -69,6 +69,15 @@ public final class FuelAssemblyTags {
 		return c > 0 && random.nextDouble() < c;
 	}
 
+	/** 19c2: its rods carrying the IFBA coating (0, or up to 104). */
+	public static int ifbaRods(ItemStack stack) {
+		return tag(stack).getIntOr("ifbaRods", 0);
+	}
+
+	public static void setIfbaRods(ItemStack stack, int rods) {
+		CustomData.update(DataComponents.CUSTOM_DATA, stack, t -> t.putInt("ifbaRods", rods));
+	}
+
 	public static void markInspected(ItemStack stack) {
 		put(stack, "inspected", true);
 	}

@@ -211,6 +211,8 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.PelletInspectionBlockEntity> PELLET_INSPECTION_ENTITY = entity(dev.wildcatter.block.PelletInspectionBlockEntity::new, PELLET_INSPECTION);
 	public static final BlockEntityType<dev.wildcatter.block.RodInspectionBlockEntity> ROD_INSPECTION_ENTITY = entity(dev.wildcatter.block.RodInspectionBlockEntity::new, ROD_INSPECTION);
 	public static final BlockEntityType<dev.wildcatter.block.ScrapOxidizerBlockEntity> SCRAP_OXIDIZER_ENTITY = entity(dev.wildcatter.block.ScrapOxidizerBlockEntity::new, SCRAP_OXIDIZER);
+	public static final BlockEntityType<dev.wildcatter.block.HfRecoveryCondenserBlockEntity> HF_RECOVERY_CONDENSER_ENTITY = entity(dev.wildcatter.block.HfRecoveryCondenserBlockEntity::new, HF_RECOVERY_CONDENSER);
+	public static final BlockEntityType<dev.wildcatter.block.IfbaCoaterBlockEntity> IFBA_COATER_ENTITY = entity(dev.wildcatter.block.IfbaCoaterBlockEntity::new, IFBA_COATER);
 	public static final BlockEntityType<dev.wildcatter.block.HeliumRecoveryBlockEntity> HELIUM_RECOVERY_ENTITY = entity(dev.wildcatter.block.HeliumRecoveryBlockEntity::new, HELIUM_RECOVERY_UNIT);
 	public static final BlockEntityType<dev.wildcatter.block.ReactorVesselBlockEntity> REACTOR_VESSEL_ENTITY = entity(dev.wildcatter.block.ReactorVesselBlockEntity::new, REACTOR_VESSEL);
 	public static final BlockEntityType<dev.wildcatter.block.ReactorConsoleBlockEntity> REACTOR_CONSOLE_ENTITY = entity(dev.wildcatter.block.ReactorConsoleBlockEntity::new, REACTOR_CONSOLE);
@@ -529,7 +531,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		add("branch_cable", BRANCH_CABLE);
 		add("branch_cable_industrial", BRANCH_CABLE_INDUSTRIAL);
 		for (Block part : new Block[] {UF6_AUTOCLAVE, IDR_KILN, GRANULATOR, PELLET_PRESS, SINTERING_FURNACE, PELLET_GRINDER, ROD_LOADER, ROD_WELDER, ASSEMBLY_FIXTURE, HELIUM_RECOVERY_UNIT,
-				PELLET_INSPECTION, ROD_INSPECTION, SCRAP_OXIDIZER}) {
+				PELLET_INSPECTION, ROD_INSPECTION, SCRAP_OXIDIZER, HF_RECOVERY_CONDENSER, IFBA_COATER}) {
 			add(((dev.wildcatter.block.FuelPartBlock) part).part().id(), part);
 		}
 		add("fuel_assembly", FUEL_ASSEMBLY);
@@ -782,6 +784,8 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("pellet_inspection"), PELLET_INSPECTION_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("rod_inspection"), ROD_INSPECTION_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("scrap_oxidizer"), SCRAP_OXIDIZER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("hf_recovery_condenser"), HF_RECOVERY_CONDENSER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("ifba_coater"), IFBA_COATER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("helium_recovery_unit"), HELIUM_RECOVERY_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("reactor_vessel"), REACTOR_VESSEL_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("reactor_console"), REACTOR_CONSOLE_ENTITY);

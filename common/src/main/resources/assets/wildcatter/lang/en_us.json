@@ -639,5 +639,7 @@
   "item.wildcatter.uo2_scrap_can": "Can of UO2 Scrap",
   "block.wildcatter.pellet_inspection": "Pellet Inspection Bench",
   "block.wildcatter.rod_inspection": "Rod Inspection (X-ray, Helium Leak, Gamma Scan)",
-  "block.wildcatter.scrap_oxidizer": "Scrap Oxidizer"
+  "block.wildcatter.scrap_oxidizer": "Scrap Oxidizer",
+  "block.wildcatter.hf_recovery_condenser": "HF Recovery Condenser",
+  "block.wildcatter.ifba_coater": "IFBA Coater (ZrB2 sputter)"
 }

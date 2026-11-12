@@ -27,6 +27,15 @@
   finishing) it kept reloading the chunks as fast as they unloaded, which could stall the tick and run the server out of memory.
   Circuits that are loaded solve exactly as before.
 
+### 19c2 (fuel fabrication: HF recovery, IFBA and the real hardware; built 2026-11-12 while Tim was away; not approved)
+- **HF recovery condenser** against the IDR kiln: its HF as 70 % aqueous HF (a new pipe product) for the conversion plant's HF column,
+  which distils it over its kiln's sulfuric acid; the HF kiln then roasts less fluorspar.
+- **IFBA coater** against the rod loader (Zircaloy tubes and boric acid); sneak-click the loader for 0, 32, 64 or 104 IFBA rods an
+  assembly. In the reactor 104 IFBA rods start an assembly 3,000 pcm lower, burning out by 12 GWd/t.
+- New world rule **`fuelNickelHardware`** (on in new worlds, off in existing ones): the assembly fixture takes 304 stainless and
+  nickel-chromium alloy ingots for its hardware, and the rod loader the alloy for its plugs, instead of steel. Field Manual: HF RECOVERY,
+  IFBA AND HARDWARE.
+
 ### 19c1 (fuel fabrication: inspection, scrap and lubricant; built 2026-11-12 while Tim was away; not approved)
 - **Pellet inspection bench** between the grinder and the rod loader (1 % of pellets rejected) and **rod inspection line** between the
   welder and the fixture (X-ray, helium leak test, gamma scan; one rod in 200 rejected); rejects go out as **cans of UO2 scrap**.

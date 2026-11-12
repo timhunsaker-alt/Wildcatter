@@ -6,6 +6,7 @@ import static dev.wildcatter.neoforge.gametest.GridSceneKit.floor;
 import static dev.wildcatter.neoforge.gametest.GridSceneKit.genset;
 import static dev.wildcatter.neoforge.gametest.GridSceneKit.log;
 import static dev.wildcatter.neoforge.gametest.GridSceneKit.place;
+import static dev.wildcatter.neoforge.gametest.GridSceneKit.put;
 import static dev.wildcatter.neoforge.gametest.GridSceneKit.read;
 import static dev.wildcatter.neoforge.gametest.GridSceneKit.start;
 import static dev.wildcatter.neoforge.gametest.NickelScenes.hopper;
@@ -41,6 +42,11 @@ import net.minecraft.world.item.ItemStack;
  * furnace, grinder, pellet inspection bench and rod loader in a line; the press without zinc stearate reads NO LUBRICANT and cracks a
  * tenth of its pellets to scrap; a scrap can by hopper, the oxidizer's U3O8 goes into the granulator; the bench rejects 1 % of the
  * pellets; a rod inspection line rejects one rod in 200; an assembly made with neither inspection part carries a 1 % leak chance.</li>
+ * <li>{@code fuel_hardware} (19c2, the fuelNickelHardware rule): the IDR kiln (U in its autoclave, stand-in hydrogen) with the HF
+ * recovery condenser against it fills a tank with 70 % aqueous HF, which the conversion plant's HF column distils over its HF kiln's
+ * sulfuric acid; the rod loader set to 104 IFBA rods has the IFBA coater coat its pellets and takes nickel-chromium alloy for its
+ * plugs; the fixture builds its skeleton of 304 and nickel alloy, and one given steel reads NO STAINLESS; an assembly of 104 IFBA rods
+ * reads 3,000 pcm lower in a vessel than a plain one.</li>
  * </ul>
  */
 final class FuelExtensionScenes {
@@ -53,6 +59,7 @@ final class FuelExtensionScenes {
 	static Map<String, Consumer<GameTestHelper>> scenes() {
 		Map<String, Consumer<GameTestHelper>> scenes = new LinkedHashMap<>();
 		scenes.put("fuel_quality", FuelExtensionScenes::fuelQuality);
+		scenes.put("fuel_hardware", FuelExtensionScenes::fuelHardware);
 		return scenes;
 	}
 
@@ -130,6 +137,97 @@ final class FuelExtensionScenes {
 					String lubed = read(helper, 0, U, 4);
 					log(scene, "ok: " + lubed);
 					check(helper, !lubed.contains("NO LUBRICANT") && press.scrapTotal() == before, "with zinc stearate the press should crack none: " + lubed, rules);
+					Rules.restore(rules);
+					helper.succeed();
+				});
+			});
+		});
+	}
+
+	// ---- fuel_hardware ------------------------------------------------------------------------------------------------------------
+	static void fuelHardware(GameTestHelper helper) {
+		String scene = "fuel_hardware";
+		boolean[] rules = Rules.snapshot();
+		Rules.set(Rules.Rule.FUEL_NICKEL_HARDWARE, true);
+		floor(helper, -12, -10, 62, 32);
+		// HF: the autoclave and the IDR kiln, the condenser against the kiln, its aqueous HF to a tank, on to an HF column and its kiln
+		place(helper, WildcatterBlocks.UF6_AUTOCLAVE, 0, U, 0, NORTH);         // z 0-3
+		place(helper, WildcatterBlocks.IDR_KILN, 0, U, 4, NORTH);              // z 4-13, hydrogen east
+		place(helper, WildcatterBlocks.HF_RECOVERY_CONDENSER, 3, U, 12, NORTH); // x 3-4, z 12-13, box (3, 11) north, aqueous HF (4, 13) south
+		place(helper, WildcatterBlocks.STOCK_TANK, 4, U, 15, NORTH);           // x 4-7, z 15-18
+		place(helper, WildcatterBlocks.HF_COLUMN, 8, U, 17, NORTH);            // x 8-9, z 17-18, aqueous HF on its north side
+		place(helper, WildcatterBlocks.HF_KILN, 10, U, 15, NORTH);             // x 10-12, z 15-24, against the column; acid east
+		place(helper, WildcatterBlocks.STOCK_TANK, 14, U, 14, NORTH);          // x 14-17, z 14-17: sulfuric acid
+		put(helper, "gas_line", 3, U, 6);
+		NickelScenes.source(helper, 4, 6, dev.wildcatter.fluid.Product.HYDROGEN, 1.0);
+		put(helper, "gas_line", 4, U, 14);
+		put(helper, "gas_line", 8, U, 16);
+		put(helper, "gas_line", 13, U, 15);
+		// IFBA and hardware, x 30: grinder, loader (the coater against its east side), welder, fixture; x 40: a welder and a fixture on steel
+		place(helper, WildcatterBlocks.PELLET_GRINDER, 30, U, 0, NORTH);       // z 0-3
+		place(helper, WildcatterBlocks.ROD_LOADER, 30, U, 4, NORTH);           // z 4-13
+		place(helper, WildcatterBlocks.IFBA_COATER, 33, U, 4, NORTH);          // x 33-35, z 4-9, box (33, 3) north
+		place(helper, WildcatterBlocks.ROD_WELDER, 30, U, 14, NORTH);          // z 14-19
+		place(helper, WildcatterBlocks.ASSEMBLY_FIXTURE, 30, U, 20, NORTH);    // z 20-29
+		place(helper, WildcatterBlocks.ROD_WELDER, 40, U, 14, NORTH);
+		place(helper, WildcatterBlocks.ASSEMBLY_FIXTURE, 40, U, 20, NORTH);
+		// the vessels, cold and open
+		place(helper, WildcatterBlocks.REACTOR_VESSEL, 50, U, 0, NORTH);
+		place(helper, WildcatterBlocks.REACTOR_VESSEL, 56, U, 0, NORTH);
+		// 480 V: a diesel set, along z -6, down to each part's box
+		genset(helper, -6, U, -6);                                             // 480 V at (-5, -6)
+		run(helper, "cable_industrial", new int[] {-5, -6}, new int[] {39, -6});
+		run(helper, "cable_industrial", new int[] {-1, -5}, new int[] {-1, 4});
+		run(helper, "cable_industrial", new int[] {5, -5}, new int[] {5, 11}, new int[] {3, 11});
+		run(helper, "cable_industrial", new int[] {29, -5}, new int[] {29, 20});
+		run(helper, "cable_industrial", new int[] {33, -5}, new int[] {33, 3});
+		run(helper, "cable_industrial", new int[] {39, -5}, new int[] {39, 20});
+		entity(helper, 14, U, 14, dev.wildcatter.block.StorageTankBlockEntity.class).testFill(dev.wildcatter.fluid.Product.SULFURIC_ACID, 5_000);
+		entity(helper, 0, U, 4, dev.wildcatter.block.WaterUser.class).addWater(100_000);
+		hopper(helper, 31, U + 3, 5, new ItemStack(WildcatterItems.ZIRCALOY_TUBE, 16), new ItemStack(WildcatterItems.NICKEL_CHROMIUM_INGOT, 1));
+		hopper(helper, 34, U + 3, 5, new ItemStack(WildcatterItems.ZIRCALOY_TUBE, 2), new ItemStack(WildcatterItems.BORIC_ACID, 1));
+		hopper(helper, 31, U + 3, 15, new ItemStack(WildcatterItems.HELIUM_CYLINDER, 1));
+		hopper(helper, 31, U + 6, 21, new ItemStack(WildcatterItems.GUIDE_THIMBLE, 25), new ItemStack(WildcatterItems.SPACER_GRID, 6),
+				new ItemStack(WildcatterItems.STAINLESS_304_INGOT, 1), new ItemStack(WildcatterItems.NICKEL_CHROMIUM_INGOT, 1));
+		hopper(helper, 41, U + 6, 21, new ItemStack(WildcatterItems.GUIDE_THIMBLE, 25), new ItemStack(WildcatterItems.SPACER_GRID, 6),
+				new ItemStack(WildcatterItems.STEEL_INGOT, 1));
+		FuelLineBlockEntity loader = entity(helper, 30, U, 4, FuelLineBlockEntity.class);
+		loader.nextIfba();
+		loader.nextIfba();
+		loader.nextIfba();   // 104
+		dev.wildcatter.block.HfRecoveryCondenserBlockEntity condenser = entity(helper, 3, U, 12, dev.wildcatter.block.HfRecoveryCondenserBlockEntity.class);
+		dev.wildcatter.block.HfColumnBlockEntity column = entity(helper, 8, U, 17, dev.wildcatter.block.HfColumnBlockEntity.class);
+		dev.wildcatter.block.IfbaCoaterBlockEntity coater = entity(helper, 33, U, 4, dev.wildcatter.block.IfbaCoaterBlockEntity.class);
+		start(helper, -6, U, -6, () -> {
+			entity(helper, 0, U, 0, FuelStage.class).addFuelU(50);    // UF6 vaporized, as if from a 30B
+			entity(helper, 30, U, 0, FuelStage.class).addFuelU(20);   // ground pellets
+			helper.runAfterDelay(500, () -> {
+				String rods = " | loader " + read(helper, 30, U, 4) + " | coater " + read(helper, 33, U, 4);
+				log(scene, "ifba:" + rods);
+				check(helper, coater.coated() >= 1 && read(helper, 30, U, 4).contains("104 IFBA"), "the coater should coat the loader's IFBA rods: " + rods, rules);
+				check(helper, !read(helper, 30, U, 4).contains("NO NICKEL ALLOY") && read(helper, 30, U, 4).contains("nickel alloy"), "the loader should take nickel alloy for its plugs: " + rods, rules);
+				String fixtures = " | 304 fixture " + read(helper, 30, U, 20) + " | steel fixture " + read(helper, 40, U, 20);
+				log(scene, "fixtures:" + fixtures);
+				check(helper, read(helper, 30, U, 20).contains("pulling rods") && read(helper, 30, U, 20).contains("304 84 kg"),
+						"the fixture should build its skeleton of 304 and nickel alloy: " + fixtures, rules);
+				check(helper, read(helper, 40, U, 20).contains("NO STAINLESS"), "with the rule a fixture given steel should read NO STAINLESS: " + fixtures, rules);
+				// an IFBA assembly and a plain one, each loaded into a vessel
+				ItemStack ifba = new ItemStack(WildcatterBlocks.FUEL_ASSEMBLY);
+				FuelAssemblyTags.setIfbaRods(ifba, 104);
+				dev.wildcatter.block.ReactorVesselBlockEntity v1 = entity(helper, 50, U, 0, dev.wildcatter.block.ReactorVesselBlockEntity.class);
+				dev.wildcatter.block.ReactorVesselBlockEntity v2 = entity(helper, 56, U, 0, dev.wildcatter.block.ReactorVesselBlockEntity.class);
+				String a = v1.load(ifba);
+				String b = v2.load(new ItemStack(WildcatterBlocks.FUEL_ASSEMBLY));
+				double pcm = (v2.reactor().assemblyRho(0) - v1.reactor().assemblyRho(0)) * 1e5;
+				log(scene, "ifba in a vessel: " + Math.round(pcm) + " pcm lower | " + a + " | " + b);
+				check(helper, a.contains("loaded") && b.contains("loaded") && Math.abs(pcm - 3000) < 1, "104 IFBA rods should read 3,000 pcm lower in a vessel: " + pcm + " | " + a, rules);
+				helper.runAfterDelay(1600, () -> {   // over a minute of the kiln's HF: the tank offers it from half a kg
+					String hf = " | kiln " + read(helper, 0, U, 4) + " | condenser " + read(helper, 3, U, 12) + " | tank " + read(helper, 4, U, 15) + " | column "
+							+ read(helper, 8, U, 17);
+					log(scene, "hf:" + hf);
+					check(helper, condenser.made() > 0, "the condenser should make aqueous HF from the kiln's: " + hf, rules);
+					check(helper, column.recovered() > 0, "the HF column should distil the aqueous HF over the kiln's acid: " + hf, rules);
+					log(scene, "ok");
 					Rules.restore(rules);
 					helper.succeed();
 				});

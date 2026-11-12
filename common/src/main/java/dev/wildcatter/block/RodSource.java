@@ -8,4 +8,9 @@ public interface RodSource {
 
 	/** 16c1: the U-235 assay of the rods in its rack. */
 	double rodAssay();
+
+	/** 19c2: whether the rod the last {@link #takeRod} gave carries the IFBA coating (they go first). */
+	default boolean lastTakenIfba() {
+		return false;
+	}
 }

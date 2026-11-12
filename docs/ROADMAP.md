@@ -528,7 +528,11 @@ does was a key in `config/wildcatter.properties`, off by default; since 2026-11-
   inspection bench, the rod inspection line, the scrap oxidizer, zinc stearate and scrap cans; the leak chance of an uninspected line's
   assemblies, rolled at loading into 19b's leakers. Behind the new world rule `fuelLineDefects` where it would change a built line.
   NeoForge scene `fuel_quality`; client scene `fuelInspection`. Known gaps: the sack and can icons are `*_placeholder`.
-- **19c, fuel fabrication extensions** (19c1 built; 19c2 planned): `docs/multiblocks/fuel-fabrication-extensions.md`. 19c1 pellet inspection,
+- **19c2, HF recovery, IFBA and the real hardware** (BUILT 2026-11-12, branch `w-17b`): the HF recovery condenser (aqueous HF to the
+  conversion plant's HF column), the IFBA coater and the loader's IFBA setting (3,000 pcm at 104 rods, burning out by 12 GWd/t), and
+  304 and nickel-chromium alloy hardware behind the new world rule `fuelNickelHardware` (steel as before in existing worlds). Scene
+  `fuel_hardware`; unit test `ReactorIfbaTest`. Gadolinia is not built (no rare-earth plant).
+- **19c, fuel fabrication extensions** (19c1 and 19c2 BUILT 2026-11-12): `docs/multiblocks/fuel-fabrication-extensions.md`. 19c1 pellet inspection,
   rod X-ray and helium leak tests, scrap and the zinc stearate lubricant; 19c2 HF recovery to the conversion plant, IFBA and gadolinia
   burnable absorbers, real Inconel and stainless hardware (after 17b's nickel smelter). 19c1's leaking rods would feed 19b's coolant
   activity (19b reads leakers from bent grids already).

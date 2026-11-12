@@ -1616,4 +1616,22 @@ public final class Tuning {
 	public static final double SCRAP_OXIDIZER_U_KGH = 5.0;
 	public static final double SCRAP_SHARE_MAX = 0.10;
 	public static final double SCRAP_CAN_KG_U = 5.0;               // a can of scrap: 5 kg of U (proposed)
+
+	// ---- Phase 19c2: HF recovery, IFBA and the real hardware (docs/multiblocks/fuel-fabrication-extensions.md) ----------------------
+	/** The HF recovery condenser: 10 kW at LV; the kiln's HF as 70 % aqueous HF; the HF column takes 0.5 kg of sulfuric acid a kg of HF. */
+	public static final double HF_CONDENSER_WATTS = 10_000.0;
+	public static final double AQUEOUS_HF_STRENGTH = 0.70;
+	public static final double HF_RECOVERY_ACID_PER_HF = 0.5;
+	/** The IFBA coater: 50 kW; about 4 g of zirconium and 5.7 g of boric acid a coated rod (ZrB2, 10 um on 300 pellets; estimate). */
+	public static final double IFBA_COATER_WATTS = 50_000.0;
+	public static final double IFBA_ZR_KG_PER_ROD = 0.004;
+	public static final double IFBA_BORIC_KG_PER_ROD = 0.0057;
+	public static final int[] IFBA_SETTINGS = {0, 32, 64, 104};
+	/** In the reactor: 104 IFBA rods start an assembly 3,000 pcm lower, burning out in a straight line by 12 GWd/t (proposed). */
+	public static final double IFBA_RHO_104 = 0.03;
+	public static final int IFBA_FULL_RODS = 104;
+	public static final double IFBA_BURNOUT_GWD = 12.0;
+	/** The fixture's hardware with the fuelNickelHardware rule: 16 kg of 304 (nozzles) and 4 kg of nickel-chromium alloy. */
+	public static final double ASSEMBLY_304_KG = 16.0;
+	public static final double ASSEMBLY_NICR_KG = 4.0;
 }

@@ -3141,6 +3141,21 @@ lang.update({f"block.{ns}.pellet_inspection": "Pellet Inspection Bench", f"block
 	f"block.{ns}.scrap_oxidizer": "Scrap Oxidizer"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
+# ---- Phase 19c2: HF recovery and IFBA (docs/multiblocks/fuel-fabrication-extensions.md) ------------------------------------------------
+FUEL_X2_PARTS = ("hf_recovery_condenser", "ifba_coater")
+for name in FUEL_X2_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in FUEL_X2_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+shaped("hf_recovery_condenser", ["SGS", "SCS", "SBS"], {"S": S_, "G": "minecraft:glass", "C": "minecraft:coal_block", "B": "minecraft:bucket"}, "hf_recovery_condenser")
+shaped("ifba_coater", ["SCS", "GRG", "SSS"], {"S": S_, "C": "minecraft:copper_block", "G": "minecraft:glass", "R": "minecraft:redstone_block"}, "ifba_coater")
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang.update({f"block.{ns}.hf_recovery_condenser": "HF Recovery Condenser", f"block.{ns}.ifba_coater": "IFBA Coater (ZrB2 sputter)"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

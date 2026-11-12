@@ -88,6 +88,9 @@ public interface FuelCycleBlocks {
 	Block PELLET_INSPECTION = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.PELLET_INSPECTION);
 	Block ROD_INSPECTION = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.ROD_INSPECTION);
 	Block SCRAP_OXIDIZER = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.SCRAP_OXIDIZER);
+	// 19c2: HF recovery and IFBA
+	Block HF_RECOVERY_CONDENSER = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.HF_RECOVERY_CONDENSER);
+	Block IFBA_COATER = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.IFBA_COATER);
 	Block HELIUM_RECOVERY_UNIT = fuelPart(dev.wildcatter.block.FuelPartBlock.Part.HELIUM_RECOVERY_UNIT);
 	// 10b2: the Bayer refinery, lime kiln, AlF3 reactor, bagging station and chlorine filler (docs/multiblocks/bayer-refinery.md, alumina-plant.md)
 	Block BALL_MILL = aluminaPart(dev.wildcatter.block.AluminaPartBlock.Part.BALL_MILL);

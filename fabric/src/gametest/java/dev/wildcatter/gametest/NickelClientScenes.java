@@ -147,12 +147,17 @@ final class NickelClientScenes {
 		place(WildcatterBlocks.ROD_LOADER, 0, 14, north);                   // z 14-23
 		place(WildcatterBlocks.ROD_WELDER, 0, 24, north);                   // z 24-29
 		place(WildcatterBlocks.ROD_INSPECTION, 0, 30, north);               // z 30-39
+		place(WildcatterBlocks.IFBA_COATER, 3, 14, north);                  // x 3-5, z 14-19, against the loader (19c2)
+		place(WildcatterBlocks.IDR_KILN, 10, 0, north);                      // x 10-12, z 0-9
+		place(WildcatterBlocks.HF_RECOVERY_CONDENSER, 13, 4, north);        // x 13-14, z 4-5, against the kiln (19c2)
 		context.waitTicks(40);
 		String bench = read(0, 0, 10);
 		check(bench.contains("Pellet inspection"), "the bench should read: " + bench);
 		show(0, 0, 10, tp(6, 4, 15, 125, 25), "wildcatter-fuel-pellet-inspection");
 		show(0, 0, 30, tp(7, 5, 42, 140, 30), "wildcatter-fuel-rod-inspection");
 		show(3, 0, 0, tp(8, 4, -3, 45, 30), "wildcatter-fuel-scrap-oxidizer");
+		show(3, 0, 14, tp(9, 5, 22, 145, 30), "wildcatter-fuel-ifba-coater");
+		show(13, 0, 4, tp(18, 6, 10, 145, 25), "wildcatter-fuel-hf-condenser");
 		System.out.println("[wildcatter-test] fuelInspection ok: " + bench);
 	}
 }

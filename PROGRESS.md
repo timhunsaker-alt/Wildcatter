@@ -1985,6 +1985,16 @@ Plan: `docs/ideas-plan.md`. Branch `phase16`. Nothing changes what an existing w
 - Numbers in `fluid/MeltShop` (`MeltShopTest`, 4). Items `stainless_304_ingot`, `stainless_316_ingot`, `nickel_chromium_ingot`; JEI
   pages. Field Manual: ALLOY MELT SHOP. NeoForge scene `melt_shop`; client `nickelSmelter` screenshot of the melt shop.
 
+## Phase 19c2: HF recovery, IFBA and the real hardware (2026-11-12; built while Tim was away; decisions: `docs/questions/phase19c-fuel.md`, 9-14)
+- **HF recovery condenser** (`HfRecoveryCondenserBlockEntity`, 10 kW, box north): takes the IDR kiln's HF (`FuelLineBlockEntity.takeKilnHf`,
+  held for it while one touches), 70 % `Product.AQUEOUS_HF` out its south side. `HfColumnBlockEntity` takes aqueous HF on its north face
+  and the acid off its HF kiln's pipe (`HfKilnBlockEntity.takeAcid`), into its anhydrous hold.
+- **IFBA coater** (`IfbaCoaterBlockEntity`, 50 kW, box north) and the rod loader's sneak-click IFBA setting; coated rods carried through
+  welder (`RodSource.lastTakenIfba`), rod line and fixture to the assembly (`FuelAssemblyTags.ifbaRods`); the vessel and the refuelling
+  machine load it (`Reactor.ifba`, saved), `Reactor.assemblyRho` subtracts `ifbaRho`.
+- **Hardware:** world rule `fuelNickelHardware`; the fixture's 304 and alloy slots, the loader's alloy slot.
+- Tests: `ReactorIfbaTest` (3); NeoForge `fuel_hardware`; client `fuelInspection` adds the coater and the condenser.
+
 ## Phase 19c1: fuel fabrication's inspection, scrap and lubricant (2026-11-12; built while Tim was away; decisions: `docs/questions/phase19c-fuel.md`)
 - **Pellet inspection** (`PelletInspectionBlockEntity`, a `FuelStage` between grinder and loader, 10 kW, 1 % to scrap), **rod inspection**
   (`RodInspectionBlockEntity`, a `RodSource` between welder and fixture, 25 kW, every 200th rod to scrap), **scrap oxidizer**

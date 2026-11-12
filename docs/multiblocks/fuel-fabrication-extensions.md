@@ -132,4 +132,16 @@ rotation.
 - **Test:** `fuel_quality` (a NeoForge scene of its own, not an extension of the `fuel` client scene): NO LUBRICANT and cracked pellets;
   the oxidizer's U3O8 into the granulator; the bench's 1 %; the rod line's one in 200; a bare line's 1 % leak chance; with zinc
   stearate nothing cracks. Client scene `fuelInspection` (screenshots).
+### 19c2 (2026-11-12, branch `w-17b`)
+- **Parts:** `hf_recovery_condenser` (2 x 6 x 2, 10 kW, box north; against the IDR kiln, 70 % aqueous HF out the south face of its bottom
+  cells), `ifba_coater` (3 x 3 x 6, 50 kW, box north; against the rod loader, Zircaloy tubes and boric acid by hopper). A new pipe product,
+  aqueous HF (70 %). The conversion plant's HF column takes it on its north face and distils it over its HF kiln's sulfuric acid.
+- **IFBA:** sneak-click on the rod loader (0, 32, 64, 104); the fixture writes the count on the assembly; in the reactor 3,000 pcm at 104
+  rods, burning out in a straight line by 12 GWd/t (`Reactor.ifbaRho`, `ReactorIfbaTest`).
+- **Hardware:** behind the new world rule `fuelNickelHardware` (on in new worlds): the fixture takes 16 kg of 304 and 4 kg of
+  nickel-chromium alloy (NO STAINLESS, NO NICKEL ALLOY), the loader its plugs of the alloy. Off (existing worlds) the line takes steel
+  exactly as before; the spec's "steel stops working" applies only with the rule.
+- **Test:** `fuel_hardware` (a NeoForge scene of its own): the condenser's aqueous HF into a tank and the HF column's recovery; the
+  coater coating the loader's 104 IFBA rods; the loader on nickel alloy; the fixture's 304 and alloy skeleton, and NO STAINLESS on steel;
+  an IFBA assembly 3,000 pcm lower in a vessel. Screenshots in the `fuelInspection` client scene.
 

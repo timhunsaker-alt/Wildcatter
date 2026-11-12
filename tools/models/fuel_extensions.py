@@ -65,8 +65,32 @@ SO.box((0.2, 0.3, 0.0), (0.7, 0.9, 0.3), "grey")                              # 
 SO.decal((0.3, 0.4, -0.01), (0.6, 0.8, 0.0), "danger", "north", "grey")
 SO.collide((0.0, 0.0, 0.0), (2.0, 1.8, 4.0))
 
+# ---- the HF recovery condenser (19c2) ------------------------------------------------------------------------------------------------
+HR = model("hf_recovery_condenser", 2, 6, 2, "grey")
+HR.box((0.0, 0.0, 0.0), (2.0, 0.2, 2.0), "concrete")
+HR.cylinder("y", (0.7, 1.0), 0.4, 0.2, 5.6, "dark", 12)                         # the graphite condenser stack
+HR.cylinder("y", (1.5, 1.2), 0.25, 0.2, 4.2, "polymer", 10)                     # the small column, lined
+HR.pipe([(0.0, 5.0, 1.0), (0.7, 5.0, 1.0)], 6, "steel")                        # the off-gas in from the kiln, west
+HR.pipe([(1.5, 0.5, 1.2), (1.5, 0.5, 2.0)], 3, "polymer")                      # aqueous HF out, south
+HR.box((0.2, 0.3, 0.0), (0.7, 0.9, 0.3), "grey")                               # its box, north
+HR.decal((0.3, 0.4, -0.01), (0.6, 0.8, 0.0), "danger", "north", "grey")
+HR.ladder(1.75, 0.1, 0.2, 5.6, -1, "galv")
+HR.collide((0.0, 0.0, 0.0), (2.0, 5.6, 2.0))
+
+# ---- the IFBA coater (19c2) -------------------------------------------------------------------------------------------------------------
+IB = model("ifba_coater", 3, 3, 6, "grey")
+IB.box((0.0, 0.0, 0.0), (3.0, 0.2, 6.0), "concrete")
+IB.cylinder("z", (1.2, 1.5), 0.9, 0.6, 5.0, "steel", 16)                        # the sputter chamber
+for z in (1.6, 3.0, 4.4):
+	IB.cylinder("x", (1.2, z), 0.25, 2.3, 2.9, "copper", 10)                   # the ZrB2 magnetron targets
+IB.box((0.3, 0.2, 5.1), (2.7, 1.6, 5.9), "blue")                              # the vacuum pumps
+IB.box((1.1, 2.1, 0.8), (1.9, 2.9, 1.6), "galv")                              # the hopper for tubes and boric acid
+IB.box((0.2, 0.3, 0.0), (0.7, 0.9, 0.3), "grey")                               # its box, north (its west against the loader)
+IB.decal((0.3, 0.4, -0.01), (0.6, 0.8, 0.0), "danger", "north", "grey")
+IB.collide((0.0, 0.0, 0.0), (3.0, 2.1, 6.0))
+
 
 M = PI
-EXTRA = [RI, SO]
+EXTRA = [RI, SO, HR, IB]
 for extra in EXTRA:
 	extra.export_args = {"blockstate": True, "item": True}

@@ -12,6 +12,7 @@ final class ReactorSaves {
 		for (int i = 0; i < r.burnup.length; i++) {
 			out.put("burnup" + i, r.burnup[i]);
 			out.put("assay" + i, r.assay[i]);
+			out.put("ifba" + i, r.ifba[i]);
 		}
 		out.put("assemblies", r.assemblies);
 		out.put("rccas", r.rccas);
@@ -60,6 +61,7 @@ final class ReactorSaves {
 		for (int i = 0; i < r.burnup.length; i++) {
 			r.burnup[i] = in.get("burnup" + i, 0);
 			r.assay[i] = in.get("assay" + i, Tuning.ASSAY_PRODUCT);
+			r.ifba[i] = (int) Math.round(in.get("ifba" + i, 0));
 		}
 		r.assemblies = (int) in.get("assemblies", 0);
 		r.rccas = (int) in.get("rccas", 0);

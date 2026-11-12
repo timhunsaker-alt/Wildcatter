@@ -50,3 +50,44 @@ recommendation; for Tim. Format as in `docs/questions/README.md`.
 
 ### 8. Placeholders
 - `zinc_stearate_placeholder` and `uo2_scrap_can_placeholder` (item icons) are drawn by script. Listed in PROGRESS.md, Known gaps.
+
+## 19c2: HF recovery, IFBA and the real hardware
+
+### 9. Steel keeps working in existing worlds: the `fuelNickelHardware` rule
+- **Decided on recommendation; for Tim.** The spec retires steel for the fixture's hardware and the loader's plugs once this wave lands
+  (specs-wildcatter 81). Since that would stop a built fuel line, it is a world rule, `fuelNickelHardware`: on in new worlds (16 kg of
+  304 stainless and 4 kg of nickel-chromium alloy an assembly, the loader's plugs of the alloy; NO STAINLESS, NO NICKEL ALLOY), off in
+  existing worlds (steel, exactly as before). Assemblies already made and those in a reactor are unchanged either way.
+- **Real counterpart:** 17x17 top and bottom nozzles of 304, end grids and springs of Inconel (fuel.md).
+
+### 10. The HF recovery condenser's place and output
+- **Decided on recommendation; for Tim.** Against the IDR kiln, box north (its west side is the kiln's); the kiln's HF waits for it (up to
+  five minutes' worth) instead of going to the scrubber; 70 % aqueous HF (a new pipe product, `aqueous HF (70 %)`, counted in kg, kept in
+  stock tanks) out of the south face of its bottom cells. At the line's rate about 29 kg/h of HF, 42 kg/h of aqueous acid.
+- **Real counterpart:** IDR off-gas HF is condensed as aqueous HF (textbook, unverified).
+
+### 11. The HF column's recovery
+- **Decided on recommendation; for Tim.** The conversion plant's HF column takes aqueous HF off a pipe on the north face of its bottom
+  cells and distils it over sulfuric acid drawn from its HF kiln's acid pipe (0.5 kg of acid a kg of HF, as the spec), first, into its
+  anhydrous HF hold; the kiln's own HF then has that much less room, so it roasts that much less fluorspar. Nothing changes until aqueous
+  HF reaches the column.
+- **Real counterpart:** aqueous to anhydrous HF by extractive distillation over strong sulfuric acid (textbook).
+
+### 12. The IFBA coater's use and the loader's setting
+- **Decided on recommendation; for Tim.** Sneak-click on the rod loader steps its IFBA rods an assembly through 0, 32, 64, 104 (0 at first,
+  so nothing changes); the first N rods of each 264 are coated. The coater (against the loader, box north) uses about 4 g of zirconium
+  (Zircaloy tubes, at a tube's cladding mass) and 5.7 g of boric acid a rod; without it, or empty, the loader waits (NO IFBA, NO
+  ZIRCONIUM, NO BORIC ACID). Coated rods go through the welder, the rod line and the fixture first, and the fixture writes their count on
+  the assembly.
+- **Real counterpart:** a ZrB2 coat about 10 um thick on the central pellets: about 15 mg of ZrB2 a pellet, 5 g a rod (estimate from the
+  pellet's 2.5 cm2 face and ZrB2's 6.1 g/cm3; unverified).
+
+### 13. IFBA in the reactor
+- **Decided on recommendation; for Tim.** Each assembly's reactivity is its own (assay, less burnup), less 3,000 pcm x (IFBA rods / 104)
+  x (1 - burnup / 12 GWd/t) while positive; the core averages its nine as before. A whole core of 104-rod IFBA fuel is 3,000 pcm lower, the
+  spec's 300 ppm less boron at -10 pcm/ppm (`ReactorIfbaTest`). A vessel's saved core keeps each assembly's IFBA count.
+- **Real counterpart:** Westinghouse IFBA (the spec's source); worths unverified.
+
+### 14. Not built
+- Gadolinia (no rare-earth plant; the spec). The new parts use the mod's materials; no new item icons in 19c2.
+
