@@ -218,7 +218,8 @@
   CO2 liquefier's liquid CO2, sends its uranium as AUC to the uranium calciner against it; the drum filler fills U3O8 drums.
 - **Field Manual:** WORLD RULES; the ash bed, spin-up and reactor rules pages now name the world rules.
 - Decisions for review: `docs/questions/world-rules.md`.
-## v0.6.2 (unreleased)
+
+## v0.6.2 (released 2026-11-13)
 
 ### Fixes
 - **No more see-through holes around small blocks:** thirteen blocks whose models are smaller than a whole block still told the game
