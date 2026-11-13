@@ -1,5 +1,7 @@
 # Phase 17c, zirconium extensions: decisions taken while Tim was away (2026-11-12)
 
+**Tim accepted every decision below as decided on 2026-11-13** (the 0.7.0 review).
+
 Spec: `docs/multiblocks/zirconium-extensions.md` (DRAFT, decided on recommendation; its "As built" section lists what was built). The
 spec's own choices are in `docs/questions/specs-wildcatter.md`, items 72-78. Format as in `docs/questions/README.md`. Each entry was
 decided on recommendation; for Tim. Entries marked **(needs you)** change something outside this phase or pick between real options.

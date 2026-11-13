@@ -1,5 +1,7 @@
 # Phase 19d, rods and the sodium sulfate: decisions taken while Tim was away (2026-11-12)
 
+**Tim accepted every decision below as decided on 2026-11-13** (the 0.7.0 review).
+
 Spec: `docs/multiblocks/reactor-extensions.md` items 9-11 (DRAFT, decided on recommendation; "As built (19d)" there). The spec's own
 choices are in `docs/questions/specs-wildcatter.md`, items 85-96. Format as in `docs/questions/README.md`. Each entry was decided on
 recommendation; for Tim. Entries marked **(needs you)** change something outside this phase or pick between real options.

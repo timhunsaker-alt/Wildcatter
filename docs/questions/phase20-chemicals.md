@@ -1,5 +1,7 @@
 # Phase 20, chemicals: decisions taken while Tim was away (2026-11-12)
 
+**Tim accepted every decision below as decided on 2026-11-13** (the 0.7.0 review).
+
 Plan: `docs/ideas-plan.md`, Phase 20. Built: **20a** the chlor-alkali plant, **20b** titanium pigment, **20c** lithium hydroxide. Specs: `docs/multiblocks/chlor-alkali-plant.md` (and, as
 they are built, `titanium-pigment.md`, `lithium.md`); each has an "As built" section. Format as in `docs/questions/README.md`. Every
 entry was decided on the best real-world recommendation; none needs Tim before it can stand, but each can be changed.

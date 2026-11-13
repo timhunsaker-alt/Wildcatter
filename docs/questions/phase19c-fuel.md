@@ -1,5 +1,7 @@
 # Phase 19c, fuel fabrication extensions: decisions taken while Tim was away (2026-11-12)
 
+**Tim accepted every decision below as decided on 2026-11-13** (the 0.7.0 review).
+
 Spec: `docs/multiblocks/fuel-fabrication-extensions.md` (DRAFT, decided on recommendation; its "As built" section lists what differs). The
 spec's own choices are `docs/questions/specs-wildcatter.md`, items 79-84. Each item below was decided on the best real-world
 recommendation; for Tim. Format as in `docs/questions/README.md`.

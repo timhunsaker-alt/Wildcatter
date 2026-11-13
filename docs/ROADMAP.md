@@ -428,7 +428,7 @@ Decisions for Tim: `docs/questions/plc-gaps.md` (12 entries). Spec updated: `doc
   - process models (pipe pressure, drum pressure, a turbine's load setpoint, dampers, vibration, CT and PT voltage);
   - the crane's lift start.
 
-## Phase 16 — Uranium routes and plant operations — 16a, 16b1, 16c1, 16d1 BUILT 2026-11-10; 16b2, 16c2, 16d2 BUILT 2026-11-12 (built while Tim was away, on the DRAFT specs decided on recommendation; not approved)
+## Phase 16 — Uranium routes and plant operations — 16a, 16b1, 16c1, 16d1 BUILT 2026-11-10; 16b2, 16c2, 16d2 BUILT 2026-11-12 (built while Tim was away, on the DRAFT specs decided on recommendation; not approved; 16b2, 16c2, 16d2 decisions accepted by Tim 2026-11-13)
 Plan: `docs/ideas-plan.md`, Phase 16. Branch `phase16`. Decisions for Tim: `docs/questions/phase16-uranium.md` (numbered across the waves).
 Rule: nothing changes or slows what an existing world already does; anything that would alter a plant already built is behind a
 default-off setting or waits until the player adds the new part.
@@ -477,7 +477,7 @@ Spec: `docs/multiblocks/ferroalloys.md` ("As built"). Decisions for Tim: `docs/q
 - **Known gaps:** the seven bag icons are `*_placeholder`; chromium metal built in 17c2; no var controller; Tailings still
   uses its placeholder ferrosilicon (question 1).
 
-## Phase 17c — Zirconium extensions — 17c1 and 17c2 BUILT 2026-11-12 (while Tim was away, on the DRAFT spec decided on recommendation; not approved)
+## Phase 17c — Zirconium extensions — 17c1 and 17c2 BUILT 2026-11-12 (while Tim was away, on the DRAFT spec decided on recommendation; decisions accepted by Tim 2026-11-13)
 Spec: `docs/multiblocks/zirconium-extensions.md` ("As built"). Decisions for Tim: `docs/questions/phase17c-zirconium.md`. Branch `w-17c`.
 - **17c1, batches, scrap and hafnium** (BUILT 2026-11-12): behind the world rule `zirconiumBatches` (on in new worlds), the Kroll
   reactor's two retorts alternate (50 kg, 5 h reduction, 4 h in the vacuum distillation), the VAR furnace melts 100 kg ingots twice (an
@@ -490,7 +490,7 @@ Spec: `docs/multiblocks/zirconium-extensions.md` ("As built"). Decisions for Tim
   dolime and a PIDGEON FURNACE (0.5 MW of gas) makes 10 kg/h of magnesium, cast into ingots each 12-hour cycle, which the magnesium cell
   takes by hopper; a CHROMATE KILN roasts chromite with caustic to chromic oxide, which the aluminothermic vessel fires to chromium metal
   for the VAR furnace. NeoForge scenes `pidgeon`, `chromium`, `fumed_silica`; client scene `pidgeon`.
-## Phase 17b — Nickel smelter, refinery and alloy melt shop — 17b1 and 17b2 BUILT 2026-11-12 (while Tim was away, on the DRAFT spec decided on recommendation; not approved)
+## Phase 17b — Nickel smelter, refinery and alloy melt shop — 17b1 and 17b2 BUILT 2026-11-12 (while Tim was away, on the DRAFT spec decided on recommendation; decisions accepted by Tim 2026-11-13)
 Spec: `docs/multiblocks/nickel-smelter.md` ("As built"). Decisions for Tim: `docs/questions/phase17b-nickel.md`. Branch `w-17b`.
 - **17b1, the smelter and refinery** (BUILT 2026-11-12): the fluid-bed roaster (2 t/h, 110 kW at MV, its SO2 to an acid plant), the
   six-in-line nickel electric furnace (1 MW on the 17a furnace transformer), the Peirce-Smith converter (250 kW blower, a 2-hour blow at
@@ -523,7 +523,7 @@ Specs: `docs/multiblocks/fertilizer.md`, `docs/multiblocks/uranium-from-phosphat
 - **Known gaps:** the bag and extractant drum icons are `*_placeholder`; Farmings does not read `c:fertilizers` yet; the
   filter acid's uranium is worked out from the rock's grade, not carried as an assay.
 
-## Phase 19 — Reactor and fuel extensions — 19a and 19b BUILT 2026-11-10, 19d BUILT 2026-11-12 (while Tim was away, on the DRAFT spec decided on recommendation; not approved)
+## Phase 19 — Reactor and fuel extensions — 19a and 19b BUILT 2026-11-10, 19d BUILT 2026-11-12 (while Tim was away, on the DRAFT spec decided on recommendation; not approved; 19c and 19d decisions accepted by Tim 2026-11-13)
 Spec: `docs/multiblocks/reactor-extensions.md` ("As built"); plan: `docs/ideas-plan.md`, Phase 19. Decisions for Tim:
 `docs/questions/phase19-reactor.md`. Branch `phase19`. **The rule for existing worlds:** every rule that changes what a reactor already
 does was a key in `config/wildcatter.properties`, off by default; since 2026-11-10 they are world rules, on in new worlds except
@@ -592,7 +592,7 @@ Decisions taken while building: `docs/questions/answers-grid.md`. NeoForge scene
 - **Pit line (12):** the 600 mm `slurry_pipe` (rated 1 m3/s), the decant tower's rate scaling with its cell's floor, the 600 mm `air_header`.
 - **Zircon concentrate (9):** `#wildcatter:zircon_feed` and a kg data file; the chlorinator's hopper takes it.
 
-## Phase 20 — Chemicals — 20a, 20b, 20c BUILT 2026-11-12 (while Tim was away, on the DRAFT specs decided on recommendation; not approved)
+## Phase 20 — Chemicals — 20a, 20b, 20c BUILT 2026-11-12 (while Tim was away, on the DRAFT specs decided on recommendation; decisions accepted by Tim 2026-11-13)
 Plan: `docs/ideas-plan.md`, Phase 20. Decisions for Tim: `docs/questions/phase20-chemicals.md`. Branch `w-20`.
 - **20a, the chlor-alkali plant** (`docs/multiblocks/chlor-alkali-plant.md`, BUILT 2026-11-12): brine saturator, brine treatment, a
   membrane cell room (15 kA, 161 V, 2.4 MW DC) on the new `rectifier_mv` (distribution tier), a chlorine train, a caustic evaporator (50 %),
