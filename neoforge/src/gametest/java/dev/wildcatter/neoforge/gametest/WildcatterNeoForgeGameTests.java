@@ -265,8 +265,80 @@ public class WildcatterNeoForgeGameTests {
 		check(helper, blocks > 250 && items > 300 && entities > 100, "registered " + blocks + " blocks, " + items + " items, " + entities + " block entity types");
 		check(helper, BuiltInRegistries.CREATIVE_MODE_TAB.containsKey(Wildcatter.id("wildcatter")), "the creative tab is registered");
 		check(helper, new ItemStack(WildcatterItems.FIELD_MANUAL).has(DataComponents.WRITTEN_BOOK_CONTENT), "the Field Manual carries its pages");
+		java.util.List<String> xray = occludingButNotCube();
+		check(helper, xray.isEmpty(), "a block whose model is smaller than a cube must be noOcclusion, or the world shows through around it: " + xray);
 		System.out.println("[wildcatter-neoforge-test] registers ok: " + blocks + " blocks, " + items + " items, " + entities + " block entity types");
 		helper.succeed();
+	}
+
+	/** The mod's blocks that still occlude although one of their models is not a whole cube (read from the jar's blockstates and models). */
+	private static java.util.List<String> occludingButNotCube() {
+		java.util.List<String> bad = new java.util.ArrayList<>();
+		for (var entry : BuiltInRegistries.BLOCK.entrySet()) {
+			Identifier key = entry.getKey().identifier();
+			if (!key.getNamespace().equals(Wildcatter.MOD_ID) || entry.getValue().getStateDefinition().getPossibleStates().stream().noneMatch(s -> s.canOcclude())) {
+				continue;
+			}
+			com.google.gson.JsonElement states = json("assets/wildcatter/blockstates/" + key.getPath() + ".json");
+			java.util.Set<String> models = new java.util.HashSet<>();
+			collectModels(states, models);
+			for (String model : models) {
+				if (!fullCube(model, 0)) {
+					bad.add(key.getPath() + " (" + model + ")");
+					break;
+				}
+			}
+		}
+		return bad;
+	}
+
+	private static com.google.gson.JsonElement json(String path) {
+		try (var in = WildcatterNeoForgeGameTests.class.getClassLoader().getResourceAsStream(path)) {
+			return in == null ? null : com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8));
+		} catch (java.io.IOException e) {
+			return null;
+		}
+	}
+
+	private static void collectModels(com.google.gson.JsonElement e, java.util.Set<String> out) {
+		if (e == null) {
+			return;
+		}
+		if (e.isJsonObject()) {
+			var o = e.getAsJsonObject();
+			if (o.has("model") && o.get("model").isJsonPrimitive()) {
+				out.add(o.get("model").getAsString());
+			}
+			o.entrySet().forEach(x -> collectModels(x.getValue(), out));
+		} else if (e.isJsonArray()) {
+			e.getAsJsonArray().forEach(x -> collectModels(x, out));
+		}
+	}
+
+	/** A model is a whole cube when it, or the parent it inherits elements from, has an element from 0,0,0 to 16,16,16 (vanilla cube parents count). */
+	private static boolean fullCube(String ref, int depth) {
+		String ns = ref.contains(":") ? ref.substring(0, ref.indexOf(':')) : "minecraft";
+		String path = ref.contains(":") ? ref.substring(ref.indexOf(':') + 1) : ref;
+		if (!ns.equals(Wildcatter.MOD_ID)) {
+			return path.startsWith("block/cube") || path.equals("block/orientable") || path.equals("block/block");
+		}
+		com.google.gson.JsonElement model = json("assets/wildcatter/models/" + path + ".json");
+		if (model == null || depth > 8) {
+			return true;   // nothing to judge by
+		}
+		var o = model.getAsJsonObject();
+		if (o.has("elements")) {
+			for (var el : o.getAsJsonArray("elements")) {
+				var from = el.getAsJsonObject().getAsJsonArray("from");
+				var to = el.getAsJsonObject().getAsJsonArray("to");
+				if (from.get(0).getAsDouble() <= 0 && from.get(1).getAsDouble() <= 0 && from.get(2).getAsDouble() <= 0
+						&& to.get(0).getAsDouble() >= 16 && to.get(1).getAsDouble() >= 16 && to.get(2).getAsDouble() >= 16) {
+					return true;
+				}
+			}
+			return false;
+		}
+		return !o.has("parent") || fullCube(o.get("parent").getAsString(), depth + 1);
 	}
 
 	/** The 120 V starter plant: a boiler on a campfire and its turbine, a hot and a neutral wire, and a lamp. */

@@ -26,7 +26,7 @@ public class ThreePhaseHeaterBlock extends BaseEntityBlock {
 	private final double watts;
 
 	public ThreePhaseHeaterBlock(Properties properties, Voltage voltage, double watts) {
-		super(properties);
+		super(properties.noOcclusion());   // its model is smaller than a cube: it must not hide its neighbours' faces
 		this.voltage = voltage;
 		this.watts = watts;
 		registerDefaultState(stateDefinition.any().setValue(LoadBlock.LIT, false));

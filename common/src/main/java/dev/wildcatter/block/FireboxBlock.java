@@ -24,7 +24,7 @@ public class FireboxBlock extends BaseEntityBlock {
 	public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
 	public FireboxBlock(Properties properties) {
-		super(properties);
+		super(properties.noOcclusion());   // its model is smaller than a cube: it must not hide its neighbours' faces
 		registerDefaultState(stateDefinition.any().setValue(LIT, false));
 	}
 

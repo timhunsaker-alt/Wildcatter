@@ -42,7 +42,7 @@ public class FuseBlock extends BaseEntityBlock {
 
 	/** A fuse for a tier; the distribution one is a fused cutout. */
 	public FuseBlock(Properties properties, dev.wildcatter.energy.Voltage voltage) {
-		super(properties);
+		super(properties.noOcclusion());   // its model is smaller than a cube: it must not hide its neighbours' faces
 		this.voltage = voltage;
 		registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(BLOWN, false));
 	}

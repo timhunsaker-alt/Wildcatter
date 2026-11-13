@@ -32,7 +32,7 @@ public class LoadBlock extends BaseEntityBlock {
 	private final double watts;
 
 	public LoadBlock(Properties properties, double watts) {
-		super(properties);
+		super(properties.noOcclusion());   // its model is smaller than a cube: it must not hide its neighbours' faces
 		this.watts = watts;
 		registerDefaultState(stateDefinition.any().setValue(LIT, false));
 	}

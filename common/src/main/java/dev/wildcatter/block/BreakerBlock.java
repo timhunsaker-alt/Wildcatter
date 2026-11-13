@@ -88,7 +88,7 @@ public class BreakerBlock extends BaseEntityBlock {
 	}
 
 	protected BreakerBlock(Properties properties, Voltage voltage, boolean plainSwitch, boolean relay, int poles, boolean relayOperated) {
-		super(properties);
+		super(properties.noOcclusion());   // its model is smaller than a cube: it must not hide its neighbours' faces
 		this.relayOperated = relayOperated;
 		this.poles = poles;
 		this.relay = relay;
