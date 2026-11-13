@@ -26,7 +26,7 @@ public class SteamTurbineBlock extends BaseEntityBlock {
 	/** Part of a medium voltage generator (a 3x3x3 cube of turbines). */
 
 	public SteamTurbineBlock(Properties properties) {
-		super(properties);
+		super(properties.noOcclusion());   // its model is smaller than a cube: it must not hide its neighbours' faces
 		registerDefaultState(stateDefinition.any().setValue(RUNNING, false));
 	}
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.6.2 (unreleased)
+
+### Fixes
+- **No more see-through holes around small blocks:** thirteen blocks whose models are smaller than a whole block still told the game
+  they filled it, so it skipped drawing the faces of the blocks beside them and the world showed through: the steam turbine, firebox,
+  pumps, day tank, breakers and switches, fuses and cutouts, pole transformers, lamps and heaters, the three-phase heater, motor
+  starters, the air compressor and dryer, and crane rail. They no longer hide their neighbours. Only how they draw changes; nothing in a
+  world does. The NeoForge `registers` scene now checks every block's models against how it occludes.
+
 ## v0.6.1 (released 2026-11-12)
 
 ### Fixes

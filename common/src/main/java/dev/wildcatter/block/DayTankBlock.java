@@ -13,7 +13,7 @@ import org.jspecify.annotations.Nullable;
 /** A 1 m³ water day tank, an intermediate bulk tank's size: filled by a pump on its pipes, emptied through a valve touching it. */
 public class DayTankBlock extends BaseEntityBlock {
 	public DayTankBlock(Properties properties) {
-		super(properties);
+		super(properties.noOcclusion());   // its model is smaller than a cube: it must not hide its neighbours' faces
 	}
 
 	@Override

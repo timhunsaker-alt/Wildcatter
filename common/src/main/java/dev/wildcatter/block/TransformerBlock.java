@@ -73,7 +73,7 @@ public class TransformerBlock extends BaseEntityBlock {
 
 	/** For the substation's power transformer: delta on the high side. */
 	protected TransformerBlock(Properties properties, Voltage low, Voltage high, double ratedVa, double percentZ, boolean threePhase, boolean deltaLow, boolean deltaHigh) {
-		super(properties);
+		super(properties.noOcclusion());   // its model is smaller than a cube: it must not hide its neighbours' faces
 		this.low = low;
 		this.high = high;
 		this.ratedVa = ratedVa;

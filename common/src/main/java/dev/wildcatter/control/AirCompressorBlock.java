@@ -13,7 +13,7 @@ import org.jspecify.annotations.Nullable;
 /** A small instrument air package: a 480 V compressor and its receiver. Its air reaches tubing through an air dryer. */
 public class AirCompressorBlock extends BaseEntityBlock {
 	public AirCompressorBlock(Properties properties) {
-		super(properties);
+		super(properties.noOcclusion());   // its model is smaller than a cube: it must not hide its neighbours' faces
 	}
 
 	@Override

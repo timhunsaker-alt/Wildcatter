@@ -55,7 +55,7 @@ public class MotorStarterBlock extends BaseEntityBlock {
 	private final boolean bucket;
 
 	public MotorStarterBlock(Properties properties, boolean bucket) {
-		super(properties);
+		super(properties.noOcclusion());   // its model is smaller than a cube: it must not hide its neighbours' faces
 		this.bucket = bucket;
 		registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(RUN, Run.STOPPED));
 	}

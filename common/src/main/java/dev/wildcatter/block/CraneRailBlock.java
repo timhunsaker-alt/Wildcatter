@@ -17,7 +17,7 @@ public class CraneRailBlock extends Block {
 	public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.HORIZONTAL_AXIS;
 
 	public CraneRailBlock(Properties properties) {
-		super(properties);
+		super(properties.noOcclusion());   // its model is smaller than a cube: it must not hide its neighbours' faces
 		registerDefaultState(stateDefinition.any().setValue(AXIS, Direction.Axis.Z));
 	}
 

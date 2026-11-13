@@ -24,7 +24,7 @@ public class PumpBlock extends BaseEntityBlock {
 	public static final net.minecraft.world.level.block.state.properties.EnumProperty<net.minecraft.core.Direction> FACING = net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
 
 	public PumpBlock(Properties properties) {
-		super(properties);
+		super(properties.noOcclusion());   // its model is smaller than a cube: it must not hide its neighbours' faces
 	}
 
 	@Override
