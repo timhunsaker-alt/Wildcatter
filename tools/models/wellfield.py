@@ -136,8 +136,7 @@ MW.cylinder("y", (0.5, 0.5), 0.06, 0.0, 0.7, "polymer", 10)                # 4 i
 MW.cylinder("y", (0.5, 0.5), 0.08, 0.7, 0.8, "danger", 10)                 # its locked cap, painted
 MW.box((0.62, 0.08, 0.35), (0.9, 0.5, 0.65), "grey")                       # the sampling pump's control box
 MW.pipe([(0.5, 0.35, 0.5), (0.0, 0.35, 0.5)], 1, "polymer")                # its sample line, west
-MW.collide((0.4, 0.0, 0.4), (0.6, 0.8, 0.6))
-MW.export_args = {"blockstate": False, "item": True}   # one cell with no states: after() writes its blockstate
+MW.export_args = {"blockstate": False, "item": True}   # one cell with no states: after() writes its blockstate; MonitorWellheadBlock has its own shape
 
 RO = model("ro_unit", 3, 3, 8, "grey")
 RO.box((0.0, 0.0, 0.0), (3.0, 0.2, 8.0), "concrete")
