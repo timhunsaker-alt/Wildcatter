@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (0.7.0, branch `w-next`): Phases 15-19, built 2026-11-10 while Tim was away
+## v0.7.0 (released 2026-11-13): Phases 15-20 and the time scale
 
 ### 16d2: monitor wells, excursions, groundwater restoration (built 2026-11-12 while Tim was away; decisions accepted by Tim 2026-11-13)
 - **Monitor wellheads** on a header house's well pipe, 30-60 blocks from its patterns. With the world rule `isrExcursions` (on in new
