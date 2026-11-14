@@ -266,6 +266,12 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 			tank = Touching.find(level, pzr.getBlockPos(), ReliefTankBlockEntity.class, t -> true);
 		}
 		reactor.step(in, dt);
+		if (parts.isEmpty()) {   // Phase 21: the quest book
+			dev.wildcatter.multiblock.Multiblock.formed(level, worldPosition);
+			if (!reactor.tripped() && !reactor.coreDamaged() && reactor.power() >= 1e-4) {
+				dev.wildcatter.quest.QuestEvents.milestone(level, worldPosition, dev.wildcatter.quest.Milestones.REACTOR_CRITICAL);
+			}
+		}
 		double onward = tank != null ? tank.relieve(level, reactor.reliefKg(), reactor.reliefJ(), cvcs, dt) : reactor.reliefKg();
 		// 19b, with the contamination rule: the relief tank's disc and a damaged core put contamination round them
 		if (level instanceof net.minecraft.server.level.ServerLevel sl) {

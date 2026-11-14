@@ -101,6 +101,9 @@ public class ToppingColumnBlockEntity extends PlantUnitBlockEntity {
 		col.add(Product.RESIDUE, got * cuts.get(Product.RESIDUE));
 		skid.give(Product.GASOLINE, got * cuts.get(Product.GASOLINE));
 		col.refined = got;
+		if (got > 0) {
+			dev.wildcatter.quest.QuestEvents.milestone(level, pos, dev.wildcatter.quest.Milestones.CRUDE_UNIT_RUNNING);   // Phase 21: the quest book
+		}
 		col.status = got > 0 ? String.format("refining %.2f L/s of %s%s", got / seconds, feed.label(), heated < 0.99 ? " (SHORT OF FUEL: pipe gas or residue to the heater)" : "")
 				: "SHORT OF FUEL: pipe gas or residue to the heater's foot";
 		col.setChanged();

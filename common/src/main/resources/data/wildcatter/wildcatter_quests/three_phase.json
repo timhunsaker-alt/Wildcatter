@@ -1,0 +1,152 @@
+{
+  "title": "Three-phase power",
+  "icon": "wildcatter:alternator",
+  "order": 40,
+  "after": [
+    "wildcatter:oil_and_gas"
+  ],
+  "quests": [
+    {
+      "id": "engine_parts",
+      "title": "Engine and generator parts",
+      "icon": "wildcatter:crankshaft",
+      "text": "A genset is built from parts you craft: block casting, pistons, crankshaft, cylinder head and injectors or spark plugs, and an alternator from a stator winding, rotor field and exciter.",
+      "requires": [
+        "steel"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:engine_block_casting",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:crankshaft",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:cylinder_head",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:stator_winding",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:rotor_field",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:exciter",
+          "count": 1
+        }
+      ],
+      "rewards": [
+        {
+          "item": "wildcatter:spark_plug",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "id": "genset",
+      "title": "The gas genset",
+      "icon": "wildcatter:genset_gas_engine",
+      "text": "Build the 480 V gas genset on its base frame with its control panel and pipe gas from the well or the separator. It cranks, comes up to speed and closes its breaker.",
+      "requires": [
+        "engine_parts",
+        "gas_well"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:genset_gas_engine",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:genset_control_panel",
+          "count": 1
+        },
+        {
+          "milestone": "wildcatter:gas_genset_running",
+          "text": "Run the gas genset"
+        }
+      ]
+    },
+    {
+      "id": "motor",
+      "title": "Start a motor",
+      "icon": "wildcatter:motor_starter",
+      "text": "Three wires, A, B and C, at 480 V. Feed a three-pole breaker, then a motor starter, then a three-phase motor: a pump, a fan, the rig.",
+      "requires": [
+        "genset"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:breaker_3p_industrial",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:industrial_wire_hot",
+          "count": 6
+        },
+        {
+          "item": "wildcatter:motor_starter",
+          "count": 1
+        },
+        {
+          "milestone": "wildcatter:motor_running",
+          "text": "Run a three-phase motor"
+        }
+      ],
+      "rewards": [
+        {
+          "item": "wildcatter:industrial_wire_hot",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "id": "mcc",
+      "title": "The MCC",
+      "icon": "wildcatter:mcc_incoming",
+      "text": "A motor control centre gathers the starters: an incoming section with the main breaker and starter sections beside it.",
+      "requires": [
+        "motor"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:mcc_incoming",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:mcc_section",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "plc",
+      "title": "A PLC",
+      "icon": "wildcatter:plc_cabinet",
+      "text": "A PLC cabinet with a CPU and I/O modules runs the plant: start motors, open valves and trip on alarms by its program.",
+      "requires": [
+        "motor"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:plc_cabinet",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:cpu_small",
+          "count": 1
+        }
+      ],
+      "rewards": [
+        {
+          "item": "wildcatter:pushbutton",
+          "count": 2
+        }
+      ]
+    }
+  ]
+}

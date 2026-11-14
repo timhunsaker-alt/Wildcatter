@@ -1,0 +1,193 @@
+{
+  "title": "Refining and plastic",
+  "icon": "wildcatter:plastic_sheet",
+  "order": 60,
+  "after": [
+    "wildcatter:distribution"
+  ],
+  "quests": [
+    {
+      "id": "crude_unit",
+      "title": "The crude unit",
+      "icon": "wildcatter:topping_column",
+      "text": "A topping unit (column, heater and pump skid) splits crude into gasoline, kerosene, diesel and residue. The atmospheric column is the big one.",
+      "requires": [
+        "crude",
+        "motor"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:topping_column",
+          "count": 1
+        },
+        {
+          "milestone": "wildcatter:crude_unit_running",
+          "text": "Refine crude"
+        }
+      ]
+    },
+    {
+      "id": "diesel",
+      "title": "Diesel and the diesel genset",
+      "icon": "wildcatter:genset_diesel_engine",
+      "text": "Diesel from the crude unit runs the 500 kW diesel genset: a bucket on its tank or a pipe from a diesel tank.",
+      "requires": [
+        "crude_unit"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:diesel_bucket",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:genset_diesel_engine",
+          "count": 1
+        },
+        {
+          "milestone": "wildcatter:diesel_genset_running",
+          "text": "Run the diesel genset"
+        }
+      ]
+    },
+    {
+      "id": "gas_plant",
+      "title": "The gas plant",
+      "icon": "wildcatter:ngl_chiller",
+      "text": "Compress, dry and chill separator gas: pipeline gas off the chiller, raw NGL to the stabilizer for LPG and gasoline.",
+      "requires": [
+        "lease",
+        "switchgear"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:gas_compressor",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:teg_dehydrator",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:ngl_chiller",
+          "count": 1
+        },
+        {
+          "milestone": "wildcatter:gas_plant_running",
+          "text": "Run the gas plant"
+        }
+      ]
+    },
+    {
+      "id": "plastic",
+      "title": "Plastic: the gate",
+      "icon": "wildcatter:plastic_sheet",
+      "text": "THE GATE: every cable needs plastic. A cracking furnace makes ethylene; the polyethylene reactor and its pelletizer make plastic sheets.",
+      "requires": [
+        "gas_plant"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:cracking_furnace",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:polyethylene_reactor",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:pelletizer",
+          "count": 1
+        },
+        {
+          "milestone": "wildcatter:pelletizer_running",
+          "text": "Run the pelletizer"
+        },
+        {
+          "item": "wildcatter:plastic_sheet",
+          "count": 16
+        }
+      ]
+    },
+    {
+      "id": "cables",
+      "title": "Cables",
+      "icon": "wildcatter:cable_industrial",
+      "text": "Three-phase cable carries A, B, C, neutral and ground in one plastic jacket. Size it for the current.",
+      "requires": [
+        "plastic"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:cable_industrial",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "id": "high_voltage",
+      "title": "DIST and HV",
+      "icon": "wildcatter:substation_transformer_60",
+      "text": "Distribution runs at DIST and transmission at HV. A substation transformer joins them, with breakers, disconnects and its relay panel.",
+      "requires": [
+        "cables",
+        "switchgear"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:dist_wire_hot",
+          "count": 4
+        },
+        {
+          "item": "wildcatter:hv_wire_hot",
+          "count": 4
+        },
+        {
+          "item": "wildcatter:power_transformer",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "combined_cycle",
+      "title": "Combined cycle",
+      "icon": "wildcatter:hrsg",
+      "text": "A gas turbine's exhaust raises steam in an HRSG for a 5 MW steam turbine: more power from the same gas.",
+      "requires": [
+        "high_voltage"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:gas_turbine",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:hrsg",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:steam_turbine_5",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "peaker",
+      "title": "The aeroderivative peaker",
+      "icon": "wildcatter:aero_turbine",
+      "text": "A 45 MW aeroderivative turbine starts fast and follows the load. The reactor's 60 MVA generator is crafted from its generator, so build this first.",
+      "requires": [
+        "combined_cycle"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:aero_turbine",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:aero_generator",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

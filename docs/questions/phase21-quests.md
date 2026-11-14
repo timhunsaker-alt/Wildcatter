@@ -67,3 +67,45 @@ changed.
 - **Why:** the plan's "a client hook set by each loader's client entry" without the same line in two places; Farmings sets its hook in
   each loader because it has no shared client init.
 - **Alternatives:** set it in `WildcatterFabricClient` and `WildcatterNeoForgeClient` separately.
+
+## 21.2: Wildcatter's chapters and the milestone calls
+
+### 10. The first 480 V supply comes after the drilling rig in the plan's order
+- **Chosen:** the plan's order is kept (Oil and gas, then Three-phase power). The rig quest's text says its drive needs 480 V three-phase and
+  points to Three-phase power; a quest is done whenever its tasks are met (entry 2), so the order does not block anyone.
+- **Why:** the rig and pumpjack are 480 V three-phase machines (Phase 3), and the first gensets burn gas from a well or diesel from the crude
+  unit. Reordering the chapters would not remove the loop; that needs a design answer, not a quest.
+- **For Tim:** how should a new world get its first 480 V three-phase before it has gas or diesel? (A diesel set with a starting tank of
+  fuel, a small LV-to-480 V transformer for the steam turbines, or a rig drive on the LV tier.)
+
+### 11. A formed multiblock fires its milestone on every structure check, not only when it forms
+- **Chosen:** `Multiblock.formed` is called by the controllers each time they find their structure complete: the genset panel, the steam
+  plant's turbine generator, the substation transformer, the cooling tower (once its fan runs), the reactor vessel (its island built), the HP
+  turbine (its island built) and the natural-draft tower (raised). The milestone's 5 s limit keeps it cheap.
+- **Why:** a structure built before the book counts as soon as a player comes near, which is what Tim asked for existing worlds.
+- **Alternatives:** fire only on the change to formed (a player away at that moment would never get it).
+
+### 12. The motor milestone reaches the level through the circuit solve
+- **Chosen:** `Motor` keeps the position it was built at, and `CircuitManager` exposes the level whose circuits it is applying; a running,
+  unstalled three-phase motor fires `wildcatter:motor_running` from there.
+- **Why:** every three-phase motor (pumps, fans, the rig, plant motors) goes through `Motor`, so one call covers them all; the motor holds
+  no level of its own.
+- **Alternatives:** a call in each machine that owns a motor (some thirty places).
+
+### 13. 57 quests rather than about 70
+- **Chosen:** every bullet of the plan's quest line has a quest; where the plan lists the parts of one build (breaker, fuse, ground rod, power
+  meter; separator, flare, injection, disposal) they are one quest with a task each.
+- **Why:** a quest per part would be a checklist, not a guide; the tasks still tick one by one in the screen.
+- **Alternatives:** split the grouped quests (about 75).
+
+### 14. Wells, the rig and the lease are found by their items, not by milestones
+- **Chosen:** only the machines the plan lists fire milestones; the pumpjack, the rig and the lease are item tasks.
+- **Why:** the plan's hook list is the list of places that already know a machine is working; adding more is cheap later.
+- **Alternatives:** a `pumpjack_running` and `well_struck` milestone.
+
+### 15. The rewards
+- **Chosen:** a handful of small things per chapter, all hand-made: apples, torches, coal, bread, iron and copper ingots, paper, a water
+  bucket, wool wire (16), ground rods, fuses, spark plugs, pushbuttons, a compass, steel (16 at the rig, as the plan suggests), steel pipe,
+  buckets, pin insulators, 480 V wire, redstone. Nothing after the plastic gate is rewarded.
+- **Why:** the plan: "small, useful, never past a gate".
+- **Alternatives:** more or fewer.

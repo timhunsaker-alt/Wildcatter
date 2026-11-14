@@ -99,4 +99,30 @@ One payload, a compound tag either way (as `wildcatter:plc`): the server sends t
 progress when it changes; the client sends a claim. Both loaders register it.
 
 ## Milestones Wildcatter fires
-(Filled in with the chapters, step 2.)
+Constants in `dev.wildcatter.quest.Milestones`; any chapter may use them.
+
+| Key | Fired by |
+|---|---|
+| `wildcatter:steam_turbine_generating` | a steam turbine on a boiler making power |
+| `wildcatter:lamp_lit` | an electric lamp lit |
+| `wildcatter:genset_running` | a genset of either kind running |
+| `wildcatter:diesel_genset_running` | a diesel genset running |
+| `wildcatter:gas_genset_running` | a gas genset running |
+| `wildcatter:genset_on_biogas` | a gas genset running on biogas (another mod's digester gas on the steel pipe) |
+| `wildcatter:motor_running` | any three-phase motor up to speed (a pump, a fan, a rig, a plant's motor) |
+| `wildcatter:transformer_energised` | a transformer (pole, pad-mount, unit substation) with its high side live |
+| `wildcatter:crude_unit_running` | the topping unit or the atmospheric column refining |
+| `wildcatter:gas_plant_running` | the NGL chiller chilling dried gas |
+| `wildcatter:pelletizer_running` | the pelletizer making plastic sheets |
+| `wildcatter:reactor_critical` | the reactor built and critical (not tripped) |
+| `wildcatter:turbine_on_line` | the nuclear turbine-generator delivering power with its breaker closed |
+| `wildcatter:formed/<controller>` | a multiblock formed, on each structure check while it stands (`Multiblock.formed`): `genset_control_panel` (a genset skid), `turbine_generator` (the 1 MW steam plant), `power_transformer` and the other substation transformers on that controller, `cooling_tower`, `reactor_vessel` (the nuclear island), `hp_turbine` (the turbine island), `natural_draft_tower` (raised) |
+
+An add-on's own multiblock can call `dev.wildcatter.multiblock.Multiblock.formed(level, controllerPos)` to fire
+`<its namespace>:formed/<its controller block>` the same way.
+
+## Wildcatter's chapters
+`getting_started` (10), `first_power` (20), `oil_and_gas` (30), `three_phase` (40), `distribution` (50), `refining` (60, plastic is the
+gate), `chemicals` (70), `uranium` (80), `nuclear` (90; the last quest is the reactor critical and the turbine-generator on line), all in
+`data/wildcatter/wildcatter_quests/`. An add-on's quest can require any of their quests, e.g. `wildcatter:genset` (the gas genset running),
+`wildcatter:steel`, `wildcatter:plastic`.

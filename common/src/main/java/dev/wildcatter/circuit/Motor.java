@@ -37,6 +37,8 @@ public final class Motor {
 	/** Two leads swapped at the terminal box (B and C): the way an electrician reverses a three-phase motor. */
 	private boolean leadsSwapped;
 
+	/** Where it was last built into a circuit, for the quest book's milestone. */
+	private BlockPos at;
 	private final int[] hot = new int[3];
 	private int neutral;
 	private int star;
@@ -75,6 +77,7 @@ public final class Motor {
 
 	/** The same, with its terminals only on {@code faces} (a big machine's terminal box). */
 	public void build(Circuit circuit, BlockPos pos, java.util.List<Direction> faces) {
+		at = pos.immutable();
 		int phases = threePhase ? 3 : 1;
 		for (int k = 0; k < phases; k++) {
 			hot[k] = circuit.node();
@@ -187,6 +190,9 @@ public final class Motor {
 			if (threePhase && state != State.STOPPED && most > 0) {
 				stalled = least < most * 0.2;
 			}
+		}
+		if (threePhase && state == State.RUNNING && !stalled && at != null) {   // Phase 21: the quest book
+			dev.wildcatter.quest.QuestEvents.milestone(CircuitManager.applying(), at, dev.wildcatter.quest.Milestones.MOTOR_RUNNING);
 		}
 	}
 

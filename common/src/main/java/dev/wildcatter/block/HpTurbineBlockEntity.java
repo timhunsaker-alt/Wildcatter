@@ -184,6 +184,12 @@ public class HpTurbineBlockEntity extends BlockEntity implements Inspectable, Bi
 					hotwell / 1000));
 		}
 		running.update(this, speed > 0.05);
+		if (missing.isEmpty()) {   // Phase 21: the quest book
+			dev.wildcatter.multiblock.Multiblock.formed(level, worldPosition);
+			if (delivered > 0) {
+				dev.wildcatter.quest.QuestEvents.milestone(level, worldPosition, dev.wildcatter.quest.Milestones.TURBINE_ON_LINE);
+			}
+		}
 	}
 
 	private double rpm() {

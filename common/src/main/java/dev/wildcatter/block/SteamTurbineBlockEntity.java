@@ -111,6 +111,9 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 		}
 
 		boolean running = turbine.idleTicks < 20;
+		if (running && !turbine.tripped && watts > 0) {
+			dev.wildcatter.quest.QuestEvents.milestone(level, pos, dev.wildcatter.quest.Milestones.STEAM_TURBINE_GENERATING);   // Phase 21: the quest book
+		}
 		if (state.getValue(SteamTurbineBlock.RUNNING) != running) {
 			level.setBlock(pos, state.setValue(SteamTurbineBlock.RUNNING, running), 3);
 		}

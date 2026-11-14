@@ -1,0 +1,155 @@
+{
+  "title": "First power",
+  "icon": "wildcatter:steam_turbine",
+  "order": 20,
+  "after": [
+    "wildcatter:getting_started"
+  ],
+  "quests": [
+    {
+      "id": "steam",
+      "title": "Raise steam",
+      "icon": "wildcatter:steam_turbine",
+      "text": "Set a Boiler on a lit campfire, fill it with water buckets, and put a Steam Turbine against it. The turbine burns steam only for the power you use.",
+      "requires": [
+        "campfire",
+        "iron",
+        "copper"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:boiler",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:steam_turbine",
+          "count": 1
+        },
+        {
+          "milestone": "wildcatter:steam_turbine_generating",
+          "text": "Make the turbine generate"
+        }
+      ],
+      "rewards": [
+        {
+          "item": "minecraft:water_bucket",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "lamp",
+      "title": "Light a lamp",
+      "icon": "wildcatter:electric_lamp",
+      "text": "Electricity needs a loop: a hot wire (red) out from the turbine and a neutral wire (black) back. Wire a lamp across both.",
+      "requires": [
+        "steam"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:wool_wire_hot",
+          "count": 4
+        },
+        {
+          "item": "wildcatter:wool_wire_neutral",
+          "count": 4
+        },
+        {
+          "item": "wildcatter:electric_lamp",
+          "count": 1
+        },
+        {
+          "milestone": "wildcatter:lamp_lit",
+          "text": "Light the lamp"
+        }
+      ],
+      "rewards": [
+        {
+          "item": "wildcatter:wool_wire_hot",
+          "count": 8
+        },
+        {
+          "item": "wildcatter:wool_wire_neutral",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "id": "protection",
+      "title": "Protect the circuit",
+      "icon": "wildcatter:breaker",
+      "text": "Put a breaker in the hot wire right at the turbine, keep a fuse for small branches, and drive a ground rod against every machine. The power meter reads volts, amps and what is wrong.",
+      "requires": [
+        "lamp"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:breaker",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:fuse",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:ground_rod",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:power_meter",
+          "count": 1
+        }
+      ],
+      "rewards": [
+        {
+          "item": "wildcatter:ground_rod",
+          "count": 2
+        },
+        {
+          "item": "wildcatter:fuse",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "firebox",
+      "title": "A firebox",
+      "icon": "wildcatter:firebox",
+      "text": "A firebox under a boiler burns coal, charcoal or wood instead of a campfire, and a hopper can feed it. It burns only while the boiler wants heat.",
+      "requires": [
+        "steam"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:firebox",
+          "count": 1
+        }
+      ],
+      "rewards": [
+        {
+          "item": "minecraft:coal",
+          "count": 16
+        }
+      ]
+    },
+    {
+      "id": "plugs",
+      "title": "Receptacle and plug",
+      "icon": "wildcatter:receptacle_nema_5_15",
+      "text": "A receptacle on your wiring and a plug adapter in it hand power to other mods' machines. The breaker upstream still sees every amp.",
+      "requires": [
+        "protection"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:receptacle_nema_5_15",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:plug_nema_5_15",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

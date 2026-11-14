@@ -1,0 +1,202 @@
+{
+  "title": "Chemicals and metals",
+  "icon": "wildcatter:membrane_cell_room",
+  "order": 70,
+  "after": [
+    "wildcatter:refining"
+  ],
+  "quests": [
+    {
+      "id": "ore_survey",
+      "title": "Ore survey",
+      "icon": "wildcatter:scintillometer",
+      "text": "The scintillometer finds uranium ore; the survey tool and blueprints lay out big plants. Mine the ores the plants below need.",
+      "requires": [
+        "steel"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:scintillometer",
+          "count": 1
+        }
+      ],
+      "rewards": [
+        {
+          "item": "minecraft:redstone",
+          "count": 16
+        }
+      ]
+    },
+    {
+      "id": "acid_plant",
+      "title": "Sulfuric acid",
+      "icon": "wildcatter:sulfur_furnace",
+      "text": "Burn sulfur from salt-dome caprock in the acid plant: melter, furnace, waste heat boiler, converter and absorbers. Its steam can run a turbine.",
+      "requires": [
+        "ore_survey",
+        "switchgear"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:sulfur",
+          "count": 8
+        },
+        {
+          "item": "wildcatter:sulfur_furnace",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:converter",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "chlor_alkali",
+      "title": "Chlor-alkali and DC",
+      "icon": "wildcatter:membrane_cell_room",
+      "text": "Brine through a membrane cell room on a rectifier transformer makes chlorine, caustic and hydrogen. DC bus bar carries the cell current.",
+      "requires": [
+        "acid_plant",
+        "high_voltage"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:membrane_cell_room",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:rectifier_mv",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:dc_bus_4k",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "coke",
+      "title": "Coke ovens",
+      "icon": "wildcatter:coke_oven_battery",
+      "text": "A coke oven battery bakes coal into metallurgical coke; its gas can fuel a gas genset.",
+      "requires": [
+        "acid_plant"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:coke_oven_battery",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:metallurgical_coke",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "ammonia",
+      "title": "Ammonia",
+      "icon": "wildcatter:ammonia_converter",
+      "text": "Hydrogen from a steam reformer and nitrogen from the air meet in the ammonia converter. Store it in a pressure bullet.",
+      "requires": [
+        "gas_plant",
+        "chlor_alkali"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:ammonia_converter",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:lpg_bullet",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "fertilizer",
+      "title": "Fertilizer bags",
+      "icon": "wildcatter:dap_bag",
+      "text": "Phosphate rock and sulfuric acid make phosphoric acid; with ammonia, the granulation plant fills bags of DAP.",
+      "requires": [
+        "ammonia"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:dap_bag",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "aluminium",
+      "title": "Aluminium",
+      "icon": "wildcatter:aluminium_ingot",
+      "text": "Bauxite to alumina in the Bayer refinery, then pots on a rectiformer smelt it. Big DC, big anodes.",
+      "requires": [
+        "chlor_alkali",
+        "coke"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:aluminium_ingot",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "zirconium",
+      "title": "Zirconium",
+      "icon": "wildcatter:zircaloy_tube",
+      "text": "Zircon chlorinated, hafnium taken out, reduced in a Kroll reactor and drawn into Zircaloy cladding tube.",
+      "requires": [
+        "chlor_alkali"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:kroll_reactor",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:zircaloy_tube",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "helium",
+      "title": "Helium",
+      "icon": "wildcatter:helium_cylinder",
+      "text": "Helium from the gas fill rides in steel cylinders: fuel rods are welded and filled under it.",
+      "requires": [
+        "gas_plant"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:helium_cylinder",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "boron",
+      "title": "Boron",
+      "icon": "wildcatter:b4c_pellets",
+      "text": "Borax to boric acid for the reactor's coolant, and boron carbide pellets for its control rods.",
+      "requires": [
+        "acid_plant"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:boric_acid",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:b4c_pellets",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

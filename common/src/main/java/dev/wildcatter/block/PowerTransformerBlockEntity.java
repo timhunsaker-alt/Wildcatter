@@ -67,6 +67,9 @@ public class PowerTransformerBlockEntity extends TransformerBlockEntity {
 		formed = found.parts() != null;
 		missing = formed ? "" : found.missing();
 		parts = formed ? found.parts() : List.of();
+		if (formed) {
+			dev.wildcatter.multiblock.Multiblock.formed(level, worldPosition);   // Phase 21: the quest book
+		}
 		if (formed != was) {
 			if (formed) {
 				level.playSound(null, worldPosition, WildcatterSounds.STRUCTURE_FORMED, SoundSource.BLOCKS, 1.5F, 0.7F);

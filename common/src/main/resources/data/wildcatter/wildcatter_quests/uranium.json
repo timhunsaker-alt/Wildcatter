@@ -1,0 +1,89 @@
+{
+  "title": "Uranium",
+  "icon": "wildcatter:yellowcake_drum",
+  "order": 80,
+  "after": [
+    "wildcatter:chemicals"
+  ],
+  "quests": [
+    {
+      "id": "yellowcake",
+      "title": "The mill",
+      "icon": "wildcatter:yellowcake_drum",
+      "text": "Crush, grind and leach uranium ore with sulfuric acid; solvent extraction and precipitation fill drums of yellowcake.",
+      "requires": [
+        "ore_survey",
+        "acid_plant"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:yellowcake_drum",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "conversion",
+      "title": "Conversion to UF6",
+      "icon": "wildcatter:uf6_cylinder_48y",
+      "text": "Reduce, hydrofluorinate and fluorinate the yellowcake; cold traps and distillation fill 48Y cylinders of UF6.",
+      "requires": [
+        "yellowcake",
+        "chlor_alkali"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:uf6_cylinder_48y",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "enrichment",
+      "title": "Enrichment",
+      "icon": "wildcatter:leu_cylinder_30b",
+      "text": "A centrifuge cascade on its frequency converter takes natural UF6 to 4.95 % in 30B cylinders.",
+      "requires": [
+        "conversion"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:leu_cylinder_30b",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "fuel",
+      "title": "Fuel assemblies",
+      "icon": "wildcatter:fuel_assembly",
+      "text": "Turn UF6 to powder, press and sinter pellets, load and weld rods, and build 17x17 assemblies. The core takes nine.",
+      "requires": [
+        "enrichment",
+        "zirconium",
+        "helium"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:fuel_assembly",
+          "count": 9
+        }
+      ]
+    },
+    {
+      "id": "rccas",
+      "title": "Control rods",
+      "icon": "wildcatter:rcca",
+      "text": "Boron carbide pellets in rodlets on a spider: the RCCA bench builds the control rods the reactor moves.",
+      "requires": [
+        "boron"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:rcca",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

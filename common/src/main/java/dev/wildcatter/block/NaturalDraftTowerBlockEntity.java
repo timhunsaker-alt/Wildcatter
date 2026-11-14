@@ -370,6 +370,7 @@ public class NaturalDraftTowerBlockEntity extends PlantUnitBlockEntity implement
 				t.build(level);
 			} else {
 				t.cool(level);
+				dev.wildcatter.multiblock.Multiblock.formed(level, pos);   // Phase 21: the quest book: the tower is raised
 			}
 			t.setChanged();
 		}

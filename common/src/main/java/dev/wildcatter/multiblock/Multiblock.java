@@ -18,6 +18,18 @@ public final class Multiblock {
 	private Multiblock() {
 	}
 
+	/**
+	 * A controller whose structure is complete says so on each structure check (Phase 21, docs/quests.md): every player near it reaches
+	 * the milestone {@code <namespace>:formed/<controller block>}. Called while formed, not only when it forms, so a structure built before
+	 * the quest book counts as soon as a player comes near.
+	 */
+	public static void formed(Level level, BlockPos controller) {
+		if (level instanceof net.minecraft.server.level.ServerLevel server) {
+			net.minecraft.resources.Identifier block = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(server.getBlockState(controller).getBlock());
+			dev.wildcatter.quest.QuestEvents.milestone(server, controller, dev.wildcatter.quest.Milestones.formed(block));
+		}
+	}
+
 	/** Quarter turns clockwise from north, as {@link MultiblockLayout#cells(int)} takes them. */
 	public static int turns(Direction facing) {
 		return switch (facing) {

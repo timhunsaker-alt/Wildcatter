@@ -40,6 +40,9 @@ public class PelletizerBlockEntity extends UnitMotorBlockEntity implements World
 	/** Polyethylene from the reactor, in kg: made into sheets as it comes. */
 	public void addPolymer(double kg) {
 		polymer += kg;
+		if (kg > 0) {
+			dev.wildcatter.quest.QuestEvents.milestone(level, worldPosition, dev.wildcatter.quest.Milestones.PELLETIZER_RUNNING);   // Phase 21: the quest book
+		}
 		while (polymer >= Tuning.PE_KG_PER_SHEET && !full()) {
 			polymer -= Tuning.PE_KG_PER_SHEET;
 			for (int i = 0; i < SLOTS; i++) {

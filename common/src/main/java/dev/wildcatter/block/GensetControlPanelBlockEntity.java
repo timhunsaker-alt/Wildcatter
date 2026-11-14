@@ -332,6 +332,7 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 			}
 			formed = true;
 			gas = (found.variant() == 1);
+			dev.wildcatter.multiblock.Multiblock.formed(level, worldPosition);   // Phase 21: the quest book
 			missing = "";
 			for (BlockPos at : found.parts()) {
 				if (level.getBlockEntity(at) instanceof GensetPartBlockEntity part) {
@@ -536,6 +537,13 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 				wantRun = false;
 				tripReason = "";
 				supply = (gas ? "OUT OF GAS" : "OUT OF FUEL") + ": the set stopped";
+			}
+		}
+		if (run == Run.RUNNING) {   // Phase 21: the quest book
+			dev.wildcatter.quest.QuestEvents.milestone(level, worldPosition, dev.wildcatter.quest.Milestones.GENSET_RUNNING);
+			dev.wildcatter.quest.QuestEvents.milestone(level, worldPosition, gas ? dev.wildcatter.quest.Milestones.GAS_GENSET_RUNNING : dev.wildcatter.quest.Milestones.DIESEL_GENSET_RUNNING);
+			if (biogas) {
+				dev.wildcatter.quest.QuestEvents.milestone(level, worldPosition, dev.wildcatter.quest.Milestones.GENSET_ON_BIOGAS);
 			}
 		}
 		// governor and starter

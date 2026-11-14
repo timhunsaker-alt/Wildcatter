@@ -1,0 +1,113 @@
+{
+  "title": "Nuclear power",
+  "icon": "wildcatter:reactor_console",
+  "order": 90,
+  "after": [
+    "wildcatter:uranium"
+  ],
+  "quests": [
+    {
+      "id": "nuclear_island",
+      "title": "The nuclear island",
+      "icon": "wildcatter:reactor_vessel",
+      "text": "The reactor vessel with its CRDM head, steam generators, coolant pumps, pressurizer and CVCS skid against it.",
+      "requires": [
+        "fuel",
+        "rccas"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:reactor_vessel",
+          "count": 1
+        },
+        {
+          "milestone": "wildcatter:formed/reactor_vessel",
+          "text": "Build the nuclear island"
+        }
+      ]
+    },
+    {
+      "id": "turbine_island",
+      "title": "The turbine island",
+      "icon": "wildcatter:hp_turbine",
+      "text": "Valve chest, HP turbine, moisture separator reheater, LP turbine, 60 MVA generator, condenser and the feedwater train.",
+      "requires": [
+        "peaker"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:hp_turbine",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:tg_generator_60",
+          "count": 1
+        },
+        {
+          "milestone": "wildcatter:formed/hp_turbine",
+          "text": "Build the turbine island"
+        }
+      ]
+    },
+    {
+      "id": "tower",
+      "title": "The natural-draft tower",
+      "icon": "wildcatter:natural_draft_tower",
+      "text": "Feed the tower concrete, steel and plastic and it raises itself, lift by lift. It cools the condenser's circulating water.",
+      "requires": [
+        "turbine_island",
+        "plastic"
+      ],
+      "tasks": [
+        {
+          "milestone": "wildcatter:formed/natural_draft_tower",
+          "text": "Raise the cooling tower"
+        }
+      ]
+    },
+    {
+      "id": "critical",
+      "title": "Critical and on line",
+      "icon": "wildcatter:reactor_console",
+      "text": "Load the core, fill and heat the coolant, pull rods at the console and dilute the boron. Critical, then roll the turbine and close the generator breaker. From punching trees to nuclear power.",
+      "requires": [
+        "nuclear_island",
+        "turbine_island",
+        "tower"
+      ],
+      "tasks": [
+        {
+          "milestone": "wildcatter:reactor_critical",
+          "text": "Take the reactor critical"
+        },
+        {
+          "milestone": "wildcatter:turbine_on_line",
+          "text": "Put the turbine-generator on line"
+        }
+      ]
+    },
+    {
+      "id": "spent_fuel",
+      "title": "Spent fuel and casks",
+      "icon": "wildcatter:storage_module",
+      "text": "Spent assemblies cool in the pool, then go into a dry storage canister at the cask loading station and out to a storage module.",
+      "requires": [
+        "critical"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:spent_fuel_pool",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:dry_storage_canister",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:storage_module",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

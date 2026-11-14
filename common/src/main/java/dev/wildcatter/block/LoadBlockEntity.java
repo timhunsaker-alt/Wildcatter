@@ -133,6 +133,9 @@ public class LoadBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		if (state.getValue(LoadBlock.LIT) != working) {
 			server.setBlock(worldPosition, state.setValue(LoadBlock.LIT, working), 3);
 		}
+		if (working && state.getBlock() == WildcatterBlocks.ELECTRIC_LAMP) {
+			dev.wildcatter.quest.QuestEvents.milestone(server, worldPosition, dev.wildcatter.quest.Milestones.LAMP_LIT);   // Phase 21: the quest book
+		}
 
 		overVoltageTicks = volts > nominal * Tuning.BURNOUT_ABOVE ? overVoltageTicks + ticks : 0;
 		if (overVoltageTicks >= Tuning.BURNOUT_TICKS) {

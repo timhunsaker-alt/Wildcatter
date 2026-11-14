@@ -72,6 +72,13 @@ public final class CircuitManager {
 		DIRTY.add(level.dimension());
 	}
 
+	/** The level whose circuits are being applied, for parts (a motor) that hold no level of their own; null between solves. */
+	private static ServerLevel applying;
+
+	public static ServerLevel applying() {
+		return applying;
+	}
+
 	public static void tick(ServerLevel level) {
 		Set<BlockPos> registered = PARTS.get(level.dimension());
 		if (registered == null || registered.isEmpty()) {
@@ -191,8 +198,13 @@ public final class CircuitManager {
 				break;
 			}
 		}
-		for (CircuitPart part : parts) {
-			part.apply(circuit, ticks);
+		applying = level;
+		try {
+			for (CircuitPart part : parts) {
+				part.apply(circuit, ticks);
+			}
+		} finally {
+			applying = null;
 		}
 		stepFrequency(level, key, islands, island, standard, parts, ticks, live);
 	}

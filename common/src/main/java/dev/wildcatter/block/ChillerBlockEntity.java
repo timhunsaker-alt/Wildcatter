@@ -88,6 +88,9 @@ public class ChillerBlockEntity extends PlantUnitBlockEntity {
 			ch.processed = got;
 			ch.add(Product.PIPELINE_GAS, GasPlant.residue(got));
 			ch.add(Product.Y_GRADE, GasPlant.ngl(got));
+			if (got > 0) {
+				dev.wildcatter.quest.QuestEvents.milestone(level, pos, dev.wildcatter.quest.Milestones.GAS_PLANT_RUNNING);   // Phase 21: the quest book
+			}
 			ch.status = got > 0 ? String.format("chilling %.2f m3/s: %.2f m3/s pipeline gas, %.2f L/s raw NGL", got / seconds(), GasPlant.residue(got) / seconds(), GasPlant.ngl(got) / seconds())
 					: "idle: its outlets are full (pipe the back end on: pipeline gas above, NGL below)";
 		}

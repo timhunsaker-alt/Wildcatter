@@ -1,0 +1,135 @@
+{
+  "title": "Distribution",
+  "icon": "wildcatter:pole_transformer",
+  "order": 50,
+  "after": [
+    "wildcatter:three_phase"
+  ],
+  "quests": [
+    {
+      "id": "poles",
+      "title": "Poles and lines",
+      "icon": "wildcatter:wood_pole_30",
+      "text": "Wood poles with crossarms and pin insulators carry bare lines over the ground. Keep bare MV and higher lines up: they shock at a distance.",
+      "requires": [
+        "motor"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:wood_pole_30",
+          "count": 2
+        },
+        {
+          "item": "wildcatter:crossarm_dist",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:insulator_dist",
+          "count": 2
+        },
+        {
+          "item": "wildcatter:mv_wire_hot",
+          "count": 4
+        }
+      ],
+      "rewards": [
+        {
+          "item": "wildcatter:insulator_dist",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "id": "pole_transformer",
+      "title": "A pole transformer",
+      "icon": "wildcatter:pole_transformer_mv",
+      "text": "Hang a pole transformer: the line to its top, the low side to its back. It steps the line down to your service voltage.",
+      "requires": [
+        "poles"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:pole_transformer_mv",
+          "count": 1
+        },
+        {
+          "milestone": "wildcatter:transformer_energised",
+          "text": "Energise a transformer"
+        }
+      ]
+    },
+    {
+      "id": "padmount",
+      "title": "Pad-mounts",
+      "icon": "wildcatter:padmount_480",
+      "text": "Pad-mount transformers feed three-phase services from the distribution line: one for buildings, one for industry at 480 V.",
+      "requires": [
+        "pole_transformer"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:padmount_480",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "steam_plant",
+      "title": "The steam plant",
+      "icon": "wildcatter:turbine_generator",
+      "text": "A 1 MW steam plant: burner, package boiler, superheater, turbine, generator, condenser and feed pump, formed around the turbine generator. Start it on a genset.",
+      "requires": [
+        "genset"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:turbine_generator",
+          "count": 1
+        },
+        {
+          "milestone": "wildcatter:formed/turbine_generator",
+          "text": "Form the steam plant"
+        }
+      ]
+    },
+    {
+      "id": "substation",
+      "title": "Unit substation and GSU",
+      "icon": "wildcatter:unit_substation",
+      "text": "A generator step-up transformer puts the plant onto the distribution line; a unit substation brings MV down to 480 V for a plant's motors.",
+      "requires": [
+        "steam_plant",
+        "padmount"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:gsu_transformer",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:unit_substation",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "switchgear",
+      "title": "MV switchgear",
+      "icon": "wildcatter:mv_switchgear_main",
+      "text": "Metal-clad switchgear: a main section and feeder sections bus together, each with a draw-out vacuum breaker and its relay.",
+      "requires": [
+        "substation"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:mv_switchgear_main",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:mv_switchgear_feeder",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

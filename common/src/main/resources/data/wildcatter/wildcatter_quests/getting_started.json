@@ -1,0 +1,156 @@
+{
+  "title": "Getting started",
+  "icon": "minecraft:oak_log",
+  "order": 10,
+  "quests": [
+    {
+      "id": "wood",
+      "title": "Punch a tree",
+      "icon": "minecraft:oak_log",
+      "text": "Break logs by hand and make planks and sticks. Everything starts with a crafting table.",
+      "tasks": [
+        {
+          "item": "#minecraft:logs",
+          "count": 4
+        }
+      ],
+      "rewards": [
+        {
+          "item": "minecraft:apple",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "id": "stone",
+      "title": "Stone age",
+      "icon": "minecraft:cobblestone",
+      "text": "Make a wooden pickaxe, mine stone, and trade up to stone tools.",
+      "requires": [
+        "wood"
+      ],
+      "tasks": [
+        {
+          "advancement": "minecraft:story/mine_stone"
+        },
+        {
+          "advancement": "minecraft:story/upgrade_tools"
+        }
+      ],
+      "rewards": [
+        {
+          "item": "minecraft:torch",
+          "count": 16
+        }
+      ]
+    },
+    {
+      "id": "campfire",
+      "title": "A campfire",
+      "icon": "minecraft:campfire",
+      "text": "A lit campfire is your first heat source: it will boil water for your first power.",
+      "requires": [
+        "wood"
+      ],
+      "tasks": [
+        {
+          "item": "minecraft:campfire",
+          "count": 1
+        }
+      ],
+      "rewards": [
+        {
+          "item": "minecraft:coal",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "id": "iron",
+      "title": "Iron",
+      "icon": "minecraft:iron_ingot",
+      "text": "Smelt iron ore in a furnace. Iron goes into boilers, turbines, pipe and breakers.",
+      "requires": [
+        "stone"
+      ],
+      "tasks": [
+        {
+          "advancement": "minecraft:story/smelt_iron"
+        },
+        {
+          "item": "minecraft:iron_ingot",
+          "count": 8
+        }
+      ],
+      "rewards": [
+        {
+          "item": "minecraft:bread",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "id": "copper",
+      "title": "Copper",
+      "icon": "minecraft:copper_ingot",
+      "text": "Smelt copper ore. Copper carries the current: every wire, winding and ground rod is made of it.",
+      "requires": [
+        "stone"
+      ],
+      "tasks": [
+        {
+          "item": "minecraft:copper_ingot",
+          "count": 16
+        }
+      ],
+      "rewards": [
+        {
+          "item": "minecraft:copper_ingot",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "id": "steel",
+      "title": "Steel",
+      "icon": "wildcatter:steel_ingot",
+      "text": "Blast iron ingots in a blast furnace to make steel. Steel goes into pipe, engine parts, cylinders and frames.",
+      "requires": [
+        "iron"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:steel_ingot",
+          "count": 8
+        }
+      ],
+      "rewards": [
+        {
+          "item": "minecraft:iron_ingot",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "id": "field_manual",
+      "title": "The Field Manual",
+      "icon": "wildcatter:field_manual",
+      "text": "Craft the Field Manual from a book and a copper ingot. It has a page for every system: read the safety pages before you wire anything.",
+      "requires": [
+        "copper"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:field_manual",
+          "count": 1
+        }
+      ],
+      "rewards": [
+        {
+          "item": "minecraft:paper",
+          "count": 8
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,154 @@
+{
+  "title": "Oil and gas",
+  "icon": "wildcatter:pumpjack",
+  "order": 30,
+  "after": [
+    "wildcatter:first_power"
+  ],
+  "quests": [
+    {
+      "id": "seismograph",
+      "title": "Find a field",
+      "icon": "wildcatter:seismograph",
+      "text": "Use the seismograph: it says whether there is an oil or gas field nearby and which way it lies.",
+      "requires": [
+        "steel",
+        "protection"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:seismograph",
+          "count": 1
+        }
+      ],
+      "rewards": [
+        {
+          "item": "minecraft:compass",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "rig",
+      "title": "The drilling rig",
+      "icon": "wildcatter:drilling_rig",
+      "text": "The drilling rig sinks a steel-cased hole into the field. Its engine needs steel pistons; its drive needs 480 V three-phase (see Three-phase power). A strike leaves a wellhead; a dry hole is reported.",
+      "requires": [
+        "seismograph"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:piston",
+          "count": 2
+        },
+        {
+          "item": "wildcatter:drilling_rig",
+          "count": 1
+        }
+      ],
+      "rewards": [
+        {
+          "item": "wildcatter:steel_ingot",
+          "count": 16
+        }
+      ]
+    },
+    {
+      "id": "oil_well",
+      "title": "An oil well",
+      "icon": "wildcatter:pumpjack",
+      "text": "On an oil strike, set the pumpjack over the oil wellhead from behind. It brings up oil, water and gas together.",
+      "requires": [
+        "rig"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:oil_wellhead",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:pumpjack",
+          "count": 1
+        }
+      ],
+      "rewards": [
+        {
+          "item": "wildcatter:gas_line",
+          "count": 12
+        }
+      ]
+    },
+    {
+      "id": "gas_well",
+      "title": "A gas well",
+      "icon": "wildcatter:gas_wellhead",
+      "text": "On a gas strike, the gas wellhead flows by itself. Carry the gas away on steel pipe: one product to a pipe.",
+      "requires": [
+        "rig"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:gas_wellhead",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:gas_line",
+          "count": 16
+        }
+      ]
+    },
+    {
+      "id": "crude",
+      "title": "A stock tank of crude",
+      "icon": "wildcatter:stock_tank",
+      "text": "Run the oil to a stock tank. Buckets fill at the tank: crude feeds fireboxes now and a crude unit later.",
+      "requires": [
+        "oil_well"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:stock_tank",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:crude_oil_bucket",
+          "count": 1
+        }
+      ],
+      "rewards": [
+        {
+          "item": "minecraft:bucket",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "lease",
+      "title": "The lease",
+      "icon": "wildcatter:separator",
+      "text": "Pipe the wells into a separator: gas off the top, oil and water out of the back. A flare burns gas nobody takes; an injection pump sends water to a disposal well.",
+      "requires": [
+        "oil_well",
+        "gas_well"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:separator",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:flare_stack",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:injection_pump",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:disposal_wellhead",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

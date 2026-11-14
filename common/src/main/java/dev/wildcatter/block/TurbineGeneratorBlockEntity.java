@@ -244,6 +244,7 @@ public class TurbineGeneratorBlockEntity extends BlockEntity implements CircuitP
 			}
 			formed = true;
 			missing = "";
+			dev.wildcatter.multiblock.Multiblock.formed(level, worldPosition);   // Phase 21: the quest book
 			for (BlockPos at : found.parts()) {
 				if (level.getBlockEntity(at) instanceof SteamPlantPartBlockEntity part) {
 					part.bind(worldPosition);

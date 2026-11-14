@@ -116,6 +116,9 @@ public class CrudeColumnBlockEntity extends PlantUnitBlockEntity {
 		strippers.give(Product.DIESEL, got * cuts.get(Product.DIESEL));
 		condenser.give(Product.GASOLINE, got * cuts.get(Product.GASOLINE));
 		condenser.give(Product.LPG, got * cuts.get(Product.LPG));
+		if (got > 0) {
+			dev.wildcatter.quest.QuestEvents.milestone(level, pos, dev.wildcatter.quest.Milestones.CRUDE_UNIT_RUNNING);   // Phase 21: the quest book
+		}
 		col.status = got > 0 ? String.format("refining %.1f L/s of %s%s", got / seconds, feed.label(), heated < 0.99 ? " (SHORT OF FUEL: pipe gas or residue to the heater's front)" : "")
 				: "SHORT OF FUEL: pipe gas or residue to the heater's front";
 		col.setChanged();

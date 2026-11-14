@@ -49,6 +49,16 @@ final class QuestScenes {
 		return out;
 	}
 
+	/** Phase 21.2: the milestones Wildcatter's machines fire, each kind in a scene of its own, with room round it. */
+	static Map<String, Consumer<GameTestHelper>> machineScenes() {
+		Map<String, Consumer<GameTestHelper>> out = new LinkedHashMap<>();
+		out.put("quest_turbine_milestone", QuestScenes::turbineMilestone);
+		out.put("quest_genset_milestone", QuestScenes::gensetMilestone);
+		out.put("quest_multiblock_milestone", QuestScenes::multiblockMilestone);
+		out.put("quest_reactor_milestone", QuestScenes::reactorMilestone);
+		return out;
+	}
+
 	static Identifier tid(String path) {
 		return Identifier.fromNamespaceAndPath("wildcatter_gametest", path);
 	}
@@ -189,6 +199,109 @@ final class QuestScenes {
 			leave(helper, fresh);
 			log("quest_book_given_once", "ok: given at join " + tagged);
 			helper.succeed();
+		});
+	}
+
+	static boolean reached(MinecraftServer server, ServerPlayer player, Identifier key) {
+		return QuestData.get(server).of(player.getStringUUID()).milestones.contains(key.toString());
+	}
+
+	static Identifier wid(String path) {
+		return dev.wildcatter.Wildcatter.id(path);
+	}
+
+	/** The starter plant lights a lamp: the turbine's and the lamp's milestones, and the First power chapter's steam quest done. */
+	static void turbineMilestone(GameTestHelper helper) {
+		MinecraftServer server = helper.getLevel().getServer();
+		for (int x = -1; x <= 6; x++) {
+			for (int z = -1; z <= 2; z++) {
+				helper.setBlock(x, 0, z, net.minecraft.world.level.block.Blocks.STONE);
+			}
+		}
+		helper.setBlock(0, 1, 0, net.minecraft.world.level.block.Blocks.CAMPFIRE.defaultBlockState().setValue(net.minecraft.world.level.block.CampfireBlock.LIT, true));
+		helper.setBlock(0, 2, 0, dev.wildcatter.WildcatterBlocks.BOILER);
+		helper.setBlock(1, 2, 0, dev.wildcatter.WildcatterBlocks.STEAM_TURBINE);
+		helper.getBlockEntity(new BlockPos(0, 2, 0), dev.wildcatter.block.BoilerBlockEntity.class).addWater(4000);
+		for (int x = 2; x <= 4; x++) {
+			GridSceneKit.put(helper, "wool_wire_hot", x, 2, 0);
+		}
+		helper.setBlock(5, 2, 0, dev.wildcatter.WildcatterBlocks.ELECTRIC_LAMP);
+		for (int x = 1; x <= 5; x++) {
+			GridSceneKit.put(helper, "wool_wire_neutral", x, 2, 1);
+		}
+		ServerPlayer player = player(helper, 3, 1, 3);
+		player.getInventory().add(new ItemStack(dev.wildcatter.WildcatterBlocks.BOILER));
+		player.getInventory().add(new ItemStack(dev.wildcatter.WildcatterBlocks.STEAM_TURBINE));
+		helper.succeedWhen(() -> {
+			check(helper, reached(server, player, dev.wildcatter.quest.Milestones.STEAM_TURBINE_GENERATING), "the turbine should fire steam_turbine_generating");
+			check(helper, reached(server, player, dev.wildcatter.quest.Milestones.LAMP_LIT), "the lamp should fire lamp_lit");
+			QuestTracker.check(player);
+			check(helper, QuestData.get(server).of(player.getStringUUID()).done.contains("wildcatter:steam"), "the steam quest (boiler, turbine, generating) should be done");
+			leave(helper, player);
+			log("quest_turbine_milestone", "ok");
+		});
+	}
+
+	/** A diesel set started: it fires genset_running, diesel_genset_running and its skid's formed milestone. */
+	static void gensetMilestone(GameTestHelper helper) {
+		MinecraftServer server = helper.getLevel().getServer();
+		GridSceneKit.floor(helper, -8, -4, 4, 4);
+		GridSceneKit.genset(helper, 0, 1, 0);
+		ServerPlayer player = player(helper, 2, 1, 2);
+		GridSceneKit.start(helper, 0, 1, 0, () -> helper.succeedWhen(() -> {
+			check(helper, reached(server, player, dev.wildcatter.quest.Milestones.GENSET_RUNNING), "the running set should fire genset_running");
+			check(helper, reached(server, player, dev.wildcatter.quest.Milestones.DIESEL_GENSET_RUNNING), "a diesel set should fire diesel_genset_running");
+			check(helper, !reached(server, player, dev.wildcatter.quest.Milestones.GAS_GENSET_RUNNING), "a diesel set is not a gas set");
+			check(helper, reached(server, player, wid("formed/genset_control_panel")), "its formed skid should fire formed/genset_control_panel");
+			leave(helper, player);
+			log("quest_genset_milestone", "ok");
+		}));
+	}
+
+	/** A diesel set's skid built and not started: the multiblock listener fires formed/genset_control_panel, and nothing runs. */
+	static void multiblockMilestone(GameTestHelper helper) {
+		MinecraftServer server = helper.getLevel().getServer();
+		GridSceneKit.floor(helper, -8, -4, 4, 4);
+		GridSceneKit.genset(helper, 0, 1, 0);
+		ServerPlayer player = player(helper, 2, 1, 2);
+		ServerPlayer far = player(helper, 2, 1, 2);
+		BlockPos panel = helper.absolutePos(new BlockPos(0, 1, 0));
+		far.teleportTo(panel.getX() + 100.5, panel.getY(), panel.getZ() + 0.5);
+		helper.succeedWhen(() -> {
+			check(helper, GridSceneKit.gensetPanel(helper, 0, 1, 0).formed(), "the skid should form: " + GridSceneKit.read(helper, 0, 1, 0));
+			check(helper, reached(server, player, wid("formed/genset_control_panel")), "the formed skid should fire formed/genset_control_panel");
+			check(helper, !reached(server, far, wid("formed/genset_control_panel")), "a player 100 blocks off should not reach it");
+			check(helper, !reached(server, player, dev.wildcatter.quest.Milestones.GENSET_RUNNING), "a set never started should not fire genset_running");
+			leave(helper, player);
+			leave(helper, far);
+			log("quest_multiblock_milestone", "ok");
+		});
+	}
+
+	/** The nuclear island built round a vessel at hot standby, its power held: formed/reactor_vessel and reactor_critical. */
+	static void reactorMilestone(GameTestHelper helper) {
+		MinecraftServer server = helper.getLevel().getServer();
+		int u = 1;
+		net.minecraft.core.Direction north = net.minecraft.core.Direction.NORTH;
+		GridSceneKit.floor(helper, -6, -8, 6, 8);
+		GridSceneKit.place(helper, dev.wildcatter.WildcatterBlocks.REACTOR_VESSEL, 0, u, 0, north);
+		GridSceneKit.place(helper, dev.wildcatter.WildcatterBlocks.CRDM_HEAD, 0, u + 10, 0, north);
+		GridSceneKit.place(helper, dev.wildcatter.WildcatterBlocks.STEAM_GENERATOR, 0, u, -3, north);
+		GridSceneKit.place(helper, dev.wildcatter.WildcatterBlocks.REACTOR_COOLANT_PUMP, 0, u, -5, north);
+		GridSceneKit.place(helper, dev.wildcatter.WildcatterBlocks.PRESSURIZER, -2, u, -3, north);
+		GridSceneKit.place(helper, dev.wildcatter.WildcatterBlocks.CVCS_SKID, -3, u, 0, north);
+		dev.wildcatter.block.ReactorVesselBlockEntity vessel = GridSceneKit.entity(helper, 0, u, 0, dev.wildcatter.block.ReactorVesselBlockEntity.class);
+		vessel.setHotStandbyForTest(1500);
+		vessel.reactor().setSetpoint(-1);   // reset, then a setpoint, as the reactor scenes do
+		vessel.reactor().setSetpoint(0.10);
+		vessel.reactor().pinPowerForTest(0.02);
+		ServerPlayer player = player(helper, 4, 1, 4);
+		helper.succeedWhen(() -> {
+			check(helper, reached(server, player, wid("formed/reactor_vessel")), "the built island should fire formed/reactor_vessel: " + GridSceneKit.read(helper, 0, u, 0));
+			check(helper, reached(server, player, dev.wildcatter.quest.Milestones.REACTOR_CRITICAL), "the critical reactor should fire reactor_critical: " + GridSceneKit.read(helper, 0, u, 0));
+			vessel.reactor().pinPowerForTest(-1);
+			leave(helper, player);
+			log("quest_reactor_milestone", "ok: " + GridSceneKit.read(helper, 0, u, 0));
 		});
 	}
 

@@ -413,6 +413,9 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 			highAmps[0] += lowBAmps / ratio;   // both halves of the secondary load the one primary
 			lossWatts += lowBAmps / ratio * lowBAmps / ratio * seriesOhms;
 		}
+		if (Math.abs(highVolts[0]) > block().high().nominal() * 0.5) {   // Phase 21: the quest book: its high side is live
+			dev.wildcatter.quest.QuestEvents.milestone(level, worldPosition, dev.wildcatter.quest.Milestones.TRANSFORMER_ENERGISED);
+		}
 		double rated = ratedVa();
 		if (rated > 0 && heating.step(perUnit(rated, delta, deltaHigh), ticks / 20.0)) {
 			failed = true;   // IEEE C57.109: its windings' (I² - 1)·t has reached its limit

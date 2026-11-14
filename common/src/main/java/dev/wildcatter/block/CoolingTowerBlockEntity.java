@@ -90,6 +90,9 @@ public class CoolingTowerBlockEntity extends BlockEntity implements CircuitPart,
 		boolean was = tower.cooling;
 		tower.wanted = tower.missing.isEmpty();   // the fan runs once the tower is built
 		tower.cooling = tower.wanted && tower.motor.output() > 0;
+		if (tower.cooling) {
+			dev.wildcatter.multiblock.Multiblock.formed(level, pos);   // Phase 21: the quest book
+		}
 		if (tower.cooling && !was) {
 			level.playSound(null, pos, WildcatterSounds.STRUCTURE_FORMED, SoundSource.BLOCKS, 1.0F, 1.1F);
 		}
