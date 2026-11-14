@@ -103,6 +103,9 @@ public class WildcatterNeoForgeGameTests {
 		TRACK_17C_RULES.putAll(RodScenes.RULES);
 	}
 
+	/** Phase 21's quest book scenes (QuestScenes): small and quick, against the test chapters in this mod's data. */
+	private static final java.util.Map<String, Consumer<GameTestHelper>> QUEST_SCENES = QuestScenes.scenes();
+
 	/** The residence holds' scene (ResidenceScenes): in a batch whose world has realResidenceTimes on. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> RESIDENCE_SCENES = ResidenceScenes.scenes();
 
@@ -155,6 +158,7 @@ public class WildcatterNeoForgeGameTests {
 			RULE_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			RESIDENCE_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			TRACK_17C_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
+			QUEST_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 		}));
 		modBus.addListener(RegisterCapabilitiesEvent.class, event -> event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, entity, side) -> STORAGE, Blocks.GOLD_BLOCK));
 		modBus.addListener(RegisterGameTestsEvent.class, event -> {
@@ -204,6 +208,11 @@ public class WildcatterNeoForgeGameTests {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
 						new TestData<>(env, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 4000, 1, true,
 								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 80)));
+			}
+			for (String scene : QUEST_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
+				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
+						new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 400, 1, true,
+								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 8)));
 			}
 			for (String scene : RULE_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),

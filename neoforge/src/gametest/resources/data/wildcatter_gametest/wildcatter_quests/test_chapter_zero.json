@@ -1,0 +1,15 @@
+{
+  "id": "test_chapter_zero",
+  "title": "Test chapter zero",
+  "icon": "minecraft:dirt",
+  "order": 899,
+  "quests": [
+    {
+      "id": "dirt",
+      "title": "Dirt",
+      "icon": "minecraft:dirt",
+      "text": "Carry dirt.",
+      "tasks": [{"item": "minecraft:dirt"}]
+    }
+  ]
+}

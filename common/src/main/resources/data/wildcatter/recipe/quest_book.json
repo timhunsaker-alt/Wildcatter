@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:book",
+    "minecraft:copper_ingot",
+    "minecraft:paper"
+  ],
+  "result": {
+    "id": "wildcatter:quest_book",
+    "count": 1
+  }
+}

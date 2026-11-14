@@ -606,6 +606,17 @@ Plan: `docs/ideas-plan.md`, Phase 20. Decisions for Tim: `docs/questions/phase20
   and lithium carbonator, 0.5 t of LiOH.H2O an hour with sodium sulfate bags; a lithium carbonate bag in a potline pot's hopper runs it
   0.1 V lower. NeoForge scene `lithium`; unit test `LithiumTest`; client screenshots `lithium`.
 
+## Phase 21 — Quest book — CURRENT (Tim, 2026-11-14: "a quest style guide system that takes us from punching trees to nuclear power", with Tailings and Farmings in it)
+Plan approved 2026-11-14. Spec: `docs/quests.md`. Decisions for Tim: `docs/questions/phase21-quests.md`. Branch `w-quest`.
+- **21.1, the engine:** chapters as data (`data/<namespace>/wildcatter_quests/*.json`, from any mod), item, advancement and milestone
+  tasks found by themselves, per-player progress, rewards claimed in the screen, the `wildcatter:quest_book` given once on first join, the
+  quest screen; the public hook `QuestEvents.milestone` for add-ons. NeoForge scenes `quest_data_loads`, `quest_item_task`,
+  `quest_milestone`, `quest_reward_claim`, `quest_book_given_once`, `quests_valid`.
+- **21.2, Wildcatter's chapters:** nine chapters from getting started to the reactor on line, and the milestone calls in the machines.
+- **21.3, client screenshots** `questBook`.
+- GregTech was looked at: no 26.x release (the only port is unofficial and unfinished), so it is left out; the engine takes any mod's
+  item ids, so a chapter can be added if one ships. FTB Quests has no 26.3 build, so the book is Wildcatter's own.
+
 ## Ideas (not scheduled)
 - **Time scale (Tim, 2026-11-10):** a world setting with presets 1:1, 5:1, 10:1, 20:1 and 50:1 that shortens the long waits (reactor heat-up
   and cooldown, residence holds, cask cooling, Tailings' paste cure), chosen on the Create World screen with the world rules. Spec and

@@ -23,6 +23,10 @@ public final class WildcatterItems {
 	public static final Item FIELD_MANUAL = new FieldManualItem(new Item.Properties().stacksTo(1)
 			.component(DataComponents.WRITTEN_BOOK_CONTENT, Manual.content()).setId(FIELD_MANUAL_KEY));
 
+	/** Phase 21: the quest book (docs/quests.md), given once on a player's first join. */
+	public static final ResourceKey<Item> QUEST_BOOK_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("quest_book"));
+	public static final Item QUEST_BOOK = new dev.wildcatter.item.QuestBookItem(new Item.Properties().stacksTo(1).setId(QUEST_BOOK_KEY));
+
 	public static final ResourceKey<Item> SEISMOGRAPH_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("seismograph"));
 	public static final Item SEISMOGRAPH = new SeismographItem(new Item.Properties().stacksTo(1).setId(SEISMOGRAPH_KEY));
 
@@ -496,6 +500,7 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, RTD4_MODULE_KEY, RTD4_MODULE);
 		Registry.register(BuiltInRegistries.ITEM, HSC2_MODULE_KEY, HSC2_MODULE);
 		Registry.register(BuiltInRegistries.ITEM, FIELD_MANUAL_KEY, FIELD_MANUAL);
+		Registry.register(BuiltInRegistries.ITEM, QUEST_BOOK_KEY, QUEST_BOOK);
 		Registry.register(BuiltInRegistries.ITEM, SEISMOGRAPH_KEY, SEISMOGRAPH);
 		Registry.register(BuiltInRegistries.ITEM, SCINTILLOMETER_KEY, SCINTILLOMETER);
 		Registry.register(BuiltInRegistries.ITEM, MAGNESIA_KEY, MAGNESIA);

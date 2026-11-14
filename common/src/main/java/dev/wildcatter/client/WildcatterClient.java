@@ -34,6 +34,7 @@ public final class WildcatterClient {
 
 	public static void init() {
 		dev.wildcatter.kinetic.Sounding.Hook.start = MachineSound::start;
+		dev.wildcatter.item.QuestBookItem.open = () -> net.minecraft.client.Minecraft.getInstance().setScreenAndShow(new dev.wildcatter.client.quest.QuestScreen());
 	}
 
 	public static void renderers(RendererSink sink) {
@@ -72,6 +73,7 @@ public final class WildcatterClient {
 	/** Leaving a world: forget its machine loops. */
 	public static void disconnected() {
 		MachineSound.clearAll();
+		dev.wildcatter.quest.QuestClient.clear();
 	}
 
 	/** Draws the ghost outline; each loader calls it just before this frame's gizmos are collected. */

@@ -26,8 +26,12 @@ public final class WildcatterNeoForgeClient {
 		// The PLC payload goes both ways. This NeoForge wants the client's handler for a clientbound payload registered here as well, or a
 		// client refuses to start: "Some clientbound payloads are missing client-side handlers: [wildcatter:plc]" (found by Farmings, 2026-11-12).
 		modBus.addListener(net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent.class,
-				event -> event.register(dev.wildcatter.control.PlcNet.Payload.TYPE,
-						(payload, context) -> context.enqueueWork(() -> dev.wildcatter.control.PlcNet.client.accept(payload.tag()))));
+				event -> {
+					event.register(dev.wildcatter.control.PlcNet.Payload.TYPE,
+							(payload, context) -> context.enqueueWork(() -> dev.wildcatter.control.PlcNet.client.accept(payload.tag())));
+					event.register(dev.wildcatter.quest.QuestNet.Payload.TYPE,
+							(payload, context) -> context.enqueueWork(() -> dev.wildcatter.quest.QuestNet.client.accept(payload.tag())));
+				});
 		NeoForge.EVENT_BUS.addListener(ClientPlayerNetworkEvent.LoggingOut.class, event -> WildcatterClient.disconnected());
 		NeoForge.EVENT_BUS.addListener(RenderLevelStageEvent.AfterTranslucentBlocks.class, event -> WildcatterClient.drawGizmos());
 		NeoForge.EVENT_BUS.addListener(ScreenEvent.Init.Post.class, event -> {

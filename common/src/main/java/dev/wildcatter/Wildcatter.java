@@ -80,10 +80,12 @@ public final class Wildcatter {
 		SpoolItem.clearAll();
 		dev.wildcatter.item.GuyStrandItem.clearAll();
 		dev.wildcatter.safety.BodyContact.clearAll();
+		dev.wildcatter.quest.QuestTracker.clearAll();
 	}
 
 	public static void serverTick(MinecraftServer server) {
 		dev.wildcatter.radiation.RadiationTicker.tick(server);
+		dev.wildcatter.quest.QuestTracker.tick(server);
 	}
 
 	public static void respawned(ServerPlayer player) {

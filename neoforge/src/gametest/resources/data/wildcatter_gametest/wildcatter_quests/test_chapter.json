@@ -1,0 +1,39 @@
+{
+  "title": "Test chapter",
+  "icon": "minecraft:cobblestone",
+  "order": 900,
+  "after": ["wildcatter_gametest:test_chapter_zero"],
+  "quests": [
+    {
+      "id": "cobble",
+      "title": "Four cobblestone",
+      "icon": "minecraft:cobblestone",
+      "text": "Carry four cobblestone.",
+      "tasks": [{"item": "minecraft:cobblestone", "count": 4}],
+      "rewards": [{"item": "minecraft:bread", "count": 2}, {"item": "wildcatter:quest_book", "count": 1}]
+    },
+    {
+      "id": "machine",
+      "title": "Run the test machine",
+      "icon": "minecraft:furnace",
+      "text": "Stand near the test machine while it runs.",
+      "requires": ["cobble"],
+      "tasks": [{"milestone": "wildcatter_gametest:test_machine", "text": "Run the test machine"}]
+    },
+    {
+      "id": "after_machine",
+      "title": "After the machine",
+      "icon": "minecraft:paper",
+      "text": "Done when the machine quest is done.",
+      "requires": ["wildcatter_gametest:machine"]
+    },
+    {
+      "id": "logs",
+      "title": "Logs by tag",
+      "icon": "minecraft:oak_log",
+      "text": "Any logs.",
+      "requires": ["cobble"],
+      "tasks": [{"item": "#minecraft:logs", "count": 2}, {"advancement": "minecraft:story/root"}]
+    }
+  ]
+}
