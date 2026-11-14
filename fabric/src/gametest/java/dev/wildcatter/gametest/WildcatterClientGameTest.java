@@ -52,6 +52,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			up = y + 1;
 			server.runCommand("fill 6 " + y + " 6 24 " + (y + 4) + " 20 minecraft:air");
 			server.runCommand("difficulty normal");
+			if (only("questBook")) {   // first: before other scenes fill the inventory
+				new QuestClientScenes(context, server).questBook();
+			}
 			if (only("lowVoltageLoop")) {
 				lowVoltageLoop(context, server);
 			}

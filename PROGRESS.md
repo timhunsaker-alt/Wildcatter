@@ -1457,6 +1457,9 @@ sized for a 40-pot line.
 - Tests: `TimeScaleTest`; `world_rules`, `time_scale_holds`; the Fabric client's Create World check.
 
 ## Known gaps
+- Phase 21 (the quest book, 2026-11-14): `quest_book_placeholder` (the book's item icon) is drawn by script. The first 480 V three-phase
+  supply comes after the drilling rig that needs it (`docs/questions/phase21-quests.md`, 10, for Tim). Wells, the rig and the lease are
+  found by their items, not by milestones. Tailings' and Farmings' chapters come in their own releases.
 - Phase 20c (lithium, 2026-11-12): `lioh_bag_placeholder`, `sodium_sulfate_bag_placeholder` and `li2co3_bag_placeholder` (item icons) are
   drawn by script; the five parts use the mod's materials. The carbonator takes LiOH bags, not solution; the pot takes its lithium from its
   own hopper, not the fume treatment centre's; sodium sulfate has no buyer. Not built: lithium from brines or clays, battery-grade
@@ -2257,3 +2260,22 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
 - **Existing worlds:** unchanged: a pot changes only once a bag is put in it (its slots keep their numbers); the bagging station's
   per-station bag defaults to the one bag every earlier part makes.
 
+## Phase 21: the quest book (2026-11-14; branch `w-quest`; decisions: `docs/questions/phase21-quests.md`)
+- Spec `docs/quests.md`. The **quest book** (`wildcatter:quest_book`: a book, a copper ingot and paper), given once on a player's first
+  join, opens the quest screen: chapters and their quests on the left, each marked done, next or later, the chosen quest on the right with
+  its text, its tasks ticked, the quests it needs as links and its rewards with a Claim button; search across every chapter.
+- **Chapters as data** from any mod: `data/<namespace>/wildcatter_quests/*.json`, read at start and on `/reload`, sent to each player.
+  Item (or tag), advancement and milestone tasks, found by the server every 20 ticks; a quest is done when its tasks are met, so an existing
+  world fills in from what the player has. Progress per player (`wildcatter:quests` saved data); rewards small and hand-made, checked
+  against a never-reward list.
+- **Milestones:** the public hook `QuestEvents.milestone(level, pos, key)` reaches players within 64 blocks; Wildcatter fires it from the
+  steam turbine, the lamp, the gensets (and biogas), every three-phase motor, transformers, the crude units, the gas plant, the pelletizer,
+  the reactor (critical) and the nuclear turbine-generator (on line), and `Multiblock.formed` fires `formed/<controller>` for the genset,
+  steam plant, substation, cooling tower, nuclear and turbine islands and the natural-draft tower.
+- **Nine chapters, 57 quests:** Getting started, First power, Oil and gas, Three-phase power, Distribution, Refining and plastic (the plastic
+  gate), Chemicals and metals, Uranium, Nuclear power (the reactor critical and on line).
+- **Field Manual:** THE QUEST BOOK.
+- **Tests:** NeoForge `quest_data_loads`, `quest_item_task`, `quest_milestone`, `quest_reward_claim`, `quest_book_given_once`,
+  `quests_valid`, `quest_turbine_milestone`, `quest_genset_milestone`, `quest_multiblock_milestone`, `quest_reactor_milestone`; client
+  screenshots `questBook`.
+- **Existing worlds:** unchanged; the book is given to each player on their next join and the quests already reached show as done.

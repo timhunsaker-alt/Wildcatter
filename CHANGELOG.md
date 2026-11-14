@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased (0.8.0)
+
+### Phase 21: the quest book
+- **Quest book** (`wildcatter:quest_book`), given once on first join: a guide from punching trees to a reactor on line, in nine chapters
+  (57 quests), every quest visible and the ones whose earlier quests are done marked next. Quests tick themselves off from what you carry,
+  your advancements, and machines running near you; a world built before the book fills in at once. Small rewards, claimed in the screen.
+- **For other mods:** chapters are data (`data/<namespace>/wildcatter_quests/*.json`), and `QuestEvents.milestone(level, pos, key)` is a
+  public hook; Tailings and Farmings add their chapters this way. Format and keys: `docs/quests.md`.
+- Decisions for review: `docs/questions/phase21-quests.md`.
+
 ## v0.7.0 (released 2026-11-13): Phases 15-20 and the time scale
 
 ### 16d2: monitor wells, excursions, groundwater restoration (built 2026-11-12 while Tim was away; decisions accepted by Tim 2026-11-13)

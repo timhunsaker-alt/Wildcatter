@@ -366,9 +366,11 @@ public class QuestScreen extends Screen {
 		if (book.isEmpty()) {
 			entries.add(new Entry(null, null, Component.translatable("gui.wildcatter.quest.empty").withStyle(Style.EMPTY.withItalic(true))));
 		} else if (!query.isEmpty()) {
-			for (Quest q : book.quests().values()) {
-				if (q.matches(query)) {
-					entries.add(new Entry(null, q, Component.literal(q.title())));
+			for (Chapter c : book.chapters()) {   // in the book's order
+				for (Quest q : c.quests()) {
+					if (q.matches(query)) {
+						entries.add(new Entry(null, q, Component.literal(q.title())));
+					}
 				}
 			}
 			if (entries.isEmpty()) {
