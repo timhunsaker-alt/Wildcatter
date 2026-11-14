@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (0.8.0)
+## v0.8.0 (released 2026-11-14): Phase 21, the quest book
 
 ### Phase 21: the quest book
 - **Quest book** (`wildcatter:quest_book`), given once on first join: a guide from punching trees to a reactor on line, in nine chapters
