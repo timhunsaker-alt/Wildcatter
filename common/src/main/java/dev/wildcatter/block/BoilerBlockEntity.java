@@ -40,7 +40,10 @@ public class BoilerBlockEntity extends BlockEntity implements Inspectable, dev.w
 		// on and off every tick as the turbine draws the tank down and it refills.
 		boolean working = boiler.isHeated(level, pos) && boiler.water > 0;
 		if (working && boiler.steam < Tuning.BOILER_STEAM_CAPACITY) {
-			int made = Math.min(Tuning.BOILER_STEAM_PER_TICK, Tuning.BOILER_STEAM_CAPACITY - boiler.steam);
+			// a firebox's fire boils as much as its heat gives at 25 % (docs/dry-type-transformer.md); a campfire 2 a tick. The fire burns
+			// only while the boiler wants heat, so the fuel follows the steam drawn.
+			int rate = fireboxFired(level, pos) ? Tuning.FIREBOX_STEAM_PER_TICK : Tuning.BOILER_STEAM_PER_TICK;
+			int made = Math.min(rate, Tuning.BOILER_STEAM_CAPACITY - boiler.steam);
 			boiler.steam += made;
 			boiler.boiled += made;
 			while (boiler.boiled >= Tuning.STEAM_PER_WATER && boiler.water > 0) {
@@ -65,6 +68,11 @@ public class BoilerBlockEntity extends BlockEntity implements Inspectable, dev.w
 	/** True if there is water to boil and room for more steam: the fire under it should burn. */
 	public boolean wantsHeat() {
 		return water > 0 && steam < Tuning.BOILER_STEAM_CAPACITY;
+	}
+
+	/** True if it stands on a firebox (lit or not): the turbines it feeds are rated by that fire. */
+	public static boolean fireboxFired(Level level, BlockPos pos) {
+		return level.getBlockState(pos.below()).getBlock() instanceof FireboxBlock;
 	}
 
 	private boolean isHeated(Level level, BlockPos pos) {

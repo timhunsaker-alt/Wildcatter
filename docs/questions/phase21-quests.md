@@ -139,17 +139,12 @@ those answers.
   in the solve. The scene showed the reverse feed works with no change to the transformer code.
 - **Alternatives:** the delta-high constructor (the substation's), with a grounding reference added for its 480 V side.
 
-### 17. It takes 34 turbines to start the rig, each between two firebox boilers
-- **Decided on recommendation; for Tim.**
-- **Chosen:** the scene `dry_type_runs_rig` measured it (the table in `docs/dry-type-transformer.md`): 33 small turbines trip on frequency
-  during the rig's direct-on-line start, 34 start it; with one boiler each the turbines nearest the dry-type run short of steam. The quest
-  and the Field Manual say "at least 34, 36 to be safe, each between two firebox boilers". Nothing in the turbine, the rig or the
-  frequency model was changed.
-- **Why:** the plan: "If the turbines can't carry the start, the scene shows how many turbines are needed, and the quest text says it."
-  Each small turbine is rated by one boiler's steam (2 kW), and the start is about 53 kW.
-- **For Tim:** 34 turbines and 68 boilers is a big first build. Ways to make it smaller, none built: start the rig through a soft starter
-  (its start current held at 2-5 x; the soft starter is a Phase 3 part, not checked against the plastic gate), rate a small turbine above
-  one boiler's steam, or let the first rig run on a drive.
+### 17. How many steam sets start the rig through the dry-type
+- **Answered by Tim 2026-11-14: turbines on a firebox are rated by its fire.** A turbine whose boiler stands on a firebox is rated
+  0.36 MW x 25 % = 90 kW (the steam plant's fuel-to-electricity figure), and a firebox boiler boils up to 90 steam a tick; campfire
+  sets stay 2 kW. One firebox set now starts the rig and keeps it drilling; one campfire set trips (`docs/dry-type-transformer.md`).
+- **Was:** with every small turbine rated 2 kW, 33 tripped on frequency during the rig's start and 34 started it, each between two
+  firebox boilers.
 
 ### 18. The oil well asks for the pumpjack running, not for a wellhead and a pumpjack
 - **Decided on recommendation; for Tim.**
@@ -168,7 +163,18 @@ those answers.
 
 ### 20. The client screenshot builds the plant by command
 - **Decided on recommendation; for Tim.**
-- **Chosen:** `dryType` in the client test builds 36 turbines with two firebox boilers each on a platform 40 blocks up (so the rig has
-  rock to drill), the player standing on the ground below while it warms up, then on the platform for the two shots.
+- **Chosen:** `dryType` in the client test builds the plant (now one firebox set, after decision 17's answer) on a platform 40 blocks up
+  (so the rig has rock to drill), the player standing on the ground below while it warms up, then on the platform for the two shots.
 - **Why:** a player left in the air falls and dies, and a dead player ticks nothing, so the fireboxes never lit.
+
+### 21. What "fired" means, and the impedance that goes with the rating
+- **Decided on recommendation; for Tim.**
+- **Chosen:** a turbine is rated 90 kW when any boiler it touches stands on a firebox, lit or not (the nameplate is what is built). Its
+  internal resistance scales with the rating (0.5 ohm x 2 kW / 90 kW), the same per-unit impedance, so the bigger set sags no more at
+  full load than the small one. The firebox code is unchanged: it already burns only while the boiler wants heat, so with the boiler
+  making 90 a tick its fuel follows the load.
+- **Why:** a 90 kW set behind the 2 kW set's 0.5 ohm could not deliver 90 kW at any useful voltage. An existing firebox set at its present
+  load makes the same power from the same steam, sags less and burns less fuel.
+- **Known gap, for Tim:** water is still 20 steam a unit, so at full load a firebox boiler empties in about 45 s without a drain and a
+  pump; this was always true per steam but no set could draw that much before.
 

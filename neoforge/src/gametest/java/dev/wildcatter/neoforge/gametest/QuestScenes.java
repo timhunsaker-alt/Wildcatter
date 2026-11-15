@@ -401,28 +401,27 @@ final class QuestScenes {
 	}
 
 	/**
-	 * One steam plant feeding a dry-type into a rig, along x from {@code x0} at row z: {@code n} steam turbines in a row, touching, each
-	 * between two firebox boilers, north and south (coal in, water in), then the dry-type with its LOW side against the last turbine and its 480 V
-	 * front facing east against the rig's terminal box, and the rig facing east. Returns the rig's main cell (relative). The dry-type
-	 * goes in only after {@code energiseAt} ticks, when the boilers have built their steam: the switch closing.
+	 * One steam plant feeding a dry-type into a rig, along x from {@code x0} at row z: {@code n} steam turbines in a row, touching, each with
+	 * a boiler north of it on a firebox (coal in) or, for {@code campfire}, on a lit campfire; water in. Then the dry-type with its LOW side
+	 * against the last turbine and its 480 V front facing east against the rig's terminal box, and the rig facing east. Returns the rig's
+	 * main cell (relative). The dry-type goes in only after {@code energiseAt} ticks, when the boilers have built their steam: the switch
+	 * closing.
 	 */
-	private static BlockPos dryTypePlant(GameTestHelper helper, int x0, int z, int y, int n, int energiseAt) {
+	private static BlockPos dryTypePlant(GameTestHelper helper, int x0, int z, int y, int n, boolean campfire, int energiseAt) {
 		int xt = x0 + n;            // the dry-type
 		int hx = xt + 6;            // the rig's main cell: its terminal box 5 west of it, at xt + 1
 		stone(helper, x0 - 1, z - 2, hx + 2, z + 2, y - 1);
 		for (int i = 0; i < n; i++) {
 			int x = x0 + i;
 			helper.setBlock(new BlockPos(x, y, z), net.minecraft.world.level.block.Blocks.STONE);
-			helper.setBlock(new BlockPos(x, y, z - 1), dev.wildcatter.WildcatterBlocks.FIREBOX);
-			GridSceneKit.entity(helper, x, y, z - 1, dev.wildcatter.block.FireboxBlockEntity.class).setItem(0, new ItemStack(Items.COAL_BLOCK, 64));
+			if (campfire) {
+				helper.setBlock(new BlockPos(x, y, z - 1), net.minecraft.world.level.block.Blocks.CAMPFIRE.defaultBlockState().setValue(net.minecraft.world.level.block.CampfireBlock.LIT, true));
+			} else {
+				helper.setBlock(new BlockPos(x, y, z - 1), dev.wildcatter.WildcatterBlocks.FIREBOX);
+				GridSceneKit.entity(helper, x, y, z - 1, dev.wildcatter.block.FireboxBlockEntity.class).setItem(0, new ItemStack(Items.COAL_BLOCK, 64));
+			}
 			helper.setBlock(new BlockPos(x, y + 1, z - 1), dev.wildcatter.WildcatterBlocks.BOILER);
 			GridSceneKit.entity(helper, x, y + 1, z - 1, dev.wildcatter.block.BoilerBlockEntity.class).addWater(4000);
-			{   // a second firebox boiler on the turbine's south side: one boiler's steam is less than a turbine near the dry-type delivers
-				helper.setBlock(new BlockPos(x, y, z + 1), dev.wildcatter.WildcatterBlocks.FIREBOX);
-				GridSceneKit.entity(helper, x, y, z + 1, dev.wildcatter.block.FireboxBlockEntity.class).setItem(0, new ItemStack(Items.COAL_BLOCK, 64));
-				helper.setBlock(new BlockPos(x, y + 1, z + 1), dev.wildcatter.WildcatterBlocks.BOILER);
-				GridSceneKit.entity(helper, x, y + 1, z + 1, dev.wildcatter.block.BoilerBlockEntity.class).addWater(4000);
-			}
 			helper.setBlock(new BlockPos(x, y + 1, z), dev.wildcatter.WildcatterBlocks.STEAM_TURBINE);
 		}
 		helper.setBlock(new BlockPos(xt, y, z), net.minecraft.world.level.block.Blocks.STONE);
@@ -432,7 +431,7 @@ final class QuestScenes {
 		return new BlockPos(hx, y + 1, z);
 	}
 
-	/** True if any of the plant's turbines has tripped on frequency. */
+	/** How many of the plant's turbines have tripped on frequency. */
 	private static int trippedTurbines(GameTestHelper helper, int x0, int z, int y, int n) {
 		int tripped = 0;
 		for (int i = 0; i < n; i++) {
@@ -443,58 +442,66 @@ final class QuestScenes {
 		return tripped;
 	}
 
-	/** Plants of these sizes, side by side; DRY_TYPE_SETS=a,b,... overrides them while the counts are being found. */
-	static final int[] DRY_TYPE_PLANTS = plants();
-
-	private static int[] plants() {
-		String env = System.getenv("DRY_TYPE_SETS");
-		if (env != null && !env.isBlank()) {
-			return java.util.Arrays.stream(env.split(",")).mapToInt(Integer::parseInt).toArray();
+	/** One plant of the scene: its turbines, and whether their boilers stand on campfires rather than fireboxes. */
+	record DryTypePlant(int turbines, boolean campfire) {
+		String name() {
+			return turbines + (campfire ? " campfire" : " firebox") + " set" + (turbines == 1 ? "" : "s");
 		}
-		return new int[] {DRY_TYPE_SHORT, DRY_TYPE_ENOUGH};
 	}
 
-	/** Turbines that trip on frequency during the rig's direct-on-line start, and turbines that start it (docs/dry-type-transformer.md: 33 trip, 34 start). */
-	static final int DRY_TYPE_SHORT = 24;
-	static final int DRY_TYPE_ENOUGH = 36;
+	/** The plants side by side; DRY_TYPE_SETS=1f,2c,... overrides them while the counts are being found. */
+	static final java.util.List<DryTypePlant> DRY_TYPE_PLANTS = plants();
+
+	private static java.util.List<DryTypePlant> plants() {
+		String env = System.getenv("DRY_TYPE_SETS");
+		if (env != null && !env.isBlank()) {
+			return java.util.Arrays.stream(env.split(",")).map(t -> new DryTypePlant(Integer.parseInt(t.substring(0, t.length() - 1)), t.endsWith("c"))).toList();
+		}
+		return java.util.List.of(new DryTypePlant(DRY_TYPE_FIRED, false), new DryTypePlant(DRY_TYPE_FIRED, true));
+	}
+
+	/** The fewest firebox sets that start the rig through the dry-type (docs/dry-type-transformer.md); the same number on campfires cannot. */
+	static final int DRY_TYPE_FIRED = 1;
 
 	/**
-	 * Firebox boilers and small steam turbines feed the dry-type on its LOW side; its 480 V side feeds the rig. Two plants: one too
-	 * small, whose turbines trip on frequency during the rig's 6 x inrush, and one that starts it: the rig runs, drills, and the
-	 * dry-type reads 480 V on its high side and fires transformer_energised.
+	 * Small steam sets feed the dry-type on its LOW side; its 480 V side feeds the rig. A turbine on a firebox boiler is rated by the fire
+	 * (Tim, 2026-11-14): one firebox set starts the rig despite its 6 x inrush and keeps it drilling, the dry-type's high side live at the
+	 * industrial tier and transformer_energised fired. The same set on a campfire boiler (2 kW) trips on frequency during the start.
 	 */
 	static void dryTypeRunsRig(GameTestHelper helper) {
 		String scene = "dry_type_runs_rig";
 		MinecraftServer server = helper.getLevel().getServer();
 		int y = oilY(helper);
-		int[] sizes = DRY_TYPE_PLANTS;
-		int[] rows = new int[sizes.length];
-		BlockPos[] rigs = new BlockPos[sizes.length];
+		java.util.List<DryTypePlant> plants = DRY_TYPE_PLANTS;
+		int count = plants.size();
+		int[] rows = new int[count];
+		BlockPos[] rigs = new BlockPos[count];
 		java.util.List<BlockPos> holes = new java.util.ArrayList<>();
-		for (int k = 0; k < sizes.length; k++) {
+		for (int k = 0; k < count; k++) {
 			rows[k] = k * 8;
-			holes.add(helper.absolutePos(new BlockPos(sizes[k] + 6, y + 1, rows[k])));
+			holes.add(helper.absolutePos(new BlockPos(plants.get(k).turbines() + 6, y + 1, rows[k])));
 		}
 		long seed = noFieldSeed(holes);
 		check(helper, seed >= 0, "no seed leaves the rigs' columns without a field");
 		BlockPos o = helper.absolutePos(BlockPos.ZERO);
-		int maxX = java.util.Arrays.stream(sizes).max().orElse(0) + 10;
-		dev.wildcatter.well.ReservoirData.TestRegion region = new dev.wildcatter.well.ReservoirData.TestRegion(o.getX() - 4, o.getZ() - 4, o.getX() + maxX, o.getZ() + rows[rows.length - 1] + 4, seed);
+		int maxX = plants.stream().mapToInt(DryTypePlant::turbines).max().orElse(0) + 10;
+		dev.wildcatter.well.ReservoirData.TestRegion region = new dev.wildcatter.well.ReservoirData.TestRegion(o.getX() - 4, o.getZ() - 4, o.getX() + maxX, o.getZ() + rows[count - 1] + 4, seed);
 		dev.wildcatter.well.ReservoirData.TEST_REGIONS.add(region);
-		for (int k = 0; k < sizes.length; k++) {
-			rigs[k] = dryTypePlant(helper, 0, rows[k], y, sizes[k], 220);
+		for (int k = 0; k < count; k++) {
+			rigs[k] = dryTypePlant(helper, 0, rows[k], y, plants.get(k).turbines(), plants.get(k).campfire(), 220);
 		}
-		ServerPlayer player = player(helper, 4, y + 1, rows[rows.length - 1] + 3);
-		int[] firstDrilling = new int[sizes.length];
+		ServerPlayer player = player(helper, 4, y + 1, rows[count - 1] + 3);
+		int[] firstDrilling = new int[count];
 		java.util.Arrays.fill(firstDrilling, -1);
-		int[] firstTrip = new int[sizes.length];
+		int[] firstTrip = new int[count];
 		java.util.Arrays.fill(firstTrip, -1);
 		for (int t = 240; t <= 1000; t += 20) {
 			final int at = t;
 			helper.runAfterDelay(t, () -> {
-				for (int k = 0; k < sizes.length; k++) {
+				for (int k = 0; k < count; k++) {
+					int n = plants.get(k).turbines();
 					String rig = GridSceneKit.read(helper, rigs[k].getX(), rigs[k].getY(), rigs[k].getZ());
-					int tripped = trippedTurbines(helper, 0, rows[k], y, sizes[k]);
+					int tripped = trippedTurbines(helper, 0, rows[k], y, n);
 					if (firstDrilling[k] < 0 && rig.contains("drilling,")) {
 						firstDrilling[k] = at;
 					}
@@ -502,33 +509,33 @@ final class QuestScenes {
 						firstTrip[k] = at;
 					}
 					if (at % 100 == 0 || at == 240) {
-						log(scene, sizes[k] + " turbines at " + at + " | tripped " + tripped + " | rig " + rig + " | dry-type " + GridSceneKit.read(helper, sizes[k], y + 1, rows[k])
-								+ " | turbine " + GridSceneKit.read(helper, sizes[k] - 1, y + 1, rows[k]));
+						log(scene, plants.get(k).name() + " at " + at + " | tripped " + tripped + " | rig " + rig + " | dry-type " + GridSceneKit.read(helper, n, y + 1, rows[k])
+								+ " | turbine " + GridSceneKit.read(helper, n - 1, y + 1, rows[k]) + " | boiler " + GridSceneKit.read(helper, n - 1, y + 1, rows[k] - 1));
 					}
 				}
 				if (at == 1000) {
 					StringBuilder sum = new StringBuilder();
-					for (int k = 0; k < sizes.length; k++) {
-						sum.append(sizes[k]).append(" turbines: drilling from ").append(firstDrilling[k]).append(", tripped from ").append(firstTrip[k]).append("; ");
+					for (int k = 0; k < count; k++) {
+						sum.append(plants.get(k).name()).append(": drilling from ").append(firstDrilling[k]).append(", tripped from ").append(firstTrip[k]).append("; ");
 					}
 					log(scene, "summary | " + sum);
 					if (System.getenv("DRY_TYPE_SETS") == null || System.getenv("DRY_TYPE_SETS").isBlank()) {
-						int s = 0, e = 1;
-						String short_ = GridSceneKit.read(helper, rigs[s].getX(), rigs[s].getY(), rigs[s].getZ());
-						check(helper, firstTrip[s] > 0 && firstDrilling[s] < 0, DRY_TYPE_SHORT + " turbines should trip on frequency during the rig's start, never drilling: " + short_);
-						String rig = GridSceneKit.read(helper, rigs[e].getX(), rigs[e].getY(), rigs[e].getZ());
-						String xfmr = GridSceneKit.read(helper, DRY_TYPE_ENOUGH, y + 1, rows[e]);
-						check(helper, firstTrip[e] < 0 && rig.contains("drilling,") && !rig.contains(" 0 blocks down"), DRY_TYPE_ENOUGH + " turbines should start the rig and keep it drilling: " + rig);
+						int f = 0, c = 1;
+						String rig = GridSceneKit.read(helper, rigs[f].getX(), rigs[f].getY(), rigs[f].getZ());
+						String xfmr = GridSceneKit.read(helper, DRY_TYPE_FIRED, y + 1, rows[f]);
+						check(helper, firstTrip[f] < 0 && rig.contains("drilling,") && !rig.contains(" 0 blocks down"), plants.get(f).name() + " should start the rig and keep it drilling: " + rig);
 						java.util.regex.Matcher hv = java.util.regex.Pattern.compile("([\\d.]+) V [\\d.]+ A on the " + java.util.regex.Pattern.quote(dev.wildcatter.energy.Voltage.INDUSTRIAL.label())).matcher(xfmr);
 						check(helper, hv.find() && Double.parseDouble(hv.group(1)) > dev.wildcatter.energy.Voltage.INDUSTRIAL.nominal() * 0.5,
 								"the dry-type's high side should be live at the industrial tier, fed from its low side: " + xfmr);
+						String camp = GridSceneKit.read(helper, rigs[c].getX(), rigs[c].getY(), rigs[c].getZ());
+						check(helper, firstTrip[c] > 0 && firstDrilling[c] < 0, plants.get(c).name() + " (2 kW each) should trip on frequency during the rig's start, never drilling: " + camp);
 						check(helper, reached(server, player, dev.wildcatter.quest.Milestones.TRANSFORMER_ENERGISED), "the dry-type should fire transformer_energised");
 						check(helper, reached(server, player, dev.wildcatter.quest.Milestones.MOTOR_RUNNING), "the rig's motor should fire motor_running");
 						log(scene, "ok: " + sum + "| rig " + rig + " | dry-type " + xfmr);
 					}
 					dev.wildcatter.well.ReservoirData.TEST_REGIONS.remove(region);
 					leave(helper, player);
-					clearBox(helper, -2, -3, maxX + 2, rows[rows.length - 1] + 3, y - 1, y + 12);
+					clearBox(helper, -2, -3, maxX + 2, rows[count - 1] + 3, y - 1, y + 12);
 					helper.succeed();
 				}
 			});

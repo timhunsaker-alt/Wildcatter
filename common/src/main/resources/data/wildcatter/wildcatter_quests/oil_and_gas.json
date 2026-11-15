@@ -32,7 +32,7 @@
       "id": "rig",
       "title": "The drilling rig",
       "icon": "wildcatter:drilling_rig",
-      "text": "The drilling rig sinks a steel-cased hole into the field. Its engine needs steel pistons; its drive needs 480 V three-phase: set a dry-type transformer against its terminal box and feed it from steam turbines (Step up to 480 V). A strike leaves a wellhead; a dry hole is reported.",
+      "text": "The drilling rig sinks a steel-cased hole into the field. Its engine needs steel pistons; its drive needs 480 V three-phase: set a dry-type transformer against its terminal box and feed it from a steam turbine on a firebox boiler (Step up to 480 V). A strike leaves a wellhead; a dry hole is reported.",
       "requires": [
         "seismograph",
         "step_up"

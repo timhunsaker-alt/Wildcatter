@@ -1251,6 +1251,12 @@ public final class Tuning {
 	/** Energy in one unit of steam. A campfire boiler (2 steam a tick) therefore makes 2 kW. */
 	public static final double JOULES_PER_STEAM = 50.0;
 	public static final double TURBINE_INTERNAL_OHMS = 0.5;  // its output sags as the current rises
+	/** Fuel to electricity in a fired steam set: the steam plant's 25 % (docs/multiblocks/steam-plant.md, Build values). */
+	public static final double FIREBOX_ELECTRIC_SHARE = 0.25;
+	/** A turbine on a firebox boiler is rated by the fire (Tim, 2026-11-14): 0.36 MW x 25 % = 90 kW (docs/dry-type-transformer.md). */
+	public static final double FIREBOX_TURBINE_WATTS = FIREBOX_HEAT_WATTS * FIREBOX_ELECTRIC_SHARE;
+	/** The steam a firebox boiler makes at most: as much as its fire gives at 25 %, 90 a tick (a campfire's is BOILER_STEAM_PER_TICK). */
+	public static final int FIREBOX_STEAM_PER_TICK = (int) Math.round(FIREBOX_TURBINE_WATTS / (JOULES_PER_STEAM * 20.0));
 	public static final double TURBINE_STEAM_SMOOTHING = 0.3; // how fast the output follows the steam supply
 
 	// ---- Wire heating (the sizes, their resistance and ampacity are in energy/ConductorSize) ---------------------

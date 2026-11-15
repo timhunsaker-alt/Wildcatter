@@ -47,25 +47,46 @@ S W S      C  block of copper (the windings)
 ```
 No pole transformer and no cable in it.
 
-## How many turbines (the `dry_type_runs_rig` scene)
-A small steam turbine is rated by the steam one boiler makes (`Tuning.BOILER_STEAM_PER_TICK`, 2 kW), and an island whose load stays
-above its generators' rating falls in frequency and trips them (docs/ELECTRICAL_MODEL.md, "Frequency and supply/demand"). The rig is a 30 kW drive
-motor started direct on line, drawing six times its current at PF 0.35 for its start: about 53 kW at the motor while it starts,
-with the 480 V side near 390 V (82 %). Running, it takes 27.6 kW at 460 V.
+## A turbine on a firebox is rated by its fire (Tim, 2026-11-14: "Rate turbine by its fire")
+Answer to decision 17. Written before the code.
 
-Measured in the scene, turbines in a row, touching (each turbine's own terminals join the next), the dry-type against the last:
+**Real counterpart:** a small packaged steam turbine-generator, single-stage and back-pressure, about 100 kW, three-phase at the low
+tier, on a skid with its governor: the size a sawmill or a plant's waste-heat boiler drives.
 
-| Turbines | Boilers each | Result |
+| Value | Used | Basis |
 |---|---|---|
-| 8, 16, 24, 32 | 1 | trip on frequency within 2 s of the start: the start steps the load from nothing to near or past the turbines' rating, and the frequency falls below 57 Hz for a second |
-| 24, 33 | 2 | trip the same way (a second boiler adds steam, not rating) |
-| 34, 35, 36, 38 | 2 | start the rig (drilling 4 s after the switch closes), 92 % speed, held for 40 s |
-| 40, 48 | 1 | start it, then starve: the turbines nearest the dry-type deliver most of the load and one boiler cannot keep up (40 turbines at 30 % speed after 40 s, 48 at 79 %) |
-| 64, 80 | 1 | start it and hold it (89 %, 86 %) |
+| Firebox heat | 0.36 MW (`Tuning.FIREBOX_HEAT_WATTS`, unchanged) | its coal fire |
+| Fuel to electricity | 25 % (`Tuning.FIREBOX_ELECTRIC_SHARE`) | the figure the steam plant uses: "25 % overall from fuel to electricity" (docs/multiblocks/steam-plant.md, Build values) |
+| Rating of a turbine on a firebox boiler | 0.36 MW x 25 % = 90 kW (`Tuning.FIREBOX_TURBINE_WATTS`) | the fire it can turn into power |
+| Steam a firebox boiler makes, at most | 90 a tick (`Tuning.FIREBOX_STEAM_PER_TICK` = 90 kW / 50 J / 20) | only what the heat rate gives; at 50 J a steam that is 90 kW |
+| Turbine on a campfire boiler | 2 kW, 2 steam a tick: unchanged | a campfire |
+| Internal resistance | 0.5 ohm x 2 kW / rating: 0.011 ohm at 90 kW | the same per-unit impedance (2.3 %) as the 2 kW set |
 
-- **To start the rig and keep it drilling:** at least 34 turbines, each between two firebox boilers; 36 to be safe. The scene runs
-  24 (trip) and 36 (drills).
-- The quest text and the Field Manual page say this.
+- A turbine is rated 90 kW when any boiler it touches stands on a firebox (the nameplate: what is built, not whether it is lit); its
+  island's frequency, its stator and its sag all use that rating.
+- **Fuel follows the load.** A firebox burns only while the boiler above wants heat (water in it and room for steam). Making up to 90 a
+  tick, a lightly loaded boiler is full after a tick of fire and the fire waits until the turbine draws it down, so a firebox at today's
+  2 kW load burns about 1/45 of the fuel it burned before, and an idle one none. Steam drawn still follows the power used.
+- **Water:** 20 steam a unit of water, unchanged; at the full 90 kW a boiler of 4,000 uses its water in 45 s unless its drain and a pump
+  refill it. At loads of 2 kW and less nothing changes.
+- **Existing worlds:** a firebox set only gains headroom. At its present load it makes the same power from the same steam; its voltage sags
+  less (0.06 V instead of 2.8 V at 2 kW) and its fire burns less often. Campfire sets are unchanged.
+
+## How many sets (the `dry_type_runs_rig` scene)
+The rig is a 30 kW drive motor started direct on line, drawing six times its current at PF 0.35 for its start: about 57 kW at the motor,
+with the 480 V side near 410 V. Running, it takes 28.4 kW at 467 V. An island whose load stays above its generators' rating falls in
+frequency and trips them (docs/ELECTRICAL_MODEL.md, "Frequency and supply/demand").
+
+With the turbines rated by their fire (above), measured in the scene, each set a turbine with one boiler beside it:
+
+| Sets | Boiler on | Result |
+|---|---|---|
+| 1, 2 | a firebox | start the rig 3 s after the switch closes and hold it at 95 % speed (59.8 Hz); one set's boiler uses about 2 units of water a tick |
+| 1, 4 | a campfire | trip on frequency within 2 s of the start |
+
+- **One firebox set starts the rig and keeps it drilling.** The scene builds one firebox set (drills) and one campfire set (trips).
+- Before Tim's answer, when every small turbine was rated 2 kW, it took 34 turbines with two firebox boilers each (decision 17).
+- The quest text and the Field Manual say this.
 
 ## Quest
 "Step up to 480 V" in Three-phase power: the dry-type transformer and `wildcatter:transformer_energised`. The drilling rig's quest

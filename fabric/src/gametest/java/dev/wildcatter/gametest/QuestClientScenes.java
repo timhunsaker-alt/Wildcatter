@@ -101,15 +101,15 @@ final class QuestClientScenes {
 	}
 
 	/**
-	 * The first 480 V (docs/dry-type-transformer.md): 36 small steam turbines in a row, each between two firebox boilers, feed a dry-type
-	 * transformer on its LOW side; its 480 V front against the drilling rig's terminal box. Built on a platform high over the flat world,
-	 * so the rig has something to drill.
+	 * The first 480 V (docs/dry-type-transformer.md): one steam turbine beside a boiler on a firebox, rated by its fire (90 kW), feeds a
+	 * dry-type transformer on its LOW side; its 480 V front against the drilling rig's terminal box. Built on a platform high over the flat
+	 * world, so the rig has something to drill.
 	 */
 	void dryType() {
-		int n = 36, x0 = 0, z0 = 24;
+		int n = 1, x0 = 12, z0 = 24;
 		int base = server.computeOnServer(srv -> srv.overworld().getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, 10, 10)) + 40;
 		int xt = x0 + n, hx = xt + 6;
-		// stand in the middle of the plant while it warms up and starts, so every firebox, boiler and turbine is ticking
+		// stand on the ground near the plant while it warms up and starts (a player left in the air falls and dies, and then nothing ticks)
 		int ground = base - 40 + 1;
 		server.runCommand("tp @p " + (x0 + n / 2 + 4) + " " + ground + " " + (z0 + 6) + " 90 -20");
 		context.waitTicks(60);
@@ -138,7 +138,7 @@ final class QuestClientScenes {
 		// the starter plant's blocks by command, as a player's placing does
 		for (int i = 0; i < n; i++) {
 			int x = x0 + i;
-			for (int z : new int[] {z0 - 1, z0 + 1}) {
+			for (int z : new int[] {z0 - 1}) {
 				server.runCommand("setblock " + x + " " + (base + 1) + " " + z + " wildcatter:firebox");
 				server.runCommand("item replace block " + x + " " + (base + 1) + " " + z + " container.0 with minecraft:coal_block 64");
 				server.runCommand("setblock " + x + " " + (base + 2) + " " + z + " wildcatter:boiler");
@@ -147,7 +147,7 @@ final class QuestClientScenes {
 		}
 		server.computeOnServer(srv -> {
 			for (int i = 0; i < n; i++) {
-				for (int z : new int[] {z0 - 1, z0 + 1}) {
+				for (int z : new int[] {z0 - 1}) {
 					((dev.wildcatter.block.BoilerBlockEntity) dev.wildcatter.multiblock.BigParts.entity(srv.overworld(), new BlockPos(x0 + i, base + 2, z))).addWater(4000);
 				}
 			}
@@ -160,17 +160,14 @@ final class QuestClientScenes {
 		String rig = read(hx, base + 2, z0);
 		String xfmr = read(xt, base + 2, z0);
 		System.out.println("[wildcatter-test] dryType: rig " + rig + " | dry-type " + xfmr + " | turbine " + read(xt - 1, base + 2, z0));
-		for (int x : new int[] {x0, x0 + 10, x0 + 20, xt - 3}) {
-			System.out.println("[wildcatter-test] dryType: at " + x + " turbine " + read(x, base + 2, z0) + " | boiler " + read(x, base + 2, z0 - 1) + " | firebox " + read(x, base + 1, z0 - 1));
-		}
-		check(rig.contains("drilling,"), n + " turbines through the dry-type should start the rig and keep it drilling: " + rig + " | " + xfmr);
+		check(rig.contains("drilling,"), "one firebox set through the dry-type should start the rig and keep it drilling: " + rig + " | " + xfmr);
 		// stand on the platform's edge by the rig, then on a ledge above the plant (a fall from the platform would kill the player)
 		server.runCommand("fill " + (xt - 3) + " " + base + " " + (z0 + 3) + " " + (xt + 6) + " " + base + " " + (z0 + 10) + " minecraft:stone");
 		server.runCommand("tp @p " + (xt + 1.5) + " " + (base + 1) + " " + (z0 + 4.5) + " 160 22");
 		context.waitTicks(40);
 		context.takeScreenshot("wildcatter-dry-type-rig");
 		server.runCommand("fill " + (xt - 1) + " " + (base + 4) + " " + (z0 + 7) + " " + (xt + 1) + " " + (base + 4) + " " + (z0 + 9) + " minecraft:stone");
-		server.runCommand("tp @p " + (xt + 0.5) + " " + (base + 5) + " " + (z0 + 8.5) + " 125 24");
+		server.runCommand("tp @p " + (xt + 0.5) + " " + (base + 5) + " " + (z0 + 8.5) + " -155 25");
 		context.waitTicks(40);
 		context.takeScreenshot("wildcatter-dry-type-plant");
 		// take it down, so nothing runs on through the later scenes

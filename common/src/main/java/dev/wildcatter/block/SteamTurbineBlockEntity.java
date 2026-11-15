@@ -76,7 +76,9 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 	@Override
 	public void build(Circuit circuit) {
 		// three phases, each able to carry the full rating on its own (a small single-phase set); the governor and frequency limit the total
-		phases.build(circuit, worldPosition, voltage(), tripped ? 0 : voltage().nominal() * satisfaction, Tuning.TURBINE_INTERNAL_OHMS);
+		// the same per-unit impedance at any rating: a 90 kW fired set sags no more at full load than the 2 kW campfire set
+		phases.build(circuit, worldPosition, voltage(), tripped ? 0 : voltage().nominal() * satisfaction,
+				Tuning.TURBINE_INTERNAL_OHMS * campfireWatts() / ratedWatts());
 	}
 
 	@Override
@@ -108,6 +110,14 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 
 		if (phase % Tuning.PLUMBING_INTERVAL == 0) {
 			turbine.drain(level);
+		}
+		if (phase % 20 == 0 || !turbine.firedChecked) {
+			turbine.firedChecked = true;
+			boolean fired = turbine.findFired(level);
+			if (fired != turbine.fired) {
+				turbine.fired = fired;   // its rating and impedance change: solve again
+				CircuitManager.markDirty(level);
+			}
 		}
 
 		boolean running = turbine.idleTicks < 20;
@@ -199,7 +209,27 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 	// ---- Generator: the island's frequency, and frequency protection ----------------------------------------------------
 	@Override
 	public double ratedWatts() {
+		return fired ? Tuning.FIREBOX_TURBINE_WATTS : campfireWatts();
+	}
+
+	/** A turbine on a campfire boiler: one campfire's steam, 2 kW. */
+	private static double campfireWatts() {
 		return Tuning.BOILER_STEAM_PER_TICK * Tuning.JOULES_PER_STEAM * 20.0;
+	}
+
+	/** True if a boiler it touches stands on a firebox: it is rated by that fire (Tim, 2026-11-14; docs/dry-type-transformer.md). */
+	private boolean fired;
+	private boolean firedChecked;
+
+	private boolean findFired(Level level) {
+		for (Direction side : Direction.values()) {
+			BlockPos at = worldPosition.relative(side);
+			if (dev.wildcatter.multiblock.BigParts.entity(level, at) instanceof BoilerBlockEntity boiler
+					&& BoilerBlockEntity.fireboxFired(level, boiler.getBlockPos())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -244,7 +274,8 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 		String drain = (drained ? ", drain connected" : ", no drain pipe (condensate is lost)")
 				+ (cooled ? ", condensate cooled" : ", NO COOLING TOWER (needs " + Math.round(100 / Tuning.UNCOOLED_EFFICIENCY - 100) + "% more steam)");
 		String starved = satisfaction < 0.98 ? ", STARVED of steam (" + Math.round(satisfaction * 100) + "%)" : "";
-		return Component.literal("Steam turbine (" + Voltage.LOW.label() + "): " + String.format("%.0f V, %.1f A, %.0f W", volts, amps, watts()) + starved + drain + "; " + earth);
+		return Component.literal("Steam turbine (" + Voltage.LOW.label() + ", " + Math.round(ratedWatts() / 1000) + " kW" + (fired ? " on a firebox" : "") + "): "
+				+ String.format("%.0f V, %.1f A, %.0f W", volts, amps, watts()) + starved + drain + "; " + earth);
 	}
 
 	@Override

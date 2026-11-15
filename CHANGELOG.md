@@ -4,11 +4,14 @@
 
 ### Tim's answers to the quest book (2026-11-14)
 - **Dry-type transformer** (`wildcatter:dry_type_transformer`): the first 480 V comes from steam. A 75 kVA shop transformer fed backwards
-  from small steam turbines gives 480 V three-phase for the drilling rig and the pumpjack. It takes at least 34 turbines (36 to be safe),
-  each between two firebox boilers, to carry the rig's start. Hand-made before plastic. Field Manual: DRY-TYPE TRANSFORMER.
+  from a steam turbine gives 480 V three-phase for the drilling rig and the pumpjack. Hand-made before plastic. Field Manual: DRY-TYPE
+  TRANSFORMER.
+- **A steam turbine on a firebox is rated by its fire:** 90 kW (a quarter of the firebox's 0.36 MW), and a firebox boiler boils up to 90
+  steam a tick; one such set starts the drilling rig through the dry-type. Campfire sets stay 2 kW. Existing worlds: a firebox set only
+  gains headroom; at its present load it makes the same power from the same steam, sags a little less and burns less fuel.
 - **Quests:** "Step up to 480 V" in Three-phase power, needed by the drilling rig's quest. New milestones `wildcatter:pumpjack_running` and
   `wildcatter:well_struck`: the oil well and gas well quests now tick from a running pumpjack and a strike, not from wellheads.
-- Decisions for review: `docs/questions/phase21-quests.md` (16-20; 1-15 accepted or answered by Tim).
+- Decisions for review: `docs/questions/phase21-quests.md` (16-21; 1-15 accepted or answered by Tim).
 
 ## v0.8.0 (released 2026-11-14): Phase 21, the quest book
 
