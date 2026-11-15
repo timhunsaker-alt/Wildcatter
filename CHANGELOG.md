@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v0.8.1 (released 2026-11-14): the first 480 V from steam, oilfield milestones
 
 ### Tim's answers to the quest book (2026-11-14)
 - **Dry-type transformer** (`wildcatter:dry_type_transformer`): the first 480 V comes from steam. A 75 kVA shop transformer fed backwards
