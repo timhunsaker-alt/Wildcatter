@@ -79,6 +79,9 @@ voltage transformers (wye-grounded, 1 MΩ a phase) give the 13.8 kV bus its grou
     25 x for 2 s. Below its rating it cools back over 10 minutes. It replaced the 150 %/10 s rule.
   Connections: Δ–Y (substation, generator step-up), Y–Y, single-phase pole-mount
   (NA: 7.2 kV → 120/240 center-tap), three-phase pad-mount.
+  - **Dry-type step-up (Tim, 2026-11-14):** a 75 kVA, 5 %Z general-purpose dry-type fed backwards from the LV tier's three
+    phases to 480Y/277 V (IEC: 400Y/230 V both sides, an isolation transformer), Y–Y grounded: the first 480 V, from small steam
+    turbines (`docs/dry-type-transformer.md`). Power flows either way through every transformer.
 - **Generators:** voltage source behind impedance, rated kVA, inertia, governor.
 - **Loads:** resistive (lamp, heater); motor (inductive, PF ≈ 0.8, inrush current on start).
   - **Start time:** a start takes 2 s at full voltage and goes with V² below it: a start at 80 % takes about 3 s, drawing its

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SWS",
+    "CIC",
+    "SWS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "W": "wildcatter:wool_wire_hot",
+    "C": "minecraft:copper_block",
+    "I": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:dry_type_transformer",
+    "count": 1
+  }
+}

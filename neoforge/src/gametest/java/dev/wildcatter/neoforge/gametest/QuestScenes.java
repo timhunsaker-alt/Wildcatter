@@ -56,6 +56,9 @@ final class QuestScenes {
 		out.put("quest_genset_milestone", QuestScenes::gensetMilestone);
 		out.put("quest_multiblock_milestone", QuestScenes::multiblockMilestone);
 		out.put("quest_reactor_milestone", QuestScenes::reactorMilestone);
+		out.put("dry_type_runs_rig", QuestScenes::dryTypeRunsRig);
+		out.put("quest_pumpjack_milestone", QuestScenes::pumpjackMilestone);
+		out.put("quest_well_struck_milestone", QuestScenes::wellStruckMilestone);
 		return out;
 	}
 
@@ -330,5 +333,305 @@ final class QuestScenes {
 				&& !QuestRules.neverReward(Identifier.parse("wildcatter:steel_ingot")), "the never-reward list");
 		log("quests_valid", "ok: " + book.chapters().size() + " chapters, " + book.quests().size() + " quests pass; the bad chapter: " + found.size() + " problems");
 		helper.succeed();
+	}
+
+	// ---- Tim's answers of 2026-11-14: the first 480 V from a dry-type step-up, and the oilfield milestones ----------------------------
+
+	/** The height of these scenes' floor in the world: high enough that a rig has rock to drill and stops at a field, not the dry-hole floor. */
+	private static final int OIL_FLOOR_Y = 40;
+
+	/** The relative y of the floor's top layer + 1: where the machines stand. */
+	private static int oilY(GameTestHelper helper) {
+		return OIL_FLOOR_Y - helper.absolutePos(BlockPos.ZERO).getY() + 1;
+	}
+
+	/** A stone floor at relative height y over (x1, z1)..(x2, z2), its chunks force-loaded. */
+	private static void stone(GameTestHelper helper, int x1, int z1, int x2, int z2, int y) {
+		BlockPos a = helper.absolutePos(new BlockPos(x1, y, z1));
+		BlockPos b = helper.absolutePos(new BlockPos(x2, y, z2));
+		for (int cx = Math.min(a.getX(), b.getX()) >> 4; cx <= Math.max(a.getX(), b.getX()) >> 4; cx++) {
+			for (int cz = Math.min(a.getZ(), b.getZ()) >> 4; cz <= Math.max(a.getZ(), b.getZ()) >> 4; cz++) {
+				helper.getLevel().setChunkForced(cx, cz, true);
+			}
+		}
+		for (int x = x1; x <= x2; x++) {
+			for (int z = z1; z <= z2; z++) {
+				helper.getLevel().setBlock(helper.absolutePos(new BlockPos(x, y, z)), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), 3);
+			}
+		}
+	}
+
+	/** Everything between the corners back to air, so no rig is left drilling into the next batch. */
+	private static void clearBox(GameTestHelper helper, int x1, int z1, int x2, int z2, int y1, int y2) {
+		BlockPos.MutableBlockPos at = new BlockPos.MutableBlockPos();
+		for (int x = x1; x <= x2; x++) {
+			for (int z = z1; z <= z2; z++) {
+				for (int y = y1; y <= y2; y++) {
+					at.set(helper.absolutePos(new BlockPos(x, y, z)));
+					if (!helper.getLevel().getBlockState(at).isAir()) {
+						helper.getLevel().removeBlockEntity(at);
+						helper.getLevel().setBlock(at, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 2 | 16);
+					}
+				}
+			}
+		}
+	}
+
+	/** A seed whose fields put nothing under any of these absolute columns (no dome grid: the scenes' world has its rules off). */
+	private static long noFieldSeed(java.util.List<BlockPos> holes) {
+		for (long s = 1; s < 100_000; s++) {
+			final long seed = s;
+			if (holes.stream().allMatch(h -> dev.wildcatter.well.Reservoir.at(seed, h.getX(), h.getZ(), d -> false) == null)) {
+				return seed;
+			}
+		}
+		return -1;
+	}
+
+	/** A seed with a field the small rig can reach under this absolute column (oil only if {@code oil}), or -1. */
+	private static long fieldSeed(BlockPos hole, boolean oil) {
+		for (long s = 1; s < 3_000_000; s++) {
+			dev.wildcatter.well.Reservoir f = dev.wildcatter.well.Reservoir.at(s, hole.getX(), hole.getZ(), d -> false);
+			if (f != null && f.units() > 0 && (!oil || f.kind() == dev.wildcatter.well.Reservoir.Kind.OIL) && f.topY() < hole.getY() - 4
+					&& hole.getY() - f.topY() < dev.wildcatter.Tuning.SMALL_RIG_MAX_DEPTH - 2) {
+				return s;
+			}
+		}
+		return -1;
+	}
+
+	/**
+	 * One steam plant feeding a dry-type into a rig, along x from {@code x0} at row z: {@code n} steam turbines in a row, touching, each
+	 * between two firebox boilers, north and south (coal in, water in), then the dry-type with its LOW side against the last turbine and its 480 V
+	 * front facing east against the rig's terminal box, and the rig facing east. Returns the rig's main cell (relative). The dry-type
+	 * goes in only after {@code energiseAt} ticks, when the boilers have built their steam: the switch closing.
+	 */
+	private static BlockPos dryTypePlant(GameTestHelper helper, int x0, int z, int y, int n, int energiseAt) {
+		int xt = x0 + n;            // the dry-type
+		int hx = xt + 6;            // the rig's main cell: its terminal box 5 west of it, at xt + 1
+		stone(helper, x0 - 1, z - 2, hx + 2, z + 2, y - 1);
+		for (int i = 0; i < n; i++) {
+			int x = x0 + i;
+			helper.setBlock(new BlockPos(x, y, z), net.minecraft.world.level.block.Blocks.STONE);
+			helper.setBlock(new BlockPos(x, y, z - 1), dev.wildcatter.WildcatterBlocks.FIREBOX);
+			GridSceneKit.entity(helper, x, y, z - 1, dev.wildcatter.block.FireboxBlockEntity.class).setItem(0, new ItemStack(Items.COAL_BLOCK, 64));
+			helper.setBlock(new BlockPos(x, y + 1, z - 1), dev.wildcatter.WildcatterBlocks.BOILER);
+			GridSceneKit.entity(helper, x, y + 1, z - 1, dev.wildcatter.block.BoilerBlockEntity.class).addWater(4000);
+			{   // a second firebox boiler on the turbine's south side: one boiler's steam is less than a turbine near the dry-type delivers
+				helper.setBlock(new BlockPos(x, y, z + 1), dev.wildcatter.WildcatterBlocks.FIREBOX);
+				GridSceneKit.entity(helper, x, y, z + 1, dev.wildcatter.block.FireboxBlockEntity.class).setItem(0, new ItemStack(Items.COAL_BLOCK, 64));
+				helper.setBlock(new BlockPos(x, y + 1, z + 1), dev.wildcatter.WildcatterBlocks.BOILER);
+				GridSceneKit.entity(helper, x, y + 1, z + 1, dev.wildcatter.block.BoilerBlockEntity.class).addWater(4000);
+			}
+			helper.setBlock(new BlockPos(x, y + 1, z), dev.wildcatter.WildcatterBlocks.STEAM_TURBINE);
+		}
+		helper.setBlock(new BlockPos(xt, y, z), net.minecraft.world.level.block.Blocks.STONE);
+		GridSceneKit.place(helper, dev.wildcatter.WildcatterBlocks.DRILLING_RIG, hx, y + 1, z, net.minecraft.core.Direction.EAST);
+		helper.runAfterDelay(energiseAt, () -> helper.setBlock(new BlockPos(xt, y + 1, z), dev.wildcatter.WildcatterBlocks.DRY_TYPE_TRANSFORMER.defaultBlockState()
+				.setValue(dev.wildcatter.block.TransformerBlock.FACING, net.minecraft.core.Direction.EAST)));
+		return new BlockPos(hx, y + 1, z);
+	}
+
+	/** True if any of the plant's turbines has tripped on frequency. */
+	private static int trippedTurbines(GameTestHelper helper, int x0, int z, int y, int n) {
+		int tripped = 0;
+		for (int i = 0; i < n; i++) {
+			if (GridSceneKit.entity(helper, x0 + i, y + 1, z, dev.wildcatter.block.SteamTurbineBlockEntity.class).isTripped()) {
+				tripped++;
+			}
+		}
+		return tripped;
+	}
+
+	/** Plants of these sizes, side by side; DRY_TYPE_SETS=a,b,... overrides them while the counts are being found. */
+	static final int[] DRY_TYPE_PLANTS = plants();
+
+	private static int[] plants() {
+		String env = System.getenv("DRY_TYPE_SETS");
+		if (env != null && !env.isBlank()) {
+			return java.util.Arrays.stream(env.split(",")).mapToInt(Integer::parseInt).toArray();
+		}
+		return new int[] {DRY_TYPE_SHORT, DRY_TYPE_ENOUGH};
+	}
+
+	/** Turbines that trip on frequency during the rig's direct-on-line start, and turbines that start it (docs/dry-type-transformer.md: 33 trip, 34 start). */
+	static final int DRY_TYPE_SHORT = 24;
+	static final int DRY_TYPE_ENOUGH = 36;
+
+	/**
+	 * Firebox boilers and small steam turbines feed the dry-type on its LOW side; its 480 V side feeds the rig. Two plants: one too
+	 * small, whose turbines trip on frequency during the rig's 6 x inrush, and one that starts it: the rig runs, drills, and the
+	 * dry-type reads 480 V on its high side and fires transformer_energised.
+	 */
+	static void dryTypeRunsRig(GameTestHelper helper) {
+		String scene = "dry_type_runs_rig";
+		MinecraftServer server = helper.getLevel().getServer();
+		int y = oilY(helper);
+		int[] sizes = DRY_TYPE_PLANTS;
+		int[] rows = new int[sizes.length];
+		BlockPos[] rigs = new BlockPos[sizes.length];
+		java.util.List<BlockPos> holes = new java.util.ArrayList<>();
+		for (int k = 0; k < sizes.length; k++) {
+			rows[k] = k * 8;
+			holes.add(helper.absolutePos(new BlockPos(sizes[k] + 6, y + 1, rows[k])));
+		}
+		long seed = noFieldSeed(holes);
+		check(helper, seed >= 0, "no seed leaves the rigs' columns without a field");
+		BlockPos o = helper.absolutePos(BlockPos.ZERO);
+		int maxX = java.util.Arrays.stream(sizes).max().orElse(0) + 10;
+		dev.wildcatter.well.ReservoirData.TestRegion region = new dev.wildcatter.well.ReservoirData.TestRegion(o.getX() - 4, o.getZ() - 4, o.getX() + maxX, o.getZ() + rows[rows.length - 1] + 4, seed);
+		dev.wildcatter.well.ReservoirData.TEST_REGIONS.add(region);
+		for (int k = 0; k < sizes.length; k++) {
+			rigs[k] = dryTypePlant(helper, 0, rows[k], y, sizes[k], 220);
+		}
+		ServerPlayer player = player(helper, 4, y + 1, rows[rows.length - 1] + 3);
+		int[] firstDrilling = new int[sizes.length];
+		java.util.Arrays.fill(firstDrilling, -1);
+		int[] firstTrip = new int[sizes.length];
+		java.util.Arrays.fill(firstTrip, -1);
+		for (int t = 240; t <= 1000; t += 20) {
+			final int at = t;
+			helper.runAfterDelay(t, () -> {
+				for (int k = 0; k < sizes.length; k++) {
+					String rig = GridSceneKit.read(helper, rigs[k].getX(), rigs[k].getY(), rigs[k].getZ());
+					int tripped = trippedTurbines(helper, 0, rows[k], y, sizes[k]);
+					if (firstDrilling[k] < 0 && rig.contains("drilling,")) {
+						firstDrilling[k] = at;
+					}
+					if (firstTrip[k] < 0 && tripped > 0) {
+						firstTrip[k] = at;
+					}
+					if (at % 100 == 0 || at == 240) {
+						log(scene, sizes[k] + " turbines at " + at + " | tripped " + tripped + " | rig " + rig + " | dry-type " + GridSceneKit.read(helper, sizes[k], y + 1, rows[k])
+								+ " | turbine " + GridSceneKit.read(helper, sizes[k] - 1, y + 1, rows[k]));
+					}
+				}
+				if (at == 1000) {
+					StringBuilder sum = new StringBuilder();
+					for (int k = 0; k < sizes.length; k++) {
+						sum.append(sizes[k]).append(" turbines: drilling from ").append(firstDrilling[k]).append(", tripped from ").append(firstTrip[k]).append("; ");
+					}
+					log(scene, "summary | " + sum);
+					if (System.getenv("DRY_TYPE_SETS") == null || System.getenv("DRY_TYPE_SETS").isBlank()) {
+						int s = 0, e = 1;
+						String short_ = GridSceneKit.read(helper, rigs[s].getX(), rigs[s].getY(), rigs[s].getZ());
+						check(helper, firstTrip[s] > 0 && firstDrilling[s] < 0, DRY_TYPE_SHORT + " turbines should trip on frequency during the rig's start, never drilling: " + short_);
+						String rig = GridSceneKit.read(helper, rigs[e].getX(), rigs[e].getY(), rigs[e].getZ());
+						String xfmr = GridSceneKit.read(helper, DRY_TYPE_ENOUGH, y + 1, rows[e]);
+						check(helper, firstTrip[e] < 0 && rig.contains("drilling,") && !rig.contains(" 0 blocks down"), DRY_TYPE_ENOUGH + " turbines should start the rig and keep it drilling: " + rig);
+						java.util.regex.Matcher hv = java.util.regex.Pattern.compile("([\\d.]+) V [\\d.]+ A on the " + java.util.regex.Pattern.quote(dev.wildcatter.energy.Voltage.INDUSTRIAL.label())).matcher(xfmr);
+						check(helper, hv.find() && Double.parseDouble(hv.group(1)) > dev.wildcatter.energy.Voltage.INDUSTRIAL.nominal() * 0.5,
+								"the dry-type's high side should be live at the industrial tier, fed from its low side: " + xfmr);
+						check(helper, reached(server, player, dev.wildcatter.quest.Milestones.TRANSFORMER_ENERGISED), "the dry-type should fire transformer_energised");
+						check(helper, reached(server, player, dev.wildcatter.quest.Milestones.MOTOR_RUNNING), "the rig's motor should fire motor_running");
+						log(scene, "ok: " + sum + "| rig " + rig + " | dry-type " + xfmr);
+					}
+					dev.wildcatter.well.ReservoirData.TEST_REGIONS.remove(region);
+					leave(helper, player);
+					clearBox(helper, -2, -3, maxX + 2, rows[rows.length - 1] + 3, y - 1, y + 12);
+					helper.succeed();
+				}
+			});
+		}
+	}
+
+	/** A diesel set at x0 feeds 480 V cable along row z to {@code boxX - 1}: the terminal box of a rig or pumpjack facing east sits at boxX. */
+	private static void setAndCable(GameTestHelper helper, int x0, int y, int z, int boxX) {
+		GridSceneKit.genset(helper, x0, y, z);   // its terminal at (x0 + 1, y, z)
+		for (int x = x0 + 1; x < boxX; x++) {
+			GridSceneKit.put(helper, "cable_industrial", x, y, z);
+		}
+	}
+
+	/**
+	 * How far to move a scene along one axis so that the absolute coordinate {@code at} lands in the middle third of a 64-block field
+	 * cell: a shallow field never reaches a cell's edge, so a hole there has no seed with a field under it.
+	 */
+	private static int aim(int at) {
+		int cell = dev.wildcatter.Tuning.FIELD_CELL;
+		return Math.floorMod(-at, cell) - cell / 2;   // at + this is half a cell past a cell's edge
+	}
+
+	/** A pumpjack over an oil wellhead on a field, on a diesel set: its motor runs, it lifts, and it fires pumpjack_running. */
+	static void pumpjackMilestone(GameTestHelper helper) {
+		String scene = "quest_pumpjack_milestone";
+		MinecraftServer server = helper.getLevel().getServer();
+		int y = oilY(helper);
+		BlockPos o = helper.absolutePos(BlockPos.ZERO);
+		int dx = aim(o.getX() + 14), z = aim(o.getZ());
+		int wx = dx + 14;                                  // the wellhead; the pumpjack's main cell west of it, its box 5 further west
+		BlockPos well = helper.absolutePos(new BlockPos(wx, y, z));
+		long seed = fieldSeed(well, true);
+		check(helper, seed >= 0, "no seed puts an oil field under the well");
+		dev.wildcatter.well.ReservoirData.TestRegion region = new dev.wildcatter.well.ReservoirData.TestRegion(o.getX() + dx - 12, o.getZ() + z - 8, o.getX() + dx + 24, o.getZ() + z + 8, seed);
+		dev.wildcatter.well.ReservoirData.TEST_REGIONS.add(region);
+		stone(helper, dx - 10, z - 4, dx + 18, z + 4, y - 1);
+		GridSceneKit.put(helper, "oil_wellhead", wx, y, z);
+		GridSceneKit.place(helper, dev.wildcatter.WildcatterBlocks.PUMPJACK, wx - 1, y, z, net.minecraft.core.Direction.EAST);
+		setAndCable(helper, dx, y, z, wx - 6);
+		ServerPlayer player = player(helper, dx + 4, y, z + 3);
+		GridSceneKit.start(helper, dx, y, z, () -> helper.runAfterDelay(200, () -> {
+			String jack = GridSceneKit.read(helper, wx - 1, y, z);
+			log(scene, "pumpjack | " + jack);
+			check(helper, jack.contains("pumping at"), "the pumpjack should run and lift: " + jack);
+			check(helper, reached(server, player, dev.wildcatter.quest.Milestones.PUMPJACK_RUNNING), "the running pumpjack should fire pumpjack_running: " + jack);
+			QuestTracker.check(player);
+			check(helper, QuestData.get(server).of(player.getStringUUID()).done.contains("wildcatter:oil_well"), "the oil well quest (pumpjack_running) should be done");
+			dev.wildcatter.well.ReservoirData.TEST_REGIONS.remove(region);
+			leave(helper, player);
+			log(scene, "ok: " + jack);
+			clearBox(helper, dx - 10, z - 4, dx + 18, z + 4, y - 1, y + 8);
+			helper.succeed();
+		}));
+	}
+
+	/** A small rig two blocks above a field, on a diesel set: it strikes, rigs down, and fires well_struck; the gas well quest's strike task follows. */
+	static void wellStruckMilestone(GameTestHelper helper) {
+		String scene = "quest_well_struck_milestone";
+		MinecraftServer server = helper.getLevel().getServer();
+		int y = oilY(helper);
+		BlockPos o = helper.absolutePos(BlockPos.ZERO);
+		int dx = aim(o.getX() + 12), z = aim(o.getZ());
+		int hx = dx + 12;                                  // the rig's main cell; its box at hx - 5
+		BlockPos hole = helper.absolutePos(new BlockPos(hx, y, z));
+		long seed = fieldSeed(hole, false);
+		check(helper, seed >= 0, "no seed puts a field under the rig");
+		dev.wildcatter.well.ReservoirData.TestRegion region = new dev.wildcatter.well.ReservoirData.TestRegion(o.getX() + dx - 12, o.getZ() + z - 8, o.getX() + dx + 24, o.getZ() + z + 8, seed);
+		dev.wildcatter.well.ReservoirData.TEST_REGIONS.add(region);
+		dev.wildcatter.well.Reservoir field = dev.wildcatter.well.ReservoirData.field(helper.getLevel(), hole.getX(), hole.getZ());
+		check(helper, field != null, "the region's seed should put the field under the hole");
+		stone(helper, dx - 10, z - 4, dx + 18, z + 4, y - 1);
+		GridSceneKit.place(helper, dev.wildcatter.WildcatterBlocks.DRILLING_RIG, hx, y, z, net.minecraft.core.Direction.EAST);
+		GridSceneKit.entity(helper, hx, y, z, dev.wildcatter.block.DrillingRigBlockEntity.class).testDepth(hole.getY() - field.topY() - 2);
+		setAndCable(helper, dx, y, z, hx - 5);
+		ServerPlayer player = player(helper, dx + 4, y, z + 3);
+		check(helper, !reached(server, player, dev.wildcatter.quest.Milestones.WELL_STRUCK), "no strike yet");
+		GridSceneKit.start(helper, dx, y, z, () -> {});
+		boolean[] done = {false};
+		for (int t = 320; t <= 1100; t += 20) {
+			helper.runAfterDelay(t, () -> {
+				if (done[0]) {
+					return;
+				}
+				boolean oil = helper.getLevel().getBlockState(hole).is(dev.wildcatter.WildcatterBlocks.OIL_WELLHEAD);
+				boolean gas = helper.getLevel().getBlockState(hole).is(dev.wildcatter.WildcatterBlocks.GAS_WELLHEAD);
+				if (!oil && !gas) {
+					if (helper.getTick() % 200 == 0) {
+						log(scene, "waiting at " + helper.getTick() + " | " + GridSceneKit.read(helper, hx, y, z) + " | field " + field + " | set " + GridSceneKit.read(helper, dx, y, z));
+					}
+					return;
+				}
+				done[0] = true;
+				check(helper, reached(server, player, dev.wildcatter.quest.Milestones.WELL_STRUCK), "the strike should fire well_struck");
+				player.getInventory().add(new ItemStack(dev.wildcatter.WildcatterBlocks.GAS_LINE, 16));
+				QuestTracker.check(player);
+				check(helper, QuestData.get(server).of(player.getStringUUID()).done.contains("wildcatter:gas_well"), "the strike and 16 steel pipe should finish the gas well quest");
+				dev.wildcatter.well.ReservoirData.TEST_REGIONS.remove(region);
+				leave(helper, player);
+				log(scene, "ok: struck " + (oil ? "oil" : "gas") + " " + (hole.getY() - field.topY()) + " blocks down");
+				clearBox(helper, dx - 10, z - 4, dx + 18, z + 4, y - 1, y + 12);
+				helper.succeed();
+			});
+		}
 	}
 }

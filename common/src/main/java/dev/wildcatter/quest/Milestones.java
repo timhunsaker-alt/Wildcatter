@@ -23,6 +23,10 @@ public final class Milestones {
 	public static final Identifier MOTOR_RUNNING = Wildcatter.id("motor_running");
 	/** A transformer's high side is live at its voltage. */
 	public static final Identifier TRANSFORMER_ENERGISED = Wildcatter.id("transformer_energised");
+	/** A pumpjack's motor is running and it is lifting well fluid. */
+	public static final Identifier PUMPJACK_RUNNING = Wildcatter.id("pumpjack_running");
+	/** A drilling rig has reached an oil or gas field (a strike, not a dry hole). */
+	public static final Identifier WELL_STRUCK = Wildcatter.id("well_struck");
 	/** A crude unit (the topping unit or the atmospheric column) is refining. */
 	public static final Identifier CRUDE_UNIT_RUNNING = Wildcatter.id("crude_unit_running");
 	/** The gas plant's NGL chiller is chilling dried gas. */

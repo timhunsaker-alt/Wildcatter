@@ -2279,3 +2279,22 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
   `quests_valid`, `quest_turbine_milestone`, `quest_genset_milestone`, `quest_multiblock_milestone`, `quest_reactor_milestone`; client
   screenshots `questBook`.
 - **Existing worlds:** unchanged; the book is given to each player on their next join and the quests already reached show as done.
+
+## Tim's answers to the quest book (2026-11-14; branch `w-qfix`; decisions: `docs/questions/phase21-quests.md`, 16-20)
+- **The first 480 V: a dry-type step-up transformer** (`wildcatter:dry_type_transformer`, spec `docs/dry-type-transformer.md`): a 75 kVA,
+  5 %Z general-purpose dry-type fed backwards, the LV tier's three phases in on its back, sides or bottom and 480Y/277 V out of its front
+  and top (IEC: 400Y/230 V both sides). One block at its real size, drawn by `tools/models/dry_type_transformer.py` in the existing
+  materials. Made by hand before the plastic gate: steel ingots, wool wire, copper blocks and an iron block.
+- **How many turbines:** set against the rig's terminal box and fed by small steam turbines in a row, it starts the rig once there are 34
+  turbines (36 to be safe), each between two firebox boilers; 33 trip on frequency during the 6 x start. The quest and the Field Manual say so.
+- **Oilfield milestones:** `wildcatter:pumpjack_running` (a pumpjack's motor running and lifting) and `wildcatter:well_struck` (the small
+  rig or the land rig reaching an oil or gas field).
+- **Quests (63):** "Step up to 480 V" opens Three-phase power and the drilling rig needs it; the oil well asks for `pumpjack_running`,
+  the gas well for `well_struck` and 16 steel pipe.
+- **Field Manual:** DRY-TYPE TRANSFORMER.
+- **Tests:** NeoForge `dry_type_runs_rig` (24 turbines trip, 36 start the rig and drill; the dry-type's 480 V side live and
+  `transformer_energised`), `quest_pumpjack_milestone`, `quest_well_struck_milestone`; client `dryType` (two screenshots) and the
+  `questBook` screenshots re-shot with the new quest (`wildcatter-quest-screen-step-up`).
+- **Known gaps:** no new placeholders. Starting the rig takes 34 turbines and 68 boilers (decision 17 asks Tim whether to make it
+  smaller). The small turbines nearest the dry-type carry most of the load.
+- **Existing worlds:** nothing changes; the new quest and tasks fill in from what a player has.

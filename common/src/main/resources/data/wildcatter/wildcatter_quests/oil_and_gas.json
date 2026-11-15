@@ -32,9 +32,10 @@
       "id": "rig",
       "title": "The drilling rig",
       "icon": "wildcatter:drilling_rig",
-      "text": "The drilling rig sinks a steel-cased hole into the field. Its engine needs steel pistons; its drive needs 480 V three-phase (see Three-phase power). A strike leaves a wellhead; a dry hole is reported.",
+      "text": "The drilling rig sinks a steel-cased hole into the field. Its engine needs steel pistons; its drive needs 480 V three-phase: set a dry-type transformer against its terminal box and feed it from steam turbines (Step up to 480 V). A strike leaves a wellhead; a dry hole is reported.",
       "requires": [
-        "seismograph"
+        "seismograph",
+        "step_up"
       ],
       "tasks": [
         {
@@ -63,12 +64,8 @@
       ],
       "tasks": [
         {
-          "item": "wildcatter:oil_wellhead",
-          "count": 1
-        },
-        {
-          "item": "wildcatter:pumpjack",
-          "count": 1
+          "milestone": "wildcatter:pumpjack_running",
+          "text": "Lift oil with a pumpjack"
         }
       ],
       "rewards": [
@@ -82,14 +79,14 @@
       "id": "gas_well",
       "title": "A gas well",
       "icon": "wildcatter:gas_wellhead",
-      "text": "On a gas strike, the gas wellhead flows by itself. Carry the gas away on steel pipe: one product to a pipe.",
+      "text": "Strike a field with the rig. On a gas strike the gas wellhead flows by itself. Carry the gas away on steel pipe: one product to a pipe.",
       "requires": [
         "rig"
       ],
       "tasks": [
         {
-          "item": "wildcatter:gas_wellhead",
-          "count": 1
+          "milestone": "wildcatter:well_struck",
+          "text": "Strike a field"
         },
         {
           "item": "wildcatter:gas_line",

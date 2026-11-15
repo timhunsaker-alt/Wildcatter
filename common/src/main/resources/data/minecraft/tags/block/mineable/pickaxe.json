@@ -469,6 +469,7 @@
     "wildcatter:acid_roast_kiln",
     "wildcatter:lithium_leach",
     "wildcatter:lioh_crystallizer",
-    "wildcatter:lithium_carbonator"
+    "wildcatter:lithium_carbonator",
+    "wildcatter:dry_type_transformer"
   ]
 }

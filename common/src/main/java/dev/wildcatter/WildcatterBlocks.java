@@ -283,7 +283,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.PowerTransformerBlockEntity> POWER_TRANSFORMER_ENTITY = entity(dev.wildcatter.block.PowerTransformerBlockEntity::new, POWER_TRANSFORMER);
 	public static final BlockEntityType<dev.wildcatter.block.DisconnectSwitchBlockEntity> DISCONNECT_ENTITY = entity(dev.wildcatter.block.DisconnectSwitchBlockEntity::new, DISCONNECT_HV, DISCONNECT_DIST);
 	public static final BlockEntityType<TransformerBlockEntity> TRANSFORMER_ENTITY = entity(TransformerBlockEntity::new, POLE_TRANSFORMER, POLE_TRANSFORMER_MV,
-			PADMOUNT_208, PADMOUNT_480, UNIT_SUBSTATION, GSU_TRANSFORMER, GSU_25, GSU_60, SUBSTATION_TRANSFORMER_60, UNIT_AUX_TRANSFORMER, SUBSTATION_TRANSFORMER_10);
+			PADMOUNT_208, PADMOUNT_480, DRY_TYPE_TRANSFORMER, UNIT_SUBSTATION, GSU_TRANSFORMER, GSU_25, GSU_60, SUBSTATION_TRANSFORMER_60, UNIT_AUX_TRANSFORMER, SUBSTATION_TRANSFORMER_10);
 
 	public static final BlockEntityType<FireboxBlockEntity> FIREBOX_ENTITY = entity(FireboxBlockEntity::new, FIREBOX);
 	public static final BlockEntityType<dev.wildcatter.control.ValveBlockEntity> VALVE_ENTITY = entity(dev.wildcatter.control.ValveBlockEntity::new, CONTROL_VALVE, ON_OFF_VALVE, MOTOR_OPERATED_VALVE, CONTROL_VALVE_STEEL, ON_OFF_VALVE_STEEL, MOTOR_OPERATED_VALVE_STEEL);
@@ -617,6 +617,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		add("dc_bus_180k_copper", DC_BUS_180K_COPPER);
 		add("padmount_208", PADMOUNT_208);
 		add("padmount_480", PADMOUNT_480);
+		add("dry_type_transformer", DRY_TYPE_TRANSFORMER);
 		add("unit_substation", UNIT_SUBSTATION);
 		add("gsu_transformer", GSU_TRANSFORMER);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("boiler"), BOILER_ENTITY);

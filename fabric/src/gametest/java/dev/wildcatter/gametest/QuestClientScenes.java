@@ -9,6 +9,8 @@ import dev.wildcatter.quest.QuestTracker;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import dev.wildcatter.WildcatterBlocks;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Items;
@@ -75,6 +77,10 @@ final class QuestClientScenes {
 		context.runOnClient(client -> screen[0].open(Identifier.parse("wildcatter:steam"), true));
 		context.waitTicks(10);
 		context.takeScreenshot("wildcatter-quest-screen-later");
+		// Tim's answer of 2026-11-14: the first 480 V from a dry-type step-up, the quest the drilling rig now needs
+		context.runOnClient(client -> screen[0].open(Identifier.parse("wildcatter:step_up"), true));
+		context.waitTicks(10);
+		context.takeScreenshot("wildcatter-quest-screen-step-up");
 
 		// the wood quest's reward claimed through the payload, as the Claim button sends it
 		context.runOnClient(client -> screen[0].open(Identifier.parse("wildcatter:wood"), true));
@@ -92,5 +98,92 @@ final class QuestClientScenes {
 		context.takeScreenshot("wildcatter-quest-screen-search");
 		context.setScreen(() -> null);
 		System.out.println("[wildcatter-test] questBook ok: done " + done);
+	}
+
+	/**
+	 * The first 480 V (docs/dry-type-transformer.md): 36 small steam turbines in a row, each between two firebox boilers, feed a dry-type
+	 * transformer on its LOW side; its 480 V front against the drilling rig's terminal box. Built on a platform high over the flat world,
+	 * so the rig has something to drill.
+	 */
+	void dryType() {
+		int n = 36, x0 = 0, z0 = 24;
+		int base = server.computeOnServer(srv -> srv.overworld().getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, 10, 10)) + 40;
+		int xt = x0 + n, hx = xt + 6;
+		// stand in the middle of the plant while it warms up and starts, so every firebox, boiler and turbine is ticking
+		int ground = base - 40 + 1;
+		server.runCommand("tp @p " + (x0 + n / 2 + 4) + " " + ground + " " + (z0 + 6) + " 90 -20");
+		context.waitTicks(60);
+		server.computeOnServer(srv -> {
+			net.minecraft.server.level.ServerLevel level = srv.overworld();
+			net.minecraft.world.level.block.state.BlockState stone = net.minecraft.world.level.block.Blocks.STONE.defaultBlockState();
+			for (int x = x0 - 1; x <= hx + 2; x++) {
+				for (int z = z0 - 2; z <= z0 + 2; z++) {
+					level.setBlock(new BlockPos(x, base, z), stone, 3);
+				}
+			}
+			for (int x = xt; x <= hx + 1; x++) {
+				for (int z = z0 - 1; z <= z0 + 1; z++) {
+					level.setBlock(new BlockPos(x, base + 1, z), stone, 3);
+				}
+			}
+			for (int i = 0; i < n; i++) {
+				level.setBlock(new BlockPos(x0 + i, base + 1, z0), stone, 3);
+			}
+			net.minecraft.world.level.block.state.BlockState rig = WildcatterBlocks.DRILLING_RIG.defaultBlockState()
+					.setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING, net.minecraft.core.Direction.EAST);
+			level.setBlock(new BlockPos(hx, base + 2, z0), rig, 3);
+			dev.wildcatter.multiblock.BigParts.grow(level, new BlockPos(hx, base + 2, z0), rig);
+			return null;
+		});
+		// the starter plant's blocks by command, as a player's placing does
+		for (int i = 0; i < n; i++) {
+			int x = x0 + i;
+			for (int z : new int[] {z0 - 1, z0 + 1}) {
+				server.runCommand("setblock " + x + " " + (base + 1) + " " + z + " wildcatter:firebox");
+				server.runCommand("item replace block " + x + " " + (base + 1) + " " + z + " container.0 with minecraft:coal_block 64");
+				server.runCommand("setblock " + x + " " + (base + 2) + " " + z + " wildcatter:boiler");
+			}
+			server.runCommand("setblock " + x + " " + (base + 2) + " " + z0 + " wildcatter:steam_turbine");
+		}
+		server.computeOnServer(srv -> {
+			for (int i = 0; i < n; i++) {
+				for (int z : new int[] {z0 - 1, z0 + 1}) {
+					((dev.wildcatter.block.BoilerBlockEntity) dev.wildcatter.multiblock.BigParts.entity(srv.overworld(), new BlockPos(x0 + i, base + 2, z))).addWater(4000);
+				}
+			}
+			return null;
+		});
+		context.waitTicks(220);   // the boilers build their steam, then the dry-type goes in: the switch closing
+		server.computeOnServer(srv -> srv.overworld().setBlock(new BlockPos(xt, base + 2, z0), WildcatterBlocks.DRY_TYPE_TRANSFORMER.defaultBlockState()
+				.setValue(dev.wildcatter.block.TransformerBlock.FACING, net.minecraft.core.Direction.EAST), 3));
+		context.waitTicks(160);
+		String rig = read(hx, base + 2, z0);
+		String xfmr = read(xt, base + 2, z0);
+		System.out.println("[wildcatter-test] dryType: rig " + rig + " | dry-type " + xfmr + " | turbine " + read(xt - 1, base + 2, z0));
+		for (int x : new int[] {x0, x0 + 10, x0 + 20, xt - 3}) {
+			System.out.println("[wildcatter-test] dryType: at " + x + " turbine " + read(x, base + 2, z0) + " | boiler " + read(x, base + 2, z0 - 1) + " | firebox " + read(x, base + 1, z0 - 1));
+		}
+		check(rig.contains("drilling,"), n + " turbines through the dry-type should start the rig and keep it drilling: " + rig + " | " + xfmr);
+		// stand on the platform's edge by the rig, then on a ledge above the plant (a fall from the platform would kill the player)
+		server.runCommand("fill " + (xt - 3) + " " + base + " " + (z0 + 3) + " " + (xt + 6) + " " + base + " " + (z0 + 10) + " minecraft:stone");
+		server.runCommand("tp @p " + (xt + 1.5) + " " + (base + 1) + " " + (z0 + 4.5) + " 160 22");
+		context.waitTicks(40);
+		context.takeScreenshot("wildcatter-dry-type-rig");
+		server.runCommand("fill " + (xt - 1) + " " + (base + 4) + " " + (z0 + 7) + " " + (xt + 1) + " " + (base + 4) + " " + (z0 + 9) + " minecraft:stone");
+		server.runCommand("tp @p " + (xt + 0.5) + " " + (base + 5) + " " + (z0 + 8.5) + " 125 24");
+		context.waitTicks(40);
+		context.takeScreenshot("wildcatter-dry-type-plant");
+		// take it down, so nothing runs on through the later scenes
+		server.runCommand("tp @p " + (x0 + n / 2) + " " + ground + " " + (z0 + 6));
+		context.waitTicks(5);
+		server.runCommand("fill " + (x0 - 1) + " " + base + " " + (z0 - 2) + " " + (hx + 2) + " " + (base + 12) + " " + (z0 + 17) + " minecraft:air");
+		server.runCommand("fill " + hx + " " + (ground + 1) + " " + z0 + " " + hx + " " + base + " " + z0 + " minecraft:air");   // the casing down the hole
+		server.runCommand("kill @e[type=item]");
+		System.out.println("[wildcatter-test] dryType ok: " + rig);
+	}
+
+	private String read(int x, int y, int z) {
+		return server.computeOnServer(srv -> dev.wildcatter.multiblock.BigParts.entity(srv.overworld(), new BlockPos(x, y, z)) instanceof dev.wildcatter.energy.Inspectable i
+				? i.inspect().getString() : "(no readout)");
 	}
 }

@@ -231,6 +231,9 @@ public interface GridBlocks {
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), "padmount_208", Voltage.LOW, Voltage.DISTRIBUTION, Tuning.PADMOUNT_208_VA, Tuning.PADMOUNT_208_PERCENT_Z));
 	Block PADMOUNT_480 = block("padmount_480", props -> dev.wildcatter.block.PadmountBlock.padmount(props.mapColor(MapColor.COLOR_GREEN)
 			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), "padmount_480", Voltage.INDUSTRIAL, Voltage.DISTRIBUTION, Tuning.PADMOUNT_480_VA, Tuning.PADMOUNT_480_PERCENT_Z));
+	/** A 75 kVA dry-type transformer fed backwards from the LOW tier's three phases up to INDUSTRIAL: the first 480 V, from steam turbines (docs/dry-type-transformer.md). */
+	Block DRY_TYPE_TRANSFORMER = block("dry_type_transformer", props -> TransformerBlock.threePhase(props.mapColor(MapColor.COLOR_GRAY)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL).requiresCorrectToolForDrops(), Voltage.LOW, Voltage.INDUSTRIAL, Tuning.DRY_TYPE_VA, Tuning.DRY_TYPE_PERCENT_Z));
 	/** A plant's unit substation: 4.16 kV down to 480 V. */
 	/** The steam plant's generator step-up: 4.16 kV delta to 12.47 kV grounded wye (IEC 3.3 kV / 11 kV), 1,500 kVA. */
 	Block GSU_TRANSFORMER = block("gsu_transformer", props -> new dev.wildcatter.block.GsuTransformerBlock(props.mapColor(MapColor.COLOR_GRAY)

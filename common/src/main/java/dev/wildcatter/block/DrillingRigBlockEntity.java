@@ -184,6 +184,7 @@ public class DrillingRigBlockEntity extends BlockEntity implements CircuitPart, 
 			return;
 		}
 		BlockPos hole = worldPosition;
+		dev.wildcatter.quest.QuestEvents.milestone(level, hole, dev.wildcatter.quest.Milestones.WELL_STRUCK);   // the quest book: a strike
 		rigDown(level, field.kind());
 		CircuitManager.markDirty(level);
 		Drilling.announce(level, hole, Component.literal("STRIKE! " + (field.kind() == Reservoir.Kind.OIL ? "Oil" : "Gas") + " at " + depth + " blocks down. "

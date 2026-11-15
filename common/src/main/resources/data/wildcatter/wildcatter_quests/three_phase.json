@@ -7,6 +7,32 @@
   ],
   "quests": [
     {
+      "id": "step_up",
+      "title": "Step up to 480 V",
+      "icon": "wildcatter:dry_type_transformer",
+      "text": "The first 480 V comes from steam. A dry-type transformer fed backwards from the steam turbines' three phases on its low side gives 480 V three-phase on its front and top. The rig's 30 kW motor starts direct on line at six times its current, and turbines that cannot carry its start trip on frequency: it takes at least 34 small turbines in a row, touching, each between two firebox boilers (36 to be safe; 33 trip).",
+      "requires": [
+        "firebox",
+        "steel"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:dry_type_transformer",
+          "count": 1
+        },
+        {
+          "milestone": "wildcatter:transformer_energised",
+          "text": "Energise a transformer"
+        }
+      ],
+      "rewards": [
+        {
+          "item": "wildcatter:wool_wire_hot",
+          "count": 16
+        }
+      ]
+    },
+    {
       "id": "engine_parts",
       "title": "Engine and generator parts",
       "icon": "wildcatter:crankshaft",

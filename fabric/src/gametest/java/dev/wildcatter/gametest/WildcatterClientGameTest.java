@@ -55,6 +55,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("questBook")) {   // first: before other scenes fill the inventory
 				new QuestClientScenes(context, server).questBook();
 			}
+			if (only("dryType")) {
+				new QuestClientScenes(context, server).dryType();
+			}
 			if (only("lowVoltageLoop")) {
 				lowVoltageLoop(context, server);
 			}

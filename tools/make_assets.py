@@ -3309,6 +3309,21 @@ lang.update({f"block.{ns}.decrepitation_kiln": "Decrepitation Kiln (1,050 C)", f
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 save_json(f"{ROOT}/data/c/tags/item/dusts/lithium_hydroxide.json", {"values": [f"{ns}:lioh_bag"]})
 save_json(f"{ROOT}/data/c/tags/item/dusts/lithium_carbonate.json", {"values": [f"{ns}:li2co3_bag"]})
+# ---- Phase 21 follow-up: the dry-type step-up transformer (docs/dry-type-transformer.md) -----------------------------------
+# drawn at true size in its one cell by tools/models/dry_type_transformer.py; its blockstate (facing only), loot, tags, name and recipe here
+save_json(f"{ASSETS}/blockstates/dry_type_transformer.json", {"variants": {f"facing={facing}": {"model": f"{ns}:block/dry_type_transformer/p0", **({"y": y} if y else {})}
+	for facing, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270))}})
+save_json(f"{ASSETS}/items/dry_type_transformer.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/dry_type_transformer/item"}})
+big_part_loot_simple("dry_type_transformer")
+for tag in ("mineable/pickaxe", "needs_stone_tool"):
+	_t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{tag}.json"))
+	if f"{ns}:dry_type_transformer" not in _t["values"]:
+		_t["values"].append(f"{ns}:dry_type_transformer")
+	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", _t)
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+lang[f"block.{ns}.dry_type_transformer"] = "Dry-Type Transformer (LV / 480 V, 75 kVA)"
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+shaped("dry_type_transformer", ["SWS", "CIC", "SWS"], {"S": f"{ns}:steel_ingot", "W": f"{ns}:wool_wire_hot", "C": "minecraft:copper_block", "I": "minecraft:iron_block"}, "dry_type_transformer")
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)

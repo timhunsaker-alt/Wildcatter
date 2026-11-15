@@ -195,6 +195,7 @@ public class PumpjackBlockEntity extends BlockEntity implements CircuitPart, Ins
 			}
 			jack.status = "pumping at " + Math.round(strength * pressure * 100) + "% of full rate, " + jack.motor.describe();
 			jack.setChanged();
+			dev.wildcatter.quest.QuestEvents.milestone(level, pos, dev.wildcatter.quest.Milestones.PUMPJACK_RUNNING);   // the quest book: running and lifting
 		}
 	}
 

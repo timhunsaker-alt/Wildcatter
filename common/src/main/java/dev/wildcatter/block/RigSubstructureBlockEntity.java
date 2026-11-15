@@ -734,6 +734,7 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 			phase = Phase.DRY;
 			return;
 		}
+		dev.wildcatter.quest.QuestEvents.milestone(level, hole, dev.wildcatter.quest.Milestones.WELL_STRUCK);   // the quest book: a strike
 		if (level.getBlockState(hole).canBeReplaced()) {
 			Drilling.setWellhead(level, hole, field.kind(), facing());
 		}

@@ -709,5 +709,6 @@
   "gui.wildcatter.quest.have": "Have %s x %s",
   "gui.wildcatter.quest.have_tag": "Have %s x any %s",
   "gui.wildcatter.quest.advancement": "Advancement: %s",
-  "gui.wildcatter.quest.milestone": "Milestone: %s"
+  "gui.wildcatter.quest.milestone": "Milestone: %s",
+  "block.wildcatter.dry_type_transformer": "Dry-Type Transformer (LV / 480 V, 75 kVA)"
 }

@@ -110,7 +110,9 @@ Constants in `dev.wildcatter.quest.Milestones`; any chapter may use them.
 | `wildcatter:gas_genset_running` | a gas genset running |
 | `wildcatter:genset_on_biogas` | a gas genset running on biogas (another mod's digester gas on the steel pipe) |
 | `wildcatter:motor_running` | any three-phase motor up to speed (a pump, a fan, a rig, a plant's motor) |
-| `wildcatter:transformer_energised` | a transformer (pole, pad-mount, unit substation) with its high side live |
+| `wildcatter:transformer_energised` | a transformer (pole, pad-mount, dry-type, unit substation) with its high side live |
+| `wildcatter:pumpjack_running` | a pumpjack whose motor runs and lifts well fluid (`PumpjackBlockEntity`, on each lift) |
+| `wildcatter:well_struck` | a drilling rig (the small rig or the land rig) reaching an oil or gas field; not a dry hole or an ISR well |
 | `wildcatter:crude_unit_running` | the topping unit or the atmospheric column refining |
 | `wildcatter:gas_plant_running` | the NGL chiller chilling dried gas |
 | `wildcatter:pelletizer_running` | the pelletizer making plastic sheets |
@@ -126,3 +128,7 @@ An add-on's own multiblock can call `dev.wildcatter.multiblock.Multiblock.formed
 gate), `chemicals` (70), `uranium` (80), `nuclear` (90; the last quest is the reactor critical and the turbine-generator on line), all in
 `data/wildcatter/wildcatter_quests/`. An add-on's quest can require any of their quests, e.g. `wildcatter:genset` (the gas genset running),
 `wildcatter:steel`, `wildcatter:plastic`.
+
+The first 480 V (Tim, 2026-11-14): Three-phase power opens with "Step up to 480 V" (`wildcatter:step_up`: the dry-type transformer and
+`transformer_energised`, after `firebox` and `steel`), and the drilling rig's quest requires it. The oil well asks for
+`pumpjack_running`, and the gas well for `well_struck` and 16 steel pipe, instead of wellheads nobody carries. 63 quests.

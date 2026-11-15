@@ -15,7 +15,7 @@ PARTS = ["gsu_transformer", "fuel_tank", "genset_base_frame", "radiator", "gense
 	"boiler_burner", "boiler_drum", "superheater", "turbine_casing", "turbine_generator", "condenser", "feed_pump",
 	"tower_basin", "cooling_fill", "drift_eliminator", "cooling_tower",
 	"hv_breaker_3p", "disconnect_hv", "bus_hv", "power_transformer", "bus_dist", "disconnect_dist", "dist_breaker_3p", "relay_panel", "gen_bus", "mv_switchgear", "panels",
-	"wood_pole_30", "wood_pole_40", "wood_pole_75", "crossarm_dist", "crossbeam_138", "x_brace_138", "pole_transformer", "fused_cutout",
+	"wood_pole_30", "wood_pole_40", "wood_pole_75", "crossarm_dist", "crossbeam_138", "x_brace_138", "pole_transformer", "fused_cutout", "dry_type_transformer",
 	"padmount_208", "padmount_480", "unit_substation", "enclosure", "fixtures", "mcc", "starter_plant",
 	"drilling_rig", "pumpjack", "wellheads", "land_rig", "lease", "gas_plant", "crude_units", "cracker", "gas_turbine", "combined_cycle", "aeroderivative",
 	"acid_plant", "uranium_mill", "wellfield", "conversion", "enrichment", "zirconium", "fuel", "reactor", "boron", "turbine_island", "fuel_handling", "drives", "alumina", "carbon", "potline", "cranes", "ammonia", "gas_power", "ferroalloys", "phosphate", "reactor_extensions", "mud", "nickel", "fuel_extensions", "chemicals", "conversion_large", "titanium", "lithium"]

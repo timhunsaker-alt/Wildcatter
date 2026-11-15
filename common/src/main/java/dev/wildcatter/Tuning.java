@@ -1321,6 +1321,8 @@ public final class Tuning {
 	public static final double THREE_PHASE_HEATER_WATTS = 15_000.0;   // an industrial duct or unit heater (docs/phase3-three-phase.md, proposed)
 	public static final double PADMOUNT_208_VA = 75_000;      // 12.47 kV to 208Y/120 V
 	public static final double PADMOUNT_208_PERCENT_Z = 3.0;
+	public static final double DRY_TYPE_VA = 75_000;          // the dry-type step-up: 208Y/120 V fed, 480Y/277 V out (docs/dry-type-transformer.md)
+	public static final double DRY_TYPE_PERCENT_Z = 5.0;
 	public static final double PADMOUNT_480_VA = 300_000;     // 12.47 kV to 480Y/277 V
 	public static final double PADMOUNT_480_PERCENT_Z = 5.0;
 	public static final double UNIT_SUBSTATION_VA = 1_000_000;   // 4.16 kV to 480Y/277 V
