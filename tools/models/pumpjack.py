@@ -52,7 +52,7 @@ M.box((-0.3, SADDLE[0] - 0.3, SADDLE[1] - 0.2), (1.3, SADDLE[0] - 0.2, SADDLE[1]
 M.box((0.3, SADDLE[0] - 0.22, SADDLE[1] - 0.15), (0.7, SADDLE[0] - 0.12, SADDLE[1] + 0.15), "iron")   # the saddle bearing housing
 M.ladder(0.5, SADDLE[1] - 0.5, 0.25, SADDLE[0] - 0.4, -1, "galv")
 # the gear reducer and its crank shaft
-M.box((0.18, 0.25, CRANK[1] - 0.5), (0.82, CRANK[0] + 0.25, CRANK[1] + 0.45), FRAME)
+M.box((0.18, 0.4, CRANK[1] - 0.5), (0.82, CRANK[0] + 0.25, CRANK[1] + 0.45), FRAME)   # on the iron base below, not through its bottom face
 M.box((0.15, 0.25, CRANK[1] - 0.55), (0.85, 0.4, CRANK[1] + 0.5), "iron")
 M.cylinder("x", CRANK, 0.12, -0.05, 1.05, "steel", 12)
 M.decal((0.83, CRANK[0] - 0.2, CRANK[1] - 0.3), (0.84, CRANK[0], CRANK[1] + 0.1), "nameplate", "east", FRAME)
@@ -79,9 +79,11 @@ C = (0.5, 0.5)   # a rotor's centre, (y, z)
 crank = rotor("pumpjack_crank")   # about x through the crank shaft; the pins toward +z, the counterweights toward -z
 for x, out in ((-0.2, -1), (1.06, 1)):   # a crank each side of the reducer, just inside the base rails
 	crank.box((x + 0.02, 0.38, 0.4), (x + 0.12, 0.62, 0.5 + R + 0.08), "iron")   # the crank arm
-	crank.cylinder("x", (0.5, 0.5 + R), 0.05, x + (0.0 if out < 0 else 0.02), x + 0.14, "steel", 10)   # its wrist pin
+	crank.cylinder("x", (0.5, 0.5 + R), 0.05, x, x + 0.14, "steel", 10)   # its wrist pin, through the arm and out both faces
 	crank.box((x, 0.12, -0.45), (x + 0.14, 0.88, 0.25), "dark")                  # the counterweight
-	crank.box((x + (0.0 if out < 0 else 0.135), 0.15, -0.42), (x + (0.005 if out < 0 else 0.14), 0.85, 0.22), "brass")   # its painted edge
+	# its painted face, a coat on the outer side: laid on the counterweight's face, never in its plane, or the two fight for the
+	# same depth and flash as the crank turns
+	crank.box((x - 0.005, 0.15, -0.42) if out < 0 else (x + 0.14, 0.15, -0.42), (x, 0.85, 0.22) if out < 0 else (x + 0.145, 0.85, 0.22), "brass")
 	crank.cylinder("x", C, 0.13, x + 0.02, x + 0.12, "iron", 12)                 # the hub
 
 def pitman(name, y1, y2, top):
@@ -115,7 +117,7 @@ BEAM_MID = beam("pumpjack_beam_mid", -0.8, 0.8)
 BEAM_MID.box((0.28, 0.5 - 0.3, 0.3), (0.72, 0.5 - 0.22, 0.7), "iron")     # the saddle on its bearing
 BEAM_BACK = beam("pumpjack_beam_back", -0.8, 1.2)                         # from the middle piece to the tail and the equalizer
 BEAM_BACK.box((-0.19, 0.5 - 0.15, 0.5 + 0.8 - 0.1), (1.19, 0.5 + 0.1, 0.5 + 0.8 + 0.1), HEAD)   # the equalizer across, over the pitmans
-BEAM_BACK.cylinder("x", (0.5 - 0.05, 0.5 + 0.8), 0.06, -0.19, 1.19, "steel", 10)
+BEAM_BACK.cylinder("x", (0.5 - 0.05, 0.5 + 0.8), 0.06, -0.2, 1.2, "steel", 10)   # its pin, standing out past the ends
 
 ROD = rotor("pumpjack_rod")   # the carrier bar at the block's centre, the polished rod through it (its centre at the well)
 ROD.box((0.3, 0.45, 0.42), (0.7, 0.55, 0.58), "iron")

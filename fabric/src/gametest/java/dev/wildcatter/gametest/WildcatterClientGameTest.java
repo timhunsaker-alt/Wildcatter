@@ -607,6 +607,17 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 				client.level.getBlockEntity(new BlockPos(51, up, 50)) instanceof dev.wildcatter.block.SteamTurbineBlockEntity t ? t.spin().rpm() : -1F,
 				client.level.getBlockEntity(new BlockPos(53, up, 50)) instanceof dev.wildcatter.block.PumpBlockEntity p ? p.spin().rpm() : -1F});
 		check(rpm[0] > 1000 && Math.abs(rpm[1] - Tuning.STARTER_PUMP_RPM) < 1, "the client should see the turbine's coupling and the pump's turning: " + rpm[0] + " / " + rpm[1] + " rpm");
+		// the boiler's stack smokes and the turbine's exhaust blows steam while they run: the client sees both running and ticks both
+		String vents = context.computeOnClient(client -> {
+			var level = client.level;
+			BlockPos b = new BlockPos(50, up, 50), t = new BlockPos(51, up, 50);
+			var bs = level.getBlockState(b);
+			var ts = level.getBlockState(t);
+			return bs.getValue(dev.wildcatter.block.BoilerBlock.LIT) + " " + ts.getValue(dev.wildcatter.block.SteamTurbineBlock.RUNNING) + " "
+					+ (bs.getTicker(level, dev.wildcatter.WildcatterBlocks.BOILER_ENTITY) != null) + " "
+					+ (ts.getTicker(level, dev.wildcatter.WildcatterBlocks.STEAM_TURBINE_ENTITY) != null);
+		});
+		check(vents.equals("true true true true"), "the client should see the boiler lit and the turbine running, and tick both for their smoke and steam: " + vents);
 		String tank = read(server, 53, up, 47);
 		check(tank.matches(".*water [1-9]\\d*/.*"), "the pipe should have carried water into the second boiler: " + tank);
 		String noDrain = read(server, 51, up, 50);

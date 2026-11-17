@@ -137,6 +137,31 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 		}
 	}
 
+	/**
+	 * Client side (docs/kinetics-and-sound.md): the running sound, and while it makes power the spent steam blowing out of the open
+	 * end of its exhaust pipe (on its right side, 0.25 m up: tools/models/starter_plant.py), as much as its shaft speed gives.
+	 */
+	public static void clientTick(Level level, BlockPos pos, BlockState state, SteamTurbineBlockEntity turbine) {
+		dev.wildcatter.kinetic.RunningSound.clientTick(turbine);
+		if (!state.getValue(SteamTurbineBlock.RUNNING) || turbine.tripped) {
+			return;
+		}
+		float speed = Math.min(1F, turbine.spin.rpm() / (float) (120 * dev.wildcatter.energy.ElectricalStandard.active().hertz() / POLES));
+		net.minecraft.util.RandomSource random = level.getRandom();
+		if (speed <= 0.05F || random.nextFloat() > 0.25F + 0.45F * speed) {
+			return;
+		}
+		Direction facing = turbine.facing();
+		double[] at = GensetPartBlockEntity.turned(1.03, 0.7, facing), out = GensetPartBlockEntity.turned(1.5, 0.5, facing);
+		double dx = out[0] - 0.5, dz = out[1] - 0.5, push = 0.08 + 0.08 * speed;   // it blows out and, hot and light, billows up
+		double x = pos.getX() + at[0], y = pos.getY() + 0.25, z = pos.getZ() + at[1];
+		level.addParticle(net.minecraft.core.particles.ParticleTypes.CLOUD, x, y, z,
+				dx * push + (random.nextDouble() - 0.5) * 0.02, 0.06 + random.nextDouble() * 0.05, dz * push + (random.nextDouble() - 0.5) * 0.02);
+		if (random.nextFloat() < 0.5F * speed) {
+			level.addParticle(net.minecraft.core.particles.ParticleTypes.WHITE_SMOKE, x + dx * 0.5, y + 0.3, z + dz * 0.5, dx * 0.02, 0.08, dz * 0.02);
+		}
+	}
+
 	// ---- moving parts: the coupling between turbine and generator, and the flyball governor geared 10 to 1 off the shaft -------
 	@Override
 	public java.util.List<Rotor> rotors() {

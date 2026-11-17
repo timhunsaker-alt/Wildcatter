@@ -2299,3 +2299,16 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
 - **Known gaps:** no new placeholders. At full load a firebox boiler empties its 4,000 units of water in about 45 s without a drain and
   a pump (20 steam a unit, unchanged; decision 21).
 - **Existing worlds:** nothing changes; the new quest and tasks fill in from what a player has.
+
+## Trailer fixes (2026-11-17; branch `w-trailer`; decisions: `docs/questions/misc-gaps.md`, 10)
+- **The pumpjack's counterweights no longer flash as they turn:** each counterweight's brass-painted face was drawn in the same plane as
+  the counterweight's outer face, so the two fought for depth and flickered dark and brass as the crank turned. The coat now sits just
+  outside the face (`tools/models/pumpjack.py`), and the same fix went to the crank's wrist pin and the equalizer pin (their ends flush
+  with the arm and the equalizer) and the gear reducer's bottom (flush with its base). Rule in `docs/kinetics-and-sound.md`.
+- **Steam and smoke on the starter plant:** a lit boiler's stack smokes (thick over a coal firebox, thin over a campfire), and a running
+  steam turbine blows white steam out of its exhaust pipe, building with its shaft speed. Client particles only; nothing in play changes.
+- **Field Manual:** STEAM mentions the smoke and steam.
+- **Tests:** client `steamLoop` checks the client sees the boiler lit and the turbine running and ticks both; the trailer scene's shots
+  01, 02, the new 07 (the flare at dusk) and 08 (the crank close, from three sides) film them.
+- **Known gaps:** no new placeholders. Other rotor models still have a flush face pair (couplings, the drawworks drum, the HV disconnect
+  arms, the flyball governor); see decision 10.

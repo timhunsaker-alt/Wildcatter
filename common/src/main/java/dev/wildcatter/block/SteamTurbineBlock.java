@@ -50,7 +50,7 @@ public class SteamTurbineBlock extends BaseEntityBlock {
 
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-		return createTickerHelper(type, WildcatterBlocks.STEAM_TURBINE_ENTITY, level.isClientSide() ? (l, p, st, be) -> dev.wildcatter.kinetic.RunningSound.clientTick(be) : SteamTurbineBlockEntity::tick);
+		return createTickerHelper(type, WildcatterBlocks.STEAM_TURBINE_ENTITY, level.isClientSide() ? SteamTurbineBlockEntity::clientTick : SteamTurbineBlockEntity::tick);
 	}
 
 	@Override

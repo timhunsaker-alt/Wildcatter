@@ -54,7 +54,7 @@ public class BoilerBlock extends BigPartBlock {
 
 	@Override
 	protected <T extends BlockEntity> BlockEntityTicker<T> mainTicker(Level level, BlockState state, BlockEntityType<T> type) {
-		return level.isClientSide() ? null : createTickerHelper(type, WildcatterBlocks.BOILER_ENTITY, BoilerBlockEntity::tick);
+		return createTickerHelper(type, WildcatterBlocks.BOILER_ENTITY, level.isClientSide() ? BoilerBlockEntity::clientTick : BoilerBlockEntity::tick);
 	}
 
 	@Override

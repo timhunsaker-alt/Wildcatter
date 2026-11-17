@@ -60,6 +60,25 @@ public class BoilerBlockEntity extends BlockEntity implements Inspectable, dev.w
 		}
 	}
 
+	/**
+	 * Client side (docs/kinetics-and-sound.md): while the fire under it is boiling water, the flue gas rises out of the stack's top,
+	 * 1.87 m over the boiler's centre (tools/models/starter_plant.py); a coal firebox's thick and dark, a campfire's thin.
+	 */
+	public static void clientTick(Level level, BlockPos pos, BlockState state, BoilerBlockEntity boiler) {
+		if (!state.getValue(BoilerBlock.LIT)) {
+			return;
+		}
+		net.minecraft.util.RandomSource random = level.getRandom();
+		boolean firebox = fireboxFired(level, pos);
+		double x = pos.getX() + 0.5 + (random.nextDouble() - 0.5) * 0.1, y = pos.getY() + 1.9, z = pos.getZ() + 0.5 + (random.nextDouble() - 0.5) * 0.1;
+		if (random.nextFloat() < (firebox ? 0.3F : 0.1F)) {
+			level.addAlwaysVisibleParticle(net.minecraft.core.particles.ParticleTypes.CAMPFIRE_COSY_SMOKE, true, x, y, z, 0, 0.05, 0);
+		}
+		if (firebox && random.nextFloat() < 0.35F) {
+			level.addParticle(net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE, x, y, z, 0, 0.07, 0);
+		}
+	}
+
 	/** Where this boiler's tanks are kept: its own position (pipes use it to count each boiler once). */
 	public BlockPos rootPos() {
 		return worldPosition;

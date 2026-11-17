@@ -98,3 +98,16 @@ Format as in `README.md` here.
 - Pumpjack and rig collision on their moving parts, and the potroom building (questions 15): not small.
 - The client scenes that changed (`cracker` unchanged; no client scene was run here): the steam plant's feedwater line, the rig's
   cables and the 1 MW alternator have been checked in model previews and server scenes, not yet in the client.
+
+### 10. Steam and smoke on the starter plant, and the flashing counterweights (trailer fixes, 2026-11-17)
+- **Chosen:** the boiler's stack smokes while it is lit (campfire smoke column, plus large smoke over a coal firebox), and the steam
+  turbine blows white steam (cloud and white smoke) out of its exhaust pipe's open end while it runs, scaled by shaft speed. The
+  pumpjack's flush brass coat is laid just outside the counterweight; the pumpjack's other flush faces were fixed with it.
+- **Why:** Tim saw the counterweights flash in the trailer and asked for the open steam generators to spray steam. A small non-condensing
+  turbine exhausts to air in a white plume; a fired boiler's stack carries the flue gas.
+- **Not done, and why:** the boiler's safety valve does not lift (the client does not know when the boiler is at full pressure; that
+  needs a synced state or a blockstate); the steam does not follow the turbine's load (the client only knows its speed); a turbine on a
+  cooling tower (condensing) still shows the plume; the 1 MW steam plant's stack does not smoke yet (its parts turn with the plant's
+  facing; next to do, by its `firing()`). Other rotor models with a flush face pair, not touched: the couplings (starter, starter pump,
+  gas compressor, injection pump, refrigeration, turbine), the drawworks drum, the HV disconnect arms and the flyball governor.
+- **Alternatives:** sync the turbine's load share and the boiler's steam level to drive the plume and lift the valve.
