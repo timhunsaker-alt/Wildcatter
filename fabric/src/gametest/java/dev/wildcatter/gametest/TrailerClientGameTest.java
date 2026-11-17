@@ -42,6 +42,8 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 	private Path out;
 	/** The site being built: its origin in x and z, and its ground's top block's y. */
 	private int ox, gy, oz;
+	/** The shots asked for (TRAILER_SHOTS), or null for all. */
+	private java.util.Set<String> shots;
 
 	@Override
 	public void runTest(ClientGameTestContext context) {
@@ -57,7 +59,10 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		} catch (java.io.IOException ex) {
 			throw new RuntimeException(ex);
 		}
-		context.getInput().resizeWindow(1920, 1080);
+		// the stills render off screen at 1920 x 1080 (TestScreenshotOptions), but the films record the window as it shows on screen:
+		// a 16:9 window that fits a laptop's screen (1440 x 810 points, 2880 x 1620 pixels on a Retina display), or the recording
+		// keeps only the part of the window on the screen, its top left
+		context.getInput().resizeWindow(1440, 810);
 		try (TestSingleplayerContext world = context.worldBuilder().setUseConsistentSettings(false).adjustSettings(s -> {
 			s.setSeed(SEED);
 			s.setGameMode(net.minecraft.client.gui.screens.worldselection.WorldCreationUiState.SelectedGameMode.CREATIVE);
@@ -89,7 +94,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 			});
 			int[] base = {0, 0};
 			String pick = System.getenv("TRAILER_SHOTS");
-			java.util.Set<String> shots = pick == null || pick.isBlank() ? null : java.util.Set.of(pick.split(","));
+			shots = pick == null || pick.isBlank() ? null : java.util.Set.of(pick.split(","));
 			Runnable[] all = {this::fireToSteam, this::oilfield, this::refinery, this::powerLines, this::gensets, this::reactor};
 			// each shot's land: {box x1, x2, z1, z2}, its range, {the plant's box}, how flat that must be
 			int[][][] boxes = {
@@ -100,7 +105,8 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 					{{-40, 40, -30, 40}, {14}, {-15, 17, -14, 16}, {4}},
 					{{-70, 150, -90, 80}, {24}, {-44, 130, -64, 46}, {9}}};
 			for (int i = 0; i < all.length; i++) {
-				if (shots != null && !shots.contains(String.valueOf(i + 1))) {
+				// 7 (the flare) is shot on the refinery's site, 8 (the pumpjack's crank, close, to check it) on the oilfield's
+				if (!wanted(i + 1) && !(i == 2 && wanted(7)) && !(i == 1 && wanted(8))) {
 					continue;
 				}
 				int[][] b = boxes[i];
@@ -115,6 +121,10 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 				}
 			}
 		}
+	}
+
+	private boolean wanted(int shot) {
+		return shots == null || shots.contains(String.valueOf(shot));
 	}
 
 	// ---- sites -----------------------------------------------------------------------------------------------------
@@ -506,7 +516,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 			put(x0 + i, 1, z0 - 1, "wildcatter:firebox");
 			server.runCommand("item replace block " + fb.getX() + " " + fb.getY() + " " + fb.getZ() + " container.0 with minecraft:coal_block 64");
 			put(x0 + i, 2, z0 - 1, "wildcatter:boiler");
-			put(x0 + i, 2, z0, "wildcatter:steam_turbine");
+			put(x0 + i, 2, z0, "wildcatter:steam_turbine[facing=east]");   // its exhaust pipe out the open south side
 		}
 		on(level -> {
 			for (int i = 0; i < n; i++) {
@@ -540,7 +550,10 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		}
 		context.waitTicks(200);
 		log("fire: rig " + read(A(hx, 2, z0)) + " | dry-type " + read(A(xt, 2, z0)) + " | turbine " + read(A(0, 2, 0)) + " | boiler " + read(A(0, 2, -1)));
-		shoot(1, "fire_to_steam", 12450, new Cam(-4, 2.4, 3.5, 2, 2.8, -0.5), new Cam(-1, 3.2, 5.5, 3, 2.8, -0.5), 180);
+		if (wanted(1)) {
+			// from the west, out of the steam's way (it blows south and billows up), the rig behind the plant
+			shoot(1, "fire_to_steam", 12450, new Cam(-3.2, 3.6, 5.0, 1.2, 3.4, 0.3), new Cam(-1.8, 4.0, 3.8, 1.3, 3.6, 0.2), 180);
+		}
 	}
 
 	// ---- 2: the oilfield -------------------------------------------------------------------------------------------
@@ -583,7 +596,20 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		}
 		ox = cx;
 		oz = cz;
-		shoot(2, "oilfield", 12450, new Cam(-17, 2.4, 71, 0, 9, 38), new Cam(-9, 4, 75, 3, 10, 38), 180);
+		// close on the second jack (main cell at -6, 64, facing east: its crank at x -9.7, the horsehead over the well at -4.5), the rig behind
+		if (wanted(2)) {
+			shoot(2, "oilfield", 12450, new Cam(-2.5, 2.2, 71, -7.5, 4.0, 64), new Cam(-4.2, 2.8, 68.6, -8.0, 4.2, 64), 180);
+		}
+		// the crank and counterweights close, from three sides, to check they draw steadily as they turn
+		if (wanted(8)) {
+			shoot(8, "crank_south", 12450, new Cam(-8.5, 2.6, 67.5, -9.7, 2.5, 64), new Cam(-12, 2.8, 67, -9.7, 2.5, 64), 100);
+			shoot(8, "crank_north", 12450, new Cam(-8, 3.0, 60.5, -9.7, 2.5, 64), new Cam(-11.5, 2.4, 60.8, -9.7, 2.5, 64), 100);
+			shoot(8, "crank_above", 12450, new Cam(-12.5, 5.5, 66.5, -9.7, 2.5, 64), new Cam(-12.5, 5.5, 61.5, -9.7, 2.5, 64), 100);
+		}
+		// the lease's flare (lease 36, 2: site 10, 42), the other candidate for the flare shot
+		if (wanted(7)) {
+			shoot(7, "flare_lease", 12850, new Cam(4, 2.0, 49, 10.5, 7.5, 42.5), new Cam(7.5, 10.0, 45.5, 10.5, 11.3, 42.5), 180);
+		}
 	}
 
 	/** landRig, with the pad on the ground: the scene's x and z (hole at 30, -440) shifted onto the site. */
@@ -748,7 +774,15 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		buildCrudeUnit();
 		ox = cx - 18;
 		oz = cz;
-		shoot(3, "refinery", 12650, new Cam(46, 5, 30, 21, 13, -4), new Cam(40, 8, 36, 20, 14, -8), 180);
+		if (wanted(3)) {
+			shoot(3, "refinery", 12650, new Cam(46, 5, 30, 21, 13, -4), new Cam(40, 8, 36, 20, 14, -8), 180);
+		}
+		// the gas plant's flare (gas plant 41, -9: site 23, -49, its tip 10.1 m up), at dusk: a crane up the stack to the flame
+		if (wanted(7)) {
+			ox = cx;
+			oz = cz;
+			shoot(7, "flare", 12850, new Cam(26, 2.0, -56, 23.5, 7.5, -49), new Cam(24.6, 10.4, -52.2, 23.5, 11.4, -48.5), 180);
+		}
 	}
 
 	private void buildGasPlant() {
@@ -805,7 +839,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		context.waitTicks(200);
 		on(level -> panel(level.getServer(), sales).setWantRun(true));
 		context.waitTicks(300);
-		log("gas plant: comp " + read(A(20, 1, 0)) + " | chill " + read(A(36, 1, -1)) + " | stab " + read(A(43, 1, -3)) + " | sales set " + read(sales));
+		log("gas plant: flare " + read(A(41, 1, -9)) + " | comp " + read(A(20, 1, 0)) + " | chill " + read(A(36, 1, -1)) + " | stab " + read(A(43, 1, -3)) + " | sales set " + read(sales));
 	}
 
 	private void buildCrudeUnit() {
