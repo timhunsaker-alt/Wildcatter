@@ -6,7 +6,8 @@
 	"environment": "client",
 	"entrypoints": {
 		"fabric-client-gametest": [
-			"dev.wildcatter.gametest.WildcatterClientGameTest"
+			"dev.wildcatter.gametest.WildcatterClientGameTest",
+			"dev.wildcatter.gametest.TrailerClientGameTest"
 		],
 		"main": [
 			"dev.wildcatter.gametest.TestGasSource"

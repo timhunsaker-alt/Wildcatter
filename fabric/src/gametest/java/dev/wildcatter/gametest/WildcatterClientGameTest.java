@@ -41,6 +41,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 
 	@Override
 	public void runTest(ClientGameTestContext context) {
+		if ("trailer".equals(System.getenv("WILDCATTER_ONLY"))) {
+			return;   // the trailer's shots alone (TrailerClientGameTest): no test world, no Create World checks
+		}
 		// the test world starts as an existing world would, every world rule off; the scenes switch on the rules they show
 		dev.wildcatter.RulesData.testWorldsAsExisting = true;
 		createWorldScreen(context);
