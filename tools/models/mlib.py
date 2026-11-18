@@ -394,6 +394,7 @@ class Model:
 					if min(p) * 16 < -16 - 1e-6 or max(p) * 16 > 32 + 1e-6:
 						raise ModelError(f"rotor {name}: a box reaches {p}, more than a block past its cell")
 				elements.append(self._json(part, (0, 0, 0)))
+		_unflush(elements)
 		textures = {k: f"{NS}:{v}" for k, v in self.textures.items()}
 		textures["particle"] = f"{NS}:{self.particle}"
 		_save(os.path.join(ASSETS, "models/block", f"rotor_{name}.json"), {"textures": textures, "elements": elements})
@@ -521,3 +522,46 @@ def _save(path, obj):
 	os.makedirs(os.path.dirname(path), exist_ok=True)
 	with open(path, "w") as f:
 		json.dump(obj, f, indent=1)
+
+
+# a face of each axis's direction: (axis, whether it is the box's high side)
+_FACE_AXIS = {"west": (0, False), "east": (0, True), "down": (1, False), "up": (1, True), "north": (2, False), "south": (2, True)}
+UNFLUSH = 0.08   # pixels (0.005 m): enough depth between the two at the distances a rotor is seen from
+
+
+def _unflush(elements):
+	"""A turning part's faces must never lie in the plane of another face of the same part (docs/kinetics-and-sound.md): turned, the two
+	fight for depth and flash. Where two boxes of different textures (with the same turn) share a face plane over some area, the smaller
+	face, the coat or the marker laid on the other, is moved out of the plane by UNFLUSH, along its normal."""
+	def rot(j):
+		r = j.get("rotation")
+		return None if not r or abs(r["angle"]) < 1e-9 else (r["axis"], r["angle"], tuple(r["origin"]))
+	def rect(j, axis):
+		o = [i for i in range(3) if i != axis]
+		return [(j["from"][i], j["to"][i]) for i in o]
+	for _ in range(3):   # a face moved once can meet another; a few passes settle it
+		moved = False
+		for i, a in enumerate(elements):
+			for b in elements[i + 1:]:
+				if rot(a) != rot(b):
+					continue
+				for face, (axis, high) in _FACE_AXIS.items():
+					if face not in a["faces"] or face not in b["faces"] or a["faces"][face]["texture"] == b["faces"][face]["texture"]:
+						continue
+					pa = a["to"][axis] if high else a["from"][axis]
+					pb = b["to"][axis] if high else b["from"][axis]
+					if abs(pa - pb) > 1e-4:
+						continue
+					ra, rb = rect(a, axis), rect(b, axis)
+					overlap = [min(x[1], y[1]) - max(x[0], y[0]) for x, y in zip(ra, rb)]
+					if min(overlap) <= 1e-3:
+						continue
+					area = lambda r: (r[0][1] - r[0][0]) * (r[1][1] - r[1][0])
+					small = a if area(ra) <= area(rb) else b
+					if high:
+						small["to"][axis] = round(small["to"][axis] + UNFLUSH, 4)
+					else:
+						small["from"][axis] = round(small["from"][axis] - UNFLUSH, 4)
+					moved = True
+		if not moved:
+			return

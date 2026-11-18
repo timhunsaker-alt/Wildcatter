@@ -50,6 +50,8 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 	private double hertz = dev.wildcatter.energy.ElectricalStandard.active().hertz();
 	/** A cooling tower on the drain's pipes is running. Without one the turbine needs more steam per joule. */
 	private boolean cooled;
+	/** Its load, output over rating, as the client last heard it (sent when it moves by more than 5 points): drives the exhaust plume. */
+	private float shownLoad;
 
 	public SteamTurbineBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.STEAM_TURBINE_ENTITY, pos, state);
@@ -131,7 +133,12 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 		float target = running && !turbine.tripped ? (float) (120 * turbine.hertz / POLES) : 0;
 		float rpm = turbine.spin.rpm() + (target - turbine.spin.rpm()) * 0.05F;
 		turbine.spin.setRpm(Math.abs(rpm - target) < 5 ? target : rpm);
-		if (turbine.spin.needsSync()) {
+		float load = running && !turbine.tripped ? (float) Math.min(1.0, watts / turbine.ratedWatts()) : 0F;
+		boolean loadMoved = Math.abs(load - turbine.shownLoad) > 0.05F || (load == 0F) != (turbine.shownLoad == 0F);
+		if (loadMoved) {
+			turbine.shownLoad = load;
+		}
+		if (turbine.spin.needsSync() || loadMoved) {
 			turbine.spin.markSynced();
 			level.sendBlockUpdated(pos, state, state, 3);
 		}
@@ -139,7 +146,8 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 
 	/**
 	 * Client side (docs/kinetics-and-sound.md): the running sound, and while it makes power the spent steam blowing out of the open
-	 * end of its exhaust pipe (on its right side, 0.25 m up: tools/models/starter_plant.py), as much as its shaft speed gives.
+	 * end of its exhaust pipe (on its right side, 0.25 m up: tools/models/starter_plant.py): as much as its load passes, times its
+	 * shaft speed (so it builds as the set spins up).
 	 */
 	public static void clientTick(Level level, BlockPos pos, BlockState state, SteamTurbineBlockEntity turbine) {
 		dev.wildcatter.kinetic.RunningSound.clientTick(turbine);
@@ -148,16 +156,17 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 		}
 		float speed = Math.min(1F, turbine.spin.rpm() / (float) (120 * dev.wildcatter.energy.ElectricalStandard.active().hertz() / POLES));
 		net.minecraft.util.RandomSource random = level.getRandom();
-		if (speed <= 0.05F || random.nextFloat() > 0.25F + 0.45F * speed) {
+		float flow = speed * (0.15F + 0.85F * turbine.shownLoad);   // a little steam idling, the rest with load
+		if (speed <= 0.05F || random.nextFloat() > 0.1F + 0.8F * flow) {
 			return;
 		}
 		Direction facing = turbine.facing();
 		double[] at = GensetPartBlockEntity.turned(1.03, 0.7, facing), out = GensetPartBlockEntity.turned(1.5, 0.5, facing);
-		double dx = out[0] - 0.5, dz = out[1] - 0.5, push = 0.08 + 0.08 * speed;   // it blows out and, hot and light, billows up
+		double dx = out[0] - 0.5, dz = out[1] - 0.5, push = 0.06 + 0.14 * flow;   // it blows out and, hot and light, billows up
 		double x = pos.getX() + at[0], y = pos.getY() + 0.25, z = pos.getZ() + at[1];
 		level.addParticle(net.minecraft.core.particles.ParticleTypes.CLOUD, x, y, z,
 				dx * push + (random.nextDouble() - 0.5) * 0.02, 0.06 + random.nextDouble() * 0.05, dz * push + (random.nextDouble() - 0.5) * 0.02);
-		if (random.nextFloat() < 0.5F * speed) {
+		if (random.nextFloat() < 0.6F * flow) {
 			level.addParticle(net.minecraft.core.particles.ParticleTypes.WHITE_SMOKE, x + dx * 0.5, y + 0.3, z + dz * 0.5, dx * 0.02, 0.08, dz * 0.02);
 		}
 	}
@@ -169,6 +178,11 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 		return java.util.List.of(
 				new Rotor(rotor.part(dev.wildcatter.kinetic.RotorBlock.Part.STARTER_COUPLING), new org.joml.Vector3f(0.5F, 0.25F, 0.5F), Direction.Axis.Z, 1.0F),
 				new Rotor(rotor.part(dev.wildcatter.kinetic.RotorBlock.Part.FLYBALL_GOVERNOR), new org.joml.Vector3f(0.5F, 0.42F, 0.91F), Direction.Axis.Y, 0.1F));
+	}
+
+	/** Its load as the client last heard it, 0 to 1. */
+	public float shownLoad() {
+		return shownLoad;
 	}
 
 	@Override
@@ -190,6 +204,7 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 	public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
 		net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
 		tag.putFloat("rpm", spin.rpm());
+		tag.putFloat("load", shownLoad);
 		return tag;
 	}
 
@@ -317,6 +332,7 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 		satisfaction = input.getDoubleOr("satisfaction", 1.0);
 		tripped = input.getBooleanOr("tripped", false);
 		spin.setRpm(input.getFloatOr("rpm", 0));
+		shownLoad = input.getFloatOr("load", 0);
 	}
 
 	@Override

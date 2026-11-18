@@ -2312,3 +2312,17 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
   01, 02, the new 07 (the flare at dusk) and 08 (the crank close, from three sides) film them.
 - **Known gaps:** no new placeholders. Other rotor models still have a flush face pair (couplings, the drawworks drum, the HV disconnect
   arms, the flyball governor); see decision 10.
+
+## The remaining trailer gaps (2026-11-17; branch `w-trailer`; decision 10 in `docs/questions/misc-gaps.md`, done)
+- **Boiler safety valve:** at full pressure (95 % of the steam space) the starter boiler's safety valve lifts, a hard jet of steam with
+  its hiss, and reseats at 75 %. The client learns it from a "lifting" flag in the boiler's update packet, sent only when it changes.
+- **Turbine plume by load:** the starter turbine sends its load (output over rating) with its speed when it moves by 5 points; its
+  exhaust plume follows load times speed.
+- **1 MW steam plant:** its superheater's stack stub smokes as hard as the burner fires.
+- **Cooling tower plume:** the natural-draft tower's plume is now the mod's own particle, `wildcatter:steam_plume` (puffs 8 to 13 m
+  across over the whole mouth, rising some 40 to 60 m and spreading for 10 to 14 s), registered on both loaders; vanilla's clouds were too small to see.
+- **Rotors unflushed:** `tools/models/mlib.py` moves any rotor face lying in another face's plane 0.005 m out; the couplings, the drawworks
+  drum, the HV disconnect arms and the flyball governor regenerated. The rotor scan is clean.
+- **Tests:** client `dryType` checks the client sees the boiler's valve lifting and the turbine at about a third load; the trailer's 01
+  and 06 film the valves and the tower's plume.
+- **Known gaps:** static models keep about 2,300 flush face pairs (decals and item models mostly); they do not flash.

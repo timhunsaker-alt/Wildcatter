@@ -161,6 +161,17 @@ final class QuestClientScenes {
 		String xfmr = read(xt, base + 2, z0);
 		System.out.println("[wildcatter-test] dryType: rig " + rig + " | dry-type " + xfmr + " | turbine " + read(xt - 1, base + 2, z0));
 		check(rig.contains("drilling,"), "one firebox set through the dry-type should start the rig and keep it drilling: " + rig + " | " + xfmr);
+		// with steam to spare (the rig takes about a third of the 90 kW) the boiler sits at full pressure and its safety valve lifts, and the
+		// turbine's exhaust plume follows its load: the client hears both (docs/kinetics-and-sound.md)
+		BlockPos boilerAt = new BlockPos(x0, base + 2, z0 - 1), turbineAt = new BlockPos(x0, base + 2, z0);
+		String vents = context.computeOnClient(client -> {
+			boolean lifting = client.level.getBlockEntity(boilerAt) instanceof dev.wildcatter.block.BoilerBlockEntity b && b.lifting();
+			float load = client.level.getBlockEntity(turbineAt) instanceof dev.wildcatter.block.SteamTurbineBlockEntity t ? t.shownLoad() : -1F;
+			return lifting + " " + load;
+		});
+		float clientLoad = Float.parseFloat(vents.split(" ")[1]);
+		check(vents.startsWith("true ") && clientLoad > 0.15F && clientLoad < 0.6F,
+				"the client should see the boiler's safety valve lifting and the turbine at about a third load: " + vents + " | " + read(x0, base + 2, z0 - 1));
 		// stand on the platform's edge by the rig, then on a ledge above the plant (a fall from the platform would kill the player)
 		server.runCommand("fill " + (xt - 3) + " " + base + " " + (z0 + 3) + " " + (xt + 6) + " " + base + " " + (z0 + 10) + " minecraft:stone");
 		server.runCommand("tp @p " + (xt + 1.5) + " " + (base + 1) + " " + (z0 + 4.5) + " 160 22");

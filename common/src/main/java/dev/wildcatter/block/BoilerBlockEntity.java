@@ -25,6 +25,8 @@ public class BoilerBlockEntity extends BlockEntity implements Inspectable, dev.w
 	}
 
 	private int water;
+	/** The safety valve is lifting: the steam is at full pressure (a full steam space). Sent to the client when it changes. */
+	private boolean lifting;
 	private boolean grown;
 	private int steam;
 	/** Steam made since the last unit of water was used up. */
@@ -52,6 +54,14 @@ public class BoilerBlockEntity extends BlockEntity implements Inspectable, dev.w
 			}
 			boiler.setChanged();
 		}
+		// the safety valve lifts at full pressure and reseats well below it, so it does not chatter as the fire cycles on and off
+		// with the turbine's draw (a tick or two of draw takes the steam down a few percent)
+		boolean lift = boiler.lifting ? boiler.steam >= Tuning.BOILER_STEAM_CAPACITY * 0.75 : boiler.steam >= Tuning.BOILER_STEAM_CAPACITY * 0.95;
+		if (lift != boiler.lifting) {
+			boiler.lifting = lift;
+			boiler.setChanged();
+			level.sendBlockUpdated(pos, state, state, 3);
+		}
 		if (state.getValue(BoilerBlock.LIT) != working) {
 			level.setBlock(pos, state.setValue(BoilerBlock.LIT, working), 3);
 		}
@@ -65,10 +75,25 @@ public class BoilerBlockEntity extends BlockEntity implements Inspectable, dev.w
 	 * 1.87 m over the boiler's centre (tools/models/starter_plant.py); a coal firebox's thick and dark, a campfire's thin.
 	 */
 	public static void clientTick(Level level, BlockPos pos, BlockState state, BoilerBlockEntity boiler) {
+		net.minecraft.util.RandomSource random = level.getRandom();
+		if (boiler.lifting) {
+			// the safety valve on the crown, 1.5 m up (tools/models/starter_plant.py), blowing a hard jet of steam straight up
+			double[] at = GensetPartBlockEntity.turned(0.35, 0.6, state.getValue(BoilerBlock.FACING));
+			double vx = pos.getX() + at[0], vy = pos.getY() + 1.52, vz = pos.getZ() + at[1];
+			for (int i = 0; i < 2; i++) {
+				level.addParticle(net.minecraft.core.particles.ParticleTypes.CLOUD, vx, vy, vz,
+						(random.nextDouble() - 0.5) * 0.04, 0.45 + random.nextDouble() * 0.2, (random.nextDouble() - 0.5) * 0.04);
+			}
+			if (random.nextFloat() < 0.5F) {
+				level.addParticle(net.minecraft.core.particles.ParticleTypes.WHITE_SMOKE, vx, vy + 0.6, vz, 0, 0.2, 0);
+			}
+			if ((level.getGameTime() + pos.hashCode()) % 30 == 0) {
+				level.playLocalSound(vx, vy, vz, WildcatterSounds.BOILER_HISS, SoundSource.BLOCKS, 0.9F, 1.3F, false);
+			}
+		}
 		if (!state.getValue(BoilerBlock.LIT)) {
 			return;
 		}
-		net.minecraft.util.RandomSource random = level.getRandom();
 		boolean firebox = fireboxFired(level, pos);
 		double x = pos.getX() + 0.5 + (random.nextDouble() - 0.5) * 0.1, y = pos.getY() + 1.9, z = pos.getZ() + 0.5 + (random.nextDouble() - 0.5) * 0.1;
 		if (random.nextFloat() < (firebox ? 0.3F : 0.1F)) {
@@ -151,6 +176,25 @@ public class BoilerBlockEntity extends BlockEntity implements Inspectable, dev.w
 		output.putInt("water", water);
 		output.putInt("steam", steam);
 		output.putInt("boiled", boiled);
+		output.putBoolean("lifting", lifting);
+	}
+
+	/** True while the safety valve is lifting (on the client as well: it is in the update packet). */
+	public boolean lifting() {
+		return lifting;
+	}
+
+	@Override
+	public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+		return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+	}
+
+	/** Only what the client draws: the valve. */
+	@Override
+	public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+		net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+		tag.putBoolean("lifting", lifting);
+		return tag;
 	}
 
 	@Override
@@ -158,6 +202,7 @@ public class BoilerBlockEntity extends BlockEntity implements Inspectable, dev.w
 		super.loadAdditional(input);
 		water = Math.min(input.getIntOr("water", 0), Tuning.BOILER_WATER_CAPACITY);   // a former coil boiler's master keeps only one boiler's worth
 		steam = Math.min(input.getIntOr("steam", 0), Tuning.BOILER_STEAM_CAPACITY);
+		lifting = input.getBooleanOr("lifting", false);
 		boiled = input.getIntOr("boiled", 0);
 		grown = input.getBooleanOr("grown", false);
 	}

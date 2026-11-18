@@ -23,6 +23,8 @@ public final class WildcatterNeoForgeClient {
 	public static void init(IEventBus modBus) {
 		modBus.addListener(FMLClientSetupEvent.class, event -> WildcatterClient.init());
 		modBus.addListener(EntityRenderersEvent.RegisterRenderers.class, event -> WildcatterClient.renderers(event::registerBlockEntityRenderer));
+		modBus.addListener(net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent.class,
+				event -> event.registerSpriteSet(dev.wildcatter.WildcatterParticles.STEAM_PLUME, dev.wildcatter.client.SteamPlumeParticle.Provider::new));
 		// The PLC payload goes both ways. This NeoForge wants the client's handler for a clientbound payload registered here as well, or a
 		// client refuses to start: "Some clientbound payloads are missing client-side handlers: [wildcatter:plc]" (found by Farmings, 2026-11-12).
 		modBus.addListener(net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent.class,

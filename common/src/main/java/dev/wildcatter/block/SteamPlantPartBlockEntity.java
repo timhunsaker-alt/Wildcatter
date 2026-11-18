@@ -271,6 +271,20 @@ public class SteamPlantPartBlockEntity extends BlockEntity implements CircuitPar
 		if (part.part() == SteamPlantPartBlock.Part.BURNER && g != null && g.firing() > 0.01 && level.getRandom().nextFloat() < 0.5F) {
 			level.addParticle(ParticleTypes.FLAME, pos.getX() + 0.2 + 0.6 * level.getRandom().nextDouble(), pos.getY() + 0.3, pos.getZ() + 0.2 + 0.6 * level.getRandom().nextDouble(), 0, 0.02, 0);
 		}
+		// the flue gas out of the stack stub on the superheater (its top 3.98 m up, 0.45 m in and 0.8 m back: tools/models/superheater.py),
+		// as hard as the burner fires: a gas flame's stack shows mostly the water vapour in its flue gas
+		if (part.part() == SteamPlantPartBlock.Part.SUPERHEATER && g != null && g.firing() > 0.01) {
+			float firing = (float) g.firing();
+			net.minecraft.util.RandomSource random = level.getRandom();
+			double[] at = GensetPartBlockEntity.turned(0.45, 0.8, part.facing());
+			double x = pos.getX() + at[0] + (random.nextDouble() - 0.5) * 0.4, y = pos.getY() + 4.0, z = pos.getZ() + at[1] + (random.nextDouble() - 0.5) * 0.4;
+			if (random.nextFloat() < 0.1F + 0.4F * firing) {
+				level.addAlwaysVisibleParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, true, x, y, z, 0, 0.04 + 0.05 * firing, 0);
+			}
+			if (random.nextFloat() < 0.5F * firing) {
+				level.addParticle(ParticleTypes.WHITE_SMOKE, x, y + 0.2, z, 0, 0.08, 0);
+			}
+		}
 	}
 
 	@Override

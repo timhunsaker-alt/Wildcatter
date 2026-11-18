@@ -33,7 +33,7 @@ public final class Manual {
 				"1. STEAM\n\nPut a Boiler (a small vertical boiler, 2 m tall) on a lit campfire. Fill it with water buckets (" + Tuning.WATER_PER_BUCKET + " each). "
 						+ "Put a Steam Turbine touching it.\n\nOne campfire makes " + Math.round(Tuning.BOILER_STEAM_PER_TICK * 20 * Tuning.JOULES_PER_STEAM / 1000)
 						+ " kW. Four buckets last about "
-						+ (Tuning.BOILER_WATER_CAPACITY * Tuning.STEAM_PER_WATER / Tuning.BOILER_STEAM_PER_TICK / 20 / 60) + " minutes.\n\nThe turbine only burns steam for the power you actually use. While it runs, its spent steam blows out of its exhaust pipe, and a boiling boiler's stack smokes.",
+						+ (Tuning.BOILER_WATER_CAPACITY * Tuning.STEAM_PER_WATER / Tuning.BOILER_STEAM_PER_TICK / 20 / 60) + " minutes.\n\nThe turbine only burns steam for the power you actually use. While it runs, its spent steam blows out of its exhaust pipe (more with more load), and a boiling boiler's stack smokes. A boiler with steam to spare sits at full pressure and its safety valve lifts, blowing steam: harmless, but steam you are not using.",
 
 				"2. THE LOOP\n\nElectricity needs a loop. Power leaves on a HOT wire (red) and comes back on a NEUTRAL wire (black). "
 						+ "Every machine has to be joined to both.\n\nOne wire is a dead end: nothing flows and the lamp stays dark.",

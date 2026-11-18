@@ -99,7 +99,7 @@ Format as in `README.md` here.
 - The client scenes that changed (`cracker` unchanged; no client scene was run here): the steam plant's feedwater line, the rig's
   cables and the 1 MW alternator have been checked in model previews and server scenes, not yet in the client.
 
-### 10. Steam and smoke on the starter plant, and the flashing counterweights (trailer fixes, 2026-11-17)
+### 10. Steam and smoke on the starter plant, and the flashing counterweights (trailer fixes, 2026-11-17) — DONE 2026-11-17
 - **Chosen:** the boiler's stack smokes while it is lit (campfire smoke column, plus large smoke over a coal firebox), and the steam
   turbine blows white steam (cloud and white smoke) out of its exhaust pipe's open end while it runs, scaled by shaft speed. The
   pumpjack's flush brass coat is laid just outside the counterweight; the pumpjack's other flush faces were fixed with it.
@@ -111,3 +111,10 @@ Format as in `README.md` here.
   facing; next to do, by its `firing()`). Other rotor models with a flush face pair, not touched: the couplings (starter, starter pump,
   gas compressor, injection pump, refrigeration, turbine), the drawworks drum, the HV disconnect arms and the flyball governor.
 - **Alternatives:** sync the turbine's load share and the boiler's steam level to drive the plume and lift the valve.
+- **Done (Tim, 2026-11-17: "fix all the remaining gaps"):** the boiler's safety valve lifts at full pressure (95 % of its steam space,
+  reseating at 75 %) with a jet and its hiss, the client told by a flag in the update packet on change; the turbine's plume follows its
+  load (sent with its speed when it moves by 5 points); the 1 MW plant's stack smokes by its firing; the natural-draft tower's plume
+  is drawn in the mod's own large steam particle, since vanilla's were too small to see over 88 m; every rotor is unflushed by
+  `mlib.py` on export (the eleven listed, regenerated; the rotor scan is clean). Still as it was: a condensing turbine (on a cooling
+  tower) shows the same plume. Static models still have about 2,300 flush face pairs over about 1,000 files (most of them decals and
+  item models); they do not turn, so they do not flash, and are left for an art pass.

@@ -16,7 +16,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BiomeTags;
@@ -476,17 +475,22 @@ public class NaturalDraftTowerBlockEntity extends PlantUnitBlockEntity implement
 		cold = Math.max(Tuning.TOWER_MIN_COLD_C, wetBulb(level) + CoolingTower.approach(watts));
 	}
 
-	/** The client: the plume over the top while it rejects heat. */
+	/**
+	 * The client: the plume over the top while it rejects heat, in puffs metres across (WildcatterParticles.STEAM_PLUME) over the whole
+	 * mouth, rising a few metres a second and spreading as they go.
+	 */
 	public static void clientTick(Level level, BlockPos pos, BlockState state, NaturalDraftTowerBlockEntity t) {
-		if (!t.plume || level.getGameTime() % 2 != 0) {
+		if (!t.plume) {
 			return;
 		}
 		double[] c = t.centre();
 		double top = pos.getY() + Tuning.TOWER_TOP_Y;
-		for (int i = 0; i < 6; i++) {
+		double mouth = CoolingTower.radius(Tuning.TOWER_TOP_Y) * 0.85;
+		for (int i = 0; i < 3; i++) {
 			double a = level.getRandom().nextDouble() * 2 * Math.PI;
-			double r = Math.sqrt(level.getRandom().nextDouble()) * CoolingTower.radius(Tuning.TOWER_TOP_Y) * 0.9;
-			level.addAlwaysVisibleParticle(ParticleTypes.CLOUD, true, c[0] + r * Math.cos(a), top, c[1] + r * Math.sin(a), 0, 0.25 + level.getRandom().nextDouble() * 0.2, 0);
+			double r = Math.sqrt(level.getRandom().nextDouble()) * mouth;
+			level.addAlwaysVisibleParticle(dev.wildcatter.WildcatterParticles.STEAM_PLUME, true, c[0] + r * Math.cos(a), top + 1, c[1] + r * Math.sin(a),
+					0.02, 0.3 + level.getRandom().nextDouble() * 0.15, 0);
 		}
 	}
 

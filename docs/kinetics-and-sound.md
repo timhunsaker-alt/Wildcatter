@@ -18,14 +18,21 @@ Tim asked for machines that visibly move, like the Create mod, with proper sound
   They change nothing in play.
 - Genset silencer: smoke, heavier with load. Flare stack: flame and smoke while it burns. Steam plant burner: flame while firing.
 - Starter plant boiler: while lit (boiling over a burning fire), flue smoke out of its stack top, a thick column over a coal firebox and a
-  thin one over a campfire.
+  thin one over a campfire. At full pressure (its steam space 95 % full) its safety valve lifts: a hard jet of steam straight up out of
+  the valve with its hiss; it reseats at 75 %, so it does not chatter as the fire cycles with the draw. The server sends the client a
+  "lifting" flag in the boiler's update packet, only when it changes.
 - Starter plant steam turbine: while running, white steam blows out of the open end of its exhaust pipe (its right side, 0.25 m up), as
-  much as its shaft speed gives, so it builds as the set spins up. The client does not know the turbine's load, so it does not follow it.
+  much as its load passes (a little at no load), times its shaft speed so it builds as the set spins up. The load (output over rating)
+  goes to the client in the turbine's update packet with its speed, when it moves by more than 5 points.
+- 1 MW steam plant: smoke out of the superheater's stack stub, as hard as the burner fires.
+- Natural-draft cooling tower: its plume over the whole mouth while it rejects heat, in the mod's own particle (`steam_plume`, puffs
+  8 to 13 m across that rise some 40 to 60 m, spread and thin out over 10 to 14 s): vanilla's half-block particles do not read over an 88 m tower.
 
 ## Moving parts: model rule
 - A rotor model's faces must never lie in the plane of another face of the same model (a painted face laid flush on the part it paints):
   turned, the two fight for the same depth and flash. A coat sits on the outside of the face it paints. The pumpjack's counterweights
-  flashed this way until 2026-11-17.
+  flashed this way until 2026-11-17. `tools/models/mlib.py` now enforces it for every rotor it exports: where two boxes of different
+  textures share a face plane, the smaller face is moved 0.005 m out along its normal.
 
 ## Sound
 - A looping machine sound (`client/MachineSound`) plays while a machine runs. Its pitch follows speed and its volume follows load.

@@ -36,6 +36,7 @@ public final class Wildcatter {
 	/** Every block, item, sound, component and feature type, in this order. */
 	public static void register() {
 		WildcatterSounds.register();
+		WildcatterParticles.register();
 		WildcatterComponents.register();
 		WildcatterBlocks.register();
 		WildcatterItems.register();
