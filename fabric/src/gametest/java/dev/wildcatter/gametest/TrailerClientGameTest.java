@@ -34,16 +34,16 @@ import net.minecraft.world.level.levelgen.Heightmap;
  * folder for the stills (default {@code trailer} in the run folder).
  */
 public class TrailerClientGameTest implements FabricClientGameTest {
-	private static final String SEED = "8675309";
-	private static final Direction NORTH = Direction.NORTH;
+	static final String SEED = "8675309";
+	static final Direction NORTH = Direction.NORTH;
 
-	private ClientGameTestContext context;
-	private TestServerContext server;
-	private Path out;
+	ClientGameTestContext context;
+	TestServerContext server;
+	Path out;
 	/** The site being built: its origin in x and z, and its ground's top block's y. */
-	private int ox, gy, oz;
+	int ox, gy, oz;
 	/** The shots asked for (TRAILER_SHOTS), or null for all. */
-	private java.util.Set<String> shots;
+	java.util.Set<String> shots;
 
 	@Override
 	public void runTest(ClientGameTestContext context) {
@@ -123,20 +123,20 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		}
 	}
 
-	private boolean wanted(int shot) {
+	boolean wanted(int shot) {
 		return shots == null || shots.contains(String.valueOf(shot));
 	}
 
 	// ---- sites -----------------------------------------------------------------------------------------------------
 
-	private final List<int[]> taken = new ArrayList<>();
+	final List<int[]> taken = new ArrayList<>();
 
 	/**
 	 * Finds dry land near (x, z) from the world's own terrain noise (no chunks generated): every point of the box x1..x2, z1..z2 round it
 	 * over the sea, the box no more than {@code range} high to low, its inner box ix1..ix2, iz1..iz2 (where the plant goes) within
 	 * {@code flat}; far from the sites already taken. The camera goes there so its chunks load, and the ground's top is the inner box's median.
 	 */
-	private void site(int x, int z, int[] box, int range, int[] inner, int flat) {
+	void site(int x, int z, int[] box, int range, int[] inner, int flat) {
 		int[] at = server.computeOnServer(srv -> {
 			ServerLevel level = srv.overworld();
 			var gen = level.getChunkSource().getGenerator();
@@ -201,7 +201,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 	}
 
 	/** Flattens a pad round the site (relative x1..x2, z1..z2): air above the ground's top at gy, grass at gy, dirt under; trees near it go. */
-	private void pad(int x1, int z1, int x2, int z2, String top) {
+	void pad(int x1, int z1, int x2, int z2, String top) {
 		fillAbs(ox + x1 - 6, gy - 2, oz + z1 - 6, ox + x2 + 6, gy + 60, oz + z2 + 6, "minecraft:air replace #minecraft:logs");
 		fillAbs(ox + x1 - 6, gy - 2, oz + z1 - 6, ox + x2 + 6, gy + 60, oz + z2 + 6, "minecraft:air replace #minecraft:leaves");
 		fillAbs(ox + x1, gy + 1, oz + z1, ox + x2, gy + 46, oz + z2, "minecraft:air");
@@ -223,7 +223,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 	}
 
 	/** A fill of any size, cut into fills the command allows (32,768 blocks). */
-	private void fillAbs(int x1, int y1, int z1, int x2, int y2, int z2, String block) {
+	void fillAbs(int x1, int y1, int z1, int x2, int y2, int z2, String block) {
 		int h = y2 - y1 + 1;
 		int zs = Math.max(1, Math.min(z2 - z1 + 1, 32768 / h));
 		int xs = Math.max(1, 32768 / (h * zs));
@@ -234,35 +234,35 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		}
 	}
 
-	private void fill(int x1, int k1, int z1, int x2, int k2, int z2, String block) {
+	void fill(int x1, int k1, int z1, int x2, int k2, int z2, String block) {
 		fillAbs(ox + x1, gy + k1, oz + z1, ox + x2, gy + k2, oz + z2, block);
 	}
 
 	/** The site position x, z with k above the ground's top block (k 0 is the ground, 1 the first block over it: the scenes' "up"). */
-	private BlockPos A(int x, int k, int z) {
+	BlockPos A(int x, int k, int z) {
 		return new BlockPos(ox + x, gy + k, oz + z);
 	}
 
 	/** The first air over the ground at site x, z (natural terrain, off the pad). */
-	private int surface(int x, int z) {
+	int surface(int x, int z) {
 		return server.computeOnServer(srv -> srv.overworld().getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, ox + x, oz + z));
 	}
 
 	// ---- the builders' helpers, as WildcatterClientGameTest has them --------------------------------------------------
 
-	private void on(Consumer<ServerLevel> work) {
+	void on(Consumer<ServerLevel> work) {
 		server.computeOnServer(srv -> {
 			work.accept(srv.overworld());
 			return null;
 		});
 	}
 
-	private void put(int x, int k, int z, String block) {
+	void put(int x, int k, int z, String block) {
 		BlockPos p = A(x, k, z);
 		server.runCommand("setblock " + p.getX() + " " + p.getY() + " " + p.getZ() + " " + block);
 	}
 
-	private void placeBig(Block block, BlockPos main, Direction facing) {
+	void placeBig(Block block, BlockPos main, Direction facing) {
 		on(level -> {
 			BlockState state = block.defaultBlockState().setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING, facing);
 			level.setBlock(main, state, 3);
@@ -270,11 +270,11 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		});
 	}
 
-	private boolean placeOn(Block block, BlockPos clicked, double px, double pz, float yaw) {
+	boolean placeOn(Block block, BlockPos clicked, double px, double pz, float yaw) {
 		return placeAt(block, clicked, Direction.UP, px, pz, yaw);
 	}
 
-	private boolean placeAt(Block block, BlockPos clicked, Direction face, double px, double pz, float yaw) {
+	boolean placeAt(Block block, BlockPos clicked, Direction face, double px, double pz, float yaw) {
 		return server.computeOnServer(srv -> {
 			net.minecraft.server.level.ServerPlayer player = srv.getPlayerList().getPlayers().get(0);
 			player.snapTo(px, clicked.getY() + 1, pz, yaw, 30.0F);
@@ -286,7 +286,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		});
 	}
 
-	private boolean clickWith(BlockPos at, Direction face, ItemStack stack) {
+	boolean clickWith(BlockPos at, Direction face, ItemStack stack) {
 		return server.computeOnServer(srv -> {
 			net.minecraft.server.level.ServerPlayer player = srv.getPlayerList().getPlayers().get(0);
 			player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, stack);
@@ -298,22 +298,22 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		});
 	}
 
-	private String read(BlockPos at) {
+	String read(BlockPos at) {
 		return server.computeOnServer(srv -> BigParts.entity(srv.overworld(), at) instanceof Inspectable i ? i.inspect().getString() : "(no readout)");
 	}
 
-	private void genset(BlockPos panel, Direction facing, boolean gas) {
+	void genset(BlockPos panel, Direction facing, boolean gas) {
 		List<BlockPos> overwrote = server.computeOnServer(srv -> dev.wildcatter.block.GensetSkid.build(srv.overworld(), panel, facing, gas));
 		if (!overwrote.isEmpty()) {
 			log("genset at " + panel.toShortString() + " overwrote " + overwrote.size() + " blocks");
 		}
 	}
 
-	private dev.wildcatter.block.GensetControlPanelBlockEntity panel(MinecraftServer srv, BlockPos at) {
+	dev.wildcatter.block.GensetControlPanelBlockEntity panel(MinecraftServer srv, BlockPos at) {
 		return (dev.wildcatter.block.GensetControlPanelBlockEntity) srv.overworld().getBlockEntity(at);
 	}
 
-	private void startGenset(BlockPos panel, Direction facing, double liters) {
+	void startGenset(BlockPos panel, Direction facing, double liters) {
 		context.waitTicks(30);
 		server.computeOnServer(srv -> {
 			BlockPos tank = dev.wildcatter.block.GensetSkid.base(panel, facing, false);
@@ -327,7 +327,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		log("genset " + panel.toShortString() + ": " + read(panel));
 	}
 
-	private BlockPos inlineTransformer(Block block, BlockPos from, Direction d, boolean feedMain) {
+	BlockPos inlineTransformer(Block block, BlockPos from, Direction d, boolean feedMain) {
 		int across = block == WildcatterBlocks.UNIT_SUBSTATION ? 3 : 1;
 		BlockPos first = from.relative(d);
 		Direction facing = feedMain ? d.getCounterClockWise() : d.getClockWise();
@@ -335,7 +335,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		return from.relative(d, across + 2);
 	}
 
-	private void sizeCables(BlockPos from, BlockPos to, Block kind, dev.wildcatter.energy.ConductorSize size) {
+	void sizeCables(BlockPos from, BlockPos to, Block kind, dev.wildcatter.energy.ConductorSize size) {
 		on(level -> {
 			for (BlockPos at : BlockPos.betweenClosed(from, to)) {
 				if (level.getBlockEntity(at) instanceof dev.wildcatter.block.MultiCableBlockEntity cable && cable.getBlockState().is(kind)) {
@@ -345,11 +345,11 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		});
 	}
 
-	private void fillTank(BlockPos tank, dev.wildcatter.fluid.Product product, double litres) {
+	void fillTank(BlockPos tank, dev.wildcatter.fluid.Product product, double litres) {
 		on(level -> ((dev.wildcatter.block.StorageTankBlockEntity) level.getBlockEntity(tank)).testFill(product, litres));
 	}
 
-	private void water(BlockPos... mains) {
+	void water(BlockPos... mains) {
 		on(level -> {
 			for (BlockPos at : mains) {
 				if (level.getBlockEntity(at) instanceof dev.wildcatter.block.WaterUser user) {
@@ -360,13 +360,13 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 	}
 
 	/** Steel pipe through cells {x, k over the ground, z}. */
-	private void pipes(int[][] cells) {
+	void pipes(int[][] cells) {
 		for (int[] c : cells) {
 			put(c[0], c[1], c[2], "wildcatter:gas_line");
 		}
 	}
 
-	private void insulator(Block block, BlockPos at, String conductor) {
+	void insulator(Block block, BlockPos at, String conductor) {
 		String why = server.computeOnServer(srv -> {
 			dev.wildcatter.block.InsulatorBlock insulator = (dev.wildcatter.block.InsulatorBlock) block;
 			dev.wildcatter.block.InsulatorBlock.Mount mount = insulator.mountAt(srv.overworld(), at);
@@ -382,14 +382,14 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		}
 	}
 
-	private void span(BlockPos a, BlockPos b, dev.wildcatter.energy.Voltage tier) {
+	void span(BlockPos a, BlockPos b, dev.wildcatter.energy.Voltage tier) {
 		var result = server.computeOnServer(srv -> dev.wildcatter.item.SpoolItem.connect(srv.overworld(), a, b, tier, false, 1024));
 		if (!result.ok()) {
 			log("span " + a.toShortString() + " to " + b.toShortString() + ": " + result);
 		}
 	}
 
-	private static void weighted(dev.wildcatter.block.RigSubstructureBlockEntity rig) {
+	static void weighted(dev.wildcatter.block.RigSubstructureBlockEntity rig) {
 		rig.testWater(0);
 		rig.testWater(45_000);
 		rig.testMix(dev.wildcatter.block.RigSubstructureBlockEntity.Solid.BENTONITE, 71.3 * 45);
@@ -398,14 +398,14 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		}
 	}
 
-	private static void log(String text) {
+	static void log(String text) {
 		System.out.println("[wildcatter-trailer] " + text);
 	}
 
 	// ---- the camera ------------------------------------------------------------------------------------------------
 
 	/** A camera position (site coordinates, y over the ground's top) looking at a site point. */
-	private record Cam(double x, double y, double z, double tx, double ty, double tz) {
+	record Cam(double x, double y, double z, double tx, double ty, double tz) {
 		float yaw() {
 			return (float) Math.toDegrees(Math.atan2(-(tx - x), tz - z));
 		}
@@ -420,7 +420,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		}
 	}
 
-	private void camera(Cam c, boolean snap) {
+	void camera(Cam c, boolean snap) {
 		double x = ox + c.x, y = gy + c.y - 1.62, z = oz + c.z;   // the eye at c
 		float yaw = c.yaw(), pitch = c.pitch();
 		if (snap) {
@@ -441,9 +441,9 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 	}
 
 	/** Run every second while a shot is taken, to keep what the scene's hooks set (a tower's heat) as it was. */
-	private Runnable keep = () -> {};
+	Runnable keep = () -> {};
 
-	private void hold(int ticks) {
+	void hold(int ticks) {
 		for (int t = 0; t < ticks; t += 20) {
 			keep.run();
 			context.waitTicks(Math.min(20, ticks - t));
@@ -451,7 +451,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 	}
 
 	/** The shot: the start frame, the end frame, then the move between them filmed over {@code ticks}. */
-	private void shoot(int n, String name, long time, Cam a, Cam b, int ticks) {
+	void shoot(int n, String name, long time, Cam a, Cam b, int ticks) {
 		server.runCommand("time set " + time);
 		server.runCommand("weather clear");
 		String id = String.format("%02d_%s", n, name);
@@ -491,7 +491,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 	 * are, so it needs no window on screen (a locked screen or a hidden window records nothing). 20 frames a second; join them with
 	 * {@code ffmpeg -framerate 20 -i %04d.png}.
 	 */
-	private void frames(String id, Cam a, Cam b, int ticks) {
+	void frames(String id, Cam a, Cam b, int ticks) {
 		Path dir = out.resolve("frames").resolve(id);
 		try {
 			Files.createDirectories(dir);
@@ -513,7 +513,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		log("frames " + id + ": " + (ticks + 1));
 	}
 
-	private void screenshot(String name) {
+	void screenshot(String name) {
 		context.takeScreenshot(TestScreenshotOptions.of(name).withSize(1920, 1080).withDestinationDir(out).disableCounterPrefix());
 		log("shot " + name);
 	}
@@ -524,7 +524,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 	 * The starter plant as the dryType scene builds it (QuestClientScenes): steam turbines beside boilers on coal-fired fireboxes, a
 	 * dry-type transformer on their low side, its 480 V front against the drilling rig, drilling; a 40 ft pole line marching off east.
 	 */
-	private void fireToSteam() {
+	void fireToSteam() {
 		pad(-14, -14, 24, 16, "minecraft:grass_block");
 		int n = 3, x0 = 0, z0 = 0, xt = x0 + n, hx = xt + 6;
 		on(level -> {
@@ -595,7 +595,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 	 * separator, stock and water tanks, H-pump, flare, gas genset), and two more pumpjacks on their own sets, started apart so they nod
 	 * out of step.
 	 */
-	private void oilfield() {
+	void oilfield() {
 		int cx = ox, cz = oz;
 		pad(-34, -18, 26, 82, "minecraft:grass_block");
 		// the lease's wellheads (lease x 21 at z 0, and the two more at 21, 24 and 33, 32), lease origin at (cx-26, cz+40)
@@ -644,7 +644,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 	}
 
 	/** landRig, with the pad on the ground: the scene's x and z (hole at 30, -440) shifted onto the site. */
-	private void buildRig(int cx, int cz) {
+	void buildRig(int cx, int cz) {
 		ox = cx - 30;
 		oz = cz + 440;
 		int hx = 30, hz = -440;
@@ -700,7 +700,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 	}
 
 	/** The lease scene's build, its origin at (cx-26, cz+40), and two more pumpjacks south of it on sets of their own. */
-	private void buildLease(int cx, int cz) {
+	void buildLease(int cx, int cz) {
 		ox = cx - 26;
 		oz = cz + 40;
 		BlockPos set = A(11, 1, 0);
@@ -782,7 +782,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 	// ---- 3: the refinery -------------------------------------------------------------------------------------------
 
 	/** The crude unit (crudeUnit scene) and, north of it, the gas plant (gasPlant scene) with its flare, both running. */
-	private void refinery() {
+	void refinery() {
 		int cx = ox, cz = oz;
 		pad(-20, -58, 36, 30, "minecraft:grass_block");
 		fill(-16, 0, -54, 34, 0, 10, "minecraft:gravel");
@@ -816,7 +816,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		}
 	}
 
-	private void buildGasPlant() {
+	void buildGasPlant() {
 		placeBig(WildcatterBlocks.GAS_WELLHEAD, A(8, 1, 0), NORTH);
 		placeBig(WildcatterBlocks.SEPARATOR, A(10, 1, 0), Direction.WEST);
 		placeBig(WildcatterBlocks.GAS_COMPRESSOR, A(18, 1, 0), Direction.WEST);
@@ -873,7 +873,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		log("gas plant: flare " + read(A(41, 1, -9)) + " | comp " + read(A(20, 1, 0)) + " | chill " + read(A(36, 1, -1)) + " | stab " + read(A(43, 1, -3)) + " | sales set " + read(sales));
 	}
 
-	private void buildCrudeUnit() {
+	void buildCrudeUnit() {
 		placeBig(WildcatterBlocks.ATMOSPHERIC_COLUMN, A(20, 1, 0), NORTH);
 		placeBig(WildcatterBlocks.CRUDE_HEATER, A(23, 1, 0), NORTH);
 		placeBig(WildcatterBlocks.SIDE_STRIPPERS, A(20, 1, -1), NORTH);
@@ -930,7 +930,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 	// ---- 4: power lines --------------------------------------------------------------------------------------------
 
 	/** The substation yard (substationParts scene), fenced, and a 138 kV H-frame line (lineParts' H-frames) marching to it over the land. */
-	private void powerLines() {
+	void powerLines() {
 		pad(-4, -20, 44, 18, "minecraft:grass_block");
 		fill(6, 0, -8, 34, 0, 14, "minecraft:gravel");
 		Object[][] parts = {
@@ -989,7 +989,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 	// ---- 5: gensets ------------------------------------------------------------------------------------------------
 
 	/** Three pairs of diesel sets as the synchronizing scene builds them: A closes onto the dead bus, B synchronizes on, heaters share. */
-	private void gensets() {
+	void gensets() {
 		ox -= 15;
 		oz -= 6;
 		pad(0, -8, 32, 22, "minecraft:grass_block");
@@ -1021,7 +1021,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 	 * The turbine island scene's build (the PWR island, the turbine hall, the gas turbine for offsite power, its load banks), brought to
 	 * 25 % with the turbine generator on line; the natural draft cooling tower east of it (coolingTower scene) with its plume up.
 	 */
-	private void reactor() {
+	void reactor() {
 		int cx = ox, cz = oz;
 		pad(-44, -64, 130, 46, "minecraft:grass_block");
 		ox = cx - 30;
@@ -1044,7 +1044,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		shoot(6, "reactor", 12550, new Cam(34, 7, 56, 70, 38, -12), new Cam(46, 13, 58, 76, 44, -12), 180);
 	}
 
-	private void buildTurbineIsland() {
+	void buildTurbineIsland() {
 		Direction north = NORTH;
 		fill(32, -3, -13, 43, 0, -4, "minecraft:stone");
 		fill(33, -2, -12, 42, 0, -5, "minecraft:water");
@@ -1280,7 +1280,7 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 	}
 
 	/** The natural draft tower (coolingTower scene), its controller at site x, z; built from its hopper, the rest by hook; 104 MW on it. */
-	private void buildTower(int cx, int cz) {
+	void buildTower(int cx, int cz) {
 		fill(cx - 35, -4, cz - 70, cx + 40, -1, cz + 5, "minecraft:stone");
 		BlockPos main = A(cx, 1, cz);
 		placeBig(WildcatterBlocks.NATURAL_DRAFT_TOWER, main, NORTH);

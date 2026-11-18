@@ -7,7 +7,8 @@
 	"entrypoints": {
 		"fabric-client-gametest": [
 			"dev.wildcatter.gametest.WildcatterClientGameTest",
-			"dev.wildcatter.gametest.TrailerClientGameTest"
+			"dev.wildcatter.gametest.TrailerClientGameTest",
+			"dev.wildcatter.gametest.PlcTrailerClientGameTest"
 		],
 		"main": [
 			"dev.wildcatter.gametest.TestGasSource"
