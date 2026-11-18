@@ -465,6 +465,10 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		screenshot(id + "_b");
 		camera(a, true);
 		hold(40);
+		if (System.getenv("TRAILER_FRAMES") != null) {
+			frames(id, a, b, ticks);
+			return;
+		}
 		Filming film = context.computeOnClient(client -> Filming.start(client, id));
 		try {
 			context.waitTicks(10);
@@ -480,6 +484,33 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 			film.stop();
 			keep = () -> {};
 		}
+	}
+
+	/**
+	 * The move filmed off screen (TRAILER_FRAMES set): a 1920 x 1080 frame each tick into {@code frames/<shot>/}, rendered as the stills
+	 * are, so it needs no window on screen (a locked screen or a hidden window records nothing). 20 frames a second; join them with
+	 * {@code ffmpeg -framerate 20 -i %04d.png}.
+	 */
+	private void frames(String id, Cam a, Cam b, int ticks) {
+		Path dir = out.resolve("frames").resolve(id);
+		try {
+			Files.createDirectories(dir);
+		} catch (java.io.IOException ex) {
+			throw new RuntimeException(ex);
+		}
+		try {
+			for (int t = 0; t <= ticks; t++) {
+				camera(a.lerp(b, (double) t / ticks), false);
+				if (t % 20 == 0) {
+					keep.run();
+				}
+				context.waitTick();
+				context.takeScreenshot(TestScreenshotOptions.of(String.format("%04d", t)).withSize(1920, 1080).withDestinationDir(dir).disableCounterPrefix());
+			}
+		} finally {
+			keep = () -> {};
+		}
+		log("frames " + id + ": " + (ticks + 1));
 	}
 
 	private void screenshot(String name) {
@@ -1009,7 +1040,8 @@ public class TrailerClientGameTest implements FabricClientGameTest {
 		}
 		ox = cx - 30;
 		oz = cz;
-		shoot(6, "reactor", 12550, new Cam(34, 7, 56, 60, 22, -14), new Cam(46, 13, 58, 66, 26, -14), 180);
+		// tilted up enough to keep the tower's top and its plume in the frame
+		shoot(6, "reactor", 12550, new Cam(34, 7, 56, 70, 38, -12), new Cam(46, 13, 58, 76, 44, -12), 180);
 	}
 
 	private void buildTurbineIsland() {
