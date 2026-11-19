@@ -26,7 +26,8 @@ import net.minecraft.nbt.StringTag;
  * <li>code: a ladder drawn, downloaded and run, the pumpjack starting as its rung goes live; then stop and start from the buttons.</li>
  * <li>gensets: feeder 3 put on from the HMI, the PLC starting set B, syncing and closing it, the load split; set B trips (a trip the
  * scene injects through the set's own frequency trip) and the program sheds feeder 3.</li>
- * <li>pid: a level loop on the HMI, its setpoint stepped from 50 to 70 % and its drain opened from 30 to 60 %, the loop recovering.</li>
+ * <li>pid: a level loop on the HMI, its setpoint stepped from 50 to 70 % and its drain opened from 30 to 80 %, the loop recovering; in the
+ * world the tank's sight glass, the drain valve's stem and the pump follow it.</li>
  * </ul>
  */
 public class PlcShortsClientGameTest extends PlcTrailerClientGameTest {
@@ -129,9 +130,13 @@ public class PlcShortsClientGameTest extends PlcTrailerClientGameTest {
 		context.waitTicks(10);
 	}
 
+	/** In TRAILER_FRAMES mode, the frame being saved: events are timed by it, at 20 frames a second. */
+	private int frame = -1;
+
 	/** Logs an event in the film being shot, with its second from the film's start. */
 	private void mark(String what) {
-		log(String.format(java.util.Locale.ROOT, "event %s %s at %.2f s", filmId, what, (System.nanoTime() - filmStart) / 1e9));
+		double at = frame >= 0 ? frame / 20.0 : (System.nanoTime() - filmStart) / 1e9;
+		log(String.format(java.util.Locale.ROOT, "event %s %s at %.2f s", filmId, what, at));
 	}
 
 	private Filming startFilm(String id) {
@@ -162,6 +167,28 @@ public class PlcShortsClientGameTest extends PlcTrailerClientGameTest {
 		context.takeScreenshot(TestScreenshotOptions.of(id + "_a").withSize(1080, 1920).withDestinationDir(root.resolve(shortName)).disableCounterPrefix());
 		camera(a, true);
 		context.waitTicks(10);
+		if (System.getenv("TRAILER_FRAMES") != null) {   // off screen: a 1080 x 1920 frame a tick, for a locked screen
+			Path dir = root.resolve("frames").resolve(shortName).resolve(id);
+			try {
+				java.nio.file.Files.createDirectories(dir);
+			} catch (java.io.IOException ex) {
+				throw new RuntimeException(ex);
+			}
+			filmId = id;
+			try {
+				for (int t = 0; t <= ticks; t++) {
+					frame = t;
+					camera(a.lerp(b, (double) t / ticks), false);
+					beat.accept(t);
+					context.waitTick();
+					context.takeScreenshot(TestScreenshotOptions.of(String.format("%04d", t)).withSize(1080, 1920).withDestinationDir(dir).disableCounterPrefix());
+				}
+			} finally {
+				frame = -1;
+			}
+			log("frames " + shortName + " " + id + ": " + (ticks + 1));
+			return;
+		}
 		Filming film = startFilm(id);
 		try {
 			context.waitTicks(10);
@@ -765,12 +792,14 @@ public class PlcShortsClientGameTest extends PlcTrailerClientGameTest {
 		put(21, 2, 3, "wildcatter:air_tubing");
 		BlockPos lt = A(20, 1, 4);
 		put(20, 1, 4, "wildcatter:transmitter[facing=south]");
-		for (int x = 14; x <= 21; x++) {
-			boolean box = x == 16 || x == 18 || x == 20 || x == 21;
+		for (int x = 14; x <= 22; x++) {
+			boolean box = x == 16 || x == 18 || x == 20;
 			put(x, 1, 5, box ? "wildcatter:junction_box" : "wildcatter:control_cable");
 		}
 		put(18, 1, 4, "wildcatter:control_cable");
-		put(21, 1, 4, "wildcatter:junction_box");
+		// the drain valve's box on its east side, so its yoke faces the cameras clear
+		put(22, 1, 4, "wildcatter:control_cable");
+		put(22, 1, 3, "wildcatter:junction_box");
 		for (int z = 1; z <= 5; z++) {
 			put(16, 2, z, "wildcatter:control_cable");
 		}
@@ -867,7 +896,7 @@ public class PlcShortsClientGameTest extends PlcTrailerClientGameTest {
 		log("after the draw: " + state.get() + " | drive " + read(drive) + " | tank " + read(tank));
 		close();
 		// 4: in the world: the pump, its drive and the tank, the setpoint stepped back down to 50 and up again
-		Cam wA = new Cam(21.0, 5.6, 9.0, 17.5, 1.6, 2.0), wB = new Cam(20.4, 4.8, 8.0, 17.5, 1.7, 2.0);
+		Cam wA = new Cam(21.0, 5.6, 9.0, 18.4, 1.6, 2.4), wB = new Cam(20.4, 4.8, 8.0, 18.6, 1.7, 2.6);
 		tallShot(4, "pump_world", WORLD_TIME, wA, wB, 220, t -> {
 			if (t == 20) {
 				mark("setpoint 50");
@@ -877,8 +906,29 @@ public class PlcShortsClientGameTest extends PlcTrailerClientGameTest {
 				mark(state.get());
 			}
 		});
-		// 1: the hook: low across the tank, the air set over it, the pump running behind
-		tallShot(1, "hook", WORLD_TIME, new Cam(19.5, 2.4, 7.0, 18.5, 2.6, 2.5), new Cam(21.5, 6.2, 9.2, 17.5, 1.6, 2.0), 180, t -> {});
+		// 1: the hook: a push-in on the tank's corner, both its sight glasses and the drain valve; the setpoint goes to 70 and the water climbs the glass
+		tallShot(1, "hook", WORLD_TIME, new Cam(22.4, 2.8, 5.9, 20.6, 1.6, 3.5), new Cam(22.2, 2.3, 4.9, 20.6, 1.6, 3.5), 180, t -> {
+			if (t == 10) {
+				mark("setpoint 70");
+				write(at, "LEVEL.HIGH_SP", true);
+			}
+			if (t % 20 == 0 && wanted(1)) {
+				mark(state.get());
+			}
+		});
+		// 5: close on the tank and its drain: the drain opened from 30 to 80 %, the stem rising, the level dipping and the loop catching it
+		write(at, "LEVEL.MORE_DRAW", false);
+		context.waitTicks(600);
+		log("before the drain: " + state.get());
+		tallShot(5, "drain_world", WORLD_TIME, new Cam(21.7, 2.0, 5.9, 20.9, 1.45, 3.7), new Cam(21.5, 1.85, 5.3, 20.9, 1.45, 3.7), 240, t -> {
+			if (t == 20) {
+				mark("drain 80");
+				write(at, "LEVEL.MORE_DRAW", true);
+			}
+			if (t % 10 == 0 && wanted(5)) {
+				mark(state.get());
+			}
+		});
 		log("pid end: " + state.get());
 	}
 }

@@ -94,6 +94,9 @@ public class OperatorDeviceBlock extends BaseEntityBlock {
 
 	@Override
 	public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-		return level.isClientSide() ? null : createTickerHelper(type, dev.wildcatter.WildcatterBlocks.OPERATOR_DEVICE_ENTITY, OperatorDeviceBlockEntity::tick);
+		if (level.isClientSide()) {
+			return kind == Kind.HORN ? createTickerHelper(type, dev.wildcatter.WildcatterBlocks.OPERATOR_DEVICE_ENTITY, OperatorDeviceBlockEntity::clientTick) : null;
+		}
+		return createTickerHelper(type, dev.wildcatter.WildcatterBlocks.OPERATOR_DEVICE_ENTITY, OperatorDeviceBlockEntity::tick);
 	}
 }

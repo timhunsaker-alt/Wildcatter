@@ -5128,6 +5128,10 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			context.waitTicks(20);
 			check(Boolean.TRUE.equals(tag.apply("WARN1.X")) && Boolean.TRUE.equals(tag.apply("WARN2.X")), "both branches should run: " + tag.apply("WARN1.X") + " " + tag.apply("WARN2.X"));
 			check(Boolean.TRUE.equals(tag.apply("HORN")) && (lamps.get() & 2) != 0, "the horn and amber light warn first: lamps " + lamps.get());
+			// the horn sounds its own loop on the client while its output is on
+			java.util.function.Supplier<String> hornHeard = () -> context.computeOnClient(client -> client.level.getBlockEntity(hornAt) instanceof dev.wildcatter.control.OperatorDeviceBlockEntity horn
+					? horn.loop() + " playing " + dev.wildcatter.client.MachineSound.playingForTest(hornAt) : "no horn");
+			check(hornHeard.get().equals(dev.wildcatter.WildcatterSounds.HORN + " playing true"), "the horn should be sounding its own loop: " + hornHeard.get());
 			check(!belt.apply(0).contains("RUNNING"), "nothing moves during the warning: " + belt.apply(0));
 			context.takeScreenshot("wildcatter-plc-sfc-warning");
 			long[] up3 = plcBelts(context, belt, true, 600);
@@ -5135,6 +5139,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			check(up3[0] >= 0 && up3[1] > up3[0] + 30 && up3[2] > up3[1] + 30, "belt 3, then 2, then 1, at least 2 s apart: " + order);
 			context.waitTicks(60);
 			check(Boolean.TRUE.equals(tag.apply("LINE_UP.X")) && (lamps.get() & 4) != 0 && (lamps.get() & 2) == 0, "the line is up, green and no amber: lamps " + lamps.get());
+			check(hornHeard.get().equals("null playing false"), "the horn's loop should stop with its output: " + hornHeard.get());
 			check(read(server, px, up, starters[0].getZ()).contains("pumping"), "the real motor is doing real work: " + read(server, px, up, starters[0].getZ()));
 			context.runOnClient(client -> plcScreen(client).sfcScrollForTest(150));
 			context.waitTicks(10);
@@ -5516,6 +5521,12 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			System.out.println("[wildcatter-test] plc analog: level " + first + " % at setpoint 50 | " + driveText.get() + " | " + read(server, 15, up, z + 3));
 			check(Math.abs(first - 50) < 4, "the PID should hold the level near 50 %: " + first + " | " + driveText.get());
 			check(Math.abs(((Number) tag.apply("PV")).doubleValue() - first) < 1.5, "what the CPU reads should be the tank: " + tag.apply("PV") + " against " + first);
+			// what the client draws: the tank's sight glass at the tank's level, each valve's stem or indicator at its opening
+			java.util.function.Function<BlockPos, Double> clientValve = pos -> context.computeOnClient(client -> ((dev.wildcatter.control.ValveBlockEntity) client.level.getBlockEntity(pos)).position());
+			double clientLevel = context.computeOnClient(client -> ((dev.wildcatter.block.DayTankBlockEntity) client.level.getBlockEntity(tank)).waterLevel() * 100);
+			check(Math.abs(clientLevel - level.get()) < 1.5, "the client should see the tank's level: " + clientLevel + " against " + level.get());
+			check(Math.abs(clientValve.apply(fcv) - valveAt.apply(fcv)) < 0.03 && Math.abs(clientValve.apply(fcv) - 0.3) < 0.03, "the client should see the control valve at 30 %: " + clientValve.apply(fcv));
+			check(clientValve.apply(mov) > 0.97, "and the motor-operated valve open: " + clientValve.apply(mov));
 			double speed = server.computeOnServer(srv -> ((dev.wildcatter.block.StarterCabinetBlockEntity) srv.overworld().getBlockEntity(drive)).measure(dev.wildcatter.control.Measurable.Quantity.SPEED));
 			double watts = server.computeOnServer(srv -> ((dev.wildcatter.block.StarterCabinetBlockEntity) srv.overworld().getBlockEntity(drive)).measure(dev.wildcatter.control.Measurable.Quantity.WATTS));
 			System.out.println("[wildcatter-test] plc analog: drive at " + speed + " %, " + watts + " W, of a 37,000 W motor");
@@ -5531,6 +5542,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			double faster = server.computeOnServer(srv -> ((dev.wildcatter.block.StarterCabinetBlockEntity) srv.overworld().getBlockEntity(drive)).measure(dev.wildcatter.control.Measurable.Quantity.SPEED));
 			System.out.println("[wildcatter-test] plc analog: drain 80 %: level " + second + " %, drive " + faster + " %");
 			check(Math.abs(second - 50) < 4, "the level should hold through a bigger draw: " + second);
+			check(Math.abs(clientValve.apply(fcv) - 0.8) < 0.03, "the client should see the drain valve at 80 %: " + clientValve.apply(fcv));
 			check(faster > speed, "by running faster: " + faster + " against " + speed);
 			// a new setpoint
 			server.runOnServer(srv -> cabinet.apply(srv).cpu().write("LEVEL.SP", 70.0));
@@ -5550,6 +5562,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			put(server, 21, up + 2, z + 3, "minecraft:air");
 			context.waitTicks(160);
 			check(valveAt.apply(fcv) < 0.02, "with no air it should fail shut: " + valveAt.apply(fcv) + " | " + read(server, 21, up, z + 3));
+			check(clientValve.apply(fcv) < 0.02, "and the client should see it shut: " + clientValve.apply(fcv));
 			put(server, 21, up + 2, z + 3, "wildcatter:air_tubing");
 			context.waitTicks(200);
 			check(valveAt.apply(fcv) > 0.5, "air back, it goes back to its signal: " + valveAt.apply(fcv));

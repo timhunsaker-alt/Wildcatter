@@ -6,19 +6,20 @@ import dev.wildcatter.energy.Inspectable;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
-/** The contacts and lamps of an {@link OperatorDeviceBlock}. Lamps and horns go dark when the PLC stops commanding them. */
-public class OperatorDeviceBlockEntity extends BlockEntity implements ControlDevice, Inspectable {
+/**
+ * The contacts and lamps of an {@link OperatorDeviceBlock}. Lamps and horns go dark when the PLC stops commanding them. A horn sounds its
+ * own loop (a diaphragm horn's steady blast) for as long as its output is on, carried to the client by its LAMPS state.
+ */
+public class OperatorDeviceBlockEntity extends BlockEntity implements ControlDevice, Inspectable, dev.wildcatter.kinetic.Sounding {
 	/** A click holds a pushbutton in for this long, as a hand does. */
 	private static final int PRESS_TICKS = 10;
-	private static final int HORN_EVERY = 20;
 	private boolean latched;
 	private int pressed;
 	private final boolean[] outputs = new boolean[3];
@@ -119,11 +120,36 @@ public class OperatorDeviceBlockEntity extends BlockEntity implements ControlDev
 		if (device.pressed > 0) {
 			device.pressed--;
 		}
-		if (device.kind() == OperatorDeviceBlock.Kind.HORN && device.output(0, now) && now % HORN_EVERY == 0) {
-			level.playSound(null, pos, SoundEvents.NOTE_BLOCK_DIDGERIDOO.value(), SoundSource.BLOCKS, 1.5F, 1.0F);
-		}
 		if (state.getValue(OperatorDeviceBlock.LAMPS) != lamps) {
 			level.setBlock(pos, state.setValue(OperatorDeviceBlock.LAMPS, lamps), 3);
+		}
+	}
+
+	/** Whether a horn is sounding: its output is on. Read on both sides from the LAMPS state the server sets. */
+	public boolean sounding() {
+		return kind() == OperatorDeviceBlock.Kind.HORN && getBlockState().getValue(OperatorDeviceBlock.LAMPS) != 0;
+	}
+
+	@Override
+	public SoundEvent loop() {
+		return sounding() ? dev.wildcatter.WildcatterSounds.HORN : null;
+	}
+
+	@Override
+	public float soundPitch() {
+		return 1.0F;
+	}
+
+	/** A 100 dB horn: full volume, heard well past the machines it warns of. */
+	@Override
+	public float soundVolume() {
+		return sounding() ? 1.5F : 0;
+	}
+
+	/** Client side: keeps a sounding horn's loop going. */
+	public static void clientTick(Level level, BlockPos pos, BlockState state, OperatorDeviceBlockEntity device) {
+		if (level.getGameTime() % 5 == 0 && device.sounding()) {
+			dev.wildcatter.kinetic.Sounding.Hook.start.accept(device);
 		}
 	}
 

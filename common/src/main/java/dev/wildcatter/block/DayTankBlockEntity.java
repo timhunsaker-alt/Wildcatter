@@ -15,10 +15,19 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
-/** Water in, through a pump's pipes; water out through each valve touching it, with the valve's opening and the square root of the head. */
+/**
+ * Water in, through a pump's pipes; water out through each valve touching it, with the valve's opening and the square root of the head.
+ * Its level goes to the client, which draws it in the tank's sight glass (DayTankRenderer).
+ */
 public class DayTankBlockEntity extends BlockEntity implements WaterUser, Inspectable, Measurable {
+	/** The client is told when the level has moved this far (a 2 L step of the 1,000 L tank) since it was last told. */
+	private static final double SYNC_STEP = 0.002;
 	private double litres;
 	private double outflow;
+	private double sentLevel = -1;
+	/** Client side: the level drawn, easing toward the level last received, and when it was last drawn (DayTankRenderer). */
+	public double shownLevel = -1;
+	public long shownAt;
 
 	public DayTankBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.DAY_TANK_ENTITY, pos, state);
@@ -54,6 +63,24 @@ public class DayTankBlockEntity extends BlockEntity implements WaterUser, Inspec
 			tank.litres = Math.max(0, tank.litres - tank.outflow / 20);
 			tank.setChanged();
 		}
+		double now = tank.waterLevel();
+		if (Math.abs(now - tank.sentLevel) >= SYNC_STEP || (now != tank.sentLevel && level.getGameTime() % 20 == 0)) {
+			tank.sentLevel = now;
+			level.sendBlockUpdated(pos, state, state, 3);
+		}
+	}
+
+	@Override
+	public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+		return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+	}
+
+	/** Only what the client draws: the water in it. */
+	@Override
+	public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+		net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+		tag.putDouble("litres", litres);
+		return tag;
 	}
 
 	@Override

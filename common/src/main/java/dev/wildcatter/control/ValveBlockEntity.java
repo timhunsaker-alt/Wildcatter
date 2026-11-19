@@ -37,6 +37,10 @@ public class ValveBlockEntity extends BlockEntity implements ControlDevice, Circ
 	private boolean commandClose;
 	private long commandTick = -100;
 	private boolean moving;
+	private double sentPosition = -1;
+	/** Client side: the opening drawn, easing toward the one last received, and when it was last drawn (ValveRenderer). */
+	public double shownPosition = -1;
+	public long shownAt;
 
 	public ValveBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.VALVE_ENTITY, pos, state);
@@ -116,6 +120,24 @@ public class ValveBlockEntity extends BlockEntity implements ControlDevice, Circ
 			}
 			valve.setChanged();
 		}
+		// the client draws the stem or the indicator: tell it every 2 % of travel, and where it stops
+		if (Math.abs(valve.position - valve.sentPosition) >= 0.02 || (!wantsMove && valve.position != valve.sentPosition)) {
+			valve.sentPosition = valve.position;
+			level.sendBlockUpdated(pos, state, state, 3);
+		}
+	}
+
+	@Override
+	public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+		return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+	}
+
+	/** Only what the client draws: how far open it is. */
+	@Override
+	public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+		net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+		tag.putDouble("position", position);
+		return tag;
 	}
 
 	// ---- signals ---------------------------------------------------------------------------------------------------------------------

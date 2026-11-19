@@ -27,6 +27,8 @@ public final class WildcatterSounds {
 	public static final SoundEvent HV_BREAKER = make("hv_breaker");
 	public static final SoundEvent FUSE_POP = make("fuse_pop");
 	public static final SoundEvent FLASHOVER = make("flashover");
+	/** The PLC horn's steady blast, looped while its output is on. */
+	public static final SoundEvent HORN = make("horn");
 
 	private WildcatterSounds() {
 	}

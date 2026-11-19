@@ -118,5 +118,11 @@
       "wildcatter:motor_hum"
     ],
     "subtitle": "subtitles.wildcatter.motor_hum"
+  },
+  "horn": {
+    "sounds": [
+      "wildcatter:horn"
+    ],
+    "subtitle": "subtitles.wildcatter.horn"
   }
 }

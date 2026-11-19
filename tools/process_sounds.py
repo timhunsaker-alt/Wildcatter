@@ -4,7 +4,8 @@
 Usage: python3 tools/process_sounds.py [folder]   (needs numpy and soundfile; the folder defaults to art/sound_source)
 Keep the Ludo sources in art/sound_source/<name>.mp3|wav. Writes common/src/main/resources/assets/wildcatter/sounds/*.ogg and sounds.json.
 One-shots are trimmed of silence and faded at both ends. Loops (docs/kinetics-and-sound.md) are left whole, because Ludo made
-them to loop seamlessly and trimming would put a click in the seam.
+them to loop seamlessly and trimming would put a click in the seam. A source that is a one-shot with a steady middle (CUT_LOOPS)
+is made a loop by cutting that middle out and crossfading its end into its start.
 """
 import json, os, sys
 import numpy as np
@@ -14,13 +15,21 @@ src = sys.argv[1] if len(sys.argv) > 1 else "art/sound_source"
 out = "common/src/main/resources/assets/wildcatter/sounds"
 os.makedirs(out, exist_ok=True)
 ONE_SHOTS = ("turbine_hum", "boiler_hiss", "breaker_trip", "breaker_click", "zap", "structure_formed", "engine_crank", "sync_bang", "disconnect_arc", "hv_breaker", "fuse_pop", "flashover")
-LOOPS = ("diesel_idle", "diesel_load", "gas_engine", "alternator_whine", "fan", "turbine_whine", "burner_roar", "motor_hum")
+LOOPS = ("diesel_idle", "diesel_load", "gas_engine", "alternator_whine", "fan", "turbine_whine", "burner_roar", "motor_hum", "horn")
+# loops cut from a one-shot's steady middle: (start s, end s, crossfade s). The horn: a 2.6 s diaphragm horn blast, steady from 0.4 to 1.9 s.
+CUT_LOOPS = {"horn": (0.5, 1.8, 0.15)}
 for name in ONE_SHOTS + LOOPS:
 	found = [f for f in os.listdir(src) if f.startswith(name + ".")] if os.path.isdir(src) else []
 	if not found:
 		continue   # no source kept for it: the .ogg already in the mod stays
 	data, rate = sf.read(os.path.join(src, found[0]), always_2d=True)
 	mono = data.mean(axis=1)
+	if name in CUT_LOOPS:
+		a, b, x = (int(t * rate) for t in CUT_LOOPS[name])
+		seg = mono[a:b]
+		t = np.linspace(0, np.pi / 2, x)
+		mono = seg[x:].copy()
+		mono[-x:] = seg[-x:] * np.cos(t) + seg[:x] * np.sin(t)   # equal-power: the end runs into the start, so the seam is seamless
 	if name in ONE_SHOTS:
 		loud = np.abs(mono) > 0.01
 		if loud.any():  # trim the silence at both ends

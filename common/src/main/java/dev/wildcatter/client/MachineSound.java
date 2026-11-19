@@ -25,6 +25,12 @@ public class MachineSound extends AbstractTickableSoundInstance {
 		PLAYING.clear();
 	}
 
+	/** Whether a loop is playing for the machine at this cell (for the game test). */
+	public static boolean playingForTest(BlockPos pos) {
+		MachineSound sound = PLAYING.get(pos);
+		return sound != null && !sound.isStopped();
+	}
+
 	private final BlockEntity machine;
 	private final SoundEvent event;
 	private float fade = 0;

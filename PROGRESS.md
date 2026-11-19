@@ -1546,7 +1546,6 @@ sized for a 40-pot line.
   rack's single owner are enforced. The modules are drawn, and ladder jumps, labels, RETURN and FUNCTIONs and FBD wire routing are built.
   - **Still open, appearance and sound:**
     - no drawn HOA position on a device;
-    - the horn borrows a note block sound;
     - the module items borrow `decal_relays` and the control key the trial key, with their recipes proposed;
     - the rack is drawn in the mod's materials, with no new texture and no placeholder.
   - **Still open, the NeoForge screen:** the NeoForge jar has not opened the PLC screen in a world by hand.
@@ -2326,3 +2325,16 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
 - **Tests:** client `dryType` checks the client sees the boiler's valve lifting and the turbine at about a third load; the trailer's 01
   and 06 film the valves and the tower's plume.
 - **Known gaps:** static models keep about 2,300 flush face pairs (decals and item models mostly); they do not flash.
+
+## The PID tank, its valves and the horn, drawn and heard (2026-11-19; branch `w-pid-vis`; decision in `docs/questions/plc-gaps.md`, 12)
+- **The day tank's level in the world:** a sight glass on each side, a steel-framed glass strip with the water standing in it at the
+  tank's level. The server sends the level every 0.2 % of the tank (2 L) it moves; the client eases between updates (`DayTankRenderer`).
+- **The valves move:** the server sends a valve's opening every 2 % of travel and where it stops (`ValveRenderer`).
+  - A control valve is a globe valve on a diaphragm actuator: its yoke is now open, and the stem rises in it as the valve opens, a yellow
+    travel indicator clamped on the stem.
+  - An on-off valve and a motor-operated valve are quarter-turn valves: the indicator on the actuator's top turns 90 degrees, across the
+    pipe and red shut, along it and green open.
+- **The horn's own sound:** a Ludo diaphragm horn, cut to a seamless loop by `tools/process_sounds.py`, playing (subtitled) while the horn's
+  output is on and fading when it drops. The note block didgeridoo is gone.
+- Game test: `plcAnalog` checks the client's tank level and both valves' openings follow the server's, and `plcSfc` that the horn's
+  loop is playing while its output is on and stops when it drops.

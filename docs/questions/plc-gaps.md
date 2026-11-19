@@ -181,8 +181,10 @@ Each has its plan in `plc.md`, "The PLC gap wave", "Planned, not built".
   keyswitch on each device's face.
   - **The question:** is a property on every controllable block (about 40 block classes, Tailings' too) wanted, or a client overlay drawn
     only while the control key is held?
-- **The horn's own sound.** It borrows the note block's didgeridoo.
-  - **The question:** a Ludo sound of a 100 dB industrial motor horn?
+- **The horn's own sound.** ANSWERED (2026-11-19, branch `w-pid-vis`): a Ludo sound of a steady diaphragm horn
+  (`art/sound_source/horn.mp3`, 2.6 s). `tools/process_sounds.py` cuts its steady middle (0.5 to 1.8 s) into a seamless loop with a
+  0.15 s equal-power crossfade; the horn plays it, subtitled "Horn sounds", for as long as its output is on and lets it fade when the
+  output drops, as the machines' running loops do. The didgeridoo is gone.
 - **Module, key and card icons.** The modules still borrow `decal_relays` and the key borrows the trial key.
   - **The question:** Ludo art for nine modules and the key?
 - **The NeoForge screen in a world.** It has not been opened by hand on the NeoForge jar. No client test harness exists for NeoForge.
