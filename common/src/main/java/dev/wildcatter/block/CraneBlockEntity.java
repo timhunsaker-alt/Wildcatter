@@ -60,7 +60,17 @@ import org.jspecify.annotations.Nullable;
  * to any cell of their base. The client draws it from the step it is in.
  */
 public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspectable, BigPartEntity, dev.wildcatter.control.ControlDevice {
-	private final dev.wildcatter.control.Remote remote = new dev.wildcatter.control.Remote(1);
+	private final dev.wildcatter.control.Remote remote = new dev.wildcatter.control.Remote(2);
+	/** A PLC's LIFT START has risen and the crane has not yet looked at it (docs/multiblocks/crane-plc-lift.md). */
+	private boolean liftRequested;
+	/** The lift it is working was started by LIFT START: it holds when a person enters its swing area, and holds again when it ends. */
+	private boolean plcLift;
+	/** The last LIFT START was refused. */
+	private boolean liftRefused;
+	/** Below the base and over the boom head, the swing area's reach up and down, m; and out past the hook (docs/multiblocks/crane-plc-lift.md). */
+	private static final double SWING_MARGIN = 3.0, SWING_BELOW = 2.0, SWING_ABOVE = 2.0;
+	/** The anemometer's 4-20 mA span, m/s. */
+	private static final double WIND_SPAN = 50.0;
 
 	@Override
 	public String deviceName() {
@@ -69,19 +79,45 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 
 	@Override
 	public java.util.List<Point> points() {
-		return java.util.List.of(new Point("RUN ENABLE", true), new Point("CARRYING", false), new Point("AUTO", false));
+		return java.util.List.of(new Point("RUN ENABLE", true), new Point("CARRYING", false), new Point("AUTO", false),
+				new Point("LIFT START", true), new Point("LIFT REFUSED", false), new Point("HOOK LOAD 4-20 mA", false, Signal.MA),
+				new Point("RADIUS 4-20 mA", false, Signal.MA), new Point("WIND 4-20 mA, 0-50 m/s", false, Signal.MA), new Point("AREA CLEAR", false));
 	}
 
 	@Override
 	public boolean readPoint(int point) {
-		return point == 1 ? carrying() : point == 2 && remote.auto();
+		return switch (point) {
+			case 1 -> carrying();
+			case 2 -> remote.auto();
+			case 4 -> liftRefused;
+			case 8 -> areaClear(steps == null ? hookRadius : swingRadius()) == null;
+			default -> false;
+		};
+	}
+
+	@Override
+	public double readMa(int point) {
+		double share = switch (point) {
+			case 5 -> onHook / Math.max(1e-6, chart().capacity(chart().minRadius()));
+			case 6 -> hookRadius / Math.max(1e-6, chart().maxRadius());
+			case 7 -> wind() / WIND_SPAN;
+			default -> -1;
+		};
+		return share < 0 ? 0 : 4 + 16 * Math.max(0, Math.min(1, share));
 	}
 
 	@Override
 	public void commandPoint(int point, boolean on, long gameTime) {
 		if (point == 0) {
 			remote.command(0, on, gameTime);
+		} else if (point == 3 && remote.command(1, on, gameTime)) {
+			liftRequested = true;   // its rising edge, in AUTO
 		}
+	}
+
+	@Override
+	public java.util.Map<BlockPos, String> hoaPositions() {
+		return java.util.Map.of(worldPosition, remote.hoa().name());
 	}
 
 	@Override
@@ -669,7 +705,14 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 
 	// ---- each tick --------------------------------------------------------------------------------------------------------------------
 	public static void tick(Level level, BlockPos pos, BlockState state, CraneBlockEntity crane) {
-		if (!crane.remote.hand() && !crane.remote.on(0, level.getGameTime())) {
+		if (!crane.remote.auto()) {
+			crane.liftRequested = false;
+			crane.plcLift = false;
+		}
+		if (crane.liftRequested && (crane.partner == null || crane.leading)) {
+			crane.startRequested(level);
+		}
+		if (!crane.remote.hand() && !crane.remote.on(0, level.getGameTime()) && !crane.plcLift) {
 			return;   // held where it is: a load stays on the hook
 		}
 		SERVER.add(crane);
@@ -726,6 +769,25 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 			load.setDemand(CraneKind.TOWER_STANDBY_WATTS);
 			return;
 		}
+		if (plcLift && level.getGameTime() % 20 == 0) {
+			String person = areaClear(swingRadius());
+			if (person != null) {
+				status = person + "; holding " + (carried ? "its load on its brakes" : "where it is");
+				personHeld = true;
+				load.setDemand(CraneKind.TOWER_STANDBY_WATTS);
+				stepStart++;
+				return;
+			}
+			if (personHeld) {
+				personHeld = false;
+				sync();
+			}
+		}
+		if (personHeld) {
+			load.setDemand(CraneKind.TOWER_STANDBY_WATTS);
+			stepStart++;
+			return;
+		}
 		String gale = level.getGameTime() % 20 == 0 ? windStop() : null;
 		if (gale == null && other != null && level.getGameTime() % 20 == 0) {
 			gale = other.windStop();
@@ -745,7 +807,7 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 		}
 		LiftCycle.Step st = steps.get(step);
 		burn(st);
-		elapsed += 1 / 20.0;
+		elapsed += speedup / 20.0;   // speedup is 1 but in a game test
 		if (elapsed + 1e-9 >= st.seconds()) {
 			if (finish(level, st)) {
 				next(level, st);
@@ -887,6 +949,7 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 			tandemTonnes = 0;
 			partner = null;
 			status = "between lifts";
+			plcLift = false;   // a PLC's one lift is done: it holds until the next start or RUN ENABLE
 		} else {
 			status = describeStep();
 		}
@@ -976,6 +1039,81 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 				chart().capacity(chart().minRadius()), chart().minRadius());
 		setChanged();
 		sync();
+	}
+
+	// ---- a PLC's lift start (docs/multiblocks/crane-plc-lift.md) ---------------------------------------------------------------------
+	private boolean personHeld;
+
+	/** LIFT START has risen: the crane checks its interlocks, looks for its next lift and starts it, or refuses and says why. */
+	private void startRequested(Level level) {
+		liftRequested = false;
+		if (remote.on(0, level.getGameTime()) || remote.hand()) {
+			return;   // already working its lifts
+		}
+		boolean held = steps != null;   // a lift begun earlier and held when its enable dropped: the start finishes it
+		if (!held) {
+			blockedUntil = 0;
+			findWork();
+			if (steps == null) {
+				refuse(status);
+				return;
+			}
+		}
+		String person = areaClear(swingRadius());
+		if (person != null) {
+			if (!held) {
+				abort("");
+			}
+			refuse(person);
+			return;
+		}
+		plcLift = true;
+		liftRefused = false;
+		setChanged();
+	}
+
+	private void refuse(String why) {
+		liftRefused = true;
+		status = "LIFT REFUSED: " + why;
+		setChanged();
+		sync();
+	}
+
+	/** The swing area's radius for the lift it works: its largest hook radius and the margin. */
+	private double swingRadius() {
+		double most = Math.max(hookRadius, liftRadius);
+		if (steps != null) {
+			for (LiftCycle.Step st : steps) {
+				most = Math.max(most, st.to().radius());
+			}
+		}
+		return most;
+	}
+
+	/** Who stands in the swing area out to {@code radius} plus the margin, in words, or null if no one. */
+	private @Nullable String areaClear(double radius) {
+		if (!(level instanceof net.minecraft.server.level.ServerLevel server)) {
+			return null;
+		}
+		double[] c = centre();
+		double reach = radius + SWING_MARGIN;
+		double bottom = worldPosition.getY() - SWING_BELOW;
+		double top = worldPosition.getY() + kind().headHeight(boom, Math.max(hookRadius, chart().minRadius())) + SWING_ABOVE;
+		for (net.minecraft.server.level.ServerPlayer player : server.players()) {
+			if (player.isSpectator() || !player.isAlive() || player.getY() < bottom || player.getY() > top) {
+				continue;
+			}
+			double d = Math.hypot(player.getX() - c[0], player.getZ() - c[1]);
+			if (d <= reach) {
+				return String.format("SWING AREA NOT CLEAR: a person %.0f m from the slewing centre, inside %.0f m", d, reach);
+			}
+		}
+		return null;
+	}
+
+	/** The last LIFT START was refused (the program's LIFT REFUSED). */
+	public boolean liftRefused() {
+		return liftRefused;
 	}
 
 	// ---- wind, ground and collision (docs/questions/plant-crane-gaps.md, 1 to 3) -----------------------------------------------------
@@ -1279,7 +1417,7 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 		testWind = metresPerSecond;
 	}
 
-	/** For the game test: its travel this many times faster than real. */
+	/** For the game test: its travel and its lift steps this many times faster than real. */
 	public void testSpeedup(double times) {
 		speedup = times;
 		setChanged();
@@ -1381,6 +1519,8 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 	protected void saveAdditional(ValueOutput output) {
 		super.saveAdditional(output);
 		remote.save(output);
+		output.putBoolean("plcLift", plcLift);
+		output.putBoolean("liftRefused", liftRefused);
 		output.putBoolean("grown", grown);
 		output.putInt("boom", boom);
 		output.putDouble("litres", litres);
@@ -1404,6 +1544,8 @@ public class CraneBlockEntity extends BlockEntity implements CircuitPart, Inspec
 	protected void loadAdditional(ValueInput input) {
 		super.loadAdditional(input);
 		remote.load(input);
+		plcLift = input.getBooleanOr("plcLift", false);
+		liftRefused = input.getBooleanOr("liftRefused", false);
 		grown = input.getBooleanOr("grown", false);
 		boom = Math.clamp(input.getIntOr("boom", kind().firstBoom()), 0, kind().booms() - 1);
 		litres = input.getDoubleOr("litres", 0);
