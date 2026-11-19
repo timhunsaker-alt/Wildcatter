@@ -9,7 +9,8 @@
 			"dev.wildcatter.gametest.WildcatterClientGameTest",
 			"dev.wildcatter.gametest.TrailerClientGameTest",
 			"dev.wildcatter.gametest.PlcTrailerClientGameTest",
-			"dev.wildcatter.gametest.PlcShortsClientGameTest"
+			"dev.wildcatter.gametest.PlcShortsClientGameTest",
+			"dev.wildcatter.gametest.Shorts2ClientGameTest"
 		],
 		"main": [
 			"dev.wildcatter.gametest.TestGasSource"
