@@ -63,6 +63,11 @@ public class RectifierBlockEntity extends PlantUnitBlockEntity implements Circui
 	}
 
 	@Override
+	public java.util.Map<BlockPos, String> hoaPositions() {
+		return java.util.Map.of(worldPosition, remote.hoa().name());
+	}
+
+	@Override
 	public String cycleHoa(BlockPos cell) {
 		setChanged();
 		if (level != null) {

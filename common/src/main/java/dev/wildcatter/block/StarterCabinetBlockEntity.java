@@ -176,6 +176,11 @@ public class StarterCabinetBlockEntity extends BlockEntity implements CircuitPar
 	}
 
 	@Override
+	public java.util.Map<BlockPos, String> hoaPositions() {
+		return java.util.Map.of(worldPosition, starter.hoa().name());
+	}
+
+	@Override
 	public String cycleHoa(BlockPos cell) {
 		if (starter.cycleHoa() && level instanceof ServerLevel server) {
 			CircuitManager.markDirty(server);

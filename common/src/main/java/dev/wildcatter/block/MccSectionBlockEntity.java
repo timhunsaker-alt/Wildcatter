@@ -137,6 +137,17 @@ public class MccSectionBlockEntity extends BlockEntity implements CircuitPart, I
 	}
 
 	@Override
+	public java.util.Map<BlockPos, String> hoaPositions() {
+		java.util.Map<BlockPos, String> out = new java.util.LinkedHashMap<>();
+		for (int space = 0; space < SPACES; space++) {
+			if (buckets[space] != null) {
+				out.put(worldPosition.above(space), buckets[space].hoa().name());
+			}
+		}
+		return out;
+	}
+
+	@Override
 	public String cycleHoa(BlockPos cell) {
 		int space = Math.max(0, Math.min(SPACES - 1, cell.getY() - worldPosition.getY()));
 		Starter bucket = buckets[space];

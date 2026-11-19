@@ -106,6 +106,11 @@ public class GensetControlPanelBlockEntity extends BlockEntity implements Circui
 	}
 
 	@Override
+	public java.util.Map<BlockPos, String> hoaPositions() {
+		return java.util.Map.of(worldPosition, remote.hoa().name());
+	}
+
+	@Override
 	public String cycleHoa(BlockPos cell) {
 		setChanged();
 		return remote.cycle();

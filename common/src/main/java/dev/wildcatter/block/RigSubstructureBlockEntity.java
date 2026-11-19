@@ -82,6 +82,11 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 	}
 
 	@Override
+	public java.util.Map<BlockPos, String> hoaPositions() {
+		return java.util.Map.of(worldPosition, remote.hoa().name());
+	}
+
+	@Override
 	public String cycleHoa(BlockPos cell) {
 		setChanged();
 		return remote.cycle();

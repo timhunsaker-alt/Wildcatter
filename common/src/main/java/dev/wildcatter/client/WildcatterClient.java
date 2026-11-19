@@ -39,7 +39,9 @@ public final class WildcatterClient {
 
 	public static void renderers(RendererSink sink) {
 		dev.wildcatter.control.PlcNet.client = tag -> {
-			if (tag.contains("hmi")) {
+			if (tag.contains("hoaView")) {
+				HoaOverlay.fromServer(tag);
+			} else if (tag.contains("hmi")) {
 				HmiScreen.fromServer(tag);
 			} else {
 				PlcScreen.fromServer(tag);
@@ -84,6 +86,7 @@ public final class WildcatterClient {
 		try (var gizmos = client.levelRenderer.collectPerFrameRenderThreadGizmos()) {
 			GhostOutline.draw(client);
 			BlueprintGhost.draw(client);
+			HoaOverlay.draw(client);
 		}
 	}
 

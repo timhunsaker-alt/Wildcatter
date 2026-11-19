@@ -87,6 +87,7 @@ public final class Wildcatter {
 	public static void serverTick(MinecraftServer server) {
 		dev.wildcatter.radiation.RadiationTicker.tick(server);
 		dev.wildcatter.quest.QuestTracker.tick(server);
+		dev.wildcatter.control.HoaView.tick(server);
 	}
 
 	public static void respawned(ServerPlayer player) {

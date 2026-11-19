@@ -78,6 +78,11 @@ public class MotorStarterBlockEntity extends BlockEntity implements CircuitPart,
 	}
 
 	@Override
+	public java.util.Map<BlockPos, String> hoaPositions() {
+		return block().bucket() ? java.util.Map.of() : java.util.Map.of(worldPosition, starter.hoa().name());
+	}
+
+	@Override
 	public String cycleHoa(BlockPos cell) {
 		if (block().bucket()) {
 			return null;

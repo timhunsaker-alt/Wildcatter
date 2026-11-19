@@ -66,6 +66,14 @@ public interface ControlDevice {
 		return deviceName() + " has no range to set";
 	}
 
+	/**
+	 * What each HAND / OFF / AUTO selector of this device reads now, by the cell it belongs to (the control key's overlay, Wave A); empty if
+	 * it has none. Switchgear reads LOCAL and REMOTE.
+	 */
+	default java.util.Map<BlockPos, String> hoaPositions() {
+		return java.util.Map.of();
+	}
+
 	/** Steps the HAND / OFF / AUTO selector of the part of this device at {@code cell}; what it now reads, or null if it has none. */
 	default @Nullable String cycleHoa(BlockPos cell) {
 		return null;

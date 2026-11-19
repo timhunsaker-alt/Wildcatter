@@ -259,6 +259,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("plcSfc")) {
 				plcSfc(context, server);
 			}
+			if (only("hoaOverlay")) {
+				hoaOverlay(context, server);
+			}
 			if (only("plcAnalog")) {
 				plcAnalog(context, server);
 			}
@@ -4926,6 +4929,58 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	}
 
 	/** Phase 13d (docs/multiblocks/plc.md): a conveyor start-up, drawn as a chart with the real mouse, on three real starters and motors standing in for belts. */
+	/**
+	 * Wave A (Tim's answer C18): holding the control key, each HAND / OFF / AUTO selector nearby is drawn over its device. Three motor starters
+	 * set HAND, OFF and AUTO and a 12.47 kV yard breaker (LOCAL); the key in hand shows all four, the key put away none.
+	 */
+	private void hoaOverlay(ClientGameTestContext context, TestServerContext server) {
+		int z = -10400;
+		server.runCommand("tp @p 10 " + (up + 2) + " " + (z + 6) + " 180 25");
+		context.waitTicks(20);
+		server.runCommand("fill 2 " + (y - 1) + " " + (z - 6) + " 20 " + (y + 8) + " " + (z + 8) + " minecraft:air");
+		server.runCommand("fill 2 " + (y - 1) + " " + (z - 6) + " 20 " + (y - 1) + " " + (z + 8) + " minecraft:stone");
+		BlockPos[] starters = {new BlockPos(7, up, z), new BlockPos(9, up, z), new BlockPos(11, up, z)};
+		for (BlockPos at : starters) {
+			put(server, at.getX(), up, z, "wildcatter:motor_starter[facing=south]");
+		}
+		BlockPos yard = new BlockPos(13, up, z - 2);
+		server.runOnServer(srv -> {
+			net.minecraft.world.level.block.state.BlockState state = dev.wildcatter.WildcatterBlocks.DIST_BREAKER_3P.defaultBlockState()
+					.setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING, net.minecraft.core.Direction.NORTH);
+			srv.overworld().setBlock(yard, state, 3);
+			dev.wildcatter.multiblock.BigParts.grow(srv.overworld(), yard, state);
+		});
+		context.waitTicks(10);
+		String set = server.computeOnServer(srv -> {
+			StringBuilder out = new StringBuilder();
+			for (int i = 0; i < starters.length; i++) {
+				dev.wildcatter.control.ControlDevice device = dev.wildcatter.control.ControlNet.deviceAt(srv.overworld(), starters[i]);
+				String now = device.hoaPositions().get(starters[i]);
+				String want = new String[] {"HAND", "OFF", "AUTO"}[i];
+				for (int k = 0; k < 3 && !want.equals(now); k++) {
+					now = device.cycleHoa(starters[i]);
+				}
+				out.append(now).append(' ');
+			}
+			return out.toString().trim();
+		});
+		check(set.equals("HAND OFF AUTO"), "the three starters should be set HAND, OFF and AUTO: " + set);
+		server.runCommand("item replace entity @p weapon.mainhand with minecraft:air");
+		context.waitTicks(30);
+		java.util.List<String> without = context.computeOnClient(client -> dev.wildcatter.client.HoaOverlay.shown());
+		check(without.isEmpty(), "without the key nothing is drawn: " + without);
+		server.runCommand("item replace entity @p weapon.mainhand with wildcatter:control_key");
+		context.waitTicks(30);
+		java.util.List<String> shown = context.computeOnClient(client -> dev.wildcatter.client.HoaOverlay.shown());
+		System.out.println("[wildcatter-test] hoaOverlay with the key: " + shown);
+		check(shown.contains("HAND") && shown.contains("OFF") && shown.contains("AUTO") && shown.contains("LOCAL"), "the key in hand should show each selector: " + shown);
+		context.takeScreenshot("wildcatter-hoa-overlay");
+		server.runCommand("item replace entity @p weapon.mainhand with minecraft:air");
+		context.waitTicks(40);
+		check(context.computeOnClient(client -> dev.wildcatter.client.HoaOverlay.shown()).isEmpty(), "the key put away, the labels go");
+		System.out.println("[wildcatter-test] hoaOverlay ok");
+	}
+
 	private void plcSfc(ClientGameTestContext context, TestServerContext server) {
 		int z = -3200;
 		int bay = z + 14;

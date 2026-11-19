@@ -208,6 +208,11 @@ public class ValveBlockEntity extends BlockEntity implements ControlDevice, Circ
 	}
 
 	@Override
+	public java.util.Map<BlockPos, String> hoaPositions() {
+		return java.util.Map.of(worldPosition, hoa.name());
+	}
+
+	@Override
 	public String cycleHoa(BlockPos cell) {
 		hoa = hoa.next();
 		setChanged();
