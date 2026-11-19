@@ -457,6 +457,11 @@ for tier, glaze in (("lv", (232, 232, 238)), ("dist", (150, 98, 66)), ("hv", (17
 	tex(f"insulator_glaze_{tier}", plain(glaze, 5))
 for key, color in CONDUCTOR_COLORS.items():
 	tex(f"insulator_cap_{key}", plain(color, 4))
+# Wave A art (C23): the Ludo pin, glazes and caps (tools/process_art.py) over the ones just drawn, which are drawn after art/final was
+# copied in; still drawn first, so the noise of every later script texture stays the same
+for _name in ["insulator_pin"] + [f"insulator_glaze_{t}" for t in ("lv", "dist", "hv")] + [f"insulator_cap_{k}" for k in CONDUCTOR_COLORS]:
+	if os.path.exists(f"art/final/{_name}.png"):
+		shutil.copy(f"art/final/{_name}.png", f"{ASSETS}/textures/block/{_name}.png")
 for tier, discs in (("lv", [(3, 5)]), ("dist", [(3, 5), (6, 8)]), ("hv", [(2, 4), (5, 7), (8, 10)])):
 	wide = 5 if tier != "hv" else 4
 	for key in CONDUCTOR_COLORS:
@@ -2649,17 +2654,27 @@ save_json(f"{ASSETS}/items/control_cable.json", {"model": {"type": "minecraft:mo
 big_part_loot_simple("control_cable")
 big_part_loot("plc_cabinet")
 big_part_loot("remote_io_drop")
+def _plc_icon(name, stand_in):
+	"""Wave A art (C23): each module and the key has its own Ludo icon (art/source/ore/, tools/process_art.py); the old stand-in
+	(a decal, the trial key) only while that is missing."""
+	if os.path.exists(f"{ORE_ART}/{name}.png"):
+		shutil.copy(f"{ORE_ART}/{name}.png", f"{ASSETS}/textures/item/ore/{name}.png")
+		_flat_item(name, f"{ns}:item/ore/{name}")
+	else:
+		_flat_item(name, stand_in)
+
+
 for name, icon in (("cpu_small", "decal_controller"), ("cpu_large", "decal_controller"), ("di16_module", "decal_relays"), ("do16_module", "decal_relays")):
-	_flat_item(name, f"{ns}:block/mat/{icon}")
-_flat_item("control_key", "minecraft:item/trial_key")
+	_plc_icon(name, f"{ns}:block/mat/{icon}")
+_plc_icon("control_key", "minecraft:item/trial_key")
 if os.path.exists(f"{ORE_ART}/memory_card.png"):   # the art wave's Ludo icon; vanilla paper's before it
 	shutil.copy(f"{ORE_ART}/memory_card.png", f"{ASSETS}/textures/item/ore/memory_card.png")
 	_flat_item("memory_card", f"{ns}:item/ore/memory_card")
 else:
 	_flat_item("memory_card", "minecraft:item/paper")
-_flat_item("comm_module", f"{ns}:block/mat/decal_controller")
+_plc_icon("comm_module", f"{ns}:block/mat/decal_controller")
 for name, icon in (("ai8_module", "decal_relays"), ("ao4_module", "decal_relays"), ("rtd4_module", "decal_relays"), ("hsc2_module", "decal_controller")):
-	_flat_item(name, f"{ns}:block/mat/{icon}")
+	_plc_icon(name, f"{ns}:block/mat/{icon}")
 # 13e: valves are a body on the pipe's core and arms; an actuator on top says which kind
 _STEEL, _BLUE = f"{ns}:block/mat/mat_galvanized", "minecraft:block/blue_concrete"
 def _valve(name, pipe, actuator, atex):
@@ -3327,6 +3342,27 @@ shaped("dry_type_transformer", ["SWS", "CIC", "SWS"], {"S": f"{ns}:steel_ingot",
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 import subprocess, sys
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)
+
+# ---- Wave A art (2026-11-19, C23): every item icon still drawn as a *_placeholder takes its Ludo icon once art/final/ore has it -----
+# (art/source/ore/<item>.webp through tools/process_art.py's icon()). The placeholders are still drawn where they were, so the noise
+# of every script texture stays the same; the step below then leaves them out. The quest book's model was only in the committed
+# files (a fresh run lost it), so it is written here too.
+if not os.path.exists(f"{ASSETS}/models/item/quest_book.json"):
+	_flat_item("quest_book", f"{ns}:item/quest_book_placeholder")
+	if not os.path.exists(f"{ASSETS}/textures/item/quest_book_placeholder.png"):
+		tex("quest_book_placeholder", lambda img, d: (d.rectangle([3, 1, 12, 14], fill=(120, 70, 40, 255), outline=(60, 34, 20, 255)),
+			d.rectangle([4, 2, 5, 13], fill=(90, 50, 30, 255))), "item")
+import glob
+for _f in sorted(glob.glob(f"{ASSETS}/models/item/*.json")):
+	_m = json.load(open(_f))
+	_layer = _m.get("textures", {}).get("layer0", "")
+	if _layer.startswith(f"{ns}:item/") and _layer.endswith("_placeholder"):
+		_item_name = _layer[len(f"{ns}:item/"):-len("_placeholder")]
+		if os.path.exists(f"{ORE_ART}/{_item_name}.png"):
+			os.makedirs(f"{ASSETS}/textures/item/ore", exist_ok=True)
+			shutil.copy(f"{ORE_ART}/{_item_name}.png", f"{ASSETS}/textures/item/ore/{_item_name}.png")
+			_m["textures"]["layer0"] = f"{ns}:item/ore/{_item_name}"
+			save_json(_f, _m)
 
 # ---- Placeholders the Ludo art has replaced stay out of the jar --------------------------------------------------------
 # A placeholder is drawn before this script knows whether its art exists (and some are drawn only to keep the noise sequence);

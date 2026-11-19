@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "wildcatter:item/u3o8_drum_placeholder"
+    "layer0": "wildcatter:item/ore/u3o8_drum"
   }
 }

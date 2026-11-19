@@ -297,3 +297,89 @@ angle, generic, no brand, game item icon, plain <white | dark grey> background, 
   mesh discs, slightly fanned".
 - `emulsifier_pail` (a): "A single 20 kg white plastic pail with a tight lid and a wire handle, holding emulsifier for explosives, a plain amber
   band label with no writing".
+
+## Wave A art (2026-11-19)
+Tim's answer C23: Ludo art for the remaining script-drawn icons and markers. `createImage`, model klimt, art_style `Photorealistic 3D`,
+2 variations each, the better kept (the letter after each name). Icons are `item-icon` in `art/source/ore/` (through
+`tools/process_art.py`'s `icon()` to 32 px; `tools/make_assets.py` points every item model still on `<item>_placeholder` at
+`item/ore/<item>` once the icon exists, and the PLC modules and the key off `decal_relays` / `decal_controller` / the trial key). Block
+materials are `texture` in `art/source/`.
+
+Bulk bags, each its own 1 t FIBC with a printed product label: "A single full white woven polypropylene FIBC bulk bag (one tonne super
+sack) with four lifting loops, a broad <band> printed band and a plain white printed product label panel on its front, top spout open
+showing <contents>, standing upright, generic, no brand, game item icon, plain dark grey background, no readable text":
+
+| Item | Band | Contents |
+|---|---|---|
+| bessemer_matte_bag (a) | red | granular dark grey metallic nickel-copper matte |
+| nickel_cathode_bag (b) | orange | small square cut pieces of bright silvery nickel cathode metal |
+| ferrochrome_bag (a) | navy blue | lumpy crushed silver-grey ferrochrome alloy pieces |
+| ferromanganese_bag (a) | maroon | lumpy crushed dark brownish-grey ferromanganese alloy pieces |
+| ferrosilicon_bag (b) | light sky blue | lumpy light silver-grey ferrosilicon alloy pieces |
+| ferromolybdenum_bag (a) | teal | angular crushed grey ferromolybdenum alloy lumps |
+| ferrotungsten_bag (b) | black | dense dark steel-grey ferrotungsten alloy lumps |
+| moly_oxide_bag (b) | olive green | fine pale yellow-green molybdenum oxide powder |
+| scheelite_concentrate_bag (a) | tan | fine cream-coloured scheelite mineral concentrate sand |
+| dap_bag (a) | green | round brown-grey diammonium phosphate fertilizer granules |
+| tsp_bag (a) | grey | round pale grey triple superphosphate fertilizer granules |
+| mop_bag (b) | pink | reddish-pink granular muriate of potash crystals |
+| li2co3_bag (a) | light purple | fine bright white lithium carbonate powder |
+| lioh_bag (a) | magenta | white crystalline lithium hydroxide powder |
+| sodium_sulfate_bag (a) | yellow | white granular sodium sulfate crystals |
+| dolime_bag (a) | beige | off-white burnt dolomite lime pebbles |
+| synthetic_fluorspar (a) | cyan | fine pale lilac-white calcium fluoride powder |
+| ti_slag_bag (a) | dark red | glassy black crushed titanium slag granules |
+| tio2_pigment_bag (b) | lime green | brilliant pure white titanium dioxide pigment powder |
+
+The other items, "..., generic, no brand, game item icon, plain <white | dark grey> background, no text":
+
+| File | Prompt |
+|---|---|
+| chromic_oxide (a) | A single 25 kg multiwall brown kraft paper sack with its top folded open showing fine dark green chromium oxide pigment powder, a plain white printed label with no readable text, standing upright (dark grey) |
+| fumed_silica (a) | A single 25 kg white multiwall paper sack, plump and light, its top folded open showing very fluffy fine white fumed silica powder, a plain blue printed band with no writing, standing upright (dark grey) |
+| zinc_stearate (a) | A single small 5 kg white paper sack with its top folded open showing soft fine white zinc stearate powder, a plain grey printed band with no writing, standing upright (dark grey) |
+| u3o8_drum (a) | A single sealed black-painted steel 55-gallon drum with a bolted ring lid, holding uranium ore concentrate, a small yellow and black radiation trefoil label and a plain white label with no writing, seen at a slight angle (white) |
+| extractant_drum (a) | A single closed blue steel 200 litre chemical drum with two small bung caps on its top, holding an oily organic solvent extractant, a plain white hazard label with no writing, seen at a slight angle (white) |
+| hfcl4_drum (a) | A single closed plain grey steel drum with a bolted ring lid, holding white hafnium tetrachloride powder, a small black and white corrosive hazard diamond label, seen at a slight angle (white) |
+| fluorinator_ash_drum (a) | A single closed dark grey steel drum with a bolted ring lid, holding grey ash from a uranium fluorination reactor, a small yellow and black radiation trefoil label, dusty, seen at a slight angle (white) |
+| uo2_scrap_can (a) | A single small cylindrical stainless steel can with a clamped lid set slightly ajar, holding broken black uranium dioxide fuel pellet fragments and chips, seen at an angle (white) |
+| chromium_metal (b) | A small heap of bright silvery electrolytic chromium metal flakes and chips with a bluish mirror sheen (dark grey) |
+| decon_washer (b) | A single portable electric high-pressure washer on two small wheels, yellow and grey plastic body with a handle, a coiled black high-pressure hose and a long steel spray lance with a trigger gun (white) |
+| dry_storage_canister (a) | A single tall empty stainless steel spent nuclear fuel dry storage canister, a plain welded cylinder with a thick flat lid and lifting lugs on top, brushed metal, standing upright (white) |
+| guy_strand (a) | A single neat coil of galvanized seven-wire steel guy strand cable, dull silver zinc-coated twisted wires, tied with wire at two points, seen at an angle (dark grey) |
+| hafnium_rcca (b) | A single nuclear reactor rod cluster control assembly: a small stainless steel spider hub with radial vanes on top holding many long thin parallel dark silver-grey hafnium rods hanging below it, lying diagonally (white) |
+| hafnium_rodlet (a) | A single long thin solid hafnium metal rod, dull dark silver-grey with a faint satin sheen and a rounded end, lying diagonally (white) |
+| ilmenite (a) | A small heap of ilmenite mineral sand concentrate, heavy black glossy fine grains (white) |
+| rutile (a) | A small heap of rutile mineral sand concentrate, reddish-brown to rust coloured fine grains with a slight metallic lustre (white) |
+| magnesium_ingot (a) | A single cast magnesium ingot, a trapezoid bar with sloped sides, bright light silver-white metal with a slightly frosted cast top surface, no markings (dark grey) |
+| nickel_chromium_ingot (a) | A single cast nickel-chromium alloy ingot, a small rectangular bar with sloped sides, dull warm grey silver metal with a faint oxide tint, no markings (dark grey) |
+| stainless_304_ingot (b) | A single square stainless steel billet ingot, a short bright satin silver bar with ground faces, one end painted green as a grade colour mark, lying diagonally, no markings (dark grey) |
+| stainless_316_ingot (a) | the same, "one end painted blue" |
+| quest_book (a) | A single closed thick field logbook with a worn dark brown leather cover, brass corner protectors, an elastic strap and a ribbon bookmark, a small blank embossed plate on the cover, seen at an angle (white) |
+| rotor_shard (a) | A single jagged broken shard of a black carbon fibre composite rotor tube, curved, with visible woven carbon fibre texture and frayed splintered edges (white) |
+| zircaloy_scrap (a) | A small heap of zirconium alloy scrap: short cut offcuts of thin dull silver-grey metal tubing and curly machining turnings (dark grey) |
+
+The PLC modules and the key, "..., generic, no brand, game item icon, plain white background, no readable text":
+
+| File | Prompt |
+|---|---|
+| cpu_small (a) | A single compact industrial PLC CPU module for DIN rail mounting, slim dark grey plastic housing seen at an angle from the front, a column of small green and amber status LEDs, a small RUN STOP slide switch, one Ethernet port and a memory card slot behind a little flap |
+| cpu_large (a) | A single large double-width industrial PLC CPU module for rack or DIN rail mounting, dark grey plastic housing seen at an angle from the front, a small backlit monochrome display, rows of status LEDs, a RUN STOP selector, two Ethernet ports and a memory card slot |
+| di16_module (a) | A single slim industrial PLC digital input I/O module for DIN rail, light grey plastic housing seen at an angle from the front, two columns of sixteen tiny green LEDs, a green label strip, and a removable green pluggable screw terminal block with a row of terminals along its front |
+| do16_module (a) | A single slim industrial PLC relay output I/O module for DIN rail, light grey plastic housing ..., sixteen tiny orange LEDs, a translucent window showing small black relays inside, an orange label strip, and a removable black pluggable screw terminal block with a row of terminals |
+| ai8_module (b) | A single slim industrial PLC analog input I/O module for DIN rail, light grey plastic housing ..., eight tiny green channel LEDs, a blue label strip, and a removable grey pluggable screw terminal block with a row of terminals |
+| ao4_module (a) | the same as an analog output module, four LEDs, a red label strip, a short row of terminals |
+| rtd4_module (b) | A single slim industrial PLC RTD temperature input I/O module for DIN rail, light grey plastic housing ..., four tiny green channel LEDs, a white label strip, and a removable green pluggable screw terminal block with a row of terminals |
+| hsc2_module (b) | A single slim industrial PLC high-speed counter I/O module for DIN rail, dark grey plastic housing ..., a few tiny green and yellow LEDs, a yellow label strip, and a removable black pluggable screw terminal block with a row of terminals |
+| comm_module (a) | A single slim industrial PLC communications module for DIN rail, dark grey plastic housing seen at an angle from the front, two RJ45 Ethernet ports with small link LEDs and a 9-pin serial connector |
+| control_key (b) | A single small industrial keyswitch key for a control panel selector switch, a short nickel-plated steel key blade with a round black plastic head, lying diagonally (no text) |
+
+Block materials, `texture`, each "Seamless flat texture, straight-on orthographic view, even lighting: ..., plain, no seams, no text":
+
+| File | Prompt |
+|---|---|
+| mat_paint_flag_red (b) | steel plate painted signal red gloss enamel, smooth and slightly worn with a few tiny scratches (the breaker's CLOSED flag; `tools/process_materials.py`, as `mat_paint_pad_green`) |
+| lever_plastic (a) | smooth off-white moulded thermoset plastic of a circuit breaker handle, faint fine moulding grain and a soft satin sheen. `tools/process_art.py` dyes it to each marker's colour: `breaker_lever_on` green, `_off` grey, `_tripped` red, and `insulator_cap_<a,b,c,n,g>` in the conductor colours |
+| insulator_glaze_white (b) | glossy white glazed porcelain of an electrical insulator, smooth glassy glaze with faint crazing and soft highlights (`insulator_glaze_lv`) |
+| insulator_glaze_grey (a) | glossy light grey-green glazed porcelain of a high voltage suspension insulator, smooth glassy glaze with soft highlights (`insulator_glaze_hv`; `insulator_glaze_dist` is the existing `mat_porcelain_brown` source) |
+| insulator_pin (a) | dull dark grey hot-dip galvanized forged steel of an insulator pin, slightly rough zinc coating with faint spangle and weathering |

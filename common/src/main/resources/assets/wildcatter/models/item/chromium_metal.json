@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "wildcatter:item/chromium_metal_placeholder"
+    "layer0": "wildcatter:item/ore/chromium_metal"
   }
 }

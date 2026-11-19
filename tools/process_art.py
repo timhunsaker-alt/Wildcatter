@@ -299,6 +299,37 @@ if os.path.exists(f"{SRC}/cable_sheath.webp"):
 if os.path.exists(f"{SRC}/rotor.webp"):
 	save("rotor", banded(load("rotor"), (230, 190, 40), (15, 16)))
 
+
+# Wave A art (2026-11-19, Tim's C23): the breaker levers and the insulator caps, glaze and pins, from Ludo materials. The levers and
+# caps are state and phase markers, so one Ludo moulded plastic is dyed to the exact colour each had before (lever green ON, grey
+# OFF, red TRIPPED; the caps in their conductor's colour), its grain kept, so they stay readable. Same names as make_assets.py draws.
+def dye(img, color):
+	"""The picture's light and shade, at the colour's mean: each pixel is the colour scaled by its brightness over the mean."""
+	from PIL import ImageStat
+	grey = img.convert("L")
+	mean = max(1.0, ImageStat.Stat(grey).mean[0])
+	gp = grey.load()
+	out = Image.new("RGB", img.size)
+	o = out.load()
+	for x in range(img.width):
+		for y in range(img.height):
+			k = gp[x, y] / mean
+			o[x, y] = tuple(max(0, min(255, int(c * k))) for c in color)
+	return out
+
+
+if os.path.exists(f"{SRC}/lever_plastic.webp"):
+	plastic = load("lever_plastic")
+	for state, color in (("on", (60, 190, 90)), ("off", (120, 120, 126)), ("tripped", (220, 60, 50))):
+		save(f"breaker_lever_{state}", dye(plastic, color))
+	for key, color in CONDUCTOR_COLORS.items():
+		save(f"insulator_cap_{key}", dye(plastic, color))
+if os.path.exists(f"{SRC}/insulator_glaze_white.webp"):
+	save("insulator_glaze_lv", dye(load("insulator_glaze_white"), (232, 232, 238)))
+	save("insulator_glaze_dist", dye(load("mat_porcelain_brown"), (150, 98, 66)))   # the brown porcelain the pole-top insulators use
+	save("insulator_glaze_hv", dye(load("insulator_glaze_grey"), (176, 196, 176)))
+	save("insulator_pin", load("insulator_pin"))
+
 print("art processed:", len(os.listdir(OUT)), "textures")
 
 

@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "wildcatter:item/ti_slag_bag_placeholder"
+    "layer0": "wildcatter:item/ore/ti_slag_bag"
   }
 }
