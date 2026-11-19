@@ -1,5 +1,7 @@
 # Phase 17a, ferroalloys: decisions taken while Tim was away (2026-11-10)
 
+**Accepted by Tim 2026-11-13** ("release without, treat them as accepted"; recorded 2026-11-19): every entry below is accepted as built.
+
 Spec: `docs/multiblocks/ferroalloys.md` (DRAFT, decided on recommendation; its "As built" section lists every number added). The spec's
 own choices are in `docs/questions/specs-wildcatter.md`, items 41-46. Format as in `docs/questions/README.md`. Entries marked
 **(needs you)** change something outside this phase or pick between real options.

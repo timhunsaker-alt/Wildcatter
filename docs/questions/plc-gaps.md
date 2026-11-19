@@ -1,5 +1,7 @@
 # The PLC gap wave: decisions taken while Tim was away (2026-11-09)
 
+**Accepted by Tim 2026-11-19** (blanket B1): entries 1-11 accepted as built; the questions of 12 are answered in 12 (C18-C22).
+
 Tim (2026-11-09): "make decisions best recommendation and complete the rest of these two mods leaving questions for when I get back ...
 close all known gaps". This wave closes the "Not yet" items of Phase 13b to 13h in `docs/multiblocks/plc.md`, where they could be done
 properly. The rest have a plan in `plc.md` ("The PLC gap wave", "Planned, not built") and stay in PROGRESS.md's Known gaps. Format as in

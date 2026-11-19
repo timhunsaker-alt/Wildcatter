@@ -1,5 +1,7 @@
 # Phase 18, phosphate: decisions taken while Tim was away (2026-11-10)
 
+**Accepted by Tim 2026-11-13** ("release without, treat them as accepted"; recorded 2026-11-19): every entry below is accepted as built.
+
 Specs: `docs/multiblocks/fertilizer.md` (18a) and `docs/multiblocks/uranium-from-phosphate.md` (18b), both DRAFT, decided on recommendation
 (`docs/questions/specs-wildcatter.md` items 52-59). Their "As built" sections list every number added. Branch `phase18`. Format as in
 `docs/questions/README.md`. Items marked **(needs Tim)** change what the specs promised or wait on another branch.

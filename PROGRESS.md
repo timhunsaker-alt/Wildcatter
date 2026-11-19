@@ -1458,7 +1458,7 @@ sized for a 40-pot line.
 
 ## Known gaps
 - Phase 21 (the quest book, 2026-11-14): `quest_book_placeholder` (the book's item icon) is drawn by script. The first 480 V three-phase
-  supply comes after the drilling rig that needs it (`docs/questions/phase21-quests.md`, 10, for Tim). Wells, the rig and the lease are
+  supply now comes from the 75 kVA dry-type step-up (Tim's answer 10, 2026-11-14). Wells, the rig and the lease are
   found by their items, not by milestones. Tailings' and Farmings' chapters come in their own releases.
 - Phase 20c (lithium, 2026-11-12): `lioh_bag_placeholder`, `sodium_sulfate_bag_placeholder` and `li2co3_bag_placeholder` (item icons) are
   drawn by script; the five parts use the mod's materials. The carbonator takes LiOH bags, not solution; the pot takes its lithium from its
@@ -1516,7 +1516,6 @@ sized for a 40-pot line.
   `u3o8_drum_placeholder` (16a), `fluorinator_ash_drum_placeholder`, `synthetic_fluorspar_placeholder` (16b1). The chlor-alkali cell on
   potash has no scene (16b1). (A fuel assembly stood up as a block keeps its assay since 2026-11-10, Tim's answer 21.) The producer's CO2
   factor is unit-tested, not run in a scene (16d1). Not built in 16a: uranyl peroxide precipitation, ammonia recovery, ASTM C967 impurity penalties.
-  16b2, 16c2 and 16d2 are planned in ROADMAP, not built.
 - Phase 14 (the ammonia plant): the `gauze_pack` and `emulsifier_pail` icons are Ludo art since the art wave (2026-11-09); no
   placeholder is left. The six parts use the mod's materials. Not built: the ammonia leak hazard, AN solution setting in a cold
   pipe, an IBC for matrix, a PGM refinery (a gauze pack is crafted straight from platinum reef ore and a worn pack is not recovered),
@@ -1533,7 +1532,7 @@ sized for a 40-pot line.
   the accumulator's hydraulic line drawn as pipe, lightning and running engines without a spark arrestor as a blowout's ignition, SICP
   and a choke schedule, oil-based muds, lost circulation and the fracture gradient, Frasch sulfur, brine wells and storage caverns in the
   salt. The relief well's kill is in code with no game test; the PLC's SHUT IN command and the 4-20 mA mud weight and pit volume are wired
-  but only KICK is read in a scene. Plain water now drills at half rate (LOW GEL) in every world (decision 13 for Tim). Grid domes in
+  but only KICK is read in a scene. Plain water now drills at half rate (LOW GEL) in every world (decision 13, accepted by Tim 2026-11-13). Grid domes in
   chunks generated before 15a have their oil but no salt; old domes keep no oil. The client scenes `ores` and `landRig` were changed for
   15a and 15b2 and not run; no Phase 15 scene was filmed or screenshotted. See `docs/questions/phase15-oilfield.md`.
 - Art (2026-11-09 art wave): no `*_placeholder` texture is left in the jar. Every placeholder named here before now has Ludo art

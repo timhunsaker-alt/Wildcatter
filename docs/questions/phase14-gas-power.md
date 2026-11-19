@@ -1,5 +1,7 @@
 # Phase 14b-14e, gas and power quick wins: decisions taken while Tim was away (2026-11-09)
 
+**Accepted by Tim 2026-11-19** (blanket B2): entries 1-19 accepted as built (12 also answered as C1, below; 20 was answered earlier).
+
 Tim (2026-11-09): "make decisions best recommendation and complete the rest of these two mods leaving questions for when I get back ...
 lets get all ideas done or planned out". Specs: `docs/multiblocks/sales-gas.md` (14b), `docs/multiblocks/acid-plant-steam.md` (14c),
 `docs/biogas.md` (14d), `docs/mekanism-check.md` (14e, still a plan). The spec-level choices are items 1-13 of
@@ -72,6 +74,7 @@ lets get all ideas done or planned out". Specs: `docs/multiblocks/sales-gas.md` 
 - **Alternatives:** split the fan motor into two.
 
 ### 12. A machine closing onto a bus behind a delta-wye transformer (solver)
+- **Answered by Tim 2026-11-19 (C1): kept as built**, snap to the nearest 30 degrees.
 - **Chosen:** when a generator or genset closes onto a live bus, it takes the bus's phase angle **to the nearest 30 degrees** as its own
   frame (`Synchronizer.angle`, saved). A machine with no delta-wye transformer between it and the others stays at 0 and shares load
   exactly as before.

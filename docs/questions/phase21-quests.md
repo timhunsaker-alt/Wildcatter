@@ -132,6 +132,7 @@ those answers.
 ## Tim's answers of 2026-11-14: the dry-type step-up and the oilfield milestones
 
 ### 16. The dry-type is grounded wye on both sides
+- **Accepted by Tim 2026-11-19** (B3).
 - **Decided on recommendation; for Tim.**
 - **Chosen:** `TransformerBlock.threePhase` (no delta), as the pad-mounts, LOW tier to INDUSTRIAL tier.
 - **Why:** a real general-purpose unit is 480 V delta to 208Y/120 V; reverse-fed, its 480 V side would be an ungrounded delta. The rig and
@@ -147,6 +148,7 @@ those answers.
   firebox boilers.
 
 ### 18. The oil well asks for the pumpjack running, not for a wellhead and a pumpjack
+- **Accepted by Tim 2026-11-19** (B3). `well_struck` stays one key for oil or gas.
 - **Decided on recommendation; for Tim.**
 - **Chosen:** "An oil well": `pumpjack_running` alone. "A gas well": `well_struck` and 16 steel pipe. The rig keeps its item tasks
   (two pistons and the rig) and now needs "Step up to 480 V".
@@ -156,18 +158,21 @@ those answers.
 - **Alternatives:** a separate `gas_struck` key; keep the pumpjack as an item task as well.
 
 ### 19. Where the milestones fire
+- **Accepted by Tim 2026-11-19** (B3). `well_struck` stays one key for oil or gas.
 - **Decided on recommendation; for Tim.**
 - **Chosen:** `pumpjack_running` in the pumpjack's well tick, on each lift (its motor running and fluid coming up); `well_struck` in the
   small rig's strike and the land rig's strike, both for oil and gas. A dry hole, a too-deep stop and an ISR well do not fire it.
 - **Why:** the places that already know; the 5 s limit per position keeps it cheap.
 
 ### 20. The client screenshot builds the plant by command
+- **Accepted by Tim 2026-11-19** (B3).
 - **Decided on recommendation; for Tim.**
 - **Chosen:** `dryType` in the client test builds the plant (now one firebox set, after decision 17's answer) on a platform 40 blocks up
   (so the rig has rock to drill), the player standing on the ground below while it warms up, then on the platform for the two shots.
 - **Why:** a player left in the air falls and dies, and a dead player ticks nothing, so the fireboxes never lit.
 
 ### 21. What "fired" means, and the impedance that goes with the rating
+- **Accepted by Tim 2026-11-19** (B3).
 - **Decided on recommendation; for Tim.**
 - **Chosen:** a turbine is rated 90 kW when any boiler it touches stands on a firebox, lit or not (the nameplate is what is built). Its
   internal resistance scales with the rating (0.5 ohm x 2 kW / 90 kW), the same per-unit impedance, so the bigger set sags no more at
@@ -177,4 +182,5 @@ those answers.
   load makes the same power from the same steam, sags less and burns less fuel.
 - **Known gap, for Tim:** water is still 20 steam a unit, so at full load a firebox boiler empties in about 45 s without a drain and a
   pump; this was always true per steam but no set could draw that much before.
+- **Answered by Tim 2026-11-19 (C3): kept as built.** A firebox boiler at 90 kW empties in about 45 s; a feed pump is required.
 

@@ -342,7 +342,7 @@ Spec: `docs/multiblocks/ammonia-plant.md` (approved 2026-11-09; "As built" lists
   product in kg for Tailings' emulsion truck). Boosters and detonators stay in Tailings (vanilla TNT, Tim's decision).
 - NeoForge scenes `ammonia_loop`, `nitric_acid`, `an_emulsion`; unit test `AmmoniaPlantTest`. Client scene `ammoniaPlant` (filmed, passes).
 
-### Phase 14b-14e — Gas and power quick wins — 14b-14d BUILT 2026-11-09 (while Tim was away, on the DRAFT specs decided on recommendation; not approved)
+### Phase 14b-14e — Gas and power quick wins — 14b-14d BUILT 2026-11-09 (while Tim was away, on the DRAFT specs decided on recommendation; accepted by Tim 2026-11-19)
 The ammonia plant above is **14a**. The plan (`docs/ideas-plan.md`) called these 14a-14d; they are renumbered 14b-14e because Phase 14
 was already the ammonia plant. Decisions for Tim: `docs/questions/specs-wildcatter.md` items 1-13 and `docs/questions/phase14-gas-power.md`.
 - **14b, the sales line** (`docs/multiblocks/sales-gas.md`, BUILT): an off-map transmission line per dimension with a saved account; receipt
@@ -358,7 +358,7 @@ was already the ammonia plant. Decisions for Tim: `docs/questions/specs-wildcatt
   scene `biogas` (written, to be filmed).
 - **14e, the Mekanism check** (`docs/mekanism-check.md`): a plan, blocked until Mekanism for 26.3 is released.
 
-## Phase 15 — The oilfield — BUILT 2026-11-09 (while Tim was away, on the DRAFT specs decided on recommendation; not approved)
+## Phase 15 — The oilfield — DONE, BUILT 2026-11-09 (while Tim was away, on the DRAFT specs decided on recommendation; accepted by Tim 2026-11-13)
 Decisions for Tim: `docs/questions/specs-wildcatter.md` items 14-22 and `docs/questions/phase15-oilfield.md` (25 entries). Branch `phase15`.
 - **15a, salt domes** (`docs/salt-dome-oil.md`, BUILT): domes on a seed grid with flank fields and caprock pools; a mound; the seismograph
   reads SALT DOME. NeoForge scene `salt_dome`; unit test `SaltDomeTest`.
@@ -428,7 +428,7 @@ Decisions for Tim: `docs/questions/plc-gaps.md` (12 entries). Spec updated: `doc
   - process models (pipe pressure, drum pressure, a turbine's load setpoint, dampers, vibration, CT and PT voltage);
   - the crane's lift start.
 
-## Phase 16 — Uranium routes and plant operations — 16a, 16b1, 16c1, 16d1 BUILT 2026-11-10; 16b2, 16c2, 16d2 BUILT 2026-11-12 (built while Tim was away, on the DRAFT specs decided on recommendation; not approved; 16b2, 16c2, 16d2 decisions accepted by Tim 2026-11-13)
+## Phase 16 — Uranium routes and plant operations — 16a, 16b1, 16c1, 16d1 BUILT 2026-11-10; 16b2, 16c2, 16d2 BUILT 2026-11-12 (built while Tim was away, on the DRAFT specs decided on recommendation; all accepted by Tim 2026-11-13)
 Plan: `docs/ideas-plan.md`, Phase 16. Branch `phase16`. Decisions for Tim: `docs/questions/phase16-uranium.md` (numbered across the waves).
 Rule: nothing changes or slows what an existing world already does; anything that would alter a plant already built is behind a
 default-off setting or waits until the player adds the new part.
@@ -466,7 +466,7 @@ default-off setting or waits until the player adds the new part.
   cells run by hook. A fuel assembly stood up as a block keeps its assay since 2026-11-10 (answer 21); the cascade scene drives its machines by hook. The producer's CO2 factor is unit-tested only (16d1). The calciner uses the mod's materials. Not built: uranyl peroxide
   precipitation, ammonia recovery from the off-gas and barren liquor, ASTM C967 impurity penalties.
 
-## Phase 17a — Ferroalloys — BUILT 2026-11-10 (while Tim was away, on the DRAFT spec decided on recommendation; not approved)
+## Phase 17a — Ferroalloys — DONE, BUILT 2026-11-10 (while Tim was away, on the DRAFT spec decided on recommendation; accepted by Tim 2026-11-13)
 Spec: `docs/multiblocks/ferroalloys.md` ("As built"). Decisions for Tim: `docs/questions/phase17-ferroalloys.md`. Branch `phase17`.
 - The 10 MVA furnace transformer and the submerged arc furnace: 8 MW at PF 0.80 on the distribution tier, HC ferrochrome, HC
   ferromanganese and ferrosilicon 75 in 1 t bags; taps, paste, freezing, PLC points.
@@ -504,7 +504,7 @@ Spec: `docs/multiblocks/nickel-smelter.md` ("As built"). Decisions for Tim: `doc
   low-nitrogen finish) and no Alloy 718 (no niobium); the nickel furnace runs at the transformer's PF
   0.80 (question 4); copper refining, cobalt metal, precious metals, flash smelting and the Mond process are not built (the spec).
 
-## Phase 18 — Phosphate — 18a BUILT, 18b first cycle BUILT 2026-11-10 (while Tim was away, on the DRAFT specs decided on recommendation; not approved)
+## Phase 18 — Phosphate — 18a BUILT, 18b first cycle BUILT 2026-11-10 (while Tim was away, on the DRAFT specs decided on recommendation; accepted by Tim 2026-11-13)
 Specs: `docs/multiblocks/fertilizer.md`, `docs/multiblocks/uranium-from-phosphate.md` ("As built" in each). Decisions for Tim:
 `docs/questions/phase18-phosphate.md` (22; items 3, 15, 17 and 19 need Tim). Branch `phase18`.
 - **18a, fertilizer:** a wet ball mill (200 kW, 4.16 kV), the dihydrate phosphoric reactor with its tilting pan filter (250 kW, 4.16 kV):
@@ -523,7 +523,7 @@ Specs: `docs/multiblocks/fertilizer.md`, `docs/multiblocks/uranium-from-phosphat
 - **Known gaps:** the bag and extractant drum icons are `*_placeholder`; Farmings does not read `c:fertilizers` yet; the
   filter acid's uranium is worked out from the rock's grade, not carried as an assay.
 
-## Phase 19 — Reactor and fuel extensions — 19a and 19b BUILT 2026-11-10, 19d BUILT 2026-11-12 (while Tim was away, on the DRAFT spec decided on recommendation; not approved; 19c and 19d decisions accepted by Tim 2026-11-13)
+## Phase 19 — Reactor and fuel extensions — 19a and 19b BUILT 2026-11-10, 19d BUILT 2026-11-12 (while Tim was away, on the DRAFT spec decided on recommendation; 19a and 19b accepted by Tim 2026-11-13, as were the 19c and 19d decisions)
 Spec: `docs/multiblocks/reactor-extensions.md` ("As built"); plan: `docs/ideas-plan.md`, Phase 19. Decisions for Tim:
 `docs/questions/phase19-reactor.md`. Branch `phase19`. **The rule for existing worlds:** every rule that changes what a reactor already
 does was a key in `config/wildcatter.properties`, off by default; since 2026-11-10 they are world rules, on in new worlds except
@@ -606,7 +606,7 @@ Plan: `docs/ideas-plan.md`, Phase 20. Decisions for Tim: `docs/questions/phase20
   and lithium carbonator, 0.5 t of LiOH.H2O an hour with sodium sulfate bags; a lithium carbonate bag in a potline pot's hopper runs it
   0.1 V lower. NeoForge scene `lithium`; unit test `LithiumTest`; client screenshots `lithium`.
 
-## Phase 21 — Quest book — CURRENT (Tim, 2026-11-14: "a quest style guide system that takes us from punching trees to nuclear power", with Tailings and Farmings in it)
+## Phase 21 — Quest book — DONE (released in 0.8.0; Tim, 2026-11-14: "a quest style guide system that takes us from punching trees to nuclear power", with Tailings and Farmings in it)
 Plan approved 2026-11-14. Spec: `docs/quests.md`. Decisions for Tim: `docs/questions/phase21-quests.md`. Branch `w-quest`.
 - **21.1, the engine:** chapters as data (`data/<namespace>/wildcatter_quests/*.json`, from any mod), item, advancement and milestone
   tasks found by themselves, per-player progress, rewards claimed in the screen, the `wildcatter:quest_book` given once on first join, the
@@ -616,6 +616,17 @@ Plan approved 2026-11-14. Spec: `docs/quests.md`. Decisions for Tim: `docs/quest
 - **21.3, client screenshots** `questBook`.
 - GregTech was looked at: no 26.x release (the only port is unofficial and unfinished), so it is left out; the engine takes any mod's
   item ids, so a chapter can be added if one ships. FTB Quests has no 26.3 build, so the book is Wildcatter's own.
+
+## Wave A — Tim's answers of 2026-11-19 — CURRENT (branch `w-wave-a`; next release 0.9.0)
+Tim's answers C18-C23 (`docs/questions/plc-gaps.md` 12) and the faults short's findings. Decisions: `docs/questions/wave-a.md`.
+- **C18** the HOA position as a client overlay while the control key is held (any controllable block, Tailings' too).
+- **C19** `<chart>.SFC_INIT` and `<chart>.SFC_PAUSE` implicit inputs; transitions stay ST.
+- **C20** the memory card carries retained values; a blank CPU boots from its card at power-up.
+- **C21** a PLC may start a crane lift, behind the interlocks of `docs/multiblocks/crane-plc-lift.md`.
+- **C22** one manual check of the PLC editor on the NeoForge jar.
+- **C23** Ludo art for the remaining script-drawn icons (PLC modules and key, breaker levers, insulator caps, hand-line cubes).
+- The breaker drawn open when it trips, with an arc flash and its sound; the trip held for the relay's operate time so a reclose onto a
+  standing fault is seen. The client `wells` scene fixed.
 
 ## Ideas (not scheduled)
 - **Time scale (Tim, 2026-11-10):** a world setting with presets 1:1, 5:1, 10:1, 20:1 and 50:1 that shortens the long waits (reactor heat-up

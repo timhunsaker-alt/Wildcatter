@@ -13,6 +13,7 @@ in the format of `docs/questions/README.md`. **Nothing here is approved; no code
 ## Sales gas pipeline and meter station (`docs/multiblocks/sales-gas.md`)
 
 ### 1. What "a buyer" is, in a mod with no money
+- **Accepted by Tim 2026-11-19** (B2, built in Phase 14b-14d).
 - **Chosen:** an off-map transmission line, one per dimension, with a world-saved account: receipt stations put pipeline gas in, delivery
   stations anywhere in the dimension take it out, less 2 % kept as compressor fuel.
 - **Why:** it is what an interstate pipeline really is (transport between a receipt point and a delivery point), it gives residue gas a use
@@ -21,17 +22,20 @@ in the format of `docs/questions/README.md`. **Nothing here is approved; no code
   stations and line pack (bigger, and the mod's pipes carry no pressure); a villager trade (money by the back door).
 
 ### 2. One account per world or per player
+- **Accepted by Tim 2026-11-19** (B2, built in Phase 14b-14d).
 - **Chosen:** per dimension (the whole world shares one line).
 - **Why:** simplest; Wildcatter has no teams elsewhere.
 - **Alternatives:** per player or per scoreboard team, so multiplayer players cannot draw each other's gas.
 
 ### 3. Which gas the line accepts
+- **Accepted by Tim 2026-11-19** (B2, built in Phase 14b-14d).
 - **Chosen:** pipeline gas only; separator, compressed and dried gas are refused as OFF SPEC: RICH, wet gas as OFF SPEC: WATER;
   biogas (biogas.md) as OFF SPEC: CO2.
 - **Why:** real tariffs set heating-value, dew-point and water limits, and the 5b gas plant is exactly what meets them.
 - **Alternatives:** accept any dry gas at its heating value.
 
 ### 4. Station rating, retention and battery time
+- **Accepted by Tim 2026-11-19** (B2, built in Phase 14b-14d).
 - **Chosen:** 5 m3/s a station; 2 % retention; 8 game hours on the RTU battery before METER FAILED.
 - **Why:** five gas plants a station is plenty; 2 % is mid-range of real 1-3 % *(unverified)*; a real RTU rides through a short outage.
 - **Alternatives:** no retention; a station that keeps working unpowered.
@@ -39,18 +43,21 @@ in the format of `docs/questions/README.md`. **Nothing here is approved; no code
 ## The acid plant's steam to a turbine (`docs/multiblocks/acid-plant-steam.md`)
 
 ### 5. Reuse the 5 MW turbine, or a new small one
+- **Accepted by Tim 2026-11-19** (B2, built in Phase 14b-14d).
 - **Chosen:** reuse `steam_turbine_5`, `st_generator`, the air-cooled condenser and feed pump at a third of their flow (about 1.6 MW), with
   the turbine island's 13.8/4.16 kV unit auxiliary transformer onto the acid plant's 4.16 kV bus.
 - **Why:** no new turbine parts; Stingray's planned plant gives about the same MW per kg/s of steam.
 - **Alternatives:** a new 2 MW, 4.16 kV turbine-generator (more parts, no transformer needed).
 
 ### 6. Superheat
+- **Accepted by Tim 2026-11-19** (B2, built in Phase 14b-14d).
 - **Chosen:** a new `acid_superheater` part against the converter (real DCDA plants superheat between beds); the turbine needs it and trips
   on LOW STEAM TEMPERATURE without heat.
 - **Why:** condensing turbines need superheat; it is a real distinct part.
 - **Alternatives:** let the turbine run on saturated steam at a derate.
 
 ### 7. The feed pump returns condensate to the waste heat boiler
+- **Accepted by Tim 2026-11-19** (B2, built in Phase 14b-14d).
 - **Chosen:** yes; the boiler's make-up falls to 10 %.
 - **Why:** a closed loop, as the steam plant's.
 - **Alternatives:** keep the water pipe feed and dump the condensate.
@@ -58,21 +65,25 @@ in the format of `docs/questions/README.md`. **Nothing here is approved; no code
 ## Biogas (`docs/biogas.md`)
 
 ### 8. Derate and heat rate
+- **Accepted by Tim 2026-11-19** (B2, built in Phase 14b-14d).
 - **Chosen:** 850 kW on biogas (the CG260-12's 84 %), 11.0 MJ/kWh, so 23 m3 of biogas makes Farmings' 48 kWh.
 - **Why:** a published biogas rating, and it agrees with Farmings' OMAFA figure.
 - **Alternatives:** a pure heating-value derate (none: the engine just burns more gas); a steeper derate.
 
 ### 9. Which machines burn biogas
+- **Accepted by Tim 2026-11-19** (B2, built in Phase 14b-14d).
 - **Chosen:** the gas set and fireboxes; not the steam plant burner, turbines, reformer, dryers or the sales line.
 - **Why:** they already require pipeline gas; real ones need fuel-gas specs biogas does not meet.
 - **Alternatives:** let every gas burner take it at its heating value.
 
 ### 10. The interface for Farmings
+- **Accepted by Tim 2026-11-19** (B2, built in Phase 14b-14d).
 - **Chosen:** Farmings' block entity implements `dev.wildcatter.block.FluidNode` offering `Product.BIOGAS`; added in v0.6.0.
 - **Why:** it is how every Wildcatter source works already, and Wildcatter never calls Farmings.
 - **Alternatives:** a Wildcatter-side "gas inlet" block Farmings fills by its own API.
 
 ### 11. A small biogas set
+- **Accepted by Tim 2026-11-19** (B2, built in Phase 14b-14d).
 - **Chosen:** not in this spec; proposed as a new Idea (a 100-250 kW gas set, as real farm CHP units).
 - **Why:** a 1 MW set idles on 61 m3/h, more than a hundred-cow digester makes; Farmings runs it in bursts from a gas holder.
 - **Alternatives:** add the small set now.

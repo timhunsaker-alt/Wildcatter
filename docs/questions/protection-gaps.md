@@ -1,5 +1,7 @@
 # The protection gap wave: decisions taken while Tim was away (2026-11-09)
 
+**Accepted by Tim 2026-11-19** (blanket B1): every entry below is accepted as built.
+
 Tim (2026-11-09): "make decisions best recommendation and complete the rest of these two mods leaving questions for when I get back ...
 close all known gaps". This wave closes the Known gaps of Phase 10d1, 10d2, 10d3 and Phase 2's distribution. Format as in
 `docs/questions/README.md`.

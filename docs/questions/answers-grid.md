@@ -1,5 +1,7 @@
 # Building Tim's answers 9, 12, 16, 17 and 18 (branch `w-grid`, 2026-11-10)
 
+**Accepted by Tim 2026-11-19** (blanket B3): entries 1-7 accepted as built.
+
 Tim's answers are in Tailings' `docs/questions/answers-2026-11-10.md`. These are the calls taken while building them, for his review.
 The NeoForge scenes are in `GridAnswerScenes`; the client scene `guyWire` films the guy wire, the slurry pipe and the air header.
 

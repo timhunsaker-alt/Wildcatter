@@ -1,5 +1,7 @@
 # Misc gaps wave (2026-11-09): decisions taken while Tim was away
 
+**Accepted by Tim 2026-11-19** (blanket B1): every entry below is accepted as built.
+
 Tim (2026-11-09): "make decisions best recommendation ... close all known gaps". This wave takes the leftover Known gaps of
 PROGRESS.md that need no Tim answer and no Mekanism: the drawing-only gaps of `plant-crane-gaps.md` 15, the coke oven gas engine and
 the aeroderivative (`plant-crane-gaps.md` 7), the cracker test's water, the spool icons and a few small ones. Branch `misc-gaps`.

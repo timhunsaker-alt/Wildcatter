@@ -1,6 +1,6 @@
 # Phase 16, uranium routes and plant operations: decisions taken while Tim was away (2026-11-10)
 
-**Tim accepted every decision below as decided on 2026-11-13** (the 0.7.0 review): items 31-45 (16b2, 16c2, 16d2); items 1-30 were not in that review.
+**Tim accepted every decision below as decided on 2026-11-13** (the 0.7.0 review): items 31-45 (16b2, 16c2, 16d2). Items 1-30 (16a-16d1) were accepted with the 11-13 "release without, treat them as accepted" (recorded 2026-11-19).
 
 Plan: `docs/ideas-plan.md`, Phase 16. Built: **16a** ADU yellowcake, **16b1** conversion's cathode hydrogen, ash bed and KOH, **16c1**
 product assay, spin-up and cooling, **16d1** ISR CO2, the bleed and satellites. Left as written plans: 16b2, 16c2, 16d2 (ROADMAP).

@@ -1,5 +1,7 @@
 # The ammonia plant: decisions taken while Tim was away (2026-11-09)
 
+**Accepted by Tim 2026-11-19** (blanket B1): every entry below is accepted as built.
+
 Spec: `docs/multiblocks/ammonia-plant.md` (approved 2026-11-09; its "As built" section lists every number added). Format as in
 `docs/questions/README.md`.
 

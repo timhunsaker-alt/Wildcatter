@@ -1,5 +1,7 @@
 # Phase 19a and 19b, the reactor extensions (2026-11-10): decisions taken while Tim was away
 
+**Accepted by Tim 2026-11-13** ("release without, treat them as accepted"; recorded 2026-11-19): every entry below (19a and 19b) is accepted as built.
+
 Tim (2026-11-09): "make decisions best recommendation and complete the rest". This wave builds 19a (containment and protection) and
 19b (dry casks, contamination, fresh-fuel inspection) of `docs/multiblocks/reactor-extensions.md`; 19c and 19d stay plans in ROADMAP.
 Branch `phase19`. Format as in `README.md` here. **Needs Tim** marks the entries that wait on him.

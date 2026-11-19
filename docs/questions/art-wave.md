@@ -1,5 +1,7 @@
 # Art wave (2026-11-09): decisions taken while Tim was away
 
+**Accepted by Tim 2026-11-19** (blanket B1): every entry below is accepted as built.
+
 Tim (2026-11-09): "close all known gaps". Every `*_placeholder` texture Wildcatter still used now comes from a Ludo picture
 (`art/source/PROMPTS.md`, "Art wave"). Format as in `README.md` here.
 

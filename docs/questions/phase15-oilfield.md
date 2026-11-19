@@ -1,5 +1,7 @@
 # Phase 15, the oilfield: decisions taken while Tim was away (2026-11-09)
 
+**Accepted by Tim 2026-11-13** ("release without, treat them as accepted"; recorded 2026-11-19): every entry below is accepted as built.
+
 Tim (2026-11-09): "make decisions best recommendation and complete the rest of these two mods leaving questions for when I get back ...
 lets get all ideas done or planned out". Specs: `docs/salt-dome-oil.md` (15a) and `docs/multiblocks/drilling-mud.md` (15b1, 15b2). The
 spec-level choices are items 14-22 of `docs/questions/specs-wildcatter.md`; these are the ones taken while building. Format as in

@@ -1,5 +1,7 @@
 # Plant and crane gaps (2026-11-09): decisions taken while Tim was away
 
+**Accepted by Tim 2026-11-19** (blanket B1): entries 1-10 accepted as built (11 was answered 2026-11-10).
+
 Tim (2026-11-09): "make decisions best recommendation and complete the rest of these two mods leaving questions for when I get back
 ... close all known gaps". This wave takes the Known gaps of the cranes (10c1-10c3), the Bayer, carbon and potline plants (10b1-10b3b)
 and the oilfield and plant leftovers. Format as in `README.md` here. Built on branch `plant-crane-gaps`.
