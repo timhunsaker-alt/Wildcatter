@@ -183,25 +183,34 @@ Each has its plan in `plc.md`, "The PLC gap wave", "Planned, not built".
   keyswitch on each device's face.
   - **The question:** is a property on every controllable block (about 40 block classes, Tailings' too) wanted, or a client overlay drawn
     only while the control key is held?
+  - **Answered by Tim 2026-11-19 (C18): a client overlay while the control key is held.** Built in 558394c4
+    (`ControlDevice.hoaPositions`, `HoaView`, `HoaOverlay`; `docs/questions/wave-a.md`, 1).
 - **The horn's own sound.** ANSWERED (2026-11-19, branch `w-pid-vis`): a Ludo sound of a steady diaphragm horn
   (`art/sound_source/horn.mp3`, 2.6 s). `tools/process_sounds.py` cuts its steady middle (0.5 to 1.8 s) into a seamless loop with a
   0.15 s equal-power crossfade; the horn plays it, subtitled "Horn sounds", for as long as its output is on and lets it fade when the
   output drops, as the machines' running loops do. The didgeridoo is gone.
 - **Module, key and card icons.** The modules still borrow `decal_relays` and the key borrows the trial key.
   - **The question:** Ludo art for nine modules and the key?
+  - **Answered by Tim 2026-11-19 (C23): one Ludo pass, all.** Built in Wave A (see `docs/questions/art-wave.md`, "Wave A").
 - **The NeoForge screen in a world.** It has not been opened by hand on the NeoForge jar. No client test harness exists for NeoForge.
   - **The question:** is a one-time manual check enough, or should a NeoForge client scene be built?
+  - **Answered by Tim 2026-11-19 (C22): one manual check.** Done in Wave A (`docs/questions/wave-a.md`, 5; PROGRESS.md, Wave A).
 - **Ladder and FBD conditions in a chart, macro steps and a chart's safety check.** These need a design for how a transition names a
   rung or network.
   - **The question:** is IEC's "a transition is a ladder rung or FBD network" form wanted, or ST-only conditions kept, as most real
     charts use?
+  - **Answered by Tim 2026-11-19 (C19): ST-only conditions stay.** Nothing to build.
 - **A chart reset and pause.** The plan is `<chart>.SFC_INIT` and `SFC_PAUSE` implicit inputs, as vendors add them.
   - **The question:** these are not in IEC 61131-3. Add them?
+  - **Answered by Tim 2026-11-19 (C19): add them.** Built in 369e5d2b (`docs/questions/wave-a.md`, 2).
 - **The memory card with retained values, and loading itself into a blank CPU at power-up.**
   - **The question:** should a card carry values, and should a blank CPU boot from it, as real ones do?
+  - **Answered by Tim 2026-11-19 (C20): yes, both.** Built in a2046ae9 (`docs/questions/wave-a.md`, 3).
 - **Boiler pressure and three-element drum control, a gas turbine's load setpoint, a steam turbine's own valve.** Each needs a
   process model the plant does not have yet (drum pressure, governor valve). These are larger than a gap.
 - **Pipe pressure, vibration, dampers, CT and PT voltage on a cable, the soft starter's and MCC drive's speed reference.** These carry
   over from 13e and 13f, with plans in plc.md.
 - **A crane's lift start and its hook load and boom readings.**
   - **The question:** may a PLC start a crane lift? A lift is normally a person's job, with a signaller.
+  - **Answered by Tim 2026-11-19 (C21): allow a PLC lift start**, interlocks specified first (`docs/multiblocks/crane-plc-lift.md`).
+    Built in b110c99e (`docs/questions/wave-a.md`, 4).

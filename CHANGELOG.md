@@ -1,5 +1,33 @@
 # Changelog
 
+## v0.9.0 (unreleased): PLC answers, breakers seen opening, the art pass
+
+### PLC (Tim's answers of 2026-11-19)
+- **HAND / OFF / AUTO at a glance:** hold the control key and every selector within 16 blocks shows its position over its device: HAND
+  amber, OFF red, AUTO green (LOCAL and REMOTE on switchgear). Other mods' devices can join through `ControlDevice.hoaPositions()`.
+- **Chart reset and pause:** every SFC chart has `SFC_INIT` (back to its initial steps, actions reset) and `SFC_PAUSE` (stopped where it
+  is). A function block chart takes them from its caller; a program chart declares them with an AT or has them written online.
+- **Memory card:** TO CARD also carries the CPU's RETAIN values, and FROM CARD puts them back by name. A CPU with no program and a card in
+  its door loads the card and starts in RUN when its 24 V supply comes on.
+- **A PLC may start a crane lift:** new crane points LIFT START, LIFT REFUSED, HOOK LOAD, RADIUS and WIND (4-20 mA) and AREA CLEAR. A
+  start needs the crane in AUTO and passes its own interlocks: load chart, reach, slew path, ground, wind, and nobody in its swing area.
+  Existing programs (RUN ENABLE) behave as before; the new points are added after the old ones, so landed signals keep their numbers.
+
+### Breakers and faults
+- The 12.47 kV and 138 kV yard breakers and the metal-clad switchgear show their position flag: red closed, green open.
+- The breaker relay cabinet's instantaneous trip now opens its breaker after the real clearing time (5 cycles) rather than at once, so a
+  reclose onto a fault is seen closing and opening again. Grounding clamps flash each time fault current starts through them.
+
+### Art
+- Ludo art for every remaining script-drawn icon (the ferroalloy, nickel, phosphate, lithium and titanium bags and drums, the zirconium,
+  hafnium and fuel-line items, the quest book, the guy strand), the nine PLC modules and the control key, the breaker levers and the
+  insulator caps. No placeholder texture is left.
+
+### Fixes
+- The client `wells` test reads its gas well while the boiler's steam is being drawn.
+
+Decisions for review: `docs/questions/wave-a.md`. Tim's earlier accepted waves are marked in `docs/questions/`.
+
 ## v0.8.1 (released 2026-11-14): the first 480 V from steam, oilfield milestones
 
 ### Tim's answers to the quest book (2026-11-14)

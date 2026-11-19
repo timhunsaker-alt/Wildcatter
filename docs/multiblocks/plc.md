@@ -421,24 +421,21 @@ Closes the "Not yet" items above that could be done properly. The rest are plann
   - nothing in play welds a contactor, so FAIL_STOP comes only from a test hook.
 
 **Planned, not built** (questions in `docs/questions/plc-gaps.md`, 12):
-- **The selector's position on each device:** a `hoa` block-state property (HAND, OFF, AUTO) drawn as a keyswitch on the face of each
-  controllable device, set by `Remote.cycle`. Or a client overlay while the control key is held.
-- **The horn's sound:** a `wildcatter:horn` sound event from Ludo, a 100 dB motor horn at about 400 Hz, replacing the note block.
-- **Icons:** Ludo art for the nine module items and the control key (`art/source/PROMPTS.md`). The rack renderer could then draw each
-  module's front from its item model.
-- **The NeoForge screen:** one manual check of the PLC screen opening on the NeoForge jar; a NeoForge client scene would need its own
-  harness.
+- ~~**The selector's position on each device**~~: built in Wave A as a client overlay while the control key is held (Tim's C18).
+- ~~**The horn's sound**~~: built 2026-11-19 (`w-pid-vis`).
+- ~~**Icons**~~: Ludo art for the nine modules and the key, Wave A (Tim's C23). The rack still draws its modules in the mod's materials.
+- ~~**The NeoForge screen**~~: checked once by hand in Wave A (Tim's C22: no NeoForge client harness).
 - **SFC (13d):**
-  - ladder or FBD transition conditions (IEC's form: a transition names a rung or network);
+  - ~~ladder or FBD transition conditions~~: not wanted (Tim's C19: ST-only conditions stay);
   - macro steps;
   - an unsafe-chart check (a token stranded or doubled) as a compile warning;
-  - `SFC_INIT` and `SFC_PAUSE` implicit inputs per chart.
-- **The card (13d):** retained values on the card (the CPU's RETAIN area as bytes); a blank CPU loading the card at power-up.
+  - ~~`SFC_INIT` and `SFC_PAUSE` implicit inputs per chart~~: built in Wave A (Tim's C19).
+- ~~**The card (13d)**~~: built in Wave A (Tim's C20), its RETAIN values by name and type rather than as bytes.
 - **PLCopen (13d):** variable comments kept through XML; import with an undo.
 - **The supply's mains draw:** it follows its load (idle 5 W plus the 24 V load at 90 % efficiency). This needs a solver hook for a load
   that changes between rebuilds.
-- **The crane (13g):** a LIFT START point and HOOK LOAD and BOOM ANGLE 4-20 mA readings (`CraneBlockEntity` knows both). This needs
-  a decision on what a PLC may start: a crane lift is a person's job.
+- ~~**The crane (13g)**~~: built in Wave A (Tim's C21: a PLC may start a lift), `docs/multiblocks/crane-plc-lift.md`; RADIUS stands for
+  the boom angle.
 - **Feedwater and a well's choke (13g):** a well choke on a signal; feedwater as a valve in the feed line under a three-element program.
   This waits on drum pressure.
 - **A unit's own flows and temperatures (13g):** a `Measurable` on each of the 43 units, one by one, as the waves reach them.

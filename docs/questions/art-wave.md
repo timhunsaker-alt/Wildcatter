@@ -47,3 +47,25 @@ Tim (2026-11-09): "close all known gaps". Every `*_placeholder` texture Wildcatt
 - The breaker levers (`breaker_lever_*`) and the insulator caps, glaze and pins are small script-drawn textures without the
   `*_placeholder` name, on no gaps list. They are flat colour markers (phase colours, lever states) rather than materials, so they
   were left, and are now listed in PROGRESS.md's Known gaps. Tell us if they should become Ludo art or take the `*_placeholder` name.
+
+## Wave A (2026-11-19, Tim's answer C23: "one Ludo pass, all")
+Built in 4e8f04a7; prompts in `art/source/PROMPTS.md`, "Wave A art (2026-11-19)"; 57 credits (one try per asset).
+
+### 8. Each bulk bag its own Ludo picture
+- **Chosen:** every 1 t bag (the ferroalloys, nickel, phosphate, lithium, titanium and sodium sulfate bags) is its own Ludo FIBC, with a
+  coloured band and a blank label panel, its product showing in the open spout; chromic oxide, fumed silica and zinc stearate are paper
+  sacks; the U3O8 and fluorinator ash drums carry a radiation trefoil, HfCl4 a corrosive diamond; the stainless ingots a green (304)
+  or blue (316) end-paint grade mark.
+- **Why:** Tim asked for the bags to have art of their own rather than the shared bag with a swatch; the band colours keep them apart at
+  32 px, where printed text cannot be read.
+- **Alternatives:** the shared Ludo bag with a printed swatch (as before).
+
+### 9. The breaker levers and insulator caps keep their exact colours
+- **Chosen:** one Ludo moulded-plastic texture dyed to each old colour (lever ON green, OFF grey, TRIPPED red; caps in the A, B, C, N and G
+  conductor colours); the glazes from Ludo glaze textures (the distribution glaze from the brown porcelain); the pin a Ludo galvanized
+  steel. Answers entry 7 above.
+- **Why:** they are markers first: phase and state colours must stay what they were.
+
+### 10. The "hand-line cubes"
+- Nothing in the mod is named so; the insulator caps and ties (done above) are taken to be what was meant. Tell us if it was something else.
+
