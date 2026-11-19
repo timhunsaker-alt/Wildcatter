@@ -397,6 +397,55 @@ public final class Cpu {
 
 	// ---- saving with the world ------------------------------------------------------------------------------------------------------
 
+	/**
+	 * The RETAIN variables' values by name, as a memory card carries them: each tag in memory whose slot is retained, with its type, so a
+	 * card read into a changed project gives back only the variables of the same name and type (as an online change keeps them).
+	 */
+	public record Retained(Map<String, String> types, Map<String, Long> values, Map<String, String> strings) {
+		public int size() {
+			return types.size();
+		}
+	}
+
+	public Retained retained() {
+		Map<String, String> types = new java.util.TreeMap<>();
+		Map<String, Long> values = new java.util.TreeMap<>();
+		Map<String, String> strings = new java.util.TreeMap<>();
+		for (Map.Entry<String, Tag> entry : program.tags().entrySet()) {
+			Tag tag = entry.getValue();
+			if (tag.area() != 0 || tag.slot() < 0 || tag.slot() >= mem.length || !program.retain()[tag.slot()]) {
+				continue;
+			}
+			types.put(entry.getKey(), tag.type().name());
+			values.put(entry.getKey(), mem[tag.slot()]);
+			if (str[tag.slot()] != null) {
+				strings.put(entry.getKey(), str[tag.slot()]);
+			}
+		}
+		return new Retained(types, values, strings);
+	}
+
+	/** A card's retained values into this CPU's RETAIN variables of the same name and type; how many were taken. */
+	public int loadRetained(Retained from) {
+		int taken = 0;
+		for (Map.Entry<String, Tag> entry : program.tags().entrySet()) {
+			Tag tag = entry.getValue();
+			String type = from.types().get(entry.getKey());
+			if (type == null || !type.equals(tag.type().name()) || tag.area() != 0 || !program.retain()[tag.slot()]) {
+				continue;
+			}
+			mem[tag.slot()] = from.values().getOrDefault(entry.getKey(), 0L);
+			if (from.strings().containsKey(entry.getKey())) {
+				str[tag.slot()] = from.strings().get(entry.getKey());
+			}
+			taken++;
+		}
+		if (taken > 0) {
+			log("retained values from the card: " + taken, null, 0);
+		}
+		return taken;
+	}
+
 	/** What a world save has to keep for a CPU, beside its project's source: all memory, as a save is no power cycle. */
 	public record State(long[] mem, String[] str, byte[] markers, byte[] outputImage, byte[] inputField, Mode mode, boolean faulted, long timeMs, long scans, Map<String, String> forced) {
 	}

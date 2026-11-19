@@ -74,6 +74,7 @@ public class WildcatterNeoForgeGameTests {
 		GRID_SCENES.putAll(PlcPlantScenes.scenes());
 		GRID_SCENES.putAll(UraniumScenes.scenes());
 		GRID_SCENES.putAll(GridAnswerScenes.scenes());
+		GRID_SCENES.putAll(WaveAScenes.scenes());
 	}
 
 	/** A stand-in for Tailings' zircon concentrate: in #wildcatter:zircon_feed at 50 kg by this mod's data (GridAnswerScenes.zirconFeed). */

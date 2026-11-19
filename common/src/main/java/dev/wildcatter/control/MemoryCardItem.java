@@ -1,8 +1,11 @@
 package dev.wildcatter.control;
 
+import dev.wildcatter.plc.Cpu;
 import dev.wildcatter.plc.lang.Project;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Consumer;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
@@ -15,7 +18,10 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.TooltipDisplay;
 
-/** A PLC's memory card (docs/multiblocks/plc.md): holds a project, to copy it between cabinets. Seated in a cabinet's door. */
+/**
+ * A PLC's memory card (docs/multiblocks/plc.md): holds a project and the CPU's retained values, to copy them between cabinets. Seated in a
+ * cabinet's door; a blank CPU boots from it at power-up.
+ */
 public class MemoryCardItem extends Item {
 	/** What it holds at most: the bound is what an item's data can carry to every player who sees it, not what a real card holds. */
 	public static final int CAPACITY = 256_000;
@@ -45,6 +51,11 @@ public class MemoryCardItem extends Item {
 
 	/** Writes the project; why not, or null. */
 	public static String write(ItemStack stack, List<Project.Source> project) {
+		return write(stack, project, null);
+	}
+
+	/** Writes the project and, if given, the CPU's retained values (its RETAIN variables, by name); why not, or null. */
+	public static String write(ItemStack stack, List<Project.Source> project, Cpu.Retained retained) {
 		String packed = Project.pack(project);
 		if (packed.length() > CAPACITY) {
 			return "The project is " + packed.length() + " characters, and a card holds " + CAPACITY;
@@ -55,8 +66,43 @@ public class MemoryCardItem extends Item {
 		}
 		CompoundTag tag = new CompoundTag();
 		tag.put("project", pieces);
+		if (retained != null && retained.size() > 0) {
+			CompoundTag values = new CompoundTag();
+			retained.types().forEach((name, type) -> {
+				CompoundTag one = new CompoundTag();
+				one.putString("t", type);
+				one.putLong("v", retained.values().getOrDefault(name, 0L));
+				if (retained.strings().containsKey(name)) {
+					one.putString("s", retained.strings().get(name));
+				}
+				values.put(name, one);
+			});
+			tag.put("retain", values);
+		}
 		stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
 		return null;
+	}
+
+	/** The retained values on the card, or null if it carries none. */
+	public static Cpu.Retained readRetained(ItemStack stack) {
+		CustomData data = stack.get(DataComponents.CUSTOM_DATA);
+		if (data == null) {
+			return null;
+		}
+		CompoundTag values = data.copyTag().getCompoundOrEmpty("retain");
+		if (values.isEmpty()) {
+			return null;
+		}
+		Map<String, String> types = new TreeMap<>();
+		Map<String, Long> longs = new TreeMap<>();
+		Map<String, String> strings = new TreeMap<>();
+		for (String name : values.keySet()) {
+			CompoundTag one = values.getCompoundOrEmpty(name);
+			types.put(name, one.getStringOr("t", ""));
+			longs.put(name, one.getLongOr("v", 0L));
+			one.getString("s").ifPresent(s -> strings.put(name, s));
+		}
+		return new Cpu.Retained(types, longs, strings);
 	}
 
 	public static String describe(ItemStack stack) {
@@ -66,7 +112,9 @@ public class MemoryCardItem extends Item {
 		}
 		List<String> names = new ArrayList<>();
 		project.forEach(unit -> names.add(unit.name()));
-		return project.size() + (project.size() == 1 ? " unit: " : " units: ") + String.join(", ", names);
+		Cpu.Retained retained = readRetained(stack);
+		return project.size() + (project.size() == 1 ? " unit: " : " units: ") + String.join(", ", names)
+				+ (retained == null ? "" : "; " + retained.size() + " retained " + (retained.size() == 1 ? "value" : "values"));
 	}
 
 	@Override

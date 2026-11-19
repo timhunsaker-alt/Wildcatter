@@ -322,7 +322,7 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		if (project.isEmpty()) {
 			return "The cabinet has no project to copy";
 		}
-		String refused = MemoryCardItem.write(card, project);
+		String refused = MemoryCardItem.write(card, project, cpu == null ? null : cpu.retained());
 		railChanged();
 		return refused;
 	}
@@ -332,9 +332,33 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		return card.isEmpty() ? "There is no card in the door" : MemoryCardItem.read(card) == null ? "The card is blank" : null;
 	}
 
-	/** The card's project to the cabinet, as a download is: compiled first, and the CPU left in STOP. The errors, or empty. */
+	/**
+	 * The card's project to the cabinet, as a download is: compiled first, and the CPU left in STOP. Its retained values go into the RETAIN
+	 * variables of the same name and type, and a warm restart keeps them. The errors, or empty.
+	 */
 	public List<String> fromCard() {
-		return download(MemoryCardItem.read(card), false).stream().map(CompileError::toString).toList();
+		List<String> errors = download(MemoryCardItem.read(card), false).stream().map(CompileError::toString).toList();
+		Cpu.Retained retained = MemoryCardItem.readRetained(card);
+		if (errors.isEmpty() && cpu != null && retained != null) {
+			cpu.loadRetained(retained);
+		}
+		return errors;
+	}
+
+	/**
+	 * Power-up with a CPU that holds no project and a card in the door: the CPU loads the card, takes its retained values and starts in RUN,
+	 * as a real CPU set to load from its card at power-up does. True when it booted.
+	 */
+	private boolean bootFromCard() {
+		if (cpuModule == null || !project.isEmpty() || card.isEmpty() || MemoryCardItem.read(card) == null) {
+			return false;
+		}
+		if (!fromCard().isEmpty() || cpu == null) {
+			return false;
+		}
+		cpu.setMode(Cpu.Mode.RUN);
+		railChanged();
+		return true;
 	}
 
 	public ItemStack unseatLast() {
@@ -612,6 +636,9 @@ public class PlcCabinetBlockEntity extends BlockEntity implements Inspectable, B
 		}
 		boolean wasPowered = powered;
 		powered = net.supplyLive();
+		if (powered && !wasPowered && bootFromCard()) {
+			wasPowered = true;
+		}
 		if (cpu != null) {
 			if (powered && !wasPowered) {
 				cpu.powerRestored();
