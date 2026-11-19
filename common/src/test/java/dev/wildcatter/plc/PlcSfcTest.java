@@ -756,4 +756,84 @@ class PlcSfcTest {
 		scans(cpu, 2);
 		assertTrue(valveFlag(cpu, "BAD_LIMIT") && valveFlag(cpu, "FAULT"));
 	}
+
+	@Test
+	void sfcInitHoldsTheChartAtItsInitialStepAndClearsStoredActions() {
+		Sfc chart = chart();
+		chart.declarations = VARS.replace("t0 : TIME;", "t0 : TIME;\n\t\t\t\tSFC_INIT AT %IX0.3 : BOOL;");
+		Sfc.Step s1 = step(chart, "S1", true);
+		Sfc.Step s2 = step(chart, "S2", false);
+		s2.actions.add(new Sfc.Association("S", "out0", ""));
+		s2.actions.add(new Sfc.Association("N", "out1", ""));
+		go(chart, "a", s1, s2);
+		go(chart, "b", s2, s1);
+		Cpu cpu = run(chart);
+		cpu.scan();
+		cpu.setInputBit(0, 0, true);
+		cpu.scan();
+		assertTrue(active(cpu, "S2") && cpu.outputBit(0, 0) && cpu.outputBit(0, 1));
+		cpu.setInputBit(0, 3, true);
+		scans(cpu, 3);
+		assertTrue(active(cpu, "S1") && !active(cpu, "S2"), "held at the initial step");
+		assertFalse(cpu.outputBit(0, 0), "a stored action is cleared");
+		assertFalse(cpu.outputBit(0, 1), "and a step's own action is off");
+		cpu.setInputBit(0, 3, false);
+		cpu.scan();
+		assertTrue(active(cpu, "S2"), "released, it runs again from the initial step");
+		assertTrue(cpu.outputBit(0, 0), "and the stored action can be set again");
+	}
+
+	@Test
+	void sfcPauseStopsTheChartAndItsStepTime() {
+		Sfc chart = chart();
+		Sfc.Step s1 = step(chart, "S1", true);
+		Sfc.Step s2 = step(chart, "S2", false);
+		go(chart, "S1.T >= T#1s", s1, s2);
+		Cpu cpu = run(chart);
+		scans(cpu, 10);
+		assertTrue(cpu.write("MAIN.SFC_PAUSE", true), "a program chart's SFC_PAUSE is its own variable, written online");
+		scans(cpu, 40);
+		assertTrue(active(cpu, "S1"), "paused, two seconds go by without the step moving");
+		long held = ((Number) cpu.read("MAIN.S1.T")).longValue();
+		assertTrue(held >= 400 && held <= 600, "its time stood still: " + held);
+		cpu.write("MAIN.SFC_PAUSE", false);
+		scans(cpu, 8);
+		assertTrue(active(cpu, "S1"), "it picks up where it stopped");
+		scans(cpu, 4);
+		assertTrue(active(cpu, "S2"));
+	}
+
+	@Test
+	void aFunctionBlockChartTakesSfcInitFromItsCaller() {
+		Sfc chart = new Sfc();
+		chart.kind = "FUNCTION_BLOCK";
+		chart.name = "FILL";
+		chart.declarations = "VAR_INPUT go : BOOL; END_VAR\nVAR_OUTPUT busy : BOOL; END_VAR";
+		Sfc.Step idle = step(chart, "IDLE", true);
+		Sfc.Step run = step(chart, "RUN", false);
+		run.actions.add(new Sfc.Association("N", "busy", ""));
+		go(chart, "go", idle, run);
+		go(chart, "NOT go", run, idle);
+		String main = """
+				PROGRAM MAIN
+				VAR
+					f : FILL;
+					a AT %IX0.0 : BOOL;
+					r AT %IX0.1 : BOOL;
+					out0 AT %QX0.0 : BOOL;
+				END_VAR
+				f(go := a, SFC_INIT := r);
+				out0 := f.busy;
+				END_PROGRAM""";
+		PlcCompiler.Result result = PlcCompiler.compile(CpuSpec.SMALL, List.of(new Source("FILL", Language.SFC, chart.write()), new Source("MAIN", Language.ST, main)));
+		assertTrue(result.ok(), () -> "should compile: " + result.errors());
+		Cpu cpu = new Cpu(CpuSpec.SMALL, result.program());
+		cpu.start(Cpu.Restart.COLD);
+		cpu.setInputBit(0, 0, true);
+		scans(cpu, 3);
+		assertTrue(cpu.outputBit(0, 0), "running");
+		cpu.setInputBit(0, 1, true);
+		scans(cpu, 2);
+		assertFalse(cpu.outputBit(0, 0), "reset by its caller, though go still holds");
+	}
 }

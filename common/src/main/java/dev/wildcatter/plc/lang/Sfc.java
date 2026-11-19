@@ -306,10 +306,26 @@ public final class Sfc {
 		}
 	}
 
+	/** The chart's reset: while on, every step is off but the initial ones, every action is reset, and the chart does not move. */
+	public static final String INIT = "SFC_INIT";
+	/** The chart's pause: while on, no transition fires and the active steps' times stand still; outputs hold where they are. */
+	public static final String PAUSE = "SFC_PAUSE";
+
 	/** This chart as a POU of the tree. */
 	Ast.Pou toPou(Ast.Pou header, List<CompileError> errors, String source) {
 		validate(errors, source);
 		List<Ast.VarDecl> vars = new ArrayList<>(header.vars());
+		// SFC_INIT and SFC_PAUSE, as vendors add them (not IEC 61131-3): a chart that declares one itself (with an AT, as VAR_EXTERNAL) keeps
+		// its own; otherwise a function block's are inputs its caller sets, and a program's are its own variables
+		Set<String> declared = new HashSet<>();
+		header.vars().forEach(v -> declared.add(v.name().toUpperCase(Locale.ROOT)));
+		Ast.VarKind implicit = kind.equals("FUNCTION_BLOCK") ? Ast.VarKind.INPUT : Ast.VarKind.VAR;
+		for (String flag : List.of(INIT, PAUSE)) {
+			if (!declared.contains(flag)) {
+				vars.add(new Ast.VarDecl(1, 1, flag, implicit, false, false, null, new Ast.NamedType(1, "BOOL"), null));
+			}
+		}
+		List<Stmt> conditions = new ArrayList<>();
 		List<Stmt> body = new ArrayList<>();
 		for (Step step : steps) {
 			String stepName = upper(step.name);
@@ -331,7 +347,8 @@ public final class Sfc {
 			List<CompileError> found = new ArrayList<>();
 			Expr condition = upper(t.condition).isEmpty() ? new Ast.BoolLit(line, false) : Parser.parseExpression(t.condition, line, found);
 			found.forEach(e -> errors.add(new CompileError(source, line, 1, "condition '" + t.condition + "': " + e.message())));
-			body.add(set(line, name(line, conditionVar), condition == null ? new Ast.BoolLit(line, false) : condition));
+			// the screen shows a condition whether the chart runs, is held or is paused
+			conditions.add(set(line, name(line, conditionVar), condition == null ? new Ast.BoolLit(line, false) : condition));
 			Expr ready = null;
 			for (int id : t.from) {
 				Step before = step(id);
@@ -371,11 +388,22 @@ public final class Sfc {
 		}
 		List<Stmt> start = new ArrayList<>();
 		start.add(set(1, name(1, "__UP"), new Ast.BoolLit(1, true)));
+		List<Stmt> reset = new ArrayList<>();
+		List<Stmt> hold = new ArrayList<>();
 		for (Step step : steps) {
-			if (step.initial && !upper(step.name).isEmpty()) {
-				start.addAll(activate(step.id, upper(step.name)));
+			String stepName = upper(step.name);
+			if (stepName.isEmpty()) {
+				continue;
 			}
+			if (step.initial) {
+				start.addAll(activate(step.id, stepName));
+			}
+			reset.add(set(step.id, member(step.id, stepName, "X"), new Ast.BoolLit(step.id, false)));
+			reset.add(set(step.id, member(step.id, stepName, "T"), new Ast.TimeLit(step.id, 0)));
+			// paused, a step's START follows the clock so its T stands where it was
+			hold.add(when(step.id, member(step.id, stepName, "X"), List.of(set(step.id, member(step.id, stepName, "START"), new Ast.Binary(step.id, "-", now(step.id), member(step.id, stepName, "T"))))));
 		}
+		reset.addAll(start);
 		body.add(when(1, new Ast.Unary(1, "NOT", name(1, "__UP")), start));
 		for (Step step : steps) {
 			String stepName = upper(step.name);
@@ -383,11 +411,13 @@ public final class Sfc {
 				body.add(when(step.id, member(step.id, stepName, "X"), List.of(set(step.id, member(step.id, stepName, "T"), new Ast.Binary(step.id, "-", now(step.id), member(step.id, stepName, "START"))))));
 			}
 		}
-		actions(vars, body, errors, source);
-		return new Ast.Pou(header.line(), header.kind(), header.name(), header.returns(), vars, body);
+		actions(vars, body, reset, errors, source);
+		List<Stmt> all = new ArrayList<>(conditions);
+		all.add(new Ast.If(1, List.of(new Ast.Branch(name(1, INIT), reset), new Ast.Branch(name(1, PAUSE), hold)), body));
+		return new Ast.Pou(header.line(), header.kind(), header.name(), header.returns(), vars, all);
 	}
 
-	private void actions(List<Ast.VarDecl> vars, List<Stmt> body, List<CompileError> errors, String source) {
+	private void actions(List<Ast.VarDecl> vars, List<Stmt> body, List<Stmt> reset, List<CompileError> errors, String source) {
 		Map<String, Map<String, Expr>> inputs = new LinkedHashMap<>();
 		Map<String, String> times = new HashMap<>();
 		Map<String, Integer> lines = new HashMap<>();
@@ -429,6 +459,10 @@ public final class Sfc {
 			vars.add(new Ast.VarDecl(line, 1, control, Ast.VarKind.VAR, false, false, null, new Ast.NamedType(line, "ACTION_CONTROL"), null));
 			List<Ast.Arg> args = new ArrayList<>();
 			in.forEach((pin, value) -> args.add(new Ast.Arg(pin, value, false)));
+			if (!in.containsKey("R")) {
+				// an input keeps its last value: R is driven off again after an SFC_INIT turned it on
+				args.add(new Ast.Arg("R", new Ast.BoolLit(line, false), false));
+			}
 			if (times.containsKey(action)) {
 				List<CompileError> found = new ArrayList<>();
 				Expr time = Parser.parseExpression(times.get(action), line, found);
@@ -438,6 +472,11 @@ public final class Sfc {
 				}
 			}
 			body.add(new Ast.CallStmt(line, new Ast.Call(line, control, name(line, control), args)));
+			// SFC_INIT: every pin this chart drives off and R on, so a stored action is cleared
+			List<Ast.Arg> clear = new ArrayList<>();
+			in.keySet().stream().filter(pin -> !pin.equals("R")).forEach(pin -> clear.add(new Ast.Arg(pin, new Ast.BoolLit(line, false), false)));
+			clear.add(new Ast.Arg("R", new Ast.BoolLit(line, true), false));
+			reset.add(new Ast.CallStmt(line, new Ast.Call(line, control, name(line, control), clear)));
 			String text = bodies.get(action);
 			if (text != null) {
 				int base = ACTION_LINES * (names.indexOf(action) + 1);
@@ -451,6 +490,7 @@ public final class Sfc {
 				found.forEach(e -> errors.add(new CompileError(source, line, 1, "action '" + action + "': " + e.message())));
 				if (target != null) {
 					body.add(set(line, target, member(line, control, "Q")));
+					reset.add(set(line, target, member(line, control, "Q")));
 				}
 			}
 		});
