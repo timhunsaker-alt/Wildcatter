@@ -8,7 +8,8 @@
 		"fabric-client-gametest": [
 			"dev.wildcatter.gametest.WildcatterClientGameTest",
 			"dev.wildcatter.gametest.TrailerClientGameTest",
-			"dev.wildcatter.gametest.PlcTrailerClientGameTest"
+			"dev.wildcatter.gametest.PlcTrailerClientGameTest",
+			"dev.wildcatter.gametest.PlcShortsClientGameTest"
 		],
 		"main": [
 			"dev.wildcatter.gametest.TestGasSource"

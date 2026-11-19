@@ -111,7 +111,7 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 	// ---- filming ---------------------------------------------------------------------------------------------------
 
 	/** A world shot: the start still, then the move from a to b filmed over {@code ticks}, {@code beat} run each tick of it. */
-	private void worldShot(int n, String name, long time, Cam a, Cam b, int ticks, IntConsumer beat) {
+	void worldShot(int n, String name, long time, Cam a, Cam b, int ticks, IntConsumer beat) {
 		server.runCommand("time set " + time);
 		server.runCommand("weather clear");
 		String id = String.format("%02d_%s", n, name);
@@ -138,7 +138,7 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 	}
 
 	/** A screen shot: the screen is open already; {@code work} drives it while the window is filmed. */
-	private void screenShot(int n, String name, Runnable work) {
+	void screenShot(int n, String name, Runnable work) {
 		String id = String.format("%02d_%s", n, name);
 		Filming film = context.computeOnClient(client -> Filming.start(client, id));
 		try {
@@ -151,20 +151,20 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 		log("filmed " + id);
 	}
 
-	private PlcCabinetBlockEntity cabinet(MinecraftServer srv, BlockPos at) {
+	PlcCabinetBlockEntity cabinet(MinecraftServer srv, BlockPos at) {
 		return (PlcCabinetBlockEntity) srv.overworld().getBlockEntity(at);
 	}
 
-	private dev.wildcatter.client.PlcScreen plcScreen(net.minecraft.client.Minecraft client) {
+	dev.wildcatter.client.PlcScreen plcScreen(net.minecraft.client.Minecraft client) {
 		return (dev.wildcatter.client.PlcScreen) client.gui.screen();
 	}
 
-	private dev.wildcatter.client.HmiScreen hmiScreen(net.minecraft.client.Minecraft client) {
+	dev.wildcatter.client.HmiScreen hmiScreen(net.minecraft.client.Minecraft client) {
 		return (dev.wildcatter.client.HmiScreen) client.gui.screen();
 	}
 
 	/** Clicks GUI pixels with the real mouse. */
-	private void mouse(int[] at) {
+	void mouse(int[] at) {
 		if (at == null) {
 			log("nothing to click");
 			return;
@@ -176,7 +176,7 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 		context.waitTick();
 	}
 
-	private void click(String label) {
+	void click(String label) {
 		int[] at = context.computeOnClient(client -> plcScreen(client).buttonForTest(label));
 		if (at == null) {
 			log("no " + label + " button");
@@ -184,22 +184,22 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 		mouse(at);
 	}
 
-	private void field(String label, String value) {
+	void field(String label, String value) {
 		if (!context.computeOnClient(client -> plcScreen(client).setFieldForTest(label, value))) {
 			log("no " + label + " field");
 		}
 	}
 
-	private void hmiClick(String label) {
+	void hmiClick(String label) {
 		mouse(context.computeOnClient(client -> hmiScreen(client).buttonForTest(label)));
 	}
 
-	private void hmiField(String label, String value) {
+	void hmiField(String label, String value) {
 		context.computeOnClient(client -> hmiScreen(client).setFieldForTest(label, value));
 	}
 
 	/** Types into the code editor as a player does, {@code perTick} keys a tick; the editor keeps a line's indent, so a new line's tabs are fixed by hand. */
-	private void type(String text, int perTick) {
+	void type(String text, int perTick) {
 		int indent = 0;
 		int keys = 0;
 		for (String line : text.split("\n", -1)) {
@@ -235,16 +235,16 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 		}
 	}
 
-	private void press(BlockPos device) {
+	void press(BlockPos device) {
 		server.runOnServer(srv -> ((dev.wildcatter.control.OperatorDeviceBlockEntity) srv.overworld().getBlockEntity(device)).operate());
 	}
 
-	private void open(BlockPos cabinet) {
+	void open(BlockPos cabinet) {
 		server.runOnServer(srv -> cabinet(srv, cabinet).open(srv.getPlayerList().getPlayers().get(0)));
 		context.waitTicks(20);
 	}
 
-	private void close() {
+	void close() {
 		context.runOnClient(client -> {
 			if (client.gui.screen() != null) {
 				client.gui.screen().onClose();
@@ -254,13 +254,13 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 	}
 
 	/** The player near a cabinet, as a screen's requests need (8 blocks), looking at it: the screen dims this behind it. */
-	private void stand(Cam at) {
+	void stand(Cam at) {
 		camera(at, true);
 		context.waitTicks(5);
 	}
 
 	/** A small steam set making 120 V for a control supply, as the PLC scenes' plant: boiler on a campfire, turbine east of it. */
-	private void plant(int z) {
+	void plant(int z) {
 		put(10, 0, z, "minecraft:campfire[lit=true]");
 		put(10, 1, z, "wildcatter:boiler");
 		put(11, 1, z, "wildcatter:steam_turbine");
@@ -268,7 +268,7 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 	}
 
 	/** The plant, its 120 V into a 24 V supply, a box and the cabinet at x 15, grown. */
-	private BlockPos cabinetAt(int z) {
+	BlockPos cabinetAt(int z) {
 		plant(z);
 		put(12, 1, z, "wildcatter:plastic_wire_hot");
 		put(13, 1, z, "wildcatter:control_supply");
@@ -283,13 +283,13 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 	}
 
 	/** A true-size pumpjack over a new oil wellhead, its motor's box at {@code box}, facing east. */
-	private void pumpjack(int bx, int z) {
+	void pumpjack(int bx, int z) {
 		put(bx + 6, 1, z, "wildcatter:oil_wellhead[facing=east]");
 		placeBig(WildcatterBlocks.PUMPJACK, A(bx + 5, 1, z), Direction.EAST);
 	}
 
 	/** A seed with oil under every one of these site columns, the way the PLC scenes pick theirs. */
-	private void oilUnder(int[]... columns) {
+	void oilUnder(int[]... columns) {
 		long seed = -1;
 		for (long s = 1; s < 4_000_000 && seed < 0; s++) {
 			boolean all = true;
@@ -305,7 +305,7 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 		ReservoirData.testSeed = seed < 0 ? null : seed;
 	}
 
-	private void emptyJacks(int bx, int... zs) {
+	void emptyJacks(int bx, int... zs) {
 		on(level -> {
 			for (int z : zs) {
 				if (dev.wildcatter.multiblock.BigParts.entity(level, A(bx + 5, 1, z)) instanceof dev.wildcatter.block.PumpjackBlockEntity jack) {
@@ -315,7 +315,7 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 		});
 	}
 
-	private static String errors(List<String> all) {
+	static String errors(List<String> all) {
 		StringBuilder errors = new StringBuilder();
 		all.stream().filter(java.util.Objects::nonNull).forEach(e -> errors.append(e).append("; "));
 		return errors.toString();
@@ -323,7 +323,7 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 
 	// ---- 1-4: the panel ------------------------------------------------------------------------------------------------
 
-	private static final String ST_HEAD = """
+	static final String ST_HEAD = """
 			(* P-101 transfer pump: start, e-stop, run lamp *)
 			PROGRAM MAIN
 			VAR
@@ -338,7 +338,7 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 			END_VAR
 			""";
 
-	private static final String ST_BODY = """
+	static final String ST_BODY = """
 			IF start AND estop_ok THEN
 				run_cmd := TRUE;
 			ELSIF NOT estop_ok OR tripped THEN
@@ -353,7 +353,7 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 	 * The plc scene's panel: a diesel set's 480 V through a combination starter to a pumpjack; a cabinet on its own 24 V, a box with
 	 * a pushbutton, an e-stop, a pilot light and a stack light, a control cable north to the starter.
 	 */
-	private void panelBench() {
+	void panelBench() {
 		oilUnder(new int[] {23, 0});
 		BlockPos set = A(12, 1, 0);
 		genset(set, NORTH, false);
@@ -523,7 +523,7 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 
 	// ---- 5-6: the chart ------------------------------------------------------------------------------------------------
 
-	private static final String BELT_VARS = """
+	static final String BELT_VARS = """
 			VAR
 				start_pb AT %IX0.0 : BOOL;
 				stop_pb AT %IX0.1 : BOOL;
@@ -548,22 +548,22 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 				m3, m2, m1 : MOTOR_CTRL;
 			END_VAR""";
 
-	private static final String BELT_DRIVE = """
+	static final String BELT_DRIVE = """
 			m3(START := want3, RUNNING := run3, TRIPPED := trip3, AUTO := auto3, RESET := start_pb, RUN => coil3);
 			m2(START := want2, RUNNING := run2, TRIPPED := trip2, AUTO := auto2, RESET := start_pb, RUN => coil2);
 			m1(START := want1, RUNNING := run1, TRIPPED := trip1, AUTO := auto1, RESET := start_pb, RUN => coil1);""";
 
-	private void step(String name) {
+	void step(String name) {
 		click("STEP");
 		field("step name", name);
 	}
 
-	private void trans(String condition) {
+	void trans(String condition) {
 		click("TRANS");
 		field("condition", condition);
 	}
 
-	private void action(String qualifier, String action, String time) {
+	void action(String qualifier, String action, String time) {
 		click("ACTION");
 		field("qualifier", qualifier);
 		field("action", action);
@@ -571,7 +571,7 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 	}
 
 	/** The plcSfc scene's line: three starters and pumpjacks standing in for belts, a cabinet with start, stop, e-stop, horn and stack light. */
-	private void chartBench() {
+	void chartBench() {
 		int bay = 14;
 		oilUnder(new int[] {23, 0}, new int[] {23, 6}, new int[] {23, 12});
 		BlockPos set = A(12, 1, 0);
@@ -744,7 +744,7 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 
 	// ---- 7: the PID ----------------------------------------------------------------------------------------------------
 
-	private static final String LEVEL_PROJECT = """
+	static final String LEVEL_PROJECT = """
 			PROGRAM LEVEL
 			VAR
 				running AT %IX0.0 : BOOL;
@@ -784,7 +784,7 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 			END_PROGRAM""";
 
 	/** The plcAnalog scene's loop: a drive-fed pump filling a day tank through a motor-operated valve, a level transmitter, an air-operated drain valve. */
-	private void pidBench() {
+	void pidBench() {
 		int bay = 10;
 		BlockPos set = A(12, 1, 0);
 		genset(set, NORTH, false);
@@ -913,7 +913,7 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 
 	// ---- 8: the gensets' HMI -----------------------------------------------------------------------
 
-	private static final String POWER_PROJECT = """
+	static final String POWER_PROJECT = """
 			PROGRAM SITE
 			VAR
 				a_running AT %IX0.0 : BOOL;
@@ -968,7 +968,7 @@ public class PlcTrailerClientGameTest extends TrailerClientGameTest {
 			END_PROGRAM""";
 
 	/** The plcPower scene's site: two sets, three feeders of heaters, a cabinet and its HMI. */
-	private void powerBench() {
+	void powerBench() {
 		int bay = 22;
 		BlockPos setA = A(12, 1, 0), setB = A(12, 1, 16);
 		genset(setA, NORTH, false);
