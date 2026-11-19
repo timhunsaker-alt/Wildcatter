@@ -263,6 +263,20 @@ public class SwitchgearSectionBlockEntity extends BlockEntity implements Circuit
 		}
 	}
 
+	/** Every change is saved here: the breaker's position goes onto its cells' flag as well (Wave A). */
+	@Override
+	public void setChanged() {
+		super.setChanged();
+		if (level != null && !level.isClientSide() && getBlockState().hasProperty(SwitchgearSectionBlock.CLOSED) && getBlockState().getValue(SwitchgearSectionBlock.CLOSED) != closed) {
+			for (BlockPos cell : dev.wildcatter.multiblock.BigParts.cells(worldPosition, getBlockState())) {
+				BlockState there = level.getBlockState(cell);
+				if (there.hasProperty(SwitchgearSectionBlock.CLOSED) && there.getValue(SwitchgearSectionBlock.CLOSED) != closed) {
+					level.setBlock(cell, there.setValue(SwitchgearSectionBlock.CLOSED, closed), cell.equals(worldPosition) ? 3 : 2);
+				}
+			}
+		}
+	}
+
 	/** Right-click: open a closed breaker; close an open one (after a trip, reset the relay too). False if it cannot close. */
 	public boolean operate() {
 		if (closed) {
@@ -538,6 +552,9 @@ public class SwitchgearSectionBlockEntity extends BlockEntity implements Circuit
 	/** 51 after the solve, and the racking motor or crank. */
 	@Override
 	public void apply(Circuit circuit, int ticks) {
+		if (getBlockState().hasProperty(SwitchgearSectionBlock.CLOSED) && getBlockState().getValue(SwitchgearSectionBlock.CLOSED) != closed) {
+			setChanged();   // a world saved before the flag: it catches up
+		}
 		double dt = ticks / 20.0;
 		if (rackTarget != null) {
 			rackLeft -= dt;

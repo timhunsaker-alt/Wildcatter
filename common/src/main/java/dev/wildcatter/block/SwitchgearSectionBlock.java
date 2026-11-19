@@ -35,8 +35,18 @@ public class SwitchgearSectionBlock extends BigPartBlock {
 
 	private final boolean main;
 
+	/** The breaker's position flag, on every cell, so the front cell draws it: red CLOSED, green OPEN (Wave A). */
+	public static final net.minecraft.world.level.block.state.properties.BooleanProperty CLOSED = net.minecraft.world.level.block.state.properties.BooleanProperty.create("closed");
+
+	@Override
+	protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
+		super.createBlockStateDefinition(builder);
+		builder.add(CLOSED);
+	}
+
 	public SwitchgearSectionBlock(Properties properties, boolean main, String shapeName) {
 		super(properties, FOOTPRINT, shapeName);
+		registerDefaultState(defaultBlockState().setValue(CLOSED, false));
 		this.main = main;
 	}
 

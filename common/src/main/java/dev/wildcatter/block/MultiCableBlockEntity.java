@@ -121,6 +121,7 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 		if (on && !grounded && level instanceof ServerLevel server && Math.abs(lineVolts) > 50) {
 			server.playSound(null, worldPosition, dev.wildcatter.WildcatterSounds.FLASHOVER, SoundSource.BLOCKS, 1.5F, 1.0F);
 			server.sendParticles(ParticleTypes.ELECTRIC_SPARK, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5, 40, 0.4, 0.4, 0.4, 0.3);
+			faulting = true;
 		}
 		if (on && !grounded) {
 			clampHeat.reset();
@@ -162,9 +163,18 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 		return clampHeat.share();
 	}
 
+	/** True while fault current runs through the clamps: each time it starts (a breaker closing onto them) they flash again. */
+	private boolean faulting;
+
 	@Override
 	public void apply(Circuit circuit, int ticks) {
 		hertz = circuit.hertz();
+		boolean fault = clamps.length > 0 && groundAmps(circuit) > Tuning.CLAMP_FLASH_AMPS;
+		if (fault && !faulting && level instanceof ServerLevel server) {
+			server.playSound(null, worldPosition, dev.wildcatter.WildcatterSounds.FLASHOVER, SoundSource.BLOCKS, 1.5F, 1.0F);
+			server.sendParticles(ParticleTypes.ELECTRIC_SPARK, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5, 40, 0.4, 0.4, 0.4, 0.3);
+		}
+		faulting = fault;
 		if (clamps.length > 0 && level != null) {
 			double seconds = Math.min(ticks, Math.max(0, level.getGameTime() - groundedAt)) / 20.0;
 			if (clampHeat.step(groundAmps(circuit), seconds, Tuning.FAULT_CLEARING_CYCLES / hertz)) {

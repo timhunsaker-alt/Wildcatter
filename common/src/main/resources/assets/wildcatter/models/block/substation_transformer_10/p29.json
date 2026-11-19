@@ -40,6 +40,7 @@
   "padgreen": "wildcatter:block/mat/mat_paint_pad_green",
   "porcelain": "wildcatter:block/mat/mat_porcelain_brown",
   "relays": "wildcatter:block/mat/decal_relays",
+  "flagred": "wildcatter:block/mat/mat_paint_flag_red",
   "particle": "wildcatter:block/mat/mat_paint_ansi61"
  },
  "elements": [

@@ -45,6 +45,9 @@ public class BreakerRelayCabinetBlockEntity extends BlockEntity implements Circu
 	private String lastTrip = "";
 	private double hertz = ElectricalStandard.active().hertz();
 	private double amps;
+	/** Seconds until 50's trip opens the breaker, from the solve it picked up in; -1 when it has not picked up. */
+	private double fiftyIn = -1;
+	private double fiftyAmps;
 	private final dev.wildcatter.circuit.RelaySettings.Element element = new dev.wildcatter.circuit.RelaySettings.Element();
 
 	public BreakerRelayCabinetBlockEntity(BlockPos pos, BlockState state) {
@@ -156,17 +159,27 @@ public class BreakerRelayCabinetBlockEntity extends BlockEntity implements Circu
 		defaultShots();
 	}
 
-	/** 50: at 8 x the pickup, on the solve the fault appears in. */
+	/**
+	 * 50: at 8 x the pickup it picks up on the solve the fault appears in, and the breaker opens after the relay's operate time and its own
+	 * interrupting time ({@link Tuning#FAULT_CLEARING_CYCLES}, 5 cycles: 83 ms at 60 Hz, 100 ms at 50 Hz). The fault current flows for
+	 * that long, so a reclose onto a standing fault is seen: the breaker closes, the fault draws, and it opens again (Wave A).
+	 */
 	@Override
 	public boolean protect(Circuit circuit, int ticks) {
 		BreakerBlockEntity b = breaker();
 		if (b == null || !b.closed()) {
+			fiftyIn = -1;
 			return false;
 		}
 		double now = b.mostAmps(circuit);
 		if (settings.instantaneous() > 0 && now > settings.instantaneous() * pickup()) {
-			trip(b, String.format("50 instantaneous, %,.0f A", now), true);
-			return true;
+			if (fiftyIn < 0) {
+				fiftyIn = Tuning.FAULT_CLEARING_CYCLES / circuit.hertz();
+			}
+			fiftyAmps = Math.max(fiftyAmps, now);
+		} else {
+			fiftyIn = -1;   // 50 drops out: the fault went before the breaker opened
+			fiftyAmps = 0;
 		}
 		return false;
 	}
@@ -203,6 +216,16 @@ public class BreakerRelayCabinetBlockEntity extends BlockEntity implements Circu
 			}
 		}
 		amps = b.mostAmps(circuit);
+		if (fiftyIn >= 0) {
+			fiftyIn -= dt;
+			if (fiftyIn <= 1e-9) {
+				double seen = fiftyAmps;
+				fiftyIn = -1;
+				fiftyAmps = 0;
+				trip(b, String.format("50 instantaneous, %,.0f A", seen), true);
+				return;
+			}
+		}
 		double shed = ElectricalStandard.active().loadShedHertz();
 		if (distribution(b) && hertz < shed) {
 			trip(b, String.format("81U under-frequency, the island fell to %.1f Hz, below %.1f Hz", hertz, shed), false);

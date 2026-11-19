@@ -804,8 +804,15 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			context.waitTicks(200);
 			String fire = read(server, gx + 2, up, gz);
 			check(fire.contains("burning"), "a gas well on a gas line should light a firebox with no fuel in it: " + fire);
+			// a firebox boiler boils 90 steam a tick into a 400 tank (Tim's answer C3), so with nothing drawing its steam the fire banks within
+			// a few ticks and the well's choke shuts; a turbine's draw (taken here by hook, 90 a tick) keeps the fire wanting gas
+			BlockPos gasBoiler = new BlockPos(fgx + 2, up + 1, fgz);
+			for (int i = 0; i < 20; i++) {
+				server.computeOnServer(srv -> ((BoilerBlockEntity) srv.overworld().getBlockEntity(gasBoiler)).takeSteam(90));
+				context.waitTicks(1);
+			}
 			String head = read(server, gx, up, gz);
-			check(head.contains("flowing"), "the wellhead should be flowing to the firebox: " + head);
+			check(head.contains("flowing"), "the wellhead should be flowing to the firebox while its boiler's steam is drawn: " + head);
 			// a gas genset whose engine stands against the same well will not take its wet gas (docs/multiblocks/lease.md): the
 			// wellhead touches the engine's third cell along, not its main cell, so the line finds the engine through any of its cells
 			BlockPos gasSet = new BlockPos(gx + 3, up, gz + 1);

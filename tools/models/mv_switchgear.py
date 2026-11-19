@@ -11,7 +11,7 @@
 import yardlib as y
 
 
-def section(name, main):
+def section(name, main, closed=False):
 	M = y.model(name, 1, 3, 3, "grey")
 	M.box((0.0, 0.0, 0.1), (1.0, 0.1, 2.5), "dark")                            # the channel base
 	M.box((0.0, 0.1, 0.1), (1.0, 2.4, 2.5), "grey")                            # the cubicle, 2.3 m deep
@@ -22,10 +22,10 @@ def section(name, main):
 	M.box((0.82, 0.6, 0.06), (0.88, 0.9, 0.08), "dark")                        # handles
 	M.box((0.82, 1.75, 0.06), (0.88, 1.95, 0.08), "dark")
 	M.box((0.2, 0.45, 0.075), (0.7, 1.05, 0.08), "dark")                       # the viewing window onto the breaker
-	M.box((0.32, 0.6, 0.07), (0.58, 0.9, 0.075), "padgreen")                   # the open/closed flag and the spring indicator
+	M.box((0.32, 0.6, 0.07), (0.58, 0.9, 0.075), "flagred" if closed else "padgreen")   # the open/closed flag (red CLOSED, green OPEN)
 	M.box((0.4, 0.22, 0.06), (0.6, 0.32, 0.08), "steel")                       # the racking port
 	M.decal((0.15, 1.75, 0.075), (0.7, 2.25, 0.08), "relays", "north", "grey")
-	M.box((0.75, 2.1, 0.07), (0.82, 2.17, 0.08), "padgreen")                   # the open (green) and closed (red) lamps
+	M.box((0.75, 2.1, 0.07), (0.82, 2.17, 0.08), "flagred" if closed else "padgreen")   # the position lamp: red closed, green open
 	M.box((0.75, 1.98, 0.07), (0.82, 2.05, 0.08), "danger")
 	M.decal((0.15, 1.5, 0.075), (0.7, 1.68, 0.08), "nameplate", "north", "steel")
 	M.box((0.08, 0.2, 2.5), (0.92, 2.3, 2.52), "grey")                         # the bolted rear covers
@@ -40,6 +40,8 @@ def section(name, main):
 
 M = section("mv_switchgear_main", True)
 F = section("mv_switchgear_feeder", False)
+MC = section("mv_switchgear_main_closed", True, True)
+FC = section("mv_switchgear_feeder_closed", False, True)
 
 # ---- the breaker relay cabinet ----------------------------------------------------------------------------------------------------------
 C = y.model("breaker_relay_cabinet", 1, 2, 1, "grey")
@@ -79,3 +81,13 @@ T.collide((-1.6, 0.0, -2.5), (2.6, 3.0, 0.6))
 EXTRA = [F, C, T]
 for extra in EXTRA:
 	extra.export_args = {"blockstate": True, "item": True}
+for closed in (MC, FC):
+	closed.export_args = {"blockstate": False, "item": False}
+EXTRA += [MC, FC]
+
+
+def after():
+	import gearlib
+	for name in ("mv_switchgear_main", "mv_switchgear_feeder"):
+		gearlib.save_blockstate(name, {f"closed={c},facing={facing},piece={piece}": {"model": f"wildcatter:block/{name}{'_closed' if c == 'true' else ''}/p{piece}", **({"y": r} if r else {})}
+			for facing, r in gearlib.ROT.items() for piece in range(len(M.cells)) for c in ("true", "false")})

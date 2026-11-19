@@ -10,7 +10,7 @@ import math
 import plantlib as p
 
 TEX = dict(p.TEX)
-TEX.update({"porcelain": "block/mat/mat_porcelain_brown", "relays": "block/mat/decal_relays"})
+TEX.update({"porcelain": "block/mat/mat_porcelain_brown", "relays": "block/mat/decal_relays", "flagred": "block/mat/mat_paint_flag_red"})
 
 HV_PHASES = (1.5, 4.5, 7.5)
 DIST_PHASES = (0.5, 1.5, 2.5)

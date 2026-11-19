@@ -258,6 +258,12 @@ final class RelayScenes {
 				String open = read(helper, 15, U, -2);
 				log("cabinet_reclose", "temporary | " + open);
 				check(helper, open.contains("TRIPPED") && open.contains("79 recloses in"), "the fault should trip it and 79 time its first shot: " + open);
+				// Wave A: every cell of the breaker carries its position, so the mechanism's flag shows it open
+				net.minecraft.core.BlockPos main = abs(helper, 15, U, -1);
+				for (net.minecraft.core.BlockPos cell : dev.wildcatter.multiblock.BigParts.cells(main, helper.getLevel().getBlockState(main))) {
+					check(helper, helper.getLevel().getBlockState(cell).getValue(dev.wildcatter.block.BreakerBlock.POSITION) == dev.wildcatter.block.BreakerBlock.Position.TRIPPED,
+							"every cell should show the breaker tripped: " + cell.toShortString() + " " + helper.getLevel().getBlockState(cell));
+				}
 				grounds(helper, 20, U, 0, false);
 				helper.runAfterDelay(80, () -> {
 					String reclosed = read(helper, 15, U, -2);
@@ -265,7 +271,17 @@ final class RelayScenes {
 					check(helper, reclosed.contains("CLOSED") && reclosed.contains("shot 1 of 3") && cabinet.shotsUsed() == 1, "79's first shot should reclose it: " + reclosed);
 					// ---- a permanent fault: shots 2 and 3 (15 s and 30 s) close onto it; the fourth trip locks out
 					grounds(helper, 20, U, 0, true);
+					// Wave A: a shot onto the standing fault is seen: the breaker stays closed for 50's operate time (5 cycles) before it opens
+					int[] runs = new int[3];   // closed runs, the run going now, the longest
+					sample(helper, 1090, () -> {
+						boolean on = helper.getLevel().getBlockState(abs(helper, 15, U, -1)).getValue(dev.wildcatter.block.BreakerBlock.POSITION) == dev.wildcatter.block.BreakerBlock.Position.ON;
+						runs[0] += on && runs[1] == 0 ? 1 : 0;
+						runs[1] = on ? runs[1] + 1 : 0;
+						runs[2] = Math.max(runs[2], runs[1]);
+					});
 					helper.runAfterDelay(1100, () -> {
+						log("cabinet_reclose", "closed onto the fault " + runs[0] + " times (the fault, shots 2 and 3), at most " + runs[2] + " ticks");
+						check(helper, runs[0] == 3 && runs[2] >= 2 && runs[2] <= 5, "the fault and each shot onto it should be seen closed for 50's operate time, a few ticks: " + runs[0] + " runs, longest " + runs[2]);
 						String locked = read(helper, 15, U, -2);
 						log("cabinet_reclose", "permanent | " + locked + " | " + read(helper, 15, U, -1));
 						check(helper, cabinet.lockedOut() && locked.contains("79 LOCKED OUT after 3 shots"), "a permanent fault should run 79 to lockout: " + locked);
@@ -282,6 +298,16 @@ final class RelayScenes {
 				});
 			});
 		}));
+	}
+
+	/** Runs {@code each} once a tick for {@code ticks} ticks, one scheduled at a time (a burst of schedules from inside one upsets the test's own). */
+	static void sample(GameTestHelper helper, int ticks, Runnable each) {
+		if (ticks > 0) {
+			helper.runAfterDelay(1, () -> {
+				each.run();
+				sample(helper, ticks - 1, each);
+			});
+		}
 	}
 
 	static net.minecraft.core.BlockPos at(GameTestHelper helper, int x, int y, int z) {

@@ -1,1352 +1,4052 @@
 {
  "variants": {
-  "facing=north,piece=0": {
+  "facing=north,piece=0,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p0"
+  },
+  "facing=north,piece=0,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p0"
   },
-  "facing=north,piece=1": {
+  "facing=north,piece=0,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p0"
+  },
+  "facing=north,piece=1,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p1"
+  },
+  "facing=north,piece=1,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p1"
   },
-  "facing=north,piece=2": {
+  "facing=north,piece=1,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p1"
+  },
+  "facing=north,piece=2,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p2"
+  },
+  "facing=north,piece=2,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p2"
   },
-  "facing=north,piece=3": {
+  "facing=north,piece=2,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p2"
+  },
+  "facing=north,piece=3,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p3"
+  },
+  "facing=north,piece=3,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p3"
   },
-  "facing=north,piece=4": {
+  "facing=north,piece=3,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p3"
+  },
+  "facing=north,piece=4,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p4"
+  },
+  "facing=north,piece=4,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p4"
   },
-  "facing=north,piece=5": {
+  "facing=north,piece=4,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p4"
+  },
+  "facing=north,piece=5,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p5"
+  },
+  "facing=north,piece=5,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p5"
   },
-  "facing=north,piece=6": {
+  "facing=north,piece=5,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p5"
+  },
+  "facing=north,piece=6,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p6"
+  },
+  "facing=north,piece=6,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p6"
   },
-  "facing=north,piece=7": {
+  "facing=north,piece=6,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p6"
+  },
+  "facing=north,piece=7,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p7"
+  },
+  "facing=north,piece=7,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p7"
   },
-  "facing=north,piece=8": {
+  "facing=north,piece=7,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p7"
+  },
+  "facing=north,piece=8,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p8"
+  },
+  "facing=north,piece=8,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p8"
   },
-  "facing=north,piece=9": {
+  "facing=north,piece=8,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p8"
+  },
+  "facing=north,piece=9,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p9"
+  },
+  "facing=north,piece=9,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p9"
   },
-  "facing=north,piece=10": {
+  "facing=north,piece=9,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p9"
+  },
+  "facing=north,piece=10,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p10"
+  },
+  "facing=north,piece=10,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p10"
   },
-  "facing=north,piece=11": {
+  "facing=north,piece=10,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p10"
+  },
+  "facing=north,piece=11,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p11"
+  },
+  "facing=north,piece=11,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p11"
   },
-  "facing=north,piece=12": {
+  "facing=north,piece=11,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p11"
+  },
+  "facing=north,piece=12,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p12"
+  },
+  "facing=north,piece=12,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p12"
   },
-  "facing=north,piece=13": {
+  "facing=north,piece=12,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p12"
+  },
+  "facing=north,piece=13,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p13"
+  },
+  "facing=north,piece=13,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p13"
   },
-  "facing=north,piece=14": {
+  "facing=north,piece=13,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p13"
+  },
+  "facing=north,piece=14,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p14"
+  },
+  "facing=north,piece=14,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p14"
   },
-  "facing=north,piece=15": {
+  "facing=north,piece=14,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p14"
+  },
+  "facing=north,piece=15,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p15"
+  },
+  "facing=north,piece=15,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p15"
   },
-  "facing=north,piece=16": {
+  "facing=north,piece=15,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p15"
+  },
+  "facing=north,piece=16,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p16"
+  },
+  "facing=north,piece=16,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p16"
   },
-  "facing=north,piece=17": {
+  "facing=north,piece=16,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p16"
+  },
+  "facing=north,piece=17,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p17"
+  },
+  "facing=north,piece=17,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p17"
   },
-  "facing=north,piece=18": {
+  "facing=north,piece=17,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p17"
+  },
+  "facing=north,piece=18,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p18"
+  },
+  "facing=north,piece=18,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p18"
   },
-  "facing=north,piece=19": {
+  "facing=north,piece=18,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p18"
+  },
+  "facing=north,piece=19,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p19"
+  },
+  "facing=north,piece=19,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p19"
   },
-  "facing=north,piece=20": {
+  "facing=north,piece=19,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p19"
+  },
+  "facing=north,piece=20,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p20"
+  },
+  "facing=north,piece=20,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p20"
   },
-  "facing=north,piece=21": {
+  "facing=north,piece=20,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p20"
+  },
+  "facing=north,piece=21,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p21"
+  },
+  "facing=north,piece=21,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p21"
   },
-  "facing=north,piece=22": {
+  "facing=north,piece=21,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p21"
+  },
+  "facing=north,piece=22,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p22"
+  },
+  "facing=north,piece=22,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p22"
   },
-  "facing=north,piece=23": {
+  "facing=north,piece=22,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p22"
+  },
+  "facing=north,piece=23,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p23"
+  },
+  "facing=north,piece=23,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p23"
   },
-  "facing=north,piece=24": {
+  "facing=north,piece=23,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p23"
+  },
+  "facing=north,piece=24,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p24"
+  },
+  "facing=north,piece=24,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p24"
   },
-  "facing=north,piece=25": {
+  "facing=north,piece=24,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p24"
+  },
+  "facing=north,piece=25,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p25"
+  },
+  "facing=north,piece=25,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p25"
   },
-  "facing=north,piece=26": {
+  "facing=north,piece=25,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p25"
+  },
+  "facing=north,piece=26,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p26"
+  },
+  "facing=north,piece=26,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p26"
   },
-  "facing=north,piece=27": {
+  "facing=north,piece=26,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p26"
+  },
+  "facing=north,piece=27,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p27"
+  },
+  "facing=north,piece=27,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p27"
   },
-  "facing=north,piece=28": {
+  "facing=north,piece=27,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p27"
+  },
+  "facing=north,piece=28,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p28"
+  },
+  "facing=north,piece=28,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p28"
   },
-  "facing=north,piece=29": {
+  "facing=north,piece=28,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p28"
+  },
+  "facing=north,piece=29,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p29"
+  },
+  "facing=north,piece=29,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p29"
   },
-  "facing=north,piece=30": {
+  "facing=north,piece=29,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p29"
+  },
+  "facing=north,piece=30,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p30"
+  },
+  "facing=north,piece=30,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p30"
   },
-  "facing=north,piece=31": {
+  "facing=north,piece=30,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p30"
+  },
+  "facing=north,piece=31,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p31"
+  },
+  "facing=north,piece=31,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p31"
   },
-  "facing=north,piece=32": {
+  "facing=north,piece=31,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p31"
+  },
+  "facing=north,piece=32,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p32"
+  },
+  "facing=north,piece=32,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p32"
   },
-  "facing=north,piece=33": {
+  "facing=north,piece=32,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p32"
+  },
+  "facing=north,piece=33,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p33"
+  },
+  "facing=north,piece=33,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p33"
   },
-  "facing=north,piece=34": {
+  "facing=north,piece=33,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p33"
+  },
+  "facing=north,piece=34,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p34"
+  },
+  "facing=north,piece=34,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p34"
   },
-  "facing=north,piece=35": {
+  "facing=north,piece=34,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p34"
+  },
+  "facing=north,piece=35,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p35"
+  },
+  "facing=north,piece=35,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p35"
   },
-  "facing=north,piece=36": {
+  "facing=north,piece=35,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p35"
+  },
+  "facing=north,piece=36,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p36"
+  },
+  "facing=north,piece=36,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p36"
   },
-  "facing=north,piece=37": {
+  "facing=north,piece=36,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p36"
+  },
+  "facing=north,piece=37,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p37"
+  },
+  "facing=north,piece=37,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p37"
   },
-  "facing=north,piece=38": {
+  "facing=north,piece=37,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p37"
+  },
+  "facing=north,piece=38,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p38"
+  },
+  "facing=north,piece=38,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p38"
   },
-  "facing=north,piece=39": {
+  "facing=north,piece=38,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p38"
+  },
+  "facing=north,piece=39,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p39"
+  },
+  "facing=north,piece=39,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p39"
   },
-  "facing=north,piece=40": {
+  "facing=north,piece=39,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p39"
+  },
+  "facing=north,piece=40,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p40"
+  },
+  "facing=north,piece=40,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p40"
   },
-  "facing=north,piece=41": {
+  "facing=north,piece=40,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p40"
+  },
+  "facing=north,piece=41,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p41"
+  },
+  "facing=north,piece=41,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p41"
   },
-  "facing=north,piece=42": {
+  "facing=north,piece=41,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p41"
+  },
+  "facing=north,piece=42,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p42"
+  },
+  "facing=north,piece=42,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p42"
   },
-  "facing=north,piece=43": {
+  "facing=north,piece=42,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p42"
+  },
+  "facing=north,piece=43,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p43"
+  },
+  "facing=north,piece=43,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p43"
   },
-  "facing=north,piece=44": {
+  "facing=north,piece=43,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p43"
+  },
+  "facing=north,piece=44,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p44"
+  },
+  "facing=north,piece=44,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p44"
   },
-  "facing=north,piece=45": {
+  "facing=north,piece=44,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p44"
+  },
+  "facing=north,piece=45,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p45"
+  },
+  "facing=north,piece=45,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p45"
   },
-  "facing=north,piece=46": {
+  "facing=north,piece=45,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p45"
+  },
+  "facing=north,piece=46,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p46"
+  },
+  "facing=north,piece=46,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p46"
   },
-  "facing=north,piece=47": {
+  "facing=north,piece=46,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p46"
+  },
+  "facing=north,piece=47,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p47"
+  },
+  "facing=north,piece=47,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p47"
   },
-  "facing=north,piece=48": {
+  "facing=north,piece=47,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p47"
+  },
+  "facing=north,piece=48,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p48"
+  },
+  "facing=north,piece=48,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p48"
   },
-  "facing=north,piece=49": {
+  "facing=north,piece=48,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p48"
+  },
+  "facing=north,piece=49,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p49"
+  },
+  "facing=north,piece=49,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p49"
   },
-  "facing=north,piece=50": {
+  "facing=north,piece=49,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p49"
+  },
+  "facing=north,piece=50,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p50"
+  },
+  "facing=north,piece=50,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p50"
   },
-  "facing=north,piece=51": {
+  "facing=north,piece=50,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p50"
+  },
+  "facing=north,piece=51,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p51"
+  },
+  "facing=north,piece=51,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p51"
   },
-  "facing=north,piece=52": {
+  "facing=north,piece=51,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p51"
+  },
+  "facing=north,piece=52,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p52"
+  },
+  "facing=north,piece=52,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p52"
   },
-  "facing=north,piece=53": {
+  "facing=north,piece=52,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p52"
+  },
+  "facing=north,piece=53,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p53"
+  },
+  "facing=north,piece=53,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p53"
   },
-  "facing=north,piece=54": {
+  "facing=north,piece=53,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p53"
+  },
+  "facing=north,piece=54,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p54"
+  },
+  "facing=north,piece=54,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p54"
   },
-  "facing=north,piece=55": {
+  "facing=north,piece=54,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p54"
+  },
+  "facing=north,piece=55,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p55"
+  },
+  "facing=north,piece=55,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p55"
   },
-  "facing=north,piece=56": {
+  "facing=north,piece=55,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p55"
+  },
+  "facing=north,piece=56,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p56"
+  },
+  "facing=north,piece=56,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p56"
   },
-  "facing=north,piece=57": {
+  "facing=north,piece=56,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p56"
+  },
+  "facing=north,piece=57,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p57"
+  },
+  "facing=north,piece=57,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p57"
   },
-  "facing=north,piece=58": {
+  "facing=north,piece=57,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p57"
+  },
+  "facing=north,piece=58,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p58"
+  },
+  "facing=north,piece=58,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p58"
   },
-  "facing=north,piece=59": {
+  "facing=north,piece=58,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p58"
+  },
+  "facing=north,piece=59,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p59"
+  },
+  "facing=north,piece=59,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p59"
   },
-  "facing=north,piece=60": {
+  "facing=north,piece=59,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p59"
+  },
+  "facing=north,piece=60,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p60"
+  },
+  "facing=north,piece=60,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p60"
   },
-  "facing=north,piece=61": {
+  "facing=north,piece=60,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p60"
+  },
+  "facing=north,piece=61,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p61"
+  },
+  "facing=north,piece=61,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p61"
   },
-  "facing=north,piece=62": {
+  "facing=north,piece=61,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p61"
+  },
+  "facing=north,piece=62,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p62"
+  },
+  "facing=north,piece=62,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p62"
   },
-  "facing=north,piece=63": {
+  "facing=north,piece=62,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p62"
+  },
+  "facing=north,piece=63,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p63"
+  },
+  "facing=north,piece=63,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p63"
   },
-  "facing=north,piece=64": {
+  "facing=north,piece=63,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p63"
+  },
+  "facing=north,piece=64,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p64"
+  },
+  "facing=north,piece=64,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p64"
   },
-  "facing=north,piece=65": {
+  "facing=north,piece=64,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p64"
+  },
+  "facing=north,piece=65,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p65"
+  },
+  "facing=north,piece=65,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p65"
   },
-  "facing=north,piece=66": {
+  "facing=north,piece=65,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p65"
+  },
+  "facing=north,piece=66,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p66"
+  },
+  "facing=north,piece=66,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p66"
   },
-  "facing=north,piece=67": {
+  "facing=north,piece=66,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p66"
+  },
+  "facing=north,piece=67,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p67"
+  },
+  "facing=north,piece=67,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p67"
   },
-  "facing=north,piece=68": {
+  "facing=north,piece=67,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p67"
+  },
+  "facing=north,piece=68,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p68"
+  },
+  "facing=north,piece=68,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p68"
   },
-  "facing=north,piece=69": {
+  "facing=north,piece=68,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p68"
+  },
+  "facing=north,piece=69,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p69"
+  },
+  "facing=north,piece=69,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p69"
   },
-  "facing=north,piece=70": {
+  "facing=north,piece=69,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p69"
+  },
+  "facing=north,piece=70,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p70"
+  },
+  "facing=north,piece=70,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p70"
   },
-  "facing=north,piece=71": {
+  "facing=north,piece=70,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p70"
+  },
+  "facing=north,piece=71,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p71"
+  },
+  "facing=north,piece=71,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p71"
   },
-  "facing=north,piece=72": {
+  "facing=north,piece=71,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p71"
+  },
+  "facing=north,piece=72,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p72"
+  },
+  "facing=north,piece=72,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p72"
   },
-  "facing=north,piece=73": {
+  "facing=north,piece=72,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p72"
+  },
+  "facing=north,piece=73,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p73"
+  },
+  "facing=north,piece=73,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p73"
   },
-  "facing=north,piece=74": {
+  "facing=north,piece=73,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p73"
+  },
+  "facing=north,piece=74,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p74"
+  },
+  "facing=north,piece=74,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p74"
   },
-  "facing=north,piece=75": {
+  "facing=north,piece=74,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p74"
+  },
+  "facing=north,piece=75,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p75"
+  },
+  "facing=north,piece=75,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p75"
   },
-  "facing=north,piece=76": {
+  "facing=north,piece=75,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p75"
+  },
+  "facing=north,piece=76,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p76"
+  },
+  "facing=north,piece=76,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p76"
   },
-  "facing=north,piece=77": {
+  "facing=north,piece=76,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p76"
+  },
+  "facing=north,piece=77,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p77"
+  },
+  "facing=north,piece=77,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p77"
   },
-  "facing=north,piece=78": {
+  "facing=north,piece=77,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p77"
+  },
+  "facing=north,piece=78,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p78"
+  },
+  "facing=north,piece=78,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p78"
   },
-  "facing=north,piece=79": {
+  "facing=north,piece=78,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p78"
+  },
+  "facing=north,piece=79,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p79"
+  },
+  "facing=north,piece=79,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p79"
   },
-  "facing=north,piece=80": {
+  "facing=north,piece=79,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p79"
+  },
+  "facing=north,piece=80,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p80"
+  },
+  "facing=north,piece=80,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p80"
   },
-  "facing=north,piece=81": {
+  "facing=north,piece=80,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p80"
+  },
+  "facing=north,piece=81,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p81"
+  },
+  "facing=north,piece=81,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p81"
   },
-  "facing=north,piece=82": {
+  "facing=north,piece=81,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p81"
+  },
+  "facing=north,piece=82,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p82"
+  },
+  "facing=north,piece=82,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p82"
   },
-  "facing=north,piece=83": {
+  "facing=north,piece=82,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p82"
+  },
+  "facing=north,piece=83,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p83"
+  },
+  "facing=north,piece=83,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p83"
   },
-  "facing=north,piece=84": {
+  "facing=north,piece=83,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p83"
+  },
+  "facing=north,piece=84,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p84"
+  },
+  "facing=north,piece=84,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p84"
   },
-  "facing=north,piece=85": {
+  "facing=north,piece=84,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p84"
+  },
+  "facing=north,piece=85,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p85"
+  },
+  "facing=north,piece=85,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p85"
   },
-  "facing=north,piece=86": {
+  "facing=north,piece=85,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p85"
+  },
+  "facing=north,piece=86,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p86"
+  },
+  "facing=north,piece=86,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p86"
   },
-  "facing=north,piece=87": {
+  "facing=north,piece=86,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p86"
+  },
+  "facing=north,piece=87,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p87"
+  },
+  "facing=north,piece=87,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p87"
   },
-  "facing=north,piece=88": {
+  "facing=north,piece=87,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p87"
+  },
+  "facing=north,piece=88,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p88"
+  },
+  "facing=north,piece=88,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p88"
   },
-  "facing=north,piece=89": {
+  "facing=north,piece=88,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p88"
+  },
+  "facing=north,piece=89,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p89"
+  },
+  "facing=north,piece=89,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p89"
   },
-  "facing=east,piece=0": {
+  "facing=north,piece=89,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p89"
+  },
+  "facing=east,piece=0,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p0",
+   "y": 90
+  },
+  "facing=east,piece=0,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p0",
    "y": 90
   },
-  "facing=east,piece=1": {
+  "facing=east,piece=0,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p0",
+   "y": 90
+  },
+  "facing=east,piece=1,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p1",
+   "y": 90
+  },
+  "facing=east,piece=1,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p1",
    "y": 90
   },
-  "facing=east,piece=2": {
+  "facing=east,piece=1,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p1",
+   "y": 90
+  },
+  "facing=east,piece=2,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p2",
+   "y": 90
+  },
+  "facing=east,piece=2,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p2",
    "y": 90
   },
-  "facing=east,piece=3": {
+  "facing=east,piece=2,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p2",
+   "y": 90
+  },
+  "facing=east,piece=3,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p3",
+   "y": 90
+  },
+  "facing=east,piece=3,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p3",
    "y": 90
   },
-  "facing=east,piece=4": {
+  "facing=east,piece=3,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p3",
+   "y": 90
+  },
+  "facing=east,piece=4,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p4",
+   "y": 90
+  },
+  "facing=east,piece=4,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p4",
    "y": 90
   },
-  "facing=east,piece=5": {
+  "facing=east,piece=4,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p4",
+   "y": 90
+  },
+  "facing=east,piece=5,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p5",
+   "y": 90
+  },
+  "facing=east,piece=5,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p5",
    "y": 90
   },
-  "facing=east,piece=6": {
+  "facing=east,piece=5,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p5",
+   "y": 90
+  },
+  "facing=east,piece=6,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p6",
+   "y": 90
+  },
+  "facing=east,piece=6,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p6",
    "y": 90
   },
-  "facing=east,piece=7": {
+  "facing=east,piece=6,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p6",
+   "y": 90
+  },
+  "facing=east,piece=7,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p7",
+   "y": 90
+  },
+  "facing=east,piece=7,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p7",
    "y": 90
   },
-  "facing=east,piece=8": {
+  "facing=east,piece=7,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p7",
+   "y": 90
+  },
+  "facing=east,piece=8,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p8",
+   "y": 90
+  },
+  "facing=east,piece=8,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p8",
    "y": 90
   },
-  "facing=east,piece=9": {
+  "facing=east,piece=8,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p8",
+   "y": 90
+  },
+  "facing=east,piece=9,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p9",
+   "y": 90
+  },
+  "facing=east,piece=9,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p9",
    "y": 90
   },
-  "facing=east,piece=10": {
+  "facing=east,piece=9,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p9",
+   "y": 90
+  },
+  "facing=east,piece=10,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p10",
+   "y": 90
+  },
+  "facing=east,piece=10,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p10",
    "y": 90
   },
-  "facing=east,piece=11": {
+  "facing=east,piece=10,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p10",
+   "y": 90
+  },
+  "facing=east,piece=11,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p11",
+   "y": 90
+  },
+  "facing=east,piece=11,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p11",
    "y": 90
   },
-  "facing=east,piece=12": {
+  "facing=east,piece=11,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p11",
+   "y": 90
+  },
+  "facing=east,piece=12,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p12",
+   "y": 90
+  },
+  "facing=east,piece=12,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p12",
    "y": 90
   },
-  "facing=east,piece=13": {
+  "facing=east,piece=12,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p12",
+   "y": 90
+  },
+  "facing=east,piece=13,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p13",
+   "y": 90
+  },
+  "facing=east,piece=13,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p13",
    "y": 90
   },
-  "facing=east,piece=14": {
+  "facing=east,piece=13,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p13",
+   "y": 90
+  },
+  "facing=east,piece=14,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p14",
+   "y": 90
+  },
+  "facing=east,piece=14,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p14",
    "y": 90
   },
-  "facing=east,piece=15": {
+  "facing=east,piece=14,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p14",
+   "y": 90
+  },
+  "facing=east,piece=15,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p15",
+   "y": 90
+  },
+  "facing=east,piece=15,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p15",
    "y": 90
   },
-  "facing=east,piece=16": {
+  "facing=east,piece=15,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p15",
+   "y": 90
+  },
+  "facing=east,piece=16,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p16",
+   "y": 90
+  },
+  "facing=east,piece=16,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p16",
    "y": 90
   },
-  "facing=east,piece=17": {
+  "facing=east,piece=16,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p16",
+   "y": 90
+  },
+  "facing=east,piece=17,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p17",
+   "y": 90
+  },
+  "facing=east,piece=17,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p17",
    "y": 90
   },
-  "facing=east,piece=18": {
+  "facing=east,piece=17,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p17",
+   "y": 90
+  },
+  "facing=east,piece=18,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p18",
+   "y": 90
+  },
+  "facing=east,piece=18,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p18",
    "y": 90
   },
-  "facing=east,piece=19": {
+  "facing=east,piece=18,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p18",
+   "y": 90
+  },
+  "facing=east,piece=19,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p19",
+   "y": 90
+  },
+  "facing=east,piece=19,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p19",
    "y": 90
   },
-  "facing=east,piece=20": {
+  "facing=east,piece=19,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p19",
+   "y": 90
+  },
+  "facing=east,piece=20,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p20",
+   "y": 90
+  },
+  "facing=east,piece=20,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p20",
    "y": 90
   },
-  "facing=east,piece=21": {
+  "facing=east,piece=20,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p20",
+   "y": 90
+  },
+  "facing=east,piece=21,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p21",
+   "y": 90
+  },
+  "facing=east,piece=21,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p21",
    "y": 90
   },
-  "facing=east,piece=22": {
+  "facing=east,piece=21,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p21",
+   "y": 90
+  },
+  "facing=east,piece=22,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p22",
+   "y": 90
+  },
+  "facing=east,piece=22,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p22",
    "y": 90
   },
-  "facing=east,piece=23": {
+  "facing=east,piece=22,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p22",
+   "y": 90
+  },
+  "facing=east,piece=23,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p23",
+   "y": 90
+  },
+  "facing=east,piece=23,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p23",
    "y": 90
   },
-  "facing=east,piece=24": {
+  "facing=east,piece=23,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p23",
+   "y": 90
+  },
+  "facing=east,piece=24,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p24",
+   "y": 90
+  },
+  "facing=east,piece=24,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p24",
    "y": 90
   },
-  "facing=east,piece=25": {
+  "facing=east,piece=24,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p24",
+   "y": 90
+  },
+  "facing=east,piece=25,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p25",
+   "y": 90
+  },
+  "facing=east,piece=25,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p25",
    "y": 90
   },
-  "facing=east,piece=26": {
+  "facing=east,piece=25,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p25",
+   "y": 90
+  },
+  "facing=east,piece=26,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p26",
+   "y": 90
+  },
+  "facing=east,piece=26,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p26",
    "y": 90
   },
-  "facing=east,piece=27": {
+  "facing=east,piece=26,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p26",
+   "y": 90
+  },
+  "facing=east,piece=27,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p27",
+   "y": 90
+  },
+  "facing=east,piece=27,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p27",
    "y": 90
   },
-  "facing=east,piece=28": {
+  "facing=east,piece=27,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p27",
+   "y": 90
+  },
+  "facing=east,piece=28,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p28",
+   "y": 90
+  },
+  "facing=east,piece=28,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p28",
    "y": 90
   },
-  "facing=east,piece=29": {
+  "facing=east,piece=28,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p28",
+   "y": 90
+  },
+  "facing=east,piece=29,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p29",
+   "y": 90
+  },
+  "facing=east,piece=29,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p29",
    "y": 90
   },
-  "facing=east,piece=30": {
+  "facing=east,piece=29,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p29",
+   "y": 90
+  },
+  "facing=east,piece=30,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p30",
+   "y": 90
+  },
+  "facing=east,piece=30,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p30",
    "y": 90
   },
-  "facing=east,piece=31": {
+  "facing=east,piece=30,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p30",
+   "y": 90
+  },
+  "facing=east,piece=31,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p31",
+   "y": 90
+  },
+  "facing=east,piece=31,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p31",
    "y": 90
   },
-  "facing=east,piece=32": {
+  "facing=east,piece=31,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p31",
+   "y": 90
+  },
+  "facing=east,piece=32,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p32",
+   "y": 90
+  },
+  "facing=east,piece=32,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p32",
    "y": 90
   },
-  "facing=east,piece=33": {
+  "facing=east,piece=32,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p32",
+   "y": 90
+  },
+  "facing=east,piece=33,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p33",
+   "y": 90
+  },
+  "facing=east,piece=33,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p33",
    "y": 90
   },
-  "facing=east,piece=34": {
+  "facing=east,piece=33,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p33",
+   "y": 90
+  },
+  "facing=east,piece=34,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p34",
+   "y": 90
+  },
+  "facing=east,piece=34,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p34",
    "y": 90
   },
-  "facing=east,piece=35": {
+  "facing=east,piece=34,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p34",
+   "y": 90
+  },
+  "facing=east,piece=35,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p35",
+   "y": 90
+  },
+  "facing=east,piece=35,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p35",
    "y": 90
   },
-  "facing=east,piece=36": {
+  "facing=east,piece=35,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p35",
+   "y": 90
+  },
+  "facing=east,piece=36,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p36",
+   "y": 90
+  },
+  "facing=east,piece=36,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p36",
    "y": 90
   },
-  "facing=east,piece=37": {
+  "facing=east,piece=36,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p36",
+   "y": 90
+  },
+  "facing=east,piece=37,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p37",
+   "y": 90
+  },
+  "facing=east,piece=37,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p37",
    "y": 90
   },
-  "facing=east,piece=38": {
+  "facing=east,piece=37,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p37",
+   "y": 90
+  },
+  "facing=east,piece=38,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p38",
+   "y": 90
+  },
+  "facing=east,piece=38,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p38",
    "y": 90
   },
-  "facing=east,piece=39": {
+  "facing=east,piece=38,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p38",
+   "y": 90
+  },
+  "facing=east,piece=39,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p39",
+   "y": 90
+  },
+  "facing=east,piece=39,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p39",
    "y": 90
   },
-  "facing=east,piece=40": {
+  "facing=east,piece=39,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p39",
+   "y": 90
+  },
+  "facing=east,piece=40,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p40",
+   "y": 90
+  },
+  "facing=east,piece=40,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p40",
    "y": 90
   },
-  "facing=east,piece=41": {
+  "facing=east,piece=40,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p40",
+   "y": 90
+  },
+  "facing=east,piece=41,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p41",
+   "y": 90
+  },
+  "facing=east,piece=41,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p41",
    "y": 90
   },
-  "facing=east,piece=42": {
+  "facing=east,piece=41,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p41",
+   "y": 90
+  },
+  "facing=east,piece=42,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p42",
+   "y": 90
+  },
+  "facing=east,piece=42,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p42",
    "y": 90
   },
-  "facing=east,piece=43": {
+  "facing=east,piece=42,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p42",
+   "y": 90
+  },
+  "facing=east,piece=43,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p43",
+   "y": 90
+  },
+  "facing=east,piece=43,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p43",
    "y": 90
   },
-  "facing=east,piece=44": {
+  "facing=east,piece=43,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p43",
+   "y": 90
+  },
+  "facing=east,piece=44,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p44",
+   "y": 90
+  },
+  "facing=east,piece=44,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p44",
    "y": 90
   },
-  "facing=east,piece=45": {
+  "facing=east,piece=44,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p44",
+   "y": 90
+  },
+  "facing=east,piece=45,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p45",
+   "y": 90
+  },
+  "facing=east,piece=45,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p45",
    "y": 90
   },
-  "facing=east,piece=46": {
+  "facing=east,piece=45,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p45",
+   "y": 90
+  },
+  "facing=east,piece=46,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p46",
+   "y": 90
+  },
+  "facing=east,piece=46,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p46",
    "y": 90
   },
-  "facing=east,piece=47": {
+  "facing=east,piece=46,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p46",
+   "y": 90
+  },
+  "facing=east,piece=47,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p47",
+   "y": 90
+  },
+  "facing=east,piece=47,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p47",
    "y": 90
   },
-  "facing=east,piece=48": {
+  "facing=east,piece=47,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p47",
+   "y": 90
+  },
+  "facing=east,piece=48,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p48",
+   "y": 90
+  },
+  "facing=east,piece=48,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p48",
    "y": 90
   },
-  "facing=east,piece=49": {
+  "facing=east,piece=48,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p48",
+   "y": 90
+  },
+  "facing=east,piece=49,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p49",
+   "y": 90
+  },
+  "facing=east,piece=49,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p49",
    "y": 90
   },
-  "facing=east,piece=50": {
+  "facing=east,piece=49,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p49",
+   "y": 90
+  },
+  "facing=east,piece=50,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p50",
+   "y": 90
+  },
+  "facing=east,piece=50,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p50",
    "y": 90
   },
-  "facing=east,piece=51": {
+  "facing=east,piece=50,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p50",
+   "y": 90
+  },
+  "facing=east,piece=51,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p51",
+   "y": 90
+  },
+  "facing=east,piece=51,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p51",
    "y": 90
   },
-  "facing=east,piece=52": {
+  "facing=east,piece=51,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p51",
+   "y": 90
+  },
+  "facing=east,piece=52,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p52",
+   "y": 90
+  },
+  "facing=east,piece=52,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p52",
    "y": 90
   },
-  "facing=east,piece=53": {
+  "facing=east,piece=52,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p52",
+   "y": 90
+  },
+  "facing=east,piece=53,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p53",
+   "y": 90
+  },
+  "facing=east,piece=53,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p53",
    "y": 90
   },
-  "facing=east,piece=54": {
+  "facing=east,piece=53,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p53",
+   "y": 90
+  },
+  "facing=east,piece=54,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p54",
+   "y": 90
+  },
+  "facing=east,piece=54,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p54",
    "y": 90
   },
-  "facing=east,piece=55": {
+  "facing=east,piece=54,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p54",
+   "y": 90
+  },
+  "facing=east,piece=55,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p55",
+   "y": 90
+  },
+  "facing=east,piece=55,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p55",
    "y": 90
   },
-  "facing=east,piece=56": {
+  "facing=east,piece=55,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p55",
+   "y": 90
+  },
+  "facing=east,piece=56,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p56",
+   "y": 90
+  },
+  "facing=east,piece=56,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p56",
    "y": 90
   },
-  "facing=east,piece=57": {
+  "facing=east,piece=56,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p56",
+   "y": 90
+  },
+  "facing=east,piece=57,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p57",
+   "y": 90
+  },
+  "facing=east,piece=57,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p57",
    "y": 90
   },
-  "facing=east,piece=58": {
+  "facing=east,piece=57,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p57",
+   "y": 90
+  },
+  "facing=east,piece=58,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p58",
+   "y": 90
+  },
+  "facing=east,piece=58,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p58",
    "y": 90
   },
-  "facing=east,piece=59": {
+  "facing=east,piece=58,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p58",
+   "y": 90
+  },
+  "facing=east,piece=59,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p59",
+   "y": 90
+  },
+  "facing=east,piece=59,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p59",
    "y": 90
   },
-  "facing=east,piece=60": {
+  "facing=east,piece=59,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p59",
+   "y": 90
+  },
+  "facing=east,piece=60,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p60",
+   "y": 90
+  },
+  "facing=east,piece=60,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p60",
    "y": 90
   },
-  "facing=east,piece=61": {
+  "facing=east,piece=60,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p60",
+   "y": 90
+  },
+  "facing=east,piece=61,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p61",
+   "y": 90
+  },
+  "facing=east,piece=61,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p61",
    "y": 90
   },
-  "facing=east,piece=62": {
+  "facing=east,piece=61,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p61",
+   "y": 90
+  },
+  "facing=east,piece=62,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p62",
+   "y": 90
+  },
+  "facing=east,piece=62,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p62",
    "y": 90
   },
-  "facing=east,piece=63": {
+  "facing=east,piece=62,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p62",
+   "y": 90
+  },
+  "facing=east,piece=63,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p63",
+   "y": 90
+  },
+  "facing=east,piece=63,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p63",
    "y": 90
   },
-  "facing=east,piece=64": {
+  "facing=east,piece=63,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p63",
+   "y": 90
+  },
+  "facing=east,piece=64,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p64",
+   "y": 90
+  },
+  "facing=east,piece=64,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p64",
    "y": 90
   },
-  "facing=east,piece=65": {
+  "facing=east,piece=64,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p64",
+   "y": 90
+  },
+  "facing=east,piece=65,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p65",
+   "y": 90
+  },
+  "facing=east,piece=65,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p65",
    "y": 90
   },
-  "facing=east,piece=66": {
+  "facing=east,piece=65,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p65",
+   "y": 90
+  },
+  "facing=east,piece=66,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p66",
+   "y": 90
+  },
+  "facing=east,piece=66,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p66",
    "y": 90
   },
-  "facing=east,piece=67": {
+  "facing=east,piece=66,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p66",
+   "y": 90
+  },
+  "facing=east,piece=67,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p67",
+   "y": 90
+  },
+  "facing=east,piece=67,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p67",
    "y": 90
   },
-  "facing=east,piece=68": {
+  "facing=east,piece=67,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p67",
+   "y": 90
+  },
+  "facing=east,piece=68,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p68",
+   "y": 90
+  },
+  "facing=east,piece=68,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p68",
    "y": 90
   },
-  "facing=east,piece=69": {
+  "facing=east,piece=68,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p68",
+   "y": 90
+  },
+  "facing=east,piece=69,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p69",
+   "y": 90
+  },
+  "facing=east,piece=69,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p69",
    "y": 90
   },
-  "facing=east,piece=70": {
+  "facing=east,piece=69,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p69",
+   "y": 90
+  },
+  "facing=east,piece=70,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p70",
+   "y": 90
+  },
+  "facing=east,piece=70,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p70",
    "y": 90
   },
-  "facing=east,piece=71": {
+  "facing=east,piece=70,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p70",
+   "y": 90
+  },
+  "facing=east,piece=71,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p71",
+   "y": 90
+  },
+  "facing=east,piece=71,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p71",
    "y": 90
   },
-  "facing=east,piece=72": {
+  "facing=east,piece=71,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p71",
+   "y": 90
+  },
+  "facing=east,piece=72,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p72",
+   "y": 90
+  },
+  "facing=east,piece=72,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p72",
    "y": 90
   },
-  "facing=east,piece=73": {
+  "facing=east,piece=72,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p72",
+   "y": 90
+  },
+  "facing=east,piece=73,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p73",
+   "y": 90
+  },
+  "facing=east,piece=73,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p73",
    "y": 90
   },
-  "facing=east,piece=74": {
+  "facing=east,piece=73,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p73",
+   "y": 90
+  },
+  "facing=east,piece=74,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p74",
+   "y": 90
+  },
+  "facing=east,piece=74,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p74",
    "y": 90
   },
-  "facing=east,piece=75": {
+  "facing=east,piece=74,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p74",
+   "y": 90
+  },
+  "facing=east,piece=75,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p75",
+   "y": 90
+  },
+  "facing=east,piece=75,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p75",
    "y": 90
   },
-  "facing=east,piece=76": {
+  "facing=east,piece=75,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p75",
+   "y": 90
+  },
+  "facing=east,piece=76,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p76",
+   "y": 90
+  },
+  "facing=east,piece=76,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p76",
    "y": 90
   },
-  "facing=east,piece=77": {
+  "facing=east,piece=76,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p76",
+   "y": 90
+  },
+  "facing=east,piece=77,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p77",
+   "y": 90
+  },
+  "facing=east,piece=77,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p77",
    "y": 90
   },
-  "facing=east,piece=78": {
+  "facing=east,piece=77,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p77",
+   "y": 90
+  },
+  "facing=east,piece=78,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p78",
+   "y": 90
+  },
+  "facing=east,piece=78,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p78",
    "y": 90
   },
-  "facing=east,piece=79": {
+  "facing=east,piece=78,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p78",
+   "y": 90
+  },
+  "facing=east,piece=79,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p79",
+   "y": 90
+  },
+  "facing=east,piece=79,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p79",
    "y": 90
   },
-  "facing=east,piece=80": {
+  "facing=east,piece=79,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p79",
+   "y": 90
+  },
+  "facing=east,piece=80,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p80",
+   "y": 90
+  },
+  "facing=east,piece=80,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p80",
    "y": 90
   },
-  "facing=east,piece=81": {
+  "facing=east,piece=80,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p80",
+   "y": 90
+  },
+  "facing=east,piece=81,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p81",
+   "y": 90
+  },
+  "facing=east,piece=81,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p81",
    "y": 90
   },
-  "facing=east,piece=82": {
+  "facing=east,piece=81,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p81",
+   "y": 90
+  },
+  "facing=east,piece=82,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p82",
+   "y": 90
+  },
+  "facing=east,piece=82,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p82",
    "y": 90
   },
-  "facing=east,piece=83": {
+  "facing=east,piece=82,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p82",
+   "y": 90
+  },
+  "facing=east,piece=83,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p83",
+   "y": 90
+  },
+  "facing=east,piece=83,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p83",
    "y": 90
   },
-  "facing=east,piece=84": {
+  "facing=east,piece=83,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p83",
+   "y": 90
+  },
+  "facing=east,piece=84,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p84",
+   "y": 90
+  },
+  "facing=east,piece=84,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p84",
    "y": 90
   },
-  "facing=east,piece=85": {
+  "facing=east,piece=84,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p84",
+   "y": 90
+  },
+  "facing=east,piece=85,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p85",
+   "y": 90
+  },
+  "facing=east,piece=85,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p85",
    "y": 90
   },
-  "facing=east,piece=86": {
+  "facing=east,piece=85,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p85",
+   "y": 90
+  },
+  "facing=east,piece=86,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p86",
+   "y": 90
+  },
+  "facing=east,piece=86,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p86",
    "y": 90
   },
-  "facing=east,piece=87": {
+  "facing=east,piece=86,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p86",
+   "y": 90
+  },
+  "facing=east,piece=87,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p87",
+   "y": 90
+  },
+  "facing=east,piece=87,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p87",
    "y": 90
   },
-  "facing=east,piece=88": {
+  "facing=east,piece=87,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p87",
+   "y": 90
+  },
+  "facing=east,piece=88,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p88",
+   "y": 90
+  },
+  "facing=east,piece=88,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p88",
    "y": 90
   },
-  "facing=east,piece=89": {
+  "facing=east,piece=88,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p88",
+   "y": 90
+  },
+  "facing=east,piece=89,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p89",
+   "y": 90
+  },
+  "facing=east,piece=89,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p89",
    "y": 90
   },
-  "facing=south,piece=0": {
+  "facing=east,piece=89,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p89",
+   "y": 90
+  },
+  "facing=south,piece=0,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p0",
+   "y": 180
+  },
+  "facing=south,piece=0,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p0",
    "y": 180
   },
-  "facing=south,piece=1": {
+  "facing=south,piece=0,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p0",
+   "y": 180
+  },
+  "facing=south,piece=1,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p1",
+   "y": 180
+  },
+  "facing=south,piece=1,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p1",
    "y": 180
   },
-  "facing=south,piece=2": {
+  "facing=south,piece=1,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p1",
+   "y": 180
+  },
+  "facing=south,piece=2,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p2",
+   "y": 180
+  },
+  "facing=south,piece=2,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p2",
    "y": 180
   },
-  "facing=south,piece=3": {
+  "facing=south,piece=2,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p2",
+   "y": 180
+  },
+  "facing=south,piece=3,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p3",
+   "y": 180
+  },
+  "facing=south,piece=3,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p3",
    "y": 180
   },
-  "facing=south,piece=4": {
+  "facing=south,piece=3,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p3",
+   "y": 180
+  },
+  "facing=south,piece=4,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p4",
+   "y": 180
+  },
+  "facing=south,piece=4,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p4",
    "y": 180
   },
-  "facing=south,piece=5": {
+  "facing=south,piece=4,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p4",
+   "y": 180
+  },
+  "facing=south,piece=5,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p5",
+   "y": 180
+  },
+  "facing=south,piece=5,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p5",
    "y": 180
   },
-  "facing=south,piece=6": {
+  "facing=south,piece=5,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p5",
+   "y": 180
+  },
+  "facing=south,piece=6,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p6",
+   "y": 180
+  },
+  "facing=south,piece=6,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p6",
    "y": 180
   },
-  "facing=south,piece=7": {
+  "facing=south,piece=6,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p6",
+   "y": 180
+  },
+  "facing=south,piece=7,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p7",
+   "y": 180
+  },
+  "facing=south,piece=7,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p7",
    "y": 180
   },
-  "facing=south,piece=8": {
+  "facing=south,piece=7,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p7",
+   "y": 180
+  },
+  "facing=south,piece=8,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p8",
+   "y": 180
+  },
+  "facing=south,piece=8,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p8",
    "y": 180
   },
-  "facing=south,piece=9": {
+  "facing=south,piece=8,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p8",
+   "y": 180
+  },
+  "facing=south,piece=9,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p9",
+   "y": 180
+  },
+  "facing=south,piece=9,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p9",
    "y": 180
   },
-  "facing=south,piece=10": {
+  "facing=south,piece=9,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p9",
+   "y": 180
+  },
+  "facing=south,piece=10,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p10",
+   "y": 180
+  },
+  "facing=south,piece=10,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p10",
    "y": 180
   },
-  "facing=south,piece=11": {
+  "facing=south,piece=10,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p10",
+   "y": 180
+  },
+  "facing=south,piece=11,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p11",
+   "y": 180
+  },
+  "facing=south,piece=11,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p11",
    "y": 180
   },
-  "facing=south,piece=12": {
+  "facing=south,piece=11,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p11",
+   "y": 180
+  },
+  "facing=south,piece=12,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p12",
+   "y": 180
+  },
+  "facing=south,piece=12,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p12",
    "y": 180
   },
-  "facing=south,piece=13": {
+  "facing=south,piece=12,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p12",
+   "y": 180
+  },
+  "facing=south,piece=13,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p13",
+   "y": 180
+  },
+  "facing=south,piece=13,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p13",
    "y": 180
   },
-  "facing=south,piece=14": {
+  "facing=south,piece=13,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p13",
+   "y": 180
+  },
+  "facing=south,piece=14,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p14",
+   "y": 180
+  },
+  "facing=south,piece=14,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p14",
    "y": 180
   },
-  "facing=south,piece=15": {
+  "facing=south,piece=14,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p14",
+   "y": 180
+  },
+  "facing=south,piece=15,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p15",
+   "y": 180
+  },
+  "facing=south,piece=15,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p15",
    "y": 180
   },
-  "facing=south,piece=16": {
+  "facing=south,piece=15,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p15",
+   "y": 180
+  },
+  "facing=south,piece=16,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p16",
+   "y": 180
+  },
+  "facing=south,piece=16,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p16",
    "y": 180
   },
-  "facing=south,piece=17": {
+  "facing=south,piece=16,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p16",
+   "y": 180
+  },
+  "facing=south,piece=17,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p17",
+   "y": 180
+  },
+  "facing=south,piece=17,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p17",
    "y": 180
   },
-  "facing=south,piece=18": {
+  "facing=south,piece=17,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p17",
+   "y": 180
+  },
+  "facing=south,piece=18,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p18",
+   "y": 180
+  },
+  "facing=south,piece=18,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p18",
    "y": 180
   },
-  "facing=south,piece=19": {
+  "facing=south,piece=18,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p18",
+   "y": 180
+  },
+  "facing=south,piece=19,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p19",
+   "y": 180
+  },
+  "facing=south,piece=19,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p19",
    "y": 180
   },
-  "facing=south,piece=20": {
+  "facing=south,piece=19,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p19",
+   "y": 180
+  },
+  "facing=south,piece=20,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p20",
+   "y": 180
+  },
+  "facing=south,piece=20,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p20",
    "y": 180
   },
-  "facing=south,piece=21": {
+  "facing=south,piece=20,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p20",
+   "y": 180
+  },
+  "facing=south,piece=21,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p21",
+   "y": 180
+  },
+  "facing=south,piece=21,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p21",
    "y": 180
   },
-  "facing=south,piece=22": {
+  "facing=south,piece=21,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p21",
+   "y": 180
+  },
+  "facing=south,piece=22,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p22",
+   "y": 180
+  },
+  "facing=south,piece=22,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p22",
    "y": 180
   },
-  "facing=south,piece=23": {
+  "facing=south,piece=22,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p22",
+   "y": 180
+  },
+  "facing=south,piece=23,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p23",
+   "y": 180
+  },
+  "facing=south,piece=23,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p23",
    "y": 180
   },
-  "facing=south,piece=24": {
+  "facing=south,piece=23,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p23",
+   "y": 180
+  },
+  "facing=south,piece=24,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p24",
+   "y": 180
+  },
+  "facing=south,piece=24,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p24",
    "y": 180
   },
-  "facing=south,piece=25": {
+  "facing=south,piece=24,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p24",
+   "y": 180
+  },
+  "facing=south,piece=25,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p25",
+   "y": 180
+  },
+  "facing=south,piece=25,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p25",
    "y": 180
   },
-  "facing=south,piece=26": {
+  "facing=south,piece=25,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p25",
+   "y": 180
+  },
+  "facing=south,piece=26,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p26",
+   "y": 180
+  },
+  "facing=south,piece=26,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p26",
    "y": 180
   },
-  "facing=south,piece=27": {
+  "facing=south,piece=26,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p26",
+   "y": 180
+  },
+  "facing=south,piece=27,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p27",
+   "y": 180
+  },
+  "facing=south,piece=27,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p27",
    "y": 180
   },
-  "facing=south,piece=28": {
+  "facing=south,piece=27,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p27",
+   "y": 180
+  },
+  "facing=south,piece=28,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p28",
+   "y": 180
+  },
+  "facing=south,piece=28,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p28",
    "y": 180
   },
-  "facing=south,piece=29": {
+  "facing=south,piece=28,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p28",
+   "y": 180
+  },
+  "facing=south,piece=29,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p29",
+   "y": 180
+  },
+  "facing=south,piece=29,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p29",
    "y": 180
   },
-  "facing=south,piece=30": {
+  "facing=south,piece=29,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p29",
+   "y": 180
+  },
+  "facing=south,piece=30,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p30",
+   "y": 180
+  },
+  "facing=south,piece=30,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p30",
    "y": 180
   },
-  "facing=south,piece=31": {
+  "facing=south,piece=30,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p30",
+   "y": 180
+  },
+  "facing=south,piece=31,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p31",
+   "y": 180
+  },
+  "facing=south,piece=31,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p31",
    "y": 180
   },
-  "facing=south,piece=32": {
+  "facing=south,piece=31,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p31",
+   "y": 180
+  },
+  "facing=south,piece=32,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p32",
+   "y": 180
+  },
+  "facing=south,piece=32,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p32",
    "y": 180
   },
-  "facing=south,piece=33": {
+  "facing=south,piece=32,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p32",
+   "y": 180
+  },
+  "facing=south,piece=33,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p33",
+   "y": 180
+  },
+  "facing=south,piece=33,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p33",
    "y": 180
   },
-  "facing=south,piece=34": {
+  "facing=south,piece=33,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p33",
+   "y": 180
+  },
+  "facing=south,piece=34,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p34",
+   "y": 180
+  },
+  "facing=south,piece=34,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p34",
    "y": 180
   },
-  "facing=south,piece=35": {
+  "facing=south,piece=34,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p34",
+   "y": 180
+  },
+  "facing=south,piece=35,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p35",
+   "y": 180
+  },
+  "facing=south,piece=35,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p35",
    "y": 180
   },
-  "facing=south,piece=36": {
+  "facing=south,piece=35,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p35",
+   "y": 180
+  },
+  "facing=south,piece=36,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p36",
+   "y": 180
+  },
+  "facing=south,piece=36,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p36",
    "y": 180
   },
-  "facing=south,piece=37": {
+  "facing=south,piece=36,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p36",
+   "y": 180
+  },
+  "facing=south,piece=37,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p37",
+   "y": 180
+  },
+  "facing=south,piece=37,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p37",
    "y": 180
   },
-  "facing=south,piece=38": {
+  "facing=south,piece=37,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p37",
+   "y": 180
+  },
+  "facing=south,piece=38,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p38",
+   "y": 180
+  },
+  "facing=south,piece=38,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p38",
    "y": 180
   },
-  "facing=south,piece=39": {
+  "facing=south,piece=38,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p38",
+   "y": 180
+  },
+  "facing=south,piece=39,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p39",
+   "y": 180
+  },
+  "facing=south,piece=39,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p39",
    "y": 180
   },
-  "facing=south,piece=40": {
+  "facing=south,piece=39,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p39",
+   "y": 180
+  },
+  "facing=south,piece=40,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p40",
+   "y": 180
+  },
+  "facing=south,piece=40,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p40",
    "y": 180
   },
-  "facing=south,piece=41": {
+  "facing=south,piece=40,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p40",
+   "y": 180
+  },
+  "facing=south,piece=41,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p41",
+   "y": 180
+  },
+  "facing=south,piece=41,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p41",
    "y": 180
   },
-  "facing=south,piece=42": {
+  "facing=south,piece=41,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p41",
+   "y": 180
+  },
+  "facing=south,piece=42,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p42",
+   "y": 180
+  },
+  "facing=south,piece=42,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p42",
    "y": 180
   },
-  "facing=south,piece=43": {
+  "facing=south,piece=42,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p42",
+   "y": 180
+  },
+  "facing=south,piece=43,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p43",
+   "y": 180
+  },
+  "facing=south,piece=43,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p43",
    "y": 180
   },
-  "facing=south,piece=44": {
+  "facing=south,piece=43,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p43",
+   "y": 180
+  },
+  "facing=south,piece=44,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p44",
+   "y": 180
+  },
+  "facing=south,piece=44,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p44",
    "y": 180
   },
-  "facing=south,piece=45": {
+  "facing=south,piece=44,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p44",
+   "y": 180
+  },
+  "facing=south,piece=45,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p45",
+   "y": 180
+  },
+  "facing=south,piece=45,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p45",
    "y": 180
   },
-  "facing=south,piece=46": {
+  "facing=south,piece=45,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p45",
+   "y": 180
+  },
+  "facing=south,piece=46,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p46",
+   "y": 180
+  },
+  "facing=south,piece=46,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p46",
    "y": 180
   },
-  "facing=south,piece=47": {
+  "facing=south,piece=46,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p46",
+   "y": 180
+  },
+  "facing=south,piece=47,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p47",
+   "y": 180
+  },
+  "facing=south,piece=47,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p47",
    "y": 180
   },
-  "facing=south,piece=48": {
+  "facing=south,piece=47,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p47",
+   "y": 180
+  },
+  "facing=south,piece=48,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p48",
+   "y": 180
+  },
+  "facing=south,piece=48,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p48",
    "y": 180
   },
-  "facing=south,piece=49": {
+  "facing=south,piece=48,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p48",
+   "y": 180
+  },
+  "facing=south,piece=49,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p49",
+   "y": 180
+  },
+  "facing=south,piece=49,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p49",
    "y": 180
   },
-  "facing=south,piece=50": {
+  "facing=south,piece=49,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p49",
+   "y": 180
+  },
+  "facing=south,piece=50,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p50",
+   "y": 180
+  },
+  "facing=south,piece=50,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p50",
    "y": 180
   },
-  "facing=south,piece=51": {
+  "facing=south,piece=50,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p50",
+   "y": 180
+  },
+  "facing=south,piece=51,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p51",
+   "y": 180
+  },
+  "facing=south,piece=51,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p51",
    "y": 180
   },
-  "facing=south,piece=52": {
+  "facing=south,piece=51,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p51",
+   "y": 180
+  },
+  "facing=south,piece=52,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p52",
+   "y": 180
+  },
+  "facing=south,piece=52,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p52",
    "y": 180
   },
-  "facing=south,piece=53": {
+  "facing=south,piece=52,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p52",
+   "y": 180
+  },
+  "facing=south,piece=53,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p53",
+   "y": 180
+  },
+  "facing=south,piece=53,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p53",
    "y": 180
   },
-  "facing=south,piece=54": {
+  "facing=south,piece=53,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p53",
+   "y": 180
+  },
+  "facing=south,piece=54,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p54",
+   "y": 180
+  },
+  "facing=south,piece=54,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p54",
    "y": 180
   },
-  "facing=south,piece=55": {
+  "facing=south,piece=54,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p54",
+   "y": 180
+  },
+  "facing=south,piece=55,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p55",
+   "y": 180
+  },
+  "facing=south,piece=55,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p55",
    "y": 180
   },
-  "facing=south,piece=56": {
+  "facing=south,piece=55,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p55",
+   "y": 180
+  },
+  "facing=south,piece=56,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p56",
+   "y": 180
+  },
+  "facing=south,piece=56,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p56",
    "y": 180
   },
-  "facing=south,piece=57": {
+  "facing=south,piece=56,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p56",
+   "y": 180
+  },
+  "facing=south,piece=57,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p57",
+   "y": 180
+  },
+  "facing=south,piece=57,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p57",
    "y": 180
   },
-  "facing=south,piece=58": {
+  "facing=south,piece=57,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p57",
+   "y": 180
+  },
+  "facing=south,piece=58,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p58",
+   "y": 180
+  },
+  "facing=south,piece=58,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p58",
    "y": 180
   },
-  "facing=south,piece=59": {
+  "facing=south,piece=58,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p58",
+   "y": 180
+  },
+  "facing=south,piece=59,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p59",
+   "y": 180
+  },
+  "facing=south,piece=59,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p59",
    "y": 180
   },
-  "facing=south,piece=60": {
+  "facing=south,piece=59,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p59",
+   "y": 180
+  },
+  "facing=south,piece=60,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p60",
+   "y": 180
+  },
+  "facing=south,piece=60,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p60",
    "y": 180
   },
-  "facing=south,piece=61": {
+  "facing=south,piece=60,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p60",
+   "y": 180
+  },
+  "facing=south,piece=61,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p61",
+   "y": 180
+  },
+  "facing=south,piece=61,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p61",
    "y": 180
   },
-  "facing=south,piece=62": {
+  "facing=south,piece=61,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p61",
+   "y": 180
+  },
+  "facing=south,piece=62,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p62",
+   "y": 180
+  },
+  "facing=south,piece=62,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p62",
    "y": 180
   },
-  "facing=south,piece=63": {
+  "facing=south,piece=62,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p62",
+   "y": 180
+  },
+  "facing=south,piece=63,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p63",
+   "y": 180
+  },
+  "facing=south,piece=63,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p63",
    "y": 180
   },
-  "facing=south,piece=64": {
+  "facing=south,piece=63,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p63",
+   "y": 180
+  },
+  "facing=south,piece=64,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p64",
+   "y": 180
+  },
+  "facing=south,piece=64,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p64",
    "y": 180
   },
-  "facing=south,piece=65": {
+  "facing=south,piece=64,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p64",
+   "y": 180
+  },
+  "facing=south,piece=65,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p65",
+   "y": 180
+  },
+  "facing=south,piece=65,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p65",
    "y": 180
   },
-  "facing=south,piece=66": {
+  "facing=south,piece=65,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p65",
+   "y": 180
+  },
+  "facing=south,piece=66,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p66",
+   "y": 180
+  },
+  "facing=south,piece=66,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p66",
    "y": 180
   },
-  "facing=south,piece=67": {
+  "facing=south,piece=66,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p66",
+   "y": 180
+  },
+  "facing=south,piece=67,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p67",
+   "y": 180
+  },
+  "facing=south,piece=67,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p67",
    "y": 180
   },
-  "facing=south,piece=68": {
+  "facing=south,piece=67,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p67",
+   "y": 180
+  },
+  "facing=south,piece=68,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p68",
+   "y": 180
+  },
+  "facing=south,piece=68,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p68",
    "y": 180
   },
-  "facing=south,piece=69": {
+  "facing=south,piece=68,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p68",
+   "y": 180
+  },
+  "facing=south,piece=69,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p69",
+   "y": 180
+  },
+  "facing=south,piece=69,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p69",
    "y": 180
   },
-  "facing=south,piece=70": {
+  "facing=south,piece=69,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p69",
+   "y": 180
+  },
+  "facing=south,piece=70,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p70",
+   "y": 180
+  },
+  "facing=south,piece=70,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p70",
    "y": 180
   },
-  "facing=south,piece=71": {
+  "facing=south,piece=70,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p70",
+   "y": 180
+  },
+  "facing=south,piece=71,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p71",
+   "y": 180
+  },
+  "facing=south,piece=71,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p71",
    "y": 180
   },
-  "facing=south,piece=72": {
+  "facing=south,piece=71,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p71",
+   "y": 180
+  },
+  "facing=south,piece=72,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p72",
+   "y": 180
+  },
+  "facing=south,piece=72,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p72",
    "y": 180
   },
-  "facing=south,piece=73": {
+  "facing=south,piece=72,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p72",
+   "y": 180
+  },
+  "facing=south,piece=73,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p73",
+   "y": 180
+  },
+  "facing=south,piece=73,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p73",
    "y": 180
   },
-  "facing=south,piece=74": {
+  "facing=south,piece=73,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p73",
+   "y": 180
+  },
+  "facing=south,piece=74,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p74",
+   "y": 180
+  },
+  "facing=south,piece=74,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p74",
    "y": 180
   },
-  "facing=south,piece=75": {
+  "facing=south,piece=74,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p74",
+   "y": 180
+  },
+  "facing=south,piece=75,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p75",
+   "y": 180
+  },
+  "facing=south,piece=75,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p75",
    "y": 180
   },
-  "facing=south,piece=76": {
+  "facing=south,piece=75,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p75",
+   "y": 180
+  },
+  "facing=south,piece=76,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p76",
+   "y": 180
+  },
+  "facing=south,piece=76,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p76",
    "y": 180
   },
-  "facing=south,piece=77": {
+  "facing=south,piece=76,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p76",
+   "y": 180
+  },
+  "facing=south,piece=77,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p77",
+   "y": 180
+  },
+  "facing=south,piece=77,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p77",
    "y": 180
   },
-  "facing=south,piece=78": {
+  "facing=south,piece=77,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p77",
+   "y": 180
+  },
+  "facing=south,piece=78,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p78",
+   "y": 180
+  },
+  "facing=south,piece=78,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p78",
    "y": 180
   },
-  "facing=south,piece=79": {
+  "facing=south,piece=78,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p78",
+   "y": 180
+  },
+  "facing=south,piece=79,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p79",
+   "y": 180
+  },
+  "facing=south,piece=79,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p79",
    "y": 180
   },
-  "facing=south,piece=80": {
+  "facing=south,piece=79,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p79",
+   "y": 180
+  },
+  "facing=south,piece=80,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p80",
+   "y": 180
+  },
+  "facing=south,piece=80,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p80",
    "y": 180
   },
-  "facing=south,piece=81": {
+  "facing=south,piece=80,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p80",
+   "y": 180
+  },
+  "facing=south,piece=81,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p81",
+   "y": 180
+  },
+  "facing=south,piece=81,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p81",
    "y": 180
   },
-  "facing=south,piece=82": {
+  "facing=south,piece=81,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p81",
+   "y": 180
+  },
+  "facing=south,piece=82,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p82",
+   "y": 180
+  },
+  "facing=south,piece=82,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p82",
    "y": 180
   },
-  "facing=south,piece=83": {
+  "facing=south,piece=82,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p82",
+   "y": 180
+  },
+  "facing=south,piece=83,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p83",
+   "y": 180
+  },
+  "facing=south,piece=83,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p83",
    "y": 180
   },
-  "facing=south,piece=84": {
+  "facing=south,piece=83,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p83",
+   "y": 180
+  },
+  "facing=south,piece=84,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p84",
+   "y": 180
+  },
+  "facing=south,piece=84,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p84",
    "y": 180
   },
-  "facing=south,piece=85": {
+  "facing=south,piece=84,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p84",
+   "y": 180
+  },
+  "facing=south,piece=85,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p85",
+   "y": 180
+  },
+  "facing=south,piece=85,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p85",
    "y": 180
   },
-  "facing=south,piece=86": {
+  "facing=south,piece=85,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p85",
+   "y": 180
+  },
+  "facing=south,piece=86,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p86",
+   "y": 180
+  },
+  "facing=south,piece=86,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p86",
    "y": 180
   },
-  "facing=south,piece=87": {
+  "facing=south,piece=86,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p86",
+   "y": 180
+  },
+  "facing=south,piece=87,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p87",
+   "y": 180
+  },
+  "facing=south,piece=87,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p87",
    "y": 180
   },
-  "facing=south,piece=88": {
+  "facing=south,piece=87,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p87",
+   "y": 180
+  },
+  "facing=south,piece=88,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p88",
+   "y": 180
+  },
+  "facing=south,piece=88,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p88",
    "y": 180
   },
-  "facing=south,piece=89": {
+  "facing=south,piece=88,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p88",
+   "y": 180
+  },
+  "facing=south,piece=89,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p89",
+   "y": 180
+  },
+  "facing=south,piece=89,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p89",
    "y": 180
   },
-  "facing=west,piece=0": {
+  "facing=south,piece=89,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p89",
+   "y": 180
+  },
+  "facing=west,piece=0,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p0",
+   "y": 270
+  },
+  "facing=west,piece=0,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p0",
    "y": 270
   },
-  "facing=west,piece=1": {
+  "facing=west,piece=0,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p0",
+   "y": 270
+  },
+  "facing=west,piece=1,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p1",
+   "y": 270
+  },
+  "facing=west,piece=1,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p1",
    "y": 270
   },
-  "facing=west,piece=2": {
+  "facing=west,piece=1,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p1",
+   "y": 270
+  },
+  "facing=west,piece=2,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p2",
+   "y": 270
+  },
+  "facing=west,piece=2,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p2",
    "y": 270
   },
-  "facing=west,piece=3": {
+  "facing=west,piece=2,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p2",
+   "y": 270
+  },
+  "facing=west,piece=3,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p3",
+   "y": 270
+  },
+  "facing=west,piece=3,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p3",
    "y": 270
   },
-  "facing=west,piece=4": {
+  "facing=west,piece=3,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p3",
+   "y": 270
+  },
+  "facing=west,piece=4,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p4",
+   "y": 270
+  },
+  "facing=west,piece=4,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p4",
    "y": 270
   },
-  "facing=west,piece=5": {
+  "facing=west,piece=4,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p4",
+   "y": 270
+  },
+  "facing=west,piece=5,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p5",
+   "y": 270
+  },
+  "facing=west,piece=5,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p5",
    "y": 270
   },
-  "facing=west,piece=6": {
+  "facing=west,piece=5,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p5",
+   "y": 270
+  },
+  "facing=west,piece=6,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p6",
+   "y": 270
+  },
+  "facing=west,piece=6,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p6",
    "y": 270
   },
-  "facing=west,piece=7": {
+  "facing=west,piece=6,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p6",
+   "y": 270
+  },
+  "facing=west,piece=7,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p7",
+   "y": 270
+  },
+  "facing=west,piece=7,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p7",
    "y": 270
   },
-  "facing=west,piece=8": {
+  "facing=west,piece=7,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p7",
+   "y": 270
+  },
+  "facing=west,piece=8,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p8",
+   "y": 270
+  },
+  "facing=west,piece=8,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p8",
    "y": 270
   },
-  "facing=west,piece=9": {
+  "facing=west,piece=8,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p8",
+   "y": 270
+  },
+  "facing=west,piece=9,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p9",
+   "y": 270
+  },
+  "facing=west,piece=9,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p9",
    "y": 270
   },
-  "facing=west,piece=10": {
+  "facing=west,piece=9,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p9",
+   "y": 270
+  },
+  "facing=west,piece=10,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p10",
+   "y": 270
+  },
+  "facing=west,piece=10,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p10",
    "y": 270
   },
-  "facing=west,piece=11": {
+  "facing=west,piece=10,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p10",
+   "y": 270
+  },
+  "facing=west,piece=11,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p11",
+   "y": 270
+  },
+  "facing=west,piece=11,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p11",
    "y": 270
   },
-  "facing=west,piece=12": {
+  "facing=west,piece=11,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p11",
+   "y": 270
+  },
+  "facing=west,piece=12,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p12",
+   "y": 270
+  },
+  "facing=west,piece=12,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p12",
    "y": 270
   },
-  "facing=west,piece=13": {
+  "facing=west,piece=12,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p12",
+   "y": 270
+  },
+  "facing=west,piece=13,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p13",
+   "y": 270
+  },
+  "facing=west,piece=13,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p13",
    "y": 270
   },
-  "facing=west,piece=14": {
+  "facing=west,piece=13,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p13",
+   "y": 270
+  },
+  "facing=west,piece=14,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p14",
+   "y": 270
+  },
+  "facing=west,piece=14,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p14",
    "y": 270
   },
-  "facing=west,piece=15": {
+  "facing=west,piece=14,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p14",
+   "y": 270
+  },
+  "facing=west,piece=15,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p15",
+   "y": 270
+  },
+  "facing=west,piece=15,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p15",
    "y": 270
   },
-  "facing=west,piece=16": {
+  "facing=west,piece=15,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p15",
+   "y": 270
+  },
+  "facing=west,piece=16,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p16",
+   "y": 270
+  },
+  "facing=west,piece=16,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p16",
    "y": 270
   },
-  "facing=west,piece=17": {
+  "facing=west,piece=16,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p16",
+   "y": 270
+  },
+  "facing=west,piece=17,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p17",
+   "y": 270
+  },
+  "facing=west,piece=17,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p17",
    "y": 270
   },
-  "facing=west,piece=18": {
+  "facing=west,piece=17,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p17",
+   "y": 270
+  },
+  "facing=west,piece=18,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p18",
+   "y": 270
+  },
+  "facing=west,piece=18,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p18",
    "y": 270
   },
-  "facing=west,piece=19": {
+  "facing=west,piece=18,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p18",
+   "y": 270
+  },
+  "facing=west,piece=19,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p19",
+   "y": 270
+  },
+  "facing=west,piece=19,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p19",
    "y": 270
   },
-  "facing=west,piece=20": {
+  "facing=west,piece=19,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p19",
+   "y": 270
+  },
+  "facing=west,piece=20,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p20",
+   "y": 270
+  },
+  "facing=west,piece=20,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p20",
    "y": 270
   },
-  "facing=west,piece=21": {
+  "facing=west,piece=20,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p20",
+   "y": 270
+  },
+  "facing=west,piece=21,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p21",
+   "y": 270
+  },
+  "facing=west,piece=21,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p21",
    "y": 270
   },
-  "facing=west,piece=22": {
+  "facing=west,piece=21,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p21",
+   "y": 270
+  },
+  "facing=west,piece=22,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p22",
+   "y": 270
+  },
+  "facing=west,piece=22,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p22",
    "y": 270
   },
-  "facing=west,piece=23": {
+  "facing=west,piece=22,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p22",
+   "y": 270
+  },
+  "facing=west,piece=23,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p23",
+   "y": 270
+  },
+  "facing=west,piece=23,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p23",
    "y": 270
   },
-  "facing=west,piece=24": {
+  "facing=west,piece=23,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p23",
+   "y": 270
+  },
+  "facing=west,piece=24,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p24",
+   "y": 270
+  },
+  "facing=west,piece=24,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p24",
    "y": 270
   },
-  "facing=west,piece=25": {
+  "facing=west,piece=24,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p24",
+   "y": 270
+  },
+  "facing=west,piece=25,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p25",
+   "y": 270
+  },
+  "facing=west,piece=25,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p25",
    "y": 270
   },
-  "facing=west,piece=26": {
+  "facing=west,piece=25,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p25",
+   "y": 270
+  },
+  "facing=west,piece=26,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p26",
+   "y": 270
+  },
+  "facing=west,piece=26,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p26",
    "y": 270
   },
-  "facing=west,piece=27": {
+  "facing=west,piece=26,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p26",
+   "y": 270
+  },
+  "facing=west,piece=27,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p27",
+   "y": 270
+  },
+  "facing=west,piece=27,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p27",
    "y": 270
   },
-  "facing=west,piece=28": {
+  "facing=west,piece=27,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p27",
+   "y": 270
+  },
+  "facing=west,piece=28,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p28",
+   "y": 270
+  },
+  "facing=west,piece=28,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p28",
    "y": 270
   },
-  "facing=west,piece=29": {
+  "facing=west,piece=28,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p28",
+   "y": 270
+  },
+  "facing=west,piece=29,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p29",
+   "y": 270
+  },
+  "facing=west,piece=29,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p29",
    "y": 270
   },
-  "facing=west,piece=30": {
+  "facing=west,piece=29,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p29",
+   "y": 270
+  },
+  "facing=west,piece=30,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p30",
+   "y": 270
+  },
+  "facing=west,piece=30,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p30",
    "y": 270
   },
-  "facing=west,piece=31": {
+  "facing=west,piece=30,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p30",
+   "y": 270
+  },
+  "facing=west,piece=31,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p31",
+   "y": 270
+  },
+  "facing=west,piece=31,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p31",
    "y": 270
   },
-  "facing=west,piece=32": {
+  "facing=west,piece=31,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p31",
+   "y": 270
+  },
+  "facing=west,piece=32,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p32",
+   "y": 270
+  },
+  "facing=west,piece=32,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p32",
    "y": 270
   },
-  "facing=west,piece=33": {
+  "facing=west,piece=32,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p32",
+   "y": 270
+  },
+  "facing=west,piece=33,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p33",
+   "y": 270
+  },
+  "facing=west,piece=33,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p33",
    "y": 270
   },
-  "facing=west,piece=34": {
+  "facing=west,piece=33,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p33",
+   "y": 270
+  },
+  "facing=west,piece=34,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p34",
+   "y": 270
+  },
+  "facing=west,piece=34,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p34",
    "y": 270
   },
-  "facing=west,piece=35": {
+  "facing=west,piece=34,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p34",
+   "y": 270
+  },
+  "facing=west,piece=35,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p35",
+   "y": 270
+  },
+  "facing=west,piece=35,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p35",
    "y": 270
   },
-  "facing=west,piece=36": {
+  "facing=west,piece=35,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p35",
+   "y": 270
+  },
+  "facing=west,piece=36,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p36",
+   "y": 270
+  },
+  "facing=west,piece=36,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p36",
    "y": 270
   },
-  "facing=west,piece=37": {
+  "facing=west,piece=36,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p36",
+   "y": 270
+  },
+  "facing=west,piece=37,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p37",
+   "y": 270
+  },
+  "facing=west,piece=37,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p37",
    "y": 270
   },
-  "facing=west,piece=38": {
+  "facing=west,piece=37,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p37",
+   "y": 270
+  },
+  "facing=west,piece=38,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p38",
+   "y": 270
+  },
+  "facing=west,piece=38,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p38",
    "y": 270
   },
-  "facing=west,piece=39": {
+  "facing=west,piece=38,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p38",
+   "y": 270
+  },
+  "facing=west,piece=39,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p39",
+   "y": 270
+  },
+  "facing=west,piece=39,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p39",
    "y": 270
   },
-  "facing=west,piece=40": {
+  "facing=west,piece=39,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p39",
+   "y": 270
+  },
+  "facing=west,piece=40,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p40",
+   "y": 270
+  },
+  "facing=west,piece=40,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p40",
    "y": 270
   },
-  "facing=west,piece=41": {
+  "facing=west,piece=40,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p40",
+   "y": 270
+  },
+  "facing=west,piece=41,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p41",
+   "y": 270
+  },
+  "facing=west,piece=41,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p41",
    "y": 270
   },
-  "facing=west,piece=42": {
+  "facing=west,piece=41,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p41",
+   "y": 270
+  },
+  "facing=west,piece=42,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p42",
+   "y": 270
+  },
+  "facing=west,piece=42,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p42",
    "y": 270
   },
-  "facing=west,piece=43": {
+  "facing=west,piece=42,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p42",
+   "y": 270
+  },
+  "facing=west,piece=43,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p43",
+   "y": 270
+  },
+  "facing=west,piece=43,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p43",
    "y": 270
   },
-  "facing=west,piece=44": {
+  "facing=west,piece=43,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p43",
+   "y": 270
+  },
+  "facing=west,piece=44,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p44",
+   "y": 270
+  },
+  "facing=west,piece=44,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p44",
    "y": 270
   },
-  "facing=west,piece=45": {
+  "facing=west,piece=44,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p44",
+   "y": 270
+  },
+  "facing=west,piece=45,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p45",
+   "y": 270
+  },
+  "facing=west,piece=45,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p45",
    "y": 270
   },
-  "facing=west,piece=46": {
+  "facing=west,piece=45,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p45",
+   "y": 270
+  },
+  "facing=west,piece=46,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p46",
+   "y": 270
+  },
+  "facing=west,piece=46,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p46",
    "y": 270
   },
-  "facing=west,piece=47": {
+  "facing=west,piece=46,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p46",
+   "y": 270
+  },
+  "facing=west,piece=47,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p47",
+   "y": 270
+  },
+  "facing=west,piece=47,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p47",
    "y": 270
   },
-  "facing=west,piece=48": {
+  "facing=west,piece=47,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p47",
+   "y": 270
+  },
+  "facing=west,piece=48,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p48",
+   "y": 270
+  },
+  "facing=west,piece=48,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p48",
    "y": 270
   },
-  "facing=west,piece=49": {
+  "facing=west,piece=48,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p48",
+   "y": 270
+  },
+  "facing=west,piece=49,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p49",
+   "y": 270
+  },
+  "facing=west,piece=49,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p49",
    "y": 270
   },
-  "facing=west,piece=50": {
+  "facing=west,piece=49,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p49",
+   "y": 270
+  },
+  "facing=west,piece=50,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p50",
+   "y": 270
+  },
+  "facing=west,piece=50,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p50",
    "y": 270
   },
-  "facing=west,piece=51": {
+  "facing=west,piece=50,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p50",
+   "y": 270
+  },
+  "facing=west,piece=51,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p51",
+   "y": 270
+  },
+  "facing=west,piece=51,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p51",
    "y": 270
   },
-  "facing=west,piece=52": {
+  "facing=west,piece=51,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p51",
+   "y": 270
+  },
+  "facing=west,piece=52,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p52",
+   "y": 270
+  },
+  "facing=west,piece=52,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p52",
    "y": 270
   },
-  "facing=west,piece=53": {
+  "facing=west,piece=52,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p52",
+   "y": 270
+  },
+  "facing=west,piece=53,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p53",
+   "y": 270
+  },
+  "facing=west,piece=53,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p53",
    "y": 270
   },
-  "facing=west,piece=54": {
+  "facing=west,piece=53,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p53",
+   "y": 270
+  },
+  "facing=west,piece=54,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p54",
+   "y": 270
+  },
+  "facing=west,piece=54,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p54",
    "y": 270
   },
-  "facing=west,piece=55": {
+  "facing=west,piece=54,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p54",
+   "y": 270
+  },
+  "facing=west,piece=55,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p55",
+   "y": 270
+  },
+  "facing=west,piece=55,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p55",
    "y": 270
   },
-  "facing=west,piece=56": {
+  "facing=west,piece=55,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p55",
+   "y": 270
+  },
+  "facing=west,piece=56,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p56",
+   "y": 270
+  },
+  "facing=west,piece=56,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p56",
    "y": 270
   },
-  "facing=west,piece=57": {
+  "facing=west,piece=56,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p56",
+   "y": 270
+  },
+  "facing=west,piece=57,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p57",
+   "y": 270
+  },
+  "facing=west,piece=57,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p57",
    "y": 270
   },
-  "facing=west,piece=58": {
+  "facing=west,piece=57,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p57",
+   "y": 270
+  },
+  "facing=west,piece=58,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p58",
+   "y": 270
+  },
+  "facing=west,piece=58,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p58",
    "y": 270
   },
-  "facing=west,piece=59": {
+  "facing=west,piece=58,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p58",
+   "y": 270
+  },
+  "facing=west,piece=59,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p59",
+   "y": 270
+  },
+  "facing=west,piece=59,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p59",
    "y": 270
   },
-  "facing=west,piece=60": {
+  "facing=west,piece=59,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p59",
+   "y": 270
+  },
+  "facing=west,piece=60,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p60",
+   "y": 270
+  },
+  "facing=west,piece=60,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p60",
    "y": 270
   },
-  "facing=west,piece=61": {
+  "facing=west,piece=60,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p60",
+   "y": 270
+  },
+  "facing=west,piece=61,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p61",
+   "y": 270
+  },
+  "facing=west,piece=61,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p61",
    "y": 270
   },
-  "facing=west,piece=62": {
+  "facing=west,piece=61,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p61",
+   "y": 270
+  },
+  "facing=west,piece=62,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p62",
+   "y": 270
+  },
+  "facing=west,piece=62,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p62",
    "y": 270
   },
-  "facing=west,piece=63": {
+  "facing=west,piece=62,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p62",
+   "y": 270
+  },
+  "facing=west,piece=63,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p63",
+   "y": 270
+  },
+  "facing=west,piece=63,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p63",
    "y": 270
   },
-  "facing=west,piece=64": {
+  "facing=west,piece=63,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p63",
+   "y": 270
+  },
+  "facing=west,piece=64,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p64",
+   "y": 270
+  },
+  "facing=west,piece=64,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p64",
    "y": 270
   },
-  "facing=west,piece=65": {
+  "facing=west,piece=64,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p64",
+   "y": 270
+  },
+  "facing=west,piece=65,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p65",
+   "y": 270
+  },
+  "facing=west,piece=65,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p65",
    "y": 270
   },
-  "facing=west,piece=66": {
+  "facing=west,piece=65,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p65",
+   "y": 270
+  },
+  "facing=west,piece=66,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p66",
+   "y": 270
+  },
+  "facing=west,piece=66,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p66",
    "y": 270
   },
-  "facing=west,piece=67": {
+  "facing=west,piece=66,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p66",
+   "y": 270
+  },
+  "facing=west,piece=67,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p67",
+   "y": 270
+  },
+  "facing=west,piece=67,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p67",
    "y": 270
   },
-  "facing=west,piece=68": {
+  "facing=west,piece=67,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p67",
+   "y": 270
+  },
+  "facing=west,piece=68,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p68",
+   "y": 270
+  },
+  "facing=west,piece=68,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p68",
    "y": 270
   },
-  "facing=west,piece=69": {
+  "facing=west,piece=68,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p68",
+   "y": 270
+  },
+  "facing=west,piece=69,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p69",
+   "y": 270
+  },
+  "facing=west,piece=69,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p69",
    "y": 270
   },
-  "facing=west,piece=70": {
+  "facing=west,piece=69,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p69",
+   "y": 270
+  },
+  "facing=west,piece=70,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p70",
+   "y": 270
+  },
+  "facing=west,piece=70,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p70",
    "y": 270
   },
-  "facing=west,piece=71": {
+  "facing=west,piece=70,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p70",
+   "y": 270
+  },
+  "facing=west,piece=71,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p71",
+   "y": 270
+  },
+  "facing=west,piece=71,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p71",
    "y": 270
   },
-  "facing=west,piece=72": {
+  "facing=west,piece=71,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p71",
+   "y": 270
+  },
+  "facing=west,piece=72,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p72",
+   "y": 270
+  },
+  "facing=west,piece=72,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p72",
    "y": 270
   },
-  "facing=west,piece=73": {
+  "facing=west,piece=72,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p72",
+   "y": 270
+  },
+  "facing=west,piece=73,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p73",
+   "y": 270
+  },
+  "facing=west,piece=73,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p73",
    "y": 270
   },
-  "facing=west,piece=74": {
+  "facing=west,piece=73,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p73",
+   "y": 270
+  },
+  "facing=west,piece=74,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p74",
+   "y": 270
+  },
+  "facing=west,piece=74,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p74",
    "y": 270
   },
-  "facing=west,piece=75": {
+  "facing=west,piece=74,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p74",
+   "y": 270
+  },
+  "facing=west,piece=75,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p75",
+   "y": 270
+  },
+  "facing=west,piece=75,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p75",
    "y": 270
   },
-  "facing=west,piece=76": {
+  "facing=west,piece=75,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p75",
+   "y": 270
+  },
+  "facing=west,piece=76,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p76",
+   "y": 270
+  },
+  "facing=west,piece=76,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p76",
    "y": 270
   },
-  "facing=west,piece=77": {
+  "facing=west,piece=76,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p76",
+   "y": 270
+  },
+  "facing=west,piece=77,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p77",
+   "y": 270
+  },
+  "facing=west,piece=77,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p77",
    "y": 270
   },
-  "facing=west,piece=78": {
+  "facing=west,piece=77,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p77",
+   "y": 270
+  },
+  "facing=west,piece=78,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p78",
+   "y": 270
+  },
+  "facing=west,piece=78,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p78",
    "y": 270
   },
-  "facing=west,piece=79": {
+  "facing=west,piece=78,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p78",
+   "y": 270
+  },
+  "facing=west,piece=79,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p79",
+   "y": 270
+  },
+  "facing=west,piece=79,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p79",
    "y": 270
   },
-  "facing=west,piece=80": {
+  "facing=west,piece=79,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p79",
+   "y": 270
+  },
+  "facing=west,piece=80,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p80",
+   "y": 270
+  },
+  "facing=west,piece=80,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p80",
    "y": 270
   },
-  "facing=west,piece=81": {
+  "facing=west,piece=80,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p80",
+   "y": 270
+  },
+  "facing=west,piece=81,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p81",
+   "y": 270
+  },
+  "facing=west,piece=81,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p81",
    "y": 270
   },
-  "facing=west,piece=82": {
+  "facing=west,piece=81,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p81",
+   "y": 270
+  },
+  "facing=west,piece=82,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p82",
+   "y": 270
+  },
+  "facing=west,piece=82,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p82",
    "y": 270
   },
-  "facing=west,piece=83": {
+  "facing=west,piece=82,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p82",
+   "y": 270
+  },
+  "facing=west,piece=83,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p83",
+   "y": 270
+  },
+  "facing=west,piece=83,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p83",
    "y": 270
   },
-  "facing=west,piece=84": {
+  "facing=west,piece=83,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p83",
+   "y": 270
+  },
+  "facing=west,piece=84,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p84",
+   "y": 270
+  },
+  "facing=west,piece=84,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p84",
    "y": 270
   },
-  "facing=west,piece=85": {
+  "facing=west,piece=84,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p84",
+   "y": 270
+  },
+  "facing=west,piece=85,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p85",
+   "y": 270
+  },
+  "facing=west,piece=85,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p85",
    "y": 270
   },
-  "facing=west,piece=86": {
+  "facing=west,piece=85,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p85",
+   "y": 270
+  },
+  "facing=west,piece=86,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p86",
+   "y": 270
+  },
+  "facing=west,piece=86,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p86",
    "y": 270
   },
-  "facing=west,piece=87": {
+  "facing=west,piece=86,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p86",
+   "y": 270
+  },
+  "facing=west,piece=87,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p87",
+   "y": 270
+  },
+  "facing=west,piece=87,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p87",
    "y": 270
   },
-  "facing=west,piece=88": {
+  "facing=west,piece=87,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p87",
+   "y": 270
+  },
+  "facing=west,piece=88,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p88",
+   "y": 270
+  },
+  "facing=west,piece=88,position=off": {
    "model": "wildcatter:block/hv_breaker_3p/p88",
    "y": 270
   },
-  "facing=west,piece=89": {
+  "facing=west,piece=88,position=tripped": {
+   "model": "wildcatter:block/hv_breaker_3p/p88",
+   "y": 270
+  },
+  "facing=west,piece=89,position=on": {
+   "model": "wildcatter:block/hv_breaker_3p_closed/p89",
+   "y": 270
+  },
+  "facing=west,piece=89,position=off": {
+   "model": "wildcatter:block/hv_breaker_3p/p89",
+   "y": 270
+  },
+  "facing=west,piece=89,position=tripped": {
    "model": "wildcatter:block/hv_breaker_3p/p89",
    "y": 270
   }

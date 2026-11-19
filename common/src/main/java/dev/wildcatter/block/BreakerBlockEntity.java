@@ -259,6 +259,16 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Prot
 
 	private void setPosition(BreakerBlock.Position position) {
 		if (level != null && getBlockState().getValue(BreakerBlock.POSITION) != position) {
+			BlockState main = getBlockState();
+			if (main.getBlock() instanceof BigBreakerBlock) {
+				// every cell carries the position, so the cell with the mechanism's open/closed flag draws it (Wave A)
+				for (BlockPos cell : dev.wildcatter.multiblock.BigParts.cells(worldPosition, main)) {
+					BlockState there = level.getBlockState(cell);
+					if (!cell.equals(worldPosition) && there.is(main.getBlock()) && there.getValue(BreakerBlock.POSITION) != position) {
+						level.setBlock(cell, there.setValue(BreakerBlock.POSITION, position), 2);
+					}
+				}
+			}
 			level.setBlock(worldPosition, getBlockState().setValue(BreakerBlock.POSITION, position), 3);
 			setChanged();
 		}

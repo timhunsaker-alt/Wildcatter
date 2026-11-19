@@ -40,6 +40,7 @@
   "padgreen": "wildcatter:block/mat/mat_paint_pad_green",
   "porcelain": "wildcatter:block/mat/mat_porcelain_brown",
   "relays": "wildcatter:block/mat/decal_relays",
+  "flagred": "wildcatter:block/mat/mat_paint_flag_red",
   "particle": "wildcatter:block/mat/mat_paint_ansi61"
  },
  "elements": [
@@ -468,6 +469,74 @@
     ],
     "axis": "x",
     "angle": 30.0
+   }
+  },
+  {
+   "from": [
+    4.8,
+    7.84,
+    15.2
+   ],
+   "to": [
+    9.6,
+    9.92,
+    15.36
+   ],
+   "faces": {
+    "north": {
+     "texture": "#padgreen",
+     "uv": [
+      6.4,
+      6.08,
+      11.2,
+      8.16
+     ]
+    },
+    "south": {
+     "texture": "#padgreen",
+     "uv": [
+      4.8,
+      6.08,
+      9.6,
+      8.16
+     ]
+    },
+    "west": {
+     "texture": "#padgreen",
+     "uv": [
+      15.2,
+      6.08,
+      15.36,
+      8.16
+     ]
+    },
+    "east": {
+     "texture": "#padgreen",
+     "uv": [
+      0.64,
+      6.08,
+      0.8,
+      8.16
+     ]
+    },
+    "up": {
+     "texture": "#padgreen",
+     "uv": [
+      4.8,
+      15.2,
+      9.6,
+      15.36
+     ]
+    },
+    "down": {
+     "texture": "#padgreen",
+     "uv": [
+      4.8,
+      0.64,
+      9.6,
+      0.8
+     ]
+    }
    }
   },
   {

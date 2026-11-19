@@ -1483,6 +1483,7 @@ public final class Tuning {
 	public static final double CLAMP_ULTIMATE_I2T = 35_000.0 * 35_000.0 * 0.25;   // ASTM F855 grade 3 (2/0 Cu): 35 kA for 15 cycles, ultimate
 	public static final double CLAMP_CONTINUOUS_AMPS = 300;        // 2/0 copper in free air: what it carries without heating toward failure
 	public static final double CLAMP_COOL_SECONDS = 300;           // a fully heated cluster cools back over 5 minutes
+	public static final double CLAMP_FLASH_AMPS = 10;              // current to ground through grounding clamps that counts as a fault: they flash
 	public static final double FAULT_CLEARING_CYCLES = 5;          // relay (1-2 cycles) plus a vacuum breaker's 3-cycle interrupting time
 
 	// ---- protection gap wave, group C: panels, GFCI, ATS, fuses, coordination ----
