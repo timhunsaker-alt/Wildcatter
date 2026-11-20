@@ -748,6 +748,10 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 				flowCheck = 0;
 			}
 		}
+		// flow through the choke (mud circulating up the choke line, or gas off it) runs the manifold's loop
+		if (well.choke() > 0.01 && (well.spm() > 0.5 || well.ventedL() > 0) && level.getBlockEntity(manifoldAt) instanceof ChokeManifoldBlockEntity manifold) {
+			manifold.flowing(level);
+		}
 		pitGain = well.gasL() / 1000;
 		killNote = flowCheck > 0 ? String.format("FLOW CHECK: %d s", (Tuning.FLOW_CHECK_TICKS - flowCheck) / 20)
 				: well.spm() < 1e-6 && well.strokes() < 1 ? "bring the pump up to SCR on the panel, opening the choke to hold casing pressure at SICP"

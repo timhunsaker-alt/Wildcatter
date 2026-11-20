@@ -573,7 +573,10 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 
 	@Override
 	public net.minecraft.sounds.SoundEvent loop() {
-		return running.on() ? (kind().endsWith("condenser") ? WildcatterSounds.FAN : WildcatterSounds.MOTOR_HUM) : null;
+		if (!running.on()) {
+			return null;
+		}
+		return kind().endsWith("condenser") ? WildcatterSounds.FAN : kind().equals("storage_compressor") ? WildcatterSounds.STORAGE_COMPRESSOR : WildcatterSounds.MOTOR_HUM;
 	}
 
 	@Override

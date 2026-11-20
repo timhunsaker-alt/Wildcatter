@@ -15,7 +15,7 @@ src = sys.argv[1] if len(sys.argv) > 1 else "art/sound_source"
 out = "common/src/main/resources/assets/wildcatter/sounds"
 os.makedirs(out, exist_ok=True)
 ONE_SHOTS = ("turbine_hum", "boiler_hiss", "breaker_trip", "breaker_click", "zap", "structure_formed", "engine_crank", "sync_bang", "disconnect_arc", "hv_breaker", "fuse_pop", "flashover", "contactor_clunk")
-LOOPS = ("diesel_idle", "diesel_load", "gas_engine", "alternator_whine", "fan", "turbine_whine", "burner_roar", "motor_hum", "horn", "inverter_whine")
+LOOPS = ("diesel_idle", "diesel_load", "gas_engine", "alternator_whine", "fan", "turbine_whine", "burner_roar", "motor_hum", "horn", "inverter_whine", "choke_flow", "mud_gas_separator", "storage_compressor", "frasch_lift")
 # loops cut from a one-shot's steady middle: (start s, end s, crossfade s). The horn: a 2.6 s diaphragm horn blast, steady from 0.4 to 1.9 s.
 CUT_LOOPS = {"horn": (0.5, 1.8, 0.15)}
 for name in ONE_SHOTS + LOOPS:

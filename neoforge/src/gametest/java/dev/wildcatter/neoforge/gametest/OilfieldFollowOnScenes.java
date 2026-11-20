@@ -420,6 +420,7 @@ final class OilfieldFollowOnScenes {
 		place(helper, WildcatterBlocks.BOP_ACCUMULATOR, 18, y, -12, Direction.NORTH);
 		place(helper, WildcatterBlocks.BOP_STACK, 30, y + 1, 0, Direction.NORTH);
 		int[] step = {0};
+		boolean[] sepHeard = {false};   // the separator's loop seen on while gas comes off the choke
 		int[] mark = {0};
 		double[] bias = {0};
 		double[] kill = {0, 0};   // the tick the kill started, restarts after another second kick
@@ -495,6 +496,11 @@ final class OilfieldFollowOnScenes {
 							bias[0] = margin + 2;
 							log(scene, String.format("on schedule: DPP %.1f against %.1f | too far closed by %.1f psi", well.dppGauge(), rig.schedulePsi(), bias[0]));
 							check(helper, Math.abs(well.dppGauge() - rig.schedulePsi()) < 8, "the operator should hold the schedule: " + now);
+							// mud circulating up the choke line and through the open choke: the manifold's running loop is on (synced to the client)
+							var manifold = GridSceneKit.entity(helper, 30, y, -9, dev.wildcatter.block.ChokeManifoldBlockEntity.class);
+							var sep = GridSceneKit.entity(helper, 32, y, -8, dev.wildcatter.block.MudGasSeparatorBlockEntity.class);
+							check(helper, manifold.flowingNow() && manifold.loop() == dev.wildcatter.WildcatterSounds.CHOKE_FLOW, "flow through the choke should run the manifold's loop");
+							log(scene, "sounds: manifold " + manifold.loop() + ", separator " + sep.loop() + " (gas through it " + sep.through() + " m3)");
 							mark[0] = at;
 							step[0] = 5;
 						}
@@ -532,11 +538,17 @@ final class OilfieldFollowOnScenes {
 						if (at % 400 == 0) {
 							log(scene, String.format("killing: gas %.1f L, top %.0f m, lightest %.2f, annulus %.2f | %s", well.gasL(), well.gasTopM(), well.lightestPpg(), well.annulusPpg(), now));
 						}
+						if (GridSceneKit.entity(helper, 32, y, -8, dev.wildcatter.block.MudGasSeparatorBlockEntity.class).gasNow()) {
+							sepHeard[0] = true;
+						}
 						if (well.strokes() > sheet.strokesCirculation() + 5 && !well.gasInHole() && well.lightestPpg() + 0.05 >= rig.killWeight() - 1e-6) {
 							double minutes = well.strokes() / Tuning.SCR_SPM;   // minutes of pumping at SCR since the last shut-in
 							log(scene, String.format("kill mud round after %.1f minutes | %s", minutes, now));
 							check(helper, minutes < 12, "the kill should take under 12 minutes: " + minutes);
 							check(helper, rig.losses() == WellControl.Losses.NONE, "on schedule no losses: " + now);
+							var sep = GridSceneKit.entity(helper, 32, y, -8, dev.wildcatter.block.MudGasSeparatorBlockEntity.class);
+							check(helper, sep.through() < 0.01 || sepHeard[0], "gas through the separator should have run its loop: " + sep.through() + " m3 through it");
+							log(scene, String.format("separator: %.1f m3 of gas through it, loop heard %s", sep.through(), sepHeard[0]));
 							panel(helper).pump(false);
 							step[0] = 8;
 						}
@@ -849,6 +861,7 @@ final class OilfieldFollowOnScenes {
 						if (head.rate() > 0) {
 							log(scene, "lifting | " + h + " | heater " + read(helper, -16, u, -4) + " | air " + read(helper, -11, u, -4));
 							check(helper, h.contains("lifting") && head.rate() > 1700 && head.rate() < 2100 && heater.temp() >= 150, "the well should lift about 2 t/h of molten sulfur on 165 C water: " + h);
+							check(helper, head.liftingNow() && head.loop() == dev.wildcatter.WildcatterSounds.FRASCH_LIFT, "lifting, the wellhead's loop should be on");
 							check(helper, h.contains("NO BLEED"), "with no bleed water well it should say so: " + h);
 							long before = count(helper, Ore.SULFUR);
 							head.testMelt(Ore.SULFUR.kgPerBlock() * Tuning.FRASCH_YIELD);
