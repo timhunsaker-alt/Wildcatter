@@ -1457,8 +1457,8 @@ sized for a 40-pot line.
 - Tests: `TimeScaleTest`; `world_rules`, `time_scale_holds`; the Fabric client's Create World check.
 
 ## Known gaps
-- Phase 23 (oilfield follow-ons): the new item icons (casing joint, oilwell cement, LCM bag, CaCl2 bag, OBM package, sonar tool) are
-  script-drawn `*_placeholder` until their Ludo art. No new sounds (the spec's choke hiss, compressor thump, sonar ping and so on use
+- Phase 23 (oilfield follow-ons): the six new item icons are Ludo art (3 credits); the parts are true-size models in existing
+  materials. No new sounds (the spec's choke hiss, compressor thump, sonar ping and so on use
   vanilla sounds or none). The client scenes `chokeKill`, `saltCavern`, `frasch` and `lostCirculation` are not written. The storage
   compressor's scene runs it by a hook (its 1 MW motor wants a bigger supply than the scene's set). The `frasch` scene does not pipe to
   the acid plant's furnace.

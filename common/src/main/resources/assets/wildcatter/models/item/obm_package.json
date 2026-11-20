@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "wildcatter:item/obm_package_placeholder"
+    "layer0": "wildcatter:item/ore/obm_package"
   }
 }
