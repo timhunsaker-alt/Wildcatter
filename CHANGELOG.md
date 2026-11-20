@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.10.1 (unreleased): battery hazards, oilfield sounds
+
+### Battery containers
+- **Explosions and lightning** now set a battery container off, under the `bessThermalRunaway` world rule only: a blast that reaches
+  it (it burns out instead of being blown apart), or lightning striking it with no ground rod within 4 blocks. With the rule off,
+  nothing changes.
+- **The PCS and the battery cabinet hum as they run:** the inverter whine is a running loop that rises with power, in place of a
+  sound repeated every 4 s.
+
+### Oilfield
+- **New sounds:** the choke manifold's flow in a kill, the mud-gas separator with gas going through it, the storage compressor running,
+  and the Frasch wellhead lifting.
+- **Remote choke panel:** the mud weight and the pit gain are on two lines, so the pit gain is no longer cut off.
+
+### Tests and films
+- The `gas_storage` scene starts its 1 MW storage compressor from a real 4.16 kV supply (the peaker's feeder through a 1.5 MVA
+  step-down transformer), no longer by a test hook.
+- New client film scenes for the 0.10 trailers: `chokeKill`, `lostCirculation`, `saltCavern`, `frasch` and `bess`.
+
+Decisions for review: `docs/questions/grid-batteries.md` (21-22), `docs/questions/oilfield-follow-ons.md` (24-25).
+
 ## v0.10.0 (unreleased): grid batteries and the oilfield follow-ons
 
 ### Grid batteries (Phase 22, `docs/multiblocks/grid-batteries.md`)
