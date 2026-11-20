@@ -169,7 +169,8 @@ public class ChokePanelScreen extends Screen {
 			default -> "WAIT AND WEIGHT";
 		}, rx, ry + 22, MUTED, false);
 		graphics.text(font, String.format("PUMP %s", state.getBooleanOr("pumpOn", false) ? "ON" : "OFF"), rx, ry + 33, MUTED, false);
-		graphics.text(font, String.format("MUD %.2f ppg  PIT %+.2f m3", d("mud"), d("gain")), rx, ry + 44, MUTED, false);
+		graphics.text(font, String.format("MUD %.2f ppg", d("mud")), rx, ry + 44, MUTED, false);
+		graphics.text(font, String.format("PIT %+.2f m3", d("gain")), rx, ry + 55, MUTED, false);
 		if (!kill) {
 			graphics.text(font, "No kill under way. The panel works a shut-in well.", 8, 40, MUTED, false);
 			return;
