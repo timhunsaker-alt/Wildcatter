@@ -225,6 +225,62 @@ public final class Tuning {
 	public static final double ACCUMULATOR_RECHARGE_S = 30.0;           // seconds of pumping to bring back one close
 	public static final int ACCUMULATOR_REACH = 20;                     // blocks from the rig it may stand
 	public static final int RELIEF_MIN_DISTANCE = 20;                   // a relief well starts at least this far from the blowout
+
+	// ---- 23a: casing, the fracture gradient, losses and oil-based mud (docs/multiblocks/oilfield-follow-ons.md; proposed unless marked) --
+	public static final double FG_OPEN_HOLE_PPG = 14.0;                 // open hole under only the surface casing (0.73 psi/ft)
+	public static final double FG_DEEP_SHOE_PPG = 15.4;                 // an intermediate shoe in a deep field's transition zone (0.80 psi/ft)
+	public static final double FG_IN_FIELD_PPG = 15.8;                  // inside a deep field: never the weakest point below a good shoe
+	public static final int DEEP_SHOE_WINDOW = 12;                      // blocks above a deep field's top a shoe gets the 15.4 ppg
+	public static final int SURFACE_CASING_M = 30;                      // the surface casing every rig sets first (decided: questions 9)
+	public static final double ECD_DRILLING_PPG = 0.3;                  // annular friction at drilling rate
+	public static final double ECD_SCR_PPG = 0.1;                       // at the slow circulating rate
+	public static final double LOSS_PARTIAL_M3S = 1.0 / 60;             // partial losses: up to 1 m3 a minute
+	public static final double LOSS_TOTAL_OVER_PPG = 0.5;               // more than this over the FG: total losses
+	public static final int LOSS_TOTAL_FALL_TICKS = 1200;               // total losses: the column falls a block a minute
+	public static final double ANNULUS_L_PER_M = 26.5;                  // 8.5 in hole round 4.5 in pipe (2.65 m3 a 100 m)
+	public static final double STRING_L_PER_M = 7.5;                    // inside 4.5 in drill pipe (0.75 m3 a 100 m)
+	public static final double LCM_STRENGTHENING_PPG = 0.5;             // a cured loss leaves the shoe 0.5 ppg stronger (wellbore strengthening)
+	public static final int LCM_CURE_TICKS = 1200;                      // an LCM bag stops partial losses within a minute
+	public static final int CASING_JOINT_M = 9;                         // a joint a 9 m of casing
+	public static final int CASING_CEMENT_BAGS = 4;                     // four 1 t bags of class H cement a string
+	public static final int CASING_TICKS_PER_JOINT = 1200;              // a minute to run a joint
+	public static final int CASING_WOC_TICKS = 12_000;                  // ten minutes waiting on cement
+	public static final int LOT_NEW_HOLE_M = 3;                         // the LOT after 3 m of new hole below the shoe
+	public static final double KICK_INFLUX_M3S_PER_PSI = 0.0006;        // chokeKill: the influx goes with the underbalance (84 psi: 0.05 m3/s)
+	public static final double KICK_ALARM_M3 = 0.5;                     // the pit volume totalizer's gain alarm (3 bbl)
+	public static final double OIL_MUD_KICK_SHOWN = 1.0 / 3;            // a kick in oil mud shows a third of its pit gain (question 8)
+	public static final int OIL_MUD_BREAKOUT_M = 20;                    // until the influx is within 20 blocks of the surface
+	public static final double KICK_RISE_M_PER_S = 1.0;                 // the influx rises at the drilling circulation rate (decided: questions 9)
+	public static final double CACL2_APPARENT_SG = 4.17;                // dissolved CaCl2: 28 % brine is SG 1.27
+	public static final double CACL2_FLAKE = 0.77;                      // 77 % CaCl2 flake
+	public static final double OIL_MUD_OWR = 0.80;                      // 80/20 oil-water ratio
+	public static final double OIL_MUD_CACL2 = 0.28;                    // the water phase's CaCl2 by weight
+	public static final double OBM_PACKAGE_SG = 1.6;                    // emulsifier, organoclay and lime (proposed)
+	public static final double OBM_ES_KG_PER_L = 0.0428;                // 15 lb/bbl of the package: the emulsion holds (ES ok)
+	public static final double OIL_MUD_RATE = 1.25;                     // oil mud's lubricity: 25 % faster drilling
+	public static final double DIESEL_FILL_LPS = 20.0;                  // the tanks' transfer pump takes diesel off its pipe
+	public static final double CUTTINGS_M3_PER_M = 0.037;               // an 8.5 in hole: 37 L of oily cuttings a metre
+	public static final double CACL2_UNIT_WATTS = 15_000.0;             // reactor agitator and evaporator pumps, industrial LV
+	public static final double CACL2_UNIT_KGS = 500.0 / 3600;           // 0.5 t/h of 77 % flake
+	public static final double CACL2_STEAM_PER_WATER = 1.2;             // kg of process steam a kg of water evaporated (single effect)
+	public static final double OBM_BENTONITE = 0.65, OBM_LIME = 0.30, OBM_AMMONIA = 0.05;   // a tonne of package: the stand-in's make-up
+
+	// ---- 23b: the choke manifold and the hand kill (proposed unless marked) ------------------------------------------------------
+	public static final double SCR_SPM = 30.0;                          // the slow circulating rate: 30 strokes a minute
+	public static final double PUMP_L_PER_STROKE = 15.9;                // 0.1 bbl a stroke: 3 bbl/min at SCR (0.48 m3/min)
+	public static final double SCR_PSI = 150.0;                         // SCR pressure at 30 spm in a game hole: mostly the bit (decided: questions 10)
+	public static final double CHOKE_K_PSI = 1.0;                       // the choke's back pressure at SCR full open; it goes as (rate / opening)^2
+	public static final double HYDRAULIC_CHOKE_PER_S = 0.10;            // the hydraulic choke moves 10 % a second
+	public static final double MANUAL_CHOKE_PER_S = 0.02;               // the manual choke 2 % a second by its handwheel
+	public static final double PUMP_SPM_PER_S = 5.0;                    // the panel brings the pump up 5 spm a second
+	public static final double GAS_GRADIENT_PPG = 2.0;                  // a gas slug's hydrostatic, 0.1 psi/ft
+	public static final double DPP_DELAY_S_PER_KFT = 2.0;               // a choke move reaches the drill pipe gauge after 2 s per 1,000 ft
+	public static final double SECOND_KICK_M3 = 0.5;                    // new influx in the kill past this: a second kick, start again
+	public static final double SEPARATOR_SEAL_PSI = 200.0;              // gas at surface over this casing pressure on a fast opening blows the seal
+	public static final double SEPARATOR_FAST_OPEN_PER_S = 0.05;        // a choke opening faster than 5 % a second is a fast opening
+	public static final int FLOW_CHECK_TICKS = 1200;                    // the 1-minute flow check before WELL DEAD
+	public static final int CHOKE_REACH = 12;                           // blocks from the substructure the manifold may stand
+	public static final double CHOKE_PANEL_WATTS = 200.0;               // the remote panel's hydraulic pump, residential
 	public static final double GAS_UNITS_PER_TICK = 1.5;      // a free-flowing well at full pressure
 	/** Fuel a firebox will take from a well before it is full, in ticks of fire. */
 	public static final double FIREBOX_FEED_CAP = 200.0;

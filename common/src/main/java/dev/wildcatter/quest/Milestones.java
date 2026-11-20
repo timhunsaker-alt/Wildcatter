@@ -27,6 +27,18 @@ public final class Milestones {
 	public static final Identifier PUMPJACK_RUNNING = Wildcatter.id("pumpjack_running");
 	/** A drilling rig has reached an oil or gas field (a strike, not a dry hole). */
 	public static final Identifier WELL_STRUCK = Wildcatter.id("well_struck");
+	/** 23a: a land rig has set and cemented intermediate casing. */
+	public static final Identifier CASING_SET = Wildcatter.id("casing_set");
+	/** 23a: a land rig has run a leak-off test on its shoe. */
+	public static final Identifier LOT_DONE = Wildcatter.id("lot_done");
+	/** 23a: a land rig is drilling on oil mud whose emulsion holds. */
+	public static final Identifier OIL_MUD_DRILLING = Wildcatter.id("oil_mud_drilling");
+	/** 23b: a kick killed through the choke manifold: WELL DEAD. */
+	public static final Identifier WELL_KILLED_CHOKE = Wildcatter.id("well_killed_choke");
+	/** 23c: a storage cavern debrined dry. */
+	public static final Identifier CAVERN_DRY = Wildcatter.id("cavern_dry");
+	/** 23d: a Frasch wellhead lifting molten sulfur. */
+	public static final Identifier FRASCH_FLOWING = Wildcatter.id("frasch_flowing");
 	/** A crude unit (the topping unit or the atmospheric column) is refining. */
 	public static final Identifier CRUDE_UNIT_RUNNING = Wildcatter.id("crude_unit_running");
 	/** The gas plant's NGL chiller is chilling dried gas. */

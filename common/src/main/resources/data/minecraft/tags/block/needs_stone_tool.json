@@ -371,6 +371,7 @@
     "wildcatter:lithium_leach",
     "wildcatter:lioh_crystallizer",
     "wildcatter:lithium_carbonator",
-    "wildcatter:dry_type_transformer"
+    "wildcatter:dry_type_transformer",
+    "wildcatter:calcium_chloride_unit"
   ]
 }

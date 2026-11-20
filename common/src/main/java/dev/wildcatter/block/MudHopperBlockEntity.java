@@ -44,7 +44,9 @@ public class MudHopperBlockEntity extends UnitMotorBlockEntity implements Hopper
 
 	private static RigSubstructureBlockEntity.@Nullable Solid solid(ItemStack stack) {
 		return stack.is(WildcatterItems.BARITE_BAG) ? RigSubstructureBlockEntity.Solid.BARITE : stack.is(WildcatterItems.BENTONITE_BAG) ? RigSubstructureBlockEntity.Solid.BENTONITE
-				: stack.is(OreBlocks.MINERALS.get(Ore.HALITE)) ? RigSubstructureBlockEntity.Solid.SALT : null;
+				: stack.is(OreBlocks.MINERALS.get(Ore.HALITE)) ? RigSubstructureBlockEntity.Solid.SALT
+				: stack.is(WildcatterItems.CACL2_BAG) ? RigSubstructureBlockEntity.Solid.CACL2 : stack.is(WildcatterItems.OBM_PACKAGE) ? RigSubstructureBlockEntity.Solid.OBM
+				: stack.is(WildcatterItems.LCM_BAG) ? RigSubstructureBlockEntity.Solid.LCM : null;   // 23a
 	}
 
 	/** The land rig whose mud tanks it stands against, or null. */
@@ -74,7 +76,7 @@ public class MudHopperBlockEntity extends UnitMotorBlockEntity implements Hopper
 		}
 		if (left <= 1e-6 || mixing == null) {
 			left = 0;
-			unit = "NO BAGS: put a hopper of barite, bentonite or rock salt on top";
+			unit = "NO BAGS: put a hopper of barite, bentonite, rock salt, CaCl2, the OBM package or LCM on top";
 			return;
 		}
 		double room = rig.roomFor(mixing);

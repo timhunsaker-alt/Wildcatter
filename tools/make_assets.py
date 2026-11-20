@@ -3339,8 +3339,10 @@ lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
 lang[f"block.{ns}.dry_type_transformer"] = "Dry-Type Transformer (LV / 480 V, 75 kVA)"
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 shaped("dry_type_transformer", ["SWS", "CIC", "SWS"], {"S": f"{ns}:steel_ingot", "W": f"{ns}:wool_wire_hot", "C": "minecraft:copper_block", "I": "minecraft:iron_block"}, "dry_type_transformer")
-# ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
+# ---- Phase 23: the oilfield follow-ons' loot, tags, recipes, names and item icons (tools/oilfield_assets.py, its own random numbers) ---
 import subprocess, sys
+subprocess.run([sys.executable, "tools/oilfield_assets.py"], check=True)
+# ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)
 
 # ---- Wave A art (2026-11-19, C23): every item icon still drawn as a *_placeholder takes its Ludo icon once art/final/ore has it -----

@@ -1,5 +1,6 @@
 package dev.wildcatter.block;
 
+import dev.wildcatter.Tuning;
 import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.WildcatterItems;
 import dev.wildcatter.item.PowerMeterItem;
@@ -25,7 +26,7 @@ import net.minecraft.world.phys.BlockHitResult;
  * and runs the rig; every other part snaps into its place when clicked on its floor or on the ground near it (see {@link LandRig}).
  * The top drive is an item clicked into the mast.
  */
-public class RigPartBlock extends BigPartBlock {
+public class RigPartBlock extends BigPartBlock implements net.minecraft.world.WorldlyContainerHolder {
 	public enum Part {
 		SUBSTRUCTURE("rig_substructure", substructure()),
 		MAST("rig_mast", mast()),
@@ -132,6 +133,18 @@ public class RigPartBlock extends BigPartBlock {
 		if (read != null) {
 			return read;
 		}
+		if (part == Part.SUBSTRUCTURE && (stack.is(WildcatterItems.CASING_JOINT) || stack.is(WildcatterItems.OILWELL_CEMENT))) {   // 23a: onto the rack
+			if (!level.isClientSide()) {
+				RigSubstructureBlockEntity rig = controller(level, main, state);
+				if (rig != null) {
+					int took = rig.rackUp(stack);
+					stack.consume(took, player);
+					player.sendOverlayMessage(Component.literal(String.format("Racked: %d casing joints and %d cement bags (SET CASING to %d m needs %d joints and %d bags)",
+							rig.joints(), rig.cementBags(), rig.depthNow(), rig.jointsNeeded(), Tuning.CASING_CEMENT_BAGS)));
+				}
+			}
+			return InteractionResult.SUCCESS;
+		}
 		if (stack.is(WildcatterItems.TOP_DRIVE)) {   // into the mast (or straight to the substructure)
 			if (!level.isClientSide()) {
 				RigSubstructureBlockEntity rig = controller(level, main, state);
@@ -156,7 +169,12 @@ public class RigPartBlock extends BigPartBlock {
 		if (!level.isClientSide()) {
 			RigSubstructureBlockEntity rig = controller(level, main(pos, state), state);
 			if (part == Part.SUBSTRUCTURE && rig != null && player.isShiftKeyDown()) {
-				player.sendOverlayMessage(rig.shutIn((net.minecraft.server.level.ServerLevel) level));   // the console's SHUT IN (15b2)
+				RigSubstructureBlockEntity.Phase p = rig.phase();
+				player.sendOverlayMessage(p == RigSubstructureBlockEntity.Phase.KICK || p == RigSubstructureBlockEntity.Phase.BLOWOUT
+						? rig.shutIn((net.minecraft.server.level.ServerLevel) level)   // the console's SHUT IN (15b2)
+						: rig.consoleCasing((net.minecraft.server.level.ServerLevel) level));   // 23a: SET CASING, then the LOT
+			} else if (part == Part.MUD_TANKS && rig != null && player.isShiftKeyDown()) {
+				player.sendOverlayMessage(rig.tanksSwitch(level.getGameTime()));   // 23a: WATER / OIL MUD, or DUMP
 			} else if (part == Part.SUBSTRUCTURE && rig != null) {
 				player.sendOverlayMessage(rig.toggle());   // the driller's console
 			} else if (level.getBlockEntity(main(pos, state)) instanceof dev.wildcatter.energy.Inspectable i) {
@@ -173,5 +191,15 @@ public class RigPartBlock extends BigPartBlock {
 		BlockPos origin = state.getBlock() == WildcatterBlocks.RIG_SUBSTRUCTURE ? main
 				: LandRig.controllerOf(level, state.getBlock(), main, state.getValue(FACING));
 		return origin != null && level.getBlockEntity(origin) instanceof RigSubstructureBlockEntity rig ? rig : null;
+	}
+
+	/** 23a: a hopper on the rig floor racks casing joints and cement bags in the substructure. */
+	@Override
+	public net.minecraft.world.WorldlyContainer getContainer(BlockState state, net.minecraft.world.level.LevelAccessor level, BlockPos pos) {
+		if (part != Part.SUBSTRUCTURE || !(level instanceof Level l)) {
+			return null;
+		}
+		RigSubstructureBlockEntity rig = controller(l, main(pos, state), state);
+		return rig == null ? null : rig.rackContainer();
 	}
 }

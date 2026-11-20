@@ -711,5 +711,11 @@
   "gui.wildcatter.quest.have_tag": "Have %s x any %s",
   "gui.wildcatter.quest.advancement": "Advancement: %s",
   "gui.wildcatter.quest.milestone": "Milestone: %s",
-  "block.wildcatter.dry_type_transformer": "Dry-Type Transformer (LV / 480 V, 75 kVA)"
+  "block.wildcatter.dry_type_transformer": "Dry-Type Transformer (LV / 480 V, 75 kVA)",
+  "block.wildcatter.calcium_chloride_unit": "Calcium Chloride Unit (0.5 t/h flake)",
+  "item.wildcatter.casing_joint": "Casing Joint (9-5/8 in, 9 m)",
+  "item.wildcatter.oilwell_cement": "Bag of Oilwell Cement (class H)",
+  "item.wildcatter.lcm_bag": "Bulk Bag of LCM (sized calcium carbonate)",
+  "item.wildcatter.cacl2_bag": "Bulk Bag of Calcium Chloride Flake (77 %)",
+  "item.wildcatter.obm_package": "Bulk Bag of OBM Package (emulsifier, organoclay, lime)"
 }

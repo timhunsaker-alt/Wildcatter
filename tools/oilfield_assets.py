@@ -1,0 +1,101 @@
+#!/usr/bin/env python3
+"""Phase 23, the oilfield follow-ons (docs/multiblocks/oilfield-follow-ons.md): loot, tags, recipes, names and item icons for its parts
+and items. The part models come from tools/models/oilfield.py. Run from the repo root (make_assets.py runs it too); it draws its
+placeholders with its own random numbers, so the rest of make_assets.py's noise is unchanged. An item whose Ludo icon is in
+art/final/ore (tools/process_art.py's icon()) takes it in place of the placeholder."""
+import json, os, random, shutil
+from PIL import Image, ImageDraw
+
+ROOT = "common/src/main/resources"
+ASSETS = f"{ROOT}/assets/wildcatter"
+DATA = f"{ROOT}/data/wildcatter"
+ORE_ART = "art/final/ore"
+ns = "wildcatter"
+rng = random.Random(23)
+
+
+def save_json(path, obj):
+	os.makedirs(os.path.dirname(path), exist_ok=True)
+	with open(path, "w") as f:
+		json.dump(obj, f, indent=2)
+		f.write("\n")
+
+
+def shaped(name, pattern, key, result, count=1):
+	save_json(f"{DATA}/recipe/{name}.json", {"type": "minecraft:crafting_shaped", "category": "redstone",
+		"pattern": pattern, "key": key, "result": {"id": f"{ns}:{result}", "count": count}})
+
+
+def shapeless(name, ingredients, result, count=1):
+	save_json(f"{DATA}/recipe/{name}.json", {"type": "minecraft:crafting_shapeless", "category": "redstone",
+		"ingredients": ingredients, "result": {"id": f"{ns}:{result}", "count": count}})
+
+
+def big_part_loot(name):
+	save_json(f"{DATA}/loot_table/blocks/{name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],
+		"conditions": [{"condition": "minecraft:survives_explosion"}, {"condition": "minecraft:block_state_property", "block": f"{ns}:{name}", "properties": {"piece": "0"}}]}]})
+
+
+def simple_loot(name):
+	save_json(f"{DATA}/loot_table/blocks/{name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{ns}:{name}"}],
+		"conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+
+
+def placeholder(name, colour, mark=None):
+	img = Image.new("RGBA", (16, 16))
+	d = ImageDraw.Draw(img)
+	for x in range(16):
+		for y in range(16):
+			n = rng.randint(-10, 10)
+			img.putpixel((x, y), tuple(max(0, min(255, c + n)) for c in colour) + (255,))
+	if mark:
+		mark(d)
+	path = f"{ASSETS}/textures/item/{name}_placeholder.png"
+	os.makedirs(os.path.dirname(path), exist_ok=True)
+	img.save(path)
+
+
+def item(name, label, colour, mark=None):
+	placeholder(name, colour, mark)   # drawn always, so the random sequence does not depend on which icons exist
+	if os.path.exists(f"{ORE_ART}/{name}.png"):
+		os.makedirs(f"{ASSETS}/textures/item/ore", exist_ok=True)
+		shutil.copy(f"{ORE_ART}/{name}.png", f"{ASSETS}/textures/item/ore/{name}.png")
+		layer = f"{ns}:item/ore/{name}"
+	else:
+		layer = f"{ns}:item/{name}_placeholder"
+	save_json(f"{ASSETS}/models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": layer}})
+	save_json(f"{ASSETS}/items/{name}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{name}"}})
+	LANG[f"item.{ns}.{name}"] = label
+
+
+def tags(names):
+	for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+		path = f"{ROOT}/data/minecraft/tags/block/{t_name}.json"
+		t = json.load(open(path))
+		wanted = [f"{ns}:{n}" for n in names]
+		t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+		save_json(path, t)
+
+
+LANG = json.load(open(f"{ASSETS}/lang/en_us.json"))
+S_, P_ = f"{ns}:steel_ingot", f"{ns}:gas_line"
+
+# ---- 23a: casing, cement, LCM, oil mud and the calcium chloride unit ------------------------------------------------------------
+PARTS_23A = ("calcium_chloride_unit",)
+for name in PARTS_23A:
+	big_part_loot(name)
+tags(PARTS_23A)
+shaped("calcium_chloride_unit", ["SHS", "PCP", "SXS"], {"S": S_, "H": "minecraft:hopper", "P": P_, "C": "minecraft:cauldron", "X": "minecraft:piston"}, "calcium_chloride_unit")
+LANG[f"block.{ns}.calcium_chloride_unit"] = "Calcium Chloride Unit (0.5 t/h flake)"
+item("casing_joint", "Casing Joint (9-5/8 in, 9 m)", (120, 126, 132), lambda d: d.rectangle([6, 0, 9, 15], fill=(80, 86, 92, 255)))
+item("oilwell_cement", "Bag of Oilwell Cement (class H)", (176, 176, 170))
+item("lcm_bag", "Bulk Bag of LCM (sized calcium carbonate)", (226, 222, 210))
+item("cacl2_bag", "Bulk Bag of Calcium Chloride Flake (77 %)", (236, 236, 236))
+item("obm_package", "Bulk Bag of OBM Package (emulsifier, organoclay, lime)", (150, 120, 80))
+shaped("casing_joint", ["S", "S", "S"], {"S": S_}, "casing_joint", 2)
+# cement: quicklime and clay (the gypsum-free variant, plain clay doubled; the mod has no gypsum item: decisions 11)
+shapeless("oilwell_cement", [f"{ns}:quicklime_bag", "minecraft:clay_ball", "minecraft:clay_ball", "minecraft:clay_ball", "minecraft:clay_ball"], "oilwell_cement")
+
+json_out = dict(sorted(LANG.items())) if False else LANG
+save_json(f"{ASSETS}/lang/en_us.json", json_out)
+print("oilfield assets written")

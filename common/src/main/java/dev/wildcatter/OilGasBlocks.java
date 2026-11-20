@@ -51,6 +51,10 @@ public interface OilGasBlocks {
 	// 15b2: well control
 	Block BOP_STACK = mudPart(dev.wildcatter.block.MudPartBlock.Part.BOP_STACK);
 	Block BOP_ACCUMULATOR = mudPart(dev.wildcatter.block.MudPartBlock.Part.BOP_ACCUMULATOR);
+	// Phase 23: the oilfield follow-ons (docs/multiblocks/oilfield-follow-ons.md)
+	Block CALCIUM_CHLORIDE_UNIT = oilfieldPart(dev.wildcatter.block.OilfieldPartBlock.Part.CALCIUM_CHLORIDE_UNIT);
+	/** Phase 23's true-size parts, for registration. */
+	Block[] OILFIELD_PARTS = {CALCIUM_CHLORIDE_UNIT};
 	// 14b: the sales line's meter stations (docs/multiblocks/sales-gas.md)
 	Block METER_BUILDING = salesGasPart(dev.wildcatter.block.SalesGasPartBlock.Part.METER_BUILDING);
 	Block FILTER_SEPARATOR = salesGasPart(dev.wildcatter.block.SalesGasPartBlock.Part.FILTER_SEPARATOR);

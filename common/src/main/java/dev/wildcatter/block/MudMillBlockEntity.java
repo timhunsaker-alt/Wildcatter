@@ -3,6 +3,7 @@ package dev.wildcatter.block;
 import dev.wildcatter.Tuning;
 import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.WildcatterItems;
+import dev.wildcatter.fluid.Product;
 import dev.wildcatter.ore.Ore;
 import dev.wildcatter.ore.OreBlocks;
 import java.util.List;
@@ -29,8 +30,11 @@ import net.minecraft.world.level.storage.ValueOutput;
  * The mineral goes in by a hopper on top, a block's worth at a time; the ground product goes to a bagging station set against it.
  */
 public class MudMillBlockEntity extends UnitMotorBlockEntity implements HopperFed, Bagged {
-	private final NonNullList<ItemStack> slots = NonNullList.withSize(1, ItemStack.EMPTY);
+	private final NonNullList<ItemStack> slots = NonNullList.withSize(2, ItemStack.EMPTY);
 	private double feed;     // kg of the mineral in the mill's bin
+	/** 23a: the second recipe: the barite mill grinding calcite or limestone to LCM, the dryer making the OBM package with quicklime and ammonia. */
+	private boolean second;
+	private double lime;     // kg of quicklime in the dryer, for the OBM package
 	private double ground;   // kg ground and ready for bags
 	private double made;     // kg ground in all
 	private String unit = "starting";
@@ -54,12 +58,40 @@ public class MudMillBlockEntity extends UnitMotorBlockEntity implements HopperFe
 
 	@Override
 	public boolean takes(ItemStack stack) {
-		return stack.is(OreBlocks.MINERALS.get(ore()));
+		return stack.is(OreBlocks.MINERALS.get(ore())) || calcite(stack);
+	}
+
+	/** The barite mill's second recipe (23a): calcite, the caprock's or the hills', or limestone, ground to sized calcium carbonate. */
+	private boolean calcite(ItemStack stack) {
+		return !dryer() && (stack.is(net.minecraft.world.item.Items.CALCITE) || stack.is(OreBlocks.MINERALS.get(Ore.LIMESTONE)));
+	}
+
+	@Override
+	public int[] getSlotsForFace(Direction side) {
+		return side == Direction.UP ? (dryer() ? new int[] {0, 1} : new int[] {0}) : new int[0];
+	}
+
+	@Override
+	public boolean canPlaceItem(int slot, ItemStack stack) {
+		return slot == 0 ? takes(stack) : slot == 1 && dryer() && stack.is(WildcatterItems.QUICKLIME_BAG);
+	}
+
+	@Override
+	public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @org.jspecify.annotations.Nullable Direction side) {
+		return side == Direction.UP && canPlaceItem(slot, stack);
 	}
 
 	@Override
 	public Item bagItem() {
+		if (second) {
+			return dryer() ? WildcatterItems.OBM_PACKAGE : WildcatterItems.LCM_BAG;
+		}
 		return dryer() ? WildcatterItems.BENTONITE_BAG : WildcatterItems.BARITE_BAG;
+	}
+
+	/** The dryer's ammonia, on the north face of its bottom cells (the OBM package's amine stand-in). */
+	private List<Lines.Face> ammonia() {
+		return faces(at -> at[1] == 0 && at[2] == 0, Direction.NORTH);
 	}
 
 	@Override
@@ -98,8 +130,26 @@ public class MudMillBlockEntity extends UnitMotorBlockEntity implements HopperFe
 		double rate = dryer() ? Tuning.BENTONITE_DRYER_KGS : Tuning.BARITE_MILL_KGS;
 		double max = rate * seconds();
 		if (feed < max && fed() > 0) {
-			useOne();
-			feed += ore().kgPerBlock();
+			ItemStack next = slots.get(0);
+			boolean alt = calcite(next);
+			if (feed < 0.01 && ground < 0.01) {
+				second = alt;   // the mill changes over only when empty
+			}
+			if (alt == second || dryer()) {
+				useOne();
+				feed += alt ? Ore.LIMESTONE.kgPerBlock() : ore().kgPerBlock();
+			}
+		}
+		if (dryer()) {
+			if (lime < Tuning.BULK_BAG_KG * Tuning.OBM_LIME && !slots.get(1).isEmpty()) {
+				slots.get(1).shrink(1);
+				lime += Tuning.BULK_BAG_KG;
+				setChanged();
+			}
+			boolean obm = lime > 1 && Lines.available(level, ammonia(), Product.AMMONIA, Pull.MACHINE, this) > 0.01;
+			if (feed < 0.01 && ground < 0.01) {
+				second = obm;
+			}
 		}
 		String name = dryer() ? "BENTONITE" : "BARITE";
 		if (feed < 0.01) {
@@ -127,11 +177,23 @@ public class MudMillBlockEntity extends UnitMotorBlockEntity implements HopperFe
 				return;
 			}
 		}
+		if (dryer() && second) {
+			// 23a: a tonne of package from 0.65 t of bentonite, 0.30 t of quicklime and 50 kg of ammonia (proposed stand-in)
+			double product = Math.min(kg / Tuning.OBM_BENTONITE, lime / Tuning.OBM_LIME);
+			double nh3 = Lines.pull(level, ammonia(), Product.AMMONIA, product * Tuning.OBM_AMMONIA / Tuning.AMMONIA_KG_PER_L, Pull.MACHINE, this);
+			product = Math.min(product, nh3 * Tuning.AMMONIA_KG_PER_L / Tuning.OBM_AMMONIA);
+			feed -= product * Tuning.OBM_BENTONITE;
+			lime -= product * Tuning.OBM_LIME;
+			ground += product;
+			made += product;
+			unit = String.format("making the OBM package at %.1f t/h, %.0f kW of gas", product / seconds() * 3.6, gas / seconds() / 1000);
+			return;
+		}
 		feed -= kg;
 		ground += kg;
 		made += kg;
 		unit = dryer() ? String.format("drying and milling at %.1f t/h, %.0f kW of gas", kg / seconds() * 3.6, gas / seconds() / 1000)
-				: String.format("grinding to API 13A 4.1 at %.1f t/h", kg / seconds() * 3.6);
+				: second ? String.format("grinding calcium carbonate to LCM at %.1f t/h", kg / seconds() * 3.6) : String.format("grinding to API 13A 4.1 at %.1f t/h", kg / seconds() * 3.6);
 	}
 
 	@Override
@@ -147,6 +209,8 @@ public class MudMillBlockEntity extends UnitMotorBlockEntity implements HopperFe
 		output.putDouble("feed", feed);
 		output.putDouble("ground", ground);
 		output.putDouble("made", made);
+		output.putBoolean("second", second);
+		output.putDouble("lime", lime);
 	}
 
 	@Override
@@ -157,5 +221,7 @@ public class MudMillBlockEntity extends UnitMotorBlockEntity implements HopperFe
 		feed = input.getDoubleOr("feed", 0);
 		ground = input.getDoubleOr("ground", 0);
 		made = input.getDoubleOr("made", 0);
+		second = input.getBooleanOr("second", false);
+		lime = input.getDoubleOr("lime", 0);
 	}
 }

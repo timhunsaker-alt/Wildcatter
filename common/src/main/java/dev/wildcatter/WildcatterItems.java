@@ -199,6 +199,22 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> BENTONITE_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("bentonite_bag"));
 	public static final Item BENTONITE_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(BENTONITE_BAG_KEY),
 			String.format("%,.0f kg of drilling bentonite, API 13A section 9", Tuning.BULK_BAG_KG), "gels a land rig's mud: into its mud hopper");
+	// 23a: casing, cement, LCM and oil mud (docs/multiblocks/oilfield-follow-ons.md)
+	public static final ResourceKey<Item> CASING_JOINT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("casing_joint"));
+	public static final Item CASING_JOINT = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(CASING_JOINT_KEY),
+			"a 9 m joint of 9-5/8 in intermediate casing", "SET CASING on a land rig: one a 9 m of hole, racked in the substructure");
+	public static final ResourceKey<Item> OILWELL_CEMENT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("oilwell_cement"));
+	public static final Item OILWELL_CEMENT = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(OILWELL_CEMENT_KEY),
+			String.format("%,.0f kg of class H oilwell cement", Tuning.BULK_BAG_KG), "four bags cement a casing string");
+	public static final ResourceKey<Item> LCM_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("lcm_bag"));
+	public static final Item LCM_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(LCM_BAG_KEY),
+			String.format("%,.0f kg of sized calcium carbonate (LCM)", Tuning.BULK_BAG_KG), "through the mud hopper during partial losses");
+	public static final ResourceKey<Item> CACL2_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("cacl2_bag"));
+	public static final Item CACL2_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(CACL2_BAG_KEY),
+			String.format("%,.0f kg of calcium chloride flake (77 %%)", Tuning.BULK_BAG_KG), "oil mud's water phase: into the mud hopper");
+	public static final ResourceKey<Item> OBM_PACKAGE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("obm_package"));
+	public static final Item OBM_PACKAGE = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(OBM_PACKAGE_KEY),
+			String.format("%,.0f kg of emulsifier, organophilic clay and lime", Tuning.BULK_BAG_KG), "holds oil mud's emulsion: into the mud hopper");
 	public static final ResourceKey<Item> EMPTY_TON_CONTAINER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("empty_ton_container"));
 	public static final Item EMPTY_TON_CONTAINER = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(4).setId(EMPTY_TON_CONTAINER_KEY),
 			String.format("Welded steel chlorine ton container, %,.0f kg tare", Tuning.CL2_TON_TARE));
@@ -544,6 +560,11 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, QUICKLIME_BAG_KEY, QUICKLIME_BAG);
 		Registry.register(BuiltInRegistries.ITEM, BARITE_BAG_KEY, BARITE_BAG);
 		Registry.register(BuiltInRegistries.ITEM, BENTONITE_BAG_KEY, BENTONITE_BAG);
+		Registry.register(BuiltInRegistries.ITEM, CASING_JOINT_KEY, CASING_JOINT);
+		Registry.register(BuiltInRegistries.ITEM, OILWELL_CEMENT_KEY, OILWELL_CEMENT);
+		Registry.register(BuiltInRegistries.ITEM, LCM_BAG_KEY, LCM_BAG);
+		Registry.register(BuiltInRegistries.ITEM, CACL2_BAG_KEY, CACL2_BAG);
+		Registry.register(BuiltInRegistries.ITEM, OBM_PACKAGE_KEY, OBM_PACKAGE);
 		Registry.register(BuiltInRegistries.ITEM, EMPTY_TON_CONTAINER_KEY, EMPTY_TON_CONTAINER);
 		Registry.register(BuiltInRegistries.ITEM, CHLORINE_TON_CONTAINER_KEY, CHLORINE_TON_CONTAINER);
 		Registry.register(BuiltInRegistries.ITEM, GREEN_COKE_KEY, GREEN_COKE);

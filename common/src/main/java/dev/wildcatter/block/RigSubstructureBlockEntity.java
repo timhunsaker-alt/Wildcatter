@@ -57,7 +57,7 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 			case 2 -> pumping();
 			case 3 -> connecting();
 			case 4 -> remote.auto();
-			case 5 -> phase == Phase.KICK || phase == Phase.BLOWOUT;
+			case 5 -> (phase == Phase.KICK && kickShown) || phase == Phase.BLOWOUT || phase == Phase.UNDERGROUND;
 			case 7 -> phase == Phase.SHUT_IN;
 			default -> false;
 		};
@@ -112,7 +112,9 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 	public enum Phase {
 		IDLE, DRILLING, COMPLETE, DRY,
 		/** 15b2 (docs/multiblocks/drilling-mud.md): the well flowing into the hole, the shut-in well, a wild well, one killed by a relief well. */
-		KICK, SHUT_IN, BLOWOUT, KILLED
+		KICK, SHUT_IN, BLOWOUT, KILLED,
+		/** 23a (docs/multiblocks/oilfield-follow-ons.md): running and cementing intermediate casing; a kick flowing into a broken-down shoe. */
+		CASING, UNDERGROUND
 	}
 
 	// ---- 15b2: well control -------------------------------------------------------------------------------------------------------
@@ -167,16 +169,372 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		return depth * Tuning.FEET_PER_M;
 	}
 
-	/** The mud is under the field's pore pressure and the trip margin: the well kicks. */
+	/** The mud is under the field's pore pressure and the trip margin: the well kicks. In working oil mud the gas dissolves and the alarm comes late. */
 	private void kick(ServerLevel level) {
 		phase = Phase.KICK;
 		kickAt = level.getGameTime();
 		pitGain = 0;
+		influxUp = 0;
+		kickShown = false;
+		if (!oilMudWorking()) {
+			alarm(level);
+		}
+		setChanged();
+		sync();
+	}
+
+	/** The pit volume alarm: the 30 s to shut in start now. */
+	private void alarm(ServerLevel level) {
+		kickShown = true;
+		kickAt = level.getGameTime();
 		level.playSound(null, hole(), SoundEvents.BELL_BLOCK, SoundSource.BLOCKS, 2.0F, 0.6F);
 		Drilling.announce(level, hole(), Component.literal("KICK! The pits are gaining: shut the well in (sneak-click the driller's console) within "
 				+ Tuning.KICK_WINDOW_TICKS / 20 + " s"));
+	}
+
+	/** m3/s the kick flows: with {@code chokeKill}, with the underbalance (84 psi gives the Phase 15 rate); else the Phase 15 rate. */
+	private double kickRate(@Nullable Reservoir field) {
+		if (!dev.wildcatter.Rules.chokeKill() || field == null) {
+			return Tuning.KICK_GAIN_M3S;
+		}
+		double under = dev.wildcatter.well.WellControl.psi(porePpg(field) - mudPpg(), tvdFeet());
+		return Math.max(0.002, Math.min(Tuning.KICK_GAIN_M3S, Tuning.KICK_INFLUX_M3S_PER_PSI * under));
+	}
+
+	/** The pit gain the pit volume totalizer shows: in oil mud a third of it until the influx is within 20 blocks of the surface (question 8). */
+	public double shownGain() {
+		if (oilMudWorking() && depth - influxUp > Tuning.OIL_MUD_BREAKOUT_M) {
+			return pitGain * Tuning.OIL_MUD_KICK_SHOWN;
+		}
+		return pitGain;
+	}
+
+	// ---- 23a: casing, the leak-off test, the fracture gradient and losses (docs/multiblocks/oilfield-follow-ons.md) -------------------
+	/** Metres down of the intermediate casing shoe; 0 with only the surface casing. */
+	private int shoeDepth;
+	private double shoeFgPpg = Tuning.FG_OPEN_HOLE_PPG;
+	private boolean lotDone;
+	/** ppg a cured loss has added to the weakest point (wellbore strengthening). */
+	private double lcmBonus;
+	private double lcmCure;
+	private double lcmPumped;
+	private double casingLeft;
+	private dev.wildcatter.well.WellControl.Losses losses = dev.wildcatter.well.WellControl.Losses.NONE;
+	private double lostMud;
+	private int columnDrop;
+	private double fallTicks;
+	private boolean kickShown = true;
+	private double influxUp;
+	/** The racks: casing joints (slot 0) and cement bags (slot 1), by click or a hopper on the floor. */
+	private final net.minecraft.core.NonNullList<ItemStack> rack = net.minecraft.core.NonNullList.withSize(2, ItemStack.EMPTY);
+	/** 23b: the well in a choke kill. */
+	private dev.wildcatter.well.@Nullable KillModel well;
+
+	public int shoeDepth() {
+		return shoeDepth;
+	}
+
+	public int depthNow() {
+		return depth;
+	}
+
+	public boolean lotDone() {
+		return lotDone;
+	}
+
+	public dev.wildcatter.well.WellControl.Losses losses() {
+		return losses;
+	}
+
+	public double lostMud() {
+		return lostMud;
+	}
+
+	/** The depth of the weakest point: the intermediate shoe, or the surface casing's. */
+	public int weakDepth() {
+		return shoeDepth > 0 ? shoeDepth : Math.min(depth, Tuning.SURFACE_CASING_M);
+	}
+
+	/** The weakest point's fracture gradient, ppg: the intermediate shoe's, or the open hole's under surface casing. */
+	public double weakFg() {
+		return (shoeDepth > 0 ? shoeFgPpg : Tuning.FG_OPEN_HOLE_PPG) + lcmBonus;
+	}
+
+	/** True with open hole below the weakest point (drilled past the surface casing or the intermediate shoe). */
+	private boolean openHole() {
+		return depth > weakDepth();
+	}
+
+	/** MAASP for the mud in the hole, psi. */
+	public double maasp() {
+		return dev.wildcatter.well.WellControl.maasp(weakFg(), mudPpg(), weakDepth() * Tuning.FEET_PER_M);
+	}
+
+	public int jointsNeeded() {
+		return (depth + Tuning.CASING_JOINT_M - 1) / Tuning.CASING_JOINT_M;
+	}
+
+	public int joints() {
+		return rack.get(0).getCount();
+	}
+
+	public int cementBags() {
+		return rack.get(1).getCount();
+	}
+
+	/** Racks a stack of casing joints or cement bags held or dropped in by hopper; returns how many it took. */
+	public int rackUp(ItemStack stack) {
+		int slot = stack.is(WildcatterItems.CASING_JOINT) ? 0 : stack.is(WildcatterItems.OILWELL_CEMENT) ? 1 : -1;
+		if (slot < 0) {
+			return 0;
+		}
+		ItemStack held = rack.get(slot);
+		int room = held.isEmpty() ? 64 : 64 - held.getCount();
+		int n = Math.min(room, stack.getCount());
+		if (n <= 0) {
+			return 0;
+		}
+		if (held.isEmpty()) {
+			rack.set(slot, stack.copyWithCount(n));
+		} else {
+			held.grow(n);
+		}
+		setChanged();
+		return n;
+	}
+
+	/** The racks, for a hopper on the rig floor. */
+	public net.minecraft.world.WorldlyContainer rackContainer() {
+		return new net.minecraft.world.WorldlyContainer() {
+			@Override
+			public int[] getSlotsForFace(Direction side) {
+				return new int[] {0, 1};
+			}
+
+			@Override
+			public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
+				return canPlaceItem(slot, stack);
+			}
+
+			@Override
+			public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
+				return false;
+			}
+
+			@Override
+			public boolean canPlaceItem(int slot, ItemStack stack) {
+				return slot == 0 ? stack.is(WildcatterItems.CASING_JOINT) : slot == 1 && stack.is(WildcatterItems.OILWELL_CEMENT);
+			}
+
+			@Override
+			public int getContainerSize() {
+				return 2;
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return rack.stream().allMatch(ItemStack::isEmpty);
+			}
+
+			@Override
+			public ItemStack getItem(int slot) {
+				return rack.get(slot);
+			}
+
+			@Override
+			public ItemStack removeItem(int slot, int count) {
+				return ItemStack.EMPTY;
+			}
+
+			@Override
+			public ItemStack removeItemNoUpdate(int slot) {
+				return ItemStack.EMPTY;
+			}
+
+			@Override
+			public void setItem(int slot, ItemStack stack) {
+				rack.set(slot, stack);
+				RigSubstructureBlockEntity.this.setChanged();
+			}
+
+			@Override
+			public void setChanged() {
+				RigSubstructureBlockEntity.this.setChanged();
+			}
+
+			@Override
+			public boolean stillValid(net.minecraft.world.entity.player.Player player) {
+				return false;
+			}
+
+			@Override
+			public void clearContent() {
+			}
+		};
+	}
+
+	/**
+	 * The console's second button (sneak-click) when no kick is on: SET CASING with no intermediate string yet, then the LOT after 3 m of
+	 * new hole. Returns what happened.
+	 */
+	public Component consoleCasing(ServerLevel level) {
+		if (phase != Phase.IDLE) {
+			return Component.literal(phase == Phase.CASING ? status : "Stop drilling first (right-click the console): " + status);
+		}
+		if (shoeDepth == 0) {
+			return setCasing(level);
+		}
+		if (!lotDone) {
+			return leakOffTest(level);
+		}
+		return Component.literal(String.format("Intermediate casing at %d m, shoe FG %.1f ppg, MAASP %,.0f psi with %.1f ppg mud: one string is all this rig runs",
+				shoeDepth, weakFg(), maasp(), mudPpg()));
+	}
+
+	/** SET CASING: runs casing from the surface to the bit and cements it; the bit's depth becomes the shoe. */
+	public Component setCasing(ServerLevel level) {
+		if (!formed || depth <= Tuning.SURFACE_CASING_M) {
+			return Component.literal("SET CASING: drill below the surface casing (" + Tuning.SURFACE_CASING_M + " m) first");
+		}
+		int need = jointsNeeded();
+		if (joints() < need || cementBags() < Tuning.CASING_CEMENT_BAGS) {
+			return Component.literal(String.format("SET CASING needs %d casing joints and %d bags of oilwell cement on the rack (has %d and %d): click them into the substructure or hopper them onto the floor",
+					need, Tuning.CASING_CEMENT_BAGS, joints(), cementBags()));
+		}
+		rack.get(0).shrink(need);
+		rack.get(1).shrink(Tuning.CASING_CEMENT_BAGS);
+		casingLeft = need * (double) Tuning.CASING_TICKS_PER_JOINT + Tuning.CASING_WOC_TICKS;
+		phase = Phase.CASING;
+		status = "RUNNING CASING";
 		setChanged();
 		sync();
+		return Component.literal(String.format("SET CASING: running %d joints of 9-5/8 in casing to %d m, then %d minutes waiting on cement", need, depth, Tuning.CASING_WOC_TICKS / 1200));
+	}
+
+	/** The casing run and the wait on cement, a tick of the drawworks' power at a time. */
+	private void runCasing(ServerLevel level, double power) {
+		casingLeft -= power;
+		int joints = jointsNeeded();
+		double running = casingLeft - Tuning.CASING_WOC_TICKS;
+		status = running > 0 ? String.format("RUNNING CASING: joint %d of %d", joints - (int) Math.ceil(running / Tuning.CASING_TICKS_PER_JOINT) + 1, joints)
+				: String.format("WAITING ON CEMENT: %d s left", (int) Math.ceil(Math.max(0, casingLeft) / 20));
+		if (casingLeft <= 0) {
+			casingLeft = 0;
+			shoeDepth = depth;
+			Reservoir field = Drilling.field(level, hole());
+			shoeFgPpg = dev.wildcatter.well.WellControl.shoeFg(hole().getY() - depth, field != null && field.deep() ? field.topY() : Integer.MIN_VALUE);
+			lotDone = false;
+			lcmBonus = 0;
+			phase = Phase.IDLE;
+			dev.wildcatter.quest.QuestEvents.milestone(level, hole(), dev.wildcatter.quest.Milestones.CASING_SET);
+			Drilling.announce(level, hole(), Component.literal("CASING SET at " + depth + " m and cemented: drill " + Tuning.LOT_NEW_HOLE_M
+					+ " m of new hole, then run a leak-off test (sneak-click the console). FG NOT TESTED until then."));
+			sync();
+		}
+		setChanged();
+	}
+
+	/** The LOT: pumps slowly against the closed annular and reads where the shoe takes mud, so its FG and the MAASP show. */
+	public Component leakOffTest(ServerLevel level) {
+		if (depth < shoeDepth + Tuning.LOT_NEW_HOLE_M) {
+			return Component.literal("LOT: drill " + (shoeDepth + Tuning.LOT_NEW_HOLE_M - depth) + " m more of new hole below the shoe first");
+		}
+		lotDone = true;
+		double feet = shoeDepth * Tuning.FEET_PER_M;
+		double leakOff = dev.wildcatter.well.WellControl.maasp(weakFg(), mudPpg(), feet);
+		dev.wildcatter.quest.QuestEvents.milestone(level, hole(), dev.wildcatter.quest.Milestones.LOT_DONE);
+		setChanged();
+		return Component.literal(String.format("LOT: leak-off at %,.0f psi on the annular with %.2f ppg mud: the shoe at %d m holds %.1f ppg; MAASP %,.0f psi",
+				leakOff, mudPpg(), shoeDepth, weakFg(), leakOff));
+	}
+
+	/** The equivalent mud weight at the weakest point: the mud, plus the annular friction while pumping. */
+	private double shoeEmw(boolean pumpingNow) {
+		return mudPpg() + (pumpingNow ? Tuning.ECD_DRILLING_PPG : 0);
+	}
+
+	/**
+	 * Each tick it pumps (by the rule {@code chokeKill}): the weakest point against its FG. Partial losses take mud and drilling goes on;
+	 * total losses stop the rig until the weight comes down or the hole is cased. Returns true while total.
+	 */
+	private boolean lossCheck(ServerLevel level) {
+		if (!dev.wildcatter.Rules.chokeKill() || !openHole()) {
+			losses = dev.wildcatter.well.WellControl.Losses.NONE;
+			return false;
+		}
+		double fg = weakFg();
+		dev.wildcatter.well.WellControl.Losses now = dev.wildcatter.well.WellControl.losses(shoeEmw(true), fg);
+		if (losses == dev.wildcatter.well.WellControl.Losses.TOTAL && now == dev.wildcatter.well.WellControl.Losses.TOTAL) {
+			fallTicks += 1;
+			if (fallTicks >= Tuning.LOSS_TOTAL_FALL_TICKS) {
+				fallTicks = 0;
+				columnDrop = Math.min(depth, columnDrop + 1);
+			}
+			return true;
+		}
+		if (losses == dev.wildcatter.well.WellControl.Losses.TOTAL) {
+			useMud(columnDrop * Tuning.ANNULUS_L_PER_M);   // the hole filled again from the tanks
+			lostMud += columnDrop * Tuning.ANNULUS_L_PER_M / 1000;
+			columnDrop = 0;
+		}
+		if (now == dev.wildcatter.well.WellControl.Losses.TOTAL && losses != now) {
+			Drilling.announce(level, hole(), Component.literal(String.format("LOST CIRCULATION: TOTAL at the shoe (%.1f ppg against %.1f): no returns. Bring the weight down or case the hole.", shoeEmw(true), fg)));
+		}
+		losses = now;
+		if (now == dev.wildcatter.well.WellControl.Losses.PARTIAL) {
+			double litres = dev.wildcatter.well.WellControl.partialLossRate(shoeEmw(true), fg) * 1000 / 20;
+			useMud(litres);
+			lostMud += litres / 1000;
+			if (lcmCure > 0) {
+				lcmCure -= 1;
+				if (lcmCure <= 0) {
+					lcmBonus = Tuning.LCM_STRENGTHENING_PPG;   // the pill seals the fractures: the shoe holds 0.5 ppg more
+					losses = dev.wildcatter.well.WellControl.Losses.NONE;
+					Drilling.announce(level, hole(), Component.literal(String.format("LCM: the losses have stopped; the weakest point now holds %.1f ppg", weakFg())));
+				}
+			}
+		}
+		return now == dev.wildcatter.well.WellControl.Losses.TOTAL;
+	}
+
+	/** The mud hopper has mixed {@code kg} of LCM in: during partial losses a tonne cures them within a minute. Returns what it took. */
+	public double pumpLcm(double kg) {
+		lcmPumped += kg;
+		if (lcmPumped >= Tuning.BULK_BAG_KG - 1e-6) {
+			lcmPumped -= Tuning.BULK_BAG_KG;
+			if (losses == dev.wildcatter.well.WellControl.Losses.PARTIAL && lcmCure <= 0) {
+				lcmCure = Tuning.LCM_CURE_TICKS;
+			}
+		}
+		setChanged();
+		return kg;   // what is not in a loss zone is screened out at the shakers
+	}
+
+	/** The losses for a readout: "", or "LOST CIRCULATION: PARTIAL (...)". */
+	private String lossText() {
+		return switch (losses) {
+			case NONE -> "";
+			case PARTIAL -> String.format("LOST CIRCULATION: PARTIAL (%.1f ppg at the shoe against %.1f; pits falling%s): ", shoeEmw(true), weakFg(), lcmCure > 0 ? ", LCM curing" : "; an LCM bag through the hopper cures it");
+			case TOTAL -> String.format("LOST CIRCULATION: TOTAL (%.1f ppg at the shoe against %.1f): no returns, the fluid level %d m down; bring the weight down (water or base oil) or case the hole",
+					shoeEmw(true), weakFg(), columnDrop);
+		};
+	}
+
+	/** Losses and a kick at once: the field flows into the broken-down shoe, nothing at the surface. A relief well kills it. */
+	private void underground(ServerLevel level) {
+		phase = Phase.UNDERGROUND;
+		BLOWING.add(this);
+		Drilling.announce(level, hole(), Component.literal("UNDERGROUND BLOWOUT: the kick is flowing into the broken-down shoe. Nothing shows at the surface; drill a relief well."));
+		setChanged();
+		sync();
+	}
+
+	/** The casing for a readout. */
+	private String casingText() {
+		if (shoeDepth == 0) {
+			return depth > Tuning.SURFACE_CASING_M ? String.format(", surface casing at %d m (open hole FG %.1f ppg)", Tuning.SURFACE_CASING_M, weakFg()) : "";
+		}
+		return lotDone ? String.format(", shoe at %d m: FG %.1f ppg, MAASP %,.0f psi", shoeDepth, weakFg(), maasp()) : String.format(", shoe at %d m: FG NOT TESTED", shoeDepth);
 	}
 
 	/**
@@ -203,12 +561,31 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		killing = 0;
 		phase = Phase.SHUT_IN;
 		BLOWING.remove(this);
+		if (dev.wildcatter.Rules.chokeKill()) {
+			// 23a-23b: the well as a column of mud with the influx at the bottom; the shoe sees the shut-in pressure
+			well = new dev.wildcatter.well.KillModel(Math.max(1, depth), Math.max(1, Math.min(depth, weakDepth())), weakFg(), pore, mudPpg(), Math.min(pitGain, 3.0));
+			double[] shut = well.shutInPressures();
+			sidpp = shut[0];
+			sicp = shut[1];
+			flowCheck = 0;
+			if (dev.wildcatter.well.WellControl.losses(well.shoeEmw(), weakFg()) == dev.wildcatter.well.WellControl.Losses.TOTAL) {
+				stack.setClosed(true);
+				underground(level);
+				return Component.literal(String.format("SHUT IN, but the shoe breaks down: %.1f ppg at %d m against %.1f. UNDERGROUND BLOWOUT.", well.shoeEmw(), weakDepth(), weakFg()));
+			}
+		}
 		setChanged();
 		sync();
 		return Component.literal("SHUT IN: annular and rams closed. " + status());
 	}
 
+	private double sicp;
+	private int flowCheck;
+
 	private String status() {
+		if (well != null) {
+			return String.format("SHUT IN: SIDPP %,.0f psi, SICP %,.0f psi, kill weight %.1f ppg (mud %.2f ppg, %.2f m3 pit gain), MAASP %,.0f psi", sidpp, sicp, killPpg, mudPpg(), shownGain(), maasp());
+		}
 		return String.format("SHUT IN: SIDPP %,.0f psi, kill weight %.1f ppg (mud %.2f ppg, %.1f m3 pit gain)", sidpp, killPpg, mudPpg(), pitGain);
 	}
 
@@ -227,9 +604,18 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		Reservoir field = Drilling.field(level, hole());
 		switch (phase) {
 			case KICK -> {
-				pitGain += Tuning.KICK_GAIN_M3S / 20;
+				pitGain += kickRate(field) / 20;
+				influxUp = Math.min(depth, influxUp + Tuning.KICK_RISE_M_PER_S / 20);
+				if (!kickShown) {
+					// in oil mud the gas is in solution: the totalizer shows a third, until it breaks out near the surface
+					status = String.format("drilling (pit volume %+.2f m3)", shownGain());
+					if (shownGain() >= Tuning.KICK_ALARM_M3) {
+						alarm(level);
+					}
+					break;
+				}
 				long left = Tuning.KICK_WINDOW_TICKS - (now - kickAt);
-				status = String.format("KICK: PIT GAIN %.1f m3: shut in (sneak-click the driller's console) within %d s", pitGain, Math.max(0, left / 20));
+				status = String.format("KICK: PIT GAIN %.1f m3: shut in (sneak-click the driller's console) within %d s", shownGain(), Math.max(0, left / 20));
 				if (now % 40 == 0) {
 					level.playSound(null, hole(), SoundEvents.BELL_BLOCK, SoundSource.BLOCKS, 2.0F, 0.6F);
 				}
@@ -252,6 +638,22 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 						if (field != null) {
 							strike(level, field);
 						}
+					}
+				}
+			}
+			case UNDERGROUND -> {
+				status = "UNDERGROUND BLOWOUT: the field is flowing into the broken-down shoe; kill it with a relief well";
+				if (field != null) {
+					blowCarry += Tuning.BLOWOUT_FLOW * Tuning.GAS_UNITS_PER_TICK;
+					int whole = (int) blowCarry;
+					if (whole > 0) {
+						blowCarry -= whole;
+						ReservoirData.get(level).draw(field, whole);
+					}
+					if (ReservoirData.get(level).remaining(field) <= 0) {
+						phase = Phase.DRY;
+						BLOWING.remove(this);
+						status = "BLOWN DOWN underground: the field is empty";
 					}
 				}
 			}
@@ -313,7 +715,7 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 	/** A relief well that has reached this field with kill-weight mud kills every wild well on it at least 20 blocks off. */
 	private void relieve(ServerLevel level, Reservoir field) {
 		for (RigSubstructureBlockEntity wild : java.util.List.copyOf(BLOWING)) {
-			if (wild != this && wild.level == level && !wild.isRemoved() && wild.phase == Phase.BLOWOUT
+			if (wild != this && wild.level == level && !wild.isRemoved() && (wild.phase == Phase.BLOWOUT || wild.phase == Phase.UNDERGROUND)
 					&& wild.hole().distSqr(hole()) >= Tuning.RELIEF_MIN_DISTANCE * Tuning.RELIEF_MIN_DISTANCE) {
 				Reservoir theirs = Drilling.field(level, wild.hole());
 				if (theirs != null && theirs.key().equals(field.key())) {
@@ -339,6 +741,18 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 	public void testCirculated(double ticks) {
 		killing += ticks;
 	}
+
+	/** Game test hook: the casing run and the wait on cement as if done. */
+	public void testCasingDone() {
+		casingLeft = Math.min(casingLeft, 1);
+	}
+
+	/** Game test hook: circulate off bottom: the pumps run (losses, ECD) but the bit does not drill. */
+	public void testHoldBit(boolean hold) {
+		holdBit = hold;
+	}
+
+	private boolean holdBit;
 
 	/** Game test hook: as if the kick's window had run out. */
 	public void testKickTimeout() {
@@ -423,7 +837,9 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 	// ---- the mud (docs/multiblocks/drilling-mud.md): water, bentonite gel, barite weight, salt --------------------------------------
 	/** What the mixing hopper puts into the tanks. */
 	public enum Solid {
-		BARITE("barite", Tuning.BARITE_SG), BENTONITE("bentonite", Tuning.BENTONITE_SG), SALT("rock salt", Tuning.SALT_APPARENT_SG);
+		BARITE("barite", Tuning.BARITE_SG), BENTONITE("bentonite", Tuning.BENTONITE_SG), SALT("rock salt", Tuning.SALT_APPARENT_SG),
+		/** 23a: calcium chloride flake (77 %) for oil mud's water phase, the oil mud package, and LCM for losses. */
+		CACL2("CaCl2 flake", Tuning.CACL2_APPARENT_SG), OBM("OBM package", Tuning.OBM_PACKAGE_SG), LCM("LCM", 2.7);
 
 		private final String label;
 		final double sg;
@@ -443,15 +859,130 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		return Math.min(salt, water * Tuning.SALT_SATURATION_KG_PER_L);
 	}
 
-	/** Litres of mud in the tanks: the water and what the solids add to it. */
+	/** Litres of mud in the tanks: the water (and 23a's diesel) and what the solids add to it. */
 	public double mudVolume() {
-		return water + barite / Tuning.BARITE_SG + bentonite / Tuning.BENTONITE_SG + dissolvedSalt() / Tuning.SALT_APPARENT_SG;
+		return water + diesel + barite / Tuning.BARITE_SG + bentonite / Tuning.BENTONITE_SG + dissolvedSalt() / Tuning.SALT_APPARENT_SG
+				+ cacl2 / Tuning.CACL2_APPARENT_SG + obm / Tuning.OBM_PACKAGE_SG;
 	}
 
 	/** The mud's density, kg/L (water alone 1.0). */
 	public double mudDensity() {
 		double v = mudVolume();
-		return v <= 0 ? Tuning.WATER_KG_PER_L : (water * Tuning.WATER_KG_PER_L + barite + bentonite + dissolvedSalt()) / v;
+		return v <= 0 ? (oilMud ? Tuning.DIESEL_KG_PER_L : Tuning.WATER_KG_PER_L)
+				: (water * Tuning.WATER_KG_PER_L + diesel * Tuning.DIESEL_KG_PER_L + barite + bentonite + dissolvedSalt() + cacl2 + obm) / v;
+	}
+
+	// ---- 23a: oil-based (invert emulsion) mud ----------------------------------------------------------------------------------------
+	/** The tanks switched to OIL MUD (sneak-click on them, empty). */
+	private boolean oilMud;
+	private double diesel;     // L
+	private double cacl2;      // kg dissolved in the water phase
+	private double obm;        // kg of emulsifier, organoclay and lime
+	private double dieselLost; // L gone down the hole and to the pit
+	private double cuttings;   // m3 of oily cuttings
+	private long dumpAsked = -1000;
+
+	public boolean oilMud() {
+		return oilMud;
+	}
+
+	public double diesel() {
+		return diesel;
+	}
+
+	public double dieselLost() {
+		return dieselLost;
+	}
+
+	public double cuttings() {
+		return cuttings;
+	}
+
+	/** Oil-water ratio's oil share. */
+	public double owr() {
+		return diesel + water <= 0 ? 0 : diesel / (diesel + water);
+	}
+
+	/** The water phase's CaCl2 by weight. */
+	public double cacl2Strength() {
+		return cacl2 + water <= 0 ? 0 : cacl2 / (cacl2 + water * Tuning.WATER_KG_PER_L);
+	}
+
+	/** The emulsion holds: enough of the package (15 lb/bbl). Without it the oil mud gives none of its benefits (ES LOW). */
+	public boolean esOk() {
+		double v = mudVolume();
+		return v > 0 && obm / v >= Tuning.OBM_ES_KG_PER_L;
+	}
+
+	/** Oil mud whose emulsion holds: no washout in salt, never LOW GEL, 25 % faster, and a kick shows late. */
+	public boolean oilMudWorking() {
+		return oilMud && diesel > 0 && esOk();
+	}
+
+	/** The tanks' sneak-click: an empty system switches WATER / OIL MUD; a full one asks, then DUMPs to the reserve pit. */
+	public Component tanksSwitch(long now) {
+		if (mudVolume() < 1) {
+			oilMud = !oilMud;
+			water = 0;
+			diesel = cacl2 = obm = barite = bentonite = salt = 0;
+			setChanged();
+			return Component.literal(oilMud ? "Mud tanks on OIL MUD: pipe diesel to the tanks and water from a pump (to 80/20), then CaCl2 and the OBM package through the hopper"
+					: "Mud tanks on WATER MUD");
+		}
+		if (now - dumpAsked > 100) {
+			dumpAsked = now;
+			return Component.literal(String.format("DUMP %.0f m3 of mud to the reserve pit? Sneak-click again within 5 s", mudVolume() / 1000));
+		}
+		dumpAsked = -1000;
+		double gone = mudVolume();
+		dieselLost += diesel;
+		water = 0;
+		diesel = cacl2 = obm = barite = bentonite = salt = 0;
+		setChanged();
+		return Component.literal(String.format("DUMPED %.0f m3 of mud to the reserve pit (lost). Sneak-click the empty tanks to switch WATER / OIL MUD", gone / 1000));
+	}
+
+	/** Litres of water the oil mud wants for 80/20 against the diesel in the tanks. */
+	private double waterTarget() {
+		return diesel * (1 - Tuning.OIL_MUD_OWR) / Tuning.OIL_MUD_OWR;
+	}
+
+	/** Diesel off the pipe at the mud tanks; returns what fitted. */
+	public double addDiesel(double litres) {
+		double took = Math.max(0, Math.min(litres, Tuning.LAND_RIG_MUD_TANK - mudVolume()));
+		diesel += took;
+		if (took > 0) {
+			setChanged();
+		}
+		return took;
+	}
+
+	/** Each second on oil mud: the tanks' transfer pump takes diesel off a steel pipe at the tanks. */
+	private void takeDiesel(ServerLevel level) {
+		if (!oilMud) {
+			return;
+		}
+		BlockPos tanks = LandRig.mudTanks(worldPosition, facing());
+		BlockState state = level.getBlockState(tanks);
+		if (!(state.getBlock() instanceof dev.wildcatter.multiblock.BigPart)) {
+			return;
+		}
+		java.util.List<Lines.Face> faces = Lines.faces(dev.wildcatter.multiblock.BigParts.cells(tanks, state));
+		double want = Math.min(Tuning.DIESEL_FILL_LPS, Tuning.LAND_RIG_MUD_TANK - mudVolume());
+		if (want > 1) {
+			addDiesel(Lines.pull(level, faces, dev.wildcatter.fluid.Product.DIESEL, want, FluidNode.Pull.MACHINE, this));
+		}
+	}
+
+	/** Game test hook: diesel straight into the tanks. */
+	public void testDiesel(double litres) {
+		addDiesel(litres);
+	}
+
+	/** "OIL MUD 80/20, 28 % CaCl2, 13.9 ppg, ES ok": oil mud for a readout. */
+	private String oilMudText() {
+		return String.format("OIL MUD %.0f/%.0f, %.0f %% CaCl2, %.1f ppg, %s; %.1f m3 of diesel lost, %.1f m3 of oily cuttings", owr() * 100, (1 - owr()) * 100,
+				cacl2Strength() * 100, mudPpg(), esOk() ? "ES ok" : "ES LOW (mix the OBM package)", dieselLost / 1000, cuttings);
 	}
 
 	/** The mud weight in lb/gal (ppg), as a mud engineer reads it off a mud balance: water 8.34. */
@@ -467,6 +998,9 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 
 	/** Below 15 lb/bbl of bentonite the cuttings settle when the pumps stop: the rate of penetration is halved. */
 	public boolean lowGel() {
+		if (oilMudWorking()) {
+			return false;   // 23a: the organoclay carries the cuttings
+		}
 		return lowGel(bentonite, mudVolume());
 	}
 
@@ -485,6 +1019,9 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 
 	/** "8.34 ppg (1,000 kg/m3), gel 0 lb/bbl LOW GEL, fresh": the mud for a readout. */
 	public String mudText() {
+		if (oilMud) {
+			return oilMudText();
+		}
 		return String.format("%.2f ppg (%,.0f kg/m3), gel %.0f lb/bbl%s, %s", mudPpg(), mudDensity() * 1000, gelLbBbl(), lowGel() ? " LOW GEL" : "",
 				saltSaturated() ? "salt-saturated" : salt > 1 ? "salty (not saturated)" : "fresh");
 	}
@@ -492,6 +1029,9 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 	/** kg of this solid the tanks have room for. */
 	public double roomFor(Solid solid) {
 		double room = Tuning.LAND_RIG_MUD_TANK - mudVolume();
+		if (solid == Solid.LCM) {
+			return Tuning.BULK_BAG_KG;   // pumped as a pill: what the loss zone does not take is screened out at the shakers
+		}
 		if (solid == Solid.SALT) {
 			double toSaturate = Math.max(0, water * Tuning.SALT_SATURATION_KG_PER_L - salt);
 			return Math.max(0, Math.min(toSaturate + 50, room * solid.sg));   // salt past saturation is not wanted: the hopper stops there
@@ -506,6 +1046,12 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 			case BARITE -> barite += took;
 			case BENTONITE -> bentonite += took;
 			case SALT -> salt += took;
+			case CACL2 -> {
+				cacl2 += took * Tuning.CACL2_FLAKE;
+				water += (int) Math.round(took * (1 - Tuning.CACL2_FLAKE));
+			}
+			case OBM -> obm += took;
+			case LCM -> pumpLcm(took);
 		}
 		if (took > 0) {
 			setChanged();
@@ -524,6 +1070,10 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		barite *= keep;
 		bentonite *= keep;
 		salt *= keep;
+		dieselLost += diesel * (1 - keep);
+		diesel *= keep;
+		cacl2 *= keep;
+		obm *= keep;
 	}
 
 	/** Game test hook: mixes this much straight into the tanks, as the hopper would. */
@@ -545,6 +1095,9 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		}
 		if (phase == Phase.SHUT_IN && mudPpg() + 1e-6 >= killPpg) {
 			return Tuning.LAND_RIG_DRILL_WATTS;   // the mud pumps circulating kill mud through the choke
+		}
+		if (phase == Phase.CASING) {
+			return Tuning.LAND_RIG_CONNECTION_WATTS;   // the drawworks running casing, then the cementing unit and the wait
 		}
 		return pumping() ? Tuning.LAND_RIG_DRILL_WATTS : Tuning.LAND_RIG_IDLE_WATTS;
 	}
@@ -576,6 +1129,9 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 	/** Water from a pump's pipe into the mud tanks; returns how much fitted. It dilutes the mud's weight. */
 	public int addWater(int amount) {
 		int took = Math.max(0, Math.min(amount, (int) Math.floor(Tuning.LAND_RIG_MUD_TANK - mudVolume())));
+		if (oilMud) {
+			took = Math.max(0, Math.min(took, (int) Math.floor(waterTarget() - water)));   // 23a: only to 80/20 against the diesel
+		}
 		water += took;
 		if (took > 0) {
 			setChanged();
@@ -584,6 +1140,9 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 	}
 
 	public double waterLevel() {
+		if (oilMud) {
+			return diesel <= 0 ? 1.0 : Math.min(1.0, water / Math.max(1, waterTarget()));
+		}
 		return water / (double) Tuning.LAND_RIG_MUD_TANK;
 	}
 
@@ -592,6 +1151,7 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		water = litres;
 		if (litres <= 0) {
 			barite = bentonite = salt = 0;
+			diesel = cacl2 = obm = 0;
 		}
 		setChanged();
 	}
@@ -602,6 +1162,7 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 			return;
 		}
 		if ((level.getGameTime() + pos.hashCode()) % 20 == 0) {
+			rig.takeDiesel(server);
 			PartLayout.Found found = LandRig.layout().check(level, pos, rig.facing());
 			boolean was = rig.formed;
 			rig.formed = found.parts() != null;
@@ -615,8 +1176,10 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		RigDriveHouseBlockEntity house = rig.driveHouse();
 		double power = house != null && rig.formed ? house.delivered() : 0;
 		float rpm = 0;
-		if (rig.formed && (rig.phase == Phase.KICK || rig.phase == Phase.SHUT_IN || rig.phase == Phase.BLOWOUT)) {
+		if (rig.formed && (rig.phase == Phase.KICK || rig.phase == Phase.SHUT_IN || rig.phase == Phase.BLOWOUT || rig.phase == Phase.UNDERGROUND)) {
 			rig.wellControl(server, power);
+		} else if (rig.formed && rig.phase == Phase.CASING) {
+			rig.runCasing(server, power);
 		} else if (!rig.drilling()) {
 			rig.status = !rig.formed ? "NOT BUILT: needs the " + rig.missing : !rig.topDrive ? "NO TOP DRIVE: click one into the mast"
 					: rig.phase == Phase.COMPLETE ? "WELL COMPLETE: break the rig down to move it" : rig.phase == Phase.DRY ? (rig.status.startsWith("BLOWN") ? rig.status : "DRY HOLE: nothing under it down to bedrock")
@@ -636,14 +1199,19 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		} else if (rig.needsBop(server)) {
 			rig.status = "NO BOP: the deep field ahead is geopressured: set a BOP STACK under the rotary table and its ACCUMULATOR within "
 					+ Tuning.ACCUMULATOR_REACH + " blocks";
+		} else if (rig.lossCheck(server)) {
+			rig.status = rig.lossText();
 		} else if (rig.washout(server)) {
 			rig.status = "WASHOUT: fresh mud dissolves the rock salt and the hole washes out; mix rock salt into the mud until it is salt-saturated ("
 					+ Math.round(Tuning.SALT_SATURATION_KG_PER_L * 1000) + " kg a m3 of water)";
 		} else {
 			rpm = (float) Tuning.TOP_DRIVE_RPM;
-			double rate = power * (rig.lowGel() ? Tuning.LOW_GEL_RATE : 1);
-			rig.progress += rate;
-			rig.status = "drilling at " + Math.round(rate * 100) + "% of full rate" + (rig.lowGel() ? " (LOW GEL: the cuttings settle; mix bentonite to " + Math.round(Tuning.LOW_GEL_KG_PER_L * 350.5) + " lb/bbl)" : "");
+			double rate = power * (rig.lowGel() ? Tuning.LOW_GEL_RATE : 1) * (rig.oilMudWorking() ? Tuning.OIL_MUD_RATE : 1);
+			rig.progress += rig.holdBit ? 0 : rate;
+			if (rig.oilMudWorking() && server.getGameTime() % 200 == 0) {
+				dev.wildcatter.quest.QuestEvents.milestone(server, rig.hole(), dev.wildcatter.quest.Milestones.OIL_MUD_DRILLING);
+			}
+			rig.status = rig.lossText() + (rig.oilMudWorking() ? "on oil mud, " : "") + "drilling at " + Math.round(rate * 100) + "% of full rate" + (rig.lowGel() ? " (LOW GEL: the cuttings settle; mix bentonite to " + Math.round(Tuning.LOW_GEL_KG_PER_L * 350.5) + " lb/bbl)" : "");
 			while (rig.progress >= Tuning.LAND_RIG_TICKS_PER_BLOCK && rig.drilling() && rig.connection <= 0) {
 				rig.progress -= Tuning.LAND_RIG_TICKS_PER_BLOCK;
 				rig.advance(server);
@@ -661,7 +1229,7 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 	 * already drilled in salt at the bottom of the hole fill back in (docs/multiblocks/drilling-mud.md).
 	 */
 	private boolean washout(ServerLevel level) {
-		if (!dev.wildcatter.Rules.wellControl() || saltSaturated() || !isSalt(level.getBlockState(hole().below(depth + 1)))) {
+		if (!dev.wildcatter.Rules.wellControl() || saltSaturated() || oilMudWorking() || !isSalt(level.getBlockState(hole().below(depth + 1)))) {
 			return false;
 		}
 		if (saltMetres > 0) {
@@ -708,6 +1276,9 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		depth++;
 		saltMetres = salty ? saltMetres + 1 : 0;
 		useMud(Tuning.LAND_RIG_MUD_PER_BLOCK);
+		if (oilMud) {
+			cuttings += Tuning.CUTTINGS_M3_PER_M;   // counted on the readout; they go nowhere (a cuttings dryer is left out)
+		}
 		stand++;
 		dev.wildcatter.well.RollFront front = Drilling.isrFirst(level, hole) ? Drilling.rollFront(level, hole) : null;
 		if (front != null && hole.getY() - depth <= front.bottomY()) {
@@ -761,7 +1332,8 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		RigDriveHouseBlockEntity house = driveHouse();
 		return Component.literal("Land rig (1,000 hp, " + Voltage.MEDIUM.label() + " three-phase): " + status + "; " + depth + " m down, stand "
 				+ stand + "/" + Tuning.LAND_RIG_STAND_BLOCKS + ", mud water " + (int) (mudVolume() / 1000) + " of " + Tuning.LAND_RIG_MUD_TANK / 1000 + " m3 at " + mudText() + ", top drive "
-				+ (topDrive ? "in" : "MISSING") + bopText() + (house != null && formed ? "; drive house " + house.load().describe() : ""));
+				+ (topDrive ? "in" : "MISSING") + bopText() + casingText() + (joints() + cementBags() > 0 ? String.format(", rack %d joints and %d cement bags", joints(), cementBags()) : "")
+				+ (lostMud > 0.05 ? String.format(", %.1f m3 lost to the formation", lostMud) : "") + (house != null && formed ? "; drive house " + house.load().describe() : ""));
 	}
 
 	private String bopText() {
@@ -865,6 +1437,28 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		output.putDouble("connection", connection);
 		output.putBoolean("grown", grown);
 		output.putFloat("rpm", spin.rpm());
+		// 23a-23b
+		output.putInt("shoeDepth", shoeDepth);
+		output.putDouble("shoeFg", shoeFgPpg);
+		output.putBoolean("lotDone", lotDone);
+		output.putDouble("lcmBonus", lcmBonus);
+		output.putDouble("lcmCure", lcmCure);
+		output.putDouble("casingLeft", casingLeft);
+		output.putInt("losses", losses.ordinal());
+		output.putDouble("lostMud", lostMud);
+		output.putInt("columnDrop", columnDrop);
+		output.putBoolean("kickShown", kickShown);
+		output.putDouble("influxUp", influxUp);
+		output.putBoolean("oilMud", oilMud);
+		output.putDouble("diesel", diesel);
+		output.putDouble("cacl2", cacl2);
+		output.putDouble("obm", obm);
+		output.putDouble("dieselLost", dieselLost);
+		output.putDouble("cuttings", cuttings);
+		output.putDouble("sicp", sicp);
+		output.putInt("flowCheck", flowCheck);
+		output.putString("well", well == null ? "" : well.save());
+		net.minecraft.world.ContainerHelper.saveAllItems(output, rack);
 	}
 
 	@Override
@@ -892,6 +1486,29 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		grown = input.getBooleanOr("grown", grown);
 		formed = input.getBooleanOr("formed", formed);   // sent to the client for the cables; the server finds it again on its next check
 		spin.setRpm(input.getFloatOr("rpm", 0));
+		shoeDepth = input.getIntOr("shoeDepth", 0);
+		shoeFgPpg = input.getDoubleOr("shoeFg", Tuning.FG_OPEN_HOLE_PPG);
+		lotDone = input.getBooleanOr("lotDone", false);
+		lcmBonus = input.getDoubleOr("lcmBonus", 0);
+		lcmCure = input.getDoubleOr("lcmCure", 0);
+		casingLeft = input.getDoubleOr("casingLeft", 0);
+		losses = dev.wildcatter.well.WellControl.Losses.values()[Math.max(0, Math.min(2, input.getIntOr("losses", 0)))];
+		lostMud = input.getDoubleOr("lostMud", 0);
+		columnDrop = input.getIntOr("columnDrop", 0);
+		kickShown = input.getBooleanOr("kickShown", true);
+		influxUp = input.getDoubleOr("influxUp", 0);
+		oilMud = input.getBooleanOr("oilMud", false);
+		diesel = input.getDoubleOr("diesel", 0);
+		cacl2 = input.getDoubleOr("cacl2", 0);
+		obm = input.getDoubleOr("obm", 0);
+		dieselLost = input.getDoubleOr("dieselLost", 0);
+		cuttings = input.getDoubleOr("cuttings", 0);
+		sicp = input.getDoubleOr("sicp", 0);
+		flowCheck = input.getIntOr("flowCheck", 0);
+		String w = input.getStringOr("well", "");
+		well = w.isEmpty() ? null : dev.wildcatter.well.KillModel.load(w);
+		rack.clear();
+		net.minecraft.world.ContainerHelper.loadAllItems(input, rack);
 	}
 
 	@Override

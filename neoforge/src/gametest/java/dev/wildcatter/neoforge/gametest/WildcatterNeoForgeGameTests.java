@@ -59,6 +59,8 @@ public class WildcatterNeoForgeGameTests {
 	private static final java.util.Map<String, Consumer<GameTestHelper>> CHEM_SCENES = ChemicalScenes.scenes();
 	/** Phase 15's oilfield scenes (OilfieldScenes): spread out round a dome or a land rig, so each gets room, and long, for the drilling. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> OILFIELD_SCENES = OilfieldScenes.scenes();
+	/** Phase 23's oilfield follow-ons (OilfieldFollowOnScenes): a new world's oilfield rules with chokeKill and cavernStability. */
+	private static final java.util.Map<String, Consumer<GameTestHelper>> OILFIELD_23_SCENES = OilfieldFollowOnScenes.scenes();
 
 	/** The protection gap wave's grid scenes (docs/questions/protection-gaps.md), each group in its own class, all run as plant scenes. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> GRID_SCENES = new java.util.LinkedHashMap<>();
@@ -158,6 +160,7 @@ public class WildcatterNeoForgeGameTests {
 			REACTOR_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			FUEL_X_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			OILFIELD_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
+			OILFIELD_23_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			RULE_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			RESIDENCE_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			TRACK_17C_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
@@ -227,6 +230,13 @@ public class WildcatterNeoForgeGameTests {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
 						new TestData<>(event.registerEnvironment(id("rules_" + scene)), net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 400, 1, true,
 								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 40)));
+			}
+			Holder<TestEnvironmentDefinition<?>> oilfield23 = OILFIELD_23_SCENES.keySet().stream().anyMatch(WildcatterNeoForgeGameTests::only)
+					? event.registerEnvironment(id("rules_oilfield23"), new RuleScenes.RulesOn(OilfieldFollowOnScenes.RULES)) : plain;
+			for (String scene : OILFIELD_23_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
+				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
+						new TestData<>(oilfield23, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 6000, 1, true,
+								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 120)));
 			}
 			for (String scene : OILFIELD_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
