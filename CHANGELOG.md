@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.9.0 (unreleased): PLC answers, breakers seen opening, the art pass
+## v0.9.0 (released 2026-11-19): PLC answers, breakers seen opening, the art pass
 
 ### PLC (Tim's answers of 2026-11-19)
 - **HAND / OFF / AUTO at a glance:** hold the control key and every selector within 16 blocks shows its position over its device: HAND
