@@ -47,13 +47,6 @@ public class StorageCompressorBlockEntity extends UnitMotorBlockEntity {
 		return null;
 	}
 
-	private boolean testDriven;
-
-	/** Game test hook: run as if its 1 MW motor had its medium-voltage supply (a scene's 500 kW set cannot start it). */
-	public void testDriven() {
-		testDriven = true;
-	}
-
 	public double made() {
 		return made;
 	}
@@ -79,7 +72,7 @@ public class StorageCompressorBlockEntity extends UnitMotorBlockEntity {
 			unit = "NO GAS: pipe pipeline gas to the north side of its front";
 			return;
 		}
-		double strength = testDriven ? 1.0 : drive(level);
+		double strength = drive(level);
 		if (strength <= 0) {
 			unit = "starting: " + describe();
 			return;
