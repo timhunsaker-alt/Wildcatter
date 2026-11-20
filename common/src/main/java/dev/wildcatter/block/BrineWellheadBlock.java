@@ -65,6 +65,11 @@ public class BrineWellheadBlock extends BaseEntityBlock {
 	}
 
 	@Override
+	public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(Level level, BlockState state, net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
+		return level.isClientSide() ? null : createTickerHelper(type, dev.wildcatter.WildcatterBlocks.BRINE_WELLHEAD_ENTITY, BrineWellheadBlockEntity::tick);   // 23c: surveys and a heaving roof
+	}
+
+	@Override
 	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
 			InteractionHand hand, BlockHitResult hit) {
 		InteractionResult read = PowerMeterItem.readIfMeter(stack, level, pos, player);

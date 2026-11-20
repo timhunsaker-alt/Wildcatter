@@ -47,7 +47,8 @@ import net.minecraft.world.level.levelgen.placement.RarityFilter;
  * with it; every rule is off as the harness asks; the command sets a rule, saves it with the world and refuses a name it does not
  * know; with {@code saltDomeGrid192} off the dome's placement takes exactly the random numbers and positions the four modifiers it had
  * before Phase 15 take, and a grid dome's flank field is not there; on, it is; {@code mudGel} off, water is not LOW GEL; on, it is;
- * {@code wellControl} off, an underbalanced strike into a deep field does not kick.</li>
+ * {@code wellControl} off, an underbalanced strike into a deep field does not kick; Phase 23's {@code chokeKill} and {@code cavernStability}
+ * are new worlds' rules, off here.</li>
  * </ul>
  */
 final class RuleScenes {
@@ -187,6 +188,10 @@ final class RuleScenes {
 			Rules.set(Rule.WELL_CONTROL, true);
 			check(helper, RigSubstructureBlockEntity.kicks(deep, 8.6) && !RigSubstructureBlockEntity.kicks(deep, 14.0), "with wellControl on, 8.6 ppg into a deep field should kick and 14 ppg not");
 			Rules.set(Rule.WELL_CONTROL, false);
+
+			// Phase 23: chokeKill and cavernStability, on in new worlds, off in the harness's world (an existing world's)
+			check(helper, Rule.byKey("chokeKill") != null && Rule.byKey("chokeKill").newWorld && !Rules.chokeKill(), "chokeKill should be a new world's rule, off here");
+			check(helper, Rule.byKey("cavernStability") != null && Rule.byKey("cavernStability").newWorld && !Rules.cavernStability(), "cavernStability should be a new world's rule, off here");
 
 			// saltDomeGrid192 off: the dome's placement is the old one, random number for random number
 			PlacedFeature placed = level.registryAccess().lookupOrThrow(Registries.PLACED_FEATURE)

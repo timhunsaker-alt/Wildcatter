@@ -51,6 +51,7 @@ final class OilfieldFollowOnScenes {
 		scenes.put("casing_lot", OilfieldFollowOnScenes::casingLot);
 		scenes.put("oil_mud", OilfieldFollowOnScenes::oilMud);
 		scenes.put("choke_kill", OilfieldFollowOnScenes::chokeKill);
+		scenes.put("gas_storage", OilfieldFollowOnScenes::gasStorage);
 		return scenes;
 	}
 
@@ -577,5 +578,202 @@ final class OilfieldFollowOnScenes {
 			next = choke * Math.max(1 / 1.03, Math.min(1.03, Math.exp(0.02 * err * 0.15)));   // a PID's output rate limit
 		}
 		panel.commandMa(0, 4 + 16 * Math.max(panel.pumpOn() ? 0.001 : 0, Math.min(1, next)), rig.getLevel().getGameTime());
+	}
+
+	// ---- gas_storage (23c) ---------------------------------------------------------------------------------------------------------
+	/**
+	 * A 9 x 9 column of rock salt (y 1-10) under a calcite cap, a hole cased into it and a brine wellhead whose brine goes by pipe to a
+	 * disposal wellhead: the injection pump on its 480 V set runs at its full 10 L/s; leached by hook (with cavernStability off) the cavern
+	 * stops at its walls, 5 x 5 by 7 high plus the hole's bottom (176 m3), its record reading 2 m of salt to the flank and 3 over the roof.
+	 * The brine wellhead swapped for a storage wellhead on INJECT, the storage compressor (driven by hook: its 1 MW motor wants more than
+	 * the scene's set) on pipeline gas debrines it to the disposal well, its cushion then by hook: CAVERN DRY, and working gas raises the
+	 * pressure. On WITHDRAW with no dehydrator it reads WET GAS; with the glycol dehydrator (on its own 480 V set, fuel gas to its reboiler)
+	 * the gas comes out dry at its outlet. A 3 x 3 salt column beside it, cavernStability on, leaches past its flank wall and breaches.
+	 */
+	static void gasStorage(GameTestHelper helper) {
+		String scene = "gas_storage";
+		int u = 2;
+		floor(helper, -18, -16, 20, 14, 1);
+		for (int x = -4; x <= 4; x++) {
+			for (int z = -4; z <= 4; z++) {
+				for (int y = 2; y <= 11; y++) {
+					helper.getLevel().setBlock(abs(helper, x, y, z), OreBlocks.block(Ore.HALITE).defaultBlockState(), 3);
+				}
+				for (int y = 12; y <= 13; y++) {
+					helper.getLevel().setBlock(abs(helper, x, y, z), Blocks.CALCITE.defaultBlockState(), 3);
+				}
+			}
+		}
+		for (int y = 10; y <= 14; y++) {
+			put(helper, "casing", 0, y, 0);
+		}
+		BlockPos headPos = abs(helper, 0, 15, 0);
+		helper.getLevel().setBlock(headPos, WildcatterBlocks.BRINE_WELLHEAD.defaultBlockState().setValue(dev.wildcatter.block.BrineWellheadBlock.FACING, Direction.EAST), 3);
+		for (int x = 1; x <= 6; x++) {
+			put(helper, "gas_line", x, 15, 0);
+		}
+		helper.getLevel().setBlock(abs(helper, 7, 15, 0), WildcatterBlocks.DISPOSAL_WELLHEAD.defaultBlockState(), 3);
+		// fresh water: the injection pump's discharge to the wellhead's west, as the brine_well scene
+		place(helper, WildcatterBlocks.INJECTION_PUMP, -6, u, -4, Direction.NORTH);
+		for (int y = u + 1; y <= 15; y++) {
+			put(helper, "gas_line", -6, y, -1);
+		}
+		put(helper, "gas_line", -6, 15, 0);
+		for (int x = -5; x <= -1; x++) {
+			put(helper, "gas_line", x, 15, 0);
+		}
+		GridSceneKit.genset(helper, -10, u, -7);
+		for (int x = -9; x <= -6; x++) {
+			put(helper, "cable_industrial", x, u, -7);
+		}
+		put(helper, "cable_industrial", -6, u, -6);
+		put(helper, "cable_industrial", -6, u, -5);
+		dev.wildcatter.block.InjectionPumpBlockEntity pump = GridSceneKit.entity(helper, -6, u, -4, dev.wildcatter.block.InjectionPumpBlockEntity.class);
+		dev.wildcatter.block.BrineWellheadBlockEntity[] brine = {(dev.wildcatter.block.BrineWellheadBlockEntity) helper.getLevel().getBlockEntity(headPos)};
+		// the second, thin column for the breach: 3 x 3, y 2-11, at x 14
+		for (int x = 13; x <= 15; x++) {
+			for (int z = -1; z <= 1; z++) {
+				for (int y = 2; y <= 11; y++) {
+					helper.getLevel().setBlock(abs(helper, x, y, z), OreBlocks.block(Ore.HALITE).defaultBlockState(), 3);
+				}
+			}
+		}
+		for (int y = 10; y <= 14; y++) {
+			put(helper, "casing", 14, y, 0);
+		}
+		BlockPos thinPos = abs(helper, 14, 15, 0);
+		helper.getLevel().setBlock(thinPos, WildcatterBlocks.BRINE_WELLHEAD.defaultBlockState().setValue(dev.wildcatter.block.BrineWellheadBlock.FACING, Direction.NORTH), 3);
+		int[] step = {0};
+		int[] mark = {0};
+		GridSceneKit.start(helper, -10, u, -7, () -> {});
+		for (int t = 300; t <= 11900; t += 20) {
+			final int at = t;
+			helper.runAfterDelay(t, () -> {
+				switch (step[0]) {
+					case 0 -> {   // the pump on fresh water, the brine to disposal at the full rate
+						pump.addWater(2_000);
+						String p = pump.inspect().getString();
+						java.util.regex.Matcher lps = java.util.regex.Pattern.compile("injecting ([0-9.]+) L/s").matcher(p);
+						if (at % 400 == 0) {
+							log(scene, "waiting | " + p + " | head " + brine[0].inspect().getString());
+						}
+						if (lps.find() && Double.parseDouble(lps.group(1)) > 9.0) {
+							log(scene, "pump | " + p + " | head " + brine[0].inspect().getString());
+							check(helper, brine[0].toDisposal(), "with its brine to disposal the well should leach at the pump's full rate: " + brine[0].inspect().getString());
+							boolean[] rules = dev.wildcatter.Rules.snapshot();
+							dev.wildcatter.Rules.set(dev.wildcatter.Rules.Rule.CAVERN_STABILITY, false);
+							for (int k = 0; k < 400 && !brine[0].inspect().getString().contains("CAVERN AT LIMIT"); k++) {
+								brine[0].testSalt(Ore.HALITE.kgPerBlock());
+								brine[0].inject(helper.getLevel(), 1.0);
+							}
+							brine[0].inject(helper.getLevel(), 0.01);
+							dev.wildcatter.Rules.restore(rules);
+							String h = brine[0].inspect().getString();
+							log(scene, "leached | " + h);
+							check(helper, h.contains("CAVERN AT LIMIT") && brine[0].blocks() == 176, "the cavern should stop at its walls, 176 m3: " + brine[0].blocks() + " | " + h);
+							check(helper, helper.getLevel().getBlockState(abs(helper, 2, 2, 2)).is(Blocks.WATER) && helper.getLevel().getBlockState(abs(helper, 3, 2, 3)).is(OreBlocks.block(Ore.HALITE)),
+									"the cavern should keep 2 blocks of salt to the flank");
+							check(helper, helper.getLevel().getBlockState(abs(helper, 1, 8, 1)).is(Blocks.WATER) && helper.getLevel().getBlockState(abs(helper, 1, 9, 1)).is(OreBlocks.block(Ore.HALITE)),
+									"the cavern should keep 3 blocks of salt under the caprock");
+							// the storage plant on the hole
+							helper.getLevel().setBlock(headPos, WildcatterBlocks.STORAGE_WELLHEAD.defaultBlockState().setValue(dev.wildcatter.block.StorageWellheadBlock.FACING, Direction.EAST), 3);
+							for (int y = u; y <= 15; y++) {
+								put(helper, "gas_line", 0, y, -6);   // the compressor's discharge up outside the salt and over to the wellhead's north side
+							}
+							for (int z = -5; z <= -1; z++) {
+								put(helper, "gas_line", 0, 15, z);
+							}
+							place(helper, WildcatterBlocks.STORAGE_COMPRESSOR, -1, u, -12, Direction.NORTH);   // x -1..1, z -12..-7: out of its back at z -6
+							source(helper, 0, u, -14, Product.PIPELINE_GAS, 10.0);
+							put(helper, "gas_line", 0, u, -13);
+							mark[0] = at;
+							step[0] = 1;
+						}
+					}
+					case 1 -> {
+						var head = GridSceneKit.entity(helper, 0, 15, 0, dev.wildcatter.block.StorageWellheadBlockEntity.class);
+						var comp = GridSceneKit.entity(helper, -1, u, -12, dev.wildcatter.block.StorageCompressorBlockEntity.class);
+						comp.testDriven();
+						head.setMode(dev.wildcatter.block.StorageWellheadBlockEntity.Mode.INJECT);
+						mark[0] = at;
+						step[0] = 2;
+					}
+					case 2 -> {
+						var head = GridSceneKit.entity(helper, 0, 15, 0, dev.wildcatter.block.StorageWellheadBlockEntity.class);
+						if (at >= mark[0] + 200) {
+							String h = head.inspect().getString();
+							log(scene, "debrining | " + h + " | compressor " + read(helper, -1, u, -12));
+							check(helper, h.contains("DEBRINING") && head.gas() > 20, "the compressor's gas should debrine the cavern to the disposal well: " + h);
+							head.testGas(dev.wildcatter.well.Cavern.cushion(head.volume()) - head.gas());
+							mark[0] = at;
+							step[0] = 3;
+						}
+					}
+					case 3 -> {
+						var head = GridSceneKit.entity(helper, 0, 15, 0, dev.wildcatter.block.StorageWellheadBlockEntity.class);
+						if (at >= mark[0] + 200) {
+							String h = head.inspect().getString();
+							log(scene, "working gas | " + h);
+							check(helper, head.dry() && head.bar() > dev.wildcatter.well.Cavern.minBar() && head.working() > 20, "dry, the compressor should put working gas in over the cushion: " + h);
+							double v = head.volume();
+							head.testGas((dev.wildcatter.well.Cavern.capacity(v) - dev.wildcatter.well.Cavern.cushion(v)) / 2);   // half full of working gas, by hook
+							head.setMode(dev.wildcatter.block.StorageWellheadBlockEntity.Mode.WITHDRAW);
+							mark[0] = at;
+							step[0] = 4;
+						}
+					}
+					case 4 -> {
+						var head = GridSceneKit.entity(helper, 0, 15, 0, dev.wildcatter.block.StorageWellheadBlockEntity.class);
+						if (at >= mark[0] + 100) {
+							check(helper, head.wetGas() && head.readPoint(7) && head.inspect().getString().contains("WET GAS"), "without a dehydrator it should read WET GAS: " + head.inspect().getString());
+							// the glycol dehydrator off the wellhead's south side, on its own set, fuel gas to its reboiler
+							for (int z = 1; z <= 6; z++) {
+								put(helper, "gas_line", 0, 15, z);
+							}
+							for (int y = u; y <= 14; y++) {
+								put(helper, "gas_line", 0, y, 6);
+							}
+							put(helper, "gas_line", 0, u, 7);
+							place(helper, WildcatterBlocks.GLYCOL_DEHYDRATOR, 0, u, 8, Direction.NORTH);   // x 0-1, z 8-10: in at its north (z 7)
+							GridSceneKit.genset(helper, -8, u, 9);
+							put(helper, "cable_industrial", -7, u, 9);
+							for (int x = -7; x <= -1; x++) {
+								put(helper, "cable_industrial", x, u, 8);
+							}
+							source(helper, 3, u, 8, Product.PIPELINE_GAS, 1.0);
+							put(helper, "gas_line", 2, u, 8);
+							GridSceneKit.start(helper, -8, u, 9, () -> {});
+							mark[0] = at;
+							step[0] = 5;
+						}
+					}
+					case 5 -> {
+						var head = GridSceneKit.entity(helper, 0, 15, 0, dev.wildcatter.block.StorageWellheadBlockEntity.class);
+						var dehy = GridSceneKit.entity(helper, 0, u, 8, dev.wildcatter.block.GlycolDehydratorBlockEntity.class);
+						if (dehy.dried() > 10) {
+							log(scene, "withdrawing | " + head.inspect().getString() + " | dehydrator " + read(helper, 0, u, 8));
+							check(helper, !head.wetGas(), "through the dehydrator it should not read WET GAS: " + head.inspect().getString());
+							// the breach: the thin column leached with cavernStability on (the batch's rule)
+							var thin = (dev.wildcatter.block.BrineWellheadBlockEntity) helper.getLevel().getBlockEntity(thinPos);
+							for (int k = 0; k < 40 && !thin.inspect().getString().contains("BREACHED"); k++) {
+								thin.testSalt(Ore.HALITE.kgPerBlock());
+								thin.inject(helper.getLevel(), 1.0);
+							}
+							String th = thin.inspect().getString();
+							log(scene, "thin column | " + th);
+							check(helper, th.contains("BREACHED"), "with cavernStability on, leaching past the flank wall should breach the cavern: " + th);
+							step[0] = 99;
+							log(scene, "ok");
+							clear(helper, -18, -16, 20, 14, 1, 20);
+							helper.succeed();
+						} else {
+							check(helper, at < mark[0] + 1500, "the dehydrator should dry withdrawn gas: " + read(helper, 0, u, 8) + " | " + head.inspect().getString());
+						}
+					}
+					default -> {
+					}
+				}
+			});
+		}
 	}
 }

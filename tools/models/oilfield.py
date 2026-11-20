@@ -7,7 +7,13 @@ OilfieldPartBlock's), in the mod's existing materials. Motor terminal boxes are 
   the gauges, the buffer chamber; the choke line in at its north end, the line to the separator on its east;
 - remote_choke_panel, 1 x 2 x 1: the console on its pedestal, the gauges and the choke lever, the hydraulic pump below;
 - mud_gas_separator, 1 x 6 x 1: the vertical vessel on its legs, the inlet from the manifold low on its west, the liquid seal's
-  U-bend under it, the vent line off its top."""
+  U-bend under it, the vent line off its top.
+- storage_compressor, 3 x 3 x 6: the medium-voltage motor (its box on the west of the main cell), the frame with two stages of
+  cylinders and their pulsation bottles, the scrubber and the aftercooler; gas in at the north of the front, out at the south of the back;
+- glycol_dehydrator, 2 x 6 x 3: the TEG contactor tower, the still column and its reboiler firebox (fuel gas on the east), the surge
+  tank and pumps; wet gas in at the north, dry gas out at the south;
+- storage_wellhead (one cell): the casing head, the master and wing valves, the subsurface safety valve's control line, the brine
+  wing out of the side it faces."""
 import mlib
 import plantlib as g
 
@@ -88,7 +94,61 @@ MG.pipe([(0.5, 5.6, 0.5), (0.5, 6.0, 0.5)], 4, "steel")                         
 MG.ladder(0.95, 0.5, 0.9, 5.4, 1, "galv") if hasattr(MG, "ladder") else None
 MG.collide((0.05, 0.0, 0.05), (0.95, 6.0, 0.95))
 
+# ---- 23c: the storage compressor ---------------------------------------------------------------------------------------------------
+SC = model("storage_compressor", 3, 3, 6, "engine")
+SC.box((0.0, 0.0, 0.0), (3.0, 0.2, 6.0), "concrete")
+SC.box((0.3, 0.2, 0.2), (1.5, 1.4, 1.8), "engine")                                # the motor
+SC.box((0.0, 0.4, 0.3), (0.4, 1.2, 1.0), "grey")                                  # its medium-voltage box, west
+SC.decal((-0.01, 0.55, 0.4), (0.0, 1.05, 0.9), "arcflash", "west", "grey")
+SC.box((0.4, 0.2, 1.8), (2.6, 1.0, 4.8), "iron")                                  # the frame and crankcase
+for z in (2.3, 3.3, 4.3):
+	SC.cylinder("x", (1.2, z), 0.32, 0.0, 0.45, "steel", 12)                       # the cylinders, both sides
+	SC.cylinder("x", (1.2, z), 0.32, 2.55, 3.0, "steel", 12)
+SC.cylinder("z", (2.3, 2.2), 0.35, 1.8, 4.8, "steel", 12)                         # the pulsation bottles
+SC.cylinder("y", (0.8, 5.3), 0.4, 0.2, 2.6, "steel", 12)                          # the inlet scrubber
+SC.box((1.6, 1.0, 4.9), (2.9, 2.6, 5.9), "galv")                                   # the aftercooler
+SC.pipe([(1.5, 0.5, 0.0), (1.5, 0.5, 0.2)], 4, "steel")                           # gas in, north
+SC.pipe([(1.5, 0.5, 5.8), (1.5, 0.5, 6.0)], 4, "steel")                           # gas out, south
+SC.collide((0.0, 0.0, 0.0), (3.0, 2.6, 6.0))
+
+# ---- 23c: the glycol dehydrator ------------------------------------------------------------------------------------------------------
+GD = model("glycol_dehydrator", 2, 6, 3, "steel")
+GD.box((0.0, 0.0, 0.0), (2.0, 0.2, 3.0), "concrete")
+GD.cylinder("y", (0.6, 0.7), 0.45, 0.2, 5.8, "steel", 14)                         # the TEG contactor
+GD.cylinder("y", (1.5, 2.2), 0.18, 1.6, 4.0, "steel", 10)                         # the still column
+GD.box((1.0, 0.2, 1.7), (2.0, 1.6, 2.8), "hipaint")                               # the reboiler and its firebox
+GD.cylinder("y", (1.7, 2.6), 0.08, 1.6, 3.2, "hipaint", 8)                        # its stack
+GD.cylinder("x", (0.6, 2.2), 0.3, 0.1, 0.9, "steel", 12)                          # the surge tank
+GD.box((0.1, 0.2, 1.3), (0.9, 0.6, 1.7), "blue")                                  # the glycol pumps
+GD.box((0.0, 0.3, 0.1), (0.3, 0.9, 0.6), "grey")                                  # the 480 V box, west
+GD.decal((-0.01, 0.4, 0.2), (0.0, 0.8, 0.5), "danger", "west", "grey")
+GD.pipe([(0.6, 0.5, 0.0), (0.6, 0.5, 0.25)], 4, "steel")                          # wet gas in, north
+GD.pipe([(0.6, 0.5, 2.75), (0.6, 0.5, 3.0)], 4, "steel")                          # dry gas out, south
+GD.pipe([(2.0, 0.4, 2.2), (1.9, 0.4, 2.2)], 2, "steel")                           # fuel gas, east
+GD.ladder(1.05, 0.7, 0.2, 5.8, 1, "galv") if hasattr(GD, "ladder") else None
+GD.collide((0.0, 0.0, 0.0), (2.0, 5.8, 3.0))
+
+# ---- 23c: the storage wellhead (one cell) -----------------------------------------------------------------------------------------
+SW = mlib.Model("storage_wellhead", [(0, 0, 0)], dict(TEX), TEX["steel"])
+SW.cylinder("y", (0.5, 0.5), 0.14, -0.2, 0.05, "steel", 12, caps=False)
+SW.cylinder("y", (0.5, 0.5), 0.18, 0.05, 0.35, "steel", 14)                       # the casing head
+SW.box((0.4, 0.35, 0.4), (0.6, 0.8, 0.6), "red" if "red" in TEX else "engine")     # the master valves
+SW.pipe([(0.5, 0.2, 0.4), (0.5, 0.2, 0.0)], 3, "steel")                           # the brine wing, the side it faces (north)
+SW.cylinder("y", (0.5, 0.5), 0.1, 0.8, 0.95, "steel", 10)
+SW.pipe([(0.6, 0.6, 0.5), (1.0, 0.6, 0.5)], 3, "steel")                           # the gas wing
+SW.pipe([(0.4, 0.5, 0.5), (0.0, 0.5, 0.5)], 3, "steel")
+SW.box((0.42, 0.95, 0.42), (0.58, 1.0, 0.58), "brass" if "brass" in TEX else "steel")   # the safety valve's control line fitting
+SW.collide((0.3, 0.0, 0.3), (0.7, 1.0, 0.7))
+
 M = CC
-EXTRA = [CM, CP, MG]
+EXTRA = [CM, CP, MG, SC, GD]
 for extra in EXTRA:
 	extra.export_args = {"blockstate": True, "item": True}
+SW.export_args = {"blockstate": False, "item": True}
+EXTRA.append(SW)
+
+
+def after():
+	import gearlib
+	for name in ("storage_wellhead",):
+		gearlib.save_blockstate(name, {f"facing={facing}": {"model": f"wildcatter:block/{name}/p0", **({"y": y} if y else {})} for facing, y in gearlib.ROT.items()})

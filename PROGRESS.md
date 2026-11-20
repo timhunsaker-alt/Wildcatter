@@ -2378,4 +2378,13 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
   separator, the flow check and WELL DEAD; off, the Phase 15 one-minute kill stays. PLC points on the panel: CHOKE POSITION command and
   feedback, DRILL PIPE and CASING PRESSURE, STROKES, PUMP RATE, KILL UNDER WAY. NeoForge scene `choke_kill` (the operator on the panel's
   PLC points); `WellControlTest` (schedule held, too closed, too open). Field Manual: THE CHOKE KILL.
+- **23c, salt caverns and gas storage:** `well/Cavern` (the window 0.3-0.85 psi/ft as if at 1,000 m: 68-193 bar; about 125 Sm3 of
+  working gas a m3) and `well/CavernData` (each hole's cavern blocks, gas, debrining, breach, saved with the world). The brine wellhead
+  leaches up without a blanket and out with one (diesel or nitrogen), to disposal at the injection pump's full 10 L/s, and stops at
+  2 blocks of salt to the flank and 3 under the caprock (CAVERN AT LIMIT); with `cavernStability` it leaches on and breaches (a flank
+  flood; a roof heave for a day, then a sinkhole). The sonar tool outlines a cavern in 30 s and reads its record (WALL THIN). New:
+  the storage wellhead (INJECT / WITHDRAW / SHUT IN, PLC points), the storage compressor (3 x 3 x 6, 1.0 MW at medium voltage, 5 Sm3/s)
+  and the glycol dehydrator (2 x 6 x 3, 15 kW industrial LV, a 0.1 MW gas reboiler); debrining to a disposal well, CAVERN DRY,
+  HIGH PRESSURE, WET GAS. NeoForge scene `gas_storage`; unit test `CavernTest`; `world_rules` checks the two new rules. Field Manual:
+  SALT CAVERNS AND GAS STORAGE.
 

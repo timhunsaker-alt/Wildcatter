@@ -215,6 +215,8 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> OBM_PACKAGE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("obm_package"));
 	public static final Item OBM_PACKAGE = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(OBM_PACKAGE_KEY),
 			String.format("%,.0f kg of emulsifier, organophilic clay and lime", Tuning.BULK_BAG_KG), "holds oil mud's emulsion: into the mud hopper");
+	public static final ResourceKey<Item> SONAR_TOOL_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("sonar_tool"));
+	public static final Item SONAR_TOOL = new dev.wildcatter.item.SonarToolItem(new Item.Properties().stacksTo(1).setId(SONAR_TOOL_KEY));
 	public static final ResourceKey<Item> EMPTY_TON_CONTAINER_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("empty_ton_container"));
 	public static final Item EMPTY_TON_CONTAINER = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(4).setId(EMPTY_TON_CONTAINER_KEY),
 			String.format("Welded steel chlorine ton container, %,.0f kg tare", Tuning.CL2_TON_TARE));
@@ -565,6 +567,7 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, LCM_BAG_KEY, LCM_BAG);
 		Registry.register(BuiltInRegistries.ITEM, CACL2_BAG_KEY, CACL2_BAG);
 		Registry.register(BuiltInRegistries.ITEM, OBM_PACKAGE_KEY, OBM_PACKAGE);
+		Registry.register(BuiltInRegistries.ITEM, SONAR_TOOL_KEY, SONAR_TOOL);
 		Registry.register(BuiltInRegistries.ITEM, EMPTY_TON_CONTAINER_KEY, EMPTY_TON_CONTAINER);
 		Registry.register(BuiltInRegistries.ITEM, CHLORINE_TON_CONTAINER_KEY, CHLORINE_TON_CONTAINER);
 		Registry.register(BuiltInRegistries.ITEM, GREEN_COKE_KEY, GREEN_COKE);

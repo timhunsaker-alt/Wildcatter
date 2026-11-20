@@ -100,6 +100,9 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.ChokeManifoldBlockEntity> CHOKE_MANIFOLD_ENTITY = entity(dev.wildcatter.block.ChokeManifoldBlockEntity::new, CHOKE_MANIFOLD);
 	public static final BlockEntityType<dev.wildcatter.block.ChokePanelBlockEntity> REMOTE_CHOKE_PANEL_ENTITY = entity(dev.wildcatter.block.ChokePanelBlockEntity::new, REMOTE_CHOKE_PANEL);
 	public static final BlockEntityType<dev.wildcatter.block.MudGasSeparatorBlockEntity> MUD_GAS_SEPARATOR_ENTITY = entity(dev.wildcatter.block.MudGasSeparatorBlockEntity::new, MUD_GAS_SEPARATOR);
+	public static final BlockEntityType<dev.wildcatter.block.StorageCompressorBlockEntity> STORAGE_COMPRESSOR_ENTITY = entity(dev.wildcatter.block.StorageCompressorBlockEntity::new, STORAGE_COMPRESSOR);
+	public static final BlockEntityType<dev.wildcatter.block.GlycolDehydratorBlockEntity> GLYCOL_DEHYDRATOR_ENTITY = entity(dev.wildcatter.block.GlycolDehydratorBlockEntity::new, GLYCOL_DEHYDRATOR);
+	public static final BlockEntityType<dev.wildcatter.block.StorageWellheadBlockEntity> STORAGE_WELLHEAD_ENTITY = entity(dev.wildcatter.block.StorageWellheadBlockEntity::new, STORAGE_WELLHEAD);
 	public static final BlockEntityType<dev.wildcatter.block.MeterBuildingBlockEntity> METER_BUILDING_ENTITY = entity(dev.wildcatter.block.MeterBuildingBlockEntity::new, METER_BUILDING);
 	public static final BlockEntityType<dev.wildcatter.block.SalesGasUnitBlockEntity> SALES_GAS_UNIT_ENTITY = entity(dev.wildcatter.block.SalesGasUnitBlockEntity::new, FILTER_SEPARATOR, ULTRASONIC_METER_RUN, REGULATOR_SKID, PIPELINE_TAP);
 	public static final BlockEntityType<dev.wildcatter.block.AcidSuperheaterBlockEntity> ACID_SUPERHEATER_ENTITY = entity(dev.wildcatter.block.AcidSuperheaterBlockEntity::new, ACID_SUPERHEATER);
@@ -527,6 +530,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		for (Block part : OILFIELD_PARTS) {
 			add(((dev.wildcatter.block.OilfieldPartBlock) part).part().id(), part);
 		}
+		add("storage_wellhead", STORAGE_WELLHEAD);
 		for (Block part : new Block[] {METER_BUILDING, FILTER_SEPARATOR, ULTRASONIC_METER_RUN, REGULATOR_SKID, PIPELINE_TAP}) {
 			add(((dev.wildcatter.block.SalesGasPartBlock) part).part().id(), part);
 		}
@@ -712,6 +716,9 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("choke_manifold"), CHOKE_MANIFOLD_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("remote_choke_panel"), REMOTE_CHOKE_PANEL_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("mud_gas_separator"), MUD_GAS_SEPARATOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("storage_compressor"), STORAGE_COMPRESSOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("glycol_dehydrator"), GLYCOL_DEHYDRATOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("storage_wellhead"), STORAGE_WELLHEAD_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("sales_gas_unit"), SALES_GAS_UNIT_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("converter"), CONVERTER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("final_absorber"), FINAL_ABSORBER_ENTITY);

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SPS",
+    "XMX",
+    "SIS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line",
+    "X": "minecraft:piston",
+    "M": "minecraft:copper_block",
+    "I": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "wildcatter:storage_compressor",
+    "count": 1
+  }
+}

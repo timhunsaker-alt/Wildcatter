@@ -161,3 +161,19 @@ choices are here; everything else in the spec is decided on the best recommendat
   within reach). The panel's hydraulic pump is a residential single-phase load; without power the choke moves at the manual 2 %/s.
 - **Why:** the same ways the rig already finds its accumulator and the mud hopper its tanks.
 - **Alternatives:** a choke line part.
+
+### 20. Caverns: walls, blanket, debrining (23c)
+- **Chosen:** the walls are read off the blocks: a rock salt block may be leached only if every block within 2 horizontally is salt (or
+  the cavern, or the well's casing) and the 3 over it are; the well's own casing counts as wall. Without a blanket the water takes the
+  highest salt block against the cavern first, with one the level ones; the blanket is diesel or nitrogen on a pipe at any other side of
+  the brine wellhead (a trickle, 0.01 L/s). Debrining fills the brine's volume with gas at the cavern's minimum pressure (the cushion),
+  so a cavern is DRY with its cushion in. Withdrawal falls off in proportion to the pressure over the minimum (full above half the
+  window) and never goes under it, so the low-pressure breach of question 2 comes only from gas lost some other way. A brine well
+  leached before 23c takes the water joined to its hole's bottom as its cavern.
+- **Why:** works for a dome's salt and a placed column alike; real debrining fills the cavern with gas as the brine goes.
+- **Alternatives:** the dome's geometry from `SaltDome` for the walls (only for grid domes).
+
+### 21. The storage compressor in the scene (23c)
+- **Chosen:** the `gas_storage` scene runs the 1 MW medium-voltage compressor by a test hook (`testDriven`): the scenes' 500 kW diesel
+  set cannot start it, and a peaker and a 12.47/4.16 kV step-down is a scene of its own. The dehydrator runs on its own 480 V set.
+- **Alternatives:** the peaker of the chemical scenes and a distribution step-down.

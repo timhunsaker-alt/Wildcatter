@@ -158,7 +158,7 @@ public class InjectionPumpBlockEntity extends BlockEntity implements CircuitPart
 			} else if (strength == 0 || pump.motor.reversed()) {
 				pump.status = "pumping nothing: " + pump.motor.describe();
 			} else {
-				double litres = Math.min(pump.fresh, Tuning.BRINE_WELL_INJECT_LPS * Tuning.WELL_INTERVAL / 20.0 * strength);
+				double litres = Math.min(pump.fresh, (brine.toDisposal() ? Tuning.INJECTION_PUMP_LPS : Tuning.BRINE_WELL_INJECT_LPS) * Tuning.WELL_INTERVAL / 20.0 * strength);   // 23c: full rate with the brine to disposal
 				pump.pumped = brine.inject(level, litres);
 				pump.fresh -= pump.pumped;
 				pump.total += pump.pumped;

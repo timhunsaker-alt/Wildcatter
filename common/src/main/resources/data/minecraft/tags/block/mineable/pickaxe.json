@@ -474,6 +474,9 @@
     "wildcatter:calcium_chloride_unit",
     "wildcatter:choke_manifold",
     "wildcatter:remote_choke_panel",
-    "wildcatter:mud_gas_separator"
+    "wildcatter:mud_gas_separator",
+    "wildcatter:storage_compressor",
+    "wildcatter:glycol_dehydrator",
+    "wildcatter:storage_wellhead"
   ]
 }

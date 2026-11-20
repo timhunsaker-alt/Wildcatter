@@ -56,8 +56,12 @@ public interface OilGasBlocks {
 	Block CHOKE_MANIFOLD = oilfieldPart(dev.wildcatter.block.OilfieldPartBlock.Part.CHOKE_MANIFOLD);
 	Block REMOTE_CHOKE_PANEL = oilfieldPart(dev.wildcatter.block.OilfieldPartBlock.Part.REMOTE_CHOKE_PANEL);
 	Block MUD_GAS_SEPARATOR = oilfieldPart(dev.wildcatter.block.OilfieldPartBlock.Part.MUD_GAS_SEPARATOR);
+	Block STORAGE_COMPRESSOR = oilfieldPart(dev.wildcatter.block.OilfieldPartBlock.Part.STORAGE_COMPRESSOR);
+	Block GLYCOL_DEHYDRATOR = oilfieldPart(dev.wildcatter.block.OilfieldPartBlock.Part.GLYCOL_DEHYDRATOR);
+	Block STORAGE_WELLHEAD = block("storage_wellhead", props -> new dev.wildcatter.block.StorageWellheadBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
+			.strength(3.0F, 6.0F).sound(SoundType.METAL)));
 	/** Phase 23's true-size parts, for registration. */
-	Block[] OILFIELD_PARTS = {CALCIUM_CHLORIDE_UNIT, CHOKE_MANIFOLD, REMOTE_CHOKE_PANEL, MUD_GAS_SEPARATOR};
+	Block[] OILFIELD_PARTS = {CALCIUM_CHLORIDE_UNIT, CHOKE_MANIFOLD, REMOTE_CHOKE_PANEL, MUD_GAS_SEPARATOR, STORAGE_COMPRESSOR, GLYCOL_DEHYDRATOR};
 	// 14b: the sales line's meter stations (docs/multiblocks/sales-gas.md)
 	Block METER_BUILDING = salesGasPart(dev.wildcatter.block.SalesGasPartBlock.Part.METER_BUILDING);
 	Block FILTER_SEPARATOR = salesGasPart(dev.wildcatter.block.SalesGasPartBlock.Part.FILTER_SEPARATOR);

@@ -30,7 +30,10 @@ public class OilfieldPartBlock extends BigPartBlock implements net.minecraft.wor
 		// 23b: the choke manifold, its remote panel and the mud-gas separator
 		CHOKE_MANIFOLD("choke_manifold", Footprint.box(2, 2, 4, 0, 0), ChokeManifoldBlockEntity::new),
 		REMOTE_CHOKE_PANEL("remote_choke_panel", Footprint.box(1, 2, 1, 0, 0), ChokePanelBlockEntity::new),
-		MUD_GAS_SEPARATOR("mud_gas_separator", Footprint.box(1, 6, 1, 0, 0), MudGasSeparatorBlockEntity::new);
+		MUD_GAS_SEPARATOR("mud_gas_separator", Footprint.box(1, 6, 1, 0, 0), MudGasSeparatorBlockEntity::new),
+		// 23c: gas storage
+		STORAGE_COMPRESSOR("storage_compressor", Footprint.box(3, 3, 6, 0, 0), StorageCompressorBlockEntity::new),
+		GLYCOL_DEHYDRATOR("glycol_dehydrator", Footprint.box(2, 6, 3, 0, 0), GlycolDehydratorBlockEntity::new);
 
 		private final String id;
 		private final Footprint footprint;

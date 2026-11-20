@@ -720,5 +720,9 @@
   "item.wildcatter.obm_package": "Bulk Bag of OBM Package (emulsifier, organoclay, lime)",
   "block.wildcatter.choke_manifold": "Choke Manifold (5,000 psi)",
   "block.wildcatter.remote_choke_panel": "Remote Choke Panel",
-  "block.wildcatter.mud_gas_separator": "Mud-Gas Separator"
+  "block.wildcatter.mud_gas_separator": "Mud-Gas Separator",
+  "block.wildcatter.storage_compressor": "Storage Compressor (5 Sm3/s, 1.0 MW)",
+  "block.wildcatter.glycol_dehydrator": "Glycol Dehydrator (TEG)",
+  "block.wildcatter.storage_wellhead": "Gas Storage Wellhead",
+  "item.wildcatter.sonar_tool": "Sonar Survey Tool"
 }

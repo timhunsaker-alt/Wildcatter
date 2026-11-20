@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " G ",
+    "SRS",
+    " S "
+  ],
+  "key": {
+    "G": "minecraft:glass_pane",
+    "S": "wildcatter:steel_ingot",
+    "R": "minecraft:note_block"
+  },
+  "result": {
+    "id": "wildcatter:sonar_tool",
+    "count": 1
+  }
+}

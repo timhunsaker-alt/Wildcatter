@@ -281,6 +281,27 @@ public final class Tuning {
 	public static final int FLOW_CHECK_TICKS = 1200;                    // the 1-minute flow check before WELL DEAD
 	public static final int CHOKE_REACH = 12;                           // blocks from the substructure the manifold may stand
 	public static final double CHOKE_PANEL_WATTS = 200.0;               // the remote panel's hydraulic pump, residential
+
+	// ---- 23c: salt caverns and gas storage (proposed unless marked) --------------------------------------------------------------
+	public static final double CAVERN_SHOE_FT = 1_000 * 3.2808;         // the pressure window taken as if at 1,000 m (question 1)
+	public static final double CAVERN_MIN_PSI_FT = 0.30;                // the cushion gas holds it (USPTO 9656807 summary)
+	public static final double CAVERN_MAX_PSI_FT = 0.85;                // Alabama's cap (Alabama Admin. Code 400-6-5)
+	public static final double CAVERN_TEMP_K = 318.0;                   // about 45 C at 1,000 m (derived)
+	public static final double CAVERN_Z = 0.9;                          // gas compressibility in the window (derived)
+	public static final double STD_TEMP_K = 288.15, STD_BAR = 1.01325;  // standard conditions, 15 C and 1 atm
+	public static final double BAR_PER_PSI = 0.0689476;
+	public static final double SALT_PER_M3_BRINE = 312.0;               // kg of salt a m3 of saturated brine
+	public static final int CAVERN_FLANK_WALL = 2;                      // blocks of salt to the dome's flank
+	public static final int CAVERN_ROOF_WALL = 3;                       // blocks of salt under the caprock
+	public static final int CAVERN_THIN_WALL = 3;                       // the sonar reads WALL THIN under this
+	public static final int CAVERN_HEAVE_TICKS = 24_000;                // a roof heaving shows cracks for a game day before it falls
+	public static final int CAVERN_LOW_TICKS = 24_000 * 7;              // under its minimum pressure for a game week: a breach
+	public static final double BLANKET_LPS = 0.01;                      // diesel or nitrogen to keep the blanket on the roof (proposed)
+	public static final double STORAGE_RATE_SM3S = 5.0;                 // injection and withdrawal, each
+	public static final double STORAGE_COMPRESSOR_WATTS = 1_000_000.0;  // two-stage reciprocating, 5 Sm3/s at a ratio of about 3
+	public static final double DEHYDRATOR_WATTS = 15_000.0;             // the TEG pumps and the cooler, industrial LV
+	public static final double DEHYDRATOR_REBOILER_W = 100_000.0;       // its gas-fired reboiler
+	public static final int SONAR_TICKS = 600;                          // a sonar survey takes 30 s
 	public static final double GAS_UNITS_PER_TICK = 1.5;      // a free-flowing well at full pressure
 	/** Fuel a firebox will take from a well before it is full, in ticks of fire. */
 	public static final double FIREBOX_FEED_CAP = 200.0;

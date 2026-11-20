@@ -107,5 +107,19 @@ shaped("mud_gas_separator", ["SPS", "S S", "SPS"], {"S": S_, "P": P_}, "mud_gas_
 LANG.update({f"block.{ns}.choke_manifold": "Choke Manifold (5,000 psi)", f"block.{ns}.remote_choke_panel": "Remote Choke Panel",
 	f"block.{ns}.mud_gas_separator": "Mud-Gas Separator"})
 
+# ---- 23c: gas storage --------------------------------------------------------------------------------------------------------------
+PARTS_23C = ("storage_compressor", "glycol_dehydrator")
+for name in PARTS_23C:
+	big_part_loot(name)
+simple_loot("storage_wellhead")
+tags(PARTS_23C + ("storage_wellhead",))
+shaped("storage_compressor", ["SPS", "XMX", "SIS"], {"S": S_, "P": P_, "X": "minecraft:piston", "M": f"{ns}:motor_mv" if False else "minecraft:copper_block", "I": "minecraft:iron_block"}, "storage_compressor")
+shaped("glycol_dehydrator", ["SPS", "SBS", "SPS"], {"S": S_, "P": P_, "B": "minecraft:blast_furnace"}, "glycol_dehydrator")
+shaped("storage_wellhead", [" P ", "SVS", " S "], {"S": S_, "P": P_, "V": "minecraft:iron_door"}, "storage_wellhead")
+shaped("sonar_tool", [" G ", "SRS", " S "], {"G": "minecraft:glass_pane", "S": S_, "R": "minecraft:note_block"}, "sonar_tool")
+LANG.update({f"block.{ns}.storage_compressor": "Storage Compressor (5 Sm3/s, 1.0 MW)", f"block.{ns}.glycol_dehydrator": "Glycol Dehydrator (TEG)",
+	f"block.{ns}.storage_wellhead": "Gas Storage Wellhead"})
+item("sonar_tool", "Sonar Survey Tool", (60, 90, 120), lambda d: d.ellipse([4, 4, 11, 11], outline=(200, 230, 255, 255)))
+
 save_json(f"{ASSETS}/lang/en_us.json", LANG)
 print("oilfield assets written")
