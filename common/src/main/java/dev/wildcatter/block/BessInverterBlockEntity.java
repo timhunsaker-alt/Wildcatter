@@ -414,6 +414,24 @@ public abstract class BessInverterBlockEntity extends BlockEntity implements Cir
 		}
 	}
 
+	/**
+	 * The current limit acts inside the solve, as an inverter's does within a cycle: a forming block over 1.2 per unit raises its virtual
+	 * impedance and the circuit is solved again, so no solve ever shows a machine's fault current from it.
+	 */
+	@Override
+	public boolean protect(Circuit circuit, int ticks) {
+		if (!formingBuilt) {
+			return false;
+		}
+		double limit = ratedVa() / (3 * Voltage.INDUSTRIAL.nominal()) * Tuning.BESS_CURRENT_LIMIT;
+		double now = phases.amps(circuit);
+		if (now > limit * 1.02) {
+			zFactor *= now / limit;
+			return true;
+		}
+		return false;
+	}
+
 	@Override
 	public void apply(Circuit circuit, int ticks) {
 		double seconds = ticks / 20.0;

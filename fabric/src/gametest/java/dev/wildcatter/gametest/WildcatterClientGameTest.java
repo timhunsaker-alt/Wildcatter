@@ -235,6 +235,12 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("lithium")) {
 				new ChemicalClientScenes(context, server, y, up, -14200).lithium();
 			}
+			if (only("cellPlant")) {   // Phase 22a
+				new ChemicalClientScenes(context, server, y, up, -14600).cellPlant();
+			}
+			if (only("bess")) {   // Phase 22b
+				new ChemicalClientScenes(context, server, y, up, -15000).bess();
+			}
 			if (only("guyWire")) {
 				new GridClientScenes(context, server, y, up, -10400).guyWire();
 			}
