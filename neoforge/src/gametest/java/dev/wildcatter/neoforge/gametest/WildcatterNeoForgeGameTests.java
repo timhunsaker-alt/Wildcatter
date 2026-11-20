@@ -236,7 +236,7 @@ public class WildcatterNeoForgeGameTests {
 			for (String scene : OILFIELD_23_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
 						new TestData<>(oilfield23, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 12000, 1, true,
-								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 120)));
+								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 160)));   // padding: gas_storage's peaker reaches 72 blocks west, the rigs 52 east
 			}
 			for (String scene : OILFIELD_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),

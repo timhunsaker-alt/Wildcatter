@@ -2427,9 +2427,12 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
   WILDCATTER_ONLY; never part of the full suite): each plant built as its NeoForge scene builds it, in the trailers' generated world,
   and filmed in real time into `build/scene-videos/<scene>__NN_<shot>.mov` (TRAILER_SHOTS picks shots). World shots are portrait
   (972 x 1728) with a readout card across the top whose values are the blocks' own, read each tick on the server thread; the remote
-  choke panel is filmed on its own screen in the landscape window (2880 x 1620, GUI scale 4). No frame mode; the cursor is hidden.
+  choke panel is filmed on its own screen in the landscape window (2880 x 1620, GUI scale 2: its layout needs 720 units). No frame mode; the cursor is hidden.
   The old parts-only `bess` screenshots now run as `bessParts`.
 - **Remote choke panel screen:** the mud weight and pit gain are two lines, so the pit gain is no longer cut off at the right edge.
 - **Known gaps:** a cavern leached to its limit keeps 2 blocks of salt to the flank (CAVERN_FLANK_WALL) but the sonar reads WALL THIN
   under 3 (CAVERN_THIN_WALL), so every full cavern reads WALL THIN; the rig's deep field in the trailer world is shallow (about 120 m),
   so the kill's pressures are small (SIDPP 14 psi).
+- **0.10.1 tests:** `build` passes; the full NeoForge suite passes, 124 of 124 (2026-11-20), once the oilfield follow-ons' batch is
+  padded 160 blocks: the first run failed `blowout`, `mv_span_flashover` and `oil_mud`, because gas_storage's peaker now reaches 72
+  blocks west and was overlapping the scenes beside it. All three pass alone.
