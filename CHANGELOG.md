@@ -1,5 +1,36 @@
 # Changelog
 
+## v0.10.0 (not released): Phase 23, the oilfield follow-ons
+
+### Casing, losses and oil mud (23a)
+- **SET CASING and the leak-off test:** rack casing joints and oilwell cement in the land rig's substructure; the stopped console's
+  sneak-click runs and cements intermediate casing to the bit, then (after 3 m of new hole) the LOT reads the shoe's fracture gradient and
+  the MAASP. A shoe within 12 blocks above a deep field holds 15.4 ppg; the open hole under the 30 m surface casing 14.0.
+- **Lost circulation** (new world rule `chokeKill`): partial losses (an LCM bag through the mud hopper cures them and strengthens the
+  shoe), total losses (no returns), and the underground blowout when a kick breaks the shoe.
+- **Oil-based mud:** the tanks switch to OIL MUD; diesel off a pipe, water to 80/20, CaCl2 flake and the OBM package by hopper. No
+  washout, never LOW GEL, 25 % faster; its diesel goes down the hole; a kick in it shows late. New part: the calcium chloride unit
+  (15 kW). The barite mill grinds calcite to LCM; the bentonite dryer makes the OBM package.
+
+### The choke kill (23b)
+- New parts: the choke manifold, the remote choke panel (its screen: kill sheet, gauges, the drill pipe chart) and the mud-gas
+  separator (its vent to a flare stack). Under `chokeKill` a shut-in kick is killed by hand or by a PLC on the panel's points: wait and
+  weight or the driller's method, losses when held too closed, a second kick when too open, gas on the floor through a blown separator,
+  the flow check, WELL DEAD. With the rule off the one-minute kill stays.
+
+### Salt caverns and gas storage (23c)
+- The brine wellhead keeps its cavern's record, leaches under a blanket, sends brine to a disposal well at the pump's full rate and stops
+  at its walls; with the new world rule `cavernStability` it leaches on and breaches (flood or sinkhole). The sonar tool surveys it.
+- New: the gas storage wellhead, the storage compressor (1.0 MW medium voltage) and the glycol dehydrator: debrining, cushion and working
+  gas between 68 and 193 bar.
+
+### Frasch sulfur (23d)
+- New: the Frasch wellhead, water heater, lift air compressor and sulfur vat: molten sulfur out of a dome's caprock at 2 t/h, with a
+  bleed water well.
+
+Six quests, six Field Manual pages. Existing worlds start with `chokeKill` and `cavernStability` off. Decisions for review:
+`docs/questions/oilfield-follow-ons.md` (9-23).
+
 ## v0.9.0 (released 2026-11-19): PLC answers, breakers seen opening, the art pass
 
 ### PLC (Tim's answers of 2026-11-19)

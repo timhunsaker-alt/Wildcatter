@@ -2397,4 +2397,5 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
   sulfur for a hopper under it); a disposal wellhead into the same caprock within 16 blocks takes the bleed water, or the rate falls to
   a third (NO BLEED). NO HOT WATER, NO AIR, CAPROCK SPENT. NeoForge scene `frasch`. Field Manual: FRASCH SULFUR. Quests: five in Oil and
   gas, Frasch sulfur in Chemicals (milestones casing_set, lot_done, well_killed_choke, oil_mud_drilling, cavern_dry, frasch_flowing).
-
+- **Phase 23 tests:** `build` passes; the full NeoForge suite passed, 119 of 119 (2026-11-19). The Fabric client suite was not run (no new
+  client scenes).
