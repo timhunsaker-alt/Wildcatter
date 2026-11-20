@@ -618,7 +618,7 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 		close();
 		// 2: the remote choke panel's screen: the kill sheet and gauges; the pump up, the choke held on the schedule
 		wide();
-		guiWidth(360);   // GUI scale 4 on the 1440-point window: the panel as big as its layout allows (5 overlaps its columns)
+		guiWidth(720);   // GUI scale 2 (720 units wide): the panel's layout needs 720; the game caps the scale at 3 on this window anyway
 		stand(new Cam(33.5, 8.3, 0.5, 33.5, 7.5, -3.0));
 		onS(srv -> panel().open(srv.getPlayerList().getPlayers().get(0)));
 		context.waitTicks(30);
@@ -743,8 +743,8 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 	 * outline; the storage wellhead and storage compressor (driven by hook) debrining it, then working gas.
 	 */
 	void saltCavern() {
-		site(5200, 600, new int[] {-22, 24, -20, 18}, 10, new int[] {-18, 20, -16, 14}, 3);
-		pad(-18, -16, 20, 14, "minecraft:grass_block");
+		site(5200, 600, new int[] {-76, 24, -56, 18}, 12, new int[] {-72, 20, -52, 14}, 4);
+		pad(-72, -52, 20, 14, "minecraft:grass_block");
 		var salt = OreBlocks.block(Ore.HALITE).defaultBlockState();
 		on(level -> {
 			for (int x = -4; x <= 4; x++) {
@@ -841,21 +841,27 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 		put(0, 2, -6, "wildcatter:gas_line");
 		run("gas_line", 2, new int[] {0, -5}, new int[] {0, -1});
 		place(WildcatterBlocks.STORAGE_COMPRESSOR, -1, 1, -12, NORTH);
+		// its 1 MW, 4.16 kV motor on a real supply (as gas_storage): the peaker's 12.47 kV feeder to a 1.5 MVA transformer back-fed beside it
+		BlockPos station = peaker(-70, -40);
+		place(WildcatterBlocks.GSU_TRANSFORMER, -3, 1, -12, Direction.WEST);
+		put(-5, 3, -12, "wildcatter:cable_dist");
+		put(-5, 2, -12, "wildcatter:cable_dist");
+		run("cable_dist", 1, new int[] {-34, -45}, new int[] {-28, -45}, new int[] {-28, -16}, new int[] {-5, -16}, new int[] {-5, -12});
+		put(-2, 1, -12, "wildcatter:cable_mv");
+		startPeaker(-70, -40, station);
 		put(0, 1, -13, "wildcatter:gas_line");
 		put(0, 0, -13, "wildcatter:gas_line");
 		source(0, -1, -13, Product.PIPELINE_GAS, 10.0);   // the pipeline, its stand-in source under the ground
 		context.waitTicks(20);
 		StorageWellheadBlockEntity head = at(A(0, 2, 0), StorageWellheadBlockEntity.class);
 		StorageCompressorBlockEntity comp = at(A(-1, 1, -12), StorageCompressorBlockEntity.class);
-		onS(srv -> {
-			comp.testDriven();
-			head.setMode(StorageWellheadBlockEntity.Mode.INJECT);
-		});
+		onS(srv -> head.setMode(StorageWellheadBlockEntity.Mode.INJECT));
+		waitUntil(() -> getS(srv -> comp.motor().state() == dev.wildcatter.circuit.Motor.State.RUNNING), 600);
+		log("compressor: " + read(A(-1, 1, -12)) + " | transformer " + read(A(-3, 1, -12)));
 		server.runCommand("effect clear @p minecraft:night_vision");
 		Cam e = new Cam(-9.0, 4.5, -18.0, -0.5, 2.0, -8.0), g = new Cam(-6.5, 3.5, -15.0, 0.0, 2.0, -6.0);
 		int[] cushionAt = {-1};
 		film(3, "compressor", e, g, 520, until(t -> {
-			onS(srv -> comp.testDriven());
 			if (t == 260) {
 				onS(srv -> head.testGas(dev.wildcatter.well.Cavern.cushion(head.volume()) - head.gas()));
 				cushionAt[0] = t;
@@ -985,19 +991,12 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 		log("frasch ok: " + read(A(0, 1, 0)) + " | vat " + read(A(8, 1, -3)));
 	}
 
-	// ---- bess (Phase 22) ------------------------------------------------------------------------------------------------------------------
 	/**
-	 * The cell line making a module (on its 480 V set by busway, HF and ethylene off test sources, the feeds and its progress to 97 % by
-	 * hook); a utility block (PCS, two containers, MV skid, plant controller) on the peaker's 12.47 kV (11 kV IEC) feeder as BessScenes'
-	 * bess_block lays it out: its containers filled with modules (by hook) and charging; idle on frequency response, a load bank step on the
-	 * peaker's bus drops the frequency and the block answers; then a commercial cabinet set to GRID FORMING black-starts a dead 480 V island
-	 * of heaters with its soft start.
+	 * The peaker (ChemicalScenes.peaker moved by px, pz): an aeroderivative gas turbine, its 13.8 kV bus duct, GSU and substation
+	 * transformer, 12.47 kV (11 kV IEC) out of the substation transformer's throat at (px+36, pz-5); its station set and unit substation.
+	 * Returns the station set's panel.
 	 */
-	void bess() {
-		site(7600, 600, new int[] {-48, 48, -36, 44}, 14, new int[] {-44, 44, -32, 40}, 5);
-		pad(-44, -32, 44, 40, "minecraft:grass_block");
-		// the peaker (ChemicalScenes.peaker at -40, -20) with two load banks on its 13.8 kV bus
-		int px = -40, pz = -20;
+	private BlockPos peaker(int px, int pz) {
 		place(WildcatterBlocks.AERO_TURBINE, px + 20, 1, pz, NORTH);
 		place(WildcatterBlocks.AERO_INLET_HOUSE, px + 20, 1, pz - 5, NORTH);
 		place(WildcatterBlocks.AERO_EXHAUST_STACK, px + 20, 1, pz + 14, NORTH);
@@ -1014,14 +1013,44 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 		for (int z = -10; z <= 4; z++) {
 			put(px + 36, 7, pz + z, "wildcatter:cable_hv");
 		}
-		BlockPos bank1 = A(px + 29, 1, pz + 11), bank2 = A(px + 32, 1, pz + 11);
-		placeBig(WildcatterBlocks.LOAD_BANK, bank1, NORTH);
-		placeBig(WildcatterBlocks.LOAD_BANK, bank2, NORTH);
 		BlockPos station = A(px + 10, 1, pz + 2);
 		genset(station, NORTH, false);
 		place(WildcatterBlocks.UNIT_SUBSTATION, px + 14, 1, pz + 2, Direction.SOUTH);
 		run("cable_mv", 1, new int[] {px + 15, pz + 2}, new int[] {px + 19, pz + 2});
 		fillTank(A(px + 14, 1, pz + 4), Product.KEROSENE, 40_000);
+		return station;
+	}
+
+	/** Starts the peaker's station set, then the turbine, its start and ramp skipped (ChemicalScenes.startPeaker). */
+	private void startPeaker(int px, int pz, BlockPos station) {
+		startGenset(station, NORTH, 3000);
+		GasTurbineBlockEntity gt = at(A(px + 20, 1, pz), GasTurbineBlockEntity.class);
+		onS(srv -> gt.setWantRun(true));
+		context.waitTicks(200);
+		onS(srv -> gt.skipStartForTest(false));
+		context.waitTicks(100);
+		onS(srv -> gt.skipRampForTest());
+		context.waitTicks(100);
+		log("peaker: " + read(A(px + 20, 1, pz)) + " | station " + read(station));
+	}
+
+	// ---- bess (Phase 22) ------------------------------------------------------------------------------------------------------------------
+	/**
+	 * The cell line making a module (on its 480 V set by busway, HF and ethylene off test sources, the feeds and its progress to 97 % by
+	 * hook); a utility block (PCS, two containers, MV skid, plant controller) on the peaker's 12.47 kV (11 kV IEC) feeder as BessScenes'
+	 * bess_block lays it out: its containers filled with modules (by hook) and charging; idle on frequency response, a load bank step on the
+	 * peaker's bus drops the frequency and the block answers; then a commercial cabinet set to GRID FORMING black-starts a dead 480 V island
+	 * of heaters with its soft start.
+	 */
+	void bess() {
+		site(7600, 600, new int[] {-48, 48, -36, 54}, 14, new int[] {-44, 44, -32, 50}, 5);
+		pad(-44, -32, 44, 50, "minecraft:grass_block");
+		// the peaker (ChemicalScenes.peaker at -40, -20) with two load banks on its 13.8 kV bus
+		int px = -40, pz = -20;
+		BlockPos station = peaker(px, pz);
+		BlockPos bank1 = A(px + 29, 1, pz + 11), bank2 = A(px + 32, 1, pz + 11);
+		placeBig(WildcatterBlocks.LOAD_BANK, bank1, NORTH);
+		placeBig(WildcatterBlocks.LOAD_BANK, bank2, NORTH);
 		// the utility block (bess_block)
 		place(WildcatterBlocks.BESS_MV_SKID, 10, 1, 0, NORTH);
 		place(WildcatterBlocks.BESS_PCS, 10, 1, -3, NORTH);
@@ -1032,9 +1061,12 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 		run("cable_dist", 1, new int[] {-4, -25}, new int[] {20, -25}, new int[] {20, 0}, new int[] {13, 0});
 		// the cell line on its own 480 V set, busway to its box; HF and ethylene off test sources
 		place(WildcatterBlocks.CELL_LINE, 30, 1, 20, NORTH);
-		BlockPos lineSet = A(28, 1, 38);
+		// three 500 kW sets in parallel on its busway, as BessScenes: one alone trips on frequency at the line's start
+		BlockPos lineSet = A(28, 1, 38), lineSet2 = A(28, 1, 42), lineSet3 = A(28, 1, 46);
 		genset(lineSet, NORTH, false);
-		run("busway_industrial", 1, new int[] {29, 38}, new int[] {29, 20});
+		genset(lineSet2, NORTH, false);
+		genset(lineSet3, NORTH, false);
+		run("busway_industrial", 1, new int[] {29, 46}, new int[] {29, 20});
 		for (int z : new int[] {20, 22}) {
 			put(34, 1, z, "wildcatter:gas_line");
 			put(34, 0, z, "wildcatter:gas_line");
@@ -1062,15 +1094,9 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 		CellLineBlockEntity cells = at(A(30, 1, 20), CellLineBlockEntity.class);
 		// start the cell line's set and the peaker
 		startGenset(lineSet, NORTH, 3000);
-		startGenset(station, NORTH, 3000);
-		GasTurbineBlockEntity gt = at(A(px + 20, 1, pz), GasTurbineBlockEntity.class);
-		onS(srv -> gt.setWantRun(true));
-		context.waitTicks(200);
-		onS(srv -> gt.skipStartForTest(false));
-		context.waitTicks(100);
-		onS(srv -> gt.skipRampForTest());
-		context.waitTicks(100);
-		log("peaker: " + read(A(px + 20, 1, pz)) + " | station " + read(station));
+		startGenset(lineSet2, NORTH, 3000);
+		startGenset(lineSet3, NORTH, 3000);
+		startPeaker(px, pz, station);
 		onS(srv -> {
 			cells.slots().set(0, new ItemStack(WildcatterItems.LFP_CATHODE_BAG, 1));
 			cells.slots().set(1, new ItemStack(WildcatterItems.PURIFIED_GRAPHITE_BAG, 1));
@@ -1078,9 +1104,11 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 			cells.slots().set(3, new ItemStack(Items.COPPER_INGOT, 2));
 			cells.slots().set(4, new ItemStack(WildcatterItems.ALUMINIUM_INGOT, 2));
 		});
-		waitUntil(() -> cells.progress() > 0, 600);
+		if (!waitUntil(() -> getS(srv -> cells.progress()) > 0, 600)) {
+			log("cell line not started: " + read(A(30, 1, 20)) + " | busway " + read(A(29, 1, 20)) + " / " + read(A(29, 1, 38)) + " | set " + read(lineSet));
+		}
 		onS(srv -> cells.testProgress(0.97));
-		log("cell line: " + read(A(30, 1, 20)));
+		log("cell line: " + read(A(30, 1, 20)) + " | busway at its box " + read(A(29, 1, 20)) + " | at the set " + read(A(29, 1, 38)) + " | set " + read(lineSet));
 		showCard();
 		// 1: the cell line makes a module
 		int made0 = cells.made();
@@ -1118,7 +1146,7 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 			}
 			boolean charging = pcs.gridWatts() < -1000;
 			card("^BATTERY CONTAINERS", "Modules " + boxA.modules() + " + " + boxB.modules() + " of " + (2 * Tuning.CONTAINER_MODULES),
-					charging ? "+Charging " + f1(-pcs.gridWatts() / 1e6) + " MW" : "Waiting to charge", "State of charge " + f1(pcs.soc(pcs.getLevel()) * 100) + " %");
+					charging ? "+Charging " + f1(-pcs.gridWatts() / 1e6) + " MW" : "Not charging yet", "State of charge " + f1(pcs.soc(pcs.getLevel()) * 100) + " %");
 		}));
 		// 3: idle on frequency response; the load banks step on, the frequency drops, the battery answers
 		onS(srv -> {
