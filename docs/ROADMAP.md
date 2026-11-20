@@ -628,6 +628,15 @@ Tim's answers C18-C23 (`docs/questions/plc-gaps.md` 12) and the faults short's f
 - The breaker drawn open when it trips, with an arc flash and its sound; the trip held for the relay's operate time so a reclose onto a
   standing fault is seen. The client `wells` scene fixed.
 
+## Phase 22 — Grid batteries — BUILT 2026-11-19 (Wave B; spec approved by Tim 2026-11-19, every question with the recommended option; branch `spec-grid-batteries`)
+Spec: `docs/multiblocks/grid-batteries.md`. Decisions: `docs/questions/grid-batteries.md` (1-8 Tim's answers, 9-20 decided while building).
+- **22a, the LFP cell plant:** graphite line, graphite furnace (1.4 MW on distribution), LFP kiln and cell line; a 52.2 kWh module every
+  10 minutes from lithium carbonate, phosphoric acid, iron, graphite schist, copper, aluminium, HF and ethylene. Graphite schist has a use.
+- **22b, the battery:** 5 MWh containers, the 2.5 MW PCS, the 2,750 kVA MV skid, the plant controller (up to 4 blocks) and the 125 kW / 261 kWh
+  cabinet; grid-following with frequency response and peak shaving; state of charge, losses, degradation, PLC points.
+- **22c:** grid-forming, black start, the 1.2 pu current limit and ride-through; thermal runaway as the world rule `bessThermalRunaway`.
+- NeoForge scenes `cell_plant`, `bess_block`, `bess_peak_shave`, `bess_forming`, `bess_runaway`; unit test `BessTest`.
+
 ## Ideas (not scheduled)
 - **Time scale (Tim, 2026-11-10):** a world setting with presets 1:1, 5:1, 10:1, 20:1 and 50:1 that shortens the long waits (reactor heat-up
   and cooldown, residence holds, cask cooling, Tailings' paste cure), chosen on the Create World screen with the world rules. Spec and
@@ -640,9 +649,8 @@ Tim's answers C18-C23 (`docs/questions/plc-gaps.md` 12) and the faults short's f
   - ferroalloys (chromium, manganese, molybdenum, tungsten);
   - a nickel smelter;
   - fertilizer from phosphate and potash (built as Phase 18a, branch `phase18`).
-- **Grid batteries (Wave B, 2026-11-19):** a containerised LFP battery energy storage system on the grid (grid-following and
-  grid-forming, black start) and the LFP cell plant that feeds it. DRAFT spec: `docs/multiblocks/grid-batteries.md`; questions:
-  `docs/questions/grid-batteries.md`. Not scheduled.
+- Raised by Phase 22: battery recycling (spent modules); NMC and sodium-ion cells; explosions and lightning setting a container off; a CT
+  part for peak shaving on a named feeder; a running sound loop for the PCS.
 - Phase 15 follow-ons: brine wells and gas storage caverns in the salt domes; Frasch sulfur from the caprock; oil-based muds and lost
   circulation; the fracture gradient (a mud too heavy for the casing shoe); a choke manifold worked by hand.
 - The purer yellowcake route: ADU precipitation on the Phase 14 ammonia and a calciner at 750-800 C (94-98 % U3O8).

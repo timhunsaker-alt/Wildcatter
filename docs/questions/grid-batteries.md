@@ -75,3 +75,72 @@ choices are here; everything else in the spec is decided on the best recommendat
 - **Alternatives:** earlier, with the cabinet's cells crafted from materials a player reaches at the 480 V stage (lithium carbonate from
   spodumene by a small crafting route), so a small base can have storage before chemicals (less real, more useful early).
 - **Answered by Tim 2026-11-19:** the Chosen option.
+
+## Decided while building (22a-22c, 2026-11-19): for Tim
+
+Each was **decided on recommendation**; none needs Tim before it can stand, but each can be changed.
+
+### 9. The graphite furnace's supply
+- **Chosen:** its own furnace transformer on the distribution tier (12.47 kV, 11 kV IEC), not industrial MV.
+- **Why:** a 1.4 MW resistance furnace is fed as the submerged arc furnace is, from a distribution feeder through its furnace transformer; on
+  the industrial MV tier it would have needed a unit substation run backward, and the 4.16 kV parts have no source that size.
+- **Alternatives:** industrial MV, as the spec first said.
+
+### 10. Line to furnace
+- **Chosen:** spherical graphite travels in bulk bags (a new `spherical_graphite_bag`), the flotation tails counted.
+- **Why:** every other plant's solid intermediates go in bags; touching would tie the two parts' layout together.
+- **Alternatives:** the furnace touching the line and drawing from it; the tails as slurry to a lined cell.
+
+### 11. Loading modules
+- **Chosen:** a container or cabinet is crafted empty and loaded by right-clicking modules into it (96, or 5). A full worn one takes 96 new
+  ones and gives the worn ones back as spent modules.
+- **Why:** a crafting grid holds one item a slot, so it cannot take 96 modules; real containers are racked on site.
+- **Alternatives:** a module "rack" item of 8 modules (12 make a container), crafted.
+
+### 12. The MV skid's windings
+- **Chosen:** wye-wye, as the pad-mounts are, so no 30-degree shift; the PCS joins its low side directly.
+- **Why:** the solver's delta-wye shift is only followed by machines that synchronise; a grid-following PCS would then read its bus 30 degrees
+  off for nothing a player sees.
+- **Alternatives:** delta on the low side (the real winding), with the PCS taking the shift as a genset does.
+
+### 13. What peak shaving watches
+- **Chosen:** what the island's machines (generators that are not storage) delivered at the last solve.
+- **Why:** it needs no new current transformer part, and on a genset island (where a cabinet earns its place) that is the peak to shave.
+- **Alternatives:** a CT on a named feeder (a new part, or a transmitter landed on the PLC).
+
+### 14. A grid-forming block's share
+- **Chosen:** it shares an island by its 5 % sag, as a genset does; its P setpoint applies only while following; it trips EMPTY at the bottom
+  of its window.
+- **Why:** the island frequency model was left as it is; a forming block behaves as one more machine, which is how real ones are tuned.
+- **Alternatives:** a power setpoint while forming (a voltage trim, as the gensets' PLC trims).
+
+### 15. The plant controller's power
+- **Chosen:** none drawn (its station battery and the PCS's auxiliaries).
+- **Why:** 3 kW at residential voltage would only add a cable a player must run before the plant does anything.
+- **Alternatives:** a 3 kW residential load, as the meter building has.
+
+### 16. What sets a container off
+- **Chosen:** fire or lava touching it for 30 s, or a burning container touching it for 2 minutes. Not yet explosions or lightning.
+- **Why:** both are seen and avoidable; an explosion already breaks a container's blocks, and the mod has no lightning hook yet.
+- **Alternatives:** add explosions and lightning (spec item 4's list).
+
+### 17. The cabinet's quest
+- **Chosen:** in the new `grid_storage` chapter, after the first module.
+- **Why:** its modules come from the cell plant, which is after chemicals; a quest in `three_phase` would wait a long time.
+- **Alternatives:** an optional quest in `three_phase`, as the spec said.
+
+### 18. The cell line's two pipes
+- **Chosen:** HF on its first cell's east face, ethylene on its third's.
+- **Why:** pipes on neighbouring cells touch and join into one line, which mixes them.
+- **Alternatives:** HF on the east face, ethylene on another face.
+
+### 19. Sounds
+- **Chosen:** the DC contactors' clunk when a PCS or cabinet leaves STOPPED, and the inverter's whine every 4 s while it moves over a tenth of
+  its rating (a one-shot repeated, not a loop).
+- **Why:** a looped sound needs the client to know the PCS is running, which these parts do not send yet.
+- **Alternatives:** a client-side running loop, as the motors have.
+
+### 20. Burned-out containers
+- **Chosen:** the container is gone; 16 iron ingots of scrap are left; its modules are lost.
+- **Why:** the spec's "scrap steel back, modules lost", in items the player has.
+- **Alternatives:** a burned container block to clear.

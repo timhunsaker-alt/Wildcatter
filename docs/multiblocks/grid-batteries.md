@@ -297,3 +297,48 @@ The same in `docs/questions/grid-batteries.md`, with why and the alternatives. R
    as with gensets.
 8. **Where in the progression:** after the lithium plant (late game, as specced) / earlier, with the cabinet's cells crafted from
    vanilla-reachable materials so a 480 V base can have one.
+
+## As built (22a-22c, 2026-11-19, branch `spec-grid-batteries`)
+Decisions taken while building are in `docs/questions/grid-batteries.md`, items 9-20.
+- **Parts:** the cell plant in `ChemPartBlock` (`GraphiteLineBlockEntity` 160 kW, `GraphiteFurnaceBlockEntity` 1.4 MW, `LfpKilnBlockEntity` 400 kW,
+  `CellLineBlockEntity` 300 kW, each box on the west face of its main cell); the battery in `BessPartBlock` (`BessContainerBlockEntity`,
+  `BessPcsBlockEntity`, `BessPlantControllerBlockEntity`, `BessCabinetBlockEntity`) and the MV skid as a transformer
+  (`PadmountBlock.mvSkid`, 2,750 kVA, 6 %Z, 3 x 3 x 3: its low side the west face of its main cell, its high side the east face of its far
+  cell). The cells' model is `energy/BessCells` (no Minecraft); the PCS and cabinet share `BessInverterBlockEntity`. Models in
+  `tools/models/cell_plant.py` and `bess.py`; values in `Tuning` ("22a", "22b-22c").
+- **The graphite furnace** is fed through its own furnace transformer on the distribution tier, not industrial MV (item 9).
+- **Spherical graphite** goes from the line to the furnace in bulk bags (`spherical_graphite_bag`), as every other plant's intermediates do
+  (item 10). The line's flotation tails are counted, not piped.
+- **The cell line's electrolyte:** anhydrous HF on the east face of its first cell and ethylene on the east face of its third (two cells apart,
+  so the two pipes cannot touch and mix), each held as it arrives.
+- **Modules into containers:** a container (and a cabinet) is crafted empty and filled with LFP modules by right-clicking them in, up to 96 (5);
+  a full, worn one takes 96 new ones to renew it and hands back spent modules (item 11). Broken, it keeps its modules, health and cycles in
+  its item, discharged.
+- **The PCS's AC side** joins its MV skid's low-voltage bushings directly (the short bus between them): its terminals are the skid's. The
+  skid is wired as the pad-mounts are (wye-wye, no 30-degree shift) (item 12). Its chillers' draw comes through the PCS's terminals.
+- **Grid-following** is a signed constant-power star (`V^2 / S*` a phase); frequency response at 4 % droop outside the standard's deadband
+  (`ElectricalStandard.frequencyResponseDeadbandHz`: 36 mHz on 60 Hz worlds, 10 mHz on 50 Hz), ramped over a second. LOSS OF GRID after 2 s,
+  back 5 minutes after the bus is good.
+- **Peak shaving** holds what the island's machines (its generators that are not storage) deliver under a limit; `Circuit.machineWatts`
+  carries it from the last solve (item 13). No CT part.
+- **Grid-forming** is a `Generator` (H 2 s) behind a 5 % sag resistance, as a genset: it shares an island by that sag, so its P setpoint applies
+  only while following. `FrequencyIsland` was not changed. It closes onto a dead bus with a 2 s voltage ramp (a black start, milestone
+  `bess_black_start`), syncs with the gensets' `Synchronizer`, holds 1.2 per unit in a fault by raising its virtual impedance, trips
+  UNDERVOLTAGE after 1 s under half voltage, and trips EMPTY at the bottom of its window (item 14).
+- **The plant controller** finds up to four PCSs by control cable (`ControlNet.walk`) and runs them as one, the setpoint shared by rating
+  and peak shaving's correction shared between them. It draws no power (its station battery) (item 15).
+- **PLC points** (24 on the PCS, the cabinet and the plant controller): RUN, GRID FORMING, BLACK START permit, PEAK SHAVE, FREQUENCY RESPONSE,
+  P, Q and PEAK LIMIT setpoints (4-20 mA); SOC, SOH, P, Q, available discharge and charge (4-20 mA); RUNNING, FORMING, ON GRID, BMS FAULT,
+  OVERTEMP, LOSS OF GRID, UNDERVOLTAGE, END OF LIFE, THERMAL RUNAWAY, AUTO. In HAND a sneak-click steps the mode.
+- **Thermal runaway** (rule `bessThermalRunaway`): fire or lava touching a container for 30 s, or a burning container touching it for 2 minutes.
+  Explosions and lightning do not set one off yet (item 16). Vents with a small blast that breaks no blocks, burns 10 minutes (5 with water in
+  its sprinkler, filled by a water pump like any water user), Poison and Blindness inside 8 blocks, then gone, 16 iron ingots of scrap left.
+- **Quests:** chapter `grid_storage` (order 75): battery graphite, cathode powder, a module, a cabinet, a block on the grid
+  (`bess_discharging`), a black start. The cabinet's quest is here rather than in `three_phase` (its modules come from the cell plant) (item 17).
+- **Art and sound (Ludo):** the container's corrugated wall (`mat_container_corrugated`), the LFP module icon (the spent one dulled from it),
+  the three bags; the DC contactors' clunk and the inverter's whine.
+- **Tests:** unit `BessTest` (6); NeoForge scenes `cell_plant` (388, 356 and 675 kg/h; bags; a module; NO NITROGEN), `bess_block` (charging
+  2.53 MW, discharging 2.47 MW, the cells giving up 1.058 x what is delivered, frequency response at 60.23 Hz to 2.28 MW as 4 % droop gives,
+  LOSS OF GRID), `bess_peak_shave` (the set held at 40 kW, the cabinet 35 kW), `bess_forming` (black start, a set syncing onto it, a bolted
+  fault held at 199 A of 166 A rated then UNDERVOLTAGE), `bess_runaway` (A set off, B catching, C a block apart spared, A burned out, the rule
+  off; a broken container's item keeping 96 modules and its health).
