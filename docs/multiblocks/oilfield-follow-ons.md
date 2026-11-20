@@ -1,8 +1,7 @@
 # Oilfield follow-ons: the fracture gradient and lost circulation, oil-based mud, the choke manifold, salt caverns and gas storage, Frasch sulfur
 
-> **DRAFT spec (2026-11-19), Wave B step 1: for Tim's review, nothing built.** Questions for Tim are at the end and in
-> `docs/questions/oilfield-follow-ons.md`. Everything not asked there is decided on the best recommendation and says so. Proposed
-> phase **23** (four waves, 23a-23d); the number is only a placeholder until Tim schedules it.
+> **APPROVED by Tim 2026-11-19** (every question answered with the recommended option). Built as **Phase 23** (23a-23d) on branch
+> `w-oilfield`. Questions and answers, and the decisions taken while building, are in `docs/questions/oilfield-follow-ons.md`.
 
 Phase 15 built salt domes with flank fields (salt-dome-oil.md), the mud plant, weighted mud, kicks, the BOP and blowouts
 (drilling-mud.md), and Phase 20a a brine wellhead that solution-mines a dome for the chlor-alkali plant (chlor-alkali-plant.md). Each

@@ -617,7 +617,7 @@ Plan approved 2026-11-14. Spec: `docs/quests.md`. Decisions for Tim: `docs/quest
 - GregTech was looked at: no 26.x release (the only port is unofficial and unfinished), so it is left out; the engine takes any mod's
   item ids, so a chapter can be added if one ships. FTB Quests has no 26.3 build, so the book is Wildcatter's own.
 
-## Wave A — Tim's answers of 2026-11-19 — CURRENT (branch `w-wave-a`; next release 0.9.0)
+## Wave A — Tim's answers of 2026-11-19 — DONE (branch `w-wave-a`; released in 0.9.0)
 Tim's answers C18-C23 (`docs/questions/plc-gaps.md` 12) and the faults short's findings. Decisions: `docs/questions/wave-a.md`.
 - **C18** the HOA position as a client overlay while the control key is held (any controllable block, Tailings' too).
 - **C19** `<chart>.SFC_INIT` and `<chart>.SFC_PAUSE` implicit inputs; transitions stay ST.
@@ -627,6 +627,16 @@ Tim's answers C18-C23 (`docs/questions/plc-gaps.md` 12) and the faults short's f
 - **C23** Ludo art for the remaining script-drawn icons (PLC modules and key, breaker levers, insulator caps, hand-line cubes).
 - The breaker drawn open when it trips, with an arc flash and its sound; the trip held for the relay's operate time so a reclose onto a
   standing fault is seen. The client `wells` scene fixed.
+
+## Phase 23 — Oilfield follow-ons — CURRENT (approved by Tim 2026-11-19, every question with the recommended option; branch `w-oilfield`)
+Spec: `docs/multiblocks/oilfield-follow-ons.md`. Questions, answers and decisions taken while building: `docs/questions/oilfield-follow-ons.md`.
+- **23a, casing, the fracture gradient, losses, oil-based mud:** SET CASING and the LOT on the driller's console, the shoe's FG and MAASP,
+  ECD, partial and total losses, LCM, the underground blowout; oil-based mud (diesel, CaCl2, the OBM package), the calcium chloride unit.
+- **23b, the choke kill:** the choke manifold, the remote choke panel and the mud-gas separator; wait-and-weight and the driller's
+  method by hand or by PLC; the world rule `chokeKill` (on in new worlds; off, the Phase 15 one-minute kill stays).
+- **23c, salt caverns and gas storage:** the brine wellhead's cavern record, the blanket, brine to disposal, the sonar tool; the storage
+  wellhead, storage compressor and glycol dehydrator; debrining, cushion and working gas; the world rule `cavernStability`.
+- **23d, Frasch sulfur:** the Frasch water heater, lift air compressor, Frasch wellhead and sulfur vat, with bleed water to a disposal well.
 
 ## Ideas (not scheduled)
 - **Time scale (Tim, 2026-11-10):** a world setting with presets 1:1, 5:1, 10:1, 20:1 and 50:1 that shortens the long waits (reactor heat-up
@@ -640,9 +650,7 @@ Tim's answers C18-C23 (`docs/questions/plc-gaps.md` 12) and the faults short's f
   - ferroalloys (chromium, manganese, molybdenum, tungsten);
   - a nickel smelter;
   - fertilizer from phosphate and potash (built as Phase 18a, branch `phase18`).
-- Phase 15 follow-ons: brine wells and gas storage caverns in the salt domes; Frasch sulfur from the caprock; oil-based muds and lost
-  circulation; the fracture gradient (a mud too heavy for the casing shoe); a choke manifold worked by hand. DRAFT spec (Wave B, 2026-11-19):
-  `docs/multiblocks/oilfield-follow-ons.md`; questions: `docs/questions/oilfield-follow-ons.md`. Not scheduled.
+- Phase 15 follow-ons: scheduled as Phase 23 (above).
 - The purer yellowcake route: ADU precipitation on the Phase 14 ammonia and a calciner at 750-800 C (94-98 % U3O8).
 - Phase 14b-14d follow-ons: a small (100-250 kW) biogas set for farm digesters; biomethane upgrading so biogas can go on the sales line;
   line pack and pressure on the sales line; a delivery station fed from the set it supplies; the condenser's fans staged at part load.

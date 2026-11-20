@@ -15,7 +15,7 @@ Format of an entry:
 
 | File | Wave | Entries |
 |---|---|---|
-| `oilfield-follow-ons.md` | Spec only (Wave B, 2026-11-19): fracture gradient, oil mud, the choke kill, salt caverns and gas storage, Frasch sulfur | 1-8 |
+| `oilfield-follow-ons.md` | Phase 23 (answered by Tim 2026-11-19, all recommended): fracture gradient, oil mud, the choke kill, salt caverns and gas storage, Frasch sulfur | 1-8 answered; 9 on, decided while building |
 | `phase21-quests.md` | Phase 21: the quest book (engine, chapters, milestones) | numbered across 21.1-21.3 |
 | `phase20-chemicals.md` | Phase 20: the chlor-alkali plant, the titanium pigment plant, lithium hydroxide | numbered across 20a-20c |
 | `phase16-uranium.md` | Phase 16: ADU, conversion's cathode hydrogen, ash bed and KOH, product assay, spin-up and cooling, ISR CO2, bleed and satellites | numbered across 16a-16d1 |

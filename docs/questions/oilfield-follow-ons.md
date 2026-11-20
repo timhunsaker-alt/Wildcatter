@@ -1,8 +1,11 @@
 # Oilfield follow-ons (2026-11-19): questions on the spec
 
-Spec: `docs/multiblocks/oilfield-follow-ons.md` (DRAFT, Wave B step 1, nothing built). Format as in `README.md` here. Only real
-design choices are here; everything else in the spec is decided on the best recommendation and says so. The recommended option is
-**Chosen**; nothing is built until Tim has gone through these.
+Spec: `docs/multiblocks/oilfield-follow-ons.md` (APPROVED by Tim 2026-11-19). Format as in `README.md` here. Only real design
+choices are here; everything else in the spec is decided on the best recommendation and says so. The recommended option is
+**Chosen**.
+
+**Answered by Tim 2026-11-19:** every entry, each with the recommended (Chosen) option. Built as Phase 23 (23a-23d) on branch
+`w-oilfield`. Decisions taken while building are numbered on from 9 at the end.
 
 ### 1. Cavern pressure
 - **Chosen:** the real window, **0.3 to 0.85 psi/ft at the casing shoe**, taken **as if the cavern were at a real storage depth of
@@ -12,6 +15,7 @@ design choices are here; everything else in the spec is decided on the best reco
   equivalent mud weights, which do not depend on depth, so it is unaffected.
 - **Alternatives:** the real gradient at the game's depth (about 7-20 bar): consistent with the small SIDPP readings, a tenth of the
   storage, and a compressor that is real equipment doing almost nothing.
+- **Answered by Tim 2026-11-19:** the Chosen option.
 
 ### 2. Cavern breaches and sinkholes
 - **Chosen:** a world rule **`cavernStability`**, on in new worlds and off in existing ones: leaching past the walls (2 blocks to the
@@ -20,6 +24,7 @@ design choices are here; everything else in the spec is decided on the best reco
 - **Why:** it is the real consequence (Bayou Corne, 2012) and the reason caverns are surveyed; with warnings it is a choice, not a trap.
 - **Alternatives:** warnings only, leaching stopping at the limits and never breaching (safe, less to think about); leave breaches
   out entirely (the sonar only measures volume).
+- **Answered by Tim 2026-11-19:** the Chosen option.
 
 ### 3. What caverns store
 - **Chosen:** **gas only.**
@@ -27,6 +32,7 @@ design choices are here; everything else in the spec is decided on the best reco
   dehydrator.
 - **Alternatives:** gas and liquids: crude and LPG stored by brine displacement (as the strategic petroleum reserve in Gulf Coast
   domes), which needs a brine pond part and a second wellhead mode.
+- **Answered by Tim 2026-11-19:** the Chosen option.
 
 ### 4. Frasch sulfur
 - **Chosen:** **build it, with bleed water:** a hot water plant, a lift air compressor, a three-string wellhead and a pour vat; the
@@ -34,6 +40,7 @@ design choices are here; everything else in the spec is decided on the best reco
 - **Why:** it is the real reason a dome's sulfur was worth anything, it ties to Spindletop's history the domes already tell, and the
   molten sulfur feeds the acid plant without digging. Bleed water is what made real Frasch fields work and costs only an existing part.
 - **Alternatives:** build it without bleed water (simpler); leave it out: native sulfur stays mined as ore (four fewer parts).
+- **Answered by Tim 2026-11-19:** the Chosen option.
 
 ### 5. Casing points
 - **Chosen:** **SET CASING by the player** on the console, with casing joints and cement bags by hopper, and a **leak-off test** to read
@@ -43,6 +50,7 @@ design choices are here; everything else in the spec is decided on the best reco
   the choke operator's MAASP a meaning.
 - **Alternatives:** the rig sets intermediate casing by itself when it nears a deep field (no new decision, fewer items); no casing at
   all, one fixed shoe FG for every rig (only the losses and the MAASP, no new step). Either is gated by `wellControl` as now.
+- **Answered by Tim 2026-11-19:** the Chosen option.
 
 ### 6. Oil mud's cost
 - **Chosen:** **diesel is lost with the mud** (about 64 L a metre drilled, 48 m3 to fill the system), and oily cuttings are **only
@@ -51,6 +59,7 @@ design choices are here; everything else in the spec is decided on the best reco
   game has nowhere to put.
 - **Alternatives:** a cuttings dryer required to drill on oil mud (real, more parts); oil mud as water mud with no salt washout and
   nothing else (no CaCl2 unit, no package bag).
+- **Answered by Tim 2026-11-19:** the Chosen option.
 
 ### 7. The choke kill
 - **Chosen:** **required under a new world rule `chokeKill`**, on in new worlds and off in existing ones; off, the Phase 15 one-minute
@@ -58,9 +67,11 @@ design choices are here; everything else in the spec is decided on the best reco
 - **Why:** a hand kill on schedule is the follow-on's point, and the rule keeps old worlds' rigs working as they did.
 - **Alternatives:** optional: the one-minute kill stays beside it, the choke for players who want it; replace the old kill in every
   world.
+- **Answered by Tim 2026-11-19:** the Chosen option.
 
 ### 8. A kick in oil mud
 - **Chosen:** **it shows late:** a third of the pit gain until the influx is within 20 blocks of the surface, then all of it as the
   gas breaks out.
 - **Why:** gas dissolves in oil mud; it is the real danger of oil mud and makes the flow check matter.
 - **Alternatives:** a kick shows the same in oil and water mud (simpler, oil mud only a benefit).
+- **Answered by Tim 2026-11-19:** the Chosen option.
