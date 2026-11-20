@@ -68,6 +68,10 @@ public class BessPlantControllerBlockEntity extends BlockEntity implements Inspe
 		pSet = watts;
 	}
 
+	public void setFrequencyResponse(boolean on) {
+		frequencyResponse = on;
+	}
+
 	public void setPeakLimit(double watts) {
 		peakLimit = watts;
 	}

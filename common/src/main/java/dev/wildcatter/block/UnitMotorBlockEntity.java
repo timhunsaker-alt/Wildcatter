@@ -208,7 +208,7 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "lioh_crystallizer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LIOH_CRYSTALLIZER_WATTS);
 				case "lithium_carbonator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LITHIUM_CARBONATOR_WATTS);
 				case "graphite_line" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.GRAPHITE_LINE_WATTS);
-				case "graphite_furnace" -> new Motor(true, Voltage.MEDIUM, Tuning.GRAPHITE_FURNACE_WATTS);
+				case "graphite_furnace" -> new Motor(true, Voltage.DISTRIBUTION, Tuning.GRAPHITE_FURNACE_WATTS);   // its furnace transformer on a distribution feeder
 				case "lfp_kiln" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LFP_KILN_WATTS);
 				case "cell_line" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CELL_LINE_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);

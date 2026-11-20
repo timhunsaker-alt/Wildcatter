@@ -22,7 +22,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * The graphite furnace (docs/multiblocks/grid-batteries.md, 22a): an electric thermal purification furnace at about 2,800 C, spherical
  * graphite bags by a hopper on top to 99.95 % C, 360 kg/h (5 % driven off), under a nitrogen purge off a pipe to the east face of its main
- * cell. 1.4 MW at the world's industrial medium voltage, the box on the west face of its main cell. Purified graphite to a bagging station
+ * cell. 1.4 MW through its furnace transformer on the world's distribution voltage, the box on the west face of its main cell. Purified graphite to a bagging station
  * against it.
  */
 public class GraphiteFurnaceBlockEntity extends UnitMotorBlockEntity implements HopperFed, Bagged {
@@ -129,7 +129,7 @@ public class GraphiteFurnaceBlockEntity extends UnitMotorBlockEntity implements 
 
 	@Override
 	public Component inspect() {
-		return Component.literal(String.format("Graphite furnace (%.1f MW, %s): ", Tuning.GRAPHITE_FURNACE_WATTS / 1e6, Voltage.MEDIUM.label()) + unit
+		return Component.literal(String.format("Graphite furnace (%.1f MW, %s): ", Tuning.GRAPHITE_FURNACE_WATTS / 1e6, Voltage.DISTRIBUTION.label()) + unit
 				+ String.format("; %.0f kg in the furnace and %d bags; %,.0f kg ready for bags; ", feed, fed(), purified) + describe());
 	}
 

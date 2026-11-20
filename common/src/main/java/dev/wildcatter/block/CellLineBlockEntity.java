@@ -26,7 +26,7 @@ import org.jspecify.annotations.Nullable;
  * minutes at full power (proposed): 115 kg of cathode powder, 60 kg of purified graphite, 9 kg of copper and 6 kg of aluminium foil, and its
  * LiPF6 electrolyte made in line from 5 kg of lithium carbonate and 3 kg of anhydrous HF in carbonate solvents from 6 kg of ethylene (a
  * stand-in for the solvent chain). Bags and ingots by a hopper on top; anhydrous HF to the east face of its main cell, ethylene to the east
- * face of the next cell south; modules out to a hopper under it. 300 kW at the world's industrial voltage, the box on the west face of its
+ * face of its third cell (two cells apart, so the two pipes do not touch); modules out to a hopper under it. 300 kW at the world's industrial voltage, the box on the west face of its
  * main cell.
  */
 public class CellLineBlockEntity extends UnitMotorBlockEntity implements HopperFed {
@@ -37,6 +37,8 @@ public class CellLineBlockEntity extends UnitMotorBlockEntity implements HopperF
 	private double li2co3;      // kg
 	private double copper;      // kg
 	private double aluminium;   // kg
+	private double hf;          // L of anhydrous HF on hand for the electrolyte
+	private double ethylene;    // m3 on hand for the solvents
 	/** Of the module in hand, 0 to 1; negative: none started. */
 	private double progress = -1;
 	private int made;
@@ -97,7 +99,7 @@ public class CellLineBlockEntity extends UnitMotorBlockEntity implements HopperF
 	}
 
 	private List<Lines.Face> ethyleneIn() {
-		return faces(at -> at[0] == 3 && at[1] == 0 && at[2] == 1, Direction.EAST);
+		return faces(at -> at[0] == 3 && at[1] == 0 && at[2] == 2, Direction.EAST);
 	}
 
 	@Override
@@ -165,16 +167,23 @@ public class CellLineBlockEntity extends UnitMotorBlockEntity implements HopperF
 			}
 			double hfL = Tuning.MODULE_HF_KG / Tuning.AHF_KG_PER_L;
 			double ethM3 = Tuning.MODULE_ETHYLENE_KG / Tuning.ETHYLENE_KG_PER_M3;
-			if (Lines.available(level, hfIn(), Product.ANHYDROUS_HF, Pull.MACHINE, this) < hfL - 1e-6) {
-				unit = "NO HF (for the electrolyte): pipe anhydrous HF to the east face of its main cell";
+			if (hf < hfL) {
+				hf += Lines.pull(level, hfIn(), Product.ANHYDROUS_HF, hfL - hf, Pull.MACHINE, this);
+			}
+			if (ethylene < ethM3) {
+				ethylene += Lines.pull(level, ethyleneIn(), Product.ETHYLENE, ethM3 - ethylene, Pull.MACHINE, this);
+			}
+			setChanged();
+			if (hf < hfL - 1e-6) {
+				unit = String.format("NO HF (for the electrolyte, %.1f of %.1f L): pipe anhydrous HF to the east face of its main cell", hf, hfL);
 				return;
 			}
-			if (Lines.available(level, ethyleneIn(), Product.ETHYLENE, Pull.MACHINE, this) < ethM3 - 1e-6) {
-				unit = "NO ETHYLENE (for the electrolyte's solvents): pipe it to the east face of its second cell";
+			if (ethylene < ethM3 - 1e-6) {
+				unit = String.format("NO ETHYLENE (for the electrolyte's solvents, %.1f of %.1f m3): pipe it to the east face of its third cell", ethylene, ethM3);
 				return;
 			}
-			Lines.pull(level, hfIn(), Product.ANHYDROUS_HF, hfL, Pull.MACHINE, this);
-			Lines.pull(level, ethyleneIn(), Product.ETHYLENE, ethM3, Pull.MACHINE, this);
+			hf -= hfL;
+			ethylene -= ethM3;
 			cathode -= Tuning.MODULE_CATHODE_KG;
 			graphite -= Tuning.MODULE_GRAPHITE_KG;
 			li2co3 -= Tuning.MODULE_ELECTROLYTE_LI2CO3_KG;
@@ -222,6 +231,8 @@ public class CellLineBlockEntity extends UnitMotorBlockEntity implements HopperF
 		output.putDouble("li2co3", li2co3);
 		output.putDouble("copper", copper);
 		output.putDouble("aluminium", aluminium);
+		output.putDouble("hf", hf);
+		output.putDouble("ethylene", ethylene);
 		output.putDouble("progress", progress);
 		output.putInt("made", made);
 	}
@@ -236,6 +247,8 @@ public class CellLineBlockEntity extends UnitMotorBlockEntity implements HopperF
 		li2co3 = input.getDoubleOr("li2co3", 0);
 		copper = input.getDoubleOr("copper", 0);
 		aluminium = input.getDoubleOr("aluminium", 0);
+		hf = input.getDoubleOr("hf", 0);
+		ethylene = input.getDoubleOr("ethylene", 0);
 		progress = input.getDoubleOr("progress", -1);
 		made = input.getIntOr("made", 0);
 	}

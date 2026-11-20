@@ -75,7 +75,7 @@ for z in (11.0, 12.6, 14.2):
 	CL.box((1.0, 3.8, z), (2.0, 4.4, z + 1.0), "louvre")                        # dry-room air handlers
 CL.box((1.2, 0.3, 15.8), (2.8, 2.4, 16.0), "steel")                             # the module door, south end
 stub(CL, (4.0, 0.5, 0.5), (3.8, 0.5, 0.5), 2, "steel")                          # HF in
-stub(CL, (4.0, 0.5, 1.5), (3.8, 0.5, 1.5), 2, "steel")                          # ethylene in
+stub(CL, (4.0, 0.5, 2.5), (3.8, 0.5, 2.5), 2, "steel")                          # ethylene in, the third cell
 box480(CL, 0.4, 0.6)
 CL.collide((0.2, 0.0, 0.2), (3.8, 3.8, 15.8))
 

@@ -1824,7 +1824,7 @@ public final class Tuning {
 	public static final double GRAPHITE_FURNACE_N2_PER_KG = 0.02;  // Nm3 of nitrogen a kg purged through the furnace (proposed: one 10 Nm3/h generator)
 	public static final double LFP_KILN_N2_PER_KG = 0.01;          // Nm3 of nitrogen a kg of cathode (proposed: one 10 Nm3/h generator)
 	public static final double GRAPHITE_LINE_WATTS = 160_000.0;    // crushing, flotation, spheroidising mills, LV (proposed)
-	public static final double GRAPHITE_FURNACE_WATTS = 1.4e6;     // thermal purification at about 2,800 C, industrial MV (about 4 MWh a tonne, unverified)
+	public static final double GRAPHITE_FURNACE_WATTS = 1.4e6;     // thermal purification at about 2,800 C, its furnace transformer on distribution (about 4 MWh a tonne, unverified)
 	public static final double LFP_KILN_WATTS = 400_000.0;         // precipitation and the electric roller-hearth kiln, LV (proposed)
 	public static final double CELL_LINE_WATTS = 300_000.0;        // coating, dry room, assembly, formation, LV (proposed)
 
