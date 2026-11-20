@@ -640,6 +640,9 @@ Tim's answers C18-C23 (`docs/questions/plc-gaps.md` 12) and the faults short's f
   - ferroalloys (chromium, manganese, molybdenum, tungsten);
   - a nickel smelter;
   - fertilizer from phosphate and potash (built as Phase 18a, branch `phase18`).
+- **Grid batteries (Wave B, 2026-11-19):** a containerised LFP battery energy storage system on the grid (grid-following and
+  grid-forming, black start) and the LFP cell plant that feeds it. DRAFT spec: `docs/multiblocks/grid-batteries.md`; questions:
+  `docs/questions/grid-batteries.md`. Not scheduled.
 - Phase 15 follow-ons: brine wells and gas storage caverns in the salt domes; Frasch sulfur from the caprock; oil-based muds and lost
   circulation; the fracture gradient (a mud too heavy for the casing shoe); a choke manifold worked by hand.
 - The purer yellowcake route: ADU precipitation on the Phase 14 ammonia and a calciner at 750-800 C (94-98 % U3O8).
