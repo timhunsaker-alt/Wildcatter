@@ -75,3 +75,61 @@ choices are here; everything else in the spec is decided on the best recommendat
 - **Why:** gas dissolves in oil mud; it is the real danger of oil mud and makes the flow check matter.
 - **Alternatives:** a kick shows the same in oil and water mud (simpler, oil mud only a benefit).
 - **Answered by Tim 2026-11-19:** the Chosen option.
+
+## Decided while building (Phase 23, 2026-11-19), on the best recommendation
+
+### 9. Small numbers the spec left open (23a)
+- **Chosen:** every rig has its **surface casing at 30 m**; the open hole below it is the weakest point until intermediate casing is
+  set. A kick's influx rises at **1 m/s** (the drilling circulation rate) for oil mud's late show. Under `chokeKill` a kick flows with its
+  underbalance (0.0006 m3/s a psi, so Phase 15's 0.05 m3/s at about 84 psi), so a small underbalance gives a small kick.
+- **Why:** surface casing is real on every well and gives the MAASP a depth before an intermediate string; a fixed kick rate whatever the
+  underbalance made every kick as big as the worst.
+- **Alternatives:** surface casing at a share of the hole's depth; the Phase 15 fixed rate kept.
+
+### 10. SCR pressure (23b)
+- **Chosen:** **150 psi at 30 spm** in a game hole (most of it the bit's nozzles); it goes with the square of the rate and with the
+  string's mud weight, so FCP = 150 x KMW / OMW.
+- **Why:** real SCR pressures of 400-800 psi come from kilometres of drill pipe; a 100 m hole has little but the bit.
+- **Alternatives:** a real-size 500 psi (the schedule's numbers larger, its shape the same).
+
+### 11. Oilwell cement's recipe (23a)
+- **Chosen:** the spec's **gypsum-free variant only**: a quicklime bag and four clay balls make a bag of class H cement.
+- **Why:** the mod has no phosphogypsum or gypsum item (the fertilizer plant only counts its phosphogypsum), and the spec allows the
+  gypsum-free variant so casing does not wait for the fertilizer plant.
+- **Alternatives:** a phosphogypsum item from the pan filter, and the spec's first recipe with it.
+
+### 12. Which rule holds the fracture gradient (23a)
+- **Chosen:** the shoe's fracture gradient, lost circulation and the underground blowout are under **`chokeKill`** with the choke kill,
+  not `wellControl`.
+- **Why:** `wellControl` is on in existing worlds that already have Phase 15; putting losses under it would change what their rigs do
+  (13.8 ppg mud with no intermediate casing now loses circulation). The MAASP is what the choke operator works against, so the two
+  belong together. SET CASING, the LOT, oil mud and the CaCl2 unit work in every world.
+- **Alternatives:** a third rule `fractureGradient`; losses under `wellControl`.
+
+### 13. The console's buttons and the rack (23a)
+- **Chosen:** casing joints and cement bags go on a **rack in the substructure** (click them in, or a hopper on the rig floor). With no
+  kick, **sneak-clicking the stopped console** is SET CASING when no intermediate string is set, then the LOT once 3 m of new hole is
+  drilled; in a kick it is SHUT IN as before. One intermediate string a rig (liners and more strings are Left out).
+- **Why:** the land rig has no pipe rack part; the console's sneak-click is already its second button.
+- **Alternatives:** a pipe rack part beside the substructure; a screen on the console.
+
+### 14. Switching and dumping the mud tanks (23a)
+- **Chosen:** **sneak-click the mud tanks**: empty, they switch WATER / OIL MUD; with mud in them the first sneak-click asks and a second
+  within 5 s DUMPs it to the reserve pit (lost, counted as diesel lost).
+- **Why:** a dump throws away 48 m3 of diesel; a second click stops it happening by accident.
+- **Alternatives:** a DUMP by a PLC point only.
+
+### 15. The OBM package and the water in oil mud (23a)
+- **Chosen:** the emulsion holds (**ES ok**) with at least **15 lb/bbl** of the package; under it the readout says ES LOW and the mud
+  behaves as water mud (washes out salt, LOW GEL by its bentonite, no lubricity, the kick shows at once). On OIL MUD the water pump
+  tops the water up only to 80/20 against the diesel; diesel comes off a steel pipe at the tanks at up to 20 L/s.
+- **Why:** gives the package its job (real invert emulsions break without emulsifier) and keeps a pump from flooding the oil mud.
+- **Alternatives:** the package optional; the OWR left to the player.
+
+### 16. LCM, the dryer's second recipe and the shut-in shoe (23a)
+- **Chosen:** an LCM bag pumped with no partial losses is screened out at the shakers (lost); the cure leaves the weakest point
+  0.5 ppg stronger once. The bentonite dryer makes the OBM package when it has a quicklime bag (its second hopper slot) and ammonia on
+  the north face of its front bottom cells; the barite mill grinds calcite or limestone to LCM, changing over only when empty. A kick
+  whose shut-in pressure puts the shoe over 0.5 ppg past its FG is an **underground blowout** at once.
+- **Why:** each follows the spec's rule for what the part does, with the smallest new behaviour.
+- **Alternatives:** LCM kept in the mud; strengthening adding up bag by bag.

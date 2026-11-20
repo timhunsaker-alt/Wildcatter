@@ -1457,6 +1457,8 @@ sized for a 40-pot line.
 - Tests: `TimeScaleTest`; `world_rules`, `time_scale_holds`; the Fabric client's Create World check.
 
 ## Known gaps
+- Phase 23 (oilfield follow-ons): the new item icons (casing joint, oilwell cement, LCM bag, CaCl2 bag, OBM package) are script-drawn
+  `*_placeholder` until their Ludo art.
 - Phase 21 (the quest book, 2026-11-14): The first 480 V three-phase
   supply now comes from the 75 kVA dry-type step-up (Tim's answer 10, 2026-11-14). Wells, the rig and the lease are
   found by their items, not by milestones. Tailings' and Farmings' chapters come in their own releases.
@@ -2351,3 +2353,19 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
 - **The client `wells` scene** draws its gas well's boiler steam before reading the well (`docs/questions/wave-a.md`, 8).
 - **Known gaps:** Tailings' selector devices need their own `hoaPositions()` to be labelled. A lamp beyond a bolted fault stays dark
   while a reclose holds onto it (the fault holds the voltage down). The switchgear sections' 50 still opens in the solve.
+
+## Phase 23: the oilfield follow-ons (branch `w-oilfield`; spec `docs/multiblocks/oilfield-follow-ons.md`; decisions `docs/questions/oilfield-follow-ons.md` 9 on)
+- **23a, casing, the fracture gradient, losses, oil mud:** `well/WellControl` (the shoe's FG, MAASP, losses, the kill sheet). The land
+  rig racks casing joints and oilwell cement (click or a hopper on its floor); the stopped console's sneak-click runs SET CASING (a
+  minute a joint, ten minutes waiting on cement; the bit's depth becomes the shoe: 15.4 ppg within 12 blocks above a deep field, else
+  14.0) and then the LOT after 3 m of new hole (FG and MAASP on the readout, FG NOT TESTED before). Under the new world rule
+  `chokeKill` the weakest point (the intermediate shoe, or the open hole under the 30 m surface casing) is checked while it pumps:
+  LOST CIRCULATION PARTIAL (pits falling, an LCM bag through the mud hopper cures it in a minute and the shoe holds 0.5 ppg more) or
+  TOTAL (no returns, the column falling); a shut-in kick that breaks the shoe is an UNDERGROUND BLOWOUT that a relief well kills.
+  Oil mud: the tanks switch to OIL MUD empty (sneak-click; a full system DUMPs on a second sneak-click), take diesel off a steel pipe and
+  water to 80/20; CaCl2 flake and the OBM package through the hopper; readout "OIL MUD 80/20, 28 % CaCl2, 8.0 ppg, ES ok", diesel lost
+  and oily cuttings counted; no washout, never LOW GEL, 25 % faster; a kick shows a third of its gain until it nears the surface. New
+  part: the calcium chloride unit (2 x 4 x 3, 15 kW industrial LV, 0.5 t/h of 77 % flake from calcite and 32 % HCl on process steam).
+  The barite mill grinds calcite or limestone to LCM; the bentonite dryer makes the OBM package (quicklime bags and ammonia). Items:
+  casing joint, oilwell cement, LCM bag, CaCl2 bag, OBM package. NeoForge scenes `casing_lot`, `oil_mud`; unit test `WellControlTest`.
+  Field Manual: CASING AND LOSSES, OIL MUD.
