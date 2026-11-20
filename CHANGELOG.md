@@ -25,6 +25,7 @@
 
 ### Fixes
 - The client `wells` test reads its gas well while the boiler's steam is being drawn.
+- The World Rules screen scrolls when every mod's rules are more than the window holds (Done no longer covers a row).
 
 Decisions for review: `docs/questions/wave-a.md`. Tim's earlier accepted waves are marked in `docs/questions/`.
 
