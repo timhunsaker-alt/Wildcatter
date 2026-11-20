@@ -21,7 +21,9 @@ CROP = {"decal_nameplate": (0.0, 0.0, 0.5, 0.5), "decal_controller": (0.0, 0.0, 
 # pattern; and a tone fix where Ludo drew it too dark or too blue: (crop, brightness, colour)
 PATTERN = {"mat_enclosure_louvre": ((0.0, 0.3, 0.45, 0.75), 1.0, 1.0), "mat_filter_house": ((0.0, 0.0, 0.5, 0.5), 1.0, 1.0),
 	"mat_radiator_fins": ((0.0, 0.0, 0.4, 0.4), 1.9, 0.45), "mat_grating": ((0.0, 0.0, 0.3, 0.3), 1.3, 1.0),
-	"mat_finned_tube": ((0.0, 0.0, 0.35, 0.35), 1.0, 1.0)}
+	"mat_finned_tube": ((0.0, 0.0, 0.35, 0.35), 1.0, 1.0),
+	# 22b: a metre of the battery container's corrugated wall, clear of the panel seam and the joint
+	"mat_container_corrugated": ((0.0, 0.05, 0.2, 0.25), 1.0, 1.0)}
 # a material Ludo drew as tiles too big for any window to miss a grout line: one tile's face, made seamless by blending it
 # with itself offset half a swatch (so no edge is ever cross-faded against a different tone), then held at the tone the
 # swatch had before, so the parts read the same (crop, mean RGB). The brass's tile line (Known gaps, questions 15).

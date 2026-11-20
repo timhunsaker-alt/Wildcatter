@@ -711,5 +711,21 @@
   "gui.wildcatter.quest.have_tag": "Have %s x any %s",
   "gui.wildcatter.quest.advancement": "Advancement: %s",
   "gui.wildcatter.quest.milestone": "Milestone: %s",
-  "block.wildcatter.dry_type_transformer": "Dry-Type Transformer (LV / 480 V, 75 kVA)"
+  "block.wildcatter.dry_type_transformer": "Dry-Type Transformer (LV / 480 V, 75 kVA)",
+  "item.wildcatter.spherical_graphite_bag": "Bulk Bag of Spherical Graphite",
+  "item.wildcatter.purified_graphite_bag": "Bulk Bag of Battery Graphite",
+  "item.wildcatter.lfp_cathode_bag": "Bulk Bag of LFP Cathode Powder",
+  "item.wildcatter.lfp_module": "LFP Battery Module",
+  "item.wildcatter.spent_lfp_module": "Spent LFP Module",
+  "block.wildcatter.graphite_line": "Graphite Line",
+  "block.wildcatter.graphite_furnace": "Graphite Furnace (2,800 C)",
+  "block.wildcatter.lfp_kiln": "LFP Kiln (700 C)",
+  "block.wildcatter.cell_line": "Cell Line (controller)",
+  "block.wildcatter.bess_container": "Battery Container (5 MWh)",
+  "block.wildcatter.bess_pcs": "Battery PCS (2.5 MW)",
+  "block.wildcatter.bess_plant_controller": "Battery Plant Controller",
+  "block.wildcatter.bess_cabinet": "Battery Cabinet (125 kW, 261 kWh)",
+  "block.wildcatter.bess_mv_skid": "Battery MV Skid (2,750 kVA)",
+  "subtitles.wildcatter.contactor_clunk": "Battery contactors close",
+  "subtitles.wildcatter.inverter_whine": "Inverter whines"
 }

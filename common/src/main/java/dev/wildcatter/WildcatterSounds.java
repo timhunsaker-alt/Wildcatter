@@ -29,6 +29,9 @@ public final class WildcatterSounds {
 	public static final SoundEvent FLASHOVER = make("flashover");
 	/** The PLC horn's steady blast, looped while its output is on. */
 	public static final SoundEvent HORN = make("horn");
+	/** 22b: a battery's DC contactors closing, and its PCS's switching whine under load. */
+	public static final SoundEvent CONTACTOR_CLUNK = make("contactor_clunk");
+	public static final SoundEvent INVERTER_WHINE = make("inverter_whine");
 
 	private WildcatterSounds() {
 	}

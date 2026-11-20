@@ -3386,7 +3386,8 @@ lang.update({f"block.{ns}.graphite_line": "Graphite Line", f"block.{ns}.graphite
 	f"block.{ns}.lfp_kiln": "LFP Kiln (700 C)", f"block.{ns}.cell_line": "Cell Line (controller)",
 	f"block.{ns}.bess_container": "Battery Container (5 MWh)", f"block.{ns}.bess_pcs": "Battery PCS (2.5 MW)",
 	f"block.{ns}.bess_plant_controller": "Battery Plant Controller", f"block.{ns}.bess_cabinet": "Battery Cabinet (125 kW, 261 kWh)",
-	f"block.{ns}.bess_mv_skid": "Battery MV Skid (2,750 kVA)"})
+	f"block.{ns}.bess_mv_skid": "Battery MV Skid (2,750 kVA)", "subtitles.wildcatter.contactor_clunk": "Battery contactors close",
+	"subtitles.wildcatter.inverter_whine": "Inverter whines"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
 # ---- Wave A art (2026-11-19, C23): every item icon still drawn as a *_placeholder takes its Ludo icon once art/final/ore has it -----

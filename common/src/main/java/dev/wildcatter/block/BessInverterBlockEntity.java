@@ -145,6 +145,9 @@ public abstract class BessInverterBlockEntity extends BlockEntity implements Cir
 	}
 
 	public void setPreset(Preset value) {
+		if (preset == Preset.STOPPED && value != Preset.STOPPED && level instanceof ServerLevel server) {
+			server.playSound(null, worldPosition, WildcatterSounds.CONTACTOR_CLUNK, SoundSource.BLOCKS, 1.0F, 1.0F);
+		}
 		preset = value;
 		switch (value) {
 			case CHARGE -> pSet = -ratedWatts();
@@ -603,6 +606,9 @@ public abstract class BessInverterBlockEntity extends BlockEntity implements Cir
 		}
 		if (rampStart >= 0 && now - rampStart <= Tuning.BESS_SOFT_START_SECONDS * 20 + 4 && now % 4 == 0) {
 			CircuitManager.markDirty(level);
+		}
+		if (Math.abs(gridWatts) > ratedWatts() * 0.1 && level instanceof ServerLevel server && now % 80 == 0) {
+			server.playSound(null, worldPosition, WildcatterSounds.INVERTER_WHINE, SoundSource.BLOCKS, 0.6F, 1.0F);
 		}
 		if (gridWatts >= 1e6 && level instanceof ServerLevel server && now % 20 == 0) {
 			dev.wildcatter.quest.QuestEvents.milestone(server, worldPosition, dev.wildcatter.quest.Milestones.BESS_DISCHARGING);

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SGS",
+    "SOS",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "G": "minecraft:glass_pane",
+    "O": "wildcatter:cpu_large"
+  },
+  "result": {
+    "id": "wildcatter:bess_plant_controller",
+    "count": 1
+  }
+}

@@ -470,6 +470,15 @@
     "wildcatter:lithium_leach",
     "wildcatter:lioh_crystallizer",
     "wildcatter:lithium_carbonator",
-    "wildcatter:dry_type_transformer"
+    "wildcatter:dry_type_transformer",
+    "wildcatter:graphite_line",
+    "wildcatter:graphite_furnace",
+    "wildcatter:lfp_kiln",
+    "wildcatter:cell_line",
+    "wildcatter:bess_container",
+    "wildcatter:bess_pcs",
+    "wildcatter:bess_plant_controller",
+    "wildcatter:bess_cabinet",
+    "wildcatter:bess_mv_skid"
   ]
 }

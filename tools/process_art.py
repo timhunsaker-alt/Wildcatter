@@ -366,4 +366,12 @@ if os.path.isdir(f"{SRC}/ore"):
 		name, ext = os.path.splitext(f)
 		if ext == ".webp" and not name.endswith("_ore") and name not in ORE_BLOCKS:
 			icon(name, f"{SRC}/ore").save(f"{OUT}/ore/{name}.png")
+# 22b: the spent LFP module is the module's icon, dulled and darkened (worn, out of a renewed container)
+if os.path.exists(f"{SRC}/ore/lfp_module.webp"):
+	from PIL import ImageEnhance
+	_m = icon("lfp_module", f"{SRC}/ore")
+	_a = _m.getchannel("A")
+	_m = ImageEnhance.Brightness(ImageEnhance.Color(_m.convert("RGB")).enhance(0.35)).enhance(0.6).convert("RGBA")
+	_m.putalpha(_a)
+	_m.save(f"{OUT}/ore/spent_lfp_module.png")
 print("icons done")
