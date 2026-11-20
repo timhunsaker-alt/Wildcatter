@@ -1457,15 +1457,13 @@ sized for a 40-pot line.
 - Tests: `TimeScaleTest`; `world_rules`, `time_scale_holds`; the Fabric client's Create World check.
 
 ## Known gaps
-- Phase 21 (the quest book, 2026-11-14): `quest_book_placeholder` (the book's item icon) is drawn by script. The first 480 V three-phase
+- Phase 21 (the quest book, 2026-11-14): The first 480 V three-phase
   supply now comes from the 75 kVA dry-type step-up (Tim's answer 10, 2026-11-14). Wells, the rig and the lease are
   found by their items, not by milestones. Tailings' and Farmings' chapters come in their own releases.
-- Phase 20c (lithium, 2026-11-12): `lioh_bag_placeholder`, `sodium_sulfate_bag_placeholder` and `li2co3_bag_placeholder` (item icons) are
-  drawn by script; the five parts use the mod's materials. The carbonator takes LiOH bags, not solution; the pot takes its lithium from its
+- Phase 20c (lithium, 2026-11-12): the bag icons are Ludo art (Wave A); the five parts use the mod's materials. The carbonator takes LiOH bags, not solution; the pot takes its lithium from its
   own hopper, not the fume treatment centre's; sodium sulfate has no buyer. Not built: lithium from brines or clays, battery-grade
   polishing, lithium-7 for a PWR, grid batteries (an Idea).
-- Phase 20b (titanium pigment, 2026-11-12): `ilmenite_placeholder`, `rutile_placeholder`, `ti_slag_bag_placeholder` and
-  `tio2_pigment_bag_placeholder` (item icons) are drawn by script; the five parts use the mod's materials. The feed's impurities are not
+- Phase 20b (titanium pigment, 2026-11-12): the four item icons are Ludo art (Wave A); the five parts use the mod's materials. The feed's impurities are not
   carried as an assay (waste chlorides and SiCl4 are counted from fixed shares); the VPSA oxygen has no other user (no AOD). Not built: the
   sulfate process, titanium sponge, synthetic rutile.
 - 16b2 (full-size conversion, 2026-11-12): the large parts use the mod's materials; no large cylinder filler or large steam reformer; the
@@ -1474,46 +1472,39 @@ sized for a 40-pot line.
   and HCl for the magnesium and the IX regeneration are not drawn; the depleted brine's return is in the balance, not piped; the
   rectifier_mv is modelled as the diode rectifier's regulation (no thyristor firing angle). Not built: hypochlorite, mercury and
   diaphragm cells, gas storage in the brine caverns. See `docs/questions/phase20-chemicals.md`.
-- `guy_strand_placeholder` (the guy strand's icon) is drawn by script (2026-11-10, `w-grid`); the guy anchor has no Ludo art yet (it is
+- The guy strand's icon is Ludo art (Wave A); the guy anchor has no Ludo art yet (it is
   drawn in the mod's galvanized material). A guy is drawn as a straight line.
 - The lean of an overloaded pole is drawn on the pole only (turned about its top cell); guys and spans are not redrawn for it.
-- Phase 18 (phosphate): the `tsp_bag`, `dap_bag`, `mop_bag` and `extractant_drum` icons are script-drawn `*_placeholder`. The ten parts
+- Phase 18 (phosphate): the bag and drum icons are Ludo art (Wave A). The ten parts
   use the mod's materials. The DEPA-TOPO second cycle is built (2026-11-10, branch `w-rules`; see "Tim's answers" below). Not built:
   the filter acid's uranium is not carried as an assay; fluorosilicic acid recovery; the hemihydrate process; potash by flotation;
   Farmings reading `c:fertilizers` (Farmings' side). See `docs/questions/phase18-phosphate.md`.
 - Phase 16d2 (2026-11-12): no new textures (the two parts use the mod's materials). The monitor well is a placed block, not completed by
   the rig; an unrestored wellfield's front is not left behind for a new house; no client scene (the scene's producer has no roll front,
   so the restoration volumes are given by hook).
-- Phase 16c2 (2026-11-12): `rotor_shard_placeholder` drawn by script. Overspeed is checked but nothing can command it (no converter speed
+- Phase 16c2 (2026-11-12): Overspeed is checked but nothing can command it (no converter speed
   reference). A blend makes whole cylinders (no partly filled cylinder items). The heel's assay is not carried. The cascade scene
   drives its machines by hook.
-- Phase 17c2 (2026-11-12): item icons `fumed_silica_placeholder`, `dolime_bag_placeholder`, `magnesium_ingot_placeholder`,
-  `chromic_oxide_placeholder`, `chromium_metal_placeholder` drawn by script; the three parts use the mod's materials. The scenes take
+- Phase 17c2 (2026-11-12): the item icons are Ludo art (Wave A); the three parts use the mod's materials. The scenes take
   hydrogen, oxygen, caustic and gas from stand-in sources (no oxygen plant in Wildcatter yet: the VPSA unit is another track's). Not
   built: the HCl absorber's water, the chromate kiln's sodium sulfate in bags, a dolime kiln's own energy figure.
-- Phase 19d (rods, 2026-11-12): item icons `hafnium_rcca_placeholder` and `sodium_sulfate_bag_placeholder` drawn by script. Not built:
+- Phase 19d (rods, 2026-11-12): Not built:
   Ag-In-Cd RCCAs (no zinc refinery), RCCA swaps at the refuelling machine and RCCA records in the pool (RCCAs come out by hand with
   their B-10 on the item), the boron side of the shutdown margin (Modes 3-5). The rods scene runs the vessel alone (no island).
-- Phase 17c1 (zirconium batches and hafnium, 2026-11-12): item icons `zircaloy_scrap_placeholder`, `hfcl4_drum_placeholder` and
-  `hafnium_rodlet_placeholder` are drawn by script. The VAR arc stays 20 kW while a 100 kg melt would really draw 100 kW (question 3).
+- Phase 17c1 (zirconium batches and hafnium, 2026-11-12): The VAR arc stays 20 kW while a 100 kg melt would really draw 100 kW (question 3).
   The scene runs the extrusion press, chlorinator and magnesium cell unpowered, fed by hook; the client `zirconium` scene still runs the
   steady flow (its world has the rule off). Hafnium scrap is counted, not an item.
-- Phase 19c1 (fuel inspection and scrap): `zinc_stearate_placeholder` and `uo2_scrap_can_placeholder` (item icons) are drawn by script;
+- Phase 19c1 (fuel inspection and scrap): the item icons are Ludo art (Wave A);
   the three parts use the mod's materials. The `fuel` client scene still films the 7g line without the new parts (`fuel_quality` and
   `fuelInspection` cover them).
-- Phase 17b2 (alloy melt shop): the `stainless_304_ingot`, `stainless_316_ingot` and `nickel_chromium_ingot` icons are script-drawn
-  `*_placeholder`; the three parts use the mod's materials. No argon finish in the AOD, no Alloy 718 (no niobium), no casting losses.
-- Phase 17b1 (nickel smelter and refinery): the `bessemer_matte_bag` and `nickel_cathode_bag` icons are script-drawn `*_placeholder`
-  (the Ludo bulk bag with a swatch); the six parts use the mod's materials. The nickel furnace runs at its transformer's PF 0.80
+- Phase 17b2 (alloy melt shop): the ingot icons are Ludo art (Wave A); the three parts use the mod's materials. No argon finish in the AOD, no Alloy 718 (no niobium), no casting losses.
+- Phase 17b1 (nickel smelter and refinery): the two bag icons are Ludo art (Wave A); the six parts use the mod's materials. The nickel furnace runs at its transformer's PF 0.80
   (`docs/questions/phase17b-nickel.md`, 4). Not built (the spec): copper refining beyond ingots, cobalt metal, precious metals, flash
   smelting, the Mond process.
-- Phase 17a (ferroalloys): the seven bulk bag icons (`ferrochrome_bag`, `ferromanganese_bag`, `ferrosilicon_bag`, `moly_oxide_bag`,
-  `scheelite_concentrate_bag`, `ferromolybdenum_bag`, `ferrotungsten_bag`) are script-drawn `*_placeholder` (the Ludo bulk bag with a
-  swatch). Not built: an automatic var controller (chromium metal: 17c2), capacitor switching inrush and harmonic
+- Phase 17a (ferroalloys): the seven bulk bag icons are Ludo art (Wave A). Not built: an automatic var controller (chromium metal: 17c2), capacitor switching inrush and harmonic
   resonance, a slag item, a frozen-furnace drop, Soderberg paste as its own item (green anodes stand in). Tailings' dense-medium plant
   keeps its placeholder ferrosilicon recipe. See `docs/questions/phase17-ferroalloys.md`.
-- Phase 16 (uranium routes and plant operations, 2026-11-10; `docs/questions/phase16-uranium.md`): script-drawn icons
-  `u3o8_drum_placeholder` (16a), `fluorinator_ash_drum_placeholder`, `synthetic_fluorspar_placeholder` (16b1). The chlor-alkali cell on
+- Phase 16 (uranium routes and plant operations, 2026-11-10; `docs/questions/phase16-uranium.md`): the icons are Ludo art (Wave A). The chlor-alkali cell on
   potash has no scene (16b1). (A fuel assembly stood up as a block keeps its assay since 2026-11-10, Tim's answer 21.) The producer's CO2
   factor is unit-tested, not run in a scene (16d1). Not built in 16a: uranyl peroxide precipitation, ammonia recovery, ASTM C967 impurity penalties.
 - Phase 14 (the ammonia plant): the `gauze_pack` and `emulsifier_pail` icons are Ludo art since the art wave (2026-11-09); no
@@ -1535,25 +1526,20 @@ sized for a 40-pot line.
   but only KICK is read in a scene. Plain water now drills at half rate (LOW GEL) in every world (decision 13, accepted by Tim 2026-11-13). Grid domes in
   chunks generated before 15a have their oil but no salt; old domes keep no oil. The client scenes `ores` and `landRig` were changed for
   15a and 15b2 and not run; no Phase 15 scene was filmed or screenshotted. See `docs/questions/phase15-oilfield.md`.
-- Art (2026-11-09 art wave): no `*_placeholder` texture is left in the jar. Every placeholder named here before now has Ludo art
-  (`art/source/PROMPTS.md`, "Art wave"), and `tools/make_assets.py` leaves out any placeholder nothing names. `memory_card` has its own icon.
-  Still drawn by script without the `*_placeholder` name: the breaker levers and the insulator caps, glaze and pins (flat colour
-  markers; `docs/questions/art-wave.md`, 7).
+- Art (Wave A, 2026-11-19, Tim's C23): no `*_placeholder` texture is left in the jar; every icon named as one in this file, the PLC
+  modules and key, the breaker levers and the insulator caps, glazes and pins are Ludo art (`art/source/PROMPTS.md`, "Wave A art").
+  Still drawn in the mod's materials or decals: the soft starter and drive bucket items (`decal_relays`, `decal_controller`), the
+  unused script textures `insulator`, `cutout_*`, `distribution_*` and `pole_tx_*`. `tools/make_assets.py` run from scratch drops the
+  quest book's recipe and chapters, 22 lang keys and the two hand-edited control valve core models (they were added by hand after it
+  last ran in full): restore them from git after a full run, until they move into `art/hand_assets/` or the script.
 - Phase 13i: Tailings' sorter routing and its TBM's course are not on a signal (Tailings' Known gaps).
 - Phase 13 after the PLC gap wave (2026-11-09; `docs/multiblocks/plc.md`, "The PLC gap wave", "Planned, not built";
   `docs/questions/plc-gaps.md`, 12). Every signal family now runs under a real PLC in a server scene. Cable cores, the supply's 10 A and a
   rack's single owner are enforced. The modules are drawn, and ladder jumps, labels, RETURN and FUNCTIONs and FBD wire routing are built.
-  - **Still open, appearance and sound:**
-    - no drawn HOA position on a device;
-    - the module items borrow `decal_relays` and the control key the trial key, with their recipes proposed;
-    - the rack is drawn in the mod's materials, with no new texture and no placeholder.
-  - **Still open, the NeoForge screen:** the NeoForge jar has not opened the PLC screen in a world by hand.
-  - **Still open, SFC:**
-    - ladder and FBD conditions and macro steps in a chart;
-    - no chart safety check;
-    - no SFC reset or pause.
-  - **Still open, the card and PLCopen:**
-    - the card carries no retained values and does not boot a blank CPU;
+  - **Still open, appearance:** the rack is drawn in the mod's materials (its modules' items have Ludo art since Wave A). Tailings'
+    selector devices show no HOA label until they answer `hoaPositions()`.
+  - **Still open, SFC:** macro steps; no chart safety check (ladder and FBD conditions are not wanted: Tim's C19).
+  - **Still open, PLCopen:**
     - XML loses comments in variable blocks;
     - import has no undo;
     - a jump wire is removed only from its target;
@@ -1568,7 +1554,6 @@ sized for a 40-pot line.
     - a gas turbine's load setpoint and a steam turbine's valve;
     - feedwater and a well choke on a signal;
     - a unit's own flows and temperatures;
-    - a crane's lift start and its load and boom readings;
     - HMI piping graphics and pages.
   - **Still open, contactors:** FAIL_STOP comes only from a welded-contactor test hook.
 - Phase 12: the process water pump borrows the water pump's model.
@@ -2337,3 +2322,32 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
   output is on and fading when it drops. The note block didgeridoo is gone.
 - Game test: `plcAnalog` checks the client's tank level and both valves' openings follow the server's, and `plcSfc` that the horn's
   loop is playing while its output is on and stops when it drops.
+
+## Wave A: Tim's answers of 2026-11-19 and the faults short (branch `w-wave-a`; decisions: `docs/questions/wave-a.md`)
+- **C18, the HOA overlay:** `ControlDevice.hoaPositions()` on every selector device (19 block entity classes, about 40 blocks); `HoaView`
+  sends the selectors within 16 blocks twice a second to a player holding the control key, and `HoaOverlay` labels each over its device
+  (HAND amber, OFF red, AUTO green; LOCAL and REMOTE on switchgear). Client scene `hoaOverlay`.
+- **C19, SFC_INIT and SFC_PAUSE** on every chart (`Sfc.toPou`): INIT holds it at its initial steps and resets its actions, PAUSE stops
+  it and its step times. Unit tests in `PlcSfcTest` (3 new). Field Manual: CHARTS.
+- **C20, the memory card:** TO CARD carries the RETAIN values by name and type, FROM CARD puts them back; a CPU with no project boots
+  from its card in RUN when its 24 V comes on (`Cpu.retained`, `Cpu.loadRetained`). NeoForge scene `plc_card_boot`. Field Manual:
+  CARDS AND FILES.
+- **C21, a PLC starts a crane lift** (`docs/multiblocks/crane-plc-lift.md`): LIFT START, LIFT REFUSED, HOOK LOAD, RADIUS, WIND and
+  AREA CLEAR on every crane; the operator's AUTO, the chart, reach, slew path, ground, wind and a swing area clear of people. NeoForge
+  scene `plc_crane_lift`. Field Manual: CRANES ON A PLC.
+- **C22, the NeoForge editor:** checked once by hand on the NeoForge client (a temporary run, not kept): a cabinet with a CPU, DI16
+  and DO16 placed in the smoke world, a seal-in rung downloaded in ST, and the editor opened from the server as a click does. It opened
+  (`PlcScreen`), with its tabs, unit list, highlighted ST and buttons, and its status reading NO 24 V (no supply was built). The
+  game's own screenshot is in the lead's review folder (`wa/neoforge-plc-editor.png`). A NeoForge client with the test mod loaded
+  cannot join a world (its test environments do not serialize to a client), so such a run must load Wildcatter alone.
+- **World Rules screen:** the rule list scrolls when every mod's rules outgrow the window (Tailings' six made 25, and Done covered a
+  row); the client test scrolls to the last row (`wildcatter-world-rules-scrolled`).
+- **C23, art:** 52 Ludo item icons (every `*_placeholder` icon, the nine PLC modules, the control key) and Ludo materials for the
+  breaker levers, insulator caps, glazes and pin, and `mat_paint_flag_red`; 57 credits (`docs/questions/art-wave.md`, 8-10).
+- **Breakers seen opening (the faults short):** the yard breakers and the switchgear sections carry their position on every cell and
+  draw their flag red closed, green open; the breaker relay cabinet's 50 opens its breaker after the 5-cycle clearing time, so a reclose
+  onto a standing fault is seen closed for about 3 ticks; grounding clamps flash each time fault current starts through them.
+  `cabinet_reclose` checks the flags and the closed runs.
+- **The client `wells` scene** draws its gas well's boiler steam before reading the well (`docs/questions/wave-a.md`, 8).
+- **Known gaps:** Tailings' selector devices need their own `hoaPositions()` to be labelled. A lamp beyond a bolted fault stays dark
+  while a reclose holds onto it (the fault holds the voltage down). The switchgear sections' 50 still opens in the solve.
