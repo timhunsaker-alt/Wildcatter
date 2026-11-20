@@ -42,7 +42,12 @@ public class ChemPartBlock extends BigPartBlock implements net.minecraft.world.W
 		ACID_ROAST_KILN("acid_roast_kiln", Footprint.box(3, 3, 8, 0, 0), AcidRoastKilnBlockEntity::new),
 		LITHIUM_LEACH("lithium_leach", Footprint.box(4, 5, 6, 0, 0), LithiumLeachBlockEntity::new),
 		LIOH_CRYSTALLIZER("lioh_crystallizer", Footprint.box(3, 10, 4, 0, 0), LiohCrystallizerBlockEntity::new),
-		LITHIUM_CARBONATOR("lithium_carbonator", Footprint.box(2, 4, 3, 0, 0), LithiumCarbonatorBlockEntity::new);
+		LITHIUM_CARBONATOR("lithium_carbonator", Footprint.box(2, 4, 3, 0, 0), LithiumCarbonatorBlockEntity::new),
+		// 22a, the LFP cell plant (docs/multiblocks/grid-batteries.md)
+		GRAPHITE_LINE("graphite_line", Footprint.box(3, 6, 6, 0, 0), GraphiteLineBlockEntity::new),
+		GRAPHITE_FURNACE("graphite_furnace", Footprint.box(4, 5, 8, 0, 0), GraphiteFurnaceBlockEntity::new),
+		LFP_KILN("lfp_kiln", Footprint.box(3, 4, 12, 0, 0), LfpKilnBlockEntity::new),
+		CELL_LINE("cell_line", Footprint.box(4, 5, 16, 0, 0), CellLineBlockEntity::new);
 
 		private final String id;
 		private final Footprint footprint;

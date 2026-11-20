@@ -213,6 +213,10 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "lithium_leach" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LITHIUM_LEACH_WATTS);
 				case "lioh_crystallizer" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LIOH_CRYSTALLIZER_WATTS);
 				case "lithium_carbonator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LITHIUM_CARBONATOR_WATTS);
+				case "graphite_line" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.GRAPHITE_LINE_WATTS);
+				case "graphite_furnace" -> new Motor(true, Voltage.DISTRIBUTION, Tuning.GRAPHITE_FURNACE_WATTS);   // its furnace transformer on a distribution feeder
+				case "lfp_kiln" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LFP_KILN_WATTS);
+				case "cell_line" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.CELL_LINE_WATTS);
 				default -> new Motor(true, Voltage.INDUSTRIAL, 1000.0);
 			};
 		}
@@ -389,6 +393,10 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "lithium_leach" -> "agitators and belt filter";
 			case "lioh_crystallizer" -> "pumps, chiller and centrifuges";
 			case "lithium_carbonator" -> "agitator and pumps";
+			case "graphite_line" -> "crusher, flotation cells and spheroidising mills";
+			case "graphite_furnace" -> "furnace transformer";
+			case "lfp_kiln" -> "kiln heaters and roller drive";
+			case "cell_line" -> "coaters, dry room, assembly and formation chargers";
 			default -> kind();
 		};
 	}

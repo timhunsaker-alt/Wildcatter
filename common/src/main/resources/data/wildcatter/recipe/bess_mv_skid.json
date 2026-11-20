@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "CTC",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_block",
+    "T": "wildcatter:padmount_480"
+  },
+  "result": {
+    "id": "wildcatter:bess_mv_skid",
+    "count": 1
+  }
+}

@@ -2357,6 +2357,28 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
 - **Known gaps:** Tailings' selector devices need their own `hoaPositions()` to be labelled. A lamp beyond a bolted fault stays dark
   while a reclose holds onto it (the fault holds the voltage down). The switchgear sections' 50 still opens in the solve.
 
+## Phase 22: grid batteries and the LFP cell plant (2026-11-19; branch `spec-grid-batteries`; spec `docs/multiblocks/grid-batteries.md`; decisions: `docs/questions/grid-batteries.md`)
+- **22a, the cell plant:** the graphite line (schist to spherical graphite, 400 kg/h, 160 kW), the graphite furnace (99.95 % C, 360 kg/h,
+  1.4 MW through its furnace transformer on distribution, nitrogen purge), the LFP kiln (LiFePO4/C, 700 kg/h, 400 kW: iron, lithium carbonate,
+  merchant phosphoric acid, nitrogen) and the cell line (one 52.2 kWh LFP module every 10 minutes, 300 kW: cathode and graphite bags, a
+  little lithium carbonate, copper and aluminium, HF and ethylene for the electrolyte). Graphite schist now has a use.
+- **22b, the battery:** the 20 ft container (96 modules, 5.0 MWh, loaded by hand; chiller, BMS, vents, sprinkler), the 2.5 MW / 2.75 MVA PCS,
+  the 2,750 kVA MV skid, the plant controller (up to four PCSs by control cable) and the 125 kW / 261 kWh cabinet on 480 V. Grid-following
+  as a signed constant-power load; frequency response at 4 % droop outside the standard's deadband; peak shaving of the island's machines;
+  SOC window 5-95 % with a taper; about 91 % round trip at the PCS (87 % or so with the transformer and chillers); fade 20 % over 6,000
+  cycles, faster hot or fast; renewing with 96 modules. 24 PLC points on each PCS, cabinet and plant.
+- **22c:** grid-forming (a Generator with 2 s of synthetic inertia), black start with a 2 s soft start, the 1.2 pu current limit and the 1 s
+  undervoltage ride-through, EMPTY at the window's floor; thermal runaway behind the new world rule `bessThermalRunaway` (on in new worlds).
+- **Quests:** chapter `grid_storage` (6 quests; milestones `bess_discharging`, `bess_black_start`). Field Manual pages: THE CELL PLANT, GRID
+  BATTERIES, BATTERY PLANT AND SAFETY.
+- **Art and sound (Ludo):** the container's corrugated wall, the module icon (the spent one dulled from it), the three bags; the contactors'
+  clunk and the inverter's whine.
+- **Tests:** unit `BessTest`; NeoForge scenes `cell_plant`, `bess_block`, `bess_peak_shave`, `bess_forming`, `bess_runaway` (the full NeoForge
+  suite passed with them); client screenshots `cellPlant` and `bess` (`WILDCATTER_ONLY=cellPlant,bess`).
+- **Known gaps:** explosions and lightning do not set a container off; no CT part for peak shaving a named feeder; the PCS's whine is a repeated
+  one-shot, not a loop; spent modules have no recycler; the client films of a block discharging, a black start and a runaway are not
+  made yet (screenshots only).
+
 ## Phase 23: the oilfield follow-ons (branch `w-oilfield`; spec `docs/multiblocks/oilfield-follow-ons.md`; decisions `docs/questions/oilfield-follow-ons.md` 9 on)
 - **23a, casing, the fracture gradient, losses, oil mud:** `well/WellControl` (the shoe's FG, MAASP, losses, the kill sheet). The land
   rig racks casing joints and oilwell cement (click or a hopper on its floor); the stopped console's sneak-click runs SET CASING (a
@@ -2397,5 +2419,6 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
   sulfur for a hopper under it); a disposal wellhead into the same caprock within 16 blocks takes the bleed water, or the rate falls to
   a third (NO BLEED). NO HOT WATER, NO AIR, CAPROCK SPENT. NeoForge scene `frasch`. Field Manual: FRASCH SULFUR. Quests: five in Oil and
   gas, Frasch sulfur in Chemicals (milestones casing_set, lot_done, well_killed_choke, oil_mud_drilling, cavern_dry, frasch_flowing).
-- **Phase 23 tests:** `build` passes; the full NeoForge suite passed, 119 of 119 (2026-11-19). The Fabric client suite was not run (no new
+- **Phase 23 tests:** `build` passes; the full NeoForge suite passed, 119 of 119 (2026-11-19), and 124 of 124 with Phase 22 merged
+  (`world_rules` checks all three new rules). The Fabric client suite was not run (no new
   client scenes).

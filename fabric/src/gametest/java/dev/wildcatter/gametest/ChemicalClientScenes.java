@@ -170,4 +170,51 @@ final class ChemicalClientScenes {
 		shot(-12, 5, 14, -140, 20, "wildcatter-lithium-kilns");
 		System.out.println("[wildcatter-test] lithium ok");
 	}
+
+	// ---- Phase 22: the cell plant and a battery block, as the NeoForge scenes cell_plant and bess_block lay them out ---------------------
+	void cellPlant() {
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 18 " + (up + 16) + " " + (z0 - 12) + " 0 35");
+		context.waitTicks(20);
+		clear(-4, -6, 38, 18, 8);
+		place(WildcatterBlocks.GRAPHITE_LINE, 0, 0);
+		place(WildcatterBlocks.GRAPHITE_FURNACE, 10, 0);
+		place(WildcatterBlocks.LFP_KILN, 20, 0);
+		place(WildcatterBlocks.CELL_LINE, 30, 0);
+		on(level -> {
+			for (int[] st : new int[][] {{4, 1}, {15, 3}, {24, 3}}) {
+				BlockState state = WildcatterBlocks.BAGGING_STATION.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.SOUTH);
+				level.setBlock(at(st[0], 0, st[1]), state, 3);
+				BigParts.grow(level, at(st[0], 0, st[1]), state);
+			}
+		});
+		run("gas_line", new int[] {14, 0});
+		run("gas_line", new int[] {23, 0});
+		run("gas_line", new int[] {23, 11});
+		run("gas_line", new int[] {34, 0});
+		run("gas_line", new int[] {34, 2});
+		context.waitTicks(40);
+		shot(18, 16, -12, 0, 35, "wildcatter-cell-plant");
+		shot(40, 8, -6, 60, 20, "wildcatter-cell-line");
+		System.out.println("[wildcatter-test] cellPlant ok");
+	}
+
+	void bess() {
+		server.runCommand("effect give @p minecraft:slow_falling 900 0 true");
+		server.runCommand("tp @p 24 " + (up + 10) + " " + (z0 - 14) + " 45 25");
+		context.waitTicks(20);
+		clear(-2, -12, 24, 6, 6);
+		place(WildcatterBlocks.BESS_MV_SKID, 10, 0);
+		place(WildcatterBlocks.BESS_PCS, 10, -3);
+		place(WildcatterBlocks.BESS_CONTAINER, 10, -9);
+		place(WildcatterBlocks.BESS_CONTAINER, 13, -6);
+		place(WildcatterBlocks.BESS_PLANT_CONTROLLER, 2, -6);
+		place(WildcatterBlocks.BESS_CABINET, 2, 0);
+		run("control_cable", new int[] {5, -4}, new int[] {5, -3}, new int[] {9, -3});
+		run("cable_dist", new int[] {20, 0}, new int[] {13, 0});
+		context.waitTicks(40);
+		shot(24, 10, -14, 45, 25, "wildcatter-bess-block");
+		shot(-4, 5, 6, -135, 20, "wildcatter-bess-cabinet-controller");
+		System.out.println("[wildcatter-test] bess ok");
+	}
 }

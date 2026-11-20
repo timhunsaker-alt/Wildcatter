@@ -628,7 +628,16 @@ Tim's answers C18-C23 (`docs/questions/plc-gaps.md` 12) and the faults short's f
 - The breaker drawn open when it trips, with an arc flash and its sound; the trip held for the relay's operate time so a reclose onto a
   standing fault is seen. The client `wells` scene fixed.
 
-## Phase 23 — Oilfield follow-ons — CURRENT (approved by Tim 2026-11-19, every question with the recommended option; branch `w-oilfield`)
+## Phase 22 — Grid batteries — DONE, BUILT 2026-11-19 (Wave B; next release 0.10.0 with Phase 23; spec approved by Tim 2026-11-19, every question with the recommended option; branch `spec-grid-batteries`)
+Spec: `docs/multiblocks/grid-batteries.md`. Decisions: `docs/questions/grid-batteries.md` (1-8 Tim's answers, 9-20 decided while building).
+- **22a, the LFP cell plant:** graphite line, graphite furnace (1.4 MW on distribution), LFP kiln and cell line; a 52.2 kWh module every
+  10 minutes from lithium carbonate, phosphoric acid, iron, graphite schist, copper, aluminium, HF and ethylene. Graphite schist has a use.
+- **22b, the battery:** 5 MWh containers, the 2.5 MW PCS, the 2,750 kVA MV skid, the plant controller (up to 4 blocks) and the 125 kW / 261 kWh
+  cabinet; grid-following with frequency response and peak shaving; state of charge, losses, degradation, PLC points.
+- **22c:** grid-forming, black start, the 1.2 pu current limit and ride-through; thermal runaway as the world rule `bessThermalRunaway`.
+- NeoForge scenes `cell_plant`, `bess_block`, `bess_peak_shave`, `bess_forming`, `bess_runaway`; unit test `BessTest`.
+
+## Phase 23 — Oilfield follow-ons — DONE, BUILT 2026-11-19 (approved by Tim 2026-11-19, every question with the recommended option; branch `w-oilfield`; next release 0.10.0 with Phase 22)
 Spec: `docs/multiblocks/oilfield-follow-ons.md`. Questions, answers and decisions taken while building: `docs/questions/oilfield-follow-ons.md`.
 - **23a, casing, the fracture gradient, losses, oil-based mud:** SET CASING and the LOT on the driller's console, the shoe's FG and MAASP,
   ECD, partial and total losses, LCM, the underground blowout; oil-based mud (diesel, CaCl2, the OBM package), the calcium chloride unit.
@@ -637,6 +646,7 @@ Spec: `docs/multiblocks/oilfield-follow-ons.md`. Questions, answers and decision
 - **23c, salt caverns and gas storage:** the brine wellhead's cavern record, the blanket, brine to disposal, the sonar tool; the storage
   wellhead, storage compressor and glycol dehydrator; debrining, cushion and working gas; the world rule `cavernStability`.
 - **23d, Frasch sulfur:** the Frasch water heater, lift air compressor, Frasch wellhead and sulfur vat, with bleed water to a disposal well.
+- NeoForge scenes `casing_lot`, `oil_mud`, `choke_kill`, `gas_storage`, `frasch`; unit tests `WellControlTest`, `CavernTest`.
 
 ## Ideas (not scheduled)
 - **Time scale (Tim, 2026-11-10):** a world setting with presets 1:1, 5:1, 10:1, 20:1 and 50:1 that shortens the long waits (reactor heat-up
@@ -650,6 +660,8 @@ Spec: `docs/multiblocks/oilfield-follow-ons.md`. Questions, answers and decision
   - ferroalloys (chromium, manganese, molybdenum, tungsten);
   - a nickel smelter;
   - fertilizer from phosphate and potash (built as Phase 18a, branch `phase18`).
+- Raised by Phase 22: battery recycling (spent modules); NMC and sodium-ion cells; explosions and lightning setting a container off; a CT
+  part for peak shaving on a named feeder; a running sound loop for the PCS.
 - Phase 15 follow-ons: scheduled as Phase 23 (above).
 - The purer yellowcake route: ADU precipitation on the Phase 14 ammonia and a calciner at 750-800 C (94-98 % U3O8).
 - Phase 14b-14d follow-ons: a small (100-250 kW) biogas set for farm digesters; biomethane upgrading so biogas can go on the sales line;

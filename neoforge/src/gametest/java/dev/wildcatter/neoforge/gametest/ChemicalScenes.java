@@ -72,6 +72,7 @@ final class ChemicalScenes {
 		scenes.put("ti_pigment", ChemicalScenes::tiPigment);
 		scenes.put("lithium", ChemicalScenes::lithium);
 		scenes.putAll(ConversionLargeScenes.scenes());   // 16b2, on the same peaker
+		scenes.putAll(BessScenes.scenes());              // Phase 22: the cell plant and grid batteries
 		return scenes;
 	}
 

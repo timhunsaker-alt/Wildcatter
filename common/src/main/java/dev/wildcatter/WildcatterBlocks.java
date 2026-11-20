@@ -211,6 +211,14 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.LithiumLeachBlockEntity> LITHIUM_LEACH_ENTITY = entity(dev.wildcatter.block.LithiumLeachBlockEntity::new, LITHIUM_LEACH);
 	public static final BlockEntityType<dev.wildcatter.block.LiohCrystallizerBlockEntity> LIOH_CRYSTALLIZER_ENTITY = entity(dev.wildcatter.block.LiohCrystallizerBlockEntity::new, LIOH_CRYSTALLIZER);
 	public static final BlockEntityType<dev.wildcatter.block.LithiumCarbonatorBlockEntity> LITHIUM_CARBONATOR_ENTITY = entity(dev.wildcatter.block.LithiumCarbonatorBlockEntity::new, LITHIUM_CARBONATOR);
+	public static final BlockEntityType<dev.wildcatter.block.GraphiteLineBlockEntity> GRAPHITE_LINE_ENTITY = entity(dev.wildcatter.block.GraphiteLineBlockEntity::new, GRAPHITE_LINE);
+	public static final BlockEntityType<dev.wildcatter.block.GraphiteFurnaceBlockEntity> GRAPHITE_FURNACE_ENTITY = entity(dev.wildcatter.block.GraphiteFurnaceBlockEntity::new, GRAPHITE_FURNACE);
+	public static final BlockEntityType<dev.wildcatter.block.LfpKilnBlockEntity> LFP_KILN_ENTITY = entity(dev.wildcatter.block.LfpKilnBlockEntity::new, LFP_KILN);
+	public static final BlockEntityType<dev.wildcatter.block.CellLineBlockEntity> CELL_LINE_ENTITY = entity(dev.wildcatter.block.CellLineBlockEntity::new, CELL_LINE);
+	public static final BlockEntityType<dev.wildcatter.block.BessContainerBlockEntity> BESS_CONTAINER_ENTITY = entity(dev.wildcatter.block.BessContainerBlockEntity::new, BESS_CONTAINER);
+	public static final BlockEntityType<dev.wildcatter.block.BessPcsBlockEntity> BESS_PCS_ENTITY = entity(dev.wildcatter.block.BessPcsBlockEntity::new, BESS_PCS);
+	public static final BlockEntityType<dev.wildcatter.block.BessPlantControllerBlockEntity> BESS_PLANT_CONTROLLER_ENTITY = entity(dev.wildcatter.block.BessPlantControllerBlockEntity::new, BESS_PLANT_CONTROLLER);
+	public static final BlockEntityType<dev.wildcatter.block.BessCabinetBlockEntity> BESS_CABINET_ENTITY = entity(dev.wildcatter.block.BessCabinetBlockEntity::new, BESS_CABINET);
 	public static final BlockEntityType<dev.wildcatter.block.PotashDryerBlockEntity> POTASH_DRYER_ENTITY = entity(dev.wildcatter.block.PotashDryerBlockEntity::new, POTASH_DRYER);
 	public static final BlockEntityType<dev.wildcatter.block.AcidPretreatmentBlockEntity> ACID_PRETREATMENT_ENTITY = entity(dev.wildcatter.block.AcidPretreatmentBlockEntity::new, ACID_PRETREATMENT);
 	public static final BlockEntityType<dev.wildcatter.block.DepaTopoCircuitBlockEntity> DEPA_TOPO_CIRCUIT_ENTITY = entity(dev.wildcatter.block.DepaTopoCircuitBlockEntity::new, DEPA_TOPO_CIRCUIT);
@@ -295,7 +303,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.PowerTransformerBlockEntity> POWER_TRANSFORMER_ENTITY = entity(dev.wildcatter.block.PowerTransformerBlockEntity::new, POWER_TRANSFORMER);
 	public static final BlockEntityType<dev.wildcatter.block.DisconnectSwitchBlockEntity> DISCONNECT_ENTITY = entity(dev.wildcatter.block.DisconnectSwitchBlockEntity::new, DISCONNECT_HV, DISCONNECT_DIST);
 	public static final BlockEntityType<TransformerBlockEntity> TRANSFORMER_ENTITY = entity(TransformerBlockEntity::new, POLE_TRANSFORMER, POLE_TRANSFORMER_MV,
-			PADMOUNT_208, PADMOUNT_480, DRY_TYPE_TRANSFORMER, UNIT_SUBSTATION, GSU_TRANSFORMER, GSU_25, GSU_60, SUBSTATION_TRANSFORMER_60, UNIT_AUX_TRANSFORMER, SUBSTATION_TRANSFORMER_10);
+			PADMOUNT_208, PADMOUNT_480, DRY_TYPE_TRANSFORMER, UNIT_SUBSTATION, GSU_TRANSFORMER, GSU_25, GSU_60, SUBSTATION_TRANSFORMER_60, UNIT_AUX_TRANSFORMER, SUBSTATION_TRANSFORMER_10, BESS_MV_SKID);
 
 	public static final BlockEntityType<FireboxBlockEntity> FIREBOX_ENTITY = entity(FireboxBlockEntity::new, FIREBOX);
 	public static final BlockEntityType<dev.wildcatter.control.ValveBlockEntity> VALVE_ENTITY = entity(dev.wildcatter.control.ValveBlockEntity::new, CONTROL_VALVE, ON_OFF_VALVE, MOTOR_OPERATED_VALVE, CONTROL_VALVE_STEEL, ON_OFF_VALVE_STEEL, MOTOR_OPERATED_VALVE_STEEL);
@@ -508,9 +516,14 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		add("isr_wellhead", ISR_WELLHEAD);
 		add("monitor_wellhead", MONITOR_WELLHEAD);
 		add("brine_wellhead", BRINE_WELLHEAD);
-		for (Block part : new Block[] {BRINE_SATURATOR, BRINE_TREATMENT, MEMBRANE_CELL_ROOM, CHLORINE_TRAIN, CAUSTIC_EVAPORATOR, HCL_SYNTHESIS_UNIT, TI_CHLORINATOR, TICL4_PURIFICATION, TICL4_OXIDISER, VPSA_OXYGEN, PIGMENT_FINISHING, DECREPITATION_KILN, ACID_ROAST_KILN, LITHIUM_LEACH, LIOH_CRYSTALLIZER, LITHIUM_CARBONATOR}) {
+		for (Block part : new Block[] {BRINE_SATURATOR, BRINE_TREATMENT, MEMBRANE_CELL_ROOM, CHLORINE_TRAIN, CAUSTIC_EVAPORATOR, HCL_SYNTHESIS_UNIT, TI_CHLORINATOR, TICL4_PURIFICATION, TICL4_OXIDISER, VPSA_OXYGEN, PIGMENT_FINISHING, DECREPITATION_KILN, ACID_ROAST_KILN, LITHIUM_LEACH, LIOH_CRYSTALLIZER, LITHIUM_CARBONATOR,
+				GRAPHITE_LINE, GRAPHITE_FURNACE, LFP_KILN, CELL_LINE}) {
 			add(((dev.wildcatter.block.ChemPartBlock) part).part().id(), part);
 		}
+		for (Block part : new Block[] {BESS_CONTAINER, BESS_PCS, BESS_PLANT_CONTROLLER, BESS_CABINET}) {
+			add(((dev.wildcatter.block.BessPartBlock) part).part().id(), part);
+		}
+		add("bess_mv_skid", BESS_MV_SKID);
 		for (Block part : new Block[] {REDUCTION_REACTOR, HYDROFLUORINATOR, FLUORINATOR, COLD_TRAPS, DISTILLATION_COLUMNS, CYLINDER_FILLER, STEAM_REFORMER, HF_KILN, HF_COLUMN, RECTIFIER, FLUORINE_CELL_HOUSE, CATHODE_GAS_SCRUBBER, KOH_SCRUBBER, RECTIFIER_MV, REDUCTION_REACTOR_LARGE, HYDROFLUORINATOR_LARGE, FLUORINATOR_LARGE, COLD_TRAPS_LARGE, DISTILLATION_COLUMNS_LARGE}) {
 			add(((dev.wildcatter.block.ConversionPartBlock) part).part().id(), part);
 		}
@@ -838,6 +851,14 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("lithium_leach"), LITHIUM_LEACH_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("lioh_crystallizer"), LIOH_CRYSTALLIZER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("lithium_carbonator"), LITHIUM_CARBONATOR_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("graphite_line"), GRAPHITE_LINE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("graphite_furnace"), GRAPHITE_FURNACE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("lfp_kiln"), LFP_KILN_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("cell_line"), CELL_LINE_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("bess_container"), BESS_CONTAINER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("bess_pcs"), BESS_PCS_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("bess_plant_controller"), BESS_PLANT_CONTROLLER_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("bess_cabinet"), BESS_CABINET_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("ti_chlorinator"), TI_CHLORINATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("ticl4_purification"), TICL4_PURIFICATION_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("ticl4_oxidiser"), TICL4_OXIDISER_ENTITY);

@@ -48,7 +48,7 @@ import net.minecraft.world.level.levelgen.placement.RarityFilter;
  * know; with {@code saltDomeGrid192} off the dome's placement takes exactly the random numbers and positions the four modifiers it had
  * before Phase 15 take, and a grid dome's flank field is not there; on, it is; {@code mudGel} off, water is not LOW GEL; on, it is;
  * {@code wellControl} off, an underbalanced strike into a deep field does not kick; Phase 23's {@code chokeKill} and {@code cavernStability}
- * are new worlds' rules, off here.</li>
+ * and Phase 22's {@code bessThermalRunaway} are new worlds' rules, off here.</li>
  * </ul>
  */
 final class RuleScenes {
@@ -192,6 +192,8 @@ final class RuleScenes {
 			// Phase 23: chokeKill and cavernStability, on in new worlds, off in the harness's world (an existing world's)
 			check(helper, Rule.byKey("chokeKill") != null && Rule.byKey("chokeKill").newWorld && !Rules.chokeKill(), "chokeKill should be a new world's rule, off here");
 			check(helper, Rule.byKey("cavernStability") != null && Rule.byKey("cavernStability").newWorld && !Rules.cavernStability(), "cavernStability should be a new world's rule, off here");
+			// Phase 22: bessThermalRunaway, likewise
+			check(helper, Rule.byKey("bessThermalRunaway") != null && Rule.byKey("bessThermalRunaway").newWorld && !Rules.on(Rule.BESS_THERMAL_RUNAWAY), "bessThermalRunaway should be a new world's rule, off here");
 
 			// saltDomeGrid192 off: the dome's placement is the old one, random number for random number
 			PlacedFeature placed = level.registryAccess().lookupOrThrow(Registries.PLACED_FEATURE)

@@ -50,6 +50,11 @@ public final class Milestones {
 	/** The nuclear turbine-generator's breaker is closed and it delivers power. */
 	public static final Identifier TURBINE_ON_LINE = Wildcatter.id("turbine_on_line");
 
+	/** 22b: a battery block (or cabinet) delivers 1 MW or more to the grid. */
+	public static final Identifier BESS_DISCHARGING = Wildcatter.id("bess_discharging");
+	/** 22c: a grid-forming battery closes onto a dead bus (a black start). */
+	public static final Identifier BESS_BLACK_START = Wildcatter.id("bess_black_start");
+
 	private Milestones() {
 	}
 

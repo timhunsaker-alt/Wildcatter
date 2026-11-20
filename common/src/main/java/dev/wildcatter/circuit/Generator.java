@@ -18,6 +18,11 @@ public interface Generator {
 	/** False once it has tripped. */
 	boolean online();
 
+	/** True for a battery (22c): its output is not a machine's, so a peak shaver does not count it. */
+	default boolean storage() {
+		return false;
+	}
+
 	/** Frequency protection: shut down. */
 	void tripOnFrequency(double hertz);
 }

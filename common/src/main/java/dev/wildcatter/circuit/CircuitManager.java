@@ -44,6 +44,8 @@ public final class CircuitManager {
 	private static final class Island {
 		final dev.wildcatter.solver.FrequencyIsland frequency;
 		double outsideSeconds;
+		/** What its machines (not storage) delivered at the last solve, W (22b). */
+		double machineWatts;
 
 		Island(double nominal) {
 			this.frequency = new dev.wildcatter.solver.FrequencyIsland(nominal, Tuning.GOVERNOR_DROOP, Tuning.AGC_SECONDS);
@@ -166,6 +168,7 @@ public final class CircuitManager {
 		for (int attempt = 0; attempt < 4; attempt++) {
 			circuit = new Circuit();
 			circuit.setHertz(hertz);
+			circuit.setMachineWatts(island != null ? island.machineWatts : 0);
 			parts.clear();
 			for (BlockPos pos : group) {
 				// a group deferred to a later tick may reach into a chunk that has since unloaded: skip it rather than load it again
@@ -229,11 +232,16 @@ public final class CircuitManager {
 		double rated = 0;
 		double inertia = 0;
 		double delivered = 0;
+		double machines = 0;
 		for (Generator generator : online) {
 			rated += generator.ratedWatts();
 			inertia += generator.ratedWatts() * generator.inertiaSeconds();
 			delivered += generator.deliveredWatts();
+			if (!generator.storage()) {
+				machines += generator.deliveredWatts();
+			}
 		}
+		island.machineWatts = machines;
 		// net over the island: current circulating between machines (one driving another) is not load
 		delivered = Math.max(0, delivered);
 		double dt = ticks / 20.0;

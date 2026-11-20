@@ -1,8 +1,24 @@
 # Changelog
 
-## v0.10.0 (not released): Phase 23, the oilfield follow-ons
+## v0.10.0 (unreleased): grid batteries and the oilfield follow-ons
 
-### Casing, losses and oil mud (23a)
+### Grid batteries (Phase 22, `docs/multiblocks/grid-batteries.md`)
+- **The LFP cell plant:** a graphite line, a 1.4 MW graphite furnace, an LFP kiln and a cell line turn graphite schist, lithium carbonate,
+  phosphoric acid and iron into 52.2 kWh LFP battery modules. Graphite schist has its first use.
+- **Battery containers, the PCS and the MV skid:** a 2.5 MW block of two 5 MWh containers on a distribution feeder, run alone or by a plant
+  controller over control cable (up to four blocks). A 125 kW, 261 kWh battery cabinet for 480 V bases.
+- **On the grid:** charging and discharging through the solver, frequency response at 4 % droop, peak shaving beside gensets; grid-forming
+  mode makes its own voltage and frequency, black-starts a dead bus and holds its current to 1.2 per unit in a fault.
+- **Cells that age:** state of charge, real losses (about 91 % round trip at the PCS), wear with cycles and heat, renewed with new modules.
+- **Thermal runaway:** a new world rule, `bessThermalRunaway` (on in new worlds, off in existing ones): fire at a container, or a burning
+  one beside it, sets it off. Leave a block between containers.
+- PLC points on every PCS, cabinet and plant controller; a new quest chapter, Grid storage; three Field Manual pages.
+
+Decisions for review: `docs/questions/grid-batteries.md` (9-20).
+
+### The oilfield follow-ons (Phase 23, `docs/multiblocks/oilfield-follow-ons.md`)
+
+#### Casing, losses and oil mud (23a)
 - **SET CASING and the leak-off test:** rack casing joints and oilwell cement in the land rig's substructure; the stopped console's
   sneak-click runs and cements intermediate casing to the bit, then (after 3 m of new hole) the LOT reads the shoe's fracture gradient and
   the MAASP. A shoe within 12 blocks above a deep field holds 15.4 ppg; the open hole under the 30 m surface casing 14.0.
@@ -12,19 +28,19 @@
   washout, never LOW GEL, 25 % faster; its diesel goes down the hole; a kick in it shows late. New part: the calcium chloride unit
   (15 kW). The barite mill grinds calcite to LCM; the bentonite dryer makes the OBM package.
 
-### The choke kill (23b)
+#### The choke kill (23b)
 - New parts: the choke manifold, the remote choke panel (its screen: kill sheet, gauges, the drill pipe chart) and the mud-gas
   separator (its vent to a flare stack). Under `chokeKill` a shut-in kick is killed by hand or by a PLC on the panel's points: wait and
   weight or the driller's method, losses when held too closed, a second kick when too open, gas on the floor through a blown separator,
   the flow check, WELL DEAD. With the rule off the one-minute kill stays.
 
-### Salt caverns and gas storage (23c)
+#### Salt caverns and gas storage (23c)
 - The brine wellhead keeps its cavern's record, leaches under a blanket, sends brine to a disposal well at the pump's full rate and stops
   at its walls; with the new world rule `cavernStability` it leaches on and breaches (flood or sinkhole). The sonar tool surveys it.
 - New: the gas storage wellhead, the storage compressor (1.0 MW medium voltage) and the glycol dehydrator: debrining, cushion and working
   gas between 68 and 193 bar.
 
-### Frasch sulfur (23d)
+#### Frasch sulfur (23d)
 - New: the Frasch wellhead, water heater, lift air compressor and sulfur vat: molten sulfur out of a dome's caprock at 2 t/h, with a
   bleed water well.
 

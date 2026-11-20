@@ -382,6 +382,15 @@
     "wildcatter:frasch_water_heater",
     "wildcatter:lift_air_compressor",
     "wildcatter:sulfur_vat",
-    "wildcatter:frasch_wellhead"
+    "wildcatter:frasch_wellhead",
+    "wildcatter:graphite_line",
+    "wildcatter:graphite_furnace",
+    "wildcatter:lfp_kiln",
+    "wildcatter:cell_line",
+    "wildcatter:bess_container",
+    "wildcatter:bess_pcs",
+    "wildcatter:bess_plant_controller",
+    "wildcatter:bess_cabinet",
+    "wildcatter:bess_mv_skid"
   ]
 }

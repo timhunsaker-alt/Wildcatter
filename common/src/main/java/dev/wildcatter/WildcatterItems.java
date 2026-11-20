@@ -348,6 +348,22 @@ public final class WildcatterItems {
 	public static final ResourceKey<Item> LI2CO3_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("li2co3_bag"));
 	public static final Item LI2CO3_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(LI2CO3_BAG_KEY),
 			String.format("%,.0f kg of lithium carbonate (Li2CO3)", Tuning.BULK_BAG_KG), "for a potline pot's bath");
+	// Phase 22a: the LFP cell plant (docs/multiblocks/grid-batteries.md)
+	public static final ResourceKey<Item> SPHERICAL_GRAPHITE_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("spherical_graphite_bag"));
+	public static final Item SPHERICAL_GRAPHITE_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(SPHERICAL_GRAPHITE_BAG_KEY),
+			String.format("%,.0f kg of spherical graphite, 95 %% C", Tuning.BULK_BAG_KG), "for the graphite furnace");
+	public static final ResourceKey<Item> PURIFIED_GRAPHITE_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("purified_graphite_bag"));
+	public static final Item PURIFIED_GRAPHITE_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(PURIFIED_GRAPHITE_BAG_KEY),
+			String.format("%,.0f kg of battery-grade graphite, 99.95 %% C", Tuning.BULK_BAG_KG), "anode material for the cell line");
+	public static final ResourceKey<Item> LFP_CATHODE_BAG_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("lfp_cathode_bag"));
+	public static final Item LFP_CATHODE_BAG = new dev.wildcatter.item.LabelledItem(new Item.Properties().stacksTo(16).setId(LFP_CATHODE_BAG_KEY),
+			String.format("%,.0f kg of LiFePO4/C cathode powder", Tuning.BULK_BAG_KG), "for the cell line");
+	public static final ResourceKey<Item> LFP_MODULE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("lfp_module"));
+	public static final Item LFP_MODULE = new dev.wildcatter.item.LabelledItem(new Item.Properties().setId(LFP_MODULE_KEY),
+			String.format("52 LFP cells of 314 Ah in series: %.1f kWh at 166 V", Tuning.LFP_MODULE_KWH), "96 make a battery container, 5 a cabinet");
+	public static final ResourceKey<Item> SPENT_LFP_MODULE_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("spent_lfp_module"));
+	public static final Item SPENT_LFP_MODULE = new dev.wildcatter.item.LabelledItem(new Item.Properties().setId(SPENT_LFP_MODULE_KEY),
+			"A worn LFP module out of a renewed container", "no recycler yet");
 	// 10c1: blueprints (docs/blueprints.md)
 	public static final ResourceKey<Item> BLUEPRINT_KEY = ResourceKey.create(Registries.ITEM, Wildcatter.id("blueprint"));
 	public static final Item BLUEPRINT = new dev.wildcatter.item.BlueprintItem(new Item.Properties().stacksTo(1).setId(BLUEPRINT_KEY));
@@ -609,6 +625,11 @@ public final class WildcatterItems {
 		Registry.register(BuiltInRegistries.ITEM, TIO2_PIGMENT_BAG_KEY, TIO2_PIGMENT_BAG);
 		Registry.register(BuiltInRegistries.ITEM, LIOH_BAG_KEY, LIOH_BAG);
 		Registry.register(BuiltInRegistries.ITEM, LI2CO3_BAG_KEY, LI2CO3_BAG);
+		Registry.register(BuiltInRegistries.ITEM, SPHERICAL_GRAPHITE_BAG_KEY, SPHERICAL_GRAPHITE_BAG);
+		Registry.register(BuiltInRegistries.ITEM, PURIFIED_GRAPHITE_BAG_KEY, PURIFIED_GRAPHITE_BAG);
+		Registry.register(BuiltInRegistries.ITEM, LFP_CATHODE_BAG_KEY, LFP_CATHODE_BAG);
+		Registry.register(BuiltInRegistries.ITEM, LFP_MODULE_KEY, LFP_MODULE);
+		Registry.register(BuiltInRegistries.ITEM, SPENT_LFP_MODULE_KEY, SPENT_LFP_MODULE);
 		Registry.register(BuiltInRegistries.ITEM, BLUEPRINT_KEY, BLUEPRINT);
 		Registry.register(BuiltInRegistries.ITEM, SURVEY_TOOL_KEY, SURVEY_TOOL);
 		Registry.register(BuiltInRegistries.ITEM, GROUNDING_SET_KEY, GROUNDING_SET);

@@ -47,6 +47,24 @@ public final class WildcatterComponents {
 			.networkSynchronized(ByteBufCodecs.DOUBLE)
 			.build();
 
+	/** 22b: a battery container's or cabinet's state of health (0 to 1), kept in its item. */
+	public static final DataComponentType<Double> BESS_SOH = DataComponentType.<Double>builder()
+			.persistent(com.mojang.serialization.Codec.DOUBLE)
+			.networkSynchronized(ByteBufCodecs.DOUBLE)
+			.build();
+
+	/** 22b: its equivalent full cycles. */
+	public static final DataComponentType<Double> BESS_CYCLES = DataComponentType.<Double>builder()
+			.persistent(com.mojang.serialization.Codec.DOUBLE)
+			.networkSynchronized(ByteBufCodecs.DOUBLE)
+			.build();
+
+	/** 22b: the LFP modules in a battery container or cabinet. */
+	public static final DataComponentType<Integer> BESS_MODULES = DataComponentType.<Integer>builder()
+			.persistent(com.mojang.serialization.Codec.INT)
+			.networkSynchronized(ByteBufCodecs.VAR_INT)
+			.build();
+
 	/** The assay a stack carries: its component, or the standard product assay. */
 	public static double assay(net.minecraft.world.item.ItemStack stack) {
 		Double a = stack.get(ASSAY);
@@ -72,5 +90,8 @@ public final class WildcatterComponents {
 		Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wildcatter.id("survey_b"), SURVEY_B);
 		Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wildcatter.id("assay"), ASSAY);
 		Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wildcatter.id("resin_u3o8"), RESIN_U3O8);
+		Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wildcatter.id("bess_soh"), BESS_SOH);
+		Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wildcatter.id("bess_cycles"), BESS_CYCLES);
+		Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wildcatter.id("bess_modules"), BESS_MODULES);
 	}
 }

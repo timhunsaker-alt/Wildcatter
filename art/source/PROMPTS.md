@@ -383,3 +383,18 @@ Block materials, `texture`, each "Seamless flat texture, straight-on orthographi
 | insulator_glaze_white (b) | glossy white glazed porcelain of an electrical insulator, smooth glassy glaze with faint crazing and soft highlights (`insulator_glaze_lv`) |
 | insulator_glaze_grey (a) | glossy light grey-green glazed porcelain of a high voltage suspension insulator, smooth glassy glaze with soft highlights (`insulator_glaze_hv`; `insulator_glaze_dist` is the existing `mat_porcelain_brown` source) |
 | insulator_pin (a) | dull dark grey hot-dip galvanized forged steel of an insulator pin, slightly rough zinc coating with faint spangle and weathering |
+
+## Phase 22 art (2026-11-19)
+Grid batteries (docs/multiblocks/grid-batteries.md). `createImage`, model klimt, art_style `Photorealistic 3D`, one variation each.
+
+| File | Prompt |
+|---|---|
+| mat_container_corrugated (texture) | Seamless flat texture, straight-on orthographic view, even lighting: the corrugated steel wall of a white-painted shipping container, regular vertical trapezoidal corrugations, light off-white paint with faint grime and a few tiny scratches, plain, no seams, no text (`tools/process_materials.py` PATTERN window) |
+| ore/lfp_module (item-icon) | A single grid battery module: a long flat rectangular pack of prismatic lithium iron phosphate cells in a light grey aluminium housing with a blue top cover, an orange high-voltage connector at one end, a black plastic end plate with a small vent, seen at an angle, generic, no brand, game item icon, plain white background, no readable text (`spent_lfp_module` is it dulled in `tools/process_art.py`) |
+
+Bulk bags, as the Wave A bags: spherical_graphite_bag lime green band, fine dark grey spherical graphite powder; purified_graphite_bag dark
+violet band, fine glossy jet black graphite powder; lfp_cathode_bag bright cyan band, fine dark grey-black lithium iron phosphate cathode powder.
+
+Sounds (`createSoundEffect`, `art/sound_source/`): contactor_clunk "heavy industrial DC contactor closing inside a steel battery cabinet: a
+single solid mechanical clunk with a short metallic ring" (1.5 s); inverter_whine "large power inverter running under load: a steady
+high-pitched electronic switching whine with a low transformer hum and cooling fans" (4 s, loop).

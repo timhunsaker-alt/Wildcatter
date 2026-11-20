@@ -3345,6 +3345,53 @@ subprocess.run([sys.executable, "tools/oilfield_assets.py"], check=True)
 # ---- Phase 4.5: the true-size part models (tools/models/), drawn in the materials in art/final/mat ----------------------
 subprocess.run([sys.executable, "tools/models/build.py"], check=True)
 
+# ---- Phase 22: the LFP cell plant and grid batteries (docs/multiblocks/grid-batteries.md) ----------------------------------------
+# blockstates, models, shapes and items come from tools/models/cell_plant.py and bess.py; here loot, names, tags, recipes, the three bags
+# (the Ludo bulk bag with a swatch: placeholders) and the module icons (placeholders until art/final/ore has them).
+BESS_PARTS = ("graphite_line", "graphite_furnace", "lfp_kiln", "cell_line", "bess_container", "bess_pcs", "bess_plant_controller", "bess_cabinet", "bess_mv_skid")
+for name in BESS_PARTS:
+	big_part_loot(name)
+for t_name in ("mineable/pickaxe", "needs_stone_tool"):
+	t = json.load(open(f"{ROOT}/data/minecraft/tags/block/{t_name}.json"))
+	wanted = [f"{ns}:{n}" for n in BESS_PARTS]
+	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
+	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
+S_, P_ = f"{ns}:steel_ingot", f"{ns}:gas_line"
+shaped("graphite_line", ["SHS", "XPX", "SSS"], {"S": S_, "H": "minecraft:hopper", "X": "minecraft:piston", "P": P_}, "graphite_line")
+shaped("graphite_furnace", ["SBS", "BFB", "SCS"], {"S": S_, "B": "minecraft:bricks", "F": "minecraft:blast_furnace", "C": "minecraft:copper_block"}, "graphite_furnace")
+shaped("lfp_kiln", ["SHS", "BFB", "SPS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:furnace", "P": P_}, "lfp_kiln")
+shaped("cell_line", ["SHS", "COC", "SXS"], {"S": S_, "H": "minecraft:hopper", "C": "minecraft:copper_ingot", "O": "minecraft:observer", "X": "minecraft:piston"}, "cell_line")
+shaped("bess_container", ["SSS", "COC", "SSS"], {"S": S_, "C": "minecraft:copper_block", "O": f"{ns}:cpu_small"}, "bess_container")
+shaped("bess_cabinet", ["SCS", "SOS", "SSS"], {"S": S_, "C": "minecraft:copper_ingot", "O": f"{ns}:cpu_small"}, "bess_cabinet")
+shaped("bess_pcs", ["SCS", "AOA", "SSS"], {"S": S_, "C": "minecraft:copper_block", "A": f"{ns}:aluminium_ingot", "O": f"{ns}:cpu_small"}, "bess_pcs")
+shaped("bess_mv_skid", ["SCS", "CTC", "SSS"], {"S": S_, "C": "minecraft:copper_block", "T": f"{ns}:padmount_480"}, "bess_mv_skid")
+shaped("bess_plant_controller", ["SGS", "SOS", "SSS"], {"S": S_, "G": "minecraft:glass_pane", "O": f"{ns}:cpu_large"}, "bess_plant_controller")
+BESS_BAGS = {"spherical_graphite_bag": ("Bulk Bag of Spherical Graphite", (70, 70, 74)), "purified_graphite_bag": ("Bulk Bag of Battery Graphite", (40, 40, 44)),
+	"lfp_cathode_bag": ("Bulk Bag of LFP Cathode Powder", (60, 66, 80))}
+lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
+for item, (name, colour) in BESS_BAGS.items():
+	bag = Image.open(f"{ORE_ART}/empty_bulk_bag.png").convert("RGBA")
+	d = ImageDraw.Draw(bag)
+	d.rectangle([10, 13, 21, 22], fill=colour + (255,), outline=(60, 60, 60, 255))
+	d.rectangle([12, 15, 14, 17], fill=tuple(min(255, c + 50) for c in colour) + (255,))
+	bag.save(f"{ASSETS}/textures/item/{item}_placeholder.png")
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}_placeholder"}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+for item, (name, body) in {"lfp_module": ("LFP Battery Module", (200, 200, 205)), "spent_lfp_module": ("Spent LFP Module", (120, 110, 100))}.items():
+	tex(f"{item}_placeholder", lambda img, d, body=body: (d.rectangle([1, 4, 14, 12], fill=body + (255,), outline=(50, 50, 55, 255)),
+		d.rectangle([2, 5, 13, 6], fill=(40, 90, 160, 255)), d.rectangle([3, 2, 5, 3], fill=(200, 40, 40, 255)), d.rectangle([10, 2, 12, 3], fill=(30, 30, 30, 255))), "item")
+	save_json(f"{ASSETS}/models/item/{item}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{item}_placeholder"}})
+	save_json(f"{ASSETS}/items/{item}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:item/{item}"}})
+	lang[f"item.{ns}.{item}"] = name
+lang.update({f"block.{ns}.graphite_line": "Graphite Line", f"block.{ns}.graphite_furnace": "Graphite Furnace (2,800 C)",
+	f"block.{ns}.lfp_kiln": "LFP Kiln (700 C)", f"block.{ns}.cell_line": "Cell Line (controller)",
+	f"block.{ns}.bess_container": "Battery Container (5 MWh)", f"block.{ns}.bess_pcs": "Battery PCS (2.5 MW)",
+	f"block.{ns}.bess_plant_controller": "Battery Plant Controller", f"block.{ns}.bess_cabinet": "Battery Cabinet (125 kW, 261 kWh)",
+	f"block.{ns}.bess_mv_skid": "Battery MV Skid (2,750 kVA)", "subtitles.wildcatter.contactor_clunk": "Battery contactors close",
+	"subtitles.wildcatter.inverter_whine": "Inverter whines"})
+save_json(f"{ASSETS}/lang/en_us.json", lang)
+
 # ---- Wave A art (2026-11-19, C23): every item icon still drawn as a *_placeholder takes its Ludo icon once art/final/ore has it -----
 # (art/source/ore/<item>.webp through tools/process_art.py's icon()). The placeholders are still drawn where they were, so the noise
 # of every script texture stays the same; the step below then leaves them out. The quest book's model was only in the committed

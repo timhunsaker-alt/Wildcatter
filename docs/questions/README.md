@@ -15,6 +15,7 @@ Format of an entry:
 
 | File | Wave | Entries |
 |---|---|---|
+| `grid-batteries.md` | Phase 22 (2026-11-19): grid batteries and the LFP cell plant; 1-8 answered by Tim, 9-20 decided while building | 1-20 |
 | `oilfield-follow-ons.md` | Phase 23 (answered by Tim 2026-11-19, all recommended): fracture gradient, oil mud, the choke kill, salt caverns and gas storage, Frasch sulfur | 1-8 answered; 9 on, decided while building |
 | `phase21-quests.md` | Phase 21: the quest book (engine, chapters, milestones) | numbered across 21.1-21.3 |
 | `phase20-chemicals.md` | Phase 20: the chlor-alkali plant, the titanium pigment plant, lithium hydroxide | numbered across 20a-20c |

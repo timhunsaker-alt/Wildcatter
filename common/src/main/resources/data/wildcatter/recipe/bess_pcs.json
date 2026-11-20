@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "AOA",
+    "SSS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_block",
+    "A": "wildcatter:aluminium_ingot",
+    "O": "wildcatter:cpu_small"
+  },
+  "result": {
+    "id": "wildcatter:bess_pcs",
+    "count": 1
+  }
+}

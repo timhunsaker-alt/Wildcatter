@@ -295,4 +295,12 @@ public interface GridBlocks {
 			.strength(0.8F).sound(SoundType.METAL).noOcclusion(), Voltage.LOW));
 	Block BRANCH_CABLE_INDUSTRIAL = block("branch_cable_industrial", props -> new dev.wildcatter.block.BranchCableBlock(props.mapColor(MapColor.METAL)
 			.strength(0.8F).sound(SoundType.METAL).noOcclusion(), Voltage.INDUSTRIAL));
+	// Phase 22b: grid batteries (docs/multiblocks/grid-batteries.md)
+	Block BESS_CONTAINER = bessPart(dev.wildcatter.block.BessPartBlock.Part.BESS_CONTAINER);
+	Block BESS_PCS = bessPart(dev.wildcatter.block.BessPartBlock.Part.BESS_PCS);
+	Block BESS_PLANT_CONTROLLER = bessPart(dev.wildcatter.block.BessPartBlock.Part.BESS_PLANT_CONTROLLER);
+	Block BESS_CABINET = bessPart(dev.wildcatter.block.BessPartBlock.Part.BESS_CABINET);
+	/** The utility block's MV skid: 2,750 kVA, the industrial LV tier (delta) to distribution (grounded wye), 6 %Z, and its ring main unit. */
+	Block BESS_MV_SKID = block("bess_mv_skid", props -> dev.wildcatter.block.PadmountBlock.mvSkid(props.mapColor(MapColor.COLOR_GREEN)
+			.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), Voltage.INDUSTRIAL, Voltage.DISTRIBUTION, Tuning.MV_SKID_VA, Tuning.MV_SKID_PERCENT_Z));
 }

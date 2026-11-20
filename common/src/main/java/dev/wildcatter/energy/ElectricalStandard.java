@@ -81,6 +81,14 @@ public enum ElectricalStandard {
 	}
 
 	/** A generator trips if the frequency stays below this. */
+	/**
+	 * The primary frequency response deadband of an inverter-based resource (22b): 36 mHz on 60 Hz worlds (IEEE 2800-2022), 10 mHz on
+	 * 50 Hz worlds (ENTSO-E's FCR insensitivity); unverified, from the codes as summarised in docs/multiblocks/grid-batteries.md.
+	 */
+	public double frequencyResponseDeadbandHz() {
+		return this == NORTH_AMERICAN ? 0.036 : 0.010;
+	}
+
 	public double generatorLowHertz() {
 		return this == NORTH_AMERICAN ? 57.0 : 47.5;
 	}

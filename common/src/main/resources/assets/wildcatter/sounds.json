@@ -71,6 +71,12 @@
     ],
     "subtitle": "subtitles.wildcatter.flashover"
   },
+  "contactor_clunk": {
+    "sounds": [
+      "wildcatter:contactor_clunk"
+    ],
+    "subtitle": "subtitles.wildcatter.contactor_clunk"
+  },
   "diesel_idle": {
     "sounds": [
       "wildcatter:diesel_idle"
@@ -124,5 +130,11 @@
       "wildcatter:horn"
     ],
     "subtitle": "subtitles.wildcatter.horn"
+  },
+  "inverter_whine": {
+    "sounds": [
+      "wildcatter:inverter_whine"
+    ],
+    "subtitle": "subtitles.wildcatter.inverter_whine"
   }
 }
