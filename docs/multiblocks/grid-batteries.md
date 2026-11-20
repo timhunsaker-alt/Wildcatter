@@ -330,15 +330,18 @@ Decisions taken while building are in `docs/questions/grid-batteries.md`, items 
 - **PLC points** (24 on the PCS, the cabinet and the plant controller): RUN, GRID FORMING, BLACK START permit, PEAK SHAVE, FREQUENCY RESPONSE,
   P, Q and PEAK LIMIT setpoints (4-20 mA); SOC, SOH, P, Q, available discharge and charge (4-20 mA); RUNNING, FORMING, ON GRID, BMS FAULT,
   OVERTEMP, LOSS OF GRID, UNDERVOLTAGE, END OF LIFE, THERMAL RUNAWAY, AUTO. In HAND a sneak-click steps the mode.
-- **Thermal runaway** (rule `bessThermalRunaway`): fire or lava touching a container for 30 s, or a burning container touching it for 2 minutes.
-  Explosions and lightning do not set one off yet (item 16). Vents with a small blast that breaks no blocks, burns 10 minutes (5 with water in
+- **Thermal runaway** (rule `bessThermalRunaway`): fire or lava touching a container for 30 s, or a burning container touching it for 2 minutes;
+  since 0.10.1 also an explosion's blast reaching any of its cells (its blocks are spared, it burns out) and lightning on it with no ground
+  rod within 4 blocks (questions items 16 and 21). Vents with a small blast that breaks no blocks, burns 10 minutes (5 with water in
   its sprinkler, filled by a water pump like any water user), Poison and Blindness inside 8 blocks, then gone, 16 iron ingots of scrap left.
 - **Quests:** chapter `grid_storage` (order 75): battery graphite, cathode powder, a module, a cabinet, a block on the grid
   (`bess_discharging`), a black start. The cabinet's quest is here rather than in `three_phase` (its modules come from the cell plant) (item 17).
 - **Art and sound (Ludo):** the container's corrugated wall (`mat_container_corrugated`), the LFP module icon (the spent one dulled from it),
-  the three bags; the DC contactors' clunk and the inverter's whine.
+  the three bags; the DC contactors' clunk and the inverter's whine (since 0.10.1 a running loop on the client, its pitch and volume rising
+  with power in tenths of the PCS's rating: questions item 22).
 - **Tests:** unit `BessTest` (6); NeoForge scenes `cell_plant` (388, 356 and 675 kg/h; bags; a module; NO NITROGEN), `bess_block` (charging
   2.53 MW, discharging 2.47 MW, the cells giving up 1.058 x what is delivered, frequency response at 60.23 Hz to 2.28 MW as 4 % droop gives,
   LOSS OF GRID), `bess_peak_shave` (the set held at 40 kW, the cabinet 35 kW), `bess_forming` (black start, a set syncing onto it, a bolted
   fault held at 199 A of 166 A rated then UNDERVOLTAGE), `bess_runaway` (A set off, B catching, C a block apart spared, A burned out, the rule
-  off; a broken container's item keeping 96 modules and its health).
+  off; a broken container's item keeping 96 modules and its health; 0.10.1: a TNT-sized blast sets E off with its blocks standing, lightning
+  sets F off and not G with a ground rod 2 blocks away, and with the rule off neither does to H, the blast breaking it).
