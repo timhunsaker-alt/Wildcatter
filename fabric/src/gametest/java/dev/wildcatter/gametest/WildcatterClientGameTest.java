@@ -458,6 +458,45 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		context.waitForScreen(dev.wildcatter.client.WorldRulesScreen.class);
 		context.waitTicks(10);
 		context.takeScreenshot("wildcatter-world-rules");
+		// Wave A: the list scrolls when the rules are more than the window holds, and no rule button runs under Done
+		String layout = context.computeOnClient(client -> {
+			dev.wildcatter.client.WorldRulesScreen rules = (dev.wildcatter.client.WorldRulesScreen) client.gui.screen();
+			int doneTop = Integer.MAX_VALUE;
+			for (var widget : net.fabricmc.fabric.api.client.screen.v1.Screens.getWidgets(rules)) {
+				if (widget instanceof net.minecraft.client.gui.components.Button b && b.getMessage().getString().equals("Done")) {
+					doneTop = b.getY();
+				}
+			}
+			int lowest = 0;
+			for (var widget : net.fabricmc.fabric.api.client.screen.v1.Screens.getWidgets(rules)) {
+				if (widget.visible && widget instanceof net.minecraft.client.gui.components.Button b && b.getMessage().getString().contains(": O")) {
+					lowest = Math.max(lowest, b.getY() + b.getHeight());
+				}
+			}
+			int[] shown = rules.shownRows();
+			return shown[0] + " " + shown[1] + " " + shown[2] + " " + lowest + " " + doneTop;
+		});
+		String[] lay = layout.split(" ");
+		System.out.println("[wildcatter-test] world rules rows shown " + lay[0] + "-" + lay[1] + " of " + lay[2] + ", lowest rule bottom " + lay[3] + ", Done at " + lay[4]);
+		check(Integer.parseInt(lay[3]) <= Integer.parseInt(lay[4]), "no rule button should run under Done: " + layout);
+		if (Integer.parseInt(lay[1]) + 1 < Integer.parseInt(lay[2])) {
+			context.runOnClient(client -> {
+				dev.wildcatter.client.WorldRulesScreen rules = (dev.wildcatter.client.WorldRulesScreen) client.gui.screen();
+				while (rules.scrollRules(1)) {
+					// to the last row, as the wheel does
+				}
+			});
+			context.waitTicks(5);
+			int[] end = context.computeOnClient(client -> ((dev.wildcatter.client.WorldRulesScreen) client.gui.screen()).shownRows());
+			check(end[1] == end[2] - 1, "scrolled down, the last row should show: " + java.util.Arrays.toString(end));
+			context.takeScreenshot("wildcatter-world-rules-scrolled");
+			context.runOnClient(client -> {
+				dev.wildcatter.client.WorldRulesScreen rules = (dev.wildcatter.client.WorldRulesScreen) client.gui.screen();
+				while (rules.scrollRules(-1)) {
+					// back to the top
+				}
+			});
+		}
 		String pressed = context.computeOnClient(client -> {
 			StringBuilder out = new StringBuilder();
 			for (var widget : net.fabricmc.fabric.api.client.screen.v1.Screens.getWidgets(client.gui.screen())) {
@@ -4978,6 +5017,15 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 		server.runCommand("item replace entity @p weapon.mainhand with minecraft:air");
 		context.waitTicks(40);
 		check(context.computeOnClient(client -> dev.wildcatter.client.HoaOverlay.shown()).isEmpty(), "the key put away, the labels go");
+		// the yard breaker's position flag (Wave A): red closed, then green open, from in front of its mechanism
+		server.runCommand("tp @p 13.7 " + up + " " + (z - 5) + " 0 0");   // the flag is 1.6 m up on the mechanism's north face
+		context.waitTicks(40);
+		context.takeScreenshot("wildcatter-breaker-flag-closed");
+		server.runOnServer(srv -> ((dev.wildcatter.block.BreakerBlockEntity) srv.overworld().getBlockEntity(yard)).setSwitch(false));
+		context.waitTicks(20);
+		String flag = server.computeOnServer(srv -> srv.overworld().getBlockState(yard.above()).getValue(dev.wildcatter.block.BreakerBlock.POSITION).getSerializedName());
+		check(flag.equals("off"), "every cell should carry the open position: " + flag);
+		context.takeScreenshot("wildcatter-breaker-flag-open");
 		System.out.println("[wildcatter-test] hoaOverlay ok");
 	}
 
