@@ -219,7 +219,8 @@ kill weight, ICP, FCP, strokes surface to bit, bit to shoe, shoe to surface, and
 - **Breach** *(question 2)*: world rule **`cavernStability`**: leaching past the limits, or a cavern holding gas under its minimum
   pressure (0.3 psi/ft) for over a game week, **breaches**: a flank breach floods it with formation water and the gas is lost; a roof
   breach opens a **sinkhole** at the surface over it (the blocks above the cavern drop to fill it, water pools). The sonar tool warns:
-  under 3 blocks of wall it reads **WALL THIN**; a roof heaving shows cracks (particles) at the surface for a game day before a
+  with less salt than either wall (under 2 blocks to the flank or 3 under the caprock) it reads
+  **WALL THIN** *(decision 26)*; a roof heaving shows cracks (particles) at the surface for a game day before a
   collapse. Off: leaching just stops at the limits and pressure has no floor.
 - **Debrining:** the storage wellhead on the hole, the compressor on pipeline gas: gas in, brine out to disposal at the same volume,
   until **DRY**. The first gas in is **cushion gas** (to the minimum pressure, not withdrawable); after it, **working gas**.

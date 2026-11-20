@@ -148,7 +148,8 @@ public final class Caverns {
 		if (r[0] == 0) {
 			return "no cavern yet";
 		}
-		boolean thin = r[3] < Tuning.CAVERN_THIN_WALL || r[4] < Tuning.CAVERN_THIN_WALL;
+		// WALL THIN only past a design wall (decision 26): a cavern leached to its limit keeps exactly its walls and reads sound
+		boolean thin = r[3] < Tuning.CAVERN_FLANK_WALL || r[4] < Tuning.CAVERN_ROOF_WALL;
 		return String.format("cavern %,d m3, %d m high, %d m across, salt %d m to the flank and %d m over the roof%s%s", r[0], r[1], r[2], Math.min(r[3], 9), Math.min(r[4], 9),
 				thin ? ": WALL THIN" : "", hole.breached ? ": BREACHED" : "");
 	}

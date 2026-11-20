@@ -223,3 +223,15 @@ choices are here; everything else in the spec is decided on the best recommendat
   flow through it is steady at the kill rate.
 - **Alternatives:** the volume following the choke's opening or the pump's strokes (another synced number); vanilla sounds.
 
+### 26. The sonar's WALL THIN against the leaching walls
+- **Chosen:** one basis for both: the spec's design walls, **2 blocks of salt to the dome's flank** (the salt pillar left between the
+  cavern and the dome's edge) and **3 under the caprock** (the salt roof). Leaching stops at them (CAVERN AT LIMIT), and the sonar reads
+  **WALL THIN** only when a cavern has less than either: past its design wall, which a cavern can only reach by leaching on under
+  `cavernStability` (its first block past the wall reads THIN, before the breach). `CAVERN_THIN_WALL` (a flat 3) is deleted.
+- **Why:** the warning threshold (3) and the flank wall (2) disagreed, so every cavern leached to its design limit read WALL THIN, a
+  warning on every sound cavern. Real practice keeps a minimum salt thickness to the dome's edge and a salt roof under the caprock, and
+  a survey flags a cavern that has thinned past those minimums. The spec's 2 and 3 blocks are the game's scale of those minimums (the
+  real distances are hundreds of feet, unverified here), so the survey warns against the same numbers the leaching obeys.
+- **Alternatives:** a flat 2 for both (the roof at 2 would read sound when it is a block past its own wall); a warning one block
+  before each wall (every cavern at its limit would again read THIN); raising the flank wall to 3 (smaller caverns, a changed spec number).
+

@@ -2430,8 +2430,10 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
   choke panel is filmed on its own screen in the landscape window (2880 x 1620, GUI scale 2: its layout needs 720 units). No frame mode; the cursor is hidden.
   The old parts-only `bess` screenshots now run as `bessParts`.
 - **Remote choke panel screen:** the mud weight and pit gain are two lines, so the pit gain is no longer cut off at the right edge.
-- **Known gaps:** a cavern leached to its limit keeps 2 blocks of salt to the flank (CAVERN_FLANK_WALL) but the sonar reads WALL THIN
-  under 3 (CAVERN_THIN_WALL), so every full cavern reads WALL THIN; the rig's deep field in the trailer world is shallow (about 120 m),
+- **Sonar WALL THIN** now follows the design walls (2 blocks to the flank, 3 under the caprock; decision 26 in
+  `docs/questions/oilfield-follow-ons.md`): a cavern leached to its limit reads sound, one past either wall reads WALL THIN. The
+  `saltCavern` film was shot before this and shows WALL THIN.
+- **Known gaps:** the rig's deep field in the trailer world is shallow (about 120 m),
   so the kill's pressures are small (SIDPP 14 psi).
 - **0.10.1 tests:** `build` passes; the full NeoForge suite passes, 124 of 124 (2026-11-20), once the oilfield follow-ons' batch is
   padded 160 blocks: the first run failed `blowout`, `mv_span_flashover` and `oil_mud`, because gas_storage's peaker now reaches 72

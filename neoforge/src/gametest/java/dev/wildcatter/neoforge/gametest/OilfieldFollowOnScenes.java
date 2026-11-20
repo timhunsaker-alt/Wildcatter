@@ -748,6 +748,8 @@ final class OilfieldFollowOnScenes {
 						if (at >= mark[0] + 200) {
 							String h = head.inspect().getString();
 							log(scene, "working gas | " + h);
+							check(helper, h.contains("salt 2 m to the flank and 3 m over the roof") && !h.contains("WALL THIN"),
+									"a cavern leached to its design walls should read sound, not WALL THIN: " + h);
 							check(helper, head.dry() && head.bar() > dev.wildcatter.well.Cavern.minBar() && head.working() > 20, "dry, the compressor should put working gas in over the cushion: " + h);
 							double v = head.volume();
 							head.testGas((dev.wildcatter.well.Cavern.capacity(v) - dev.wildcatter.well.Cavern.cushion(v)) / 2);   // half full of working gas, by hook

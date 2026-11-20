@@ -293,7 +293,6 @@ public final class Tuning {
 	public static final double SALT_PER_M3_BRINE = 312.0;               // kg of salt a m3 of saturated brine
 	public static final int CAVERN_FLANK_WALL = 2;                      // blocks of salt to the dome's flank
 	public static final int CAVERN_ROOF_WALL = 3;                       // blocks of salt under the caprock
-	public static final int CAVERN_THIN_WALL = 3;                       // the sonar reads WALL THIN under this
 	public static final int CAVERN_HEAVE_TICKS = 24_000;                // a roof heaving shows cracks for a game day before it falls
 	public static final int CAVERN_LOW_TICKS = 24_000 * 7;              // under its minimum pressure for a game week: a breach
 	public static final double BLANKET_LPS = 0.01;                      // diesel or nitrogen to keep the blanket on the roof (proposed)
