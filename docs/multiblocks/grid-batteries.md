@@ -1,3 +1,5 @@
+# Grid batteries: a battery energy storage system on the AC grid, and the LFP cell plant that feeds it
+
 > **APPROVED by Tim 2026-11-19** (every question answered with the recommended option, `docs/questions/grid-batteries.md`).
 > Phase **22** (waves 22a-22c). See "As built" at the end.
 
