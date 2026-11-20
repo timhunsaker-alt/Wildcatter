@@ -2368,7 +2368,8 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
   BATTERIES, BATTERY PLANT AND SAFETY.
 - **Art and sound (Ludo):** the container's corrugated wall, the module icon (the spent one dulled from it), the three bags; the contactors'
   clunk and the inverter's whine.
-- **Tests:** unit `BessTest`; NeoForge scenes `cell_plant`, `bess_block`, `bess_peak_shave`, `bess_forming`, `bess_runaway`.
+- **Tests:** unit `BessTest`; NeoForge scenes `cell_plant`, `bess_block`, `bess_peak_shave`, `bess_forming`, `bess_runaway` (the full NeoForge
+  suite passed with them); client screenshots `cellPlant` and `bess` (`WILDCATTER_ONLY=cellPlant,bess`).
 - **Known gaps:** explosions and lightning do not set a container off; no CT part for peak shaving a named feeder; the PCS's whine is a repeated
-  one-shot, not a loop; spent modules have no recycler; the client scenes `bessBlock`, `blackStart`, `cellPlant`, `bessRunaway` are not
-  written yet (screenshots below).
+  one-shot, not a loop; spent modules have no recycler; the client films of a block discharging, a black start and a runaway are not
+  made yet (screenshots only).
