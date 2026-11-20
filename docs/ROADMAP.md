@@ -641,7 +641,8 @@ Tim's answers C18-C23 (`docs/questions/plc-gaps.md` 12) and the faults short's f
   - a nickel smelter;
   - fertilizer from phosphate and potash (built as Phase 18a, branch `phase18`).
 - Phase 15 follow-ons: brine wells and gas storage caverns in the salt domes; Frasch sulfur from the caprock; oil-based muds and lost
-  circulation; the fracture gradient (a mud too heavy for the casing shoe); a choke manifold worked by hand.
+  circulation; the fracture gradient (a mud too heavy for the casing shoe); a choke manifold worked by hand. DRAFT spec (Wave B, 2026-11-19):
+  `docs/multiblocks/oilfield-follow-ons.md`; questions: `docs/questions/oilfield-follow-ons.md`. Not scheduled.
 - The purer yellowcake route: ADU precipitation on the Phase 14 ammonia and a calciner at 750-800 C (94-98 % U3O8).
 - Phase 14b-14d follow-ons: a small (100-250 kW) biogas set for farm digesters; biomethane upgrading so biogas can go on the sales line;
   line pack and pressure on the sales line; a delivery station fed from the set it supplies; the condenser's fans staged at part load.
