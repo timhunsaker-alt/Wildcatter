@@ -177,6 +177,7 @@ choices are here; everything else in the spec is decided on the best recommendat
 - **Chosen:** the `gas_storage` scene runs the 1 MW medium-voltage compressor by a test hook (`testDriven`): the scenes' 500 kW diesel
   set cannot start it, and a peaker and a 12.47/4.16 kV step-down is a scene of its own. The dehydrator runs on its own 480 V set.
 - **Alternatives:** the peaker of the chemical scenes and a distribution step-down.
+- **Superseded in 0.10.1 by 24:** the scene now starts it off a real supply and the hook is gone.
 
 ### 22. Frasch: parts found by pipe, no new products (23d)
 - **Chosen:** the Frasch wellhead finds the water heater and the lift air compressor by a steel pipe run on its other sides and asks
@@ -193,3 +194,32 @@ choices are here; everything else in the spec is decided on the best recommendat
   storage cavern) and Frasch sulfur after the acid plant in Chemicals. There is no sales line quest, so the storage cavern requires the
   gas plant's.
 - **Alternatives:** a sales line quest of its own first.
+
+## 0.10.1 (2026-11-20, decided on the best recommendation while Tim is away; for his review)
+
+### 24. The storage compressor's supply in `gas_storage`
+- **Chosen:** the chemical scenes' peaker (the aero gas turbine, 12.47 kV / 11 kV out of its substation transformer) feeds a 1.5 MVA
+  12.47/4.16 kV transformer beside the compressor (the GSU, back-fed: 5.75 %Z), and the compressor's 1 MW motor starts **direct on line**
+  off its 4.16 kV side. In the scene the inrush (6 x 174 A at PF 0.35) dips the 4.16 kV bus to 3,156 V and loads the transformer to 379 %
+  for about 3 s (its C57.109 heating reaches 2 %); running, it draws 167 A at 3,995 V, 922 kW, within the transformer's rating. The
+  `testDriven` hook is deleted (nothing else used it).
+- **Why:** the MV soft starter's overload dial stops at 125 A (`CABINET_SETTINGS_MV`) and the motor's full-load current is 174 A, so it
+  cannot carry this motor (nor can the MV drive, on the same dial); a 1 MW gas set or a 1 MVA unit substation is smaller than the motor's
+  1.25 MVA running; the peaker is stiff and the GSU is the only 12.47/4.16 kV transformer in the mod. Large motors this size are commonly
+  started across the line on a transformer of about 1.5 times their kVA.
+- **Alternatives:** the soft starter's dial extended past 125 A (a new number: 160 and 200 A are the next R10 steps) and the motor behind it;
+  two 1 MW gas sets paralleled at 480 V through two unit substations; the 10 MVA substation transformer off the peaker's 69 kV line, or
+  the unit auxiliary transformer off its generator bus (both stiffer, both far larger than a 1 MW motor wants); a dedicated 12.47/4.16 kV
+  step-down part.
+
+### 25. The oilfield follow-ons' running loops
+- **Chosen:** four Ludo sound effects, one generation each, made as seamless loops and processed by `tools/process_sounds.py` to mono Ogg:
+  `choke_flow` (mud and gas rushing through the choke), `mud_gas_separator` (gas churning out of the mud), `storage_compressor` (a
+  reciprocating compressor's thump), `frasch_lift` (frothy surging liquid with a steam hiss). Each plays as a running loop (`MachineSound`,
+  the server sending only whether it runs): the choke manifold while a kill pumps mud through an open choke or gas comes off it, the
+  separator while gas goes through it, the storage compressor while its motor runs (it runs only while compressing into a wellhead on
+  INJECT), the Frasch wellhead while it lifts. Fixed pitch and volume.
+- **Why:** the spec's sound list, with the loop the other running machines use. The choke's "hiss rising with flow" is one level: the
+  flow through it is steady at the kill rate.
+- **Alternatives:** the volume following the choke's opening or the pump's strokes (another synced number); vanilla sounds.
+

@@ -60,7 +60,9 @@ import net.minecraft.world.phys.AABB;
  * <li>{@code bess_forming} (22c): a cabinet set to GRID FORMING black-starts a dead 480 V bus and carries its heaters; a genset synchronises
  * and closes onto it; a bolted fault holds the cabinet at its current limit and trips it on UNDERVOLTAGE.</li>
  * <li>{@code bess_runaway} (22c): with the rule on, fire at a container sets it off, the container touching it catches, the one a block apart
- * does not, and the burned one is gone; with the rule off, fire does nothing. A container broken keeps its modules and health in its item.</li>
+ * does not, and the burned one is gone; with the rule off, fire does nothing. A container broken keeps its modules and health in its item.
+ * Then an explosion at a container sets it off (its blocks spared), lightning on one with no ground rod within 4 blocks sets it off, and on
+ * one with a ground rod beside it does not; with the rule off, neither lightning nor an explosion does (the blast just breaks it).</li>
  * </ul>
  */
 final class BessScenes {
@@ -224,6 +226,7 @@ final class BessScenes {
 				log(scene, "charging: " + charging);
 				check(helper, plant.pcs(helper.getLevel()).size() == 1, "the plant controller should find its PCS by control cable: " + charging);
 				check(helper, near(pcs.gridWatts(), -Tuning.PCS_WATTS, 0.06), "the block should charge at about 2.5 MW: " + pcs.gridWatts() + " | " + charging);
+				check(helper, pcs.whine() >= 9 && pcs.loop() == dev.wildcatter.WildcatterSounds.INVERTER_WHINE, "at full power its whine loop should be on, near the top of its range: " + pcs.whine());
 				double e0 = pcs.energyKwh(helper.getLevel());
 				long t0 = helper.getLevel().getGameTime();
 				plant.setPreset(Preset.DISCHARGE);
@@ -353,7 +356,7 @@ final class BessScenes {
 	// ---- bess_runaway (22c) ------------------------------------------------------------------------------------------------------------------
 	static void runaway(GameTestHelper helper) {
 		String scene = "bess_runaway";
-		floor(helper, -6, -4, 16, 18);
+		floor(helper, -6, -4, 20, 44);
 		boolean[] rules = Rules.snapshot();
 		place(helper, WildcatterBlocks.BESS_CONTAINER, 0, U, 0, NORTH);        // A: x 0-2, z 0-5
 		place(helper, WildcatterBlocks.BESS_CONTAINER, 3, U, 0, NORTH);        // B: x 3-5, touching A
@@ -403,10 +406,57 @@ final class BessScenes {
 						c.testFire(Tuning.RUNAWAY_FIRE_SECONDS + 5);
 						helper.runAfterDelay(60, () -> {
 							check(helper, !c.burning(), "with the rule off fire should not set C off: " + read(helper, 7, U, 0));
-							log(scene, "ok: B " + read(helper, 3, U, 0) + " | C " + read(helper, 7, U, 0));
-							Rules.restore(rules);
-							helper.succeed();
+							log(scene, "fire: B " + read(helper, 3, U, 0) + " | C " + read(helper, 7, U, 0));
+							blastAndLightning(helper, scene, rules);
 						});
+					});
+				});
+			});
+		});
+	}
+
+	/** bess_runaway, part two: explosions and lightning, with the rule on and off. */
+	private static void blastAndLightning(GameTestHelper helper, String scene, boolean[] rules) {
+		Rules.set(Rules.Rule.BESS_THERMAL_RUNAWAY, true);
+		place(helper, WildcatterBlocks.BESS_CONTAINER, 0, U, 20, NORTH);       // E: an explosion against its west wall
+		place(helper, WildcatterBlocks.BESS_CONTAINER, 12, U, 20, NORTH);      // F: lightning, no ground rod
+		place(helper, WildcatterBlocks.BESS_CONTAINER, 12, U, 30, NORTH);      // G: lightning, a ground rod 2 blocks off its east wall
+		place(helper, WildcatterBlocks.BESS_CONTAINER, 0, U, 36, NORTH);       // H: the rule off, lightning then an explosion
+		helper.getLevel().setBlock(abs(helper, 16, U, 32), dev.wildcatter.GridBlocks.GROUND_ROD.defaultBlockState(), 3);
+		BessContainerBlockEntity e = entity(helper, 0, U, 20, BessContainerBlockEntity.class);
+		BessContainerBlockEntity f = entity(helper, 12, U, 20, BessContainerBlockEntity.class);
+		BessContainerBlockEntity g = entity(helper, 12, U, 30, BessContainerBlockEntity.class);
+		BessContainerBlockEntity h = entity(helper, 0, U, 36, BessContainerBlockEntity.class);
+		for (BessContainerBlockEntity box : new BessContainerBlockEntity[] {e, f, g, h}) {
+			box.setModules(Tuning.CONTAINER_MODULES);
+		}
+		// lightning on F's roof and on G's: F has no ground rod near, G has one
+		helper.spawn(net.minecraft.world.entity.EntityTypes.LIGHTNING_BOLT, new net.minecraft.world.phys.Vec3(13.5, U + 3, 22.5));
+		helper.spawn(net.minecraft.world.entity.EntityTypes.LIGHTNING_BOLT, new net.minecraft.world.phys.Vec3(13.5, U + 3, 32.5));
+		await(helper, 60, f::burning, () -> {
+			check(helper, f.burning(), "lightning on a container with no ground rod within 4 blocks should set it off: " + read(helper, 12, U, 20));
+			check(helper, !g.burning(), "lightning on a container with a ground rod 2 blocks away should not: " + read(helper, 12, U, 30));
+			// an explosion's blast against E's west wall
+			net.minecraft.core.BlockPos blast = abs(helper, -1, U + 1, 22);
+			helper.getLevel().explode(null, blast.getX() + 0.5, blast.getY() + 0.5, blast.getZ() + 0.5, 4.0F, net.minecraft.world.level.Level.ExplosionInteraction.TNT);
+			helper.runAfterDelay(5, () -> {
+				check(helper, e.burning(), "an explosion's blast reaching a container should set it off: " + read(helper, 0, U, 20));
+				check(helper, helper.getLevel().getBlockState(abs(helper, 0, U, 20)).is(WildcatterBlocks.BESS_CONTAINER), "the blast should spare its blocks (it burns out instead)");
+				check(helper, !g.burning(), "G should still not be burning: " + read(helper, 12, U, 30));
+				log(scene, "blast and lightning: E " + read(helper, 0, U, 20) + " | F " + read(helper, 12, U, 20) + " | G " + read(helper, 12, U, 30));
+				// the rule off: lightning on H, then a blast, do not set it off
+				Rules.set(Rules.Rule.BESS_THERMAL_RUNAWAY, false);
+				helper.spawn(net.minecraft.world.entity.EntityTypes.LIGHTNING_BOLT, new net.minecraft.world.phys.Vec3(1.5, U + 3, 38.5));
+				helper.runAfterDelay(30, () -> {
+					check(helper, !h.burning(), "with the rule off lightning should not set H off: " + read(helper, 0, U, 36));
+					net.minecraft.core.BlockPos blastH = abs(helper, -1, U + 1, 38);
+					helper.getLevel().explode(null, blastH.getX() + 0.5, blastH.getY() + 0.5, blastH.getZ() + 0.5, 4.0F, net.minecraft.world.level.Level.ExplosionInteraction.TNT);
+					helper.runAfterDelay(25, () -> {
+						check(helper, !h.burning(), "with the rule off an explosion should not set H off");
+						boolean broken = !helper.getLevel().getBlockState(abs(helper, 0, U, 36)).is(WildcatterBlocks.BESS_CONTAINER);
+						log(scene, "ok: rule off, H " + (broken ? "blown apart by the blast, not burning" : "standing, not burning: " + read(helper, 0, U, 36)));
+						Rules.restore(rules);
+						helper.succeed();
 					});
 				});
 			});

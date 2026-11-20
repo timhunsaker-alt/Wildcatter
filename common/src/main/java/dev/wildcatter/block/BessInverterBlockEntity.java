@@ -46,7 +46,8 @@ import net.minecraft.world.level.storage.ValueOutput;
  * </ul>
  * The cells (containers, or the cabinet's own) are stepped at each solve with what it delivered plus its chillers' draw.
  */
-public abstract class BessInverterBlockEntity extends BlockEntity implements CircuitPart, Generator, Inspectable, BigPartEntity, ControlDevice, Measurable {
+public abstract class BessInverterBlockEntity extends BlockEntity implements CircuitPart, Generator, Inspectable, BigPartEntity, ControlDevice, Measurable,
+		dev.wildcatter.kinetic.Sounding {
 	private static final Conductor[] PHASES = {Conductor.A, Conductor.B, Conductor.C};
 
 	/** What the controller's face (or the plant controller) runs it at, in HAND. */
@@ -112,6 +113,8 @@ public abstract class BessInverterBlockEntity extends BlockEntity implements Cir
 	/** What it was told to deliver at the last build, W. */
 	protected double commanded;
 	private boolean grown;
+	/** How hard it is switching, in tenths of its rating (0 under a tenth: silent), kept in step with the client for its whine. */
+	private int whine;
 
 	protected BessInverterBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
@@ -625,8 +628,13 @@ public abstract class BessInverterBlockEntity extends BlockEntity implements Cir
 		if (rampStart >= 0 && now - rampStart <= Tuning.BESS_SOFT_START_SECONDS * 20 + 4 && now % 4 == 0) {
 			CircuitManager.markDirty(level);
 		}
-		if (Math.abs(gridWatts) > ratedWatts() * 0.1 && level instanceof ServerLevel server && now % 80 == 0) {
-			server.playSound(null, worldPosition, WildcatterSounds.INVERTER_WHINE, SoundSource.BLOCKS, 0.6F, 1.0F);
+		if (now % 10 == 0) {   // the whine: the client plays it as a loop while it moves over a tenth of its rating, louder and higher with power
+			double share = Math.abs(gridWatts) / ratedWatts();
+			int step = share > 0.1 ? (int) Math.min(10, Math.round(share * 10)) : 0;
+			if (step != whine) {
+				whine = step;
+				level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+			}
 		}
 		if (gridWatts >= 1e6 && level instanceof ServerLevel server && now % 20 == 0) {
 			dev.wildcatter.quest.QuestEvents.milestone(server, worldPosition, dev.wildcatter.quest.Milestones.BESS_DISCHARGING);
@@ -860,6 +868,40 @@ public abstract class BessInverterBlockEntity extends BlockEntity implements Cir
 		socMax = input.getDoubleOr("socMax", Tuning.SOC_MAX);
 		tripped = input.getStringOr("tripped", "");
 		closed = input.getBooleanOr("closed", false);
+		whine = input.getIntOr("whine", 0);   // only in the update tag: a loaded world starts silent until it next runs
+	}
+
+	// ---- the whine (docs/multiblocks/grid-batteries.md, "Sounds and art": it rises with power) --------------------------------------------
+	/** Tenths of its rating it is switching, as the client knows it (0: silent). */
+	public int whine() {
+		return whine;
+	}
+
+	@Override
+	public net.minecraft.sounds.SoundEvent loop() {
+		return whine > 0 ? WildcatterSounds.INVERTER_WHINE : null;
+	}
+
+	@Override
+	public float soundPitch() {
+		return 0.8F + 0.04F * whine;   // 0.84 at a tenth of its rating to 1.2 at full power
+	}
+
+	@Override
+	public float soundVolume() {
+		return whine > 0 ? 0.25F + 0.05F * whine : 0;   // 0.3 to 0.75
+	}
+
+	@Override
+	public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+		return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+	}
+
+	@Override
+	public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+		net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+		tag.putInt("whine", whine);
+		return tag;
 	}
 
 	/** Every port cell and face of a list, for a subclass. */

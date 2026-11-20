@@ -65,7 +65,8 @@ public class FraschWellheadBlock extends BaseEntityBlock {
 
 	@Override
 	public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(Level level, BlockState state, net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
-		return level.isClientSide() ? null : createTickerHelper(type, dev.wildcatter.WildcatterBlocks.FRASCH_WELLHEAD_ENTITY, FraschWellheadBlockEntity::tick);
+		return createTickerHelper(type, dev.wildcatter.WildcatterBlocks.FRASCH_WELLHEAD_ENTITY,
+				level.isClientSide() ? (l, p, s, e) -> dev.wildcatter.kinetic.RunningSound.clientTick(e) : FraschWellheadBlockEntity::tick);
 	}
 
 	@Override

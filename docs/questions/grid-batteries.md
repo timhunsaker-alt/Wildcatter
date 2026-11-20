@@ -123,6 +123,7 @@ Each was **decided on recommendation**; none needs Tim before it can stand, but 
 - **Chosen:** fire or lava touching it for 30 s, or a burning container touching it for 2 minutes. Not yet explosions or lightning.
 - **Why:** both are seen and avoidable; an explosion already breaks a container's blocks, and the mod has no lightning hook yet.
 - **Alternatives:** add explosions and lightning (spec item 4's list).
+- **Superseded in 0.10.1 by 21:** explosions and lightning now set one off too.
 
 ### 17. The cabinet's quest
 - **Chosen:** in the new `grid_storage` chapter, after the first module.
@@ -139,8 +140,32 @@ Each was **decided on recommendation**; none needs Tim before it can stand, but 
   its rating (a one-shot repeated, not a loop).
 - **Why:** a looped sound needs the client to know the PCS is running, which these parts do not send yet.
 - **Alternatives:** a client-side running loop, as the motors have.
+- **Superseded in 0.10.1 by 22:** the whine is a client-side running loop.
 
 ### 20. Burned-out containers
 - **Chosen:** the container is gone; 16 iron ingots of scrap are left; its modules are lost.
 - **Why:** the spec's "scrap steel back, modules lost", in items the player has.
 - **Alternatives:** a burned container block to clear.
+
+## 0.10.1 (2026-11-20, decided on the best recommendation while Tim is away; for his review)
+
+### 21. Explosions and lightning set a container off
+- **Chosen:** under `bessThermalRunaway`, an explosion that would break any cell of a container sets it off instead (its blocks are
+  spared: it burns out to scrap as any runaway does); lightning striking its roof sets it off unless a ground rod stands within 4 blocks
+  of any of its cells (a cube, the rod need not be wired to it). The struck block is the one under the bolt, as the game's lightning rod
+  reads it; the container looks for a bolt every other tick (a bolt lives at least 3). A wind charge (it only triggers blocks) and a blast
+  that keeps blocks (a creeper with mob griefing off) do nothing. With the rule off nothing changes: a blast breaks it as before and
+  lightning is only lightning.
+- **Why:** the spec's list (item 4), with the least new machinery: the game already tells a block it is in a blast, and polling for a bolt
+  near a container needs no loader hook. Sparing the blocks keeps the runaway visible: a container blown apart could not burn. The mod's
+  own blasts that break blocks (the containment's hydrogen, the vessel's hydrogen) now count; the blowout fire counts as fire already.
+- **Alternatives:** let the blast break it and set the containers touching it off; a lightning hook on each loader (an entity-join event);
+  the rod counting only when wired to the container by ground wire (the bonding rule `Grounding` uses).
+
+### 22. The PCS's whine is a loop
+- **Chosen:** the PCS and the cabinet send the client how hard they switch, in tenths of their rating (0 under a tenth: silent), checked
+  every half second and sent when it changes; the client plays `inverter_whine` as a running loop (the motors' `MachineSound`), its pitch
+  from 0.84 at a tenth of rating to 1.2 at full power and its volume from 0.3 to 0.75, fading out when it stops. The repeated one-shot is gone.
+- **Why:** the spec's "rises with power"; tenths keep the updates rare while frequency response wanders the power a little.
+- **Alternatives:** the exact power sent every tick; a fixed loop with no pitch change.
+

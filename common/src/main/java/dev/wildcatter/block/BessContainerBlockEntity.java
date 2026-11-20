@@ -33,8 +33,9 @@ import net.minecraft.world.phys.AABB;
  * nominal), its BMS, liquid chiller, gas detection, roof vents, aerosol suppression and a sprinkler connection. It must touch its PCS, which
  * steps its cells. Broken, it drops itself with its state of health and cycles kept, discharged.
  * <p>
- * 22c, the world rule {@code bessThermalRunaway}: fire or lava touching it for 30 s, or a burning container touching it for 2 minutes, sets
- * it off: THERMAL RUNAWAY, its PCS trips, the vents lift, it burns 10 minutes (5 with sprinkler water) with toxic smoke round it, and is
+ * 22c, the world rule {@code bessThermalRunaway}: fire or lava touching it for 30 s, a burning container touching it for 2 minutes, an
+ * explosion's blast reaching it (its blocks are spared: it burns out instead), or lightning striking it with no ground rod within 4 blocks,
+ * sets it off: THERMAL RUNAWAY, its PCS trips, the vents lift, it burns 10 minutes (5 with sprinkler water) with toxic smoke round it, and is
  * destroyed to scrap. Never at random.
  */
 public class BessContainerBlockEntity extends BlockEntity implements Inspectable, BigPartEntity, WaterUser, BessModules {
@@ -115,9 +116,55 @@ public class BessContainerBlockEntity extends BlockEntity implements Inspectable
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, BessContainerBlockEntity box) {
-		if (level instanceof ServerLevel server && level.getGameTime() % 20 == 0) {
+		if (!(level instanceof ServerLevel server)) {
+			return;
+		}
+		// a bolt lives at least 3 ticks, so looking every other tick catches it
+		if (level.getGameTime() % 2 == 0 && box.burning < 0 && Rules.on(Rules.Rule.BESS_THERMAL_RUNAWAY)) {
+			box.lightning(server);
+		}
+		if (level.getGameTime() % 20 == 0) {
 			box.second(server);
 		}
+	}
+
+	/** An explosion's blast reaching one of its cells (its block calls this in place of being blown up), under the rule. */
+	public void blasted(ServerLevel level) {
+		if (burning < 0) {
+			runaway(level, "an explosion's blast reaching it");
+		}
+	}
+
+	/** Lightning striking it: with no ground rod within 4 blocks of it the surge goes through its racks and sets it off (proposed). */
+	private void lightning(ServerLevel level) {
+		List<net.minecraft.world.entity.LightningBolt> bolts = level.getEntitiesOfClass(net.minecraft.world.entity.LightningBolt.class,
+				new AABB(worldPosition).inflate(Tuning.CONTAINER_LIGHTNING_LOOK));
+		if (bolts.isEmpty()) {
+			return;
+		}
+		List<BlockPos> mine = BigParts.cellsAt(level, worldPosition);
+		for (net.minecraft.world.entity.LightningBolt bolt : bolts) {
+			// the block a bolt strikes is the one just under its feet, as the game's own lightning rod reads it
+			BlockPos struck = BlockPos.containing(bolt.position().subtract(0, 1.0E-6, 0));
+			if (mine.contains(struck)) {
+				if (!groundRodNear(level, mine)) {
+					runaway(level, "lightning striking it with no ground rod within " + Tuning.CONTAINER_ROD_REACH + " blocks");
+				}
+				return;
+			}
+		}
+	}
+
+	private static boolean groundRodNear(Level level, List<BlockPos> mine) {
+		int r = Tuning.CONTAINER_ROD_REACH;
+		for (BlockPos cell : mine) {
+			for (BlockPos p : BlockPos.betweenClosed(cell.offset(-r, -r, -r), cell.offset(r, r, r))) {
+				if (level.getBlockState(p).is(dev.wildcatter.GridBlocks.GROUND_ROD)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private void second(ServerLevel level) {

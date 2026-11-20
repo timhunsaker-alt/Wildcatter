@@ -28,7 +28,7 @@ import org.jspecify.annotations.Nullable;
  * put down must come out: a disposal wellhead on another hole into the same caprock within 16 blocks is its bleed water well; without one
  * the rate falls to a third over 10 minutes (NO BLEED). NO HOT WATER, NO AIR, CAPROCK SPENT.
  */
-public class FraschWellheadBlockEntity extends BlockEntity implements FluidNode, Inspectable {
+public class FraschWellheadBlockEntity extends BlockEntity implements FluidNode, Inspectable, dev.wildcatter.kinetic.Sounding {
 	private double molten;      // litres held for the pipe
 	private double melted;      // kg of the block now melting
 	private double lifted;      // kg lifted in all
@@ -36,6 +36,7 @@ public class FraschWellheadBlockEntity extends BlockEntity implements FluidNode,
 	private double rate;        // kg/h the last interval
 	private @Nullable BlockPos melting;
 	private String status = "idle";
+	private final dev.wildcatter.kinetic.RunningSound running = new dev.wildcatter.kinetic.RunningSound();
 
 	public FraschWellheadBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.FRASCH_WELLHEAD_ENTITY, pos, state);
@@ -106,6 +107,7 @@ public class FraschWellheadBlockEntity extends BlockEntity implements FluidNode,
 			return;
 		}
 		head.work(server);
+		head.running.update(head, head.rate > 0);   // its loop plays while it lifts
 		head.setChanged();
 	}
 
@@ -246,5 +248,35 @@ public class FraschWellheadBlockEntity extends BlockEntity implements FluidNode,
 		melted = input.getDoubleOr("melted", 0);
 		lifted = input.getDoubleOr("lifted", 0);
 		bleed = input.getDoubleOr("bleed", 1.0);
+		running.load(input);
+	}
+
+	@Override
+	public net.minecraft.sounds.SoundEvent loop() {
+		return running.on() ? dev.wildcatter.WildcatterSounds.FRASCH_LIFT : null;
+	}
+
+	@Override
+	public float soundPitch() {
+		return 1.0F;
+	}
+
+	@Override
+	public float soundVolume() {
+		return running.on() ? 0.7F : 0;
+	}
+
+	public boolean liftingNow() {
+		return running.on();
+	}
+
+	@Override
+	public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+		return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+	}
+
+	@Override
+	public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+		return running.tag();
 	}
 }

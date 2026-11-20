@@ -32,6 +32,12 @@ public final class WildcatterSounds {
 	/** 22b: a battery's DC contactors closing, and its PCS's switching whine under load. */
 	public static final SoundEvent CONTACTOR_CLUNK = make("contactor_clunk");
 	public static final SoundEvent INVERTER_WHINE = make("inverter_whine");
+	/** 0.10.1: the oilfield follow-ons' running loops: kill flow through the choke manifold, gas through the mud-gas separator, the storage
+	 * compressor compressing, and the Frasch wellhead lifting. */
+	public static final SoundEvent CHOKE_FLOW = make("choke_flow");
+	public static final SoundEvent MUD_GAS_SEPARATOR = make("mud_gas_separator");
+	public static final SoundEvent STORAGE_COMPRESSOR = make("storage_compressor");
+	public static final SoundEvent FRASCH_LIFT = make("frasch_lift");
 
 	private WildcatterSounds() {
 	}

@@ -136,5 +136,29 @@
       "wildcatter:inverter_whine"
     ],
     "subtitle": "subtitles.wildcatter.inverter_whine"
+  },
+  "choke_flow": {
+    "sounds": [
+      "wildcatter:choke_flow"
+    ],
+    "subtitle": "subtitles.wildcatter.choke_flow"
+  },
+  "mud_gas_separator": {
+    "sounds": [
+      "wildcatter:mud_gas_separator"
+    ],
+    "subtitle": "subtitles.wildcatter.mud_gas_separator"
+  },
+  "storage_compressor": {
+    "sounds": [
+      "wildcatter:storage_compressor"
+    ],
+    "subtitle": "subtitles.wildcatter.storage_compressor"
+  },
+  "frasch_lift": {
+    "sounds": [
+      "wildcatter:frasch_lift"
+    ],
+    "subtitle": "subtitles.wildcatter.frasch_lift"
   }
 }

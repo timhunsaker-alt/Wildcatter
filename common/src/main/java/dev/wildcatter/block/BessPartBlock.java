@@ -69,8 +69,12 @@ public class BessPartBlock extends BigPartBlock {
 
 	@Override
 	protected <T extends BlockEntity> BlockEntityTicker<T> mainTicker(Level level, BlockState state, BlockEntityType<T> type) {
-		if (level.isClientSide()) {
-			return null;
+		if (level.isClientSide()) {   // a PCS's or cabinet's whine, looped while it runs
+			return (l, p, s, e) -> {
+				if (e instanceof dev.wildcatter.kinetic.Sounding) {
+					dev.wildcatter.kinetic.RunningSound.clientTick(e);
+				}
+			};
 		}
 		return (l, p, s, e) -> {
 			if (e instanceof BessInverterBlockEntity inv) {
@@ -81,6 +85,23 @@ public class BessPartBlock extends BigPartBlock {
 				BessPlantControllerBlockEntity.tick(l, p, s, plant);
 			}
 		};
+	}
+
+	/**
+	 * 22c: under {@code bessThermalRunaway} an explosion's blast reaching a battery container sets it off (a vessel burst, TNT); its blocks are
+	 * spared, for it burns out to scrap. With the rule off it is blown up as any block.
+	 */
+	@Override
+	protected void onExplosionHit(BlockState state, net.minecraft.server.level.ServerLevel level, BlockPos pos, net.minecraft.world.level.Explosion explosion,
+			java.util.function.BiConsumer<ItemStack, BlockPos> drops) {
+		if (part == Part.BESS_CONTAINER && dev.wildcatter.Rules.on(dev.wildcatter.Rules.Rule.BESS_THERMAL_RUNAWAY)
+				&& explosion.getBlockInteraction() != net.minecraft.world.level.Explosion.BlockInteraction.TRIGGER_BLOCK
+				&& explosion.getBlockInteraction() != net.minecraft.world.level.Explosion.BlockInteraction.KEEP
+				&& level.getBlockEntity(main(pos, state)) instanceof BessContainerBlockEntity box) {
+			box.blasted(level);
+			return;
+		}
+		super.onExplosionHit(state, level, pos, explosion, drops);
 	}
 
 	@Override

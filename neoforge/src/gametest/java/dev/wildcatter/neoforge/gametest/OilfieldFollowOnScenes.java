@@ -10,6 +10,7 @@ import static dev.wildcatter.neoforge.gametest.GridSceneKit.read;
 import dev.wildcatter.Tuning;
 import dev.wildcatter.WildcatterBlocks;
 import dev.wildcatter.WildcatterItems;
+import dev.wildcatter.block.GasTurbineBlockEntity;
 import dev.wildcatter.block.RigSubstructureBlockEntity;
 import dev.wildcatter.block.RigSubstructureBlockEntity.Solid;
 import dev.wildcatter.fluid.Product;
@@ -420,6 +421,7 @@ final class OilfieldFollowOnScenes {
 		place(helper, WildcatterBlocks.BOP_ACCUMULATOR, 18, y, -12, Direction.NORTH);
 		place(helper, WildcatterBlocks.BOP_STACK, 30, y + 1, 0, Direction.NORTH);
 		int[] step = {0};
+		boolean[] sepHeard = {false};   // the separator's loop seen on while gas comes off the choke
 		int[] mark = {0};
 		double[] bias = {0};
 		double[] kill = {0, 0};   // the tick the kill started, restarts after another second kick
@@ -495,6 +497,11 @@ final class OilfieldFollowOnScenes {
 							bias[0] = margin + 2;
 							log(scene, String.format("on schedule: DPP %.1f against %.1f | too far closed by %.1f psi", well.dppGauge(), rig.schedulePsi(), bias[0]));
 							check(helper, Math.abs(well.dppGauge() - rig.schedulePsi()) < 8, "the operator should hold the schedule: " + now);
+							// mud circulating up the choke line and through the open choke: the manifold's running loop is on (synced to the client)
+							var manifold = GridSceneKit.entity(helper, 30, y, -9, dev.wildcatter.block.ChokeManifoldBlockEntity.class);
+							var sep = GridSceneKit.entity(helper, 32, y, -8, dev.wildcatter.block.MudGasSeparatorBlockEntity.class);
+							check(helper, manifold.flowingNow() && manifold.loop() == dev.wildcatter.WildcatterSounds.CHOKE_FLOW, "flow through the choke should run the manifold's loop");
+							log(scene, "sounds: manifold " + manifold.loop() + ", separator " + sep.loop() + " (gas through it " + sep.through() + " m3)");
 							mark[0] = at;
 							step[0] = 5;
 						}
@@ -532,11 +539,17 @@ final class OilfieldFollowOnScenes {
 						if (at % 400 == 0) {
 							log(scene, String.format("killing: gas %.1f L, top %.0f m, lightest %.2f, annulus %.2f | %s", well.gasL(), well.gasTopM(), well.lightestPpg(), well.annulusPpg(), now));
 						}
+						if (GridSceneKit.entity(helper, 32, y, -8, dev.wildcatter.block.MudGasSeparatorBlockEntity.class).gasNow()) {
+							sepHeard[0] = true;
+						}
 						if (well.strokes() > sheet.strokesCirculation() + 5 && !well.gasInHole() && well.lightestPpg() + 0.05 >= rig.killWeight() - 1e-6) {
 							double minutes = well.strokes() / Tuning.SCR_SPM;   // minutes of pumping at SCR since the last shut-in
 							log(scene, String.format("kill mud round after %.1f minutes | %s", minutes, now));
 							check(helper, minutes < 12, "the kill should take under 12 minutes: " + minutes);
 							check(helper, rig.losses() == WellControl.Losses.NONE, "on schedule no losses: " + now);
+							var sep = GridSceneKit.entity(helper, 32, y, -8, dev.wildcatter.block.MudGasSeparatorBlockEntity.class);
+							check(helper, sep.through() < 0.01 || sepHeard[0], "gas through the separator should have run its loop: " + sep.through() + " m3 through it");
+							log(scene, String.format("separator: %.1f m3 of gas through it, loop heard %s", sep.through(), sepHeard[0]));
 							panel(helper).pump(false);
 							step[0] = 8;
 						}
@@ -586,15 +599,26 @@ final class OilfieldFollowOnScenes {
 	 * A 9 x 9 column of rock salt (y 1-10) under a calcite cap, a hole cased into it and a brine wellhead whose brine goes by pipe to a
 	 * disposal wellhead: the injection pump on its 480 V set runs at its full 10 L/s; leached by hook (with cavernStability off) the cavern
 	 * stops at its walls, 5 x 5 by 7 high plus the hole's bottom (176 m3), its record reading 2 m of salt to the flank and 3 over the roof.
-	 * The brine wellhead swapped for a storage wellhead on INJECT, the storage compressor (driven by hook: its 1 MW motor wants more than
-	 * the scene's set) on pipeline gas debrines it to the disposal well, its cushion then by hook: CAVERN DRY, and working gas raises the
-	 * pressure. On WITHDRAW with no dehydrator it reads WET GAS; with the glycol dehydrator (on its own 480 V set, fuel gas to its reboiler)
+	 * The brine wellhead swapped for a storage wellhead on INJECT, the storage compressor on pipeline gas debrines it to the disposal well,
+	 * its cushion then by hook: CAVERN DRY, and working gas raises the pressure. Its 1 MW, 4.16 kV (IEC 3.3 kV) motor starts direct on line
+	 * off the peaker's 12.47 kV (11 kV) feeder through a 1.5 MVA step-down transformer (a GSU back-fed: 5.75 %Z), its inrush dipping
+	 * the 4.16 kV bus. On WITHDRAW with no dehydrator it reads WET GAS; with the glycol dehydrator (on its own 480 V set, fuel gas to its reboiler)
 	 * the gas comes out dry at its outlet. A 3 x 3 salt column beside it, cavernStability on, leaches past its flank wall and breaches.
 	 */
 	static void gasStorage(GameTestHelper helper) {
 		String scene = "gas_storage";
 		int u = 2;
-		floor(helper, -18, -16, 20, 14, 1);
+		floor(helper, -72, -52, 20, 14, 1);
+		// the storage compressor's supply: the peaker's 12.47 kV feeder (x -60..-32, z -50..-26) to a 1.5 MVA 12.47/4.16 kV transformer
+		// beside the compressor, back-fed: its 12.47 kV bushings west, 4.16 kV out of its east face at (-2, -12), the compressor's box
+		GasTurbineBlockEntity gt = ChemicalScenes.peaker(helper, -70, -40);
+		place(helper, WildcatterBlocks.GSU_TRANSFORMER, -3, u, -12, Direction.WEST);   // x -4..-3, z -13..-11; bushings on top of (-4, -12)
+		put(helper, "cable_dist", -5, u + 2, -12);
+		put(helper, "cable_dist", -5, u + 1, -12);
+		ChemicalScenes.run(helper, "cable_dist", new int[] {-34, -45}, new int[] {-28, -45}, new int[] {-28, -16}, new int[] {-5, -16}, new int[] {-5, -12});
+		put(helper, "cable_mv", -2, u, -12);
+		boolean[] peakerUp = {false};
+		ChemicalScenes.startPeaker(helper, -70, -40, gt, () -> peakerUp[0] = true);
 		for (int x = -4; x <= 4; x++) {
 			for (int z = -4; z <= 4; z++) {
 				for (int y = 2; y <= 11; y++) {
@@ -691,20 +715,29 @@ final class OilfieldFollowOnScenes {
 							step[0] = 1;
 						}
 					}
-					case 1 -> {
-						var head = GridSceneKit.entity(helper, 0, 15, 0, dev.wildcatter.block.StorageWellheadBlockEntity.class);
-						var comp = GridSceneKit.entity(helper, -1, u, -12, dev.wildcatter.block.StorageCompressorBlockEntity.class);
-						comp.testDriven();
-						head.setMode(dev.wildcatter.block.StorageWellheadBlockEntity.Mode.INJECT);
-						mark[0] = at;
-						step[0] = 2;
+					case 1 -> {   // once the peaker carries load, the wellhead on INJECT calls the compressor: its motor starts direct on line
+						if (peakerUp[0]) {
+							var head = GridSceneKit.entity(helper, 0, 15, 0, dev.wildcatter.block.StorageWellheadBlockEntity.class);
+							head.setMode(dev.wildcatter.block.StorageWellheadBlockEntity.Mode.INJECT);
+							mark[0] = at;
+							step[0] = 2;
+						} else {
+							check(helper, at < mark[0] + 2000, "the peaker should be carrying load: " + gt.inspect().getString());
+						}
 					}
 					case 2 -> {
 						var head = GridSceneKit.entity(helper, 0, 15, 0, dev.wildcatter.block.StorageWellheadBlockEntity.class);
-						if (at >= mark[0] + 200) {
+						var comp = GridSceneKit.entity(helper, -1, u, -12, dev.wildcatter.block.StorageCompressorBlockEntity.class);
+						if (at == mark[0] + 40) {
+							log(scene, "compressor starting | " + read(helper, -1, u, -12) + " | transformer " + read(helper, -3, u, -12));
+						}
+						if (at >= mark[0] + 200 && head.gas() > 20 || at >= mark[0] + 800) {
 							String h = head.inspect().getString();
-							log(scene, "debrining | " + h + " | compressor " + read(helper, -1, u, -12));
+							log(scene, "debrining | " + h + " | compressor " + read(helper, -1, u, -12) + " | transformer " + read(helper, -3, u, -12));
+							check(helper, comp.motor().state() == dev.wildcatter.circuit.Motor.State.RUNNING && comp.motor().output() > 0.9,
+									"the compressor's 1 MW motor should be running off the 4.16 kV transformer: " + read(helper, -1, u, -12) + " | transformer " + read(helper, -3, u, -12));
 							check(helper, h.contains("DEBRINING") && head.gas() > 20, "the compressor's gas should debrine the cavern to the disposal well: " + h);
+							check(helper, comp.loop() == dev.wildcatter.WildcatterSounds.STORAGE_COMPRESSOR, "compressing, its own loop should play: " + comp.loop());
 							head.testGas(dev.wildcatter.well.Cavern.cushion(head.volume()) - head.gas());
 							mark[0] = at;
 							step[0] = 3;
@@ -765,7 +798,7 @@ final class OilfieldFollowOnScenes {
 							check(helper, th.contains("BREACHED"), "with cavernStability on, leaching past the flank wall should breach the cavern: " + th);
 							step[0] = 99;
 							log(scene, "ok");
-							clear(helper, -18, -16, 20, 14, 1, 20);
+							clear(helper, -72, -52, 20, 14, 1, 20);
 							helper.succeed();
 						} else {
 							check(helper, at < mark[0] + 1500, "the dehydrator should dry withdrawn gas: " + read(helper, 0, u, 8) + " | " + head.inspect().getString());
@@ -849,6 +882,7 @@ final class OilfieldFollowOnScenes {
 						if (head.rate() > 0) {
 							log(scene, "lifting | " + h + " | heater " + read(helper, -16, u, -4) + " | air " + read(helper, -11, u, -4));
 							check(helper, h.contains("lifting") && head.rate() > 1700 && head.rate() < 2100 && heater.temp() >= 150, "the well should lift about 2 t/h of molten sulfur on 165 C water: " + h);
+							check(helper, head.liftingNow() && head.loop() == dev.wildcatter.WildcatterSounds.FRASCH_LIFT, "lifting, the wellhead's loop should be on");
 							check(helper, h.contains("NO BLEED"), "with no bleed water well it should say so: " + h);
 							long before = count(helper, Ore.SULFUR);
 							head.testMelt(Ore.SULFUR.kgPerBlock() * Tuning.FRASCH_YIELD);

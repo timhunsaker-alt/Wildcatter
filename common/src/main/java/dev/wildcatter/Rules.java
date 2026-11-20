@@ -59,8 +59,8 @@ public final class Rules {
 		FUEL_LINE_DEFECTS("fuelLineDefects", true, "pellets crack without zinc stearate, scrap comes out in cans, uninspected assemblies may leak"),
 		/** 19c2: the assembly fixture and the rod loader take 304 stainless and nickel-chromium alloy for the hardware, not steel. */
 		FUEL_NICKEL_HARDWARE("fuelNickelHardware", true, "fuel assemblies take 304 stainless and nickel-chromium alloy hardware, not steel"),
-		/** 22c (docs/multiblocks/grid-batteries.md): a battery container in fire, or beside a burning one, goes into thermal runaway. Never at random. */
-		BESS_THERMAL_RUNAWAY("bessThermalRunaway", true, "a battery container in fire, or touching a burning one, goes into thermal runaway and burns");
+		/** 22c (docs/multiblocks/grid-batteries.md): a battery container in fire, beside a burning one, in a blast or struck by lightning (no ground rod near) goes into thermal runaway. Never at random. */
+		BESS_THERMAL_RUNAWAY("bessThermalRunaway", true, "a battery container in fire, touching a burning one, in a blast or struck by lightning with no ground rod near goes into thermal runaway and burns");
 
 		public final String key;
 		public final boolean newWorld;

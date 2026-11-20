@@ -744,5 +744,9 @@
   "block.wildcatter.bess_cabinet": "Battery Cabinet (125 kW, 261 kWh)",
   "block.wildcatter.bess_mv_skid": "Battery MV Skid (2,750 kVA)",
   "subtitles.wildcatter.contactor_clunk": "Battery contactors close",
-  "subtitles.wildcatter.inverter_whine": "Inverter whines"
+  "subtitles.wildcatter.inverter_whine": "Inverter whines",
+  "subtitles.wildcatter.choke_flow": "Choke manifold rushes",
+  "subtitles.wildcatter.mud_gas_separator": "Mud-gas separator churns",
+  "subtitles.wildcatter.storage_compressor": "Gas compressor thumps",
+  "subtitles.wildcatter.frasch_lift": "Frasch well gurgles"
 }

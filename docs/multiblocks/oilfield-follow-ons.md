@@ -270,6 +270,10 @@ was at Spindletop).
   needle tick (subtle); the compressor's reciprocating thump; the dehydrator's reboiler burner; the Frasch heater's burners and steam
   hammer, molten sulfur pouring into the vat; a breach's rumble and the sinkhole's collapse; a sonar ping while surveying.
 - **Visuals:** the separator's flare; the sonar outline; surface cracks before a roof breach; yellow molten sulfur in the vat.
+- **As built (0.10.1):** four Ludo running loops (questions item 25): `choke_flow` while a kill's flow goes through the choke manifold,
+  `mud_gas_separator` while gas goes through the separator, `storage_compressor` while the compressor runs, `frasch_lift` while the Frasch
+  wellhead lifts. The hydraulic pump, the gauge's tick, the dehydrator's and heater's burners, the vat's pour, the breach's rumble and the
+  sonar ping are not made.
 
 ## Game tests and client scenes
 NeoForge game scenes:
@@ -282,7 +286,8 @@ NeoForge game scenes:
   operator (a PLC PID in the scene) kills the well in under 12 minutes; the same with the choke held too far closed: LOST CIRCULATION at
   the shoe; too far open: a second kick; NO CHOKE with the manifold removed (rule on); rule off, the old kill.
 - `gas_storage` (23c): a brine well leaches a placed salt column to its limit (by hook for speed); the sonar reads the volume; debrining
-  sends brine to a disposal well; the compressor fills cushion then working gas; withdrawal through the dehydrator feeds a gas set;
+  sends brine to a disposal well; the compressor, its 1 MW motor started direct on line off the peaker's feeder through a 1.5 MVA
+  12.47/4.16 kV transformer (questions item 24), fills cushion then working gas; withdrawal through the dehydrator feeds a gas set;
   WET GAS without it; with `cavernStability` on, leaching past the wall breaches it.
 - `frasch` (23d): a placed caprock with sulfur blocks: the wellhead lifts molten sulfur to the acid plant's melter and to a vat; sulfur
   blocks in reach turn to calcite; NO BLEED cuts the rate to a third.

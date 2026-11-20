@@ -1458,10 +1458,10 @@ sized for a 40-pot line.
 
 ## Known gaps
 - Phase 23 (oilfield follow-ons): the six new item icons are Ludo art (3 credits); the parts are true-size models in existing
-  materials. No new sounds (the spec's choke hiss, compressor thump, sonar ping and so on use
-  vanilla sounds or none). The client scenes `chokeKill`, `saltCavern`, `frasch` and `lostCirculation` are not written. The storage
-  compressor's scene runs it by a hook (its 1 MW motor wants a bigger supply than the scene's set). The `frasch` scene does not pipe to
-  the acid plant's furnace.
+  materials. Four Ludo running loops (0.10.1: the choke manifold's flow, the mud-gas separator, the storage compressor, the Frasch
+  wellhead); the spec's other sounds (the hydraulic pump, the gauge's tick, the burners, the vat's pour, the breach's rumble, the sonar
+  ping) are not made. The client scenes `chokeKill`, `saltCavern`, `frasch` and `lostCirculation` are not written. The `frasch` scene does
+  not pipe to the acid plant's furnace.
 - Phase 21 (the quest book, 2026-11-14): The first 480 V three-phase
   supply now comes from the 75 kVA dry-type step-up (Tim's answer 10, 2026-11-14). Wells, the rig and the lease are
   found by their items, not by milestones. Tailings' and Farmings' chapters come in their own releases.
@@ -2375,8 +2375,7 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
   clunk and the inverter's whine.
 - **Tests:** unit `BessTest`; NeoForge scenes `cell_plant`, `bess_block`, `bess_peak_shave`, `bess_forming`, `bess_runaway` (the full NeoForge
   suite passed with them); client screenshots `cellPlant` and `bess` (`WILDCATTER_ONLY=cellPlant,bess`).
-- **Known gaps:** explosions and lightning do not set a container off; no CT part for peak shaving a named feeder; the PCS's whine is a repeated
-  one-shot, not a loop; spent modules have no recycler; the client films of a block discharging, a black start and a runaway are not
+- **Known gaps:** no CT part for peak shaving a named feeder; spent modules have no recycler; the client films of a block discharging, a black start and a runaway are not
   made yet (screenshots only).
 
 ## Phase 23: the oilfield follow-ons (branch `w-oilfield`; spec `docs/multiblocks/oilfield-follow-ons.md`; decisions `docs/questions/oilfield-follow-ons.md` 9 on)

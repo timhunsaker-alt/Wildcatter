@@ -3389,7 +3389,10 @@ lang.update({f"block.{ns}.graphite_line": "Graphite Line", f"block.{ns}.graphite
 	f"block.{ns}.bess_container": "Battery Container (5 MWh)", f"block.{ns}.bess_pcs": "Battery PCS (2.5 MW)",
 	f"block.{ns}.bess_plant_controller": "Battery Plant Controller", f"block.{ns}.bess_cabinet": "Battery Cabinet (125 kW, 261 kWh)",
 	f"block.{ns}.bess_mv_skid": "Battery MV Skid (2,750 kVA)", "subtitles.wildcatter.contactor_clunk": "Battery contactors close",
-	"subtitles.wildcatter.inverter_whine": "Inverter whines"})
+	"subtitles.wildcatter.inverter_whine": "Inverter whines",
+	# 0.10.1: the oilfield follow-ons' running loops
+	"subtitles.wildcatter.choke_flow": "Choke manifold rushes", "subtitles.wildcatter.mud_gas_separator": "Mud-gas separator churns",
+	"subtitles.wildcatter.storage_compressor": "Gas compressor thumps", "subtitles.wildcatter.frasch_lift": "Frasch well gurgles"})
 save_json(f"{ASSETS}/lang/en_us.json", lang)
 
 # ---- Wave A art (2026-11-19, C23): every item icon still drawn as a *_placeholder takes its Ludo icon once art/final/ore has it -----

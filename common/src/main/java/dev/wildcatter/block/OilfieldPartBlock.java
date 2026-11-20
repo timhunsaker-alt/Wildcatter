@@ -74,8 +74,8 @@ public class OilfieldPartBlock extends BigPartBlock implements net.minecraft.wor
 	protected <T extends BlockEntity> BlockEntityTicker<T> mainTicker(Level level, BlockState state, BlockEntityType<T> type) {
 		if (level.isClientSide()) {
 			return (l, p, s, e) -> {
-				if (e instanceof UnitMotorBlockEntity motor) {
-					dev.wildcatter.kinetic.RunningSound.clientTick(motor);
+				if (e instanceof dev.wildcatter.kinetic.Sounding) {   // the motors, and the choke manifold and mud-gas separator while flow goes through
+					dev.wildcatter.kinetic.RunningSound.clientTick(e);
 				}
 			};
 		}
