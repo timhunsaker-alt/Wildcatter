@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " G ",
+    "SCS",
+    "SPS"
+  ],
+  "key": {
+    "G": "minecraft:glass_pane",
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:comparator",
+    "P": "minecraft:piston"
+  },
+  "result": {
+    "id": "wildcatter:remote_choke_panel",
+    "count": 1
+  }
+}

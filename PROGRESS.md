@@ -2369,3 +2369,13 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
   The barite mill grinds calcite or limestone to LCM; the bentonite dryer makes the OBM package (quicklime bags and ammonia). Items:
   casing joint, oilwell cement, LCM bag, CaCl2 bag, OBM package. NeoForge scenes `casing_lot`, `oil_mud`; unit test `WellControlTest`.
   Field Manual: CASING AND LOSSES, OIL MUD.
+- **23b, the choke kill:** `well/KillModel` (mud segments, a rising and expanding gas slug, choke back pressure, the late drill pipe
+  gauge, influx, losses at the shoe). New parts: the choke manifold (2 x 2 x 4, piped from the BOP stack's choke line within 12 blocks),
+  the remote choke panel (1 x 2 x 1 on the rig floor, 0.2 kW residential hydraulic pump; its screen `ChokePanelScreen`: kill sheet,
+  gauges, the drill pipe chart against its schedule, PUMP, METHOD, the choke held OPEN or CLOSE) and the mud-gas separator (1 x 6 x 1,
+  its vent to a flare stack). Under `chokeKill` a deep field needs the manifold (NO CHOKE); a shut-in kick is killed by wait and
+  weight or the driller's method: losses when held too closed, a SECOND KICK when too open, GAS ON THE FLOOR through a blown or missing
+  separator, the flow check and WELL DEAD; off, the Phase 15 one-minute kill stays. PLC points on the panel: CHOKE POSITION command and
+  feedback, DRILL PIPE and CASING PRESSURE, STROKES, PUMP RATE, KILL UNDER WAY. NeoForge scene `choke_kill` (the operator on the panel's
+  PLC points); `WellControlTest` (schedule held, too closed, too open). Field Manual: THE CHOKE KILL.
+

@@ -133,3 +133,31 @@ choices are here; everything else in the spec is decided on the best recommendat
   whose shut-in pressure puts the shoe over 0.5 ppg past its FG is an **underground blowout** at once.
 - **Why:** each follows the spec's rule for what the part does, with the smallest new behaviour.
 - **Alternatives:** LCM kept in the mud; strengthening adding up bag by bag.
+
+### 17. The kill model and the panel (23b)
+- **Chosen:** a column model of the well (`well/KillModel`): mud segments in the string and annulus, one gas slug that rises with the
+  circulation and expands (Boyle), the shut-in annulus a closed volume; back pressure from the choke equation for the pump's flow
+  (1 psi at SCR full open, as (rate/opening)^2), and never under the shut-in pressure bled off as the choke opens to 10 %; drill pipe
+  pressure 2 s per 1,000 ft late. The influx flows with the underbalance; **0.5 m3 of new influx in a kill is a second kick**: the rig
+  closes the choke and stops the pump, and the kill sheet is worked again for the new SIDPP (the kill weight stays unless SIDPP asks for
+  more). The panel is a screen (kill sheet, four gauges, the drill pipe chart against its schedule and casing pressure), the choke held
+  open or closed with the mouse or O and C. **TOTAL losses with the well underbalanced** are the underground blowout in a kill (total
+  losses alone only lose mud).
+- **Why:** the smallest model that makes the real choke operator's job: casing pressure climbing as gas nears the surface, drill pipe
+  pressure as the truth, a schedule that only holds while the choke is right.
+- **Alternatives:** a scripted schedule with no hydraulics (simpler, but nothing to work); a full transient model with gas migration
+  in a closed well (more real, more cost).
+
+### 18. GAS ON THE FLOOR and the separator (23b)
+- **Chosen:** gas reaching the surface goes to the separator, which offers it on its top face for a flare stack on its vent line to burn
+  (vented cold at the top with no flare). With no separator, or with casing pressure over **200 psi while the choke opens faster than
+  5 % a second**, it is GAS ON THE FLOOR; a fire, lava or lit campfire within 16 blocks ignites it as a blowout.
+- **Why:** the spec's "a few hundred psi on a fast choke opening"; a fast opening is what blows a real liquid seal.
+- **Alternatives:** a separator rating in gas flow.
+
+### 19. Finding the parts (23b)
+- **Chosen:** the rig finds the choke manifold by a steel pipe run touching its BOP stack and the manifold (within 12 blocks of the
+  substructure, 21 of its main cell); the separator touching the manifold; the panel on the rig floor (standing on the substructure or
+  within reach). The panel's hydraulic pump is a residential single-phase load; without power the choke moves at the manual 2 %/s.
+- **Why:** the same ways the rig already finds its accumulator and the mud hopper its tanks.
+- **Alternatives:** a choke line part.

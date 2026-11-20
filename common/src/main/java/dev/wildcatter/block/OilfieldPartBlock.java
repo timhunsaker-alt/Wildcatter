@@ -26,7 +26,11 @@ import net.minecraft.world.phys.BlockHitResult;
 public class OilfieldPartBlock extends BigPartBlock implements net.minecraft.world.WorldlyContainerHolder {
 	public enum Part {
 		// 23a: oil mud
-		CALCIUM_CHLORIDE_UNIT("calcium_chloride_unit", Footprint.box(2, 4, 3, 0, 0), CalciumChlorideUnitBlockEntity::new);
+		CALCIUM_CHLORIDE_UNIT("calcium_chloride_unit", Footprint.box(2, 4, 3, 0, 0), CalciumChlorideUnitBlockEntity::new),
+		// 23b: the choke manifold, its remote panel and the mud-gas separator
+		CHOKE_MANIFOLD("choke_manifold", Footprint.box(2, 2, 4, 0, 0), ChokeManifoldBlockEntity::new),
+		REMOTE_CHOKE_PANEL("remote_choke_panel", Footprint.box(1, 2, 1, 0, 0), ChokePanelBlockEntity::new),
+		MUD_GAS_SEPARATOR("mud_gas_separator", Footprint.box(1, 6, 1, 0, 0), MudGasSeparatorBlockEntity::new);
 
 		private final String id;
 		private final Footprint footprint;
@@ -119,6 +123,10 @@ public class OilfieldPartBlock extends BigPartBlock implements net.minecraft.wor
 			return InteractionResult.SUCCESS;
 		}
 		BlockEntity entity = level.getBlockEntity(main(pos, state));
+		if (entity instanceof ChokePanelBlockEntity panel && !player.isShiftKeyDown() && player instanceof net.minecraft.server.level.ServerPlayer sp) {
+			panel.open(sp);   // the kill is worked on its screen
+			return InteractionResult.SUCCESS;
+		}
 		if (player.isShiftKeyDown() && entity instanceof SneakAction action) {
 			player.sendOverlayMessage(Component.literal(action.sneakClick()));
 			return InteractionResult.SUCCESS;

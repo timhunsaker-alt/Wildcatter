@@ -717,5 +717,8 @@
   "item.wildcatter.oilwell_cement": "Bag of Oilwell Cement (class H)",
   "item.wildcatter.lcm_bag": "Bulk Bag of LCM (sized calcium carbonate)",
   "item.wildcatter.cacl2_bag": "Bulk Bag of Calcium Chloride Flake (77 %)",
-  "item.wildcatter.obm_package": "Bulk Bag of OBM Package (emulsifier, organoclay, lime)"
+  "item.wildcatter.obm_package": "Bulk Bag of OBM Package (emulsifier, organoclay, lime)",
+  "block.wildcatter.choke_manifold": "Choke Manifold (5,000 psi)",
+  "block.wildcatter.remote_choke_panel": "Remote Choke Panel",
+  "block.wildcatter.mud_gas_separator": "Mud-Gas Separator"
 }

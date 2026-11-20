@@ -529,6 +529,298 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		sync();
 	}
 
+	// ---- 23b: the choke manifold and the hand kill (docs/multiblocks/oilfield-follow-ons.md) ------------------------------------------
+	private @Nullable BlockPos manifoldAt, separatorAt, panelAt;
+	private boolean flare;
+	private long systemAt = -1000, panelSeen = -1000;
+	/** The driller's method: 1 in its first circulation (old mud, ICP held), 2 in the second; 0 for wait and weight. */
+	private int drillers;
+	private double secondFrom;
+	private double influxFrom;
+	/** The mud weight the kill sheet was worked out for (the string's, after a second kick). */
+	private double sheetOmw;
+	private double gasVented;
+	private String killNote = "";
+	/** Game test hook: model steps a tick (a faster kill). */
+	private int killSteps = 1;
+
+	/** The remote choke panel on the floor tells the rig it is there, every interval. */
+	void panelHere(BlockPos at, long now) {
+		panelAt = at;
+		panelSeen = now;
+	}
+
+	public @Nullable ChokePanelBlockEntity panel() {
+		return level != null && panelAt != null && level.getGameTime() - panelSeen < 40
+				&& dev.wildcatter.multiblock.BigParts.entity(level, panelAt) instanceof ChokePanelBlockEntity p ? p : null;
+	}
+
+	/** Finds the choke manifold piped from the BOP stack's choke line within 12 blocks, the separator against it and a flare on its vent. */
+	private void findChokeSystem(ServerLevel level) {
+		if (level.getGameTime() - systemAt < 20) {
+			return;
+		}
+		systemAt = level.getGameTime();
+		manifoldAt = separatorAt = null;
+		flare = false;
+		BopStackBlockEntity stack = bop();
+		if (stack == null) {
+			return;
+		}
+		java.util.List<Lines.Face> faces = Lines.faces(dev.wildcatter.multiblock.BigParts.cells(stack.getBlockPos(), stack.getBlockState()));
+		for (Lines.Line line : Lines.lines(level, faces)) {
+			for (BlockPos pipe : line.pipes()) {
+				for (Direction side : Direction.values()) {
+					if (manifoldAt == null && dev.wildcatter.multiblock.BigParts.entity(level, pipe.relative(side)) instanceof ChokeManifoldBlockEntity m
+							&& m.getBlockPos().closerThan(worldPosition, Tuning.CHOKE_REACH + 9)) {
+						manifoldAt = m.getBlockPos();
+					}
+				}
+			}
+		}
+		if (manifoldAt == null || !(level.getBlockEntity(manifoldAt) instanceof ChokeManifoldBlockEntity manifold)) {
+			return;
+		}
+		MudGasSeparatorBlockEntity sep = Touching.find(level, manifoldAt, MudGasSeparatorBlockEntity.class, s -> true);
+		if (sep != null) {
+			separatorAt = sep.getBlockPos();
+			flare = sep.ventsToFlare(level);
+		}
+		manifold.rigHere(worldPosition, level.getGameTime());
+	}
+
+	public boolean hasChoke() {
+		return manifoldAt != null;
+	}
+
+	public boolean hasSeparator() {
+		return separatorAt != null;
+	}
+
+	/** With {@code chokeKill}, the next block reaches a deep field and there is no choke manifold on the BOP's choke line. */
+	private boolean needsChoke(ServerLevel level) {
+		if (!dev.wildcatter.Rules.chokeKill()) {
+			return false;
+		}
+		Reservoir field = Drilling.field(level, hole());
+		if (field == null || !field.deep() || hole().getY() - (depth + 1) > field.topY()) {
+			return false;
+		}
+		findChokeSystem(level);
+		return manifoldAt == null;
+	}
+
+	public dev.wildcatter.well.@Nullable KillModel well() {
+		return well;
+	}
+
+	/** The kill sheet worked out at shut-in, or null with no kill under way. */
+	public dev.wildcatter.well.WellControl.@Nullable KillSheet killSheet() {
+		if (well == null) {
+			return null;
+		}
+		dev.wildcatter.well.WellControl.KillSheet sheet = dev.wildcatter.well.WellControl.killSheet(sidpp, sicp, sheetOmw > 0 ? sheetOmw : well.omw, tvdFeet(), well.shoeM * Tuning.FEET_PER_M, well.fgPpg);
+		if (sheetOmw > 0) {
+			// after a second kick the kill weight is the first sheet's unless the new SIDPP asks for more (no second trip margin)
+			double kmw = Math.max(killPpg, sheet.kmwExact());
+			sheet = new dev.wildcatter.well.WellControl.KillSheet(sheet.sidpp(), sheet.sicp(), sheet.omw(), sheet.kmwExact(), kmw, sheet.scrPsi(), sheet.icp(),
+					sheet.scrPsi() * kmw / sheet.omw(), sheet.strokesToBit(), sheet.strokesBitToShoe(), sheet.strokesShoeToSurface(), sheet.maasp());
+		}
+		return sheet;
+	}
+
+	/** The drill pipe pressure the schedule asks for now: the kill sheet's, or ICP held through the driller's first circulation. */
+	public double schedulePsi() {
+		dev.wildcatter.well.WellControl.KillSheet sheet = killSheet();
+		if (sheet == null) {
+			return 0;
+		}
+		if (drillers == 1) {
+			return sheet.icp();
+		}
+		return sheet.schedule(well.strokes() - (drillers == 2 ? secondFrom : 0));
+	}
+
+	/** The kill weight the tanks must reach, ppg. */
+	public double killWeight() {
+		return killPpg;
+	}
+
+	public int drillersMethod() {
+		return drillers;
+	}
+
+	/** The panel's method switch: wait and weight, or the driller's method (before the pump starts). */
+	public String toggleMethod() {
+		if (well == null || well.strokes() > 1) {
+			return "The method is set before the kill starts";
+		}
+		drillers = drillers == 0 ? 1 : 0;
+		setChanged();
+		return drillers == 0 ? "WAIT AND WEIGHT: weight the tanks to the kill weight, then bring the pump up" : "DRILLER'S METHOD: first circulation on the old mud, holding ICP";
+	}
+
+	public double gasVented() {
+		return gasVented;
+	}
+
+	public String killNote() {
+		return killNote;
+	}
+
+	public void testKillSteps(int steps) {
+		killSteps = Math.max(1, steps);
+	}
+
+	/** Each tick of a shut-in well under {@code chokeKill}: the panel's pump and choke worked against the well model. */
+	private void chokeKill(ServerLevel level, double power) {
+		findChokeSystem(level);
+		ChokePanelBlockEntity panel = panel();
+		if (manifoldAt == null) {
+			status = status() + ": NO CHOKE: pipe a choke manifold to the BOP stack's choke line within " + Tuning.CHOKE_REACH + " blocks";
+			return;
+		}
+		if (panel == null) {
+			status = status() + ": NO CHOKE PANEL: set a remote choke panel on the rig floor";
+			return;
+		}
+		dev.wildcatter.well.WellControl.KillSheet sheet = killSheet();
+		for (int k = 0; k < killSteps && phase == Phase.SHUT_IN; k++) {
+			double target = panel.pumpOn() && power > 0.01 && mudVolume() > 1000 ? Tuning.SCR_SPM : 0;
+			double spm = well.spm();
+			spm = target > spm ? Math.min(target, spm + Tuning.PUMP_SPM_PER_S / 20) : Math.max(target, spm - Tuning.PUMP_SPM_PER_S * 2 / 20);
+			double rate = (panel.powered() ? Tuning.HYDRAULIC_CHOKE_PER_S : Tuning.MANUAL_CHOKE_PER_S) / 20;
+			double before = well.choke();
+			double want = panel.chokeTarget(level.getGameTime(), before);
+			double choke = Math.max(before - rate, Math.min(before + rate, want));
+			well.step(0.05, mudPpg(), spm, choke);
+			double opening = (choke - before) * 20;
+			// the mud lost at the shoe
+			dev.wildcatter.well.WellControl.Losses now = dev.wildcatter.well.WellControl.losses(well.shoeEmw(), weakFg());
+			if (well.lossLps() > 0) {
+				useMud(well.lossLps() / 20);
+				lostMud += well.lossLps() / 20000;
+			}
+			if (now != losses && now != dev.wildcatter.well.WellControl.Losses.NONE) {
+				Drilling.announce(level, hole(), Component.literal(String.format("LOST CIRCULATION at the shoe in the kill: %.1f ppg against %.1f. Open the choke.", well.shoeEmw(), weakFg())));
+			}
+			losses = now;
+			if (now == dev.wildcatter.well.WellControl.Losses.TOTAL && well.bhpPsi() < well.porePsi()) {   // losses and a kick at once
+				underground(level);
+				return;
+			}
+			// gas at the surface: through the separator to the flare, or on the floor
+			if (well.ventedL() > 0) {
+				gasVented += well.ventedL() / 1000;
+				boolean blown = separatorAt == null || (well.casingPsi() > Tuning.SEPARATOR_SEAL_PSI && opening > Tuning.SEPARATOR_FAST_OPEN_PER_S);
+				if (blown) {
+					gasOnFloor(level);
+					if (phase != Phase.SHUT_IN) {
+						return;
+					}
+				} else if (separatorAt != null && level.getBlockEntity(separatorAt) instanceof MudGasSeparatorBlockEntity sep) {
+					sep.gasThrough(level, well.ventedL() / 1000);
+				}
+			}
+			// too little back pressure: a second kick
+			if (well.influxL() - influxFrom > Tuning.SECOND_KICK_M3 * 1000) {
+				secondKick(level, panel);
+				return;
+			}
+			// the driller's method: the first circulation ends once the gas is out and a circulation pumped
+			if (drillers == 1 && sheet != null && !well.gasInHole() && well.strokes() >= sheet.strokesCirculation() && mudPpg() + 1e-6 >= killPpg) {
+				drillers = 2;
+				secondFrom = well.strokes();
+			}
+			// killed: kill mud all round, the choke open, the pump stopped and both gauges at zero, then a minute's flow check
+			boolean killMudRound = well.lightestPpg() + 0.05 >= killPpg && !well.gasInHole();
+			if (killMudRound && well.spm() < 1e-6 && choke >= 0.95 && well.casingPsi() < 1.5 && well.dppNow() < 1.5) {
+				flowCheck++;
+				if (well.influxL() > influxFrom + 1) {
+					flowCheck = 0;
+					influxFrom = well.influxL();
+				}
+				if (flowCheck >= Tuning.FLOW_CHECK_TICKS) {
+					wellDead(level);
+					return;
+				}
+			} else {
+				flowCheck = 0;
+			}
+		}
+		pitGain = well.gasL() / 1000;
+		killNote = flowCheck > 0 ? String.format("FLOW CHECK: %d s", (Tuning.FLOW_CHECK_TICKS - flowCheck) / 20)
+				: well.spm() < 1e-6 && well.strokes() < 1 ? "bring the pump up to SCR on the panel, opening the choke to hold casing pressure at SICP"
+				: killMudRound() ? "kill mud all round: stop the pump, open the choke full, flow check" : "hold drill pipe pressure on the schedule with the choke";
+		status = String.format("KILL%s: pump %.0f spm, choke %.0f %%, DPP %,.0f psi (schedule %,.0f), casing %,.0f psi, %,.0f strokes; %s%s",
+				drillers == 1 ? " (driller's 1st circulation)" : drillers == 2 ? " (driller's 2nd)" : "", well.spm(), well.choke() * 100, well.dppGauge(), schedulePsi(),
+				well.casingPsi(), well.strokes(), killNote, losses != dev.wildcatter.well.WellControl.Losses.NONE ? "; LOST CIRCULATION at the shoe" : "");
+	}
+
+	private boolean killMudRound() {
+		return well != null && well.lightestPpg() + 0.05 >= killPpg && !well.gasInHole();
+	}
+
+	/** Too little back pressure let more influx in: the schedule no longer holds; shut in and start again. */
+	private void secondKick(ServerLevel level, ChokePanelBlockEntity panel) {
+		panel.stopForSecondKick();
+		pitGain = well.gasL() / 1000;
+		well.shutInAgain();   // the choke closed and the pump stopped: the new shut-in pressures, the stroke counter from zero
+		double[] shut = well.shutInPressures();
+		sidpp = shut[0];
+		sicp = shut[1];
+		sheetOmw = well.stringPpg();
+		influxFrom = well.influxL();
+		drillers = drillers == 0 ? 0 : 1;
+		flowCheck = 0;
+		dev.wildcatter.well.WellControl.KillSheet sheet = killSheet();
+		if (sheet != null) {
+			killPpg = sheet.kmw();
+		}
+		Drilling.announce(level, hole(), Component.literal(String.format("SECOND KICK: the choke was held too far open and the well took more influx. Shut in: SIDPP %,.0f psi, SICP %,.0f psi. Start the kill again.", sidpp, sicp)));
+		setChanged();
+	}
+
+	/** Gas on the rig floor: no separator, or its seal blown by a fast opening at high casing pressure. A fire within 16 blocks lights it. */
+	private void gasOnFloor(ServerLevel level) {
+		killNote = "GAS ON THE FLOOR";
+		BlockPos h = hole();
+		if (level.getGameTime() % 10 == 0) {
+			level.sendParticles(net.minecraft.core.particles.ParticleTypes.CLOUD, h.getX() + 0.5, h.getY() + 7, h.getZ() + 0.5, 8, 0.8, 0.5, 0.8, 0.02);
+			Drilling.announce(level, h, Component.literal(separatorAt == null ? "GAS ON THE FLOOR: no mud-gas separator against the choke manifold"
+					: "GAS ON THE FLOOR: the separator's liquid seal blew on a fast choke opening"));
+		}
+		if (fireNear(level, h)) {
+			ignite(level, h);
+			phase = Phase.BLOWOUT;
+			BLOWING.add(this);
+			sync();
+		}
+	}
+
+	/** The kill is done: the BOP opens and the rig drills on into the field, as a strike. */
+	private void wellDead(ServerLevel level) {
+		BopStackBlockEntity stack = bop();
+		if (stack != null) {
+			stack.setClosed(false);
+		}
+		ChokePanelBlockEntity panel = panel();
+		if (panel != null) {
+			panel.stopForSecondKick();
+		}
+		well = null;
+		losses = dev.wildcatter.well.WellControl.Losses.NONE;
+		Drilling.announce(level, hole(), Component.literal("WELL DEAD: the flow check holds. The BOP opens."));
+		dev.wildcatter.quest.QuestEvents.milestone(level, hole(), dev.wildcatter.quest.Milestones.WELL_KILLED_CHOKE);
+		phase = Phase.DRILLING;
+		Reservoir field = Drilling.field(level, hole());
+		if (field != null) {
+			strike(level, field);
+		}
+		setChanged();
+		sync();
+	}
+
 	/** The casing for a readout. */
 	private String casingText() {
 		if (shoeDepth == 0) {
@@ -568,6 +860,11 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 			sidpp = shut[0];
 			sicp = shut[1];
 			flowCheck = 0;
+			influxFrom = 0;
+			sheetOmw = 0;
+			drillers = 0;
+			secondFrom = 0;
+			gasVented = 0;
 			if (dev.wildcatter.well.WellControl.losses(well.shoeEmw(), weakFg()) == dev.wildcatter.well.WellControl.Losses.TOTAL) {
 				stack.setClosed(true);
 				underground(level);
@@ -624,6 +921,10 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 				}
 			}
 			case SHUT_IN -> {
+				if (well != null && dev.wildcatter.Rules.chokeKill()) {
+					chokeKill(level, power);   // 23b: the kill through the choke, by hand or by a PLC
+					break;
+				}
 				if (mudPpg() + 1e-6 < killPpg) {
 					status = status() + ": weight the mud to the kill weight";
 				} else {
@@ -1093,6 +1394,10 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		if (connecting()) {
 			return Tuning.LAND_RIG_CONNECTION_WATTS;
 		}
+		if (phase == Phase.SHUT_IN && well != null && dev.wildcatter.Rules.chokeKill()) {
+			ChokePanelBlockEntity panel = panel();
+			return panel != null && panel.pumpOn() || well.spm() > 0 ? Tuning.LAND_RIG_DRILL_WATTS : Tuning.LAND_RIG_IDLE_WATTS;
+		}
 		if (phase == Phase.SHUT_IN && mudPpg() + 1e-6 >= killPpg) {
 			return Tuning.LAND_RIG_DRILL_WATTS;   // the mud pumps circulating kill mud through the choke
 		}
@@ -1199,6 +1504,8 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		} else if (rig.needsBop(server)) {
 			rig.status = "NO BOP: the deep field ahead is geopressured: set a BOP STACK under the rotary table and its ACCUMULATOR within "
 					+ Tuning.ACCUMULATOR_REACH + " blocks";
+		} else if (rig.needsChoke(server)) {
+			rig.status = "NO CHOKE: the rule chokeKill wants a CHOKE MANIFOLD piped from the BOP stack's choke line within " + Tuning.CHOKE_REACH + " blocks before a deep field";
 		} else if (rig.lossCheck(server)) {
 			rig.status = rig.lossText();
 		} else if (rig.washout(server)) {
@@ -1458,6 +1765,11 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		output.putDouble("sicp", sicp);
 		output.putInt("flowCheck", flowCheck);
 		output.putString("well", well == null ? "" : well.save());
+		output.putInt("drillers", drillers);
+		output.putDouble("secondFrom", secondFrom);
+		output.putDouble("influxFrom", influxFrom);
+		output.putDouble("sheetOmw", sheetOmw);
+		output.putDouble("gasVented", gasVented);
 		net.minecraft.world.ContainerHelper.saveAllItems(output, rack);
 	}
 
@@ -1507,6 +1819,11 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 		flowCheck = input.getIntOr("flowCheck", 0);
 		String w = input.getStringOr("well", "");
 		well = w.isEmpty() ? null : dev.wildcatter.well.KillModel.load(w);
+		drillers = input.getIntOr("drillers", 0);
+		secondFrom = input.getDoubleOr("secondFrom", 0);
+		influxFrom = input.getDoubleOr("influxFrom", 0);
+		sheetOmw = input.getDoubleOr("sheetOmw", 0);
+		gasVented = input.getDoubleOr("gasVented", 0);
 		rack.clear();
 		net.minecraft.world.ContainerHelper.loadAllItems(input, rack);
 	}

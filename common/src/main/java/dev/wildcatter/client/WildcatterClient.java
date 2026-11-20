@@ -41,6 +41,8 @@ public final class WildcatterClient {
 		dev.wildcatter.control.PlcNet.client = tag -> {
 			if (tag.contains("hoaView")) {
 				HoaOverlay.fromServer(tag);
+			} else if (tag.contains("chokePanel")) {
+				ChokePanelScreen.fromServer(tag);
 			} else if (tag.contains("hmi")) {
 				HmiScreen.fromServer(tag);
 			} else {

@@ -471,6 +471,9 @@
     "wildcatter:lioh_crystallizer",
     "wildcatter:lithium_carbonator",
     "wildcatter:dry_type_transformer",
-    "wildcatter:calcium_chloride_unit"
+    "wildcatter:calcium_chloride_unit",
+    "wildcatter:choke_manifold",
+    "wildcatter:remote_choke_panel",
+    "wildcatter:mud_gas_separator"
   ]
 }

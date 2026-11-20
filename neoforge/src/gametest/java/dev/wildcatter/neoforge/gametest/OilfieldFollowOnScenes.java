@@ -50,6 +50,7 @@ final class OilfieldFollowOnScenes {
 		Map<String, Consumer<GameTestHelper>> scenes = new LinkedHashMap<>();
 		scenes.put("casing_lot", OilfieldFollowOnScenes::casingLot);
 		scenes.put("oil_mud", OilfieldFollowOnScenes::oilMud);
+		scenes.put("choke_kill", OilfieldFollowOnScenes::chokeKill);
 		return scenes;
 	}
 
@@ -124,6 +125,29 @@ final class OilfieldFollowOnScenes {
 		}
 	}
 
+	/**
+	 * The choke manifold (x 30-31, z -9..-6) piped from the BOP stack's north side down the substructure's BOP space; with {@code all}, the
+	 * mud-gas separator against it (x 32, z -8), its vent to a flare stack (x 34), and the remote choke panel on the rig floor.
+	 */
+	static void chokeSystem(GameTestHelper helper, int y, boolean all) {
+		for (int z = -5; z <= -1; z++) {
+			put(helper, "gas_line", 30, y + 1, z);
+		}
+		place(helper, WildcatterBlocks.CHOKE_MANIFOLD, 30, y, -9, Direction.NORTH);
+		if (all) {
+			place(helper, WildcatterBlocks.MUD_GAS_SEPARATOR, 32, y, -8, Direction.NORTH);
+			put(helper, "gas_line", 32, y + 6, -8);
+			put(helper, "gas_line", 33, y + 6, -8);
+			place(helper, WildcatterBlocks.FLARE_STACK, 34, y, -8, Direction.NORTH);
+			place(helper, WildcatterBlocks.REMOTE_CHOKE_PANEL, 33, y + 6, -3, Direction.NORTH);
+		}
+	}
+
+	/** The remote choke panel on the rig floor ({@link #chokeSystem}). */
+	static dev.wildcatter.block.ChokePanelBlockEntity panel(GameTestHelper helper) {
+		return GridSceneKit.entity(helper, 33, FLOOR_Y - abs(helper, 0, 0, 0).getY() + 1 + 6, -3, dev.wildcatter.block.ChokePanelBlockEntity.class);
+	}
+
 	private static void finish(GameTestHelper helper, String scene, String text, int y, ReservoirData.TestRegion region) {
 		log(scene, text);
 		if (region != null) {
@@ -145,6 +169,7 @@ final class OilfieldFollowOnScenes {
 		RigSubstructureBlockEntity rig = OilfieldScenes.landRig(helper, y);
 		place(helper, WildcatterBlocks.BOP_ACCUMULATOR, 18, y, -12, Direction.NORTH);
 		place(helper, WildcatterBlocks.BOP_STACK, 30, y + 1, 0, Direction.NORTH);
+		chokeSystem(helper, y, false);   // chokeKill: no deep field without a choke manifold
 		int above = 8;
 		int[] step = {0};
 		int[] mark = {0};
@@ -285,6 +310,7 @@ final class OilfieldFollowOnScenes {
 		RigSubstructureBlockEntity rig = OilfieldScenes.landRig(helper, y);
 		place(helper, WildcatterBlocks.BOP_ACCUMULATOR, 18, y, -12, Direction.NORTH);
 		place(helper, WildcatterBlocks.BOP_STACK, 30, y + 1, 0, Direction.NORTH);
+		chokeSystem(helper, y, false);
 		for (int k = 3; k <= 5; k++) {
 			helper.getLevel().setBlock(hole.below(k), OreBlocks.block(Ore.HALITE).defaultBlockState(), 3);
 		}
@@ -368,5 +394,188 @@ final class OilfieldFollowOnScenes {
 				}
 			});
 		}
+	}
+
+	// ---- choke_kill (23b) ----------------------------------------------------------------------------------------------------------
+	/**
+	 * A land rig cased 8 blocks above a forced deep field, its choke manifold left off: NO CHOKE stops it short of the field. With the
+	 * manifold, separator, flare and panel set it drills in at 12.8 ppg and kicks; shut in, the kill sheet's SIDPP, kill weight, ICP and
+	 * FCP match the hand figures. Weighted to the kill weight, the pump brought up on the panel and the choke held on the schedule by a
+	 * scripted operator on the panel's PLC points (its CHOKE POSITION command, reading DRILL PIPE PRESSURE and PUMP RATE, as a PLC's PID
+	 * would): held too far closed the shoe takes LOST CIRCULATION; held too far open the well takes a SECOND KICK and is shut in again;
+	 * then held on schedule it kills the well in under 12 minutes (the model run 3 steps a tick, by hook): kill mud round, the pump
+	 * stopped and the choke open, the flow check, WELL DEAD, and the rig strikes.
+	 */
+	static void chokeKill(GameTestHelper helper) {
+		String scene = "choke_kill";
+		BlockPos o = abs(helper, 0, 0, 0);
+		int y = FLOOR_Y - o.getY() + 1;
+		BlockPos hole = abs(helper, 30, y, 0);
+		Reservoir[] field = new Reservoir[1];
+		ReservoirData.TestRegion region = deepField(helper, hole, field);
+		floor(helper, -16, -16, 52, 18, y - 1);
+		RigSubstructureBlockEntity rig = OilfieldScenes.landRig(helper, y);
+		place(helper, WildcatterBlocks.BOP_ACCUMULATOR, 18, y, -12, Direction.NORTH);
+		place(helper, WildcatterBlocks.BOP_STACK, 30, y + 1, 0, Direction.NORTH);
+		int[] step = {0};
+		int[] mark = {0};
+		double[] bias = {0};
+		double[] kill = {0, 0};   // the tick the kill started, restarts after another second kick
+		GridSceneKit.start(helper, 10, y, 7, () -> {});
+		helper.runAfterDelay(40, () -> {
+			check(helper, rig.formed() && rig.installTopDrive(), "the rig should be built: " + read(helper, 26, y, -4));
+			weigh(rig, 12.8);
+			rig.testDepth(hole.getY() - field[0].topY() - 8);
+			rig.rackUp(new ItemStack(WildcatterItems.CASING_JOINT, rig.jointsNeeded()));
+			rig.rackUp(new ItemStack(WildcatterItems.OILWELL_CEMENT, Tuning.CASING_CEMENT_BAGS));
+			rig.consoleCasing(helper.getLevel());
+			rig.testCasingDone();
+		});
+		for (int t = 400; t <= 11900; t++) {
+			final int at = t;
+			helper.runAfterDelay(t, () -> {
+				if (step[0] >= 3 && step[0] < 99) {
+					operate(rig, bias[0], step[0] == 3);
+				}
+				if (at % 10 != 0) {
+					return;
+				}
+				String now = read(helper, 26, y, -4);
+				switch (step[0]) {
+					case 0 -> {
+						if (rig.phase() == RigSubstructureBlockEntity.Phase.IDLE && rig.shoeDepth() > 0) {
+							check(helper, Math.abs(rig.weakFg() - 15.4) < 1e-6, "the shoe 8 blocks above the field should hold 15.4: " + now);
+							rig.toggle();
+							step[0] = 1;
+						}
+					}
+					case 1 -> {
+						if (now.contains("NO CHOKE")) {
+							log(scene, "no choke | " + now);
+							int d = rig.depthNow();
+							check(helper, hole.getY() - (d + 1) <= field[0].topY(), "NO CHOKE should stop it just short of the deep field: " + now);
+							chokeSystem(helper, y, true);
+							panel(helper).testHydraulics();
+							step[0] = 2;
+						}
+					}
+					case 2 -> {
+						if (rig.phase() == RigSubstructureBlockEntity.Phase.KICK) {
+							String shut = rig.shutIn(helper.getLevel()).getString();
+							log(scene, "shut in | " + shut);
+							WellControl.KillSheet sheet = rig.killSheet();
+							check(helper, rig.phase() == RigSubstructureBlockEntity.Phase.SHUT_IN && rig.well() != null && sheet != null, "shut in, the well should be in the kill model: " + shut);
+							double tvd = rig.depthNow() * Tuning.FEET_PER_M;
+							double sidpp = 0.052 * (Tuning.DEEP_PORE_PPG - 12.8) * tvd;
+							log(scene, String.format("kill sheet: SIDPP %.1f (hand %.1f), SICP %.1f, KMW %.2f, ICP %.1f, FCP %.1f, strokes to bit %d, circulation %d, MAASP %.1f",
+									sheet.sidpp(), sidpp, sheet.sicp(), sheet.kmw(), sheet.icp(), sheet.fcp(), sheet.strokesToBit(), sheet.strokesCirculation(), rig.maasp()));
+							check(helper, Math.abs(sheet.sidpp() - sidpp) < 2.0, "SIDPP should be 0.052 x (13.5 - 12.8) x TVD: " + sheet.sidpp() + " against " + sidpp);
+							check(helper, Math.abs(sheet.kmwExact() - Tuning.DEEP_PORE_PPG) < 0.1, "the kill weight should be the pore pressure's 13.5: " + sheet.kmwExact());
+							check(helper, Math.abs(sheet.icp() - (sheet.sidpp() + Tuning.SCR_PSI)) < 1e-6 && Math.abs(sheet.fcp() - Tuning.SCR_PSI * sheet.kmw() / 12.8) < 0.5,
+									"ICP = SIDPP + SCR pressure, FCP = SCR x KMW / OMW: " + sheet.icp() + ", " + sheet.fcp());
+							weigh(rig, sheet.kmw());
+							rig.testKillSteps(3);
+							panel(helper).pump(true);
+							mark[0] = at;
+							step[0] = 3;
+						}
+					}
+					case 3 -> {   // the pump coming up, the choke opened to hold SICP
+						if (rig.well().spm() >= Tuning.SCR_SPM - 1e-6) {
+							mark[0] = at;
+							step[0] = 4;
+						}
+					}
+					case 4 -> {   // on schedule a while, then too far closed
+						if (at >= mark[0] + 60) {
+							var well = rig.well();
+							double margin = (well.fgPpg - well.shoeEmw()) * 0.052 * well.shoeM * Tuning.FEET_PER_M;
+							bias[0] = margin + 2;
+							log(scene, String.format("on schedule: DPP %.1f against %.1f | too far closed by %.1f psi", well.dppGauge(), rig.schedulePsi(), bias[0]));
+							check(helper, Math.abs(well.dppGauge() - rig.schedulePsi()) < 8, "the operator should hold the schedule: " + now);
+							mark[0] = at;
+							step[0] = 5;
+						}
+					}
+					case 5 -> {
+						if (rig.losses() != WellControl.Losses.NONE) {
+							log(scene, "too far closed | " + now);
+							check(helper, now.contains("LOST CIRCULATION"), "held too far closed the shoe should take losses: " + now);
+							bias[0] = -15;
+							mark[0] = at;
+							step[0] = 6;
+						} else {
+							check(helper, rig.phase() == RigSubstructureBlockEntity.Phase.SHUT_IN && at < mark[0] + 400, "held too far closed it should lose mud at the shoe: " + now);
+						}
+					}
+					case 6 -> {   // too far open: a second kick
+						if (rig.well() != null && rig.well().strokes() < 1 && !rig.panel().pumpOn() && at > mark[0] + 10) {
+							log(scene, "too far open | " + now);
+							bias[0] = 0;
+							panel(helper).pump(true);
+							kill[0] = at;
+							step[0] = 7;
+						} else {
+							check(helper, at < mark[0] + 1600, "held too far open the well should take a second kick: " + now);
+						}
+					}
+					case 7 -> {   // the kill on schedule, to kill mud round
+						var well = rig.well();
+						var sheet = rig.killSheet();
+						if (!rig.panel().pumpOn() && well.strokes() < 1) {   // shut in again after another second kick: start again
+							check(helper, ++kill[1] <= 3, "the kill should not keep taking second kicks: " + now);
+							log(scene, "shut in again, starting again | " + now);
+							panel(helper).pump(true);
+						}
+						if (at % 400 == 0) {
+							log(scene, String.format("killing: gas %.1f L, top %.0f m, lightest %.2f, annulus %.2f | %s", well.gasL(), well.gasTopM(), well.lightestPpg(), well.annulusPpg(), now));
+						}
+						if (well.strokes() > sheet.strokesCirculation() + 5 && !well.gasInHole() && well.lightestPpg() + 0.05 >= rig.killWeight() - 1e-6) {
+							double minutes = well.strokes() / Tuning.SCR_SPM;   // minutes of pumping at SCR since the last shut-in
+							log(scene, String.format("kill mud round after %.1f minutes | %s", minutes, now));
+							check(helper, minutes < 12, "the kill should take under 12 minutes: " + minutes);
+							check(helper, rig.losses() == WellControl.Losses.NONE, "on schedule no losses: " + now);
+							panel(helper).pump(false);
+							step[0] = 8;
+						}
+					}
+					case 8 -> {
+						if (at % 200 == 0) {
+							log(scene, "flow check | " + now);
+						}
+						if (now.contains("WELL COMPLETE")) {
+							check(helper, helper.getLevel().getBlockState(hole).is(WildcatterBlocks.OIL_WELLHEAD), "WELL DEAD, it should strike: " + now);
+							step[0] = 99;
+							finish(helper, scene, "ok: NO CHOKE, kill sheet, losses closed, second kick open, killed on schedule, dead and struck | " + now, y, region);
+						}
+					}
+					default -> {
+					}
+				}
+			});
+		}
+	}
+
+	/** The scripted choke operator on the panel's PLC points: open the choke as the pump comes up holding SICP, then hold the schedule (+ bias). */
+	private static void operate(RigSubstructureBlockEntity rig, double bias, boolean pumpUp) {
+		var panel = rig.panel();
+		var well = rig.well();
+		if (panel == null || well == null) {
+			return;
+		}
+		double spm = (panel.readMa(5) - 4) / 16 * 60;
+		double choke = (panel.readMa(1) - 4) / 16;
+		double next;
+		if (!panel.pumpOn()) {
+			next = rig.killNote().startsWith("kill mud all round") || rig.killNote().startsWith("FLOW CHECK") ? 1.0 : 0.0;   // the pump stopped: closed, or open for the flow check
+		} else if (pumpUp || spm < Tuning.SCR_SPM - 1e-6) {
+			double r = Math.min(1, (spm + Tuning.PUMP_SPM_PER_S * 3 / 20) / Tuning.SCR_SPM);
+			next = r * Math.sqrt(Tuning.CHOKE_K_PSI / Math.max(1, rig.killSheet().sicp()));
+		} else {
+			double dpp = (panel.readMa(2) - 4) / 16 * 1000;
+			double err = dpp - (rig.schedulePsi() + bias);
+			next = choke * Math.max(1 / 1.03, Math.min(1.03, Math.exp(0.02 * err * 0.15)));   // a PID's output rate limit
+		}
+		panel.commandMa(0, 4 + 16 * Math.max(panel.pumpOn() ? 0.001 : 0, Math.min(1, next)), rig.getLevel().getGameTime());
 	}
 }

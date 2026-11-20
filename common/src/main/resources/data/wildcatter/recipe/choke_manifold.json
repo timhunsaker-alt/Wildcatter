@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SVS",
+    "PVP",
+    "SVS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "V": "minecraft:lever",
+    "P": "wildcatter:gas_line"
+  },
+  "result": {
+    "id": "wildcatter:choke_manifold",
+    "count": 1
+  }
+}

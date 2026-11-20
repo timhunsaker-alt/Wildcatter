@@ -97,6 +97,9 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 	public static final BlockEntityType<dev.wildcatter.block.BopAccumulatorBlockEntity> BOP_ACCUMULATOR_ENTITY = entity(dev.wildcatter.block.BopAccumulatorBlockEntity::new, BOP_ACCUMULATOR);
 	// Phase 23 (docs/multiblocks/oilfield-follow-ons.md)
 	public static final BlockEntityType<dev.wildcatter.block.CalciumChlorideUnitBlockEntity> CALCIUM_CHLORIDE_UNIT_ENTITY = entity(dev.wildcatter.block.CalciumChlorideUnitBlockEntity::new, CALCIUM_CHLORIDE_UNIT);
+	public static final BlockEntityType<dev.wildcatter.block.ChokeManifoldBlockEntity> CHOKE_MANIFOLD_ENTITY = entity(dev.wildcatter.block.ChokeManifoldBlockEntity::new, CHOKE_MANIFOLD);
+	public static final BlockEntityType<dev.wildcatter.block.ChokePanelBlockEntity> REMOTE_CHOKE_PANEL_ENTITY = entity(dev.wildcatter.block.ChokePanelBlockEntity::new, REMOTE_CHOKE_PANEL);
+	public static final BlockEntityType<dev.wildcatter.block.MudGasSeparatorBlockEntity> MUD_GAS_SEPARATOR_ENTITY = entity(dev.wildcatter.block.MudGasSeparatorBlockEntity::new, MUD_GAS_SEPARATOR);
 	public static final BlockEntityType<dev.wildcatter.block.MeterBuildingBlockEntity> METER_BUILDING_ENTITY = entity(dev.wildcatter.block.MeterBuildingBlockEntity::new, METER_BUILDING);
 	public static final BlockEntityType<dev.wildcatter.block.SalesGasUnitBlockEntity> SALES_GAS_UNIT_ENTITY = entity(dev.wildcatter.block.SalesGasUnitBlockEntity::new, FILTER_SEPARATOR, ULTRASONIC_METER_RUN, REGULATOR_SKID, PIPELINE_TAP);
 	public static final BlockEntityType<dev.wildcatter.block.AcidSuperheaterBlockEntity> ACID_SUPERHEATER_ENTITY = entity(dev.wildcatter.block.AcidSuperheaterBlockEntity::new, ACID_SUPERHEATER);
@@ -706,6 +709,9 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("bop_stack"), BOP_STACK_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("bop_accumulator"), BOP_ACCUMULATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("calcium_chloride_unit"), CALCIUM_CHLORIDE_UNIT_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("choke_manifold"), CHOKE_MANIFOLD_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("remote_choke_panel"), REMOTE_CHOKE_PANEL_ENTITY);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("mud_gas_separator"), MUD_GAS_SEPARATOR_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("sales_gas_unit"), SALES_GAS_UNIT_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("converter"), CONVERTER_ENTITY);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Wildcatter.id("final_absorber"), FINAL_ABSORBER_ENTITY);

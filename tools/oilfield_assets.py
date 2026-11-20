@@ -96,6 +96,16 @@ shaped("casing_joint", ["S", "S", "S"], {"S": S_}, "casing_joint", 2)
 # cement: quicklime and clay (the gypsum-free variant, plain clay doubled; the mod has no gypsum item: decisions 11)
 shapeless("oilwell_cement", [f"{ns}:quicklime_bag", "minecraft:clay_ball", "minecraft:clay_ball", "minecraft:clay_ball", "minecraft:clay_ball"], "oilwell_cement")
 
-json_out = dict(sorted(LANG.items())) if False else LANG
-save_json(f"{ASSETS}/lang/en_us.json", json_out)
+# ---- 23b: the choke manifold, the remote choke panel and the mud-gas separator ----------------------------------------------------
+PARTS_23B = ("choke_manifold", "remote_choke_panel", "mud_gas_separator")
+for name in PARTS_23B:
+	big_part_loot(name)
+tags(PARTS_23B)
+shaped("choke_manifold", ["SVS", "PVP", "SVS"], {"S": S_, "V": "minecraft:lever", "P": P_}, "choke_manifold")
+shaped("remote_choke_panel", [" G ", "SCS", "SPS"], {"G": "minecraft:glass_pane", "S": S_, "C": "minecraft:comparator", "P": "minecraft:piston"}, "remote_choke_panel")
+shaped("mud_gas_separator", ["SPS", "S S", "SPS"], {"S": S_, "P": P_}, "mud_gas_separator")
+LANG.update({f"block.{ns}.choke_manifold": "Choke Manifold (5,000 psi)", f"block.{ns}.remote_choke_panel": "Remote Choke Panel",
+	f"block.{ns}.mud_gas_separator": "Mud-Gas Separator"})
+
+save_json(f"{ASSETS}/lang/en_us.json", LANG)
 print("oilfield assets written")
