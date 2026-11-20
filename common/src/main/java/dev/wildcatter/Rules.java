@@ -38,6 +38,11 @@ public final class Rules {
 		MUD_GEL("mudGel", true, "plain water and thin mud are LOW GEL and drill at half rate"),
 		/** 15b2 and the washout: a deep field kicks under light mud and needs a BOP (NO BOP); unsaturated mud washes out in rock salt. */
 		WELL_CONTROL("wellControl", true, "kicks, NO BOP into a deep field, blowouts, and washouts in rock salt"),
+		/** 23a-23b: the casing shoe's fracture gradient and lost circulation, and a kick killed through a choke manifold by hand or by a PLC;
+		 * off, the Phase 15 one-minute circulation kills a kick and no mud is lost to the formation. */
+		CHOKE_KILL("chokeKill", true, "the shoe's fracture gradient, lost circulation, and a kick killed through a choke manifold"),
+		/** 23c: a salt cavern leached past its walls or held under its minimum pressure for a game week breaches (flood or sinkhole). */
+		CAVERN_STABILITY("cavernStability", true, "salt caverns breach when leached past their walls or held under minimum pressure"),
 		/** Plant residence times as real holds: coking 18 h, digestion 1 h, precipitation 36 h. Off even in new worlds. */
 		REAL_RESIDENCE_TIMES("realResidenceTimes", false, "coking 18 h, digestion 1 h and precipitation 36 h as real holds"),
 		/** 17c1: the Kroll reactor's two retorts and the VAR furnace's ingots run as batches, and the line loses scrap (84 % to tube). */
@@ -176,6 +181,14 @@ public final class Rules {
 
 	public static boolean wellControl() {
 		return on(Rule.WELL_CONTROL);
+	}
+
+	public static boolean chokeKill() {
+		return on(Rule.CHOKE_KILL);
+	}
+
+	public static boolean cavernStability() {
+		return on(Rule.CAVERN_STABILITY);
 	}
 
 	public static boolean isrExcursions() {
