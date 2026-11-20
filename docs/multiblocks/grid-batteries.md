@@ -1,8 +1,5 @@
-# Grid batteries: a battery energy storage system on the AC grid, and the LFP cell plant that feeds it
-
-> **DRAFT spec (2026-11-19), Wave B step 1: for Tim's review, nothing built.** Questions for Tim are at the end and in
-> `docs/questions/grid-batteries.md`. Everything not asked there is decided on the best recommendation and says so. Proposed phase
-> **22** (three waves, 22a-22c); the number is only a placeholder until Tim schedules it.
+> **APPROVED by Tim 2026-11-19** (every question answered with the recommended option, `docs/questions/grid-batteries.md`).
+> Phase **22** (waves 22a-22c). See "As built" at the end.
 
 Wildcatter's grid today has only rotating sources: gensets, steam and gas turbines, the reactor. Nothing on it stores energy, and
 the lithium plant (20c) makes hydroxide and carbonate with one small use (the potline bath). Graphite schist and cobaltite have no
