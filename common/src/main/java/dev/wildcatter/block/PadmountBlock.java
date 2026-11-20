@@ -38,6 +38,13 @@ public class PadmountBlock extends BigTransformerBlock {
 		return new PadmountBlock(properties, PADMOUNT, shapeName, low, high, ratedVa, percentZ, 1, false);
 	}
 
+	/** 22b: the battery block's MV skid, 3 x 3 x 3: its low side (delta) at the main cell's end, its high side (the RMU) at the far end. */
+	public static final Footprint MV_SKID = Footprint.box(3, 3, 3, 0, 0);
+
+	public static PadmountBlock mvSkid(Properties properties, Voltage low, Voltage high, double ratedVa, double percentZ) {
+		return new PadmountBlock(properties, MV_SKID, "bess_mv_skid", low, high, ratedVa, percentZ, 2, false);
+	}
+
 	public static PadmountBlock unitSubstation(Properties properties, Voltage low, Voltage high, double ratedVa, double percentZ) {
 		return new PadmountBlock(properties, UNIT_SUBSTATION, "unit_substation", low, high, ratedVa, percentZ, 3, true);
 	}

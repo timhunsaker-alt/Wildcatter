@@ -65,6 +65,14 @@ public class WildcatterJeiPlugin implements IModPlugin {
 		registration.addItemStackInfo(new ItemStack(WildcatterItems.LI2CO3_BAG), Component.literal("Lithium carbonate from the lithium carbonator. In a potline "
 				+ "pot's hopper it goes into the bath and the pot runs 0.1 V lower."));
 		registration.addItemStackInfo(new ItemStack(WildcatterItems.SODIUM_SULFATE_BAG), Component.literal("Sodium sulfate from the LiOH crystallizer. No use yet."));
+		registration.addItemStackInfo(new ItemStack(WildcatterItems.SPHERICAL_GRAPHITE_BAG), Component.literal("Spherical graphite (95 % C) from the graphite line, "
+				+ "for the graphite furnace."));
+		registration.addItemStackInfo(new ItemStack(WildcatterItems.PURIFIED_GRAPHITE_BAG), Component.literal("Battery-grade graphite (99.95 % C) from the graphite "
+				+ "furnace: the anode of the cell line's LFP cells."));
+		registration.addItemStackInfo(new ItemStack(WildcatterItems.LFP_CATHODE_BAG), Component.literal("LiFePO4/C cathode powder from the LFP kiln, for the cell line."));
+		registration.addItemStackInfo(new ItemStack(WildcatterItems.LFP_MODULE), Component.literal("An LFP module from the cell line: 52 cells of 314 Ah, 52.2 kWh. "
+				+ "Right-click them into a battery container (96) or a battery cabinet (5); a full, worn container takes 96 new ones to renew it."));
+		registration.addItemStackInfo(new ItemStack(WildcatterItems.SPENT_LFP_MODULE), Component.literal("A worn module out of a renewed container. No recycler yet."));
 		registration.addItemStackInfo(new ItemStack(WildcatterItems.MAGNESIA), Component.literal("Caustic-calcined magnesia (MgO), "
 				+ "from magnesite in a furnace. The uranium mill's precipitation tank uses it to precipitate the uranium, and the "
 				+ "magnesia chlorinator turns it into MgCl2 for the magnesium cell."));

@@ -212,6 +212,11 @@ public interface FuelCycleBlocks {
 	Block LITHIUM_LEACH = chemPart(dev.wildcatter.block.ChemPartBlock.Part.LITHIUM_LEACH);
 	Block LIOH_CRYSTALLIZER = chemPart(dev.wildcatter.block.ChemPartBlock.Part.LIOH_CRYSTALLIZER);
 	Block LITHIUM_CARBONATOR = chemPart(dev.wildcatter.block.ChemPartBlock.Part.LITHIUM_CARBONATOR);
+	// Phase 22a: the LFP cell plant (docs/multiblocks/grid-batteries.md)
+	Block GRAPHITE_LINE = chemPart(dev.wildcatter.block.ChemPartBlock.Part.GRAPHITE_LINE);
+	Block GRAPHITE_FURNACE = chemPart(dev.wildcatter.block.ChemPartBlock.Part.GRAPHITE_FURNACE);
+	Block LFP_KILN = chemPart(dev.wildcatter.block.ChemPartBlock.Part.LFP_KILN);
+	Block CELL_LINE = chemPart(dev.wildcatter.block.ChemPartBlock.Part.CELL_LINE);
 	Block RECTIFIER_MV = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.RECTIFIER_MV);
 	// 16b2: the full-size conversion plant's larger main line (docs/multiblocks/conversion-extensions.md)
 	Block REDUCTION_REACTOR_LARGE = conversionPart(dev.wildcatter.block.ConversionPartBlock.Part.REDUCTION_REACTOR_LARGE);

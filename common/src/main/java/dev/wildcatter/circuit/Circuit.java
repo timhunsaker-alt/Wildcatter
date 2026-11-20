@@ -25,6 +25,20 @@ public final class Circuit {
 		network.frequency(hertz);
 	}
 
+	private double machineWatts;
+
+	/**
+	 * What the island's machines (its generators that are not storage) delivered at the last solve, W (22b): a battery's peak shaver holds
+	 * it under a limit. 0 on an island with no machine.
+	 */
+	public double machineWatts() {
+		return machineWatts;
+	}
+
+	public void setMachineWatts(double watts) {
+		machineWatts = watts;
+	}
+
 	private static Network.Cell cell(BlockPos pos) {
 		return new Network.Cell(pos.getX(), pos.getY(), pos.getZ());
 	}

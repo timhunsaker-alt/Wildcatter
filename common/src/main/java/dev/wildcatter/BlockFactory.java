@@ -134,6 +134,11 @@ final class BlockFactory {
 				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
 	}
 
+	static Block bessPart(dev.wildcatter.block.BessPartBlock.Part part) {
+		return block(part.id(), props -> new dev.wildcatter.block.BessPartBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
+				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));
+	}
+
 	static Block chemPart(dev.wildcatter.block.ChemPartBlock.Part part) {
 		return block(part.id(), props -> new dev.wildcatter.block.ChemPartBlock(props.mapColor(MapColor.COLOR_LIGHT_GRAY)
 				.strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion(), part));

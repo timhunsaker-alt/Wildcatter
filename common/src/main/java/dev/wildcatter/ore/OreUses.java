@@ -77,7 +77,8 @@ public final class OreUses {
 			case PENTLANDITE -> List.of("the nickel smelter's fluid-bed roaster, as ore or as flotation concentrate from Tailings' concentrator (Bessemer matte, then cathode nickel at the refinery)");
 			case SPODUMENE -> List.of("the lithium plant's decrepitation kiln (lithium hydroxide and carbonate)");
 			case DOLOMITE -> List.of("the lime kiln, burned to dolime for the Pidgeon furnace (magnesium)");
-			case PLATINUM, GRAPHITE, COBALTITE -> List.of();
+			case GRAPHITE -> List.of("the cell plant's graphite line (battery anode graphite, for LFP modules and grid batteries)");
+			case PLATINUM, COBALTITE -> List.of();
 		};
 	}
 
