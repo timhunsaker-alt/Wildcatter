@@ -226,6 +226,7 @@ final class BessScenes {
 				log(scene, "charging: " + charging);
 				check(helper, plant.pcs(helper.getLevel()).size() == 1, "the plant controller should find its PCS by control cable: " + charging);
 				check(helper, near(pcs.gridWatts(), -Tuning.PCS_WATTS, 0.06), "the block should charge at about 2.5 MW: " + pcs.gridWatts() + " | " + charging);
+				check(helper, pcs.whine() >= 9 && pcs.loop() == dev.wildcatter.WildcatterSounds.INVERTER_WHINE, "at full power its whine loop should be on, near the top of its range: " + pcs.whine());
 				double e0 = pcs.energyKwh(helper.getLevel());
 				long t0 = helper.getLevel().getGameTime();
 				plant.setPreset(Preset.DISCHARGE);

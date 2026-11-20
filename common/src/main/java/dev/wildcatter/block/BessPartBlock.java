@@ -69,8 +69,12 @@ public class BessPartBlock extends BigPartBlock {
 
 	@Override
 	protected <T extends BlockEntity> BlockEntityTicker<T> mainTicker(Level level, BlockState state, BlockEntityType<T> type) {
-		if (level.isClientSide()) {
-			return null;
+		if (level.isClientSide()) {   // a PCS's or cabinet's whine, looped while it runs
+			return (l, p, s, e) -> {
+				if (e instanceof dev.wildcatter.kinetic.Sounding) {
+					dev.wildcatter.kinetic.RunningSound.clientTick(e);
+				}
+			};
 		}
 		return (l, p, s, e) -> {
 			if (e instanceof BessInverterBlockEntity inv) {
