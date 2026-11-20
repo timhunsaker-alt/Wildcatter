@@ -198,6 +198,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 				case "remote_choke_panel" -> new Motor(false, Voltage.LOW, Tuning.CHOKE_PANEL_WATTS);   // residential, single-phase
 				case "storage_compressor" -> new Motor(true, Voltage.MEDIUM, Tuning.STORAGE_COMPRESSOR_WATTS);
 				case "glycol_dehydrator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.DEHYDRATOR_WATTS);
+				case "frasch_water_heater" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.FRASCH_CHARGE_PUMP_WATTS);
+				case "lift_air_compressor" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.LIFT_AIR_WATTS);
 				case "bop_accumulator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.ACCUMULATOR_WATTS);
 				case "brine_saturator" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BRINE_SATURATOR_WATTS);
 				case "brine_treatment" -> new Motor(true, Voltage.INDUSTRIAL, Tuning.BRINE_TREATMENT_WATTS);
@@ -372,6 +374,8 @@ public class UnitMotorBlockEntity extends PlantUnitBlockEntity implements Circui
 			case "remote_choke_panel" -> "hydraulic pump";
 			case "storage_compressor" -> "compressor motor";
 			case "glycol_dehydrator" -> "glycol pumps and cooler";
+			case "frasch_water_heater" -> "charge pump";
+			case "lift_air_compressor" -> "screw compressor";
 			case "bop_accumulator" -> "accumulator pump";
 			case "brine_saturator" -> "agitator and brine pumps";
 			case "brine_treatment" -> "clarifier, filter and IX pumps";

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SBS",
+    "PFP",
+    "SBS"
+  ],
+  "key": {
+    "S": "wildcatter:steel_ingot",
+    "B": "minecraft:bricks",
+    "P": "wildcatter:gas_line",
+    "F": "minecraft:blast_furnace"
+  },
+  "result": {
+    "id": "wildcatter:frasch_water_heater",
+    "count": 1
+  }
+}

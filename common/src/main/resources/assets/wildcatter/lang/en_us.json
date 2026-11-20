@@ -724,5 +724,9 @@
   "block.wildcatter.storage_compressor": "Storage Compressor (5 Sm3/s, 1.0 MW)",
   "block.wildcatter.glycol_dehydrator": "Glycol Dehydrator (TEG)",
   "block.wildcatter.storage_wellhead": "Gas Storage Wellhead",
-  "item.wildcatter.sonar_tool": "Sonar Survey Tool"
+  "item.wildcatter.sonar_tool": "Sonar Survey Tool",
+  "block.wildcatter.frasch_water_heater": "Frasch Water Heater (165 C, 2.8 MPa)",
+  "block.wildcatter.lift_air_compressor": "Lift Air Compressor",
+  "block.wildcatter.sulfur_vat": "Sulfur Vat",
+  "block.wildcatter.frasch_wellhead": "Frasch Wellhead"
 }

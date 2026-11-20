@@ -177,3 +177,19 @@ choices are here; everything else in the spec is decided on the best recommendat
 - **Chosen:** the `gas_storage` scene runs the 1 MW medium-voltage compressor by a test hook (`testDriven`): the scenes' 500 kW diesel
   set cannot start it, and a peaker and a 12.47/4.16 kV step-down is a scene of its own. The dehydrator runs on its own 480 V set.
 - **Alternatives:** the peaker of the chemical scenes and a distribution step-down.
+
+### 22. Frasch: parts found by pipe, no new products (23d)
+- **Chosen:** the Frasch wellhead finds the water heater and the lift air compressor by a steel pipe run on its other sides and asks
+  them each interval (as the storage compressor finds its wellhead), so no new pipe products for hot water and lift air; the molten
+  sulfur goes out as the existing molten sulfur product (litres at 1.79 kg/L), which the acid plant's sulfur furnace takes. The heater's
+  water reaches 165 C only when its burners get the gas for the flow (620 kJ/kg); under 150 C it is NO HOT WATER. The bleed water well is
+  a disposal wellhead whose cased hole ends in caprock, within 16 blocks; the rate falls from full to a third over 10 minutes without
+  one and climbs back as fast with one. The `frasch` scene pipes to a sulfur vat; the acid plant's furnace is not built in it.
+- **Why:** the spec's "finds them by pipe"; a hot water product would be piped nowhere else.
+- **Alternatives:** hot water and lift air as products on the pipe.
+
+### 23. Quests (23a-23d)
+- **Chosen:** five quests after "The lease" in Oil and gas (a casing point, a leak-off test, kill a kick through the choke, oil mud, a
+  storage cavern) and Frasch sulfur after the acid plant in Chemicals. There is no sales line quest, so the storage cavern requires the
+  gas plant's.
+- **Alternatives:** a sales line quest of its own first.

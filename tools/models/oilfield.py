@@ -13,7 +13,12 @@ OilfieldPartBlock's), in the mod's existing materials. Motor terminal boxes are 
 - glycol_dehydrator, 2 x 6 x 3: the TEG contactor tower, the still column and its reboiler firebox (fuel gas on the east), the surge
   tank and pumps; wet gas in at the north, dry gas out at the south;
 - storage_wellhead (one cell): the casing head, the master and wing valves, the subsurface safety valve's control line, the brine
-  wing out of the side it faces."""
+  wing out of the side it faces.
+- frasch_water_heater, 4 x 6 x 8: the softener vessels, two fired heaters with their burners and stacks (gas on the east of the bottom
+  cells), the pressurised hot water drum, the charge pump (its 480 V box on the west of the main cell), the hot water line out;
+- lift_air_compressor, 2 x 3 x 4: a rotary screw package in its enclosure, the air receiver and aftercooler;
+- sulfur_vat, 6 x 2 x 6: a low walled pour vat of yellow sulfur, its pour spout on the north and a loader's ramp;
+- frasch_wellhead (one cell): the three concentric strings' heads: hot water in, air in, molten sulfur out of the side it faces."""
 import mlib
 import plantlib as g
 
@@ -140,15 +145,65 @@ SW.pipe([(0.4, 0.5, 0.5), (0.0, 0.5, 0.5)], 3, "steel")
 SW.box((0.42, 0.95, 0.42), (0.58, 1.0, 0.58), "brass" if "brass" in TEX else "steel")   # the safety valve's control line fitting
 SW.collide((0.3, 0.0, 0.3), (0.7, 1.0, 0.7))
 
+# ---- 23d: the Frasch water heater -----------------------------------------------------------------------------------------------------
+FH = model("frasch_water_heater", 4, 6, 8, "hipaint")
+FH.box((0.0, 0.0, 0.0), (4.0, 0.2, 8.0), "concrete")
+for x in (0.8, 2.0):
+	FH.cylinder("y", (x, 0.9), 0.45, 0.2, 2.6, "polymer", 12)                     # the softener vessels
+for z in (2.8, 5.4):
+	FH.box((0.4, 0.2, z - 1.0), (3.4, 3.4, z + 1.0), "hipaint")                    # the fired heaters
+	FH.cylinder("y", (1.9, z), 0.3, 3.4, 5.9, "steel", 12)                         # their stacks
+	FH.pipe([(4.0, 0.5, z), (3.4, 0.5, z)], 3, "steel")                            # gas to the burners, east
+FH.decal((3.99, 1.0, 2.0), (4.0, 1.6, 2.6), "flammable", "east", "hipaint")
+FH.cylinder("z", (2.6, 2.0), 0.6, 6.6, 7.9, "steel", 16)                         # the hot water drum
+FH.box((0.3, 0.2, 6.7), (1.4, 1.0, 7.8), "blue")                                  # the charge pump
+FH.box((0.0, 0.3, 0.1), (0.3, 0.9, 0.6), "grey")                                  # its 480 V box, west
+FH.decal((-0.01, 0.4, 0.2), (0.0, 0.8, 0.5), "danger", "west", "grey")
+FH.pipe([(1.0, 0.6, 7.8), (1.0, 0.6, 8.0)], 4, "steel")                           # hot water out
+FH.collide((0.0, 0.0, 0.0), (4.0, 5.9, 8.0))
+
+# ---- 23d: the lift air compressor ----------------------------------------------------------------------------------------------------
+LA = model("lift_air_compressor", 2, 3, 4, "blue")
+LA.box((0.0, 0.0, 0.0), (2.0, 0.2, 4.0), "iron")
+LA.box((0.1, 0.2, 0.1), (1.9, 2.0, 2.6), "blue")                                  # the screw package's enclosure
+LA.grille if False else None
+LA.cylinder("y", (1.0, 3.3), 0.5, 0.2, 2.6, "steel", 14)                          # the air receiver
+LA.box((0.0, 0.3, 0.2), (0.3, 0.9, 0.7), "grey")                                  # its 480 V box, west
+LA.decal((-0.01, 0.4, 0.3), (0.0, 0.8, 0.6), "danger", "west", "grey")
+LA.pipe([(1.0, 0.5, 3.8), (1.0, 0.5, 4.0)], 3, "steel")
+LA.collide((0.0, 0.0, 0.0), (2.0, 2.6, 4.0))
+
+# ---- 23d: the sulfur vat ---------------------------------------------------------------------------------------------------------------
+TEX["sulfur"] = "block/ore/sulfur_ore"   # the native sulfur texture, for the sulfur set in the vat
+SV = model("sulfur_vat", 6, 2, 6, "concrete")
+SV.box((0.0, 0.0, 0.0), (6.0, 0.2, 6.0), "concrete")
+for a, b in (((0.0, 0.2, 0.0), (6.0, 1.2, 0.3)), ((0.0, 0.2, 5.7), (6.0, 1.2, 6.0)), ((0.0, 0.2, 0.0), (0.3, 1.2, 6.0)), ((5.7, 0.2, 0.0), (6.0, 1.2, 6.0))):
+	SV.box(a, b, "concrete")                                                         # the vat's walls
+SV.box((0.3, 0.2, 0.3), (5.7, 0.9, 5.7), "sulfur")                                # the sulfur set in it
+SV.pipe([(3.0, 1.4, 0.0), (3.0, 1.4, 0.8)], 4, "steel")                           # the pour spout, north
+SV.collide((0.0, 0.0, 0.0), (6.0, 1.2, 6.0))
+
+# ---- 23d: the Frasch wellhead (one cell) --------------------------------------------------------------------------------------------
+FW = mlib.Model("frasch_wellhead", [(0, 0, 0)], dict(TEX), TEX["hipaint"])
+FW.cylinder("y", (0.5, 0.5), 0.15, -0.2, 0.05, "steel", 12, caps=False)
+FW.cylinder("y", (0.5, 0.5), 0.2, 0.05, 0.3, "hipaint", 14)                       # the outer string's head: hot water in
+FW.pipe([(0.7, 0.18, 0.5), (1.0, 0.18, 0.5)], 3, "steel")
+FW.cylinder("y", (0.5, 0.5), 0.14, 0.3, 0.6, "hipaint", 12)                       # the middle string: molten sulfur out, north
+FW.pipe([(0.5, 0.45, 0.36), (0.5, 0.45, 0.0)], 3, "sulfur")
+FW.cylinder("y", (0.5, 0.5), 0.08, 0.6, 0.95, "steel", 10)                        # the inner string: air in
+FW.pipe([(0.42, 0.8, 0.5), (0.0, 0.8, 0.5)], 2, "steel")
+FW.collide((0.3, 0.0, 0.3), (0.7, 0.95, 0.7))
+
 M = CC
-EXTRA = [CM, CP, MG, SC, GD]
+EXTRA = [CM, CP, MG, SC, GD, FH, LA, SV]
 for extra in EXTRA:
 	extra.export_args = {"blockstate": True, "item": True}
 SW.export_args = {"blockstate": False, "item": True}
-EXTRA.append(SW)
+FW.export_args = {"blockstate": False, "item": True}
+EXTRA += [SW, FW]
 
 
 def after():
 	import gearlib
-	for name in ("storage_wellhead",):
+	for name in ("storage_wellhead", "frasch_wellhead"):
 		gearlib.save_blockstate(name, {f"facing={facing}": {"model": f"wildcatter:block/{name}/p0", **({"y": y} if y else {})} for facing, y in gearlib.ROT.items()})

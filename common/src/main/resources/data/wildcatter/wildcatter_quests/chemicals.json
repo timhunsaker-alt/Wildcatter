@@ -52,6 +52,25 @@
       ]
     },
     {
+      "id": "frasch",
+      "title": "Frasch sulfur",
+      "icon": "wildcatter:frasch_wellhead",
+      "text": "Drill into a salt dome's caprock and set a Frasch wellhead: 165 C water from a Frasch water heater, lift air from a compressor, and a bleed water well into the same caprock. Molten sulfur goes straight to the acid plant's furnace or to a vat.",
+      "requires": [
+        "acid_plant"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:frasch_wellhead",
+          "count": 1
+        },
+        {
+          "milestone": "wildcatter:frasch_flowing",
+          "text": "Lift molten sulfur"
+        }
+      ]
+    },
+    {
       "id": "chlor_alkali",
       "title": "Chlor-alkali and DC",
       "icon": "wildcatter:membrane_cell_room",

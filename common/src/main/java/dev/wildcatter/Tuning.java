@@ -302,6 +302,20 @@ public final class Tuning {
 	public static final double DEHYDRATOR_WATTS = 15_000.0;             // the TEG pumps and the cooler, industrial LV
 	public static final double DEHYDRATOR_REBOILER_W = 100_000.0;       // its gas-fired reboiler
 	public static final int SONAR_TICKS = 600;                          // a sonar survey takes 30 s
+
+	// ---- 23d: Frasch sulfur (Wikipedia, Frasch process; proposed unless marked) ---------------------------------------------------------
+	public static final double FRASCH_SULFUR_KGS = 2_000.0 / 3600;      // 2 t of sulfur an hour a well
+	public static final double FRASCH_WATER_PER_SULFUR = 10.0;          // 10 m3 of water a tonne (the source's 3-38)
+	public static final double FRASCH_WATER_J_PER_KG = 620_000.0;       // 20 C to 165 C (derived): 3.4 MW at full rate
+	public static final double FRASCH_HOT_C = 165.0, FRASCH_MIN_C = 150.0, FRASCH_COLD_C = 20.0;
+	public static final double FRASCH_CHARGE_PUMP_WATTS = 75_000.0;     // as the lease's H-pump
+	public static final double LIFT_AIR_WATTS = 110_000.0;              // rotary screw compressor (proposed)
+	public static final int FRASCH_REACH = 6;                           // blocks of caprock round the hole the hot water reaches
+	public static final double FRASCH_YIELD = 0.80;                     // of a native sulfur block's sulfur: 1.7 t
+	public static final int BLEED_REACH = 16;                           // a bleed water well within 16 blocks, into the same caprock
+	public static final int BLEED_FALL_TICKS = 12_000;                  // without one the rate falls to a third in 10 minutes
+	public static final double BLEED_FLOOR = 1.0 / 3;
+	public static final double FRASCH_WATER_HOLD = 20_000.0;            // litres the heater's softener and tank hold
 	public static final double GAS_UNITS_PER_TICK = 1.5;      // a free-flowing well at full pressure
 	/** Fuel a firebox will take from a well before it is full, in ticks of fire. */
 	public static final double FIREBOX_FEED_CAP = 200.0;

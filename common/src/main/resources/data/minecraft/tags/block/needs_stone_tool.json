@@ -378,6 +378,10 @@
     "wildcatter:mud_gas_separator",
     "wildcatter:storage_compressor",
     "wildcatter:glycol_dehydrator",
-    "wildcatter:storage_wellhead"
+    "wildcatter:storage_wellhead",
+    "wildcatter:frasch_water_heater",
+    "wildcatter:lift_air_compressor",
+    "wildcatter:sulfur_vat",
+    "wildcatter:frasch_wellhead"
   ]
 }

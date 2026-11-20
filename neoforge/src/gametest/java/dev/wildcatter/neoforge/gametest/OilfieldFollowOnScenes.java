@@ -52,6 +52,7 @@ final class OilfieldFollowOnScenes {
 		scenes.put("oil_mud", OilfieldFollowOnScenes::oilMud);
 		scenes.put("choke_kill", OilfieldFollowOnScenes::chokeKill);
 		scenes.put("gas_storage", OilfieldFollowOnScenes::gasStorage);
+		scenes.put("frasch", OilfieldFollowOnScenes::frasch);
 		return scenes;
 	}
 
@@ -775,5 +776,127 @@ final class OilfieldFollowOnScenes {
 				}
 			});
 		}
+	}
+
+	// ---- frasch (23d) --------------------------------------------------------------------------------------------------------------
+	/**
+	 * A placed caprock of calcite (13 x 13 x 4) with native sulfur in a third of it, a hole cased into it and a Frasch wellhead: the Frasch
+	 * water heater (water by hook, fuel gas off a test source) and the lift air compressor on a 480 V set, both on the steel pipe to its west
+	 * side; the molten sulfur out of its east side by pipe to a sulfur vat. It lifts molten sulfur at 2 t/h; the sulfur block in hand, melted
+	 * by hook, turns to calcite; with no bleed water well its rate falls to a third (NO BLEED, by hook for the 10 minutes); a disposal
+	 * wellhead on another hole into the caprock within 16 blocks brings it back up; the vat takes the molten sulfur.
+	 */
+	static void frasch(GameTestHelper helper) {
+		String scene = "frasch";
+		int u = 2;
+		floor(helper, -32, -10, 16, 10, 1);
+		int sulfur = 0;
+		for (int x = -6; x <= 6; x++) {
+			for (int z = -6; z <= 6; z++) {
+				for (int y = 2; y <= 5; y++) {
+					boolean s = Math.floorMod(x + 2 * z + y, 3) == 0 && !(x == 0 && z == 0);
+					sulfur += s ? 1 : 0;
+					helper.getLevel().setBlock(abs(helper, x, y, z), s ? OreBlocks.block(Ore.SULFUR).defaultBlockState() : Blocks.CALCITE.defaultBlockState(), 3);
+				}
+			}
+		}
+		put(helper, "casing", 0, 5, 0);
+		put(helper, "casing", 0, 6, 0);
+		BlockPos headPos = abs(helper, 0, 7, 0);
+		helper.getLevel().setBlock(headPos, WildcatterBlocks.FRASCH_WELLHEAD.defaultBlockState().setValue(dev.wildcatter.block.FraschWellheadBlock.FACING, Direction.EAST), 3);
+		// molten sulfur east and down to the vat (x 8-13, z -3..2)
+		for (int x = 1; x <= 7; x++) {
+			put(helper, "gas_line", x, 7, 0);
+		}
+		for (int y = u; y <= 6; y++) {
+			put(helper, "gas_line", 7, y, 0);
+		}
+		place(helper, WildcatterBlocks.SULFUR_VAT, 8, u, -3, Direction.NORTH);
+		// hot water and air: one pipe off its west side, down outside the caprock and west past the compressor to the heater
+		for (int x = -8; x <= -1; x++) {
+			put(helper, "gas_line", x, 7, 0);
+		}
+		for (int y = u; y <= 6; y++) {
+			put(helper, "gas_line", -8, y, 0);
+		}
+		for (int x = -12; x <= -9; x++) {
+			put(helper, "gas_line", x, u, 0);
+		}
+		place(helper, WildcatterBlocks.FRASCH_WATER_HEATER, -16, u, -4, Direction.NORTH);   // x -16..-13, z -4..3; box (-17, -4)
+		place(helper, WildcatterBlocks.LIFT_AIR_COMPRESSOR, -11, u, -4, Direction.NORTH);   // x -11..-10, z -4..-1; box (-12, -4)
+		source(helper, -11, u, 3, Product.PIPELINE_GAS, 2.0);
+		put(helper, "gas_line", -12, u, 3);
+		GridSceneKit.genset(helper, -24, u, -6);
+		ChemicalScenes.run(helper, "cable_industrial", new int[] {-23, -6}, new int[] {-12, -6}, new int[] {-12, -4});   // 500 kcmil: the compressor's start
+		ChemicalScenes.run(helper, "cable_industrial", new int[] {-17, -5}, new int[] {-17, -4});
+		var heater = GridSceneKit.entity(helper, -16, u, -4, dev.wildcatter.block.FraschWaterHeaterBlockEntity.class);
+		var vat = GridSceneKit.entity(helper, 8, u, -3, dev.wildcatter.block.SulfurVatBlockEntity.class);
+		int sulfurBlocks = sulfur;
+		int[] step = {0};
+		int[] mark = {0};
+		GridSceneKit.start(helper, -24, u, -6, () -> {});
+		for (int t = 300; t <= 5900; t += 20) {
+			final int at = t;
+			helper.runAfterDelay(t, () -> {
+				var head = (dev.wildcatter.block.FraschWellheadBlockEntity) helper.getLevel().getBlockEntity(headPos);
+				heater.addWater(20_000);
+				String h = head.inspect().getString();
+				switch (step[0]) {
+					case 0 -> {
+						if (at % 400 == 0) {
+							log(scene, "waiting | " + h + " | heater " + read(helper, -16, u, -4) + " | air " + read(helper, -11, u, -4) + " | set " + read(helper, -24, u, -6) + " | cable " + read(helper, -17, u, -4));
+						}
+						if (head.rate() > 0) {
+							log(scene, "lifting | " + h + " | heater " + read(helper, -16, u, -4) + " | air " + read(helper, -11, u, -4));
+							check(helper, h.contains("lifting") && head.rate() > 1700 && head.rate() < 2100 && heater.temp() >= 150, "the well should lift about 2 t/h of molten sulfur on 165 C water: " + h);
+							check(helper, h.contains("NO BLEED"), "with no bleed water well it should say so: " + h);
+							long before = count(helper, Ore.SULFUR);
+							head.testMelt(Ore.SULFUR.kgPerBlock() * Tuning.FRASCH_YIELD);
+							long after = count(helper, Ore.SULFUR);
+							check(helper, after == before - 1, "the sulfur block in hand, melted out, should turn to calcite: " + before + " -> " + after + " of " + sulfurBlocks);
+							head.testBleedSpent();
+							mark[0] = at;
+							step[0] = 1;
+						}
+					}
+					case 1 -> {
+						if (at >= mark[0] + 40) {
+							log(scene, "no bleed | " + h);
+							check(helper, head.rate() < 2000 * 0.4 && h.contains("NO BLEED"), "without a bleed well the rate should be down to a third: " + h);
+							put(helper, "casing", 4, 5, 4);
+							put(helper, "casing", 4, 6, 4);
+							helper.getLevel().setBlock(abs(helper, 4, 7, 4), WildcatterBlocks.DISPOSAL_WELLHEAD.defaultBlockState(), 3);
+							mark[0] = at;
+							step[0] = 2;
+						}
+					}
+					case 2 -> {
+						if (at >= mark[0] + 200) {
+							log(scene, "bleed well | " + h + " | vat " + read(helper, 8, u, -3));
+							check(helper, head.bleed() > Tuning.BLEED_FLOOR + 0.01 && !h.contains("NO BLEED"), "a bleed water well into the caprock should bring the rate back up: " + h);
+							check(helper, vat.poured() > 0, "the vat should take the molten sulfur: " + read(helper, 8, u, -3));
+							step[0] = 99;
+							log(scene, "ok");
+							clear(helper, -32, -10, 16, 10, 1, 12);
+							helper.succeed();
+						}
+					}
+					default -> {
+					}
+				}
+			});
+		}
+	}
+
+	private static long count(GameTestHelper helper, Ore ore) {
+		long n = 0;
+		for (int x = -6; x <= 6; x++) {
+			for (int z = -6; z <= 6; z++) {
+				for (int y = 2; y <= 5; y++) {
+					n += helper.getLevel().getBlockState(abs(helper, x, y, z)).is(OreBlocks.block(ore)) ? 1 : 0;
+				}
+			}
+		}
+		return n;
 	}
 }

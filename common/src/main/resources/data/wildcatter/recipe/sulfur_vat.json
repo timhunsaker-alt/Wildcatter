@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "B B",
+    "BSB",
+    "BBB"
+  ],
+  "key": {
+    "B": "minecraft:bricks",
+    "S": "wildcatter:steel_ingot"
+  },
+  "result": {
+    "id": "wildcatter:sulfur_vat",
+    "count": 1
+  }
+}

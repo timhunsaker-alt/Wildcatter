@@ -1457,8 +1457,11 @@ sized for a 40-pot line.
 - Tests: `TimeScaleTest`; `world_rules`, `time_scale_holds`; the Fabric client's Create World check.
 
 ## Known gaps
-- Phase 23 (oilfield follow-ons): the new item icons (casing joint, oilwell cement, LCM bag, CaCl2 bag, OBM package) are script-drawn
-  `*_placeholder` until their Ludo art.
+- Phase 23 (oilfield follow-ons): the new item icons (casing joint, oilwell cement, LCM bag, CaCl2 bag, OBM package, sonar tool) are
+  script-drawn `*_placeholder` until their Ludo art. No new sounds (the spec's choke hiss, compressor thump, sonar ping and so on use
+  vanilla sounds or none). The client scenes `chokeKill`, `saltCavern`, `frasch` and `lostCirculation` are not written. The storage
+  compressor's scene runs it by a hook (its 1 MW motor wants a bigger supply than the scene's set). The `frasch` scene does not pipe to
+  the acid plant's furnace.
 - Phase 21 (the quest book, 2026-11-14): The first 480 V three-phase
   supply now comes from the 75 kVA dry-type step-up (Tim's answer 10, 2026-11-14). Wells, the rig and the lease are
   found by their items, not by milestones. Tailings' and Farmings' chapters come in their own releases.
@@ -2387,4 +2390,11 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
   and the glycol dehydrator (2 x 6 x 3, 15 kW industrial LV, a 0.1 MW gas reboiler); debrining to a disposal well, CAVERN DRY,
   HIGH PRESSURE, WET GAS. NeoForge scene `gas_storage`; unit test `CavernTest`; `world_rules` checks the two new rules. Field Manual:
   SALT CAVERNS AND GAS STORAGE.
+- **23d, Frasch sulfur:** the Frasch wellhead (on a hole into a dome's caprock) finds the Frasch water heater (4 x 6 x 8; 165 C at
+  2.8 MPa on 3.4 MW of gas at full rate, its 75 kW charge pump at industrial LV, water from a water pump) and the lift air compressor
+  (2 x 3 x 4, 110 kW industrial LV) by pipe; it melts the native sulfur within 6 blocks, nearest first (1.7 t a block, which turns to
+  calcite), and lifts up to 2 t/h of molten sulfur out of the side it faces, to the acid plant's furnace or the sulfur vat (6 x 2 x 6,
+  sulfur for a hopper under it); a disposal wellhead into the same caprock within 16 blocks takes the bleed water, or the rate falls to
+  a third (NO BLEED). NO HOT WATER, NO AIR, CAPROCK SPENT. NeoForge scene `frasch`. Field Manual: FRASCH SULFUR. Quests: five in Oil and
+  gas, Frasch sulfur in Chemicals (milestones casing_set, lot_done, well_killed_choke, oil_mud_drilling, cavern_dry, frasch_flowing).
 

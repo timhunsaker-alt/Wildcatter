@@ -121,5 +121,18 @@ LANG.update({f"block.{ns}.storage_compressor": "Storage Compressor (5 Sm3/s, 1.0
 	f"block.{ns}.storage_wellhead": "Gas Storage Wellhead"})
 item("sonar_tool", "Sonar Survey Tool", (60, 90, 120), lambda d: d.ellipse([4, 4, 11, 11], outline=(200, 230, 255, 255)))
 
+# ---- 23d: Frasch sulfur ------------------------------------------------------------------------------------------------------------
+PARTS_23D = ("frasch_water_heater", "lift_air_compressor", "sulfur_vat")
+for name in PARTS_23D:
+	big_part_loot(name)
+simple_loot("frasch_wellhead")
+tags(PARTS_23D + ("frasch_wellhead",))
+shaped("frasch_water_heater", ["SBS", "PFP", "SBS"], {"S": S_, "B": "minecraft:bricks", "P": P_, "F": "minecraft:blast_furnace"}, "frasch_water_heater")
+shaped("lift_air_compressor", ["SPS", "SXS", "SIS"], {"S": S_, "P": P_, "X": "minecraft:piston", "I": "minecraft:iron_block"}, "lift_air_compressor")
+shaped("sulfur_vat", ["B B", "BSB", "BBB"], {"B": "minecraft:bricks", "S": S_}, "sulfur_vat")
+shaped("frasch_wellhead", ["PPP", "SVS", " S "], {"S": S_, "P": P_, "V": "minecraft:lever"}, "frasch_wellhead")
+LANG.update({f"block.{ns}.frasch_water_heater": "Frasch Water Heater (165 C, 2.8 MPa)", f"block.{ns}.lift_air_compressor": "Lift Air Compressor",
+	f"block.{ns}.sulfur_vat": "Sulfur Vat", f"block.{ns}.frasch_wellhead": "Frasch Wellhead"})
+
 save_json(f"{ASSETS}/lang/en_us.json", LANG)
 print("oilfield assets written")

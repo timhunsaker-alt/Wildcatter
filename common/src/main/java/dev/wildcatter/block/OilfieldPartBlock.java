@@ -33,7 +33,11 @@ public class OilfieldPartBlock extends BigPartBlock implements net.minecraft.wor
 		MUD_GAS_SEPARATOR("mud_gas_separator", Footprint.box(1, 6, 1, 0, 0), MudGasSeparatorBlockEntity::new),
 		// 23c: gas storage
 		STORAGE_COMPRESSOR("storage_compressor", Footprint.box(3, 3, 6, 0, 0), StorageCompressorBlockEntity::new),
-		GLYCOL_DEHYDRATOR("glycol_dehydrator", Footprint.box(2, 6, 3, 0, 0), GlycolDehydratorBlockEntity::new);
+		GLYCOL_DEHYDRATOR("glycol_dehydrator", Footprint.box(2, 6, 3, 0, 0), GlycolDehydratorBlockEntity::new),
+		// 23d: Frasch sulfur
+		FRASCH_WATER_HEATER("frasch_water_heater", Footprint.box(4, 6, 8, 0, 0), FraschWaterHeaterBlockEntity::new),
+		LIFT_AIR_COMPRESSOR("lift_air_compressor", Footprint.box(2, 3, 4, 0, 0), LiftAirCompressorBlockEntity::new),
+		SULFUR_VAT("sulfur_vat", Footprint.box(6, 2, 6, 0, 0), SulfurVatBlockEntity::new);
 
 		private final String id;
 		private final Footprint footprint;
