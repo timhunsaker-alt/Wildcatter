@@ -195,26 +195,34 @@ public final class KillModel {
 		return Math.min(5_000, Tuning.CHOKE_K_PSI * r * r / Math.max(1e-6, choke * choke));
 	}
 
+	/** The choke's back pressure: the choke equation for the pump's flow, but never under the shut-in pressure bled off as the choke opens to 10 %. */
+	private double backPressure(double hann) {
+		double bleed = Math.max(0, porePsi() - hann) * Math.max(0, 1 - choke / 0.1);   // a choke nearly shut holds the well's pressure
+		return spm < 1e-6 ? bleed : Math.max(chokePsi(), bleed);
+	}
+
 	/** Finds the gas's volume, the casing pressure and bottomhole pressure for the state now. */
 	private void settle() {
 		double atm = 14.7;
 		double[] p = profile(gasNow);
-		boolean closed = spm < 1e-6 && choke < 1e-6;
+		boolean closed = spm < 1e-6 && choke < 0.02;   // a choke nearly shut with the pump stopped holds the well shut in
 		for (int k = 0; k < 4; k++) {
 			p = profile(gasNow);
 			double hann = p[0];
 			if (closed) {
+				// shut in, the annulus is a closed volume of mud and gas: the gas keeps its volume and its pressure follows the formation's
 				casing = Math.max(0, porePsi() - hann);
-			} else {
-				casing = chokePsi();
+				gasBh = gasNow <= 0 ? 0 : gasNow * (casing + p[2] + atm) / (porePsi() + atm);
+				break;
 			}
+			casing = backPressure(hann);
 			bhp = casing + hann + frictionAnnulus();
 			double atGas = casing + p[2];
-			gasNow = gasBh <= 0 ? 0 : gasBh * (Math.max(bhp, porePsi()) + atm) / (atGas + atm);
+			gasNow = gasBh <= 0 ? 0 : gasBh * (porePsi() + atm) / (atGas + atm);   // gasBh: its volume at the formation's pressure
 		}
 		p = profile(gasNow);
 		double hann = p[0];
-		casing = closed ? Math.max(0, porePsi() - hann) : chokePsi();
+		casing = closed ? Math.max(0, porePsi() - hann) : backPressure(hann);
 		bhp = casing + hann + frictionAnnulus();
 		shoePsi = casing + p[1] + frictionAnnulus() * shoeM / Math.max(1, depthM);
 		dpp = Math.max(0, bhp - stringPsi() + frictionSystem() - frictionAnnulus());
@@ -241,13 +249,13 @@ public final class KillModel {
 		settle();
 		// influx while bottomhole pressure is under the pore pressure
 		double under = porePsi() - bhp;
-		if (under > 0 && !(spm < 1e-6 && choke < 1e-6)) {
+		if (under > 0 && !(spm < 1e-6 && choke < 0.02)) {
 			double litres = Math.min(Tuning.KICK_GAIN_M3S, Tuning.KICK_INFLUX_M3S_PER_PSI * under) * 1000 * seconds;
 			influxL += litres;
 			if (gasBh <= 0) {
 				gasPos = 0;
 			}
-			gasBh += litres * (porePsi() + 14.7) / (bhp + 14.7);
+			gasBh += litres * (bhp + 14.7) / (porePsi() + 14.7);
 			settle();
 		}
 		// losses at the shoe
@@ -260,7 +268,7 @@ public final class KillModel {
 			// the gas is at the surface: what will not fit vents
 			double over = gasPos + gasNow - annulusL();
 			if (over > 0 || dv > 0) {
-				double vent = Math.max(over, 0);
+				double vent = Math.min(gasNow, Math.max(over, dv));   // the circulation pushes the gas at the top out through the choke
 				double frac = Math.min(1, vent / Math.max(1e-9, gasNow));
 				ventedL = vent * (casing + 14.7) / 14.7;   // at surface conditions
 				gasBh *= 1 - frac;
@@ -435,6 +443,15 @@ public final class KillModel {
 			light = Math.min(light, s.ppg);
 		}
 		return light;
+	}
+
+	/** Shut in again (a second kick): the pump stopped, the choke closed, the stroke counter back to zero. */
+	public void shutInAgain() {
+		spm = 0;
+		choke = 0;
+		strokes = 0;
+		settle();
+		java.util.Arrays.fill(dppHistory, dpp);
 	}
 
 	/** The shut-in pressures with the pump stopped and the choke closed: {SIDPP, SICP}. */
