@@ -1961,5 +1961,7 @@ public final class Tuning {
 	public static final double RUNAWAY_SPRINKLED_BURN_SECONDS = 300.0;
 	public static final double RUNAWAY_SPREAD_SECONDS = 120.0;     // a container touching a burning one catches after 2 minutes
 	public static final double RUNAWAY_SMOKE_RADIUS = 8.0;         // Poison and Blindness inside 8 blocks (proposed: HF and soot)
+	public static final int CONTAINER_ROD_REACH = 4;               // lightning sets a container off with no ground rod within 4 blocks (proposed)
+	public static final double CONTAINER_LIGHTNING_LOOK = 8.0;     // how far round its main cell it looks for a bolt (its 3 x 3 x 6 body, and a bit)
 	public static final double PEAK_SHAVE_GAIN = 0.5;              // share of the error a solve the peak shaver corrects
 }

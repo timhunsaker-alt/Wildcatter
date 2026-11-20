@@ -83,6 +83,23 @@ public class BessPartBlock extends BigPartBlock {
 		};
 	}
 
+	/**
+	 * 22c: under {@code bessThermalRunaway} an explosion's blast reaching a battery container sets it off (a vessel burst, TNT); its blocks are
+	 * spared, for it burns out to scrap. With the rule off it is blown up as any block.
+	 */
+	@Override
+	protected void onExplosionHit(BlockState state, net.minecraft.server.level.ServerLevel level, BlockPos pos, net.minecraft.world.level.Explosion explosion,
+			java.util.function.BiConsumer<ItemStack, BlockPos> drops) {
+		if (part == Part.BESS_CONTAINER && dev.wildcatter.Rules.on(dev.wildcatter.Rules.Rule.BESS_THERMAL_RUNAWAY)
+				&& explosion.getBlockInteraction() != net.minecraft.world.level.Explosion.BlockInteraction.TRIGGER_BLOCK
+				&& explosion.getBlockInteraction() != net.minecraft.world.level.Explosion.BlockInteraction.KEEP
+				&& level.getBlockEntity(main(pos, state)) instanceof BessContainerBlockEntity box) {
+			box.blasted(level);
+			return;
+		}
+		super.onExplosionHit(state, level, pos, explosion, drops);
+	}
+
 	@Override
 	public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 		super.setPlacedBy(level, pos, state, placer, stack);
