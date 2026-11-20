@@ -41,7 +41,8 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 
 	@Override
 	public void runTest(ClientGameTestContext context) {
-		if ("trailer".equals(System.getenv("WILDCATTER_ONLY")) || "plcTrailer".equals(System.getenv("WILDCATTER_ONLY")) || "plcShorts".equals(System.getenv("WILDCATTER_ONLY"))) {
+		if ("trailer".equals(System.getenv("WILDCATTER_ONLY")) || "plcTrailer".equals(System.getenv("WILDCATTER_ONLY")) || "plcShorts".equals(System.getenv("WILDCATTER_ONLY"))
+				|| System.getenv("WILDCATTER_ONLY") != null && java.util.Arrays.stream(System.getenv("WILDCATTER_ONLY").split(",")).anyMatch(Films010ClientGameTest.SCENES::contains)) {
 			return;   // a trailer's shots alone (TrailerClientGameTest, PlcTrailerClientGameTest, PlcShortsClientGameTest): no test world, no Create World checks
 		}
 		// the test world starts as an existing world would, every world rule off; the scenes switch on the rules they show
@@ -238,7 +239,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("cellPlant")) {   // Phase 22a
 				new ChemicalClientScenes(context, server, y, up, -14600).cellPlant();
 			}
-			if (only("bess")) {   // Phase 22b
+			if (only("bessParts")) {   // Phase 22b (WILDCATTER_ONLY=bess is the filmed scene, Films010ClientGameTest)
 				new ChemicalClientScenes(context, server, y, up, -15000).bess();
 			}
 			if (only("guyWire")) {
