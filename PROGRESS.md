@@ -2451,3 +2451,24 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
 - **Tests:** `build` passes; NeoForge `casks` and `cask_cooling` (the pool's scenes) pass.
 - **Known gaps:** the refuelling machine has no renderer, so a move is not seen: the assembly appears in its slot. In the model an
   assembly's decay heat (and so its glow) falls to almost nothing within a year; real pool fuel glows for years.
+
+## Shorts batch 3, filmed (2026-11-21; branch `films-batch3`; decisions in `docs/questions/shorts-batch3.md`)
+- **Rod position indicators (`ReactorConsoleRenderer`):** a vertical board on top of the reactor console, one column of 12 green lamps
+  per RCCA (the shutdown bank's four, then bank D) lit up to its rod's position, a red ROD BOTTOM lamp under each, and a REACTOR TRIP
+  annunciator that flashes while tripped. The vessel sends the positions to the console each step; the client eases between updates,
+  so a trip is seen as the columns falling in 2 s.
+- **The trip's alarms:** a new trip plays the trip breakers' clunk at the console, then the horn sounds a blast every 1.5 s for 9 s.
+- **A blowout's spray:** an unlit surface blowout throws mud and oil drops (particle `blowout_spray`) 10 to 15 m up out of the rotary
+  table, spreads a gas mist over the floor and plays the choke flow loop as its roar. The dark smoke is thinned. A burning blowout is
+  unchanged.
+- **The clamps' arc:** grounding clamps closing onto a live line now draw a blue-white glare (particle `arc_flash`) with the sparks,
+  each time fault current starts. There is still no flash at the breaker (Wave A).
+- **Client scenes `scram`, `blowout` and `arcflash`** (`Films010ClientGameTest`, run alone with WILDCATTER_ONLY; never part of the full
+  suite). All are filmed in real time in the landscape window (2880 x 1620), the card in the frame's middle 9:16, with a 3 s still at
+  each end.
+  - `scram`: the trailer's turbine island at 25 %, then a manual trip.
+  - `blowout`: the chokeKill rig kicks and is not shut in, so it blows out.
+  - `arcflash`: a yard breaker with 79 set to one shot recloses onto a standing bolted fault and locks out.
+- **Known gaps:** the rod position board has no lettering (the columns are not labelled). The horn has no acknowledge. The blowout's
+  roar is the choke flow loop, not a sound of its own. The lamps past a bolted fault cannot flash on during a reclose; a fault with
+  impedance (an arcing fault through a tree, say) is not modelled.

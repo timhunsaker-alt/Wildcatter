@@ -59,7 +59,7 @@ import net.minecraft.world.level.block.Blocks;
  * run, unfilmed).
  */
 public class Films010ClientGameTest extends PlcTrailerClientGameTest {
-	static final List<String> SCENES = List.of("chokeKill", "lostCirculation", "saltCavern", "frasch", "bess", "fuelPool");
+	static final List<String> SCENES = List.of("chokeKill", "lostCirculation", "saltCavern", "frasch", "bess", "fuelPool", "scram", "blowout", "arcflash");
 	/** Late afternoon: the sun up, long light. */
 	private static final long WORLD_TIME = 10500;
 
@@ -67,6 +67,8 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 	private String filmId = "";
 	private long filmStart;
 	private boolean filming;
+	/** Ticks the camera holds still at each end of a film's move (the shorts' 3 s stills); 0 moves it over the whole film. */
+	private int still;
 
 	@Override
 	public void runTest(ClientGameTestContext context) {
@@ -133,6 +135,9 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 						case "frasch" -> frasch();
 						case "bess" -> bess();
 						case "fuelPool" -> fuelPool();
+						case "scram" -> scram();
+						case "blowout" -> blowout();
+						case "arcflash" -> arcflash();
 						default -> {
 						}
 					}
@@ -210,7 +215,8 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 			context.waitTicks(want ? 10 : 0);
 			for (int t = 0; t <= ticks; t++) {
 				if (a != null && b != null) {
-					camera(a.lerp(b, Math.min(1.0, (double) t / ticks)), false);
+					double move = Math.max(1, ticks - 2 * still);
+					camera(a.lerp(b, Math.max(0.0, Math.min(1.0, (t - still) / move))), false);
 				}
 				int tick = t;
 				if (!server.computeOnServer(srv -> beat.at(tick))) {   // the beats read and work the blocks: on the server thread
@@ -1313,6 +1319,246 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 				context.takeScreenshot(net.fabricmc.fabric.api.client.gametest.v1.screenshot.TestScreenshotOptions.of(name).withSize(2880, 1620).withDestinationDir(dir).disableCounterPrefix());
 				log("still " + name);
 			}
+		}
+	}
+
+	// ---- shorts batch 3 (2026-11-21): scram, blowout, arcflash ------------------------------------------------------------------------
+	// Filmed in the landscape window (2880 x 1620) with the readout card kept in the frame's middle 9:16 for a vertical cut, a 3 s still at
+	// each end of every film.
+
+	/**
+	 * A reactor trip at power: the trailer's turbine island (TrailerClientGameTest.buildTurbineIsland) at 25 % with its turbine generator on
+	 * line, then a manual trip on the console. The rods drop in 2 s on the
+	 * console's rod position indicators, the trip breakers clunk and the annunciator horn sounds, the fission power falls on the delayed
+	 * neutrons; the decay heat carries on and both reactor coolant pumps keep running.
+	 */
+	void scram() {
+		wide();
+		guiWidth(480);
+		FilmCard.narrow = true;
+		still = 60;
+		try {
+			site(9400, 600, new int[] {-70, 150, -90, 80}, 24, new int[] {-44, 130, -64, 46}, 9);
+			int cx = ox;
+			pad(-44, -64, 130, 46, "minecraft:grass_block");
+			ox = cx - 30;
+			buildTurbineIsland();
+			BlockPos vessel = A(0, 1, 0), cvcs = A(-3, 1, 0), afw = A(12, 1, 0), da = A(29, 1, 13), console = A(3, 4, 1);
+			BlockPos pumpA = A(0, 1, -5), pumpB = A(0, 1, 6);
+			dev.wildcatter.fluid.Reactor r = getS(srv -> ((dev.wildcatter.block.ReactorVesselBlockEntity) srv.overworld().getBlockEntity(vessel)).reactor());
+			Runnable keepWater = () -> onS(srv -> {   // from a beat: already on the server thread
+				for (BlockPos at : new BlockPos[] {cvcs, afw, da}) {
+					if (srv.overworld().getBlockEntity(at) instanceof dev.wildcatter.block.WaterUser user) {
+						user.addWater(100_000);
+					}
+				}
+			});
+			java.util.function.DoubleSupplier flowA = () -> getS(srv -> ((dev.wildcatter.block.ReactorCoolantPumpBlockEntity) srv.overworld().getBlockEntity(pumpA)).flow());
+			java.util.function.DoubleSupplier flowB = () -> getS(srv -> ((dev.wildcatter.block.ReactorCoolantPumpBlockEntity) srv.overworld().getBlockEntity(pumpB)).flow());
+			double rated = dev.wildcatter.fluid.Reactor.ratedWatts();
+			log("scram at power: " + read(vessel));
+			showCard();
+			// 1: the island at power
+			film(1, "at_power", new Cam(9.5, 10.0, -5.0, 1.5, 6.0, 1.0), new Cam(8.0, 8.5, -3.5, 1.5, 6.0, 1.0), 260, until(t -> {
+				if (t % 40 == 0) {
+					keepWater.run();
+				}
+				card("^REACTOR AT POWER", "Power " + f1(r.power() * 100) + " %", "Rods: bank D " + f0(r.bankD()) + " of " + Tuning.ROD_STEPS + " steps",
+						"Coolant pumps A " + f0(flowA.getAsDouble() * 100) + " %  B " + f0(flowB.getAsDouble() * 100) + " %");
+			}));
+			// 2: close on the console's rod position indicators: the trip, the rods drop
+			int[] tripAt = {-1}, inAt = {-1};
+			Cam rpi = new Cam(6.6, 6.6, -2.4, 4.4, 6.0, 1.6), rpi2 = new Cam(6.3, 6.5, -2.0, 4.4, 6.0, 1.6);
+			film(2, "trip", rpi, rpi2, 400, until(t -> {
+				if (t % 40 == 0) {
+					keepWater.run();
+				}
+				if (t == 80) {
+					r.setSetpoint(-1);
+					tripAt[0] = t;
+					mark("MANUAL TRIP");
+				}
+				boolean in = r.shutdownBank() <= 0 && r.bankD() <= 0;
+				if (tripAt[0] >= 0 && in && inAt[0] < 0) {
+					inAt[0] = t;
+					mark(String.format(Locale.ROOT, "all rods in, %.2f s after the trip", (t - tripAt[0]) / 20.0));
+				}
+				String rods = "Rods: shutdown " + f0(r.shutdownBank()) + "  bank D " + f0(r.bankD());
+				if (tripAt[0] < 0) {
+					card("^REACTOR AT POWER", "Power " + f1(r.power() * 100) + " %", rods, "Coolant pumps running");
+				} else {
+					card("!REACTOR TRIP", inAt[0] >= 0 ? "+ALL RODS IN: " + String.format(Locale.ROOT, "%.1f", (inAt[0] - tripAt[0]) / 20.0) + " s" : rods,
+							"Power " + f2(r.power() * 100) + " %", "Decay heat " + f1(r.decayHeat() * rated / 1e6) + " MW");
+				}
+			}));
+			log("tripped: " + read(vessel));
+			// 3: the island after the trip: fission power falling, the decay heat, the pumps still cooling
+			film(3, "after", new Cam(8.0, 8.5, -3.5, 1.5, 6.0, 1.0), new Cam(9.5, 10.0, -5.0, 1.5, 6.0, 1.0), 360, until(t -> {
+				if (t % 40 == 0) {
+					keepWater.run();
+				}
+				card("!REACTOR TRIPPED", "Fission power " + f2(r.power() * 100) + " %", "+Decay heat " + f1(r.decayHeat() * rated / 1e6) + " MW, still coming",
+						"+Pumps A " + f0(flowA.getAsDouble() * 100) + " %  B " + f0(flowB.getAsDouble() * 100) + " %: cooling", "Tavg " + f1(r.tavg()) + " °C");
+			}));
+			card();
+			close();
+			log("scram ok: " + read(vessel));
+		} finally {
+			FilmCard.narrow = false;
+			still = 0;
+		}
+	}
+
+	/**
+	 * An uncontrolled well: the chokeKill rig drilling into the deep field at 12.8 ppg, the kick comes and the alarm sounds, and nobody shuts
+	 * it in: after the 30 s window the well blows out (RigSubstructureBlockEntity's BLOWOUT), mud, oil and gas at the rig floor. No fire is
+	 * near it, so it does not light.
+	 */
+	void blowout() {
+		wide();
+		guiWidth(480);
+		FilmCard.narrow = true;
+		still = 60;
+		try {
+			rigSite();
+			int top = field.topY();
+			on(level -> {
+				if (rig.phase() != RigSubstructureBlockEntity.Phase.IDLE) {
+					rig.toggle();
+				}
+				rig.testHoldBit(false);
+				weigh(rig, 12.8);
+				rig.testDepth(hole.getY() - top - 3);
+			});
+			context.waitTicks(40);
+			showCard();
+			int[] kickAt = {-1}, blowAt = {-1};
+			java.util.regex.Pattern within = java.util.regex.Pattern.compile("within (\\d+) s");
+			// 1: drilling, the kick, the alarm, the window running out: BLOWOUT
+			film(1, "kick", new Cam(17.5, 9.0, 11.0, 30.0, 9.0, 0.0), new Cam(19.5, 9.0, 8.5, 30.0, 9.0, 0.0), 1500, t -> {
+				if (t == 60) {
+					onS(srv -> rig.toggle());
+					mark("drilling");
+				}
+				RigSubstructureBlockEntity.Phase phase = rig.phase();
+				String text = read(rigPos());
+				var m = within.matcher(text);
+				if (phase == RigSubstructureBlockEntity.Phase.KICK && m.find() && kickAt[0] < 0) {
+					kickAt[0] = t;
+					mark("KICK alarm");
+				}
+				if (phase == RigSubstructureBlockEntity.Phase.BLOWOUT && blowAt[0] < 0) {
+					blowAt[0] = t;
+					mark("BLOWOUT");
+				}
+				if (blowAt[0] >= 0) {
+					card("!BLOWOUT", "Flowing wild at the rig floor", "Nobody shut it in", rig.onFire() ? "!ON FIRE" : "No fire near: not lit");
+				} else if (kickAt[0] >= 0) {
+					var left = within.matcher(text);
+					card("!KICK!", "Pit gain +" + f2(rig.shownGain()) + " m3", left.find() ? "Shut in within " + left.group(1) + " s" : "Shut it in", "Mud " + f1(rig.mudPpg()) + " ppg");
+				} else {
+					card("^DRILLING", "Mud " + f1(rig.mudPpg()) + " ppg", rig.depthNow() + " m down");
+				}
+				return blowAt[0] < 0 || t < blowAt[0] + 220;
+			});
+			if (blowAt[0] < 0) {
+				throw new IllegalStateException("no blowout: " + read(rigPos()));
+			}
+			// 2: close on the rig floor: the spray
+			film(2, "floor", new Cam(22.0, 11.5, 7.5, 30.0, 10.0, 0.0), new Cam(23.0, 11.0, 6.5, 30.0, 10.5, 0.0), 300, until(t ->
+					card("!BLOWOUT", "Mud, oil and gas", "out of the rotary table", rig.onFire() ? "!ON FIRE" : "Not lit")));
+			// 3: the whole rig, the jet over the floor
+			film(3, "wide", new Cam(8.0, 8.0, 22.0, 30.0, 12.0, 0.0), new Cam(11.0, 9.0, 19.0, 30.0, 12.0, 0.0), 300, until(t ->
+					card("!BLOWOUT", "The field flowing wild", "Close the BOP if it stands,", "or drill a relief well")));
+			card();
+			close();
+			log("blowout ok: " + read(rigPos()));
+		} finally {
+			FilmCard.narrow = false;
+			still = 0;
+		}
+	}
+
+	/**
+	 * A fault that stays: the faults short's feeder made small, the yard breaker, its relay cabinet (50 at 40 A, 79 set to one shot, as a
+	 * line's) and the line a few blocks long to a pole unit and its lamps. Grounding clamps closed onto the live cable just past the breaker
+	 * (a bolted fault, standing): the arc at the clamps, the breaker's flag green, 79 recloses after 2 s onto the fault (the flag red, the
+	 * clamps arc again), it trips again and locks out. The lamps past the fault stay dark throughout: a bolted fault holds the line dead.
+	 */
+	void arcflash() {
+		wide();
+		guiWidth(480);
+		FilmCard.narrow = true;
+		still = 60;
+		try {
+			site(10400, 600, new int[] {-10, 40, -16, 20}, 12, new int[] {0, 30, -8, 10}, 3);
+			pad(-2, -10, 32, 12, "minecraft:grass_block");
+			BlockPos set = A(8, 1, 0);
+			genset(set, NORTH, false);
+			BlockPos out = inlineTransformer(WildcatterBlocks.PADMOUNT_480, set, Direction.EAST, true);
+			for (int x = out.getX() - ox; x <= 14; x++) {
+				put(x, 1, 0, "wildcatter:cable_dist");
+			}
+			BlockPos breaker = A(15, 1, -1), cabinet = A(15, 1, 2);
+			placeBig(WildcatterBlocks.DIST_BREAKER_3P, breaker, NORTH);
+			placeBig(WildcatterBlocks.BREAKER_RELAY_CABINET, cabinet, NORTH);
+			put(17, 1, 0, "wildcatter:cable_dist");
+			put(18, 1, 0, "wildcatter:cable_dist");
+			put(19, 1, 0, "wildcatter:pole_transformer[facing=west]");
+			BlockPos[] lamps = {A(20, 1, 0), A(19, 1, 1), A(19, 1, -1)};
+			for (BlockPos l : lamps) {
+				server.runCommand("setblock " + l.getX() + " " + l.getY() + " " + l.getZ() + " wildcatter:electric_lamp");
+			}
+			BlockPos fault = A(18, 1, 0);
+			startGenset(set, NORTH, 3000);
+			context.waitTicks(40);
+			on(level -> {
+				var cab = (dev.wildcatter.block.BreakerRelayCabinetBlockEntity) level.getBlockEntity(cabinet);
+				cab.setPickup(5);
+				cab.setShots(1);
+			});
+			context.waitTicks(100);
+			server.runCommand("time set 12450");   // sunset: the lamps show and the breaker's flag still reads
+			java.util.function.Supplier<String> state = () -> getS(srv -> {
+				var level = srv.overworld();
+				int lit = 0;
+				for (BlockPos l : lamps) {
+					var s = level.getBlockState(l);
+					if (s.hasProperty(dev.wildcatter.block.LoadBlock.LIT) && s.getValue(dev.wildcatter.block.LoadBlock.LIT)) {
+						lit++;
+					}
+				}
+				var cab = (dev.wildcatter.block.BreakerRelayCabinetBlockEntity) level.getBlockEntity(cabinet);
+				return level.getBlockState(breaker).getValue(dev.wildcatter.block.BreakerBlock.POSITION).getSerializedName() + "|" + lit + "|" + cab.shotsUsed() + "|"
+						+ cab.lockedOut() + "|" + cab.hasTripped() + "|" + cab.lastTrip();
+			});
+			log("arcflash ready: " + read(cabinet) + " | " + state.get());
+			showCard();
+			String[] last = {""};
+			film(1, "reclose", new Cam(19.8, 2.5, -4.8, 16.9, 3.0, 0.0), new Cam(19.5, 2.4, -4.4, 16.9, 3.0, 0.0), 400, t -> {
+				if (t == 70) {
+					onS(srv -> ((dev.wildcatter.block.MultiCableBlockEntity) srv.overworld().getBlockEntity(fault)).setGrounded(true));
+					mark("fault: grounding clamps on the live cable");
+				}
+				String now = state.get();
+				if (!now.equals(last[0])) {
+					mark(now);
+					last[0] = now;
+				}
+				String[] f = now.split("\\|", -1);
+				boolean closed = f[0].equals("on");
+				String text = read(cabinet);
+				var m = java.util.regex.Pattern.compile("recloses in (\\d+) s").matcher(text);
+				String relay = f[3].equals("true") ? "!LOCKED OUT" : m.find() ? "^RECLOSING in " + m.group(1) + " s" : f[4].equals("true") ? "!TRIPPED" : "+Relay healthy";
+				card("^FEEDER BREAKER", closed ? "Breaker CLOSED" : "Breaker OPEN", relay, f[5].isEmpty() ? "No fault" : "!" + f[5], "Lamps lit " + f[1] + " of " + lamps.length);
+				return true;
+			});
+			card();
+			close();
+			log("arcflash ok: " + read(cabinet) + " | " + state.get());
+		} finally {
+			FilmCard.narrow = false;
+			still = 0;
 		}
 	}
 }
