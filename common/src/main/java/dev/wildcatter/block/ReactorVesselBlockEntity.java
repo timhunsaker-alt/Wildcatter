@@ -271,6 +271,11 @@ public class ReactorVesselBlockEntity extends PlantUnitBlockEntity {
 			tank = Touching.find(level, pzr.getBlockPos(), ReliefTankBlockEntity.class, t -> true);
 		}
 		reactor.step(in, dt);
+		for (BlockEntity e : around) {   // the board's rod position indicators and its trip alarm
+			if (e instanceof ReactorConsoleBlockEntity console) {
+				console.show(level, reactor.shutdownBank(), reactor.bankD(), reactor.tripped());
+			}
+		}
 		if (parts.isEmpty()) {   // Phase 21: the quest book
 			dev.wildcatter.multiblock.Multiblock.formed(level, worldPosition);
 			if (!reactor.tripped() && !reactor.coreDamaged() && reactor.power() >= 1e-4) {

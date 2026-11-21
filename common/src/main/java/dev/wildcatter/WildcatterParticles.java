@@ -14,6 +14,16 @@ public final class WildcatterParticles {
 			new SimpleParticleType(true) {
 			});
 
+	/** A blowout's spray: drops of mud and oil thrown up off the rig floor by the gas, falling back round the rig. Sent by the server. */
+	public static final SimpleParticleType BLOWOUT_SPRAY = Registry.register(BuiltInRegistries.PARTICLE_TYPE, Wildcatter.id("blowout_spray"),
+			new SimpleParticleType(true) {
+			});
+
+	/** The glare of a power arc (grounding clamps closed onto a live line): a few ticks of blue-white light. Sent by the server. */
+	public static final SimpleParticleType ARC_FLASH = Registry.register(BuiltInRegistries.PARTICLE_TYPE, Wildcatter.id("arc_flash"),
+			new SimpleParticleType(true) {
+			});
+
 	private WildcatterParticles() {
 	}
 

@@ -15,6 +15,7 @@ Format of an entry:
 
 | File | Wave | Entries |
 |---|---|---|
+| `shorts-batch3.md` | Shorts batch 3 (2026-11-21): the console's rod position indicators and trip alarm, a blowout's spray, the clamps' arc glare | 1-4 |
 | `grid-batteries.md` | Phase 22 (2026-11-19): grid batteries and the LFP cell plant; 1-8 answered by Tim, 9-20 decided while building | 1-20 |
 | `oilfield-follow-ons.md` | Phase 23 (answered by Tim 2026-11-19, all recommended): fracture gradient, oil mud, the choke kill, salt caverns and gas storage, Frasch sulfur | 1-8 answered; 9 on, decided while building |
 | `phase21-quests.md` | Phase 21: the quest book (engine, chapters, milestones) | numbered across 21.1-21.3 |

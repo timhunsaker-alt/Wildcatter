@@ -81,7 +81,10 @@ public class ReactorPartBlock extends BigPartBlock implements net.minecraft.worl
 			case REACTOR_VESSEL -> {
 				return level.isClientSide() ? null : createTickerHelper(type, WildcatterBlocks.REACTOR_VESSEL_ENTITY, ReactorVesselBlockEntity::tick);
 			}
-			case REACTOR_CONSOLE, STEAM_GENERATOR, RHR_HEAT_EXCHANGER -> {
+			case REACTOR_CONSOLE -> {   // the trip alarm's blasts
+				return level.isClientSide() ? null : createTickerHelper(type, WildcatterBlocks.REACTOR_CONSOLE_ENTITY, ReactorConsoleBlockEntity::tick);
+			}
+			case STEAM_GENERATOR, RHR_HEAT_EXCHANGER -> {
 				return null;
 			}
 			default -> {

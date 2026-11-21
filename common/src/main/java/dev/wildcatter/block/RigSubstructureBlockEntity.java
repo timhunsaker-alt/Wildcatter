@@ -980,7 +980,10 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 				BlockPos h = hole();
 				if (now % 4 == 0) {
 					level.sendParticles(onFire ? net.minecraft.core.particles.ParticleTypes.FLAME : net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE,
-							h.getX() + 0.5, h.getY() + 7, h.getZ() + 0.5, 20, 0.6, 2.0, 0.6, 0.1);
+							h.getX() + 0.5, h.getY() + 7, h.getZ() + 0.5, onFire ? 20 : 6, 0.6, 2.0, 0.6, 0.1);
+				}
+				if (!onFire) {
+					spray(level, h, now);
 				}
 				if (!onFire && now % 20 == 0 && fireNear(level, h)) {
 					ignite(level, h);
@@ -990,6 +993,29 @@ public class RigSubstructureBlockEntity extends BlockEntity implements Inspectab
 			}
 		}
 		setChanged();
+	}
+
+	/**
+	 * A wild well at the rig floor: the gas throws mud and oil up out of the rotary table in a jet some 10 to 15 m over the floor that falls
+	 * back round the rig, and spreads as a mist across the floor; its roar every few seconds.
+	 */
+	private static void spray(ServerLevel level, BlockPos h, long now) {
+		var random = level.getRandom();
+		double x = h.getX() + 0.5, y = h.getY() + 6.6, z = h.getZ() + 0.5;
+		for (int i = 0; i < 10; i++) {
+			double up = 0.85 + random.nextDouble() * 0.45;
+			level.sendParticles(dev.wildcatter.WildcatterParticles.BLOWOUT_SPRAY, x + random.nextGaussian() * 0.15, y, z + random.nextGaussian() * 0.15, 0,
+					random.nextGaussian() * 0.09, up, random.nextGaussian() * 0.09, 1.0);
+		}
+		if (now % 2 == 0) {
+			for (int i = 0; i < 4; i++) {
+				double a = random.nextDouble() * Math.PI * 2;
+				level.sendParticles(net.minecraft.core.particles.ParticleTypes.CLOUD, x, y + 0.2, z, 0, Math.cos(a), 0.05, Math.sin(a), 0.35);
+			}
+		}
+		if (now % 90 == 0) {
+			level.playSound(null, h.above(6), dev.wildcatter.WildcatterSounds.CHOKE_FLOW, SoundSource.BLOCKS, 4.0F, 0.6F);
+		}
 	}
 
 	/** A fire, lava or a lit campfire within {@link Tuning#IGNITION_RANGE} of the hole: the gas round the floor finds it. */

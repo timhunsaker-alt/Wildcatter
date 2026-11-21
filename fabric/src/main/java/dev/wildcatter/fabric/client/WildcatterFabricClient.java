@@ -16,6 +16,10 @@ public class WildcatterFabricClient implements ClientModInitializer {
 		WildcatterClient.renderers(BlockEntityRenderers::register);
 		net.fabricmc.fabric.api.client.particle.v1.ParticleProviderRegistry.getInstance().register(dev.wildcatter.WildcatterParticles.STEAM_PLUME,
 				sprites -> new dev.wildcatter.client.SteamPlumeParticle.Provider(sprites));
+		net.fabricmc.fabric.api.client.particle.v1.ParticleProviderRegistry.getInstance().register(dev.wildcatter.WildcatterParticles.BLOWOUT_SPRAY,
+				sprites -> new dev.wildcatter.client.BlowoutSprayParticle.Provider(sprites));
+		net.fabricmc.fabric.api.client.particle.v1.ParticleProviderRegistry.getInstance().register(dev.wildcatter.WildcatterParticles.ARC_FLASH,
+				sprites -> new dev.wildcatter.client.ArcFlashParticle.Provider(sprites));
 		net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.registerGlobalReceiver(dev.wildcatter.control.PlcNet.Payload.TYPE,
 				(payload, context) -> context.client().execute(() -> dev.wildcatter.control.PlcNet.client.accept(payload.tag())));
 		net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.registerGlobalReceiver(dev.wildcatter.quest.QuestNet.Payload.TYPE,

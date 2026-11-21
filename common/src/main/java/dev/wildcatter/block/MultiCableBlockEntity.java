@@ -121,6 +121,7 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 		if (on && !grounded && level instanceof ServerLevel server && Math.abs(lineVolts) > 50) {
 			server.playSound(null, worldPosition, dev.wildcatter.WildcatterSounds.FLASHOVER, SoundSource.BLOCKS, 1.5F, 1.0F);
 			server.sendParticles(ParticleTypes.ELECTRIC_SPARK, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5, 40, 0.4, 0.4, 0.4, 0.3);
+			server.sendParticles(dev.wildcatter.WildcatterParticles.ARC_FLASH, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5, 4, 0.15, 0.15, 0.15, 0);
 			faulting = true;
 		}
 		if (on && !grounded) {
@@ -173,6 +174,7 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 		if (fault && !faulting && level instanceof ServerLevel server) {
 			server.playSound(null, worldPosition, dev.wildcatter.WildcatterSounds.FLASHOVER, SoundSource.BLOCKS, 1.5F, 1.0F);
 			server.sendParticles(ParticleTypes.ELECTRIC_SPARK, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5, 40, 0.4, 0.4, 0.4, 0.3);
+			server.sendParticles(dev.wildcatter.WildcatterParticles.ARC_FLASH, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5, 4, 0.15, 0.15, 0.15, 0);
 		}
 		faulting = fault;
 		if (clamps.length > 0 && level != null) {
