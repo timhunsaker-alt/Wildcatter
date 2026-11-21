@@ -59,7 +59,7 @@ import net.minecraft.world.level.block.Blocks;
  * run, unfilmed).
  */
 public class Films010ClientGameTest extends PlcTrailerClientGameTest {
-	static final List<String> SCENES = List.of("chokeKill", "lostCirculation", "saltCavern", "frasch", "bess", "fuelPool", "scram", "blowout", "arcflash");
+	static final List<String> SCENES = List.of("chokeKill", "lostCirculation", "saltCavern", "frasch", "bess", "fuelPool", "scram", "blowout", "arcflash", "turbine", "cascade");
 	/** Late afternoon: the sun up, long light. */
 	private static final long WORLD_TIME = 10500;
 
@@ -138,6 +138,8 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 						case "scram" -> scram();
 						case "blowout" -> blowout();
 						case "arcflash" -> arcflash();
+						case "turbine" -> turbine();
+						case "cascade" -> cascade();
 						default -> {
 						}
 					}
@@ -1565,6 +1567,290 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 			card();
 			close();
 			log("arcflash ok: " + read(cabinet) + " | " + state.get());
+		} finally {
+			FilmCard.narrow = false;
+			still = 0;
+		}
+	}
+
+	// ---- shorts batch 4 (2026-11-21): turbine, cascade -----------------------------------------------------------------------------
+
+	/**
+	 * A gas turbine start onto a live bus: two peakers (aeroderivatives, ChemicalScenes.peaker) whose 138 kV sides are tied. Unit B is
+	 * already on line (its start skipped by hook) carrying two load banks; unit A starts for real: its starter cranks it to a quarter
+	 * speed for the 30 s purge, it lights off (the light-off puff out of its stack), runs up to full speed in 60 s, and its generator's
+	 * synchronizer slips it into phase with the live bus and closes its breaker; then a load bank on its own bus steps on and it picks
+	 * up load at its ramp rate. Its synchronizer is put 150 degrees out of phase by hook as it reaches speed (the game starts the slip at
+	 * 0 degrees, so it would close at once); from there the sweep and the close are the synchronizer's own.
+	 */
+	void turbine() {
+		wide();
+		guiWidth(480);
+		FilmCard.narrow = true;
+		still = 60;
+		try {
+			site(11200, 600, new int[] {-50, 56, -30, 28}, 14, new int[] {-44, 50, -22, 22}, 5);
+			pad(-44, -22, 50, 22, "minecraft:grass_block");
+			int px = -45, pz = -5, qx = px + 44;
+			BlockPos stationA = peaker(px, pz);
+			BlockPos stationB = peaker(qx, pz);
+			for (int x = px + 36; x <= qx + 36; x++) {
+				put(x, 7, pz - 10, "wildcatter:cable_hv");   // the two units' 138 kV tied
+			}
+			BlockPos bankA = A(px + 29, 1, pz + 11), bankB1 = A(qx + 29, 1, pz + 11), bankB2 = A(qx + 32, 1, pz + 11);
+			placeBig(WildcatterBlocks.LOAD_BANK, bankA, NORTH);
+			placeBig(WildcatterBlocks.LOAD_BANK, bankB1, NORTH);
+			placeBig(WildcatterBlocks.LOAD_BANK, bankB2, NORTH);
+			startPeaker(qx, pz, stationB);
+			onS(srv -> {
+				((LoadBankBlockEntity) BigParts.entity(srv.overworld(), bankB1)).setSteps(Tuning.LOAD_BANK_STEPS);
+				((LoadBankBlockEntity) BigParts.entity(srv.overworld(), bankB2)).setSteps(Tuning.LOAD_BANK_STEPS);
+			});
+			startGenset(stationA, NORTH, 3000);
+			context.waitTicks(200);
+			GasTurbineBlockEntity gt = at(A(px + 20, 1, pz), GasTurbineBlockEntity.class);
+			GasTurbineBlockEntity other = at(A(qx + 20, 1, pz), GasTurbineBlockEntity.class);
+			var gen = getS(srv -> gt.generatorPart());
+			var genB = getS(srv -> other.generatorPart());
+			var sync = gen.synchronizer();
+			double nominal = ElectricalStandard.active().hertz();
+			int poles = 2;   // the aeroderivative's generator (docs/multiblocks/aeroderivative.md)
+			log("turbine: unit B " + read(A(qx + 20, 1, pz)) + " | gen B " + read(A(qx + 25, 1, pz + 1)) + " | unit A " + read(A(px + 20, 1, pz)) + " | station A " + read(stationA));
+			int[] closedAt = {-1}, litAt = {-1};
+			boolean[] offset = {false};
+			java.util.function.IntFunction<String[]> readout = t -> {
+				double sp = gt.speed();
+				String phase = switch (gt.phase()) {
+					case STOPPED -> "!STOPPED";
+					case PURGE -> "^CRANKING: PURGE";
+					case RUNUP -> litAt[0] >= 0 && t >= litAt[0] && t - litAt[0] < 60 ? "!LIGHT-OFF" : "^RUN-UP";
+					case RUNNING -> gen.breakerClosed() ? "+ON LINE" : "^SYNCHRONIZING";
+				};
+				double genHz = gt.phase() == GasTurbineBlockEntity.Phase.RUNNING ? (gen.breakerClosed() ? gen.hertz() : sync.ownHertz()) : sp * nominal;
+				String hz = "Gen " + f2(genHz) + " Hz  Bus " + f2(genB.hertz()) + " Hz";
+				String third = gt.phase() == GasTurbineBlockEntity.Phase.RUNNING && !gen.breakerClosed()
+						? "Phase " + f0(Math.abs(sync.slipDegrees())) + "° " + (sync.slipDegrees() < 0 ? "behind" : "ahead")
+						: gen.breakerClosed() ? "+Breaker CLOSED" : "Breaker open";
+				return new String[] {phase, "Speed " + f0(sp * 100) + " %  " + f0(sp * 120 * nominal / poles) + " rpm", "Exhaust heat " + f1(gt.exhaustWatts() / 1e6) + " MW", hz, third,
+						"Output " + f1(Math.max(0, gen.deliveredWatts()) / 1e6) + " MW"};
+			};
+			java.util.function.IntConsumer watch = t -> {
+				if (gt.phase() == GasTurbineBlockEntity.Phase.RUNUP && litAt[0] == -1) {
+					litAt[0] = t;
+					mark("LIGHT-OFF");
+				}
+				if (gt.phase() == GasTurbineBlockEntity.Phase.RUNNING && !offset[0]) {
+					offset[0] = true;
+					sync.setSlipForTest(-150);
+					mark("full speed: synchronizing, 150 degrees behind");
+				}
+				if (gen.breakerClosed() && closedAt[0] < 0) {
+					closedAt[0] = t;
+					mark("BREAKER CLOSED: " + sync.lastClose());
+				}
+				card(readout.apply(t));
+			};
+			showCard();
+			long[] pressed = {0};
+			// 1: the start button: the starter cranks it to a quarter speed for the purge
+			Cam a = new Cam(px + 7.0, 5.0, pz + 25.0, px + 22.0, 5.0, pz + 9.0), b = new Cam(px + 8.5, 5.0, pz + 23.0, px + 22.0, 5.0, pz + 9.0);
+			film(1, "crank", a, b, 380, until(t -> {
+				if (t == 60) {
+					gt.setWantRun(true);
+					pressed[0] = gt.getLevel().getGameTime();
+					mark("START: wantRun");
+				}
+				watch.accept(t);
+			}));
+			// to 5 s before the light-off
+			long purge = (long) (Tuning.AERO_PURGE_SECONDS * 20);
+			waitUntil(() -> getS(srv -> srv.overworld().getGameTime()) - pressed[0] >= purge - 160, 2000);
+			// 2: light-off, the puff out of the stack; the run-up begins
+			litAt[0] = -1;
+			Cam c = new Cam(px + 10.0, 9.0, pz + 31.0, px + 22.0, 13.0, pz + 16.0), d = new Cam(px + 11.0, 9.5, pz + 29.5, px + 22.0, 13.5, pz + 16.0);
+			film(2, "light_off", c, d, 420, t -> {
+				watch.accept(t);
+				return litAt[0] < 0 || t < litAt[0] + 200;
+			});
+			if (litAt[0] < 0) {
+				throw new IllegalStateException("no light-off: " + read(A(px + 20, 1, pz)));
+			}
+			litAt[0] = Integer.MAX_VALUE / 2;   // the light-off is behind us: no more LIGHT-OFF on the card
+			// to 92 % speed
+			waitUntil(() -> getS(srv -> gt.speed()) >= 0.92, 2400);
+			// 3: to full speed; the synchronizer brings it into phase and closes; a load bank steps on its bus, it picks up load
+			closedAt[0] = -1;
+			Cam e = new Cam(px + 36.0, 5.5, pz + 20.0, px + 26.0, 2.0, pz + 7.0), g = new Cam(px + 34.5, 5.0, pz + 18.0, px + 26.0, 2.0, pz + 7.0);
+			film(3, "sync", e, g, 1200, t -> {
+				watch.accept(t);
+				if (closedAt[0] >= 0 && t == closedAt[0] + 40) {
+					((LoadBankBlockEntity) BigParts.entity(gt.getLevel(), bankA)).setSteps(Tuning.LOAD_BANK_STEPS);
+					mark("load bank on its bus: " + Tuning.LOAD_BANK_STEPS + " MW");
+				}
+				return closedAt[0] < 0 || t < closedAt[0] + 340;
+			});
+			if (closedAt[0] < 0) {
+				throw new IllegalStateException("never closed: " + read(A(px + 25, 1, pz + 1)));
+			}
+			// 4: on line, pulling back over both units
+			film(4, "on_line", new Cam(px + 14.0, 8.0, pz + 30.0, px + 30.0, 3.0, pz + 6.0), new Cam(px + 6.0, 16.0, pz + 42.0, px + 40.0, 3.0, pz + 4.0), 300, until(watch));
+			card();
+			close();
+			log("turbine ok: " + read(A(px + 20, 1, pz)) + " | gen " + read(A(px + 25, 1, pz + 1)) + " | gen B " + read(A(qx + 25, 1, pz + 1)));
+		} finally {
+			FilmCard.narrow = false;
+			still = 0;
+		}
+	}
+
+	/**
+	 * The centrifuge cascade (WildcatterClientGameTest.cascade's layout, docs/multiblocks/enrichment.md): the peaker's 12.47 kV to the
+	 * frequency converter, eleven machines on the header, the feed station with a natural UF6 48Y, the product and tails take-offs.
+	 * The stage readout is the cascade's own numbers: eleven stages, each raising the abundance ratio by the same factor from the tails'
+	 * 0.25 % to the product's 4.95 %.
+	 */
+	void cascade() {
+		wide();
+		guiWidth(480);
+		FilmCard.narrow = true;
+		still = 60;
+		try {
+			site(12000, 600, new int[] {-36, 50, -46, 28}, 14, new int[] {-32, 46, -42, 24}, 5);
+			pad(-32, -42, 46, 24, "minecraft:grass_block");
+			int zg = -30;
+			BlockPos station = peaker(0, 0);
+			// 12.47 kV: the substation transformer's throat, east, north up x 40, west along -38 and down to the converter's box
+			List<int[]> mv = new ArrayList<>();
+			for (int x = 36; x <= 40; x++) {
+				mv.add(new int[] {x, -5});
+			}
+			for (int z = -38; z <= -6; z++) {
+				mv.add(new int[] {40, z});
+			}
+			for (int x = -17; x <= 39; x++) {
+				mv.add(new int[] {x, -38});
+			}
+			mv.add(new int[] {-17, -37});
+			mv.add(new int[] {-17, -36});
+			for (int[] m : mv) {
+				put(m[0], 1, m[1], "wildcatter:cable_dist");
+			}
+			sizeCables(A(-17, 1, -38), A(40, 1, -5), WildcatterBlocks.CABLE_DIST, dev.wildcatter.energy.ConductorSize.MV_500);
+			BlockPos feed = A(-20, 1, zg - 5), converter = A(-16, 1, zg - 6), product = A(-12, 1, zg + 1), tails = A(-8, 1, zg + 1);
+			placeBig(WildcatterBlocks.FEED_STATION, feed, NORTH);
+			placeBig(WildcatterBlocks.FREQUENCY_CONVERTER, converter, NORTH);
+			placeBig(WildcatterBlocks.PRODUCT_TAKEOFF, product, NORTH);
+			placeBig(WildcatterBlocks.TAILS_TAKEOFF, tails, NORTH);
+			int machines = 11;
+			for (int x = 0; x < machines; x++) {
+				placeBig(WildcatterBlocks.CENTRIFUGE, A(x, 1, zg), NORTH);
+			}
+			for (int x = -20; x <= -1; x++) {
+				put(x, 1, zg, "wildcatter:gas_line");
+			}
+			for (int k = 2; k <= 7; k++) {
+				put(-1, k, zg, "wildcatter:gas_line");
+			}
+			for (int x = 0; x <= machines; x++) {
+				put(x, 7, zg, "wildcatter:gas_line");
+			}
+			put(-19, 4, zg - 3, "minecraft:hopper");
+			put(-19, 0, zg - 3, "minecraft:hopper");
+			put(-11, 4, zg + 2, "minecraft:hopper");
+			put(-11, 0, zg + 2, "minecraft:hopper");
+			put(-7, 4, zg + 2, "minecraft:hopper");
+			put(-7, 0, zg + 2, "minecraft:hopper");
+			BlockPos hop = A(-11, 4, zg + 2), hop2 = A(-7, 4, zg + 2);
+			server.runCommand("item replace block " + hop.getX() + " " + hop.getY() + " " + hop.getZ() + " container.0 with wildcatter:empty_30b_cylinder 2");
+			server.runCommand("item replace block " + hop2.getX() + " " + hop2.getY() + " " + hop2.getZ() + " container.0 with wildcatter:empty_48y_cylinder 2");
+			// 480 V for the stations: a set south-west, up x -23 to the feed station's box, east along zg+6 to the take-offs' boxes
+			BlockPos lvSet = A(-24, 1, zg + 4);
+			genset(lvSet, NORTH, false);
+			List<int[]> lv = new ArrayList<>();
+			for (int z = zg - 5; z <= zg + 6; z++) {
+				lv.add(new int[] {-23, z});
+			}
+			lv.add(new int[] {-22, zg - 5});
+			lv.add(new int[] {-21, zg - 5});
+			for (int x = -22; x <= -9; x++) {
+				lv.add(new int[] {x, zg + 6});
+			}
+			for (int z = zg + 1; z <= zg + 5; z++) {
+				lv.add(new int[] {-13, z});
+				lv.add(new int[] {-9, z});
+			}
+			for (int[] m : lv) {
+				put(m[0], 1, m[1], "wildcatter:cable_industrial");
+			}
+			startPeaker(0, 0, station);
+			startGenset(lvSet, NORTH, 3000);
+			context.waitTicks(200);
+			log("cascade before feed: " + read(feed) + " | converter " + read(converter) + " | machine " + read(A(5, 1, zg)));
+			dev.wildcatter.block.FeedStationBlockEntity fs = at(feed, dev.wildcatter.block.FeedStationBlockEntity.class);
+			dev.wildcatter.block.TakeoffBlockEntity pt = at(product, dev.wildcatter.block.TakeoffBlockEntity.class);
+			java.util.regex.Pattern feeding = java.util.regex.Pattern.compile("feeding ([0-9,]+) kg of UF6 an hour; ([0-9,]+) kg left");
+			java.util.regex.Pattern made = java.util.regex.Pattern.compile("([0-9.]+) kg of ([0-9.]+) % product an hour");
+			java.util.regex.Pattern hz = java.util.regex.Pattern.compile("machines at ([0-9,]+) Hz");
+			java.util.regex.Pattern kw = java.util.regex.Pattern.compile("([0-9,]+) kW of");
+			showCard();
+			// 1: the feed goes in: a natural UF6 48Y into the hopper on the feed station; it loads and starts feeding
+			BlockPos top = A(-19, 4, zg - 3);
+			boolean[] fed = {false};
+			film(1, "feed", new Cam(-26.0, 6.0, zg + 4.0, -18.5, 2.5, zg - 3.0), new Cam(-24.5, 5.5, zg + 2.5, -18.5, 2.5, zg - 3.0), 340, until(t -> {
+				if (t == 60) {
+					((net.minecraft.world.level.block.entity.HopperBlockEntity) fs.getLevel().getBlockEntity(top)).setItem(0, new ItemStack(WildcatterItems.UF6_CYLINDER_48Y, 1));
+					mark("48Y of natural UF6 into the hopper");
+				}
+				String r = fs.inspect().getString();
+				var m = feeding.matcher(r);
+				if (m.find() && !fed[0]) {
+					fed[0] = true;
+					mark("feeding: " + r);
+				}
+				if (t < 60) {
+					card("^FEED STATION", "Natural uranium as UF6", "0.71 % U-235", "Waiting for a cylinder");
+				} else if (!fed[0]) {
+					card("^FEED: A 48Y CYLINDER", "12,501 kg of natural UF6", "0.71 % U-235", "Heating it to sublime");
+				} else {
+					card("+FEEDING THE CASCADE", "UF6 " + m.group(1) + " kg an hour", "0.71 % U-235 in", "In the 48Y: " + m.group(2) + " kg");
+				}
+			}));
+			log("cascade fed: " + read(feed) + " | converter " + read(converter));
+			// 2: the hall: eleven machines on the header, driven at 1,225 Hz
+			film(2, "hall", new Cam(15.0, 3.0, zg + 7.0, 4.0, 3.5, zg - 2.0), new Cam(13.0, 4.0, zg + 5.5, 3.0, 4.0, zg - 2.0), 300, until(t -> {
+				String cv = read(converter);
+				var h = hz.matcher(cv);
+				var k = kw.matcher(cv);
+				card("^CENTRIFUGE HALL", machines + " machines, " + (h.find() ? h.group(1) : f0(Tuning.CENTRIFUGE_HERTZ)) + " Hz", "Rotors at " + f0(Tuning.CENTRIFUGE_TIP_SPEED) + " m/s",
+						"Drive " + (k.find() ? f1(Double.parseDouble(k.group(1).replace(",", "")) / 1000) : "?") + " MW");
+			}));
+			// 3: along the cascade, stage by stage: the U-235 share climbing from the tails' to the product's
+			double rt = Tuning.ASSAY_TAILS / (1 - Tuning.ASSAY_TAILS), rp = Tuning.ASSAY_PRODUCT / (1 - Tuning.ASSAY_PRODUCT);
+			int stages = dev.wildcatter.fluid.Enrichment.stages();
+			int[] shown = {0};
+			Cam s0 = new Cam(0.5, 3.4, zg + 4.6, 0.5, 3.2, zg + 0.5), s1 = new Cam(machines - 0.5, 3.4, zg + 4.6, machines - 0.5, 3.2, zg + 0.5);
+			film(3, "stages", s0, s1, 520, until(t -> {
+				double f = Math.max(0, Math.min(1, (t - 60) / 400.0));
+				double eased = f * f * (3 - 2 * f);
+				int stage = Math.max(1, Math.min(stages, (int) Math.round(eased * (stages - 1)) + 1));   // the machine mid-frame
+				double r = rt * Math.pow(rp / rt, stage / (double) stages);
+				double x = r / (1 + r);
+				if (stage != shown[0]) {
+					shown[0] = stage;
+					mark("stage " + stage + ": " + f2(x * 100) + " %");
+				}
+				card("^STAGE " + stage + " OF " + stages, (stage == stages ? "+" : "") + "U-235: " + f2(x * 100) + " %", "Each stage enriches", "a little more");
+			}));
+			// 4: the product take-off: low-enriched uranium into a 30B, for reactor fuel
+			film(4, "product", new Cam(-17.0, 4.5, zg + 10.0, -10.0, 2.0, zg + 4.5), new Cam(-15.5, 4.0, zg + 8.5, -10.0, 2.0, zg + 4.5), 300, until(t -> {
+				var m = made.matcher(fs.inspect().getString());
+				boolean ok = m.find();
+				card("^PRODUCT: LOW-ENRICHED", "+" + (ok ? m.group(2) : f2(Tuning.ASSAY_PRODUCT * 100)) + " % U-235", "UF6 " + (ok ? m.group(1) : "?") + " kg an hour",
+						"into a 30B cylinder", "Fuel for the reactor");
+			}));
+			card();
+			close();
+			log("cascade ok: " + read(feed) + " | converter " + read(converter) + " | product " + read(product) + " | tails " + read(tails));
 		} finally {
 			FilmCard.narrow = false;
 			still = 0;

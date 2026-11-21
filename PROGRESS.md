@@ -2477,3 +2477,17 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
 - **Known gaps:** the rod position board has no lettering (the columns are not labelled). The horn has no acknowledge. The blowout's
   roar is the choke flow loop, not a sound of its own. The lamps past a bolted fault cannot flash on during a reclose; a fault with
   impedance (an arcing fault through a tree, say) is not modelled.
+
+## Shorts batch 4, filmed (2026-11-21; branch `films-batch4`; decisions in `docs/questions/shorts-batch4.md`)
+- **The gas turbine's exhaust at its stack (`GasTurbineBlockEntity.exhaust`):** a light-off throws 3 s of smoke out of the stack top;
+  while it burns, a thin white haze rises from it, growing with the fuel burnt. None with an HRSG in the stack's place.
+- **`GeneratorPartBlockEntity.synchronizer()`** and **`GasTurbineBlockEntity.generatorPart()`**: read by the films' card.
+- **Client scenes `turbine` and `cascade`** (`Films010ClientGameTest`, run alone with WILDCATTER_ONLY; never part of the full suite),
+  real time in the landscape window, the card in the middle 9:16, a 3 s still at each end.
+  - `turbine`: two aeroderivative peakers tied at 138 kV; unit B on line with 20 MW of load banks; unit A cranks (purge), lights off,
+    runs up, synchronizes onto the live bus (put 150 degrees out of phase by hook as it reaches speed) and picks up a 10 MW bank.
+  - `cascade`: the enrichment test's plant (peaker, converter, eleven machines, feed station, take-offs): a 48Y of natural UF6 into the
+    feed station's hopper, the hall, the eleven stages' assays climbing 0.25 to 4.95 % on the card, the product take-off.
+- **Tests:** `build` passes; NeoForge `unit_differentials`, `aero_lean_gas`, `plc_gas_turbine`, `chlor_alkali` and `cascade_operations` pass.
+- **Known gaps:** no exhaust temperature is modelled (the card reads exhaust heat in MW). Every synchronizer starts its slip at 0
+  degrees, so in play a generator closes the tick it reaches speed. Centrifuges have no sound or moving part (real casings are still).
