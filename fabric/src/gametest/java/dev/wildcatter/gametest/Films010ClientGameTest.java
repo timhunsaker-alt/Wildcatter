@@ -1481,8 +1481,8 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 
 	/**
 	 * A fault that stays: the faults short's feeder made small, the yard breaker, its relay cabinet (50 at 40 A, 79 set to one shot, as a
-	 * line's) and the line a few blocks long to a pole unit and its lamps. Grounding clamps closed onto the live cable just past the breaker
-	 * (a bolted fault, standing): the arc at the clamps, the breaker's flag green, 79 recloses after 2 s onto the fault (the flag red, the
+	 * line's) and the line a few blocks long to a pole unit and its lamps. Grounding clamps closed onto the live cable at the breaker's
+	 * terminal (a bolted fault, standing): the arc at the clamps, the breaker's flag green, 79 recloses after 2 s onto the fault (the flag red, the
 	 * clamps arc again), it trips again and locks out. The lamps past the fault stay dark throughout: a bolted fault holds the line dead.
 	 */
 	void arcflash() {
@@ -1502,6 +1502,7 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 			BlockPos breaker = A(15, 1, -1), cabinet = A(15, 1, 2);
 			placeBig(WildcatterBlocks.DIST_BREAKER_3P, breaker, NORTH);
 			placeBig(WildcatterBlocks.BREAKER_RELAY_CABINET, cabinet, NORTH);
+			// the line: east from the breaker's terminal to a pole unit and its lamps; the clamps go on it right beside the breaker
 			put(17, 1, 0, "wildcatter:cable_dist");
 			put(18, 1, 0, "wildcatter:cable_dist");
 			put(19, 1, 0, "wildcatter:pole_transformer[facing=west]");
@@ -1509,7 +1510,7 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 			for (BlockPos l : lamps) {
 				server.runCommand("setblock " + l.getX() + " " + l.getY() + " " + l.getZ() + " wildcatter:electric_lamp");
 			}
-			BlockPos fault = A(18, 1, 0);
+			BlockPos fault = A(17, 1, 0);
 			startGenset(set, NORTH, 3000);
 			context.waitTicks(40);
 			on(level -> {
@@ -1518,7 +1519,7 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 				cab.setShots(1);
 			});
 			context.waitTicks(100);
-			server.runCommand("time set 12450");   // sunset: the lamps show and the breaker's flag still reads
+			server.runCommand("time set 6000");   // midday: everything reads; the arc is bright enough for it
 			java.util.function.Supplier<String> state = () -> getS(srv -> {
 				var level = srv.overworld();
 				int lit = 0;
@@ -1535,24 +1536,32 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 			log("arcflash ready: " + read(cabinet) + " | " + state.get());
 			showCard();
 			String[] last = {""};
-			film(1, "reclose", new Cam(19.8, 2.5, -4.8, 16.9, 3.0, 0.0), new Cam(19.5, 2.4, -4.4, 16.9, 3.0, 0.0), 400, t -> {
-				if (t == 70) {
-					onS(srv -> ((dev.wildcatter.block.MultiCableBlockEntity) srv.overworld().getBlockEntity(fault)).setGrounded(true));
-					mark("fault: grounding clamps on the live cable");
-				}
+			java.util.regex.Pattern amps = java.util.regex.Pattern.compile("(\\d+) A");
+			// the card's lines kept short, so it stays as large through the film as in its first second
+			IntConsumer readout = t -> {
 				String now = state.get();
 				if (!now.equals(last[0])) {
 					mark(now);
 					last[0] = now;
 				}
 				String[] f = now.split("\\|", -1);
-				boolean closed = f[0].equals("on");
-				String text = read(cabinet);
-				var m = java.util.regex.Pattern.compile("recloses in (\\d+) s").matcher(text);
-				String relay = f[3].equals("true") ? "!LOCKED OUT" : m.find() ? "^RECLOSING in " + m.group(1) + " s" : f[4].equals("true") ? "!TRIPPED" : "+Relay healthy";
-				card("^FEEDER BREAKER", closed ? "Breaker CLOSED" : "Breaker OPEN", relay, f[5].isEmpty() ? "No fault" : "!" + f[5], "Lamps lit " + f[1] + " of " + lamps.length);
+				var m = java.util.regex.Pattern.compile("recloses in (\\d+) s").matcher(read(cabinet));
+				var a = amps.matcher(f[5]);
+				String relay = f[3].equals("true") ? "!LOCKED OUT" : m.find() ? "^RECLOSE IN " + m.group(1) + " s" : f[4].equals("true") ? "!TRIPPED: 50" : "+Relay healthy";
+				card("^FEEDER BREAKER", f[0].equals("on") ? "Breaker CLOSED" : "Breaker OPEN", relay, a.find() ? "!Fault " + a.group(1) + " A" : "No fault",
+						"Lamps lit " + f[1] + " of " + lamps.length);
+			};
+			// 1: close, the clamps at the breaker's terminal in the middle of the frame, its flag above and left
+			film(1, "reclose", new Cam(17.4, 1.9, -5.4, 17.3, 3.3, 0.5), new Cam(17.4, 1.85, -5.2, 17.3, 3.3, 0.5), 400, t -> {
+				if (t == 70) {
+					onS(srv -> ((dev.wildcatter.block.MultiCableBlockEntity) srv.overworld().getBlockEntity(fault)).setGrounded(true));
+					mark("fault: grounding clamps on the live cable");
+				}
+				readout.accept(t);
 				return true;
 			});
+			// 2: locked out, pulling back over the bench (for the end card)
+			film(2, "locked_out", new Cam(17.4, 1.9, -5.4, 17.3, 3.3, 0.5), new Cam(19.0, 4.5, -11.0, 17.3, 4.2, 0.5), 240, until(readout));
 			card();
 			close();
 			log("arcflash ok: " + read(cabinet) + " | " + state.get());

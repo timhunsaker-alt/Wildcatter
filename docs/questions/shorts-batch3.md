@@ -32,10 +32,14 @@ recommendation; for Tim**: none needs him before it can stand, but each can be c
 - **Alternatives:** vanilla block-crack particles (the game caps their speed, so no jet); a Ludo roar sound (one more asset).
 
 ### 4. The arc at the grounding clamps
-- **Chosen:** each time fault current starts through grounding clamps, a blue-white glare (a new particle, `arc_flash`, a metre or two
-  across at full brightness, 3 to 5 ticks) is drawn there with the sparks. Wave A's flash was the sparks alone.
-- **Why:** the 40 small sparks did not read on camera from more than a couple of metres. A bolted fault's arc lights its surroundings
-  for the few cycles it lasts.
+- **Chosen:** each time fault current starts through grounding clamps, the arc is drawn there (`safety/ArcFlash`):
+  - a blue-white glare (particle `arc_flash`, 2 to 4 m across, full brightness, 4 to 6 ticks);
+  - its light on the surroundings: a level-15 light block in the nearest air for 5 ticks, then taken away;
+  - a burst of sparks, a few molten drops and a puff of smoke;
+  - the flashover's crack, louder than before.
+  Wave A's flash was 40 small sparks and the crack.
+- **Why:** the small sparks did not read on camera from more than a couple of metres. A bolted fault's arc lights its surroundings
+  for the few cycles it lasts, and it throws molten metal and smoke.
 - **Kept from Wave A:** no flash is drawn at the breaker, as Wave A decided (6): a vacuum interrupter's arc is inside its bottle.
 - **Kept from Wave A:** the lamps past a bolted fault stay dark when the breaker recloses onto it (7). The short says so; it does not
   show them flashing on.

@@ -9,7 +9,7 @@ import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.RandomSource;
 
 /**
- * The light of a power arc ({@link dev.wildcatter.WildcatterParticles#ARC_FLASH}): a blue-white glare a metre or two across, at full
+ * The light of a power arc ({@link dev.wildcatter.WildcatterParticles#ARC_FLASH}): a blue-white glare two to four metres across, at full
  * brightness whatever the light round it, gone within a few ticks (a fault's arc lasts the few cycles until it is cleared).
  */
 public class ArcFlashParticle extends SingleQuadParticle {
@@ -20,11 +20,11 @@ public class ArcFlashParticle extends SingleQuadParticle {
 		this.zd = 0;
 		this.hasPhysics = false;
 		this.gravity = 0;
-		this.lifetime = 3 + random.nextInt(3);
-		this.quadSize = 1.1F + random.nextFloat() * 0.9F;
+		this.lifetime = 4 + random.nextInt(3);
+		this.quadSize = 2.2F + random.nextFloat() * 1.6F;
 		this.roll = random.nextFloat() * (float) Math.PI * 2;
 		this.oRoll = roll;
-		setColor(0.82F, 0.9F, 1.0F);
+		setColor(0.88F, 0.94F, 1.0F);
 		setAlpha(0.95F);
 	}
 

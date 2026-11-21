@@ -2461,14 +2461,19 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
 - **A blowout's spray:** an unlit surface blowout throws mud and oil drops (particle `blowout_spray`) 10 to 15 m up out of the rotary
   table, spreads a gas mist over the floor and plays the choke flow loop as its roar. The dark smoke is thinned. A burning blowout is
   unchanged.
-- **The clamps' arc:** grounding clamps closing onto a live line now draw a blue-white glare (particle `arc_flash`) with the sparks,
-  each time fault current starts. There is still no flash at the breaker (Wave A).
+- **The clamps' arc (`safety/ArcFlash`):** each time fault current starts through grounding clamps on a live line, they draw:
+  - a blue-white glare (particle `arc_flash`);
+  - its light on the surroundings (a light block for 5 ticks);
+  - sparks, molten drops and a puff of smoke;
+  - a louder crack.
+  There is still no flash at the breaker (Wave A).
 - **Client scenes `scram`, `blowout` and `arcflash`** (`Films010ClientGameTest`, run alone with WILDCATTER_ONLY; never part of the full
   suite). All are filmed in real time in the landscape window (2880 x 1620), the card in the frame's middle 9:16, with a 3 s still at
   each end.
   - `scram`: the trailer's turbine island at 25 %, then a manual trip.
   - `blowout`: the chokeKill rig kicks and is not shut in, so it blows out.
-  - `arcflash`: a yard breaker with 79 set to one shot recloses onto a standing bolted fault and locks out.
+  - `arcflash`: at midday and close, a yard breaker with 79 set to one shot recloses onto a standing bolted fault at its terminal
+    and locks out. The readout card's lines are kept short, so it stays the same size throughout.
 - **Known gaps:** the rod position board has no lettering (the columns are not labelled). The horn has no acknowledge. The blowout's
   roar is the choke flow loop, not a sound of its own. The lamps past a bolted fault cannot flash on during a reclose; a fault with
   impedance (an arcing fault through a tree, say) is not modelled.
