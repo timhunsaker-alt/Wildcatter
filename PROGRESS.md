@@ -2438,3 +2438,16 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
 - **0.10.1 tests:** `build` passes; the full NeoForge suite passes, 124 of 124 (2026-11-20), once the oilfield follow-ons' batch is
   padded 160 blocks: the first run failed `blowout`, `mv_span_flashover` and `oil_mud`, because gas_storage's peaker now reaches 72
   blocks west and was overlapping the scenes beside it. All three pass alone.
+
+## The spent fuel pool's glow, filmed (2026-11-21; branch `film-fuel-pool`)
+- **Renderer (`SpentFuelPoolRenderer`):** the Cherenkov glow did not show: the assemblies were pale-tinted steel under the game's
+  water face (about 70 % opaque), and from above nothing of the racks read. Now each hot assembly has additive shells of deep
+  electric blue round it and light rising off its top, scaled by its decay heat (full at 20 kW, as before); the pool's water is drawn
+  clear: a water mask over the pool hides the game's water face and a thinner tinted one is drawn in its place (classic transparency
+  only). Hot steel is lit pale blue, cooled steel plain.
+- **Client scene `fuelPool`** (`Films010ClientGameTest`, run alone with WILDCATTER_ONLY; never part of the full suite): the pool in a
+  dark fuel building at night, racks loaded with records from 7 to 300 days out of the core; filmed in real time in the landscape
+  window (2880 x 1620) with the readout card kept in the frame's middle 9:16. FUEL_POOL_CHECK=1 takes stills only.
+- **Tests:** `build` passes; NeoForge `casks` and `cask_cooling` (the pool's scenes) pass.
+- **Known gaps:** the refuelling machine has no renderer, so a move is not seen: the assembly appears in its slot. In the model an
+  assembly's decay heat (and so its glow) falls to almost nothing within a year; real pool fuel glows for years.

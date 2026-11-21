@@ -59,7 +59,7 @@ import net.minecraft.world.level.block.Blocks;
  * run, unfilmed).
  */
 public class Films010ClientGameTest extends PlcTrailerClientGameTest {
-	static final List<String> SCENES = List.of("chokeKill", "lostCirculation", "saltCavern", "frasch", "bess");
+	static final List<String> SCENES = List.of("chokeKill", "lostCirculation", "saltCavern", "frasch", "bess", "fuelPool");
 	/** Late afternoon: the sun up, long light. */
 	private static final long WORLD_TIME = 10500;
 
@@ -132,6 +132,7 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 						case "saltCavern" -> saltCavern();
 						case "frasch" -> frasch();
 						case "bess" -> bess();
+						case "fuelPool" -> fuelPool();
 						default -> {
 						}
 					}
@@ -250,6 +251,8 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 	 */
 	static final class FilmCard extends Screen {
 		static volatile String[] lines = new String[0];
+		/** In a landscape film cut to a vertical short: the card kept inside the frame's middle 9:16. */
+		static volatile boolean narrow;
 
 		FilmCard() {
 			super(Component.literal("readout"));
@@ -274,7 +277,8 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 			for (String l : now) {
 				widest = Math.max(widest, font.width(text(l)));
 			}
-			float s = Math.min(2.4f, (width * 0.90f) / widest);
+			float room = narrow ? Math.min(width, height * 9f / 16f) : width;
+			float s = Math.min(narrow ? 4f : 2.4f, (room * 0.90f) / widest);
 			int line = 11;
 			int boxW = (int) (widest * s) + 16;
 			int boxH = (int) (now.length * line * s) + 10;
@@ -1190,5 +1194,125 @@ public class Films010ClientGameTest extends PlcTrailerClientGameTest {
 		}));
 		close();
 		log("bess ok: cabinet " + read(A(8, 1, 12)));
+	}
+
+	// ---- fuelPool (8e) ------------------------------------------------------------------------------------------------------------------------
+	/**
+	 * The spent fuel pool (docs/multiblocks/fuel-handling.md) in a dark fuel building: its controller digs, lines and fills the 6 x 6 m
+	 * pool, 12 m deep, and the racks are loaded with irradiated assembly records (as the refuelling machine stores them): two rows from
+	 * this outage, a week out of the core; a row cooled 60 to 110 days; a row cooled 150 to 365 days. Their Cherenkov glow is the
+	 * renderer's, from each assembly's own decay heat. Filmed in the landscape window (2880 x 1620) for a vertical cut from its middle;
+	 * FUEL_POOL_CHECK=1 takes stills only (day and night, with and without the building's roof) to judge the glow.
+	 */
+	void fuelPool() {
+		wide();
+		guiWidth(480);
+		FilmCard.narrow = true;
+		try {
+			site(8800, 600, new int[] {-24, 24, -24, 24}, 12, new int[] {-12, 12, -14, 10}, 3);
+			pad(-16, -16, 16, 12, "minecraft:grass_block");
+			place(WildcatterBlocks.SPENT_FUEL_POOL, 0, 1, 0, NORTH);   // x 0-3, z 0-3; the pool x -1..4, z -6..-1, 12 deep
+			BlockPos poolAt = A(0, 1, 0);
+			dev.wildcatter.block.SpentFuelPoolBlockEntity pool = at(poolAt, dev.wildcatter.block.SpentFuelPoolBlockEntity.class);
+			if (!waitUntil(() -> getS(srv -> srv.overworld().getBlockState(pool.cell(2, 2, 6)).is(Blocks.WATER)), 400)) {
+				throw new IllegalStateException("the pool did not dig: " + read(poolAt));
+			}
+			// the fuel building: concrete walls and a roof, dim lights high on its walls
+			String wall = "minecraft:light_gray_concrete";
+			fill(-5, 1, -10, 8, 10, -10, wall);
+			fill(-5, 1, 6, 8, 10, 6, wall);
+			fill(-5, 1, -10, -5, 10, 6, wall);
+			fill(8, 1, -10, 8, 10, 6, wall);
+			fill(-5, 10, -10, 8, 10, 6, wall);
+			fill(-4, 0, -9, 7, 0, 5, "minecraft:smooth_stone replace minecraft:grass_block");
+			for (int[] l : new int[][] {{-4, -8}, {7, -8}, {-4, 4}, {7, 4}, {1, -9}, {-4, -2}, {7, -2}}) {
+				put(l[0], 8, l[1], "minecraft:light[level=7]");
+			}
+			// the racks: index i is across i % 6 (x -1..4), front i / 6 (z -1 at the controller back to -6)
+			double[] days = {7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 60, 70, 80, 90, 100, 110, 150, 180, 220, 260, 300};
+			onS(srv -> {
+				for (double d : days) {
+					pool.store(srv.overworld(), assembly(d));
+				}
+			});
+			context.waitTicks(40);
+			log("fuelPool built: " + getS(srv -> pool.inspect().getString()));
+			if (System.getenv("FUEL_POOL_CHECK") != null) {
+				checkStills();
+				return;
+			}
+			server.runCommand("time set 18000");
+			showCard();
+			card();
+			// 1: looking down into the pool at the racks glowing, a slow push down toward the water
+			film(1, "look_down", new Cam(1.5, 6.5, -1.2, 1.5, -10.0, -2.4), new Cam(1.5, 2.0, -1.9, 1.5, -10.0, -2.4), 300, until(t -> {}));
+			// 2: under the water, a slow move along the racks on their west side
+			film(2, "along_racks", new Cam(-0.6, -4.0, -0.5, 2.2, -9.5, -2.0), new Cam(-0.6, -4.0, -5.5, 2.2, -9.5, -4.5), 320, until(t -> {}));
+			// 3: under the water: a fresh assembly racked at the end of a row of cooled ones
+			film(3, "fresh_beside_cooled", new Cam(0.8, -5.2, -5.6, 4.0, -9.5, -3.5), new Cam(1.2, -5.6, -5.5, 4.0, -9.5, -3.5), 240, t -> {
+				if (t == 60) {
+					pool.store(pool.getLevel(), assembly(7));
+					mark("a fresh assembly (7 days out of the core) racked at the row's near end, beside ones cooled 150-300 days");
+				}
+				return true;
+			});
+			// 4: the pool's readout on a large card over the whole pool
+			film(4, "readout", new Cam(1.5, 3.4, -1.4, 1.5, -10.0, -2.6), new Cam(1.5, 3.1, -1.6, 1.5, -10.0, -2.6), 260, until(t -> {
+				double heat = 0;
+				double hottest = 0;
+				for (dev.wildcatter.fluid.SpentFuel.Assembly a : pool.racks()) {
+					heat += a.watts();
+					hottest = Math.max(hottest, a.watts());
+				}
+				card("^SPENT FUEL POOL", "Racks " + pool.racks().size() + " of " + Tuning.POOL_RACKS, "Decay heat " + f0(heat / 1000) + " kW",
+						"Hottest assembly " + f0(hottest / 1000) + " kW", "Water " + f1(pool.tempC()) + " °C", f1(pool.layers() - Tuning.POOL_FUEL_TOP_M) + " m of water over the fuel");
+			}));
+			card();
+			close();
+			log("fuelPool ok: " + read(poolAt));
+		} finally {
+			FilmCard.narrow = false;
+		}
+	}
+
+	/** An irradiated assembly's record {@code days} out of the core after a long run at full power: each decay group at its share, decayed. */
+	private static dev.wildcatter.fluid.SpentFuel.Assembly assembly(double days) {
+		double[] d = new double[Tuning.DECAY_LAMBDA.length];
+		for (int g = 0; g < d.length; g++) {
+			d[g] = Tuning.DECAY_SHARE[g] * Math.exp(-Tuning.DECAY_LAMBDA[g] * days * 86400);
+		}
+		return new dev.wildcatter.fluid.SpentFuel.Assembly(40, d, false, days * 86400);
+	}
+
+	/** Stills at the film's size to judge the glow: day and night, with the building's roof and without. */
+	private void checkStills() {
+		java.nio.file.Path dir = java.nio.file.Path.of("../../scene-videos/fuelPool-check").toAbsolutePath().normalize();
+		Cam down = new Cam(1.5, 6.0, -0.3, 1.5, -9.0, -4.0), row = new Cam(4.6, 2.2, -3.5, 0.5, -7.5, -3.5), under = new Cam(-0.5, -3.0, -0.5, 2.5, -9.0, -4.5);
+		dev.wildcatter.block.SpentFuelPoolBlockEntity pool = at(A(0, 1, 0), dev.wildcatter.block.SpentFuelPoolBlockEntity.class);
+		log("pool check: origin " + A(0, 0, 0).toShortString() + " racks " + pool.racks().size() + " cell(0,0,1) " + pool.cell(0, 0, 1).toShortString() + "="
+				+ getS(srv -> srv.overworld().getBlockState(pool.cell(0, 0, 1)).toString()) + " cell(0,0,12) " + pool.cell(0, 0, 12).toShortString() + " rack0 "
+				+ java.util.Arrays.toString(pool.rackPoint(0)) + " | " + getS(srv -> pool.inspect().getString()));
+		fill(-5, 10, -10, 8, 10, 6, "minecraft:air");
+		server.runCommand("time set 6000");
+		camera(new Cam(1.5, 24.0, 16.0, 1.5, -2.0, -3.0), true);
+		context.waitTicks(80);
+		log("camera at " + context.computeOnClient(client -> client.player.position().toString() + " yaw " + client.player.getYRot() + " pitch " + client.player.getXRot()));
+		context.takeScreenshot(net.fabricmc.fabric.api.client.gametest.v1.screenshot.TestScreenshotOptions.of("far").withSize(2880, 1620).withDestinationDir(dir).disableCounterPrefix());
+		fill(-5, 10, -10, 8, 10, 6, "minecraft:light_gray_concrete");
+		String[][] looks = {{"hall_night", "18000", "roof"}, {"open_night", "18000", ""}, {"open_day", "6000", ""}};
+		for (String[] look : looks) {
+			server.runCommand("time set " + look[1]);
+			if (look[2].isEmpty()) {
+				fill(-5, 10, -10, 8, 10, 6, "minecraft:air");
+			}
+			for (Cam c : new Cam[] {down, row, under}) {
+				camera(c, true);
+				context.waitTicks(60);
+				log("camera at " + context.computeOnClient(client -> client.player.position().toString()));
+				String name = look[0] + (c == down ? "_down" : c == row ? "_row" : "_under");
+				context.takeScreenshot(net.fabricmc.fabric.api.client.gametest.v1.screenshot.TestScreenshotOptions.of(name).withSize(2880, 1620).withDestinationDir(dir).disableCounterPrefix());
+				log("still " + name);
+			}
+		}
 	}
 }
