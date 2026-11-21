@@ -204,6 +204,11 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 		return fuel;
 	}
 
+	/** Its generator, if one touches it (the films read its synchronizer). */
+	public @Nullable GeneratorPartBlockEntity generatorPart() {
+		return level == null ? null : generator(level);
+	}
+
 	// ---- its parts, by touching --------------------------------------------------------------------------------------------------
 	private @Nullable GeneratorPartBlockEntity generator(Level level) {
 		net.minecraft.world.level.block.Block mine = aero() ? WildcatterBlocks.AERO_GENERATOR : WildcatterBlocks.GT_GENERATOR;
@@ -316,6 +321,7 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 						gt.stop(server, "NO FUEL at light-off: pipe pipeline gas, diesel or kerosene to its fuel nozzle (west side)");
 					} else {
 						gt.phase = Phase.RUNUP;
+						gt.lightOff = 60;
 						server.playSound(null, pos, WildcatterSounds.BURNER_ROAR, SoundSource.BLOCKS, 1.5F, 1.4F);
 					}
 				}
@@ -354,6 +360,7 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 			}
 		}
 		gt.fuelWatts = burn;
+		gt.exhaust(server, burn);
 		if (gen != null) {
 			if (gt.phase != Phase.RUNNING) {
 				gt.ramp = 0.05;   // it synchronizes carrying a little, then ramps
@@ -362,6 +369,50 @@ public class GasTurbineBlockEntity extends BlockEntity implements CircuitPart, I
 		}
 		gt.running.update(gt, gt.phase != Phase.STOPPED || gt.speed > 0.05);
 		gt.setChanged();
+	}
+
+	/** Ticks of the light-off puff left: a liquid-fuel light-off throws a few seconds of smoke out of the stack. */
+	private int lightOff;
+
+	/**
+	 * Its exhaust out of the stack top while it burns: a puff of smoke at light-off, then a thin haze that grows with the fuel it burns
+	 * (vanilla smoke, standing in for the shimmer of hot exhaust).
+	 */
+	private void exhaust(ServerLevel level, double burn) {
+		if (burn <= 0) {
+			if (phase == Phase.STOPPED) {
+				lightOff = 0;
+			}
+			return;   // the light-off tick itself burns nothing yet: the puff starts with the run-up
+		}
+		boolean puff = lightOff > 0;
+		if (puff) {
+			lightOff--;
+		}
+		if (!puff && (level.getGameTime() + worldPosition.hashCode()) % 4 != 0) {
+			return;
+		}
+		boolean aero = aero();
+		net.minecraft.world.level.block.Block kind = aero ? WildcatterBlocks.AERO_EXHAUST_STACK : WildcatterBlocks.GT_EXHAUST_STACK;
+		TurbinePassiveBlockEntity stack = Touching.find(level, worldPosition, TurbinePassiveBlockEntity.class, e -> e.getBlockState().is(kind));
+		if (stack == null) {
+			return;   // an HRSG takes the exhaust
+		}
+		int w = aero ? 4 : 3, h = aero ? 14 : 12;
+		BlockPos a = LeasePartBlock.at(stack.getBlockPos(), stack.getBlockState(), 0, h, 0);
+		BlockPos b = LeasePartBlock.at(stack.getBlockPos(), stack.getBlockState(), w - 1, h, w - 1);
+		double x = (a.getX() + b.getX()) / 2.0 + 0.5, y = a.getY() + 0.2, z = (a.getZ() + b.getZ()) / 2.0 + 0.5;
+		double r = w * 0.25;
+		double share = Math.min(1, burn / fullFuelWatts());
+		if (puff) {
+			level.sendParticles(net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE, false, true, x, y, z, 10, r, 0.3, r, 0.08);
+			level.sendParticles(net.minecraft.core.particles.ParticleTypes.CAMPFIRE_COSY_SMOKE, false, true, x, y, z, 3, r, 0.2, r, 0.02);
+		} else {
+			level.sendParticles(net.minecraft.core.particles.ParticleTypes.WHITE_SMOKE, false, true, x, y, z, 2 + (int) Math.round(6 * share), r, 0.2, r, 0.04);
+			if (level.getRandom().nextDouble() < 0.25 + 0.5 * share) {
+				level.sendParticles(net.minecraft.core.particles.ParticleTypes.CAMPFIRE_COSY_SMOKE, false, true, x, y, z, 1, r * 0.5, 0.1, r * 0.5, 0.01);
+			}
+		}
 	}
 
 	private void stop(ServerLevel level, String why) {

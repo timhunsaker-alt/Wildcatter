@@ -109,6 +109,11 @@ public class GeneratorPartBlockEntity extends BlockEntity implements CircuitPart
 		return hertz;
 	}
 
+	/** Its synchronizer: the slip and phase angle it reads against the bus while its breaker is open. */
+	public Synchronizer synchronizer() {
+		return sync;
+	}
+
 	/** Reset after a trip: the prime mover's button. */
 	public void reset() {
 		tripped = false;
