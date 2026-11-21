@@ -73,7 +73,10 @@ from 1 m. 3 m of water over the fuel gives about 2.7×10⁷, so a day-old assemb
 | item `dosimeter` | | An electronic personal dosimeter. |
 
 **The renderer** draws the racks at the pool's floor and each assembly in them, with a blue Cherenkov glow while its decay heat
-is high.
+is high (full at 20 kW): a deep electric blue drawn additively in the water round the assembly and rising off its top, so
+neighbours add up and the hottest are brightest. The pool's water is drawn clear (its cleanup skid keeps it so): the game's own
+water face, about 70 % opaque, hid the racks, so a water mask hides it over the pool and a thinner tinted face is drawn instead
+(the classic transparency path only; with improved transparency the game's water is kept).
 
 ## Game test
 `fuelHandling`:
