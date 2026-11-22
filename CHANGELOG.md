@@ -2,6 +2,11 @@
 
 ## v0.10.1 (unreleased): battery hazards, oilfield sounds
 
+### Ferroalloys
+- **The moly roaster takes concentrate by hopper:** items in `#wildcatter:molybdenite_feed` or `#wildcatter:scheelite_feed` (Tailings'
+  molybdenite and scheelite concentrate) go in by a hopper on its top, as well as slurry by pipe, so scheelite concentrate reaches the
+  ferrotungsten route as items.
+
 ### Battery containers
 - **Explosions and lightning** now set a battery container off, under the `bessThermalRunaway` world rule only: a blast that reaches
   it (it burns out instead of being blown apart), or lightning striking it with no ground rod within 4 blocks. With the rule off,

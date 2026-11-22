@@ -81,6 +81,8 @@ public class WildcatterNeoForgeGameTests {
 
 	/** A stand-in for Tailings' zircon concentrate: in #wildcatter:zircon_feed at 50 kg by this mod's data (GridAnswerScenes.zirconFeed). */
 	static net.minecraft.world.item.Item ZIRCON_CONCENTRATE;
+	/** A stand-in for Tailings' scheelite concentrate: in #wildcatter:scheelite_feed at 47.125 kg by this mod's data (FerroalloyScenes.scheeliteHopper). */
+	static net.minecraft.world.item.Item SCHEELITE_CONCENTRATE;
 
 	/** Phase 19's reactor scenes (ReactorExtensionScenes): a scene that switches a reactor rule on runs in a batch of its own. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> REACTOR_SCENES = ReactorExtensionScenes.scenes();
@@ -125,6 +127,9 @@ public class WildcatterNeoForgeGameTests {
 				ResourceKey<net.minecraft.world.item.Item> key = ResourceKey.create(Registries.ITEM, id("zircon_concentrate"));
 				ZIRCON_CONCENTRATE = new net.minecraft.world.item.Item(new net.minecraft.world.item.Item.Properties().setId(key));
 				helper.register(id("zircon_concentrate"), ZIRCON_CONCENTRATE);
+				ResourceKey<net.minecraft.world.item.Item> scheelite = ResourceKey.create(Registries.ITEM, id("scheelite_concentrate"));
+				SCHEELITE_CONCENTRATE = new net.minecraft.world.item.Item(new net.minecraft.world.item.Item.Properties().setId(scheelite));
+				helper.register(id("scheelite_concentrate"), SCHEELITE_CONCENTRATE);
 			});
 			event.register(Registries.BLOCK_ENTITY_TYPE, helper -> {
 				TestGasSource.TYPE = new net.minecraft.world.level.block.entity.BlockEntityType<>(TestGasSource.SourceEntity::new,

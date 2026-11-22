@@ -65,6 +65,7 @@ final class FerroalloyScenes {
 		Map<String, Consumer<GameTestHelper>> scenes = new LinkedHashMap<>();
 		scenes.put("ferroalloys", FerroalloyScenes::ferroalloys);
 		scenes.put("alumino", FerroalloyScenes::alumino);
+		scenes.put("scheelite_hopper", FerroalloyScenes::scheeliteHopper);
 		return scenes;
 	}
 
@@ -310,6 +311,34 @@ final class FerroalloyScenes {
 					});
 				});
 			});
+		}));
+	}
+
+	// ---- scheelite_hopper (copper-smelter answers, Tailings #3) ------------------------------------------------------------------------
+	/**
+	 * scheelite_hopper: on a diesel set, a moly roaster with a hopper on its top holding four stand-in scheelite concentrates (in
+	 * #wildcatter:scheelite_feed at 47.125 kg each): it takes them through the hopper, one at a time while its cake is low, and dries
+	 * the scheelite into concentrate for bags, no pipe needed; it refuses what is not concentrate.
+	 */
+	static void scheeliteHopper(GameTestHelper helper) {
+		floor(helper, -10, -8, 10, 6);
+		place(helper, WildcatterBlocks.MOLY_ROASTER, 0, U, 0, NORTH);                // x 0-2, z 0-2, box (0, 0) west
+		MolyRoasterBlockEntity roaster = entity(helper, 0, U, 0, MolyRoasterBlockEntity.class);
+		ItemStack feed = new ItemStack(WildcatterNeoForgeGameTests.SCHEELITE_CONCENTRATE, 4);
+		check(helper, roaster.takes(feed) && roaster.canPlaceItemThroughFace(0, feed, Direction.UP), "a hopper on top puts scheelite concentrate in its bin");
+		check(helper, !roaster.takes(new ItemStack(Items.SAND)), "and nothing else");
+		hopper(helper, 1, U + 9, 1, feed);
+		genset(helper, -3, U, -6);                                                    // skid x -8..-3, z -6..-5
+		put(helper, "cable_industrial", -2, U, -6);
+		for (int z = -6; z <= 0; z++) {
+			put(helper, "cable_industrial", -1, U, z);
+		}
+		start(helper, -3, U, -6, () -> helper.runAfterDelay(600, () -> {
+			String state = read(helper, 0, U, 0);
+			log("scheelite_hopper", state);
+			check(helper, state.contains("drying scheelite concentrate") || roaster.bagReady() > 0, "it dries the hopper's scheelite: " + state);
+			check(helper, roaster.bagReady() > 0, "scheelite concentrate waits for bags: " + state);
+			helper.succeed();
 		}));
 	}
 }

@@ -23,9 +23,10 @@ import org.jspecify.annotations.Nullable;
  * drive and fans 22 kW at LV (box west). 2 MoS2 + 7 O2 -> 2 MoO3 + 4 SO2: 0.25 t/h of technical moly oxide (57 % Mo) to the bagging
  * station against it, and its off-gas on the pipe out of its south side as burner gas for an acid plant's converter. Real roasters must not
  * vent: with nowhere for the gas to go it reads NO ACID PLANT and stops. A concentrate carrying scheelite instead is only filtered and
- * dried, into bags of scheelite concentrate for the aluminothermic vessel.
+ * dried, into bags of scheelite concentrate for the aluminothermic vessel. Concentrate items ({@link ConcentrateFeed}: Tailings' molybdenite and
+ * scheelite concentrate) go in by a hopper on its top.
  */
-public class MolyRoasterBlockEntity extends UnitMotorBlockEntity implements Bagged {
+public class MolyRoasterBlockEntity extends UnitMotorBlockEntity implements Bagged, HopperFed {
 	public static final String MOLYBDENITE = "wildcatter:molybdenite";
 	public static final String SCHEELITE = "wildcatter:scheelite";
 
@@ -36,6 +37,19 @@ public class MolyRoasterBlockEntity extends UnitMotorBlockEntity implements Bagg
 	private double making;      // kg/h of oxide (or concentrate), the last interval
 	private double madeOxide;   // t
 	private String unit = "starting";
+	/** Concentrate items by a hopper on its top (ferroalloys.md, "Concentrate by hopper"). */
+	private final net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> slots = net.minecraft.core.NonNullList.withSize(1, net.minecraft.world.item.ItemStack.EMPTY);
+
+	@Override
+	public net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> slots() {
+		return slots;
+	}
+
+	/** Molybdenite or scheelite concentrate as items: {@code #wildcatter:molybdenite_feed} or {@code #wildcatter:scheelite_feed}. */
+	@Override
+	public boolean takes(net.minecraft.world.item.ItemStack stack) {
+		return ConcentrateFeed.MOLYBDENITE.is(stack) || ConcentrateFeed.SCHEELITE.is(stack);
+	}
 
 	public MolyRoasterBlockEntity(BlockPos pos, BlockState state) {
 		super(WildcatterBlocks.MOLY_ROASTER_ENTITY, pos, state);
@@ -92,6 +106,12 @@ public class MolyRoasterBlockEntity extends UnitMotorBlockEntity implements Bagg
 	protected void work(Level level) {
 		making = 0;
 		double dt = seconds();
+		// concentrate by hopper: an item into the cake while it is low, its mineral by its kg file
+		if (mos2 + scheelite < Tuning.ROASTER_SLURRY_HOLD_KG * 0.05 && !slots.get(0).isEmpty()) {
+			net.minecraft.world.item.ItemStack one = useOne();
+			mos2 += ConcentrateFeed.MOLYBDENITE.kg(level.getServer(), one);
+			scheelite += ConcentrateFeed.SCHEELITE.kg(level.getServer(), one);
+		}
 		// the drum filter: slurry in while its cake is low
 		if (mos2 + scheelite < Tuning.ROASTER_SLURRY_HOLD_KG * 0.05) {
 			Slurry.Taken got = Slurry.take(level, inlet(), Product.THICKENED_CONCENTRATE, 50, this);
@@ -101,7 +121,7 @@ public class MolyRoasterBlockEntity extends UnitMotorBlockEntity implements Bagg
 		double oxideKg = Tuning.ROASTER_OXIDE_KGH / 3600 * dt;
 		boolean roast = mos2 >= oxideKg * Ferroalloys.mos2PerOxide();
 		if (!roast && scheelite <= 1e-6) {
-			unit = mos2 > 0 ? "filtering: waiting for more concentrate" : "NO CONCENTRATE: pipe thickened concentrate carrying molybdenite or scheelite to its east side";
+			unit = mos2 > 0 ? "filtering: waiting for more concentrate" : "NO CONCENTRATE: pipe thickened concentrate carrying molybdenite or scheelite to its east side, or put concentrate in a hopper on its top";
 			return;
 		}
 		if (plcHold(level)) {
@@ -177,6 +197,7 @@ public class MolyRoasterBlockEntity extends UnitMotorBlockEntity implements Bagg
 		output.putDouble("oxide", oxide);
 		output.putDouble("dried", dried);
 		output.putDouble("madeOxide", madeOxide);
+		net.minecraft.world.ContainerHelper.saveAllItems(output, slots);
 	}
 
 	@Override
@@ -187,5 +208,7 @@ public class MolyRoasterBlockEntity extends UnitMotorBlockEntity implements Bagg
 		oxide = input.getDoubleOr("oxide", 0);
 		dried = input.getDoubleOr("dried", 0);
 		madeOxide = input.getDoubleOr("madeOxide", 0);
+		slots.clear();
+		net.minecraft.world.ContainerHelper.loadAllItems(input, slots);
 	}
 }
