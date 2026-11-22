@@ -2,6 +2,11 @@
 
 ## v0.10.1 (unreleased): battery hazards, oilfield sounds
 
+### DC
+- **The 4.16 kV rectifier carries a copper tankhouse:** a cell set against it is held at its rating up to 25 kA (was its dial's
+  16 kA in name, no ceiling in fact), within its transformer's 2.4 MW: above 16 kA its volts are held under 2.4 MW over the current.
+  Nothing up to 16 kA changes. For Tailings' electrorefining tankhouse, 72 cells at 20.5 kA and 21.6 V.
+
 ### Battery containers
 - **Explosions and lightning** now set a battery container off, under the `bessThermalRunaway` world rule only: a blast that reaches
   it (it burns out instead of being blown apart), or lightning striking it with no ground rod within 4 blocks. With the rule off,

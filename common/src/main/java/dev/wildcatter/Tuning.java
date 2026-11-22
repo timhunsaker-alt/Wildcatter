@@ -484,6 +484,9 @@ public final class Tuning {
 	public static final double[] RECTIFIER_SETPOINTS_KA = {1, 2, 2.8, 4, 6, 8, 10, 12, 14, 16};
 	public static final int RECTIFIER_SETPOINT_DEFAULT = 4;        // 6 kA, the fluorine cell house's
 	public static final double RECTIFIER_MAX_DC_VOLTS = 150.0;     // 16 kA x 150 V = 2.4 MW
+	public static final double RECTIFIER_MAX_DC_WATTS = 2.4e6;     // its transformer: above 16 kA its volts are held under 2.4 MW / setpoint (dc-bus.md, 2026-11-22)
+	public static final double RECTIFIER_MAX_CELL_KA = 25.0;       // a cell set against it: its bridge and bars, for a copper tankhouse's 20.5 kA (dc-bus.md, 2026-11-22)
+	public static final double RECTIFIER_MV_MAX_CELL_KA = 16.0;    // the 12.47 kV rectifier's own rating
 	public static final double RECTIFIER_DC_OHMS = 0.1e-3;         // its regulation: about 1 % of 150 V at 16 kA (its losses are the 97 %)
 	public static final double RECTIFIER_RAMP_VOLTS_PER_S = 15.0;  // an on-load tap changer steps in seconds
 	public static final double RECTIFIER_OVERCURRENT = 1.25;       // x setpoint for RECTIFIER_OVERCURRENT_SECONDS: it trips

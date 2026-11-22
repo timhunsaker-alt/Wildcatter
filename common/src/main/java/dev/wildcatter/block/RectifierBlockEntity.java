@@ -108,6 +108,11 @@ public class RectifierBlockEntity extends PlantUnitBlockEntity implements Circui
 		this.acVoltage = acVoltage;
 	}
 
+	/** The most a cell set against it is held at: its bridge and bars (dc-bus.md, 2026-11-22). */
+	protected double maxCellAmps() {
+		return Tuning.RECTIFIER_MAX_CELL_KA * 1000;
+	}
+
 	/** Its name in a readout. */
 	protected String label() {
 		return String.format("Rectifier (12-pulse, %s in)", acVoltage.label());
@@ -174,7 +179,7 @@ public class RectifierBlockEntity extends PlantUnitBlockEntity implements Circui
 	@Override
 	public void build(Circuit circuit) {
 		Electrolysis.Part cell = level == null ? null : Touching.find(level, worldPosition, Electrolysis.Part.class, c -> true);
-		cellAmps = cell == null ? 0 : cell.electrolysis().cells().ratedAmps();
+		cellAmps = cell == null ? 0 : Math.min(cell.electrolysis().cells().ratedAmps(), maxCellAmps());
 		dc.build(circuit, worldPosition, List.of(boxFace()), enabled());
 		Direction east = LeasePartBlock.world(getBlockState(), Direction.EAST);
 		circuit.dcPort(LeasePartBlock.at(worldPosition, getBlockState(), 2, 2, 2), east, dc.plus(), Tuning.DC_JOINT_OHMS / 2, false);

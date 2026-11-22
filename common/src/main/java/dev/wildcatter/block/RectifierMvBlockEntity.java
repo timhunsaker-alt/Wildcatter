@@ -20,6 +20,11 @@ public class RectifierMvBlockEntity extends RectifierBlockEntity {
 	}
 
 	@Override
+	protected double maxCellAmps() {
+		return Tuning.RECTIFIER_MV_MAX_CELL_KA * 1000;
+	}
+
+	@Override
 	public String deviceName() {
 		return "Rectifier (" + Voltage.DISTRIBUTION.label() + ")";
 	}

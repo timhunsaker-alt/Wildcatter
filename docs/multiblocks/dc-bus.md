@@ -104,6 +104,27 @@ chlor-alkali cell, east face (x = 2), z = 3:     y = 2 +, y = 0 -
   - a unit not touching another is a yard of one.
 - **The cell's back-EMF can change while it runs:** a pot's anode effect raises it to 27.65 V (potline.md).
 
+## A copper tankhouse on the 10b1 rectifier (2026-11-22, Tailings' copper-smelter answers, #11)
+**DRAFT: decided on recommendation; Tim asked for it on 2026-11-22.** Tailings' electrorefining tankhouse (Tailings
+`docs/copper-smelter.md`) is 72 copper cells in series at **20.5 kA and 0.30 V a cell, 21.6 V, 443 kW**. Before this change the
+4.16 kV rectifier was rated 16 kA at up to 150 V (2.4 MW). It held a touching cell's rating with no ceiling, so it would have carried
+20.5 kA above its nameplate.
+
+A real copper refinery rectifier is a low-voltage, high-current unit: tens of kA at a few tens of volts. The 10b1 rectifier is
+re-rated as one rectifier transformer with two duties, which is real practice: the same transformer power at a lower DC voltage gives
+more current, so its diode bridge and its bus to a cell are sized for that current.
+| Item | Value | Basis |
+|---|---|---|
+| Rectifier DC current | **up to 25 kA** for a cell set against it (its dial still stops at 16 kA) | the bridge and its bars to the cell; real copper refinery rectifiers are 20-45 kA *(unverified range)* |
+| Rectifier power | **2.4 MW** DC, its transformer's rating, unchanged | above 16 kA its volts are held under 2.4 MW / setpoint: 117 V at 20.5 kA, 96 V at 25 kA |
+| Everything else | as the 10b1 rectifier: 150 V, 0.1 mΩ, 15 V/s, 97 %, PF 0.95 on 4.16 kV | |
+
+- `DcSupply` takes a maximum DC power. It holds its EMF under that power at its setpoint, which changes nothing up to 16 kA. The
+  rectiformer and the 12.47 kV rectifier keep no power limit beyond their volts. The 12.47 kV rectifier is held at its own 16 kA.
+- A cell rated above 25 kA set against the 4.16 kV rectifier is held at 25 kA. No Wildcatter cell is.
+- Unit tests in `DcTest`: 72 copper cells at 20.5 kA hold about 21.6 V and draw 443 kW; at 25 kA into a load that wants more than
+  96 V the rectifier stops at 96 V.
+
 ## Controls and readouts
 - **Rectifier:**
   - sneak and right-click steps the setpoint dial;

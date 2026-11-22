@@ -27,6 +27,10 @@ class DcTest {
 
 	/** Runs the rectifier {@code seconds} on {@code load}; {@code faultMinus} grounds its - pole. */
 	private static void run(DcSupply dc, DcCell cells, Load load, boolean faultMinus, double seconds) {
+		run(dc, cells, load, faultMinus, seconds, SIX_KA);
+	}
+
+	private static void run(DcSupply dc, DcCell cells, Load load, boolean faultMinus, double seconds, double setpoint) {
 		ThreePhaseSource source = new ThreePhaseSource();
 		for (double t = 0; t < seconds; t += 0.2) {
 			Circuit circuit = new Circuit();
@@ -42,7 +46,7 @@ class DcTest {
 				circuit.resistor(dc.minus(), 0, Tuning.SHORT_CONTACT_OHMS);
 			}
 			assertTrue(circuit.solve());
-			dc.apply(circuit, 4, SIX_KA, true);
+			dc.apply(circuit, 4, setpoint, true);
 			cells.apply(circuit, dc.plus(), dc.minus());
 		}
 	}
@@ -111,5 +115,25 @@ class DcTest {
 		dc.reset();
 		run(dc, cells, Load.CELLS, false, 40);
 		assertEquals(SIX_KA, cells.amps(), SIX_KA * 0.01, "back at 6 kA after a reset");
+	}
+
+	/** A copper tankhouse on it (dc-bus.md, 2026-11-22): 72 cells at 0.30 V hold 20.5 kA at about 21.6 V, 443 kW, under its 2.4 MW. */
+	@Test
+	void itCarriesACopperTankhousesTwentyKiloamps() {
+		DcSupply dc = new DcSupply(Voltage.MEDIUM);
+		DcCell cells = new DcCell(72, 0.05, 0.30, 20_500);
+		run(dc, cells, Load.CELLS, false, 60, 20_500);
+		assertEquals(20_500, cells.amps(), 20_500 * 0.01);
+		assertEquals(21.6, cells.volts(), 0.5);
+		assertTrue(dc.tripped().isEmpty(), "no trip: " + dc.tripped());
+	}
+
+	/** Above 16 kA its volts are held under its transformer's 2.4 MW: 96 V at 25 kA. */
+	@Test
+	void aboveSixteenKiloampsItsVoltsAreHeldUnderItsPower() {
+		DcSupply dc = new DcSupply(Voltage.MEDIUM);
+		DcCell cells = f2(20);   // 180 V wanted
+		run(dc, cells, Load.CELLS, false, 60, 25_000);
+		assertEquals(Tuning.RECTIFIER_MAX_DC_WATTS / 25_000, dc.emf(), 1e-6);
 	}
 }

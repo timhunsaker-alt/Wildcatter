@@ -18,6 +18,8 @@ public final class DcSupply {
 	private final double ohms;
 	private final double ramp;
 	private final double efficiency;
+	/** Its transformer's DC power: its EMF is held under this over its setpoint (infinite for a rectifier rated by its volts alone). */
+	private final double maxWatts;
 	private int plus;
 	private int minus;
 	private int branch = -1;
@@ -34,11 +36,17 @@ public final class DcSupply {
 
 	/** The 10b1 rectifier: 4.16 kV in, up to 150 V. */
 	public DcSupply(Voltage acVoltage) {
-		this(acVoltage, Tuning.RECTIFIER_MAX_DC_VOLTS, Tuning.RECTIFIER_DC_OHMS, Tuning.RECTIFIER_RAMP_VOLTS_PER_S, Tuning.RECTIFIER_EFFICIENCY);
+		this(acVoltage, Tuning.RECTIFIER_MAX_DC_VOLTS, Tuning.RECTIFIER_DC_OHMS, Tuning.RECTIFIER_RAMP_VOLTS_PER_S, Tuning.RECTIFIER_EFFICIENCY, Tuning.RECTIFIER_MAX_DC_WATTS);
 	}
 
 	/** A rectifier of its own size: its AC tier, its maximum DC volts, its internal resistance, its ramp in V/s and its efficiency. */
 	public DcSupply(Voltage acVoltage, double maxVolts, double ohms, double ramp, double efficiency) {
+		this(acVoltage, maxVolts, ohms, ramp, efficiency, Double.POSITIVE_INFINITY);
+	}
+
+	/** As above, with its transformer's DC power: above maxWatts / maxVolts amps its volts are held under that power (dc-bus.md, 2026-11-22). */
+	public DcSupply(Voltage acVoltage, double maxVolts, double ohms, double ramp, double efficiency, double maxWatts) {
+		this.maxWatts = maxWatts;
 		this.ac = new DriveLoad(acVoltage, Tuning.RECTIFIER_POWER_FACTOR, 0);
 		this.maxVolts = maxVolts;
 		this.ohms = ohms;
@@ -119,7 +127,7 @@ public final class DcSupply {
 		}
 		lastEmf = emf;
 		lastAmps = amps;
-		emf = Math.max(0, Math.min(maxVolts, next));
+		emf = Math.max(0, Math.min(Math.min(maxVolts, maxWatts / Math.max(1, setpoint)), next));
 	}
 
 	private void tripOn(double at) {
