@@ -1708,6 +1708,13 @@ public final class Tuning {
 	public static final double ROASTER_RECOVERY = 0.98;             // molybdenum to the oxide (proposed)
 	public static final double ROASTER_SLURRY_HOLD_KG = 2_000.0;    // its drum filter's cake (proposed)
 	public static final double SCHEELITE_BAG_WO3 = 0.65;            // a bag of dried scheelite concentrate: 65 % WO3 (proposed)
+	/**
+	 * An item of {@code #wildcatter:molybdenite_feed} or {@code #wildcatter:scheelite_feed} with no kg file (block/ConcentrateFeed) counts as
+	 * this much mineral: Tailings' concentrate items, a quarter of a block's mineral at the ores' game grades (2.65 t x 3 % / 4 and
+	 * 2.9 t x 6.5 % / 4).
+	 */
+	public static final double MOLYBDENITE_FEED_ITEM_KG = 19.875;
+	public static final double SCHEELITE_FEED_ITEM_KG = 47.125;
 	/** The aluminothermic vessel: a batch fires in 10 minutes; its baghouse fan 15 kW at LV. */
 	public static final double VESSEL_FIRE_SECONDS = 600.0;
 	public static final double VESSEL_FAN_WATTS = 15_000.0;

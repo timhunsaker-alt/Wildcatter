@@ -153,6 +153,12 @@ The grid is a sketch; the game test is the layout of record.
   oxide (0.97 kg of MoS2 a kg, 98 % recovery), the SO2 (0.78 kg a kg) on the pipe out of its south side (local 1, 0, 2) as the burner gas
   that carries it; NO ACID PLANT when its 5 s of gas cannot go. `wildcatter:scheelite` dried to 65 % WO3 concentrate bags. 22 kW at LV,
   box west. PLC RUN, RUNNING, AUTO, RATE.
+- **Concentrate by hopper (2026-11-22, Tailings' copper-smelter answers, #3):** a hopper on the roaster's top feeds it concentrate as
+  items, one at a time while its filter cake is low: anything in `#wildcatter:molybdenite_feed` or `#wildcatter:scheelite_feed`, its kg
+  of mineral from a kg file `data/<namespace>/wildcatter/<feed>/<any>.json` (`{"item": ..., "kg": ...}`), as `#wildcatter:zircon_feed`
+  works for the chlorinator (`block/ConcentrateFeed`). With no kg file an item counts as Tailings' concentrate item: 19.875 kg of
+  molybdenite, 47.125 kg of scheelite (`Tuning.MOLYBDENITE_FEED_ITEM_KG`, `SCHEELITE_FEED_ITEM_KG`). Both tags are empty here; Tailings
+  fills them with its concentrates. Scene `scheelite_hopper`.
 - **Vessel:** bins for moly oxide bags, scheelite concentrate bags, iron and aluminium ingots; FeMo batch 1 bag + 4 iron + 20 aluminium
   = 860 kg; FeW batch 1 bag + 1 iron + 8 aluminium = 648 kg; 10 minutes, fire damage under its hood; fan 15 kW at LV, box west.
 - **Items:** 1 t bulk bags of HC ferrochrome, HC ferromanganese, ferrosilicon 75, technical moly oxide, scheelite concentrate,

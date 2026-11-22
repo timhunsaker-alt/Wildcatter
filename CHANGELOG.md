@@ -7,6 +7,11 @@
   16 kA in name, no ceiling in fact), within its transformer's 2.4 MW: above 16 kA its volts are held under 2.4 MW over the current.
   Nothing up to 16 kA changes. For Tailings' electrorefining tankhouse, 72 cells at 20.5 kA and 21.6 V.
 
+### Ferroalloys
+- **The moly roaster takes concentrate by hopper:** items in `#wildcatter:molybdenite_feed` or `#wildcatter:scheelite_feed` (Tailings'
+  molybdenite and scheelite concentrate) go in by a hopper on its top, as well as slurry by pipe, so scheelite concentrate reaches the
+  ferrotungsten route as items.
+
 ### Battery containers
 - **Explosions and lightning** now set a battery container off, under the `bessThermalRunaway` world rule only: a blast that reaches
   it (it burns out instead of being blown apart), or lightning striking it with no ground rod within 4 blocks. With the rule off,
