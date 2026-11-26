@@ -10,6 +10,8 @@ fabricApi {
 		modId = "wildcatter-gametest"
 		enableGameTests = false
 		enableClientGameTests = true
+		// films (Built From Scratch): the filmed player's name, which the chat shows with each advancement; the test default otherwise
+		username = providers.environmentVariable("FILM_USERNAME").orElse("Player0")
 	}
 }
 

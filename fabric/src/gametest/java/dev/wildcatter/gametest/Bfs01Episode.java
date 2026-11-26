@@ -743,90 +743,124 @@ final class Bfs01Episode {
 
 	private BlockPos trunk;
 
-	private void tree(int n) {
-		// the nearest oak or birch trunk to the base standing on the ground, at least five logs tall, with a cell beside it facing the base
-		BlockPos base = new BlockPos(bx, by + 1, bz);
-		trunk = server.computeOnServer(srv -> {
-			ServerLevel level = srv.overworld();
-			BlockPos best = null;
-			double bestD = 1e9;
-			for (BlockPos p : BlockPos.betweenClosed(base.offset(-30, -4, -30), base.offset(30, 6, 30))) {
-				BlockState st = level.getBlockState(p);
-				if (!st.is(BlockTags.LOGS) || !level.getBlockState(p.below()).is(BlockTags.DIRT)) {
-					continue;
-				}
-				int h = 0;
-				while (level.getBlockState(p.above(h)).is(BlockTags.LOGS)) {
-					h++;
-				}
-				if (h < 5 || p.distSqr(base) >= bestD || p.distSqr(base) < 64) {   // at the forest's edge, clear of the base
-					continue;
-				}
-				best = p.immutable();
-				bestD = p.distSqr(base);
-			}
-			return best;
-		});
-		if (trunk == null) {
-			throw new IllegalStateException("no tree near the base");
-		}
-		int logs = server.computeOnServer(srv -> {
-			int h = 0;
-			while (srv.overworld().getBlockState(trunk.above(h)).is(BlockTags.LOGS)) {
-				h++;
-			}
-			return h;
-		});
-		log("trunk at " + trunk.toShortString() + ", " + logs + " logs, " + state(trunk));
-		// stand beside it, on the side towards the base
-		Direction toward = Direction.getApproximateNearest(bx - trunk.getX(), 0, bz - trunk.getZ());
-		BlockPos feet = null;
-		for (Direction d : new Direction[] {toward, toward.getClockWise(), toward.getCounterClockWise(), toward.getOpposite()}) {
+	/** A cell beside {@code trunk} to stand in (clear, two high, on solid ground), the side towards {@code toward} first. */
+	private BlockPos besideTrunk(BlockPos trunk, BlockPos toward) {
+		Direction d0 = Direction.getApproximateNearest(toward.getX() - trunk.getX(), 0, toward.getZ() - trunk.getZ());
+		for (Direction d : new Direction[] {d0, d0.getClockWise(), d0.getCounterClockWise(), d0.getOpposite()}) {
 			BlockPos f = trunk.relative(d);
 			if (clear(f) && clear(f.above()) && solid(f.below())) {
-				feet = f;
-				break;
+				return f;
 			}
 		}
-		if (feet == null) {
-			throw new IllegalStateException("no room beside the trunk at " + trunk.toShortString());
+		return null;
+	}
+
+	/** Walks the player in a straight line to {@code to} (feet), a step a block, as a player walks on level ground. */
+	private void walk(BlockPos to) {
+		Vec3 from = context.computeOnClient(c -> c.player.position()), end = Vec3.atBottomCenterOf(to);
+		int steps = (int) Math.max(1, from.distanceTo(end) * 5);
+		for (int i = 1; i <= steps; i++) {
+			Vec3 p = from.lerp(end, (double) i / steps);
+			context.runOnClient(c -> c.player.setPos(p.x, p.y, p.z));
+			context.waitTick();
 		}
+	}
+
+	private boolean pathClear(BlockPos a, BlockPos b) {
+		Vec3 va = Vec3.atBottomCenterOf(a), vb = Vec3.atBottomCenterOf(b);
+		int n = (int) Math.ceil(va.distanceTo(vb) * 2);
+		for (int i = 0; i <= n; i++) {
+			Vec3 v = va.lerp(vb, (double) i / Math.max(1, n));
+			BlockPos c = BlockPos.containing(v.x, a.getY() + 0.1, v.z);
+			if (!clear(c) || !clear(c.above()) || !solid(c.below())) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Punch a tree: two oaks at the forest's edge, the bottom two logs of each, so the camera stays level on the trunk (a log higher up
+	 * means looking up into the leaves). Four logs finish the quest.
+	 */
+	private void tree(int n) {
+		BlockPos base = new BlockPos(bx, by + 1, bz);
+		List<BlockPos> trunks = server.computeOnServer(srv -> {
+			ServerLevel level = srv.overworld();
+			List<BlockPos> out = new ArrayList<>();
+			for (BlockPos p : BlockPos.betweenClosed(base.offset(-30, -4, -30), base.offset(30, 6, 30))) {
+				if (!level.getBlockState(p).is(Blocks.OAK_LOG) || !level.getBlockState(p.below()).is(BlockTags.DIRT) || !level.getBlockState(p.above()).is(Blocks.OAK_LOG)
+						|| p.distSqr(base) < 64) {
+					continue;
+				}
+				out.add(p.immutable());
+			}
+			out.sort((x, y) -> Double.compare(x.distSqr(base), y.distSqr(base)));
+			return out;
+		});
+		BlockPos a = null, b = null, fa = null, fb = null;
+		search:
+		for (BlockPos t1 : trunks) {
+			BlockPos s1 = besideTrunk(t1, base);
+			if (s1 == null) {
+				continue;
+			}
+			for (BlockPos t2 : trunks) {
+				double d = t1.distSqr(t2);
+				if (t2.equals(t1) || d < 9 || d > 81 || Math.abs(t2.getY() - t1.getY()) > 0) {
+					continue;
+				}
+				BlockPos s2 = besideTrunk(t2, t1);
+				if (s2 != null && pathClear(s1, s2)) {
+					a = t1;
+					b = t2;
+					fa = s1;
+					fb = s2;
+					break search;
+				}
+			}
+		}
+		if (a == null) {
+			throw new IllegalStateException("no two oaks near the base: " + trunks.size() + " trunks");
+		}
+		trunk = a;
+		log("trees at " + a.toShortString() + " and " + b.toShortString() + "; stand " + fa.toShortString() + ", " + fb.toShortString());
 		survival();
 		// a few steps in, as a player walks up to the tree (from the farthest of up to three cells back that is clear and level)
-		Direction back = Direction.getApproximateNearest(feet.getX() - trunk.getX(), 0, feet.getZ() - trunk.getZ());
-		BlockPos start = feet;
+		Direction back = Direction.getApproximateNearest(fa.getX() - a.getX(), 0, fa.getZ() - a.getZ());
+		BlockPos start = fa;
 		for (int k = 1; k <= 3; k++) {
-			BlockPos c = feet.relative(back, k);
+			BlockPos c = fa.relative(back, k);
 			if (!clear(c) || !clear(c.above()) || !solid(c.below())) {
 				break;
 			}
 			start = c;
 		}
-		standAt(start, Vec3.atCenterOf(trunk.above(2)));
+		standAt(start, Vec3.atCenterOf(a.above()));
+		context.getInput().pressKey(o -> o.keyHotbarSlots[8]);   // an empty hand (the book sits in slot 1; the logs fill from slot 2)
 		context.waitTicks(wanted(n) ? 100 : 5);
 		startFilm(n, "tree");
-		Vec3 from = Vec3.atBottomCenterOf(start), to = Vec3.atBottomCenterOf(feet);
-		int steps = (int) Math.max(1, from.distanceTo(to) * 9);
 		context.waitTicks(20);
-		for (int i = 1; i <= steps; i++) {
-			Vec3 p = from.lerp(to, (double) i / steps);
-			context.runOnClient(c -> c.player.setPos(p.x, p.y, p.z));
-			context.waitTick();
-		}
-		mark("at the tree");
+		walk(fa);
+		mark("at the first tree");
 		int got = 0;
-		for (int k = 0; k < Math.min(logs, 5); k++) {
-			BlockPos log = trunk.above(k);
+		for (BlockPos log : new BlockPos[] {a, a.above()}) {
 			if (dig(log, 140)) {
 				got++;
 				mark("log " + got);
 			}
-			if (got == 4) {
-				context.waitTicks(10);
+		}
+		face(Vec3.atCenterOf(b.above()), 14);
+		walk(fb);
+		mark("at the second tree");
+		for (BlockPos log : new BlockPos[] {b, b.above()}) {
+			if (dig(log, 140)) {
+				got++;
+				mark("log " + got);
 			}
 		}
 		context.waitTicks(20);
-		mark("logs in hand " + count(Items.OAK_LOG) + " oak " + count(Items.BIRCH_LOG) + " birch");
+		mark("logs in hand " + count(Items.OAK_LOG));
 		waitQuest("wood");
 		context.waitTicks(40);
 		stopFilm();
@@ -1066,6 +1100,29 @@ final class Bfs01Episode {
 	 * The nearest iron or copper ore to the gully's floor; a passage one wide and two high is dug to it off camera (from the gully, in steps
 	 * down), lit with the stone quest's torches, and the player stands at its end facing the ore.
 	 */
+	private final List<BlockPos> passage = new ArrayList<>();
+
+	/** Walks down the passage from where oreFace left the player to the face: the cells in order, a few ticks a cell. */
+	private void downPassage(BlockPos target) {
+		int from = Math.max(0, passage.size() - 5);
+		for (int i = from + 1; i < passage.size(); i++) {
+			Vec3 a = Vec3.atBottomCenterOf(passage.get(i - 1)), b = Vec3.atBottomCenterOf(passage.get(i));
+			for (int k = 1; k <= 6; k++) {
+				Vec3 p = a.lerp(b, k / 6.0);
+				float[] yp = yawPitch(p.add(0, 1.62, 0), Vec3.atCenterOf(target));
+				context.runOnClient(c -> {
+					c.player.setPos(p.x, p.y, p.z);
+					c.player.setYRot(yp[0]);
+					c.player.setXRot(yp[1]);
+					c.player.setYHeadRot(yp[0]);
+					c.player.setDeltaMovement(Vec3.ZERO);
+				});
+				context.waitTick();
+			}
+		}
+		context.waitTicks(10);
+	}
+
 	private BlockPos oreFace(Block ore) {
 		BlockPos from = gullyFeet;
 		BlockPos target = server.computeOnServer(srv -> {
@@ -1084,6 +1141,8 @@ final class Bfs01Episode {
 		// dig: step from the gully toward the ore, down one a step while above it, until the next step is the ore
 		BlockPos at = from;
 		List<BlockPos> dug = new ArrayList<>();
+		passage.clear();
+		passage.add(from);
 		for (int i = 0; i < 60; i++) {
 			int hx = target.getX() - at.getX(), hz = target.getZ() - at.getZ();
 			int dy = at.getY() > target.getY() ? -1 : 0;
@@ -1111,6 +1170,7 @@ final class Bfs01Episode {
 				server.computeOnServer(srv -> srv.overworld().setBlock(next.below(), Blocks.STONE.defaultBlockState(), 3));
 			}
 			at = next;
+			passage.add(at);
 			if (i % 4 == 2) {
 				BlockPos torch = at.above();
 				server.computeOnServer(srv -> srv.overworld().setBlock(torch, Blocks.TORCH.defaultBlockState(), 3));
@@ -1119,7 +1179,8 @@ final class Bfs01Episode {
 		// a step back from the face on the same level, so the ore shows with the rock round it, and a torch in a niche either side
 		Direction dir = Direction.getApproximateNearest(target.getX() - at.getX(), 0, target.getZ() - at.getZ());
 		BlockPos back = at.relative(dir.getOpposite());
-		BlockPos[] cut = {back, back.above(), at.relative(dir.getClockWise()), back.relative(dir.getCounterClockWise())};
+		// the cell over the ore too, so its drop lies where the player can step to it
+		BlockPos[] cut = {back, back.above(), at.relative(dir.getClockWise()), back.relative(dir.getCounterClockWise()), target.above()};
 		for (BlockPos c : cut) {
 			if (!c.equals(target) && !clear(c)) {
 				server.computeOnServer(srv -> srv.overworld().setBlock(c, Blocks.AIR.defaultBlockState(), 3));
@@ -1135,7 +1196,10 @@ final class Bfs01Episode {
 			}
 		}
 		log("dug " + dug.size() + " blocks off camera to " + ore + " at " + target.toShortString() + "; stand at " + back.toShortString());
-		standAt(back, Vec3.atCenterOf(target));
+		passage.add(back);
+		// start four cells up the passage, looking down it
+		BlockPos start = passage.get(Math.max(0, passage.size() - 5));
+		standAt(start, Vec3.atCenterOf(target));
 		return target;
 	}
 
@@ -1145,8 +1209,12 @@ final class Bfs01Episode {
 		BlockPos ore = oreFace(Blocks.IRON_ORE);
 		context.waitTicks(wanted(n) ? 120 : 5);
 		startFilm(n, "iron");
+		context.waitTicks(20);
+		downPassage(ore);
+		mark("at the face");
+		context.waitTicks(20);
 		dig(ore, 80);
-		context.waitTicks(30);
+		context.waitTicks(40);
 		mark("raw iron " + count(Items.RAW_IRON));
 		stopFilm();
 		give("minecraft:raw_iron", 13 - count(Items.RAW_IRON), "the rest of the iron ore, mined off camera");
@@ -1236,8 +1304,12 @@ final class Bfs01Episode {
 		BlockPos ore = oreFace(Blocks.COPPER_ORE);
 		context.waitTicks(wanted(n) || shots != null && shots.contains("copper") ? 120 : 5);
 		startFilm(n, "copper");
+		context.waitTicks(20);
+		downPassage(ore);
+		mark("at the face");
+		context.waitTicks(20);
 		dig(ore, 80);
-		context.waitTicks(30);
+		context.waitTicks(40);
 		mark("raw copper " + count(Items.RAW_COPPER));
 		stopFilm();
 		give("minecraft:raw_copper", Math.max(0, 17 - count(Items.RAW_COPPER)), "the rest of the copper ore, mined off camera");
@@ -1435,7 +1507,8 @@ final class Bfs01Episode {
 		stopFilm();
 		spectator();
 		drone(n, "hook_orbit", cam(8, 4.5, 8, 1.5, 0.6, 2.5), cam(-5, 4, 9, 1.5, 0.6, 2.5), 240);
-		drone(n, "top", cam(1.5, 10, 6.5, 1.5, 0, 2.6), cam(1.5, 8.5, 5.0, 1.5, 0, 2.6), 160);
+		// three-quarter from the south-east, in front of the row: the campfire's smoke rises off to the left, clear of the table and furnaces
+		drone(n, "top", cam(8.0, 5.0, 5.0, 1.8, 0.4, 0.6), cam(5.5, 4.5, 6.5, 1.8, 0.4, 0.6), 200);
 		survival();
 		log("final inventory: " + inventory());
 	}
