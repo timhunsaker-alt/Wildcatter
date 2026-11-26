@@ -110,6 +110,10 @@ public class WildcatterNeoForgeGameTests {
 
 	/** Phase 21's quest book scenes (QuestScenes): small and quick, against the test chapters in this mod's data. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> QUEST_SCENES = QuestScenes.scenes();
+
+	static {
+		QUEST_SCENES.putAll(Bfs01Scenes.scenes());   // Built From Scratch ep 1: the Getting started chapter and steel in the blast furnace
+	}
 	/** Phase 21.2's milestone scenes (QuestScenes.machineScenes): a plant each, so room round them and time for a set to start. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> QUEST_MACHINE_SCENES = QuestScenes.machineScenes();
 
