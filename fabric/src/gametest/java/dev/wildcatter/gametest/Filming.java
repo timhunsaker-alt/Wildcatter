@@ -41,7 +41,13 @@ import net.minecraft.client.Minecraft;
  */
 final class Filming {
 	/** Frames read a second of game time, frames a second written, the film's size over the scene's window. */
-	private static final int TICK_FPS = 20, OUT_FPS = 60, SCALE = 2, BUFFERS = 4, QUEUE = 6;
+	private static final int TICK_FPS = 20, OUT_FPS = 60, SCALE = 2, BUFFERS = 4;
+	/**
+	 * Frames waiting for the writer: about 256 MB of them, 6 to 60 (13, 0.65 s of game time, at 2880 x 1620), so a stall of the encoder
+	 * (seen when another app is brought in front of the game) is waited out rather than a frame dropped.
+	 */
+	private static final long QUEUE_BYTES = 256L << 20;
+	private final int queueSize;
 	private static final String TAG = "[wildcatter-test] ";
 	private static volatile Filming active;
 	private static boolean hooked;
@@ -74,7 +80,8 @@ final class Filming {
 		this.height = height;
 		this.buffers = sink == null ? null : new GpuBuffer[BUFFERS];
 		this.busy = new boolean[BUFFERS];
-		this.queue = sink == null ? null : new ArrayBlockingQueue<>(QUEUE);
+		this.queueSize = (int) Math.max(6, Math.min(60, QUEUE_BYTES / Math.max(1L, (long) width * height * 4)));
+		this.queue = sink == null ? null : new ArrayBlockingQueue<>(queueSize);
 		this.writer = sink == null ? null : new Thread(() -> write(sink), "wildcatter-filming-" + scene);
 	}
 
@@ -255,7 +262,7 @@ final class Filming {
 				sink.write(frame);
 				written++;
 				synchronized (spare) {
-					if (spare.size() < QUEUE) {
+					if (spare.size() < queueSize) {
 						spare.addLast(frame);
 					}
 				}
