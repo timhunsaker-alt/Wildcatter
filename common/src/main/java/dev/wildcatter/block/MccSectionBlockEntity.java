@@ -270,6 +270,9 @@ public class MccSectionBlockEntity extends BlockEntity implements CircuitPart, I
 			}
 			if (level != null) {
 				follow(space, level.getGameTime());
+				if (buckets[space] != null && buckets[space].motorUpToSpeed()) {   // the quest book: a motor started from a starter
+					dev.wildcatter.quest.QuestEvents.milestone(level, worldPosition, dev.wildcatter.quest.Milestones.MOTOR_STARTED);
+				}
 			}
 		}
 	}

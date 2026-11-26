@@ -53,7 +53,7 @@
       "id": "gas_plant",
       "title": "The gas plant",
       "icon": "wildcatter:ngl_chiller",
-      "text": "Compress, dry and chill separator gas: pipeline gas off the chiller, raw NGL to the stabilizer for LPG and gasoline.",
+      "text": "Compress, dry and chill separator gas, a refrigeration compressor against the chiller: pipeline gas off the chiller, raw NGL to the stabilizer for LPG and gasoline.",
       "requires": [
         "lease",
         "switchgear"
@@ -72,6 +72,14 @@
           "count": 1
         },
         {
+          "item": "wildcatter:refrigeration_compressor",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:stabilizer",
+          "count": 1
+        },
+        {
           "milestone": "wildcatter:gas_plant_running",
           "text": "Run the gas plant"
         }
@@ -81,13 +89,26 @@
       "id": "plastic",
       "title": "Plastic: the gate",
       "icon": "wildcatter:plastic_sheet",
-      "text": "THE GATE: every cable needs plastic. A cracking furnace makes ethylene; the polyethylene reactor and its pelletizer make plastic sheets.",
+      "text": "THE GATE: every cable needs plastic. The cracking furnace cracks LPG from the stabilizer or the crude unit's gasoline; the quench tower, cracked-gas compressor and cold box (a refrigeration compressor against it) take out the ethylene for the polyethylene reactor and its pelletizer.",
       "requires": [
-        "gas_plant"
+        "gas_plant",
+        "crude_unit"
       ],
       "tasks": [
         {
           "item": "wildcatter:cracking_furnace",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:quench_tower",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:cracked_gas_compressor",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:cold_box",
           "count": 1
         },
         {

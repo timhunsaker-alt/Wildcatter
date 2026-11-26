@@ -31,7 +31,7 @@ public class NitrogenGeneratorBlockEntity extends UnitMotorBlockEntity {
 
 	@Override
 	protected double hold(Product product) {
-		return product == Product.NITROGEN ? Tuning.N2_GENERATOR_NM3H / 3600 * Tuning.PLANT_HOLD_SECONDS * 4 : 0;
+		return product == Product.NITROGEN ? Tuning.N2_GENERATOR_NM3H * dev.wildcatter.TimeScale.production() / 3600 * Tuning.PLANT_HOLD_SECONDS * 4 : 0;
 	}
 
 	/** Nm3/h of nitrogen it made over the last interval. */
@@ -56,7 +56,7 @@ public class NitrogenGeneratorBlockEntity extends UnitMotorBlockEntity {
 			unit = "NO AIR: its air compressor is not running";
 			return;
 		}
-		double m3 = Math.min(room, Tuning.N2_GENERATOR_NM3H / 3600 * seconds() * strength);
+		double m3 = Math.min(room, Tuning.N2_GENERATOR_NM3H * dev.wildcatter.TimeScale.production() / 3600 * seconds() * strength);
 		add(Product.NITROGEN, m3);
 		making = m3 / seconds() * 3600;
 		unit = String.format("making %.1f Nm3/h of 99.9 %% nitrogen", making);
@@ -64,7 +64,7 @@ public class NitrogenGeneratorBlockEntity extends UnitMotorBlockEntity {
 
 	@Override
 	public Component inspect() {
-		return Component.literal(String.format("Nitrogen generator (PSA, %.0f Nm3/h, %.0f kW, %s): ", Tuning.N2_GENERATOR_NM3H, Tuning.N2_GENERATOR_WATTS / 1000, Voltage.INDUSTRIAL.label())
+		return Component.literal(String.format("Nitrogen generator (PSA, %.0f Nm3/h, %.0f kW, %s): ", Tuning.N2_GENERATOR_NM3H * dev.wildcatter.TimeScale.production(), Tuning.N2_GENERATOR_WATTS / 1000, Voltage.INDUSTRIAL.label())
 				+ unit + String.format("; nitrogen held %.2f Nm3; ", held(Product.NITROGEN)) + describe());
 	}
 }

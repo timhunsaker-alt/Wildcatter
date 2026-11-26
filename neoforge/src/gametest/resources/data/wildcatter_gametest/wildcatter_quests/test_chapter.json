@@ -28,6 +28,13 @@
       "requires": ["wildcatter_gametest:machine"]
     },
     {
+      "id": "kept_machine",
+      "title": "A machine, set down and run",
+      "icon": "minecraft:furnace",
+      "text": "Carry a furnace once, set it down, then run the test machine.",
+      "tasks": [{"item": "minecraft:furnace", "count": 1}, {"milestone": "wildcatter_gametest:test_kept_machine", "text": "Run it"}]
+    },
+    {
       "id": "logs",
       "title": "Logs by tag",
       "icon": "minecraft:oak_log",

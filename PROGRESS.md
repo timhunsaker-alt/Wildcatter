@@ -2491,3 +2491,13 @@ Answers 2, 15, 20, 21, 22 and 23 of Tailings' `docs/questions/answers-2026-11-10
 - **Tests:** `build` passes; NeoForge `unit_differentials`, `aero_lean_gas`, `plc_gas_turbine`, `chlor_alkali` and `cascade_operations` pass.
 - **Known gaps:** no exhaust temperature is modelled (the card reads exhaust heat in MW). Every synchronizer starts its slip at 0
   degrees, so in play a generator closes the tick it reaches speed. Centrifuges have no sound or moving part (real casings are still).
+
+## Built From Scratch quest fixes (2026-11-26; branch `bfs-fixes`, 0.10.2)
+From the quest check in `videos/longform/built-from-scratch/QUEST_CHECK.md`; decisions in `docs/questions/bfs-fixes.md`.
+- **Quest book:** item tasks stay met once met (kept in `QuestData`, old saves load); `motor_started` (a motor up to speed from a
+  starter) and `pole_transformer_energised` (a pole-mount unit) for the motor and pole transformer quests; prerequisites fixed against
+  the code; the machines the book never taught added as tasks; the RCCA quest asks for 5.
+- **World rule `fastProduction`** (off by default): the time scale also multiplies the lime kiln, ammonia plant, battery graphite,
+  lithium and cathode plant and zirconium line rates (docs/time-scale.md, "Fast production").
+- **Tests:** NeoForge `quest_item_task_kept`, `quest_motor_started`, `fast_production`; `dry_type_runs_rig` and `mv_span_flashover`
+  check the new keys; JUnit `TimeScaleTest.fastProductionOnlyWithItsRule`.

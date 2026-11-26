@@ -10,10 +10,12 @@
       "id": "yellowcake",
       "title": "The mill",
       "icon": "wildcatter:yellowcake_drum",
-      "text": "Crush, grind and leach uranium ore with sulfuric acid; solvent extraction and precipitation fill drums of yellowcake.",
+      "text": "Crush, grind and leach uranium ore with sulfuric acid; solvent extraction (on kerosene from the crude unit) and precipitation, then a dryer on pipeline gas, fill drums of yellowcake.",
       "requires": [
         "ore_survey",
-        "acid_plant"
+        "acid_plant",
+        "crude_unit",
+        "gas_plant"
       ],
       "tasks": [
         {
@@ -57,13 +59,21 @@
       "id": "fuel",
       "title": "Fuel assemblies",
       "icon": "wildcatter:fuel_assembly",
-      "text": "Turn UF6 to powder, press and sinter pellets, load and weld rods, and build 17x17 assemblies. The core takes nine.",
+      "text": "Turn UF6 to powder, press and sinter pellets, load and weld rods, and build 17x17 assemblies. The core takes nine. With fuelNickelHardware on, the hardware takes 304 stainless and nickel-chromium alloy from the alloy melt shop (induction furnace and AOD converter) and the nickel refinery.",
       "requires": [
         "enrichment",
         "zirconium",
         "helium"
       ],
       "tasks": [
+        {
+          "item": "wildcatter:induction_furnace",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:aod_converter",
+          "count": 1
+        },
         {
           "item": "wildcatter:fuel_assembly",
           "count": 9
@@ -74,14 +84,14 @@
       "id": "rccas",
       "title": "Control rods",
       "icon": "wildcatter:rcca",
-      "text": "Boron carbide pellets in rodlets on a spider: the RCCA bench builds the control rods the reactor moves.",
+      "text": "Boron carbide pellets in rodlets on a spider: the RCCA bench builds the control rods the reactor moves. The reactor holds at LOADING until five are in.",
       "requires": [
         "boron"
       ],
       "tasks": [
         {
           "item": "wildcatter:rcca",
-          "count": 1
+          "count": 5
         }
       ]
     }

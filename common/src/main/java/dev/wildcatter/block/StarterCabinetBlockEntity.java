@@ -258,6 +258,9 @@ public class StarterCabinetBlockEntity extends BlockEntity implements CircuitPar
 		}
 		if (level != null) {
 			follow(level.getGameTime());
+			if (starter.motorUpToSpeed()) {   // the quest book: a motor started from a starter
+				dev.wildcatter.quest.QuestEvents.milestone(level, worldPosition, dev.wildcatter.quest.Milestones.MOTOR_STARTED);
+			}
 		}
 		setChanged();
 	}

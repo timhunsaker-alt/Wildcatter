@@ -20,7 +20,7 @@ public final class Lithium {
 
 	/** kg/s of LiOH.H2O at the rating. */
 	public static double liohKgs() {
-		return Tuning.LIOH_TPH * 1000 / 3600;
+		return Tuning.LIOH_TPH * dev.wildcatter.TimeScale.production() * 1000 / 3600;   // fastProduction
 	}
 
 	/** kg/s of Li2O recovered at the rating, and of ore through the kilns. */

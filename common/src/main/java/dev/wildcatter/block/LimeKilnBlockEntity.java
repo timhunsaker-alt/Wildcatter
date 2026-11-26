@@ -106,7 +106,7 @@ public class LimeKilnBlockEntity extends UnitMotorBlockEntity implements HopperF
 
 	@Override
 	protected void work(Level level) {
-		double max = Tuning.LIME_KILN_KGS * seconds();
+		double max = Tuning.LIME_KILN_KGS * dev.wildcatter.TimeScale.production() * seconds();
 		if (dolomite >= 0.01 || slots.get(0).is(OreBlocks.MINERALS.get(Ore.DOLOMITE))) {
 			burnDolomite(level, max);
 			return;
@@ -140,7 +140,7 @@ public class LimeKilnBlockEntity extends UnitMotorBlockEntity implements HopperF
 		caco3 -= kg / Tuning.CAO_PER_CACO3;
 		quicklime += kg;
 		co2 += kg * Bayer.co2PerLime() / 1000;
-		kilnGas = Math.min(Tuning.LIME_KILN_KGS * Bayer.co2PerLime() * Tuning.PLANT_HOLD_SECONDS, kilnGas + kg * Bayer.co2PerLime());
+		kilnGas = Math.min(Tuning.LIME_KILN_KGS * dev.wildcatter.TimeScale.production() * Bayer.co2PerLime() * Tuning.PLANT_HOLD_SECONDS, kilnGas + kg * Bayer.co2PerLime());
 		unit = String.format("burning at 1,000 C: %.0f kg/h of quicklime, %.0f kW of gas", kg / seconds() * 3600, got / seconds() / 1000);
 	}
 
@@ -172,7 +172,7 @@ public class LimeKilnBlockEntity extends UnitMotorBlockEntity implements HopperF
 		dolomite -= kg / Tuning.DOLIME_PER_DOLOMITE;
 		dolime += kg;
 		co2 += kg * co2PerDolime / 1000;
-		kilnGas = Math.min(Tuning.LIME_KILN_KGS * Bayer.co2PerLime() * Tuning.PLANT_HOLD_SECONDS, kilnGas + kg * co2PerDolime);
+		kilnGas = Math.min(Tuning.LIME_KILN_KGS * dev.wildcatter.TimeScale.production() * Bayer.co2PerLime() * Tuning.PLANT_HOLD_SECONDS, kilnGas + kg * co2PerDolime);
 		unit = String.format("burning dolomite at 1,000 C: %.0f kg/h of dolime, %.0f kW of gas", kg / seconds() * 3600, got / seconds() / 1000);
 	}
 

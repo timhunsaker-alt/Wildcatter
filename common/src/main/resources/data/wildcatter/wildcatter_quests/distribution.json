@@ -53,8 +53,8 @@
           "count": 1
         },
         {
-          "milestone": "wildcatter:transformer_energised",
-          "text": "Energise a transformer"
+          "milestone": "wildcatter:pole_transformer_energised",
+          "text": "Energise the pole transformer"
         }
       ]
     },

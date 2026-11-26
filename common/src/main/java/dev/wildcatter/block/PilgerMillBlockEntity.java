@@ -165,7 +165,7 @@ public class PilgerMillBlockEntity extends UnitMotorBlockEntity implements Hoppe
 		}
 		double yield = batches ? Zirconium.pilgerYield() : 1;
 		boolean hafnium = up.hafnium();
-		double kg = up.takeZirconium(Math.min(Tuning.ZR_LINE_KGS * 1.2 * seconds() * Math.min(strength, heat), (tubeKg() - progress) / yield));
+		double kg = up.takeZirconium(Math.min(Tuning.ZR_LINE_KGS * dev.wildcatter.TimeScale.production() * 1.2 * seconds() * Math.min(strength, heat), (tubeKg() - progress) / yield));
 		progress += kg * yield;
 		if (batches) {
 			scrap(kg * (1 - yield), hafnium);

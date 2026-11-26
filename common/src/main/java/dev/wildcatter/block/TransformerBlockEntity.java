@@ -415,6 +415,9 @@ public class TransformerBlockEntity extends BlockEntity implements CircuitPart, 
 		}
 		if (Math.abs(highVolts[0]) > block().high().nominal() * 0.5) {   // Phase 21: the quest book: its high side is live
 			dev.wildcatter.quest.QuestEvents.milestone(level, worldPosition, dev.wildcatter.quest.Milestones.TRANSFORMER_ENERGISED);
+			if (block().poleMount()) {   // the pole transformer's own quest: only a pole-mount unit fires it
+				dev.wildcatter.quest.QuestEvents.milestone(level, worldPosition, dev.wildcatter.quest.Milestones.POLE_TRANSFORMER_ENERGISED);
+			}
 		}
 		double rated = ratedVa();
 		if (rated > 0 && heating.step(perUnit(rated, delta, deltaHigh), ticks / 20.0)) {

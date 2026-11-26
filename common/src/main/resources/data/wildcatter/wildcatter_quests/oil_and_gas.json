@@ -98,9 +98,10 @@
       "id": "crude",
       "title": "A stock tank of crude",
       "icon": "wildcatter:stock_tank",
-      "text": "Run the oil to a stock tank. Buckets fill at the tank: crude feeds fireboxes now and a crude unit later.",
+      "text": "Run the separator's oil to a stock tank: the tank takes no raw well fluid. Buckets fill at the tank: crude feeds fireboxes now and a crude unit later.",
       "requires": [
-        "oil_well"
+        "oil_well",
+        "lease"
       ],
       "tasks": [
         {
@@ -151,11 +152,20 @@
       "id": "casing_point",
       "title": "A casing point",
       "icon": "wildcatter:casing_joint",
-      "text": "A deep field breaks down the open hole under the surface casing. Rack casing joints and oilwell cement in the land rig's substructure and SET CASING (sneak-click the stopped console) within 12 blocks above the field: the seismograph's DEEP ECHO says where.",
+      "text": "The land rig (its substructure, mast, drawworks, mud pumps and tanks, and a medium-voltage drive house) drills a deep field. Oilwell cement is a quicklime bag from the lime kiln and clay. Rack casing and cement in the substructure and SET CASING (sneak-click the stopped console) within 12 blocks above the field: the seismograph's DEEP ECHO says where.",
       "requires": [
-        "lease"
+        "lease",
+        "wildcatter:steam_plant"
       ],
       "tasks": [
+        {
+          "item": "wildcatter:rig_substructure",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:lime_kiln",
+          "count": 1
+        },
         {
           "item": "wildcatter:casing_joint",
           "count": 4
@@ -185,7 +195,7 @@
       "id": "choke_kill",
       "title": "Kill a kick through the choke",
       "icon": "wildcatter:choke_manifold",
-      "text": "Pipe a choke manifold to the BOP stack's choke line, a mud-gas separator against it venting to a flare, and a remote choke panel on the floor. Shut in a kick and hold drill pipe pressure on the kill sheet's schedule until the well is dead.",
+      "text": "Pipe a choke manifold to the BOP stack's choke line, a mud-gas separator against it venting to a flare, and a remote choke panel on the floor. Shut in a kick and hold drill pipe pressure on the kill sheet's schedule until the well is dead. Weight the kill mud with barite bags from the barite mill.",
       "requires": [
         "leak_off_test"
       ],
@@ -199,6 +209,10 @@
           "count": 1
         },
         {
+          "item": "wildcatter:barite_mill",
+          "count": 1
+        },
+        {
           "milestone": "wildcatter:well_killed_choke",
           "text": "WELL DEAD through the choke"
         }
@@ -208,14 +222,19 @@
       "id": "oil_mud",
       "title": "Oil mud",
       "icon": "wildcatter:cacl2_bag",
-      "text": "Switch the empty mud tanks to OIL MUD: diesel on a pipe, water to 80/20, calcium chloride flake and the OBM package through the hopper. It does not wash out salt, but watch the pits: a kick hides in it.",
+      "text": "Switch the empty mud tanks to OIL MUD: diesel on a pipe, water to 80/20, calcium chloride flake and the OBM package through the hopper. The OBM package comes from the bentonite dryer's second mode, on quicklime and piped ammonia. Watch the pits: a kick hides in it.",
       "requires": [
         "casing_point",
-        "wildcatter:diesel"
+        "wildcatter:diesel",
+        "wildcatter:ammonia"
       ],
       "tasks": [
         {
           "item": "wildcatter:calcium_chloride_unit",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:bentonite_dryer",
           "count": 1
         },
         {

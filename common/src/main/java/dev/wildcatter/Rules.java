@@ -60,7 +60,11 @@ public final class Rules {
 		/** 19c2: the assembly fixture and the rod loader take 304 stainless and nickel-chromium alloy for the hardware, not steel. */
 		FUEL_NICKEL_HARDWARE("fuelNickelHardware", true, "fuel assemblies take 304 stainless and nickel-chromium alloy hardware, not steel"),
 		/** 22c (docs/multiblocks/grid-batteries.md): a battery container in fire, beside a burning one, in a blast or struck by lightning (no ground rod near) goes into thermal runaway. Never at random. */
-		BESS_THERMAL_RUNAWAY("bessThermalRunaway", true, "a battery container in fire, touching a burning one, in a blast or struck by lightning with no ground rod near goes into thermal runaway and burns");
+		BESS_THERMAL_RUNAWAY("bessThermalRunaway", true, "a battery container in fire, touching a burning one, in a blast or struck by lightning with no ground rod near goes into thermal runaway and burns"),
+		/** Tim, 2026-11-26 (docs/time-scale.md, "Fast production"): the time scale also runs a few long production chains faster, for filming.
+		 * The lime kiln, the ammonia plant (fertilizer), the graphite line and furnace, the lithium and cathode plant, and the zirconium
+		 * line. Off even in new worlds: a world rule to switch on, never a default. */
+		FAST_PRODUCTION("fastProduction", false, "the time scale also speeds the lime kiln, ammonia, battery graphite, cathode powder and zirconium lines (for filming)");
 
 		public final String key;
 		public final boolean newWorld;

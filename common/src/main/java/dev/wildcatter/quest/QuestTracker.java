@@ -153,6 +153,7 @@ public final class QuestTracker {
 		QuestData.Progress p = data.of(player.getStringUUID());
 		List<QuestBook.Quest> finished = new ArrayList<>();
 		List<String> met = new ArrayList<>();
+		boolean changed = false;
 		boolean again = true;
 		while (again) {   // a quest with no tasks follows the ones it needs in the same pass
 			again = false;
@@ -163,8 +164,15 @@ public final class QuestTracker {
 				}
 				boolean all = true;
 				for (int i = 0; i < q.tasks().size(); i++) {
-					if (met(player, p, q.tasks().get(i))) {
-						met.add(q.id() + "#" + i);
+					QuestBook.Task task = q.tasks().get(i);
+					String key = q.id() + "#" + i;
+					boolean kept = task.kind() == QuestBook.Kind.ITEM && p.items.contains(key);
+					if (kept || met(player, p, task)) {
+						met.add(key);
+						if (task.kind() == QuestBook.Kind.ITEM && !kept) {
+							p.items.add(key);   // an item task met once stays met: craft the machine, set it down, run it
+							changed = true;
+						}
 					} else {
 						all = false;
 					}
@@ -174,13 +182,17 @@ public final class QuestTracker {
 				}
 				if (all) {
 					p.done.add(q.id().toString());
+					String prefix = q.id() + "#";
+					p.items.removeIf(k -> k.startsWith(prefix));   // a done quest's tasks are no longer needed
 					finished.add(q);
 					again = true;
 				}
 			}
 		}
-		if (!finished.isEmpty()) {
+		if (changed || !finished.isEmpty()) {
 			data.changed();
+		}
+		if (!finished.isEmpty()) {
 			if (finished.size() <= 3) {
 				for (QuestBook.Quest q : finished) {
 					player.sendSystemMessage(Component.translatable("quest.wildcatter.done", q.title()).withStyle(ChatFormatting.GOLD));
@@ -193,7 +205,10 @@ public final class QuestTracker {
 		return finished;
 	}
 
-	/** True if the task is met for this player now. */
+	/**
+	 * True if the task is met for this player now: an item carried at its count, an advancement had, a milestone reached. {@link #check}
+	 * also counts an item task met once before as met (kept in {@link QuestData.Progress#items}).
+	 */
 	public static boolean met(ServerPlayer player, QuestData.Progress p, QuestBook.Task task) {
 		return switch (task.kind()) {
 			case ITEM -> count(player.getInventory(), task.target()) >= task.count();

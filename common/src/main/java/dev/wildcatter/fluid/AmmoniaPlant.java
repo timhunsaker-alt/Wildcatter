@@ -29,7 +29,7 @@ public final class AmmoniaPlant {
 
 	/** Nm3/h of ammonia from one reformer's hydrogen. */
 	public static double ammoniaNm3h() {
-		return Tuning.SMR_M3H / H2_PER_NH3;
+		return Tuning.SMR_M3H * dev.wildcatter.TimeScale.production() / H2_PER_NH3;   // fastProduction runs the whole plant faster
 	}
 
 	/** kg/h of ammonia from one reformer's hydrogen: about 15.2. */

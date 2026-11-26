@@ -182,7 +182,7 @@ public class ZrLineBlockEntity extends UnitMotorBlockEntity implements ZrStage, 
 
 	// ---- its work -------------------------------------------------------------------------------------------------------------
 	private double rate() {
-		return Tuning.ZR_LINE_KGS * 1.2 * seconds();
+		return Tuning.ZR_LINE_KGS * dev.wildcatter.TimeScale.production() * 1.2 * seconds();
 	}
 
 	private double room() {

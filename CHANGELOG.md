@@ -1,5 +1,35 @@
 # Changelog
 
+## v0.10.2 (unreleased): the quest book checked for a fresh world
+
+### Quest book
+- **Item tasks stay met once met:** crafting a machine ticks its line and setting it down and running it finishes the quest. Before,
+  items were counted live, so a machine quest only ticked with a spare machine in the pocket. Saves from 0.10.1 load as they are.
+- **Milestones that fired too early:** the motor quest now asks for a motor started from a motor starter and up to speed (new key
+  `wildcatter:motor_started`), not any running motor such as the rig's; the pole transformer quest asks for an energised pole-mount
+  transformer (new key `wildcatter:pole_transformer_energised`), not the dry-type. `motor_running` and `transformer_energised` still fire.
+- **Prerequisites that missed a real need:** crude needs lease (the stock tank takes no raw well fluid); casing_point needs the steam
+  plant (the land rig is medium voltage); oil_mud needs ammonia; frasch needs casing_point (only the land rig stops in caprock);
+  aluminium needs the crude unit (calcined coke for the pot) instead of the coke ovens; plastic needs the crude unit; the battery module
+  and battery block need aluminium; battery graphite needs the substation; yellowcake needs the crude unit and the gas plant.
+  Dropped where nothing is used: coke no longer needs the acid plant, the battery cabinet no longer needs the module or the genset (it
+  needs the PLC, for its CPU), spent fuel no longer needs the reactor critical (it follows the nuclear island).
+- **Machines the book needed but never taught** are tasks in the quest that needs them, named in its text: the land rig and lime kiln
+  (casing point), barite mill (choke kill), bentonite dryer (oil mud), refrigeration compressor and stabilizer (gas plant), quench
+  tower, cracked-gas compressor and cold box (plastic), coke drum and coke kiln (aluminium), nitrogen generator (battery graphite),
+  lithium leach, carbonator and CO2 liquefier (cathode powder), induction furnace and AOD converter (fuel).
+- **Control rods:** the RCCA quest asks for 5, as the reactor holds at LOADING with fewer.
+
+### World rules
+- **New rule `fastProduction`, off by default and in new worlds** (Tim, 2026-11-26): with it on, the time scale also multiplies the
+  production rates of the lime kiln, the ammonia plant, the graphite line and furnace, the lithium and cathode plant and the zirconium
+  line, for filming the long chains. Nothing electrical and nothing in the uranium and fuel chain changes. On the World Rules screen and
+  `/wildcatter rule fastProduction`. See docs/time-scale.md, "Fast production".
+
+### Tests
+- New NeoForge scenes `quest_item_task_kept`, `quest_motor_started` and `fast_production`; `dry_type_runs_rig` checks the dry-type and the
+  rig fire neither new key; `mv_span_flashover` checks the pole unit fires `pole_transformer_energised`. Rule scenes may run 1,200 ticks.
+
 ## v0.10.1 (unreleased): battery hazards, oilfield sounds
 
 ### DC

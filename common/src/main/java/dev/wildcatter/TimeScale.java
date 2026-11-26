@@ -4,7 +4,8 @@ package dev.wildcatter;
  * The world's time scale (Tim, 2026-11-10; docs/time-scale.md): one of five presets, 1:1 to 50:1, that shortens the long waits and
  * nothing else. At 10:1 a wait of 10 hours in the real plant takes one hour of play: the reactor's real heat-up and cooldown
  * ({@code reactorRealHeatup}), the residence holds ({@code realResidenceTimes}), dry cask cooling, and other mods' waits that read it
- * (Tailings' paste cure). Rates, fuel, motion and everything electrical stay real at every preset.
+ * (Tailings' paste cure). Rates, fuel, motion and everything electrical stay real at every preset, except the few production rates
+ * the opt-in world rule {@code fastProduction} names (Tim, 2026-11-26; {@link #production()}).
  * <p>
  * Saved with the world rules ({@link RulesData}); an existing world loads at 1:1. Held here, static, for the running server, as
  * {@link Rules} is. Plain Java.
@@ -27,6 +28,15 @@ public final class TimeScale {
 	/** A real wait of this many seconds, at the world's scale. */
 	public static double scaled(double seconds) {
 		return seconds / scale;
+	}
+
+	/**
+	 * The factor the fastProduction chains run at (Tim, 2026-11-26): the scale with the rule on, else 1. Only the lime kiln, the
+	 * ammonia plant, the graphite line and furnace, the lithium and cathode plant and the zirconium line multiply their rates by it;
+	 * nothing electrical and nothing in the uranium or fuel chain does.
+	 */
+	public static double production() {
+		return Rules.on(Rules.Rule.FAST_PRODUCTION) ? scale : 1;
 	}
 
 	public static boolean valid(int value) {

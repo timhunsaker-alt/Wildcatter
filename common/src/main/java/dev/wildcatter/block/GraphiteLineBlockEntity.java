@@ -70,7 +70,7 @@ public class GraphiteLineBlockEntity extends UnitMotorBlockEntity implements Hop
 	@Override
 	protected void work(Level level) {
 		making = 0;
-		double max = Tuning.GRAPHITE_LINE_KGH / 3600 * seconds();
+		double max = Tuning.GRAPHITE_LINE_KGH * dev.wildcatter.TimeScale.production() / 3600 * seconds();
 		if (graphite < max / Tuning.GRAPHITE_FLAKE_RECOVERY && fed() > 0) {
 			useOne();
 			graphite += Ore.GRAPHITE.blockKg() * Ore.GRAPHITE.grade;

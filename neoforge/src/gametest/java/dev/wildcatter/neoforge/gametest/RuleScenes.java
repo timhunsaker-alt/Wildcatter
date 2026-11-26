@@ -49,6 +49,8 @@ import net.minecraft.world.level.levelgen.placement.RarityFilter;
  * before Phase 15 take, and a grid dome's flank field is not there; on, it is; {@code mudGel} off, water is not LOW GEL; on, it is;
  * {@code wellControl} off, an underbalanced strike into a deep field does not kick; Phase 23's {@code chokeKill} and {@code cavernStability}
  * and Phase 22's {@code bessThermalRunaway} are new worlds' rules, off here.</li>
+ * <li>{@code fast_production} (a batch of its own; Tim, 2026-11-26): at 10:1 a graphite line on a diesel set mills its real 400 kg/h with
+ * {@code fastProduction} off, ten times that with it on, and its real rate again once it is off.</li>
  * </ul>
  */
 final class RuleScenes {
@@ -58,6 +60,7 @@ final class RuleScenes {
 	static Map<String, Consumer<GameTestHelper>> scenes() {
 		Map<String, Consumer<GameTestHelper>> out = new LinkedHashMap<>();
 		out.put("world_rules", RuleScenes::worldRules);
+		out.put("fast_production", RuleScenes::fastProduction);
 		return out;
 	}
 
@@ -122,6 +125,59 @@ final class RuleScenes {
 		public MapCodec<RulesOnAtScale> codec() {
 			return MapCodec.unit(this);
 		}
+	}
+
+	static void fastProduction(GameTestHelper helper) {
+		String scene = "fast_production";
+		int u = 2;
+		boolean[] before = Rules.snapshot();
+		int scaleBefore = dev.wildcatter.TimeScale.scale();
+		Runnable restore = () -> {
+			Rules.restore(before);
+			dev.wildcatter.TimeScale.set(scaleBefore);
+		};
+		GridSceneKit.floor(helper, -10, -2, 6, 10);
+		GridSceneKit.place(helper, dev.wildcatter.WildcatterBlocks.GRAPHITE_LINE, 0, u, 0, net.minecraft.core.Direction.NORTH);   // x 0-2, z 0-5, box west (-1, 0)
+		GridSceneKit.genset(helper, -6, u, 8);
+		ChemicalScenes.run(helper, "cable_industrial", new int[] {-5, 8}, new int[] {-5, 0}, new int[] {-1, 0});
+		dev.wildcatter.block.GraphiteLineBlockEntity line = GridSceneKit.entity(helper, 0, u, 0, dev.wildcatter.block.GraphiteLineBlockEntity.class);
+		dev.wildcatter.TimeScale.set(10);
+		Rules.set(Rule.FAST_PRODUCTION, false);
+		double real = Tuning.GRAPHITE_LINE_KGH;
+		GridSceneKit.start(helper, -6, u, 8, () -> {
+			line.slots().set(0, new net.minecraft.world.item.ItemStack(dev.wildcatter.ore.OreBlocks.MINERALS.get(dev.wildcatter.ore.Ore.GRAPHITE), 16));
+			BessScenes.await(helper, 400, () -> line.making() > 0, () -> {
+				try {
+					double off = line.making();
+					log(scene, "10:1, fastProduction off: " + GridSceneKit.read(helper, 0, u, 0));
+					check(helper, GridSceneKit.near(off, real, 0.15), "with fastProduction off the line should mill its real 400 kg/h at 10:1: " + off);
+					check(helper, dev.wildcatter.TimeScale.production() == 1, "production factor off should be 1");
+					rule(helper, "fastProduction", true);
+					check(helper, Rules.on(Rule.FAST_PRODUCTION) && dev.wildcatter.TimeScale.production() == 10, "the command should turn fastProduction on: factor " + dev.wildcatter.TimeScale.production());
+				} catch (RuntimeException e) {
+					restore.run();
+					throw e;
+				}
+				helper.runAfterDelay(60, () -> {
+					try {
+						double on = line.making();
+						log(scene, "10:1, fastProduction on: " + GridSceneKit.read(helper, 0, u, 0));
+						check(helper, GridSceneKit.near(on, real * 10, 0.15), "with fastProduction on the line should mill ten times its rate at 10:1: " + on);
+						rule(helper, "fastProduction", false);
+					} catch (RuntimeException e) {
+						restore.run();
+						throw e;
+					}
+					helper.runAfterDelay(60, () -> {
+						double back = line.making();
+						restore.run();
+						check(helper, GridSceneKit.near(back, real, 0.15), "fastProduction off again should bring back the real rate: " + back);
+						log(scene, "ok: off " + Math.round(real) + " kg/h, on " + Math.round(real * 10) + " kg/h, off again " + Math.round(back) + " kg/h");
+						helper.succeed();
+					});
+				});
+			});
+		});
 	}
 
 	static void worldRules(GameTestHelper helper) {

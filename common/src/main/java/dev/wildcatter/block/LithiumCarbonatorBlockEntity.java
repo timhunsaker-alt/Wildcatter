@@ -73,7 +73,7 @@ public class LithiumCarbonatorBlockEntity extends UnitMotorBlockEntity implement
 	@Override
 	protected void work(Level level) {
 		making = 0;
-		double max = Tuning.LITHIUM_CARBONATOR_KGH / 3600 * seconds();
+		double max = Tuning.LITHIUM_CARBONATOR_KGH * dev.wildcatter.TimeScale.production() / 3600 * seconds();
 		if (lioh < max * Lithium.liohPerLi2co3() && fed() > 0) {
 			useOne();
 			lioh += Tuning.BULK_BAG_KG;

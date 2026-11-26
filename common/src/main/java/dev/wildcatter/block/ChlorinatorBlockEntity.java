@@ -117,7 +117,7 @@ public class ChlorinatorBlockEntity extends UnitMotorBlockEntity implements ZrSt
 			unit = "NOT BUILT: set it against the MINERAL SEPARATOR, or feed it zircon concentrate by a hopper on top";
 			return;
 		}
-		double rate = Tuning.ZR_LINE_KGS * 1.2 * seconds();
+		double rate = Tuning.ZR_LINE_KGS * dev.wildcatter.TimeScale.production() * 1.2 * seconds();
 		ZrStage up = fed ? feedStage() : separator;   // zircon concentrate in its hopper first, then the separator's
 		if (carbon < rate * Zirconium.carbonPerZr() && fed() > 0) {
 			carbon += SolidCarbon.carbonKg(useOne());
@@ -162,7 +162,7 @@ public class ChlorinatorBlockEntity extends UnitMotorBlockEntity implements ZrSt
 		return new ZrStage() {
 			@Override
 			public double zirconium() {
-				return feedZirconium(Tuning.ZR_LINE_KGS * 1.2 * seconds());
+				return feedZirconium(Tuning.ZR_LINE_KGS * dev.wildcatter.TimeScale.production() * 1.2 * seconds());
 			}
 
 			@Override

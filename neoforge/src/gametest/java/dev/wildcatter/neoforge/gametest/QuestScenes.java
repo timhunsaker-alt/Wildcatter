@@ -28,6 +28,8 @@ import net.minecraft.world.item.Items;
  * <ul>
  * <li>{@code quest_data_loads}: the chapters load from every namespace, sorted by order, with bare ids in the file's namespace;</li>
  * <li>{@code quest_item_task}: an item task is met only at its count, and the quest stays done when the items go;</li>
+ * <li>{@code quest_item_task_kept} (0.10.2): an item task met once stays met when the item goes (a machine set down), so the milestone
+ * alone finishes the quest; a save from before the met item tasks were kept still loads;</li>
  * <li>{@code quest_milestone}: a milestone reaches players within 64 blocks and not beyond, and a quest with no tasks follows;</li>
  * <li>{@code quest_reward_claim}: rewards are given once, only for a done quest;</li>
  * <li>{@code quest_book_given_once}: the tracker gives a joining player the book, and never a second;</li>
@@ -42,6 +44,7 @@ final class QuestScenes {
 		Map<String, Consumer<GameTestHelper>> out = new LinkedHashMap<>();
 		out.put("quest_data_loads", QuestScenes::dataLoads);
 		out.put("quest_item_task", QuestScenes::itemTask);
+		out.put("quest_item_task_kept", QuestScenes::itemTaskKept);
 		out.put("quest_milestone", QuestScenes::milestone);
 		out.put("quest_reward_claim", QuestScenes::rewardClaim);
 		out.put("quest_book_given_once", QuestScenes::bookGivenOnce);
@@ -58,6 +61,7 @@ final class QuestScenes {
 		out.put("quest_reactor_milestone", QuestScenes::reactorMilestone);
 		out.put("dry_type_runs_rig", QuestScenes::dryTypeRunsRig);
 		out.put("quest_pumpjack_milestone", QuestScenes::pumpjackMilestone);
+		out.put("quest_motor_started", QuestScenes::motorStarted);
 		out.put("quest_well_struck_milestone", QuestScenes::wellStruckMilestone);
 		return out;
 	}
@@ -135,6 +139,39 @@ final class QuestScenes {
 		check(helper, !done(server, player, "logs"), "the logs quest also needs its advancement");
 		leave(helper, player);
 		log("quest_item_task", "ok");
+		helper.succeed();
+	}
+
+	static void itemTaskKept(GameTestHelper helper) {
+		MinecraftServer server = helper.getLevel().getServer();
+		ServerPlayer player = player(helper, 1, 2, 1);
+		String key = tid("kept_machine") + "#0";
+		player.getInventory().add(new ItemStack(Items.FURNACE));
+		QuestTracker.check(player);
+		QuestData.Progress p = QuestData.get(server).of(player.getStringUUID());
+		check(helper, !done(server, player, "kept_machine") && p.items.contains(key), "carrying the furnace should meet its task and keep it: " + p.items);
+		player.getInventory().clearContent();   // set down
+		QuestTracker.check(player);
+		check(helper, p.items.contains(key) && !done(server, player, "kept_machine"), "the met item task should stay met with the furnace gone");
+		QuestEvents.milestone(helper.getLevel(), helper.absolutePos(new BlockPos(2, 1, 2)), tid("test_kept_machine"));
+		QuestTracker.check(player);
+		check(helper, done(server, player, "kept_machine"), "the milestone alone should now finish the quest, the furnace no longer carried");
+		check(helper, !p.items.contains(key), "a done quest's met item tasks should be let go");
+		// a save from 0.10.1 and before: no "items" list
+		net.minecraft.nbt.CompoundTag one = new net.minecraft.nbt.CompoundTag();
+		for (String list : new String[] {"done", "claimed", "milestones"}) {
+			net.minecraft.nbt.ListTag l = new net.minecraft.nbt.ListTag();
+			l.add(net.minecraft.nbt.StringTag.valueOf("wildcatter:" + list));
+			one.put(list, l);
+		}
+		net.minecraft.nbt.CompoundTag old = new net.minecraft.nbt.CompoundTag();
+		old.put("someone", one);
+		QuestData loaded = QuestData.CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE, old).getOrThrow();
+		QuestData.Progress q = loaded.of("someone");
+		check(helper, q.done.contains("wildcatter:done") && q.milestones.contains("wildcatter:milestones") && q.items.isEmpty(),
+				"an old save should load its progress, with no met item tasks: " + q.done + " " + q.milestones + " " + q.items);
+		leave(helper, player);
+		log("quest_item_task_kept", "ok");
 		helper.succeed();
 	}
 
@@ -531,6 +568,8 @@ final class QuestScenes {
 						check(helper, firstTrip[c] > 0 && firstDrilling[c] < 0, plants.get(c).name() + " (2 kW each) should trip on frequency during the rig's start, never drilling: " + camp);
 						check(helper, reached(server, player, dev.wildcatter.quest.Milestones.TRANSFORMER_ENERGISED), "the dry-type should fire transformer_energised");
 						check(helper, reached(server, player, dev.wildcatter.quest.Milestones.MOTOR_RUNNING), "the rig's motor should fire motor_running");
+						check(helper, !reached(server, player, dev.wildcatter.quest.Milestones.POLE_TRANSFORMER_ENERGISED), "the dry-type should not fire the pole transformer's milestone");
+						check(helper, !reached(server, player, dev.wildcatter.quest.Milestones.MOTOR_STARTED), "the rig's motor, on no starter, should not fire motor_started");
 						log(scene, "ok: " + sum + "| rig " + rig + " | dry-type " + xfmr);
 					}
 					dev.wildcatter.well.ReservoirData.TEST_REGIONS.remove(region);
@@ -590,6 +629,64 @@ final class QuestScenes {
 			clearBox(helper, dx - 10, z - 4, dx + 18, z + 4, y - 1, y + 8);
 			helper.succeed();
 		}));
+	}
+
+	/**
+	 * The motor quest (0.10.2): the pumpjack's 480 V through a combination starter. Stopped, the jack is still and motor_started is not
+	 * reached; started at the starter, the jack comes up to speed and the starter fires motor_started. The breaker, wire and starter
+	 * were carried once and set down, so the motor quest is done on the milestone.
+	 */
+	static void motorStarted(GameTestHelper helper) {
+		String scene = "quest_motor_started";
+		MinecraftServer server = helper.getLevel().getServer();
+		int y = oilY(helper);
+		BlockPos o = helper.absolutePos(BlockPos.ZERO);
+		int dx = aim(o.getX() + 14), z = aim(o.getZ());
+		int wx = dx + 14;
+		BlockPos well = helper.absolutePos(new BlockPos(wx, y, z));
+		long seed = fieldSeed(well, true);
+		check(helper, seed >= 0, "no seed puts an oil field under the well");
+		dev.wildcatter.well.ReservoirData.TestRegion region = new dev.wildcatter.well.ReservoirData.TestRegion(o.getX() + dx - 12, o.getZ() + z - 8, o.getX() + dx + 24, o.getZ() + z + 8, seed);
+		dev.wildcatter.well.ReservoirData.TEST_REGIONS.add(region);
+		stone(helper, dx - 10, z - 4, dx + 18, z + 4, y - 1);
+		GridSceneKit.put(helper, "oil_wellhead", wx, y, z);
+		GridSceneKit.place(helper, dev.wildcatter.WildcatterBlocks.PUMPJACK, wx - 1, y, z, net.minecraft.core.Direction.EAST);
+		setAndCable(helper, dx, y, z, wx - 6);
+		int sx = wx - 8;   // the starter in the run: the line on its back (west), the motor off its front (east)
+		helper.setBlock(sx, y, z, dev.wildcatter.WildcatterBlocks.MOTOR_STARTER.defaultBlockState()
+				.setValue(dev.wildcatter.block.MotorStarterBlock.FACING, net.minecraft.core.Direction.EAST));
+		ServerPlayer player = player(helper, dx + 4, y, z + 3);
+		player.getInventory().add(new ItemStack(dev.wildcatter.WildcatterBlocks.BREAKER_3P_INDUSTRIAL));
+		player.getInventory().add(new ItemStack(BuiltInRegistriesItem("industrial_wire_hot"), 6));
+		player.getInventory().add(new ItemStack(dev.wildcatter.WildcatterBlocks.MOTOR_STARTER));
+		QuestTracker.check(player);
+		player.getInventory().clearContent();   // the breaker, wire and starter set down
+		GridSceneKit.start(helper, dx, y, z, () -> helper.runAfterDelay(100, () -> {
+			String still = GridSceneKit.read(helper, wx - 1, y, z);
+			check(helper, !still.contains("pumping at"), "with its starter stopped the pumpjack should be still: " + still);
+			check(helper, !reached(server, player, dev.wildcatter.quest.Milestones.MOTOR_STARTED), "a stopped starter should not fire motor_started");
+			helper.getBlockEntity(new BlockPos(sx, y, z), dev.wildcatter.block.MotorStarterBlockEntity.class).pushButton();
+			dev.wildcatter.circuit.CircuitManager.markDirty(helper.getLevel());
+			helper.runAfterDelay(240, () -> {
+				String jack = GridSceneKit.read(helper, wx - 1, y, z);
+				String starter = GridSceneKit.read(helper, sx, y, z);
+				log(scene, "pumpjack | " + jack + " | starter | " + starter);
+				check(helper, jack.contains("pumping at"), "started at the starter the pumpjack should run and lift: " + jack + " | " + starter);
+				check(helper, reached(server, player, dev.wildcatter.quest.Milestones.MOTOR_STARTED), "the starter should fire motor_started: " + starter);
+				QuestTracker.check(player);
+				check(helper, QuestData.get(server).of(player.getStringUUID()).done.contains("wildcatter:motor"),
+						"the motor quest should be done: its parts were carried once and the motor started from the starter");
+				dev.wildcatter.well.ReservoirData.TEST_REGIONS.remove(region);
+				leave(helper, player);
+				log(scene, "ok: " + starter);
+				clearBox(helper, dx - 10, z - 4, dx + 18, z + 4, y - 1, y + 8);
+				helper.succeed();
+			});
+		}));
+	}
+
+	private static net.minecraft.world.item.Item BuiltInRegistriesItem(String path) {
+		return net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(wid(path));
 	}
 
 	/** A small rig two blocks above a field, on a diesel set: it strikes, rigs down, and fires well_struck; the gas well quest's strike task follows. */

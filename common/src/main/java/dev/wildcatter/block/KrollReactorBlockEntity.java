@@ -215,7 +215,7 @@ public class KrollReactorBlockEntity extends UnitMotorBlockEntity implements ZrS
 			unit = "starting the furnace: " + describe();
 			return;
 		}
-		double kg = reduce(up, cell, campaign, Math.min(Tuning.ZR_LINE_KGS * 1.2 * seconds() * strength, room));
+		double kg = reduce(up, cell, campaign, Math.min(Tuning.ZR_LINE_KGS * dev.wildcatter.TimeScale.production() * 1.2 * seconds() * strength, room));
 		metal += kg;
 		metalHf = campaign;
 		unit = String.format("reducing %s at about 850 C: %.1f kg/h of sponge; %.2f kg of sponge held", campaign ? "HfCl4 (HAFNIUM CAMPAIGN)" : "ZrCl4",
@@ -286,7 +286,7 @@ public class KrollReactorBlockEntity extends UnitMotorBlockEntity implements ZrS
 		}
 		if (need > 1e-9) {
 			Feed up = feed(column, hf);
-			double kg = reduce(up, cell, hf, Math.min(Tuning.ZR_LINE_KGS * 1.2 * seconds() * strength, need));
+			double kg = reduce(up, cell, hf, Math.min(Tuning.ZR_LINE_KGS * dev.wildcatter.TimeScale.production() * 1.2 * seconds() * strength, need));
 			retortKg[f] += kg;
 			retortHf[f] = hf;
 		}

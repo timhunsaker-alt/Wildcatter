@@ -55,9 +55,10 @@
       "id": "frasch",
       "title": "Frasch sulfur",
       "icon": "wildcatter:frasch_wellhead",
-      "text": "Drill into a salt dome's caprock and set a Frasch wellhead: 165 C water from a Frasch water heater, lift air from a compressor, and a bleed water well into the same caprock. Molten sulfur goes straight to the acid plant's furnace or to a vat.",
+      "text": "Drill into a salt dome's caprock with the land rig (the small rig cannot stop there) and set a Frasch wellhead: 165 C water from a Frasch water heater, lift air from a compressor, and a bleed water well into the same caprock. Molten sulfur goes straight to the acid plant's furnace or to a vat.",
       "requires": [
-        "acid_plant"
+        "acid_plant",
+        "casing_point"
       ],
       "tasks": [
         {
@@ -100,7 +101,8 @@
       "icon": "wildcatter:coke_oven_battery",
       "text": "A coke oven battery bakes coal into metallurgical coke; its gas can fuel a gas genset.",
       "requires": [
-        "acid_plant"
+        "ore_survey",
+        "motor"
       ],
       "tasks": [
         {
@@ -152,12 +154,20 @@
       "id": "aluminium",
       "title": "Aluminium",
       "icon": "wildcatter:aluminium_ingot",
-      "text": "Bauxite to alumina in the Bayer refinery, then pots on a rectiformer smelt it. Big DC, big anodes.",
+      "text": "Bauxite to alumina in the Bayer refinery, then pots on a rectiformer smelt it. A pot is built on calcined coke: crude-unit residue through the delayed coker (heater, coke drum, fractionator) and the coke kiln. Its later anodes take coke-oven pitch.",
       "requires": [
         "chlor_alkali",
-        "coke"
+        "crude_unit"
       ],
       "tasks": [
+        {
+          "item": "wildcatter:coke_drum",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:coke_kiln",
+          "count": 1
+        },
         {
           "item": "wildcatter:aluminium_ingot",
           "count": 1

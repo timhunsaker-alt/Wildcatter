@@ -35,7 +35,7 @@ public class Co2LiquefierBlockEntity extends UnitMotorBlockEntity {
 
 	@Override
 	protected double hold(Product product) {
-		return product == Product.CO2 ? Tuning.CO2_LIQUEFIER_KGH / 3600 * Tuning.PLANT_HOLD_SECONDS * 4 : 0;
+		return product == Product.CO2 ? Tuning.CO2_LIQUEFIER_KGH * dev.wildcatter.TimeScale.production() / 3600 * Tuning.PLANT_HOLD_SECONDS * 4 : 0;
 	}
 
 	/** kg an hour it liquefied, its last interval. */
@@ -61,7 +61,7 @@ public class Co2LiquefierBlockEntity extends UnitMotorBlockEntity {
 			unit = "starting the compressor: " + describe();
 			return;
 		}
-		double kg = kiln.takeKilnGas(Math.min(room, Tuning.CO2_LIQUEFIER_KGH / 3600 * seconds() * strength));
+		double kg = kiln.takeKilnGas(Math.min(room, Tuning.CO2_LIQUEFIER_KGH * dev.wildcatter.TimeScale.production() / 3600 * seconds() * strength));
 		add(Product.CO2, kg);
 		made += kg;
 		rate = kg / seconds();

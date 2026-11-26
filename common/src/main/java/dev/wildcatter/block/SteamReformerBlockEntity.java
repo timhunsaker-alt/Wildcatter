@@ -37,7 +37,7 @@ public class SteamReformerBlockEntity extends PlantUnitBlockEntity implements Wa
 
 	@Override
 	protected double hold(Product product) {
-		return Tuning.SMR_M3H / 3600 * Tuning.PLANT_HOLD_SECONDS * 4;
+		return Tuning.SMR_M3H * dev.wildcatter.TimeScale.production() / 3600 * Tuning.PLANT_HOLD_SECONDS * 4;
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class SteamReformerBlockEntity extends PlantUnitBlockEntity implements Wa
 		if ((level.getGameTime() + pos.hashCode()) % Tuning.WELL_INTERVAL != 0) {
 			return;
 		}
-		double m3 = Math.min(Tuning.SMR_M3H / 3600 * seconds(), r.room(Product.HYDROGEN));
+		double m3 = Math.min(Tuning.SMR_M3H * dev.wildcatter.TimeScale.production() / 3600 * seconds(), r.room(Product.HYDROGEN));
 		m3 = Math.min(m3, r.water / Tuning.SMR_WATER_PER_H2);
 		if (r.water < 0.001) {
 			r.status = "NO WATER: pump water to it for its steam";

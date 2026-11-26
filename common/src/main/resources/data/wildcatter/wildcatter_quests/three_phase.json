@@ -119,8 +119,8 @@
           "count": 1
         },
         {
-          "milestone": "wildcatter:motor_running",
-          "text": "Run a three-phase motor"
+          "milestone": "wildcatter:motor_started",
+          "text": "Start a motor from the starter"
         }
       ],
       "rewards": [

@@ -40,7 +40,8 @@ import net.minecraft.world.level.block.state.BlockState;
  * <li>{@code span_burns}: a 12.47 kV span and a lead to a pole transformer feed two heaters; with the span's ampacity shrunk (a test
  * hook) the span heats, burns down and the heaters go dark; breaking the far pole brings its pole transformer down with it.</li>
  * <li>{@code mv_span_flashover}: a 4.16 kV span strung from an MV spool carries 2.4 kV to neutral and, through a lead, lights a 4.16 kV
- * pole unit's heater; a second span to a 1 kV insulator flashes over, and its arc shatters it.</li>
+ * pole unit's heater; a second span to a 1 kV insulator flashes over, and its arc shatters it. The pole unit fires the quest book's
+ * pole_transformer_energised.</li>
  * <li>{@code house_earth}: a service with a ground rod at its load centre reads SERVICE (bonded and earthed); with the service
  * neutral cut the lamp stays lit through the earth; with the rod gone too it goes dark.</li>
  * </ul>
@@ -168,11 +169,15 @@ final class DistributionScenes {
 		check(helper, lead.ok(), "a 4.16 kV lead down to the pole unit should string: " + lead);
 		SpoolItem.Result wrong = SpoolItem.connectLead(helper.getLevel(), far, abs(helper, 37, U + 6, 1), Voltage.DISTRIBUTION, false, 64, ConductorSize.ACSR_RAVEN);
 		check(helper, !wrong.ok(), "a 12.47 kV lead should not land on a 4.16 kV unit: " + wrong);
+		net.minecraft.server.level.ServerPlayer watcher = QuestScenes.player(helper, 30, U, 12);   // the quest book: within 64 blocks of the pole unit
 		start(helper, 10, U, 0, () -> helper.runAfterDelay(80, () -> {
 			String farRead = read(helper, 37, U + 10, 0);
 			log("mv_span_flashover", "carrying | " + farRead + " | " + read(helper, 37, U + 6, 1));
 			check(helper, farRead.contains("4.16 kV") && farRead.matches(".*\\b2[34]\\d\\d V.*"), "the far insulator should hold about 2.4 kV to neutral: " + farRead);
 			check(helper, lit(helper, 37, U + 5, 1), "the lamp should light through the 4.16 kV span, the lead and the pole unit: " + read(helper, 37, U + 6, 1));
+			check(helper, QuestScenes.reached(helper.getLevel().getServer(), watcher, dev.wildcatter.quest.Milestones.POLE_TRANSFORMER_ENERGISED),
+					"the energised pole unit should fire pole_transformer_energised (0.10.2): " + read(helper, 37, U + 6, 1));
+			QuestScenes.leave(helper, watcher);
 			// a span on to a 1 kV insulator: the 4.16 kV line flashes over it to earth, and its arc shatters the porcelain
 			insulator(helper, WildcatterBlocks.INSULATOR_LV, 17, U + 10, 18, Conductor.A);
 			SpoolItem.Result under = SpoolItem.connect(helper.getLevel(), near, abs(helper, 17, U + 10, 18), Voltage.MEDIUM, false, 1024, ConductorSize.ACSR_RAVEN);

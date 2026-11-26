@@ -18,12 +18,15 @@ Plan: `/Users/timhunsaker/.claude/plans/elegant-swinging-starfish.md` (approved 
 
 ## Detection (server side, `dev.wildcatter.quest.QuestTracker`)
 - Every 20 ticks each player's open quests are checked:
-  - an **item** task is met while the player carries the count (any components; cables carry their size as a component);
+  - an **item** task is met once the player carries the count (any components; cables carry their size as a component). Once met it
+    stays met, kept with the player, so crafting a machine ticks its line and setting it down and running it finishes the quest
+    (0.10.2; before, the count was read live and a machine quest wanted a spare machine in the pocket);
   - an **advancement** task is met once the player has the vanilla advancement (so advancements earned before the book existed count);
   - a **milestone** task is met once a machine near the player has fired the milestone (below). Milestones are kept with the player.
 - A quest is done when all its tasks are met at once, whether or not its prerequisites are done (an existing world fills in at once).
   Once done it stays done. A quest with no tasks is done when the quests it needs are done.
-- Progress is kept per player in the overworld's saved data `wildcatter:quests` (done quests, claimed rewards, milestones reached).
+- Progress is kept per player in the overworld's saved data `wildcatter:quests` (done quests, claimed rewards, milestones reached, and
+  the item tasks of open quests met so far). A save from before 0.10.2 has no met item tasks and loads with none.
 
 ## Milestones: `QuestEvents.milestone`
 ```java
@@ -110,7 +113,9 @@ Constants in `dev.wildcatter.quest.Milestones`; any chapter may use them.
 | `wildcatter:gas_genset_running` | a gas genset running |
 | `wildcatter:genset_on_biogas` | a gas genset running on biogas (another mod's digester gas on the steel pipe) |
 | `wildcatter:motor_running` | any three-phase motor up to speed (a pump, a fan, a rig, a plant's motor) |
+| `wildcatter:motor_started` | a three-phase motor started from a motor starter (standalone, an MCC bucket or a starter cabinet) and up to speed: the starter closed, current on every line for three start times and down from inrush (a soft starter bypassed, a drive at speed). The motor quest asks for it (0.10.2), so the rig's own motor no longer ticks it |
 | `wildcatter:transformer_energised` | a transformer (pole, pad-mount, dry-type, unit substation) with its high side live |
+| `wildcatter:pole_transformer_energised` | a pole-mount transformer with its high side live (0.10.2; the pole transformer quest asks for it, so the dry-type no longer ticks it) |
 | `wildcatter:pumpjack_running` | a pumpjack whose motor runs and lifts well fluid (`PumpjackBlockEntity`, on each lift) |
 | `wildcatter:well_struck` | a drilling rig (the small rig or the land rig) reaching an oil or gas field; not a dry hole or an ISR well |
 | `wildcatter:crude_unit_running` | the topping unit or the atmospheric column refining |

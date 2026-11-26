@@ -21,8 +21,12 @@ public final class Milestones {
 	public static final Identifier GENSET_ON_BIOGAS = Wildcatter.id("genset_on_biogas");
 	/** A three-phase motor has come up to speed and runs. */
 	public static final Identifier MOTOR_RUNNING = Wildcatter.id("motor_running");
+	/** A three-phase motor started from a motor starter (standalone, an MCC bucket or a starter cabinet) is up to speed. */
+	public static final Identifier MOTOR_STARTED = Wildcatter.id("motor_started");
 	/** A transformer's high side is live at its voltage. */
 	public static final Identifier TRANSFORMER_ENERGISED = Wildcatter.id("transformer_energised");
+	/** A pole-mount transformer's high side is live at its voltage (not a dry-type, pad-mount or substation unit). */
+	public static final Identifier POLE_TRANSFORMER_ENERGISED = Wildcatter.id("pole_transformer_energised");
 	/** A pumpjack's motor is running and it is lifting well fluid. */
 	public static final Identifier PUMPJACK_RUNNING = Wildcatter.id("pumpjack_running");
 	/** A drilling rig has reached an oil or gas field (a strike, not a dry hole). */

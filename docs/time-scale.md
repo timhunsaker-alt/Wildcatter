@@ -28,9 +28,37 @@ tonnes an hour, a fuel's heat, a motor's start and every electrical number stay 
 | Dry cask cooling, for eligibility (already counted 100x) | years | 10x more | 50x more |
 | Tailings paste cure | 1 game day | 2.4 min | 29 s |
 
-Not scaled: electrical (protection trip times, motor and stator heating and cooling, breaker and clamp cooling), every flow and
+Not scaled (unless the world rule `fastProduction` is on, and then only the rates in "Fast production" below): electrical (protection trip times, motor and stator heating and cooling, breaker and clamp cooling), every flow and
 throughput, burn times (a fuel bucket still burns an hour), the drill and TBM advance, train and crane speeds, and the waits that are
 already compressed for play (the steam plant's 300 s heat-up, `HEATUP_SPEEDUP`). Those keep their present numbers at every preset.
+
+## Fast production: an opt-in rule for filming (Tim, 2026-11-26)
+Tim (2026-11-26, Built From Scratch): the very long chains (uranium to fuel, loading the core) are started on camera and then cut to a
+world prepared off camera; the shorter long chains are filmed at a faster time scale, "once the time-scale setting also reaches those
+production rates". The 2026-11-10 decision above (waits, not rates) still stands for every world that does not ask otherwise, so this
+is a world rule of its own, **`fastProduction`, off by default and off in new worlds**.
+
+With it on, these production rates are multiplied by the time scale (`TimeScale.production()`: the scale with the rule on, else 1).
+At 1:1 the rule changes nothing.
+
+| Chain (the quest it holds up) | Rates multiplied | Real time to the first product | At 10:1 |
+|---|---|---|---|
+| Quicklime for oilwell cement (casing_point) | the lime kiln's 10 t a day, and the kiln gas it holds for the CO2 liquefier | about 9.6 h for 4 bags | about 1 h |
+| Fertilizer (fertilizer, spreader) | the whole ammonia plant together: steam reformer, nitrogen generator, syngas compressor, converter (15.2 kg/h of NH3) | about 14.4 h a DAP bag | about 1.4 h |
+| Battery graphite | the graphite line (400 kg/h) and the graphite furnace (360 kg/h); the nitrogen generator above | about 5.3 h | about 32 min |
+| Cathode powder | the lithium plant (its leach, kilns and crystallizer follow the leach's rate), the lithium carbonator (100 kg/h), the CO2 liquefier (150 kg/h), the LFP kiln (700 kg/h); the lime kiln above | about 16 h | under 2 h |
+| Zirconium to the first tube | every flow stage of the Zr line (12 kg/h: separator, chlorinator, hafnium column, Kroll fill, distillation, VAR charge, extrusion, pilger); the Kroll and VAR batch holds already follow the scale as waits | about 20 h | about 2 h |
+
+Not touched, rule or no rule: anything electrical (power drawn, protection, motor starts), fuel burn times, and the uranium and fuel
+chain (mill, conversion, enrichment, fuel line, RCCAs), which is filmed from a prepared world. The inputs a multiplied machine pulls
+(ore, gas, acid, power) are not multiplied, so a faster machine wants its feed to keep up: the lime kiln at 10:1 burns ten times the gas.
+The zirconium line also makes the fuel's cladding, so with the rule on the fuel's Zr tubes come faster too.
+
+Left out on purpose: the delayed coker's green coke for the aluminium pot (about 2 h on the crude column) is held by the crude unit's
+residue, and the crude unit is not multiplied; the cell line's 10 minutes a module is short already.
+
+Readouts that state a rate (the nitrogen generator's header, each machine's "kg/h" line) read the multiplied rate. The scene
+`fast_production` shows the graphite line at 10:1 at its real 400 kg/h with the rule off, 4,000 kg/h with it on, and back again.
 
 ## How it is stored and read
 - One value per world, saved with the world rules (`data/wildcatter/rules.dat`, `RulesData`). Tailings has Wildcatter as a

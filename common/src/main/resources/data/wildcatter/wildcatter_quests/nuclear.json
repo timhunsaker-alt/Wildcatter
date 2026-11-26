@@ -92,7 +92,7 @@
       "icon": "wildcatter:storage_module",
       "text": "Spent assemblies cool in the pool, then go into a dry storage canister at the cask loading station and out to a storage module.",
       "requires": [
-        "critical"
+        "nuclear_island"
       ],
       "tasks": [
         {

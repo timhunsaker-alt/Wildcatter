@@ -72,7 +72,7 @@ public class GraphiteFurnaceBlockEntity extends UnitMotorBlockEntity implements 
 	@Override
 	protected void work(Level level) {
 		making = 0;
-		double max = Tuning.GRAPHITE_FURNACE_KGH / 3600 * seconds();
+		double max = Tuning.GRAPHITE_FURNACE_KGH * dev.wildcatter.TimeScale.production() / 3600 * seconds();
 		if (feed < max / (1 - Tuning.GRAPHITE_PURIFY_LOSS) && fed() > 0) {
 			useOne();
 			feed += Tuning.BULK_BAG_KG;

@@ -99,7 +99,7 @@ public class LfpKilnBlockEntity extends UnitMotorBlockEntity implements HopperFe
 	@Override
 	protected void work(Level level) {
 		making = 0;
-		double max = Tuning.LFP_KILN_KGH / 3600 * seconds();
+		double max = Tuning.LFP_KILN_KGH * dev.wildcatter.TimeScale.production() / 3600 * seconds();
 		if (iron < max * Tuning.LFP_IRON_PER_KG && !slots.get(IRON).isEmpty()) {
 			slots.get(IRON).shrink(1);
 			iron += Tuning.IRON_INGOT_KG;

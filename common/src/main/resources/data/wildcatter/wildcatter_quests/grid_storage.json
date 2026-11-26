@@ -2,49 +2,109 @@
   "title": "Grid storage",
   "icon": "wildcatter:bess_container",
   "order": 75,
-  "after": ["wildcatter:chemicals"],
+  "after": [
+    "wildcatter:chemicals"
+  ],
   "quests": [
     {
       "id": "battery_graphite",
       "title": "Battery graphite",
       "icon": "wildcatter:purified_graphite_bag",
-      "text": "The graphite line floats and rounds graphite schist; the graphite furnace purifies it to 99.95 % carbon at about 2,800 C, a 1.4 MW load under a nitrogen purge.",
-      "requires": ["ore_survey"],
-      "tasks": [{"item": "wildcatter:purified_graphite_bag", "count": 1}]
+      "text": "The graphite line floats and rounds graphite schist; the graphite furnace purifies it to 99.95 % carbon at about 2,800 C, a 1.4 MW load on a distribution feed, purged with nitrogen from a nitrogen generator.",
+      "requires": [
+        "ore_survey",
+        "substation"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:nitrogen_generator",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:purified_graphite_bag",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "cathode_powder",
       "title": "Cathode powder",
       "icon": "wildcatter:lfp_cathode_bag",
-      "text": "The LFP kiln: iron ingots, lithium carbonate from the lithium plant and phosphoric acid from the fertilizer plant, calcined at 700 C under nitrogen.",
-      "requires": ["fertilizer", "chlor_alkali"],
-      "tasks": [{"item": "wildcatter:lfp_cathode_bag", "count": 1}]
+      "text": "The LFP kiln: iron ingots, phosphoric acid from the fertilizer plant and lithium carbonate, calcined at 700 C under nitrogen. The lithium plant makes the hydroxide; the carbonator turns it to carbonate with liquid CO2 from the CO2 liquefier on the lime kiln's gas.",
+      "requires": [
+        "fertilizer",
+        "chlor_alkali"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:lithium_leach",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:lithium_carbonator",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:co2_liquefier",
+          "count": 1
+        },
+        {
+          "item": "wildcatter:lfp_cathode_bag",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "lfp_module",
       "title": "A battery module",
       "icon": "wildcatter:lfp_module",
-      "text": "The cell line coats, stacks, fills and forms 52 cells into a 52.2 kWh module every 10 minutes. Its electrolyte takes anhydrous HF and ethylene.",
-      "requires": ["battery_graphite", "cathode_powder"],
-      "tasks": [{"item": "wildcatter:lfp_module", "count": 1}]
+      "text": "The cell line coats, stacks, fills and forms 52 cells into a 52.2 kWh module every 10 minutes. It takes aluminium ingots for the foil; its electrolyte takes ethylene and anhydrous HF from an HF kiln and column.",
+      "requires": [
+        "battery_graphite",
+        "cathode_powder",
+        "aluminium"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:lfp_module",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "battery_cabinet",
       "title": "A battery cabinet",
       "icon": "wildcatter:bess_cabinet",
       "text": "Five modules in a 125 kW cabinet on a 480 V feeder: peak shaving beside a genset, or frequency response on a small island.",
-      "requires": ["lfp_module", "genset"],
-      "tasks": [{"item": "wildcatter:bess_cabinet", "count": 1}]
+      "requires": [
+        "plc"
+      ],
+      "tasks": [
+        {
+          "item": "wildcatter:bess_cabinet",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "bess_block",
       "title": "A battery on the grid",
       "icon": "wildcatter:bess_container",
-      "text": "A PCS, two containers of 96 modules and an MV skid on a distribution feeder: 2.5 MW for four hours.",
-      "requires": ["battery_cabinet", "substation"],
+      "text": "A PCS, two containers of 96 modules and an MV skid on a distribution feeder: 2.5 MW for four hours. The PCS is built with aluminium ingots.",
+      "requires": [
+        "battery_cabinet",
+        "substation",
+        "aluminium"
+      ],
       "tasks": [
-        {"item": "wildcatter:bess_container", "count": 1},
-        {"milestone": "wildcatter:bess_discharging", "text": "Deliver 1 MW from a battery"}
+        {
+          "item": "wildcatter:bess_container",
+          "count": 1
+        },
+        {
+          "milestone": "wildcatter:bess_discharging",
+          "text": "Deliver 1 MW from a battery"
+        }
       ]
     },
     {
@@ -52,8 +112,15 @@
       "title": "A grid from a battery",
       "icon": "wildcatter:bess_pcs",
       "text": "Set a block (or a cabinet) to GRID FORMING on a dead bus: it closes with a soft start and holds the island while a genset synchronises to it.",
-      "requires": ["bess_block"],
-      "tasks": [{"milestone": "wildcatter:bess_black_start", "text": "Black-start a dead bus from a battery"}]
+      "requires": [
+        "bess_block"
+      ],
+      "tasks": [
+        {
+          "milestone": "wildcatter:bess_black_start",
+          "text": "Black-start a dead bus from a battery"
+        }
+      ]
     }
   ]
 }

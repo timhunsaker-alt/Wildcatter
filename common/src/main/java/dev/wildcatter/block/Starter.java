@@ -49,6 +49,9 @@ public final class Starter {
 	/** 0 to 1: how close the overload relay is to tripping. */
 	private double heat;
 	private double amps;
+	/** Seconds it has run with current on every line (the quest book: a motor started from a starter). */
+	private double carryingSeconds;
+	private boolean upToSpeed;
 	private boolean powered;
 	private String lastTrip = "";
 
@@ -348,6 +351,25 @@ public final class Starter {
 		circuit.port(cell, face, Conductor.G, voltage, ground, Tuning.CONTACT_OHMS / 2, false);
 	}
 
+	private static double leastAmps(Circuit circuit, int[] branches) {
+		if (branches.length == 0) {
+			return 0;
+		}
+		double least = Double.MAX_VALUE;
+		for (int branch : branches) {
+			least = Math.min(least, circuit.current(branch));
+		}
+		return least;
+	}
+
+	/**
+	 * True while the motor it started runs up to speed: the starter closed, current on every line for three start times, and down to
+	 * twice its overload setting or less (a soft starter bypassed, a drive at its speed). The quest book's {@code motor_started}.
+	 */
+	public boolean motorUpToSpeed() {
+		return upToSpeed && run == MotorStarterBlock.Run.RUNNING;
+	}
+
 	private double mostAmps(Circuit circuit, int[] branches) {
 		double most = 0;
 		for (int branch : branches) {
@@ -446,6 +468,12 @@ public final class Starter {
 				}
 			}
 		}
+		// the quest book: the motor it started is up to speed: running on every line, past its start, the current down from inrush
+		double least = kind == Kind.DRIVE ? leastAmps(circuit, outBranch) : leastAmps(circuit, poles);
+		boolean carrying = running && motorAmps > 0.5 && least > motorAmps * 0.2;
+		carryingSeconds = carrying ? carryingSeconds + dt : 0;
+		upToSpeed = carryingSeconds >= Tuning.MOTOR_START_SECONDS * 3 && motorAmps <= fla * 2
+				&& (kind != Kind.SOFT || bypassed) && (kind != Kind.DRIVE || ramp >= speedTarget * 0.995);
 		double ratio = motorAmps / fla;
 		double pickup = Tuning.OVERLOAD_PICKUP * Tuning.OVERLOAD_PICKUP;
 		if (ratio > Tuning.OVERLOAD_PICKUP) {
@@ -463,6 +491,8 @@ public final class Starter {
 
 	private void trip(String why) {
 		heat = 0;
+		carryingSeconds = 0;
+		upToSpeed = false;
 		amps = 0;
 		lastTrip = why;
 		run = MotorStarterBlock.Run.TRIPPED;

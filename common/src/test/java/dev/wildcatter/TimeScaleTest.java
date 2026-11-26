@@ -64,6 +64,22 @@ class TimeScaleTest {
 	}
 
 	@Test
+	void fastProductionOnlyWithItsRule() {
+		TimeScale.set(10);
+		assertEquals(1, TimeScale.production());   // waits, not rates: off by default, and off in a new world
+		assertFalse(Rules.Rule.FAST_PRODUCTION.newWorld);
+		double ammonia = Tuning.SMR_M3H / dev.wildcatter.fluid.AmmoniaPlant.H2_PER_NH3;
+		assertEquals(ammonia, dev.wildcatter.fluid.AmmoniaPlant.ammoniaNm3h(), 1e-9);
+		Rules.set(Rules.Rule.FAST_PRODUCTION, true);
+		assertEquals(10, TimeScale.production());
+		assertEquals(ammonia * 10, dev.wildcatter.fluid.AmmoniaPlant.ammoniaNm3h(), 1e-9);
+		assertEquals(Tuning.LIOH_TPH * 10 * 1000 / 3600, dev.wildcatter.fluid.Lithium.liohKgs(), 1e-9);
+		TimeScale.set(1);
+		assertEquals(1, TimeScale.production());   // at 1:1 the rule changes nothing
+		Rules.set(Rules.Rule.FAST_PRODUCTION, false);
+	}
+
+	@Test
 	void newWorldChoices() {
 		assertEquals(1, NewWorldSetup.scale());
 		assertTrue(NewWorldSetup.rule(Wildcatter.MOD_ID, "mudGel", true));
