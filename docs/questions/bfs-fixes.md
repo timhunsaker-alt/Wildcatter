@@ -69,3 +69,10 @@ Each of the report's items 5 and 6 was checked; all hold, with these notes:
   fuel's cladding, so with the rule on those uranium-chapter steps get their nitrogen and Zr tubes faster. Their own rates are not
   touched. The machines' feeds (ore, gas, acid, power) are not multiplied: the lime kiln at 10:1 burns ten times the gas.
 - **The scene:** `fast_production` uses the graphite line (it needs only ore and 480 V, so it shows the rate alone).
+
+## Release check (2026-11-26, main session)
+Full suite on merged master: 1 of 3 runs passed all 128; the other two failed `mv_span_flashover` only, which passed 3 of 3 alone. The
+failing runs read "no spans, 0 V" at the under-rated insulator 200 ticks on: the span dropped before its arc shattered the porcelain
+(in the passing run the insulator was already gone 2 ticks after stringing). A timing race in the scene, noted as flaky before this
+branch (PROGRESS); the new quest-book check runs before that part and is not involved. Worth making the scene wait for the shatter or
+the span drop, whichever comes first, in a later pass.

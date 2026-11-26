@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.10.2 (unreleased): the quest book checked for a fresh world
+## v0.10.2 (2026-11-26): the quest book checked for a fresh world
 
 ### Quest book
 - **Item tasks stay met once met:** crafting a machine ticks its line and setting it down and running it finishes the quest. Before,
