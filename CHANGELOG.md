@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Steam turbine
+- **An open circuit is not a load:** a starter turbine with only a hot wire to a lamp (no neutral back) counted the solver's tiny leak to
+  earth (a few nanowatts) as output, so it drew a unit of steam a tick and could tick Raise steam with no loop. Below one watt
+  (`Tuning.TURBINE_NO_LOAD_WATTS`) it now idles: no steam drawn and no `steam_turbine_generating`. Proof: `bfs02_first_power`.
+
 ## v0.10.2 (2026-11-26): the quest book checked for a fresh world
 
 ### Quest book

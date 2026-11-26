@@ -1343,6 +1343,8 @@ public final class Tuning {
 	// ---- Steam turbine -----------------------------------------------------------------------------------------
 	/** Energy in one unit of steam. A campfire boiler (2 steam a tick) therefore makes 2 kW. */
 	public static final double JOULES_PER_STEAM = 50.0;
+	/** A starter turbine's output below this is the solver's tiny leak on an open circuit, not a load: it idles (no steam, no milestone). */
+	public static final double TURBINE_NO_LOAD_WATTS = 1.0;
 	public static final double TURBINE_INTERNAL_OHMS = 0.5;  // its output sags as the current rises
 	/** Fuel to electricity in a fired steam set: the steam plant's 25 % (docs/multiblocks/steam-plant.md, Build values). */
 	public static final double FIREBOX_ELECTRIC_SHARE = 0.25;

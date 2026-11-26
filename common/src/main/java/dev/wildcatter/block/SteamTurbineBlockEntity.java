@@ -95,7 +95,9 @@ public class SteamTurbineBlockEntity extends BlockEntity implements CircuitPart,
 	public static void tick(Level level, BlockPos pos, BlockState state, SteamTurbineBlockEntity turbine) {
 		long phase = level.getGameTime() + pos.hashCode();
 
-		double watts = turbine.watts();
+		// below a watt is the solver's leak to earth on an open circuit (a hot wire with no way back), not a load: the set idles, draws
+		// no steam and does not count as generating (Built From Scratch ep 2)
+		double watts = turbine.watts() < Tuning.TURBINE_NO_LOAD_WATTS ? 0 : turbine.watts();
 		double joules = watts / 20.0;
 		double perSteam = Tuning.JOULES_PER_STEAM * (turbine.cooled ? 1.0 : Tuning.UNCOOLED_EFFICIENCY);
 		int wanted = (int) Math.ceil(joules / perSteam);
