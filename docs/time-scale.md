@@ -75,8 +75,8 @@ Readouts that state a rate (the nitrogen generator's header, each machine's "kg/
 ## New world setup
 - A **World Rules... (time 1:1)** button on the Create World screen's Game tab, under the Grid button, opens a screen with:
   - the time scale as five buttons (1:1 to 50:1);
-  - every world rule as a toggle, preset to its new-world default (`reactorContamination`, `cascadeSpinUp` and
-    `realResidenceTimes` off, the rest on). Another mod adds its rules with `NewWorldSetup.register` (Tailings' after 0.7.0,
+  - every world rule as a toggle, preset to its new-world default (`reactorContamination`, `cascadeSpinUp`,
+    `realResidenceTimes` and `fastProduction` off, the rest on). Another mod adds its rules with `NewWorldSetup.register` (Tailings' after 0.7.0,
     `paste_wall_breach` off).
 - The choices go into the new world when it is made, before its first chunk (the same moment the rules are made today). This
   replaces typing `/wildcatter rule` and `/tailings rule` in a new world.

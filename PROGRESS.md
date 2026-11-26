@@ -2501,3 +2501,7 @@ From the quest check in `videos/longform/built-from-scratch/QUEST_CHECK.md`; dec
   lithium and cathode plant and zirconium line rates (docs/time-scale.md, "Fast production").
 - **Tests:** NeoForge `quest_item_task_kept`, `quest_motor_started`, `fast_production`; `dry_type_runs_rig` and `mv_span_flashover`
   check the new keys; JUnit `TimeScaleTest.fastProductionOnlyWithItsRule`.
+- **0.10.2 tests:** `build` passes. The full NeoForge suite was run twice: the first run failed only `oil_mud` (timed out POWER
+  LIMITED), the second only `mv_span_flashover` (the insulator not shattered), both scenes already known as flaky. Each passed in the
+  other full run and again in its own batch (`casing_lot`, `oil_mud`, `choke_kill`, `gas_storage`, `frasch`: 6 of 6;
+  `span_burns`, `mv_span_flashover`, `house_earth`: 4 of 4). The quest and rule scenes pass. The Fabric client suite was not run.
