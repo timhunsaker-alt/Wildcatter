@@ -18,6 +18,10 @@ import net.minecraft.util.Util;
  * sits, over a dark band, and held long enough to read (two seconds and a fortieth of a second a character, at most twelve seconds), then
  * faded. A message that fits, or one the game animates (a record playing), is left to the game. Both loaders wrap the game's own overlay
  * message layer with {@link #draw}.
+ * <p>
+ * The hold is counted in game time (the level's ticks and the partial tick), as the game's own three seconds are, not by the wall
+ * clock: paused, the readout waits with the game, and when the game runs slower than the clock (a filmed take draws every frame of game
+ * time, however long that takes) it is still up as long in the game as in play.
  */
 public final class ReadoutOverlay {
 	private static final int MARGIN = 12;
@@ -50,6 +54,20 @@ public final class ReadoutOverlay {
 		return f.get(hud);
 	}
 
+	/** Now, in milliseconds of game time when a level is loaded (its ticks and the partial tick), else by the clock. */
+	static long now() {
+		Minecraft mc = Minecraft.getInstance();
+		if (mc.level == null) {
+			return Util.getMillis();
+		}
+		return gameMs(mc.level.getGameTime(), mc.getDeltaTracker().getGameTimeDeltaPartialTick(true));
+	}
+
+	/** Game time in milliseconds: 50 a tick. */
+	static long gameMs(long ticks, float partial) {
+		return ticks * 50 + Math.round(partial * 50);
+	}
+
 	/** How long a message of {@code chars} characters stays up. */
 	static long holdMs(int chars) {
 		return Math.min(MAX_MS, BASE_MS + PER_CHAR_MS * chars);
@@ -74,7 +92,7 @@ public final class ReadoutOverlay {
 			vanilla.run();   // a game whose action bar is laid out differently: leave it alone
 			return;
 		}
-		long now = Util.getMillis();
+		long now = now();
 		if (cur != null && t > 0 && (cur != seen || t > lastTime)) {   // a new message (or the same one sent again)
 			seen = cur;
 			String text = cur.getString();
@@ -87,7 +105,7 @@ public final class ReadoutOverlay {
 			}
 		}
 		lastTime = t;
-		if (held == null || now - heldAt > holdMs) {
+		if (held == null || now - heldAt > holdMs || now < heldAt) {   // now < heldAt: another world's time
 			held = null;
 			vanilla.run();
 			return;
@@ -116,7 +134,8 @@ public final class ReadoutOverlay {
 
 	/** The lines a long message is drawn in now (empty when the game draws it, or nothing is up), for the client test. */
 	public static List<String> shown(int guiWidth) {
-		if (held == null || Util.getMillis() - heldAt > holdMs) {
+		long now = now();
+		if (held == null || now - heldAt > holdMs || now < heldAt) {
 			return List.of();
 		}
 		return Minecraft.getInstance().font.split(held, wrapWidth(guiWidth)).stream().map(l -> {

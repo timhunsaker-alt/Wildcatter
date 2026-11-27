@@ -60,6 +60,9 @@ import net.minecraft.world.level.block.Blocks;
  * <li>{@code bfs03_big_part_grounded}: a ground rod against a cell of the rig, and of the pumpjack, that is not its main cell (and not
  * beside it) grounds the machine: its readout says grounded, where before the fix it said UNGROUNDED (the search began only at the main
  * cell, as the episode's rod against the rig's skid and the pumpjack's terminal box showed).</li>
+ * <li>{@code bfs03_meter_on_terminal_box}: the power meter used on the rig's and the pumpjack's terminal box (a cell that is not the
+ * machine's main one) reads the machine, as on its main cell. Before the fix it read nothing there (the episode's meter on the rig's box
+ * drew no readout).</li>
  * </ul>
  */
 final class Bfs03Scenes {
@@ -73,6 +76,7 @@ final class Bfs03Scenes {
 		out.put("bfs03_pumpjack_on_wellhead", Bfs03Scenes::pumpjackOnWellhead);
 		out.put("bfs03_recipes", Bfs03Scenes::recipes);
 		out.put("bfs03_big_part_grounded", Bfs03Scenes::bigPartGrounded);
+		out.put("bfs03_meter_on_terminal_box", Bfs03Scenes::meterOnTerminalBox);
 		return out;
 	}
 
@@ -243,6 +247,53 @@ final class Bfs03Scenes {
 		var oldRecipe = server.getRecipeManager().getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING, old, helper.getLevel());
 		check(helper, oldRecipe.map(r -> !r.value().assemble(old).is(item("wildcatter:stock_tank"))).orElse(true), "eight steel round an empty middle should not give a stock tank");
 		log("bfs03_recipes", "ok: " + ok);
+		helper.succeed();
+	}
+
+	// ---- the meter on a terminal box -----------------------------------------------------------------------------------------------------
+
+	static void meterOnTerminalBox(GameTestHelper helper) {
+		String scene = "bfs03_meter_on_terminal_box";
+		GridSceneKit.floor(helper, -18, -10, 18, 10);
+		for (int x = -18; x <= 18; x++) {
+			for (int z = -10; z <= 10; z++) {
+				for (int y = 1; y <= 14; y++) {
+					helper.setBlock(new BlockPos(x, y, z), Blocks.AIR);
+				}
+			}
+		}
+		ServerPlayer player = QuestScenes.player(helper, 0, 1, 6);
+		ItemStack meter = new ItemStack(dev.wildcatter.WildcatterItems.POWER_METER);
+		player.setItemInHand(InteractionHand.MAIN_HAND, meter);
+		StringBuilder ok = new StringBuilder();
+		for (Block machine : List.of(WildcatterBlocks.DRILLING_RIG, WildcatterBlocks.PUMPJACK)) {
+			int mx = machine == WildcatterBlocks.DRILLING_RIG ? -10 : 4;
+			GridSceneKit.place(helper, machine, mx, 1, 0, Direction.WEST);
+			BlockPos main = helper.absolutePos(new BlockPos(mx, 1, 0));
+			net.minecraft.world.level.block.state.BlockState st = helper.getLevel().getBlockState(main);
+			BlockPos box = machine == WildcatterBlocks.DRILLING_RIG ? dev.wildcatter.block.DrillingRigBlock.terminalBox(main, st)
+					: dev.wildcatter.block.PumpjackBlock.terminalBox(main, st);
+			check(helper, !box.equals(main), machine + ": its terminal box should not be its main cell");
+			net.minecraft.world.phys.BlockHitResult hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(box).add(0.5, 0, 0),
+					Direction.EAST, box, false);
+			// as a right-click does: the block's own use first (the machine's cells pass a meter to readIfMeter), then the item's
+			java.util.List<net.minecraft.network.chat.Component> sent = new java.util.ArrayList<>();
+			ServerPlayer probe = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(), player.getGameProfile(), player.clientInformation()) {
+				@Override
+				public void sendOverlayMessage(net.minecraft.network.chat.Component message) {
+					sent.add(message);
+				}
+			};
+			probe.snapTo(box.getX() + 2.5, box.getY(), box.getZ() + 0.5, 90F, 20F);
+			probe.setItemInHand(InteractionHand.MAIN_HAND, meter);
+			net.minecraft.world.InteractionResult r = probe.gameMode.useItemOn(probe, helper.getLevel(), meter, InteractionHand.MAIN_HAND, hit);
+			String read = sent.isEmpty() ? "(nothing)" : sent.get(sent.size() - 1).getString();
+			check(helper, r.consumesAction() && read.startsWith(machine == WildcatterBlocks.DRILLING_RIG ? "Drilling rig" : "Pumpjack"),
+					machine + ": the meter on its terminal box " + helper.relativePos(box) + " should read the machine: " + r + ", " + read);
+			ok.append(machine.getDescriptionId()).append(" box ").append(helper.relativePos(box)).append(": ").append(read).append("; ");
+		}
+		log(scene, "ok: " + ok);
+		QuestScenes.leave(helper, player);
 		helper.succeed();
 	}
 

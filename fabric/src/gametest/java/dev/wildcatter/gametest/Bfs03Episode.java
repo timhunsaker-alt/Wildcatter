@@ -48,9 +48,9 @@ import net.minecraft.world.phys.Vec3;
  * The rig at each field is powered by a second steam set and the dry-type, against its terminal box; the ground at each site is levelled
  * and its trees cleared off camera.
  * <p>
- * Film only: names that carry a standard's body or a voltage not read from the standard are shown without them (labels()); the game's
- * action-bar readouts, which run off the screen's edges when long, are drawn wrapped and held for a few seconds (readoutHook()), except in
- * the GAME_READOUT films, re-shot once the game wrapped them itself. Films land
+ * Film only: names that carry a standard's body or a voltage not read from the standard are shown without them (labels()). The readouts
+ * are the game's own (it wraps and holds a long one itself, ReadoutOverlay). Each take is timed to the narration over it (until(), in
+ * game time: the re-film of 2026-11-27, every beat shown once, in order). Films land
  * in {@code build/scene-videos/bfs03__NN_<shot>.mov}; BFS_SHOTS picks shots by number or name (the rest run unfilmed).
  */
 final class Bfs03Episode {
@@ -62,7 +62,6 @@ final class Bfs03Episode {
 	private BlockPos table, furnace, blast, campfire;
 	private boolean filming;
 	private String filmId = "";
-	private long filmStart;
 	/** Episode 2's plant (PLAN.md "Episode 2's base"). */
 	private BlockPos boiler, turbine, lamp;
 
@@ -111,7 +110,7 @@ final class Bfs03Episode {
 			o.cloudStatus().set(net.minecraft.client.CloudStatus.FANCY);
 		});
 		cursorHook();
-		readoutHook();
+		tickHook();
 		labels();
 		bx = -568;
 		bz = 940;
@@ -206,95 +205,45 @@ final class Bfs03Episode {
 		log("film labels: " + over);
 	}
 
-	// ---- the readout, wrapped and held (film only) ----------------------------------------------------------------------------------
+	// ---- film time -----------------------------------------------------------------------------------------------------------------------
 
-	private static boolean readoutHooked;
-	private static volatile net.minecraft.network.chat.Component heldReadout;
-	private static volatile Object lastReadout;
-	private static volatile long heldAt;
-	/** How long a readout stays up: the game's own fades after three seconds, too short to read a long line on a film. */
-	static final int READOUT_HOLD = 170;
-	/**
-	 * Films re-shot after the game learnt to wrap long readouts itself (master 486c7446, ReadoutOverlay): in these the readout is the
-	 * game's own, not this film-only wrap. They are the shots whose rig or pumpjack readout changed to grounded (a rod against any cell of
-	 * a big part grounds it), filmed again for that (BFS patch, take 3).
-	 */
-	static final Set<String> GAME_READOUT = Set.of("bfs03__06_power_place", "bfs03__09_jack_place", "bfs03__10_mistake");
-	private static volatile boolean gameReadout;
+	/** Client ticks since the game started. A take's time is its ticks over 20 (film60: three frames a tick, whatever the clock). */
+	private static volatile long clientTicks;
+	private static boolean ticking;
+	private long filmTick0;
 
-	private static Object hudField(Object hud, String name) {
-		try {
-			java.lang.reflect.Field f = hud.getClass().getDeclaredField(name);
-			f.setAccessible(true);
-			return f.get(hud);
-		} catch (ReflectiveOperationException e) {
-			throw new IllegalStateException(e);
+	private void tickHook() {
+		if (!ticking) {
+			ticking = true;
+			net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK.register(c -> clientTicks++);
 		}
 	}
 
+	/** Seconds of the take filmed so far (game time). */
+	private double filmTime() {
+		return (clientTicks - filmTick0) / 20.0;
+	}
+
 	/**
-	 * The action bar's readout drawn in up to four centred lines, wrapped at 80 % of the screen's width, over a dark band, where the game
-	 * draws it, and held READOUT_HOLD ticks. The words are the game's own, unchanged.
+	 * Waits until the take is {@code sec} seconds in (game time), so each beat lands where its paragraph of narration wants it (the
+	 * episode's lengths, videos/longform/built-from-scratch/ep03); off camera it does not wait.
 	 */
-	private void readoutHook() {
-		if (readoutHooked) {
+	private void until(double sec) {
+		if (!filming) {
 			return;
 		}
-		readoutHooked = true;
-		net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry.replaceElement(
-				net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements.OVERLAY_MESSAGE, old -> (g, delta) -> {
-					var mc = net.minecraft.client.Minecraft.getInstance();
-					if (gameReadout) {
-						old.extractRenderState(g, delta);   // the game's own readout (ReadoutOverlay)
-						return;
-					}
-					if (mc.level == null) {
-						return;
-					}
-					Object hud = mc.gui.hud;
-					net.minecraft.network.chat.Component cur = (net.minecraft.network.chat.Component) hudField(hud, "overlayMessageString");
-					int time = (Integer) hudField(hud, "overlayMessageTime");
-					long now = mc.level.getGameTime();
-					if (cur != null && time > 0 && cur != lastReadout) {
-						lastReadout = cur;
-						heldReadout = cur;
-						heldAt = now;
-					}
-					net.minecraft.network.chat.Component msg = heldReadout;
-					if (msg != null && msg.getString().contains(" API ")) {
-						// film only, as the names: a standard body's name left out of a readout (the stock tank's "API 12F")
-						msg = net.minecraft.network.chat.Component.literal(msg.getString().replaceAll(" API [0-9A-Z-]+", ""));
-					}
-					if (msg == null || msg.getString().isEmpty() || now - heldAt > READOUT_HOLD) {
-						return;
-					}
-					long left = READOUT_HOLD - (now - heldAt);
-					int alpha = left < 10 ? (int) (255 * left / 10.0) : 255;
-					var font = mc.font;
-					List<net.minecraft.util.FormattedCharSequence> lines = font.split(msg, (int) (g.guiWidth() * 0.8));
-					int lh = font.lineHeight + 1;
-					int bottom = g.guiHeight() - 64;
-					int top = bottom - lines.size() * lh;
-					int w = 0;
-					for (var l : lines) {
-						w = Math.max(w, font.width(l));
-					}
-					int x0 = (g.guiWidth() - w) / 2;
-					g.nextStratum();
-					g.fill(x0 - 4, top - 3, x0 + w + 4, bottom + 1, net.minecraft.util.ARGB.color((int) (alpha * 0.6), 0, 0, 0));
-					for (int i = 0; i < lines.size(); i++) {
-						g.text(font, lines.get(i), (g.guiWidth() - font.width(lines.get(i))) / 2, top + i * lh, net.minecraft.util.ARGB.white(alpha), true);
-					}
-				});
-		log("readout hook: action-bar readouts wrapped and held " + READOUT_HOLD + " ticks (film only)");
+		int left = (int) Math.ceil((sec - filmTime()) * 20 - 1e-6);
+		if (left > 0) {
+			context.waitTicks(left);
+		} else if (left < -4) {
+			log(String.format(Locale.ROOT, "late: %s wanted %.2f s, at %.2f s", filmId, sec, filmTime()));
+		}
 	}
 
-	/** No readout carried over from the last film. */
+	/** No readout carried over from the last take. */
 	private void clearReadout() {
-		heldReadout = null;
 		context.runOnClient(c -> c.gui.hud.setOverlayMessage(net.minecraft.network.chat.Component.empty(), false));
 		context.waitTick();
-		heldReadout = null;
 	}
 
 	// ---- filming ------------------------------------------------------------------------------------------------------------------------
@@ -306,20 +255,18 @@ final class Bfs03Episode {
 			return;
 		}
 		filmId = String.format(Locale.ROOT, "bfs03__%02d_%s", n, name);
-		gameReadout = GAME_READOUT.contains(filmId);
 		clearReadout();
 		context.waitTicks(2);
 		film = context.computeOnClient(client -> Filming.start(client, filmId));
-		filmStart = System.nanoTime();
+		filmTick0 = clientTicks;
 		filming = true;
-		context.waitTicks(10);
 	}
 
 	private void stopFilm() {
 		if (film != null) {
 			context.waitTicks(10);
 			film.stop();
-			log("filmed " + filmId);
+			log(String.format(Locale.ROOT, "filmed %s (%.2f s)", filmId, filmTime()));
 			film = null;
 		}
 		filming = false;
@@ -328,7 +275,7 @@ final class Bfs03Episode {
 	/** Logs a beat with its time from the film's start (the edit cuts to these). */
 	private void mark(String what) {
 		if (filming) {
-			log(String.format(Locale.ROOT, "event %s %s at %.2f s", filmId, what, (System.nanoTime() - filmStart) / 1e9));
+			log(String.format(Locale.ROOT, "event %s %s at %.2f s", filmId, what, filmTime()));
 		} else {
 			log("beat (unfilmed) " + what);
 		}
@@ -628,7 +575,7 @@ final class Bfs03Episode {
 			double k = (double) c.getWindow().getScreenWidth() / c.getWindow().getGuiScaledWidth();
 			return new double[] {gx * k, gy * k};
 		});
-		glide(to, 7);
+		glide(to, glideTicks);
 	}
 
 	private void glide(double[] to, int ticks) {
@@ -648,13 +595,44 @@ final class Bfs03Episode {
 		mouse = mid;
 	}
 
+	/** The mouse's move to a slot and the pause after a click, in ticks (paceCraft sets them so a craft fills its time). */
+	private int glideTicks = 7, clickWait = 5;
+
 	private void click(int slot, int button, ContainerInput kind) {
 		moveTo(slot);
 		context.runOnClient(c -> {
 			AbstractContainerMenu m = c.player.containerMenu;
 			c.gameMode.handleContainerInput(m.containerId, slot, button, kind, c.player);
 		});
-		context.waitTicks(5);
+		context.waitTicks(clickWait);
+	}
+
+	/** The clicks craft() makes: for each ingredient, the pick-up, a right click a cell a time, the rest put back; the takes and the drop. */
+	private static int clicks(String[] pattern, Map<Character, Item> key, int times) {
+		int n = 0;
+		for (char k : key.keySet()) {
+			n += 2;
+			for (String row : pattern) {
+				for (char ch : row.toCharArray()) {
+					if (ch == k) {
+						n += times;
+					}
+				}
+			}
+		}
+		return n + times + 1;
+	}
+
+	/** The mouse slowed (never sped past its usual pace) so a craft of {@code clicks} clicks ends about {@code endSec} into the take. */
+	private void paceCraft(int clicks, double endSec) {
+		glideTicks = 7;
+		clickWait = 5;
+		if (filming) {
+			int per = (int) Math.floor(((endSec - filmTime()) * 20 - 16) / clicks);
+			per = Math.max(12, Math.min(30, per));
+			glideTicks = Math.max(7, (int) Math.round(per * 0.6));
+			clickWait = Math.max(5, per - glideTicks);
+		}
 	}
 
 	private void left(int slot) {
@@ -1224,7 +1202,9 @@ final class Bfs03Episode {
 		context.waitTicks(4);
 		useOn(at, faceToward(at));
 		mark("meter on " + at.toShortString() + ": " + reading(at));
-		context.waitTicks(70);
+		if (!filming) {
+			context.waitTicks(10);
+		}
 	}
 
 	private String reading(BlockPos at) {
@@ -1265,6 +1245,16 @@ final class Bfs03Episode {
 		craft(width, pattern, key, times, 10, 37);
 		mark(what + " made");
 		context.waitTicks(8);
+	}
+
+	/** A table craft paced to end about {@code endSec} into the take (the mouse slower, every cell still laid one at a time). */
+	private void tableCraftBy(double endSec, int width, String[] pattern, Map<Character, Item> key, int times, String what) {
+		paceCraft(clicks(pattern, key, times), endSec);
+		craft(width, pattern, key, times, 10, 37);
+		glideTicks = 7;
+		clickWait = 5;
+		mark(what + " made");
+		context.waitTicks(4);
 	}
 
 	private Map<Character, Item> keys(Object... kv) {
@@ -1465,6 +1455,11 @@ final class Bfs03Episode {
 
 	/** Claims a quest's reward with its page open (the Claim button), and holds the page a moment. */
 	private void claimIn(String quest) {
+		claimIn(quest, 30, 30);
+	}
+
+	/** As claimIn(quest), the page held {@code before} ticks before the Claim button and {@code after} ticks after it. */
+	private void claimIn(String quest, int before, int after) {
 		hold(WildcatterItems.QUEST_BOOK);
 		useHeld();
 		context.waitTicks(6);
@@ -1473,9 +1468,9 @@ final class Bfs03Episode {
 				q.open(Identifier.parse("wildcatter:" + quest), true);
 			}
 		});
-		context.waitTicks(30);
+		context.waitTicks(before);
 		claim(quest);
-		context.waitTicks(30);
+		context.waitTicks(after);
 		context.setScreen(() -> null);
 		context.waitTicks(4);
 	}
@@ -1536,6 +1531,11 @@ final class Bfs03Episode {
 
 	/** Walks over the ground to {@code to} (feet), about four blocks a second, easing in and out, the head turned the way it goes. */
 	private void walkGround(int toX, int toZ) {
+		walkGround(toX, toZ, 0);
+	}
+
+	/** As walkGround(toX, toZ), over {@code ticks} ticks (0: about four blocks a second). */
+	private void walkGround(int toX, int toZ, int ticks) {
 		Vec3 from = context.computeOnClient(c -> c.player.position());
 		Vec3 end = new Vec3(toX + 0.5, from.y, toZ + 0.5);
 		double dist = Math.hypot(end.x - from.x, end.z - from.z);
@@ -1543,7 +1543,7 @@ final class Bfs03Episode {
 			return;
 		}
 		face(new Vec3(end.x, from.y + 1.5, end.z), 10);
-		int steps = (int) Math.max(6, dist * 5);
+		int steps = ticks > 0 ? ticks : (int) Math.max(6, dist * 5);
 		double y = from.y;
 		for (int i = 1; i <= steps; i++) {
 			double s = (double) i / steps;
@@ -1589,10 +1589,12 @@ final class Bfs03Episode {
 	}
 
 	/**
-	 * One reading of the survey: the player a few blocks short of the spot, walking in along {@code fromX, fromZ}, then the seismograph; the
-	 * readout held; then the head turned the way the report says the field lies.
+	 * One reading of the survey, one take: the player a few blocks short of the spot, walking in along {@code fromX, fromZ} over
+	 * {@code walkTicks}, then the seismograph at {@code thumpAt} s; the readout (the game's own, wrapped and held by it) left up; at
+	 * {@code turnAt} the head turned the way the report says the field lies (or down at the ground, over a field); the take ends at
+	 * {@code endAt}. The times are the paragraph's (the longer narration and a second).
 	 */
-	private String reading(int n, String name, int fromX, int fromZ, int atX, int atZ, long time) {
+	private String reading(int n, String name, int fromX, int fromZ, int atX, int atZ, long time, int walkTicks, double thumpAt, double turnAt, double endAt) {
 		BlockPos at0 = open(atX, atZ);
 		atX = at0.getX();
 		atZ = at0.getZ();
@@ -1602,19 +1604,38 @@ final class Bfs03Episode {
 		server.runCommand("time set " + time);
 		context.waitTicks(wanted(n, name) ? 80 : 3);
 		startFilm(n, name);
-		context.waitTicks(6);
-		walkGround(atX, atZ);
-		context.waitTicks(10);
+		until(1.0);
+		walkGround(atX, atZ, walkTicks);
+		until(thumpAt - 0.85);
 		String report = thump();
-		context.waitTicks(80);
+		until(turnAt);
 		Vec3 way = lies(report);
 		if (way != null) {
-			face(way, 30);
+			face(way, 40);
 			mark("turned to the " + way);
+		} else {
+			lookDown(3.0, 40);
+			mark("looked down at the ground: over the field");
 		}
-		context.waitTicks(70);
+		until(endAt);
 		stopFilm();
 		return report;
+	}
+
+	/** The head lowered to the ground {@code ahead} blocks in front, over {@code ticks}. */
+	private void lookDown(double ahead, int ticks) {
+		Vec3 eye = context.computeOnClient(c -> c.player.getEyePosition());
+		float yaw = context.computeOnClient(c -> c.player.getYRot());
+		double a = Math.toRadians(yaw);
+		face(new Vec3(eye.x - Math.sin(a) * ahead, eye.y - 1.62, eye.z + Math.cos(a) * ahead), ticks);
+	}
+
+	/** The head turned {@code degrees} (positive: right) and level, over {@code ticks}. */
+	private void lookAround(double degrees, int ticks) {
+		Vec3 eye = context.computeOnClient(c -> c.player.getEyePosition());
+		float yaw = context.computeOnClient(c -> c.player.getYRot());
+		double a = Math.toRadians(yaw + degrees);
+		face(new Vec3(eye.x - Math.sin(a) * 10, eye.y - 0.8, eye.z + Math.cos(a) * 10), ticks);
 	}
 
 	/** Drops lying within {@code r} of {@code at} picked up: drawn in to the player, as walking over them does. */
@@ -1685,12 +1706,15 @@ final class Bfs03Episode {
 	}
 
 	// ---- 1: where episode two left off ---------------------------------------------------------------------------------------------------
+	//
+	// Each take runs as long as the narration over it (the longer of the English and the Spanish paragraph, and a second): the beats are
+	// placed with until(), in game time, so nothing in the edit has to be shown twice or held (re-film 2026-11-27, REFILM_BRIEF.md).
 
 	private void base(int n) {
 		spectator();
 		server.runCommand("time set 1500");
-		// from the south-east, low, along the plant: the lamp at the front, the boiler on its firebox behind
-		drone(n, "base", cam(8.5, 3.6, 10.5, 2.0, 1.4, 4.8), cam(1.5, 3.8, 12.0, 2.0, 1.4, 4.8), 300);
+		// from the south-east, low, along the plant: the lamp at the front, the boiler on its firebox behind (P3, 19.5 s)
+		drone(n, "base", cam(8.5, 3.6, 10.5, 2.0, 1.4, 4.8), cam(1.0, 3.9, 12.5, 2.0, 1.4, 4.8), 440);
 		survival();
 	}
 
@@ -1701,41 +1725,57 @@ final class Bfs03Episode {
 	private void stepUp(int n) {
 		give("minecraft:copper_block", 2, "copper mined and smelted, packed into blocks");
 		give("minecraft:iron_block", 1, "iron mined and smelted, packed into a block");
+		// P4 (16.5 s): the craft
 		atTable(n, "drytype_craft", 2000);
-		tableCraft(3, new String[] {"sws", "cic", "sws"}, keys('s', WildcatterItems.STEEL_INGOT, 'w', item("wildcatter:wool_wire_hot"), 'c', item("minecraft:copper_block"),
-				'i', Items.IRON_BLOCK), 1, "dry-type transformer");
-		context.waitTicks(10);
+		tableCraftBy(15.2, 3, new String[] {"sws", "cic", "sws"}, keys('s', WildcatterItems.STEEL_INGOT, 'w', item("wildcatter:wool_wire_hot"), 'c',
+				item("minecraft:copper_block"), 'i', Items.IRON_BLOCK), 1, "dry-type transformer");
+		until(16.6);
 		closeScreen();
+		until(18.4);
 		stopFilm();
-		// on top of episode 2's turbine: its bottom face is a low side; the high side (front and top) left open
+		// P5 (20.1 s) and P6 (15.2 s): on top of episode 2's turbine (its bottom face is a low side; the high side, front and top, left
+		// open), then the meter and the quest
 		dryAtBase = turbine.above();
-		standAt(new BlockPos(-563, by + 1, 947), Vec3.atCenterOf(dryAtBase));
+		standAt(new BlockPos(-563, by + 1, 947), Vec3.atCenterOf(boiler));
 		server.runCommand("time set 2300");
 		context.waitTicks(wanted(n, "drytype_place") ? 60 : 3);
 		startFilm(n, "drytype_place");
-		context.waitTicks(10);
-		face(Vec3.atCenterOf(dryAtBase), 10);
+		hold(item("wildcatter:dry_type_transformer"));
+		until(1.5);
+		face(Vec3.atCenterOf(boiler).add(0, 0.5, 0), 50);
+		mark("looking at the boiler");
+		until(6.0);
+		face(Vec3.atCenterOf(turbine), 60);
+		mark("looking at the turbine");
+		until(11.5);
+		face(Vec3.atCenterOf(turbine).add(0, 0.5, 0), 40);
+		until(15.9);
 		sneakPut(item("wildcatter:dry_type_transformer"), turbine, Direction.UP);
 		mark("dry-type placed: " + state(dryAtBase));
-		context.waitTicks(30);
+		until(17.4);
+		face(Vec3.atCenterOf(dryAtBase).add(0, 0.45, 0), 40);
+		until(20.6);
 		meter(dryAtBase);
 		waitQuest("step_up");
-		context.waitTicks(20);
+		until(29.5);
 		stopFilm();
 		startFilm(n, "stepup_book");
-		claimIn("step_up");
+		claimIn("step_up", 50, 90);
 		stopFilm();
-		// it goes to the field with the rig: taken down again
+		// P7 (9.8 s): it goes to the field with the rig: taken down again
 		standAt(new BlockPos(-563, by + 1, 947), Vec3.atCenterOf(dryAtBase));
 		context.waitTicks(wanted(n, "drytype_off") ? 40 : 3);
 		startFilm(n, "drytype_off");
-		context.waitTicks(8);
+		until(1.2);
 		hold(Items.STONE_PICKAXE);
+		until(2.0);
 		dig(dryAtBase, 200);
 		mark("dry-type taken down: " + state(dryAtBase) + "; lamp lit " + lampLit());
-		context.waitTicks(20);
-		stopFilm();
 		pickUpNear(dryAtBase, 2.5);
+		until(7.0);
+		face(Vec3.atCenterOf(lamp), 40);
+		until(11.3);
+		stopFilm();
 		log("dry-type carried: " + count(item("wildcatter:dry_type_transformer")));
 	}
 
@@ -1745,15 +1785,17 @@ final class Bfs03Episode {
 		give("minecraft:iron_ingot", 4, "iron mined and smelted");
 		give("minecraft:redstone", 2, "redstone from the passage");
 		give("minecraft:compass", 1, "a compass (four iron and a redstone)");
+		// P8 (14.4 s): the craft, then the book
 		atTable(n, "seismo_craft", 3000);
-		tableCraft(3, new String[] {"ipi", "rcr", "iii"}, keys('i', Items.IRON_INGOT, 'p', Items.PAPER, 'r', Items.REDSTONE, 'c', Items.COMPASS), 1, "seismograph");
-		context.waitTicks(10);
+		tableCraftBy(9.6, 3, new String[] {"ipi", "rcr", "iii"}, keys('i', Items.IRON_INGOT, 'p', Items.PAPER, 'r', Items.REDSTONE, 'c', Items.COMPASS), 1,
+				"seismograph");
+		until(10.4);
 		closeScreen();
 		waitQuest("seismograph");
-		context.waitTicks(10);
+		until(12.5);
 		stopFilm();
 		startFilm(n, "seismo_book");
-		claimIn("seismograph");   // a compass
+		claimIn("seismograph", 40, 70);   // a compass
 		stopFilm();
 	}
 
@@ -1764,24 +1806,72 @@ final class Bfs03Episode {
 
 	private void survey(int n) {
 		server.runCommand("forceload add -600 930 -460 1000");
-		give("minecraft:oak_fence", 2, "two fence posts made from planks");
-		// at the base: the table's corner, walking in from the furnaces
-		reading(n, "survey_base", -570, 944, -569, 941, 3600);
-		// a few blocks south-west, as it said: over the deep field
-		reading(n, "survey_deep", -571, 943, -576, 947, 3800);
-		// forty blocks east, through the trees: still the deep field, now behind
-		reading(n, "survey_east", -545, 945, -540, 945, 4100);
-		// over the river, on the far bank: a field the small rig reaches
-		reading(n, "survey_river", -494, 987, -489, 986, 4400);
-		// on to the field: over it
-		reading(n, "survey_field", -486, 980, -481, 980, 4600);
+		// P9 (15.5 s), P10 (18.7 s), P11 (16.6 s) in one take: the reading at the base (the table's corner, walking in from the
+		// furnaces), the walk a few blocks south-west as it said, the reading over the deep field
+		BlockPos at = open(-569, 941), from = open(-570, 944), deep = open(-576, 947);
+		BlockPos mid = open((at.getX() + deep.getX()) / 2, (at.getZ() + deep.getZ()) / 2);
+		trample(from, at);
+		trample(at, deep);
+		standAt(from, new Vec3(at.getX() + 0.5, from.getY() + 1.4, at.getZ() + 0.5));
+		server.runCommand("time set 3600");
+		context.waitTicks(wanted(n, "survey_base") ? 80 : 3);
+		startFilm(n, "survey_base");
+		until(1.0);
+		walkGround(at.getX(), at.getZ(), 50);
+		until(3.6);
+		String here = thump();
+		until(12.6);
+		Vec3 way = lies(here);
+		if (way != null) {
+			face(way, 50);
+			mark("turned to the " + way);
+		}
+		until(17.0);
+		walkGround(mid.getX(), mid.getZ(), 100);
+		mark("halfway south-west");
+		until(23.0);
+		lookAround(-35, 40);
+		until(25.5);
+		lookAround(70, 60);
+		until(28.6);
+		walkGround(deep.getX(), deep.getZ(), 80);
+		mark("at the spot south-west");
+		until(32.5);
+		lookDown(3.0, 30);
+		until(35.0);
+		String over = thump();
+		log("over the deep field: " + over);
+		until(43.5);
+		lookDown(1.5, 50);
+		mark("looked down: its top far down");
+		until(48.5);
+		lookAround(0, 40);
+		until(53.0);
+		stopFilm();
+		// P12 (16.5 s): forty blocks east, through the trees: still the deep field, now behind
+		reading(n, "survey_east", -545, 945, -540, 945, 4100, 80, 6.0, 14.0, 18.4);
+		// P13 (13.9 s): over the river, on the far bank: a field the small rig reaches
+		reading(n, "survey_river", -494, 987, -489, 986, 4400, 60, 4.4, 11.0, 15.6);
+		// P14 (13.4 s): on to the field: over it
+		reading(n, "survey_field", -486, 980, -481, 980, 4600, 60, 4.4, 10.5, 15.2);
+		// P15 (10.8 s): the stake
 		BlockPos stakeAt = feet(-480, GAS_HOLE_Z).below();
+		give("minecraft:oak_fence", 1, "a fence post made from planks");
 		standAt(feet(-482, GAS_HOLE_Z + 1), Vec3.atCenterOf(stakeAt.above()));
 		context.waitTicks(wanted(n, "survey_stake") ? 60 : 3);
 		startFilm(n, "survey_stake");
-		context.waitTicks(10);
-		stake(stakeAt);
-		context.waitTicks(40);
+		hold(Items.OAK_FENCE);
+		until(2.0);
+		useOn(stakeAt, Direction.UP);
+		mark("fence post");
+		until(4.0);
+		hold(Items.TORCH);
+		until(5.0);
+		useOn(stakeAt.above(), Direction.UP);
+		mark("stake at " + stakeAt.above().toShortString());
+		until(7.0);
+		lookAround(-50, 60);
+		until(12.4);
 		stopFilm();
 	}
 
@@ -1795,22 +1885,24 @@ final class Bfs03Episode {
 		give("minecraft:iron_nugget", 1, "an iron ingot crafted into nuggets");
 		give("wildcatter:steel_ingot", 14, "steel from the blast furnace");
 		give("minecraft:copper_ingot", 2, "copper mined and smelted");
+		// P16 (17.3 s): the pistons and rods, the rig; P17 (13.7 s): the quest, its reward, the steel pipe (3x)
 		atTable(n, "rig_craft", 5200);
-		tableCraft(3, new String[] {"ssn"}, keys('s', WildcatterItems.STEEL_INGOT, 'n', Items.IRON_NUGGET), 1, "pistons");
-		tableCraft(3, new String[] {"ipi", "cmc", "ibi"}, keys('i', Items.IRON_INGOT, 'p', Items.IRON_PICKAXE, 'c', Items.COPPER_INGOT, 'm', Items.PISTON,
+		tableCraftBy(5.4, 3, new String[] {"ssn"}, keys('s', WildcatterItems.STEEL_INGOT, 'n', Items.IRON_NUGGET), 1, "pistons");
+		tableCraftBy(16.6, 3, new String[] {"ipi", "cmc", "ibi"}, keys('i', Items.IRON_INGOT, 'p', Items.IRON_PICKAXE, 'c', Items.COPPER_INGOT, 'm', Items.PISTON,
 				'b', Items.IRON_BLOCK), 1, "drilling rig");
-		context.waitTicks(10);
+		until(17.4);
 		closeScreen();
 		waitQuest("rig");
-		context.waitTicks(10);
+		until(21.5);
 		stopFilm();
 		startFilm(n, "rig_book");
-		claimIn("rig");   // 16 steel
+		claimIn("rig", 40, 80);   // 16 steel
 		stopFilm();
 		atTable(n, "lines_craft", 5400);
 		tableCraft(3, new String[] {"sss", "   ", "sss"}, keys('s', WildcatterItems.STEEL_INGOT), 3, "steel pipe x3");
-		context.waitTicks(10);
+		until(19.0);
 		closeScreen();
+		until(21.0);
 		stopFilm();
 		log("after the rig: " + inventory());
 	}
@@ -1856,81 +1948,111 @@ final class Bfs03Episode {
 		give("minecraft:coal", 16, "coal mined off camera");
 		take(Items.BUCKET, 4);
 		give("minecraft:water_bucket", 4, "buckets filled at the river");
-		// the rig, from the stake: looking east, so it faces west with its power unit at the far end
+		// P18 (16.5 s): the rig, from the stake: looking east, so it faces west with its power unit at the far end
 		BlockPos hole = gas.hole();
 		standAt(new BlockPos(hole.getX() - 3, gas.s(), hole.getZ() + 1), Vec3.atCenterOf(hole.below()));
 		server.runCommand("time set 6000");
 		context.waitTicks(wanted(n, "rig_place") ? 80 : 3);
 		startFilm(n, "rig_place");
-		context.waitTicks(10);
-		put(item("wildcatter:drilling_rig"), hole.below(), Direction.UP);
+		hold(item("wildcatter:drilling_rig"));
+		until(2.0);
+		useOn(hole.below(), Direction.UP);
 		mark("rig placed: " + state(hole) + "; box " + gas.box().toShortString());
-		face(Vec3.atCenterOf(hole).add(0, 6, 0), 30);
-		context.waitTicks(30);
-		face(Vec3.atCenterOf(gas.box()), 30);
-		context.waitTicks(30);
+		until(4.0);
+		face(Vec3.atCenterOf(hole).add(0, 7, 0), 70);
+		mark("the mast");
+		until(9.0);
+		face(Vec3.atCenterOf(hole.east(3)).add(0, 1, 0), 60);
+		mark("the power unit");
+		until(13.0);
+		face(Vec3.atCenterOf(gas.box()), 40);
+		mark("the terminal box");
+		until(18.0);
 		stopFilm();
 		powerUp(n, gas, "power_place", 6300, true, true);
 		drill(n, gas, "gas", 6600);
 		startFilm(n, "gas_book");
-		book("gas_well", 70);
+		book("gas_well", 140);
 		stopFilm();
 	}
 
 	/**
-	 * The field plant by hand, from the east: the dry-type against the rig's terminal box (placed looking west, so its high side faces the
-	 * box), a ground rod touching both, the turbine against its low side, a firebox dug into the ground with coal in it, the boiler on it and
-	 * four buckets. Filmed when {@code film}.
+	 * The field plant by hand, from the east: the rig's terminal box read with the meter (its motor, unpowered), the dry-type against it
+	 * (placed looking west, so its high side faces the box), a ground rod touching both, the turbine against its low side, a firebox dug
+	 * into the ground with coal in it, the boiler on it and four buckets; the rig starting and the dry-type's load read. Filmed (P19 17.4 s,
+	 * P20 20.6 s, P21 13.7 s) when {@code film}.
 	 */
 	private void powerUp(int n, Site site, String name, long time, boolean film, boolean rig) {
 		BlockPos stand = new BlockPos(site.hole().getX() + 9, site.s(), site.hole().getZ());
-		standAt(stand, Vec3.atCenterOf(site.dry().below()));
+		standAt(stand, Vec3.atCenterOf(site.box()));
 		server.runCommand("time set " + time);
 		if (film) {
 			context.waitTicks(wanted(n, name) ? 80 : 3);
 			startFilm(n, name);
 		}
-		context.waitTicks(10);
+		if (rig) {
+			// up to the terminal box to read the rig (from where the plant will stand it is out of reach), then back
+			until(1.0);
+			walk(new BlockPos(site.hole().getX() + 7, site.s(), site.hole().getZ()));
+			until(2.6);
+			meter(site.box());
+			until(9.4);
+			walk(stand);
+		}
+		until(10.8);
+		face(Vec3.atCenterOf(site.dry().below()), 50);
+		until(17.9);
 		put(item("wildcatter:dry_type_transformer"), site.dry().below(), Direction.UP);
 		mark("dry-type placed: " + state(site.dry()));
+		until(19.7);
 		put(item("wildcatter:ground_rod"), site.rod().below(), Direction.UP);
 		mark("ground rod placed");
+		until(21.4);
 		put(item("wildcatter:steam_turbine"), site.turbine().below(), Direction.UP);
 		mark("turbine placed: " + state(site.turbine()));
+		until(23.0);
 		hold(Items.STONE_PICKAXE);
 		dig(site.firebox(), 120);
 		pickUpNear(site.firebox(), 1.5);
+		mark("pit dug");
+		until(26.0);
 		face(Vec3.atCenterOf(site.firebox()), 6);
 		put(item("wildcatter:firebox"), site.firebox().below(), Direction.UP);
 		mark("firebox placed: " + state(site.firebox()));
+		until(27.6);
 		openBlock(site.firebox());
 		shift(slotOf(Items.COAL, 9));
 		mark("coal in: " + reading(site.firebox()));
-		context.waitTicks(16);
+		until(29.6);
 		closeScreen();
+		until(30.4);
 		sneakPut(item("wildcatter:boiler"), site.firebox(), Direction.UP);
 		mark("boiler placed: " + state(site.boiler()));
 		for (int i = 0; i < 4; i++) {
+			until(32.0 + 1.5 * i);
 			hold(Items.WATER_BUCKET);
 			useOn(site.boiler(), faceToward(site.boiler()));
 			mark("bucket " + (i + 1) + ": " + reading(site.boiler()));
-			context.waitTicks(8);
 		}
-		// step aside, clear of the boiler, to read the rig as it starts
+		until(38.6);
+		// step aside, clear of the boiler, to read the plant as the rig starts
 		walk(new BlockPos(site.hole().getX() + 8, site.s(), site.hole().getZ() + 2));
 		if (!rig) {
 			context.waitTicks(60);
 			face(Vec3.atCenterOf(site.dry()), 10);
 			meter(site.dry());
+			context.waitTicks(20);
 			return;
 		}
+		face(Vec3.atCenterOf(site.turbine()).add(0, 0.6, 0), 30);
 		for (int i = 0; i < 20 && !reading(site.hole()).contains("drilling,"); i++) {
 			context.waitTicks(10);
 		}
 		mark("rig: " + reading(site.hole()));
-		meter(site.box());
-		face(Vec3.atCenterOf(site.dry()), 10);
+		until(43.0);
+		face(Vec3.atCenterOf(site.dry()), 20);
 		meter(site.dry());
+		until(53.0);
 		if (film) {
 			stopFilm();
 		}
@@ -1950,8 +2072,8 @@ final class Bfs03Episode {
 	}
 
 	/**
-	 * The drilling, filmed from a fixed camera (spectator, the HUD hidden) for the edit to speed up; the boiler topped up by hand if it runs
-	 * low (logged); then the player beside the rig for the strike: the rig rigs down and drops, the wellhead stands on the hole.
+	 * The drilling, filmed from a fixed camera (spectator, the HUD hidden) for the edit to speed up (3x); the boiler topped up if it runs
+	 * low (off camera, logged); then the player beside the rig for the strike: the rig rigs down and drops, the wellhead stands on the hole.
 	 */
 	private void drill(int n, Site site, String tag, long time) {
 		BlockPos hole = site.hole();
@@ -1967,8 +2089,8 @@ final class Bfs03Episode {
 		t.camera(a, true);
 		context.waitTicks(10);
 		startFilm(n, tag + "_drill");
-		int ticks = 0, total = Math.max(200, (goal - depth(hole) - 8) * 20 + 60);
-		while (depth(hole) >= 0 && depth(hole) < goal - 8 && ticks < 4000) {
+		int ticks = 0, total = Math.max(200, (goal - depth(hole) - 9) * 20 + 60);
+		while (depth(hole) >= 0 && depth(hole) < goal - 9 && ticks < 4000) {
 			t.camera(a.lerp(b, Math.min(1.0, ticks / (double) total)), false);
 			context.waitTick();
 			ticks++;
@@ -1982,22 +2104,29 @@ final class Bfs03Episode {
 		mark("drilled to " + depth(hole) + " of " + goal + " in " + ticks + " ticks");
 		stopFilm();
 		survival();
-		// beside the rig, south of the mast, for the strike
+		// beside the rig, south of the mast, for the strike (P23 14.6 s; the gas well's tree read for P24)
 		standAt(new BlockPos(hole.getX() - 3, site.s(), hole.getZ() - 3), Vec3.atCenterOf(hole).add(0, 2.5, 0));
 		context.waitTicks(4);
 		startFilm(n, tag + "_strike");
 		for (int i = 0; i < 400 && !state(hole).is(block("wildcatter:oil_wellhead")) && !state(hole).is(block("wildcatter:gas_wellhead")); i++) {
 			context.waitTick();
 		}
+		double struck = filmTime();
 		mark("struck: " + state(hole) + "; quests " + questsDone());
 		context.waitTicks(40);
-		face(Vec3.atCenterOf(hole), 14);
-		context.waitTicks(30);
+		face(Vec3.atCenterOf(hole), 30);
+		until(struck + 4.0);
 		walk(new BlockPos(hole.getX(), site.s(), hole.getZ() - 2));
 		pickUpNear(hole.east().above(), 3.0);
 		mark("rig carried: " + count(item("wildcatter:drilling_rig")));
-		face(Vec3.atCenterOf(hole), 10);
-		meter(hole);
+		face(Vec3.atCenterOf(hole), 20);
+		if (tag.equals("gas")) {
+			until(struck + 9.6);
+			meter(hole);
+			until(struck + 20.0);
+		} else {
+			until(struck + 10.0);
+		}
 		stopFilm();
 	}
 
@@ -2024,19 +2153,12 @@ final class Bfs03Episode {
 
 	private void oilSurvey(int n) {
 		server.runCommand("forceload add -690 850 -590 930");
-		reading(n, "oil_base", -594, 925, -600, 920, 7200);
-		reading(n, "oil_fair", -621, 904, -626, 900, 7400);
-		reading(n, "oil_strong", -649, 884, -654, 880, 7600);
+		// P25 (13.6 s); then P26 (15.8 s) cuts between three readings, about five seconds of each
+		reading(n, "oil_base", -594, 925, -600, 920, 7200, 60, 4.4, 11.0, 15.2);
+		reading(n, "oil_fair", -621, 904, -626, 900, 7400, 60, 4.4, 10.5, 12.6);
+		reading(n, "oil_strong", -649, 884, -654, 880, 7600, 60, 4.4, 10.5, 12.6);
 		levelSite(-692, 852, -662, 873, OIL_GROUND, 6);
-		reading(n, "oil_field", -674, 869, -679, 867, 7800);
-		BlockPos stakeAt = feet(-679, 867).below();
-		standAt(feet(-681, 868), Vec3.atCenterOf(stakeAt.above()));
-		context.waitTicks(wanted(n, "oil_stake") ? 60 : 3);
-		startFilm(n, "oil_stake");
-		context.waitTicks(10);
-		stake(stakeAt);
-		context.waitTicks(40);
-		stopFilm();
+		reading(n, "oil_field", -674, 869, -679, 867, 7800, 60, 4.4, 10.5, 13.6);
 	}
 
 	// ---- 8: the oil field: the same plant, moved (off camera), drilled, struck ---------------------------------------------------------------
@@ -2075,14 +2197,11 @@ final class Bfs03Episode {
 		log("oil rig placed (off camera): " + state(hole));
 		powerUp(n, oil, "oil_power", 8200, false, true);
 		log("oil field set up off camera: rig " + reading(hole));
-		// on camera: the plant as it stands, then the drilling and the strike
+		// on camera (P27 11.6 s): the plant as it stands, then the drilling (3x); P28 (8.2 s) the strike
 		spectator();
 		droneAt(n, "oil_site", hole, cam(-6.0, 6.0, -9.0, 4.5, 3.0, 0.5), cam(-8.5, 6.0, -5.0, 4.5, 3.0, 0.5), 200);
 		survival();
 		drill(n, oil, "oil", 8400);
-		startFilm(n, "oil_book");
-		book("oil_well", 50);
-		stopFilm();
 	}
 
 	// ---- 9: the pumpjack -------------------------------------------------------------------------------------------------------------------
@@ -2121,36 +2240,55 @@ final class Bfs03Episode {
 		standAt(new BlockPos(fieldTable.getX(), oil.s(), fieldTable.getZ() + 2), Vec3.atCenterOf(fieldTable.below()));
 		put(Items.CRAFTING_TABLE, fieldTable.below(), Direction.UP);
 		log("moved one block back (off camera): dry-type " + state(oil.dry()) + "; table " + state(fieldTable));
-		// the pumpjack, crafted at the field
+		// P29 (20.2 s): the pumpjack, crafted at the field; then a look at the plant, moved back a block
 		give("minecraft:iron_ingot", 5, "iron mined and smelted");
 		give("minecraft:piston", 1, "a piston");
 		give("minecraft:redstone", 1, "redstone");
 		give("minecraft:copper_ingot", 2, "copper");
-		fieldCraft(n, "jack_craft", 9000);
-		tableCraft(3, new String[] {"iii", "cpc", "iri"}, keys('i', Items.IRON_INGOT, 'c', Items.COPPER_INGOT, 'p', Items.PISTON, 'r', Items.REDSTONE), 1, "pumpjack");
-		context.waitTicks(10);
+		standAt(new BlockPos(fieldTable.getX() + 3, oil.s(), fieldTable.getZ() + 2), Vec3.atCenterOf(fieldTable));
+		server.runCommand("time set 9000");
+		context.waitTicks(wanted(n, "jack_craft") ? 60 : 3);
+		startFilm(n, "jack_craft");
+		until(1.0);
+		walkGround(fieldTable.getX(), fieldTable.getZ() + 2, 50);
+		until(3.6);
+		openBlock(fieldTable);
+		tableCraftBy(13.6, 3, new String[] {"iii", "cpc", "iri"}, keys('i', Items.IRON_INGOT, 'c', Items.COPPER_INGOT, 'p', Items.PISTON, 'r', Items.REDSTONE), 1,
+				"pumpjack");
+		until(14.6);
 		closeScreen();
+		until(15.4);
+		face(Vec3.atCenterOf(oil.dry()), 50);
+		mark("looking at the plant, moved back a block");
+		until(19.0);
+		face(Vec3.atCenterOf(oil.boiler()).add(0, 0.5, 0), 40);
+		until(22.0);
 		stopFilm();
-		// set over the wellhead from behind: from the east, looking west at it
+		// P30 (15.5 s) and P31 (13.5 s): set over the wellhead from behind: from the east, looking west at it; the meter; the book
 		Vec3 eye = new Vec3(hole.getX() + 3.5, oil.s() + 1.62, hole.getZ() + 2.35);
 		float[] yp = yawPitch(eye, Vec3.atCenterOf(hole).add(0, 0.5, 0));
 		stand(eye.x, oil.s(), eye.z, yp[0], yp[1]);
 		server.runCommand("time set 9300");
 		context.waitTicks(wanted(n, "jack_place") ? 80 : 3);
 		startFilm(n, "jack_place");
-		context.waitTicks(10);
 		hold(item("wildcatter:pumpjack"));
+		until(1.8);
 		useOn(hole, Direction.UP);
 		mark("pumpjack placed: " + state(hole.east()) + "; box " + hole.east(6).toShortString());
-		context.waitTicks(20);
+		until(3.5);
 		walk(new BlockPos(hole.getX() + 2, oil.s(), hole.getZ() + 6));
-		face(Vec3.atCenterOf(hole.east(3)).add(0, 1.5, 0), 20);
+		face(Vec3.atCenterOf(hole.east(3)).add(0, 1.5, 0), 30);
 		waitQuest("oil_well");
-		context.waitTicks(40);
+		until(10.0);
+		face(Vec3.atCenterOf(hole).add(0, 2.5, 0), 50);
+		mark("the horsehead over the well");
+		until(16.2);
+		face(Vec3.atCenterOf(hole.east(3)).add(0, 1.0, 0), 16);
 		meter(hole.east());
+		until(24.5);
 		stopFilm();
 		startFilm(n, "jack_book");
-		claimIn("oil_well");   // 12 steel pipe
+		claimIn("oil_well", 40, 90);   // 12 steel pipe
 		stopFilm();
 	}
 
@@ -2195,6 +2333,7 @@ final class Bfs03Episode {
 		server.runCommand("time set " + time);
 		context.waitTicks(wanted(n, film) ? 60 : 3);
 		startFilm(n, film);
+		until(0.6);
 		openBlock(fieldTable);
 	}
 
@@ -2210,6 +2349,7 @@ final class Bfs03Episode {
 		give("minecraft:copper_ingot", 2, "copper");
 		give("minecraft:iron_block", 1, "iron packed into a block");
 		give("minecraft:ladder", 1, "a ladder (sticks)");
+		// P32 (23.4 s): the four parts (3x), the quest, then the stock tank (1x)
 		fieldCraft(n, "lease_craft", 9600);
 		tableCraft(3, new String[] {"sss", "pgp", "sss"}, keys('s', WildcatterItems.STEEL_INGOT, 'p', item("wildcatter:gas_line"), 'g', Items.GLASS), 1, "separator");
 		tableCraft(3, new String[] {" f ", " p ", " p "}, keys('f', Items.FLINT_AND_STEEL, 'p', item("wildcatter:gas_line")), 1, "flare stack");
@@ -2220,17 +2360,16 @@ final class Bfs03Episode {
 		context.waitTicks(10);
 		closeScreen();
 		waitQuest("lease");
-		context.waitTicks(10);
+		context.waitTicks(30);
 		stopFilm();
 		fieldCraft(n, "tank_craft", 9800);
-		tableCraft(3, new String[] {"sss", "sls", "sss"}, keys('s', WildcatterItems.STEEL_INGOT, 'l', Items.LADDER), 1, "stock tank");
-		context.waitTicks(10);
+		tableCraftBy(9.0, 3, new String[] {"sss", "sls", "sss"}, keys('s', WildcatterItems.STEEL_INGOT, 'l', Items.LADDER), 1, "stock tank");
+		until(10.0);
 		closeScreen();
+		until(11.6);
 		stopFilm();
-		startFilm(n, "lease_book");
-		book("lease", 50);
-		stopFilm();
-		// the separator west of the well, facing east (its inlet end towards the well): placed by a player east of it, looking west
+		// P33 (17.1 s): the separator west of the well, facing east (its inlet end towards the well): placed by a player east of it,
+		// looking west; two pipes from the wellhead to its front end (flanged where they meet the wellhead and the separator)
 		BlockPos hole = new BlockPos(OIL_HOLE_X, oil.s(), OIL_HOLE_Z);
 		sepMain = hole.west(3).north();          // cells x -683..-680, z 863..864
 		tankMain = hole.west(9).south(2);        // cells x -689..-686, z 866..869
@@ -2239,30 +2378,49 @@ final class Bfs03Episode {
 		server.runCommand("time set 10000");
 		context.waitTicks(wanted(n, "sep_place") ? 80 : 3);
 		startFilm(n, "sep_place");
-		context.waitTicks(10);
+		hold(item("wildcatter:separator"));
+		until(1.6);
 		put(item("wildcatter:separator"), sepMain.below(), Direction.UP);
 		mark("separator placed: " + state(sepMain) + " cells " + cellsOf(sepMain));
-		// the well's flowline to its front end
+		until(3.6);
+		face(Vec3.atCenterOf(hole.west(2)), 30);
+		until(5.2);
 		pipeAt(hole.west());
+		until(7.0);
 		pipeAt(hole.west(2));
 		mark("well to separator: " + reading(hole.west()) + " | separator " + reading(sepMain));
-		context.waitTicks(20);
+		until(8.6);
+		face(Vec3.atCenterOf(hole.west(2)).add(-0.5, 0, 0), 30);
+		mark("the flange at the separator's inlet");
+		until(11.6);
+		face(Vec3.atCenterOf(sepMain.west(3)).add(0, 1.0, 0), 60);
+		mark("the back end: gas on top, the oil and water nozzles");
+		until(18.4);
 		stopFilm();
-		// its oil side (the back end's upper nozzle) to a stock tank south-west of it
+		// P34 (13.9 s): its oil side (the back end's upper nozzle) to a stock tank south-west of it
 		standAt(new BlockPos(tankMain.getX() + 3, oil.s(), tankMain.getZ()), new Vec3(tankMain.getX() + 0.5, tankMain.getY(), tankMain.getZ() + 0.5));
 		context.waitTicks(wanted(n, "tank_place") ? 60 : 3);
 		startFilm(n, "tank_place");
-		context.waitTicks(10);
+		hold(item("wildcatter:stock_tank"));
+		until(1.5);
 		put(item("wildcatter:stock_tank"), tankMain.below(), Direction.UP);
 		mark("stock tank placed: " + state(tankMain) + " cells " + cellsOf(tankMain));
+		until(3.4);
 		BlockPos o1 = hole.west(7).above();
-		for (BlockPos p : new BlockPos[] {o1, o1.west(), o1.west().below(), o1.west().below().south(), o1.west().below().south(2)}) {
-			pipeAt(p);
+		face(Vec3.atCenterOf(o1), 30);
+		BlockPos[] run = {o1, o1.west(), o1.west().below(), o1.west().below().south(), o1.west().below().south(2)};
+		for (int i = 0; i < run.length; i++) {
+			until(4.6 + 1.5 * i);
+			pipeAt(run[i]);
 		}
 		mark("oil side piped: " + reading(o1) + " | separator " + reading(sepMain));
-		context.waitTicks(20);
+		until(12.4);
+		face(Vec3.atCenterOf(run[run.length - 1]).add(-0.5, 0, 0), 30);
+		mark("the flange at the tank's bottom ring");
+		until(15.6);
 		stopFilm();
-		// what goes wrong: no flare. The separator fills with gas and shuts in, and the pumpjack backs up behind it
+		// P35 (12.4 s) and P36 (13.7 s), what goes wrong: no flare. The separator fills with gas and shuts in, and the pumpjack backs up
+		// behind it
 		standAt(new BlockPos(hole.getX() - 2, oil.s(), hole.getZ() + 2), Vec3.atCenterOf(sepMain));
 		context.waitTicks(3);
 		for (int i = 0; i < 160 && !reading(sepMain).contains("SHUT IN"); i++) {
@@ -2270,31 +2428,44 @@ final class Bfs03Episode {
 		}
 		mark("separator: " + reading(sepMain));
 		startFilm(n, "mistake");
-		context.waitTicks(20);
+		until(1.0);
+		face(Vec3.atCenterOf(sepMain.west(3)).add(0, 0.9, 0), 80);
+		mark("the gas nozzle, nothing on it");
+		until(7.0);
+		face(Vec3.atCenterOf(sepMain).add(0, 0.5, 0), 80);
+		until(12.8);
 		meter(sepMain);
-		face(Vec3.atCenterOf(hole.east(2)).add(0, 2, 0), 20);
+		until(20.8);
+		face(Vec3.atCenterOf(hole.east(2)).add(0, 2, 0), 30);
+		until(22.4);
 		meter(hole.east());
+		until(28.6);
 		stopFilm();
-		// the fix: a flare on the gas side (the separator's top, back end), north of it, away from the tank
+		// P37 (16.9 s), the fix: a flare on the gas side (the separator's top, back end), north of it, away from the tank
 		standAt(new BlockPos(hole.getX() - 4, oil.s(), hole.getZ() - 3), Vec3.atCenterOf(flareAt));
 		context.waitTicks(wanted(n, "flare") ? 60 : 3);
 		startFilm(n, "flare");
-		context.waitTicks(10);
+		hold(item("wildcatter:flare_stack"));
+		until(1.5);
 		put(item("wildcatter:flare_stack"), flareAt.below(), Direction.UP);
 		mark("flare placed: " + state(flareAt));
 		BlockPos g0 = sepMain.west(3).above(2);   // over the back cell: its top face is the gas nozzle
-		for (BlockPos p : new BlockPos[] {g0, g0.north(), g0.north(2), g0.north(2).below(), g0.north(2).below(2)}) {
-			pipeAt(p);
+		BlockPos[] gasRun = {g0, g0.north(), g0.north(2), g0.north(2).below(), g0.north(2).below(2)};
+		for (int i = 0; i < gasRun.length; i++) {
+			until(3.0 + 1.5 * i);
+			pipeAt(gasRun[i]);
 		}
 		mark("gas side piped: " + reading(g0));
 		for (int i = 0; i < 80 && !reading(sepMain).contains("separating"); i++) {
 			context.waitTicks(5);
 		}
 		mark("flare: " + reading(flareAt) + " | separator " + reading(sepMain));
-		face(Vec3.atCenterOf(flareAt).add(0, 9, 0), 30);
-		context.waitTicks(60);
-		face(Vec3.atCenterOf(sepMain), 20);
+		face(Vec3.atCenterOf(flareAt).add(0, 9, 0), 40);
+		until(12.5);
+		face(Vec3.atCenterOf(sepMain), 30);
+		until(14.2);
 		meter(sepMain);
+		until(18.6);
 		stopFilm();
 	}
 
@@ -2310,7 +2481,7 @@ final class Bfs03Episode {
 
 	private void crude(int n) {
 		BlockPos hole = new BlockPos(OIL_HOLE_X, oil.s(), OIL_HOLE_Z);
-		// the tank filling: a fixed camera over the lease for the edit to speed up
+		// P38 (14.4 s at 3x): the tank filling, a fixed camera over the lease; at least 48 s
 		spectator();
 		t.ox = hole.getX();
 		t.gy = oil.s() - 1;
@@ -2321,10 +2492,15 @@ final class Bfs03Episode {
 		context.waitTicks(20);
 		startFilm(n, "tank_fill");
 		int ticks = 0;
-		while (tankLitres() < 1100 && ticks < 4000) {
+		double at1000 = -1;
+		while ((tankLitres() < 1100 || ticks < 980) && ticks < 4000) {
 			t.camera(a.lerp(b, Math.min(1.0, ticks / 2400.0)), false);
 			context.waitTick();
 			ticks++;
+			if (at1000 < 0 && tankLitres() >= 1000) {
+				at1000 = filmTime();
+				mark("tank at a bucket's worth (" + tankLitres() + " L)");
+			}
 			if (ticks % 200 == 0) {
 				mark("tank: " + reading(tankMain) + " | separator " + reading(sepMain) + " | boiler " + reading(oil.boiler()));
 				if (boilerWater(oil.boiler()) < 1200) {
@@ -2335,19 +2511,19 @@ final class Bfs03Episode {
 		mark("tank at " + tankLitres() + " L after " + ticks + " ticks");
 		stopFilm();
 		survival();
+		// P39 (12.0 s): a bucket of crude from the tank, the quest, the book
 		standAt(new BlockPos(tankMain.getX() + 1, oil.s(), tankMain.getZ() + 5), Vec3.atCenterOf(tankMain.west().south(2)));
 		context.waitTicks(wanted(n, "bucket") ? 60 : 3);
 		startFilm(n, "bucket");
-		context.waitTicks(10);
-		meter(tankMain.west().south(3));
 		hold(Items.BUCKET);
+		until(1.6);
 		useOn(tankMain.west().south(3), Direction.SOUTH);
 		mark("bucket: " + count(item("wildcatter:crude_oil_bucket")) + " crude; tank " + reading(tankMain));
 		waitQuest("crude");
-		context.waitTicks(30);
+		until(7.6);
 		stopFilm();
 		startFilm(n, "crude_book");
-		claimIn("crude");   // two buckets
+		claimIn("crude", 40, 80);   // two buckets
 		stopFilm();
 	}
 
@@ -2356,24 +2532,29 @@ final class Bfs03Episode {
 				? s.amount() : 0.0);
 	}
 
-	// ---- 12: the hook, the chapter, the lease in late light ----------------------------------------------------------------------------------
+	// ---- 12: the hook, the title, the lease, the chapter, the lease in late light, the outro (each its own take) ----------------------------
 
 	private void done(int n) {
 		BlockPos hole = new BlockPos(OIL_HOLE_X, oil.s(), OIL_HOLE_Z);
 		t.ox = hole.getX();
 		t.gy = oil.s() - 1;
 		t.oz = hole.getZ();
-		server.runCommand("time set 11200");
 		spectator();
-		// the hook: low past the pumpjack's horsehead nodding over the well, the stock tank behind
-		droneAt(n, "hook_jack", hole, cam(1.5, 2.2, 5.5, -1.0, 2.5, 0.0), cam(-1.0, 2.6, 6.0, -1.0, 2.5, 0.0), 260);
-		droneAt(n, "hook_lease", hole, cam(6.0, 7.0, 11.0, -4.0, 2.0, -1.0), cam(-1.0, 7.5, 12.0, -4.0, 2.0, -1.0), 280);
+		// P1, the hook (10.3 s): low past the stock tank to the pumpjack nodding over the well
+		server.runCommand("time set 11000");
+		droneAt(n, "hook", hole, cam(-14.5, 3.0, 9.5, -10.5, 2.5, 3.5), cam(-3.0, 3.2, 8.0, 1.0, 2.5, 0.0), 250);
+		// the title card (5 s): close on the horsehead, from the north-west
+		droneAt(n, "hook_title", hole, cam(-3.0, 4.5, -4.5, 0.0, 3.0, 0.0), cam(-4.0, 4.6, -2.0, 0.0, 3.0, 0.0), 170);
+		// P2 (19.1 s): high over the whole lease from the north
+		server.runCommand("time set 11300");
+		droneAt(n, "lease_wide", hole, cam(-8.0, 16.0, -18.0, -4.0, 1.0, 2.0), cam(4.0, 16.0, -17.0, -4.0, 1.0, 2.0), 440);
+		// P41 (16.6 s): the book
 		survival();
 		standAt(new BlockPos(hole.getX() - 2, oil.s(), hole.getZ() + 4), Vec3.atCenterOf(hole));
 		context.waitTicks(10);
 		startFilm(n, "chapter");
-		book("crude", 80);
-		book("step_up", 60);
+		book("crude", 110);
+		book("step_up", 100);
 		hold(WildcatterItems.QUEST_BOOK);
 		useHeld();
 		context.waitTicks(6);
@@ -2383,12 +2564,16 @@ final class Bfs03Episode {
 			}
 		});
 		mark("next: genset");
-		context.waitTicks(80);
+		until(18.4);
 		context.setScreen(() -> null);
 		stopFilm();
+		// P40 (13.7 s): the lease in late light
 		server.runCommand("time set 12000");
 		spectator();
-		droneAt(n, "top", hole, cam(14.0, 14.0, 10.0, -3.0, 1.0, -1.0), cam(10.0, 15.0, 15.0, -3.0, 1.0, -1.0), 300);
+		droneAt(n, "top", hole, cam(14.0, 14.0, 10.0, -3.0, 1.0, -1.0), cam(10.0, 15.0, 15.0, -3.0, 1.0, -1.0), 320);
+		// the outro (8 s): low from the west, behind the tank, at sunset
+		server.runCommand("time set 12500");
+		droneAt(n, "outro", hole, cam(-21.0, 5.0, -3.0, 0.0, 3.0, 0.0), cam(-20.0, 6.0, 3.0, 0.0, 3.0, 0.0), 220);
 		survival();
 		log("lease at the end: pumpjack " + reading(hole.east()) + " | separator " + reading(sepMain) + " | tank " + reading(tankMain) + " | flare " + reading(flareAt)
 				+ " | boiler " + reading(oil.boiler()) + " | gas well " + reading(gas.hole()));

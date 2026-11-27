@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Fixes (Built From Scratch ep 3 re-film)
+- **The power meter reads a big machine from any of its cells:** used on the drilling rig's or the pumpjack's terminal box (where the
+  power lands) it took the click and sent no readout; it now reads the machine, as on its main cell. Proof `bfs03_meter_on_terminal_box`.
+- **A long readout is held in game time:** the wrapped readout (ReadoutOverlay) counted its hold on the wall clock, so with the game paused
+  or running slower than the clock (a filmed take) it went early; it now counts the game's ticks. Unit test `ReadoutOverlayTest`.
+
 ### Wire, cable and pipe
 - **Wires, cables and pipes look connected:** where a wire meets a machine it lands on a terminal block in a brass lug; a cable goes
   through a cable gland; at a receptacle, lamp or heater the run is carried into the gear's box. A machine drawn smaller than its cell is
