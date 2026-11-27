@@ -77,7 +77,7 @@
       "id": "steam_plant",
       "title": "The steam plant",
       "icon": "wildcatter:turbine_generator",
-      "text": "A 1 MW steam plant: burner, package boiler, superheater, turbine, generator, condenser and feed pump, formed around the turbine generator. Start it on a genset.",
+      "text": "A 1 MW steam plant: burner, package boiler, superheater, turbine, generator, condenser and feed pump, formed around the turbine generator. Start it on a genset, or on a small steam set through a dry-type.",
       "requires": [
         "genset"
       ],
