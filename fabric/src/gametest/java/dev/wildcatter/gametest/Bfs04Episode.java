@@ -114,7 +114,7 @@ final class Bfs04Episode {
 		table = new BlockPos(bx, by + 1, bz);
 		log("industrial tier " + Voltage.INDUSTRIAL.label() + ", medium " + Voltage.MEDIUM.label() + ", low " + Voltage.LOW.label());
 		String[] steps = {"setup", "well", "parts", "engine", "frame", "wet", "separator", "start", "motor", "rig", "mcc", "poles", "dry", "pole1", "line", "base",
-				"pad", "ends"};
+				"energize", "pad", "ends"};
 		for (int i = 0; i < steps.length; i++) {
 			int n = i + 1;
 			log("step " + n + " " + steps[i]);
@@ -136,6 +136,7 @@ final class Bfs04Episode {
 					case "pole1" -> pole1(n);
 					case "line" -> line(n);
 					case "base" -> baseEnd(n);
+					case "energize" -> energize(n);
 					case "pad" -> pad(n);
 					case "ends" -> ends(n);
 					default -> {
@@ -144,7 +145,9 @@ final class Bfs04Episode {
 			} catch (Throwable e) {
 				log("step " + steps[i] + " FAILED: " + e);
 				e.printStackTrace();
-				pin = null;
+				climbing = false;
+				context.getInput().releaseKey(o -> o.keyShift);
+				context.getInput().releaseKey(o -> o.keyJump);
 				stopFilm();
 				context.setScreen(() -> null);
 				break;
@@ -908,7 +911,9 @@ final class Bfs04Episode {
 		context.getInput().holdKey(o -> o.keyShift);
 		context.waitTicks(4);
 		useOn(on, face);
-		context.getInput().releaseKey(o -> o.keyShift);
+		if (!climbing) {
+			context.getInput().releaseKey(o -> o.keyShift);
+		}
 		context.waitTicks(6);
 	}
 
@@ -1266,7 +1271,9 @@ final class Bfs04Episode {
 			}
 		});
 		context.waitTicks(3);
-		context.getInput().releaseKey(o -> o.keyShift);
+		if (!climbing) {
+			context.getInput().releaseKey(o -> o.keyShift);
+		}
 		context.waitTicks(2);
 	}
 
@@ -1379,41 +1386,51 @@ final class Bfs04Episode {
 		}
 	}
 
-	/** Climbs the pole at {@code pole} (its ground cell) from its {@code side}, the feet to {@code feetY}, a block every six ticks. */
+	/** True while the player is on a pole: the sneak key stays down (holding on), so every click there is a sneaking one. */
+	private boolean climbing;
+
+	/**
+	 * Climbs the pole at {@code pole} (its ground cell) from its {@code side}, as a player does: a step into the pole's cell beside the wood
+	 * (the pole is climbable), the jump key held until the feet are at {@code feetY}, then the sneak key held to hang there.
+	 */
 	private void climb(BlockPos pole, Direction side, double feetY) {
 		Vec3 from = context.computeOnClient(c -> c.player.position());
-		Vec3 at = new Vec3(pole.getX() + 0.5 + side.getStepX() * 0.43, from.y, pole.getZ() + 0.5 + side.getStepZ() * 0.43);
-		// step into the pole's cell on its side, facing it
-		for (int i = 1; i <= 8; i++) {
-			Vec3 p = from.lerp(at, i / 8.0);
-			pin = p;
+		if (!climbing) {
+			Vec3 at = new Vec3(pole.getX() + 0.5 + side.getStepX() * 0.47, from.y, pole.getZ() + 0.5 + side.getStepZ() * 0.47);
+			for (int i = 1; i <= 8; i++) {
+				Vec3 p = from.lerp(at, i / 8.0);
+				context.runOnClient(c -> c.player.setPos(p.x, p.y, p.z));
+				context.waitTick();
+			}
+			face(new Vec3(pole.getX() + 0.5, feetY + 1.4, pole.getZ() + 0.5), 8);
+		}
+		context.getInput().releaseKey(o -> o.keyShift);
+		context.getInput().holdKey(o -> o.keyJump);
+		for (int i = 0; i < 240 && context.computeOnClient(c -> c.player.getY()) < feetY - 0.05; i++) {
 			context.waitTick();
 		}
-		face(new Vec3(pole.getX() + 0.5, feetY + 1.4, pole.getZ() + 0.5), 8);
-		int steps = (int) Math.max(1, Math.round((feetY - at.y) * 6));
-		for (int i = 1; i <= steps; i++) {
-			double s = (double) i / steps;
-			pin = new Vec3(at.x, at.y + (feetY - at.y) * s, at.z);
-			context.waitTick();
-		}
-		mark("climbed to " + feetY);
+		context.getInput().holdKey(o -> o.keyShift);
+		context.getInput().releaseKey(o -> o.keyJump);
+		climbing = true;
+		context.waitTicks(4);
+		mark(String.format(Locale.ROOT, "climbed to %.2f (server %.2f)", context.computeOnClient(c -> c.player.getY()),
+				server.computeOnServer(srv -> sp(srv).getY())));
 	}
 
-	/** Back down the pole to the ground beside it, and the pin let go. */
+	/** Back down the pole (the sneak key let go, sliding down its steps) and a step out to {@code ground}. */
 	private void climbDown(BlockPos ground) {
-		Vec3 p0 = pin != null ? pin : context.computeOnClient(c -> c.player.position());
-		int steps = (int) Math.max(1, Math.round((p0.y - ground.getY()) * 4));
-		for (int i = 1; i <= steps; i++) {
-			double s = (double) i / steps;
-			pin = new Vec3(p0.x, p0.y + (ground.getY() - p0.y) * s, p0.z);
+		context.getInput().releaseKey(o -> o.keyShift);
+		climbing = false;
+		for (int i = 0; i < 200 && !context.computeOnClient(c -> c.player.onGround()); i++) {
 			context.waitTick();
 		}
+		Vec3 p0 = context.computeOnClient(c -> c.player.position());
 		Vec3 out = Vec3.atBottomCenterOf(ground);
-		for (int i = 1; i <= 6; i++) {
-			pin = new Vec3(p0.x, ground.getY(), p0.z).lerp(out, i / 6.0);
+		for (int i = 1; i <= 8; i++) {
+			Vec3 p = p0.lerp(out, i / 8.0);
+			context.runOnClient(c -> c.player.setPos(p.x, p.y, p.z));
 			context.waitTick();
 		}
-		pin = null;
 		context.waitTicks(2);
 	}
 
@@ -1707,7 +1724,7 @@ final class Bfs04Episode {
 		cue("P10");
 		at(0.06);
 		sneakPut(item("wildcatter:exhaust_silencer_large"), ENGINE.east(1).south().above(), Direction.UP);   // the top of the engine, under its slot
-		mark("silencer: " + state(ENGINE.east(1).above(2)) + "; panel " + reading(PANEL));
+		mark("silencer: " + state(ENGINE.east(1).south().above(2)) + "; panel " + reading(PANEL) + " | " + overlay());
 		at(0.30);
 		face(Vec3.atCenterOf(ENGINE).add(1.5, 2.2, 0.5), 40);
 		at(0.55);
@@ -1728,24 +1745,36 @@ final class Bfs04Episode {
 		mark(id + ": " + state(slot) + " cells " + cellsOf(slot));
 	}
 
-	/** The action-bar text the player sees now (for the log). */
+	/** The action-bar text the player sees now (for the log): every text field of the HUD, named. */
 	private String overlay() {
 		return context.computeOnClient(c -> {
+			StringBuilder b = new StringBuilder();
 			try {
 				for (java.lang.reflect.Field f : c.gui.hud.getClass().getDeclaredFields()) {
-					if (f.getType() == net.minecraft.network.chat.Component.class) {
+					if (net.minecraft.network.chat.Component.class.isAssignableFrom(f.getType()) && !java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
 						f.setAccessible(true);
 						Object v = f.get(c.gui.hud);
-						if (v != null && !((net.minecraft.network.chat.Component) v).getString().isEmpty()) {
-							return ((net.minecraft.network.chat.Component) v).getString();
+						if (v != null) {
+							b.append(f.getName()).append('=').append(((net.minecraft.network.chat.Component) v).getString()).append("; ");
 						}
 					}
 				}
 			} catch (ReflectiveOperationException e) {
-				return "(" + e + ")";
+				b.append(e);
 			}
-			return "";
+			return b.toString();
 		});
+	}
+
+	/** Uses the held item on a block sneaking (so the block's own click, a readout or a setting, gives way to the item). */
+	private void sneakUse(BlockPos on, Direction face) {
+		context.getInput().holdKey(o -> o.keyShift);
+		context.waitTicks(3);
+		useOn(on, face);
+		if (!climbing) {
+			context.getInput().releaseKey(o -> o.keyShift);
+		}
+		context.waitTicks(3);
 	}
 
 	// ---- 6: what goes wrong: wet gas (P11, P12) -------------------------------------------------------------------------------------------
@@ -2055,36 +2084,40 @@ final class Bfs04Episode {
 
 	private void pole1(int n) {
 		give("wildcatter:single_phase_cable", 8, "single-phase cable (a hot, a neutral and a ground wire for each)");
-		standAt(new BlockPos(-470, S, 988), Vec3.atCenterOf(CABLE1[0]));
+		standAt(new BlockPos(-470, S, 988), Vec3.atCenterOf(CABLE1[1]));
 		server.runCommand("time set 4800");
 		context.waitTicks(wanted(n, "pole1") ? 80 : 3);
 		startFilm(n, "pole1");
 		cue("P26");
-		at(0.10);
-		put(item("wildcatter:single_phase_cable"), CABLE1[0].below(), Direction.UP);
-		at(0.22);
+		// the cable from a block short of the dry-type (its last piece waits: the line is built dead), to the pole and up it
+		at(0.08);
 		put(item("wildcatter:single_phase_cable"), CABLE1[1].below(), Direction.UP);
-		mark("cable from the dry-type: " + reading(CABLE1[0]));
-		at(0.40);
+		mark("cable, a block short of the dry-type: " + reading(CABLE1[1]));
+		at(0.22);
 		face(Vec3.atCenterOf(P1.below()).add(0, 0.5, 0), 20);
 		put(item("wildcatter:wood_pole_30"), P1.below(), Direction.UP);
 		mark("pole 1: " + state(P1) + " top " + state(P1.above(7)));
-		at(0.55);
+		at(0.36);
 		face(Vec3.atCenterOf(P1).add(0, 6, 0), 30);
-		at(0.70);
+		at(0.48);
 		for (int i = 2; i < CABLE1.length; i++) {
 			sneakPut(item("wildcatter:single_phase_cable"), CABLE1[i - 1], Direction.UP);
 		}
 		mark("cable up the pole: " + reading(CABLE1[CABLE1.length - 1]));
+		at(0.75);
+		face(Vec3.atCenterOf(CABLE1[0]), 30);
+		mark("the gap at the dry-type");
 		settle();
 		cue("P27");
 		at(0.10);
 		BlockPos unit = unitOf(P1);
+		face(Vec3.atCenterOf(unit), 20);
 		put(item("wildcatter:pole_transformer_mv"), unit.south(), Direction.NORTH);
 		mark("pole transformer 1: " + state(unit) + " | " + reading(unit));
 		at(0.45);
-		waitQuest("pole_transformer");
-		meter(unit);
+		face(Vec3.atCenterOf(unit).add(0, 0.5, 0), 30);
+		at(0.70);
+		face(Vec3.atCenterOf(CABLE1[3]), 30);
 		settle();
 		stopFilm();
 	}
@@ -2103,16 +2136,16 @@ final class Bfs04Episode {
 		climb(P1, Direction.EAST, P1.getY() + 5.0);
 		at(0.30);
 		put(item("wildcatter:insulator_dist"), P1.above(7), Direction.UP);
-		mark("insulator 1: " + state(insulatorOf(P1)));
+		mark("insulator 1: " + state(insulatorOf(P1)) + " | pos " + context.computeOnClient(c -> c.player.position()));
 		at(0.55);
 		hold(item("wildcatter:conductor_spool_mv"));
-		useOn(unit, Direction.EAST);
+		sneakUse(unit, Direction.EAST);
 		mark("jumper's lower end on the bushing");
 		at(0.72);
-		useOn(insulatorOf(P1), Direction.EAST);
-		mark("jumper: " + reading(insulatorOf(P1)));
+		sneakUse(insulatorOf(P1), Direction.EAST);
+		mark("jumper: " + reading(insulatorOf(P1)) + " | " + overlay() + " | server at " + server.computeOnServer(srv -> sp(srv).position()));
 		at(0.88);
-		useOn(insulatorOf(P1), Direction.EAST);
+		sneakUse(insulatorOf(P1), Direction.EAST);
 		mark("the span's first end chosen");
 		settle();
 		stopFilm();
@@ -2140,8 +2173,8 @@ final class Bfs04Episode {
 		cue("P30");
 		at(0.08);
 		hold(item("wildcatter:conductor_spool_mv"));
-		useOn(insulatorOf(p2), Direction.SOUTH);
-		mark("span 1: " + reading(insulatorOf(p2)));
+		sneakUse(insulatorOf(p2), Direction.SOUTH);
+		mark("span 1: " + reading(insulatorOf(p2)) + " | " + overlay());
 		at(0.30);
 		face(Vec3.atCenterOf(insulatorOf(P1)), 50);
 		mark("looking back along the span to the first pole");
@@ -2155,7 +2188,7 @@ final class Bfs04Episode {
 			standAt(feet(prev.getX(), prev.getZ() + 2), Vec3.atCenterOf(prev));
 			climb(prev, Direction.SOUTH, prev.getY() + 5.0);
 			hold(item("wildcatter:conductor_spool_mv"));
-			useOn(insulatorOf(prev), Direction.SOUTH);
+			sneakUse(insulatorOf(prev), Direction.SOUTH);
 			climbDown(feet(prev.getX(), prev.getZ() + 2));
 			standAt(feet(p.getX() + 2, p.getZ() + 2), Vec3.atCenterOf(p));
 			put(item("wildcatter:wood_pole_30"), p.below(), Direction.UP);
@@ -2163,7 +2196,7 @@ final class Bfs04Episode {
 			climb(p, Direction.SOUTH, p.getY() + 5.0);
 			put(item("wildcatter:insulator_dist"), p.above(7), Direction.UP);
 			hold(item("wildcatter:conductor_spool_mv"));
-			useOn(insulatorOf(p), Direction.SOUTH);
+			sneakUse(insulatorOf(p), Direction.SOUTH);
 			mark("off camera: pole " + (i + 1) + " " + p.toShortString() + " and its span: " + reading(insulatorOf(p)));
 			climbDown(feet(p.getX(), p.getZ() + 2));
 		}
@@ -2178,25 +2211,24 @@ final class Bfs04Episode {
 		last = poles.get(poles.size() - 1);
 		unit2 = unitOf(last);
 		give("wildcatter:electric_lamp", 4, "four lamps, made as in episode two");
+		give("wildcatter:single_phase_cable", 12, "more single-phase cable");
 		standAt(feet(last.getX(), last.getZ() + 2), Vec3.atCenterOf(last).add(0, 4, 0));
 		server.runCommand("time set 6200");
 		context.waitTicks(wanted(n, "unit2") ? 80 : 3);
 		startFilm(n, "unit2");
 		cue("P31");
-		at(0.04);
-		climb(last, Direction.SOUTH, last.getY() + 3.0);
-		at(0.20);
+		at(0.06);
 		put(item("wildcatter:pole_transformer_mv"), unit2.south(), Direction.NORTH);
-		mark("pole transformer 2: " + state(unit2));
-		at(0.36);
+		mark("pole transformer 2: " + state(unit2) + " | " + overlay());
+		at(0.24);
 		climb(last, Direction.SOUTH, last.getY() + 5.0);
 		hold(item("wildcatter:conductor_spool_mv"));
-		useOn(unit2, Direction.SOUTH);
+		sneakUse(unit2, Direction.SOUTH);
 		at(0.50);
-		useOn(insulatorOf(last), Direction.SOUTH);
+		sneakUse(insulatorOf(last), Direction.SOUTH);
 		mark("jumper 2: " + reading(insulatorOf(last)));
-		at(0.62);
-		meter(insulatorOf(last));
+		at(0.70);
+		face(Vec3.atCenterOf(unit2), 30);
 		settle();
 		stopFilm();
 		climbDown(feet(last.getX(), last.getZ() + 2));
@@ -2239,11 +2271,47 @@ final class Bfs04Episode {
 		for (BlockPos l : lamps) {
 			put(item("wildcatter:electric_lamp"), l.below(), Direction.UP);
 		}
-		mark("lamps: " + lamps.stream().map(l -> state(l).toString()).toList());
+		mark("lamps (the line not yet fed): " + lamps.stream().map(l -> state(l).toString()).toList());
 		at(0.80);
 		face(Vec3.atCenterOf(lamps.get(0)), 30);
 		settle();
 		stopFilm();
+	}
+
+	// ---- 15: the line fed: the cable's last piece at the dry-type (P33), the lamps at the base (P33b) -------------------------------
+
+	private void energize(int n) {
+		standAt(new BlockPos(-470, S, 987), Vec3.atCenterOf(CABLE1[0]));
+		server.runCommand("time set 6800");
+		context.waitTicks(wanted(n, "energize") ? 80 : 3);
+		startFilm(n, "energize");
+		cue("P33");
+		at(0.08);
+		put(item("wildcatter:single_phase_cable"), CABLE1[0].below(), Direction.UP);
+		mark("the last piece: " + reading(CABLE1[0]) + " | dry-type " + reading(DRY));
+		at(0.30);
+		face(Vec3.atCenterOf(unitOf(P1)).add(0, 0.6, 0), 40);
+		waitQuest("pole_transformer");
+		mark("pole transformer 1: " + reading(unitOf(P1)) + " | insulator " + reading(insulatorOf(P1)));
+		settle();
+		stopFilm();
+		// the lamps at the base, lit (the player well clear of the pole transformer's bushing)
+		BlockPos l0 = lamps.get(0);
+		standAt(feet(l0.getX() - 3, l0.getZ() + 4), Vec3.atCenterOf(l0));
+		server.runCommand("time set 7000");
+		context.waitTicks(wanted(n, "lamps_lit") ? 80 : 3);
+		startFilm(n, "lamps_lit");
+		cue("P33b");
+		mark("lamps: " + lamps.stream().map(l -> state(l).toString()).toList() + " | cable " + reading(run0()) + " | unit 2 " + reading(unit2));
+		at(0.40);
+		face(Vec3.atCenterOf(last).add(0, 5, 0), 50);
+		settle();
+		stopFilm();
+	}
+
+	/** The far pole transformer's cable at the foot of its pole. */
+	private BlockPos run0() {
+		return new BlockPos(unit2.getX(), last.getY(), unit2.getZ());
 	}
 
 	// ---- 15: the pad-mount, at the base's table (P33) --------------------------------------------------------------------------------------
@@ -2257,7 +2325,7 @@ final class Bfs04Episode {
 		server.runCommand("time set 7000");
 		context.waitTicks(wanted(n, "pad_craft") ? 60 : 3);
 		startFilm(n, "pad_craft");
-		cue("P33");
+		cue("P34");
 		openBlock(table);
 		tableCraftBy(by(0.80), 3, new String[] {"sds", "tct", "sss"}, keys('s', WildcatterItems.STEEL_INGOT, 'd', Items.DIAMOND, 't', item("wildcatter:pole_transformer_mv"),
 				'c', item("minecraft:copper_block")), 1, "pad-mount transformer");
@@ -2276,7 +2344,7 @@ final class Bfs04Episode {
 		server.runCommand("time set 11800");
 		context.waitTicks(wanted(n, "chapter") ? 60 : 3);
 		startFilm(n, "chapter");
-		cue("P35");
+		cue("P36");
 		at(0.04);
 		bookOpen("plc");
 		at(0.40);
@@ -2291,7 +2359,7 @@ final class Bfs04Episode {
 		// P34: the line at dusk, from the gas well across the river to the lamps
 		server.runCommand("time set 12600");
 		BlockPos mid = poles.get(1);
-		droneAt(n, "line_dusk", mid, cam(6.0, 16.0, 14.0, -20.0, 4.0, -10.0), cam(-6.0, 15.0, 16.0, -30.0, 3.0, -14.0), "P34");
+		droneAt(n, "line_dusk", mid, cam(6.0, 16.0, 14.0, -20.0, 4.0, -10.0), cam(-6.0, 15.0, 16.0, -30.0, 3.0, -14.0), "P35");
 		// P1, the hook: low past the lamps at dusk to the last pole
 		server.runCommand("time set 12900");
 		droneAt(n, "hook", last, cam(-14.0, 2.6, 4.0, -7.0, 1.0, 0.0), cam(-4.0, 3.0, 5.0, 0.0, 4.0, -1.0), "P01");
