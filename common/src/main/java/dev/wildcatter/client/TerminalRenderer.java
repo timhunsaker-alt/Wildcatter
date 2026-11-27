@@ -123,7 +123,7 @@ public class TerminalRenderer<T extends BlockEntity> implements BlockEntityRende
 	private static net.minecraft.resources.@Nullable Identifier texture(BlockState block) {
 		String path = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block.getBlock()).getPath();
 		if (block.getBlock() instanceof MultiCableBlock cable) {
-			return cable.singlePhase() ? dev.wildcatter.Wildcatter.id("block/single_phase_cable_placeholder") : cable.busway() ? null : dev.wildcatter.Wildcatter.id("block/" + path);
+			return cable.singlePhase() ? dev.wildcatter.Wildcatter.id("block/single_phase_cable") : cable.busway() ? null : dev.wildcatter.Wildcatter.id("block/" + path);
 		}
 		if (block.hasProperty(CableBlock.CONDUCTOR) && (path.endsWith("_hot") || path.endsWith("_neutral"))) {
 			String base = path.substring(0, path.lastIndexOf('_'));

@@ -48,8 +48,8 @@ def shapes(kind, widths):
 	"""Parent models for one kind of conductor: its core and its north arm at each gauge, textured by #cable."""
 	for gauge, w in zip(GAUGES, widths):
 		a, b = 8 - w / 2, 8 + w / 2
-		save_json(f"{ASSETS}/models/block/conductor/{kind}_core_{gauge}.json", {"elements": [cuboid([a, a, a], [b, b, b])]})
-		save_json(f"{ASSETS}/models/block/conductor/{kind}_arm_{gauge}.json", {"elements": [cuboid([a, a, 0], [b, b, a])]})
+		save_json(f"{ASSETS}/models/block/conductor/{kind}_core_{gauge}.json", {"parent": "minecraft:block/block", "elements": [cuboid([a, a, a], [b, b, b])]})
+		save_json(f"{ASSETS}/models/block/conductor/{kind}_arm_{gauge}.json", {"parent": "minecraft:block/block", "elements": [cuboid([a, a, 0], [b, b, a])]})
 
 
 def textured(name, parent, texture):
