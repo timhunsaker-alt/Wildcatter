@@ -44,7 +44,7 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	@Override
 	public void runTest(ClientGameTestContext context) {
 		if ("trailer".equals(System.getenv("WILDCATTER_ONLY")) || "plcTrailer".equals(System.getenv("WILDCATTER_ONLY")) || "plcShorts".equals(System.getenv("WILDCATTER_ONLY"))
-				|| System.getenv("WILDCATTER_ONLY") != null && java.util.Arrays.stream(System.getenv("WILDCATTER_ONLY").split(",")).anyMatch(n -> Films010ClientGameTest.SCENES.contains(n) || n.equals("bfs01") || n.equals("bfs02") || n.equals("bfs03"))) {
+				|| System.getenv("WILDCATTER_ONLY") != null && java.util.Arrays.stream(System.getenv("WILDCATTER_ONLY").split(",")).anyMatch(n -> Films010ClientGameTest.SCENES.contains(n) || n.equals("bfs01") || n.equals("bfs02") || n.equals("bfs03") || n.equals("film60"))) {
 			return;   // a trailer's shots alone (TrailerClientGameTest, PlcTrailerClientGameTest, PlcShortsClientGameTest): no test world, no Create World checks
 		}
 		// the test world starts as an existing world would, every world rule off; the scenes switch on the rules they show

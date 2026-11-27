@@ -1,0 +1,12 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "dev.wildcatter.gametest.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"FilmClockMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

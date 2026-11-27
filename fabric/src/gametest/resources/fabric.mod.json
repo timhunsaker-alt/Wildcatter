@@ -14,12 +14,16 @@
 			"dev.wildcatter.gametest.Films010ClientGameTest",
 			"dev.wildcatter.gametest.Bfs01Films",
 			"dev.wildcatter.gametest.Bfs02Films",
-			"dev.wildcatter.gametest.Bfs03Films"
+			"dev.wildcatter.gametest.Bfs03Films",
+			"dev.wildcatter.gametest.Film60ProofClientGameTest"
 		],
 		"main": [
 			"dev.wildcatter.gametest.TestGasSource"
 		]
 	},
+	"mixins": [
+		"wildcatter-gametest.mixins.json"
+	],
 	"depends": {
 		"wildcatter": "*",
 		"fabric-api": "*"
