@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Fixes (Built From Scratch ep 4)
+- **The Field Manual's drilling page no longer sends the rig through a 60 A breaker:** a 60 A three-pole breaker ahead of the rig trips
+  on its start (six times its 45 A for two seconds); the page now says to start the rig from a motor starter against its terminal box,
+  its overload set to the rig's current. Proof `bfs04_rig_start`; the episode's layout in `bfs04_gas_genset` (the first proof of
+  `gas_genset_running` in normal play).
+
 ### Fixes (Built From Scratch ep 3 re-film)
 - **The power meter reads a big machine from any of its cells:** used on the drilling rig's or the pumpjack's terminal box (where the
   power lands) it took the click and sent no readout; it now reads the machine, as on its main cell. Proof `bfs03_meter_on_terminal_box`.
