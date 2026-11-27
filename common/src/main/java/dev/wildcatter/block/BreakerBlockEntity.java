@@ -281,7 +281,7 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Prot
 
 	@Override
 	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
-		return (role != Conductor.G && role != Conductor.N || poles() == 3) && voltage == voltage() && (face == facing() || face == facing().getOpposite());
+		return voltage == voltage() && (face == facing() || face == facing().getOpposite());
 	}
 
 	private int poles() {
@@ -318,8 +318,9 @@ public class BreakerBlockEntity extends BlockEntity implements CircuitPart, Prot
 				circuit.port(at(facing()), facing(), phases[k], voltage(), front[k], Tuning.CONTACT_OHMS / 2, false);
 			}
 		}
-		if (poles == 3) {
-			// the neutral and ground run straight through a three-pole breaker, unswitched
+		{
+			// the neutral and ground run straight through, unswitched: a cable's neutral and ground pass a breaker in its run (a one-pole
+			// breaker switches only the hot, as in a panel, where the neutral goes to its bar)
 			int neutral = circuit.node();
 			int ground = circuit.node();
 			circuit.port(at(facing().getOpposite()), facing().getOpposite(), Conductor.N, voltage(), neutral, Tuning.CONTACT_OHMS / 2, false);

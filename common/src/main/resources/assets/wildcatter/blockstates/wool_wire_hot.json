@@ -3,7 +3,8 @@
     {
       "when": {
         "conductor": "a",
-        "wear": "0"
+        "wear": "0",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_a_0_core"
@@ -16,8 +17,13 @@
             "north": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -32,8 +38,13 @@
             "east": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -49,8 +60,13 @@
             "south": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -66,8 +82,13 @@
             "west": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -83,8 +104,13 @@
             "up": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -100,8 +126,13 @@
             "down": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -113,7 +144,431 @@
     {
       "when": {
         "conductor": "a",
-        "wear": "1"
+        "wear": "0",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "a",
+        "wear": "0",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "a",
+        "wear": "0",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_0_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "a",
+        "wear": "1",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_a_1_core"
@@ -126,8 +581,13 @@
             "north": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -142,8 +602,13 @@
             "east": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -159,8 +624,13 @@
             "south": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -176,8 +646,13 @@
             "west": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -193,8 +668,13 @@
             "up": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -210,8 +690,13 @@
             "down": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -223,7 +708,431 @@
     {
       "when": {
         "conductor": "a",
-        "wear": "2"
+        "wear": "1",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "a",
+        "wear": "1",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "a",
+        "wear": "1",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_1_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "a",
+        "wear": "2",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_a_2_core"
@@ -236,8 +1145,13 @@
             "north": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -252,8 +1166,13 @@
             "east": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -269,8 +1188,13 @@
             "south": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -286,8 +1210,13 @@
             "west": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -303,8 +1232,13 @@
             "up": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -320,8 +1254,13 @@
             "down": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -333,7 +1272,431 @@
     {
       "when": {
         "conductor": "a",
-        "wear": "3"
+        "wear": "2",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "a",
+        "wear": "2",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "a",
+        "wear": "2",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_2_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "a",
+        "wear": "3",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_a_3_core"
@@ -346,8 +1709,13 @@
             "north": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -362,8 +1730,13 @@
             "east": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -379,8 +1752,13 @@
             "south": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -396,8 +1774,13 @@
             "west": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -413,8 +1796,13 @@
             "up": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -430,8 +1818,13 @@
             "down": "true"
           },
           {
-            "conductor": "a",
+            "conductor": "a"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -442,8 +1835,432 @@
     },
     {
       "when": {
+        "conductor": "a",
+        "wear": "3",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "a",
+        "wear": "3",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "a",
+        "wear": "3",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_a_3_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
         "conductor": "b",
-        "wear": "0"
+        "wear": "0",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_b_0_core"
@@ -456,8 +2273,13 @@
             "north": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -472,8 +2294,13 @@
             "east": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -489,8 +2316,13 @@
             "south": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -506,8 +2338,13 @@
             "west": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -523,8 +2360,13 @@
             "up": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -540,8 +2382,13 @@
             "down": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -553,7 +2400,431 @@
     {
       "when": {
         "conductor": "b",
-        "wear": "1"
+        "wear": "0",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "b",
+        "wear": "0",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "b",
+        "wear": "0",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_0_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "b",
+        "wear": "1",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_b_1_core"
@@ -566,8 +2837,13 @@
             "north": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -582,8 +2858,13 @@
             "east": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -599,8 +2880,13 @@
             "south": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -616,8 +2902,13 @@
             "west": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -633,8 +2924,13 @@
             "up": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -650,8 +2946,13 @@
             "down": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -663,7 +2964,431 @@
     {
       "when": {
         "conductor": "b",
-        "wear": "2"
+        "wear": "1",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "b",
+        "wear": "1",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "b",
+        "wear": "1",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_1_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "b",
+        "wear": "2",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_b_2_core"
@@ -676,8 +3401,13 @@
             "north": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -692,8 +3422,13 @@
             "east": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -709,8 +3444,13 @@
             "south": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -726,8 +3466,13 @@
             "west": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -743,8 +3488,13 @@
             "up": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -760,8 +3510,13 @@
             "down": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -773,7 +3528,431 @@
     {
       "when": {
         "conductor": "b",
-        "wear": "3"
+        "wear": "2",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "b",
+        "wear": "2",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "b",
+        "wear": "2",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_2_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "b",
+        "wear": "3",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_b_3_core"
@@ -786,8 +3965,13 @@
             "north": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -802,8 +3986,13 @@
             "east": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -819,8 +4008,13 @@
             "south": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -836,8 +4030,13 @@
             "west": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -853,8 +4052,13 @@
             "up": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -870,8 +4074,13 @@
             "down": "true"
           },
           {
-            "conductor": "b",
+            "conductor": "b"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -882,8 +4091,432 @@
     },
     {
       "when": {
+        "conductor": "b",
+        "wear": "3",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "b",
+        "wear": "3",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "b",
+        "wear": "3",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_b_3_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
         "conductor": "c",
-        "wear": "0"
+        "wear": "0",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_c_0_core"
@@ -896,8 +4529,13 @@
             "north": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -912,8 +4550,13 @@
             "east": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -929,8 +4572,13 @@
             "south": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -946,8 +4594,13 @@
             "west": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -963,8 +4616,13 @@
             "up": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -980,8 +4638,13 @@
             "down": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -993,7 +4656,431 @@
     {
       "when": {
         "conductor": "c",
-        "wear": "1"
+        "wear": "0",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "c",
+        "wear": "0",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "c",
+        "wear": "0",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_0_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "c",
+        "wear": "1",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_c_1_core"
@@ -1006,8 +5093,13 @@
             "north": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1022,8 +5114,13 @@
             "east": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1039,8 +5136,13 @@
             "south": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1056,8 +5158,13 @@
             "west": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1073,8 +5180,13 @@
             "up": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1090,8 +5202,13 @@
             "down": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1103,7 +5220,431 @@
     {
       "when": {
         "conductor": "c",
-        "wear": "2"
+        "wear": "1",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "c",
+        "wear": "1",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "c",
+        "wear": "1",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_1_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "c",
+        "wear": "2",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_c_2_core"
@@ -1116,8 +5657,13 @@
             "north": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1132,8 +5678,13 @@
             "east": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1149,8 +5700,13 @@
             "south": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1166,8 +5722,13 @@
             "west": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1183,8 +5744,13 @@
             "up": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1200,8 +5766,13 @@
             "down": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1213,7 +5784,431 @@
     {
       "when": {
         "conductor": "c",
-        "wear": "3"
+        "wear": "2",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "c",
+        "wear": "2",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "c",
+        "wear": "2",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_2_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "c",
+        "wear": "3",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_c_3_core"
@@ -1226,8 +6221,13 @@
             "north": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1242,8 +6242,13 @@
             "east": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1259,8 +6264,13 @@
             "south": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1276,8 +6286,13 @@
             "west": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1293,8 +6308,13 @@
             "up": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1310,8 +6330,13 @@
             "down": "true"
           },
           {
-            "conductor": "c",
+            "conductor": "c"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1322,8 +6347,432 @@
     },
     {
       "when": {
+        "conductor": "c",
+        "wear": "3",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "c",
+        "wear": "3",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "c",
+        "wear": "3",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_c_3_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
         "conductor": "n",
-        "wear": "0"
+        "wear": "0",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_n_0_core"
@@ -1336,8 +6785,13 @@
             "north": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1352,8 +6806,13 @@
             "east": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1369,8 +6828,13 @@
             "south": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1386,8 +6850,13 @@
             "west": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1403,8 +6872,13 @@
             "up": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1420,8 +6894,13 @@
             "down": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1433,7 +6912,431 @@
     {
       "when": {
         "conductor": "n",
-        "wear": "1"
+        "wear": "0",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "n",
+        "wear": "0",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "n",
+        "wear": "0",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_0_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "n",
+        "wear": "1",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_n_1_core"
@@ -1446,8 +7349,13 @@
             "north": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1462,8 +7370,13 @@
             "east": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1479,8 +7392,13 @@
             "south": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1496,8 +7414,13 @@
             "west": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1513,8 +7436,13 @@
             "up": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1530,8 +7458,13 @@
             "down": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1543,7 +7476,431 @@
     {
       "when": {
         "conductor": "n",
-        "wear": "2"
+        "wear": "1",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "n",
+        "wear": "1",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "n",
+        "wear": "1",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_1_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "n",
+        "wear": "2",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_n_2_core"
@@ -1556,8 +7913,13 @@
             "north": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1572,8 +7934,13 @@
             "east": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1589,8 +7956,13 @@
             "south": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1606,8 +7978,13 @@
             "west": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1623,8 +8000,13 @@
             "up": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1640,8 +8022,13 @@
             "down": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1653,7 +8040,431 @@
     {
       "when": {
         "conductor": "n",
-        "wear": "3"
+        "wear": "2",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "n",
+        "wear": "2",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "n",
+        "wear": "2",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_2_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "n",
+        "wear": "3",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_n_3_core"
@@ -1666,8 +8477,13 @@
             "north": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1682,8 +8498,13 @@
             "east": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1699,8 +8520,13 @@
             "south": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1716,8 +8542,13 @@
             "west": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1733,8 +8564,13 @@
             "up": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1750,8 +8586,13 @@
             "down": "true"
           },
           {
-            "conductor": "n",
+            "conductor": "n"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1762,8 +8603,432 @@
     },
     {
       "when": {
+        "conductor": "n",
+        "wear": "3",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "n",
+        "wear": "3",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "n",
+        "wear": "3",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_n_3_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
         "conductor": "g",
-        "wear": "0"
+        "wear": "0",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_g_0_core"
@@ -1776,8 +9041,13 @@
             "north": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1792,8 +9062,13 @@
             "east": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1809,8 +9084,13 @@
             "south": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1826,8 +9106,13 @@
             "west": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1843,8 +9128,13 @@
             "up": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1860,8 +9150,13 @@
             "down": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "0"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1873,7 +9168,431 @@
     {
       "when": {
         "conductor": "g",
-        "wear": "1"
+        "wear": "0",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "g",
+        "wear": "0",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "g",
+        "wear": "0",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "0"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_0_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "g",
+        "wear": "1",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_g_1_core"
@@ -1886,8 +9605,13 @@
             "north": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1902,8 +9626,13 @@
             "east": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1919,8 +9648,13 @@
             "south": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1936,8 +9670,13 @@
             "west": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1953,8 +9692,13 @@
             "up": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1970,8 +9714,13 @@
             "down": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "1"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -1983,7 +9732,431 @@
     {
       "when": {
         "conductor": "g",
-        "wear": "2"
+        "wear": "1",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "g",
+        "wear": "1",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "g",
+        "wear": "1",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "1"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_1_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "g",
+        "wear": "2",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_g_2_core"
@@ -1996,8 +10169,13 @@
             "north": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -2012,8 +10190,13 @@
             "east": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -2029,8 +10212,13 @@
             "south": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -2046,8 +10234,13 @@
             "west": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -2063,8 +10256,13 @@
             "up": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -2080,8 +10278,13 @@
             "down": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "2"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -2093,7 +10296,431 @@
     {
       "when": {
         "conductor": "g",
-        "wear": "3"
+        "wear": "2",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "g",
+        "wear": "2",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "g",
+        "wear": "2",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "2"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_2_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "g",
+        "wear": "3",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_g_3_core"
@@ -2106,8 +10733,13 @@
             "north": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -2122,8 +10754,13 @@
             "east": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -2139,8 +10776,13 @@
             "south": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -2156,8 +10798,13 @@
             "west": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -2173,8 +10820,13 @@
             "up": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -2190,13 +10842,441 @@
             "down": "true"
           },
           {
-            "conductor": "g",
+            "conductor": "g"
+          },
+          {
             "wear": "3"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
       "apply": {
         "model": "wildcatter:block/wool_wire_g_3_arm",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "g",
+        "wear": "3",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "g",
+        "wear": "3",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "g",
+        "wear": "3",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "wear": "3"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/wool_wire_g_3_arm_very_large",
         "x": 90
       }
     }

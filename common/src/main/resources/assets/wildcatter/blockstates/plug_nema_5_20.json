@@ -1,25 +1,46 @@
 {
  "variants": {
-  "attach=north": {
+  "attach=north,seated=false": {
    "model": "wildcatter:block/plug_nema_5_20_wall/p0"
   },
-  "attach=east": {
+  "attach=east,seated=false": {
    "model": "wildcatter:block/plug_nema_5_20_wall/p0",
    "y": 90
   },
-  "attach=south": {
+  "attach=south,seated=false": {
    "model": "wildcatter:block/plug_nema_5_20_wall/p0",
    "y": 180
   },
-  "attach=west": {
+  "attach=west,seated=false": {
    "model": "wildcatter:block/plug_nema_5_20_wall/p0",
    "y": 270
   },
-  "attach=down": {
+  "attach=down,seated=false": {
    "model": "wildcatter:block/plug_nema_5_20_floor/p0"
   },
-  "attach=up": {
+  "attach=up,seated=false": {
    "model": "wildcatter:block/plug_nema_5_20_ceiling/p0"
+  },
+  "attach=north,seated=true": {
+   "model": "wildcatter:block/plug_nema_5_20_wall_seated/p0"
+  },
+  "attach=east,seated=true": {
+   "model": "wildcatter:block/plug_nema_5_20_wall_seated/p0",
+   "y": 90
+  },
+  "attach=south,seated=true": {
+   "model": "wildcatter:block/plug_nema_5_20_wall_seated/p0",
+   "y": 180
+  },
+  "attach=west,seated=true": {
+   "model": "wildcatter:block/plug_nema_5_20_wall_seated/p0",
+   "y": 270
+  },
+  "attach=down,seated=true": {
+   "model": "wildcatter:block/plug_nema_5_20_floor_seated/p0"
+  },
+  "attach=up,seated=true": {
+   "model": "wildcatter:block/plug_nema_5_20_ceiling_seated/p0"
   }
  }
 }

@@ -58,7 +58,15 @@ public class CableBlock extends BaseEntityBlock {
 		this.plastic = plastic;
 		this.voltage = voltage;
 		this.wool = wool;
-		registerDefaultState(WireShape.noArms(stateDefinition.any()).setValue(WEAR, 0).setValue(CONDUCTOR, conductor));
+		BlockState start = WireShape.noArms(stateDefinition.any()).setValue(CONDUCTOR, conductor).setValue(WireShape.GAUGE, dev.wildcatter.energy.ConductorSize.Gauge.SMALL);
+		registerDefaultState(start.hasProperty(WEAR) ? start.setValue(WEAR, 0) : start);
+	}
+
+	/** Wool-wrapped wire: the one kind that wears, so the one kind with a {@link #WEAR} property. */
+	public static class Wool extends CableBlock {
+		public Wool(Properties properties, Voltage voltage, Conductor conductor) {
+			super(properties, voltage, conductor, true);
+		}
 	}
 
 	public Voltage voltage() {
@@ -81,12 +89,16 @@ public class CableBlock extends BaseEntityBlock {
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		WireShape.ARMS.values().forEach(builder::add);
-		builder.add(WEAR, CONDUCTOR);
+		builder.add(CONDUCTOR, WireShape.GAUGE);
+		if (this instanceof Wool) {   // only wool wears: bare and plastic wire keep their state count down
+			builder.add(WEAR);
+		}
 	}
 
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
-		return withArms(defaultBlockState(), context.getLevel(), context.getClickedPos());
+		dev.wildcatter.energy.ConductorSize size = dev.wildcatter.item.ConductorItem.size(context.getItemInHand(), voltage, dev.wildcatter.energy.ConductorSize.Kind.WIRE);
+		return withArms(defaultBlockState().setValue(WireShape.GAUGE, size.gauge()), context.getLevel(), context.getClickedPos());
 	}
 
 	@Override
@@ -101,7 +113,13 @@ public class CableBlock extends BaseEntityBlock {
 
 	@Override
 	protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
-		neighborChanged(state, level, pos, this, null, movedByPiston);
+		// set by a command or a blueprint (not from its item), its arms are found here; set them with a neighbour update, since vanilla
+		// skips the one for this placement once the state has changed under it, and the older neighbours would never reach back
+		BlockState updated = withArms(state, level, pos);
+		if (updated != state) {
+			level.setBlock(pos, updated, Block.UPDATE_ALL);
+		}
+		CircuitManager.markDirty(level);
 	}
 
 	private BlockState withArms(BlockState state, BlockGetter level, BlockPos pos) {

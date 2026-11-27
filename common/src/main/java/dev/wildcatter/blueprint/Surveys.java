@@ -220,7 +220,8 @@ public final class Surveys {
 		return true;
 	}
 
-	private static final java.util.Set<String> SIDES = java.util.Set.of("north", "south", "east", "west", "up", "down");
+	/** Left out when matching a survey: the sides (redrawn from the neighbours) and a conductor's gauge (drawn from its size). */
+	private static final java.util.Set<String> SIDES = java.util.Set.of("north", "south", "east", "west", "up", "down", "gauge");
 
 	/**
 	 * Sets one lift of a site whose blueprint ({@code turned} already, with its turned {@code states}) has its origin at {@code origin}:

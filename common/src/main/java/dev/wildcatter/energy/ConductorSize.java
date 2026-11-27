@@ -134,6 +134,60 @@ public enum ConductorSize implements StringRepresentable {
 		return size != null && size.family == family(tier, kind) ? size : standard(tier, kind);
 	}
 
+	/**
+	 * How thick it is drawn (four visible steps): building wire 12 and 10 AWG small, 6 and 2 AWG medium, 4/0 large, 500 kcmil very
+	 * large; ACSR Sparrow small, Raven and Penguin medium, Linnet large, Drake very large; MV cable 1/0 small, 4/0 medium, 500 kcmil
+	 * large. Busway and bus duct have their own housings and are drawn one way.
+	 */
+	public Gauge gauge() {
+		return switch (this) {
+			case AWG_6, AWG_2, ACSR_RAVEN, ACSR_PENGUIN, MV_4_0 -> Gauge.MEDIUM;
+			case AWG_4_0, ACSR_LINNET, MV_500 -> Gauge.LARGE;
+			case KCMIL_500, ACSR_DRAKE -> Gauge.VERY_LARGE;
+			default -> Gauge.SMALL;
+		};
+	}
+
+	/** The drawn thickness of a conductor: a blockstate property of wire and cable, set from the size when it is placed. */
+	public enum Gauge implements StringRepresentable {
+		SMALL("small"), MEDIUM("medium"), LARGE("large"), VERY_LARGE("very_large");
+
+		private final String id;
+
+		Gauge(String id) {
+			this.id = id;
+		}
+
+		@Override
+		public String getSerializedName() {
+			return id;
+		}
+	}
+
+	/** The smallest size of this family that carries {@code amps}, or null if none does. */
+	public static ConductorSize smallestFor(Family family, double amps) {
+		for (ConductorSize size : sizes(family)) {
+			if (size.amps >= amps) {
+				return size;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * For a readout: empty while it carries no more than its ampacity, otherwise that it is undersized and the smallest size of its
+	 * family that would carry the present current, e.g. "UNDERSIZED: carrying 48 A; needs 6 AWG or bigger". Wires never resize
+	 * themselves: the player replaces the run.
+	 */
+	public String undersized(double amps) {
+		if (!(amps > this.amps)) {
+			return "";
+		}
+		ConductorSize needed = smallestFor(family, amps);
+		return "UNDERSIZED: carrying " + Math.round(amps) + " A; " + (needed != null ? "needs " + needed.label() + " or bigger"
+				: "more than any one " + sizes(family).get(sizes(family).size() - 1).label() + " carries: split the load");
+	}
+
 	public static ConductorSize byId(String id) {
 		for (ConductorSize size : values()) {
 			if (size.id.equals(id)) {

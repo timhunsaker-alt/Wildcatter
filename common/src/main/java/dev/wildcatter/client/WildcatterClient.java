@@ -56,6 +56,8 @@ public final class WildcatterClient {
 		sink.accept(dev.wildcatter.WildcatterBlocks.REACTOR_CONSOLE_ENTITY, context -> new ReactorConsoleRenderer());
 		sink.accept(dev.wildcatter.WildcatterBlocks.DAY_TANK_ENTITY, context -> new DayTankRenderer());
 		sink.accept(dev.wildcatter.WildcatterBlocks.VALVE_ENTITY, context -> new ValveRenderer());
+		sink.accept(dev.wildcatter.WildcatterBlocks.WIRE_ENTITY, context -> new TerminalRenderer<>());   // terminals and glands at machines
+		sink.accept(dev.wildcatter.WildcatterBlocks.MULTI_CABLE_ENTITY, context -> new TerminalRenderer<>());
 		sink.accept(dev.wildcatter.WildcatterBlocks.CRANE_ENTITY, CraneRenderer::new);
 		sink.accept(dev.wildcatter.WildcatterBlocks.PLC_CABINET_ENTITY, context -> new PlcRackRenderer<>());
 		sink.accept(dev.wildcatter.WildcatterBlocks.REMOTE_IO_DROP_ENTITY, context -> new PlcRackRenderer<>());

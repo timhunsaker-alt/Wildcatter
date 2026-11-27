@@ -1,0 +1,7 @@
+{
+  "parent": "wildcatter:block/conductor/wire_arm_large",
+  "textures": {
+    "cable": "wildcatter:block/wire_b",
+    "particle": "wildcatter:block/wire_b"
+  }
+}

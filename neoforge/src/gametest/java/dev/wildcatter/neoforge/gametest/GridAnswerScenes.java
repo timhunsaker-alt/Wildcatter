@@ -23,7 +23,6 @@ import dev.wildcatter.block.Plumbing;
 import dev.wildcatter.block.PoleLoad;
 import dev.wildcatter.block.TransformerBlock;
 import dev.wildcatter.block.TransformerBlockEntity;
-import dev.wildcatter.block.WireShape;
 import dev.wildcatter.block.WoodPoleBlock;
 import dev.wildcatter.circuit.Conductor;
 import dev.wildcatter.energy.ConductorSize;
@@ -311,7 +310,7 @@ final class GridAnswerScenes {
 			check(helper, Math.abs(cap - 75) < 1e-6, "1 m3/s at 1.5 t/m3 is 75 kg a tick: " + cap);
 			check(helper, Math.abs(rate[0] - 75) < 1, "the pipe should pass its rated 75 kg a tick to a cell that would take 80: " + rate[0]);
 			check(helper, Lines.capacityPerTick(line, Product.BIOGAS) == 0, "a slurry pipe carries no gas");
-			check(helper, helper.getLevel().getBlockState(pipe).getValue(WireShape.ARMS.get(Direction.DOWN)), "the slurry pipe draws its arm into the tower");
+			check(helper, PipeBlock.joined(helper.getLevel().getBlockState(pipe), Direction.DOWN), "the slurry pipe draws its arm into the tower");
 			log("slurry_pipe", "ok");
 			helper.succeed();
 		});
@@ -333,8 +332,8 @@ final class GridAnswerScenes {
 			log("air_header", header + " lengths of header, " + tubing + " of tubing on the cell");
 			check(helper, header == 11, "the cell's air header is its 11 lengths: " + header);
 			check(helper, tubing == 0, "instrument air tubing is not on the header");
-			check(helper, end.getValue(WireShape.ARMS.get(Direction.WEST)) && !end.getValue(WireShape.ARMS.get(Direction.EAST)), "the header draws no arm to the tubing");
-			check(helper, state(helper, 5, U, 1).getValue(WireShape.ARMS.get(Direction.NORTH)), "the drop draws its arm to the header");
+			check(helper, PipeBlock.joined(end, Direction.WEST) && !PipeBlock.joined(end, Direction.EAST), "the header draws no arm to the tubing");
+			check(helper, PipeBlock.joined(state(helper, 5, U, 1), Direction.NORTH), "the drop draws its arm to the header");
 			log("air_header", "ok");
 			helper.succeed();
 		});

@@ -3437,3 +3437,11 @@ for _png in glob.glob(f"{ASSETS}/textures/**/*_placeholder.png", recursive=True)
 		os.remove(_png)
 		_gone += 1
 print(f"{_gone} replaced placeholders left out")
+
+# ---- Wires, cables and pipes that read as connected (2026-11-27): gauges, single-phase cable, flanges -------------------------------
+# tools/wire_look.py rewrites the wire, cable and pipe blockstates and models written above (adding the gauge steps and the flanges),
+# patches the valves' blockstates, and writes the single-phase cable's texture, models, loot, lang, recipes and the lamp quest's tags.
+import sys as _sys
+_sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import wire_look
+wire_look.run()

@@ -55,17 +55,59 @@ public class PipeBlock extends Block {
 		boolean joinsPipe(BlockState state, Kind kind);
 	}
 
+	/**
+	 * How a pipe ends on one side: no arm, an arm to another pipe, or an arm to a machine's nozzle, bolted with a flange pair. Saved as
+	 * "false", "true" and "flange", so a pipe from a world before flanges loads with its arms.
+	 */
+	public enum End implements net.minecraft.util.StringRepresentable {
+		NONE("false"), PIPE("true"), FLANGE("flange");
+
+		private final String id;
+
+		End(String id) {
+			this.id = id;
+		}
+
+		@Override
+		public String getSerializedName() {
+			return id;
+		}
+	}
+
+	/** One property per side, named as the wire arms are. */
+	public static final Map<Direction, net.minecraft.world.level.block.state.properties.EnumProperty<End>> ENDS = new EnumMap<>(Direction.class);
+
+	static {
+		for (Direction side : Direction.values()) {
+			ENDS.put(side, net.minecraft.world.level.block.state.properties.EnumProperty.create(side.getName(), End.class));
+		}
+	}
+
+	/** True if a pipe has an arm on {@code side} (to a pipe or a machine). */
+	public static boolean joined(BlockState state, Direction side) {
+		return state.getBlock() instanceof PipeBlock && state.getValue(ENDS.get(side)) != End.NONE;
+	}
+
+	/** How the pipe ends on {@code side}. */
+	public static End end(BlockState state, Direction side) {
+		return state.getValue(ENDS.get(side));
+	}
+
 	private final Kind kind;
 
 	public PipeBlock(Properties properties, Kind kind) {
 		super(properties);
 		this.kind = kind;
-		registerDefaultState(WireShape.noArms(stateDefinition.any()));
+		BlockState start = stateDefinition.any();
+		for (Direction side : Direction.values()) {
+			start = start.setValue(ENDS.get(side), End.NONE);
+		}
+		registerDefaultState(start);
 	}
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		WireShape.ARMS.values().forEach(builder::add);
+		ENDS.values().forEach(builder::add);
 	}
 
 	@Override
@@ -84,7 +126,12 @@ public class PipeBlock extends Block {
 
 	@Override
 	protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
-		neighborChanged(state, level, pos, this, null, movedByPiston);
+		// set by a command or a blueprint (not from its item), its arms are found here; set them with a neighbour update, since vanilla
+		// skips the one for this placement once the state has changed under it, and the older neighbours would never reach back
+		BlockState updated = withArms(state, level, pos);
+		if (updated != state) {
+			level.setBlock(pos, updated, Block.UPDATE_ALL);
+		}
 	}
 
 	@Override
@@ -163,9 +210,12 @@ public class PipeBlock extends Block {
 						|| block instanceof SteamPlantPartBlock burner && burner.part() == SteamPlantPartBlock.Part.BURNER;
 	}
 
+	/** An arm toward each pipe of its kind; toward a machine's nozzle a flanged one (tubing and network cable just plug in). */
 	private BlockState withArms(BlockState state, BlockGetter level, BlockPos pos) {
 		for (Direction side : Direction.values()) {
-			state = state.setValue(WireShape.ARMS.get(side), joins(level.getBlockState(pos.relative(side))));
+			BlockState there = level.getBlockState(pos.relative(side));
+			End end = !joins(there) ? End.NONE : there.getBlock() instanceof PipeBlock || kind == Kind.NETWORK || kind == Kind.AIR ? End.PIPE : End.FLANGE;
+			state = state.setValue(ENDS.get(side), end);
 		}
 		return state;
 	}
@@ -175,7 +225,7 @@ public class PipeBlock extends Block {
 		boolean big = kind == Kind.SLURRY || kind == Kind.AIR_HEADER;
 		VoxelShape shape = big ? BIG_CORE : CORE;
 		for (Direction side : Direction.values()) {
-			if (state.getValue(WireShape.ARMS.get(side))) {
+			if (state.getValue(ENDS.get(side)) != End.NONE) {
 				shape = Shapes.or(shape, (big ? BIG_ARM_SHAPES : ARM_SHAPES).get(side));
 			}
 		}

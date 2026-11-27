@@ -44,7 +44,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 			WOOL_WIRE_NEUTRAL, MV_WIRE_HOT, MV_WIRE_NEUTRAL, HV_WIRE_HOT, HV_WIRE_NEUTRAL,
 			PLASTIC_WIRE_HOT, PLASTIC_WIRE_NEUTRAL, MV_PLASTIC_WIRE_HOT, MV_PLASTIC_WIRE_NEUTRAL, HV_PLASTIC_WIRE_HOT, HV_PLASTIC_WIRE_NEUTRAL,
 			INDUSTRIAL_WIRE_HOT, INDUSTRIAL_WIRE_NEUTRAL, INDUSTRIAL_PLASTIC_WIRE_HOT, INDUSTRIAL_PLASTIC_WIRE_NEUTRAL);
-	public static final BlockEntityType<MultiCableBlockEntity> MULTI_CABLE_ENTITY = entity(MultiCableBlockEntity::new, CABLE_LV, CABLE_INDUSTRIAL, CABLE_MV, CABLE_DIST, CABLE_HV, BUSWAY_LV, BUSWAY_INDUSTRIAL, BUS_DUCT_GEN, BRANCH_CABLE, BRANCH_CABLE_INDUSTRIAL);
+	public static final BlockEntityType<MultiCableBlockEntity> MULTI_CABLE_ENTITY = entity(MultiCableBlockEntity::new, CABLE_LV, SINGLE_PHASE_CABLE, CABLE_INDUSTRIAL, CABLE_MV, CABLE_DIST, CABLE_HV, BUSWAY_LV, BUSWAY_INDUSTRIAL, BUS_DUCT_GEN, BRANCH_CABLE, BRANCH_CABLE_INDUSTRIAL);
 	public static final BlockEntityType<MotorStarterBlockEntity> MOTOR_STARTER_ENTITY = entity(MotorStarterBlockEntity::new, MOTOR_STARTER, MCC_BUCKET);
 	public static final BlockEntityType<MccIncomingBlockEntity> MCC_INCOMING_ENTITY = entity(MccIncomingBlockEntity::new, MCC_INCOMING);
 	public static final BlockEntityType<dev.wildcatter.block.MccSectionBlockEntity> MCC_SECTION_ENTITY = entity(dev.wildcatter.block.MccSectionBlockEntity::new, MCC_SECTION);
@@ -450,6 +450,7 @@ public final class WildcatterBlocks implements FuelCycleBlocks, GridBlocks, Nucl
 		add("industrial_plastic_wire_hot", INDUSTRIAL_PLASTIC_WIRE_HOT);
 		add("industrial_plastic_wire_neutral", INDUSTRIAL_PLASTIC_WIRE_NEUTRAL);
 		add("cable_lv", CABLE_LV);
+		add("single_phase_cable", SINGLE_PHASE_CABLE);
 		add("cable_industrial", CABLE_INDUSTRIAL);
 		add("cable_mv", CABLE_MV);
 		add("cable_dist", CABLE_DIST);

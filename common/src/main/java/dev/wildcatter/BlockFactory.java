@@ -219,8 +219,10 @@ final class BlockFactory {
 	}
 
 	static Block cable(String name, Voltage voltage, Conductor role, boolean wool) {
-		return block(name, props -> new CableBlock(props.mapColor(role == Conductor.A ? MapColor.COLOR_RED : MapColor.COLOR_BLACK)
-				.strength(0.5F).sound(wool ? SoundType.WOOL : SoundType.COPPER).noOcclusion(), voltage, role, wool));
+		return block(name, props -> {
+			props = props.mapColor(role == Conductor.A ? MapColor.COLOR_RED : MapColor.COLOR_BLACK).strength(0.5F).sound(wool ? SoundType.WOOL : SoundType.COPPER).noOcclusion();
+			return wool ? new CableBlock.Wool(props, voltage, role) : new CableBlock(props, voltage, role, false);
+		});
 	}
 
 	static Block plasticCable(String name, Voltage voltage, Conductor role) {

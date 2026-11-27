@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "wildcatter:wool_wire_hot",
+      "components": {
+        "wildcatter:conductor_size": "awg_10"
+      },
+      "strict": false
+    },
+    {
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "wildcatter:wool_wire_neutral",
+      "components": {
+        "wildcatter:conductor_size": "awg_10"
+      },
+      "strict": false
+    },
+    "wildcatter:ground_wire"
+  ],
+  "result": {
+    "id": "wildcatter:single_phase_cable",
+    "count": 1,
+    "components": {
+      "wildcatter:conductor_size": "awg_10"
+    }
+  }
+}

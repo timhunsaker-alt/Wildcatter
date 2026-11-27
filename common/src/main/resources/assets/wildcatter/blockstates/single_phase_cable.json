@@ -1,0 +1,416 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "gauge": "small"
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_core"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "gauge": "small"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "gauge": "small"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "gauge": "small"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "gauge": "small"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "gauge": "small"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "gauge": "small"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/single_phase_cable_arm_very_large",
+        "x": 90
+      }
+    }
+  ]
+}

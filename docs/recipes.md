@@ -60,3 +60,8 @@ to bottom; `·` is an empty slot.
 | Empty Drum (208 L) (`empty_drum`) | `SNS` / `S·S` / `SSS` (S iron, N iron nugget) |
 | Ground Rod (`ground_rod`) | `C` / `I` / `C` (C copper, I iron) |
 | Receptacle IEC 60309 red (400 V 3-phase, 63 A) (`receptacle_iec_60309_red_63`) | shapeless: 2 iron, 4 copper, 1 red dye |
+
+## Single-phase cable (2026-11-27)
+Shapeless, per size, in each loader's resources (written by `tools/wire_look.py`, which `tools/make_assets.py` runs at its end): one hot
+wire, one neutral wire and one ground wire make one single-phase cable of the wires' size, with both wires wool-wrapped or both plastic;
+two to three of a size make one of the next, as for every conductor. `recipes_unique` checks them.

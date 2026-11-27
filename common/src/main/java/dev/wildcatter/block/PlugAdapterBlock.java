@@ -31,11 +31,25 @@ import org.jspecify.annotations.Nullable;
  */
 public class PlugAdapterBlock extends BaseEntityBlock {
 
+	/**
+	 * True when the receptacle it is set against faces it (the receptacle is on the far wall, floor or ceiling of its cell, straight
+	 * ahead): the plug is then drawn in the receptacle's face and its cord runs back to the adapter. Otherwise it sits at its own face.
+	 */
+	public static final net.minecraft.world.level.block.state.properties.BooleanProperty SEATED = net.minecraft.world.level.block.state.properties.BooleanProperty.create("seated");
+
 	private final PlugType type;
 
 	public PlugAdapterBlock(Properties properties, PlugType type) {
 		super(properties);
 		this.type = type;
+		registerDefaultState(defaultBlockState().setValue(SEATED, false));
+	}
+
+	private BlockState seated(BlockState state, LevelReader level, BlockPos pos) {
+		Direction toward = state.getValue(AttachedGear.ATTACH);
+		BlockState there = level.getBlockState(pos.relative(toward));
+		boolean seated = there.getBlock() instanceof ReceptacleBlock receptacle && receptacle.type() == type && there.getValue(AttachedGear.ATTACH) == toward;
+		return state.setValue(SEATED, seated);
 	}
 
 	public PlugType type() {
@@ -62,13 +76,22 @@ public class PlugAdapterBlock extends BaseEntityBlock {
 			@Nullable Orientation orientation, boolean movedByPiston) {
 		if (!canSurvive(state, level, pos)) {
 			level.destroyBlock(pos, true);
+		} else if (seated(state, level, pos) != state) {
+			level.setBlock(pos, seated(state, level, pos), 2);
 		}
 		CircuitManager.markDirty(level);
 	}
 
 	@Override
+	protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+		if (!level.isClientSide() && canSurvive(state, level, pos) && seated(state, level, pos) != state) {
+			level.setBlock(pos, seated(state, level, pos), 2);
+		}
+	}
+
+	@Override
 	protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(AttachedGear.ATTACH);
+		builder.add(AttachedGear.ATTACH, SEATED);
 	}
 
 	/** Plugged into the receptacle beside it (the one of its type), its cord running away from it. */
@@ -76,7 +99,7 @@ public class PlugAdapterBlock extends BaseEntityBlock {
 	public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
 		for (Direction side : Direction.values()) {
 			if (context.getLevel().getBlockState(context.getClickedPos().relative(side)).getBlock() instanceof ReceptacleBlock receptacle && receptacle.type() == type) {
-				return defaultBlockState().setValue(AttachedGear.ATTACH, side);
+				return seated(defaultBlockState().setValue(AttachedGear.ATTACH, side), context.getLevel(), context.getClickedPos());
 			}
 		}
 		return AttachedGear.place(defaultBlockState(), context);
