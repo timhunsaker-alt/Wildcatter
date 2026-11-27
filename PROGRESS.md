@@ -1699,8 +1699,8 @@ sized for a 40-pot line.
   have been checked in model previews and NeoForge server scenes, not yet in the client (no client scene was run in the wave).
   Coker gas keeps a gas set's full rating (its heavier hydrocarbons' knock is not modelled). No new script-drawn textures.
 
-- Wire look (2026-11-27): the single-phase cable's sheath is a script-drawn placeholder, `single_phase_cable_placeholder` (ivory with a
-  printed stripe); it wants Ludo art. The terminals, glands and leads are block entity drawing in the mod's materials. The leads into wall
+- Wire look (2026-11-27): the single-phase cable's sheath is now Ludo's cable-sheath art coloured to the ivory jacket of real building
+  cable (`single_phase_cable`, process_art.py); no placeholder is left. The terminals, glands and leads are block entity drawing in the mod's materials. The leads into wall
   gear are drawn only while the wire's own cell is in view.
 
 ## Ideas not started

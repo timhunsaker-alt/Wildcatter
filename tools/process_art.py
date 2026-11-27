@@ -292,6 +292,12 @@ if os.path.exists(f"{SRC}/fuse_cartridge.webp"):
 	save("fuse_tube", tube)
 	save("fuse_tube_blown", tint(darker(tube, 0.45), (30, 24, 20), 0.35))   # scorched dark when the element has melted
 	save("fuse_cap", part((0, int(h * 0.2), int(w * 0.09), int(h * 0.8))))   # a brass end cap
+# wire look (2026-11-27): the single-phase building cable (hot, neutral, ground under one sheath), the real thing's ivory
+# thermoplastic jacket: Ludo's sheath drawing in its own light and shade, coloured ivory
+if os.path.exists(f"{SRC}/cable_sheath.webp"):
+	from PIL import ImageOps
+	shade = ImageOps.autocontrast(load("cable_sheath").convert("L"), cutoff=2)
+	save("single_phase_cable", ImageOps.colorize(shade, (184, 177, 158), (246, 242, 228)))
 if os.path.exists(f"{SRC}/cable_sheath.webp"):
 	save("cable_mv", tint(load("cable_sheath"), (40, 46, 60), 0.25))   # the 4.16 kV cable, between the LV and the distribution jacket
 # art wave (2026-11-09): the turning parts' paint (tower fan, disconnect blades): Ludo's dark steel, with the painted yellow

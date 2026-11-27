@@ -41,8 +41,8 @@
     }
   },
   "textures": {
-    "cable": "wildcatter:block/single_phase_cable_placeholder",
-    "particle": "wildcatter:block/single_phase_cable_placeholder"
+    "cable": "wildcatter:block/single_phase_cable",
+    "particle": "wildcatter:block/single_phase_cable"
   },
   "elements": [
     {

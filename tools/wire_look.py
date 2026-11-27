@@ -94,7 +94,9 @@ def cable_texture(cable):
 
 
 def single_phase_texture():
-	"""Placeholder: an ivory thermoplastic sheath with its printed legend stripe."""
+	"""Placeholder (only while the Ludo art in art/final is missing): an ivory thermoplastic sheath with its printed legend stripe."""
+	if os.path.exists("art/final/single_phase_cable.png"):
+		return
 	random.seed(11)
 	img = Image.new("RGBA", (16, 16))
 	d = ImageDraw.Draw(img)
@@ -108,16 +110,21 @@ def single_phase_texture():
 	img.save(f"{ASSETS}/textures/block/single_phase_cable_placeholder.png")
 
 
+def SINGLE_TEXTURE():
+	"""The single-phase cable's sheath: Ludo art (process_art.py) when it has been made, else the placeholder."""
+	return f"{ns}:block/single_phase_cable" if os.path.exists("art/final/single_phase_cable.png") else f"{ns}:block/single_phase_cable_placeholder"
+
+
 def cables():
 	shapes("cable", CABLE_WIDTH)
 	shapes("single_cable", SINGLE_WIDTH)
 	for cable in ("cable_lv", "cable_industrial", "cable_mv", "cable_dist", "cable_hv", "single_phase_cable"):
 		single = cable == "single_phase_cable"
-		texture = f"{ns}:block/single_phase_cable_placeholder" if single else cable_texture(cable)
+		texture = SINGLE_TEXTURE() if single else cable_texture(cable)
 		parts = conductor_parts(cable, "single_cable" if single else "cable", texture, {})
 		save_json(f"{ASSETS}/blockstates/{cable}.json", {"multipart": parts})
 	w = SINGLE_WIDTH[0]
-	t = {"cable": f"{ns}:block/single_phase_cable_placeholder", "particle": f"{ns}:block/single_phase_cable_placeholder"}
+	t = {"cable": SINGLE_TEXTURE(), "particle": SINGLE_TEXTURE()}
 	a, b = 8 - w / 2, 8 + w / 2
 	save_json(f"{ASSETS}/models/block/single_phase_cable_inventory.json", {"parent": "minecraft:block/block",
 		"display": {"gui": {"rotation": [30, 225, 0], "scale": [1.1, 1.1, 1.1]}, "ground": {"scale": [0.8, 0.8, 0.8]},
