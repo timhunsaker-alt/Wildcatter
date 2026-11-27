@@ -15,6 +15,7 @@
 			"dev.wildcatter.gametest.Bfs01Films",
 			"dev.wildcatter.gametest.Bfs02Films",
 			"dev.wildcatter.gametest.Bfs03Films",
+			"dev.wildcatter.gametest.Bfs04Films",
 			"dev.wildcatter.gametest.Film60ProofClientGameTest"
 		],
 		"main": [
