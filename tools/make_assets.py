@@ -1466,7 +1466,7 @@ for tag in ("mineable/pickaxe", "needs_stone_tool"):
 	t["values"] += [f"{ns}:{n}" for n in LEASE_PARTS + ("disposal_wellhead",)]
 	save_json(f"{ROOT}/data/minecraft/tags/block/{tag}.json", t)
 shaped("separator", ["SSS", "PGP", "SSS"], {"S": S_, "P": f"{ns}:gas_line", "G": "minecraft:glass"}, "separator")
-shaped("stock_tank", ["SSS", "S S", "SSS"], {"S": S_}, "stock_tank")
+shaped("stock_tank", ["SSS", "SLS", "SSS"], {"S": S_, "L": "minecraft:ladder"}, "stock_tank")   # its own grid: "S S" was the dry storage canister's too (Built From Scratch ep 3)
 shaped("water_tank", ["PPP", "P P", "PPP"], {"P": f"{ns}:plastic_sheet"}, "water_tank")
 shaped("flare_stack", [" F ", " P ", " P "], {"F": "minecraft:flint_and_steel", "P": f"{ns}:gas_line"}, "flare_stack")
 shaped("injection_pump", ["SPS", "CXC", "SSS"], {"S": S_, "P": f"{ns}:gas_line", "C": "minecraft:copper_ingot", "X": f"{ns}:crankshaft"}, "injection_pump")

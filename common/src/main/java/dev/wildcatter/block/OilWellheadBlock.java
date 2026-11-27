@@ -64,6 +64,10 @@ public class OilWellheadBlock extends Block {
 		if (read != null) {
 			return read;
 		}
+		if (stack.is(dev.wildcatter.WildcatterBlocks.PUMPJACK.asItem())) {
+			// a pumpjack in hand: the click is for the item, which sets it over this well (PumpjackBlock#snap), not for the readout
+			return InteractionResult.PASS;
+		}
 		PumpjackBlockEntity jack = pumpjack(level, pos);
 		if (jack != null && stack.is(net.minecraft.world.item.Items.BUCKET)) {
 			if (!level.isClientSide()) {

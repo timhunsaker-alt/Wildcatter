@@ -3,11 +3,12 @@
   "category": "redstone",
   "pattern": [
     "SSS",
-    "S S",
+    "SLS",
     "SSS"
   ],
   "key": {
-    "S": "wildcatter:steel_ingot"
+    "S": "wildcatter:steel_ingot",
+    "L": "minecraft:ladder"
   },
   "result": {
     "id": "wildcatter:stock_tank",

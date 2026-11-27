@@ -113,12 +113,14 @@ public class WildcatterNeoForgeGameTests {
 
 	static {
 		QUEST_SCENES.putAll(Bfs01Scenes.scenes());   // Built From Scratch ep 1: the Getting started chapter and steel in the blast furnace
+		QUEST_SCENES.putAll(Bfs03Scenes.scenes());   // Built From Scratch ep 3: the seismograph's readings and Find a field
 	}
 	/** Phase 21.2's milestone scenes (QuestScenes.machineScenes): a plant each, so room round them and time for a set to start. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> QUEST_MACHINE_SCENES = QuestScenes.machineScenes();
 
 	static {
 		QUEST_MACHINE_SCENES.putAll(Bfs02Scenes.scenes());   // Built From Scratch ep 2: the First power chapter on the episode's layout
+		QUEST_MACHINE_SCENES.putAll(Bfs03Scenes.machineScenes());   // Built From Scratch ep 3: the lease on the dry-type, no flare then a flare, crude
 	}
 
 	/** The residence holds' scene (ResidenceScenes): in a batch whose world has realResidenceTimes on. */

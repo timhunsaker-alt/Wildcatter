@@ -7,6 +7,18 @@
   earth (a few nanowatts) as output, so it drew a unit of steam a tick and could tick Raise steam with no loop. Below one watt
   (`Tuning.TURBINE_NO_LOAD_WATTS`) it now idles: no steam drawn and no `steam_turbine_generating`. Proof: `bfs02_first_power`.
 
+### Oil well
+- **A pumpjack clicked on its wellhead is set over it:** the strike's message, the quest and the well-site doc say to click the oil
+  wellhead with a pumpjack, but the wellhead took the click for its own readout ("no pumpjack over it") and nothing was placed unless
+  the player sneaked. With a pumpjack in hand the click now goes to the pumpjack, which snaps over the well facing the way the player
+  faces. Proof: `bfs03_pumpjack_on_wellhead` (failed before the fix).
+
+### Lease
+- **The stock tank has its own recipe:** eight steel round an empty middle was also the dry storage canister's, the fuel tank's and the
+  48Y cylinder's grid, and the crafting table gave a dry storage canister, so a stock tank (A stock tank of crude) could not be made by
+  hand. It is now eight steel round a ladder (the tank's ladder and walkway). Proof: `bfs03_recipes`. Other shared grids remain (listed
+  in the Built From Scratch ep 3 notes for a decision).
+
 ## v0.10.2 (2026-11-26): the quest book checked for a fresh world
 
 ### Quest book
