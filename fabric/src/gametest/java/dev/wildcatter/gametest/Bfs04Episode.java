@@ -1481,14 +1481,7 @@ final class Bfs04Episode {
 		// what this episode never uses put away at the base, off camera
 		stashJunk(item("wildcatter:seismograph"), item("wildcatter:disposal_wellhead"), item("wildcatter:injection_pump"), item("wildcatter:crude_oil_bucket"),
 				Items.BUCKET, Items.WATER_BUCKET, item("minecraft:leaf_litter"));
-		// a crafting table carried out here; the ground under the base frame dug out, a block deep
-		set(TABLE, Blocks.CRAFTING_TABLE.defaultBlockState());
-		for (int x = -480; x <= -474; x++) {
-			for (int z = 984; z <= 985; z++) {
-				set(new BlockPos(x, G, z), Blocks.AIR.defaultBlockState());
-			}
-		}
-		log("off camera: a crafting table at " + TABLE.toShortString() + "; the frame's trench dug x -480..-474, z 984..985 at y " + G);
+
 		// the pole line's ground: each pole on the nearest dry, open column, the trees along the line cleared
 		poles.add(P1);
 		for (int[] r : ROUTE) {
@@ -1629,6 +1622,8 @@ final class Bfs04Episode {
 	// ---- 3: engine and generator parts (P4-P6) --------------------------------------------------------------------------------------------
 
 	private void parts(int n) {
+		set(TABLE, Blocks.CRAFTING_TABLE.defaultBlockState());
+		log("off camera: a crafting table carried out to " + TABLE.toShortString());
 		give("minecraft:iron_block", 2, "iron mined and smelted, packed into blocks");
 		give("minecraft:iron_ingot", 4, "iron mined and smelted");
 		give("minecraft:copper_ingot", 24, "copper mined and smelted");
@@ -1702,6 +1697,12 @@ final class Bfs04Episode {
 	// ---- 5: the set on its frame (P9, P10) ------------------------------------------------------------------------------------------------
 
 	private void frame(int n) {
+		for (int x = -480; x <= -474; x++) {
+			for (int z = 984; z <= 985; z++) {
+				set(new BlockPos(x, G, z), Blocks.AIR.defaultBlockState());
+			}
+		}
+		log("off camera: the frame's pit dug x -480..-474, z 984..985 at y " + G);
 		// the frame faces the player (its front, the readout side, north): placed looking south, from the north
 		BlockPos stand = new BlockPos(-480, S, 981);
 		standAt(stand, Vec3.atCenterOf(FRAME));
@@ -1830,7 +1831,7 @@ final class Bfs04Episode {
 		put(item("wildcatter:separator"), SEP.below(), Direction.UP);
 		mark("separator: " + state(SEP) + " cells " + cellsOf(SEP));
 		at(0.45);
-		walk(new BlockPos(-475, S, 983));
+		walk(new BlockPos(-472, S, 982));   // back from the pipe run over the separator's back end, so the view stays on it
 		for (int i = 0; i < SEP_GAS.length; i++) {
 			at(0.50 + 0.07 * i);
 			pipeAt(SEP_GAS[i]);
