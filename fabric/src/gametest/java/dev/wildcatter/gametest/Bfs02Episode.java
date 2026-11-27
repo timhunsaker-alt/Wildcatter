@@ -68,7 +68,7 @@ final class Bfs02Episode {
 	 * Seconds of footage each paragraph needs (re-film 2026-11-27): the longer of its English and Spanish lengths (lead, sentences, gaps,
 	 * pad) plus a second, so the take under it never runs short and nothing is reused.
 	 */
-	private static final Map<Integer, Double> NEED = needs(1, 12.0, 2, 18.5, 3, 18.9, 4, 20.0, 5, 13.5, 6, 10.3, 7, 19.7, 8, 8.5, 9, 20.3, 10, 16.0,
+	private static final Map<Integer, Double> NEED = needs(1, 12.0, 2, 18.5, 3, 18.9, 4, 20.0, 5, 13.5, 6, 10.3, 7, 19.7, 8, 8.5, 9, 20.3, 10, 22.8,
 			11, 16.6, 12, 26.8, 13, 14.2, 14, 21.1, 15, 14.1, 16, 18.8, 17, 15.4, 18, 14.7, 19, 11.2, 20, 22.8, 21, 7.7, 22, 21.5, 23, 17.5, 24, 17.8,
 			25, 9.3, 26, 18.1, 27, 9.0, 28, 14.1, 29, 13.1, 30, 9.3, 31, 16.1, 32, 18.3, 33, 15.3, 34, 15.9, 35, 15.6);
 	/** Hand speed at the crafting table: 1 as before, under 1 quicker, over 1 slower (each glide and click scaled). */
@@ -1435,6 +1435,9 @@ final class Bfs02Episode {
 		beat(10);
 		face(Vec3.atCenterOf(turbine), 10);
 		handRead(turbine, 90);
+		// P10's second sentence: the readout's "no drain pipe" and "NO COOLING TOWER" read again while it is said
+		face(Vec3.atCenterOf(turbine).add(0, 0.3, 0.4), 16);
+		handRead(turbine, 110);
 		mark("steam quest done: " + questDone("steam"));
 		book("steam", 120);
 		fill(10);
