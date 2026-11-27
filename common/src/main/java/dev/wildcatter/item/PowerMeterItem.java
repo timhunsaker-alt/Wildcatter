@@ -24,7 +24,9 @@ public class PowerMeterItem extends Item {
 		if (!stack.is(WildcatterItems.POWER_METER)) {
 			return null;
 		}
-		if (!level.isClientSide() && level.getBlockEntity(pos) instanceof Inspectable machine) {
+		// any cell of a big part reads the whole machine: the rig's or the pumpjack's terminal box, where the power lands, read nothing
+		// before (Built From Scratch ep 3: the click was taken and no readout sent)
+		if (!level.isClientSide() && dev.wildcatter.multiblock.BigParts.entity(level, pos) instanceof Inspectable machine) {
 			player.sendOverlayMessage(machine.inspect());
 		}
 		return InteractionResult.SUCCESS;
@@ -32,7 +34,8 @@ public class PowerMeterItem extends Item {
 
 	@Override
 	public InteractionResult useOn(UseOnContext context) {
-		if (context.getLevel().getBlockEntity(context.getClickedPos()) instanceof Inspectable machine) {
+		// any cell of a big part reads the whole machine (its main cell's entity)
+		if (dev.wildcatter.multiblock.BigParts.entity(context.getLevel(), context.getClickedPos()) instanceof Inspectable machine) {
 			if (!context.getLevel().isClientSide() && context.getPlayer() != null) {
 				context.getPlayer().sendOverlayMessage(machine.inspect());
 			}
