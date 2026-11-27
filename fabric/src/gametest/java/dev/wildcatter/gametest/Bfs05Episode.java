@@ -1926,7 +1926,7 @@ final class Bfs05Episode {
 		give("minecraft:water_bucket", 5, "water carried from the river");
 		give("wildcatter:pipe", 1, "water pipe");
 		give("wildcatter:pump", 1, "a second water pump, made as in episode two (the first went into the feed pump)");
-		give("minecraft:coal", 8, "coal for the small set's firebox");
+		give("minecraft:coal", 16, "coal for the small set's firebox");
 		standAt(new BlockPos(-482, S, 973), Vec3.atCenterOf(PANEL));
 		server.runCommand("time set 3800");
 		context.waitTicks(wanted(n, "start_set") ? 60 : 3);
