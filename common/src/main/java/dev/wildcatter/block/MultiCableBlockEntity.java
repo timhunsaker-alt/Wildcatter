@@ -79,18 +79,39 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 	public void setSize(ConductorSize value) {
 		size = value;
 		setChanged();
+		syncGauge();
 		CircuitManager.markDirty(level);
+	}
+
+	/** Keeps the drawn thickness in step with the size (a cable from before gauges, or one given a size by a command or a test). */
+	private void syncGauge() {
+		if (level == null || level.isClientSide() || block().busway()) {
+			return;
+		}
+		BlockState state = level.getBlockState(worldPosition);   // the world's: a block entity's own copy can lag its arms
+		if (state.getBlock() == getBlockState().getBlock() && state.hasProperty(WireShape.GAUGE) && state.getValue(WireShape.GAUGE) != size().gauge()) {
+			level.setBlock(worldPosition, state.setValue(WireShape.GAUGE, size().gauge()), 2);
+		}
+	}
+
+	/** The undersized warning for its most loaded conductor's present current, or empty (ConductorSize#undersized). */
+	public String undersized() {
+		double worst = 0;
+		for (Conductor conductor : block().conductors()) {
+			worst = Math.max(worst, amps[conductor.ordinal()]);
+		}
+		return size().undersized(worst);
 	}
 
 	@Override
 	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
-		return voltage == voltage() && block().joins(getBlockState(), face);
+		return voltage == voltage() && block().conductors().contains(role) && block().joins(getBlockState(), face);
 	}
 
 	@Override
 	public void build(Circuit circuit) {
 		double half = size().ohmsPerMeter() / 2.0;   // one block is a metre
-		for (Conductor conductor : CONDUCTORS) {
+		for (Conductor conductor : block().conductors()) {
 			int k = conductor.ordinal();
 			node[k] = circuit.node();
 			if (conductor == Conductor.G) {
@@ -105,7 +126,8 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 		clamps = new int[0];
 		if (grounded) {
 			int g = node[Conductor.G.ordinal()];
-			clamps = new int[] {circuit.resistor(node[Conductor.A.ordinal()], g, Tuning.GROUNDING_SET_OHMS),
+			clamps = block().singlePhase() ? new int[] {circuit.resistor(node[Conductor.A.ordinal()], g, Tuning.GROUNDING_SET_OHMS)}
+					: new int[] {circuit.resistor(node[Conductor.A.ordinal()], g, Tuning.GROUNDING_SET_OHMS),
 					circuit.resistor(node[Conductor.B.ordinal()], g, Tuning.GROUNDING_SET_OHMS), circuit.resistor(node[Conductor.C.ordinal()], g, Tuning.GROUNDING_SET_OHMS)};
 		}
 	}
@@ -179,13 +201,16 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 				burnOff();
 			}
 		}
+		syncGauge();
 		double worst = 0;
-		for (int k = 0; k < CONDUCTORS.length; k++) {
+		for (Conductor conductor : block().conductors()) {
+			int k = conductor.ordinal();
 			volts[k] = circuit.voltage(node[k]);
 			amps[k] = circuit.through(node[k]);
 			worst = Math.max(worst, amps[k]);
 		}
-		lineVolts = circuit.across(node[Conductor.A.ordinal()], node[Conductor.B.ordinal()]);
+		lineVolts = block().singlePhase() ? circuit.across(node[Conductor.A.ordinal()], node[Conductor.N.ordinal()])
+				: circuit.across(node[Conductor.A.ordinal()], node[Conductor.B.ordinal()]);
 		double ratio = worst / size().amps();
 		heat = dev.wildcatter.energy.WireHeat.step(heat, ratio, ticks / 20.0);
 		if (dev.wildcatter.energy.WireHeat.burnt(heat) && level instanceof ServerLevel server) {
@@ -217,7 +242,14 @@ public class MultiCableBlockEntity extends BlockEntity implements CircuitPart, I
 
 	@Override
 	public Component inspect() {
-		StringBuilder text = new StringBuilder((block().busway() ? "Busway (" : "Three-phase cable (") + voltage().label() + ", " + size().label() + ", insulated): "
+		String warning = undersized().isEmpty() ? "" : undersized() + ". ";
+		if (block().singlePhase()) {
+			return Component.literal(warning + "Single-phase cable (" + voltage().label() + ", " + size().label() + ", hot, neutral and ground, insulated): "
+					+ (grounded ? "GROUNDED (protective grounds applied), " : "") + (burnedOff ? "UNGROUNDED: the grounding clamps BURNED OFF, " : "")
+					+ String.format("hot %.0f V %.1f A, neutral %.1f A, hot to neutral %.0f V; %.0f A per conductor allowed%s, %.1f Hz", volts[Conductor.A.ordinal()],
+							amps[Conductor.A.ordinal()], amps[Conductor.N.ordinal()], lineVolts, size().amps(), dev.wildcatter.energy.WireHeat.readout(heat), hertz));
+		}
+		StringBuilder text = new StringBuilder(warning + (block().busway() ? "Busway (" : "Three-phase cable (") + voltage().label() + ", " + size().label() + ", insulated): "
 				+ (grounded ? (clampHeat.share() > 0.01 ? String.format("GROUNDED (protective grounds applied, %.0f%% of their I²t used), ", clampHeat.share() * 100)
 						: "GROUNDED (protective grounds applied), ") : "")
 				+ (burnedOff ? "UNGROUNDED: the grounding clamps BURNED OFF (the fault outlasted their rating), " : ""));

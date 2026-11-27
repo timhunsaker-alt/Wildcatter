@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Wire, cable and pipe
+- **Wires, cables and pipes look connected:** where a wire meets a machine it lands on a terminal block in a brass lug; a cable goes
+  through a cable gland; at a receptacle, lamp or heater the run is carried into the gear's box. A machine drawn smaller than its cell is
+  reached at its surface. A pipe meets a machine's nozzle with a bolted flange pair, and has a welded fitting only where it turns,
+  branches or ends (straight runs are plain).
+- **Runs set by command or blueprint join up:** a wire, cable or pipe set beside another no longer leaves the older one without its arm
+  toward it (placing by hand was not affected).
+- **Thicker for bigger sizes:** wire, cable and span lines are drawn in four steps by conductor size (12/10 AWG small up to 500 kcmil
+  very large; ACSR and MV cable likewise).
+- **Undersized warning:** a wire, cable or span carrying more than its ampacity says so first in its readout and on the Power Meter,
+  naming the smallest size that would carry the current ("UNDERSIZED: carrying 48 A; needs 6 AWG or bigger"). Wires never resize.
+- **Single-phase cable:** hot, neutral and ground in one sheath for the low tier, in the building wire sizes; crafted from a hot wire,
+  a neutral wire and a ground wire. It joins conductor by conductor. One-pole breakers and in-line fuses now pass the neutral and ground
+  through. Light a lamp accepts it as well as separate wires; saves keep their progress.
+- **Receptacle and plug:** a plug adapter facing the receptacle is drawn plugged into it, its cord back to the adapter's box; the
+  receptacles are drawn larger (1.8 times true size, the 5-15 and 5-20 in a 4 in square box) so they read beside their wire.
+
 ### Steam turbine
 - **An open circuit is not a load:** a starter turbine with only a hot wire to a lamp (no neutral back) counted the solver's tiny leak to
   earth (a few nanowatts) as output, so it drew a unit of steam a tick and could tick Raise steam with no loop. Below one watt

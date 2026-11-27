@@ -1,0 +1,7 @@
+{
+  "parent": "wildcatter:block/conductor/wire_arm_medium",
+  "textures": {
+    "cable": "wildcatter:block/hv_plastic_wire_a",
+    "particle": "wildcatter:block/hv_plastic_wire_a"
+  }
+}

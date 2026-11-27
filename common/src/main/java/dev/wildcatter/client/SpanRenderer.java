@@ -22,6 +22,8 @@ public class SpanRenderer implements BlockEntityRenderer<InsulatorBlockEntity, S
 		int color = 0xFFC8322D;
 	}
 
+	private static final float[] GAUGE_WIDTH = {1.0F, 1.35F, 1.7F, 2.1F};
+
 	@Override
 	public State createRenderState() {
 		return new State();
@@ -44,14 +46,14 @@ public class SpanRenderer implements BlockEntityRenderer<InsulatorBlockEntity, S
 			if (entity.getBlockPos().asLong() < span.other().asLong()) {
 				double there = entity.getLevel() != null ? InsulatorBlock.conductorY(entity.getLevel().getBlockState(span.other())) : here;
 				state.spans.add(new double[] {span.other().getX() - entity.getBlockPos().getX(), span.other().getY() - entity.getBlockPos().getY(),
-						span.other().getZ() - entity.getBlockPos().getZ(), span.covered() ? 1 : 0, span.length(), here, there});
+						span.other().getZ() - entity.getBlockPos().getZ(), span.covered() ? 1 : 0, span.length(), here, there, span.size().gauge().ordinal()});
 			}
 		}
 		// leads down to a cutout or a pole transformer: drawn from the insulator, slack
 		for (InsulatorBlockEntity.Lead lead : entity.leads()) {
 			double there = entity.getLevel() != null && entity.getLevel().getBlockEntity(lead.to()) instanceof dev.wildcatter.block.LeadEnd end ? end.leadY() : 0.9;
 			state.spans.add(new double[] {lead.to().getX() - entity.getBlockPos().getX(), lead.to().getY() - entity.getBlockPos().getY(),
-					lead.to().getZ() - entity.getBlockPos().getZ(), lead.covered() ? 1 : 0, Math.max(4, lead.length() * 2), here, there});
+					lead.to().getZ() - entity.getBlockPos().getZ(), lead.covered() ? 1 : 0, Math.max(4, lead.length() * 2), here, there, lead.size().gauge().ordinal()});
 		}
 	}
 
@@ -67,7 +69,8 @@ public class SpanRenderer implements BlockEntityRenderer<InsulatorBlockEntity, S
 				double dy = span[1];
 				double dz = span[2];
 				double sag = Tuning.SPAN_SAG * span[4];
-				float width = span[3] > 0 ? 4.0F : 2.5F;
+				// thicker for bigger conductors, in the same four steps as wire (ConductorSize#gauge)
+				float width = (span[3] > 0 ? 4.0F : 2.5F) * GAUGE_WIDTH[(int) span[7]];
 				int segments = Math.max(14, (int) (span[4] / 3));
 				double px = 0.5;
 				double py = span[5];

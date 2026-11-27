@@ -345,6 +345,10 @@ public class InsulatorBlockEntity extends BlockEntity implements CircuitPart, In
 		}
 		if (worst != null) {
 			load.append(String.format("; span %.1f A of %.0f A", spanAmps.getOrDefault(worst.other, 0.0), worst.size().amps()));
+			String undersized = worst.size().undersized(spanAmps.getOrDefault(worst.other, 0.0));
+			if (!undersized.isEmpty()) {
+				load.append(", ").append(undersized);
+			}
 			double rise = Math.max(spanHeat.getOrDefault(worst.other, 0.0), 0);
 			if (rise > 1.02) {
 				load.append(String.format(", OVERLOADED, heating %d%%", Math.round(Math.min(1, (rise - 1) / (Tuning.SPAN_BURN_RISE - 1)) * 100)));

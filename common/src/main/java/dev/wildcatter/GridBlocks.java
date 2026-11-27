@@ -74,6 +74,9 @@ public interface GridBlocks {
 
 	/** Three-phase cable: A, B, C, N and G in one insulated block. */
 	Block CABLE_LV = multiCable("cable_lv", Voltage.LOW);
+	/** Single-phase cable: hot, neutral and ground in one sheath, as house wiring is run (low tier only). */
+	Block SINGLE_PHASE_CABLE = block("single_phase_cable", props -> new dev.wildcatter.block.MultiCableBlock(props.mapColor(MapColor.TERRACOTTA_WHITE).strength(0.6F)
+			.sound(SoundType.WOOL).noOcclusion(), Voltage.LOW, false, dev.wildcatter.block.MultiCableBlock.SINGLE_PHASE));
 	Block CABLE_INDUSTRIAL = multiCable("cable_industrial", Voltage.INDUSTRIAL);
 	/** 4.16 kV (IEC 3.3 kV) cable: 5 kV class shielded MV cable, for a land rig's drive house or a plant's 4.16 kV feeders. */
 	Block CABLE_MV = multiCable("cable_mv", Voltage.MEDIUM);

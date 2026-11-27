@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "wildcatter:block/single_phase_cable_inventory"
+  }
+}

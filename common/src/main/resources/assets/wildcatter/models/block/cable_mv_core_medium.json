@@ -1,0 +1,7 @@
+{
+  "parent": "wildcatter:block/conductor/cable_core_medium",
+  "textures": {
+    "cable": "wildcatter:block/cable_mv",
+    "particle": "wildcatter:block/cable_mv"
+  }
+}

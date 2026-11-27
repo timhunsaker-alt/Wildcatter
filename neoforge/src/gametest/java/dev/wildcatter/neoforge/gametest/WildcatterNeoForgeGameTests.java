@@ -121,7 +121,8 @@ public class WildcatterNeoForgeGameTests {
 
 	static {
 		QUEST_MACHINE_SCENES.putAll(Bfs02Scenes.scenes());   // Built From Scratch ep 2: the First power chapter on the episode's layout
-		QUEST_MACHINE_SCENES.putAll(Bfs03Scenes.machineScenes());   // Built From Scratch ep 3: the lease on the dry-type, no flare then a flare, crude
+		QUEST_MACHINE_SCENES.putAll(Bfs03Scenes.machineScenes());
+		QUEST_MACHINE_SCENES.putAll(WireLookScenes.scenes());   // single-phase cable, sizes drawn, the undersized warning, fittings on placement   // Built From Scratch ep 3: the lease on the dry-type, no flare then a flare, crude
 	}
 
 	/** The residence holds' scene (ResidenceScenes): in a batch whose world has realResidenceTimes on. */

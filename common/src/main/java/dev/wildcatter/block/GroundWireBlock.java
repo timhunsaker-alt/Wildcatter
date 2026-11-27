@@ -42,7 +42,12 @@ public class GroundWireBlock extends Block {
 
 	@Override
 	protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
-		neighborChanged(state, level, pos, this, null, movedByPiston);
+		// set by a command or a blueprint (not from its item), its arms are found here; set them with a neighbour update, since vanilla
+		// skips the one for this placement once the state has changed under it, and the older neighbours would never reach back
+		BlockState updated = withArms(state, level, pos);
+		if (updated != state) {
+			level.setBlock(pos, updated, Block.UPDATE_ALL);
+		}
 	}
 
 	private static BlockState withArms(BlockState state, BlockGetter level, BlockPos pos) {

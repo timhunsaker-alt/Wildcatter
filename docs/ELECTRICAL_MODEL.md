@@ -46,6 +46,8 @@ voltage transformers (wye-grounded, 1 MΩ a phase) give the 13.8 kV bus its grou
   hot/neutral roles; hot becomes A, B or C.
 - Overhead lines: one conductor per phase, strung between insulators. Ground level / indoor:
   multi-conductor cable (e.g. 3φ + N + G) as one block.
+- Single-phase cable (low tier, 2026-11-27, docs/phase4-conductors.md): hot (A), N and G in one sheathed block, as house wiring
+  is. A one-pole breaker and an in-line fuse switch only the hot and pass N and G through.
 - Line-to-line voltage = √3 × line-to-neutral (480 = √3 × 277, 400 = √3 × 230, 208 = √3 × 120).
 - Three-phase power: P = √3 × V_LL × I_L × PF.
 - Phase rotation matters: swapping two phases makes a motor run backward.

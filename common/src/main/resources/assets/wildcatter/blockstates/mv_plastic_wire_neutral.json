@@ -2,7 +2,8 @@
   "multipart": [
     {
       "when": {
-        "conductor": "a"
+        "conductor": "a",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/mv_plastic_wire_a_core"
@@ -16,6 +17,9 @@
           },
           {
             "conductor": "a"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -31,6 +35,9 @@
           },
           {
             "conductor": "a"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -47,6 +54,9 @@
           },
           {
             "conductor": "a"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -63,6 +73,9 @@
           },
           {
             "conductor": "a"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -79,6 +92,9 @@
           },
           {
             "conductor": "a"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -95,6 +111,9 @@
           },
           {
             "conductor": "a"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -105,7 +124,374 @@
     },
     {
       "when": {
-        "conductor": "b"
+        "conductor": "a",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "a",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "a",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "a"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_a_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "b",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/mv_plastic_wire_b_core"
@@ -119,6 +505,9 @@
           },
           {
             "conductor": "b"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -134,6 +523,9 @@
           },
           {
             "conductor": "b"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -150,6 +542,9 @@
           },
           {
             "conductor": "b"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -166,6 +561,9 @@
           },
           {
             "conductor": "b"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -182,6 +580,9 @@
           },
           {
             "conductor": "b"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -198,6 +599,9 @@
           },
           {
             "conductor": "b"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -208,7 +612,374 @@
     },
     {
       "when": {
-        "conductor": "c"
+        "conductor": "b",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "b",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "b",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "b"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_b_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "c",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/mv_plastic_wire_c_core"
@@ -222,6 +993,9 @@
           },
           {
             "conductor": "c"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -237,6 +1011,9 @@
           },
           {
             "conductor": "c"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -253,6 +1030,9 @@
           },
           {
             "conductor": "c"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -269,6 +1049,9 @@
           },
           {
             "conductor": "c"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -285,6 +1068,9 @@
           },
           {
             "conductor": "c"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -301,6 +1087,9 @@
           },
           {
             "conductor": "c"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -311,7 +1100,374 @@
     },
     {
       "when": {
-        "conductor": "n"
+        "conductor": "c",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "c",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "c",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "c"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_c_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "n",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/mv_plastic_wire_n_core"
@@ -325,6 +1481,9 @@
           },
           {
             "conductor": "n"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -340,6 +1499,9 @@
           },
           {
             "conductor": "n"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -356,6 +1518,9 @@
           },
           {
             "conductor": "n"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -372,6 +1537,9 @@
           },
           {
             "conductor": "n"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -388,6 +1556,9 @@
           },
           {
             "conductor": "n"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -404,6 +1575,9 @@
           },
           {
             "conductor": "n"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -414,7 +1588,374 @@
     },
     {
       "when": {
-        "conductor": "g"
+        "conductor": "n",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "n",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "n",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "n"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_n_arm_very_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "g",
+        "gauge": "small"
       },
       "apply": {
         "model": "wildcatter:block/mv_plastic_wire_g_core"
@@ -428,6 +1969,9 @@
           },
           {
             "conductor": "g"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -443,6 +1987,9 @@
           },
           {
             "conductor": "g"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -459,6 +2006,9 @@
           },
           {
             "conductor": "g"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -475,6 +2025,9 @@
           },
           {
             "conductor": "g"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -491,6 +2044,9 @@
           },
           {
             "conductor": "g"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
@@ -507,11 +2063,380 @@
           },
           {
             "conductor": "g"
+          },
+          {
+            "gauge": "small"
           }
         ]
       },
       "apply": {
         "model": "wildcatter:block/mv_plastic_wire_g_arm",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "g",
+        "gauge": "medium"
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_core_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_arm_medium"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_arm_medium",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_arm_medium",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_arm_medium",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_arm_medium",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "gauge": "medium"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_arm_medium",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "g",
+        "gauge": "large"
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_core_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_arm_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_arm_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_arm_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_arm_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_arm_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "gauge": "large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_arm_large",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "conductor": "g",
+        "gauge": "very_large"
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_core_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_arm_very_large"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_arm_very_large",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_arm_very_large",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_arm_very_large",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_arm_very_large",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "conductor": "g"
+          },
+          {
+            "gauge": "very_large"
+          }
+        ]
+      },
+      "apply": {
+        "model": "wildcatter:block/mv_plastic_wire_g_arm_very_large",
         "x": 90
       }
     }

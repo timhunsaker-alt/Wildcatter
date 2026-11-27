@@ -61,7 +61,24 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 	public void setSize(ConductorSize value) {
 		size = value;
 		setChanged();
+		syncGauge();
 		CircuitManager.markDirty(level);
+	}
+
+	/** Keeps the drawn thickness in step with the size (a wire from before gauges, or one given a size by a command or a test). */
+	private void syncGauge() {
+		if (level == null || level.isClientSide()) {
+			return;
+		}
+		BlockState state = level.getBlockState(worldPosition);   // the world's: a block entity's own copy can lag its arms
+		if (state.getBlock() == getBlockState().getBlock() && state.hasProperty(WireShape.GAUGE) && state.getValue(WireShape.GAUGE) != size().gauge()) {
+			level.setBlock(worldPosition, state.setValue(WireShape.GAUGE, size().gauge()), 2);
+		}
+	}
+
+	/** The undersized warning for the present current, or empty (ConductorSize#undersized). */
+	public String undersized() {
+		return size().undersized(amps);
 	}
 
 	private String metal() {
@@ -118,6 +135,7 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		if (level == null) {
 			return;
 		}
+		syncGauge();
 		hertz = circuit.hertz();
 		volts = circuit.voltage(node);
 		amps = circuit.through(node);
@@ -153,7 +171,10 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 			return;
 		}
 		int stage = wear >= 1.0 ? Tuning.WEAR_STAGES : (int) (wear * Tuning.WEAR_STAGES);
-		BlockState state = getBlockState();
+		BlockState state = level.getBlockState(worldPosition);   // the world's: a block entity's own copy can lag its arms
+		if (!state.hasProperty(CableBlock.WEAR)) {
+			return;
+		}
 		if (state.getValue(CableBlock.WEAR) != stage) {
 			level.setBlock(worldPosition, state.setValue(CableBlock.WEAR, stage), 2);
 			CircuitManager.markDirty(level);
@@ -184,7 +205,7 @@ public class WireBlockEntity extends BlockEntity implements CircuitPart, Inspect
 		String insulation = block.plastic() ? "plastic insulated, safe to touch"
 				: !block.wool() ? "bare " + metal() + ", live to the touch"
 				: wear >= 1.0 ? "wool worn OUT, bare " + metal() : "wool " + Math.round(wear * 100) + "% worn";
-		return Component.literal(getBlockState().getValue(CableBlock.CONDUCTOR).label() + " wire (" + block.voltage().label() + (block.voltage() == Voltage.LOW ? "" : ", " + fmt(block.voltage().nominal()) + " V to neutral") + ", " + size().label() + ", " + insulation + "): "
+		return Component.literal((undersized().isEmpty() ? "" : undersized() + ". ") + getBlockState().getValue(CableBlock.CONDUCTOR).label() + " wire (" + block.voltage().label() + (block.voltage() == Voltage.LOW ? "" : ", " + fmt(block.voltage().nominal()) + " V to neutral") + ", " + size().label() + ", " + insulation + "): "
 				+ fmt(volts) + " V, " + fmt(amps) + " A of " + fmt(ampacity()) + " A allowed"
 				+ (dev.wildcatter.energy.WireHeat.readout(heat)) + String.format(", %.1f Hz", hertz));
 	}

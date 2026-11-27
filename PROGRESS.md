@@ -1699,6 +1699,10 @@ sized for a 40-pot line.
   have been checked in model previews and NeoForge server scenes, not yet in the client (no client scene was run in the wave).
   Coker gas keeps a gas set's full rating (its heavier hydrocarbons' knock is not modelled). No new script-drawn textures.
 
+- Wire look (2026-11-27): the single-phase cable's sheath is a script-drawn placeholder, `single_phase_cable_placeholder` (ivory with a
+  printed stripe); it wants Ludo art. The terminals, glands and leads are block entity drawing in the mod's materials. The leads into wall
+  gear are drawn only while the wire's own cell is in view.
+
 ## Ideas not started
 Ideas live in one list: `docs/ROADMAP.md`, "Ideas (not scheduled)". Phase 10 took switches and panels, the art, drives, the DC tier
 and cranes from it.
@@ -2517,3 +2521,23 @@ From filming episode 3; decisions in `docs/questions/bfs-fixes2.md`.
 - **Tests:** NeoForge `recipes_unique` (44 colliding pairs before, none after) and `bfs03_big_part_grounded`; Fabric client `readout`.
 - **Known gaps:** `casing_lot`, `well_control`, `blowout` and `oil_mud` still search seeds for a deep field under a fixed hole and can fail when the
   hole is near a deep cell's edge (rerun).
+
+## Wire, cable and pipe look (2026-11-27; branch `wire-look`)
+Tim's four changes; the details in `docs/phase4-conductors.md` ("How conductors look and the single-phase cable").
+- **Fittings:** `client/TerminalRenderer` draws a terminal block and lug (wire) or cable gland (cable) where a run meets a machine, at the
+  machine's surface when it is drawn smaller than its cell, and carries a run into the box of wall, floor or ceiling gear; pipes have a
+  `flange` end at a machine's nozzle and a fitting only at turns, branches and ends. Receptacles 1.8 times true size; a plug adapter
+  facing its receptacle is `seated` (its plug in the receptacle, its cord back to it).
+- **Fixed:** a wire, cable or pipe set by command or blueprint left the older neighbour without its arm (vanilla skips the neighbour
+  update when `onPlace` changes the state; `onPlace` now does the update itself).
+- **Gauge:** a `gauge` blockstate on wire and cable (four steps, `ConductorSize#gauge`), set on placement from the stack and kept in step
+  by the block entity; spans draw thicker too. Only wool wire keeps `wear` (the state count of bare and plastic wire is unchanged).
+- **Undersized:** `ConductorSize#undersized` in the wire, cable and insulator readouts.
+- **Single-phase cable:** `single_phase_cable` (A, N, G; low tier; building sizes); breakers and in-line fuses pass N and G; Light a
+  lamp takes it (item tags `lamp_hot_wiring`, `lamp_neutral_wiring`); Field Manual page SINGLE-PHASE CABLE.
+- **Assets:** `tools/wire_look.py` (run alone, or by `tools/make_assets.py` at its end); the receptacle and plug in
+  `tools/models/fixtures.py`.
+- **Tests:** NeoForge `single_phase_cable_lamp`, `single_phase_cable_one_conductor`, `wire_undersized`, `fittings_on_placement`;
+  Fabric client `wireLook` (screenshots; checks the lamp lights and the arms join).
+- **Known gaps:** see Known gaps (the single-phase cable's placeholder texture).
+

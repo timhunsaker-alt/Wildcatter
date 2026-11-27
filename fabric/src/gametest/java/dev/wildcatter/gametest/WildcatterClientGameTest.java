@@ -247,6 +247,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			if (only("bessParts")) {   // Phase 22b (WILDCATTER_ONLY=bess is the filmed scene, Films010ClientGameTest)
 				new ChemicalClientScenes(context, server, y, up, -15000).bess();
 			}
+			if (only("wireLook")) {   // wires, cables and pipes that read as connected (2026-11-27)
+				new WireLookClientScenes(context, server, y, up, -16000).run();
+			}
 			if (only("guyWire")) {
 				new GridClientScenes(context, server, y, up, -10400).guyWire();
 			}

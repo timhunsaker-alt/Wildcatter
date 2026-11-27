@@ -1,0 +1,7 @@
+{
+  "parent": "wildcatter:block/conductor/single_cable_core_medium",
+  "textures": {
+    "cable": "wildcatter:block/single_phase_cable_placeholder",
+    "particle": "wildcatter:block/single_phase_cable_placeholder"
+  }
+}

@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
@@ -45,13 +44,9 @@ public class ValveRenderer implements BlockEntityRenderer<ValveBlockEntity, Valv
 		state.position = valve.shownPosition;
 		BlockState block = valve.getBlockState();
 		state.type = block.getBlock() instanceof ValveBlock v ? v.type() : ValveBlock.Type.CONTROL;
-		boolean x = on(block, BlockStateProperties.EAST) || on(block, BlockStateProperties.WEST);
-		boolean z = on(block, BlockStateProperties.NORTH) || on(block, BlockStateProperties.SOUTH);
+		boolean x = dev.wildcatter.block.PipeBlock.joined(block, net.minecraft.core.Direction.EAST) || dev.wildcatter.block.PipeBlock.joined(block, net.minecraft.core.Direction.WEST);
+		boolean z = dev.wildcatter.block.PipeBlock.joined(block, net.minecraft.core.Direction.NORTH) || dev.wildcatter.block.PipeBlock.joined(block, net.minecraft.core.Direction.SOUTH);
 		state.alongX = x || !z;
-	}
-
-	private static boolean on(BlockState state, net.minecraft.world.level.block.state.properties.BooleanProperty side) {
-		return state.hasProperty(side) && state.getValue(side);
 	}
 
 	@Override

@@ -41,18 +41,20 @@
       "id": "lamp",
       "title": "Light a lamp",
       "icon": "wildcatter:electric_lamp",
-      "text": "Electricity needs a loop: a hot wire (red) out from the turbine and a neutral wire (black) back. Wire a lamp across both.",
+      "text": "Electricity needs a loop: a hot wire (red) out from the turbine and a neutral wire (black) back. Wire a lamp across both. Or run single-phase cable, hot, neutral and ground in one sheath (craft it from a red wire, a black wire and a ground wire): it does both at once.",
       "requires": [
         "steam"
       ],
       "tasks": [
         {
-          "item": "wildcatter:wool_wire_hot",
-          "count": 4
+          "item": "#wildcatter:lamp_hot_wiring",
+          "count": 4,
+          "text": "4 hot wires (red) or single-phase cable"
         },
         {
-          "item": "wildcatter:wool_wire_neutral",
-          "count": 4
+          "item": "#wildcatter:lamp_neutral_wiring",
+          "count": 4,
+          "text": "4 neutral wires (black) or single-phase cable"
         },
         {
           "item": "wildcatter:electric_lamp",

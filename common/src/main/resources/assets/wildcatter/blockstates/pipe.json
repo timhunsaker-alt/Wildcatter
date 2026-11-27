@@ -2,12 +2,509 @@
   "multipart": [
     {
       "apply": {
+        "model": "wildcatter:block/pipe_run"
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "north": "false",
+            "south": "false",
+            "east": "false",
+            "west": "false",
+            "up": "false",
+            "down": "false"
+          },
+          {
+            "north": "!false",
+            "south": "false",
+            "east": "false",
+            "west": "false",
+            "up": "false",
+            "down": "false"
+          },
+          {
+            "north": "false",
+            "south": "!false",
+            "east": "false",
+            "west": "false",
+            "up": "false",
+            "down": "false"
+          },
+          {
+            "north": "false",
+            "south": "false",
+            "east": "!false",
+            "west": "false",
+            "up": "false",
+            "down": "false"
+          },
+          {
+            "north": "!false",
+            "south": "false",
+            "east": "!false",
+            "west": "false",
+            "up": "false",
+            "down": "false"
+          },
+          {
+            "north": "false",
+            "south": "!false",
+            "east": "!false",
+            "west": "false",
+            "up": "false",
+            "down": "false"
+          },
+          {
+            "north": "!false",
+            "south": "!false",
+            "east": "!false",
+            "west": "false",
+            "up": "false",
+            "down": "false"
+          },
+          {
+            "north": "false",
+            "south": "false",
+            "east": "false",
+            "west": "!false",
+            "up": "false",
+            "down": "false"
+          },
+          {
+            "north": "!false",
+            "south": "false",
+            "east": "false",
+            "west": "!false",
+            "up": "false",
+            "down": "false"
+          },
+          {
+            "north": "false",
+            "south": "!false",
+            "east": "false",
+            "west": "!false",
+            "up": "false",
+            "down": "false"
+          },
+          {
+            "north": "!false",
+            "south": "!false",
+            "east": "false",
+            "west": "!false",
+            "up": "false",
+            "down": "false"
+          },
+          {
+            "north": "!false",
+            "south": "false",
+            "east": "!false",
+            "west": "!false",
+            "up": "false",
+            "down": "false"
+          },
+          {
+            "north": "false",
+            "south": "!false",
+            "east": "!false",
+            "west": "!false",
+            "up": "false",
+            "down": "false"
+          },
+          {
+            "north": "!false",
+            "south": "!false",
+            "east": "!false",
+            "west": "!false",
+            "up": "false",
+            "down": "false"
+          },
+          {
+            "north": "false",
+            "south": "false",
+            "east": "false",
+            "west": "false",
+            "up": "!false",
+            "down": "false"
+          },
+          {
+            "north": "!false",
+            "south": "false",
+            "east": "false",
+            "west": "false",
+            "up": "!false",
+            "down": "false"
+          },
+          {
+            "north": "false",
+            "south": "!false",
+            "east": "false",
+            "west": "false",
+            "up": "!false",
+            "down": "false"
+          },
+          {
+            "north": "!false",
+            "south": "!false",
+            "east": "false",
+            "west": "false",
+            "up": "!false",
+            "down": "false"
+          },
+          {
+            "north": "false",
+            "south": "false",
+            "east": "!false",
+            "west": "false",
+            "up": "!false",
+            "down": "false"
+          },
+          {
+            "north": "!false",
+            "south": "false",
+            "east": "!false",
+            "west": "false",
+            "up": "!false",
+            "down": "false"
+          },
+          {
+            "north": "false",
+            "south": "!false",
+            "east": "!false",
+            "west": "false",
+            "up": "!false",
+            "down": "false"
+          },
+          {
+            "north": "!false",
+            "south": "!false",
+            "east": "!false",
+            "west": "false",
+            "up": "!false",
+            "down": "false"
+          },
+          {
+            "north": "false",
+            "south": "false",
+            "east": "false",
+            "west": "!false",
+            "up": "!false",
+            "down": "false"
+          },
+          {
+            "north": "!false",
+            "south": "false",
+            "east": "false",
+            "west": "!false",
+            "up": "!false",
+            "down": "false"
+          },
+          {
+            "north": "false",
+            "south": "!false",
+            "east": "false",
+            "west": "!false",
+            "up": "!false",
+            "down": "false"
+          },
+          {
+            "north": "!false",
+            "south": "!false",
+            "east": "false",
+            "west": "!false",
+            "up": "!false",
+            "down": "false"
+          },
+          {
+            "north": "false",
+            "south": "false",
+            "east": "!false",
+            "west": "!false",
+            "up": "!false",
+            "down": "false"
+          },
+          {
+            "north": "!false",
+            "south": "false",
+            "east": "!false",
+            "west": "!false",
+            "up": "!false",
+            "down": "false"
+          },
+          {
+            "north": "false",
+            "south": "!false",
+            "east": "!false",
+            "west": "!false",
+            "up": "!false",
+            "down": "false"
+          },
+          {
+            "north": "!false",
+            "south": "!false",
+            "east": "!false",
+            "west": "!false",
+            "up": "!false",
+            "down": "false"
+          },
+          {
+            "north": "false",
+            "south": "false",
+            "east": "false",
+            "west": "false",
+            "up": "false",
+            "down": "!false"
+          },
+          {
+            "north": "!false",
+            "south": "false",
+            "east": "false",
+            "west": "false",
+            "up": "false",
+            "down": "!false"
+          },
+          {
+            "north": "false",
+            "south": "!false",
+            "east": "false",
+            "west": "false",
+            "up": "false",
+            "down": "!false"
+          },
+          {
+            "north": "!false",
+            "south": "!false",
+            "east": "false",
+            "west": "false",
+            "up": "false",
+            "down": "!false"
+          },
+          {
+            "north": "false",
+            "south": "false",
+            "east": "!false",
+            "west": "false",
+            "up": "false",
+            "down": "!false"
+          },
+          {
+            "north": "!false",
+            "south": "false",
+            "east": "!false",
+            "west": "false",
+            "up": "false",
+            "down": "!false"
+          },
+          {
+            "north": "false",
+            "south": "!false",
+            "east": "!false",
+            "west": "false",
+            "up": "false",
+            "down": "!false"
+          },
+          {
+            "north": "!false",
+            "south": "!false",
+            "east": "!false",
+            "west": "false",
+            "up": "false",
+            "down": "!false"
+          },
+          {
+            "north": "false",
+            "south": "false",
+            "east": "false",
+            "west": "!false",
+            "up": "false",
+            "down": "!false"
+          },
+          {
+            "north": "!false",
+            "south": "false",
+            "east": "false",
+            "west": "!false",
+            "up": "false",
+            "down": "!false"
+          },
+          {
+            "north": "false",
+            "south": "!false",
+            "east": "false",
+            "west": "!false",
+            "up": "false",
+            "down": "!false"
+          },
+          {
+            "north": "!false",
+            "south": "!false",
+            "east": "false",
+            "west": "!false",
+            "up": "false",
+            "down": "!false"
+          },
+          {
+            "north": "false",
+            "south": "false",
+            "east": "!false",
+            "west": "!false",
+            "up": "false",
+            "down": "!false"
+          },
+          {
+            "north": "!false",
+            "south": "false",
+            "east": "!false",
+            "west": "!false",
+            "up": "false",
+            "down": "!false"
+          },
+          {
+            "north": "false",
+            "south": "!false",
+            "east": "!false",
+            "west": "!false",
+            "up": "false",
+            "down": "!false"
+          },
+          {
+            "north": "!false",
+            "south": "!false",
+            "east": "!false",
+            "west": "!false",
+            "up": "false",
+            "down": "!false"
+          },
+          {
+            "north": "!false",
+            "south": "false",
+            "east": "false",
+            "west": "false",
+            "up": "!false",
+            "down": "!false"
+          },
+          {
+            "north": "false",
+            "south": "!false",
+            "east": "false",
+            "west": "false",
+            "up": "!false",
+            "down": "!false"
+          },
+          {
+            "north": "!false",
+            "south": "!false",
+            "east": "false",
+            "west": "false",
+            "up": "!false",
+            "down": "!false"
+          },
+          {
+            "north": "false",
+            "south": "false",
+            "east": "!false",
+            "west": "false",
+            "up": "!false",
+            "down": "!false"
+          },
+          {
+            "north": "!false",
+            "south": "false",
+            "east": "!false",
+            "west": "false",
+            "up": "!false",
+            "down": "!false"
+          },
+          {
+            "north": "false",
+            "south": "!false",
+            "east": "!false",
+            "west": "false",
+            "up": "!false",
+            "down": "!false"
+          },
+          {
+            "north": "!false",
+            "south": "!false",
+            "east": "!false",
+            "west": "false",
+            "up": "!false",
+            "down": "!false"
+          },
+          {
+            "north": "false",
+            "south": "false",
+            "east": "false",
+            "west": "!false",
+            "up": "!false",
+            "down": "!false"
+          },
+          {
+            "north": "!false",
+            "south": "false",
+            "east": "false",
+            "west": "!false",
+            "up": "!false",
+            "down": "!false"
+          },
+          {
+            "north": "false",
+            "south": "!false",
+            "east": "false",
+            "west": "!false",
+            "up": "!false",
+            "down": "!false"
+          },
+          {
+            "north": "!false",
+            "south": "!false",
+            "east": "false",
+            "west": "!false",
+            "up": "!false",
+            "down": "!false"
+          },
+          {
+            "north": "false",
+            "south": "false",
+            "east": "!false",
+            "west": "!false",
+            "up": "!false",
+            "down": "!false"
+          },
+          {
+            "north": "!false",
+            "south": "false",
+            "east": "!false",
+            "west": "!false",
+            "up": "!false",
+            "down": "!false"
+          },
+          {
+            "north": "false",
+            "south": "!false",
+            "east": "!false",
+            "west": "!false",
+            "up": "!false",
+            "down": "!false"
+          },
+          {
+            "north": "!false",
+            "south": "!false",
+            "east": "!false",
+            "west": "!false",
+            "up": "!false",
+            "down": "!false"
+          }
+        ]
+      },
+      "apply": {
         "model": "wildcatter:block/pipe_core"
       }
     },
     {
       "when": {
-        "north": "true"
+        "north": "true|flange"
       },
       "apply": {
         "model": "wildcatter:block/pipe_arm"
@@ -15,7 +512,15 @@
     },
     {
       "when": {
-        "east": "true"
+        "north": "flange"
+      },
+      "apply": {
+        "model": "wildcatter:block/pipe_flange"
+      }
+    },
+    {
+      "when": {
+        "east": "true|flange"
       },
       "apply": {
         "model": "wildcatter:block/pipe_arm",
@@ -24,7 +529,16 @@
     },
     {
       "when": {
-        "south": "true"
+        "east": "flange"
+      },
+      "apply": {
+        "model": "wildcatter:block/pipe_flange",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "true|flange"
       },
       "apply": {
         "model": "wildcatter:block/pipe_arm",
@@ -33,7 +547,16 @@
     },
     {
       "when": {
-        "west": "true"
+        "south": "flange"
+      },
+      "apply": {
+        "model": "wildcatter:block/pipe_flange",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "true|flange"
       },
       "apply": {
         "model": "wildcatter:block/pipe_arm",
@@ -42,7 +565,16 @@
     },
     {
       "when": {
-        "up": "true"
+        "west": "flange"
+      },
+      "apply": {
+        "model": "wildcatter:block/pipe_flange",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "up": "true|flange"
       },
       "apply": {
         "model": "wildcatter:block/pipe_arm",
@@ -51,10 +583,28 @@
     },
     {
       "when": {
-        "down": "true"
+        "up": "flange"
+      },
+      "apply": {
+        "model": "wildcatter:block/pipe_flange",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "down": "true|flange"
       },
       "apply": {
         "model": "wildcatter:block/pipe_arm",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "down": "flange"
+      },
+      "apply": {
+        "model": "wildcatter:block/pipe_flange",
         "x": 90
       }
     }

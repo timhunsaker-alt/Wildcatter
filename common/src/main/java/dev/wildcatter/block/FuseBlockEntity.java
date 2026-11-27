@@ -88,7 +88,7 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Protect
 
 	@Override
 	public boolean hasPort(Direction face, Conductor role, Voltage voltage) {
-		return (role == Conductor.A || role == Conductor.B || role == Conductor.C) && voltage == voltage() && (face == facing() || face == facing().getOpposite());
+		return (role == Conductor.A || role == Conductor.B || role == Conductor.C || !cutout()) && voltage == voltage() && (face == facing() || face == facing().getOpposite());
 	}
 
 	/** Latched once it has hung on a pole: it then falls when its pole goes (a cutout or transformer set down elsewhere never does). */
@@ -113,6 +113,13 @@ public class FuseBlockEntity extends BlockEntity implements CircuitPart, Protect
 			circuit.publish(worldPosition, back);   // a lead from a line insulator lands on the line (top) contact
 		}
 		circuit.hotPort(worldPosition, facing(), voltage(), front, Tuning.CONTACT_OHMS / 2, false);
+		if (!cutout()) {   // a cable's neutral and ground pass an in-line fuse unswitched
+			for (Conductor passing : new Conductor[] {Conductor.N, Conductor.G}) {
+				int through = circuit.node();
+				circuit.port(worldPosition, facing().getOpposite(), passing, voltage(), through, Tuning.CONTACT_OHMS / 2, false);
+				circuit.port(worldPosition, facing(), passing, voltage(), through, Tuning.CONTACT_OHMS / 2, false);
+			}
+		}
 	}
 
 	@Override

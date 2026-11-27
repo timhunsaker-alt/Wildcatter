@@ -1,0 +1,7 @@
+{
+  "parent": "wildcatter:block/conductor/wire_core_medium",
+  "textures": {
+    "cable": "wildcatter:block/industrial_wire_g",
+    "particle": "wildcatter:block/industrial_wire_g"
+  }
+}

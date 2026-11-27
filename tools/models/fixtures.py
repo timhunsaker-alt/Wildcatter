@@ -6,9 +6,14 @@ import gearlib as g
 PLUGS = ["nema_5_15", "nema_5_20", "nema_14_50", "cee_7", "iec_60309_blue", "nema_l21_30", "nema_l22_30", "iec_60309_red_32", "iec_60309_red_63"]
 # plate width and height, box depth: a duplex plate is 0.07 x 0.115 m; single 50 A and twist-lock plates 0.115 square; an IEC
 # 60309 wall socket's housing about 0.1 x 0.14 x 0.09 m
-PLATE = {"nema_5_15": (0.07, 0.115, 0.05), "nema_5_20": (0.07, 0.115, 0.05), "nema_14_50": (0.115, 0.115, 0.06), "cee_7": (0.08, 0.08, 0.045),
+# (2026-11-27: the 5-15 and 5-20 in a surface 4 in square box with a raised duplex cover, 0.115 m square, as on a shop wall, so it reads)
+PLATE = {"nema_5_15": (0.115, 0.115, 0.055), "nema_5_20": (0.115, 0.115, 0.055), "nema_14_50": (0.115, 0.115, 0.06), "cee_7": (0.08, 0.08, 0.045),
 	"nema_l21_30": (0.115, 0.115, 0.06), "nema_l22_30": (0.115, 0.115, 0.06), "iec_60309_blue": (0.1, 0.14, 0.09),
 	"iec_60309_red_32": (0.1, 0.14, 0.09), "iec_60309_red_63": (0.12, 0.16, 0.1)}
+# Drawn at 1.8 times true size (2026-11-27, to Tim): the wire feeding a receptacle is drawn far thicker than life, and at true size the
+# receptacle came out smaller than its wire and did not read. This fills about the box it is clicked by (ReceptacleBlock's shape).
+SCALE = 1.8
+PLATE = {k: (min(w * SCALE, 0.26), min(h * SCALE, 0.26), d * 1.6) for k, (w, h, d) in PLATE.items()}
 WHERE = ("wall", "floor", "ceiling")
 WALL_V = 0.4   # receptacles sit lower on a wall than switches
 
@@ -30,13 +35,26 @@ def receptacle(kind, where):
 	return M
 
 
-def plug(kind, where):
-	"""The plug in its receptacle's face (the receptacle is beyond this cell's face), its cord running out across the cell."""
-	M = g.model(f"plug_{kind}_{where}", {"face": f"block/plug_{kind}"}, "rubber")
+def plug(kind, where, seated=False):
+	"""The plug adapter. Seated (its receptacle on the far side of the next cell, facing it): the plug pushed into the receptacle's face
+	there, its cord back across that cell to the adapter, a moulded power-adapter box at this cell's face. Otherwise the plug at this
+	cell's face, its cord running out across the cell."""
+	M = g.model(f"plug_{kind}_{where}{'_seated' if seated else ''}", {"face": f"block/plug_{kind}"}, "rubber")
 	F = g.Face(M, where)
-	w, h, _ = PLATE[kind]
+	w, h, d = PLATE[kind]
 	v = WALL_V if where == "wall" else 0.5
 	r = min(w, h) * 0.38
+	cord = 0.006 if w < 0.1 else 0.01
+	if seated:
+		face = -1.0 + (0.016 if where == "floor" else d)                # the receptacle's face, one cell back
+		F.cylinder(0.5, v, r, face, face + 0.06, "rubber", 12)          # the plug body, pushed home
+		F.cylinder(0.5, v, r * 0.45, face + 0.06, face + 0.11, "rubber", 8)   # its strain relief
+		F.cylinder(0.5, v, cord * 1.6, face + 0.11, 0.0, "rubber", 6)  # the cord back to the adapter (drawn heavier than life to read)
+		F.box((0.5 - 0.1, v - 0.1, 0.0), (0.5 + 0.1, v + 0.1, 0.22), "polymer")        # the adapter's moulded box
+		F.decal((0.5 - 0.06, v - 0.06, 0.22), (0.5 + 0.06, v + 0.06, 0.224), "face", "polymer")
+		F.cylinder(0.5, v, 0.035, 0.0, 0.03, "rubber", 8)              # the cord's grommet
+		F.collide((0.4, v - 0.1, 0.0), (0.6, v + 0.1, 0.22))
+		return M
 	F.cylinder(0.5, v, r, 0.0, 0.07, "rubber", 12)                     # the plug body
 	F.decal((0.5 - r * 0.7, v - r * 0.7, 0.07), (0.5 + r * 0.7, v + r * 0.7, 0.074), "face", "rubber")
 	F.cylinder(0.5, v, r * 0.45, 0.074, 0.12, "rubber", 8)             # strain relief
@@ -102,7 +120,7 @@ def unit_heater(where, lit):
 LOOKS = []
 for kind in PLUGS:
 	LOOKS += g.single([receptacle(kind, w) for w in WHERE], f"receptacle_{kind}")
-	LOOKS += g.single([plug(kind, w) for w in WHERE], f"plug_{kind}")
+	LOOKS += g.single([plug(kind, w) for w in WHERE] + [plug(kind, w, True) for w in WHERE], f"plug_{kind}")
 for name, make in (("electric_lamp", lamp), ("electric_heater", wall_heater), ("three_phase_heater", unit_heater)):
 	LOOKS += g.single([make(w, lit) for lit in (False, True) for w in WHERE], name)
 M = LOOKS[0]
@@ -124,7 +142,10 @@ def attached(name, suffix=""):
 
 def after():
 	for kind in PLUGS:
-		for name in (f"receptacle_{kind}", f"plug_{kind}"):
-			g.save_blockstate(name, {f"attach={face}": v for face, v in attached(name).items()})
+		name = f"receptacle_{kind}"
+		g.save_blockstate(name, {f"attach={face}": v for face, v in attached(name).items()})
+		name = f"plug_{kind}"
+		g.save_blockstate(name, {f"attach={face},seated={seated}": v for seated in ("false", "true")
+			for face, v in attached(name, "_seated" if seated == "true" else "").items()})
 	for name in ("electric_lamp", "electric_heater", "three_phase_heater"):
 		g.save_blockstate(name, {f"attach={face},lit={lit}": v for lit in ("false", "true") for face, v in attached(name, "_lit" if lit == "true" else "").items()})

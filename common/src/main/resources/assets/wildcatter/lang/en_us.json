@@ -748,5 +748,6 @@
   "subtitles.wildcatter.choke_flow": "Choke manifold rushes",
   "subtitles.wildcatter.mud_gas_separator": "Mud-gas separator churns",
   "subtitles.wildcatter.storage_compressor": "Gas compressor thumps",
-  "subtitles.wildcatter.frasch_lift": "Frasch well gurgles"
+  "subtitles.wildcatter.frasch_lift": "Frasch well gurgles",
+  "block.wildcatter.single_phase_cable": "Single-Phase Cable (LV, hot, neutral, ground)"
 }
