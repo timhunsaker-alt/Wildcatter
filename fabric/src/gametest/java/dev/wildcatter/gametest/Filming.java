@@ -98,6 +98,13 @@ public final class Filming {
 	private final Thread writer;
 	private volatile boolean stopping, closed;
 	private long grabbed, written, dropped, resizing, startNanos;
+	/** Frames grabbed so far, for the test thread (the film's time is this over 60 at 60 fps). */
+	private volatile long frameCount;
+	/**
+	 * 60 fps takes: run on the client thread at the start of every frame, once the frame before is filmed, with the frames grabbed so
+	 * far (Bfs01Episode glides its drawn cursor a frame at a time with it, so a cursor move is as smooth as the camera's).
+	 */
+	public static volatile java.util.function.LongConsumer perFrame;
 	/** Of the dropped: the frame not the film's size, every read-back buffer busy, the writer behind. */
 	private long droppedSize, droppedBusy, droppedBehind;
 	/** 60 fps: the times the game waited for a read-back buffer and for the writer, and the clock time spent waiting. */
@@ -262,6 +269,10 @@ public final class Filming {
 		}
 		if (!film.stopping) {
 			film.grab(film.client);
+			java.util.function.LongConsumer each = perFrame;
+			if (each != null) {
+				each.accept(film.frameCount);
+			}
 		}
 		return FRAMES_PER_TICK;
 	}
@@ -405,6 +416,7 @@ public final class Filming {
 		}
 		busy[i] = true;
 		grabbed++;
+		frameCount = grabbed;
 		GpuBuffer buffer = buffers[i];
 		RenderSystem.getDevice().createCommandEncoder().copyTextureToBuffer(texture, buffer, 0L, () -> {
 			try {
@@ -497,6 +509,11 @@ public final class Filming {
 	}
 
 	/** Stops the recording and writes the file. */
+	/** Frames grabbed so far (any thread): the take's length in film frames. */
+	long frames() {
+		return frameCount;
+	}
+
 	void stop() {
 		if (process == null) {
 			return;
