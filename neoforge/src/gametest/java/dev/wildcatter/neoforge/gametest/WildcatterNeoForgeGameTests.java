@@ -114,6 +114,7 @@ public class WildcatterNeoForgeGameTests {
 	static {
 		QUEST_SCENES.putAll(Bfs01Scenes.scenes());   // Built From Scratch ep 1: the Getting started chapter and steel in the blast furnace
 		QUEST_SCENES.putAll(Bfs03Scenes.scenes());   // Built From Scratch ep 3: the seismograph's readings and Find a field
+		QUEST_SCENES.putAll(Bfs04Scenes.scenes());   // Built From Scratch ep 4: the episode's crafting grids
 		QUEST_SCENES.putAll(RecipeScenes.scenes());   // no two crafting recipes give different things for the same grid
 	}
 	/** Phase 21.2's milestone scenes (QuestScenes.machineScenes): a plant each, so room round them and time for a set to start. */
@@ -122,6 +123,7 @@ public class WildcatterNeoForgeGameTests {
 	static {
 		QUEST_MACHINE_SCENES.putAll(Bfs02Scenes.scenes());   // Built From Scratch ep 2: the First power chapter on the episode's layout
 		QUEST_MACHINE_SCENES.putAll(Bfs03Scenes.machineScenes());
+		QUEST_MACHINE_SCENES.putAll(Bfs04Scenes.machineScenes());   // Built From Scratch ep 4: the gas genset, the rig on a starter, the pole line
 		QUEST_MACHINE_SCENES.putAll(WireLookScenes.scenes());   // single-phase cable, sizes drawn, the undersized warning, fittings on placement   // Built From Scratch ep 3: the lease on the dry-type, no flare then a flare, crude
 	}
 

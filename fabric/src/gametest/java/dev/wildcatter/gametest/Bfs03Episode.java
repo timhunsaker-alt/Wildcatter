@@ -66,11 +66,20 @@ final class Bfs03Episode {
 	private BlockPos boiler, turbine, lamp;
 
 	Bfs03Episode(Bfs03Films t) {
+		this(t, pick());
+	}
+
+	/** Episode 3 with the given shots wanted (Bfs04Films plays it through with none, to leave the world as episode 3 left it). */
+	Bfs03Episode(Bfs03Films t, Set<String> shots) {
 		this.t = t;
 		this.context = t.context;
 		this.server = t.server;
+		this.shots = shots;
+	}
+
+	private static Set<String> pick() {
 		String pick = System.getenv("BFS_SHOTS");
-		shots = pick == null || pick.isBlank() ? null : Set.of(pick.split(","));
+		return pick == null || pick.isBlank() ? null : Set.of(pick.split(","));
 	}
 
 	static void log(String s) {
