@@ -1400,10 +1400,11 @@ final class Bfs02Episode {
 	private void protection(int n) {
 		give("minecraft:glass_pane", 6, "more glass from the river's sand");
 		give("minecraft:iron_nugget", 2, "an iron ingot crafted into nuggets");
+		give("minecraft:iron_ingot", 1, "an iron ingot for the ground rods' core");   // the rod is copper, iron, copper (master 486c7446)
 		atTable(n, "protect_craft", 9000);
 		tableCraft(3, new String[] {"ici", "iri", "ici"}, keys('i', Items.IRON_INGOT, 'c', Items.COPPER_INGOT, 'r', Items.REDSTONE), 1, "breaker");
 		tableCraft(3, new String[] {"ggg", "ncn", "ggg"}, keys('g', Items.GLASS_PANE, 'n', Items.IRON_NUGGET, 'c', Items.COPPER_INGOT), 1, "fuses");
-		tableCraft(3, new String[] {" c ", " c ", " c "}, keys('c', Items.COPPER_INGOT), 1, "ground rods");
+		tableCraft(3, new String[] {" c ", " i ", " c "}, keys('c', Items.COPPER_INGOT, 'i', Items.IRON_INGOT), 1, "ground rods");
 		context.waitTicks(10);
 		closeScreen();
 		waitQuest("protection");

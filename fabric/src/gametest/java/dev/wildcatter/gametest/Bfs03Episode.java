@@ -49,7 +49,8 @@ import net.minecraft.world.phys.Vec3;
  * and its trees cleared off camera.
  * <p>
  * Film only: names that carry a standard's body or a voltage not read from the standard are shown without them (labels()); the game's
- * action-bar readouts, which run off the screen's edges when long, are drawn wrapped and held for a few seconds (readoutHook()). Films land
+ * action-bar readouts, which run off the screen's edges when long, are drawn wrapped and held for a few seconds (readoutHook()), except in
+ * the GAME_READOUT films, re-shot once the game wrapped them itself. Films land
  * in {@code build/scene-videos/bfs03__NN_<shot>.mov}; BFS_SHOTS picks shots by number or name (the rest run unfilmed).
  */
 final class Bfs03Episode {
@@ -213,6 +214,13 @@ final class Bfs03Episode {
 	private static volatile long heldAt;
 	/** How long a readout stays up: the game's own fades after three seconds, too short to read a long line on a film. */
 	static final int READOUT_HOLD = 170;
+	/**
+	 * Films re-shot after the game learnt to wrap long readouts itself (master 486c7446, ReadoutOverlay): in these the readout is the
+	 * game's own, not this film-only wrap. They are the shots whose rig or pumpjack readout changed to grounded (a rod against any cell of
+	 * a big part grounds it), filmed again for that (BFS patch, take 3).
+	 */
+	static final Set<String> GAME_READOUT = Set.of("bfs03__06_power_place", "bfs03__09_jack_place", "bfs03__10_mistake");
+	private static volatile boolean gameReadout;
 
 	private static Object hudField(Object hud, String name) {
 		try {
@@ -236,6 +244,10 @@ final class Bfs03Episode {
 		net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry.replaceElement(
 				net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements.OVERLAY_MESSAGE, old -> (g, delta) -> {
 					var mc = net.minecraft.client.Minecraft.getInstance();
+					if (gameReadout) {
+						old.extractRenderState(g, delta);   // the game's own readout (ReadoutOverlay)
+						return;
+					}
 					if (mc.level == null) {
 						return;
 					}
@@ -294,6 +306,7 @@ final class Bfs03Episode {
 			return;
 		}
 		filmId = String.format(Locale.ROOT, "bfs03__%02d_%s", n, name);
+		gameReadout = GAME_READOUT.contains(filmId);
 		clearReadout();
 		context.waitTicks(2);
 		film = context.computeOnClient(client -> Filming.start(client, filmId));
