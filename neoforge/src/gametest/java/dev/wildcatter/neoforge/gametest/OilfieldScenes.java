@@ -457,17 +457,21 @@ final class OilfieldScenes {
 		BlockPos o = abs(helper, 0, 0, 0);
 		int y = FLOOR_Y - o.getY() + 1;
 		BlockPos hole = abs(helper, 30, y, 0);
+		// Fields keep clear of their cell's edges, so no seed puts one under a column near a cell's corner: read the fields over the
+		// middle of the hole's deep cell instead, wherever the test lands.
+		int dx = Math.floorDiv(hole.getX(), Tuning.DEEP_FIELD_CELL) * Tuning.DEEP_FIELD_CELL + Tuning.DEEP_FIELD_CELL / 2 - hole.getX();
+		int dz = Math.floorDiv(hole.getZ(), Tuning.DEEP_FIELD_CELL) * Tuning.DEEP_FIELD_CELL + Tuning.DEEP_FIELD_CELL / 2 - hole.getZ();
 		long seed = -1;
 		for (long s = 1; s < 3_000_000 && seed < 0; s++) {
-			Reservoir f = Reservoir.at(s, hole.getX(), hole.getZ());
+			Reservoir f = Reservoir.at(s, hole.getX() + dx, hole.getZ() + dz);
 			if (f != null && f.deep() && f.kind() == Reservoir.Kind.OIL) {
 				seed = s;
 			}
 		}
 		check(helper, seed >= 0, "no seed puts a deep oil field under the rig");
-		ReservoirData.TestRegion region = new ReservoirData.TestRegion(o.getX() - 20, o.getZ() - 30, o.getX() + 70, o.getZ() + 30, seed);
+		ReservoirData.TestRegion region = new ReservoirData.TestRegion(o.getX() - 20, o.getZ() - 30, o.getX() + 70, o.getZ() + 30, seed, dx, dz);
 		ReservoirData.TEST_REGIONS.add(region);
-		Reservoir field = Reservoir.at(seed, hole.getX(), hole.getZ());
+		Reservoir field = Reservoir.at(seed, hole.getX() + dx, hole.getZ() + dz);
 		floor(helper, 0, -14, 52, 18, y - 1);
 		dev.wildcatter.block.RigSubstructureBlockEntity rig = landRig(helper, y);
 		place(helper, WildcatterBlocks.BOP_ACCUMULATOR, 18, y, -12, Direction.NORTH);    // x 18-19, z -12..-9: within 20 blocks

@@ -37,10 +37,27 @@ public class ReservoirData extends SavedData {
 	}
 
 	/** A game test's own seed over its own area, so scenes running side by side each keep the field they forced. */
-	public record TestRegion(int minX, int minZ, int maxX, int maxZ, long seed) {
+	/**
+	 * A game test's region: its fields come from {@code seed}, looked up {@code dx, dz} blocks away (so a scene whose well lands where no
+	 * field can lie, a cell's corner, can read the fields over a cell's middle). Play never adds one.
+	 */
+	public record TestRegion(int minX, int minZ, int maxX, int maxZ, long seed, int dx, int dz) {
+		public TestRegion(int minX, int minZ, int maxX, int maxZ, long seed) {
+			this(minX, minZ, maxX, maxZ, seed, 0, 0);
+		}
+
 		boolean has(int x, int z) {
 			return x >= minX && x <= maxX && z >= minZ && z <= maxZ;
 		}
+	}
+
+	private static @org.jspecify.annotations.Nullable TestRegion region(int x, int z) {
+		for (TestRegion r : TEST_REGIONS) {
+			if (r.has(x, z)) {
+				return r;
+			}
+		}
+		return null;
 	}
 
 	public static final java.util.List<TestRegion> TEST_REGIONS = new java.util.concurrent.CopyOnWriteArrayList<>();
@@ -77,12 +94,14 @@ public class ReservoirData extends SavedData {
 
 	/** The field a hole at this column reaches first in this world, salt domes included (docs/salt-dome-oil.md). */
 	public static @org.jspecify.annotations.Nullable Reservoir field(ServerLevel level, int x, int z) {
-		return Reservoir.at(seed(level, x, z), x, z, site(level));
+		TestRegion r = region(x, z);
+		return r != null ? Reservoir.at(r.seed(), x + r.dx(), z + r.dz(), site(level)) : Reservoir.at(seed(level, x, z), x, z, site(level));
 	}
 
 	/** The grid dome under this column in this world (its middle or flanks), or null. */
 	public static @org.jspecify.annotations.Nullable SaltDome dome(ServerLevel level, int x, int z) {
-		SaltDome dome = SaltDome.near(seed(level, x, z), x, z);
+		TestRegion r = region(x, z);
+		SaltDome dome = r != null ? SaltDome.near(r.seed(), x + r.dx(), z + r.dz()) : SaltDome.near(seed(level, x, z), x, z);
 		return dome != null && site(level).test(dome) ? dome : null;
 	}
 

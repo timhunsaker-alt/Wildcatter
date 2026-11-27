@@ -357,9 +357,13 @@ final class Bfs03Scenes {
 		List<String> ids = book.quests().values().stream().filter(q -> q.chapter().equals(chapter.id())).map(q -> q.id().getPath()).toList();
 		check(helper, ids.containsAll(List.of("seismograph", "rig", "oil_well", "gas_well", "lease", "crude")), "the chapter should hold the episode's six quests: " + ids);
 		BlockPos wellAbs = helper.absolutePos(new BlockPos(0, 1, 0));
-		long seed = oilSeed(wellAbs);
+		// Fields keep clear of their cell's edges, so no seed puts one under a column in a cell's corner (about one test place in seven).
+		// The region reads its fields over the middle of the well's cell instead, wherever the test lands.
+		int dx = Math.floorDiv(wellAbs.getX(), Tuning.FIELD_CELL) * Tuning.FIELD_CELL + Tuning.FIELD_CELL / 2 - wellAbs.getX();
+		int dz = Math.floorDiv(wellAbs.getZ(), Tuning.FIELD_CELL) * Tuning.FIELD_CELL + Tuning.FIELD_CELL / 2 - wellAbs.getZ();
+		long seed = oilSeed(wellAbs.offset(dx, 0, dz));
 		check(helper, seed > 0, "no seed puts an oil field under the well");
-		ReservoirData.TestRegion region = new ReservoirData.TestRegion(wellAbs.getX() - 16, wellAbs.getZ() - 10, wellAbs.getX() + 16, wellAbs.getZ() + 10, seed);
+		ReservoirData.TestRegion region = new ReservoirData.TestRegion(wellAbs.getX() - 16, wellAbs.getZ() - 10, wellAbs.getX() + 16, wellAbs.getZ() + 10, seed, dx, dz);
 		ReservoirData.TEST_REGIONS.add(region);
 		GridSceneKit.floor(helper, -14, -7, 12, 7);
 		put(helper, "oil_wellhead", 0, 1, 0);
