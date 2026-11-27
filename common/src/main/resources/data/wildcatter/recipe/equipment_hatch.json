@@ -3,12 +3,12 @@
   "category": "redstone",
   "pattern": [
     "SSS",
-    "SIS",
+    "SDS",
     "SSS"
   ],
   "key": {
     "S": "wildcatter:steel_ingot",
-    "I": "minecraft:iron_block"
+    "D": "minecraft:iron_door"
   },
   "result": {
     "id": "wildcatter:equipment_hatch",

@@ -4,12 +4,13 @@
   "pattern": [
     "SPS",
     "S S",
-    "SFS"
+    "BFB"
   ],
   "key": {
     "S": "wildcatter:steel_ingot",
     "P": "wildcatter:gas_line",
-    "F": "minecraft:furnace"
+    "F": "minecraft:furnace",
+    "B": "minecraft:bricks"
   },
   "result": {
     "id": "wildcatter:hafnium_column",

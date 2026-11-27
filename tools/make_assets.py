@@ -750,7 +750,7 @@ for role, dye in (("hot", "minecraft:red_dye"), ("neutral", "minecraft:black_dye
 	shapeless(f"dist_wire_{role}", ["minecraft:iron_ingot"] * 2 + ["minecraft:copper_ingot"] * 3 + ["minecraft:gold_ingot", dye], f"dist_wire_{role}", 4)
 	shapeless(f"mv_wire_{role}", ["minecraft:iron_ingot"] * 2 + ["minecraft:copper_ingot"] * 3 + [dye], f"mv_wire_{role}", 4)
 	shapeless(f"hv_wire_{role}", ["minecraft:iron_ingot"] * 4 + ["minecraft:copper_ingot"] * 2 + [dye], f"hv_wire_{role}", 4)
-shaped("ground_rod", ["C", "C", "C"], {"C": "minecraft:copper_ingot"}, "ground_rod", 2)
+shaped("ground_rod", ["C", "I", "C"], {"C": "minecraft:copper_ingot", "I": "minecraft:iron_ingot"}, "ground_rod", 2)
 shapeless("ground_wire", [f"{ns}:wire_neutral", "minecraft:green_dye"], "ground_wire")
 shaped("fused_cutout", ["BCB", "NFN", " I "], {"B": "minecraft:brick", "C": "minecraft:copper_ingot", "N": "minecraft:iron_nugget", "F": f"{ns}:fuse", "I": "minecraft:iron_ingot"}, "fused_cutout")
 shaped("fuse", ["GGG", "ICI", "GGG"], {"G": "minecraft:glass_pane", "I": "minecraft:iron_nugget", "C": "minecraft:copper_ingot"}, "fuse", 2)
@@ -764,7 +764,8 @@ shaped("insulator_lv", ["B", "N"], {"B": "minecraft:brick", "N": "minecraft:iron
 shaped("insulator_dist", ["B", "B", "N"], {"B": "minecraft:brick", "N": "minecraft:iron_nugget"}, "insulator_dist", 2)
 shaped("insulator_hv", ["BBB", "BNB", "BIB"], {"B": "minecraft:brick", "N": "minecraft:iron_nugget", "I": "minecraft:iron_ingot"}, "insulator_hv", 2)
 for pid, dye, copper in (("nema_5_15", "minecraft:white_dye", 1), ("nema_5_20", "minecraft:red_dye", 1), ("nema_14_50", "minecraft:black_dye", 2), ("cee_7", "minecraft:yellow_dye", 1), ("iec_60309_blue", "minecraft:blue_dye", 2), ("nema_l21_30", "minecraft:gray_dye", 3), ("nema_l22_30", "minecraft:orange_dye", 3), ("iec_60309_red_32", "minecraft:red_dye", 3), ("iec_60309_red_63", "minecraft:red_dye", 4)):
-	shapeless(f"receptacle_{pid}", ["minecraft:iron_ingot"] + ["minecraft:copper_ingot"] * copper + [dye], f"receptacle_{pid}", 2)
+	# the 63 A red takes a second iron (its bigger housing): with one iron its ingredients were the 480 V red wire's
+	shapeless(f"receptacle_{pid}", ["minecraft:iron_ingot"] * (2 if pid == "iec_60309_red_63" else 1) + ["minecraft:copper_ingot"] * copper + [dye], f"receptacle_{pid}", 2)
 	shapeless(f"plug_{pid}", [f"{ns}:receptacle_{pid}", "minecraft:redstone", "minecraft:iron_ingot"], f"plug_{pid}")
 shaped("pole", ["L", "L", "L"], {"L": "#minecraft:logs"}, "pole", 3)
 shaped("crossarm", ["PPP", " N "], {"P": "#minecraft:planks", "N": "minecraft:iron_nugget"}, "crossarm", 2)
@@ -937,6 +938,11 @@ def busway_side(img, d):
 
 
 tex("busway_placeholder", busway_side)
+# each its own grid (one grid gave all three): the 480 V busway takes two iron ingots in its housing, as the 480 V wire takes an iron
+# ingot the 120 V wire does not; the generator bus duct stands its bars on porcelain (brick) standoffs, as the insulators are made
+BUS_GRIDS = {"busway_lv": (["SCS", "CCC", "SCS"], {"S": f"{ns}:steel_ingot", "C": "minecraft:copper_block"}),
+	"busway_industrial": (["SCS", "CCC", "ICI"], {"S": f"{ns}:steel_ingot", "C": "minecraft:copper_block", "I": "minecraft:iron_ingot"}),
+	"bus_duct_gen": (["BCB", "CCC", "BCB"], {"B": "minecraft:brick", "C": "minecraft:copper_block"})}
 for bus in ("busway_lv", "busway_industrial", "bus_duct_gen"):
 	t = {"cable": f"{ns}:block/{art('busway')}", "particle": f"{ns}:block/{art('busway')}"}
 	save_json(f"{ASSETS}/models/block/{bus}_core.json", {"textures": t, "elements": [cuboid([4, 4, 4], [12, 12, 12])]})
@@ -947,7 +953,8 @@ for bus in ("busway_lv", "busway_industrial", "bus_duct_gen"):
 	save_json(f"{ASSETS}/blockstates/{bus}.json", {"multipart": [{"apply": {"model": f"{ns}:block/{bus}_core"}}] + [
 		{"when": {side: "true"}, "apply": {"model": f"{ns}:block/{bus}_arm", **rot}} for side, rot in arms.items()]})
 	save_json(f"{ASSETS}/items/{bus}.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/{bus}_inventory"}})
-	shaped(bus, ["SCS", "CCC", "SCS"], {"S": f"{ns}:steel_ingot", "C": "minecraft:copper_block"}, bus, 4)
+	pattern, key = BUS_GRIDS[bus]
+	shaped(bus, pattern, key, bus, 4)
 pick = json.load(open(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json"))
 pick["values"] += [f"{ns}:busway_lv", f"{ns}:busway_industrial", f"{ns}:bus_duct_gen"]
 save_json(f"{ROOT}/data/minecraft/tags/block/mineable/pickaxe.json", pick)
@@ -1038,8 +1045,8 @@ shaped("genset_diesel_engine", ["IHI", "PCP", "PBP"], {"I": f"{ns}:fuel_injector
 shaped("genset_gas_engine", ["IHI", "PCP", "PBP"], {"I": f"{ns}:spark_plug", "H": f"{ns}:cylinder_head", "P": f"{ns}:piston", "C": f"{ns}:crankshaft", "B": f"{ns}:engine_block_casting"}, "genset_gas_engine")
 shaped("alternator", ["SWS", "WRW", "SXS"], {"S": S_, "W": f"{ns}:stator_winding", "R": f"{ns}:rotor_field", "X": f"{ns}:exciter"}, "alternator")
 shaped("radiator", ["SBS", "BCB", "SBS"], {"S": S_, "B": "minecraft:iron_bars", "C": "minecraft:copper_block"}, "radiator")
-shaped("fuel_tank", ["SSS", "S S", "SSS"], {"S": S_}, "fuel_tank")
-shaped("exhaust_stack", ["S", "S", "S"], {"S": S_}, "exhaust_stack")
+shaped("fuel_tank", ["SSS", "S S", "SPS"], {"S": S_, "P": f"{ns}:gas_line"}, "fuel_tank")
+shaped("exhaust_stack", ["S", "B", "S"], {"S": S_, "B": "minecraft:iron_bars"}, "exhaust_stack")
 shaped("exhaust_silencer_large", ["SSS", "S S", "SSS"], {"S": f"{ns}:exhaust_stack"}, "exhaust_silencer_large")
 shaped("genset_base_frame", ["SIS", "SIS"], {"S": S_, "I": "minecraft:iron_block"}, "genset_base_frame")
 shaped("genset_control_panel", ["SGS", "RBR", "SCS"], {"S": S_, "G": "minecraft:glass_pane", "R": "minecraft:redstone", "B": f"{ns}:breaker_3p_industrial", "C": "minecraft:comparator"}, "genset_control_panel")
@@ -1126,7 +1133,7 @@ shaped("boiler_burner", ["SBS", "BFB", "SBS"], {"S": S_, "B": "minecraft:bricks"
 shaped("boiler_drum", ["SSS", "SWS", "SSS"], {"S": S_, "W": "minecraft:water_bucket"}, "boiler_drum")
 shaped("superheater", ["SCS", "CSC", "SCS"], {"S": S_, "C": "minecraft:copper_ingot"}, "superheater")
 shaped("turbine_casing", ["SSS", "BCB", "SSS"], {"S": S_, "B": "minecraft:iron_bars", "C": f"{ns}:crankshaft"}, "turbine_casing")
-shaped("turbine_generator", ["SWS", "WRW", "SXS"], {"S": S_, "W": f"{ns}:stator_winding", "R": f"{ns}:rotor_field", "X": f"{ns}:exciter"}, "turbine_generator")
+shaped("turbine_generator", ["SWS", "WRW", "PXP"], {"S": S_, "W": f"{ns}:stator_winding", "R": f"{ns}:rotor_field", "X": f"{ns}:exciter", "P": f"{ns}:gas_line"}, "turbine_generator")
 shaped("condenser", ["SPS", "PCP", "SPS"], {"S": S_, "P": f"{ns}:pipe", "C": "minecraft:copper_block"}, "condenser")
 shaped("feed_pump", ["SPS", "MCM"], {"S": S_, "P": f"{ns}:pump", "M": "minecraft:piston", "C": "minecraft:copper_ingot"}, "feed_pump")
 lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
@@ -1439,7 +1446,7 @@ shaped("rig_drawworks", ["SCS", "CXC", "SSS"], {"S": S_, "C": C_, "X": f"{ns}:cr
 shaped("mud_pump", ["SPS", "CXC", "SSS"], {"S": S_, "P": "minecraft:piston", "C": C_, "X": f"{ns}:crankshaft"}, "mud_pump")
 shaped("mud_tanks", ["S S", "S S", "SSS"], {"S": S_}, "mud_tanks")
 shaped("rig_drive_house", ["SSS", "CRC", "SSS"], {"S": S_, "C": C_, "R": "minecraft:redstone_block"}, "rig_drive_house")
-shaped("top_drive", ["SCS", "CXC", "SPS"], {"S": S_, "C": C_, "X": f"{ns}:crankshaft", "P": f"{ns}:gas_line"}, "top_drive")
+shaped("top_drive", ["SNS", "CXC", "SPS"], {"S": S_, "N": "minecraft:iron_chain", "C": C_, "X": f"{ns}:crankshaft", "P": f"{ns}:gas_line"}, "top_drive")
 save_json(f"{ASSETS}/models/item/top_drive.json", {"parent": f"{ns}:block/rotor_top_drive", "display": {
 	"gui": {"rotation": [30, 225, 0], "translation": [0, -2, 0], "scale": [0.45, 0.45, 0.45]}, "ground": {"scale": [0.3, 0.3, 0.3]},
 	"fixed": {"scale": [0.5, 0.5, 0.5]}, "thirdperson_righthand": {"rotation": [75, 45, 0], "scale": [0.3, 0.3, 0.3]},
@@ -1520,11 +1527,11 @@ shaped("atmospheric_column", ["BPB", "B B", "BPB"], {"B": "minecraft:iron_block"
 shaped("crude_heater", ["BBB", "BFB", "BPB"], {"B": "minecraft:iron_block", "F": F_, "P": P_}, "crude_heater")
 shaped("desalter", ["SCS", "PRP", "SSS"], {"S": S_, "C": "minecraft:copper_block", "P": P_, "R": "minecraft:redstone_block"}, "desalter")
 shaped("crude_charge_pump", ["SCS", "PXP", "SBS"], {"S": S_, "C": "minecraft:copper_block", "P": P_, "X": f"{ns}:crankshaft", "B": "minecraft:iron_block"}, "crude_charge_pump")
-shaped("side_strippers", ["SPS", "S S", "SPS"], {"S": S_, "P": P_}, "side_strippers", 1)
+shaped("side_strippers", ["PSP", "S S", "PSP"], {"S": S_, "P": P_}, "side_strippers", 1)
 shaped("overhead_condenser", ["SCS", "GXG", "SPS"], {"S": S_, "C": "minecraft:copper_block", "G": "minecraft:iron_bars", "X": "minecraft:piston", "P": P_}, "overhead_condenser")
 shaped("cracking_furnace", ["BBB", "BFB", "PFP"], {"B": "minecraft:iron_block", "F": F_, "P": P_}, "cracking_furnace")
 shaped("quench_tower", ["SPS", "SWS", "SPS"], {"S": S_, "P": P_, "W": "minecraft:water_bucket"}, "quench_tower")
-shaped("cracked_gas_compressor", ["SPS", "CXC", "SBS"], {"S": S_, "P": P_, "C": "minecraft:copper_block", "X": f"{ns}:crankshaft", "B": "minecraft:iron_block"}, "cracked_gas_compressor")
+shaped("cracked_gas_compressor", ["PSP", "CXC", "SBS"], {"S": S_, "P": P_, "C": "minecraft:copper_block", "X": f"{ns}:crankshaft", "B": "minecraft:iron_block"}, "cracked_gas_compressor")
 shaped("cold_box", ["SIS", "IWI", "SPS"], {"S": S_, "I": "minecraft:blue_ice", "W": "minecraft:white_wool", "P": P_}, "cold_box")
 shaped("polyethylene_reactor", ["SPS", "S S", "SXS"], {"S": S_, "P": P_, "X": "minecraft:piston"}, "polyethylene_reactor")
 shaped("pelletizer", ["SCS", "XHX", "SSS"], {"S": S_, "C": "minecraft:copper_block", "X": f"{ns}:crankshaft", "H": "minecraft:hopper"}, "pelletizer")
@@ -1775,7 +1782,7 @@ shaped("sx_circuit", ["SXS", "PGP", "SSS"], {"S": S_, "X": "minecraft:piston", "
 shaped("precipitation_tank", ["SXS", "SCS", "SPS"], {"S": S_, "X": "minecraft:piston", "C": "minecraft:cauldron", "P": P_}, "precipitation_tank")
 shaped("yellowcake_dryer", ["SFS", "S S", "SHS"], {"S": S_, "F": "minecraft:blast_furnace", "H": "minecraft:hopper"}, "yellowcake_dryer")
 shaped("drum_filler", ["SHS", "S S", "SXS"], {"S": S_, "H": "minecraft:hopper", "X": "minecraft:piston"}, "drum_filler")
-shaped("empty_drum", ["S S", "S S", "SSS"], {"S": "minecraft:iron_ingot"}, "empty_drum", 2)
+shaped("empty_drum", ["SNS", "S S", "SSS"], {"S": "minecraft:iron_ingot", "N": "minecraft:iron_nugget"}, "empty_drum", 2)
 for kind, time in (("smelting", 200), ("blasting", 100)):
 	save_json(f"{DATA}/recipe/magnesia_from_{kind}_magnesite.json", {"type": f"minecraft:{kind}", "cookingtime": time, "experience": 0.3,
 		"group": "magnesia", "ingredient": f"{ns}:magnesite", "result": {"id": f"{ns}:magnesia"}})
@@ -1850,14 +1857,14 @@ shaped("reduction_reactor", ["SHS", "SBS", "SPS"], {"S": S_, "H": "minecraft:hop
 shaped("hydrofluorinator", ["SPS", "BSB", "SPS"], {"S": S_, "P": P_, "B": "minecraft:blast_furnace"}, "hydrofluorinator")
 shaped("fluorinator", ["SPS", "SBS", "SIS"], {"S": S_, "P": P_, "B": "minecraft:blast_furnace", "I": "minecraft:iron_bars"}, "fluorinator")
 shaped("cold_traps", ["SPS", "IXI", "SSS"], {"S": S_, "P": P_, "I": "minecraft:packed_ice", "X": "minecraft:piston"}, "cold_traps")
-shaped("distillation_columns", ["SPS", "S S", "SFS"], {"S": S_, "P": P_, "F": "minecraft:furnace"}, "distillation_columns")
+shaped("distillation_columns", ["SPS", "SPS", "SFS"], {"S": S_, "P": P_, "F": "minecraft:furnace"}, "distillation_columns")
 shaped("cylinder_filler", ["SHS", "SXS", "BBB"], {"S": S_, "H": "minecraft:hopper", "X": "minecraft:piston", "B": "minecraft:iron_block"}, "cylinder_filler")
 shaped("steam_reformer", ["SBS", "PFP", "SSS"], {"S": S_, "B": "minecraft:bricks", "P": P_, "F": "minecraft:blast_furnace"}, "steam_reformer")
 shaped("hf_kiln", ["BBB", "PFP", "SXS"], {"B": "minecraft:bricks", "P": P_, "F": "minecraft:blast_furnace", "S": S_, "X": f"{ns}:crankshaft"}, "hf_kiln")
 shaped("hf_column", ["SPS", "S S", "SPS"], {"S": "minecraft:iron_ingot", "P": P_}, "hf_column")
 shaped("rectifier", ["CRC", "CSC", "CRC"], {"C": "minecraft:copper_block", "R": "minecraft:redstone_block", "S": S_}, "rectifier")
 shaped("fluorine_cell_house", ["SCS", "GXG", "SPS"], {"S": S_, "C": "minecraft:copper_block", "G": "minecraft:coal_block", "X": "minecraft:cauldron", "P": P_}, "fluorine_cell_house")
-shaped("empty_48y_cylinder", ["SSS", "S S", "SSS"], {"S": S_}, "empty_48y_cylinder")
+shaped("empty_48y_cylinder", ["SSS", "S S", "SCS"], {"S": S_, "C": "minecraft:copper_ingot"}, "empty_48y_cylinder")
 lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
 for item, (name, colour) in {"empty_48y_cylinder": ("Empty 48Y Cylinder", (200, 200, 195)), "uf6_cylinder_48y": ("48Y Cylinder of UF6 (natural)", (210, 200, 120))}.items():
 	if os.path.exists(f"{ORE_ART}/{item}.png"):
@@ -1892,7 +1899,7 @@ shaped("frequency_converter", ["CRC", "SXS", "CRC"], {"C": "minecraft:copper_blo
 shaped("feed_station", ["SHS", "PFP", "SSS"], {"S": S_, "H": "minecraft:hopper", "P": P_, "F": "minecraft:furnace"}, "feed_station")
 shaped("product_takeoff", ["SHS", "PIP", "BBB"], {"S": S_, "H": "minecraft:hopper", "P": P_, "I": "minecraft:packed_ice", "B": "minecraft:iron_block"}, "product_takeoff")
 shaped("tails_takeoff", ["SHS", "PIP", "SBS"], {"S": S_, "H": "minecraft:hopper", "P": P_, "I": "minecraft:packed_ice", "B": "minecraft:iron_block"}, "tails_takeoff")
-shaped("empty_30b_cylinder", ["S S", "S S", "SSS"], {"S": S_}, "empty_30b_cylinder")
+shaped("empty_30b_cylinder", ["SCS", "S S", "SSS"], {"S": S_, "C": "minecraft:copper_ingot"}, "empty_30b_cylinder")
 lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
 for item, (name, colour) in {"empty_30b_cylinder": ("Empty 30B Cylinder", (200, 200, 195)), "leu_cylinder_30b": ("30B Cylinder of UF6 (4.95 % LEU)", (220, 190, 90)),
 		"tails_cylinder_48y": ("48Y Cylinder of UF6 (0.25 % tails)", (150, 150, 140))}.items():
@@ -1923,7 +1930,7 @@ for t_name in ("mineable/pickaxe", "needs_stone_tool"):
 	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
 shaped("mineral_separator", ["SHS", "IRI", "SSS"], {"S": S_, "H": "minecraft:hopper", "I": "minecraft:iron_block", "R": "minecraft:redstone"}, "mineral_separator")
 shaped("chlorinator", ["SHS", "BFB", "SPS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace", "P": P_}, "chlorinator")
-shaped("hafnium_column", ["SPS", "S S", "SFS"], {"S": S_, "P": P_, "F": "minecraft:furnace"}, "hafnium_column")
+shaped("hafnium_column", ["SPS", "S S", "BFB"], {"S": S_, "P": P_, "F": "minecraft:furnace", "B": "minecraft:bricks"}, "hafnium_column")
 shaped("kroll_reactor", ["SPS", "SBS", "SSS"], {"S": S_, "P": P_, "B": "minecraft:blast_furnace"}, "kroll_reactor")
 shaped("vacuum_distillation", ["SGS", "SBS", "SSS"], {"S": S_, "G": "minecraft:glass", "B": "minecraft:blast_furnace"}, "vacuum_distillation")
 shaped("var_furnace", ["SHS", "CBC", "SSS"], {"S": S_, "H": "minecraft:hopper", "C": "minecraft:copper_block", "B": "minecraft:blast_furnace"}, "var_furnace")
@@ -1931,7 +1938,7 @@ shaped("extrusion_press", ["SXS", "IAI", "SXS"], {"S": S_, "X": "minecraft:pisto
 shaped("pilger_mill", ["SXS", "IRI", "SSS"], {"S": S_, "X": "minecraft:piston", "I": "minecraft:iron_block", "R": f"{ns}:crankshaft"}, "pilger_mill")
 shaped("vacuum_anneal_furnace", ["SSS", "GFG", "SSS"], {"S": S_, "G": "minecraft:glass", "F": "minecraft:furnace"}, "vacuum_anneal_furnace")
 shaped("magnesium_cell", ["CBC", "SXS", "SSS"], {"C": "minecraft:copper_block", "B": "minecraft:bricks", "S": S_, "X": "minecraft:cauldron"}, "magnesium_cell")
-shaped("magnesia_chlorinator", ["SHS", "BFB", "SPS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:furnace", "P": P_}, "magnesia_chlorinator")
+shaped("magnesia_chlorinator", ["SHS", "BFB", "PSP"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:furnace", "P": P_}, "magnesia_chlorinator")
 shaped("chlor_alkali_cell", ["CPC", "SXS", "SHS"], {"C": "minecraft:copper_block", "P": P_, "S": S_, "X": "minecraft:cauldron", "H": "minecraft:hopper"}, "chlor_alkali_cell")
 lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
 for item, (name, colour) in {"zircaloy_tube": ("Zircaloy-4 Cladding Tube", (190, 190, 185)), "guide_thimble": ("Zircaloy-4 Guide Thimble", (175, 175, 170))}.items():
@@ -2233,7 +2240,7 @@ for t_name in ("mineable/pickaxe", "needs_stone_tool"):
 	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
 	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
 shaped("gen_feeder_breaker", ["SIS", "SXS", "SCS"], {"S": S_, "I": "minecraft:iron_block", "X": f"{ns}:hv_breaker_3p", "C": "minecraft:copper_ingot"}, "gen_feeder_breaker")
-shaped("bus_relay_panel", ["SGS", "SRS", "SCS"], {"S": S_, "G": "minecraft:glass_pane", "R": "minecraft:comparator", "C": "minecraft:copper_ingot"}, "bus_relay_panel")
+shaped("bus_relay_panel", ["SGS", "SRS", "SDS"], {"S": S_, "G": "minecraft:glass_pane", "R": "minecraft:comparator", "D": "minecraft:redstone"}, "bus_relay_panel")
 shaped("grounding_set", ["CCC", " I ", " T "], {"C": "minecraft:copper_ingot", "I": "minecraft:iron_ingot", "T": "minecraft:stick"}, "grounding_set")
 tex("grounding_set_placeholder", lambda img, d: noise(img, (190, 110, 60), 12), "item")   # drawn so the noise sequence stays put; 10d4's art replaces it
 save_json(f"{ASSETS}/models/item/grounding_set.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{ns}:item/{art('grounding_set')}"}})
@@ -2258,8 +2265,8 @@ shaped("nitrogen_generator", ["SPS", "GXG", "SSS"], {"S": S_, "P": P_, "G": "min
 shaped("syngas_compressor", ["SPS", "XIX", "SSS"], {"S": S_, "P": P_, "X": "minecraft:piston", "I": "minecraft:iron_block"}, "syngas_compressor")
 shaped("ammonia_converter", ["SPS", "IFI", "SIS"], {"S": S_, "P": P_, "I": "minecraft:iron_block", "F": "minecraft:blast_furnace"}, "ammonia_converter")
 shaped("nitric_acid_unit", ["SPS", "SFS", "SXS"], {"S": S_, "P": P_, "F": "minecraft:blast_furnace", "X": "minecraft:piston"}, "nitric_acid_unit")
-shaped("an_neutraliser", ["SPS", "S S", "SPS"], {"S": S_, "P": P_}, "an_neutraliser")
-shaped("emulsion_blender", ["SHS", "PXP", "SSS"], {"S": S_, "H": "minecraft:hopper", "P": P_, "X": "minecraft:piston"}, "emulsion_blender")
+shaped("an_neutraliser", ["SPS", "SKS", "SPS"], {"S": S_, "P": P_, "K": "minecraft:cauldron"}, "an_neutraliser")
+shaped("emulsion_blender", ["SHS", "PXP", "SCS"], {"S": S_, "H": "minecraft:hopper", "P": P_, "X": "minecraft:piston", "C": "minecraft:copper_ingot"}, "emulsion_blender")
 recipe = {"type": "minecraft:crafting_shapeless", "category": "misc", "ingredients": [f"{ns}:platinum"], "result": {"id": f"{ns}:gauze_pack", "count": 1}}
 save_json(f"{DATA}/recipe/gauze_pack.json", recipe)
 recipe = {"type": "minecraft:crafting_shapeless", "category": "misc", "ingredients": [f"{ns}:plastic_sheet", f"{ns}:diesel_bucket", "minecraft:iron_ingot"],
@@ -2322,13 +2329,13 @@ for t_name in ("mineable/pickaxe", "needs_stone_tool"):
 	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
 	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
 shaped("uf6_autoclave", ["SHS", "SFS", "SSS"], {"S": S_, "H": "minecraft:hopper", "F": "minecraft:furnace"}, "uf6_autoclave")
-shaped("idr_kiln", ["SPS", "BFB", "SXS"], {"S": S_, "P": P_, "B": "minecraft:bricks", "F": "minecraft:blast_furnace", "X": f"{ns}:crankshaft"}, "idr_kiln")
+shaped("idr_kiln", ["PSP", "BFB", "SXS"], {"S": S_, "P": P_, "B": "minecraft:bricks", "F": "minecraft:blast_furnace", "X": f"{ns}:crankshaft"}, "idr_kiln")
 shaped("granulator", ["SHS", "XGX", "SSS"], {"S": S_, "H": "minecraft:hopper", "X": "minecraft:piston", "G": "minecraft:grindstone"}, "granulator")
 shaped("pellet_press", ["GXG", "SIS", "SSS"], {"G": "minecraft:glass", "X": "minecraft:piston", "S": S_, "I": "minecraft:iron_block"}, "pellet_press")
 shaped("sintering_furnace", ["SSS", "BFB", "SPS"], {"S": S_, "B": "minecraft:bricks", "F": "minecraft:blast_furnace", "P": P_}, "sintering_furnace")
 shaped("pellet_grinder", ["SGS", "SXS", "SSS"], {"S": S_, "G": "minecraft:grindstone", "X": "minecraft:piston"}, "pellet_grinder")
 shaped("rod_loader", ["GHG", "SXS", "SSS"], {"G": "minecraft:glass", "H": "minecraft:hopper", "S": S_, "X": "minecraft:piston"}, "rod_loader")
-shaped("rod_welder", ["SCS", "GRG", "SSS"], {"S": S_, "C": "minecraft:copper_block", "G": "minecraft:glass", "R": "minecraft:redstone_block"}, "rod_welder")
+shaped("rod_welder", ["SCS", "GRG", "SPS"], {"S": S_, "C": "minecraft:copper_block", "G": "minecraft:glass", "R": "minecraft:redstone_block", "P": P_}, "rod_welder")
 shaped("assembly_fixture", ["SXS", "IAI", "SSS"], {"S": S_, "X": "minecraft:piston", "I": "minecraft:iron_block", "A": "minecraft:anvil"}, "assembly_fixture")
 shaped("helium_recovery_unit", ["SPS", "IXI", "SPS"], {"S": S_, "P": P_, "I": "minecraft:packed_ice", "X": "minecraft:piston"}, "helium_recovery_unit")
 shaped("empty_helium_cylinder", [" S ", "S S", "SSS"], {"S": S_}, "empty_helium_cylinder")
@@ -2369,8 +2376,8 @@ shaped("steam_generator", ["SPS", "SIS", "SPS"], {"S": S_, "P": P_, "I": "minecr
 shaped("reactor_coolant_pump", ["SCS", "SXS", "SIS"], {"S": S_, "C": "minecraft:copper_block", "X": f"{ns}:crankshaft", "I": "minecraft:iron_block"}, "reactor_coolant_pump")
 shaped("pressurizer", ["SPS", "SRS", "SIS"], {"S": S_, "P": P_, "R": "minecraft:redstone_block", "I": "minecraft:iron_block"}, "pressurizer")
 shaped("cvcs_skid", ["SHS", "PXP", "SSS"], {"S": S_, "H": "minecraft:hopper", "P": P_, "X": "minecraft:piston"}, "cvcs_skid")
-shaped("aux_feed_pump", ["SPS", "SXS", "SSS"], {"S": S_, "P": P_, "X": "minecraft:piston"}, "aux_feed_pump")
-shaped("rhr_pump", ["SCS", "SXS", "SPS"], {"S": S_, "C": "minecraft:copper_block", "X": "minecraft:piston", "P": P_}, "rhr_pump")
+shaped("aux_feed_pump", ["SPS", "SXS", "SCS"], {"S": S_, "P": P_, "X": "minecraft:piston", "C": "minecraft:copper_ingot"}, "aux_feed_pump")
+shaped("rhr_pump", ["SCS", "SXS", "PSP"], {"S": S_, "C": "minecraft:copper_block", "X": "minecraft:piston", "P": P_}, "rhr_pump")
 shaped("rhr_heat_exchanger", ["SPS", "SCS", "SPS"], {"S": S_, "P": P_, "C": "minecraft:copper_ingot"}, "rhr_heat_exchanger")
 shaped("borax_dissolver", ["SHS", "SCS", "SSS"], {"S": S_, "H": "minecraft:hopper", "C": "minecraft:cauldron"}, "borax_dissolver")
 shaped("boric_acid_crystallizer", ["SCS", "SXS", "SHS"], {"S": S_, "C": "minecraft:cauldron", "X": "minecraft:piston", "H": "minecraft:hopper"}, "boric_acid_crystallizer")
@@ -2875,7 +2882,7 @@ for t_name in ("mineable/pickaxe", "needs_stone_tool"):
 	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
 	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
 shaped("furnace_transformer", ["SCS", "CIC", "SCS"], {"S": S_, "C": "minecraft:copper_block", "I": "minecraft:iron_block"}, "furnace_transformer")
-shaped("submerged_arc_furnace", ["SHS", "BFB", "SBS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace"}, "submerged_arc_furnace")
+shaped("submerged_arc_furnace", ["CHC", "BFB", "SBS"], {"S": S_, "C": "minecraft:copper_ingot", "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace"}, "submerged_arc_furnace")
 shaped("capacitor_bank", ["CCC", "SRS", "SIS"], {"C": "minecraft:copper_ingot", "S": S_, "R": "minecraft:redstone_block", "I": "minecraft:iron_bars"}, "capacitor_bank")
 shaped("moly_roaster", ["SBS", "SFS", "SBS"], {"S": S_, "B": "minecraft:bricks", "F": "minecraft:furnace"}, "moly_roaster")
 shaped("aluminothermic_vessel", ["SHS", "BCB", "SSS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "C": "minecraft:cauldron"}, "aluminothermic_vessel")
@@ -2924,8 +2931,8 @@ shaped("phosphoric_reactor", ["SXS", "CPC", "CCC"], {"S": S_, "X": "minecraft:pi
 shaped("tilting_pan_filter", ["SLS", "PXP", "SIS"], {"S": S_, "L": "minecraft:paper", "P": P_, "X": "minecraft:piston", "I": "minecraft:iron_block"}, "tilting_pan_filter")
 shaped("acid_evaporator", ["SPS", "SCS", "SXS"], {"S": S_, "P": P_, "C": "minecraft:copper_block", "X": "minecraft:piston"}, "acid_evaporator")
 shaped("granulation_plant", ["SPS", "IFI", "SXS"], {"S": S_, "P": P_, "I": "minecraft:iron_block", "F": "minecraft:blast_furnace", "X": "minecraft:piston"}, "granulation_plant")
-shaped("potash_dissolver", ["SHS", "SXS", "SPS"], {"S": S_, "H": "minecraft:hopper", "X": "minecraft:piston", "P": P_}, "potash_dissolver")
-shaped("vacuum_crystallizer", ["SPS", "S S", "SXS"], {"S": S_, "P": P_, "X": "minecraft:piston"}, "vacuum_crystallizer")
+shaped("potash_dissolver", ["SHS", "SXS", "SCS"], {"S": S_, "H": "minecraft:hopper", "X": "minecraft:piston", "C": "minecraft:copper_ingot"}, "potash_dissolver")
+shaped("vacuum_crystallizer", ["SPS", "S S", "SHS"], {"S": S_, "P": P_, "H": "minecraft:hopper"}, "vacuum_crystallizer")
 shaped("potash_dryer", ["SPS", "BFB", "SXS"], {"S": S_, "P": P_, "B": "minecraft:bricks", "F": "minecraft:furnace", "X": "minecraft:piston"}, "potash_dryer")
 shaped("acid_pretreatment", ["SPS", "SXS", "SSS"], {"S": S_, "P": P_, "X": "minecraft:piston"}, "acid_pretreatment")
 shaped("depa_topo_circuit", ["PXP", "SSS"], {"S": S_, "P": P_, "X": "minecraft:piston"}, "depa_topo_circuit")
@@ -2974,7 +2981,7 @@ save_json(f"{ASSETS}/blockstates/hydrogen_igniter.json", {"variants": {"lit=fals
 save_json(f"{ASSETS}/items/hydrogen_igniter.json", {"model": {"type": "minecraft:model", "model": f"{ns}:block/hydrogen_igniter"}})
 shaped("containment_concrete", ["CCC", "CSC", "CCC"], {"C": "minecraft:gray_concrete", "S": f"{ns}:steel_ingot"}, "containment_concrete", 8)
 shaped("hydrogen_igniter", [" R ", "SCS"], {"R": "minecraft:redstone", "S": f"{ns}:steel_ingot", "C": "minecraft:copper_ingot"}, "hydrogen_igniter", 2)
-shaped("equipment_hatch", ["SSS", "SIS", "SSS"], {"S": f"{ns}:steel_ingot", "I": "minecraft:iron_block"}, "equipment_hatch")
+shaped("equipment_hatch", ["SSS", "SDS", "SSS"], {"S": f"{ns}:steel_ingot", "D": "minecraft:iron_door"}, "equipment_hatch")
 shaped("personnel_airlock", ["SDS", "S S", "SDS"], {"S": f"{ns}:steel_ingot", "D": "minecraft:iron_door"}, "personnel_airlock")
 shaped("hydrogen_recombiner", ["SBS", "SGS", "SBS"], {"S": f"{ns}:steel_ingot", "B": "minecraft:iron_bars", "G": "minecraft:gold_ingot"}, "hydrogen_recombiner")
 shaped("containment_monitor", ["GCG", "SRS", "SSS"], {"G": "minecraft:glass_pane", "C": "minecraft:comparator", "R": "minecraft:redstone", "S": f"{ns}:steel_ingot"}, "containment_monitor")
@@ -3099,7 +3106,7 @@ for t_name in ("mineable/pickaxe", "needs_stone_tool"):
 	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
 	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
 shaped("fluid_bed_roaster", ["SCS", "BFB", "SBS"], {"S": S_, "C": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace"}, "fluid_bed_roaster")
-shaped("nickel_electric_furnace", ["SHS", "BFB", "BBB"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace"}, "nickel_electric_furnace")
+shaped("nickel_electric_furnace", ["CHC", "BFB", "BBB"], {"C": "minecraft:copper_ingot", "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace"}, "nickel_electric_furnace")
 shaped("peirce_smith_converter", ["SBS", "BCB", "SIS"], {"S": S_, "B": "minecraft:bricks", "C": "minecraft:cauldron", "I": "minecraft:iron_block"}, "peirce_smith_converter")
 shaped("chlorine_leach_reactor", ["SGS", "SCS", "SSS"], {"S": S_, "G": "minecraft:glass", "C": "minecraft:cauldron"}, "chlorine_leach_reactor")
 shaped("ni_purification", ["SGS", "CBC", "SSS"], {"S": S_, "G": "minecraft:glass", "C": "minecraft:cauldron", "B": "minecraft:barrel"}, "ni_purification")
@@ -3222,8 +3229,8 @@ shaped("brine_treatment", ["SPS", "CXC", "SPS"], {"S": S_, "P": P_, "C": "minecr
 shaped("membrane_cell_room", ["SPS", "CIC", "SCS"], {"S": S_, "P": P_, "C": "minecraft:copper_block", "I": "minecraft:iron_block"}, "membrane_cell_room")
 shaped("rectifier_mv", ["SCS", "CRC", "SIS"], {"S": S_, "C": "minecraft:copper_block", "R": "minecraft:redstone_block", "I": "minecraft:iron_block"}, "rectifier_mv")
 shaped("chlorine_train", ["SPS", "PXP", "SIS"], {"S": S_, "P": P_, "X": "minecraft:piston", "I": "minecraft:iron_block"}, "chlorine_train")
-shaped("caustic_evaporator", ["SPS", "SCS", "SPS"], {"S": S_, "P": P_, "C": "minecraft:copper_block"}, "caustic_evaporator")
-shaped("hcl_synthesis_unit", ["SPS", "SBS", "SPS"], {"S": S_, "P": P_, "B": "minecraft:blast_furnace"}, "hcl_synthesis_unit")
+shaped("caustic_evaporator", ["SPS", "SCS", "PSP"], {"S": S_, "P": P_, "C": "minecraft:copper_block"}, "caustic_evaporator")
+shaped("hcl_synthesis_unit", ["PSP", "SBS", "SPS"], {"S": S_, "P": P_, "B": "minecraft:blast_furnace"}, "hcl_synthesis_unit")
 shaped("brine_wellhead", [" P ", "SVS", " S "], {"S": S_, "P": P_, "V": "minecraft:lever"}, "brine_wellhead")
 lang = json.load(open(f"{ASSETS}/lang/en_us.json"))
 lang.update({f"block.{ns}.brine_saturator": "Brine Saturator", f"block.{ns}.brine_treatment": "Brine Treatment (controller)",
@@ -3263,10 +3270,10 @@ for t_name in ("mineable/pickaxe", "needs_stone_tool"):
 	t["values"] = [v for v in t["values"] if v not in wanted] + wanted
 	save_json(f"{ROOT}/data/minecraft/tags/block/{t_name}.json", t)
 S_, P_ = f"{ns}:steel_ingot", f"{ns}:gas_line"
-shaped("ti_chlorinator", ["SHS", "BFB", "SPS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace", "P": P_}, "ti_chlorinator")
-shaped("ticl4_purification", ["SPS", "SCS", "SPS"], {"S": S_, "P": P_, "C": "minecraft:copper_block"}, "ticl4_purification")
+shaped("ti_chlorinator", ["SHS", "BFB", "PSP"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace", "P": P_}, "ti_chlorinator")
+shaped("ticl4_purification", ["SPS", "SCS", "SFS"], {"S": S_, "P": P_, "C": "minecraft:copper_block", "F": "minecraft:furnace"}, "ticl4_purification")
 shaped("ticl4_oxidiser", ["SPS", "BFB", "SPS"], {"S": S_, "P": P_, "B": "minecraft:bricks", "F": "minecraft:furnace"}, "ticl4_oxidiser")
-shaped("vpsa_oxygen", ["SPS", "SXS", "SIS"], {"S": S_, "P": P_, "X": "minecraft:piston", "I": "minecraft:iron_block"}, "vpsa_oxygen")
+shaped("vpsa_oxygen", ["PSP", "SXS", "SIS"], {"S": S_, "P": P_, "X": "minecraft:piston", "I": "minecraft:iron_block"}, "vpsa_oxygen")
 shaped("pigment_finishing", ["SHS", "XFX", "SPS"], {"S": S_, "H": "minecraft:hopper", "X": "minecraft:piston", "F": "minecraft:furnace", "P": P_}, "pigment_finishing")
 save_json(f"{DATA}/recipe/white_dye_from_tio2_pigment.json", {"type": "minecraft:crafting_shapeless", "category": "misc",
 	"ingredients": [f"{ns}:tio2_pigment_bag"], "result": {"id": "minecraft:white_dye", "count": 64}})   # the only vanilla use (titanium-pigment.md)
@@ -3303,7 +3310,7 @@ S_, P_ = f"{ns}:steel_ingot", f"{ns}:gas_line"
 shaped("decrepitation_kiln", ["SHS", "BFB", "SSS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:blast_furnace"}, "decrepitation_kiln")
 shaped("acid_roast_kiln", ["SPS", "BFB", "SSS"], {"S": S_, "P": P_, "B": "minecraft:bricks", "F": "minecraft:furnace"}, "acid_roast_kiln")
 shaped("lithium_leach", ["SHS", "CXC", "SPS"], {"S": S_, "H": "minecraft:hopper", "C": "minecraft:cauldron", "X": "minecraft:piston", "P": P_}, "lithium_leach")
-shaped("lioh_crystallizer", ["SPS", "SCS", "SXS"], {"S": S_, "P": P_, "C": "minecraft:copper_block", "X": "minecraft:piston"}, "lioh_crystallizer")
+shaped("lioh_crystallizer", ["SPS", "SCS", "SHS"], {"S": S_, "P": P_, "C": "minecraft:copper_block", "H": "minecraft:hopper"}, "lioh_crystallizer")
 shaped("lithium_carbonator", ["SHS", "SCS", "SPS"], {"S": S_, "H": "minecraft:hopper", "C": "minecraft:cauldron", "P": P_}, "lithium_carbonator")
 # sodium_sulfate_bag is 19d's (Phase 16 items above); the lithium plant fills the same bag
 LI_BAGS = {"lioh_bag": ("Bulk Bag of Lithium Hydroxide (LiOH.H2O)", (236, 236, 228)),
@@ -3359,7 +3366,7 @@ for t_name in ("mineable/pickaxe", "needs_stone_tool"):
 S_, P_ = f"{ns}:steel_ingot", f"{ns}:gas_line"
 shaped("graphite_line", ["SHS", "XPX", "SSS"], {"S": S_, "H": "minecraft:hopper", "X": "minecraft:piston", "P": P_}, "graphite_line")
 shaped("graphite_furnace", ["SBS", "BFB", "SCS"], {"S": S_, "B": "minecraft:bricks", "F": "minecraft:blast_furnace", "C": "minecraft:copper_block"}, "graphite_furnace")
-shaped("lfp_kiln", ["SHS", "BFB", "SPS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:furnace", "P": P_}, "lfp_kiln")
+shaped("lfp_kiln", ["SHS", "BFB", "SBS"], {"S": S_, "H": "minecraft:hopper", "B": "minecraft:bricks", "F": "minecraft:furnace"}, "lfp_kiln")
 shaped("cell_line", ["SHS", "COC", "SXS"], {"S": S_, "H": "minecraft:hopper", "C": "minecraft:copper_ingot", "O": "minecraft:observer", "X": "minecraft:piston"}, "cell_line")
 shaped("bess_container", ["SSS", "COC", "SSS"], {"S": S_, "C": "minecraft:copper_block", "O": f"{ns}:cpu_small"}, "bess_container")
 shaped("bess_cabinet", ["SCS", "SOS", "SSS"], {"S": S_, "C": "minecraft:copper_ingot", "O": f"{ns}:cpu_small"}, "bess_cabinet")

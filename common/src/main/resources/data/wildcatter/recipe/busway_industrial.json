@@ -4,11 +4,12 @@
   "pattern": [
     "SCS",
     "CCC",
-    "SCS"
+    "ICI"
   ],
   "key": {
     "S": "wildcatter:steel_ingot",
-    "C": "minecraft:copper_block"
+    "C": "minecraft:copper_block",
+    "I": "minecraft:iron_ingot"
   },
   "result": {
     "id": "wildcatter:busway_industrial",

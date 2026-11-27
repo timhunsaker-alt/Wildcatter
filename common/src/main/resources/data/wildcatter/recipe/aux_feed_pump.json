@@ -4,12 +4,13 @@
   "pattern": [
     "SPS",
     "SXS",
-    "SSS"
+    "SCS"
   ],
   "key": {
     "S": "wildcatter:steel_ingot",
     "P": "wildcatter:gas_line",
-    "X": "minecraft:piston"
+    "X": "minecraft:piston",
+    "C": "minecraft:copper_ingot"
   },
   "result": {
     "id": "wildcatter:aux_feed_pump",

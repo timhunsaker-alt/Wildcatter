@@ -4,13 +4,14 @@
   "pattern": [
     "SCS",
     "GRG",
-    "SSS"
+    "SPS"
   ],
   "key": {
     "S": "wildcatter:steel_ingot",
     "C": "minecraft:copper_block",
     "G": "minecraft:glass",
-    "R": "minecraft:redstone_block"
+    "R": "minecraft:redstone_block",
+    "P": "wildcatter:gas_line"
   },
   "result": {
     "id": "wildcatter:rod_welder",

@@ -4,13 +4,14 @@
   "pattern": [
     "SWS",
     "WRW",
-    "SXS"
+    "PXP"
   ],
   "key": {
     "S": "wildcatter:steel_ingot",
     "W": "wildcatter:stator_winding",
     "R": "wildcatter:rotor_field",
-    "X": "wildcatter:exciter"
+    "X": "wildcatter:exciter",
+    "P": "wildcatter:gas_line"
   },
   "result": {
     "id": "wildcatter:turbine_generator",

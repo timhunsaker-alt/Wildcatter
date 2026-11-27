@@ -2,12 +2,12 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "pattern": [
-    "SCS",
+    "BCB",
     "CCC",
-    "SCS"
+    "BCB"
   ],
   "key": {
-    "S": "wildcatter:steel_ingot",
+    "B": "minecraft:brick",
     "C": "minecraft:copper_block"
   },
   "result": {

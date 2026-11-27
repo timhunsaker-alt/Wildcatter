@@ -3,7 +3,7 @@
   "category": "redstone",
   "pattern": [
     "SPS",
-    "S S",
+    "SPS",
     "SFS"
   ],
   "key": {

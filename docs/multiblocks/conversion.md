@@ -63,7 +63,7 @@ The main line passes its solids and its UF6 by touching, the way they move insid
   - hydrogen (m3);
   - anhydrous HF (L, 0.99 kg a litre; no stock tank holds it, because real AHF is stored chilled under pressure);
   - fluorine (kg).
-- **Empty 48Y cylinder:** 48 in steel, 2,359 kg tare, crafted from steel.
+- **Empty 48Y cylinder:** 48 in steel, 2,359 kg tare, crafted from steel and a copper ingot (its valve).
 - **48Y cylinder of UF6:** 12,501 kg of natural UF6 (0.711 % U-235), 8,453 kg of U.
 - **Fluorspar:** the 7a mineral, 2,544 kg of CaF2 a block. One block lasts about 9.5 hours at the plant's rate.
 

@@ -69,7 +69,7 @@ public final class Manual {
 						+ (int) Tuning.BARE_REACH_HIGH + " blocks, so keep bare lines up on tall poles.\n\n" + Voltage.LOW.label() + ": " + hearts(Tuning.SHOCK_DAMAGE_LOW) + " heart. " + Voltage.MEDIUM.label() + ": "
 						+ hearts(Tuning.SHOCK_DAMAGE_MEDIUM) + " hearts. " + Voltage.HIGH.label() + ": " + hearts(Tuning.SHOCK_DAMAGE_HIGH) + ".\nDouble if you are wet.",
 
-				"11. GROUNDING\n\nPut a Ground Rod in the earth against a machine, or run Ground Wire from the machine to a rod. A grounded machine is safe to touch.\n\n"
+				"11. GROUNDING\n\nPut a Ground Rod in the earth against a machine, or run Ground Wire from the machine to a rod. On a big machine (a rig, a pumpjack) any part will do. A grounded machine is safe to touch.\n\n"
 						+ "An ungrounded machine with power in it may bite when you touch it: " + Math.round(Tuning.TOUCH_SHOCK_CHANCE_LOW * 100) + "% at " + Voltage.LOW.label() + ", "
 						+ Math.round(Tuning.TOUCH_SHOCK_CHANCE_MEDIUM * 100) + "% at " + Voltage.MEDIUM.label() + ", always at " + Voltage.HIGH.label() + ".",
 

@@ -3,12 +3,13 @@
   "category": "redstone",
   "pattern": [
     "SPS",
-    "S S",
+    "SKS",
     "SPS"
   ],
   "key": {
     "S": "wildcatter:steel_ingot",
-    "P": "wildcatter:gas_line"
+    "P": "wildcatter:gas_line",
+    "K": "minecraft:cauldron"
   },
   "result": {
     "id": "wildcatter:an_neutraliser",

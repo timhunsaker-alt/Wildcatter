@@ -4,12 +4,13 @@
   "pattern": [
     "SPS",
     "SCS",
-    "SPS"
+    "SFS"
   ],
   "key": {
     "S": "wildcatter:steel_ingot",
     "P": "wildcatter:gas_line",
-    "C": "minecraft:copper_block"
+    "C": "minecraft:copper_block",
+    "F": "minecraft:furnace"
   },
   "result": {
     "id": "wildcatter:ticl4_purification",

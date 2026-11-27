@@ -4,14 +4,13 @@
   "pattern": [
     "SHS",
     "BFB",
-    "SPS"
+    "SBS"
   ],
   "key": {
     "S": "wildcatter:steel_ingot",
     "H": "minecraft:hopper",
     "B": "minecraft:bricks",
-    "F": "minecraft:furnace",
-    "P": "wildcatter:gas_line"
+    "F": "minecraft:furnace"
   },
   "result": {
     "id": "wildcatter:lfp_kiln",

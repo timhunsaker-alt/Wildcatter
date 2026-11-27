@@ -4,13 +4,13 @@
   "pattern": [
     "SHS",
     "SXS",
-    "SPS"
+    "SCS"
   ],
   "key": {
     "S": "wildcatter:steel_ingot",
     "H": "minecraft:hopper",
     "X": "minecraft:piston",
-    "P": "wildcatter:gas_line"
+    "C": "minecraft:copper_ingot"
   },
   "result": {
     "id": "wildcatter:potash_dissolver",

@@ -53,7 +53,7 @@ pregnant liquor -> SX CIRCUIT -> strip liquor -> PRECIPITATION TANK -> YELLOWCAK
   - No storage tank holds them.
 - **Sulfuric acid:** counted in L; a storage tank may hold it.
 - **Magnesia:** a furnace or blast furnace turns one magnesite into one Magnesia. This is caustic calcining at about 700-1,000 C *(unverified)*, as limestone becomes lime. MgCO3 is 47.8 % MgO, so 2,610 kg of magnesite gives 1,250 kg.
-- **Empty drum:** a 208 L (55 gallon) open-head steel drum, crafted from iron.
+- **Empty drum:** a 208 L (55 gallon) open-head steel drum, crafted from iron (a nugget for its bung).
 - **Yellowcake drum:**
   - **400 kg net** of magnesium diuranate concentrate at **80 % U3O8**: 320 kg of U3O8, 271 kg of uranium. The WNTI allows up to 450 kg gross, and its sample manifest shows about 437 kg net.
   - ASTM C967 asks for at least 65 % uranium (77 % U3O8). The grade of a magnesia concentrate is a proposal; ammonia (ADU) and a calciner give 94-98 %, and that route is in ROADMAP Ideas.

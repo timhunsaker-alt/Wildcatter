@@ -26,6 +26,9 @@ public class WildcatterFabricClient implements ClientModInitializer {
 				(payload, context) -> context.client().execute(() -> dev.wildcatter.quest.QuestNet.client.accept(payload.tag())));
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> WildcatterClient.disconnected());
 		LevelRenderEvents.BEFORE_GIZMOS.register(context -> WildcatterClient.drawGizmos());
+		// a long readout wrapped onto several lines and held long enough to read (ReadoutOverlay); a short one is the game's own line
+		net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry.replaceElement(net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements.OVERLAY_MESSAGE,
+				old -> (graphics, delta) -> dev.wildcatter.client.ReadoutOverlay.draw(graphics, () -> old.extractRenderState(graphics, delta)));
 		ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
 			Runnable tick = WildcatterClient.screenOpened(screen, Screens.getWidgets(screen), Screens.getWidgets(screen)::add);
 			if (tick != null) {

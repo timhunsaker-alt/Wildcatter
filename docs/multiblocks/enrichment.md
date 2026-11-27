@@ -61,7 +61,7 @@ A figure marked *(unverified)* is textbook, an estimate or a proposal.
 
 ## Products and items
 - **UF6:** the header's product, a gas in kg. No stock tank holds it, because real UF6 is a solid in its cylinders at room temperature.
-- **Empty 30B cylinder:** 30 in steel, 635 kg tare, crafted from steel.
+- **Empty 30B cylinder:** 30 in steel, 635 kg tare, crafted from steel and a copper ingot (its valve).
 - **30B of LEU:** 2,277 kg of UF6 at 4.95 % U-235, 1,539 kg of U (0.6761 kg of U a kg of UF6).
 - **48Y of tails:** 12,501 kg of depleted UF6 at 0.25 %, 8,453 kg of U.
 

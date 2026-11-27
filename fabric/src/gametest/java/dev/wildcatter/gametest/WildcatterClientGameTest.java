@@ -22,6 +22,8 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import java.util.List;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Items;
 import net.minecraft.core.component.DataComponents;
@@ -58,6 +60,9 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 			server.runCommand("difficulty normal");
 			if (only("questBook")) {   // first: before other scenes fill the inventory
 				new QuestClientScenes(context, server).questBook();
+			}
+			if (only("readout")) {
+				readout(context, server);
 			}
 			if (only("dryType")) {
 				new QuestClientScenes(context, server).dryType();
@@ -403,6 +408,56 @@ public class WildcatterClientGameTest implements FabricClientGameTest {
 	}
 
 	/** WILDCATTER_ONLY=sceneA,sceneB runs just those scenes while working on them; unset, every scene runs. */
+	/**
+	 * A long readout on the screen (Built From Scratch ep 3: the game's one line ran off both edges and was gone in three seconds): a
+	 * pumpjack's readout sent to the action bar as the power meter sends it is drawn wrapped onto several lines, each inside the screen,
+	 * the words all there, and is still up five seconds later; a short message is left to the game's own line.
+	 */
+	private void readout(ClientGameTestContext context, TestServerContext server) {
+		int x = -120, z = -120;
+		int ground = server.computeOnServer(srv -> {
+			srv.overworld().getChunk(x >> 4, z >> 4);   // generated, so the height is the ground's
+			return srv.overworld().getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+		});
+		server.runCommand("fill " + (x - 4) + " " + ground + " " + (z - 4) + " " + (x + 10) + " " + (ground + 10) + " " + (z + 4) + " minecraft:air");
+		server.runCommand("fill " + (x - 4) + " " + (ground - 1) + " " + (z - 4) + " " + (x + 10) + " " + (ground - 1) + " " + (z + 4) + " minecraft:stone");
+		BlockPos main = new BlockPos(x, ground, z);
+		placeBig(server, WildcatterBlocks.PUMPJACK, main, net.minecraft.core.Direction.WEST);
+		server.runCommand("tp @p " + (x + 3) + " " + ground + " " + (z + 9) + " 180 10");
+		server.runCommand("time set day");
+		context.waitTicks(40);
+		String text = server.computeOnServer(srv -> {
+			Component reading = ((Inspectable) dev.wildcatter.multiblock.BigParts.entity(srv.overworld(), main)).inspect();
+			srv.getPlayerList().getPlayers().get(0).sendOverlayMessage(reading);   // as the power meter sends it
+			return reading.getString();
+		});
+		context.waitTicks(10);
+		int gw = context.computeOnClient(c -> c.getWindow().getGuiScaledWidth());
+		int wide = context.computeOnClient(c -> c.font.width(text));
+		check(wide > gw, "the pumpjack's readout should be wider than the screen for this check (" + wide + " of " + gw + "): " + text);
+		List<String> lines = context.computeOnClient(c -> dev.wildcatter.client.ReadoutOverlay.shown(gw));
+		check(lines.size() > 1, "a readout wider than the screen should be drawn on several lines: " + lines);
+		for (String line : lines) {
+			int w = context.computeOnClient(c -> c.font.width(line));
+			check(w <= gw - 16, "each line of the readout should sit inside the screen (" + w + " of " + gw + "): " + line);
+		}
+		check(String.join("", lines).replace(" ", "").equals(text.replace(" ", "")), "every word of the readout should be shown: " + lines + " | " + text);
+		context.takeScreenshot("wildcatter-readout-wrapped");
+		context.waitTicks(100);   // five seconds: past the game's own three
+		check(!context.computeOnClient(c -> dev.wildcatter.client.ReadoutOverlay.shown(gw)).isEmpty(), "a long readout should still be up after five seconds");
+		context.takeScreenshot("wildcatter-readout-held");
+		server.computeOnServer(srv -> {
+			srv.getPlayerList().getPlayers().get(0).sendOverlayMessage(Component.literal("Breaker: on"));
+			return true;
+		});
+		context.waitTicks(5);
+		check(context.computeOnClient(c -> dev.wildcatter.client.ReadoutOverlay.shown(gw)).isEmpty(), "a short message should be the game's own line");
+		System.out.println("[wildcatter-client-test] readout ok: " + lines.size() + " lines at gui width " + gw + ": " + lines);
+		server.runCommand("fill " + (x - 4) + " " + ground + " " + (z - 4) + " " + (x + 10) + " " + (ground + 10) + " " + (z + 4) + " minecraft:air");
+		server.runCommand("tp @p 10 " + up + " 10");
+		context.waitTicks(20);
+	}
+
 	private static boolean only(String scene) {
 		String only = System.getenv("WILDCATTER_ONLY");
 		return only == null || only.isBlank() || java.util.Arrays.asList(only.split(",")).contains(scene);

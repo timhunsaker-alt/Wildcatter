@@ -23,6 +23,9 @@ public final class WildcatterNeoForgeClient {
 	public static void init(IEventBus modBus) {
 		modBus.addListener(FMLClientSetupEvent.class, event -> WildcatterClient.init());
 		modBus.addListener(EntityRenderersEvent.RegisterRenderers.class, event -> WildcatterClient.renderers(event::registerBlockEntityRenderer));
+		// a long readout wrapped onto several lines and held long enough to read (ReadoutOverlay); a short one is the game's own line
+		modBus.addListener(net.neoforged.neoforge.client.event.RegisterGuiLayersEvent.class, event -> event.wrapLayer(net.neoforged.neoforge.client.gui.VanillaGuiLayers.OVERLAY_MESSAGE,
+				old -> (graphics, delta) -> dev.wildcatter.client.ReadoutOverlay.draw(graphics, () -> old.render(graphics, delta))));
 		modBus.addListener(net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent.class,
 				event -> {
 					event.registerSpriteSet(dev.wildcatter.WildcatterParticles.STEAM_PLUME, dev.wildcatter.client.SteamPlumeParticle.Provider::new);

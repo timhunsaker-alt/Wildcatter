@@ -2,9 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "pattern": [
-    "SPS",
+    "PSP",
     "S S",
-    "SPS"
+    "PSP"
   ],
   "key": {
     "S": "wildcatter:steel_ingot",

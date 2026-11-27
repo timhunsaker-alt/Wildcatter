@@ -4,12 +4,12 @@
   "pattern": [
     "SPS",
     "S S",
-    "SXS"
+    "SHS"
   ],
   "key": {
     "S": "wildcatter:steel_ingot",
     "P": "wildcatter:gas_line",
-    "X": "minecraft:piston"
+    "H": "minecraft:hopper"
   },
   "result": {
     "id": "wildcatter:vacuum_crystallizer",

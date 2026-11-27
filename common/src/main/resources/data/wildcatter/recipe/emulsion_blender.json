@@ -4,13 +4,14 @@
   "pattern": [
     "SHS",
     "PXP",
-    "SSS"
+    "SCS"
   ],
   "key": {
     "S": "wildcatter:steel_ingot",
     "H": "minecraft:hopper",
     "P": "wildcatter:gas_line",
-    "X": "minecraft:piston"
+    "X": "minecraft:piston",
+    "C": "minecraft:copper_ingot"
   },
   "result": {
     "id": "wildcatter:emulsion_blender",

@@ -4,13 +4,13 @@
   "pattern": [
     "SGS",
     "SRS",
-    "SCS"
+    "SDS"
   ],
   "key": {
     "S": "wildcatter:steel_ingot",
     "G": "minecraft:glass_pane",
     "R": "minecraft:comparator",
-    "C": "minecraft:copper_ingot"
+    "D": "minecraft:redstone"
   },
   "result": {
     "id": "wildcatter:bus_relay_panel",

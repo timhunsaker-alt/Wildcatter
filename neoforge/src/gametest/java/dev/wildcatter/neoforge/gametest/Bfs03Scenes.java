@@ -57,6 +57,9 @@ import net.minecraft.world.level.block.Blocks;
  * dry-type, the seismograph, the pistons and the rig, steel pipe, the pumpjack, the lease's parts and the stock tank. The stock tank's
  * old grid (eight steel round an empty middle) was also the dry storage canister's, the fuel tank's and the 48Y cylinder's, and gave a
  * canister.</li>
+ * <li>{@code bfs03_big_part_grounded}: a ground rod against a cell of the rig, and of the pumpjack, that is not its main cell (and not
+ * beside it) grounds the machine: its readout says grounded, where before the fix it said UNGROUNDED (the search began only at the main
+ * cell, as the episode's rod against the rig's skid and the pumpjack's terminal box showed).</li>
  * </ul>
  */
 final class Bfs03Scenes {
@@ -69,6 +72,7 @@ final class Bfs03Scenes {
 		out.put("bfs03_seismograph", Bfs03Scenes::seismograph);
 		out.put("bfs03_pumpjack_on_wellhead", Bfs03Scenes::pumpjackOnWellhead);
 		out.put("bfs03_recipes", Bfs03Scenes::recipes);
+		out.put("bfs03_big_part_grounded", Bfs03Scenes::bigPartGrounded);
 		return out;
 	}
 
@@ -239,6 +243,56 @@ final class Bfs03Scenes {
 		var oldRecipe = server.getRecipeManager().getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING, old, helper.getLevel());
 		check(helper, oldRecipe.map(r -> !r.value().assemble(old).is(item("wildcatter:stock_tank"))).orElse(true), "eight steel round an empty middle should not give a stock tank");
 		log("bfs03_recipes", "ok: " + ok);
+		helper.succeed();
+	}
+
+	// ---- a rod against any cell of a big part grounds it ---------------------------------------------------------------------------------
+
+	static void bigPartGrounded(GameTestHelper helper) {
+		String scene = "bfs03_big_part_grounded";
+		GridSceneKit.floor(helper, -18, -10, 18, 10);
+		for (int x = -18; x <= 18; x++) {
+			for (int z = -10; z <= 10; z++) {
+				for (int y = 1; y <= 14; y++) {
+					helper.setBlock(new BlockPos(x, y, z), Blocks.AIR);
+				}
+			}
+		}
+		StringBuilder ok = new StringBuilder();
+		for (Block machine : List.of(WildcatterBlocks.DRILLING_RIG, WildcatterBlocks.PUMPJACK)) {
+			int mx = machine == WildcatterBlocks.DRILLING_RIG ? -10 : 4;
+			GridSceneKit.place(helper, machine, mx, 1, 0, Direction.WEST);
+			BlockPos main = helper.absolutePos(new BlockPos(mx, 1, 0));
+			List<BlockPos> cells = dev.wildcatter.multiblock.BigParts.cells(main, helper.getLevel().getBlockState(main));
+			String before = GridSceneKit.read(helper, mx, 1, 0);
+			check(helper, before.contains("UNGROUNDED"), machine + " with no rod should read UNGROUNDED: " + before);
+			// a free spot on the floor against a ground-level cell, as far from the main cell as the part goes
+			BlockPos rod = null, against = null;
+			for (BlockPos cell : cells) {
+				if (cell.getY() != main.getY() || cell.equals(main)) {
+					continue;
+				}
+				for (Direction side : Direction.Plane.HORIZONTAL) {
+					BlockPos spot = cell.relative(side);
+					if (cells.contains(spot) || spot.distManhattan(main) <= 1 || !helper.getLevel().getBlockState(spot).isAir()) {
+						continue;
+					}
+					if (rod == null || spot.distManhattan(main) > rod.distManhattan(main)) {
+						rod = spot;
+						against = cell;
+					}
+				}
+			}
+			check(helper, rod != null, machine + " should have a free spot against a cell other than its main one");
+			helper.getLevel().setBlock(rod, WildcatterBlocks.GROUND_ROD.defaultBlockState(), 3);
+			String after = GridSceneKit.read(helper, mx, 1, 0);
+			check(helper, after.endsWith("grounded") && !after.contains("UNGROUNDED"),
+					machine + " with a rod at " + helper.relativePos(rod) + " against its cell " + helper.relativePos(against) + " should read grounded: " + after);
+			check(helper, dev.wildcatter.safety.Grounding.isGrounded(helper.getLevel(), against), "asked at the cell the rod touches, it is grounded too");
+			ok.append(machine.getDescriptionId()).append(" rod ").append(helper.relativePos(rod)).append(" against ").append(helper.relativePos(against))
+					.append(" (main ").append(helper.relativePos(main)).append(", ").append(cells.size()).append(" cells); ");
+		}
+		log(scene, "ok: " + ok);
 		helper.succeed();
 	}
 

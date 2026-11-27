@@ -103,7 +103,7 @@ for name in PARTS_23B:
 tags(PARTS_23B)
 shaped("choke_manifold", ["SVS", "PVP", "SVS"], {"S": S_, "V": "minecraft:lever", "P": P_}, "choke_manifold")
 shaped("remote_choke_panel", [" G ", "SCS", "SPS"], {"G": "minecraft:glass_pane", "S": S_, "C": "minecraft:comparator", "P": "minecraft:piston"}, "remote_choke_panel")
-shaped("mud_gas_separator", ["SPS", "S S", "SPS"], {"S": S_, "P": P_}, "mud_gas_separator")
+shaped("mud_gas_separator", ["SPS", "SIS", "SPS"], {"S": S_, "P": P_, "I": "minecraft:iron_bars"}, "mud_gas_separator")
 LANG.update({f"block.{ns}.choke_manifold": "Choke Manifold (5,000 psi)", f"block.{ns}.remote_choke_panel": "Remote Choke Panel",
 	f"block.{ns}.mud_gas_separator": "Mud-Gas Separator"})
 

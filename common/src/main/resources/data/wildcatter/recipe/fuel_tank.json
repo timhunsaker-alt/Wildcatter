@@ -4,10 +4,11 @@
   "pattern": [
     "SSS",
     "S S",
-    "SSS"
+    "SPS"
   ],
   "key": {
-    "S": "wildcatter:steel_ingot"
+    "S": "wildcatter:steel_ingot",
+    "P": "wildcatter:gas_line"
   },
   "result": {
     "id": "wildcatter:fuel_tank",

@@ -3,11 +3,12 @@
   "category": "redstone",
   "pattern": [
     "C",
-    "C",
+    "I",
     "C"
   ],
   "key": {
-    "C": "minecraft:copper_ingot"
+    "C": "minecraft:copper_ingot",
+    "I": "minecraft:iron_ingot"
   },
   "result": {
     "id": "wildcatter:ground_rod",

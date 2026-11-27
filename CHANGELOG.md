@@ -16,8 +16,41 @@
 ### Lease
 - **The stock tank has its own recipe:** eight steel round an empty middle was also the dry storage canister's, the fuel tank's and the
   48Y cylinder's grid, and the crafting table gave a dry storage canister, so a stock tank (A stock tank of crude) could not be made by
-  hand. It is now eight steel round a ladder (the tank's ladder and walkway). Proof: `bfs03_recipes`. Other shared grids remain (listed
-  in the Built From Scratch ep 3 notes for a decision).
+  hand. It is now eight steel round a ladder (the tank's ladder and walkway). Proof: `bfs03_recipes`.
+
+### Recipes
+- **Every crafting grid gives one thing:** 29 more groups of recipes shared a grid (27 among Wildcatter's own, and the ground rod with
+  the game's lightning rod, the empty drum with the cauldron), so the table made only one of each. Each now has its own grid; the
+  new scene `recipes_unique` checks every Wildcatter crafting recipe against every crafting recipe loaded, mirrored shapes and tags
+  included. Changed (old and new grids and why in `docs/questions/bfs-fixes2.md`, current grids in `docs/recipes.md`):
+  - LiOH crystallizer: a hopper at the bottom in place of the piston. Aux feed pump: a copper ingot at the bottom middle.
+  - LFP kiln: bricks in place of the bottom pipe. Magnesia chlorinator and titanium chlorinator: two pipes in the bottom corners.
+  - Turbine generator: steel pipes in the bottom corners (the alternator keeps its grid).
+  - Mud-gas separator: iron bars in the middle. Side strippers: pipes in the four corners. AN neutraliser: a cauldron in the middle.
+  - Potash dissolver: a copper ingot in place of the bottom pipe. Emulsion blender: a copper ingot at the bottom middle.
+  - 480 V busway: two iron ingots in its bottom corners. Generator bus duct: bricks in the corners (porcelain standoffs).
+  - Generator bus relay panel: redstone in place of the copper.
+  - IDR kiln, HCl synthesis unit, VPSA oxygen unit, cracked gas compressor: two pipes in the top corners.
+  - Caustic evaporator and RHR pump: two pipes in the bottom corners. TiCl4 purification: a furnace at the bottom middle.
+  - UF6 distillation columns: a second pipe in the middle. Hafnium column: bricks either side of its furnace.
+  - Exhaust silencer: iron bars in the middle. Rod welder: a steel pipe at the bottom middle.
+  - Empty 48Y cylinder: a copper ingot at the bottom middle; empty 30B cylinder: a copper ingot at the top middle (their valves).
+  - Sub-base fuel tank: a steel pipe at the bottom middle. Equipment hatch: an iron door in place of the iron block.
+  - Submerged arc furnace and nickel electric furnace: copper ingots in the top corners (electrodes).
+  - Vacuum crystallizer: a hopper in place of the piston. Top drive: a chain at the top middle.
+  - Empty drum: an iron nugget in the top middle (a closed drum with a bung).
+  - Ground rod: copper, iron, copper in a column (copper-clad); three copper in a column is the lightning rod again.
+  - IEC 60309 red 63 A receptacle: two iron ingots (one iron with four copper and red dye was the 480 V red wire's).
+
+### Grounding
+- **A ground rod against any cell of a big part grounds it:** grounding was searched only from the cell asked about (a big part's main
+  cell for its readout), so the rig and the pumpjack read UNGROUNDED, and could shock, with a rod against their skid or terminal box. The
+  search now starts from every cell of the machine; a one-block machine's search is unchanged. Proof: `bfs03_big_part_grounded`.
+
+### Readouts
+- **Long readouts wrap and stay up:** the action bar drew a machine's readout as one line that ran off both edges of the screen and faded
+  after three seconds. A message wider than the screen is now drawn on several centred lines over a dark band and held 2 s plus 40 ms a
+  character (at most 12 s); shorter messages are the game's own line. Both loaders. Proof: Fabric client scene `readout`.
 
 ## v0.10.2 (2026-11-26): the quest book checked for a fresh world
 

@@ -3,11 +3,12 @@
   "category": "redstone",
   "pattern": [
     "S",
-    "S",
+    "B",
     "S"
   ],
   "key": {
-    "S": "wildcatter:steel_ingot"
+    "S": "wildcatter:steel_ingot",
+    "B": "minecraft:iron_bars"
   },
   "result": {
     "id": "wildcatter:exhaust_stack",

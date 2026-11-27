@@ -4,10 +4,11 @@
   "pattern": [
     "SSS",
     "S S",
-    "SSS"
+    "SCS"
   ],
   "key": {
-    "S": "wildcatter:steel_ingot"
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_ingot"
   },
   "result": {
     "id": "wildcatter:empty_48y_cylinder",

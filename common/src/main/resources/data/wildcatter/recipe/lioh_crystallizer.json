@@ -4,13 +4,13 @@
   "pattern": [
     "SPS",
     "SCS",
-    "SXS"
+    "SHS"
   ],
   "key": {
     "S": "wildcatter:steel_ingot",
     "P": "wildcatter:gas_line",
     "C": "minecraft:copper_block",
-    "X": "minecraft:piston"
+    "H": "minecraft:hopper"
   },
   "result": {
     "id": "wildcatter:lioh_crystallizer",

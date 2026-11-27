@@ -2,12 +2,13 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "pattern": [
-    "SHS",
+    "CHC",
     "BFB",
     "SBS"
   ],
   "key": {
     "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_ingot",
     "H": "minecraft:hopper",
     "B": "minecraft:bricks",
     "F": "minecraft:blast_furnace"

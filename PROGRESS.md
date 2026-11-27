@@ -2505,3 +2505,15 @@ From the quest check in `videos/longform/built-from-scratch/QUEST_CHECK.md`; dec
   LIMITED), the second only `mv_span_flashover` (the insulator not shattered), both scenes already known as flaky. Each passed in the
   other full run and again in its own batch (`casing_lot`, `oil_mud`, `choke_kill`, `gas_storage`, `frasch`: 6 of 6;
   `span_burns`, `mv_span_flashover`, `house_earth`: 4 of 4). The quest and rule scenes pass. The Fabric client suite was not run.
+
+## Built From Scratch fixes 2 (2026-11-26; branch `bfs-fixes2`)
+From filming episode 3; decisions in `docs/questions/bfs-fixes2.md`.
+- **Recipes:** every crafting grid gives one thing: 36 recipes given their own grid (29 groups that shared one, two of them with the
+  game's lightning rod and cauldron); `docs/recipes.md` holds the rule and the grids changed.
+- **Grounding:** `Grounding.isGrounded` starts from every cell of a big part, so a rod against the rig's skid or the pumpjack's box
+  grounds it.
+- **Readouts:** `ReadoutOverlay` wraps an action-bar message wider than the screen onto several lines and holds it long enough to read
+  (both loaders).
+- **Tests:** NeoForge `recipes_unique` (44 colliding pairs before, none after) and `bfs03_big_part_grounded`; Fabric client `readout`.
+- **Known gaps:** `casing_lot`, `well_control`, `blowout` and `oil_mud` still search seeds for a deep field under a fixed hole and can fail when the
+  hole is near a deep cell's edge (rerun).

@@ -2,12 +2,13 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "pattern": [
-    "S S",
+    "SCS",
     "S S",
     "SSS"
   ],
   "key": {
-    "S": "wildcatter:steel_ingot"
+    "S": "wildcatter:steel_ingot",
+    "C": "minecraft:copper_ingot"
   },
   "result": {
     "id": "wildcatter:empty_30b_cylinder",
