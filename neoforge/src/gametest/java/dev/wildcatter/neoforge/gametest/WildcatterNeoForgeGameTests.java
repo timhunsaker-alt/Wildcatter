@@ -115,6 +115,7 @@ public class WildcatterNeoForgeGameTests {
 		QUEST_SCENES.putAll(Bfs01Scenes.scenes());   // Built From Scratch ep 1: the Getting started chapter and steel in the blast furnace
 		QUEST_SCENES.putAll(Bfs03Scenes.scenes());   // Built From Scratch ep 3: the seismograph's readings and Find a field
 		QUEST_SCENES.putAll(Bfs04Scenes.scenes());   // Built From Scratch ep 4: the episode's crafting grids
+		QUEST_SCENES.putAll(Bfs05Scenes.scenes());   // Built From Scratch ep 5: the episode's crafting grids
 		QUEST_SCENES.putAll(RecipeScenes.scenes());   // no two crafting recipes give different things for the same grid
 	}
 	/** Phase 21.2's milestone scenes (QuestScenes.machineScenes): a plant each, so room round them and time for a set to start. */
@@ -124,8 +125,12 @@ public class WildcatterNeoForgeGameTests {
 		QUEST_MACHINE_SCENES.putAll(Bfs02Scenes.scenes());   // Built From Scratch ep 2: the First power chapter on the episode's layout
 		QUEST_MACHINE_SCENES.putAll(Bfs03Scenes.machineScenes());
 		QUEST_MACHINE_SCENES.putAll(Bfs04Scenes.machineScenes());   // Built From Scratch ep 4: the gas genset, the rig on a starter, the pole line
+		QUEST_MACHINE_SCENES.putAll(Bfs05Scenes.machineScenes());   // Built From Scratch ep 5: the unit substation in the stand-in's place, feeding the line
 		QUEST_MACHINE_SCENES.putAll(WireLookScenes.scenes());   // single-phase cable, sizes drawn, the undersized warning, fittings on placement   // Built From Scratch ep 3: the lease on the dry-type, no flare then a flare, crude
 	}
+
+	/** Built From Scratch ep 5's steam plant from cold (Bfs05Scenes.longScenes): its 5 minute heat-up and the drum filled in normal play. */
+	private static final java.util.Map<String, Consumer<GameTestHelper>> BFS_LONG_SCENES = Bfs05Scenes.longScenes();
 
 	/** The residence holds' scene (ResidenceScenes): in a batch whose world has realResidenceTimes on. */
 	private static final java.util.Map<String, Consumer<GameTestHelper>> RESIDENCE_SCENES = ResidenceScenes.scenes();
@@ -185,6 +190,7 @@ public class WildcatterNeoForgeGameTests {
 			TRACK_17C_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			QUEST_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 			QUEST_MACHINE_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
+			BFS_LONG_SCENES.forEach((name, scene) -> helper.register(id(name), scene));
 		}));
 		modBus.addListener(RegisterCapabilitiesEvent.class, event -> event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, entity, side) -> STORAGE, Blocks.GOLD_BLOCK));
 		modBus.addListener(RegisterGameTestsEvent.class, event -> {
@@ -244,6 +250,11 @@ public class WildcatterNeoForgeGameTests {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
 						new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 1200, 1, true,
 								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 140)));
+			}
+			for (String scene : BFS_LONG_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
+				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),
+						new TestData<>(plain, net.minecraft.world.level.Level.OVERWORLD, Identifier.withDefaultNamespace("empty"), 24000, 1, true,
+								net.minecraft.world.level.block.Rotation.NONE, false, 1, 1, false, 60)));
 			}
 			for (String scene : RULE_SCENES.keySet().stream().filter(WildcatterNeoForgeGameTests::only).toList()) {
 				event.registerTest(id(scene), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(scene)),

@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Changes (Built From Scratch ep 5, Tim 2026-11-27)
+- **The steam plant may be started on a small steam set through a dry-type, as well as on a genset:** the quest text and the Field
+  Manual's steam plant page say so. The feed pump needs the industrial tier before the plant can start, and without three-phase cable
+  (plastic) a genset's power reaches only what touches it. Proofs: `bfs05_steam_plant` (the plant from cold, lit with the starting set
+  cold: the drum stays dry; with it running, the feed pump fills the drum and the plant runs) and `bfs05_unit_sub_line` (a unit
+  substation fed from its 480 V side feeds the pole line through a bare medium-voltage wire beside the first insulator).
+
 ### Fixes (Built From Scratch ep 4)
 - **The Field Manual's drilling page no longer sends the rig through a 60 A breaker:** a 60 A three-pole breaker ahead of the rig trips
   on its start (six times its 45 A for two seconds); the page now says to start the rig from a motor starter against its terminal box,
