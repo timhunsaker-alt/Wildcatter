@@ -1753,6 +1753,7 @@ final class Bfs05Episode {
 		walkGround(-466, 990);
 		at(0.75);
 		meter(RISER[2]);   // read from three blocks away: a bare medium-voltage wire shocks within two
+		context.waitTicks(80);   // the reading held on screen (the edit cuts to it: make_spec CUT_TO)
 		settle();
 		stopFilm();
 		log("the line fed: insulator " + reading(INS1) + " | lamps " + java.util.Arrays.stream(LAMPS).map(l -> state(l).toString()).toList());
@@ -1968,10 +1969,17 @@ final class Bfs05Episode {
 		hold(Items.IRON_PICKAXE);
 		dig(WATER, 40);
 		at(0.20);
+		// the bucket poured from the hole's edge, looking steeply down into it: from further back the look grazes the grass beside the
+		// hole and the water lands on top of the ground and spreads (take 1)
+		walkGround(WATER.getX(), WATER.getZ() + 1);
 		hold(Items.WATER_BUCKET);
-		face(Vec3.atCenterOf(WATER).add(0, -0.45, 0), 10);
+		face(Vec3.atCenterOf(WATER).add(0, -0.45, -0.1), 10);
 		useHeld();   // a bucket pours where the player looks
-		mark("water: " + state(WATER));
+		context.waitTicks(4);
+		mark("water: " + state(WATER) + " | above it " + state(WATER.above()) + " | beside " + state(WATER.south().above()));
+		if (!state(WATER).getFluidState().isSource() || !state(WATER.south().above()).getFluidState().isEmpty()) {
+			throw new IllegalStateException("the water did not go into the hole: " + state(WATER) + ", " + state(WATER.south().above()));
+		}
 		at(0.36);
 		sneakPut(item("wildcatter:pump"), SMALL, Direction.EAST);
 		mark("water pump: " + state(PUMP));
@@ -2022,7 +2030,8 @@ final class Bfs05Episode {
 			}
 		}
 		log(String.format(Locale.ROOT, "off camera: %.0f s of filling (%s -> %s)", (clientTicks - t0) / 20.0, at0, reading(GEN)));
-		standAt(new BlockPos(-474, S, 966), Vec3.atCenterOf(TURBINE).add(0, 1, 0));
+		standAt(new BlockPos(-471, S, 970), Vec3.atCenterOf(TURBINE).add(0, 0.5, 0));   // from the east: the turbine and the generator behind it
+		context.waitTicks(20);
 		startFilm(n, "roll");
 		cue("P25");
 		mark("the plant: " + reading(GEN));
@@ -2179,7 +2188,7 @@ final class Bfs05Episode {
 		droneAt(n, "context", GEN, cam(24.0, 26.0, 22.0, 2.0, 0.0, 8.0), cam(8.0, 26.0, 28.0, 2.0, 0.0, 8.0), "P02");
 		// the outro: low from the south-west at sunset
 		server.runCommand("time set 12500");
-		droneAt(n, "outro", GEN, cam(-10.0, 4.0, 14.0, 2.0, 2.0, 0.0), cam(-12.0, 4.5, 9.0, 2.0, 2.0, 0.0), "outro");
+		droneAt(n, "outro", GEN, cam(14.0, 5.0, -10.0, 1.0, 1.5, 1.0), cam(12.0, 5.5, -5.0, 1.0, 1.5, 1.0), "outro");
 		survival();
 		log("at the end: plant " + reading(GEN) + " | GSU " + reading(GSU) + " | set " + reading(PANEL) + " | unit " + reading(UNIT) + " | main " + reading(MAIN)
 				+ " | small set " + reading(SMALL) + " | feed pump " + reading(FEED) + " | lamps " + java.util.Arrays.stream(LAMPS).map(l -> state(l).toString()).toList());
